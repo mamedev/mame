@@ -323,7 +323,7 @@ private:
 	tilemap_t *m_tilemap_B_cache_16[3];
 	tilemap_t *m_tilemap_A;
 	tilemap_t *m_tilemap_B;
-	bitmap_ind16 *m_work_bitmap;
+	bitmap_ind16 m_work_bitmap;
 
 	void HandleYGV608Reset();
 	void HandleRomTransfers();

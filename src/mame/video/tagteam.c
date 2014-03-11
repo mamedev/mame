@@ -35,11 +35,10 @@ static const res_net_decode_info tagteam_decode_info =
 PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &tagteam_decode_info, &tagteam_net_info);
+	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb, 0x20);
-	auto_free(machine(), rgb);
 }
 
 

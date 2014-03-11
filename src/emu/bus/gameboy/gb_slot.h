@@ -117,7 +117,7 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
@@ -139,7 +139,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,gb,gbc"; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -180,7 +180,7 @@ public:
 	virtual const char *file_extensions() const { return "bin"; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 };
 
 

@@ -1443,7 +1443,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 void namco_c45_road_device::device_start()
 {
 	// create a gfx_element describing the road graphics
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),

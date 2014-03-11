@@ -1587,7 +1587,6 @@ ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool inver
 ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value defvalue, ioport_value maskbits, const char *name)
 	: m_next(NULL),
 		m_port(port),
-		m_live(NULL),
 		m_modcount(port.modcount()),
 		m_mask(maskbits),
 		m_defvalue(defvalue & maskbits),
@@ -1638,7 +1637,6 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 
 ioport_field::~ioport_field()
 {
-	global_free(m_live);
 }
 
 
@@ -2263,7 +2261,7 @@ void ioport_field::init_live_state(analog_field *analog)
 	m_crosshair_mapper.bind_relative_to(device());
 
 	// allocate live state
-	m_live = global_alloc(ioport_field_live(*this, analog));
+	m_live.reset(global_alloc(ioport_field_live(*this, analog)));
 
 	m_condition.initialize(device());
 
@@ -2338,8 +2336,7 @@ ioport_port::ioport_port(device_t &owner, const char *tag)
 		m_device(owner),
 		m_tag(tag),
 		m_modcount(0),
-		m_active(0),
-		m_live(NULL)
+		m_active(0)
 {
 }
 
@@ -2350,7 +2347,6 @@ ioport_port::ioport_port(device_t &owner, const char *tag)
 
 ioport_port::~ioport_port()
 {
-	global_free(m_live);
 }
 
 
@@ -2530,7 +2526,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 
 void ioport_port::init_live_state()
 {
-	m_live = global_alloc(ioport_port_live(*this));
+	m_live.reset(global_alloc(ioport_port_live(*this)));
 }
 
 

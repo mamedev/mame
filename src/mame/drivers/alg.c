@@ -724,7 +724,7 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -735,7 +735,6 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }
@@ -744,7 +743,7 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -754,7 +753,6 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }
@@ -763,7 +761,7 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -775,7 +773,6 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 		dstaddr ^= 0x20000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }

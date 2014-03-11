@@ -67,7 +67,7 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	void install_rom();
 
@@ -88,7 +88,7 @@ public:
 	virtual const char *file_extensions() const { return "gba,bin"; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);

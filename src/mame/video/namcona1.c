@@ -289,9 +289,9 @@ void namcona1_state::video_start()
 	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
 	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
 
-	m_gfxdecode->set_gfx(0, auto_alloc( machine(), gfx_element(m_palette, cg_layout_8bpp, (UINT8 *)m_cgram, m_palette->entries()/256, 0 )));
-	m_gfxdecode->set_gfx(1, auto_alloc( machine(), gfx_element(m_palette, cg_layout_4bpp, (UINT8 *)m_cgram, m_palette->entries()/16, 0 )));
-	m_gfxdecode->set_gfx(2, auto_alloc( machine(), gfx_element(m_palette, shape_layout, (UINT8 *)m_shaperam, m_palette->entries()/2, 0 )));
+	m_gfxdecode->set_gfx(0, global_alloc( gfx_element(m_palette, cg_layout_8bpp, (UINT8 *)m_cgram, m_palette->entries()/256, 0 )));
+	m_gfxdecode->set_gfx(1, global_alloc( gfx_element(m_palette, cg_layout_4bpp, (UINT8 *)m_cgram, m_palette->entries()/16, 0 )));
+	m_gfxdecode->set_gfx(2, global_alloc( gfx_element(m_palette, shape_layout, (UINT8 *)m_shaperam, m_palette->entries()/2, 0 )));
 
 } /* namcona1_vh_start */
 

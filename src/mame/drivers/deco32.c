@@ -3641,7 +3641,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3652,8 +3652,6 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
-
-	auto_free(machine(), tmp);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -3662,7 +3660,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3673,8 +3671,6 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
-
-	auto_free(machine(), tmp);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine(), "gfx2");

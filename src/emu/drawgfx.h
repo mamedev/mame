@@ -452,9 +452,8 @@ public:
 	static void static_set_palette(device_t &device, const char *tag);
 
 	gfx_element * gfx(int index) { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }	
-	gfx_element ** gfx() { return m_gfx; }	
 	
-	void set_gfx(int index, gfx_element * val) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = val; }	
+	void set_gfx(int index, gfx_element * val) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index].reset(val); }	
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -465,7 +464,7 @@ private:
 	// configuration state
 	palette_device *        m_palette;
 	const gfx_decode_entry *m_gfxdecodeinfo;            // pointer to array of graphics decoding information
-	gfx_element *           m_gfx[MAX_GFX_ELEMENTS];		// array of pointers to graphic sets (chars, sprites)
+	auto_pointer<gfx_element> m_gfx[MAX_GFX_ELEMENTS];		// array of pointers to graphic sets (chars, sprites)
 };
 
 // device type iterator

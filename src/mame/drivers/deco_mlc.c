@@ -801,7 +801,7 @@ void deco_mlc_state::descramble_sound(  )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 
 	UINT32 x;
 
@@ -820,8 +820,6 @@ void deco_mlc_state::descramble_sound(  )
 	}
 
 	memcpy(rom,buf1,length);
-
-	auto_free(machine(), buf1);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)

@@ -473,7 +473,7 @@ public:
 									*prev;
 	};
 
-	unsigned char *buffer;
+	dynamic_buffer buffer;
 	unsigned int head,
 								tail,
 								in,
@@ -494,14 +494,12 @@ public:
 			marker_tail(NULL)
 	{
 		buffer_size=sector_size*num_sectors;
-		buffer=new unsigned char [buffer_size];
-		memset(buffer,0,buffer_size);
+		buffer.resize_and_clear(buffer_size);
 	}
 
 	~stream_buffer()
 	{
 		flush_all();
-		global_free(buffer);
 	}
 
 	unsigned char *add_sector(const unsigned int sector)
@@ -594,10 +592,10 @@ public:
 	unsigned int get_bytes_in() const { return in; }
 	unsigned int get_bytes_free() const { return buffer_size-in; }
 
-	unsigned char *get_tail_ptr() const { return buffer+tail; }
-	unsigned char *get_tail_ptr(const unsigned int offset) const
+	unsigned char *get_tail_ptr() { return &buffer[tail]; }
+	unsigned char *get_tail_ptr(const unsigned int offset)
 	{
-		return buffer+((tail+offset)%buffer_size);
+		return &buffer[((tail+offset)%buffer_size)];
 	}
 	unsigned int get_tail_offset() const { return tail; }
 	void increment_tail(const unsigned int offset)
@@ -1003,7 +1001,7 @@ void spu_device::device_start()
 	save_item(NAME(xa_buffer->sector_size));
 	save_item(NAME(xa_buffer->num_sectors));
 	save_item(NAME(xa_buffer->buffer_size));
-	save_pointer(NAME(xa_buffer->buffer), xa_sector_size*xa_buffer_sectors);
+	save_item(NAME(xa_buffer->buffer));
 
 	save_item(NAME(cdda_buffer->head));
 	save_item(NAME(cdda_buffer->tail));
@@ -1011,7 +1009,7 @@ void spu_device::device_start()
 	save_item(NAME(cdda_buffer->sector_size));
 	save_item(NAME(cdda_buffer->num_sectors));
 	save_item(NAME(cdda_buffer->buffer_size));
-	save_pointer(NAME(cdda_buffer->buffer), cdda_sector_size*cdda_buffer_sectors);
+	save_item(NAME(cdda_buffer->buffer));
 }
 
 void spu_device::device_reset()
@@ -1082,16 +1080,16 @@ void spu_device::device_post_load()
 void spu_device::device_stop()
 {
 	for (unsigned int i=0; i<4; i++)
-		global_free(output_buf[i]);
+		global_free_array(output_buf[i]);
 
 	kill_stream();
 
-	global_free(spu_ram);
+	global_free_array(spu_ram);
 	invalidate_cache(0,spu_ram_size);
-	global_free(cache);
+	global_free_array(cache);
 	global_free(xa_buffer);
 	global_free(cdda_buffer);
-	global_free(voice);
+	global_free_array(voice);
 }
 //
 //

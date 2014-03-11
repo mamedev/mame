@@ -72,6 +72,7 @@ private:
 class cli_frontend
 {
 	typedef tagmap_t<FPTR> int_map;
+
 public:
 	// construction/destruction
 	cli_frontend(cli_options &options, osd_interface &osd);
@@ -107,12 +108,13 @@ private:
 	void execute_commands(const char *exename);
 	void display_help();
 	void display_suggestions(const char *gamename);
-	void output_single_softlist(FILE *out,software_list *list, const char *listname);
+	void output_single_softlist(FILE *out, software_list_device &swlist);
 
 	// internal state
 	cli_options &       m_options;
 	osd_interface &     m_osd;
 	int                 m_result;
+	UINT64				m_start_memory;
 };
 
 

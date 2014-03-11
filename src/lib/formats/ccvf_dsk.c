@@ -90,11 +90,11 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const format &f = formats[0];
 
 	UINT64 size = io_generic_size(io);
-	UINT8 *img = global_alloc_array(UINT8, size);
+	dynamic_buffer img(size);
 	io_generic_read(io, img, 0, size);
 
-	astring ccvf = astring((const char *)img, size);
-	UINT8 *bytes = global_alloc_array(UINT8, 78720);
+	astring ccvf = astring((const char *)&img[0], size);
+	dynamic_buffer bytes(78720);
 
 	int start = 0, end = 0;
 	astring line;
@@ -119,7 +119,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int total_size = 200000000/f.cell_size;
 	
 	for(int track=0; track < f.track_count; track++) {
-		UINT32 *buffer = global_alloc_array_clear(UINT32, total_size);
+		dynamic_array<UINT32> buffer(total_size);
 		int offset = 0;
 	
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
@@ -137,13 +137,9 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		}
 
 		generate_track_from_levels(track, 0, buffer, total_size, 0, image);
-		global_free(buffer);
 	}
 
 	image->set_variant(f.variant);
-
-	global_free(bytes);
-	global_free(img);
 
 	return true;
 }

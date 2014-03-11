@@ -394,7 +394,7 @@ DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 {
 	UINT32 length;
-	UINT8 *temp_copy;
+	dynamic_buffer temp_copy;
 	UINT16 *ROM16;
 	UINT32 *ROM32;
 	int i;
@@ -402,13 +402,13 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 	if (image.software_entry() == NULL)
 	{
 		length = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, length);
+		temp_copy.resize(length);
 		image.fread(temp_copy, length);
 	}
 	else
 	{
 		length = image.get_software_region_length("rom");
-		temp_copy = auto_alloc_array(machine(), UINT8, length);
+		temp_copy.resize(length);
 		memcpy(temp_copy, image.get_software_region("rom"), length);
 	}
 
@@ -425,8 +425,6 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 	ROM16 = (UINT16 *) memregion("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
-
-	auto_free(machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }

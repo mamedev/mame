@@ -782,7 +782,7 @@ ROM_END
 DRIVER_INIT_MEMBER(toki_state,toki)
 {
 	UINT8 *ROM = memregion("oki")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
+	dynamic_buffer buffer(0x20000);
 	int i;
 
 	memcpy(buffer,ROM,0x20000);
@@ -791,15 +791,13 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 
-	auto_free(machine(), buffer);
-
 	m_seibu_sound->decrypt("audiocpu",0x2000);
 }
 
 
 DRIVER_INIT_MEMBER(toki_state,tokib)
 {
-	UINT8 *temp = auto_alloc_array(machine(), UINT8, 65536 * 2);
+	dynamic_buffer temp(65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
@@ -832,8 +830,6 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-
-	auto_free (machine(), temp);
 }
 
 DRIVER_INIT_MEMBER(toki_state,jujuba)
@@ -872,7 +868,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	{
 		UINT8 *ROM = memregion("oki")->base();
-		UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
+		dynamic_buffer buffer(0x20000);
 		int i;
 
 		memcpy(buffer,ROM,0x20000);
@@ -880,8 +876,6 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		{
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
-
-		auto_free(machine(), buffer);
 	}
 }
 

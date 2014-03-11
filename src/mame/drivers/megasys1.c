@@ -3661,7 +3661,6 @@ void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 {
 	UINT8 *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
-	UINT8 *buffer;
 	int i;
 
 	/* data lines swap: 76543210 -> 64537210 */
@@ -3671,7 +3670,7 @@ void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 				| ((rom[i] & 0x48) << 1)
 				| ((rom[i] & 0x10) << 2);
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer buffer(size);
 
 	memcpy(buffer,rom,size);
 
@@ -3685,22 +3684,19 @@ void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 				| ((i & 0x0008) << 5);
 		rom[i] = buffer[a];
 	}
-
-	auto_free(machine(), buffer);
 }
 
 void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
 	UINT8 *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
-	UINT8 *buffer;
 	int i;
 
 	/* data lines swap: 76543210 -> 43576210 */
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer buffer(size);
 
 	memcpy(buffer,rom,size);
 
@@ -3712,22 +3708,19 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 		rom[i] = buffer[a];
 	}
-
-	auto_free(machine(), buffer);
 }
 
 void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
 	UINT8 *rom = memregion(region)->base();
 	int size = memregion(region)->bytes();
-	UINT8 *buffer;
 	int i;
 
 	/* data lines swap: 76543210 -> 37564210 */
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer buffer(size);
 
 	memcpy(buffer,rom,size);
 
@@ -3739,8 +3732,6 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 		rom[i] = buffer[a];
 	}
-
-	auto_free(machine(), buffer);
 }
 
 /*************************************

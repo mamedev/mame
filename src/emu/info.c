@@ -401,7 +401,7 @@ void info_xml_creator::output_devices()
 			{
 				astring temptag("_");
 				temptag.cat(option->name());
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0);
+				auto_pointer<device_t> dev(const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0));
 
 				// notify this device and all its subdevices that they are now configured
 				device_iterator subiter(*dev);
@@ -413,7 +413,6 @@ void info_xml_creator::output_devices()
 					output_one_device(*dev, temptag.cstr());
 
 				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
-				global_free(dev);
 			}
 		}
 	}

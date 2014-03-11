@@ -274,16 +274,14 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state,uzebox_cart)
 	if (image.software_entry() == NULL)
 	{
 		UINT32 size = image.length();
-		UINT8* data = (UINT8*)auto_alloc_array(machine(), UINT8, size);
+		dynamic_buffer data(size);
 
 		image.fread(data, size);
 
-		if (!strncmp((const char*)data, "UZEBOX", 6))
+		if (!strncmp((const char*)&data[0], "UZEBOX", 6))
 			memcpy(rom, data + 0x200, size - 0x200);
 		else
 			memcpy(rom, data, size);
-
-		auto_free(machine(), data);
 	}
 	else
 	{

@@ -29,8 +29,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_memcard_handler(NULL),
 		m_default_layout(NULL),
 		m_gamedrv(gamedrv),
-		m_options(options),
-		m_root_device(NULL)
+		m_options(options)
 {
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL, NULL);
@@ -89,7 +88,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 machine_config::~machine_config()
 {
-	global_free(m_root_device);
 }
 
 
@@ -145,7 +143,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 
 	// otherwise, allocate the device directly
 	assert(m_root_device == NULL);
-	m_root_device = (*type)(*this, tag, owner, clock);
+	m_root_device.reset((*type)(*this, tag, owner, clock));
 
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = m_root_device->machine_config_additions();

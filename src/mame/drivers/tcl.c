@@ -195,7 +195,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	UINT8 *src = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer src(len);
 
 	int i,idx=0;
 	memcpy(src, dest, len);
@@ -216,7 +216,6 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
 		}
 	}
-	auto_free(machine(), src);
 
 	space.set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
 }

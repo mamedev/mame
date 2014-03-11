@@ -451,9 +451,9 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
  call softlist load
  -------------------------------------------------*/
 
-bool base_gb_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -574,43 +574,46 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-const char * base_gb_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void base_gb_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "rom";
 		UINT32 len = core_fsize(m_file), offset = 0;
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
 
-		if (get_mmm01_candidate(ROM + offset, len - offset))
+		if (get_mmm01_candidate(rom + offset, len - offset))
 			offset += (len - 0x8000);
 
-		type = get_cart_type(ROM + offset, len - offset);
+		type = get_cart_type(rom + offset, len - offset);
 		slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
+		return;
 	}
 
-	return software_get_default_slot(config, options, this, "rom");
+	software_get_default_slot(result, "rom");
 }
 
 
-const char * megaduck_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void megaduck_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
-		return "rom";
+	if (open_image_file(mconfig().options()))
+	{
+		result.cpy("rom");
+		return;
+	}
 
-	return software_get_default_slot(config, options, this, "rom");
+	software_get_default_slot(result, "rom");
 }
 
 

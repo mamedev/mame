@@ -360,9 +360,9 @@ bool cococart_slot_device::call_load()
 //  call_softlist_load
 //-------------------------------------------------
 
-bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool cococart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -372,9 +372,9 @@ bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 //  get_default_card_software
 //-------------------------------------------------
 
-const char * cococart_slot_device::get_default_card_software(const machine_config &devlist, emu_options &options)
+void cococart_slot_device::get_default_card_software(astring &result)
 {
-	return software_get_default_slot(devlist, options, this, "pak");
+	software_get_default_slot(result, "pak");
 }
 
 

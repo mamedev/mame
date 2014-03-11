@@ -1736,11 +1736,10 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
-	UINT8* buffer;
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	buffer = auto_alloc_array(machine, UINT8, gfxregionsize);
+	dynamic_buffer buffer(gfxregionsize);
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
@@ -1749,8 +1748,6 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 	}
 
 	memcpy(gfxregion, buffer, gfxregionsize);
-
-	auto_free (machine, buffer);
 }
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)

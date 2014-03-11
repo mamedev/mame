@@ -229,6 +229,8 @@ asr733_device::asr733_device(const machine_config &mconfig, const char *tag, dev
 	m_token = global_alloc_clear(asr_t);
 }
 
+asr733_device::~asr733_device() { global_free(m_token); }
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

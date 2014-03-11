@@ -41,7 +41,7 @@ int g64_format::identify(io_generic *io, UINT32 form_factor)
 bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
-	UINT8 *img = global_alloc_array(UINT8, size);
+	dynamic_buffer img(size);
 	io_generic_read(io, img, 0, size);
 
 	if (img[VERSION]) {
@@ -74,8 +74,6 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		generate_track_from_bitstream(track, head, &img[track_offset+2], track_size, image);
 	}
 
-	global_free(img);
-
 	image->set_variant(floppy_image::SSSD);
 
 	return true;
@@ -102,6 +100,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	int head = 0;
 	int tracks_written = 0;
 
+	dynamic_buffer trackbuf(TRACK_LENGTH-2);
 	for (int track = 0; track < 84; track++) {
 		offs_t tpos = TRACK_OFFSET + track * 4;
 		offs_t spos = SPEED_ZONE + track * 4;
@@ -113,7 +112,6 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		if (image->get_track_size(track, head) <= 1)
 			continue;
 
-		UINT8 *trackbuf = global_alloc_array(UINT8, TRACK_LENGTH-2);
 		int track_size;
 		int speed_zone;
 
@@ -141,8 +139,6 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		io_generic_write(io, trackbuf, dpos + 2, track_size);
 		
 		tracks_written++;
-
-		global_free(trackbuf);
 	}
 
 	return true;

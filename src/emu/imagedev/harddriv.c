@@ -74,15 +74,7 @@ void harddisk_image_device::device_config_complete()
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
 
-	image_device_format *format = global_alloc_clear(image_device_format);;
-	format->m_index       = 0;
-	format->m_name        = "chd";
-	format->m_description = "CHD Hard drive";
-	format->m_extensions  = "chd,hd";
-	format->m_optspec     = hd_option_spec;
-	format->m_next        = NULL;
-
-	m_formatlist = format;
+	m_formatlist.append(*global_alloc(image_device_format("chd", "CHD Hard drive", "chd,hd", hd_option_spec)));
 
 	// set brief and instance name
 	update_names();

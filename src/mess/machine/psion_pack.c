@@ -94,16 +94,7 @@ void datapack_device::device_start()
 
 void datapack_device::device_config_complete()
 {
-	image_device_format *format = global_alloc_clear(image_device_format);
-
-	format->m_index       = 0;
-	format->m_name        = "opk";
-	format->m_description = "Psion Datapack image";
-	format->m_extensions  = "opk";
-	format->m_optspec     = datapack_option_spec;
-	format->m_next        = NULL;
-
-	m_formatlist = format;
+	m_formatlist.append(*global_alloc(image_device_format("opk", "Psion Datapack image", "opk", datapack_option_spec)));
 
 	// set brief and instance name
 	update_names();

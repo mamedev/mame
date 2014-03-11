@@ -75,7 +75,7 @@ public:
 	UINT8 m_kbd_row;
 	bool m_kbd_irq;
 	UINT8 *m_p_pcgram;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_control_bits;
 	virtual void machine_reset();

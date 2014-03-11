@@ -59,8 +59,8 @@ public:
 	UINT8 m_framecnt;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<const UINT8> m_p_colorram;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_colorram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);

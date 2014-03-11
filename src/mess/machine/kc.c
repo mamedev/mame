@@ -28,7 +28,6 @@ struct kcc_header
 /* load snapshot */
 QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 {
-	UINT8 *data;
 	struct kcc_header *header;
 	UINT16 addr;
 	UINT16 datasize;
@@ -38,20 +37,13 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	/* get file size */
 	UINT64 size = image.length();
 
-	if (size != 0)
-	{
-		/* malloc memory for this data */
-		data = (UINT8 *)auto_alloc_array(machine(), UINT8, size);
-
-		if (data != NULL)
-			image.fread( data, size);
-	}
-	else
-	{
+	if (size == 0)
 		return IMAGE_INIT_FAIL;
-	}
 
-	header = (struct kcc_header *) data;
+	dynamic_buffer data(size);
+	image.fread( data, size);
+
+	header = (struct kcc_header *) &data[0];
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
 	datasize = ((header->end_address_l & 0x0ff) | ((header->end_address_h & 0x0ff)<<8)) - addr;
 	execution_address = (header->execution_address_l & 0x0ff) | ((header->execution_address_h & 0x0ff)<<8);
@@ -72,8 +64,6 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 		// if specified, jumps to the quickload start address
 		m_maincpu->set_pc(execution_address);
 	}
-
-	auto_free(machine(), data);
 
 	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
 

@@ -20,10 +20,10 @@ class wd1770_device : public device_t
 public:
 	wd1770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	wd1770_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~wd1770_device() { global_free(m_token); }
+	virtual ~wd1770_device();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct wd1770_state *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -31,7 +31,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	struct wd1770_state *m_token;
 };
 
 extern const device_type WD1770;

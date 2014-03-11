@@ -124,7 +124,7 @@ READ8_MEMBER(gyruss_state::gyruss_scanline_r)
 }
 
 
-void gyruss_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx )
+void gyruss_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int offs;
 
@@ -139,7 +139,7 @@ void gyruss_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		int flip_x = ~m_spriteram[offs + 2] & 0x40;
 		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		 gfx[gfx_bank]->transpen(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
+		 m_gfxdecode->gfx(gfx_bank)->transpen(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 	}
 }
 
@@ -153,7 +153,7 @@ UINT32 gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 &b
 	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(bitmap, cliprect, m_gfxdecode->gfx());
+	draw_sprites(bitmap, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;

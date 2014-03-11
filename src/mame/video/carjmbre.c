@@ -33,12 +33,11 @@ static const res_net_info carjmbre_net_info =
 PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &carjmbre_decode_info, &carjmbre_net_info);
+	compute_res_net_all(rgb, color_prom, carjmbre_decode_info, carjmbre_net_info);
 	palette.set_pen_colors(0, rgb, 64);
 	palette.palette()->normalize_range(0, 63);
-	auto_free(machine(), rgb);
 }
 
 

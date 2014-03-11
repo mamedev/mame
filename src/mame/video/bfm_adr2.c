@@ -458,9 +458,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 
 	if ( p )
 	{
-		UINT8 *s;
-
-		s = auto_alloc_array(machine(), UINT8, 0x40000 );
+		dynamic_buffer s( 0x40000 );
 		{
 			int x, y;
 
@@ -487,7 +485,6 @@ void bfm_adder2_device::adder2_decode_char_roms()
 				}
 				y++;
 			}
-			auto_free(machine(), s);
 		}
 	}
 }

@@ -861,7 +861,6 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	int i;
 	UINT8 *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
-	UINT8 *buf;
 
 	/* Unscrambling data lines */
 	for ( i = 0; i < memsize; i++ )
@@ -870,14 +869,12 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	}
 
 	/* Unscrambling address lines */
-	buf = auto_alloc_array(machine(), UINT8, memsize);
+	dynamic_buffer buf(memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,15,14,5,6,3,0,12,1,9,13,4,7,10,8,2,11)] = buf[i];
 	}
-
-	auto_free(machine(), buf);
 }
 
 

@@ -370,9 +370,15 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
 	if (index >= stream->chunksalloc)
 	{
 		UINT32 newcount = MAX(index, stream->chunksalloc + 1000);
-		stream->chunk = (avi_chunk_list *)realloc(stream->chunk, newcount * sizeof(stream->chunk[0]));
-		if (stream->chunk == NULL)
+		avi_chunk_list *newchunks = (avi_chunk_list *)malloc(newcount * sizeof(stream->chunk[0]));
+		if (newchunks == NULL)
 			return AVIERR_NO_MEMORY;
+		if (stream->chunk != NULL)
+		{
+			memcpy(newchunks, stream->chunk, stream->chunksalloc * sizeof(stream->chunk[0]));
+			free(stream->chunk);
+		}
+		stream->chunk = newchunks;
 		stream->chunksalloc = newcount;
 	}
 
@@ -446,9 +452,12 @@ INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 	if (length > file->tempbuffersize)
 	{
 		file->tempbuffersize = 2 * length;
-		file->tempbuffer = (UINT8 *)realloc(file->tempbuffer, file->tempbuffersize);
-		if (file->tempbuffer == NULL)
+		UINT8 *newbuffer = (UINT8 *)malloc(file->tempbuffersize);
+		if (newbuffer == NULL)
 			return AVIERR_NO_MEMORY;
+		if (file->tempbuffer != NULL)
+			free(file->tempbuffer);
+		file->tempbuffer = newbuffer;
 	}
 	return AVIERR_NONE;
 }

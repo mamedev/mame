@@ -26,22 +26,30 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct output_notify
+class output_notify
 {
-	output_notify *     next;           /* link to next item */
-	output_notifier_func        notifier;       /* callback to call */
-	void *              param;          /* parameter to pass the callback */
+public:
+	output_notify(output_notifier_func callback, void *param)
+		: m_next(NULL),
+		  m_notifier(callback),
+		  m_param(param) { }
+
+	output_notify *next() const { return m_next; }
+
+	output_notify *     	m_next;           /* link to next item */
+	output_notifier_func    m_notifier;       /* callback to call */
+	void *              	m_param;          /* parameter to pass the callback */
 };
 
 
 struct output_item
 {
 	output_item *       next;           /* next item in list */
-	const char *        name;           /* string name of the item */
+	astring             name;           /* string name of the item */
 	UINT32              hash;           /* hash for this item name */
 	UINT32              id;             /* unique ID for this item */
 	INT32               value;          /* current value */
-	output_notify *     notifylist;     /* list of notifier callbacks */
+	simple_list<output_notify> notifylist;     /* list of notifier callbacks */
 };
 
 
@@ -51,7 +59,7 @@ struct output_item
 ***************************************************************************/
 
 static output_item *itemtable[HASH_SIZE];
-static output_notify *global_notifylist;
+static simple_list<output_notify> global_notifylist;
 static UINT32 uniqueid = 12345;
 
 
@@ -121,11 +129,10 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
 
 	/* fill in the data */
 	item->next = itemtable[hash % HASH_SIZE];
-	item->name = copy_string(outname);
+	item->name.cpy(outname);
 	item->hash = hash;
 	item->id = uniqueid++;
 	item->value = value;
-	item->notifylist = NULL;
 
 	/* add us to the hash table */
 	itemtable[hash % HASH_SIZE] = item;
@@ -153,7 +160,7 @@ void output_init(running_machine &machine)
 
 	/* reset the lists */
 	memset(itemtable, 0, sizeof(itemtable));
-	global_notifylist = NULL;
+	global_notifylist.reset();
 }
 
 
@@ -178,7 +185,6 @@ static void output_resume(running_machine &machine)
 
 static void output_exit(running_machine &machine)
 {
-	output_notify *notify;
 	output_item *item;
 	int hash;
 
@@ -188,28 +194,13 @@ static void output_exit(running_machine &machine)
 		{
 			output_item *next = item->next;
 
-			/* remove all notifiers */
-			for (notify = item->notifylist; notify != NULL; )
-			{
-				output_notify *next_notify = notify->next;
-				global_free(notify);
-				notify = next_notify;
-			}
-
 			/* free the name and the item */
-			if (item->name != NULL)
-				global_free(item->name);
 			global_free(item);
 			item = next;
 		}
 
 	/* remove all global notifiers */
-	for (notify = global_notifylist; notify != NULL; )
-	{
-		output_notify *next = notify->next;
-		global_free(notify);
-		notify = next;
-	}
+	global_notifylist.reset();
 }
 
 
@@ -220,7 +211,6 @@ static void output_exit(running_machine &machine)
 void output_set_value(const char *outname, INT32 value)
 {
 	output_item *item = find_item(outname);
-	output_notify *notify;
 	INT32 oldval;
 
 	/* if no item of that name, create a new one and send the item's state */
@@ -241,12 +231,12 @@ void output_set_value(const char *outname, INT32 value)
 	if (oldval != value)
 	{
 		/* call the local notifiers first */
-		for (notify = item->notifylist; notify != NULL; notify = notify->next)
-			(*notify->notifier)(outname, value, notify->param);
+		for (output_notify *notify = item->notifylist.first(); notify != NULL; notify = notify->next())
+			(*notify->m_notifier)(outname, value, notify->m_param);
 
 		/* call the global notifiers next */
-		for (notify = global_notifylist; notify != NULL; notify = notify->next)
-			(*notify->notifier)(outname, value, notify->param);
+		for (output_notify *notify = global_notifylist.first(); notify != NULL; notify = notify->next())
+			(*notify->m_notifier)(outname, value, notify->m_param);
 	}
 }
 
@@ -327,8 +317,6 @@ INT32 output_get_indexed_value(const char *basename, int index)
 
 void output_set_notifier(const char *outname, output_notifier_func callback, void *param)
 {
-	output_notify **headptr;
-
 	/* if an item is specified, find it */
 	if (outname != NULL)
 	{
@@ -337,22 +325,10 @@ void output_set_notifier(const char *outname, output_notifier_func callback, voi
 		/* if no item of that name, create a new one */
 		if (item == NULL)
 			item = create_new_item(outname, 0);
-		headptr = &item->notifylist;
+		item->notifylist.append(*global_alloc(output_notify(callback, param)));
 	}
-
-	/* if no item is specified, we add to the global list */
 	else
-		headptr = &global_notifylist;
-
-	/* find the end of the list and add to it */
-	while (*headptr != NULL)
-		headptr = &(*headptr)->next;
-	*headptr = global_alloc(output_notify);
-
-	/* fill in the new record */
-	(*headptr)->next = NULL;
-	(*headptr)->notifier = callback;
-	(*headptr)->param = param;
+		global_notifylist.append(*global_alloc(output_notify(callback, param)));
 }
 
 

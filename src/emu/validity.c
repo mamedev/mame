@@ -237,9 +237,7 @@ void validity_checker::validate_begin()
 	// reset internal state
 	m_errors = 0;
 	m_warnings = 0;
-
-	// reset some special case state
-	software_list_device::reset_checked_lists();
+	m_already_checked.reset();
 }
 
 
@@ -1047,7 +1045,6 @@ void validity_checker::validate_devices()
 			}
 
 			const_cast<machine_config &>(*m_current_config).device_remove(&m_current_config->root_device(), temptag.cstr());
-			global_free(dev);
 		}
 	}
 

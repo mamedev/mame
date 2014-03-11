@@ -53,9 +53,7 @@ inline render_font::glyph &render_font::get_char(unicode_char chnum)
 
 	// grab the table; if none, return the dummy character
 	if (m_glyphs[chnum / 256].count() == 0 && m_format == FF_OSD)
-	{
 		m_glyphs[chnum / 256].resize(256);
-	}
 	if (m_glyphs[chnum / 256].count() == 0)
 		return dummy_glyph;
 
@@ -123,18 +121,11 @@ render_font::~render_font()
 {
 	// free all the subtables
 	for (int tablenum = 0; tablenum < 256; tablenum++)
-		if (m_glyphs[tablenum] != NULL)
+		for (int charnum = 0; charnum < m_glyphs[tablenum].count(); charnum++)
 		{
-			// loop over characters
-			for (int charnum = 0; charnum < 256; charnum++)
-			{
-				glyph &gl = m_glyphs[tablenum][charnum];
-				m_manager.texture_free(gl.texture);
-			}
+			glyph &gl = m_glyphs[tablenum][charnum];
+			m_manager.texture_free(gl.texture);
 		}
-
-	// free the raw data and the size itself
-	auto_free(m_manager.machine(), m_rawdata);
 
 	// release the OSD font
 	if (m_osdfont != NULL)
@@ -534,7 +525,7 @@ bool render_font::load_bdf()
 	}
 
 	// make sure all the numbers are the same width
-	if (m_glyphs[0] != NULL)
+	if (m_glyphs[0].count() > '9')
 	{
 		int maxwidth = 0;
 		for (int ch = '0'; ch <= '9'; ch++)

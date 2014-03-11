@@ -116,9 +116,9 @@ class device_t : public delegate_late_bind
 protected:
 	// construction/destruction
 	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+public:
 	virtual ~device_t();
 
-public:
 	// getters
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	const char *tag() const { return m_tag; }
@@ -270,7 +270,7 @@ protected:
 	double                  m_clock_scale;          // clock scale factor
 	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
-	device_debug *          m_debug;
+	auto_pointer<device_debug> m_debug;
 	memory_region *         m_region;               // our device-local region
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
 	const void *            m_static_config;        // static device configuration

@@ -19,12 +19,12 @@ static const UINT8 DataDecode[]=
 ///////////////////////////////////////////////////////////////////////////
 void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8* codec_data)
 {
-	UINT8 *tmp, *rom;
+	UINT8 *rom;
 
 	rom = machine.root_device().memregion(rom_region)->base();
 
-	tmp = auto_alloc_array(machine, UINT8, 0x10000);
 	{
+		dynamic_buffer tmp(0x10000);
 		int i;
 		long address;
 
@@ -64,6 +64,5 @@ void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8*
 
 			rom[newaddress] = codec_data[ tmp[address] ];
 		}
-		auto_free(machine, tmp);
 	}
 }

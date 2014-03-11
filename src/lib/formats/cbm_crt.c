@@ -90,7 +90,7 @@ static const char * CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 //  cbm_crt_get_card - get slot interface card
 //-------------------------------------------------
 
-const char * cbm_crt_get_card(core_file *file)
+void cbm_crt_get_card(astring &result, core_file *file)
 {
 	// read the header
 	cbm_crt_header header;
@@ -100,10 +100,11 @@ const char * cbm_crt_get_card(core_file *file)
 	{
 		UINT16 hardware = pick_integer_be(header.hardware, 0, 2);
 
-		return CRT_C64_SLOT_NAMES[hardware];
+		result.cpy(CRT_C64_SLOT_NAMES[hardware]);
+		return;
 	}
 
-	return NULL;
+	result.reset();
 }
 
 

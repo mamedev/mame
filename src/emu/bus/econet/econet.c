@@ -270,7 +270,7 @@ void econet_device::device_stop()
 
 void econet_device::add_device(device_t *target, int address)
 {
-	daisy_entry *entry = auto_alloc(machine(), daisy_entry(target));
+	daisy_entry *entry = global_alloc(daisy_entry(target));
 
 	entry->m_interface->m_econet = this;
 	entry->m_interface->m_address = address;

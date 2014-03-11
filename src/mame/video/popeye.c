@@ -124,9 +124,9 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 	{
 		int prom_offs = i | ((i & 8) << 1);	/* address bits 3 and 4 are tied together */
 		int r, g, b;
-		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, &popeye_7051_txt_net_info);
-		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, &popeye_7051_txt_net_info);
-		b = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x03, 2, &popeye_7051_txt_net_info);
+		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, popeye_7051_txt_net_info);
+		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, popeye_7051_txt_net_info);
+		b = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x03, 2, popeye_7051_txt_net_info);
 		m_palette->set_pen_color(16 + (2 * i) + 0,rgb_t(0,0,0));
 		m_palette->set_pen_color(16 + (2 * i) + 1,rgb_t(r,g,b));
 	}
@@ -160,15 +160,14 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 
 #if USE_NEW_COLOR
 	/* sprites */
-	rgb_t	*rgb;
+	dynamic_array<rgb_t> rgb;
 	UINT8 cpi[512];
 
 	for (i=0; i<512; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
-	rgb = compute_res_net_all(machine(), &cpi[0], &popeye_7052_decode_info,  &popeye_7052_obj_net_info);
+	compute_res_net_all(rgb, &cpi[0], popeye_7052_decode_info, popeye_7052_obj_net_info);
 	m_palette->set_pen_colors(48, rgb, 256);
-	auto_free(machine(), rgb);
 #else
 	for (i = 0;i < 256;i++)
 	{
@@ -221,13 +220,12 @@ void popeye_state::set_background_palette(int bank)
 
 #if USE_NEW_COLOR
 	UINT8 cpi[16];
-	rgb_t	*rgb;
+	dynamic_array<rgb_t> rgb;
 	for (i=0; i<16; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
-	rgb = compute_res_net_all(machine(), cpi, &popeye_7051_decode_info, &popeye_7051_bck_net_info);
+	compute_res_net_all(rgb, cpi, popeye_7051_decode_info, popeye_7051_bck_net_info);
 	m_palette->set_pen_colors(0, rgb, 16);
-	auto_free(machine(), rgb);
 
 #else
 	for (i = 0;i < 16;i++)

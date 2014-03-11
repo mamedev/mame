@@ -292,7 +292,7 @@ void igs_m027_state::sdwx_gfx_decrypt()
 	int i;
 	unsigned rom_size = 0x80000;
 	UINT8 *src = (UINT8 *) (memregion("gfx1")->base());
-	UINT8 *result_data = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer result_data(rom_size);
 
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13,12,11,8,7,6,10,9,5,4,3,2,1,0)];
@@ -304,7 +304,6 @@ void igs_m027_state::sdwx_gfx_decrypt()
 		memcpy(src+i+0x100,result_data+i+0x080,0x80);
 		memcpy(src+i+0x180,result_data+i+0x180,0x80);
 	}
-	auto_free(machine(), result_data);
 }
 
 /***************************************************************************

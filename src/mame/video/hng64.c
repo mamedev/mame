@@ -2416,7 +2416,7 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = auto_alloc_array(machine, struct polygon, 1024*5);
+	dynamic_array<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7]);
 	switch (packet[0])
@@ -2501,8 +2501,6 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 			drawShaded(machine, &polys[i]);
 		}
 	}
-
-	auto_free(machine, polys);
 }
 
 void hng64_state::clear3d()

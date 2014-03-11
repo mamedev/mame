@@ -126,9 +126,8 @@ void deco156_decrypt(running_machine &machine)
 {
 	UINT32 *rom = (UINT32 *)machine.root_device().memregion("maincpu")->base();
 	int length = machine.root_device().memregion("maincpu")->bytes();
-	UINT32 *buf = auto_alloc_array(machine, UINT32, length/4);
+	dynamic_array<UINT32> buf(length/4);
 
 	memcpy(buf, rom, length);
 	decrypt(buf, rom, length);
-	auto_free(machine, buf);
 }

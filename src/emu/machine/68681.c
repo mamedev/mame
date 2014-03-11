@@ -912,6 +912,11 @@ duart68681_device::duart68681_device(const machine_config &mconfig, const char *
 	m_token = global_alloc_clear(duart68681_state);
 }
 
+duart68681_device::~duart68681_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

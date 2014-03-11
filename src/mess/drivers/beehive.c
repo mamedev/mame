@@ -36,7 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_keyline;
 	virtual void machine_reset();
 	virtual void video_start();

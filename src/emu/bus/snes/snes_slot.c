@@ -909,9 +909,9 @@ void base_sns_cart_slot_device::setup_nvram()
  call softlist load
  -------------------------------------------------*/
 
-bool base_sns_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool base_sns_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -1024,23 +1024,23 @@ void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int 
  get default card software
  -------------------------------------------------*/
 
-const char * base_sns_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void base_sns_cart_slot_device::get_default_card_software(astring &result)
 {
-	bool fullpath = open_image_file(options);
+	bool fullpath = open_image_file(mconfig().options());
 
 	if (fullpath)
 	{
 		const char *slot_string = "lorom";
 		UINT32 offset = 0;
 		UINT32 len = core_fsize(m_file);
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		offset = snes_skip_header(ROM, len);
+		offset = snes_skip_header(rom, len);
 
-		get_cart_type_addon(ROM + offset, len - offset, type, addon);
+		get_cart_type_addon(rom + offset, len - offset, type, addon);
 		// here we're from fullpath, so check if it's a DSP game which needs legacy device (i.e. it has no appended DSP dump)
 		switch (addon)
 		{
@@ -1081,13 +1081,13 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 
 		slot_string = sns_get_slot(type);
 
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
+		return;
 	}
 
-	return software_get_default_slot(config, options, this, "lorom");
+	software_get_default_slot(result, "lorom");
 }
 
 

@@ -189,14 +189,13 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const format &f = formats[type];
 
 	UINT64 size = io_generic_size(io);
-	UINT8 *img;
+	dynamic_buffer img;
 
 	if(size == (UINT32)f.sector_count*f.sector_base_size) {
-		img = global_alloc_array(UINT8, size + f.sector_count);
-		memset(&img[size], ERROR_00, f.sector_count);
+		img.resize_and_clear(size + f.sector_count, ERROR_00);
 	}
 	else {
-		img = global_alloc_array(UINT8, size);
+		img.resize(size);
 	}
 
 	io_generic_read(io, img, 0, size);
@@ -234,8 +233,6 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			error_offset += sector_count;
 		}
 	}
-
-	global_free(img);
 
 	image->set_variant(f.variant);
 

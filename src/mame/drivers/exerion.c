@@ -524,10 +524,10 @@ ROM_END
 DRIVER_INIT_MEMBER(exerion_state,exerion)
 {
 	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst, *temp;
+	UINT8 *src, *dst;
 
 	/* allocate some temporary space */
-	temp = auto_alloc_array(machine(), UINT8, 0x10000);
+	dynamic_buffer temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
@@ -565,8 +565,6 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
-
-	auto_free(machine(), temp);
 }
 
 

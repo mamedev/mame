@@ -61,7 +61,7 @@ struct dd_info
 	DDCAPS                  ddcaps;                     // capabilities of the device
 	DDCAPS                  helcaps;                    // capabilities of the hardware
 
-	void *                  membuffer;                  // memory buffer for complex rendering
+	UINT8 *                 membuffer;                  // memory buffer for complex rendering
 	UINT32                  membuffersize;              // current size of the memory buffer
 };
 
@@ -537,7 +537,7 @@ static int ddraw_create_surfaces(win_window_info *window)
 	if (dd->membuffersize < dd->blitwidth * dd->blitheight * 4)
 	{
 		dd->membuffersize = dd->blitwidth * dd->blitheight * 4;
-		global_free(dd->membuffer);
+		global_free_array(dd->membuffer);
 		dd->membuffer = global_alloc_array(UINT8, dd->membuffersize);
 	}
 	if (dd->membuffer == NULL)
@@ -640,7 +640,7 @@ static void ddraw_delete_surfaces(win_window_info *window)
 	dd->clipper = NULL;
 
 	// free the memory buffer
-	global_free(dd->membuffer);
+	global_free_array(dd->membuffer);
 	dd->membuffer = NULL;
 	dd->membuffersize = 0;
 

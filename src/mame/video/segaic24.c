@@ -117,7 +117,7 @@ void segas24_tile::device_start()
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, auto_alloc(machine(), gfx_element(m_palette, char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(tile_ram), 0x10000/2);
 	save_pointer(NAME(char_ram), 0x80000/2);

@@ -719,7 +719,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
-	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer buf(0x80000);
 	UINT8 *rom;
 	int size;
 	int i,j;
@@ -822,8 +822,6 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
 		}
 	}
-
-	auto_free(machine(), buf);
 
 	m_tempbitmap_1 = auto_bitmap_ind16_alloc(machine(),256,256);
 	m_temprender = auto_bitmap_ind16_alloc(machine(),256,256);

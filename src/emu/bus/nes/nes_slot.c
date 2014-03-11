@@ -957,9 +957,9 @@ void nes_cart_slot_device::call_unload()
  call softlist load
  -------------------------------------------------*/
 
-bool nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool nes_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -967,29 +967,28 @@ bool nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
  get default card software
  -------------------------------------------------*/
 
-const char * nes_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void nes_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "nrom";
 		UINT32 len = core_fsize(m_file);
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		if ((ROM[0] == 'N') && (ROM[1] == 'E') && (ROM[2] == 'S'))
-			slot_string = get_default_card_ines(ROM, len);
+		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
+			slot_string = get_default_card_ines(rom, len);
 
-		if ((ROM[0] == 'U') && (ROM[1] == 'N') && (ROM[2] == 'I') && (ROM[3] == 'F'))
-			slot_string = get_default_card_unif(ROM, len);
+		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
+			slot_string = get_default_card_unif(rom, len);
 
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
 	}
 	else
-		return software_get_default_slot(config, options, this, "nrom");
+		software_get_default_slot(result, "nrom");
 }
 
 

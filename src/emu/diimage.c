@@ -55,13 +55,10 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	: device_interface(device),
 		m_file(NULL),
 		m_mame_file(NULL),
-		m_full_software_name(NULL),
 		m_software_info_ptr(NULL),
 		m_software_part_ptr(NULL),
-		m_software_list_name(NULL),
 		m_readonly(false),
 		m_created(false),
-		m_formatlist(NULL),
 		m_is_loading(FALSE)
 {
 }
@@ -73,15 +70,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 
 device_image_interface::~device_image_interface()
 {
-	image_device_format **formatptr = &m_formatlist;
-
-	/* free all entries */
-	while (*formatptr != NULL)
-	{
-		image_device_format *entry = *formatptr;
-		*formatptr = entry->m_next;
-		global_free(entry);
-	}
 }
 
 //-------------------------------------------------
@@ -196,22 +184,6 @@ image_error_t device_image_interface::set_image_filename(const char *filename)
 ****************************************************************************/
 
 /*-------------------------------------------------
-    device_get_indexed_creatable_format -
-    accesses a specific image format available for
-    image creation by index
--------------------------------------------------*/
-
-const image_device_format *device_image_interface::device_get_indexed_creatable_format(int index)
-{
-	const image_device_format *format = device_get_creatable_formats();
-	while(index-- && (format != NULL))
-		format = format->m_next;
-	return format;
-}
-
-
-
-/*-------------------------------------------------
     device_get_named_creatable_format -
     accesses a specific image format available for
     image creation by name
@@ -219,10 +191,10 @@ const image_device_format *device_image_interface::device_get_indexed_creatable_
 
 const image_device_format *device_image_interface::device_get_named_creatable_format(const char *format_name)
 {
-	const image_device_format *format = device_get_creatable_formats();
-	while((format != NULL) && strcmp(format->m_name, format_name))
-		format = format->m_next;
-	return format;
+	for (const image_device_format *format = m_formatlist.first(); format != NULL; format = format->next())
+		if (strcmp(format->name(), format_name) == 0)
+			return format;
+	return NULL;
 }
 
 /****************************************************************************
@@ -420,18 +392,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
 
 const char *device_image_interface::get_feature(const char *feature_name)
 {
-	feature_list *feature;
-
-	if ( ! m_software_part_ptr || ! m_software_part_ptr->featurelist )
-		return NULL;
-
-	for ( feature = m_software_part_ptr->featurelist; feature; feature = feature->next )
-	{
-		if ( ! strcmp( feature->name, feature_name ) )
-			return feature->value;
-	}
-
-	return NULL;
+	return (m_software_part_ptr == NULL) ? NULL : m_software_part_ptr->feature(feature_name);
 }
 
 
@@ -786,7 +747,8 @@ static int verify_length_and_hash(emu_file *file, const char *name, UINT32 exple
 /*-------------------------------------------------
     load_software - software image loading
 -------------------------------------------------*/
-bool device_image_interface::load_software(char *swlist, char *swname, rom_entry *start)
+
+bool device_image_interface::load_software(software_list_device &swlist, const char *swname, const rom_entry *start)
 {
 	astring locationtag, breakstr("%");
 	const rom_entry *region;
@@ -807,38 +769,29 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 				UINT32 crc = 0;
 				bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
+				software_info *swinfo = swlist.find(swname);
+				if (swinfo == NULL)
+					return false;
+
+				UINT32 supported = swinfo->supported();
+				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
+					mame_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+				if (supported == SOFTWARE_SUPPORTED_NO)
+					mame_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+
 				// attempt reading up the chain through the parents and create a locationtag astring in the format
 				// " swlist % clonename % parentname "
 				// below, we have the code to split the elements and to create paths to load from
 
-				software_list *software_list_ptr = software_list_open(device().machine().options(), swlist, FALSE, NULL);
-				if (software_list_ptr)
+				while (swinfo != NULL)
 				{
-					for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
-					{
-						{
-							astring tmp(swinfo->shortname);
-							locationtag.cat(tmp);
-							locationtag.cat(breakstr);
-							//printf("%s\n", locationtag.cstr());
-						}
-
-						const char *parentname = software_get_clone(device().machine().options(), swlist, swinfo->shortname);
-						if (parentname != NULL)
-							swinfo = software_list_find(software_list_ptr, parentname, NULL);
-						else
-							swinfo = NULL;
-					}
-					// strip the final '%'
-					locationtag.del(locationtag.len() - 1, 1);
-					software_list_close(software_list_ptr);
+					locationtag.cat(swinfo->shortname()).cat(breakstr);
+					const char *parentname = swinfo->parentname();
+					swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
 				}
+				// strip the final '%'
+				locationtag.del(locationtag.len() - 1, 1);
 
-				if (software_get_support(device().machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
-					mame_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
-
-				if (software_get_support(device().machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_NO)
-					mame_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
 
 				// check if locationtag actually contains two locations separated by '%'
 				// (i.e. check if we are dealing with a clone in softwarelist)
@@ -852,10 +805,10 @@ bool device_image_interface::load_software(char *swlist, char *swname, rom_entry
 				}
 
 				// prepare locations where we have to load from: list/parentname & list/clonename
-				astring tag1(swlist);
+				astring tag1(swlist.list_name());
 				tag1.cat(PATH_SEPARATOR);
 				tag2.cpy(tag1.cat(tag4));
-				tag1.cpy(swlist);
+				tag1.cpy(swlist.list_name());
 				tag1.cat(PATH_SEPARATOR);
 				tag3.cpy(tag1.cat(tag5));
 
@@ -933,19 +886,26 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		/* Check if there's a software list defined for this device and use that if we're not creating an image */
 		if (!filename_has_period && !just_load)
 		{
-			softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name, &m_software_list_name );
-			// if we had launched from softlist with a specified part, e.g. "shortname:part"
-			// we would have recorded the wrong name, so record it again based on software_info
-			if (m_software_info_ptr && m_full_software_name)
-				m_err = set_image_filename(m_full_software_name);
+			softload = load_software_part(path, m_software_part_ptr);
+			if (softload)
+			{
+				m_software_info_ptr = &m_software_part_ptr->info();
+				m_software_list_name.cpy(m_software_info_ptr->list().list_name());
+				m_full_software_name.cpy(m_software_part_ptr->name());
+				
+				// if we had launched from softlist with a specified part, e.g. "shortname:part"
+				// we would have recorded the wrong name, so record it again based on software_info
+				if (m_software_info_ptr && m_full_software_name)
+					m_err = set_image_filename(m_full_software_name);
 
-			// check if image should be read-only		
-			const char *read_only = get_feature("read_only");
-			if (read_only && !strcmp(read_only, "true")) {
-				make_readonly();
+				// check if image should be read-only		
+				const char *read_only = get_feature("read_only");
+				if (read_only && !strcmp(read_only, "true")) {
+					make_readonly();
+				}
+
+				m_from_swlist = TRUE;
 			}
-
-			m_from_swlist = TRUE;
 		}
 
 		if (is_create || filename_has_period)
@@ -967,14 +927,14 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		if ( m_software_info_ptr )
 		{
 			// sanitize
-			if (!m_software_info_ptr->longname || !m_software_info_ptr->publisher || !m_software_info_ptr->year)
+			if (m_software_info_ptr->longname() == NULL || m_software_info_ptr->publisher() == NULL || m_software_info_ptr->year() == NULL)
 				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
 
 			// store
-			m_longname = m_software_info_ptr->longname;
-			m_manufacturer = m_software_info_ptr->publisher;
-			m_year = m_software_info_ptr->year;
-			//m_playable = m_software_info_ptr->supported;
+			m_longname = m_software_info_ptr->longname();
+			m_manufacturer = m_software_info_ptr->publisher();
+			m_year = m_software_info_ptr->year();
+			//m_playable = m_software_info_ptr->supported();
 		}
 
 		/* did we fail to find the file? */
@@ -1107,7 +1067,7 @@ bool device_image_interface::finish_load()
 
 bool device_image_interface::create(const char *path, const image_device_format *create_format, option_resolution *create_args)
 {
-	int format_index = (create_format != NULL) ? create_format->m_index : 0;
+	int format_index = (create_format != NULL) ? m_formatlist.indexof(*create_format) : 0;
 	return load_internal(path, TRUE, format_index, create_args, FALSE);
 }
 
@@ -1143,10 +1103,10 @@ void device_image_interface::clear()
 	m_basename_noext.reset();
 	m_filetype.reset();
 
-	m_full_software_name = NULL;
+	m_full_software_name.reset();
 	m_software_info_ptr = NULL;
 	m_software_part_ptr = NULL;
-	m_software_list_name = NULL;
+	m_software_list_name.reset();
 }
 
 /*-------------------------------------------------
@@ -1193,6 +1153,173 @@ void device_image_interface::update_names(const device_type device_type, const c
 	}
 }
 
+//-------------------------------------------------
+//  software_name_split - helper that splits a 
+//  software_list:software:part string into 
+//  separate software_list, software, and part 
+//  strings.
+//
+//  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
+//  str1:str2       => swlist_name - NULL, swname - str1, swpart - str2
+//  str1            => swlist_name - NULL, swname - str1, swpart - NULL
+//-------------------------------------------------
+
+void device_image_interface::software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart)
+{
+	// reset all output parameters
+	swlist_name.reset();
+	swname.reset();
+	swpart.reset();
+
+	// if no colon, this is the swname by itself
+	const char *split1 = strchr(swlist_swname, ':');
+	if (split1 == NULL)
+	{
+		swname.cpy(swlist_swname);
+		return;
+	}
+	
+	// if one colon, it is the swname and swpart alone
+	const char *split2 = strchr(split1 + 1, ':');
+	if (split2 == NULL)
+	{
+		swname.cpy(swlist_swname, split1 - swlist_swname);
+		swpart.cpy(split1 + 1);
+		return;
+	}
+
+	// if two colons present, split into 3 parts
+	swlist_name.cpy(swlist_swname, split1 - swlist_swname);
+	swname.cpy(split1 + 1, split2 - (split1 + 1));
+	swpart.cpy(split2 + 1);
+}
+
+
+software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
+{
+	//
+	// Note: old code would explicitly load swlist_name if it was specified, rather than
+	// searching the devices.
+	//
+	// Also if not found, old code would attempt to open <drivername>.xml and even 
+	// <swinfo_name>.xml. Hopefully removing this won't break anything.
+	//
+
+	// split full software name into software list name and short software name
+	astring swlist_name, swinfo_name, swpart_name;
+	software_name_split(path, swlist_name, swinfo_name, swpart_name);
+	bool explicit_name = (swlist_name.len() > 0);
+
+	// determine interface
+	const char *interface = NULL;
+	if (restrict_to_interface)
+		interface = image_interface();
+	
+	// find the software list if explicitly specified
+	software_list_device_iterator deviter(device().mconfig().root_device());
+	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
+		if (!explicit_name || swlist_name == swlistdev->list_name())
+		{
+			software_info *info = swlistdev->find(swinfo_name);
+			if (info != NULL)
+			{
+				software_part *part = info->find_part(swpart_name, interface);
+				if (part != NULL)
+					return part;
+			}
+		}
+	
+	// if explicitly specified and not found, just error here
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  load_software_part
+//
+//  Load a software part for a device. The part to
+//  load is determined by the "path", software lists
+//  configured for a driver, and the interface
+//  supported by the device.
+//
+//  returns true if the software could be loaded,
+//  false otherwise. If the software could be loaded
+//  sw_info and sw_part are also set.
+//-------------------------------------------------
+
+bool device_image_interface::load_software_part(const char *path, software_part *&swpart)
+{
+	// if no match has been found, we suggest similar shortnames
+	swpart = find_software_item(path, true);
+	if (swpart == NULL)
+	{
+		software_list_device::display_matches(device().machine().config(), image_interface(), path);
+		return false;
+	}
+
+	// Load the software part
+	bool result = call_softlist_load(swpart->info().list(), swpart->info().shortname(), swpart->romdata());
+
+	// Tell the world which part we actually loaded
+	astring full_sw_name;
+	full_sw_name.printf("%s:%s:%s", swpart->info().list().list_name(), swpart->info().shortname(), swpart->name());
+
+	// check compatibility
+	if (!swpart->is_compatible(swpart->info().list()))
+		mame_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", swpart->info().shortname(), swpart->info().list().filter());
+
+	// check requirements and load those images
+	const char *requirement = swpart->feature("requirement");
+	if (requirement != NULL)
+	{
+		software_part *req_swpart = find_software_item(requirement, false);
+		if (req_swpart != NULL)
+		{
+			image_interface_iterator imgiter(device().machine().root_device());
+			for (device_image_interface *req_image = imgiter.first(); req_image != NULL; req_image = imgiter.next())
+			{
+				const char *interface = req_image->image_interface();
+				if (interface != NULL)
+				{
+					if (req_swpart->matches_interface(interface))
+					{
+						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
+						// mount only if not already mounted
+						if (strlen(option) == 0 && !req_image->filename()) 
+						{
+							req_image->set_init_phase();
+							req_image->load(requirement);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	return result;
+}
+
+//-------------------------------------------------
+//  software_get_default_slot
+//-------------------------------------------------
+
+void device_image_interface::software_get_default_slot(astring &result, const char *default_card_slot)
+{
+	const char *path = device().mconfig().options().value(instance_name());
+	result.reset();
+	if (strlen(path) > 0)
+	{
+		result.cpy(default_card_slot);
+		software_part *swpart = find_software_item(path, true);
+		if (swpart != NULL)
+		{
+			const char *slot = swpart->feature("slot");
+			if (slot != NULL)
+				result.cpy(slot);
+		}
+	}
+}
+
 /*-------------------------------------------------
     get_selection_menu - create the menu stack
     for ui-level image selection
@@ -1200,7 +1327,7 @@ void device_image_interface::update_names(const device_type device_type, const c
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
+	return global_alloc_clear(ui_menu_control_device_image(machine, container, this));
 }
 
 ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu(machine, container)
@@ -1210,7 +1337,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	sld = 0;
 	if (image->software_list_name()) {
 		software_list_device_iterator iter(machine.config().root_device());
-		for (const software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
+		for (software_list_device *swlist = iter.first(); swlist != NULL; swlist = iter.next())
 		{
 			if (strcmp(swlist->list_name(),image->software_list_name())==0) sld = swlist;
 		}
@@ -1296,11 +1423,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 void ui_menu_control_device_image::load_software_part()
 {
-	astring temp_name(sld->list_name());
-	temp_name.cat(":");
-	temp_name.cat(swi->shortname);
-	temp_name.cat(":");
-	temp_name.cat(swp->name);
+	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
 	hook_load(temp_name, true);
 }
 
@@ -1327,20 +1450,20 @@ void ui_menu_control_device_image::handle()
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
+		ui_menu::stack_push(global_alloc_clear(ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
 		sld = 0;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &sld)));
+		ui_menu::stack_push(global_alloc_clear(ui_menu_software(machine(), container, image->image_interface(), &sld)));
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, swp->interface_, &swp, true, &submenu_result)));
+		ui_menu::stack_push(global_alloc_clear(ui_menu_software_parts(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -1351,22 +1474,20 @@ void ui_menu_control_device_image::handle()
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
+		ui_menu::stack_push(global_alloc_clear(ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
 		state = SELECT_PARTLIST;
 		break;
 
 	case SELECT_PARTLIST:
-		swl = software_list_open(machine().options(), sld->list_name(), false, NULL);
-		swi = software_list_find(swl, software_info_name, NULL);
-		if(swinfo_has_multiple_parts(swi, image->image_interface())) {
+		swi = sld->find(software_info_name);
+		if(swi->has_multiple_parts(image->image_interface())) {
 			submenu_result = -1;
 			swp = 0;
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
+			ui_menu::stack_push(global_alloc_clear(ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
 		} else {
-			swp = software_find_part(swi, NULL, NULL);
+			swp = swi->first_part();
 			load_software_part();
-			software_list_close(swl);
 			ui_menu::stack_pop(machine());
 		}
 		break;
@@ -1375,13 +1496,11 @@ void ui_menu_control_device_image::handle()
 		switch(submenu_result) {
 		case ui_menu_software_parts::T_ENTRY: {
 			load_software_part();
-			software_list_close(swl);
 			ui_menu::stack_pop(machine());
 			break;
 		}
 
 		case -1: // return to list
-			software_list_close(swl);
 			state = SELECT_SOFTLIST;
 			break;
 
@@ -1419,7 +1538,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
+			ui_menu::stack_push(global_alloc_clear(ui_menu_file_create(machine(), container, image, current_directory, current_file)));
 			state = CREATE_FILE;
 			break;
 
@@ -1439,7 +1558,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
+				ui_menu::stack_push(global_alloc_clear(ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;

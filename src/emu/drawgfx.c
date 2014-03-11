@@ -76,7 +76,6 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 		m_palette(NULL),
 		m_gfxdecodeinfo(NULL)
 {
-	memset(m_gfx, 0, sizeof(m_gfx));
 }
 
 //**************************************************************************
@@ -94,8 +93,6 @@ void gfxdecode_device::static_set_gfxdecodeinfo(device_t &device, const gfx_deco
 
 void gfxdecode_device::device_stop()
 {
-	for (int i = 0; i < MAX_GFX_ELEMENTS; i++)
-		auto_free(machine(), m_gfx[i]);
 }
 
 //-------------------------------------------------
@@ -244,7 +241,7 @@ void gfxdecode_device::device_start()
 		glcopy.total = total;
 
 		// allocate the graphics
-		m_gfx[curgfx] = auto_alloc(machine(), gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start));
+		m_gfx[curgfx].reset(global_alloc(gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start)));
 	}
 }
 

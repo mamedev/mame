@@ -24,7 +24,7 @@ protected:
 	bool m_promisc;
 	char m_mac[6];
 	float m_bandwidth;
-	class netdev *m_dev;
+	auto_pointer<class netdev> m_dev;
 	int m_intf;
 };
 

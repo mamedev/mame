@@ -1325,10 +1325,10 @@ void ti99_cartridge_device::set_slot(int i)
 	m_slot = i;
 }
 
-bool ti99_cartridge_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	if (VERBOSE>8) LOG("ti99_cartridge_device: swlist = %s, swname = %s\n", swlist, swname);
-	load_software_part_region(this, swlist, swname, start_entry);
+	if (VERBOSE>8) LOG("ti99_cartridge_device: swlist = %s, swname = %s\n", swlist.list_name(), swname);
+	load_software_part_region(*this, swlist, swname, start_entry);
 	m_softlist = true;
 	m_rpk = NULL;
 	return true;

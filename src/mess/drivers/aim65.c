@@ -221,7 +221,6 @@ static const struct aim_cart_range aim_cart_table[] =
 DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 {
 	UINT32 size;
-	UINT8 *temp_copy;
 	const struct aim_cart_range *aim_cart = &aim_cart_table[0], *this_cart;
 
 	/* First, determine where this cart has to be loaded */
@@ -243,22 +242,21 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
+	dynamic_buffer temp_copy;
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
 
 		if (size > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
+		temp_copy.resize(size);
 		if (image.fread(temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
@@ -274,13 +272,11 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		}
 
 		size = image.get_software_region_length(this_cart->tag + 1);
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		memcpy(temp_copy, image.get_software_region(this_cart->tag + 1), size);
 	}
 
 	memcpy(memregion("maincpu")->base() + this_cart->offset, temp_copy, size);
-
-	auto_free(machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }

@@ -46,11 +46,10 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 	address_space &dest = m_maincpu->space(AS_PROGRAM);
 	UINT32 size = MIN(image.length(), RAMDISK_SIZE);
 
-	UINT8 *buffer = global_alloc_array(UINT8, size);
+	dynamic_buffer buffer(size);
 	image.fread(buffer, size);
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
-	global_free(buffer);
 
 	return IMAGE_INIT_PASS;
 }
@@ -62,7 +61,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 NVRAM_HANDLER( cybikoxt )
 {
 	address_space &space =  machine.driver_data<cybiko_state>()->m_maincpu->space(AS_PROGRAM);
-	UINT8 *buffer = global_alloc_array(UINT8, RAMDISK_SIZE);
+	dynamic_buffer buffer(RAMDISK_SIZE);
 
 	if (read_or_write)
 	{
@@ -81,8 +80,6 @@ NVRAM_HANDLER( cybikoxt )
 		for (offs_t offs = 0; offs < RAMDISK_SIZE; offs++)
 			space.write_byte(0x400000 + offs, buffer[offs]);
 	}
-
-	global_free(buffer);
 }
 
 void cybiko_state::machine_start()

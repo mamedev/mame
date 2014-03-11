@@ -402,7 +402,6 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 layout_element::layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname)
 	: m_next(NULL),
 		m_machine(machine),
-		m_complist(machine.respool()),
 		m_defstate(0),
 		m_maxstate(0)
 {
@@ -421,7 +420,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	for (xml_data_node *compnode = elemnode.child; compnode != NULL; compnode = compnode->next)
 	{
 		// allocate a new component
-		component &newcomp = m_complist.append(*auto_alloc(machine, component(machine, *compnode, dirname)));
+		component &newcomp = m_complist.append(*global_alloc(component(machine, *compnode, dirname)));
 
 		// accumulate bounds
 		if (first)
@@ -571,10 +570,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_state(0)
 {
 	for (int i=0;i<MAX_BITMAPS;i++)
-	{
 		m_hasalpha[i] = false;
-		m_file[i] = NULL;
-	}
 
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
@@ -589,7 +585,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 			m_dirname = dirname;
 		m_imagefile[0] = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
 		m_alphafile[0] = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
-		m_file[0] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
+		m_file[0].reset(global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ)));
 	}
 
 	// text nodes
@@ -657,13 +653,13 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
 
 				//m_alphafile[i] =
-				m_file[i] = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
+				m_file[i].reset(global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ)));
 			}
 			else
 			{
 				//m_imagefile[i] = 0;
 				//m_alphafile[i] = 0;
-				m_file[i] = 0;
+				m_file[i].reset();
 			}
 		}
 
@@ -712,10 +708,6 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 layout_element::component::~component()
 {
-	for (int i=0;i<MAX_BITMAPS;i++)
-	{
-		global_free(m_file[i]);
-	}
 }
 
 
@@ -1188,8 +1180,7 @@ void layout_element::component::load_reel_bitmap(int number)
 	if (!m_bitmap[number].valid())
 	{
 		// fallback to text rendering
-		global_free(m_file[number]);
-		m_file[number] = NULL;
+		m_file[number].reset();
 	}
 
 }
@@ -1914,14 +1905,7 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist)
 	: m_next(NULL),
 		m_aspect(1.0f),
-		m_scraspect(1.0f),
-		m_screens(machine.respool()),
-		m_backdrop_list(machine.respool()),
-		m_screen_list(machine.respool()),
-		m_overlay_list(machine.respool()),
-		m_bezel_list(machine.respool()),
-		m_cpanel_list(machine.respool()),
-		m_marquee_list(machine.respool())
+		m_scraspect(1.0f)
 {
 	// allocate a copy of the name
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
@@ -1934,27 +1918,27 @@ layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simp
 
 	// load backdrop items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "backdrop"))
-		m_backdrop_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load screen items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "screen"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "screen"))
-		m_screen_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load overlay items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "overlay"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "overlay"))
-		m_overlay_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load bezel items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "bezel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "bezel"))
-		m_bezel_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load cpanel items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "cpanel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "cpanel"))
-		m_cpanel_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load marquee items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "marquee"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "marquee"))
-		m_marquee_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
+		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// recompute the data for the view based on a default layer config
 	recompute(render_layer_config());
@@ -2201,9 +2185,7 @@ int layout_view::item::state() const
 //-------------------------------------------------
 
 layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname)
-	: m_next(NULL),
-		m_elemlist(machine.respool()),
-		m_viewlist(machine.respool())
+	: m_next(NULL)
 {
 	// find the layout node
 	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");
@@ -2217,11 +2199,11 @@ layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, cons
 
 	// parse all the elements
 	for (xml_data_node *elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode != NULL; elemnode = xml_get_sibling(elemnode->next, "element"))
-		m_elemlist.append(*auto_alloc(machine, layout_element(machine, *elemnode, dirname)));
+		m_elemlist.append(*global_alloc(layout_element(machine, *elemnode, dirname)));
 
 	// parse all the views
 	for (xml_data_node *viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode != NULL; viewnode = xml_get_sibling(viewnode->next, "view"))
-		m_viewlist.append(*auto_alloc(machine, layout_view(machine, *viewnode, m_elemlist)));
+		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
 }
 
 

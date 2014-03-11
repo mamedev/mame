@@ -44,10 +44,10 @@ class latch8_device : public device_t
 {
 public:
 	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~latch8_device() { global_free(m_token); }
+	~latch8_device();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct latch8_t *token() const { assert(m_token != NULL); return m_token; }
 	latch8_config m_inline_config;
 
 	void set_maskout(UINT32 maskout) { m_inline_config.maskout = maskout; }
@@ -73,7 +73,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	struct latch8_t *m_token;
 };
 
 extern const device_type LATCH8;

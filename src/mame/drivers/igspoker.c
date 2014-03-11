@@ -2292,7 +2292,6 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 {
 	int A;
 	int length;
-	UINT8 *tmp;
 	UINT8 *rom;
 
 	rom = memregion("maincpu")->base();
@@ -2327,15 +2326,13 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	/* Descramble graphic */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	tmp = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer tmp(length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{
 		int addr = (A & ~0xffff) | BITSWAP16(A,15,14,13,12,11,10,9,8,7,6,5,4,3,0,1,2);
 		rom[A] = tmp[addr];
 	}
-
-	auto_free(machine(), tmp);
 }
 
 

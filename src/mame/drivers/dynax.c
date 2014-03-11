@@ -5121,11 +5121,12 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 	}
 
 	/* Address lines scrambling on the blitter data roms */
-	rom = auto_alloc_array(machine(), UINT8, 0xc0000);
-	memcpy(rom, gfx, 0xc0000);
-	for (i = 0; i < 0xc0000; i++)
-		gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
-	auto_free(machine(), rom);
+	{
+		dynamic_buffer rom(0xc0000);
+		memcpy(rom, gfx, 0xc0000);
+		for (i = 0; i < 0xc0000; i++)
+			gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
+	}
 }
 
 
@@ -5921,12 +5922,11 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 	int i;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer rom1(size);
 
 	memcpy(rom1, rom, size);
 	for (i = 0; i < size; i++)
 		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
-	auto_free(machine(), rom1);
 }
 
 DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
@@ -5934,7 +5934,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 	int i, j;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer rom1(size);
 
 	memcpy(rom1, rom, size);
 	for (i = 0; i < size; i++)
@@ -5964,7 +5964,6 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		}
 		rom[j] = rom1[i];
 	}
-	auto_free(machine(), rom1);
 
 	DRIVER_INIT_CALL(mjelct3);
 }

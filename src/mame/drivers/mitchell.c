@@ -2234,7 +2234,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
-	UINT8* source = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer source(len);
 	UINT8* dst = memregion("maincpu")->base() ;
 	int x;
 
@@ -2271,7 +2271,6 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 			memcpy(&dst[((x / 2) * 0x4000) + 0x50000],&source[tablebank[x + 1] * 0x4000], 0x4000);
 		}
 	}
-	auto_free(machine(), source);
 
 	bootleg_decode();
 	configure_banks();

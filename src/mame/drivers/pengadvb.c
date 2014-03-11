@@ -293,7 +293,6 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 {
 	UINT8 *mem = memregion(region)->base();
 	int memsize = memregion(region)->bytes();
-	UINT8 *buf;
 	int i;
 
 	// data lines swap
@@ -303,13 +302,12 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 	}
 
 	// address line swap
-	buf = auto_alloc_array(machine(), UINT8, memsize);
+	dynamic_buffer buf(memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
 	}
-	auto_free(machine(), buf);
 }
 
 DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)

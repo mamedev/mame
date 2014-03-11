@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:

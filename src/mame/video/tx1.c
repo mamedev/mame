@@ -130,9 +130,9 @@ PALETTE_INIT_MEMBER(tx1_state,tx1)
 	{
 		int r, g, b;
 
-		r = compute_res_net(color_prom[i + 0x300] & 0xf, 0, &tx1_net_info);
-		g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, &tx1_net_info);
-		b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, &tx1_net_info);
+		r = compute_res_net(color_prom[i + 0x300] & 0xf, 0, tx1_net_info);
+		g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, tx1_net_info);
+		b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, tx1_net_info);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

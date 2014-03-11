@@ -80,8 +80,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<serial_keyboard_device> m_keyboard;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<const UINT8> m_p_videoram;
-	required_shared_ptr<const UINT8> m_p_attribram;
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_attribram;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 };

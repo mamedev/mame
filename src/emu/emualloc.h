@@ -15,6 +15,7 @@
 
 #include <new>
 #include "osdcore.h"
+#include "coretmpl.h"
 
 
 //**************************************************************************
@@ -43,133 +44,6 @@
 #define pool_alloc_array(_pool, _type, _num)        (_pool).add_array(new(__FILE__, __LINE__) _type[_num], (_num))
 #define pool_alloc_array_clear(_pool, _type, _num)  (_pool).add_array(new(__FILE__, __LINE__, zeromem) _type[_num], (_num))
 #define pool_free(_pool, v)                         (_pool).remove(v)
-
-// global allocation helpers
-#define global_alloc(_type)                         pool_alloc(global_resource_pool(), _type)
-#define global_alloc_clear(_type)                   pool_alloc_clear(global_resource_pool(), _type)
-#define global_alloc_array(_type, _num)             pool_alloc_array(global_resource_pool(), _type, _num)
-#define global_alloc_array_clear(_type, _num)       pool_alloc_array_clear(global_resource_pool(), _type, _num)
-#define global_free(v)                              pool_free(global_resource_pool(), v)
-
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-// allocate memory with file and line number information
-void *malloc_file_line(size_t size, const char *file, int line);
-void *malloc_array_file_line(size_t size, const char *file, int line);
-
-// free memory with file and line number information
-void free_file_line(void *memory, const char *file, int line);
-
-// called from the exit path of any code that wants to check for unfreed memory
-void track_memory(bool track);
-void dump_unfreed_mem();
-
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-// zeromem_t is a dummy class used to tell new to zero memory after allocation
-class zeromem_t { };
-
-#ifndef NO_MEM_TRACKING
-
-// standard new/delete operators (try to avoid using)
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_array_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr) throw()
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr) throw()
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-#endif
-
-// file/line new/delete operators
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_array_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-
-// file/line new/delete operators with zeroing
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_array_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
 
 
 
@@ -254,7 +128,7 @@ public:
 	resource_pool(int hash_size = 193);
 	virtual ~resource_pool();
 
-	void add(resource_pool_item &item);
+	void add(resource_pool_item &item, size_t size, const char *type);
 	void remove(resource_pool_item &item) { remove(item.m_ptr); }
 	void remove(void *ptr);
 	void remove(const void *ptr) { remove(const_cast<void *>(ptr)); }
@@ -262,46 +136,17 @@ public:
 	bool contains(void *ptrstart, void *ptrend);
 	void clear();
 
-	template<class _ObjectClass> _ObjectClass *add_object(_ObjectClass* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<_ObjectClass>(object)); return object; }
-	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<_ObjectClass>(array, count)); return array; }
+	template<class _ObjectClass> _ObjectClass *add_object(_ObjectClass* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<_ObjectClass>(object), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return object; }
+	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<_ObjectClass>(array, count), sizeof(_ObjectClass), typeid(_ObjectClass).name()); return array; }
 
 private:
 	int                     m_hash_size;
 	osd_lock *              m_listlock;
-	resource_pool_item **   m_hash;
+	dynamic_array<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;
+	static UINT64			s_id;
 };
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// dummy objects to pass to the specialized new variants
-extern const zeromem_t zeromem;
-
-
-resource_pool &global_resource_pool();
-
-
-
-//**************************************************************************
-//  ADDDITIONAL MACROS
-//**************************************************************************
-
-#ifndef NO_MEM_TRACKING
-// re-route classic malloc-style allocations
-#undef malloc
-#undef calloc
-#undef realloc
-#undef free
-
-#define malloc(x)       malloc_array_file_line(x, __FILE__, __LINE__)
-#define calloc(x,y)     __error_use_auto_alloc_clear_or_global_alloc_clear_instead__
-#define realloc(x,y)    __error_realloc_is_dangerous__
-#define free(x)         free_file_line(x, __FILE__, __LINE__)
-#endif
 
 #endif  /* __EMUALLOC_H__ */

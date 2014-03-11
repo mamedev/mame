@@ -236,11 +236,10 @@ void tceptor_state::decode_bg(const char * region)
 
 	int gfx_index = m_bg;
 	UINT8 *src = memregion(region)->base() + 0x8000;
-	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
 
-	buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)
@@ -250,16 +249,15 @@ void tceptor_state::decode_bg(const char * region)
 	}
 
 	memcpy(src, buffer, len);
-	auto_free(machine(), buffer);
 
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(m_palette, bg_layout, memregion(region)->base(), 64, 0x0a00)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, bg_layout, memregion(region)->base(), 64, 0x0a00)));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(m_palette, *layout, (const UINT8 *)data, 64, 1024)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, *layout, (const UINT8 *)data, 64, 1024)));
 }
 
 // fix sprite order

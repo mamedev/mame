@@ -601,8 +601,7 @@ sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
 		m_end(0),
 		m_rgnoffs(~0),
 		m_srcptr(NULL),
-		m_fd1089(NULL),
-		m_fd1094_cache(NULL)
+		m_fd1089(NULL)
 {
 	// invalidate all states
 	reset();
@@ -615,8 +614,6 @@ sega_315_5195_mapper_device::decrypt_bank::decrypt_bank()
 
 sega_315_5195_mapper_device::decrypt_bank::~decrypt_bank()
 {
-	// delete any allocated cache
-	global_free(m_fd1094_cache);
 }
 
 
@@ -631,14 +628,13 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1089_base_device *
 	m_fd1089 = fd1089;
 
 	// clear out all fd1094 stuff
-	delete m_fd1094_cache;
-	m_fd1094_cache = NULL;
+	m_fd1094_cache.reset();
 }
 
 void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd1094)
 {
 	// set the fd1094 pointer and allocate a decryption cache
-	m_fd1094_cache = global_alloc(fd1094_decryption_cache(*fd1094));
+	m_fd1094_cache.reset(global_alloc(fd1094_decryption_cache(*fd1094)));
 
 	// clear out all fd1089 stuff
 	m_fd1089 = NULL;

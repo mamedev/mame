@@ -5709,6 +5709,11 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_token = global_alloc_clear(voodoo_state);
 }
 
+voodoo_device::~voodoo_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

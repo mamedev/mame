@@ -4820,7 +4820,6 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 DRIVER_INIT_MEMBER(cave_state,mazinger)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *buffer;
 	UINT8 *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
@@ -4833,13 +4832,12 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0xdf88] = src[BITSWAP24(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		memcpy(src, buffer, len);
-		auto_free(machine(), buffer);
 	}
 
 	unpack_sprites("sprites0");
@@ -4888,7 +4886,6 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *buffer;
 	UINT8 *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 	int i, j;
@@ -4897,7 +4894,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
-	buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4908,7 +4905,6 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 		}
 
 		memcpy(src,buffer,len);
-		auto_free(machine(), buffer);
 	}
 
 	unpack_sprites("sprites0");
@@ -4935,7 +4931,6 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 DRIVER_INIT_MEMBER(cave_state,sailormn)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *buffer;
 	UINT8 *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
@@ -4952,13 +4947,12 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0x950c4] = src[BITSWAP24(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		memcpy(src, buffer, len);
-		auto_free(machine(), buffer);
 	}
 
 	sailormn_unpack_tiles( machine(), "layer2" );

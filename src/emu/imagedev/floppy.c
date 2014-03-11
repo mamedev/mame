@@ -187,9 +187,6 @@ void floppy_image_device::setup_wpt_cb(wpt_cb cb)
 
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
-	image_device_format **formatptr;
-	image_device_format *format;
-	formatptr = &m_formatlist;
 	extension_list[0] = '\0';
 	fif_list = 0;
 	for(int cnt=0; formats[cnt]; cnt++)
@@ -201,17 +198,9 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 		else
 			fif_list->append(fif);
 
-		format = global_alloc_clear(image_device_format);
-		format->m_index       = cnt;
-		format->m_name        = fif->name();
-		format->m_description = fif->description();
-		format->m_extensions  = fif->extensions();
-		format->m_optspec     = "";
+		m_formatlist.append(*global_alloc(image_device_format(fif->name(), fif->description(), fif->extensions(), "")));
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
-		// and append it to the list
-		*formatptr = format;
-		formatptr = &format->m_next;
 	}
 
 	// set brief and instance name
@@ -615,7 +604,7 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 	int start_pos = find_position(base, start);
 	int end_pos   = find_position(base, end);
 
-	int *trans_pos = transition_count ? global_alloc_array(int, transition_count) : 0;
+	dynamic_array<int> trans_pos(transition_count);
 	for(int i=0; i != transition_count; i++)
 		trans_pos[i] = find_position(base, transitions[i]);
 
@@ -663,9 +652,6 @@ void floppy_image_device::write_flux(attotime start, attotime end, int transitio
 	}
 
 	image->set_track_size(cyl, ss, cells);
-
-	if(trans_pos)
-		global_free(trans_pos);
 }
 
 void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg)
@@ -839,32 +825,29 @@ astring ui_menu_control_floppy_image::try_file(astring location, astring name, b
 void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 {
 	input_filename = filename;
-	if(softlist) {
-		char *swlist_name, *swname, *swpart;
-		software_name_split(filename.cstr(), &swlist_name, &swname, &swpart);
-		software_list *sw_list = software_list_open(machine().options(), swlist_name, FALSE, NULL);
-		software_info *sw_info = software_list_find(sw_list, swname, NULL);
-		software_part *sw_part = software_find_part(sw_info, swpart, NULL);
-		const char *parentname = software_get_clone(machine().options(), swlist_name, sw_info->shortname);
-		for(const rom_entry *region = sw_part->romdata; region; region = rom_next_region(region)) {
+	if (softlist)
+	{
+		astring swlist_name, swinfo_name, swpart_name;
+		device_image_interface::software_name_split(filename.cstr(), swlist_name, swinfo_name, swpart_name);
+		software_list_device *swlistdev = software_list_device::find_by_name(machine().config(), swlist_name);
+		software_info *swinfo = swlistdev->find(swinfo_name);
+		software_part *swpart = swinfo->find_part(swpart_name);
+		const char *parentname = swinfo->parentname();
+		for(const rom_entry *region = swpart->romdata(); region; region = rom_next_region(region)) {
 			const rom_entry *romp = region + 1;
 			UINT32 crc = 0;
 			bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
-			filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(swname), ROM_GETNAME(romp), has_crc, crc);
+			filename = try_file(astring(swlistdev->list_name()) + PATH_SEPARATOR + astring(swinfo_name), ROM_GETNAME(romp), has_crc, crc);
 			if(filename == "")
 				filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(parentname), ROM_GETNAME(romp), has_crc, crc);
 			if(filename == "")
-				filename = try_file(swname, ROM_GETNAME(romp), has_crc, crc);
+				filename = try_file(swinfo_name, ROM_GETNAME(romp), has_crc, crc);
 			if(filename == "")
 				filename = try_file(parentname, ROM_GETNAME(romp), has_crc, crc);
 			if(filename != "")
-				goto found;
+				break;
 		}
-
-	found:
-		software_list_close(sw_list);
-		global_free(swlist_name);
 	}
 
 	input_format = static_cast<floppy_image_device *>(image)->identify(filename);

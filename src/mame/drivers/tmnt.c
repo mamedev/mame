@@ -4068,7 +4068,6 @@ DRIVER_INIT_MEMBER(tmnt_state,mia)
 	int len;
 	int i, j, k, A, B;
 	int bits[32];
-	UINT8 *temp;
 
 	/*
 	    along with the normal byte reordering, TMNT also needs the bits to
@@ -4112,7 +4111,7 @@ DRIVER_INIT_MEMBER(tmnt_state,mia)
 		}
 	}
 
-	temp = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer temp(len);
 	memcpy(temp, gfxdata, len);
 	for (A = 0; A < len / 4; A++)
 	{
@@ -4150,7 +4149,6 @@ DRIVER_INIT_MEMBER(tmnt_state,mia)
 		gfxdata[4 * A + 2] = temp[4 * B + 2];
 		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
-	auto_free(machine(), temp);
 }
 
 
@@ -4161,7 +4159,6 @@ DRIVER_INIT_MEMBER(tmnt_state,tmnt)
 	int len;
 	int i, j, k, A, B, entry;
 	int bits[32];
-	UINT8 *temp;
 
 	/*
 	    along with the normal byte reordering, TMNT also needs the bits to
@@ -4205,7 +4202,7 @@ DRIVER_INIT_MEMBER(tmnt_state,tmnt)
 		}
 	}
 
-	temp = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer temp(len);
 	memcpy(temp, gfxdata, len);
 	code_conv_table = &memregion("proms")->base()[0x0000];
 	for (A = 0; A < len / 4; A++)
@@ -4257,7 +4254,6 @@ DRIVER_INIT_MEMBER(tmnt_state,tmnt)
 		gfxdata[4 * A + 2] = temp[4 * B + 2];
 		gfxdata[4 * A + 3] = temp[4 * B + 3];
 	}
-	auto_free(machine(), temp);
 }
 
 DRIVER_INIT_MEMBER(tmnt_state,cuebrick)

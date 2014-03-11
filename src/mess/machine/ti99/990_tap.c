@@ -1073,6 +1073,8 @@ tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, d
 	m_token = global_alloc_clear(tap_990_t);
 }
 
+tap_990_device::~tap_990_device() { global_free(m_token); }
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

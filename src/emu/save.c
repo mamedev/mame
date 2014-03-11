@@ -62,10 +62,7 @@ enum
 save_manager::save_manager(running_machine &machine)
 	: m_machine(machine),
 		m_reg_allowed(true),
-		m_illegal_regs(0),
-		m_entry_list(machine.respool()),
-		m_presave_list(machine.respool()),
-		m_postload_list(machine.respool())
+		m_illegal_regs(0)
 {
 }
 
@@ -120,7 +117,7 @@ void save_manager::register_presave(save_prepost_delegate func)
 			fatalerror("Duplicate save state function (%s/%s)\n", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_presave_list.append(*auto_alloc(machine(), state_callback(func)));
+	m_presave_list.append(*global_alloc(state_callback(func)));
 }
 
 
@@ -141,7 +138,7 @@ void save_manager::register_postload(save_prepost_delegate func)
 			fatalerror("Duplicate save state function (%s/%s)\n", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_postload_list.append(*auto_alloc(machine(), state_callback(func)));
+	m_postload_list.append(*global_alloc(state_callback(func)));
 }
 
 
@@ -186,7 +183,7 @@ void save_manager::save_memory(const char *module, const char *tag, UINT32 index
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*auto_alloc(machine(), state_entry(val, totalname, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname, valsize, valcount)), insert_after);
 }
 
 

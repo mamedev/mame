@@ -918,31 +918,14 @@ void legacy_floppy_image_device::device_start()
 
 void legacy_floppy_image_device::device_config_complete()
 {
-	image_device_format **formatptr;
-	image_device_format *format;
-	formatptr = &m_formatlist;
-	int cnt = 0;
-
 	m_extension_list[0] = '\0';
 	const struct FloppyFormat *floppy_options = ((floppy_interface*)static_config())->formats;
 	for (int i = 0; floppy_options[i].construct; i++)
 	{
 		// only add if creatable
 		if (floppy_options[i].param_guidelines) {
-			// allocate a new format
-			format = global_alloc_clear(image_device_format);
-
-			// populate it
-			format->m_index       = cnt;
-			format->m_name        = floppy_options[i].name;
-			format->m_description = floppy_options[i].description;
-			format->m_extensions  = floppy_options[i].extensions;
-			format->m_optspec     = floppy_options[i].param_guidelines;
-
-			// and append it to the list
-			*formatptr = format;
-			formatptr = &format->m_next;
-			cnt++;
+			// allocate a new format and append it to the list
+			m_formatlist.append(*global_alloc(image_device_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines)));
 		}
 		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
 	}

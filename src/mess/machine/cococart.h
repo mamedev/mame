@@ -83,7 +83,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 
@@ -97,7 +97,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	// reading and writing to $FF40-$FF7F
 	DECLARE_READ8_MEMBER(read);

@@ -5758,7 +5758,7 @@ void galaxian_state::decode_anteater_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
+	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -5770,7 +5770,6 @@ void galaxian_state::decode_anteater_gfx()
 		srcoffs |= (BIT(offs,0) ^ BIT(offs,6) ^ 1) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	auto_free(machine(), scratch);
 }
 
 
@@ -5778,7 +5777,7 @@ void galaxian_state::decode_losttomb_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
+	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -5790,7 +5789,6 @@ void galaxian_state::decode_losttomb_gfx()
 		srcoffs |= ((BIT(offs,1) & BIT(offs,7)) | ((1 ^ BIT(offs,1)) & (BIT(offs,8)))) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	auto_free(machine(), scratch);
 }
 
 

@@ -430,7 +430,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 	floperr_t err;
 	const struct FloppyCallbacks *fmt;
 	size_t this_buffer_len;
-	UINT8 *alloc_buf = NULL;
+	dynamic_buffer alloc_buf;
 	UINT32 sector_length;
 	UINT8 *buffer_ptr = (UINT8 *)buffer;
 	floperr_t (*read_sector)(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen);
@@ -486,13 +486,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 			{
 				/* we will be doing an partial read/write; in other words we
 				 * will not be reading/writing a full sector */
-				if (alloc_buf) free(alloc_buf);
-				alloc_buf = (UINT8*)malloc(sector_length);
-				if (!alloc_buf)
-				{
-					err = FLOPPY_ERROR_OUTOFMEMORY;
-					goto done;
-				}
+				alloc_buf.resize(sector_length);
 
 				/* read the sector (we need to do this even when writing */
 				err = read_sector(floppy, head, track, sector, alloc_buf, sector_length);
@@ -543,8 +537,6 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 	err = FLOPPY_ERROR_SUCCESS;
 
 done:
-	if (alloc_buf)
-		free(alloc_buf);
 	return err;
 }
 
@@ -965,7 +957,7 @@ floppy_image::~floppy_image()
 {
 	for (int i=0;i<MAX_FLOPPY_TRACKS;i++) {
 		for (int j=0;j<MAX_FLOPPY_HEADS;j++) {
-			global_free(cell_data[i][j]);
+			global_free_array(cell_data[i][j]);
 		}
 	}
 }
@@ -1006,7 +998,7 @@ void floppy_image::ensure_alloc(int track, int head)
 		UINT32 *new_array = global_alloc_array(UINT32, new_size);
 		if(track_alloc_size[track][head]) {
 			memcpy(new_array, cell_data[track][head], track_alloc_size[track][head]*4);
-			global_free(cell_data[track][head]);
+			global_free_array(cell_data[track][head]);
 		}
 		cell_data[track][head] = new_array;
 		track_alloc_size[track][head] = new_size;
@@ -1355,7 +1347,7 @@ int floppy_image_format_t::calc_sector_index(int num, int interleave, int skew, 
 
 void floppy_image_format_t::generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image)
 {
-	UINT32 *buffer = global_alloc_array_clear(UINT32, track_size);
+	dynamic_array<UINT32> buffer(track_size);
 
 	gen_crc_info crcs[MAX_CRC_COUNT];
 	collect_crcs(desc, crcs);
@@ -1638,7 +1630,6 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 	fixup_crcs(buffer, crcs);
 
 	generate_track_from_levels(track, head, buffer, track_size, 0, image);
-	global_free(buffer);
 }
 
 void floppy_image_format_t::normalize_times(UINT32 *buffer, int bitlen)
@@ -2606,7 +2597,7 @@ void floppy_image_format_t::build_wd_track_mfm(int track, int head, floppy_image
 
 void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a, int gap_1, int gap_2)
 {
-	UINT32 *track_data = global_alloc_array(UINT32, cell_count+10000);
+	dynamic_array<UINT32> track_data(cell_count+10000);
 	int tpos = 0;
 
 	// gap 4a , IAM and gap 1
@@ -2670,12 +2661,11 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 	raw_w(track_data, tpos, cell_count-tpos, 0xffff >> (16+tpos-cell_count));
 
 	generate_track_from_levels(track, head, track_data, cell_count, 0, image);
-	global_free(track_data);
 }
 
 void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image *image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a, int gap_1, int gap_2)
 {
-	UINT32 *track_data = global_alloc_array(UINT32, cell_count+10000);
+	dynamic_array<UINT32> track_data(cell_count+10000);
 	int tpos = 0;
 
 	// gap 4a , IAM and gap 1
@@ -2742,5 +2732,4 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	raw_w(track_data, tpos, cell_count-tpos, 0x9254 >> (16+tpos-cell_count));
 
 	generate_track_from_levels(track, head, track_data, cell_count, 0, image);
-	global_free(track_data);
 }

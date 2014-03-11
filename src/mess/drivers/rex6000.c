@@ -569,21 +569,18 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	static const char magic[] = "ApplicationName:Addin";
 	address_space& flash = machine().device("flash0b")->memory().space(0);
 	UINT32 img_start = 0;
-	UINT8 *data;
 
-	data = (UINT8*)auto_alloc_array(machine(), UINT8, image.length());
+	dynamic_buffer data(image.length());
 	image.fread(data, image.length());
 
-	if(strncmp((const char*)data, magic, 21))
+	if(strncmp((const char*)&data[0], magic, 21))
 		return IMAGE_INIT_FAIL;
 
-	img_start = strlen((const char*)data) + 5;
+	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
 	for (UINT32 i=0; i<image.length() - img_start ;i++)
 		flash.write_byte(i, data[img_start + i]);
-
-	auto_free(machine(), data);
 
 	return IMAGE_INIT_PASS;
 }

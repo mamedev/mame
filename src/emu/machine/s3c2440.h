@@ -45,13 +45,13 @@ class s3c2440_device : public device_t
 {
 public:
 	s3c2440_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~s3c2440_device() { global_free(m_token); }
+	~s3c2440_device();
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct s3c24xx_t *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -59,7 +59,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	struct s3c24xx_t *m_token;
 	required_device<palette_device> m_palette;
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

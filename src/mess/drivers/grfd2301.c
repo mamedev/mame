@@ -47,7 +47,7 @@ public:
 	virtual void machine_reset();
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	required_device<cpu_device> m_maincpu;
 

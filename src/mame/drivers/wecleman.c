@@ -1300,7 +1300,7 @@ void wecleman_state::wecleman_unpack_sprites()
 
 void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 	int i;
 
 	memcpy(buffer,src,len);
@@ -1309,7 +1309,6 @@ void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _
 		src[i] =
 			buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
 	}
-	auto_free(machine(), buffer);
 }
 
 /* Unpack sprites data and do some patching */
@@ -1410,11 +1409,11 @@ ROM_END
 
 void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
-	UINT8 *base, *temp;
+	UINT8 *base;
 	int i;
 
 	base = memregion("gfx1")->base(); // sprites
-	temp = auto_alloc_array(machine(), UINT8,  bank_size );
+	dynamic_buffer temp( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
 		UINT8 *finish   = base + 2*bank_size*i;
@@ -1452,7 +1451,6 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 			*dest++ = data & 0xF;
 		} while( dest<finish );
 	}
-	auto_free( machine(), temp );
 }
 
 /* Unpack sprites data and do some patching */

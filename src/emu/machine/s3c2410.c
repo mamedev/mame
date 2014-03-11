@@ -79,6 +79,11 @@ s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, d
 	m_token = global_alloc_clear(s3c24xx_t);
 }
 
+s3c2410_device::~s3c2410_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
 //  palette device

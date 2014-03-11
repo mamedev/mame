@@ -956,9 +956,7 @@ static void on_disasm_cpu_activate(DView *dv, const ui_menu_event *event)
 	{
 		current = current->next();
 		if (current == NULL)
-		{
-			current = dv->view->source_list().head();
-		}
+			current = dv->view->first_source();
 		dv->view->set_source(*current);
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
 		dview_set_title(dv, current->name());
@@ -1360,7 +1358,7 @@ static void followers_set_cpu(device_t *device)
 	{
 		if (dview_is_state(dv, VIEW_STATE_FOLLOW_CPU))
 		{
-			const debug_view_source *source = dv->view->source_list().match_device(device);
+			const debug_view_source *source = dv->view->source_for_device(device);
 			switch (dv->type)
 			{
 			case DVT_DISASSEMBLY:

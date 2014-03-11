@@ -693,7 +693,7 @@ BOOL wininput_handle_raw(HANDLE device)
 
 	// free the temporary buffer and return the result
 	if (data != small_buffer)
-		global_free(data);
+		global_free_array(data);
 	return result;
 }
 
@@ -1295,7 +1295,7 @@ static char *dinput_device_item_name(device_info *devinfo, int offset, const TCH
 
 	// convert to UTF8, free the temporary string, and return
 	utf8 = utf8_from_tstring(combined);
-	global_free(combined);
+	global_free_array(combined);
 	return utf8;
 }
 
@@ -1728,12 +1728,12 @@ static void rawinput_init(running_machine &machine)
 		if (!(*register_rawinput_devices)(reglist, regcount, sizeof(reglist[0])))
 			goto error;
 
-	global_free(devlist);
+	global_free_array(devlist);
 	return;
 
 error:
 	if (devlist != NULL)
-		global_free(devlist);
+		global_free_array(devlist);
 }
 
 
@@ -1777,7 +1777,7 @@ static device_info *rawinput_device_create(running_machine &machine, device_info
 	// improve the name and then allocate a device
 	tname = rawinput_device_improve_name(tname);
 	devinfo = generic_device_alloc(machine, devlist_head_ptr, tname);
-	global_free(tname);
+	global_free_array(tname);
 
 	// copy the handle
 	devinfo->rawinput.device = device->hDevice;
@@ -1785,7 +1785,7 @@ static device_info *rawinput_device_create(running_machine &machine, device_info
 
 error:
 	if (tname != NULL)
-		global_free(tname);
+		global_free_array(tname);
 	if (devinfo != NULL)
 		rawinput_device_release(devinfo);
 	return NULL;
@@ -1918,7 +1918,7 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 
 					// free memory and close the key
 					if (endparentid != NULL)
-						global_free(endparentid);
+						global_free_array(endparentid);
 					RegCloseKey(endkey);
 				}
 			}
@@ -1934,7 +1934,7 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 
 convert:
 	// replace the name with the nicer one
-	global_free(name);
+	global_free_array(name);
 
 	// remove anything prior to the final semicolon
 	chsrc = _tcsrchr(regstring, ';');
@@ -1947,9 +1947,9 @@ convert:
 
 exit:
 	if (regstring != NULL)
-		global_free(regstring);
+		global_free_array(regstring);
 	if (regpath != NULL)
-		global_free(regpath);
+		global_free_array(regpath);
 	if (regkey != NULL)
 		RegCloseKey(regkey);
 
@@ -2172,7 +2172,7 @@ static TCHAR *reg_query_string(HKEY key, const TCHAR *path)
 		return buffer;
 
 	// otherwise return a NULL buffer
-	global_free(buffer);
+	global_free_array(buffer);
 	return NULL;
 }
 

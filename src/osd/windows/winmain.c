@@ -198,7 +198,7 @@ private:
 	UINT8           m_stack_depth;
 	UINT8           m_entry_stride;
 	UINT32          m_max_seconds;
-	FPTR *          m_buffer;
+	dynamic_array<FPTR> m_buffer;
 	FPTR *          m_buffer_ptr;
 	FPTR *          m_buffer_end;
 };
@@ -1648,7 +1648,7 @@ sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
 		m_stack_depth(stack_depth),
 		m_entry_stride(stack_depth + 2),
 		m_max_seconds(max_seconds),
-		m_buffer(global_alloc(FPTR[max_seconds * 1000 * m_entry_stride])),
+		m_buffer(max_seconds * 1000 * m_entry_stride),
 		m_buffer_ptr(m_buffer),
 		m_buffer_end(m_buffer + max_seconds * 1000 * m_entry_stride)
 {
@@ -1661,7 +1661,6 @@ sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
 
 sampling_profiler::~sampling_profiler()
 {
-	global_free(m_buffer);
 }
 
 

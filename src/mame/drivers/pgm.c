@@ -4025,7 +4025,7 @@ void pgm_state::expand_32x32x5bpp()
 
 	glcopy.total = (gfx2_size_needed / glcopy.charincrement)*8;
 
-	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(m_palette, glcopy, (UINT8 *)dst, 32, 0x400)));
+	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, glcopy, (UINT8 *)dst, 32, 0x400)));
 
 
 }

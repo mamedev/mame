@@ -86,10 +86,10 @@ void ui_menu_file_manager::populate()
 			if (image->part_entry() != NULL)
 			{
 				const software_part *tmp = image->part_entry();
-				if (tmp->name != NULL)
+				if (tmp->name() != NULL)
 				{
 					tmp_name.cat(" (");
-					tmp_name.cat(tmp->name);
+					tmp_name.cat(tmp->name());
 					// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
 					if (image->get_feature("part_id") != NULL)
 					{

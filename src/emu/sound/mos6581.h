@@ -56,7 +56,7 @@ class mos6581_device : public device_t,
 public:
 	mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mos6581_device() { global_free(m_token); }
+	~mos6581_device();
 
 	template<class _potx, class _poty> void set_callbacks(_potx potx, _poty poty) {
 		m_read_potx.set_callback(potx);

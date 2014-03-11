@@ -2847,7 +2847,7 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 	};
 
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x5800);
+	dynamic_buffer buffer(0x5800);
 
 	for (int i=0;i<88;i++)
 	{
@@ -2856,7 +2856,6 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 	}
 
 	memcpy(rom, buffer, 0x5800);
-	auto_free(machine(), buffer);
 }
 
 

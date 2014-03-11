@@ -1524,7 +1524,6 @@ void atarigen_state::blend_gfx(int gfx0, int gfx1, int mask0, int mask1)
 
 	// free the second graphics element
 	m_gfxdecode->set_gfx(gfx1, NULL);
-	auto_free(machine(), gx1);
 }
 
 

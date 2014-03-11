@@ -68,8 +68,7 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	UINT64 pos = 4;
-	UINT8 *data = 0;
-	int data_size = 0; // size of currently allocated array for a track
+	dynamic_buffer data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
 	int rpm=360; // drive rpm
@@ -84,18 +83,11 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		// if the position-so-far-in-file plus 10 (for the header) plus track size
 		// is larger than the size of the file, free buffers and bail out
 		if(pos+tsize+10 > size) {
-			if(data)
-				global_free(data);
 			return false;
 		}
 
 		// reallocate the data array if it gets too small
-		if(tsize > data_size) {
-			if(data)
-				global_free(data);
-			data_size = tsize;
-			data = global_alloc_array(UINT8, data_size);
-		}
+		data.resize(tsize);
 
 		pos += 10; // skip the header, we already read it
 		io_generic_read(io, data, pos, tsize);
@@ -228,9 +220,6 @@ bool dfi_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		index_count = 0;
 		image->set_track_size(track, head, tpos);
 	}
-
-	if(data)
-		global_free(data);
 
 	return true;
 }

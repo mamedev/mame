@@ -71,23 +71,17 @@ bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	MFMIMG header;
 	MFMTRACKIMG trackdesc;
-	UINT8 *trackbuf = 0;
-	int trackbuf_size = 0;
 
 	// read header
 	io_generic_read(io, &header, 0, sizeof(header));
 	int counter = 0;
+	dynamic_buffer trackbuf;
 	for(int track=0; track < header.number_of_track; track++) {
 		for(int side=0; side < header.number_of_side; side++) {
 			// read location of
 			io_generic_read(io, &trackdesc,(header.mfmtracklistoffset)+( counter *sizeof(trackdesc)),sizeof(trackdesc));
 
-			if(trackdesc.mfmtracksize > trackbuf_size) {
-				if(trackbuf)
-					global_free(trackbuf);
-				trackbuf_size = trackdesc.mfmtracksize;
-				trackbuf = global_alloc_array(UINT8, trackbuf_size);
-			}
+			trackbuf.resize(trackdesc.mfmtracksize);
 
 			// actual data read
 			io_generic_read(io, trackbuf, trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
@@ -97,8 +91,6 @@ bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			counter++;
 		}
 	}
-	if(trackbuf)
-		global_free(trackbuf);
 
 	image->set_variant(floppy_image::DSDD);
 	return true;

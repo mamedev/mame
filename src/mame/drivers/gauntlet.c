@@ -1662,7 +1662,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet2)
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
 	UINT8 *gfx2_base = memregion("gfx2")->base();
-	UINT8 *data = auto_alloc_array(machine(), UINT8, 0x8000);
+	dynamic_buffer data(0x8000);
 	int i;
 
 	common_init(118, 1);
@@ -1676,7 +1676,6 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];
 	}
-	auto_free(machine(), data);
 }
 
 

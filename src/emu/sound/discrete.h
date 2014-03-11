@@ -3765,7 +3765,7 @@ public:
 		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
 	~dynamic_array_t() {
-		global_free(m_arr);
+		global_free_array(m_arr);
 	}
 	_ElementType& operator [] (unsigned int index) const // get array item
 	{

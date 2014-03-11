@@ -11020,12 +11020,11 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
 	int rom_size;
-	UINT8 *buf;
 	UINT8 *rom;
 	int rpos;
 
 	rom_size = 0x80000;
-	buf = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx2")->base() + 0x40000;
 
@@ -11044,8 +11043,6 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	}
 
 	memcpy( rom, buf, rom_size );
-
-	auto_free(machine(), buf);
 }
 
 

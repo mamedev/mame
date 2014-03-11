@@ -240,9 +240,9 @@ void gba_cart_slot_device::call_unload()
  call softlist load
  -------------------------------------------------*/
 
-bool gba_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -396,28 +396,28 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-const char * gba_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void gba_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "gba_rom";
 		UINT32 len = core_fsize(m_file);
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		type = get_cart_type(ROM, len);
+		type = get_cart_type(rom, len);
 		slot_string = gba_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
+		return;
 	}
 
-	return software_get_default_slot(config, options, this, "gba_rom");
+	software_get_default_slot(result, "gba_rom");
 }
 
 /*-------------------------------------------------

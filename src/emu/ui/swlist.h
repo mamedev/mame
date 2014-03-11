@@ -41,7 +41,7 @@ private:
 
 class ui_menu_software_list : public ui_menu {
 public:
-	ui_menu_software_list(running_machine &machine, render_container *container, const software_list_device *swlist, const char *interface, astring &result);
+	ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result);
 	virtual ~ui_menu_software_list();
 	virtual void populate();
 	virtual void handle();
@@ -55,7 +55,7 @@ private:
 	};
 
 	// variables
-	const software_list_device *	m_swlist; // currently selected list
+	software_list_device *			m_swlist; // currently selected list
 	const char *					m_interface;
 	astring &						m_result;
 	entry_info *					m_entrylist;
@@ -72,14 +72,14 @@ private:
 
 class ui_menu_software : public ui_menu {
 public:
-	ui_menu_software(running_machine &machine, render_container *container, const char *interface, const software_list_device **result);
+	ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result);
 	virtual ~ui_menu_software();
 	virtual void populate();
 	virtual void handle();
 
 private:
 	const char *					m_interface;
-	const software_list_device **	m_result;
+	software_list_device **			m_result;
 };
 
 #endif  /* __UI_SWLIST_H__ */

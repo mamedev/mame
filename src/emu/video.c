@@ -101,7 +101,6 @@ video_manager::video_manager(running_machine &machine)
 		m_snap_native(true),
 		m_snap_width(0),
 		m_snap_height(0),
-		m_mngfile(NULL),
 		m_avifile(NULL),
 		m_movie_frame_period(attotime::zero),
 		m_movie_next_frame_time(attotime::zero),
@@ -422,7 +421,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	else if (format == MF_MNG)
 	{
 		// create a new movie file and start recording
-		m_mngfile = auto_alloc(machine(), emu_file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+		m_mngfile.reset(global_alloc(emu_file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)));
 		file_error filerr;
 		if (name != NULL)
 			filerr = m_mngfile->open(name);
@@ -443,8 +442,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		else
 		{
 			mame_printf_error("Error creating MNG\n");
-			global_free(m_mngfile);
-			m_mngfile = NULL;
+			m_mngfile.reset();
 		}
 	}
 }
@@ -467,8 +465,7 @@ void video_manager::end_recording()
 	if (m_mngfile != NULL)
 	{
 		mng_capture_stop(*m_mngfile);
-		auto_free(machine(), m_mngfile);
-		m_mngfile = NULL;
+		m_mngfile.reset();
 	}
 
 	// reset the state

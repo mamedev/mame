@@ -46,7 +46,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	DECLARE_WRITE_LINE_MEMBER(irisha_pic_set_int_line);
 	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 
 private:
 	bool m_sg1_line;

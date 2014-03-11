@@ -97,10 +97,10 @@ class voodoo_device : public device_t
 {
 public:
 	voodoo_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~voodoo_device() { global_free(m_token); }
+	~voodoo_device();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct voodoo_state *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -108,7 +108,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	struct voodoo_state *m_token;
 };
 
 class voodoo_1_device : public voodoo_device

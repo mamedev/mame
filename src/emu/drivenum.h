@@ -50,11 +50,11 @@ public:
 
 	// static helpers
 	static bool matches(const char *wildstring, const char *string);
+	static int penalty_compare(const char *source, const char *target);
 
 protected:
 	// internal helpers
 	static int driver_sort_callback(const void *elem1, const void *elem2);
-	static int penalty_compare(const char *source, const char *target);
 
 	// internal state
 	static int                          s_driver_count;
@@ -116,6 +116,9 @@ public:
 	void find_approximate_matches(const char *string, int count, int *results);
 
 private:
+	// internal helpers
+	void release_current();
+
 	// entry in the config cache
 	struct config_entry
 	{
@@ -123,8 +126,7 @@ private:
 
 	public:
 		// construction/destruction
-		config_entry(machine_config &config, int index);
-		~config_entry();
+		config_entry(machine_config &config, int index) : m_next(NULL), m_config(&config), m_index(index) { }
 
 		// getters
 		config_entry *next() const { return m_next; }
@@ -134,7 +136,7 @@ private:
 	private:
 		// internal state
 		config_entry *      m_next;
-		machine_config *    m_config;
+		auto_pointer<machine_config> m_config;
 		int                 m_index;
 	};
 
@@ -144,8 +146,8 @@ private:
 	int                 m_current;
 	int                 m_filtered_count;
 	emu_options &       m_options;
-	UINT8 *             m_included;
-	machine_config **   m_config;
+	dynamic_array<UINT8> m_included;
+	mutable dynamic_array<machine_config *> m_config;
 	mutable simple_list<config_entry> m_config_cache;
 };
 

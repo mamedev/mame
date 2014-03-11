@@ -484,6 +484,55 @@ private:
 };
 
 
+// ======================> input_device_item
+
+// a single item on an input device
+class input_device_item
+{
+protected:
+	// construction/destruction
+	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
+
+public:
+	virtual ~input_device_item() { }
+
+	// getters
+	input_device &device() const { return m_device; }
+	input_manager &manager() const;
+	running_machine &machine() const;
+	const char *name() const { return m_name; }
+	void *internal() const { return m_internal; }
+	input_item_id itemid() const { return m_itemid; }
+	input_item_class itemclass() const { return m_itemclass; }
+	const char *token() const { return m_token; }
+	INT32 current() const { return m_current; }
+	INT32 memory() const { return m_memory; }
+
+	// helpers
+	INT32 update_value();
+	void set_memory(INT32 value) { m_memory = value; }
+
+	// readers
+	virtual INT32 read_as_switch(input_item_modifier modifier) = 0;
+	virtual INT32 read_as_relative(input_item_modifier modifier) = 0;
+	virtual INT32 read_as_absolute(input_item_modifier modifier) = 0;
+
+protected:
+	// internal state
+	input_device &          m_device;               // reference to our owning device
+	astring                 m_name;                 // string name of item
+	void *                  m_internal;             // internal callback pointer
+	input_item_id           m_itemid;               // originally specified item id
+	input_item_class        m_itemclass;            // class of the item
+	item_get_state_func     m_getstate;             // get state callback
+	astring                 m_token;                // tokenized name for non-standard items
+
+	// live state
+	INT32                   m_current;              // current raw value
+	INT32                   m_memory;               // "memory" value, to remember where we started during polling
+};
+
+
 // ======================> input_device
 
 // a logical device of a given class that can provide input
@@ -522,7 +571,7 @@ private:
 	input_class &           m_class;                // reference to our class
 	astring                 m_name;                 // string name of device
 	int                     m_devindex;             // device index of this device
-	input_device_item *     m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
+	auto_pointer<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
 	void *                  m_internal;             // internal callback pointer
 
@@ -547,7 +596,7 @@ public:
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const;
-	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index] : NULL; }
+	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : NULL; }
 	input_device_class devclass() const { return m_devclass; }
 	int maxindex() const { return m_maxindex; }
 	bool enabled() const { return m_enabled; }
@@ -570,7 +619,7 @@ private:
 
 	// internal state
 	input_manager &         m_manager;              // reference to our manager
-	input_device *          m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
+	auto_pointer<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
 	input_device_class      m_devclass;             // our device class
 	int                     m_maxindex;             // maximum populated index
 	bool                    m_enabled;              // is this class enabled?
@@ -1094,6 +1143,11 @@ extern const char joystick_map_4way_diagonal[];
 //  INLINE FUNCTIONS
 //**************************************************************************
 
+// input_device_item helpers
+inline input_manager &input_device_item::manager() const { return m_device.manager(); }
+inline running_machine &input_device_item::machine() const { return m_device.machine(); }
+inline  INT32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
+
 // input_device helpers
 inline input_manager &input_device::manager() const { return m_class.manager(); }
 inline running_machine &input_device::machine() const { return m_class.machine(); }
@@ -1101,6 +1155,7 @@ inline input_device_class input_device::devclass() const { return m_class.devcla
 
 // input_class helpers
 inline running_machine &input_class::machine() const { return m_manager.machine(); }
+
 
 
 #endif  // __INPUT_H__

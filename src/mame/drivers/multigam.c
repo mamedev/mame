@@ -1460,7 +1460,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	UINT8* buf = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer buf(0x80000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -1492,7 +1492,6 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 		rom[i] = BITSWAP8(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 
-	auto_free(machine(), buf);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 };
 

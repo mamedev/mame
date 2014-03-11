@@ -260,18 +260,18 @@ public:
 private:
 	// internal helpers
 	bool set_state(script_state newstate);
-	cheat_script *&script_for_state(script_state state);
+	auto_pointer<cheat_script> &script_for_state(script_state state);
 
 	// internal state
 	cheat_manager &     m_manager;                      // reference to our manager
 	cheat_entry *       m_next;                         // next cheat entry
 	astring             m_description;                  // string description/menu title
 	astring             m_comment;                      // comment data
-	cheat_parameter *   m_parameter;                    // parameter
-	cheat_script *      m_on_script;                    // script to run when turning on
-	cheat_script *      m_off_script;                   // script to run when turning off
-	cheat_script *      m_change_script;                // script to run when value changes
-	cheat_script *      m_run_script;                   // script to run each frame when on
+	auto_pointer<cheat_parameter> m_parameter;          // parameter
+	auto_pointer<cheat_script> m_on_script;             // script to run when turning on
+	auto_pointer<cheat_script> m_off_script;            // script to run when turning off
+	auto_pointer<cheat_script> m_change_script;         // script to run when value changes
+	auto_pointer<cheat_script> m_run_script;            // script to run each frame when on
 	symbol_table        m_symbols;                      // symbol table for this cheat
 	script_state        m_state;                        // current cheat state
 	UINT32              m_numtemp;                      // number of temporary variables

@@ -138,7 +138,7 @@ struct device_info
 	// device information
 	device_info **          head;
 	device_info *           next;
-	char    *           name;
+	astring                 name;
 
 	// MAME information
 	input_device *          device;
@@ -759,7 +759,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 
 		devinfo->joystick.device = joy;
 
-		mame_printf_verbose("Joystick: %s\n", devinfo->name);
+		mame_printf_verbose("Joystick: %s\n", devinfo->name.cstr());
 		mame_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 		mame_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
 
@@ -775,7 +775,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 			else
 				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
-			sprintf(tempname, "A%d %s", axis, devinfo->name);
+			sprintf(tempname, "A%d %s", axis, devinfo->name.cstr());
 			devinfo->device->add_item(tempname, itemid, generic_axis_get_state, &devinfo->joystick.axes[axis]);
 		}
 
@@ -826,9 +826,9 @@ static void sdlinput_register_joysticks(running_machine &machine)
 			else
 				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
-			sprintf(tempname, "R%d %s", ball * 2, devinfo->name);
+			sprintf(tempname, "R%d %s", ball * 2, devinfo->name.cstr());
 			devinfo->device->add_item(tempname, (input_item_id) itemid, generic_axis_get_state, &devinfo->joystick.balls[ball * 2]);
-			sprintf(tempname, "R%d %s", ball * 2 + 1, devinfo->name);
+			sprintf(tempname, "R%d %s", ball * 2 + 1, devinfo->name.cstr());
 			devinfo->device->add_item(tempname, (input_item_id) (itemid + 1), generic_axis_get_state, &devinfo->joystick.balls[ball * 2 + 1]);
 		}
 	}
@@ -886,9 +886,9 @@ static void sdlinput_register_mice(running_machine &machine)
 			continue;
 
 		// add the axes
-		sprintf(defname, "X %s", devinfo->name);
+		sprintf(defname, "X %s", devinfo->name.cstr());
 		devinfo->device->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->mouse.lX);
-		sprintf(defname, "Y %s", devinfo->name);
+		sprintf(defname, "Y %s", devinfo->name.cstr());
 		devinfo->device->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->mouse.lY);
 
 		for (button = 0; button < 4; button++)
@@ -903,7 +903,7 @@ static void sdlinput_register_mice(running_machine &machine)
 
 		if (0 && mouse_enabled)
 			SDL_SetRelativeMouseMode(index, SDL_TRUE);
-		mame_printf_verbose("Mouse: Registered %s\n", devinfo->name);
+		mame_printf_verbose("Mouse: Registered %s\n", devinfo->name.cstr());
 	}
 	mame_printf_verbose("Mouse: End initialization\n");
 }
@@ -920,7 +920,7 @@ static void sdlinput_register_mice(running_machine &machine)
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
-	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name.cstr(), devinfo);
 
 	mouse_enabled = machine.options().mouse();
 
@@ -936,7 +936,7 @@ static void sdlinput_register_mice(running_machine &machine)
 		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->mouse.buttons[button]);
 	}
 
-	mame_printf_verbose("Mouse: Registered %s\n", devinfo->name);
+	mame_printf_verbose("Mouse: Registered %s\n", devinfo->name.cstr());
 	mame_printf_verbose("Mouse: End initialization\n");
 }
 #endif
@@ -1143,9 +1143,9 @@ static void sdlinput_register_lightguns(running_machine &machine)
 		}
 
 
-		sprintf(defname, "X %s", devinfo->name);
+		sprintf(defname, "X %s", devinfo->name.cstr());
 		devinfo->device->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->lightgun.lX);
-		sprintf(defname, "Y %s", devinfo->name);
+		sprintf(defname, "Y %s", devinfo->name.cstr());
 		devinfo->device->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->lightgun.lY);
 
 
@@ -1342,7 +1342,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 			devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 		}
 
-		mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
+		mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name.cstr());
 	}
 	mame_printf_verbose("Keyboard: End initialization\n");
 }
@@ -1363,7 +1363,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
 	devinfo = generic_device_alloc(&keyboard_list, "System keyboard");
-	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name.cstr(), devinfo);
 
 	// populate it
 	for (keynum = 0; sdl_key_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
@@ -1380,7 +1380,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 	}
 
-	mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
+	mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name.cstr());
 	mame_printf_verbose("Keyboard: End initialization\n");
 }
 #endif
@@ -1761,7 +1761,7 @@ void sdlinput_poll(running_machine &machine)
 		case SDL_KEYDOWN:
 #ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
-			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
+			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name.cstr(), OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 #else
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
 #endif
@@ -1857,7 +1857,7 @@ void sdlinput_poll(running_machine &machine)
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
 #endif
 			devinfo->mouse.buttons[event.button.button-1] = 0x80;
-			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name);
+			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name.cstr());
 			if (event.button.button == 1)
 			{
 				// FIXME Move static declaration
@@ -1915,7 +1915,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 #if (SDLMAME_SDL2)
 			// FIXME: may apply to 1.2 as well ...
-			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name);
+			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name.cstr());
 			devinfo->mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
 #else
@@ -2238,20 +2238,13 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const c
 	devinfo->head = devlist_head_ptr;
 
 	// allocate a UTF8 copy of the name
-	devinfo->name = (char *) global_alloc_array(char, strlen(name)+1);
-	if (devinfo->name == NULL)
-		goto error;
-	strcpy(devinfo->name, (char *)name);
+	devinfo->name.cpy(name);
 
 	// append us to the list
 	for (curdev_ptr = devinfo->head; *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;
 	*curdev_ptr = devinfo;
 
 	return devinfo;
-
-error:
-	global_free(devinfo);
-	return NULL;
 }
 
 
@@ -2267,13 +2260,6 @@ static void generic_device_free(device_info *devinfo)
 	for (curdev_ptr = devinfo->head; *curdev_ptr != devinfo && *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;
 	if (*curdev_ptr == devinfo)
 		*curdev_ptr = devinfo->next;
-
-	// free the copy of the name if present
-	if (devinfo->name != NULL)
-	{
-		global_free((void *)devinfo->name);
-	}
-	devinfo->name = NULL;
 
 	// and now free the info
 	global_free(devinfo);

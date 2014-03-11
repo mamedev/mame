@@ -161,7 +161,7 @@ public:
 
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	void set_image_interface(const char *image_interface) { m_image_interface = image_interface; }
 protected:

@@ -750,10 +750,7 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 		/* read as much as we can */
 		LOG(("  Reading %X bytes into buffer\n", bytesleft));
 		if (rom_fread(romdata, bufptr, bytesleft, parent_region) != bytesleft)
-		{
-			auto_free(romdata->machine(), tempbuf);
 			return 0;
-		}
 		numbytes -= bytesleft;
 
 		LOG(("  Copying to %p\n", base));
@@ -1281,43 +1278,12 @@ static void normalize_flags_for_device(running_machine &machine, const char *rgn
     more general process_region_list.
 -------------------------------------------------*/
 
-void load_software_part_region(device_t *device, char *swlist, char *swname, rom_entry *start_region)
+void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region)
 {
-	astring locationtag(swlist), breakstr("%");
-	romload_private *romdata = device->machine().romload_data;
+	astring locationtag(swlist.list_name()), breakstr("%");
+	romload_private *romdata = device.machine().romload_data;
 	const rom_entry *region;
 	astring regiontag;
-
-	// attempt reading up the chain through the parents and create a locationtag astring in the format
-	// " swlist % clonename % parentname "
-	// open_rom_file contains the code to split the elements and to create paths to load from
-
-	software_list *software_list_ptr = software_list_open(device->machine().options(), swlist, FALSE, NULL);
-	if (software_list_ptr)
-	{
-		locationtag.cat(breakstr);
-
-		for (software_info *swinfo = software_list_find(software_list_ptr, swname, NULL); swinfo != NULL; )
-		{
-			{
-				astring tmp(swinfo->shortname);
-				locationtag.cat(tmp);
-				locationtag.cat(breakstr);
-				// printf("%s\n", locationtag.cstr());
-			}
-			const char *parentname = software_get_clone(device->machine().options(), swlist, swinfo->shortname);
-			if (parentname != NULL)
-				swinfo = software_list_find(software_list_ptr, parentname, NULL);
-			else
-				swinfo = NULL;
-		}
-		// strip the final '%'
-		locationtag.del(locationtag.len() - 1, 1);
-		software_list_close(software_list_ptr);
-	}
-
-	/* Make sure we are passed a device */
-	assert(device != NULL);
 
 	romdata->errorstring.reset();
 	romdata->softwarningstring.reset();
@@ -1326,23 +1292,44 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	romdata->romstotalsize = 0;
 	romdata->romsloadedsize = 0;
 
-	if (software_get_support(device->machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
+	software_info *swinfo = swlist.find(swname);
+	if (swinfo != NULL)
 	{
-		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
-		romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only partial\n", swname, swlist);
+		UINT32 supported = swinfo->supported();
+		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
+		{
+			romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+		}
+		if (supported == SOFTWARE_SUPPORTED_NO)
+		{
+			romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+		}
+
+		// attempt reading up the chain through the parents and create a locationtag astring in the format
+		// " swlist % clonename % parentname "
+		// open_rom_file contains the code to split the elements and to create paths to load from
+
+		locationtag.cat(breakstr);
+
+		while (swinfo != NULL)
+		{
+			locationtag.cat(swinfo->shortname()).cat(breakstr);
+			const char *parentname = swinfo->parentname();
+			swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
+		}
+		// strip the final '%'
+		locationtag.del(locationtag.len() - 1, 1);
 	}
-	if (software_get_support(device->machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_NO)
-	{
-		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist);
-		romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only preliminary\n", swname, swlist);
-	}
+
 
 	/* loop until we hit the end */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
-		device->subtag(regiontag, ROMREGION_GETTAG(region));
+		device.subtag(regiontag, ROMREGION_GETTAG(region));
 		LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
 
 		/* the first entry must be a region */
@@ -1388,7 +1375,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, locationtag, region, region + 1, device, TRUE);
+			process_rom_entries(romdata, locationtag, region, region + 1, &device, TRUE);
 		else if (ROMREGION_ISDISKDATA(region))
 			process_disk_entries(romdata, core_strdup(regiontag.cstr()), region, region + 1, locationtag);
 	}
@@ -1396,7 +1383,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
-		device->subtag(regiontag, ROMREGION_GETTAG(region));
+		device.subtag(regiontag, ROMREGION_GETTAG(region));
 		region_post_process(romdata, regiontag.cstr(), ROMREGION_ISINVERTED(region));
 	}
 

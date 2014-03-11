@@ -325,12 +325,12 @@ ROM_END
 void pirates_state::pirates_decrypt_68k()
 {
 	int rom_size;
-	UINT16 *buf, *rom;
+	UINT16 *rom;
 	int i;
 
 	rom_size = memregion("maincpu")->bytes();
 
-	buf = auto_alloc_array(machine(), UINT16, rom_size/2);
+	dynamic_buffer buf(rom_size/2);
 
 	rom = (UINT16 *)memregion("maincpu")->base();
 	memcpy (buf, rom, rom_size);
@@ -348,18 +348,17 @@ void pirates_state::pirates_decrypt_68k()
 
 		rom[i] = (vr<<8) | vl;
 	}
-	auto_free (machine(), buf);
 }
 
 void pirates_state::pirates_decrypt_p()
 {
 	int rom_size;
-	UINT8 *buf, *rom;
+	UINT8 *rom;
 	int i;
 
 	rom_size = memregion("gfx1")->bytes();
 
-	buf = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx1")->base();
 	memcpy (buf, rom, rom_size);
@@ -372,18 +371,17 @@ void pirates_state::pirates_decrypt_p()
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
 	}
-	auto_free (machine(), buf);
 }
 
 void pirates_state::pirates_decrypt_s()
 {
 	int rom_size;
-	UINT8 *buf, *rom;
+	UINT8 *rom;
 	int i;
 
 	rom_size = memregion("gfx2")->bytes();
 
-	buf = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx2")->base();
 	memcpy (buf, rom, rom_size);
@@ -396,19 +394,18 @@ void pirates_state::pirates_decrypt_s()
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
 	}
-	auto_free (machine(), buf);
 }
 
 
 void pirates_state::pirates_decrypt_oki()
 {
 	int rom_size;
-	UINT8 *buf, *rom;
+	UINT8 *rom;
 	int i;
 
 	rom_size = memregion("oki")->bytes();
 
-	buf = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer buf(rom_size);
 
 	rom = memregion("oki")->base();
 	memcpy (buf, rom, rom_size);
@@ -418,7 +415,6 @@ void pirates_state::pirates_decrypt_oki()
 		int adr = BITSWAP24(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
 		rom[adr] = BITSWAP8(buf[i], 2,3,4,0,7,5,1,6);
 	}
-	auto_free (machine(), buf);
 }
 
 

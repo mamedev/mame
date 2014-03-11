@@ -299,10 +299,10 @@ class apollo_graphics_15i : public device_t
 public:
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
-	~apollo_graphics_15i() { global_free(m_token); }
+	~apollo_graphics_15i();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	class apollo_graphics *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -310,7 +310,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	class apollo_graphics *m_token;
 };
 
 extern const device_type APOLLO_GRAPHICS;

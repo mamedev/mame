@@ -342,13 +342,10 @@ void nes_cart_slot_device::call_load_ines()
 	UINT8 header[0x10];
 	UINT8 mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
-	const char *mapinfo = NULL;
+	astring mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 	bool bus_conflict = FALSE;
-
-	// check if the image is recognized by nes.hsi
-	mapinfo = hashfile_extrainfo(*this);
 
 	// read out the header
 	fseek(0, SEEK_SET);
@@ -380,7 +377,7 @@ void nes_cart_slot_device::call_load_ines()
 	}
 
 	// use info from nes.hsi if available!
-	if (mapinfo)
+	if (hashfile_extrainfo(*this, mapinfo))
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
@@ -395,7 +392,7 @@ void nes_cart_slot_device::call_load_ines()
 		}
 		else
 		{
-			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo);
+			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.cstr());
 		}
 	}
 	else
@@ -818,12 +815,9 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 {
 	UINT8 mapper, submapper = 0;
 	bool ines20 = FALSE;
-	const char *mapinfo = NULL;
+	astring mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
-
-	// check if the image is recognized by nes.hsi
-//  mapinfo = hashfile_extrainfo(*this);
 
 	mapper = (ROM[6] & 0xf0) >> 4;
 
@@ -843,7 +837,8 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	}
 
 	// use info from nes.hsi if available!
-	if (mapinfo)
+//	if (hashfile_extrainfo(*this, mapinfo))
+	if (0)
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{

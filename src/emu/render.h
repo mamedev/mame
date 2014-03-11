@@ -246,15 +246,11 @@ class render_screen_list
 	};
 
 public:
-	// construction/destruction
-	render_screen_list(resource_pool &pool = global_resource_pool())
-		: m_list(pool) { }
-
 	// getters
 	int count() const { return m_list.count(); }
 
 	// operations
-	void add(screen_device &screen) { m_list.append(*pool_alloc(m_list.pool(), item(screen))); }
+	void add(screen_device &screen) { m_list.append(*global_alloc(item(screen))); }
 	void reset() { m_list.reset(); }
 
 	// query
@@ -424,6 +420,7 @@ class render_texture
 public:
 	// getters
 	int format() const { return m_format; }
+	render_manager *manager() const { return m_manager; }
 
 	// configure the texture bitmap
 	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
@@ -578,7 +575,7 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	palette_client *        m_palclient;            // client to the system palette
+	auto_pointer<palette_client> m_palclient;       // client to the system palette
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 	rgb_t                   m_bcglookup[0x10000];   // full palette lookup with bcg adjustements
 };
@@ -694,7 +691,7 @@ private:
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
 	layout_view *           m_curview;                  // current view
-	simple_list<layout_file> &m_filelist;               // list of layout files
+	simple_list<layout_file> m_filelist;                // list of layout files
 	UINT32                  m_flags;                    // creation flags
 	render_primitive_list   m_primlist[NUM_PRIMLISTS];  // list of primitives
 	int                     m_listindex;                // index of next primlist to use

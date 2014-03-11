@@ -104,7 +104,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 #define auto_bitmap_ind16_alloc(m, w, h)    auto_alloc(m, bitmap_ind16(w, h))
 #define auto_bitmap_ind32_alloc(m, w, h)    auto_alloc(m, bitmap_ind32(w, h))
 #define auto_bitmap_rgb32_alloc(m, w, h)    auto_alloc(m, bitmap_rgb32(w, h))
-#define auto_strdup(m, s)               strcpy(auto_alloc_array(m, char, strlen(s) + 1), s)
 
 
 
@@ -311,14 +310,14 @@ private:
 	osd_interface &         m_osd;                  // reference to OSD system
 
 	// managers
-	cheat_manager *         m_cheat;                // internal data from cheat.c
-	render_manager *        m_render;               // internal data from render.c
-	input_manager *         m_input;                // internal data from input.c
-	sound_manager *         m_sound;                // internal data from sound.c
-	video_manager *         m_video;                // internal data from video.c
-	ui_manager *            m_ui;                   // internal data from ui.c
-	tilemap_manager *       m_tilemap;              // internal data from tilemap.c
-	debug_view_manager *    m_debug_view;           // internal data from debugvw.c
+	auto_pointer<cheat_manager> m_cheat;            // internal data from cheat.c
+	auto_pointer<render_manager> m_render;          // internal data from render.c
+	auto_pointer<input_manager> m_input;            // internal data from input.c
+	auto_pointer<sound_manager> m_sound;            // internal data from sound.c
+	auto_pointer<video_manager> m_video;            // internal data from video.c
+	auto_pointer<ui_manager> m_ui;                  // internal data from ui.c
+	auto_pointer<tilemap_manager> m_tilemap;        // internal data from tilemap.c
+	auto_pointer<debug_view_manager> m_debug_view;  // internal data from debugvw.c
 
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
@@ -341,7 +340,7 @@ private:
 	astring                 m_basename;             // basename used for game-related paths
 	astring                 m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
-	emu_file *              m_logfile;              // pointer to the active log file
+	auto_pointer<emu_file>  m_logfile;              // pointer to the active log file
 
 	// load/save management
 	enum saveload_schedule

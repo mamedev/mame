@@ -1662,9 +1662,8 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 
 	UINT32 i;
 	UINT8 *rom;
-	UINT8 *tmp;
 
-	tmp = auto_alloc_array(machine(), UINT8, 0x8000);
+	dynamic_buffer tmp(0x8000);
 	rom = memregion("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
@@ -1683,8 +1682,6 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 
 		rom[addr] = data;
 	}
-
-	auto_free(machine(), tmp);
 
 	init_ram();
 

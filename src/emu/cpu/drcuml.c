@@ -124,9 +124,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 		m_beintf((device.machine().options().drc_use_c()) ?
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine(), drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
-		m_umllog(NULL),
-		m_blocklist(device.machine().respool()),
-		m_symlist(device.machine().respool())
+		m_umllog(NULL)
 {
 	// if we're to log, create the logfile
 	if (flags & DRCUML_OPTION_LOG_UML)
@@ -201,7 +199,7 @@ drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 
 	// if we failed to find one, allocate a new one
 	if (bestblock == NULL)
-		bestblock = &m_blocklist.append(*auto_alloc(m_device.machine(), drcuml_block(*this, maxinst * 3/2)));
+		bestblock = &m_blocklist.append(*global_alloc(drcuml_block(*this, maxinst * 3/2)));
 
 	// start the block
 	bestblock->begin();
@@ -216,7 +214,7 @@ drcuml_block *drcuml_state::begin_block(UINT32 maxinst)
 code_handle *drcuml_state::handle_alloc(const char *name)
 {
 	// allocate the handle, add it to our list, and return it
-	return &m_handlelist.append(*auto_alloc(m_device.machine(), code_handle(*this, name)));
+	return &m_handlelist.append(*global_alloc(code_handle(*this, name)));
 }
 
 
@@ -227,7 +225,7 @@ code_handle *drcuml_state::handle_alloc(const char *name)
 
 void drcuml_state::symbol_add(void *base, UINT32 length, const char *name)
 {
-	m_symlist.append(*auto_alloc(m_device.machine(), symbol(base, length, name)));
+	m_symlist.append(*global_alloc(symbol(base, length, name)));
 }
 
 

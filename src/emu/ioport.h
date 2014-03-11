@@ -1090,7 +1090,7 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	ioport_field_live *         m_live;             // live state of field (NULL if not live)
+	auto_pointer<ioport_field_live> m_live;         // live state of field (NULL if not live)
 	int                         m_modcount;         // modification count
 	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
 	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
@@ -1138,9 +1138,7 @@ class ioport_list : public tagged_list<ioport_port>
 	DISABLE_COPYING(ioport_list);
 
 public:
-	// construction/destruction
-	ioport_list(resource_pool &pool = global_resource_pool())
-		: tagged_list<ioport_port>(pool) { }
+	ioport_list() { }
 
 	using tagged_list<ioport_port>::append;
 	void append(device_t &device, astring &errorbuf);
@@ -1195,7 +1193,7 @@ private:
 	astring                     m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
-	ioport_port_live *          m_live;         // live state of port (NULL if not live)
+	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
 };
 
 

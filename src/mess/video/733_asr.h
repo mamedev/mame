@@ -19,12 +19,12 @@ class asr733_device : public device_t
 {
 public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~asr733_device() { global_free(m_token); }
+	~asr733_device();
 
 	DECLARE_PALETTE_INIT(asr733);
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct asr_t *token() const { assert(m_token != NULL); return m_token; }
 	
 protected:
 	// device-level overrides
@@ -36,7 +36,7 @@ public:
 	required_device<palette_device> m_palette;
 private:
 	// internal state
-	void *m_token;
+	struct asr_t *m_token;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

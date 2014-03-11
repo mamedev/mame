@@ -482,10 +482,10 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, auto_alloc(machine(), gfx_element(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(m_palette, mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+2, auto_alloc(machine(), gfx_element(m_palette, mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+3, auto_alloc(machine(), gfx_element(m_palette, mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+0, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+2, global_alloc(gfx_element(m_palette, mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+3, global_alloc(gfx_element(m_palette, mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), m_palette->entries() / 16, 0)));
 
 	m_scn2674->init_stuff();
 

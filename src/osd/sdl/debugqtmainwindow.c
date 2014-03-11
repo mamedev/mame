@@ -123,8 +123,8 @@ MainWindow::~MainWindow()
 void MainWindow::setProcessor(device_t* processor)
 {
 	// Cpu swap
-	m_procFrame->view()->view()->set_source(*m_procFrame->view()->view()->source_list().match_device(processor));
-	m_dasmFrame->view()->view()->set_source(*m_dasmFrame->view()->view()->source_list().match_device(processor));
+	m_procFrame->view()->view()->set_source(*m_procFrame->view()->view()->source_for_device(processor));
+	m_dasmFrame->view()->view()->set_source(*m_dasmFrame->view()->view()->source_for_device(processor));
 
 	// Scrollbar refresh - seems I should be able to do in the DebuggerView
 	m_dasmFrame->view()->verticalScrollBar()->setValue(m_dasmFrame->view()->view()->visible_position().y);

@@ -1755,7 +1755,7 @@ static void memory_create_window(running_machine &machine)
 
 	// populate the combobox
 	int maxlength = 0;
-	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = info->view[0].view->first_source(); source != NULL; source = source->next())
 	{
 		int length = strlen(source->name());
 		if (length > maxlength)
@@ -1764,8 +1764,8 @@ static void memory_create_window(running_machine &machine)
 		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
-	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);
-	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().index(*source), 0);
+	const debug_view_source *source = info->view[0].view->source_for_device(curcpu);
+	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().indexof(*source), 0);
 	SendMessage(info->otherwnd[0], CB_SETDROPPEDWIDTH, (maxlength + 2) * debug_font_width + vscroll_width, 0);
 	info->view[0].view->set_source(*source);
 
@@ -1889,7 +1889,7 @@ static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			int sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 			if (sel != CB_ERR)
 			{
-				memview->set_source(*memview->source_list().by_index(sel));
+				memview->set_source(*memview->source_list().find(sel));
 				memory_update_caption(info->machine(), info->wnd);
 
 				// reset the focus
@@ -2066,7 +2066,7 @@ static void disasm_create_window(running_machine &machine)
 
 	// populate the combobox
 	int maxlength = 0;
-	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = info->view[0].view->first_source(); source != NULL; source = source->next())
 	{
 		int length = strlen(source->name());
 		if (length > maxlength)
@@ -2075,8 +2075,8 @@ static void disasm_create_window(running_machine &machine)
 		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
-	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);
-	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().index(*source), 0);
+	const debug_view_source *source = info->view[0].view->source_for_device(curcpu);
+	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().indexof(*source), 0);
 	SendMessage(info->otherwnd[0], CB_SETDROPPEDWIDTH, (maxlength + 2) * debug_font_width + vscroll_width, 0);
 	info->view[0].view->set_source(*source);
 
@@ -2198,7 +2198,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			int sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 			if (sel != CB_ERR)
 			{
-				dasmview->set_source(*dasmview->source_list().by_index(sel));
+				dasmview->set_source(*dasmview->source_list().find(sel));
 				disasm_update_caption(info->machine(), info->wnd);
 
 				// reset the focus
@@ -2468,7 +2468,7 @@ void console_create_window(running_machine &machine)
 
 	// loop over all register views and get the maximum size
 	main_console_regwidth = 0;
-	for (const debug_view_source *source = info->view[1].view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = info->view[1].view->first_source(); source != NULL; source = source->next())
 	{
 		UINT32 regchars;
 
@@ -2486,7 +2486,7 @@ void console_create_window(running_machine &machine)
 	// loop over all CPUs and compute the width range based on dasm width
 	info->minwidth = 0;
 	info->maxwidth = 0;
-	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = info->view[0].view->first_source(); source != NULL; source = source->next())
 	{
 		UINT32 minwidth, maxwidth, dischars;
 
@@ -2623,8 +2623,8 @@ static void console_process_string(debugwin_info *info, const char *string)
 static void console_set_cpu(device_t *device)
 {
 	// first set all the views to the new cpu number
-	main_console->view[0].view->set_source(*main_console->view[0].view->source_list().match_device(device));
-	main_console->view[1].view->set_source(*main_console->view[1].view->source_list().match_device(device));
+	main_console->view[0].view->set_source(*main_console->view[0].view->source_for_device(device));
+	main_console->view[1].view->set_source(*main_console->view[1].view->source_for_device(device));
 
 	// then update the caption
 	char curtitle[256];

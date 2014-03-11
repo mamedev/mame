@@ -1510,37 +1510,38 @@ void gaiden_state::descramble_drgnbowl_gfx()
 	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, size);
-
-	memcpy(buffer, ROM, size);
-	for( i = 0; i < size; i++ )
+	
 	{
-		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
-									19,18,17,15,
-							16,14,13,12,
-							11,10, 9, 8,
-								7, 6, 5, 4,
-								3, 2, 1, 0)];
-	}
+		dynamic_buffer buffer(size);
 
-	auto_free(machine(), buffer);
+		memcpy(buffer, ROM, size);
+		for( i = 0; i < size; i++ )
+		{
+			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+										19,18,17,15,
+								16,14,13,12,
+								11,10, 9, 8,
+									7, 6, 5, 4,
+									3, 2, 1, 0)];
+		}
+	}
 
 	ROM = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes();
-	buffer = auto_alloc_array(machine(), UINT8, size);
-
-	memcpy(buffer,ROM,size);
-	for( i = 0; i < size; i++ )
 	{
-		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
-									19,18,16,17,
-									15,14,13, 4,
-										3,12,11,10,
-										9, 8, 7, 6,
-										5, 2, 1, 0)];
-	}
+		dynamic_buffer buffer(size);
 
-	auto_free(machine(), buffer);
+		memcpy(buffer,ROM,size);
+		for( i = 0; i < size; i++ )
+		{
+			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+										19,18,16,17,
+										15,14,13, 4,
+											3,12,11,10,
+											9, 8, 7, 6,
+											5, 2, 1, 0)];
+		}
+	}
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
@@ -1552,12 +1553,11 @@ DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
 
 void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 {
-	UINT8 *buffer;
 	int len = 0x80000;
 
 	/*  rearrange gfx */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 		{
@@ -1570,11 +1570,10 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		auto_free(machine(), buffer);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0; i < len; i++)
 		{
@@ -1587,7 +1586,6 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		auto_free(machine(), buffer);
 	}
 }
 

@@ -202,6 +202,11 @@ namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *
 	m_token = global_alloc_clear(namco_53xx_state);
 }
 
+namco_53xx_device::~namco_53xx_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

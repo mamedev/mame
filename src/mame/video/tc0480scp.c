@@ -292,7 +292,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0480SCP_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));

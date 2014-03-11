@@ -910,11 +910,10 @@ static const gfx_layout legionna_new_charlayout =
 
 void legionna_state::descramble_legionnaire_gfx(UINT8* src)
 {
-	UINT8 *buffer;
 	int len = 0x10000;
 
 	/*  rearrange gfx */
-	buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -928,7 +927,6 @@ void legionna_state::descramble_legionnaire_gfx(UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src,buffer,len);
-		auto_free(machine(), buffer);
 	}
 
 }

@@ -1600,6 +1600,11 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	m_token = global_alloc_clear(aica_state);
 }
 
+aica_device::~aica_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

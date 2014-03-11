@@ -245,6 +245,11 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 	m_token = global_alloc_clear(dmadac_state);
 }
 
+dmadac_sound_device::~dmadac_sound_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

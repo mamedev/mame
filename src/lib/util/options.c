@@ -50,19 +50,19 @@ const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 //  entry - constructor
 //-------------------------------------------------
 
-core_options::entry::entry(const options_entry &entrylist)
+core_options::entry::entry(const char *name, const char *description, UINT32 flags, const char *defvalue)
 	: m_next(NULL),
-		m_flags(entrylist.flags),
+		m_flags(flags),
 		m_seqid(0),
 		m_error_reported(false),
 		m_priority(OPTION_PRIORITY_DEFAULT),
-		m_description(entrylist.description)
+		m_description(description)
 {
 	// copy in the name(s) as appropriate
-	if (entrylist.name != NULL)
+	if (name != NULL)
 	{
 		// first extract any range
-		astring namestr(entrylist.name);
+		astring namestr(name);
 		int lparen = namestr.chr(0, '(');
 		int dash = namestr.chr(lparen + 1, '-');
 		int rparen = namestr.chr(dash + 1, ')');
@@ -88,8 +88,8 @@ core_options::entry::entry(const options_entry &entrylist)
 	}
 
 	// set the default value
-	if (entrylist.defvalue != NULL)
-		m_defdata = entrylist.defvalue;
+	if (defvalue != NULL)
+		m_defdata = defvalue;
 	m_data = m_defdata;
 }
 
@@ -156,29 +156,21 @@ void core_options::entry::revert(int priority)
 //-------------------------------------------------
 
 core_options::core_options()
-	: m_entrylist(NULL),
-		m_entrylist_tailptr(&m_entrylist)
 {
 }
 
 core_options::core_options(const options_entry *entrylist)
-	: m_entrylist(NULL),
-		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist);
 }
 
 core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2)
-	: m_entrylist(NULL),
-		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist1);
 	add_entries(entrylist2);
 }
 
 core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2, const options_entry *entrylist3)
-	: m_entrylist(NULL),
-		m_entrylist_tailptr(&m_entrylist)
 {
 	add_entries(entrylist1);
 	add_entries(entrylist2);
@@ -186,8 +178,6 @@ core_options::core_options(const options_entry *entrylist1, const options_entry 
 }
 
 core_options::core_options(const core_options &src)
-	: m_entrylist(NULL),
-		m_entrylist_tailptr(&m_entrylist)
 {
 	copyfrom(src);
 }
@@ -199,13 +189,6 @@ core_options::core_options(const core_options &src)
 
 core_options::~core_options()
 {
-	// delete all entries from the list
-	while (m_entrylist != NULL)
-	{
-		core_options::entry *e = m_entrylist;
-		remove_entry(*m_entrylist);
-		delete e;
-	}
 }
 
 
@@ -229,11 +212,11 @@ core_options &core_options::operator=(const core_options &rhs)
 bool core_options::operator==(const core_options &rhs)
 {
 	// iterate over options in the first list
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+	for (entry *curentry = m_entrylist.first(); curentry != NULL; curentry = curentry->next())
 		if (!curentry->is_header())
 		{
 			// if the values differ, return false
-			if (strcmp(curentry->m_data, rhs.value(curentry->name())) != 0)
+			if (strcmp(curentry->value(), rhs.value(curentry->name())) != 0)
 				return false;
 		}
 
@@ -252,6 +235,40 @@ bool core_options::operator!=(const core_options &rhs)
 
 
 //-------------------------------------------------
+//  add_entry - add an entry to the current
+//  options set
+//-------------------------------------------------
+
+void core_options::add_entry(const char *name, const char *description, UINT32 flags, const char *defvalue, bool override_existing)
+{
+	// allocate a new entry
+	entry *newentry = global_alloc(entry(name, description, flags, defvalue));
+	if (newentry->name() != NULL)
+	{
+		// see if we match an existing entry
+		entry *existing = m_entrymap.find(newentry->name());
+		if (existing != NULL)
+		{
+			// if we're overriding existing entries, then remove the old one
+			if (override_existing)
+				m_entrylist.remove(*existing);
+
+			// otherwise, just override the default and current values and throw out the new entry
+			else
+			{
+				existing->set_default_value(newentry->value());
+				global_free(newentry);
+				return;
+			}
+		}
+	}
+
+	// add us to the list and maps
+	append_entry(*newentry);
+}
+
+
+//-------------------------------------------------
 //  add_entries - add entries to the current
 //  options sets
 //-------------------------------------------------
@@ -260,36 +277,7 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 {
 	// loop over entries until we hit a NULL name
 	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER) != 0; entrylist++)
-	{
-		// allocate a new entry
-		entry *newentry = new entry(*entrylist);
-		if (newentry->name() != NULL)
-		{
-			// see if we match an existing entry
-			entry *existing = m_entrymap.find(newentry->name());
-			if (existing != NULL)
-			{
-				// if we're overriding existing entries, then remove the old one
-				if (override_existing)
-				{
-					core_options::entry *e = m_entrylist;
-					remove_entry(*existing);
-					delete e;
-				}
-
-				// otherwise, just override the default and current values and throw out the new entry
-				else
-				{
-					existing->set_default_value(newentry->value());
-					delete newentry;
-					continue;
-				}
-			}
-		}
-
-		// add us to the list and maps
-		append_entry(*newentry);
-	}
+		add_entry(*entrylist, override_existing);
 }
 
 
@@ -323,7 +311,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 
 	// iterate through arguments
 	int unadorned_index = 0;
-	bool retVal = true;
+	bool retval = true;
 	for (int arg = 1; arg < argc; arg++)
 	{
 		// determine the entry name to search for
@@ -336,7 +324,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 		if (curentry == NULL)
 		{
 			error_string.catprintf("Error: unknown option: %s\n", curarg);
-			retVal = false;
+			retval = false;
 			if (!is_unadorned) arg++;
 			continue;
 		}
@@ -371,7 +359,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 		// set the new data
 		validate_and_set_data(*curentry, newdata, priority, error_string);
 	}
-	return retVal;
+	return retval;
 }
 
 
@@ -448,7 +436,7 @@ bool core_options::parse_ini_file(core_file &inifile, int priority, int ignore_p
 void core_options::revert(int priority)
 {
 	// iterate over options and revert to defaults if below the given priority
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+	for (entry *curentry = m_entrylist.first(); curentry != NULL; curentry = curentry->next())
 		curentry->revert(priority);
 }
 
@@ -469,7 +457,7 @@ const char *core_options::output_ini(astring &buffer, const core_options *diff)
 	const char *last_header = NULL;
 
 	// loop over all items
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+	for (entry *curentry = m_entrylist.first(); curentry != NULL; curentry = curentry->next())
 	{
 		const char *name = curentry->name();
 		const char *value = curentry->value();
@@ -529,7 +517,7 @@ const char *core_options::output_help(astring &buffer)
 	buffer.reset();
 
 	// loop over all items
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+	for (entry *curentry = m_entrylist.first(); curentry != NULL; curentry = curentry->next())
 	{
 		// header: just print
 		if (curentry->is_header())
@@ -629,6 +617,7 @@ void core_options::set_flag(const char *name, UINT32 mask, UINT32 flag)
 	curentry->set_flag(mask, flag);
 }
 
+
 //-------------------------------------------------
 //  reset - reset the options state, removing
 //  everything
@@ -636,15 +625,7 @@ void core_options::set_flag(const char *name, UINT32 mask, UINT32 flag)
 
 void core_options::reset()
 {
-	// remove all entries from the list
-	while (m_entrylist != NULL)
-	{
-		core_options::entry *e = m_entrylist;
-		remove_entry(*m_entrylist);
-		delete e;
-	}
-
-	// reset the map
+	m_entrylist.reset();
 	m_entrymap.reset();
 }
 
@@ -656,20 +637,17 @@ void core_options::reset()
 
 void core_options::append_entry(core_options::entry &newentry)
 {
-	// append to the list
-	*m_entrylist_tailptr = &newentry;
-	m_entrylist_tailptr = &newentry.m_next;
+	m_entrylist.append(newentry);
 
 	// if we have names, add them to the map
-	astring tempstr;
 	for (int name = 0; name < ARRAY_LENGTH(newentry.m_name); name++)
-		if (newentry.m_name[name])
+		if (newentry.name(name) != NULL)
 		{
-			m_entrymap.add(newentry.m_name[name], &newentry);
+			m_entrymap.add(newentry.name(name), &newentry);
 
 			// for boolean options add a "no" variant as well
 			if (newentry.type() == OPTION_BOOLEAN)
-				m_entrymap.add(tempstr.cpy("no").cat(newentry.m_name[name]), &newentry);
+				m_entrymap.add(astring("no", newentry.name(name)), &newentry);
 		}
 }
 
@@ -681,32 +659,13 @@ void core_options::append_entry(core_options::entry &newentry)
 
 void core_options::remove_entry(core_options::entry &delentry)
 {
-	// remove us from the list
-	entry *preventry = NULL;
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
-		if (curentry == &delentry)
-		{
-			// update link from previous to us
-			if (preventry != NULL)
-				preventry->m_next = delentry.m_next;
-			else
-				m_entrylist = delentry.m_next;
+	// remove all names from the map
+	for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
+		if (delentry.m_name[name])
+			m_entrymap.remove(delentry.m_name[name]);
 
-			// if we're the last item, update the next pointer
-			if (delentry.m_next == NULL)
-			{
-				if (preventry != NULL)
-					m_entrylist_tailptr = &preventry->m_next;
-				else
-					m_entrylist_tailptr = &m_entrylist;
-			}
-
-			// remove all entries from the map
-			for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
-				if (delentry.m_name[name])
-					m_entrymap.remove(delentry.m_name[name]);
-			break;
-		}
+	// remove the entry from the list
+	m_entrylist.remove(delentry);
 }
 
 
@@ -720,8 +679,8 @@ void core_options::copyfrom(const core_options &src)
 	reset();
 
 	// iterate through the src options and make our own
-	for (entry *curentry = src.m_entrylist; curentry != NULL; curentry = curentry->next())
-		append_entry(*new entry(*curentry));
+	for (entry *curentry = src.m_entrylist.first(); curentry != NULL; curentry = curentry->next())
+		append_entry(*global_alloc(entry(curentry->name(), curentry->description(), curentry->flags(), curentry->default_value())));
 }
 
 
@@ -801,16 +760,4 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	// set the data
 	curentry.set_value(data, priority);
 	return true;
-}
-
-//-------------------------------------------------
-//  options_count - take number of existing
-//  number of options in structure
-//-------------------------------------------------
-
-int core_options::options_count()
-{
-	int number = 0;
-	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next()) number++;
-	return number;
 }

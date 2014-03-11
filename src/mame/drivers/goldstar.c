@@ -11561,7 +11561,6 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 void goldstar_state::do_blockswaps(UINT8* ROM)
 {
 	int A;
-	UINT8 *buffer;
 
 	static const UINT16 cherry_swaptables[32] = {
 		/* to align with goldstar */
@@ -11577,7 +11576,7 @@ void goldstar_state::do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	dynamic_buffer buffer(0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
@@ -11585,8 +11584,6 @@ void goldstar_state::do_blockswaps(UINT8* ROM)
 	{
 		memcpy(ROM+A*0x800,buffer+cherry_swaptables[A],0x800);
 	}
-
-	auto_free(machine(), buffer);
 }
 
 void goldstar_state::dump_to_file( UINT8* ROM)

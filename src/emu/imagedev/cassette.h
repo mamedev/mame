@@ -65,7 +65,7 @@ public:
 	virtual void call_unload();
 	virtual void call_display();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_CASSETTE; }
 

@@ -43,12 +43,12 @@ class vdt911_device : public device_t
 {
 public:
 	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~vdt911_device() { global_free(m_token); }
+	~vdt911_device();
 
 	DECLARE_PALETTE_INIT(vdt911);
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct vdt_t *token() const { assert(m_token != NULL); return m_token; }
 	
 protected:
 	// device-level overrides
@@ -57,7 +57,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	// internal state
-	void *m_token;
+	struct vdt_t *m_token;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

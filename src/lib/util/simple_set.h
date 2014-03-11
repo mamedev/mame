@@ -40,9 +40,8 @@ class simple_set
 
 public:
 	// Construction
-	simple_set(resource_pool &pool = global_resource_pool())
-		: m_root(NULL),
-			m_pool(pool)
+	simple_set()
+		: m_root(NULL)
 	{ }
 
 	simple_set(const simple_set& rhs)
@@ -55,10 +54,6 @@ public:
 	{
 		clear();
 	}
-
-
-	// A reference to the resource pool
-	resource_pool &pool() const { return m_pool; }
 
 
 	// Returns number of elements in the tree -- O(n)
@@ -116,7 +111,7 @@ public:
 
 				// If it's a leaf node, simply remove it
 				removeNode(currNode);
-				pool_free(m_pool, currNode);
+				global_free(currNode);
 			}
 			else
 			{
@@ -145,7 +140,7 @@ public:
 				tree_node* right = currNode->right;
 
 				// We no longer need this node
-				pool_free(m_pool, currNode);
+				global_free(currNode);
 
 				// Check to see if we removed the root node
 				if (!parentNode)
@@ -216,7 +211,7 @@ public:
 		}
 		else
 		{
-			pool_free(m_pool, c);
+			global_free(c);
 		}
 
 		return retVal;
@@ -258,10 +253,6 @@ private:
 	// The AVL tree's root
 	tree_node* m_root;
 
-	// Resource pool where objects are freed
-	resource_pool& m_pool;
-
-
 	// Find a node in the tree
 	tree_node* findNode(const T& x) const
 	{
@@ -282,7 +273,7 @@ private:
 	{
 		if (t == NULL)
 		{
-			t = pool_alloc(m_pool, tree_node(x, NULL, NULL, NULL));
+			t = global_alloc(tree_node(x, NULL, NULL, NULL));
 
 			// An empty sub-tree here, insertion successful
 			return true;
@@ -353,7 +344,7 @@ private:
 			clearRecurse(t->left);
 			clearRecurse(t->right);
 
-			pool_free(m_pool, t);
+			global_free(t);
 		}
 		t = NULL;
 	}
@@ -485,7 +476,7 @@ private:
 		else
 		{
 			// Create a node with the left and right nodes and a parent set to NULL
-			tree_node* retVal = pool_alloc(m_pool, tree_node(t->element, NULL, clone(t->left), clone(t->right)));
+			tree_node* retVal = global_alloc(tree_node(t->element, NULL, clone(t->left), clone(t->right)));
 
 			// Now set our children's parent node reference
 			if (retVal->left) { retVal->left->setParent(retVal); }

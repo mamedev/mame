@@ -433,7 +433,7 @@ A12 <-> A13
 
 	UINT32 i,j,jscr,romoffset;
 	UINT8 *igrosoft_gamble_gfx = memregion("gfx")->base();
-	UINT8 *temprom = auto_alloc_array(machine(), UINT8, igrosoft_gamble_ROM_SIZE);
+	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
 
 
 	/* ROM 1 decode */
@@ -476,7 +476,6 @@ A12 <-> A13
 		}
 		memcpy(&igrosoft_gamble_gfx[romoffset],temprom,igrosoft_gamble_ROM_SIZE);
 	}
-	auto_free(machine(), temprom);
 }
 
 INLINE void rom_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
@@ -505,7 +504,7 @@ INLINE void rom_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor
 static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
 	UINT8 *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	UINT8 *temprom = auto_alloc_array(machine, UINT8, igrosoft_gamble_ROM_SIZE);
+	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
 	rom_decodel(&igrosoft_gamble_gfx[0x000000], temprom, xor12, xor_addr);
@@ -516,8 +515,6 @@ static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, U
 	rom_decodeh(&igrosoft_gamble_gfx[0x180000], temprom, xor56, xor_addr);
 	rom_decodeh(&igrosoft_gamble_gfx[0x280000], temprom, xor78, xor_addr);
 	rom_decodeh(&igrosoft_gamble_gfx[0x380000], temprom, xor78, xor_addr);
-
-	auto_free(machine, temprom);
 }
 
 INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
@@ -546,7 +543,7 @@ INLINE void roment_decodeh(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 
 static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8 xor56, UINT8 xor78, UINT32 xor_addr)
 {
 	UINT8 *igrosoft_gamble_gfx = machine.root_device().memregion("gfx")->base();
-	UINT8 *temprom = auto_alloc_array(machine, UINT8, igrosoft_gamble_ROM_SIZE);
+	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
 	roment_decodel(&igrosoft_gamble_gfx[0x000000], temprom, xor12, xor_addr);
@@ -557,8 +554,6 @@ static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8
 	roment_decodeh(&igrosoft_gamble_gfx[0x180000], temprom, xor56, xor_addr);
 	roment_decodeh(&igrosoft_gamble_gfx[0x280000], temprom, xor78, xor_addr);
 	roment_decodeh(&igrosoft_gamble_gfx[0x380000], temprom, xor78, xor_addr);
-
-	auto_free(machine, temprom);
 }
 
 DRIVER_INIT_MEMBER(igrosoft_gamble_state,island2l)

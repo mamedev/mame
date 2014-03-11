@@ -169,7 +169,7 @@ void srmp6_state::video_start()
 	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(m_palette, tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;

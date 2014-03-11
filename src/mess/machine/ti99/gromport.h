@@ -96,7 +96,7 @@ protected:
 	// Image handling: implementation of methods which are abstract in the parent
 	bool call_load();
 	void call_unload();
-	bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	void prepare_cartridge();
 

@@ -361,10 +361,6 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, gfxdecode_device &decoder, 
 
 	// populate logical <-> memory mappings
 	m_mapper = mapper;
-	m_memory_to_logical = NULL;
-	m_max_logical_index = 0;
-	m_logical_to_memory = NULL;
-	m_max_memory_index = 0;
 
 	// initialize tile information geters
 	m_tile_get_info = tile_get_info;
@@ -381,10 +377,8 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, gfxdecode_device &decoder, 
 	// reset scroll information
 	m_scrollrows = 1;
 	m_scrollcols = 1;
-	m_rowscroll.resize(m_height);
-	memset(&m_rowscroll[0], 0, m_height * sizeof(m_rowscroll[0]));
-	m_colscroll.resize(m_width);
-	memset(&m_colscroll[0], 0, m_width * sizeof(m_rowscroll[0]));
+	m_rowscroll.resize_and_clear(m_height);
+	m_colscroll.resize_and_clear(m_width);
 	m_dx = 0;
 	m_dx_flipped = 0;
 	m_dy = 0;
@@ -395,7 +389,6 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, gfxdecode_device &decoder, 
 
 	// allocate transparency mapping
 	m_flagsmap.allocate(m_width, m_height);
-	m_tileflags = NULL;
 	memset(m_pen_to_flags, 0, sizeof(m_pen_to_flags));
 
 	// create the initial mappings
@@ -408,7 +401,6 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, gfxdecode_device &decoder, 
 	m_tileinfo.gfxnum = 0xff;
 
 	// allocate transparency mapping data
-	m_tileflags = auto_alloc_array(machine(), UINT8, m_max_logical_index);
 	for (int group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		map_pens_to_layer(group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
@@ -449,7 +441,7 @@ tilemap_t::~tilemap_t()
 void tilemap_t::mark_tile_dirty(tilemap_memory_index memindex)
 {
 	// only mark if within range
-	if (memindex < m_max_memory_index)
+	if (memindex < m_memory_to_logical.count())
 	{
 		// there may be no logical index for a given memory index
 		logical_index logindex = m_memory_to_logical[memindex];
@@ -619,21 +611,22 @@ void tilemap_t::postload()
 void tilemap_t::mappings_create()
 {
 	// compute the maximum logical index
-	m_max_logical_index = m_rows * m_cols;
+	int max_logical_index = m_rows * m_cols;
 
 	// compute the maximum memory index
-	m_max_memory_index = 0;
+	int max_memory_index = 0;
 	for (UINT32 row = 0; row < m_rows; row++)
 		for (UINT32 col = 0; col < m_cols; col++)
 		{
 			tilemap_memory_index memindex = memory_index(col, row);
-			m_max_memory_index = MAX(m_max_memory_index, memindex);
+			max_memory_index = MAX(max_memory_index, memindex);
 		}
-	m_max_memory_index++;
+	max_memory_index++;
 
 	// allocate the necessary mappings
-	m_memory_to_logical = auto_alloc_array(machine(), logical_index, m_max_memory_index);
-	m_logical_to_memory = auto_alloc_array(machine(), tilemap_memory_index, m_max_logical_index);
+	m_memory_to_logical.resize(max_memory_index);
+	m_logical_to_memory.resize(max_logical_index);
+	m_tileflags.resize(max_logical_index);
 
 	// update the mappings
 	mappings_update();
@@ -648,10 +641,10 @@ void tilemap_t::mappings_create()
 void tilemap_t::mappings_update()
 {
 	// initialize all the mappings to invalid values
-	memset(m_memory_to_logical, 0xff, m_max_memory_index * sizeof(m_memory_to_logical[0]));
+	memset(&m_memory_to_logical[0], 0xff, m_memory_to_logical.count() * sizeof(m_memory_to_logical[0]));
 
 	// now iterate over all logical indexes and populate the memory index
-	for (logical_index logindex = 0; logindex < m_max_logical_index; logindex++)
+	for (logical_index logindex = 0; logindex < m_logical_to_memory.count(); logindex++)
 	{
 		UINT32 logical_col = logindex % m_cols;
 		UINT32 logical_row = logindex / m_cols;
@@ -685,7 +678,7 @@ inline void tilemap_t::realize_all_dirty_tiles()
 	// flush the dirty status to all tiles
 	if (m_all_tiles_dirty || gfx_elements_changed())
 	{
-		memset(m_tileflags, TILE_FLAG_DIRTY, m_max_logical_index);
+		memset(&m_tileflags[0], TILE_FLAG_DIRTY, m_tileflags.count());
 		m_all_tiles_dirty = false;
 		m_gfx_used = 0;
 	}
@@ -1478,6 +1471,29 @@ tilemap_manager::tilemap_manager(running_machine &machine)
 
 
 //-------------------------------------------------
+//  ~tilemap_manager - destructor
+//-------------------------------------------------
+
+tilemap_manager::~tilemap_manager()
+{
+	// detach all device tilemaps since they will be destroyed
+	// as subdevices elsewhere
+	bool found = true;
+	while (found)
+	{
+		found = false;
+		for (tilemap_t *tmap = m_tilemap_list.first(); tmap != NULL; tmap = tmap->next())
+			if (tmap->device() != NULL)
+			{
+				found = true;
+				m_tilemap_list.detach(*tmap);
+				break;
+			}
+	}
+}
+
+
+//-------------------------------------------------
 //  set_flip_all - set a global flip for all the
 //  tilemaps
 //-------------------------------------------------
@@ -1501,14 +1517,14 @@ static const struct
 tilemap_t &tilemap_manager::create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == NULL)
-		allocated = auto_alloc(machine(), tilemap_t);
+		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
 tilemap_t &tilemap_manager::create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated)
 {
 	if (allocated == NULL)
-		allocated = auto_alloc(machine(), tilemap_t);
+		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, tilemap_mapper_delegate(s_standard_mappers[mapper].func, s_standard_mappers[mapper].name, machine().driver_data()), tilewidth, tileheight, cols, rows));
 }
 

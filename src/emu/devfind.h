@@ -251,10 +251,7 @@ public:
 	shared_ptr_finder(device_t &base, const char *tag, UINT8 width = sizeof(_PointerType) * 8)
 		: object_finder_base<_PointerType>(base, tag),
 			m_bytes(0),
-			m_allocated(false),
 			m_width(width) { }
-
-	virtual ~shared_ptr_finder() { if (m_allocated) global_free(this->m_target); }
 
 	// operators to make use transparent
 	_PointerType operator[](int index) const { return this->m_target[index]; }
@@ -270,11 +267,11 @@ public:
 	// dynamic allocation of a shared pointer
 	void allocate(UINT32 entries)
 	{
-		assert(!m_allocated);
-		m_allocated = true;
-		this->m_target = global_alloc_array_clear(_PointerType, entries);
+		assert(m_allocated.count() == 0);
+		m_allocated.resize(entries);
+		this->m_target = m_allocated;
 		m_bytes = entries * sizeof(_PointerType);
-		this->m_base.save_pointer(this->m_target, this->m_tag, entries);
+		this->m_base.save_item(this->m_allocated, this->m_tag);
 	}
 
 	// finder
@@ -288,8 +285,8 @@ public:
 protected:
 	// internal state
 	size_t m_bytes;
-	bool m_allocated;
 	UINT8 m_width;
+	dynamic_array<_PointerType> m_allocated;
 };
 
 // optional shared pointer finder
@@ -322,13 +319,7 @@ public:
 	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
 	{
 		for (int index = 0; index < _Count; index++)
-			m_array[index] = global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width));
-	}
-
-	virtual ~shared_ptr_array_finder()
-	{
-		for (int index = 0; index < _Count; index++)
-			global_free(m_array[index]);
+			m_array[index].reset(global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width)));
 	}
 
 	// array accessors
@@ -337,7 +328,7 @@ public:
 
 protected:
 	// internal state
-	shared_ptr_type *m_array[_Count+1];
+	auto_pointer<shared_ptr_type> m_array[_Count+1];
 	astring m_tag[_Count+1];
 };
 

@@ -3529,7 +3529,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 void tumbleb_state::suprtrio_decrypt_code()
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x80000/2);
+	dynamic_array<UINT16> buf(0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
@@ -3541,13 +3541,12 @@ void tumbleb_state::suprtrio_decrypt_code()
 		if ((i & 3) == 0) j ^= 0x08;
 		rom[i] = buf[j];
 	}
-	auto_free(machine(), buf);
 }
 
 void tumbleb_state::suprtrio_decrypt_gfx()
 {
 	UINT16 *rom = (UINT16 *)memregion("tilegfx")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	dynamic_array<UINT16> buf(0x100000/2);
 	int i;
 
 	/* decrypt tiles */
@@ -3558,7 +3557,6 @@ void tumbleb_state::suprtrio_decrypt_gfx()
 		if (i & 1) j ^= 0x04;
 		rom[i] = buf[j];
 	}
-	auto_free(machine(), buf);
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)

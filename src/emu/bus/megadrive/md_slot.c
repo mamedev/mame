@@ -682,9 +682,9 @@ void base_md_cart_slot_device::setup_nvram()
  call softlist load
  -------------------------------------------------*/
 
-bool base_md_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool base_md_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -907,30 +907,29 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-const char * base_md_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void base_md_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "rom";
 		UINT32 len = core_fsize(m_file), offset = 0;
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		if (genesis_is_SMD(&ROM[0x200], len - 0x200))
+		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;
 
-		type = get_cart_type(ROM + offset, len - offset);
+		type = get_cart_type(rom + offset, len - offset);
 		slot_string = md_get_slot(type);
 
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
 	}
 	else
-		return software_get_default_slot(config, options, this, "rom");
+		software_get_default_slot(result, "rom");
 }
 
 

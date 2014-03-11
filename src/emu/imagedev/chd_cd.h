@@ -38,7 +38,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { load_software_part_region(this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
 
 	virtual iodevice_t image_type() const { return IO_CDROM; }
 
@@ -61,7 +61,6 @@ protected:
 
 	chd_file    m_self_chd;
 	cdrom_file  *m_cdrom_handle;
-	image_device_format m_format;
 	const char  *m_extension_list;
 };
 

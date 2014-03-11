@@ -1025,7 +1025,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
 	UINT8 *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 
 	UINT32 x;
 
@@ -1045,8 +1045,6 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 	}
 
 	memcpy(rom, buf1, length);
-
-	auto_free(machine(), buf1);
 
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco156_decrypt(machine());

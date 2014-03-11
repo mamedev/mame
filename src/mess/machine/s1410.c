@@ -260,7 +260,7 @@ void s1410_device::ExecCommand()
 
 		if ((m_disk) && (m_blocks))
 		{
-			UINT8 *data = global_alloc_array(UINT8, m_sector_bytes);
+			dynamic_buffer data(m_sector_bytes);
 			memset(data, 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)
@@ -272,8 +272,6 @@ void s1410_device::ExecCommand()
 				m_lba++;
 				m_blocks--;
 			}
-
-			global_free(data);
 		}
 
 		m_phase = SCSI_PHASE_STATUS;

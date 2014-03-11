@@ -65,14 +65,12 @@ static const res_net_info mario_net_info_std =
 PALETTE_INIT_MEMBER(mario_state, mario)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t   *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &mario_decode_info, &mario_net_info);
+	compute_res_net_all(rgb, color_prom, mario_decode_info, mario_net_info);
 	palette.set_pen_colors(0, rgb, 256);
-	auto_free(machine(), rgb);
-	rgb = compute_res_net_all(machine(), color_prom+256, &mario_decode_info, &mario_net_info_std);
+	compute_res_net_all(rgb, color_prom+256, mario_decode_info, mario_net_info_std);
 	palette.set_pen_colors(256, rgb, 256);
-	auto_free(machine(), rgb);
 
 	palette.palette()->normalize_range(0, 255);
 	palette.palette()->normalize_range(256, 511);

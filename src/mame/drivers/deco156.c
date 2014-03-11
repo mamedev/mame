@@ -629,7 +629,7 @@ void deco156_state::descramble_sound( const char *tag )
 {
 	UINT8 *rom = memregion(tag)->base();
 	int length = memregion(tag)->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)
@@ -647,8 +647,6 @@ void deco156_state::descramble_sound( const char *tag )
 	}
 
 	memcpy(rom,buf1,length);
-
-	auto_free(machine(), buf1);
 }
 
 DRIVER_INIT_MEMBER(deco156_state,hvysmsh)

@@ -470,8 +470,8 @@ int intv_state::intv_load_rom_file(device_image_interface &image)
 		// 7. extra = 1 ECS, 2 Intellivoice
 		int start, size;
 		int mapper, rom[5], ram, extra;
-		const char *extrainfo = hashfile_extrainfo(image);
-		if (!extrainfo)
+		astring extrainfo;
+		if (!hashfile_extrainfo(image, extrainfo))
 		{
 			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
 			for (i = 0; i < 0x2000; i++ )
@@ -484,7 +484,7 @@ int intv_state::intv_load_rom_file(device_image_interface &image)
 		}
 		else
 		{
-			sscanf(extrainfo,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+			sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 																&rom[3], &ram, &extra);
 
 //          logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],

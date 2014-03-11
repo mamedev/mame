@@ -68,14 +68,15 @@ public:
 	class entry
 	{
 		friend class core_options;
+		friend class simple_list<entry>;
 
 		// construction/destruction
-		entry(const options_entry &entry);
+		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL);
 
 	public:
 		// getters
 		entry *next() const { return m_next; }
-		const char *name() const { return m_name[0] ? m_name[0].cstr() : NULL; }
+		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && m_name[index]) ? m_name[index].cstr() : NULL; }
 		const char *description() const { return m_description; }
 		const char *value() const { return m_data; }
 		const char *default_value() const { return m_defdata; }
@@ -125,10 +126,12 @@ public:
 	bool operator!=(const core_options &rhs);
 
 	// getters
-	entry *first() const { return m_entrylist; }
+	entry *first() const { return m_entrylist.first(); }
 	const char *command() const { return m_command; }
 
 	// configuration
+	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL, bool override_existing = false);
+	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
 	void remove_entry(entry &delentry);
@@ -162,7 +165,8 @@ public:
 
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }
-	int options_count();
+	int options_count() const { return m_entrylist.count(); }
+
 private:
 	// internal helpers
 	void reset();
@@ -171,8 +175,7 @@ private:
 	bool validate_and_set_data(entry &curentry, const char *newdata, int priority, astring &error_string);
 
 	// internal state
-	entry *                 m_entrylist;            // head of list of entries
-	entry **                m_entrylist_tailptr;    // pointer to tail of entry list
+	simple_list<entry>		m_entrylist;            // head of list of entries
 	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
 	astring                 m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"

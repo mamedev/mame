@@ -24,15 +24,13 @@ void neogeo_state::neogeo_bootleg_cx_decrypt()
 	int i;
 	int cx_size = memregion( "sprites" )->bytes();
 	UINT8 *rom = memregion( "sprites" )->base();
-	UINT8 *buf = auto_alloc_array(machine(), UINT8, cx_size );
+	dynamic_buffer buf( cx_size );
 
 	memcpy( buf, rom, cx_size );
 
 	for( i = 0; i < cx_size / 0x40; i++ ){
 		memcpy( &rom[ i * 0x40 ], &buf[ (i ^ 1) * 0x40 ], 0x40 );
 	}
-
-	auto_free( machine(), buf );
 }
 
 
@@ -44,7 +42,7 @@ void neogeo_state::neogeo_bootleg_sx_decrypt(int value )
 
 	if (value == 1)
 	{
-		UINT8 *buf = auto_alloc_array(machine(), UINT8, sx_size );
+		dynamic_buffer buf( sx_size );
 		memcpy( buf, rom, sx_size );
 
 		for( i = 0; i < sx_size; i += 0x10 )
@@ -52,7 +50,6 @@ void neogeo_state::neogeo_bootleg_sx_decrypt(int value )
 			memcpy( &rom[ i ], &buf[ i + 8 ], 8 );
 			memcpy( &rom[ i + 8 ], &buf[ i ], 8 );
 		}
-		auto_free( machine(), buf );
 	}
 	else if (value == 2)
 	{
@@ -72,7 +69,7 @@ void neogeo_state::kog_px_decrypt()
 {
 	/* the protection chip does some *very* strange things to the rom */
 	UINT8 *src = memregion("maincpu")->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x600000 );
+	dynamic_buffer dst( 0x600000 );
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int i;
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
@@ -87,7 +84,6 @@ void neogeo_state::kog_px_decrypt()
 	memcpy (dst + 0x090000, src + 0x040000, 0x004000);
 	memcpy (dst + 0x100000, src + 0x200000, 0x400000);
 	memcpy (src, dst, 0x600000);
-	auto_free (machine(), dst);
 
 	for (i = 0x90000/2; i < 0x94000/2; i++){
 		if (((rom[i]&0xFFBF) == 0x4EB9 || rom[i] == 0x43F9) && !rom[i + 1])
@@ -135,7 +131,7 @@ void neogeo_state::kog_px_decrypt()
 void neogeo_state::kof97oro_px_decode()
 {
 	int i;
-	UINT16 *tmp = auto_alloc_array(machine(), UINT16, 0x500000 );
+	dynamic_array<UINT16> tmp( 0x500000 );
 	UINT16 *src = (UINT16*)memregion("maincpu")->base();
 
 	for (i = 0; i < 0x500000/2; i++) {
@@ -143,8 +139,6 @@ void neogeo_state::kof97oro_px_decode()
 	}
 
 	memcpy (src, tmp, 0x500000);
-
-	auto_free (machine(), tmp);
 }
 
 
@@ -204,7 +198,7 @@ void neogeo_state::install_kof10th_protection ()
 void neogeo_state::decrypt_kof10th()
 {
 	int i, j;
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x900000);
+	dynamic_buffer dst(0x900000);
 	UINT8 *src = memregion( "maincpu" )->base();
 
 	memcpy(dst + 0x000000, src + 0x700000, 0x100000); // Correct (Verified in Uni-bios)
@@ -214,8 +208,6 @@ void neogeo_state::decrypt_kof10th()
 		j = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,2,9,8,7,1,5,4,3,10,6,0);
 		src[j] = dst[i];
 	}
-
-	auto_free(machine(), dst);
 
 	// Altera protection chip patches these over P ROM
 	((UINT16*)src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
@@ -233,7 +225,7 @@ void neogeo_state::decrypt_kof10th()
 void neogeo_state::kf10thep_px_decrypt()
 {
 	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	dynamic_array<UINT16> buf(0x100000/2);
 
 	memcpy(&buf[0x000000/2], &rom[0x060000/2], 0x20000);
 	memcpy(&buf[0x020000/2], &rom[0x100000/2], 0x20000);
@@ -246,7 +238,6 @@ void neogeo_state::kf10thep_px_decrypt()
 	memcpy(&buf[0x0002e0/2], &rom[0x0402e0/2], 0x6a);  // copy banked code to a new memory region
 	memcpy(&buf[0x0f92bc/2], &rom[0x0492bc/2], 0xb9e); // copy banked code to a new memory region
 	memcpy(rom, buf, 0x100000);
-	auto_free(machine(), buf);
 
 	for (int i = 0xf92bc/2; i < 0xf9e58/2; i++)
 	{
@@ -266,7 +257,7 @@ void neogeo_state::kf2k5uni_px_decrypt()
 {
 	int i, j, ofst;
 	UINT8 *src = memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x80);
+	UINT8 dst[0x80];
 
 	for (i = 0; i < 0x800000; i+=0x80)
 	{
@@ -277,7 +268,6 @@ void neogeo_state::kf2k5uni_px_decrypt()
 		}
 		memcpy(src + i, dst, 0x80);
 	}
-	auto_free(machine(), dst);
 
 	memcpy(src, src + 0x600000, 0x100000); // Seems to be the same as kof10th
 }
@@ -326,7 +316,7 @@ void neogeo_state::kof2002b_gfx_decrypt(UINT8 *src, int size)
 		{ 8, 0, 7, 6, 2, 1 },
 	};
 
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  0x10000 );
+	dynamic_buffer dst( 0x10000 );
 
 	for ( i = 0; i < size; i+=0x10000 )
 	{
@@ -339,7 +329,6 @@ void neogeo_state::kof2002b_gfx_decrypt(UINT8 *src, int size)
 			memcpy( src+i+ofst*128, dst+j*128, 128 );
 		}
 	}
-	auto_free( machine(), dst );
 }
 
 
@@ -351,7 +340,7 @@ void neogeo_state::kf2k2mp_decrypt()
 	int i,j;
 
 	UINT8 *src = memregion("maincpu")->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x80);
+	UINT8 dst[0x80];
 
 	memmove(src, src + 0x300000, 0x500000);
 
@@ -364,7 +353,6 @@ void neogeo_state::kf2k2mp_decrypt()
 		}
 		memcpy(src + i, dst, 0x80);
 	}
-	auto_free(machine(), dst);
 }
 
 
@@ -374,14 +362,13 @@ void neogeo_state::kf2k2mp_decrypt()
 void neogeo_state::kf2k2mp2_px_decrypt()
 {
 	UINT8 *src = memregion("maincpu")->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x600000);
+	dynamic_buffer dst(0x600000);
 
 	memcpy (dst + 0x000000, src + 0x1C0000, 0x040000);
 	memcpy (dst + 0x040000, src + 0x140000, 0x080000);
 	memcpy (dst + 0x0C0000, src + 0x100000, 0x040000);
 	memcpy (dst + 0x100000, src + 0x200000, 0x400000);
 	memcpy (src + 0x000000, dst + 0x000000, 0x600000);
-	auto_free (machine(), dst);
 }
 
 
@@ -394,7 +381,7 @@ void neogeo_state::cthd2003_neogeo_gfx_address_fix_do(int start, int end, int bi
 	int i,j;
 	int tilesize=128;
 
-	UINT8* rom = auto_alloc_array(machine(), UINT8, 16*tilesize); // 16 tiles buffer
+	dynamic_buffer rom(16*tilesize); // 16 tiles buffer
 	UINT8* realrom = memregion("sprites")->base() + start*tilesize;
 
 	for (i = 0; i < (end-start)/16; i++) {
@@ -409,7 +396,6 @@ void neogeo_state::cthd2003_neogeo_gfx_address_fix_do(int start, int end, int bi
 		memcpy(realrom,rom,tilesize*16);
 		realrom+=16*tilesize;
 	}
-	auto_free(machine(), rom);
 }
 
 void neogeo_state::cthd2003_neogeo_gfx_address_fix(int start, int end)
@@ -449,7 +435,7 @@ void neogeo_state::cthd2003_c(int pow)
 void neogeo_state::decrypt_cthd2003()
 {
 	UINT8 *romdata = memregion("fixed")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 8*128*128);
+	dynamic_buffer tmp(8*128*128);
 
 	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
 	memcpy(tmp+8*32*128, romdata+8*64*128, 8*32*128);
@@ -463,8 +449,6 @@ void neogeo_state::decrypt_cthd2003()
 	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
 	memcpy(tmp+8*96*128, romdata+8*96*128, 8*32*128);
 	memcpy(romdata, tmp, 8*128*128);
-
-	auto_free(machine(), tmp);
 
 	memcpy(romdata-0x10000,romdata,0x10000);
 
@@ -534,7 +518,7 @@ void neogeo_state::ct2k3sp_sx_decrypt()
 {
 	int rom_size = memregion( "fixed" )->bytes();
 	UINT8 *rom = memregion( "fixed" )->base();
-	UINT8 *buf = auto_alloc_array(machine(), UINT8,  rom_size );
+	dynamic_buffer buf( rom_size );
 	int i;
 	int ofst;
 
@@ -556,21 +540,18 @@ void neogeo_state::ct2k3sp_sx_decrypt()
 	memcpy( &rom[ 0x10000 ], &buf[ 0x08000 ], 0x8000 );
 	memcpy( &rom[ 0x28000 ], &buf[ 0x30000 ], 0x8000 );
 	memcpy( &rom[ 0x30000 ], &buf[ 0x28000 ], 0x8000 );
-
-	auto_free( machine(), buf );
 }
 
 void neogeo_state::decrypt_ct2k3sp()
 {
 	UINT8 *romdata = memregion("audiocpu")->base()+0x10000;
-	UINT8*tmp = auto_alloc_array(machine(), UINT8, 8*128*128);
+	dynamic_buffer tmp(8*128*128);
 	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
 	memcpy(tmp+8*32*128, romdata+8*64*128, 8*32*128);
 	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
 	memcpy(tmp+8*96*128, romdata+8*96*128, 8*32*128);
 	memcpy(romdata, tmp, 8*128*128);
 
-	auto_free(machine(), tmp);
 	memcpy(romdata-0x10000,romdata,0x10000);
 	ct2k3sp_sx_decrypt();
 	cthd2003_c(0);
@@ -583,14 +564,13 @@ void neogeo_state::decrypt_ct2k3sp()
 void neogeo_state::decrypt_ct2k3sa()
 {
 	UINT8 *romdata = memregion("audiocpu")->base()+0x10000;
-	UINT8*tmp = auto_alloc_array(machine(), UINT8, 8*128*128);
+	dynamic_buffer tmp(8*128*128);
 	memcpy(tmp+8*0*128, romdata+8*0*128, 8*32*128);
 	memcpy(tmp+8*32*128, romdata+8*64*128, 8*32*128);
 	memcpy(tmp+8*64*128, romdata+8*32*128, 8*32*128);
 	memcpy(tmp+8*96*128, romdata+8*96*128, 8*32*128);
 	memcpy(romdata, tmp, 8*128*128);
 
-	auto_free(machine(), tmp);
 	memcpy(romdata-0x10000,romdata,0x10000);
 	cthd2003_c(0);
 }
@@ -641,7 +621,7 @@ void neogeo_state::patch_ct2k3sa()
 void neogeo_state::decrypt_kof2k4se_68k()
 {
 	UINT8 *src = memregion("maincpu")->base()+0x100000;
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x400000);
+	dynamic_buffer dst(0x400000);
 	int i;
 	static const int sec[] = {0x300000,0x200000,0x100000,0x000000};
 	memcpy(dst,src,0x400000);
@@ -650,7 +630,6 @@ void neogeo_state::decrypt_kof2k4se_68k()
 	{
 		memcpy(src+i*0x100000,dst+sec[i],0x100000);
 	}
-	auto_free(machine(), dst);
 }
 
 
@@ -671,10 +650,10 @@ void neogeo_state::lans2004_decrypt_68k()
 	int i;
 	UINT8 *src = memregion( "maincpu" )->base();
 	UINT16 *rom = (UINT16*)memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x600000);
 
 	{
 		static const int sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
+		dynamic_buffer dst(0x600000);
 
 		for (i = 0; i < 8; i++)
 			memcpy (dst + i * 0x20000, src + sec[i] * 0x20000, 0x20000);
@@ -683,7 +662,6 @@ void neogeo_state::lans2004_decrypt_68k()
 		memcpy (dst + 0x02FFF0, src + 0x1A92BE, 0x000010);
 		memcpy (dst + 0x100000, src + 0x200000, 0x400000);
 		memcpy (src, dst, 0x600000);
-		auto_free (machine(), dst);
 	}
 
 	for (i = 0xBBB00/2; i < 0xBE000/2; i++) {
@@ -751,7 +729,7 @@ void neogeo_state::svcboot_px_decrypt()
 	int i;
 	int size = memregion( "maincpu" )->bytes();
 	UINT8 *src = memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  size );
+	dynamic_buffer dst( size );
 	int ofst;
 	for( i = 0; i < size / 0x100000; i++ ){
 		memcpy( &dst[ i * 0x100000 ], &src[ sec[ i ] * 0x100000 ], 0x100000 );
@@ -761,7 +739,6 @@ void neogeo_state::svcboot_px_decrypt()
 		ofst += (i & 0xffff00);
 		memcpy( &src[ i * 2 ], &dst[ ofst * 2 ], 0x02 );
 	}
-	auto_free( machine(), dst );
 }
 
 void neogeo_state::svcboot_cx_decrypt()
@@ -780,7 +757,7 @@ void neogeo_state::svcboot_cx_decrypt()
 	int i;
 	int size = memregion( "sprites" )->bytes();
 	UINT8 *src = memregion( "sprites" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  size );
+	dynamic_buffer dst( size );
 	int ofst;
 	memcpy( dst, src, size );
 	for( i = 0; i < size / 0x80; i++ ){
@@ -793,7 +770,6 @@ void neogeo_state::svcboot_cx_decrypt()
 		ofst += (i & 0xfffff00);
 		memcpy( &src[ i * 0x80 ], &dst[ ofst * 0x80 ], 0x80 );
 	}
-	auto_free( machine(), dst );
 }
 
 
@@ -807,7 +783,7 @@ void neogeo_state::svcplus_px_decrypt()
 	};
 	int size = memregion( "maincpu" )->bytes();
 	UINT8 *src = memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  size );
+	dynamic_buffer dst( size );
 	int i;
 	int ofst;
 	memcpy( dst, src, size );
@@ -823,7 +799,6 @@ void neogeo_state::svcplus_px_decrypt()
 	for( i = 0; i < 6; i++ ){
 		memcpy( &src[ i * 0x100000 ], &dst[ sec[ i ] * 0x100000 ], 0x100000 );
 	}
-	auto_free( machine(), dst );
 }
 
 void neogeo_state::svcplus_px_hack()
@@ -845,12 +820,11 @@ void neogeo_state::svcplusa_px_decrypt()
 	};
 	int size = memregion( "maincpu" )->bytes();
 	UINT8 *src = memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  size );
+	dynamic_buffer dst( size );
 	memcpy( dst, src, size );
 	for( i = 0; i < 6; i++ ){
 		memcpy( &src[ i * 0x100000 ], &dst[ sec[ i ] * 0x100000 ], 0x100000 );
 	}
-	auto_free( machine(), dst );
 }
 
 
@@ -864,7 +838,7 @@ void neogeo_state::svcsplus_px_decrypt()
 	};
 	int size = memregion( "maincpu" )->bytes();
 	UINT8 *src = memregion( "maincpu" )->base();
-	UINT8 *dst = auto_alloc_array(machine(), UINT8,  size );
+	dynamic_buffer dst( size );
 	int i;
 	int ofst;
 	memcpy( dst, src, size );
@@ -876,7 +850,6 @@ void neogeo_state::svcsplus_px_decrypt()
 		ofst += sec[ (i & 0xf80000) >> 19 ] << 19;
 		memcpy( &src[ i * 2 ], &dst[ ofst * 2 ], 0x02 );
 	}
-	auto_free( machine(), dst );
 }
 
 void neogeo_state::svcsplus_px_hack()
@@ -959,13 +932,12 @@ void neogeo_state::kf2k3bl_px_decrypt()
 
 	int rom_size = 0x800000;
 	UINT8 *rom = memregion( "maincpu" )->base();
-	UINT8 *buf = auto_alloc_array(machine(), UINT8,  rom_size );
+	dynamic_buffer buf( rom_size );
 	memcpy( buf, rom, rom_size );
 
 	for( i = 0; i < rom_size / 0x100000; i++ ){
 		memcpy( &rom[ i * 0x100000 ], &buf[ sec[ i ] * 0x100000 ], 0x100000 );
 	}
-	auto_free( machine(), buf );
 }
 
 void neogeo_state::kf2k3bl_install_protection()
@@ -981,7 +953,7 @@ void neogeo_state::kf2k3bl_install_protection()
 
 void neogeo_state::kf2k3pl_px_decrypt()
 {
-	UINT16*tmp = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	dynamic_array<UINT16> tmp(0x100000/2);
 	UINT16*rom = (UINT16*)memregion( "maincpu" )->base();
 	int j;
 	int i;
@@ -992,7 +964,6 @@ void neogeo_state::kf2k3pl_px_decrypt()
 		for (j = 0;j < 0x100000/2;j++)
 			rom[i+j] = tmp[BITSWAP24(j,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)];
 	}
-	auto_free(machine(), tmp);
 
 	/* patched by Altera protection chip on PCB */
 	rom[0xf38ac/2] = 0x4e75;
@@ -1038,7 +1009,7 @@ void neogeo_state::samsho5b_px_decrypt()
 {
 	int px_size = memregion( "maincpu" )->bytes();
 	UINT8 *rom = memregion( "maincpu" )->base();
-	UINT8 *buf = auto_alloc_array(machine(), UINT8,  px_size );
+	dynamic_buffer buf( px_size );
 	int ofst;
 	int i;
 
@@ -1056,8 +1027,6 @@ void neogeo_state::samsho5b_px_decrypt()
 
 	memcpy( &rom[ 0x000000 ], &buf[ 0x700000 ], 0x100000 );
 	memcpy( &rom[ 0x100000 ], &buf[ 0x000000 ], 0x700000 );
-
-	auto_free( machine(), buf );
 }
 
 
@@ -1081,7 +1050,7 @@ void neogeo_state::matrimbl_decrypt()
 {
 	/* decrypt Z80 */
 	UINT8 *rom = memregion( "audiocpu" )->base()+0x10000;
-	UINT8 *buf = auto_alloc_array(machine(), UINT8,  0x20000 );
+	dynamic_buffer buf( 0x20000 );
 	int i, j=0;
 	memcpy( buf, rom, 0x20000 );
 	for( i=0x00000; i<0x20000; i++ )
@@ -1112,7 +1081,6 @@ void neogeo_state::matrimbl_decrypt()
 		}
 		rom[ j ]=buf[ i ];
 	}
-	auto_free( machine(), buf );
 	memcpy( rom-0x10000, rom, 0x10000 );
 
 	/* decrypt gfx */

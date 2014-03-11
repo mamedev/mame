@@ -5840,7 +5840,6 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	int sizep = memregion("proms")->bytes();
 	int startp = 0;
 
-	UINT8 *buffer;
 	int i, a;
 
 	/*****************************
@@ -5854,37 +5853,37 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
-	memcpy(buffer, rom, size);
-
-
-	/* address lines swap: fedcba9876543210 -> fedcba9820134567 */
-
-	for (i = start; i < size; i++)
 	{
-		a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
-		rom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(size);
+		memcpy(buffer, rom, size);
 
-	auto_free(machine(), buffer);
+
+		/* address lines swap: fedcba9876543210 -> fedcba9820134567 */
+
+		for (i = start; i < size; i++)
+		{
+			a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
+			rom[a] = buffer[i];
+		}
+	}
  
 
 	/******************************
 	*   Graphics ROM decryption   *
 	******************************/
 
-	buffer = auto_alloc_array(machine(), UINT8, sizeg);
-	memcpy(buffer, gfxrom, sizeg);
-
-	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
-
-	for (i = startg; i < sizeg; i++)
 	{
-		a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
-		gfxrom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(sizeg);
+		memcpy(buffer, gfxrom, sizeg);
 
-	auto_free(machine(), buffer);
+		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+		for (i = startg; i < sizeg; i++)
+		{
+			a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
+			gfxrom[a] = buffer[i];
+		}
+	}
 
 
 	/****************************
@@ -5898,19 +5897,19 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, sizep);
-	memcpy(buffer, prom, sizep);
-
-
-	/* address lines swap: fedcba9876543210 -> fedcba9487652013 */
-
-	for (i = startp; i < sizep; i++)
 	{
-		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
-		prom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(sizep);
+		memcpy(buffer, prom, sizep);
 
-	auto_free(machine(), buffer);
+
+		/* address lines swap: fedcba9876543210 -> fedcba9487652013 */
+
+		for (i = startp; i < sizep; i++)
+		{
+			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
+			prom[a] = buffer[i];
+		}
+	}
 
 	m_palette->update();
 }
@@ -6026,7 +6025,6 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	int sizeg = memregion("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *buffer;
 	int i, a;
 
 	/*****************************
@@ -6040,37 +6038,37 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
-	memcpy(buffer, rom, size);
-
-
-	/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
-
-	for (i = start; i < size; i++)
 	{
-		a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-		rom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(size);
+		memcpy(buffer, rom, size);
 
-	auto_free(machine(), buffer);
+
+		/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
+
+		for (i = start; i < size; i++)
+		{
+			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			rom[a] = buffer[i];
+		}
+	}
 
 
 	/******************************
 	*   Graphics ROM decryption   *
 	******************************/
 
-	buffer = auto_alloc_array(machine(), UINT8, sizeg);
-	memcpy(buffer, gfxrom, sizeg);
-
-	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
-
-	for (i = startg; i < sizeg; i++)
 	{
-		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
-		gfxrom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(sizeg);
+		memcpy(buffer, gfxrom, sizeg);
 
-	auto_free(machine(), buffer);
+		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+		for (i = startg; i < sizeg; i++)
+		{
+			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			gfxrom[a] = buffer[i];
+		}
+	}
 }
 
 
@@ -6145,7 +6143,6 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 	int sizeg = memregion("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *buffer;
 	int i, a;
 
 	/*****************************
@@ -6159,37 +6156,37 @@ DRIVER_INIT_MEMBER(funworld_state, rcdino4)
 		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
-	buffer = auto_alloc_array(machine(), UINT8, size);
-	memcpy(buffer, rom, size);
-
-
-	/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
-
-	for (i = start; i < size; i++)
 	{
-		a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-		rom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(size);
+		memcpy(buffer, rom, size);
 
-	auto_free(machine(), buffer);
+
+		/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
+
+		for (i = start; i < size; i++)
+		{
+			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			rom[a] = buffer[i];
+		}
+	}
 
 	
 	/******************************
 	*   Graphics ROM decryption   *
 	******************************/
 
-	buffer = auto_alloc_array(machine(), UINT8, sizeg);
-	memcpy(buffer, gfxrom, sizeg);
-
-	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
-
-	for (i = startg; i < sizeg; i++)
 	{
-		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
-		gfxrom[a] = buffer[i];
-	}
+		dynamic_buffer buffer(sizeg);
+		memcpy(buffer, gfxrom, sizeg);
 
-	auto_free(machine(), buffer);
+		/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+		for (i = startg; i < sizeg; i++)
+		{
+			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			gfxrom[a] = buffer[i];
+		}
+	}
 
 	/* d4-d5 data lines swap, plus a XOR with 0x81, implemented in two steps for an easy view */
 	

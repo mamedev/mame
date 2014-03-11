@@ -1019,13 +1019,12 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	if (eeprom != NULL)
 	{
 		size_t len = memregion("eeprom")->bytes();
-		UINT8* temp = (UINT8*)auto_alloc_array(machine(), UINT8, len);
+		dynamic_buffer temp(len);
 		int i;
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
 
 		memcpy(eeprom, temp, len);
-		auto_free(machine(), temp);
 	}
 }
 

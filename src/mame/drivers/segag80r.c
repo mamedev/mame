@@ -1400,13 +1400,13 @@ ROM_END
 
 void segag80r_state::monsterb_expand_gfx(const char *region)
 {
-	UINT8 *temp, *dest;
+	UINT8 *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memregion(region)->base();
-	temp = auto_alloc_array(machine(), UINT8, 0x4000);
+	dynamic_buffer temp(0x4000);
 	memcpy(temp, dest, 0x4000);
 
 	/* 16 effective total banks */
@@ -1415,7 +1415,6 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 		memcpy(&dest[0x0000 + i * 0x800], &temp[0x0000 + (i & 3) * 0x800], 0x800);
 		memcpy(&dest[0x8000 + i * 0x800], &temp[0x2000 + (i >> 2) * 0x800], 0x800);
 	}
-	auto_free(machine(), temp);
 }
 
 

@@ -103,7 +103,7 @@ legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type 
 
 legacy_cpu_device::~legacy_cpu_device()
 {
-	global_free(m_token);
+	global_free_array((UINT8 *)m_token);
 }
 
 

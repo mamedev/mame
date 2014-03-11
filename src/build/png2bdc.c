@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     png2bdc.c
 
     Super-simple PNG to BDC file generator
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
 
@@ -54,227 +53,219 @@
 #include "png.h"
 
 
-/***************************************************************************
-    CONSTANTS & DEFINES
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS & DEFINES
+//**************************************************************************
 
 #define CACHED_CHAR_SIZE        12
 #define CACHED_HEADER_SIZE      16
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-/* a render_font contains information about a single character in a font */
+// a render_font contains information about a single character in a font
 struct render_font_char
 {
-	INT32               width;              /* width from this character to the next */
-	INT32               xoffs, yoffs;       /* X and Y offset from baseline to top,left of bitmap */
-	INT32               bmwidth, bmheight;  /* width and height of bitmap */
-	bitmap_argb32 *     bitmap;             /* pointer to the bitmap containing the raw data */
+	render_font_char() : width(0), xoffs(0), yoffs(0), bmwidth(0), bmheight(0) { }
+
+	INT32               width;              // width from this character to the next
+	INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
+	INT32               bmwidth, bmheight;  // width and height of bitmap
+	bitmap_argb32 *	 	bitmap;             // pointer to the bitmap containing the raw data
 };
 
 
-/* a render_font contains information about a font */
+// a render_font contains information about a font
 struct render_font
 {
-	int                 height;             /* height of the font, from ascent to descent */
-	int                 yoffs;              /* y offset from baseline to descent */
-	render_font_char    chars[65536];       /* array of characters */
+	render_font() : height(0), yoffs(0) { }
+
+	int                 height;             // height of the font, from ascent to descent
+	int                 yoffs;              // y offset from baseline to descent
+	render_font_char    chars[65536];       // array of characters
 };
 
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
 
-INLINE int pixel_is_set(bitmap_argb32 &bitmap, int y, int x)
+inline int pixel_is_set(bitmap_argb32 &bitmap, int y, int x)
 {
 	return (bitmap.pix32(y, x) & 0xffffff) == 0;
 }
 
 
 
-/***************************************************************************
-    MAIN
-***************************************************************************/
+//**************************************************************************
+//  MAIN
+//**************************************************************************
 
-static int render_font_save_cached(render_font *font, const char *filename, UINT32 hash)
+//-------------------------------------------------
+//  write_data - write data to the given file and
+//	throw an exception if an error occurs
+//-------------------------------------------------
+
+static void write_data(core_file &file, UINT8 *base, UINT8 *end)
 {
-	file_error filerr;
-	render_font_char *ch;
-	UINT32 bytes_written;
-	UINT8 *tempbuffer;
-	UINT8 *chartable;
-	core_file *file;
-	int numchars;
-	UINT8 *dest;
-	int tableindex;
-	int chnum;
-
-	/* attempt to open the file */
-	filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
-	if (filerr != FILERR_NONE)
-		return 1;
-
-	/* determine the number of characters */
-	numchars = 0;
-	for (chnum = 0; chnum < 65536; chnum++)
-		if (font->chars[chnum].width > 0)
-			numchars++;
-
-	/* allocate an array to hold the character data */
-	chartable = (UINT8 *)malloc(numchars * CACHED_CHAR_SIZE);
-
-	/* allocate a temp buffer to compress into */
-	tempbuffer = (UINT8 *)malloc(65536);
-	if (chartable == NULL || tempbuffer == NULL)
-		goto error;
-
-	memset(chartable, 0, numchars * CACHED_CHAR_SIZE);
-
-	/* write the header */
-	dest = tempbuffer;
-	*dest++ = 'f';
-	*dest++ = 'o';
-	*dest++ = 'n';
-	*dest++ = 't';
-	*dest++ = hash >> 24;
-	*dest++ = hash >> 16;
-	*dest++ = hash >> 8;
-	*dest++ = hash & 0xff;
-	*dest++ = font->height >> 8;
-	*dest++ = font->height & 0xff;
-	*dest++ = font->yoffs >> 8;
-	*dest++ = font->yoffs & 0xff;
-	*dest++ = numchars >> 24;
-	*dest++ = numchars >> 16;
-	*dest++ = numchars >> 8;
-	*dest++ = numchars & 0xff;
-	bytes_written = core_fwrite(file, tempbuffer, dest - tempbuffer);
-	if (bytes_written != dest - tempbuffer)
-		goto error;
-
-	/* write the empty table to the beginning of the file */
-	bytes_written = core_fwrite(file, chartable, numchars * CACHED_CHAR_SIZE);
-	if (bytes_written != numchars * CACHED_CHAR_SIZE)
-		goto error;
-
-	/* loop over all characters */
-	tableindex = 0;
-	for (chnum = 0; chnum < 65536; chnum++)
+	UINT32 bytes_written = core_fwrite(&file, base, end - base);
+	if (bytes_written != end - base)
 	{
-		ch = &font->chars[chnum];
-		if (ch->width > 0)
-		{
-			UINT8 accum, accbit;
-			int x, y;
-
-			/* write out a bit-compressed bitmap if we have one */
-			if (ch->bitmap != NULL)
-			{
-				/* write the data to the tempbuffer */
-				dest = tempbuffer;
-				accum = 0;
-				accbit = 7;
-
-				/* bit-encode the character data */
-				for (y = 0; y < ch->bmheight; y++)
-				{
-					int desty = y + font->height + font->yoffs - ch->yoffs - ch->bmheight;
-					const UINT32 *src = (desty >= 0 && desty < font->height) ? &ch->bitmap->pix32(desty) : NULL;
-					for (x = 0; x < ch->bmwidth; x++)
-					{
-						if (src != NULL && src[x] != 0)
-							accum |= 1 << accbit;
-						if (accbit-- == 0)
-						{
-							*dest++ = accum;
-							accum = 0;
-							accbit = 7;
-						}
-					}
-				}
-
-				/* flush any extra */
-				if (accbit != 7)
-					*dest++ = accum;
-
-				/* write the data */
-				bytes_written = core_fwrite(file, tempbuffer, dest - tempbuffer);
-				if (bytes_written != dest - tempbuffer)
-					goto error;
-
-				/* free the bitmap and texture */
-				delete ch->bitmap;
-				ch->bitmap = NULL;
-			}
-
-			/* compute the table entry */
-			dest = &chartable[tableindex++ * CACHED_CHAR_SIZE];
-			*dest++ = chnum >> 8;
-			*dest++ = chnum & 0xff;
-			*dest++ = ch->width >> 8;
-			*dest++ = ch->width & 0xff;
-			*dest++ = ch->xoffs >> 8;
-			*dest++ = ch->xoffs & 0xff;
-			*dest++ = ch->yoffs >> 8;
-			*dest++ = ch->yoffs & 0xff;
-			*dest++ = ch->bmwidth >> 8;
-			*dest++ = ch->bmwidth & 0xff;
-			*dest++ = ch->bmheight >> 8;
-			*dest++ = ch->bmheight & 0xff;
-		}
+		fprintf(stderr, "Error writing to destination file\n");
+		throw;
 	}
-
-	/* seek back to the beginning and rewrite the table */
-	core_fseek(file, CACHED_HEADER_SIZE, SEEK_SET);
-	bytes_written = core_fwrite(file, chartable, numchars * CACHED_CHAR_SIZE);
-	if (bytes_written != numchars * CACHED_CHAR_SIZE)
-		goto error;
-
-	/* all done */
-	core_fclose(file);
-	free(tempbuffer);
-	free(chartable);
-	return 0;
-
-error:
-	core_fclose(file);
-	osd_rmfile(filename);
-	free(tempbuffer);
-	free(chartable);
-	return 1;
 }
 
 
-/*-------------------------------------------------
-    bitmap_to_chars - convert a bitmap to
-    characters in the given font
--------------------------------------------------*/
+//-------------------------------------------------
+//  render_font_save_cached - write the cached
+//	data out to the file
+//-------------------------------------------------
 
-static int bitmap_to_chars(bitmap_argb32 &bitmap, render_font *font)
+static bool render_font_save_cached(render_font &font, const char *filename, UINT32 hash)
 {
-	int rowstart = 0;
-	int x, y;
+	// attempt to open the file
+	core_file *file;
+	file_error filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	if (filerr != FILERR_NONE)
+		return true;
 
-	/* loop over rows */
+	try
+	{
+		// determine the number of characters
+		int numchars = 0;
+		for (int chnum = 0; chnum < 65536; chnum++)
+			if (font.chars[chnum].width > 0)
+				numchars++;
+
+		// write the header
+		dynamic_buffer tempbuffer(65536);
+		UINT8 *dest = &tempbuffer[0];
+		*dest++ = 'f';
+		*dest++ = 'o';
+		*dest++ = 'n';
+		*dest++ = 't';
+		*dest++ = hash >> 24;
+		*dest++ = hash >> 16;
+		*dest++ = hash >> 8;
+		*dest++ = hash & 0xff;
+		*dest++ = font.height >> 8;
+		*dest++ = font.height & 0xff;
+		*dest++ = font.yoffs >> 8;
+		*dest++ = font.yoffs & 0xff;
+		*dest++ = numchars >> 24;
+		*dest++ = numchars >> 16;
+		*dest++ = numchars >> 8;
+		*dest++ = numchars & 0xff;
+		write_data(*file, tempbuffer, dest);
+
+		// write the empty table to the beginning of the file
+		dynamic_buffer chartable(numchars * CACHED_CHAR_SIZE + 1, 0);
+		write_data(*file, &chartable[0], &chartable[numchars * CACHED_CHAR_SIZE]);
+
+		// loop over all characters
+		int tableindex = 0;
+		for (int chnum = 0; chnum < 65536; chnum++)
+		{
+			render_font_char &ch = font.chars[chnum];
+			if (ch.width > 0)
+			{
+				// write out a bit-compressed bitmap if we have one
+				if (ch.bitmap != NULL)
+				{
+					// write the data to the tempbuffer
+					dest = tempbuffer;
+					UINT8 accum = 0;
+					UINT8 accbit = 7;
+
+					// bit-encode the character data
+					for (int y = 0; y < ch.bmheight; y++)
+					{
+						int desty = y + font.height + font.yoffs - ch.yoffs - ch.bmheight;
+						const UINT32 *src = (desty >= 0 && desty < font.height) ? &ch.bitmap->pix32(desty) : NULL;
+						for (int x = 0; x < ch.bmwidth; x++)
+						{
+							if (src != NULL && src[x] != 0)
+								accum |= 1 << accbit;
+							if (accbit-- == 0)
+							{
+								*dest++ = accum;
+								accum = 0;
+								accbit = 7;
+							}
+						}
+					}
+
+					// flush any extra
+					if (accbit != 7)
+						*dest++ = accum;
+
+					// write the data
+					write_data(*file, tempbuffer, dest);
+
+					// free the bitmap and texture
+					global_free(ch.bitmap);
+					ch.bitmap = NULL;
+				}
+
+				// compute the table entry
+				dest = &chartable[tableindex++ * CACHED_CHAR_SIZE];
+				*dest++ = chnum >> 8;
+				*dest++ = chnum & 0xff;
+				*dest++ = ch.width >> 8;
+				*dest++ = ch.width & 0xff;
+				*dest++ = ch.xoffs >> 8;
+				*dest++ = ch.xoffs & 0xff;
+				*dest++ = ch.yoffs >> 8;
+				*dest++ = ch.yoffs & 0xff;
+				*dest++ = ch.bmwidth >> 8;
+				*dest++ = ch.bmwidth & 0xff;
+				*dest++ = ch.bmheight >> 8;
+				*dest++ = ch.bmheight & 0xff;
+			}
+		}
+
+		// seek back to the beginning and rewrite the table
+		core_fseek(file, CACHED_HEADER_SIZE, SEEK_SET);
+		write_data(*file, &chartable[0], &chartable[numchars * CACHED_CHAR_SIZE]);
+
+		// all done
+		core_fclose(file);
+		return false;
+	}
+	catch (...)
+	{
+		core_fclose(file);
+		osd_rmfile(filename);
+		return true;
+	}
+}
+
+
+//-------------------------------------------------
+//  bitmap_to_chars - convert a bitmap to
+//	characters in the given font
+//-------------------------------------------------
+
+static bool bitmap_to_chars(bitmap_argb32 &bitmap, render_font &font)
+{
+	// loop over rows
+	int rowstart = 0;
 	while (rowstart < bitmap.height())
 	{
-		int rowend, baseline, colstart;
-		int chstart;
-
-		/* find the top of the row */
+		// find the top of the row
 		for ( ; rowstart < bitmap.height(); rowstart++)
 			if (pixel_is_set(bitmap, rowstart, 0))
 				break;
 		if (rowstart >= bitmap.height())
 			break;
 
-		/* find the bottom of the row */
+		// find the bottom of the row
+		int rowend;
 		for (rowend = rowstart + 1; rowend < bitmap.height(); rowend++)
 			if (!pixel_is_set(bitmap, rowend, 0))
 			{
@@ -282,7 +273,8 @@ static int bitmap_to_chars(bitmap_argb32 &bitmap, render_font *font)
 				break;
 			}
 
-		/* find the baseline */
+		// find the baseline
+		int baseline;
 		for (baseline = rowstart; baseline <= rowend; baseline++)
 			if (pixel_is_set(bitmap, baseline, 1))
 				break;
@@ -292,50 +284,50 @@ static int bitmap_to_chars(bitmap_argb32 &bitmap, render_font *font)
 			break;
 		}
 
-		/* set or confirm the height */
-		if (font->height == 0)
+		// set or confirm the height
+		if (font.height == 0)
 		{
-			font->height = rowend - rowstart + 1;
-			font->yoffs = baseline - rowend;
+			font.height = rowend - rowstart + 1;
+			font.yoffs = baseline - rowend;
 		}
 		else
 		{
-			if (font->height != rowend - rowstart + 1)
+			if (font.height != rowend - rowstart + 1)
 			{
 				fprintf(stderr, "Inconsistent font height at rows %d-%d\n", rowstart, rowend);
 				break;
 			}
-			if (font->yoffs != baseline - rowend)
+			if (font.yoffs != baseline - rowend)
 			{
 				fprintf(stderr, "Inconsistent baseline at rows %d-%d\n", rowstart, rowend);
 				break;
 			}
 		}
 
-		/* decode the starting character */
-		chstart = 0;
-		for (x = 0; x < 4; x++)
-			for (y = 0; y < 4; y++)
+		// decode the starting character
+		int chstart = 0;
+		for (int x = 0; x < 4; x++)
+			for (int y = 0; y < 4; y++)
 				chstart = (chstart << 1) | pixel_is_set(bitmap, rowstart + y, 2 + x);
 
-		/* print info */
+		// print info
 //      printf("Row %d-%d, baseline %d, character start %X\n", rowstart, rowend, baseline, chstart);
 
-		/* scan the column to find characters */
-		colstart = 0;
+		// scan the column to find characters
+		int colstart = 0;
 		while (colstart < bitmap.width())
 		{
-			render_font_char *ch = &font->chars[chstart];
-			int colend;
+			render_font_char &ch = font.chars[chstart];
 
-			/* find the start of the character */
+			// find the start of the character
 			for ( ; colstart < bitmap.width(); colstart++)
 				if (pixel_is_set(bitmap, rowend + 2, colstart))
 					break;
 			if (colstart >= bitmap.width())
 				break;
 
-			/* find the end of the character */
+			// find the end of the character
+			int colend;
 			for (colend = colstart + 1; colend < bitmap.width(); colend++)
 				if (!pixel_is_set(bitmap, rowend + 2, colend))
 				{
@@ -344,82 +336,68 @@ static int bitmap_to_chars(bitmap_argb32 &bitmap, render_font *font)
 				}
 
 			// skip char which code is already registered
-			if (ch->width <= 0)
+			if (ch.width <= 0)
 			{
-				/* print info */
+				// print info
 //              printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
 
-				/* allocate a bitmap */
-				ch->bitmap = new(std::nothrow) bitmap_argb32(colend - colstart + 1, font->height);
-				if (ch->bitmap == NULL)
-				{
-					fprintf(stderr, "Error allocating character bitmap (%dx%d)\n", colend - colstart + 1, font->height);
-					continue;
-				}
+				// allocate a bitmap
+				ch.bitmap = global_alloc(bitmap_argb32(colend - colstart + 1, font.height));
 
-				/* plot the character */
-				for (y = rowstart; y <= rowend; y++)
-					for (x = colstart; x <= colend; x++)
-						ch->bitmap->pix32(y - rowstart, x - colstart) = pixel_is_set(bitmap, y, x) ? 0xffffffff : 0x00000000;
+				// plot the character
+				for (int y = rowstart; y <= rowend; y++)
+					for (int x = colstart; x <= colend; x++)
+						ch.bitmap->pix32(y - rowstart, x - colstart) = pixel_is_set(bitmap, y, x) ? 0xffffffff : 0x00000000;
 
-				/* set the character parameters */
-				ch->width = colend - colstart + 1;
-				ch->xoffs = 0;
-				ch->yoffs = font->yoffs;
-				ch->bmwidth = ch->bitmap->width();
-				ch->bmheight = ch->bitmap->height();
+				// set the character parameters
+				ch.width = colend - colstart + 1;
+				ch.xoffs = 0;
+				ch.yoffs = font.yoffs;
+				ch.bmwidth = ch.bitmap->width();
+				ch.bmheight = ch.bitmap->height();
 			}
 
-			/* next character */
+			// next character
 			chstart++;
 			colstart = colend + 1;
 		}
 
-		/* next row */
+		// next row
 		rowstart = rowend + 1;
 	}
 
-	/* return non-zero (TRUE) if we errored */
+	// return non-zero (TRUE) if we errored
 	return (rowstart < bitmap.height());
 }
 
 
-/*-------------------------------------------------
-    main - main entry point
--------------------------------------------------*/
+//-------------------------------------------------
+//  main - main entry point
+//-------------------------------------------------
 
 int main(int argc, char *argv[])
 {
-	const char *bdcname;
-	render_font *font;
-	int error = FALSE;
-	int curarg;
-
-	/* validate arguments */
+	// validate arguments
 	if (argc < 3)
 	{
 		fprintf(stderr, "Usage:\n%s <input.png> [<input2.png> [...]] <output.bdc>\n", argv[0]);
 		return 1;
 	}
-	bdcname = argv[argc - 1];
+	const char *bdcname = argv[argc - 1];
 
-	/* allocate a font */
-	font = (render_font *)malloc(sizeof(*font));
-	if (font == NULL)
-		return 1;
-	memset(font, 0, sizeof(*font));
-
-	/* iterate over input files */
-	for (curarg = 1; curarg < argc - 1; curarg++)
+	// iterate over input files
+	static render_font font;
+	bool error = false;
+	for (int curarg = 1; curarg < argc - 1; curarg++)
 	{
-		/* load the png file */
+		// load the png file
 		const char *pngname = argv[curarg];
 		core_file *file;
 		file_error filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
 		if (filerr != FILERR_NONE)
 		{
 			fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
-			error = TRUE;
+			error = true;
 			break;
 		}
 
@@ -429,21 +407,20 @@ int main(int argc, char *argv[])
 		if (pngerr != PNGERR_NONE)
 		{
 			fprintf(stderr, "Error %d reading PNG file\n", pngerr);
-			error = TRUE;
+			error = true;
 			break;
 		}
 
-		/* parse the PNG into characters */
+		// parse the PNG into characters
 		error = bitmap_to_chars(bitmap, font);
 		if (error)
 			break;
 	}
 
-	/* write out the resulting font */
+	// write out the resulting font
 	if (!error)
-		render_font_save_cached(font, bdcname, 0);
+		error = render_font_save_cached(font, bdcname, 0);
 
-	/* cleanup after ourselves */
-	free(font);
-	return error;
+	// cleanup after ourselves
+	return error ? 1 : 0;
 }

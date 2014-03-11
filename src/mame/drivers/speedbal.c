@@ -272,7 +272,7 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
 	UINT8* rom = memregion("sprites")->base();
-	UINT8* temp = auto_alloc_array(machine(), UINT8, 0x200*128);
+	dynamic_buffer temp(0x200*128);
 
 	for (int i=0;i<0x200;i++)
 	{
@@ -281,7 +281,6 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 	}
 
 	memcpy(rom,temp,0x200*128);
-	auto_free(machine(), temp);
 }
 
 

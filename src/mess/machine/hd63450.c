@@ -473,6 +473,8 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 	m_token = global_alloc_clear(hd63450_t);
 }
 
+hd63450_device::~hd63450_device() { global_free(m_token); }
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

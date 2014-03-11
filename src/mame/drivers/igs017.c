@@ -670,7 +670,7 @@ void igs017_state::mgcs_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer tmp(length);
 	int i;
 
 	memcpy(tmp,rom,length);
@@ -679,8 +679,6 @@ void igs017_state::mgcs_decrypt_tiles()
 		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
-
-	auto_free(machine(), tmp);
 }
 
 void igs017_state::mgcs_flip_sprites()
@@ -966,7 +964,7 @@ void igs017_state::lhzb2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer tmp(length);
 	int i;
 
 	int addr;
@@ -976,8 +974,6 @@ void igs017_state::lhzb2_decrypt_tiles()
 		addr = (i & ~0xffffff) | BITSWAP24(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
 		rom[i] = tmp[addr];
 	}
-
-	auto_free(machine(), tmp);
 }
 
 void igs017_state::lhzb2_decrypt_sprites()
@@ -1193,7 +1189,7 @@ void igs017_state::slqz2_decrypt_tiles()
 {
 	int length = memregion("tilemaps")->bytes();
 	UINT8 *rom = memregion("tilemaps")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer tmp(length);
 	int i;
 
 	memcpy(tmp,rom,length);
@@ -1202,8 +1198,6 @@ void igs017_state::slqz2_decrypt_tiles()
 		int addr = (i & ~0xff) | BITSWAP8(i,7,4,5,6,3,2,1,0);
 		rom[i] = tmp[addr];
 	}
-
-	auto_free(machine(), tmp);
 }
 
 DRIVER_INIT_MEMBER(igs017_state,slqz2)

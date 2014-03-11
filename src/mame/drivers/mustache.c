@@ -237,7 +237,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	int G2 = memregion("gfx2")->bytes()/2;
 	UINT8 *gfx1 = memregion("gfx1")->base();
 	UINT8 *gfx2 = memregion("gfx2")->base();
-	UINT8 *buf=auto_alloc_array(machine(), UINT8, G2*2);
+	dynamic_buffer buf(G2*2);
 
 	/* BG data lines */
 	for (i=0;i<G1; i++)
@@ -273,7 +273,6 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	for (i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
-	auto_free(machine(), buf);
 	m_cpu_decrypt->decrypt("maincpu",0x8000);
 }
 

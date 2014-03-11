@@ -2270,8 +2270,8 @@ DEVICE_IMAGE_LOAD_MEMBER( a400_state, a5200_cart )
 	{
 		/* load an optional (dual) cartidge */
 		size = image.fread(&mem[0x4000], 0x8000);
-		const char *info = hashfile_extrainfo(image);
-		if (info && !strcmp(info, "A13MIRRORING"))
+		astring info;
+		if (hashfile_extrainfo(image, info) && info == "A13MIRRORING")
 			A13_mirr = TRUE;
 	}
 	else

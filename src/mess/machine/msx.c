@@ -72,7 +72,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 	int size_aligned;
 	UINT8 *mem;
 	int type = -1;
-	const char *extra = NULL;
+	astring extra;
 	char *sramfile;
 	slot_state *st;
 	int id = -1;
@@ -179,21 +179,19 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		}
 
 		/* see if msx.crc will tell us more */
-		extra = hashfile_extrainfo(image);
-
-		if (!extra)
+		if (!hashfile_extrainfo(image, extra))
 		{
 			logerror("cart #%d: warning: no information in crc file\n", id);
 			type = -1;
 		}
 		else
-		if ((1 != sscanf(extra, "%d", &type) ) || type < 0 || type > SLOT_LAST_CARTRIDGE_TYPE)
+		if ((1 != sscanf(extra.cstr(), "%d", &type) ) || type < 0 || type > SLOT_LAST_CARTRIDGE_TYPE)
 		{
 			logerror("cart #%d: warning: information in crc file not valid\n", id);
 			type = -1;
 		}
 		else
-			logerror ("cart #%d: info: cart extra info: '%s' = %s\n", id, extra, msx_slot_list[type].name);
+			logerror ("cart #%d: info: cart extra info: '%s' = %s\n", id, extra.cstr(), msx_slot_list[type].name);
 
 		/* if not, attempt autodetection */
 		if (type < 0)

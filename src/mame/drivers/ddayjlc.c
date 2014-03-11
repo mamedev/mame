@@ -669,8 +669,8 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 
 	{
 		UINT32 oldaddr, newadr, length,j;
-		UINT8 *src, *dst, *temp;
-		temp = auto_alloc_array(machine(), UINT8, 0x10000);
+		UINT8 *src, *dst;
+		dynamic_buffer temp(0x10000);
 		src = temp;
 		dst = memregion("gfx1")->base();
 		length = memregion("gfx1")->bytes();
@@ -684,7 +684,6 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 			newadr += 32;
 			oldaddr += 16;
 		}
-		auto_free(machine(), temp);
 	}
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);

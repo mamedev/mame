@@ -1423,7 +1423,7 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
 	UINT8* const src = memregion(region)->base();
-	UINT8* const temp = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
 	for (int sa = 0; sa < length; sa++)
@@ -1433,7 +1433,6 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 	}
 
 	memcpy(src, temp, length);
-	auto_free(machine(), temp);
 }
 
 void ninjakd2_state::gfx_unscramble()

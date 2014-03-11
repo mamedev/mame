@@ -2139,6 +2139,11 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,
 	m_token = new apollo_graphics;
 }
 
+apollo_graphics_15i::~apollo_graphics_15i()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
