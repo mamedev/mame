@@ -355,8 +355,14 @@ ifdef MSVC_BUILD
 else
 	FLACOPTS += -DVERSION=\"1.2.1\"
 endif
+
 ifneq (,$(findstring clang,$(CC)))
-	FLACOPTS += -Wno-unused-const-variable
+	# TODO: needs to use $(CC)
+	TEST_CLANG := $(shell clang --version)
+
+	ifeq ($(findstring 3.4,$(TEST_CLANG)),3.4)
+		FLACOPTS += -Wno-unused-const-variable
+	endif	
 endif
 
 LIBFLACOBJS = \
