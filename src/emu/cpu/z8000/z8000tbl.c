@@ -587,6 +587,6 @@ void z8000_init_tables(void)
 
 void z8000_deinit_tables(void)
 {
-	global_free( z8000_exec );
+	global_free_array( z8000_exec );
 	z8000_exec = NULL;
 }
