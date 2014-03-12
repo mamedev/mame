@@ -3497,6 +3497,7 @@ warzard         // 21/11/1996 (c) 1996 (Japan)
 warzardr1       // 23/10/1996 (c) 1996 (Japan)
 sfiii           // 04/02/1997 (c) 1997 (Euro)
 sfiiiu          // 04/02/1997 (c) 1997 (USA)
+sfiiia			// 04/02/1997 (c) 1997 (Asia)
 sfiiij          // 04/02/1997 (c) 1997 (Japan)
 sfiiih          // 04/02/1997 (c) 1997 (Hispanic)
 sfiii2          // 30/09/1997 (c) 1997 (USA)
@@ -3527,6 +3528,8 @@ jojobane        // 27/09/1999 (c) 1999 (Euro)
 jojobaner1      // 13/09/1999 (c) 1999 (Euro)
 cps3boot        // bootleg
 cps3boota       // bootleg
+cps3bs32		//
+cps3bs32a		//
 
 // Capcom ZN1
 cpzn1
