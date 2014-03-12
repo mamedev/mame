@@ -235,7 +235,7 @@ upd1771c_device::upd1771c_device(const machine_config &mconfig, const char *tag,
 void upd1771c_device::device_start()
 {
 	/* resolve callbacks */
-	m_ack_handler.resolve();
+	m_ack_handler.resolve_safe();
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd1771c_device::ack_callback),this));
 
