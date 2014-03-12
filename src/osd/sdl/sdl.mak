@@ -400,7 +400,7 @@ OSDOBJS = \
 	$(SDLOBJ)/sdlmidi.o
 
 ifdef NO_USE_MIDI
-DEFS += "-DDISABLE_MIDI=1"
+DEFS += -DDISABLE_MIDI=1
 endif
 
 # Add SDL2.0 support
