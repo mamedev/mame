@@ -289,6 +289,9 @@ Mark Gordon
 
     TODO:
 
+	- spinner INT
+	- devcb2 expansion port
+	- cartridge slot interface
     - printer
     - SPI
     - sound (PSG RDY -> Z80 WAIT)
@@ -543,11 +546,11 @@ READ8_MEMBER( adam_state::iorq_r )
 	case 7:
 		if (BIT(offset, 1))
 		{
-			data = input2_r(space, 0);
+			data = m_joy2->read();
 		}
 		else
 		{
-			data = input1_r(space, 0);
+			data = m_joy1->read();
 		}
 		break;
 	}
@@ -579,7 +582,10 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 
 	case 4:
-		paddle_w(space, 0, data);
+		m_joy1->common0_w(1);
+		m_joy1->common1_w(0);
+		m_joy2->common0_w(1);
+		m_joy2->common1_w(0);
 		break;
 
 	case 5:
@@ -594,7 +600,10 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 
 	case 6:
-		joystick_w(space, 0, data);
+		m_joy1->common0_w(0);
+		m_joy1->common1_w(1);
+		m_joy2->common0_w(0);
+		m_joy2->common1_w(1);
 		break;
 
 	case 7:
@@ -848,65 +857,6 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 
 
 //**************************************************************************
-//  PADDLES
-//**************************************************************************
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( paddle_tick )
-//-------------------------------------------------
-
-TIMER_DEVICE_CALLBACK_MEMBER( adam_state::paddle_tick )
-{
-	// TODO: improve irq behaviour (see drivers/coleco.c)
-	if (coleco_scan_paddles(machine(), &m_joy_status0, &m_joy_status1))
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
-}
-
-
-//-------------------------------------------------
-//  paddle_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( adam_state::paddle_w )
-{
-	m_joy_mode = 0;
-}
-
-
-//-------------------------------------------------
-//  joystick_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( adam_state::joystick_w )
-{
-	m_joy_mode = 1;
-}
-
-
-//-------------------------------------------------
-//  input1_r -
-//-------------------------------------------------
-
-READ8_MEMBER( adam_state::input1_r )
-{
-	// TODO serious tagmap abuse here
-	return coleco_paddle_read(machine(), 0, m_joy_mode, m_joy_status0);
-}
-
-
-//-------------------------------------------------
-//  input2_r -
-//-------------------------------------------------
-
-READ8_MEMBER( adam_state::input2_r )
-{
-	// TODO serious tagmap abuse here
-	return coleco_paddle_read(machine(), 1, m_joy_mode, m_joy_status1);
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -949,6 +899,20 @@ static ADDRESS_MAP_START( m6801_io, AS_IO, 8, adam_state )
 	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(m6801_p3_r, m6801_p3_w)
 	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_WRITE(m6801_p4_w)
 ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( adam )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( adam )
+	// defined in bus/adamnet/kb.c
+INPUT_PORTS_END
 
 
 
@@ -1034,6 +998,17 @@ static ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
 };
 
 
+WRITE_LINE_MEMBER( adam_state::joy1_irq_w )
+{
+	// TODO
+}
+
+WRITE_LINE_MEMBER( adam_state::joy2_irq_w )
+{
+	// TODO
+}
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1054,9 +1029,7 @@ void adam_state::machine_start()
 	save_item(NAME(m_bwr));
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_data_out));
-	save_item(NAME(m_joy_mode));
-	save_item(NAME(m_joy_status0));
-	save_item(NAME(m_joy_status1));
+	save_item(NAME(m_spindis));
 	save_item(NAME(m_vdp_nmi));
 }
 
@@ -1126,8 +1099,6 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// TODO Z80 RDY
 
 	// devices
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddles", adam_state, paddle_tick, attotime::from_msec(20))
-
 	MCFG_ADAMNET_BUS_ADD()
 	MCFG_ADAMNET_SLOT_ADD("net1", adamnet_devices, "kb")
 	MCFG_ADAMNET_SLOT_ADD("net2", adamnet_devices, "prn")
@@ -1154,6 +1125,11 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot1_intf, adam_slot1_devices, "adamlink")
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot2_intf, adam_slot2_devices, NULL)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot3_intf, adam_slot3_devices, "ram")
+
+	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL1_TAG, colecovision_control_port_devices, "hand")
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy1_irq_w))
+	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL2_TAG, colecovision_control_port_devices, NULL)
+	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy2_irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1202,4 +1178,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                    COMPANY         FULLNAME            FLAGS
-COMP( 1982, adam,       0,          coleco, adam,       coleco,     driver_device,  0,      "Coleco",       "Adam",             GAME_SUPPORTS_SAVE )
+COMP( 1982, adam,       0,          coleco, adam,       adam,       driver_device,  0,      "Coleco",       "Adam",             GAME_SUPPORTS_SAVE )

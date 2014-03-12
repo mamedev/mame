@@ -218,6 +218,18 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/coleco/ctrl.h,BUSES += COLECO
+#-------------------------------------------------
+
+ifneq ($(filter COLECO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/coleco
+BUSOBJS += $(BUSOBJ)/coleco/ctrl.o
+BUSOBJS += $(BUSOBJ)/coleco/hand.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ecbbus/ecbbus.h,BUSES += ECBBUS
 #-------------------------------------------------
 
