@@ -9,13 +9,14 @@
 #ifndef PC1251_H_
 #define PC1251_H_
 
+#include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
 
 #define PC1251_CONTRAST (ioport("DSW0")->read() & 0x07)
 
 
-class pc1251_state : public driver_device
+class pc1251_state : public pocketc_state
 {
 public:
 	enum
@@ -24,7 +25,7 @@ public:
 	};
 
 	pc1251_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: pocketc_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }

@@ -13,7 +13,6 @@
 #include "includes/pc1350.h"
 #include "includes/pc1403.h"
 #include "machine/ram.h"
-#include "drivlgcy.h"
 
 /* pc1430 no peek poke operations! */
 
@@ -708,7 +707,7 @@ static GFXDECODE_START( pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_FRAGMENT( pocketc )
+static MACHINE_CONFIG_START( pocketc,  pocketc_state)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NVRAM_ADD_0FILL("cpu_nvram")
@@ -730,13 +729,13 @@ static MACHINE_CONFIG_FRAGMENT( pocketc )
 	MCFG_GFXDECODE_ADD("gfxdecode", pc1401 )
 	MCFG_PALETTE_ADD("palette", 8*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(6)
-	MCFG_PALETTE_INIT_LEGACY( pocketc )
+	MCFG_PALETTE_INIT_OWNER( pocketc_state, pocketc )
 
 	/* sound hardware */
 	/*MCFG_SOUND_ADD("dac", DAC, pocketc_sound_interface)*/
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc1401, pc1401_state )
+static MACHINE_CONFIG_DERIVED_CLASS( pc1401, pocketc, pc1401_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(READLINE(pc1401_state,pc1401_reset))
@@ -748,8 +747,6 @@ static MACHINE_CONFIG_START( pc1401, pc1401_state )
 	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1401_state,pc1401_outb))
 	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1401_state,pc1401_outc))
 
-	MCFG_FRAGMENT_ADD(pocketc)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pc1401_state, screen_update_pc1401)
 MACHINE_CONFIG_END
@@ -759,7 +756,7 @@ static MACHINE_CONFIG_DERIVED( pc1402, pc1401 )
 	MCFG_CPU_PROGRAM_MAP( pc1402_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc1250, pc1251_state )
+static MACHINE_CONFIG_DERIVED_CLASS( pc1250, pocketc, pc1251_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1250_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NULL)
@@ -770,9 +767,7 @@ static MACHINE_CONFIG_START( pc1250, pc1251_state )
 	MCFG_SC61860_READ_B_HANDLER(READ8(pc1251_state,pc1251_inb))
 	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1251_state,pc1251_outb))
 	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1251_state,pc1251_outc))
-
-	MCFG_FRAGMENT_ADD(pocketc)
-
+	
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(608, 300)
@@ -803,7 +798,7 @@ static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
 	MCFG_CPU_PROGRAM_MAP( pc1261_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc1350, pc1350_state )
+static MACHINE_CONFIG_DERIVED_CLASS( pc1350, pocketc, pc1350_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1350_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NULL)
@@ -814,8 +809,6 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_SC61860_READ_B_HANDLER(READ8(pc1350_state,pc1350_inb))
 	MCFG_SC61860_WRITE_B_HANDLER(WRITE8(pc1350_state,pc1350_outb))
 	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1350_state,pc1350_outc))
-
-	MCFG_FRAGMENT_ADD( pocketc )
 
 	/*
 	   aim: show sharp with keyboard
@@ -833,7 +826,7 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc1403, pc1403_state )
+static MACHINE_CONFIG_DERIVED_CLASS( pc1403, pocketc, pc1403_state )
 	MCFG_CPU_ADD( "maincpu", SC61860, 256000 )
 	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
 	MCFG_SC61860_READ_RESET_HANDLER(NULL)
@@ -844,8 +837,6 @@ static MACHINE_CONFIG_START( pc1403, pc1403_state )
 	MCFG_SC61860_READ_B_HANDLER(NULL)
 	MCFG_SC61860_WRITE_B_HANDLER(NULL)
 	MCFG_SC61860_WRITE_C_HANDLER(WRITE8(pc1403_state,pc1403_outc))
-
-	MCFG_FRAGMENT_ADD( pocketc )
 
 	/*
 	   aim: show sharp with keyboard

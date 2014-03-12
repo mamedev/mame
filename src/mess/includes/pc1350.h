@@ -9,6 +9,7 @@
 #ifndef PC1350_H_
 #define PC1350_H_
 
+#include "pocketc.h"
 #include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -16,7 +17,7 @@
 #define PC1350_CONTRAST (ioport("DSW0")->read() & 0x07)
 
 
-class pc1350_state : public driver_device
+class pc1350_state : public pocketc_state
 {
 public:
 	enum
@@ -25,7 +26,7 @@ public:
 	};
 
 	pc1350_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: pocketc_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
