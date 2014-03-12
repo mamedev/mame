@@ -231,7 +231,7 @@ struct apu_t
 	dpcm_t     dpcm;
 
 	/* APU registers */
-	unsigned char regs[0x17];
+	unsigned char regs[0x18];
 
 	/* Sound pointers */
 	void *buffer;
