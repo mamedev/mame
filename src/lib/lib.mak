@@ -356,7 +356,9 @@ else
 	FLACOPTS += -DVERSION=\"1.2.1\"
 endif
 ifneq (,$(findstring clang,$(CC)))
+ifneq (,$(findstring emcc,$(CC)))
 	FLACOPTS += -Wno-unused-const-variable
+endif
 endif
 
 LIBFLACOBJS = \

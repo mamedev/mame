@@ -12,3 +12,7 @@ TEST_CLANG := $(shell clang --version)
 ifeq ($(findstring 3.4,$(TEST_CLANG)),3.4)
 CCOMFLAGS += -Wno-inline-new-delete
 endif
+
+ifeq ($(TARGETOS),emscripten)
+CCOMFLAGS += -Qunused-arguments
+endif
