@@ -401,7 +401,7 @@ void info_xml_creator::output_devices()
 			{
 				astring temptag("_");
 				temptag.cat(option->name());
-				auto_pointer<device_t> dev(const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0));
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
 				device_iterator subiter(*dev);
