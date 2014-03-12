@@ -164,20 +164,21 @@ WRITE8_MEMBER(wardner_state::wardner_bank_w)
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_DEVICE("membank", address_map_bank_device, amap8) /* Overlapped RAM/Banked ROM */
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w)						// AM_SHARE("spriteram8")
+	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write)	// AM_SHARE("palette")
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITEONLY AM_SHARE("sharedram")
+	AM_RANGE(0x8000, 0xffff) AM_DEVREAD("membank", address_map_bank_device, read8)
 ADDRESS_MAP_END
 
+// Overlapped RAM/Banked ROM
+// Can't use AM_RANGE(0x00000, 0x3ffff) for ROM because the shared pointers get messed up somehow
 static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
-	AM_RANGE(0x02000, 0x02fff) AM_DEVREAD("palette", palette_device, read) AM_SHARE("palette")
-	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_READONLY AM_SHARE("sharedram")
-	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x01000)
-	AM_RANGE(0x03000, 0x03fff) AM_ROM AM_REGION("maincpu", 0x03000)
-	AM_RANGE(0x05000, 0x07fff) AM_ROM AM_REGION("maincpu", 0x05000)
-	AM_RANGE(0x08000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x08000)
-	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x38000) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
-	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x38000) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x04000, 0x047ff) AM_MIRROR(0x38000) AM_RAM AM_WRITEONLY AM_SHARE("sharedram")
+	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x1000)
+	AM_RANGE(0x02000, 0x02fff) AM_READONLY AM_SHARE("palette")
+	AM_RANGE(0x03000, 0x03fff) AM_ROM AM_REGION("maincpu", 0x3000)
+	AM_RANGE(0x04000, 0x047ff) AM_READONLY AM_SHARE("sharedram")
+	AM_RANGE(0x04800, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4800)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
