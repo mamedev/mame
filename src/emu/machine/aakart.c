@@ -245,8 +245,7 @@ READ8_MEMBER( aakart_device::read )
 
 WRITE8_MEMBER( aakart_device::write )
 {
-	if(m_new_command)
-//		printf("skip cmd %02x\n",data);
+	// if(m_new_command) printf("skip cmd %02x\n",data);
 
 	m_tx_latch = data;
 	m_new_command |= 1;
