@@ -41,11 +41,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT32> m_igs_mainram;
-	required_shared_ptr<UINT32> m_igs_cg_videoram;
-	required_shared_ptr<UINT32> m_igs_palette32;
-	required_shared_ptr<UINT32> m_igs_tx_videoram;
-	required_shared_ptr<UINT32> m_igs_bg_videoram;
+	optional_shared_ptr<UINT32> m_igs_mainram;
+	optional_shared_ptr<UINT32> m_igs_cg_videoram;
+	optional_shared_ptr<UINT32> m_igs_palette32;
+	optional_shared_ptr<UINT32> m_igs_tx_videoram;
+	optional_shared_ptr<UINT32> m_igs_bg_videoram;
 
 	tilemap_t *m_igs_tx_tilemap;
 	tilemap_t *m_igs_bg_tilemap;
@@ -68,6 +68,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
+	virtual void video_start_fearless();
 	UINT32 screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_fearless(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
@@ -199,6 +200,11 @@ void igs_m027_state::video_start()
 	logerror("Video START OK!\n");
 }
 
+void igs_m027_state::video_start_fearless()
+{
+
+}
+
 UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//??????????
@@ -249,6 +255,11 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 	AM_RANGE(0x70000200, 0x70000203) AM_RAM     //??????????????
 	AM_RANGE(0x50000000, 0x500003ff) AM_WRITENOP // uploads xor table to external rom here
 	AM_RANGE(0xf0000000, 0xF000000f) AM_WRITENOP // magic registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( igs_fearless_map, AS_PROGRAM, 32, igs_m027_state )
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
+	AM_RANGE(0x08000000, 0x0807ffff) AM_ROM AM_REGION("user1", 0)/* Game ROM */
 ADDRESS_MAP_END
 
 
@@ -419,7 +430,7 @@ static void sound_irq( device_t *device, int level )
 
 static MACHINE_CONFIG_START( fearless, igs_m027_state )
 	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
-	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_CPU_PROGRAM_MAP(igs_fearless_map)
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 
@@ -428,6 +439,8 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+
+	MCFG_VIDEO_START_OVERRIDE(igs_m027_state, fearless)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_fearless)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
