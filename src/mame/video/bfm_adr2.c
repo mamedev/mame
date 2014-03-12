@@ -192,6 +192,9 @@ void bfm_adder2_device::device_reset()
 
 void bfm_adder2_device::device_start()
 {
+	if (!m_palette->started())
+		throw device_missing_dependencies();
+
 	adder2_decode_char_roms();
 
 	save_item(NAME(m_adder2_screen_page_reg));
