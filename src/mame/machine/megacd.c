@@ -1732,6 +1732,9 @@ READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
 
 void sega_segacd_device::device_start()
 {
+	if (m_gfxdecode != NULL && !m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	segacd_gfx_conversion_timer = machine().device<timer_device>(":segacd:stamp_timer");
 	segacd_irq3_timer = machine().device<timer_device>(":segacd:irq3_timer");
 	scd_dma_timer = machine().device<timer_device>(":segacd:scd_dma_timer");
