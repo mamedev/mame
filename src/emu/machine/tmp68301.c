@@ -90,7 +90,7 @@ READ16_MEMBER(tmp68301_device::pdr_r)
 
 WRITE16_MEMBER(tmp68301_device::pdr_w)
 {
-	m_out_parallel_cb(0, data & m_pdir, 0xffff);
+	m_out_parallel_cb(0, data & m_pdir, mem_mask);
 }
 
 
