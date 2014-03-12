@@ -18,6 +18,7 @@
 #include "ti99defs.h"
 #include "peribox.h"
 #include "machine/smartmed.h"
+#include "machine/strata.h"
 
 extern const device_type TI99_USBSM;
 
@@ -39,19 +40,25 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 
 private:
-	UINT16      usbsm_mem_16_r(offs_t offset);
-	void        usbsm_mem_16_w(offs_t offset, UINT16 data);
+
 	smartmedia_image_device*    m_smartmedia;
-	device_t*   m_strata;
 
 	int         m_feeprom_page;
 	int         m_sram_page;
 	int         m_cru_register;
 	bool        m_tms9995_mode;
 
+	bool        m_enable_io;
+	bool        m_enable_int;
+	bool        m_enable_sm;
+	bool        m_write_flash;
+
 	UINT16      m_input_latch;
 	UINT16      m_output_latch;
 	UINT16*     m_ram;
+
+	// Link to the FEEPROM containing the DSR (driver)
+	required_device<strataflash_device> m_flash;
 };
 
 #endif
