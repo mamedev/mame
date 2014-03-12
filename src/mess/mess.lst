@@ -353,7 +353,7 @@ mu100   // 1997 MU-100
 mt32
 cm32l
 d110
-sc55	// 1991 Sound Canvas SC-55
+sc55    // 1991 Sound Canvas SC-55
 
 //***************COMPUTERS**************************************************
 
@@ -995,6 +995,7 @@ ip244415    // IP24: Indigo 2, R4400, 150MHz
 // Texas Instruments
 ti990_10  // 1975 TI 990/10
 ti990_4   // 1976 TI 990/4
+ti990_4v   // 1976 TI 990/4 with video display terminal
 990189  // 1978 TM 990/189
 990189v   // 1980 TM 990/189 with Color Video Board
 
@@ -1939,7 +1940,7 @@ batmantv    // The Batman, 2004
 harriet // 1990
 
 // Fanuc
-fanucs15	// 1990
+fanucs15    // 1990
 
 //********** Misc **********************************************************
 

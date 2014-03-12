@@ -28,6 +28,7 @@
     Note that only interrupt levels 3-7 are supported by the board (8-15 are not wired).
 
 TODO:
+* Split into two machines for either ASR or VDT
 * finish ASR emulation
 * programmer panel
 * emulate other devices: card reader, printer
@@ -36,17 +37,13 @@ TODO:
     Rewritten by Michael Zapf 2013
 */
 
-/*if 1, use 911 VDT; if 0, use 733 ASR  */
-#define VIDEO_911 0
-
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#if VIDEO_911
+
 #include "video/911_vdt.h"
 #include "sound/beep.h"
-#else
 #include "video/733_asr.h"
-#endif
+
 #include "imagedev/flopdrv.h"
 #include "machine/ti99/990_dk.h"
 
@@ -55,23 +52,26 @@ class ti990_4_state : public driver_device
 {
 public:
 	ti990_4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_fd800(*this, "fd800") { }
 
 	device_t *m_terminal;
 	DECLARE_READ8_MEMBER( panel_read );
 	DECLARE_WRITE8_MEMBER( panel_write );
 	DECLARE_WRITE8_MEMBER( external_operation );
 	DECLARE_READ8_MEMBER( interrupt_level );
+	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
 
 	DECLARE_DRIVER_INIT(ti990_4);
+	DECLARE_DRIVER_INIT(ti990_4v);
+
 	DECLARE_MACHINE_RESET(ti990_4);
 
 	virtual void video_start();
 	UINT32 screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti990_4_line_interrupt);
 	void idle_callback(int state);
-	required_device<tms9900_device> m_maincpu;
 
 private:
 	void        hold_load();
@@ -87,6 +87,12 @@ private:
 	void        set_int6(int state);
 	void        set_int7(int state);
 	bool        m_ckon_state;
+
+	bool        m_video;
+
+	// Connected devices
+	required_device<tms9900_device>     m_maincpu;
+	required_device<fd800_legacy_device> m_fd800;
 };
 
 enum
@@ -96,16 +102,18 @@ enum
 
 void ti990_4_state::hold_load()
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INT_9900_LOAD, ASSERT_LINE);
+	logerror("ti990_4: Triggering LOAD interrupt\n");
 	m_nmi_timer->adjust(attotime::from_msec(100));
 }
 
 /*
-    NMI timer callback
+    LOAD interrupt trigger callback
 */
 void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INT_9900_LOAD, CLEAR_LINE);
+	logerror("ti990_4: Released LOAD interrupt\n");
 }
 
 READ8_MEMBER( ti990_4_state::panel_read )
@@ -131,7 +139,8 @@ void ti990_4_state::set_int_line(int line, int state)
 	{
 		m_int_level = 0;
 		while ((m_intlines & (1 << m_int_level))==0) m_int_level++;
-		m_maincpu->set_input_line(INT_9900_INTREQ, ASSERT_LINE);  /* interrupt it, baby */
+		logerror("ti990_4: Setting int level to %x\n", m_int_level);
+		m_maincpu->set_input_line(INT_9900_INTREQ, ASSERT_LINE);
 	}
 	else
 		m_maincpu->set_input_line(INT_9900_INTREQ, CLEAR_LINE);
@@ -162,18 +171,23 @@ void ti990_4_state::line_interrupt()
 	if (m_ckon_state) set_int_line(5, ASSERT_LINE);
 }
 
+/*
+    Callback from the floppy controller.
+*/
+WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
+{
+	set_int7(state);
+}
+
 INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 {
-#if VIDEO_911
-	vdt911_keyboard(m_terminal);
-#else
-	asr733_keyboard(m_terminal);
-#endif
+	if (m_video)
+		vdt911_keyboard(m_terminal);
+	else
+		asr733_keyboard(m_terminal);
 
 	line_interrupt();
 }
-
-#if VIDEO_911
 
 /*
     TI990/4 video emulation.
@@ -181,43 +195,40 @@ INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
     We emulate a single VDT911 CRT terminal.
 */
 
+void ti990_vdt_int(running_machine &machine, int state)
+{
+	// set_int3
+}
+
 static const vdt911_init_params_t vdt911_intf =
 {
 	char_1920,
 	vdt911_model_US,
-	ti990_set_int3
+	ti990_vdt_int
 };
 
 void ti990_4_state::video_start()
 {
-	m_terminal = machine().device("vdt911");
+	if (m_video)
+		m_terminal = machine().device("vdt911");
+	else
+		m_terminal = machine().device("asr733");
 }
 
 UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vdt911_refresh(m_terminal, bitmap, cliprect, 0, 0);
+	if (m_video)
+		vdt911_refresh(m_terminal, bitmap, cliprect, 0, 0);
+	else
+		asr733_refresh(m_terminal, bitmap, 0, 0);
+
 	return 0;
 }
-
-#else
 
 static const asr733_init_params_t asr733_intf =
 {
 	// set_int6
 };
-
-void ti990_4_state::video_start()
-{
-	m_terminal = machine().device("asr733");
-}
-
-UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	asr733_refresh(m_terminal, bitmap, 0, 0);
-	return 0;
-}
-
-#endif
 
 WRITE8_MEMBER( ti990_4_state::external_operation )
 {
@@ -287,20 +298,27 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
-#if VIDEO_911
-	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
-#else
 	AM_RANGE(0x00, 0x01) AM_DEVREAD_LEGACY("asr733", asr733_cru_r)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE_LEGACY("asr733", asr733_cru_w)
-#endif
 
-	AM_RANGE(0x08, 0x0b) AM_READ_LEGACY(fd800_cru_r)
-	AM_RANGE(0x40, 0x5f) AM_WRITE_LEGACY(fd800_cru_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
+	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
 
 	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
 	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(cru_map_v, AS_IO, 8, ti990_4_state )
+	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
+
+	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
+	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
+
+	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
+	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
+ADDRESS_MAP_END
+
 
 static const floppy_interface ti990_4_floppy_interface =
 {
@@ -309,7 +327,7 @@ static const floppy_interface ti990_4_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_8_DSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(fd800),
 	NULL,
 	NULL
@@ -331,48 +349,79 @@ MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 	hold_load();
 	reset_int_lines();
 	m_ckon_state = false;
-//  fd800_machine_init(machine(), ti990_4_state::set_int7);
+	m_maincpu->set_ready(ASSERT_LINE);
 }
+
+DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
+{
+	m_video = false;
+	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
+	asr733_init(machine());
+}
+
+DRIVER_INIT_MEMBER(ti990_4_state, ti990_4v)
+{
+	m_video = true;
+	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
+	vdt911_init(machine());
+}
+
+static INPUT_PORTS_START(ti990_4)
+	ASR733_KEY_PORTS
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(ti990_4v)
+	VDT911_KEY_PORTS
+INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, cpuconf)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
 
+	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
-	/* video hardware - we emulate a single 911 vdt display */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(ti990_4_state, screen_update_ti990_4)
-#if VIDEO_911
-	MCFG_SCREEN_SIZE(560, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_PALETTE("vdt911:palette")
-#else
+
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("asr733:palette")
-#endif
-
-#if VIDEO_911
-	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
-#else
 	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
-#endif
 
-#if VIDEO_911
-	/* 911 VDT has a beep tone generator */
+	// Floppy controller
+	MCFG_FD800_ADD("fd800", WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
+	/* basic machine hardware */
+	/* TMS9900 CPU @ 3.0(???) MHz */
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v, cpuconf)
+
+	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
+	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(ti990_4_state, screen_update_ti990_4)
+
+	MCFG_SCREEN_SIZE(560, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
+	MCFG_SCREEN_PALETTE("vdt911:palette")
+	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-#endif
+
+	// Floppy controller
+	MCFG_FD800_ADD("fd800", WRITELINE(ti990_4_state, fd_interrupt))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
-
 MACHINE_CONFIG_END
-
 
 /*
   ROM loading
@@ -398,41 +447,22 @@ ROM_START(ti990_4)
 	ROMX_LOAD("94519116.u7", 0xFE01, 0x100, CRC(fa387bf3), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1))
 
 #else
-	/* ROM set 945121-4(?): "Floppy disc loader with self test" (cf 945401-9701
-	pp. 1-19) */
-
+	/* ROM set 945121-4(?): "Floppy disc loader with self test" (cf 945401-9701 pp. 1-19) */
 	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
-
 #endif
 
-#if VIDEO_911
-	/* VDT911 character definitions */
-	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
-#else
 	ROM_REGION(asr733_chr_region_len, asr733_chr_region, ROMREGION_ERASEFF)
-#endif
-
 ROM_END
 
-DRIVER_INIT_MEMBER(ti990_4_state,ti990_4)
-{
-	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
+ROM_START(ti990_4v)
+	/*CPU memory space*/
+	ROM_REGION16_BE(0x10000, "maincpu",0)
+	ROM_LOAD16_WORD("ti9904.rom", 0xFC00, 0x400, CRC(691e7d19) SHA1(58d9bed80490fdf71c743bfd3077c70840b7df8c))
 
-#if VIDEO_911
-	vdt911_init(machine());
-#else
-	asr733_init(machine());
-#endif
-}
-
-static INPUT_PORTS_START(ti990_4)
-#if VIDEO_911
-	VDT911_KEY_PORTS
-#else
-	ASR733_KEY_PORTS
-#endif
-INPUT_PORTS_END
-
+	/* VDT911 character definitions */
+	ROM_REGION(vdt911_chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
+ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976, ti990_4,    0,      0,      ti990_4,    ti990_4, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4,  0,      0,      ti990_4,    ti990_4, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   ti990_4v, ti990_4_state, ti990_4v,    "Texas Instruments",    "TI 990/4 Minicomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )
