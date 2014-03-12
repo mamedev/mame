@@ -221,15 +221,20 @@ software_info::software_info(software_list_device &list, const char *name, const
 software_part *software_info::find_part(const char *partname, const char *interface)
 {
 	// if neither partname nor interface supplied, then we just return the first entry
+	if (partname != NULL && strlen(partname)==0) partname = NULL;
+
 	if (partname == NULL && interface == NULL)
 		return m_partdata.first();
 	
 	// look for the part by name and match against the interface if provided
 	for (software_part *part = m_partdata.first(); part != NULL; part = part->next())
 		if (partname != NULL && strcmp(partname, part->name()) == 0)
+		{
 			if (interface == NULL || part->matches_interface(interface))
 				return part;
-
+		} 
+		else if (partname == NULL && part->matches_interface(interface))
+				return part;
 	return NULL;
 }
 
