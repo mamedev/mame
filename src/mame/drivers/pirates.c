@@ -324,18 +324,14 @@ ROM_END
 
 void pirates_state::pirates_decrypt_68k()
 {
-	int rom_size;
-	UINT16 *rom;
-	int i;
-
-	rom_size = memregion("maincpu")->bytes();
-
-	dynamic_buffer buf(rom_size/2);
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	size_t rom_size = memregion("maincpu")->bytes();
+	dynamic_array<UINT16> buf(rom_size/2);
 
 	rom = (UINT16 *)memregion("maincpu")->base();
 	memcpy (buf, rom, rom_size);
 
-	for (i=0; i<rom_size/2; i++)
+	for (int i=0; i<rom_size/2; i++)
 	{
 		int adrl, adrr;
 		UINT8 vl, vr;
