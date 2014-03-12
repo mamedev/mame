@@ -675,57 +675,45 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 
 
-
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch0)
 {
-	megaphx_state *drvstate = machine().driver_data<megaphx_state>();
-
-	int bank = drvstate->m_soundbank[0] & 7;
-	drvstate->membank("snddata")->set_entry(bank);
-
-	drvstate->m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-
+	int bank = m_soundbank[0] & 7;
+	membank("snddata")->set_entry(bank);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch1)
 {
-	megaphx_state *drvstate = machine().driver_data<megaphx_state>();
-
-	int bank = drvstate->m_soundbank[1] & 7;
-	drvstate->membank("snddata")->set_entry(bank);
-
-	drvstate->m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-
+	int bank = m_soundbank[1] & 7;
+	membank("snddata")->set_entry(bank);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch2)
 {
-	megaphx_state *drvstate = machine().driver_data<megaphx_state>();
-
-	int bank = drvstate->m_soundbank[2] & 7;
-	drvstate->membank("snddata")->set_entry(bank);
-
-	drvstate->m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	int bank = m_soundbank[2] & 7;
+	membank("snddata")->set_entry(bank);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch3)
 {
-	megaphx_state *drvstate = machine().driver_data<megaphx_state>();
-
-	int bank = drvstate->m_soundbank[3] & 7;
-	drvstate->membank("snddata")->set_entry(bank);
-
-	drvstate->m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	int bank = m_soundbank[3] & 7;
+	membank("snddata")->set_entry(bank);
+	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 	
 
 static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
 {
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_ch0),    // for channel 0
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_ch1),    // for channel 1
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_ch2),    // for channel 2
-	DEVCB_DEVICE_LINE_MEMBER("ctc", megaphx_state, z80ctc_ch3),    // for channel 3
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch0),    // for channel 0
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch1),    // for channel 1
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch2),    // for channel 2
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch3),    // for channel 3
 };
 
 static const z80_daisy_config daisy_chain[] =
