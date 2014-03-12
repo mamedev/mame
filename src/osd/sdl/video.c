@@ -584,15 +584,14 @@ static void check_osd_inputs(running_machine &machine)
 		machine.ui().popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 
-	if (USE_OPENGL || SDLMAME_SDL2)
-	{
+	#if (USE_OPENGL || SDLMAME_SDL2)
 		//FIXME: on a per window basis
 		if (ui_input_pressed(machine, IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
 			machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 		}
-	}
+	#endif
 
 	if (ui_input_pressed(machine, IPT_OSD_6))
 		sdlwindow_modify_prescale(machine, window, -1);
@@ -680,13 +679,11 @@ static void extract_video_config(running_machine &machine)
 		video_config.syncrefresh = 0;
 	}
 
-	if (USE_OPENGL || SDLMAME_SDL2)
-	{
+	#if (USE_OPENGL || SDLMAME_SDL2)
 		video_config.filter        = options.filter();
-	}
+	#endif
 
-	if (USE_OPENGL)
-	{
+	#if (USE_OPENGL)
 		video_config.prescale      = options.prescale();
 		if (video_config.prescale < 1 || video_config.prescale > 3)
 		{
@@ -765,7 +762,7 @@ static void extract_video_config(running_machine &machine)
 			video_config.glsl_vid_attributes = 0;
 		}
 
-	}
+	#endif /* USE_OPENGL */
 	// misc options: sanity check values
 
 	// global options: sanity check values
