@@ -306,16 +306,7 @@ MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
 	m_dsp_BIO = CLEAR_LINE;
-	m_wardner_membank = 0;
 	m_fsharkbt_8741 = -1;
-}
-
-MACHINE_RESET_MEMBER(twincobr_state,wardner)
-{
-	MACHINE_RESET_CALL_MEMBER(twincobr);
-
-	m_toaplan_main_cpu = 1;     /* Z80 */
-	twincobr_display(1);
 }
 
 void twincobr_state::twincobr_driver_savestate()
@@ -328,7 +319,6 @@ void twincobr_state::twincobr_driver_savestate()
 	save_item(NAME(m_dsp_BIO));
 	save_item(NAME(m_dsp_execute));
 	save_item(NAME(m_fsharkbt_8741));
-	save_item(NAME(m_wardner_membank));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_state::twincobr_restore_dsp), this));
 }

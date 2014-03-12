@@ -128,6 +128,7 @@ out:
 #include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/3812intf.h"
+#include "machine/bankdev.h"
 #include "includes/toaplipt.h"
 #include "includes/twincobr.h"
 
@@ -137,62 +138,46 @@ class wardner_state : public twincobr_state
 public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twincobr_state(mconfig, type, tag),
-			m_rambase_c000(*this, "rambase_c000")
+		m_membank(*this, "membank")
 	{
 	}
 
-	required_shared_ptr<UINT8> m_rambase_c000;
-	UINT8 *m_ROM;
+	required_device<address_map_bank_device> m_membank;
 
-	DECLARE_WRITE8_MEMBER(wardner_ramrom_bank_sw);
-	DECLARE_READ8_MEMBER(wardner_bank_r);
+	DECLARE_WRITE8_MEMBER(wardner_bank_w);
 	DECLARE_DRIVER_INIT(wardner);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void driver_start();
+	virtual void machine_reset();
 };
-
-
-READ8_MEMBER( wardner_state::wardner_bank_r )
-{
-	if (m_wardner_membank == 0)
-	{
-		// RAM mapped (plus fallthroughs to bits of ROM bank 0)
-		int addr = offset + 0x8000;
-
-		// 0x8000 - 0x8fff (sprites)
-		if ((addr >= 0x8000) && (addr < 0x9000))
-			return wardner_sprite_r(space, addr - 0x8000);
-
-		// 0xa000 - 0xafff (paletteram)
-		else if ((addr >= 0xa000) && (addr < 0xb000))
-			return m_palette->basemem().read8(addr - 0xa000);
-
-		// 0xc000 - 0xc7ff (z80 shared ram)
-		else if ((addr >= 0xc000) && (addr < 0xc800))
-			return m_rambase_c000[addr - 0xc000];
-	}
-
-	// ROM bank mapped
-	return m_ROM[m_wardner_membank * 0x8000 + offset];
-}
-
-WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
-{
-	m_wardner_membank = data & 7;
-}
 
 
 /***************************** Z80 Main Memory Map **************************/
 
+WRITE8_MEMBER(wardner_state::wardner_bank_w)
+{
+	m_membank->set_bank(data & 7);
+}
+
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_READ(wardner_bank_r) /* Overlapped RAM/Banked ROM */
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
-	AM_RANGE(0x9000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("rambase_c000") /* Shared RAM with Sound Z80 */
-	AM_RANGE(0xc800, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_DEVICE("membank", address_map_bank_device, amap8) /* Overlapped RAM/Banked ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_bank_map, AS_PROGRAM, 8, wardner_state )
+	AM_RANGE(0x00000, 0x00fff) AM_READ(wardner_sprite_r) AM_SHARE("spriteram8")
+	AM_RANGE(0x02000, 0x02fff) AM_DEVREAD("palette", palette_device, read) AM_SHARE("palette")
+	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_READONLY AM_SHARE("sharedram")
+	AM_RANGE(0x01000, 0x01fff) AM_ROM AM_REGION("maincpu", 0x01000)
+	AM_RANGE(0x03000, 0x03fff) AM_ROM AM_REGION("maincpu", 0x03000)
+	AM_RANGE(0x05000, 0x07fff) AM_ROM AM_REGION("maincpu", 0x05000)
+	AM_RANGE(0x08000, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x08000)
+	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x38000) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
+	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x38000) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x04000, 0x047ff) AM_MIRROR(0x38000) AM_RAM AM_WRITEONLY AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
@@ -213,8 +198,8 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, wardner_state )
 	AM_RANGE(0x58, 0x58) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x5a, 0x5a) AM_WRITE(wardner_coin_dsp_w)       /* Machine system control */
 	AM_RANGE(0x5c, 0x5c) AM_WRITE(wardner_control_w)        /* Machine system control */
-	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)       /* data from video layer RAM */
-	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_ramrom_bank_sw)   /* ROM bank select */
+	AM_RANGE(0x60, 0x65) AM_READWRITE(wardner_videoram_r, wardner_videoram_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(wardner_bank_w)
 ADDRESS_MAP_END
 
 
@@ -223,9 +208,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("rambase_c000")    /* Shared RAM with Main Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, wardner_state )
@@ -243,9 +227,9 @@ ADDRESS_MAP_END
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
 static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, wardner_state )
-	AM_RANGE(0, 0) AM_WRITE(wardner_dsp_addrsel_w)
-	AM_RANGE(1, 1) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
-	AM_RANGE(3, 3) AM_WRITE(twincobr_dsp_bio_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(wardner_dsp_addrsel_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(twincobr_dsp_bio_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(twincobr_BIO_r)
 ADDRESS_MAP_END
 
@@ -379,7 +363,21 @@ static GFXDECODE_START( wardner )
 GFXDECODE_END
 
 
+void wardner_state::driver_start()
+{
+	/* Save-State stuff in src/machine/twincobr.c */
+	twincobr_driver_savestate();
+}
 
+void wardner_state::machine_reset()
+{
+	MACHINE_RESET_CALL_MEMBER(twincobr);
+
+	m_toaplan_main_cpu = 1;     /* Z80 */
+	twincobr_display(1);
+
+	m_membank->set_bank(0);
+}
 
 static MACHINE_CONFIG_START( wardner, wardner_state )
 
@@ -388,6 +386,12 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wardner_state,  wardner_interrupt)
+
+	MCFG_DEVICE_ADD("membank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(main_bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14MHz/4)     /* 3.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_program_map)
@@ -399,8 +403,6 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	MCFG_CPU_IO_MAP(DSP_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
-
-	MCFG_MACHINE_RESET_OVERRIDE(wardner_state,wardner)
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
@@ -432,16 +434,14 @@ MACHINE_CONFIG_END
 
 
 
-
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-
 ROM_START( wardner )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* Banked Main Z80 code */
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) /* Banked Main Z80 code */
 	ROM_LOAD( "wardner.17", 0x00000, 0x08000, CRC(c5dd56fd) SHA1(f0a09557150e9c1c6b9d8e125f5408fc269c9d17) )    /* Main Z80 code */
 	ROM_LOAD( "b25-18.rom", 0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )    /* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom", 0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
@@ -492,7 +492,7 @@ ROM_START( wardner )
 ROM_END
 
 ROM_START( pyros )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* Banked Z80 code */
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) /* Banked Z80 code */
 	ROM_LOAD( "b25-29.rom", 0x00000, 0x08000, CRC(b568294d) SHA1(5d04dd006f5180fa0c9340e2efa6613625d712a8) )    /* Main Z80 code */
 	ROM_LOAD( "b25-18.rom", 0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )    /* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom", 0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
@@ -543,7 +543,7 @@ ROM_START( pyros )
 ROM_END
 
 ROM_START( wardnerj )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* Banked Z80 code */
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF ) /* Banked Z80 code */
 	ROM_LOAD( "b25-17.bin",  0x00000, 0x08000, CRC(4164dca9) SHA1(1f02c0991d7c14230043e34cb4b8e089b467b234) )   /* Main Z80 code */
 	ROM_LOAD( "b25-18.rom",  0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )   /* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom",  0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
@@ -594,14 +594,6 @@ ROM_START( wardnerj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(wardner_state,wardner)
-{
-	m_ROM = memregion("maincpu")->base();
-	twincobr_driver_savestate();   /* Save-State stuff in src/machine/twincobr.c */
-}
-
-
-
-GAME( 1987, wardner,  0,       wardner, wardner, wardner_state,  wardner, ROT0, "Toaplan / Taito Corporation Japan", "Wardner (World)", GAME_SUPPORTS_SAVE )
-GAME( 1987, pyros,    wardner, wardner, pyros, wardner_state,    wardner, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner_state, wardner, ROT0, "Toaplan / Taito Corporation", "Wardner no Mori (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wardner,  0,       wardner, wardner,  driver_device, 0, ROT0, "Toaplan / Taito Corporation Japan", "Wardner (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    driver_device, 0, ROT0, "Toaplan / Taito America Corporation", "Pyros (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, driver_device, 0, ROT0, "Toaplan / Taito Corporation", "Wardner no Mori (Japan)", GAME_SUPPORTS_SAVE )

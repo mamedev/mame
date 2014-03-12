@@ -29,7 +29,6 @@ public:
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 
 	int m_toaplan_main_cpu;
-	int m_wardner_membank;
 	INT32 m_fg_rom_bank;
 	INT32 m_bg_ram_bank;
 	int m_intenable;
@@ -106,7 +105,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
-	DECLARE_MACHINE_RESET(wardner);
 	void copy_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	UINT32 screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
