@@ -159,6 +159,7 @@ class s100_device : public device_t,
 public:
 	// construction/destruction
 	s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~s100_device() { m_device_list.detach_all(); }
 
 	void add_s100_card(device_s100_card_interface *card);
 
