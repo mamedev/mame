@@ -21,12 +21,6 @@
 #include "porttime.h"
 #include "osdcomm.h"
 
-#ifdef PTR64
-typedef UINT64 FPTR;
-#else
-typedef UINT32 FPTR;
-#endif
-
 /* asserts used to verify portMidi code logic is sound; later may want
     something more graceful */
 #include <assert.h>
