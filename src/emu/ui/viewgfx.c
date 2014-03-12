@@ -909,7 +909,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
-	const rgb_t *palette = (machine.first_screen()->palette()->entries() != 0) ? machine.first_screen()->palette()->palette()->entry_list_raw() : NULL;
+	const rgb_t *palette = (machine.first_screen()->palette() != NULL) ? machine.first_screen()->palette()->palette()->entry_list_raw() : NULL;
 	UINT32 palette_mask = ~0;
 	int x, y;
 
