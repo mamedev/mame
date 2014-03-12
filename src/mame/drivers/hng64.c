@@ -1938,11 +1938,6 @@ void hng64_state::machine_reset()
 }
 
 
-static MSM6242_INTERFACE( hng64_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
@@ -1960,7 +1955,8 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_IO_MAP(hng_comm_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MSM6242_ADD("rtc", hng64_rtc_intf)
+	
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hng64)
 

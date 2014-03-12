@@ -4191,11 +4191,6 @@ static const ay8910_interface htengoku_ay8910_interface =
 	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,htengoku_dsw_w)     // W
 };
 
-static MSM6242_INTERFACE( htengoku_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
@@ -4242,7 +4237,7 @@ static MACHINE_CONFIG_START( htengoku, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", htengoku_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 
@@ -9420,11 +9415,6 @@ MACHINE_START_MEMBER(ddenlovr_state,sryudens)
                             Don Den Lover Vol.1
 ***************************************************************************/
 
-static MSM6242_INTERFACE( ddenlovr_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 
 	/* basic machine hardware */
@@ -9461,7 +9451,7 @@ static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", ddenlovr_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
@@ -9550,11 +9540,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::quizchq_rtc_irq )
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 }
 
-static MSM6242_INTERFACE( quizchq_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,quizchq_rtc_irq)
-};
-
 static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
 
 	/* basic machine hardware */
@@ -9589,7 +9574,8 @@ static MACHINE_CONFIG_START( quizchq, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", quizchq_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, quizchq_rtc_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rongrong, quizchq )
@@ -9631,11 +9617,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::mmpanic_rtc_irq )
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // RST 18, clock
 }
-
-static MSM6242_INTERFACE( mmpanic_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,mmpanic_rtc_irq)
-};
 
 static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
 
@@ -9679,7 +9660,8 @@ static MACHINE_CONFIG_START( mmpanic, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", mmpanic_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mmpanic_rtc_irq))
 MACHINE_CONFIG_END
 
 
@@ -9717,11 +9699,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
 }
 
-static MSM6242_INTERFACE( hanakanz_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,hanakanz_rtc_irq)
-};
-
 static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
 
 	/* basic machine hardware */
@@ -9756,7 +9733,8 @@ static MACHINE_CONFIG_START( hanakanz, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
@@ -9800,7 +9778,8 @@ static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-//  MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+//  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+//	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )
@@ -9850,11 +9829,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjchuuka_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
-static MSM6242_INTERFACE( mjchuuka_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,mjchuuka_rtc_irq)
-};
-
 static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
 
 	/* basic machine hardware */
@@ -9863,7 +9837,7 @@ static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, mjchuuka_irq)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjchuuka_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -9879,7 +9853,7 @@ static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjchuuka_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(funkyfig_sound_portmap)
@@ -9942,11 +9916,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_rtc_irq)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MSM6242_INTERFACE( mjmyster_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,mjmyster_rtc_irq)
-};
-
 
 static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
 
@@ -9959,7 +9928,7 @@ static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjmyster_rtc_irq))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10011,10 +9980,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
 }
 
-static MSM6242_INTERFACE( hginga_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,hginga_rtc_irq)
-};
 
 static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 
@@ -10025,7 +9990,7 @@ static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hginga_irq)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(hginga_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10043,7 +10008,7 @@ static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hginga_irq)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(hginga_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10081,7 +10046,7 @@ static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjmyster_rtc_irq))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
 	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -10101,7 +10066,7 @@ static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjmyster_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjmyster_rtc_irq))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
 	MCFG_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -10121,10 +10086,6 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjflove_rtc_irq)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static MSM6242_INTERFACE( mjflove_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddenlovr_state,mjflove_rtc_irq)
-};
 
 static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
 
@@ -10139,7 +10100,7 @@ static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_DEVICE_CONFIG(mjflove_rtc_intf)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjflove_rtc_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
@@ -10201,7 +10162,8 @@ static MACHINE_CONFIG_START( jongtei, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10245,7 +10207,8 @@ static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", mjchuuka_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10290,7 +10253,8 @@ static MACHINE_CONFIG_START( janshinp, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", mjchuuka_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
 // Same PCB as janshinp
@@ -10365,7 +10329,8 @@ static MACHINE_CONFIG_START( seljan2, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", mjchuuka_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
 
@@ -10408,7 +10373,8 @@ static MACHINE_CONFIG_START( daimyojn, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
 

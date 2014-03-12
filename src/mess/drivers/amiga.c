@@ -627,11 +627,6 @@ static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MSM6242_INTERFACE( amiga_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( ntsc, amiga_state )
 	/* basic machine hardware */
@@ -664,7 +659,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
@@ -871,7 +866,7 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
@@ -978,7 +973,7 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))

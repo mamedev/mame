@@ -390,12 +390,6 @@ WRITE_LINE_MEMBER(nevada_state::nevada_rtc_irq)
 }
 
 /***************************************************************************/
-static MSM6242_INTERFACE( nevada_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(nevada_state,nevada_rtc_irq)
-};
-
-/***************************************************************************/
 /*********************    SOUND SECTION     ********************************/
 /***************************************************************************/
 #if 0
@@ -657,8 +651,10 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", duartn68681_device, rx_a_w) )
+	
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", nevada_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(nevada_state, nevada_rtc_irq))
 
 MACHINE_CONFIG_END
 

@@ -533,10 +533,6 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-static MSM6242_INTERFACE( samcoupe_rtc_intf )
-{
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* basic machine hardware */
@@ -565,7 +561,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
-	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
+	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD("cassette", samcoupe_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 

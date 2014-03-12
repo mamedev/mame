@@ -254,12 +254,6 @@ static const huc6260_interface sgx_huc6260_config =
 	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, hsync_changed )
 };
 
-static MSM6242_INTERFACE( ggconnie_rtc_intf )
-{
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
@@ -277,7 +271,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_HUC6270_ADD( "huc6270_1", sgx_huc6270_1_config )
 	MCFG_HUC6202_ADD( "huc6202", sgx_huc6202_config )
 
-	MCFG_MSM6242_ADD("rtc", ggconnie_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)

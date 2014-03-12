@@ -162,14 +162,9 @@ static const wd17xx_interface coco_wd17xx_interface =
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 
-static MSM6242_INTERFACE( coco_fdc_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT(coco_fdc)
 	MCFG_WD1773_ADD(WD_TAG, coco_wd17xx_interface)
-	MCFG_MSM6242_ADD(DISTO_TAG, coco_fdc_rtc_intf)
+	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL_32_768kHz)
 	MCFG_DS1315_ADD(CLOUD9_TAG)
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
