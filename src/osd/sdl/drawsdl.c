@@ -566,12 +566,12 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 
 	if (sdl->yuv_lookup != NULL)
 	{
-		global_free(sdl->yuv_lookup);
+		global_free_array(sdl->yuv_lookup);
 		sdl->yuv_lookup = NULL;
 	}
 	if (sdl->yuv_bitmap != NULL)
 	{
-		global_free(sdl->yuv_bitmap);
+		global_free_array(sdl->yuv_bitmap);
 		sdl->yuv_bitmap = NULL;
 	}
 	osd_free(sdl);
