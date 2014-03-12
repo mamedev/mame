@@ -30,6 +30,8 @@
 #include "rendlay.h"
 #include "sound/speaker.h"
 #include "machine/nsc810.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/null_modem.h"
 
 class hunter2_state : public driver_device
 {
@@ -38,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_rs232(*this, "serial")
 	{ }
 
 	DECLARE_READ8_MEMBER(port00_r);
@@ -46,6 +49,9 @@ public:
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
+	DECLARE_WRITE8_MEMBER(port81_w);
+	DECLARE_WRITE8_MEMBER(port82_w);
+	DECLARE_WRITE8_MEMBER(port84_w);
 	DECLARE_WRITE8_MEMBER(port86_w);
 	DECLARE_WRITE8_MEMBER(portbb_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
@@ -60,6 +66,7 @@ private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<rs232_port_device> m_rs232;
 };
 
 static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
@@ -181,19 +188,30 @@ READ8_MEMBER( hunter2_state::port00_r )
 
 READ8_MEMBER( hunter2_state::port01_r )
 {
-	// TODO: bit 7 = RS232 DSR line
-	return 0x00;
+	UINT8 res = 0x00;
+
+	if(m_rs232->dsr_r())
+		res |= 0x80;
+
+	return res;
 }
 
 WRITE8_MEMBER( hunter2_state::port01_w )
 {
 	m_keydata = data;
-	logerror("Key row select %02x\n",data);
+	//logerror("Key row select %02x\n",data);
 }
 
 READ8_MEMBER( hunter2_state::port02_r )
 {
-	return 0x28;
+	UINT8 res = 0x28;
+
+	if(m_rs232->rxd_r())
+		res |= 0x01;
+	if(m_rs232->dcd_r())
+		res |= 0x02;
+
+	return res;
 }
 
 WRITE8_MEMBER( hunter2_state::port60_w )
@@ -208,6 +226,21 @@ Bits 1,0,7,6: Contrast level.
 WRITE8_MEMBER( hunter2_state::port80_w )
 {
 // bit 0 does something
+}
+
+WRITE8_MEMBER( hunter2_state::port81_w )
+{
+	m_rs232->write_txd(data & 0x01);
+}
+
+WRITE8_MEMBER( hunter2_state::port82_w )
+{
+	m_rs232->write_dtr(data & 0x01);
+}
+
+WRITE8_MEMBER( hunter2_state::port84_w )
+{
+	m_rs232->write_rts(data & 0x01);
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -321,6 +354,10 @@ WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+SLOT_INTERFACE_START( hunter2_rs232_devices )
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
@@ -354,6 +391,8 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,port02_r))
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(INPUTLINE("maincpu",NSC800_RSTA))
+
+	MCFG_RS232_PORT_ADD("serial",hunter2_rs232_devices,NULL)
 MACHINE_CONFIG_END
 
 /* ROM definition */
