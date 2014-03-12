@@ -636,13 +636,6 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
-static TMP68301_INTERFACE( tmp68301_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 
 	/* basic machine hardware */
@@ -650,7 +643,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_CPU_PROGRAM_MAP(csplayh5_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
-	MCFG_TMP68301_ADD("tmp68301",tmp68301_interface)
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 
 #if USE_H8
 	MCFG_CPU_ADD("subcpu", H83002, 16000000)    /* unknown clock */

@@ -934,12 +934,6 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
-static TMP68301_INTERFACE( tmp68301_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER16(niyanpai_state,tmp68301_parallel_port_w)
-};
-
 static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
 	/* basic machine hardware */
@@ -947,7 +941,8 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  niyanpai_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301",tmp68301_interface)
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_OUT_PARALLEL_CALLBACK(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)                  /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)

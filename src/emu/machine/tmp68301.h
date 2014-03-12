@@ -5,41 +5,30 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-/* TODO: frequency & hook it up with m68k */
-#define MCFG_TMP68301_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, TMP68301, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+/* TODO: serial ports, frequency & hook it up with m68k */
+#define MCFG_TMP68301_IN_PARALLEL_CALLBACK(_devcb) \
+	devcb = &tmp68301_device::set_in_parallel_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_TMP68301_MODIFY(_tag, _config) \
-	MCFG_DEVICE_MODIFY(_tag) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define TMP68301_INTERFACE(name) \
-	const tmp68301_interface (name) =
+#define MCFG_TMP68301_OUT_PARALLEL_CALLBACK(_devcb) \
+	devcb = &tmp68301_device::set_out_parallel_callback(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mb_vcu_interface
 
-struct tmp68301_interface
-{
-	devcb_read16         m_in_parallel_cb;
-	devcb_write16        m_out_parallel_cb;
-//  TODO: serial ports
-};
 
 class tmp68301_device : public device_t,
-						public device_memory_interface,
-						public tmp68301_interface
+						public device_memory_interface
 {
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tmp68301_device() {}
 
+	template<class _Object> static devcb2_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
+	
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
@@ -62,14 +51,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-	devcb_resolved_read16         m_in_parallel_func;
-	devcb_resolved_write16        m_out_parallel_func;
 private:
+	devcb2_read16         m_in_parallel_cb;
+	devcb2_write16        m_out_parallel_cb;
+	
 	// internal state
 	UINT16 m_regs[0x400];
 
