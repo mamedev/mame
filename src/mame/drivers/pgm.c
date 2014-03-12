@@ -437,16 +437,18 @@ INPUT_PORTS_END
 
 /*** GFX Decodes *************************************************************/
 
-/* we can't decode the sprite data like this because it isn't tile based.  the
-   data decoded by pgm32_charlayout was rearranged at start-up */
+/* We can't decode the sprite data like this because it isn't tile based.
+   The 32x32 tile data is 5bpp chunky LSB first (bits 01234 are pixel 0,
+   bits 567+01 of the next byte are pixel 1, etc.) which MAME can't decode
+   as-is, so we must invert the bit order of the ROM data */
 
 static const gfx_layout pgm8_charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 4, 0, 12, 8, 20,16,  28, 24 },
+	{ 3, 2, 1, 0 },
+	{ 0, 4, 8, 12, 16, 20, 24, 28 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	8*32
 };
@@ -454,24 +456,24 @@ static const gfx_layout pgm8_charlayout =
 static const gfx_layout pgm32_charlayout =
 {
 	32,32,
-	0, // determined in init
+	RGN_FRAC(1,1),
 	5,
-	{ 3,4,5,6,7 },
-	{ 0  , 8 ,16 ,24 ,32 ,40 ,48 ,56 ,
-		64 ,72 ,80 ,88 ,96 ,104,112,120,
-		128,136,144,152,160,168,176,184,
-		192,200,208,216,224,232,240,248 },
-	{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256,
-		8*256, 9*256,10*256,11*256,12*256,13*256,14*256,15*256,
-		16*256,17*256,18*256,19*256,20*256,21*256,22*256,23*256,
-		24*256,25*256,26*256,27*256,28*256,29*256,30*256,31*256 },
-		32*256
+	{ 4, 3, 2, 1, 0 },
+	{ 0, 5, 10, 15, 20, 25, 30, 35,
+		40, 45, 50, 55, 60, 65, 70, 75,
+		80, 85, 90, 95, 100, 105, 110, 115,
+		120, 125, 130, 135, 140, 145, 150, 155 },
+	{ 0*160, 1*160, 2*160, 3*160, 4*160, 5*160, 6*160, 7*160,
+		8*160, 9*160,10*160,11*160,12*160,13*160,14*160,15*160,
+		16*160,17*160,18*160,19*160,20*160,21*160,22*160,23*160,
+		24*160,25*160,26*160,27*160,28*160,29*160,30*160,31*160 },
+		32*160
 };
 
 GFXDECODE_START( pgm )
 	GFXDECODE_ENTRY( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
-	// we have to unpack the data before we can decode it as 32x32, hence we don't know how many tiles etc. in advance, see INIT
-	//GFXDECODE_ENTRY( "gfx2", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
+
+	GFXDECODE_ENTRY( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
 
 /*** Machine Driver **********************************************************/
@@ -547,8 +549,7 @@ MACHINE_CONFIG_END
 
 /*** Rom Loading *************************************************************/
 
-/* take note of "gfx2" needed for expanding the 32x32x5bpp data and
-   "sprmask" needed for expanding the Sprite Colour Data */
+/* take note of "sprmask" needed for expanding the Sprite Colour Data */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
@@ -3988,52 +3989,20 @@ ROM_END
 
 /*** Init Stuff **************************************************************/
 
-/* This function expands the 32x32 5-bit data into a format which is easier to
-   decode in MAME */
+/* Invert the bit order so that we can decode the 32x32x5bpp tiles */
 
-void pgm_state::expand_32x32x5bpp()
+void pgm_state::invert_tiledata()
 {
 	UINT8 *src = memregion( "tiles" )->base();
-	gfx_layout glcopy;
-	glcopy = *(&pgm32_charlayout);
-
-	size_t  srcsize = memregion( "tiles" )->bytes();
-	int cnt, pix;
-	size_t gfx2_size_needed = ((srcsize/5)*8)+0x1000;
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, gfx2_size_needed);
-
-
-	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
-	{
-		pix = ((src[0 + 5 * cnt] >> 0)& 0x1f );
-			dst[0 + 8 * cnt]=pix;
-		pix = ((src[0 + 5 * cnt] >> 5)& 0x07) | ((src[1 + 5 * cnt] << 3) & 0x18);
-			dst[1 + 8 * cnt]=pix;
-		pix = ((src[1 + 5 * cnt] >> 2)& 0x1f );
-			dst[2 + 8 * cnt]=pix;
-		pix = ((src[1 + 5 * cnt] >> 7)& 0x01) | ((src[2 + 5 * cnt] << 1) & 0x1e);
-			dst[3 + 8 * cnt]=pix;
-		pix = ((src[2 + 5 * cnt] >> 4)& 0x0f) | ((src[3 + 5 * cnt] << 4) & 0x10);
-			dst[4 + 8 * cnt]=pix;
-		pix = ((src[3 + 5 * cnt] >> 1)& 0x1f );
-			dst[5 + 8 * cnt]=pix;
-		pix = ((src[3 + 5 * cnt] >> 6)& 0x03) | ((src[4 + 5 * cnt] << 2) & 0x1c);
-			dst[6 + 8 * cnt]=pix;
-		pix = ((src[4 + 5 * cnt] >> 3)& 0x1f );
-			dst[7 + 8 * cnt]=pix;
-	}
-
-	glcopy.total = (gfx2_size_needed / glcopy.charincrement)*8;
-
-	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, glcopy, (UINT8 *)dst, 32, 0x400)));
-
-
+	size_t srcsize = memregion( "tiles" )->bytes();
+	for (int i = 0; i < srcsize; i++)
+		src[i] = BITSWAP8(src[i], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 /* This function expands the sprite colour data (in the A Roms) from 3 pixels
    in each word to a byte per pixel making it easier to use */
 
-void pgm_state::expand_colourdata(  )
+void pgm_state::expand_colourdata()
 {
 	UINT8 *src = memregion( "sprcol" )->base();
 	size_t srcsize = memregion( "sprcol" )->bytes();
@@ -4064,7 +4033,7 @@ void pgm_state::pgm_basic_init( bool set_bank)
 	UINT8 *ROM = memregion("maincpu")->base();
 	if (set_bank) membank("bank1")->set_base(&ROM[0x100000]);
 
-	expand_32x32x5bpp();
+	invert_tiledata();
 	expand_colourdata();
 
 	m_bg_videoram = &m_videoram[0];
