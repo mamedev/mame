@@ -207,7 +207,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	int previous_bit;
 
 	//LOG(("receive register receive bit: %1x\n",bit));
-	previous_bit = (m_rcv_register_data & 0x8000) & 1;
+	previous_bit = (m_rcv_register_data & 0x8000) ? 1 : 0;
 
 	/* shift previous bit 7 out */
 	m_rcv_register_data = m_rcv_register_data>>1;
