@@ -148,6 +148,7 @@ private:
 	// state of input pins
 	int m_ca;
 	int m_sel;
+	bool m_last_chan;
 };
 
 

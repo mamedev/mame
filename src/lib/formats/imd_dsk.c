@@ -410,7 +410,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		for(int i=0; i<sector_count; i++)
 			if(sects[i].data && (sects[i].data < img || sects[i].data >= img+size))
-				global_free(sects[i].data);
+				global_free_array(sects[i].data);
 	}
 
 	return true;

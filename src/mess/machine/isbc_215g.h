@@ -52,10 +52,10 @@ private:
 	const char *m_maincpu_tag;
 	address_space *m_maincpu_mem;
 	UINT16 m_cyl[2];
-	UINT8 m_idcompare[4], m_drive, m_head;
-	bool m_idfound, m_index, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
+	UINT8 m_idcompare[4], m_drive, m_head, m_index;
+	bool m_idfound, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
 
-	bool m_isbx_irq[4], m_fdctc;
+	bool m_isbx_irq[4], m_fdctc, m_step;
 
 	const struct hard_disk_info* m_geom[2];
 };

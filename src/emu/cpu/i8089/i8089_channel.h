@@ -54,8 +54,10 @@ public:
 	bool executing();
 	bool transferring();
 	bool priority();
+	int  chan_prio();
 	bool chained();
 	bool lock();
+	void ca();
 
 	DECLARE_WRITE_LINE_MEMBER( ext_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
@@ -198,6 +200,19 @@ private:
 		DMA_STORE_BYTE_HIGH,
 		DMA_COMPARE,
 		DMA_TERMINATE
+	};
+
+	int m_prio;
+
+	// priority
+	enum
+	{
+		PRIO_DMA = 1,
+		PRIO_DMA_TERM = 1,
+		PRIO_PROG_CHAIN = 1,
+		PRIO_CHAN_ATTN,
+		PRIO_PROG,
+		PRIO_IDLE
 	};
 };
 

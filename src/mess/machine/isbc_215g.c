@@ -89,7 +89,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			data |= (m_sbx1->get_card_device() ? 0 : 1) << 8;
 			data |= m_isbx_irq[0] << 9;
 			data |= m_isbx_irq[1] << 10;
-			data |= m_index << 15;
+			data |= ((m_index--) <= 0) ? 0x8000 : 0; // fake an index pulse
 			break;
 		case 0x04:
 			//read status 2
@@ -170,16 +170,16 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			else if(m_amsrch)
 				logerror("isbc_215g: address search without read gate\n");
 		case 0x01:
-			m_stepdir = (data & 0x80) ? 0 : 1;
+			m_stepdir = (data & 0x80) ? 1 : 0;
 			break;
 		case 0x04:
 			//clear index and id latch
-			m_index = false;
+			m_index = 10;
 			m_idfound = false;
 			break;
 		case 0x08:
 			//cmd data bus/head sel
-			m_head = data & 3;
+			m_head = data & 7;
 			m_out_irq_func((data & 0x100) ? 1 : 0);
 			break;
 		case 0x0c:
@@ -192,6 +192,14 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			// 5: extr 2
 			// 6: format
 			// 7: format wr gate
+			if(!m_step && (data & 1) && m_geom[m_drive])
+			{
+				if(m_cyl[m_drive] && !m_stepdir)
+					m_cyl[m_drive]--;
+				else if((m_cyl[m_drive] < m_geom[m_drive]->cylinders) && m_stepdir)
+					m_cyl[m_drive]++;
+			}
+			m_step = data & 1;
 			m_drive = (data >> 3) & 1; // st406 two drives only
 			if(((data >> 1) & 1) != m_fdctc)
 			{
@@ -342,11 +350,12 @@ void isbc_215g_device::device_start()
 	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
 	m_cyl[0] = m_cyl[1] = 0;
 	m_idcompare[0] = m_idcompare[1] = m_idcompare[2] = m_idcompare[3] = 0;
-	m_index = false;
+	m_index = 10;
 	m_idfound = false;
 	m_drive = 0;
 	m_head = 0;
 	m_stepdir = false;
+	m_step = false;
 
 	m_out_irq_func.resolve_safe();
 
@@ -356,10 +365,11 @@ WRITE8_MEMBER(isbc_215g_device::write)
 {
 	if(!offset)
 	{
+		data &= 3;
 		if(!data && (m_reset == 2))
 			m_dmac->reset();
 		m_out_irq_func(0);
-		m_dmac->ca_w(data != 2);
+		m_dmac->ca_w(data == 1);
 		m_dmac->ca_w(0);
 		m_reset = data;
 	}

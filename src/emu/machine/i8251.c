@@ -686,7 +686,7 @@ void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 WRITE_LINE_MEMBER(i8251_device::write_rxd)
 {
 	m_rxd = state;
-	device_serial_interface::rx_w(state);
+//	device_serial_interface::rx_w(state);
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_cts)
