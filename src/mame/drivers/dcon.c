@@ -255,13 +255,6 @@ WRITE16_MEMBER( dcon_state::layer_scroll_w )
 	COMBINE_DATA(&m_scroll_ram[offset]);
 }
 
-
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(dcon_state, layer_en_w),
-	DEVCB_DRIVER_MEMBER16(dcon_state, layer_scroll_w),
-};
-
 /******************************************************************************/
 
 static MACHINE_CONFIG_START( dcon, dcon_state )
@@ -281,7 +274,9 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_dcon)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -308,7 +303,9 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_sdgndmps)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)

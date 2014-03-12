@@ -1858,13 +1858,7 @@ static GFXDECODE_START( raiden2 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 128 )
 GFXDECODE_END
 
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(raiden2_state, tilemap_enable_w),
-	DEVCB_DRIVER_MEMBER16(raiden2_state, tile_scroll_w),
-};
-
-
+	
 /* MACHINE DRIVERS */
 
 static MACHINE_CONFIG_START( raiden2, raiden2_state )
@@ -1890,7 +1884,9 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(raiden2_state, tile_scroll_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1944,7 +1940,9 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(raiden2_state, tile_scroll_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

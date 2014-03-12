@@ -554,12 +554,6 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(sengokmj_state, layer_en_w),
-	DEVCB_DRIVER_MEMBER16(sengokmj_state, layer_scroll_w),
-};
-
 static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	/* basic machine hardware */
@@ -580,7 +574,9 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update_sengokmj)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(sengokmj_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(sengokmj_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)

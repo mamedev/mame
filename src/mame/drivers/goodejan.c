@@ -636,12 +636,6 @@ WRITE16_MEMBER( goodejan_state::layer_scroll_w )
 }
 
 
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_en_w),
-	DEVCB_DRIVER_MEMBER16(goodejan_state, layer_scroll_w),
-
-};
 
 static MACHINE_CONFIG_START( goodejan, goodejan_state )
 
@@ -661,7 +655,9 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update_goodejan)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(goodejan_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(goodejan_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goodejan)
 	MCFG_PALETTE_ADD("palette", 0x1000)
