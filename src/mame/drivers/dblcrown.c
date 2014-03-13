@@ -606,8 +606,8 @@ ROM_START( dblcrown )
 	ROM_REGION( 0x1000*0x10, "vram", ROMREGION_ERASE00 )
 #endif
 
-	ROM_REGION( 0x0bf1, "pals", 0 ) // in Jedec format
-	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
+	ROM_REGION( 0x0bf1, "plds", 0 )
+	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
 
-GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",      "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
+GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
