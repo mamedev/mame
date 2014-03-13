@@ -1881,7 +1881,7 @@ sre_zpx
 
 # undocumented unreliable instructions
 anc_imm
-	read_pc();
+	A &= read_pc();
 	set_nz(A);
 	if(A & 0x80)
 		P |= F_C;
@@ -1896,12 +1896,12 @@ ane_imm
 	prefetch();
 
 asr_imm
-	read_pc();
+	A &= read_pc();
 	A = do_lsr(A);
 	prefetch();
 
 arr_imm
-	read_pc();
+	A &= read_pc();
 	do_arr();
 	prefetch();
 
@@ -1918,8 +1918,7 @@ las_aby
 	prefetch();
 
 lxa_imm
-	TMP2 = read_pc();
-	A = X = A & TMP2;
+	A = X = read_pc();
 	set_nz(A);
 	prefetch();
 
