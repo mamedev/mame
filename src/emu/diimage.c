@@ -891,7 +891,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 			{
 				m_software_info_ptr = &m_software_part_ptr->info();
 				m_software_list_name.cpy(m_software_info_ptr->list().list_name());
-				m_full_software_name.cpy(m_software_part_ptr->name());
+				m_full_software_name.cpy(m_software_part_ptr->info().shortname());
 				
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
