@@ -32,14 +32,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define ADAM_EXPANSION_SLOT_INTERFACE(_name) \
-	const adam_expansion_slot_interface (_name) =
-
-
-#define MCFG_ADAM_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot) \
+#define MCFG_ADAM_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ADAM_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
+	devcb = &adam_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -47,38 +46,31 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> adam_expansion_slot_interface
-
-struct adam_expansion_slot_interface
-{
-	devcb_write_line    m_out_int_cb;
-};
-
-
 // ======================> adam_expansion_slot_device
 
 class device_adam_expansion_slot_card_interface;
 
 class adam_expansion_slot_device : public device_t,
-									public adam_expansion_slot_interface,
-									public device_slot_interface,
-									public device_image_interface
+								   public device_slot_interface,
+								   public device_image_interface
 {
 public:
 	// construction/destruction
 	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~adam_expansion_slot_device();
+	virtual ~adam_expansion_slot_device() { }
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
 	// computer interface
 	UINT8 bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 	void bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( int_w );
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -100,7 +92,7 @@ protected:
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
 
-	devcb_resolved_write_line   m_out_int_func;
+	devcb2_write_line   m_write_irq;
 
 	device_adam_expansion_slot_card_interface *m_cart;
 };
@@ -115,7 +107,7 @@ class device_adam_expansion_slot_card_interface : public device_slot_card_interf
 public:
 	// construction/destruction
 	device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_adam_expansion_slot_card_interface();
+	virtual ~device_adam_expansion_slot_card_interface() { }
 
 protected:
 	// initialization

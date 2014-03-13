@@ -37,21 +37,12 @@ const device_type ADAM_EXPANSION_SLOT = &device_creator<adam_expansion_slot_devi
 //  device_adam_expansion_slot_card_interface - constructor
 //-------------------------------------------------
 
-device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom_mask(0),
-		m_ram_mask(0)
+device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_rom_mask(0),
+	m_ram_mask(0)
 {
 	m_slot = dynamic_cast<adam_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_adam_expansion_slot_card_interface - destructor
-//-------------------------------------------------
-
-device_adam_expansion_slot_card_interface::~device_adam_expansion_slot_card_interface()
-{
 }
 
 
@@ -99,45 +90,11 @@ UINT8* device_adam_expansion_slot_card_interface::adam_ram_pointer(running_machi
 //-------------------------------------------------
 
 adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+	device_t(mconfig, ADAM_EXPANSION_SLOT, "ADAM expansion slot", tag, owner, clock, "adam_expansion_slot", __FILE__),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_write_irq(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  adam_expansion_slot_device - destructor
-//-------------------------------------------------
-
-adam_expansion_slot_device::~adam_expansion_slot_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void adam_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const adam_expansion_slot_interface *intf = reinterpret_cast<const adam_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<adam_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -150,7 +107,7 @@ void adam_expansion_slot_device::device_start()
 	m_cart = dynamic_cast<device_adam_expansion_slot_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_write_irq.resolve_safe();
 }
 
 
@@ -241,8 +198,6 @@ void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8
 		m_cart->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
 }
-
-WRITE_LINE_MEMBER( adam_expansion_slot_device::int_w ) { m_out_int_func(state); }
 
 
 // slot devices

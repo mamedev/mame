@@ -290,7 +290,6 @@ Mark Gordon
     TODO:
 
 	- spinner INT
-	- devcb2 expansion port
 	- cartridge slot interface
     - printer
     - SPI
@@ -968,36 +967,6 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 }
 
 
-//-------------------------------------------------
-//  ADAM_EXPANSION_SLOT_INTERFACE( slot1_intf )
-//-------------------------------------------------
-
-static ADAM_EXPANSION_SLOT_INTERFACE( slot1_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
-};
-
-
-//-------------------------------------------------
-//  ADAM_EXPANSION_SLOT_INTERFACE( slot2_intf )
-//-------------------------------------------------
-
-static ADAM_EXPANSION_SLOT_INTERFACE( slot2_intf )
-{
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
-};
-
-
-//-------------------------------------------------
-//  ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
-//-------------------------------------------------
-
-static ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
-{
-	DEVCB_NULL // slot 3 has no INT line
-};
-
-
 WRITE_LINE_MEMBER( adam_state::joy1_irq_w )
 {
 	// TODO
@@ -1071,6 +1040,7 @@ DEVICE_INPUT_DEFAULTS_START( drive2 )
 	DEVICE_INPUT_DEFAULTS("SW3", 0x01, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
+
 //-------------------------------------------------
 //  MACHINE_CONFIG( adam )
 //-------------------------------------------------
@@ -1122,9 +1092,11 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("coleco_cart")
 
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot1_intf, adam_slot1_devices, "adamlink")
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot2_intf, adam_slot2_devices, NULL)
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot3_intf, adam_slot3_devices, "ram")
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, adam_slot1_devices, "adamlink")
+	MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, adam_slot2_devices, NULL)
+	MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, adam_slot3_devices, "ram")
 
 	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL1_TAG, colecovision_control_port_devices, "hand")
 	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(adam_state, joy1_irq_w))
