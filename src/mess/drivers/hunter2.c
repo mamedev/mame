@@ -55,10 +55,12 @@ public:
 	DECLARE_WRITE8_MEMBER(port86_w);
 	DECLARE_WRITE8_MEMBER(portbb_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(a_timer);
 	DECLARE_PALETTE_INIT(hunter2);
 	DECLARE_DRIVER_INIT(hunter2);
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
+	DECLARE_WRITE_LINE_MEMBER(timer1_out);
+	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
 private:
 	UINT8 m_keydata;
@@ -225,7 +227,6 @@ Bits 1,0,7,6: Contrast level.
 
 WRITE8_MEMBER( hunter2_state::port80_w )
 {
-// bit 0 does something
 }
 
 WRITE8_MEMBER( hunter2_state::port81_w )
@@ -236,11 +237,13 @@ WRITE8_MEMBER( hunter2_state::port81_w )
 WRITE8_MEMBER( hunter2_state::port82_w )
 {
 	m_rs232->write_dtr(data & 0x01);
+	logerror("DTR write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port84_w )
 {
 	m_rs232->write_rts(data & 0x01);
+	logerror("RTS write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -257,6 +260,14 @@ Bit 3 = Enable RSTA interrupts
 WRITE8_MEMBER( hunter2_state::portbb_w )
 {
 	m_irq_mask = data;
+	if(!(data & 0x08))
+		m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
+	if(!(data & 0x04))
+		m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
+	if(!(data & 0x02))
+		m_maincpu->set_input_line(NSC800_RSTC, CLEAR_LINE);
+
+	logerror("SYS: IRQ mask set %02x\n",data);
 }
 
 /*
@@ -342,16 +353,31 @@ static const mm58274c_interface rtc_intf =
 	1   /*  first day of week */
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(hunter2_state::a_timer)
-{
-	if BIT(m_irq_mask, 3)
-		m_maincpu->set_input_line(NSC800_RSTA, HOLD_LINE);
-}
-
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+WRITE_LINE_MEMBER(hunter2_state::timer1_out)
+{
+	if(m_irq_mask & 0x08)
+		m_maincpu->set_input_line(NSC800_RSTA, state);
+}
+
+WRITE_LINE_MEMBER(hunter2_state::cts_w)
+{
+	if(BIT(m_irq_mask, 1))
+	{
+		m_maincpu->set_input_line(NSC800_RSTC, state);
+		printf("CTS: RSTC set %i\n",state);
+	}
+}
+
+WRITE_LINE_MEMBER(hunter2_state::rxd_w)
+{
+	if(BIT(m_irq_mask, 2))
+		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
 SLOT_INTERFACE_START( hunter2_rs232_devices )
@@ -390,9 +416,11 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,port01_w))
 	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,port02_r))
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
-	MCFG_NSC810_TIMER1_OUT(INPUTLINE("maincpu",NSC800_RSTA))
+	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
 
 	MCFG_RS232_PORT_ADD("serial",hunter2_rs232_devices,NULL)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
