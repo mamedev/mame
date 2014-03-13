@@ -441,7 +441,7 @@ static const hd63484_interface shanghai_hd63484_intf = { 0 };
 static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
+	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* NEC D70116C-8 */
 	MCFG_CPU_PROGRAM_MAP(shanghai_map)
 	MCFG_CPU_IO_MAP(shanghai_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
