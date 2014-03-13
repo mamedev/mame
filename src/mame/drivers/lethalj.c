@@ -861,8 +861,10 @@ ROM_END
 
 ROM_START( eggventrd )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )     /* 34010 code */
-	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
-	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x080000, CRC(cc5f122e) SHA1(e719a3937378df605cdb86c59a534808473c8f90) )
+	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x020000, CRC(8d678842) SHA1(92b18ec903ec8579e7dffb40284987f1d44255b8) )
+	ROM_LOAD16_BYTE( "eggdlx.vc9", 0x000001, 0x020000, CRC(9db3fd23) SHA1(165a12a2d107c93cf216e755596e7457010a8f17) )
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x080000 ) // Program roms found as 27C010 & 27C040 with data repeated 4 times
 
 	ROM_REGION16_LE( 0x600000, "gfx1", 0 )          /* graphics data */
 	ROM_LOAD16_BYTE( "egr1.gr1",   0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
