@@ -117,6 +117,7 @@
 #include "machine/nvram.h"
 #include "includes/goldstar.h"
 
+#include "goldstar.lh"
 #include "cherryb3.lh"
 #include "lucky8.lh"
 #include "bingowng.lh"
@@ -136,21 +137,42 @@ READ8_MEMBER(goldstar_state::protection_r)
 	return data[m_dataoffset++];
 }
 
+WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x  Bet Red / Card 2.
+  ---- --x-  Stop 3 / Small / Info / Card 1
+  ---- -x--  Bet Blue / Double / Card 3
+  ---- x---  Stop 1 / Take
+  ---x ----  Stop 2 / Big / Bonus
+  --x- ----  Start / Stop All / Card 4
+*/
+	output_set_lamp_value(0, (data) & 1);       /* Bet Red / Card 2 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Stop 3 / Small / Info / Card 1 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Bet Blue / Double / Card 3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Stop 1 / Take */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 2 / Big / Bonus */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All / Card 4 */
+
+//	popmessage("lamps: %02X", data);
+}
+
 WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
 {
 /*  bits
   7654 3210
   ---- ---x  Stop 2 / Big
-  ---- --x-  Bet / Double
+  ---- --x-  Blue Bet / Double
   ---- -x--  Stop 1 / Take
-  ---- x---  Collect or separate Bet?
+  ---- x---  Red Bet
   ---x ----  Stop 3 / Small / Info
   --x- ----  Start / Stop All
 */
 	output_set_lamp_value(0, (data) & 1);       /* Stop 2 / Big */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Bet / Double */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Blue Bet / Double */
 	output_set_lamp_value(2, (data >> 2) & 1);  /* Stop 1 / Take */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Collect or separate Bet */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Red Bet */
 	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 3 / Small / Info */
 	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All */
 
@@ -183,6 +205,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(goldstar_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -274,7 +297,7 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	
-	/* Not sure... Need to be checked */
+	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
@@ -1691,13 +1714,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldstar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Bet Red / 2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Small / 1 / Info")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 3 / Small / 1 / Info")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet Blue / D-UP / 3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big / Ticket")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop 1 / Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop 2 / Big / Ticket")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop All / 4")
 
 	PORT_START("IN1")
@@ -1705,9 +1728,10 @@ static INPUT_PORTS_START( goldstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* this is not a coin, not sure what it is */
-													/* maybe it's used to buy tickets. Will check soon. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* this is not a coin, not sure what it is */
+	/* maybe it's used to buy tickets. Will check soon. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Collect")
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Statistics")
 
@@ -12277,8 +12301,8 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 **********************************************
 
        YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
-GAME(  199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0 )
-GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0 )
+GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
+GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
