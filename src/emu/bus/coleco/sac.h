@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    ColecoVision Hand Controller emulation
+    ColecoVision Super Action Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __COLECO_HAND_CONTROLLER__
-#define __COLECO_HAND_CONTROLLER__
+#ifndef __COLECO_SUPER_ACTION_CONTROLLER__
+#define __COLECO_SUPER_ACTION_CONTROLLER__
 
 #include "emu.h"
 #include "ctrl.h"
@@ -23,19 +23,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> coleco_hand_controller_t
+// ======================> coleco_super_action_controller_t
 
-class coleco_hand_controller_t : public device_t,
-								 public device_colecovision_control_port_interface
+class coleco_super_action_controller_t : public device_t,
+										 public device_colecovision_control_port_interface
 {
 public:
 	// construction/destruction
-	coleco_hand_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_CUSTOM_INPUT_MEMBER( keypad_r );
+	DECLARE_INPUT_CHANGED_MEMBER( slider_w );
 
 protected:
 	// device-level overrides
@@ -52,7 +53,7 @@ private:
 
 
 // device type definition
-extern const device_type COLECO_HAND_CONTROLLER;
+extern const device_type COLECO_SUPER_ACTION_CONTROLLER;
 
 
 #endif

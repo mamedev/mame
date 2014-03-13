@@ -2,14 +2,14 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    ColecoVision Hand Controller emulation
+    ColecoVision Super Action Controller emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
-#include "hand.h"
+#include "sac.h"
 
 
 
@@ -17,10 +17,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COLECO_HAND_CONTROLLER = &device_creator<coleco_hand_controller_t>;
+const device_type COLECO_SUPER_ACTION_CONTROLLER = &device_creator<coleco_super_action_controller_t>;
 
 
-CUSTOM_INPUT_MEMBER( coleco_hand_controller_t::keypad_r )
+CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
 {
 	UINT8 data = 0xf;
 	UINT16 keypad = m_io_keypad->read();
@@ -37,11 +37,18 @@ CUSTOM_INPUT_MEMBER( coleco_hand_controller_t::keypad_r )
 	if (!BIT(keypad, 9)) data &= 0x0b;
 	if (!BIT(keypad, 10)) data &= 0x06;
 	if (!BIT(keypad, 11)) data &= 0x09;
+	if (!BIT(keypad, 12)) data &= 0x04;
+	if (!BIT(keypad, 13)) data &= 0x08;
 
 	return data;
 }
 
-static INPUT_PORTS_START( coleco_hand_controller )
+INPUT_CHANGED_MEMBER( coleco_super_action_controller_t::slider_w )
+{
+	// TODO
+}
+
+static INPUT_PORTS_START( coleco_super_action_controller )
 	PORT_START("COMMON0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -52,7 +59,7 @@ static INPUT_PORTS_START( coleco_hand_controller )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
 	PORT_START("COMMON1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, coleco_hand_controller_t, keypad_r, 0)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, coleco_super_action_controller_t, keypad_r, 0)
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
@@ -70,6 +77,11 @@ static INPUT_PORTS_START( coleco_hand_controller )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Keypad *") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 )
+
+	PORT_START("SLIDER")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_RESET PORT_CHANGED_MEMBER(DEVICE_SELF, coleco_super_action_controller_t, slider_w, 0)
 INPUT_PORTS_END
 
 
@@ -77,9 +89,9 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor coleco_hand_controller_t::device_input_ports() const
+ioport_constructor coleco_super_action_controller_t::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( coleco_hand_controller );
+	return INPUT_PORTS_NAME( coleco_super_action_controller );
 }
 
 
@@ -89,11 +101,11 @@ ioport_constructor coleco_hand_controller_t::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  coleco_hand_controller_t - constructor
+//  coleco_super_action_controller_t - constructor
 //-------------------------------------------------
 
-coleco_hand_controller_t::coleco_hand_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COLECO_HAND_CONTROLLER, "ColecoVision Hand Controller", tag, owner, clock, "coleco_hand", __FILE__),
+coleco_super_action_controller_t::coleco_super_action_controller_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, COLECO_SUPER_ACTION_CONTROLLER, "ColecoVision Super Action Controller", tag, owner, clock, "coleco_sac", __FILE__),
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),
 	m_io_common1(*this, "COMMON1"),
@@ -106,7 +118,7 @@ coleco_hand_controller_t::coleco_hand_controller_t(const machine_config &mconfig
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void coleco_hand_controller_t::device_start()
+void coleco_super_action_controller_t::device_start()
 {
 	// state saving
 	save_item(NAME(m_common0));
@@ -118,7 +130,7 @@ void coleco_hand_controller_t::device_start()
 //  joy_r - joystick read
 //-------------------------------------------------
 
-UINT8 coleco_hand_controller_t::joy_r()
+UINT8 coleco_super_action_controller_t::joy_r()
 {
 	UINT8 data = 0x7f;
 

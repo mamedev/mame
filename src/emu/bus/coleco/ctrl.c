@@ -72,7 +72,9 @@ void colecovision_control_port_device::device_start()
 //-------------------------------------------------
 
 #include "hand.h"
+#include "sac.h"
 
 SLOT_INTERFACE_START( colecovision_control_port_devices )
 	SLOT_INTERFACE("hand", COLECO_HAND_CONTROLLER)
+	SLOT_INTERFACE("sac", COLECO_SUPER_ACTION_CONTROLLER)
 SLOT_INTERFACE_END
