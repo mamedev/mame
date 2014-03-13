@@ -197,6 +197,9 @@ static GFXDECODE_START( pokechmp )
 GFXDECODE_END
 
 /*
+
+OSCs: 24MHz & 4MHz
+
 Clocks - from Billiard List PCB
 Main 6502: 1mhz
 Sound 6502: 1mhz
@@ -209,11 +212,11 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1000000)
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
 
@@ -232,13 +235,13 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1000000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 1500000)
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL_24MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1500000, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/16, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, pokechmp_oki_map)
