@@ -304,14 +304,21 @@ void neogeo_state::start_interrupt_timers()
  *
  *************************************/
 
-void neogeo_state::audio_cpu_assert_nmi()
+void neogeo_state::audio_cpu_check_nmi()
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_cpu_nmi_enabled && m_audio_cpu_nmi_pending) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-void neogeo_state::audio_cpu_clear_nmi()
+WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audio_cpu_nmi_enabled = true;
+	audio_cpu_check_nmi();
+}
+
+WRITE8_MEMBER(neogeo_state::audio_cpu_disable_nmi_w)
+{
+	m_audio_cpu_nmi_enabled = false;
+	audio_cpu_check_nmi();
 }
 
 
@@ -333,9 +340,9 @@ CUSTOM_INPUT_MEMBER(neogeo_state::multiplexed_controller_r)
 	int port = (FPTR)param;
 
 	static const char *const cntrl[2][2] =
-		{
-			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
-		};
+	{
+		{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
+	};
 
 	return ioport(cntrl[port][m_controller_select & 0x01])->read_safe(0x00);
 }
@@ -542,7 +549,8 @@ WRITE16_MEMBER(neogeo_state::audio_command_w)
 	{
 		soundlatch_write(data >> 8);
 
-		audio_cpu_assert_nmi();
+		m_audio_cpu_nmi_pending = true;
+		audio_cpu_check_nmi();
 
 		/* boost the interleave to let the audio CPU read the command */
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
@@ -550,14 +558,12 @@ WRITE16_MEMBER(neogeo_state::audio_command_w)
 }
 
 
-
-
-
 READ8_MEMBER(neogeo_state::audio_command_r)
 {
 	UINT8 ret = soundlatch_read();
 
-	audio_cpu_clear_nmi();
+	m_audio_cpu_nmi_pending = false;
+	audio_cpu_check_nmi();
 
 	return ret;
 }
@@ -875,6 +881,8 @@ void neogeo_state::machine_start()
 	m_vblank_level = 1;
 	m_raster_level = 2;
 
+	m_audio_cpu_nmi_pending = false;
+	
 	/* start with an IRQ3 - but NOT on a reset */
 	m_irq3_pending = 1;
 
@@ -884,6 +892,8 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_vblank_interrupt_pending));
 	save_item(NAME(m_display_position_interrupt_pending));
 	save_item(NAME(m_irq3_pending));
+	save_item(NAME(m_audio_cpu_nmi_enabled));
+	save_item(NAME(m_audio_cpu_nmi_pending));
 	save_item(NAME(m_controller_select));
 	save_item(NAME(m_main_cpu_bank_address));
 	save_item(NAME(m_save_ram_unlocked));
@@ -913,6 +923,11 @@ void neogeo_state::machine_reset()
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
+
+	// disable audiocpu nmi
+	m_audio_cpu_nmi_enabled = false;
+	m_audio_cpu_nmi_pending = false;
+	audio_cpu_check_nmi();
 
 	m_maincpu->reset();
 
@@ -990,10 +1005,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, neogeo_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, soundlatch_clear_byte_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	// AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(audio_cpu_enable_nmi_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xff03) AM_READ(audio_cpu_bank_select_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(soundlatch2_byte_w)
-	// AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_WRITE(audio_cpu_disable_nmi_w)
 ADDRESS_MAP_END
 
 
@@ -1189,7 +1204,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-
+	
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 

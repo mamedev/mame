@@ -40,7 +40,8 @@ public:
 		m_upd4990a(*this, "upd4990a"),
 		m_save_ram(*this, "saveram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE16_MEMBER(io_control_w);
 	DECLARE_READ16_MEMBER(memcard_r);
@@ -49,6 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
+	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
+	DECLARE_WRITE8_MEMBER(audio_cpu_disable_nmi_w);
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
@@ -188,8 +191,7 @@ protected:
 	void create_sprite_line_timer(  );
 	void start_sprite_line_timer(  );
 	UINT16 get_video_control(  );
-	void audio_cpu_assert_nmi();
-	void audio_cpu_clear_nmi();
+	void audio_cpu_check_nmi();
 	void select_controller( UINT8 data );
 	void set_save_ram_unlock( UINT8 data );
 	void set_outputs(  );
@@ -345,6 +347,8 @@ protected:
 	UINT32     m_main_cpu_bank_address;
 	UINT8      m_controller_select;
 	bool       m_recurse;
+	bool       m_audio_cpu_nmi_enabled;
+	bool       m_audio_cpu_nmi_pending;
 
 	// MVS-specific state
 	UINT8      m_save_ram_unlocked;
