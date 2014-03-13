@@ -351,7 +351,10 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 
 tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_read_input_port_cb(*this),
+		m_databus_contents_cb(*this),
+		m_vsync_cb(*this)
 {
 }
 
@@ -410,36 +413,15 @@ machine_config_constructor tia_ntsc_video_device::device_mconfig_additions() con
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tia_video_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tia_interface *intf = reinterpret_cast<const tia_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<tia_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_read_input_port_cb, 0, sizeof(m_read_input_port_cb));
-		memset(&m_databus_contents_cb, 0, sizeof(m_databus_contents_cb));
-		memset(&m_vsync_callback_cb, 0, sizeof(m_vsync_callback_cb));
-	}
-}
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void tia_video_device::device_start()
 {
 	// resolve callbacks
-	m_read_input_port_func.resolve(m_read_input_port_cb, *this);
-	m_databus_contents_func.resolve(m_databus_contents_cb, *this);
-	m_vsync_callback_func.resolve(m_vsync_callback_cb, *this);
+	m_read_input_port_cb.resolve();
+	m_databus_contents_cb.resolve();
+	m_vsync_cb.resolve();
 
 
 	int cx = m_screen->width();
@@ -1050,8 +1032,8 @@ WRITE8_MEMBER( tia_video_device::VSYNC_w )
 					m_screen->width(),
 					m_screen->height());
 
-			if ( !m_vsync_callback_func.isnull() ) {
-				m_vsync_callback_func(0, curr_y, 0xFFFF );
+			if ( !m_vsync_cb.isnull() ) {
+				m_vsync_cb(0, curr_y, 0xFFFF );
 			}
 
 			prev_y = 0;
@@ -1824,9 +1806,9 @@ READ8_MEMBER( tia_video_device::INPT_r )
 {
 	UINT64 elapsed = machine().firstcpu->total_cycles() - paddle_start;
 	UINT16 input = TIA_INPUT_PORT_ALWAYS_ON;
-	if ( !m_read_input_port_func.isnull() )
+	if ( !m_read_input_port_cb.isnull() )
 	{
-		input = m_read_input_port_func(offset & 3, 0xFFFF);
+		input = m_read_input_port_cb(offset & 3, 0xFFFF);
 	}
 
 	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
@@ -1848,9 +1830,9 @@ READ8_MEMBER( tia_video_device::read )
 	*/
 	UINT8 data = offset & 0x3f;
 
-	if ( !m_databus_contents_func.isnull() )
+	if ( !m_databus_contents_cb.isnull() )
 	{
-		data = m_databus_contents_func(offset) & 0x3f;
+		data = m_databus_contents_cb(offset) & 0x3f;
 	}
 
 	if (!(offset & 0x8))
@@ -1886,13 +1868,13 @@ READ8_MEMBER( tia_video_device::read )
 		return data | INPT_r(space,3);
 	case 0xC:
 		{
-			int button = !m_read_input_port_func.isnull() ? ( m_read_input_port_func(4,0xFFFF) & 0x80 ) : 0x80;
+			int button = !m_read_input_port_cb.isnull() ? ( m_read_input_port_cb(4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
 	case 0xD:
 		{
-			int button = !m_read_input_port_func.isnull() ? ( m_read_input_port_func(5,0xFFFF) & 0x80 ) : 0x80;
+			int button = !m_read_input_port_cb.isnull() ? ( m_read_input_port_cb(5,0xFFFF) & 0x80 ) : 0x80;
 			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
 		}
 		return data | INPT5;

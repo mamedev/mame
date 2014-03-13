@@ -1450,20 +1450,6 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 	}
 }
 
-static const tia_interface a2600_tia_interface =
-{
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback)
-};
-
-static const tia_interface a2600_tia_interface_pal =
-{
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback_pal)
-};
-
 
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
@@ -1948,8 +1934,11 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_NTSC_VIDEO_ADD("tia_video", a2600_tia_interface)
-
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
@@ -1983,7 +1972,11 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_PAL_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback_pal))
+	
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )
