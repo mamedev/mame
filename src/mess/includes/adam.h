@@ -9,6 +9,7 @@
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
 #include "bus/coleco/ctrl.h"
+#include "bus/coleco/exp.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cartslot.h"
@@ -39,11 +40,11 @@ public:
 		m_slot1(*this, ADAM_LEFT_EXPANSION_SLOT_TAG),
 		m_slot2(*this, ADAM_CENTER_EXPANSION_SLOT_TAG),
 		m_slot3(*this, ADAM_RIGHT_EXPANSION_SLOT_TAG),
+		m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
 		m_boot_rom(*this, "boot"),
 		m_os7_rom(*this, "os7"),
-		m_cart_rom(*this, "cart"),
 		m_mioc(0),
 		m_game(0),
 		m_an(0),
@@ -61,11 +62,11 @@ public:
 	required_device<adam_expansion_slot_device> m_slot1;
 	required_device<adam_expansion_slot_device> m_slot2;
 	required_device<adam_expansion_slot_device> m_slot3;
+	required_device<colecovision_cartridge_slot_device> m_cart;
 	required_device<colecovision_control_port_device> m_joy1;
 	required_device<colecovision_control_port_device> m_joy2;
 	required_memory_region m_boot_rom;
 	required_memory_region m_os7_rom;
-	required_memory_region m_cart_rom;
 
 	virtual void machine_start();
 	virtual void machine_reset();

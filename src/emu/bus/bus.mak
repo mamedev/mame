@@ -225,6 +225,8 @@ ifneq ($(filter COLECO,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/coleco
 BUSOBJS += $(BUSOBJ)/coleco/ctrl.o
 BUSOBJS += $(BUSOBJ)/coleco/hand.o
+BUSOBJS += $(BUSOBJ)/coleco/exp.o
+BUSOBJS += $(BUSOBJ)/coleco/std.o
 endif
 
 

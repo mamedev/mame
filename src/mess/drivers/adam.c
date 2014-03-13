@@ -290,7 +290,6 @@ Mark Gordon
     TODO:
 
 	- spinner INT
-	- cartridge slot interface
     - printer
     - SPI
     - sound (PSG RDY -> Z80 WAIT)
@@ -348,7 +347,7 @@ enum
 
 READ8_MEMBER( adam_state::mreq_r )
 {
-	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
+	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
 	UINT8 data = 0;
 
@@ -438,15 +437,25 @@ READ8_MEMBER( adam_state::mreq_r )
 		case 1: break;
 		case 2: break;
 
-		case 4: // CS1
-		case 5: // CS2
-		case 6: // CS3
-		case 7: // CS4
-			data = m_cart_rom->base()[offset & 0x7fff];
+		case 4:
+			cs1 = 0;
+			break;
+
+		case 5:
+			cs2 = 0;
+			break;
+			
+		case 6:
+			cs3 = 0;
+			break;
+			
+		case 7:
+			cs4 = 0;
 			break;
 		}
 	}
 
+	data = m_cart->bd_r(space, offset & 0x7fff, data, cs1, cs2, cs3, cs4);
 	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
 	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
@@ -1087,11 +1096,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_ADAMNET_SLOT_ADD("net14", adamnet_devices, NULL)
 	MCFG_ADAMNET_SLOT_ADD("net15", adamnet_devices, NULL)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("coleco_cart")
-
+	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, NULL)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, adam_slot1_devices, "adamlink")
 	MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, adam_slot2_devices, NULL)
@@ -1138,9 +1143,6 @@ ROM_START( adam )
 
 	ROM_REGION( 0x800, M6801_TAG, 0 )
 	ROM_LOAD( "master rev a 174b.u6", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
-
-	ROM_REGION( 0x8000, "cart", 0 )
-	ROM_CART_LOAD( "cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
 ROM_END
 
 
