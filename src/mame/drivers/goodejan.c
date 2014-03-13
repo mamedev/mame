@@ -656,8 +656,8 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(goodejan_state, screen_update_goodejan)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(goodejan_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(goodejan_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(goodejan_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(goodejan_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", goodejan)
 	MCFG_PALETTE_ADD("palette", 0x1000)

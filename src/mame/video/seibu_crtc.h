@@ -14,10 +14,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(_devcb) \
+#define MCFG_SEIBU_CRTC_LAYER_EN_CB(_devcb) \
 	devcb = &seibu_crtc_device::set_layer_en_callback(*device, DEVCB2_##_devcb);
 	
-#define MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(_devcb) \
+#define MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(_devcb) \
 	devcb = &seibu_crtc_device::set_layer_scroll_callback(*device, DEVCB2_##_devcb);
 
 

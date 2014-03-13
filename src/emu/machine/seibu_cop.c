@@ -71,35 +71,16 @@ inline void seibu_cop_device::write_word(offs_t address, UINT16 data)
 seibu_cop_device::seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEIBU_COP, "seibu_cop", tag, owner, clock, "seibu_cop", __FILE__),
 		device_memory_interface(mconfig, *this),
+		m_in_byte_cb(*this),
+		m_in_word_cb(*this),
+		m_in_dword_cb(*this),
+		m_out_byte_cb(*this),
+		m_out_word_cb(*this),
+		m_out_dword_cb(*this),
 		m_space_config("io", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_cop_io))
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_cop_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const seibu_cop_interface *intf = reinterpret_cast<const seibu_cop_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<seibu_cop_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_byte_cb,   0, sizeof(m_in_byte_cb));
-		memset(&m_in_word_cb,   0, sizeof(m_in_word_cb));
-		memset(&m_in_dword_cb,  0, sizeof(m_in_dword_cb));
-		memset(&m_out_byte_cb,  0, sizeof(m_out_byte_cb));
-		memset(&m_out_word_cb,  0, sizeof(m_out_word_cb));
-		memset(&m_out_dword_cb, 0, sizeof(m_out_dword_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -118,13 +99,12 @@ void seibu_cop_device::device_validity_check(validity_checker &valid) const
 void seibu_cop_device::device_start()
 {
 	// resolve callbacks
-	m_in_byte_func.resolve(m_in_byte_cb, *this);
-	m_in_word_func.resolve(m_in_word_cb, *this);
-	m_in_word_func.resolve(m_in_dword_cb, *this);
-	m_out_byte_func.resolve(m_out_byte_cb, *this);
-	m_out_word_func.resolve(m_out_word_cb, *this);
-	m_out_dword_func.resolve(m_out_dword_cb, *this);
-
+	m_in_byte_cb.resolve_safe(0);
+	m_in_word_cb.resolve_safe(0);
+	m_in_dword_cb.resolve_safe(0);
+	m_out_byte_cb.resolve_safe();
+	m_out_word_cb.resolve_safe();
+	m_out_dword_cb.resolve_safe();
 }
 
 
@@ -245,7 +225,7 @@ void seibu_cop_device::normal_dma_transfer(void)
 
 	for(i = 0;i < size;i++)
 	{
-		m_out_word_func(dst, m_in_word_func(src));
+		m_out_word_cb(dst, m_in_word_cb(src));
 		src+=2;
 		dst+=2;
 	}
@@ -292,30 +272,30 @@ void seibu_cop_device::palette_dma_transfer(void)
 
 		if(m_pal_brightness_mode == 5)
 		{
-			bt = ((m_in_word_func(src + (m_dma_pal_fade_table * 0x400))) & 0x7c00) >> 5;
+			bt = ((m_in_word_cb(src + (m_dma_pal_fade_table * 0x400))) & 0x7c00) >> 5;
 			bt = fade_table(bt|(m_pal_brightness_val ^ 0));
-			b = ((m_in_word_func(src)) & 0x7c00) >> 5;
+			b = ((m_in_word_cb(src)) & 0x7c00) >> 5;
 			b = fade_table(b|(m_pal_brightness_val ^ 0x1f));
 			pal_val = ((b + bt) & 0x1f) << 10;
-			gt = ((m_in_word_func(src + (m_dma_pal_fade_table * 0x400))) & 0x03e0);
+			gt = ((m_in_word_cb(src + (m_dma_pal_fade_table * 0x400))) & 0x03e0);
 			gt = fade_table(gt|(m_pal_brightness_val ^ 0));
-			g = ((m_in_word_func(src)) & 0x03e0);
+			g = ((m_in_word_cb(src)) & 0x03e0);
 			g = fade_table(g|(m_pal_brightness_val ^ 0x1f));
 			pal_val |= ((g + gt) & 0x1f) << 5;
-			rt = ((m_in_word_func(src + (m_dma_pal_fade_table * 0x400))) & 0x001f) << 5;
+			rt = ((m_in_word_cb(src + (m_dma_pal_fade_table * 0x400))) & 0x001f) << 5;
 			rt = fade_table(rt|(m_pal_brightness_val ^ 0));
-			r = ((m_in_word_func(src)) & 0x001f) << 5;
+			r = ((m_in_word_cb(src)) & 0x001f) << 5;
 			r = fade_table(r|(m_pal_brightness_val ^ 0x1f));
 			pal_val |= ((r + rt) & 0x1f);
 		}
 		else if(m_pal_brightness_mode == 4) //Denjin Makai
 		{
-			bt =(m_in_word_func(src + (m_dma_pal_fade_table * 0x400)) & 0x7c00) >> 10;
-			b = (m_in_word_func(src) & 0x7c00) >> 10;
-			gt =(m_in_word_func(src + (m_dma_pal_fade_table * 0x400)) & 0x03e0) >> 5;
-			g = (m_in_word_func(src) & 0x03e0) >> 5;
-			rt =(m_in_word_func(src + (m_dma_pal_fade_table * 0x400)) & 0x001f) >> 0;
-			r = (m_in_word_func(src) & 0x001f) >> 0;
+			bt =(m_in_word_cb(src + (m_dma_pal_fade_table * 0x400)) & 0x7c00) >> 10;
+			b = (m_in_word_cb(src) & 0x7c00) >> 10;
+			gt =(m_in_word_cb(src + (m_dma_pal_fade_table * 0x400)) & 0x03e0) >> 5;
+			g = (m_in_word_cb(src) & 0x03e0) >> 5;
+			rt =(m_in_word_cb(src + (m_dma_pal_fade_table * 0x400)) & 0x001f) >> 0;
+			r = (m_in_word_cb(src) & 0x001f) >> 0;
 
 			if(m_pal_brightness_val == 0x10)
 				pal_val = bt << 10 | gt << 5 | rt << 0;
@@ -337,10 +317,10 @@ void seibu_cop_device::palette_dma_transfer(void)
 		else
 		{
 			printf("Seibu COP: palette DMA used with mode %02x!\n",m_pal_brightness_mode);
-			pal_val = m_in_word_func(src);
+			pal_val = m_in_word_cb(src);
 		}
 
-		m_out_word_func(dst, pal_val);
+		m_out_word_cb(dst, pal_val);
 		src+=2;
 		dst+=2;
 	}
@@ -359,7 +339,7 @@ void seibu_cop_device::fill_word_transfer(void)
 
 	for (i=address;i<address+length;i+=4)
 	{
-		m_out_dword_func(i, m_fill_val);
+		m_out_dword_cb(i, m_fill_val, 0xffff);
 	}
 }
 
@@ -377,7 +357,7 @@ void seibu_cop_device::fill_dword_transfer(void)
 
 	for (i=address;i<address+length;i+=4)
 	{
-		m_out_dword_func(i, m_fill_val);
+		m_out_dword_cb(i, m_fill_val, 0xffff);
 	}
 }
 

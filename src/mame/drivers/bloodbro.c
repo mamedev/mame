@@ -469,8 +469,8 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_bloodbro)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(bloodbro_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(bloodbro_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(bloodbro_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(bloodbro_state, layer_scroll_w))
 	
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bloodbro)

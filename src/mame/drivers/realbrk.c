@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_OUT_PARALLEL_CALLBACK(WRITE16(realbrk_state,realbrk_flipscreen_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(realbrk_state,realbrk_flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -789,7 +789,7 @@ static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 	
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CALLBACK(NULL)
+	MCFG_TMP68301_OUT_PARALLEL_CB(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )

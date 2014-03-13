@@ -275,8 +275,8 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_dcon)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(dcon_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -304,8 +304,8 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dcon_state, screen_update_sdgndmps)
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CALLBACK(WRITE16(dcon_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CALLBACK(WRITE16(dcon_state, layer_scroll_w))
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)

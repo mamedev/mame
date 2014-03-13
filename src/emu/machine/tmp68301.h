@@ -6,10 +6,10 @@
 //**************************************************************************
 
 /* TODO: serial ports, frequency & hook it up with m68k */
-#define MCFG_TMP68301_IN_PARALLEL_CALLBACK(_devcb) \
+#define MCFG_TMP68301_IN_PARALLEL_CB(_devcb) \
 	devcb = &tmp68301_device::set_in_parallel_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_TMP68301_OUT_PARALLEL_CALLBACK(_devcb) \
+#define MCFG_TMP68301_OUT_PARALLEL_CB(_devcb) \
 	devcb = &tmp68301_device::set_out_parallel_callback(*device, DEVCB2_##_devcb);
 
 
