@@ -17,7 +17,7 @@ AY-3-8910 @ 1.789766MHz [10.7386/6]
 4416 RAM x2
 4164 RAM x8
 10.7386 XTAL
-10 position DIPSW (where are they read??)
+10 position DIPSW
 NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 
 ***************************************************************************/
@@ -35,31 +35,18 @@ class pengadvb_state : public driver_device
 public:
 	pengadvb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_page0(*this, "page0"),
-		m_page1(*this, "page1"),
-		m_page2(*this, "page2"),
-		m_page3(*this, "page3"),
-		m_bank0(*this, "bank0"),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3")
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_page0;
-	required_device<address_map_bank_device> m_page1;
-	required_device<address_map_bank_device> m_page2;
-	required_device<address_map_bank_device> m_page3;
 	
-	required_memory_bank m_bank0;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-
+	address_map_bank_device *m_page[4];
+	memory_bank *m_bank[4];
 	UINT8 m_primary_slot_reg;
 	UINT8 m_kb_matrix_row;
 
+	DECLARE_READ8_MEMBER(mem_r);
+	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
 	
 	DECLARE_WRITE8_MEMBER(pengadvb_psg_port_b_w);
@@ -82,17 +69,23 @@ public:
 
 ***************************************************************************/
 
+READ8_MEMBER(pengadvb_state::mem_r)
+{
+	return m_page[offset >> 14 & 3]->read8(space, offset);
+}
+
+WRITE8_MEMBER(pengadvb_state::mem_w)
+{
+	m_page[offset >> 14 & 3]->write8(space, offset, data);
+}
+
 WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
 {
-	memory_bank *bank[4] = { m_bank0, m_bank1, m_bank2, m_bank3 };
-	bank[offset >> 13 & 3]->set_entry(data & 0xf);
+	m_bank[offset >> 13 & 3]->set_entry(data & 0xf);
 }
 
 static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
-	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("page0", address_map_bank_device, amap8)
-	AM_RANGE(0x0000, 0x7fff) AM_DEVICE("page1", address_map_bank_device, amap8)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("page2", address_map_bank_device, amap8)
-	AM_RANGE(0x0000, 0xffff) AM_DEVICE("page3", address_map_bank_device, amap8)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w) // 4 pages of 16KB
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank_mem, AS_PROGRAM, 8, pengadvb_state )
@@ -175,20 +168,28 @@ READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_r)
 
 WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 {
-	m_page0->set_bank(data >> 0 & 3);
-	m_page1->set_bank(data >> 2 & 3);
-	m_page2->set_bank(data >> 4 & 3);
-	m_page3->set_bank(data >> 6 & 3);
+	if (data != m_primary_slot_reg)
+	{
+		for (int i = 0; i < 4; i++)
+			m_page[i]->set_bank(data >> (i * 2) & 3);
 
-	m_primary_slot_reg = data;
+		m_primary_slot_reg = data;
+	}
 }
 
 READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
 {
-	if (m_kb_matrix_row == 0)
-		return ioport("IN1")->read();
-	else
-		return 0xff;
+	// TODO: dipswitch
+	switch (m_kb_matrix_row)
+	{
+		case 0x0:
+			return ioport("IN1")->read();
+		
+		default:
+			break;
+	}			
+
+	return 0xff;
 }
 
 WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
@@ -295,15 +296,11 @@ void pengadvb_state::machine_reset()
 	m_primary_slot_reg = 0;
 	m_kb_matrix_row = 0;
 
-	m_page0->set_bank(0);
-	m_page1->set_bank(0);
-	m_page2->set_bank(0);
-	m_page3->set_bank(0);
-	
-	m_bank0->set_entry(0);
-	m_bank1->set_entry(1);
-	m_bank2->set_entry(2);
-	m_bank3->set_entry(3);
+	for (int i = 0; i < 4; i++)
+	{
+		m_page[i]->set_bank(0);
+		m_bank[i]->set_entry(i);
+	}
 }
 
 void pengadvb_state::pengadvb_decrypt(const char* region)
@@ -331,10 +328,16 @@ DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
 	pengadvb_decrypt("maincpu");
 	pengadvb_decrypt("game");
 	
-	m_bank0->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
-	m_bank1->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
-	m_bank2->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
-	m_bank3->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
+	// init banks
+	static const char * const pagenames[] = { "page0", "page1", "page2", "page3" };
+	static const char * const banknames[] = { "bank0", "bank1", "bank2", "bank3" };
+	for (int i = 0; i < 4; i++)
+	{
+		m_page[i] = machine().device<address_map_bank_device>(pagenames[i]);
+
+		m_bank[i] = membank(banknames[i]);
+		m_bank[i]->configure_entries(0, 0x10, memregion("game")->base(), 0x2000);
+	}
 }
 
 
