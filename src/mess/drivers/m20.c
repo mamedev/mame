@@ -164,20 +164,24 @@ WRITE_LINE_MEMBER(m20_state::kbd_tx)
 		m_kbrecv_data = (m_kbrecv_data >> 1) | (state ? (1<<10) : 0);
 		if (m_kbrecv_bitcount == 11) {
 			data = (m_kbrecv_data >> 1) & 0xff;
-			printf ("0x%02X received by keyboard\n", data);
+//			printf ("0x%02X received by keyboard\n", data);
 			switch (data) {
 				case 0x03: m_kbdi8251->receive_character(2); printf ("sending 2 back from kb...\n"); break;
 				case 0x0a: break;
 				case 0x80: m_kbdi8251->receive_character(0x80); printf ("sending 0x80 back from kb...\n");break;
-				default: abort();
+				default: logerror("m20: keyboard hack got unexpected %02x\n", data); break;
 			}
 			m_kbrecv_in_progress = 0;
 		}
 	}
-	else {
-		m_kbrecv_in_progress = 1;
-		m_kbrecv_bitcount = 1;
-		m_kbrecv_data = state ? (1<<10) : 0;
+	else 
+	{
+		if (state == 0)
+		{
+			m_kbrecv_in_progress = 1; 
+			m_kbrecv_bitcount = 1;
+			m_kbrecv_data = state ? (1<<10) : 0;
+		}
 	}
 }
 
@@ -994,3 +998,4 @@ ROM_END
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
 COMP( 1981, m20,   0,      0,      m20,    m20, m20_state,    m20,  "Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1981, m40,   m20,    0,      m20,    m20, m20_state,    m20, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING | GAME_NO_SOUND)
+
