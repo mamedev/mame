@@ -577,13 +577,6 @@ WRITE8_MEMBER(thunderx_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_config =
-{
-	DEVCB_DRIVER_MEMBER(thunderx_state,volume_callback) /* external port callback */
-};
-
-
-
 static const k052109_interface thunderx_k052109_intf =
 {
 	"gfx1", 0,
@@ -685,7 +678,7 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
 	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END

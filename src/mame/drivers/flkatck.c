@@ -175,17 +175,11 @@ static GFXDECODE_START( flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(flkatck_state::volume_callback0)
+WRITE8_MEMBER(flkatck_state::volume_callback)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
-
-static const k007232_interface k007232_config =
-{
-	DEVCB_DRIVER_MEMBER(flkatck_state,volume_callback0)    /* external port callback */
-};
-
 
 void flkatck_state::machine_start()
 {
@@ -245,7 +239,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(flkatck_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)

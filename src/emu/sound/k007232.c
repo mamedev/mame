@@ -147,28 +147,9 @@ const device_type K007232 = &device_creator<k007232_device>;
 
 k007232_device::k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K007232, "K007232", tag, owner, clock, "k007232", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_port_write_handler(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k007232_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k007232_interface *intf = reinterpret_cast<const k007232_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k007232_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_portwritehandler, 0, sizeof(m_portwritehandler));
-	}
 }
 
 //-------------------------------------------------
@@ -182,7 +163,7 @@ void k007232_device::device_start()
 	m_pcmbuf[1] = *region();
 	m_pcmlimit  = region()->bytes();
 
-	m_portwritehandler_func.resolve(m_portwritehandler,*this);
+	m_port_write_handler.resolve();
 
 	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
 	{
@@ -272,7 +253,7 @@ WRITE8_MEMBER( k007232_device::write )
 
 	if (r == 0x0c){
 	/* external port, usually volume control */
-	if (!m_portwritehandler_func.isnull()) m_portwritehandler_func(0,v);
+	if (!m_port_write_handler.isnull()) m_port_write_handler(0, v, mem_mask);
 	return;
 	}
 	else if( r == 0x0d ){
