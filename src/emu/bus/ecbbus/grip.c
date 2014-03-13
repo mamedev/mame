@@ -240,7 +240,7 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, c
 			int x = (column * 8) + bit;
 			int color = m_flash ? 0 : BIT(data, bit);
 
-			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
+			bitmap.pix32(y, x) = m_palette->pen(color);
 		}
 	}
 }
@@ -551,6 +551,8 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -686,6 +688,7 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 	m_sti(*this, Z80STI_TAG),
 	m_crtc(*this, MC6845_TAG),
 	m_centronics(*this, CENTRONICS_TAG),
+	m_palette(*this, "palette"),
 	m_speaker(*this, "speaker"),
 	m_video_ram(*this, "video_ram"),
 	m_j3a(*this, "J3A"),

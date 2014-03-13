@@ -112,6 +112,7 @@ private:
 	const address_space_config m_space_config;
 
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_memory_region m_wrmsk_rom;
 	required_memory_region m_shinf_rom;
 	required_memory_region m_drmsk_rom;

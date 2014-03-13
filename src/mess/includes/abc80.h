@@ -71,6 +71,7 @@ public:
 			m_kb(*this, ABC80_KEYBOARD_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
+			m_palette(*this, "palette"),
 			m_rom(*this, Z80_TAG),
 			m_mmu_rom(*this, "mmu"),
 			m_char_rom(*this, "chargen"),
@@ -91,6 +92,7 @@ public:
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
+	required_device<palette_device> m_palette;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
 	required_memory_region m_char_rom;

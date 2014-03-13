@@ -45,6 +45,7 @@ public:
 			m_kbc(*this, AY3600PRO002_TAG),
 			m_crtc(*this, MC6845_TAG),
 			m_pit(*this, PIT8253_TAG),
+			m_palette(*this, "palette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, UPD765_TAG ":1:525dd"),
@@ -63,6 +64,7 @@ public:
 	required_device<ay3600_device> m_kbc;
 	required_device<mc6845_device> m_crtc;
 	required_device<pit8253_device> m_pit;
+	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;

@@ -82,6 +82,7 @@ public:
 			m_ctc(*this,"ctc"),
 			m_crtc(*this,"crtc"),
 			m_dma(*this, "dma"),
+			m_palette(*this, "palette"),
 			m_floppy0(*this, "fdc:0:525dd"),
 			m_floppy1(*this, "fdc:1:525dd"),
 			m_kb_row0(*this, "row0"),
@@ -180,6 +181,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<tms9927_device> m_crtc;
 	required_device<am9517a_device> m_dma;
+	required_device<palette_device> m_palette;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_ioport m_kb_row0;
@@ -242,6 +244,8 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// Graphics output (if enabled)
 	if(m_gfx_enabled)
 	{
+		const pen_t *pen = m_palette->pens();
+
 		for(y=0;y<(bitmap.height()-1)/10;y++)
 		{
 			for(x=0;x<(bitmap.width()-1)/8;x++)
@@ -250,22 +254,22 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				for(scan=0;scan<10;scan+=2)
 				{
 					data = m_gfx_ram[(128*32*(scan/2))+(y*128+x)];
-					bitmap.pix32(y*10+scan,x*8)   = (BIT(data,7) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+1) = (BIT(data,7) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+2) = (BIT(data,6) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+3) = (BIT(data,6) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+4) = (BIT(data,5) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+5) = (BIT(data,5) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+6) = (BIT(data,4) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan,x*8+7) = (BIT(data,4) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8)   = (BIT(data,3) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+1) = (BIT(data,3) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+2) = (BIT(data,2) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+3) = (BIT(data,2) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+4) = (BIT(data,1) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+5) = (BIT(data,1) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+6) = (BIT(data,0) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
-					bitmap.pix32(y*10+scan+1,x*8+7) = (BIT(data,0) ? RGB_MONOCHROME_GREEN_HIGHLIGHT[1] : RGB_MONOCHROME_GREEN_HIGHLIGHT[0]);
+					bitmap.pix32(y*10+scan,x*8)   = pen[BIT(data,7)];
+					bitmap.pix32(y*10+scan,x*8+1) = pen[BIT(data,7)];
+					bitmap.pix32(y*10+scan,x*8+2) = pen[BIT(data,6)];
+					bitmap.pix32(y*10+scan,x*8+3) = pen[BIT(data,6)];
+					bitmap.pix32(y*10+scan,x*8+4) = pen[BIT(data,5)];
+					bitmap.pix32(y*10+scan,x*8+5) = pen[BIT(data,5)];
+					bitmap.pix32(y*10+scan,x*8+6) = pen[BIT(data,4)];
+					bitmap.pix32(y*10+scan,x*8+7) = pen[BIT(data,4)];
+					bitmap.pix32(y*10+scan+1,x*8)   = pen[BIT(data,3)];
+					bitmap.pix32(y*10+scan+1,x*8+1) = pen[BIT(data,3)];
+					bitmap.pix32(y*10+scan+1,x*8+2) = pen[BIT(data,2)];
+					bitmap.pix32(y*10+scan+1,x*8+3) = pen[BIT(data,2)];
+					bitmap.pix32(y*10+scan+1,x*8+4) = pen[BIT(data,1)];
+					bitmap.pix32(y*10+scan+1,x*8+5) = pen[BIT(data,1)];
+					bitmap.pix32(y*10+scan+1,x*8+6) = pen[BIT(data,0)];
+					bitmap.pix32(y*10+scan+1,x*8+7) = pen[BIT(data,0)];
 				}
 			}
 		}
@@ -280,6 +284,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
 			UINT8 ch = m_char_ram[(y*128)+x];
+			pen_t fg = m_palette->pen(m_attr_ram[(y*128)+x] & 0x08 ? 2 : 1); // brightness
 			if(m_attr_ram[(y*128)+x] & 0x10) // double-size
 				dbl_mode++;
 			else
@@ -335,10 +340,7 @@ UINT32 attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					UINT16 xpos = x*8+bit;
 					UINT16 ypos = y*10+scan;
-					UINT32 fg = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];;
 
-					if(m_attr_ram[(y*128)+x] & 0x08) // brightness
-						fg = RGB_MONOCHROME_GREEN_HIGHLIGHT[2];
 					if(BIT(data,7-bit))
 						bitmap.pix32(ypos,xpos) = fg;
 				}
@@ -1020,6 +1022,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(attache_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(attache_state, vblank_int)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("psg", AY8912, XTAL_8MHz / 4)

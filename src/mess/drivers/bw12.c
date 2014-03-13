@@ -327,7 +327,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( bw12_update_row )
 {
 	bw12_state *state = device->machine().driver_data<bw12_state>();
-
+	const pen_t *pen = state->m_palette->pens();
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
@@ -346,7 +346,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
-			bitmap.pix32(y, x) = RGB_MONOCHROME_AMBER[color];
+			bitmap.pix32(y, x) = pen[color];
 
 			data <<= 1;
 		}
@@ -587,6 +587,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bw12)
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/8, bw12_mc6845_interface)
 

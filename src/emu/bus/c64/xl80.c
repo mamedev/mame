@@ -83,6 +83,8 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 
 void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
+	const pen_t *pen = m_palette->pens();
+
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_ram[((ma + column) & 0x7ff)];
@@ -99,7 +101,7 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
-			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
+			bitmap.pix32(y, x) = pen[color];
 
 			data <<= 1;
 		}
@@ -150,6 +152,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_xl80 )
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", c64_xl80)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL_14_31818MHz, crtc_intf)
 MACHINE_CONFIG_END
@@ -179,6 +182,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock, "c64_xl80", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),
+	m_palette(*this, "palette"),
 	m_char_rom(*this, HD46505SP_TAG),
 	m_ram(*this, "ram")
 {

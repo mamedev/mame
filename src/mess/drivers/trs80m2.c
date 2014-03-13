@@ -383,6 +383,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
 	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
+	const pen_t *pen = state->m_palette->pens();
 
 	int x = 0;
 
@@ -400,7 +401,7 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 			int dout = BIT(data, 7);
 			int color = dcursor ^ drevid ^ dout;
 
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
+			bitmap.pix32(y, x++) = pen[color];
 
 			data <<= 1;
 		}
@@ -827,6 +828,8 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
@@ -884,6 +887,8 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
 

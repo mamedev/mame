@@ -532,6 +532,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;
+	const pen_t *pen=m_palette->pens();
 
 	m_framecnt++;
 
@@ -560,13 +561,13 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 					gfx = 0xff;
 
 			/* Display a scanline of a character (7 pixels) */
-			*p++ = RGB_MONOCHROME_WHITE[0];
-			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 4) ^ 1];
-			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 3) ^ 1];
-			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 2) ^ 1];
-			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 1) ^ 1];
-			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 0) ^ 1];
-			*p++ = RGB_MONOCHROME_WHITE[0];
+			*p++ = pen[0];
+			*p++ = pen[BIT(gfx, 4) ^ 1];
+			*p++ = pen[BIT(gfx, 3) ^ 1];
+			*p++ = pen[BIT(gfx, 2) ^ 1];
+			*p++ = pen[BIT(gfx, 1) ^ 1];
+			*p++ = pen[BIT(gfx, 0) ^ 1];
+			*p++ = pen[0];
 			}
 		}
 		ma+=128;
@@ -697,6 +698,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", xerox820)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
@@ -749,6 +751,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	
 	MCFG_GFXDECODE_ADD("gfxdecode", xerox820ii)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

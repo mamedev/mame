@@ -15,8 +15,6 @@
 
 ***************************************************************************/
 
-#define MODERN_DRIVER_INIT
-
 #include "emu.h"
 #include "includes/segahang.h"
 #include "machine/segaic16.h"

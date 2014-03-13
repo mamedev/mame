@@ -1108,6 +1108,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( crtc_update_row )
 {
 	cbm2_state *state = device->machine().driver_data<cbm2_state>();
+	const pen_t *pen = state->m_palette->pens();
 
 	int x = 0;
 
@@ -1122,7 +1123,7 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
 			if (cursor_x == column) color ^= 1;
 
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
+			bitmap.pix32(y, x++) = pen[color];
 
 			if (bit < 8 || !state->m_graphics) data <<= 1;
 		}
@@ -2292,6 +2293,8 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9, crtc_intf)
 

@@ -1037,6 +1037,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
 
 UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	for (int y = 0; y < 200; y++)
 	{
 		for (int sx = 0; sx < 40; sx++)
@@ -1052,7 +1054,7 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			for (int x = 0; x < 8; x++, data <<= 1)
 			{
 			int color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
-			bitmap.pix32(y, (sx * 8) + x) = RGB_MONOCHROME_GREEN[color];
+			bitmap.pix32(y, (sx * 8) + x) = pen[color];
 			}
 		}
 	}
@@ -1070,6 +1072,7 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 	pet80_state *state = device->machine().driver_data<pet80_state>();
 	int x = 0;
 	int char_rom_mask = state->m_char_rom->bytes() - 1;
+	const pen_t *pen = state->m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1089,7 +1092,7 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+			bitmap.pix32(y, x++) = pen[video];
 		}
 
 		// odd character
@@ -1102,7 +1105,7 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+			bitmap.pix32(y, x++) = pen[video];
 		}
 	}
 }
@@ -1132,6 +1135,7 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 	pet80_state *state = device->machine().driver_data<pet80_state>();
 	int x = 0;
 	int char_rom_mask = state->m_char_rom->bytes() - 1;
+	const pen_t *pen = state->m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1153,7 +1157,7 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+			bitmap.pix32(y, x++) = pen[video];
 		}
 
 		// odd character
@@ -1166,7 +1170,7 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
 			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+			bitmap.pix32(y, x++) = pen[video];
 		}
 	}
 }
@@ -1378,6 +1382,8 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(120))
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// devices
 	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_8MHz/8)
@@ -1688,6 +1694,8 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, crtc_intf)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

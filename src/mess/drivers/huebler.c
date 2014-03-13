@@ -212,6 +212,7 @@ INPUT_PORTS_END
 UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
+	const pen_t *pen = m_palette->pens();
 
 	for (y = 0; y < 240; y++)
 	{
@@ -229,7 +230,7 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			{
 				int color = ((line > 7) ? 0 : BIT(data, 7)) ^ BIT(videoram_data, 7);
 
-				bitmap.pix32(y, (sx * 6) + x) = RGB_MONOCHROME_WHITE[color];
+				bitmap.pix32(y, (sx * 6) + x) = pen[color];
 
 				data <<= 1;
 			}
@@ -403,6 +404,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_SCREEN_RAW_PARAMS(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", amu880)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* devices */
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_10MHz/4, ctc_intf)

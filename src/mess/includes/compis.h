@@ -61,6 +61,7 @@ public:
 			m_uart(*this, I8251A_TAG),
 			m_rtc(*this, MM58174A_TAG),
 			m_crtc(*this, "upd7220"),
+			m_palette(*this, "palette"),
 			m_cassette(*this, CASSETTE_TAG),
 			m_isbx0(*this, ISBX_0_TAG),
 			m_isbx1(*this, ISBX_1_TAG),
@@ -78,6 +79,7 @@ public:
 	required_device<i8251_device> m_uart;
 	required_device<mm58274c_device> m_rtc;
 	required_device<upd7220_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cassette;
 	required_device<isbx_slot_device> m_isbx0;
 	required_device<isbx_slot_device> m_isbx1;

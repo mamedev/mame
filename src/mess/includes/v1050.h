@@ -73,6 +73,7 @@ public:
 		m_uart_sio(*this, I8251A_SIO_TAG),
 		m_fdc(*this, MB8877_TAG),
 		m_crtc(*this, H46505_TAG),
+		m_palette(*this, "palette"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, MB8877_TAG":0"),
@@ -168,6 +169,7 @@ public: // HACK for MC6845
 	required_device<i8251_device> m_uart_sio;
 	required_device<mb8877_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;

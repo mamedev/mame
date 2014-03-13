@@ -172,6 +172,7 @@ void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitma
 	if (y > 0x3ff) return;
 
 	int x = HFP;
+	const pen_t *pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column += 2)
 	{
@@ -186,7 +187,7 @@ void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitma
 			{
 				int color = (BIT(data, 15) ^ PIX_POL) && !BLANK;
 
-				bitmap.pix32(y + VFP, x++) = RGB_MONOCHROME_GREEN[color];
+				bitmap.pix32(y + VFP, x++) = pen[color];
 
 				data <<= 1;
 			}
@@ -234,6 +235,8 @@ static MACHINE_CONFIG_FRAGMENT( abc1600_mover )
 	MCFG_SCREEN_SIZE(958, 1067)
 	MCFG_SCREEN_VISIBLE_AREA(0, 958-1, 0, 1067-1)
 
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+
 	MCFG_MC6845_ADD(SY6845E_TAG, SY6845E, SCREEN_TAG, XTAL_64MHz/32, crtc_intf)
 MACHINE_CONFIG_END
 
@@ -263,6 +266,7 @@ abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const 
 		device_memory_interface(mconfig, *this),
 		m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, *ADDRESS_MAP_NAME(mover_map)),
 		m_crtc(*this, SY6845E_TAG),
+		m_palette(*this, "palette"),
 		m_wrmsk_rom(*this, "wrmsk"),
 		m_shinf_rom(*this, "shinf"),
 		m_drmsk_rom(*this, "drmsk")
@@ -1284,7 +1288,7 @@ UINT32 abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	if (m_endisp)
 	{
-		bitmap.fill(RGB_MONOCHROME_GREEN[FRAME_POL], cliprect);
+		bitmap.fill(m_palette->pen(FRAME_POL), cliprect);
 		m_crtc->screen_update(screen, bitmap, cliprect);
 	}
 	else

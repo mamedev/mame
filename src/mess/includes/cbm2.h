@@ -59,6 +59,7 @@ public:
 			m_maincpu(*this, M6509_TAG),
 			m_pla1(*this, PLA1_TAG),
 			m_crtc(*this, MC68B45_TAG),
+			m_palette(*this, "palette"),
 			m_sid(*this, MOS6581_TAG),
 			m_tpi1(*this, MOS6525_1_TAG),
 			m_tpi2(*this, MOS6525_2_TAG),
@@ -114,6 +115,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pls100_device> m_pla1;
 	optional_device<mc6845_device> m_crtc;
+	optional_device<palette_device> m_palette;
 	required_device<mos6581_device> m_sid;
 	required_device<tpi6525_device> m_tpi1;
 	required_device<tpi6525_device> m_tpi2;

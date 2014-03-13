@@ -457,9 +457,10 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	compis_state *state = device->machine().driver_data<compis_state>();
 	UINT8 i,gfx = state->m_video_ram[address];
+	const pen_t *pen = state->m_palette->pens();
 
 	for(i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[BIT(gfx, i)];
+		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
 }
 
 static UPD7220_INTERFACE( hgdc_intf )
@@ -723,6 +724,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// devices
 	MCFG_I80130_ADD(I80130_TAG, XTAL_16MHz/2, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))

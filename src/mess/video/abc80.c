@@ -32,8 +32,8 @@ static const gfx_layout charlayout =
 //-------------------------------------------------
 
 static GFXDECODE_START( abc80 )
-	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 2 ) // normal characters
-	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 2 ) // graphics characters
+	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 1 ) // normal characters
+	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 1 ) // graphics characters
 GFXDECODE_END
 
 
@@ -137,7 +137,7 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				color ^= (cursor & m_blink);
 				color &= blank;
 
-				bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
+				bitmap.pix32(y, x) = m_palette->pen(color);
 
 				data <<= 1;
 			}
@@ -204,5 +204,6 @@ MACHINE_CONFIG_FRAGMENT( abc80_video )
 
 	MCFG_SCREEN_RAW_PARAMS(XTAL_11_9808MHz/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", abc80)	
+	MCFG_GFXDECODE_ADD("gfxdecode", abc80)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END

@@ -29,17 +29,4 @@ extern const gfx_layout gfx_8x8x6_planar;
 
 extern const gfx_layout gfx_16x16x4_planar;
 
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-extern const rgb_t RGB_MONOCHROME_WHITE[];
-extern const rgb_t RGB_MONOCHROME_WHITE_HIGHLIGHT[];
-extern const rgb_t RGB_MONOCHROME_AMBER[];
-extern const rgb_t RGB_MONOCHROME_GREEN[];
-extern const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[];
-extern const rgb_t RGB_MONOCHROME_YELLOW[];
-
 #endif  /* __VIDEO_GENERIC_H__ */

@@ -116,9 +116,8 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7) ? 7 : 0;
 
-			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
+			bitmap.pix32(y, x) = m_palette->pen(BIT(data, 7));
 
 			data <<= 1;
 		}
@@ -169,6 +168,7 @@ static MACHINE_CONFIG_FRAGMENT( comx_clm )
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", comx_clm)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL_14_31818MHz/7, crtc_intf)
 MACHINE_CONFIG_END
@@ -198,6 +198,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock, "comx_clm", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
+	m_palette(*this, "palette"),
 	m_rom(*this, "c000"),
 	m_char_rom(*this, MC6845_TAG),
 	m_video_ram(*this, "video_ram")

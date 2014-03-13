@@ -213,6 +213,10 @@
 	MCFG_PALETTE_ADD(_tag, 3) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green_highlight), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_MONOCHROME_YELLOW(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_yellow), downcast<palette_device *>(device)));
+
 #define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
@@ -231,10 +235,12 @@
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
+// not implemented yet
+#if 0
 #define MCFG_PALETTE_ADD_HARDCODED(_tag, _array) \
 	MCFG_PALETTE_ADD(_tag, sizeof(_array) / 3) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
-
+#endif
 
 
 
@@ -377,6 +383,7 @@ public:
 	void palette_init_monochrome_amber(palette_device &palette);
 	void palette_init_monochrome_green(palette_device &palette);
 	void palette_init_monochrome_green_highlight(palette_device &palette);
+	void palette_init_monochrome_yellow(palette_device &palette);
 	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);

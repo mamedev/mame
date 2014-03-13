@@ -66,11 +66,11 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 			{
 				int color = BIT(charrom_data, 7) ^ rv;
 
-				bitmap.pix32(y, x++) = RGB_MONOCHROME_WHITE[color];
+				bitmap.pix32(y, x++) = m_palette->pen(color);
 
 				if (columns == 40)
 				{
-					bitmap.pix32(y, x++) = RGB_MONOCHROME_WHITE[color];
+					bitmap.pix32(y, x++) = m_palette->pen(color);
 				}
 
 				charrom_data <<= 1;
@@ -125,4 +125,6 @@ MACHINE_CONFIG_FRAGMENT( newbrain_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END

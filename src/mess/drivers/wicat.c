@@ -45,6 +45,7 @@ public:
 		m_videouart1(*this,"videouart1"),
 		m_videouart(*this,"videouart"),
 		m_videosram(*this,"vsram"),
+		m_palette(*this, "palette"),
 		m_chargen(*this,"g2char"),
 		m_fdc(*this,"fdc")
 	{
@@ -105,6 +106,7 @@ public:
 	required_device<mc2661_device> m_videouart1;
 	required_device<im6402_device> m_videouart;
 	required_device<x2210_device> m_videosram;
+	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
 	required_device<fd1795_t> m_fdc;
 
@@ -733,16 +735,16 @@ I8275_DISPLAY_PIXELS(wicat_display_pixels)
 	wicat_state *state = device->machine().driver_data<wicat_state>();
 
 	UINT8 romdata = state->m_chargen->base()[((charcode << 4) | linecount) + 1];
-	int i;
+	const pen_t *pen = state->m_palette->pens();
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		int color = (romdata >> (7-i)) & 0x01;
 
 		if(linecount > 9)
 			color = 0;
 
-		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
+		bitmap.pix32(y, x + i) = pen[color];
 	}
 }
 
@@ -962,6 +964,8 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_I8275_ADD("video",XTAL_19_6608MHz/8,9,wicat_display_pixels,DEVWRITELINE("videodma",am9517a_device, dreq0_w))
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))

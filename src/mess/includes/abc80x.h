@@ -5,8 +5,6 @@
 #ifndef __ABC800__
 #define __ABC800__
 
-#define MODERN_DRIVER_INIT
-
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
@@ -166,11 +164,13 @@ public:
 	abc800m_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
+			m_palette(*this, "palette"),
 			m_fgctl_prom(*this, "hru2"),
 			m_char_rom(*this, MC6845_TAG)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
 	required_memory_region m_char_rom;
 
@@ -214,11 +214,13 @@ public:
 	abc802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
+			m_palette(*this, "palette"),
 			m_char_rom(*this, MC6845_TAG),
 			m_config(*this, "CONFIG")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 

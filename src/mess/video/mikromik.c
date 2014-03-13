@@ -31,7 +31,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
+		bitmap.pix32(y, x + i) = state->m_palette->pen(color);
 	}
 }
 
@@ -58,7 +58,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(data, 7-i)) bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];
+		if (BIT(data, 7-i)) bitmap.pix32(y, x + i) = state->m_palette->pen(1);
 	}
 }
 
@@ -106,7 +106,7 @@ static const gfx_layout charlayout =
 //-------------------------------------------------
 
 static GFXDECODE_START( mm1 )
-	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 0x100 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -123,6 +123,7 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mm1)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_I8275_ADD(I8275_TAG, XTAL_18_720MHz/8, 8, crtc_display_pixels, DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)

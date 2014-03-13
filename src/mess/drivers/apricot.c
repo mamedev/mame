@@ -49,6 +49,7 @@ public:
 	m_fdc(*this, "ic68"),
 	m_floppy0(*this, "ic68:0"),
 	m_floppy1(*this, "ic68:1"),
+	m_palette(*this, "palette"),
 	m_screen_buffer(*this, "screen_buffer"),
 	m_data_selector_dtr(1),
 	m_data_selector_rts(1),
@@ -71,7 +72,7 @@ public:
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-
+	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_screen_buffer;
 
 	DECLARE_WRITE8_MEMBER( i8089_ca1_w );
@@ -272,6 +273,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *state = device->machine().driver_data<apricot_state>();
 	UINT8 *ram = state->m_ram->pointer();
+	const pen_t *pen = state->m_palette->pens();
 	int i, x;
 
 	if (state->m_video_mode)
@@ -292,7 +294,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				if (BIT(code, 15)) color = !color; // reverse?
-				bitmap.pix32(y, x + i*10) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color ? 1 + BIT(code, 14) : 0];
+				bitmap.pix32(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 	}
@@ -392,6 +394,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 

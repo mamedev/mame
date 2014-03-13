@@ -45,6 +45,7 @@ public:
 		m_dmac(*this, Z80DMA_TAG),
 		m_pio(*this, Z80PIO_TAG),
 		m_crtc(*this, MC6845_TAG),
+		m_palette(*this, "palette"),
 		m_fdc(*this, FD1791_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_floppy0(*this, FD1791_TAG":0"),
@@ -65,6 +66,7 @@ public:
 	required_device<z80dma_device> m_dmac;
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_device<fd1791_t> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_connector> m_floppy0;

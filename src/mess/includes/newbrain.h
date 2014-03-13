@@ -61,6 +61,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_copcpu(*this, COP420_TAG),
+		m_palette(*this, "palette"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
 		m_rom(*this, Z80_TAG),
@@ -137,6 +138,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_copcpu;
+	required_device<palette_device> m_palette;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_memory_region m_rom;
