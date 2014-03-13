@@ -205,8 +205,7 @@ cfx9850 // Casio CFX-9850
 
 // Coleco
 coleco  // ColecoVision (Original BIOS)
-colecoa   // ColecoVision (Thick Characters)
-colecob   // Spectravideo SVI-603 Coleco Game Adapter
+svi603   // Spectravideo SVI-603 Coleco Game Adapter
 czz50    // Bit Corporation Chuang Zao Zhe 50
 dina      // Telegames Dina
 prsarcde  // Telegames Personal Arcade
