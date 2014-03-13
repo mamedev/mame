@@ -287,7 +287,16 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+/*
 
+both program roms contain the following string (at the same location)
+
+This Game is programmed by the freelance group GAMART.
+ADRESS: C\SAnt Ramon,11 08130-STA PERPETUA DE MOGODA - BARCELONA (SPAIN)
+Telephone (93) 560 27 32
+Fax (93) 574 18 34
+
+*/
 
 ROM_START( diverboy )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
@@ -321,4 +330,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Electronic Devices Italy", "Diver Boy", GAME_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", GAME_SUPPORTS_SAVE )
