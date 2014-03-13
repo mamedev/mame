@@ -560,17 +560,6 @@ static const ay8910_interface psg_intf =
 
 
 //-------------------------------------------------
-//  sp0256_interface sp0256_intf
-//-------------------------------------------------
-
-static const sp0256_interface sp0256_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
@@ -755,7 +744,6 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL_3MHz)
-	MCFG_SOUND_CONFIG(sp0256_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

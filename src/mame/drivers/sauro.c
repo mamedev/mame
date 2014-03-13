@@ -349,12 +349,6 @@ static const gfx_layout sauro_spritelayout =
 	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static const sp0256_interface sauro_sp256 =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_NMI),
-	DEVCB_NULL
-};
-
 static GFXDECODE_START( sauro )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 64 )
@@ -366,10 +360,6 @@ static GFXDECODE_START( trckydoc )
 	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sauro_state::sauro_interrupt)
-{
-	device.execute().set_input_line(0, HOLD_LINE);
-}
 
 static MACHINE_CONFIG_START( tecfri, sauro_state )
 
@@ -417,7 +407,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  // 4 MHz?
 	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, sauro_interrupt,  8*60) // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sauro)
 
@@ -426,7 +416,7 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(sauro_sp256)
+	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

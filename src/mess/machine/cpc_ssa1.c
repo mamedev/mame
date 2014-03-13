@@ -85,18 +85,6 @@ WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
 	set_sby(state);
 }
 
-static sp0256_interface sp0256_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,lrq_cb),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,sby_cb)
-};
-
-static sp0256_interface sp0256_dk_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,lrq_cb),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,sby_cb)
-};
-
 //-------------------------------------------------
 //  Device ROM definition
 //-------------------------------------------------
@@ -131,7 +119,8 @@ const rom_entry *cpc_dkspeech_device::device_rom_region() const
 static MACHINE_CONFIG_FRAGMENT( cpc_ssa1 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_3_12MHz)
-	MCFG_SOUND_CONFIG(sp0256_intf)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_ssa1_device, lrq_cb))
+	MCFG_SP0256_STANDBY_CB(WRITELINE(cpc_ssa1_device, sby_cb))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through
@@ -142,7 +131,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( cpc_dkspeech )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sp0256",SP0256,XTAL_4MHz)  // uses the CPC's clock from pin 50 of the expansion port
-	MCFG_SOUND_CONFIG(sp0256_dk_intf)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(cpc_dkspeech_device, lrq_cb))
+	MCFG_SP0256_STANDBY_CB(WRITELINE(cpc_dkspeech_device, sby_cb))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// pass-through

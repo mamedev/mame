@@ -54,7 +54,6 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "includes/intv.h"
 #include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
-#include "sound/sp0256.h"
 
 #ifndef VERBOSE
 #ifdef MAME_DEBUG
@@ -135,12 +134,6 @@ static const ay8910_interface intv_ay8914_ecs_interface =
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_r),
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_portb_r),
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_w),
-	DEVCB_NULL
-};
-
-static const sp0256_interface intellivoice_sp0256 =
-{
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -835,7 +828,6 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(intellivoice_sp0256)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

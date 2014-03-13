@@ -748,13 +748,6 @@ static GFXDECODE_START( odyssey2 )
 GFXDECODE_END
 
 
-static const sp0256_interface the_voice_sp0256 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(odyssey2_state,the_voice_lrq_callback),
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
@@ -786,7 +779,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -816,7 +809,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
@@ -848,7 +841,7 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
@@ -883,7 +876,7 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
