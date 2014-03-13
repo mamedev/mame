@@ -94,7 +94,7 @@ protected:
 
 	devcb2_write_line   m_write_irq;
 
-	device_adam_expansion_slot_card_interface *m_cart;
+	device_adam_expansion_slot_card_interface *m_card;
 };
 
 
@@ -110,21 +110,13 @@ public:
 	virtual ~device_adam_expansion_slot_card_interface() { }
 
 protected:
-	// initialization
-	virtual UINT8* adam_rom_pointer(running_machine &machine, size_t size);
-	virtual UINT8* adam_ram_pointer(running_machine &machine, size_t size);
-
 	// runtime
 	virtual UINT8 adam_bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { return data; }
 	virtual void adam_bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) { }
 
 	adam_expansion_slot_device *m_slot;
 
-	dynamic_array<UINT8> m_rom;
-	dynamic_array<UINT8> m_ram;
-
-	size_t m_rom_mask;
-	size_t m_ram_mask;
+	optional_shared_ptr<UINT8> m_rom;
 };
 
 

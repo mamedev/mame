@@ -39,44 +39,9 @@ const device_type ADAM_EXPANSION_SLOT = &device_creator<adam_expansion_slot_devi
 
 device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
-	m_rom_mask(0),
-	m_ram_mask(0)
+	m_rom(*this, "rom")
 {
 	m_slot = dynamic_cast<adam_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  adam_rom_pointer - get expansion ROM pointer
-//-------------------------------------------------
-
-UINT8* device_adam_expansion_slot_card_interface::adam_rom_pointer(running_machine &machine, size_t size)
-{
-	if (m_rom.count() == 0)
-	{
-		m_rom.resize(size);
-
-		m_rom_mask = size - 1;
-	}
-
-	return m_rom;
-}
-
-
-//-------------------------------------------------
-//  adam_ram_pointer - get expansion ROM pointer
-//-------------------------------------------------
-
-UINT8* device_adam_expansion_slot_card_interface::adam_ram_pointer(running_machine &machine, size_t size)
-{
-	if (m_ram.count() == 0)
-	{
-		m_ram.resize(size);
-
-		m_ram_mask = size - 1;
-	}
-
-	return m_ram;
 }
 
 
@@ -104,7 +69,7 @@ adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mco
 
 void adam_expansion_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_adam_expansion_slot_card_interface *>(get_card_device());
+	m_card = dynamic_cast<device_adam_expansion_slot_card_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -126,7 +91,7 @@ void adam_expansion_slot_device::device_reset()
 
 bool adam_expansion_slot_device::call_load()
 {
-	if (m_cart)
+	if (m_card)
 	{
 		size_t size = 0;
 
@@ -134,15 +99,11 @@ bool adam_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			fread(m_cart->adam_rom_pointer(machine(), size), size);
+			fread(m_card->m_rom, size);
 		}
 		else
 		{
-			size = get_software_region_length("rom");
-			if (size) memcpy(m_cart->adam_rom_pointer(machine(), size), get_software_region("rom"), size);
-
-			size = get_software_region_length("ram");
-			if (size) memcpy(m_cart->adam_ram_pointer(machine(), size), get_software_region("ram"), size);
+			load_software_region("rom", m_card->m_rom);
 		}
 	}
 
@@ -178,9 +139,9 @@ void adam_expansion_slot_device::get_default_card_software(astring &result)
 
 UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		data = m_cart->adam_bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
+		data = m_card->adam_bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
 
 	return data;
@@ -193,9 +154,9 @@ UINT8 adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, UINT
 
 void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8 data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		m_cart->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
+		m_card->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
 }
 
