@@ -5,54 +5,74 @@ enum
 {
 	/* 8 bytes per character definition */
 	asr733_single_char_len = 8,
-
 	asr733_chr_region_len   = 128*asr733_single_char_len
 };
 
-struct asr733_init_params_t
-{
-	void (*int_callback)(running_machine &machine, int state);
-};
-
-void asr733_init(running_machine &machine);
 class asr733_device : public device_t
 {
 public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~asr733_device();
 
 	DECLARE_PALETTE_INIT(asr733);
 
-	// access to legacy token
-	struct asr_t *token() const { assert(m_token != NULL); return m_token; }
-	
+	DECLARE_READ8_MEMBER(cru_r);
+	DECLARE_WRITE8_MEMBER(cru_w);
+
+	void refresh(bitmap_ind16 &bitmap, int x, int y);
+	void keyboard();
+
+	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object)
+	{
+		return downcast<asr733_device &>(device).m_int_line.set_callback(object);
+	}
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-public:	
-	required_device<palette_device> m_palette;
+	void device_config_complete();
+	void device_start();
+	void device_reset();
+	machine_config_constructor device_mconfig_additions() const;
+
 private:
 	// internal state
-	struct asr_t *m_token;
-	required_device<gfxdecode_device> m_gfxdecode;
+#if 0
+	UINT8 m_OutQueue[ASROutQueueSize];
+	int m_OutQueueHead;
+	int m_OutQueueLen;
+#endif
+
+	void set_interrupt_line();
+	void draw_char(int character, int x, int y, int color);
+	void linefeed();
+	void transmit(UINT8 data);
+
+
+	UINT8   m_recv_buf;
+	UINT8   m_xmit_buf;
+
+	UINT8   m_status;
+	UINT8   m_mode;
+	UINT8   m_last_key_pressed;
+	int     m_last_modifier_state;
+
+	unsigned char m_repeat_timer;
+	int     m_new_status_flag;
+
+	int     m_x;
+
+	bitmap_ind16*       m_bitmap;
+
+	required_device<palette_device>     m_palette;
+	required_device<gfxdecode_device>   m_gfxdecode;
+	devcb2_write_line                   m_int_line;
 };
 
 extern const device_type ASR733;
 
+#define MCFG_ASR733_VIDEO_ADD(_tag, _intcallb) \
+	MCFG_DEVICE_ADD(_tag, ASR733, 0)  \
+	devcb = &asr733_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
 
-#define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
-
-DECLARE_READ8_DEVICE_HANDLER(asr733_cru_r);
-DECLARE_WRITE8_DEVICE_HANDLER(asr733_cru_w);
-
-void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y);
-
-void asr733_keyboard(device_t *device);
 
 #define ASR733_KEY_PORTS                                                                        \
 	PORT_START("KEY0")  /* keys 1-16 */                                                                 \

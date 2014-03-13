@@ -30,34 +30,6 @@
 
 #include "emu.h"
 #include "990_tap.h"
-#include "devlegcy.h"
-
-
-static void update_interrupt(device_t *device);
-
-#define MAX_TAPE_UNIT 4
-
-struct tape_unit_t
-{
-	device_image_interface *img;        /* image descriptor */
-	unsigned int bot : 1;   /* TRUE if we are at the beginning of tape */
-	unsigned int eot : 1;   /* TRUE if we are at the end of tape */
-	unsigned int wp : 1;    /* TRUE if tape is write-protected */
-};
-
-struct tap_990_t
-{
-	UINT16 w[8];
-
-	const ti990_tpc_interface *intf;
-
-	tape_unit_t t[MAX_TAPE_UNIT];
-};
-
-struct ti990_tape_t
-{
-	int dummy;
-};
 
 enum
 {
@@ -108,44 +80,21 @@ static const UINT16 w_mask[8] =
 	0xf3ff      /* Don't overwrite reserved bits */
 };
 
-static int tape_get_id(device_t *image)
-{
-	int drive =0;
-	if (strcmp(image->tag(), ":tape0") == 0) drive = 0;
-	if (strcmp(image->tag(), ":tape1") == 0) drive = 1;
-	if (strcmp(image->tag(), ":tape2") == 0) drive = 2;
-	if (strcmp(image->tag(), ":tape3") == 0) drive = 3;
-	return drive;
-}
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-INLINE tap_990_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TI990_TAPE_CTRL);
-
-	return (tap_990_t *)downcast<tap_990_device *>(device)->token();
-}
-
-
 /*
     Parse the tape select lines, and return the corresponding tape unit.
     (-1 if none)
 */
-static int cur_tape_unit(device_t *device)
+int tap_990_device::cur_tape_unit()
 {
 	int reply;
-	tap_990_t *tpc = get_safe_token(device);
 
-	if (tpc->w[6] & w6_unit0_sel)
+	if (m_w[6] & w6_unit0_sel)
 		reply = 0;
-	else if (tpc->w[6] & w6_unit1_sel)
+	else if (m_w[6] & w6_unit1_sel)
 		reply = 1;
-	else if (tpc->w[6] & w6_unit2_sel)
+	else if (m_w[6] & w6_unit2_sel)
 		reply = 2;
-	else if (tpc->w[6] & w6_unit3_sel)
+	else if (m_w[6] & w6_unit3_sel)
 		reply = 3;
 	else
 		reply = -1;
@@ -159,19 +108,18 @@ static int cur_tape_unit(device_t *device)
 /*
     Update interrupt state
 */
-static void update_interrupt(device_t *device)
+void tap_990_device::update_interrupt()
 {
-	tap_990_t *tpc = get_safe_token(device);
-	if (tpc->intf->interrupt_callback)
-		(*tpc->intf->interrupt_callback)(device->machine(), (tpc->w[7] & w7_idle)
-									&& (((tpc->w[7] & w7_int_enable) && (tpc->w[7] & (w7_complete | w7_error)))
-										|| ((tpc->w[0] & ~(tpc->w[0] >> 4)) & w0_rewind_mask)));
+	bool level = (m_w[7] & w7_idle)
+				&& (((m_w[7] & w7_int_enable) && (m_w[7] & (w7_complete | w7_error)))
+										|| ((m_w[0] & ~(m_w[0] >> 4)) & w0_rewind_mask));
+	m_int_line(level);
 }
 
 /*
     Handle the read binary forward command: read the next record on tape.
 */
-static void cmd_read_binary_forward(device_t *device)
+void tap_990_device::cmd_read_binary_forward()
 {
 	UINT8 buffer[256];
 	int reclen;
@@ -185,48 +133,48 @@ static void cmd_read_binary_forward(device_t *device)
 	int bytes_to_read;
 	int bytes_read;
 	int i;
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (!m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= 0x80 >> tap_sel;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= 0x80 >> tap_sel;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #endif
 
-	tpc->t[tap_sel].bot = 0;
+	m_tape[tap_sel].bot = 0;
 
-	dma_address = ((((int) tpc->w[6]) << 16) | tpc->w[5]) & 0x1ffffe;
-	char_count = tpc->w[4];
-	read_offset = tpc->w[3];
+	dma_address = ((((int)m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	char_count = m_w[4];
+	read_offset = m_w[3];
 
-	bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
+	bytes_read = m_tape[tap_sel].img->fread(buffer, 4);
 	if (bytes_read != 4)
 	{
 		if (bytes_read == 0)
 		{   /* legitimate EOF */
-			tpc->t[tap_sel].eot = 1;
-			tpc->w[0] |= w0_EOT;    /* or should it be w0_command_timeout? */
-			tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt(device);
+			m_tape[tap_sel].eot = 1;
+			m_w[0] |= w0_EOT;    /* or should it be w0_command_timeout? */
+			m_w[7] |= w7_idle | w7_error | w7_tape_error;
+			update_interrupt();
 			goto update_registers;
 		}
 		else
@@ -234,10 +182,10 @@ static void cmd_read_binary_forward(device_t *device)
 			/* No idea what to report... */
 			/* eject tape to avoid catastrophes */
 			logerror("Tape error\n");
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 	}
@@ -247,10 +195,10 @@ static void cmd_read_binary_forward(device_t *device)
 		logerror("Tape error\n");
 		logerror("Tape format looks gooofy\n");
 		/* eject tape to avoid catastrophes */
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		goto update_registers;
 	}
 
@@ -258,9 +206,9 @@ static void cmd_read_binary_forward(device_t *device)
 	if (reclen == 0)
 	{
 		logerror("read binary forward: found EOF, requested %d\n", char_count);
-		tpc->w[0] |= w0_EOF;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_EOF;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		goto update_registers;
 	}
 
@@ -271,13 +219,13 @@ static void cmd_read_binary_forward(device_t *device)
 	/* skip up to read_offset bytes */
 	chunk_len = (read_offset > rec_count) ? rec_count : read_offset;
 
-	if (tpc->t[tap_sel].img->fseek(chunk_len, SEEK_CUR))
+	if (m_tape[tap_sel].img->fseek(chunk_len, SEEK_CUR))
 	{   /* eject tape */
 		logerror("Tape error\n");
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		goto update_registers;
 	}
 
@@ -285,9 +233,9 @@ static void cmd_read_binary_forward(device_t *device)
 	read_offset -= chunk_len;
 	if (read_offset)
 	{
-		tpc->w[0] |= w0_EOR;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_EOR;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		goto skip_trailer;
 	}
 
@@ -297,7 +245,7 @@ static void cmd_read_binary_forward(device_t *device)
 	for (; chunk_len>0; )
 	{
 		bytes_to_read = (chunk_len < sizeof(buffer)) ? chunk_len : sizeof(buffer);
-		bytes_read = tpc->t[tap_sel].img->fread(buffer, bytes_to_read);
+		bytes_read = m_tape[tap_sel].img->fread(buffer, bytes_to_read);
 
 		if (bytes_read & 1)
 		{
@@ -307,7 +255,7 @@ static void cmd_read_binary_forward(device_t *device)
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			device->machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -318,53 +266,53 @@ static void cmd_read_binary_forward(device_t *device)
 		if (bytes_read != bytes_to_read)
 		{   /* eject tape */
 			logerror("Tape error\n");
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 	}
 
 	if (char_count)
 	{
-		tpc->w[0] |= w0_EOR;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_EOR;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		goto skip_trailer;
 	}
 
 	if (rec_count)
 	{   /* skip end of record */
-		if (tpc->t[tap_sel].img->fseek(rec_count, SEEK_CUR))
+		if (m_tape[tap_sel].img->fseek(rec_count, SEEK_CUR))
 		{   /* eject tape */
 			logerror("Tape error\n");
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 	}
 
 skip_trailer:
-	if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
+	if (m_tape[tap_sel].img->fread(buffer, 4) != 4)
 	{   /* eject tape */
 		logerror("Tape error\n");
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		goto update_registers;
 	}
 
 	if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 	{   /* eject tape */
 		logerror("Tape error\n");
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		goto update_registers;
 	}
 	if (buffer[2] || buffer[3])
@@ -372,91 +320,91 @@ skip_trailer:
 		logerror("Tape error\n");
 		logerror("Tape format looks gooofy\n");
 		/* eject tape to avoid catastrophes */
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		goto update_registers;
 	}
 
-	if (! (tpc->w[7] & w7_error))
+	if (! (m_w[7] & w7_error))
 	{
-		tpc->w[7] |= w7_idle | w7_complete;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_complete;
+		update_interrupt();
 	}
 
 update_registers:
-	tpc->w[1] = rec_count & 0xffff;
-	tpc->w[2] = (rec_count >> 8) & 0xff;
-	tpc->w[3] = read_offset;
-	tpc->w[4] = char_count;
-	tpc->w[5] = (dma_address >> 1) & 0xffff;
-	tpc->w[6] = (tpc->w[6] & 0xffe0) | ((dma_address >> 17) & 0xf);
+	m_w[1] = rec_count & 0xffff;
+	m_w[2] = (rec_count >> 8) & 0xff;
+	m_w[3] = read_offset;
+	m_w[4] = char_count;
+	m_w[5] = (dma_address >> 1) & 0xffff;
+	m_w[6] = (m_w[6] & 0xffe0) | ((dma_address >> 17) & 0xf);
 }
 
 /*
     Handle the record skip forward command: skip a specified number of records.
 */
-static void cmd_record_skip_forward(device_t *device)
+void tap_990_device::cmd_record_skip_forward()
 {
 	UINT8 buffer[4];
 	int reclen;
 
 	int record_count;
 	int bytes_read;
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (! m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= 0x80 >> tap_sel;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= 0x80 >> tap_sel;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #endif
 
-	record_count = tpc->w[4];
+	record_count = m_w[4];
 
 	if (record_count)
-		tpc->t[tap_sel].bot = 0;
+		m_tape[tap_sel].bot = 0;
 
 	while (record_count > 0)
 	{
-		bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
+		bytes_read = m_tape[tap_sel].img->fread(buffer, 4);
 		if (bytes_read != 4)
 		{
 			if (bytes_read == 0)
 			{   /* legitimate EOF */
-				tpc->t[tap_sel].eot = 1;
-				tpc->w[0] |= w0_EOT;    /* or should it be w0_command_timeout? */
-				tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-				update_interrupt(device);
+				m_tape[tap_sel].eot = 1;
+				m_w[0] |= w0_EOT;    /* or should it be w0_command_timeout? */
+				m_w[7] |= w7_idle | w7_error | w7_tape_error;
+				update_interrupt();
 				goto update_registers;
 			}
 			else
 			{   /* illegitimate EOF */
 				/* No idea what to report... */
 				/* eject tape to avoid catastrophes */
-				tpc->t[tap_sel].img->unload();
-				tpc->w[0] |= w0_offline;
-				tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-				update_interrupt(device);
+				m_tape[tap_sel].img->unload();
+				m_w[0] |= w0_offline;
+				m_w[7] |= w7_idle | w7_error | w7_hard_error;
+				update_interrupt();
 				goto update_registers;
 			}
 		}
@@ -465,10 +413,10 @@ static void cmd_record_skip_forward(device_t *device)
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
@@ -476,64 +424,64 @@ static void cmd_record_skip_forward(device_t *device)
 		if (reclen == 0)
 		{
 			logerror("record skip forward: found EOF\n");
-			tpc->w[0] |= w0_EOF;
-			tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt(device);
+			m_w[0] |= w0_EOF;
+			m_w[7] |= w7_idle | w7_error | w7_tape_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
 		/* skip record data */
-		if (tpc->t[tap_sel].img->fseek(reclen, SEEK_CUR))
+		if (m_tape[tap_sel].img->fseek(reclen, SEEK_CUR))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
-		if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
+		if (m_tape[tap_sel].img->fread(buffer, 4) != 4)
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
 		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 		if (buffer[2] || buffer[3])
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
 		record_count--;
 	}
 
-	tpc->w[7] |= w7_idle | w7_complete;
-	update_interrupt(device);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 
 update_registers:
-	tpc->w[4] = record_count;
+	m_w[4] = record_count;
 }
 
 /*
     Handle the record skip reverse command: skip a specified number of records backwards.
 */
-static void cmd_record_skip_reverse(device_t *device)
+void tap_990_device::cmd_record_skip_reverse()
 {
 	UINT8 buffer[4];
 	int reclen;
@@ -541,66 +489,66 @@ static void cmd_record_skip_reverse(device_t *device)
 	int record_count;
 
 	int bytes_read;
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (! m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= 0x80 >> tap_sel;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= 0x80 >> tap_sel;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #endif
 
-	record_count = tpc->w[4];
+	record_count = m_w[4];
 
 	if (record_count)
-		tpc->t[tap_sel].eot = 0;
+		m_tape[tap_sel].eot = 0;
 
 	while (record_count > 0)
 	{
-		if (tpc->t[tap_sel].img->ftell() == 0)
+		if (m_tape[tap_sel].img->ftell() == 0)
 		{   /* bot */
-			tpc->t[tap_sel].bot = 1;
-			tpc->w[0] |= w0_BOT;
-			tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt(device);
+			m_tape[tap_sel].bot = 1;
+			m_w[0] |= w0_BOT;
+			m_w[7] |= w7_idle | w7_error | w7_tape_error;
+			update_interrupt();
 			goto update_registers;
 		}
-		if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
+		if (m_tape[tap_sel].img->fseek(-4, SEEK_CUR))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
-		bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
+		bytes_read = m_tape[tap_sel].img->fread(buffer, 4);
 		if (bytes_read != 4)
 		{
 			/* illegitimate EOF */
 			/* No idea what to report... */
 			/* eject tape to avoid catastrophes */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 		reclen = (((int) buffer[1]) << 8) | buffer[0];
@@ -608,10 +556,10 @@ static void cmd_record_skip_reverse(device_t *device)
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
@@ -619,286 +567,282 @@ static void cmd_record_skip_reverse(device_t *device)
 		if (reclen == 0)
 		{
 			logerror("record skip reverse: found EOF\n");
-			if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
+			if (m_tape[tap_sel].img->fseek(-4, SEEK_CUR))
 			{   /* eject tape */
-				tpc->t[tap_sel].img->unload();
-				tpc->w[0] |= w0_offline;
-				tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-				update_interrupt(device);
+				m_tape[tap_sel].img->unload();
+				m_w[0] |= w0_offline;
+				m_w[7] |= w7_idle | w7_error | w7_hard_error;
+				update_interrupt();
 				goto update_registers;
 			}
-			tpc->w[0] |= w0_EOF;
-			tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-			update_interrupt(device);
+			m_w[0] |= w0_EOF;
+			m_w[7] |= w7_idle | w7_error | w7_tape_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
-		if (tpc->t[tap_sel].img->fseek(-reclen-8, SEEK_CUR))
+		if (m_tape[tap_sel].img->fseek(-reclen-8, SEEK_CUR))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
-		if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
+		if (m_tape[tap_sel].img->fread(buffer, 4) != 4)
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 		if (buffer[2] || buffer[3])
 		{   /* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
-		if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
+		if (m_tape[tap_sel].img->fseek(-4, SEEK_CUR))
 		{   /* eject tape */
-			tpc->t[tap_sel].img->unload();
-			tpc->w[0] |= w0_offline;
-			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-			update_interrupt(device);
+			m_tape[tap_sel].img->unload();
+			m_w[0] |= w0_offline;
+			m_w[7] |= w7_idle | w7_error | w7_hard_error;
+			update_interrupt();
 			goto update_registers;
 		}
 
 		record_count--;
 	}
 
-	tpc->w[7] |= w7_idle | w7_complete;
-	update_interrupt(device);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 
 update_registers:
-	tpc->w[4] = record_count;
+	m_w[4] = record_count;
 }
 
 /*
     Handle the rewind command: rewind to BOT.
 */
-static void cmd_rewind(device_t *device)
+void tap_990_device::cmd_rewind()
 {
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (! m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= 0x80 >> tap_sel;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= 0x80 >> tap_sel;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #endif
 
-	tpc->t[tap_sel].eot = 0;
+	m_tape[tap_sel].eot = 0;
 
-	if (tpc->t[tap_sel].img->fseek(0, SEEK_SET))
+	if (m_tape[tap_sel].img->fseek(0, SEEK_SET))
 	{   /* eject tape */
-		tpc->t[tap_sel].img->unload();
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_tape[tap_sel].img->unload();
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	tpc->t[tap_sel].bot = 1;
+	m_tape[tap_sel].bot = 1;
 
-	tpc->w[7] |= w7_idle | w7_complete;
-	update_interrupt(device);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the rewind and offline command: disable the tape unit.
 */
-static void cmd_rewind_and_offline(device_t *device)
+void tap_990_device::cmd_rewind_and_offline()
 {
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		return;
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (! m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= 0x80 >> tap_sel;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= 0x80 >> tap_sel;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 		return;
 	}
 #endif
 
 	/* eject tape */
-	tpc->t[tap_sel].img->unload();
+	m_tape[tap_sel].img->unload();
 
-	tpc->w[7] |= w7_idle | w7_complete;
-	update_interrupt(device);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the read transport status command: return the current tape status.
 */
-static void read_transport_status(device_t *device)
+void tap_990_device::read_transport_status()
 {
-	tap_990_t *tpc = get_safe_token(device);
-	int tap_sel = cur_tape_unit(device);
+	int tap_sel = cur_tape_unit();
 
 	if (tap_sel == -1)
 	{
 		/* No idea what to report... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 	}
-	else if (! tpc->t[tap_sel].img->exists())
+	else if (! m_tape[tap_sel].img->exists())
 	{   /* offline */
-		tpc->w[0] |= w0_offline;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= w0_offline;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 	}
 #if 0
 	else if (0)
 	{   /* rewind in progress */
-		tpc->w[0] |= /*...*/;
-		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
-		update_interrupt(device);
+		m_w[0] |= /*...*/;
+		m_w[7] |= w7_idle | w7_error | w7_tape_error;
+		update_interrupt();
 	}
 #endif
 	else
 	{   /* no particular error condition */
-		if (tpc->t[tap_sel].bot)
-			tpc->w[0] |= w0_BOT;
-		if (tpc->t[tap_sel].eot)
-			tpc->w[0] |= w0_EOT;
-		if (tpc->t[tap_sel].wp)
-			tpc->w[0] |= w0_write_ring;
-		tpc->w[7] |= w7_idle | w7_complete;
-		update_interrupt(device);
+		if (m_tape[tap_sel].bot)
+			m_w[0] |= w0_BOT;
+		if (m_tape[tap_sel].eot)
+			m_w[0] |= w0_EOT;
+		if (m_tape[tap_sel].wp)
+			m_w[0] |= w0_write_ring;
+		m_w[7] |= w7_idle | w7_complete;
+		update_interrupt();
 	}
 }
 
 /*
     Parse command code and execute the command.
 */
-static void execute_command(device_t *device)
+void tap_990_device::execute_command()
 {
 	/* hack */
-	tap_990_t *tpc = get_safe_token(device);
-	tpc->w[0] &= 0xff;
+	m_w[0] &= 0xff;
 
-	switch ((tpc->w[6] & w6_command) >> 8)
+	switch ((m_w[6] & w6_command) >> 8)
 	{
 	case 0x00:
 	case 0x0C:
 	case 0x0E:
 		/* NOP */
 		logerror("NOP\n");
-		tpc->w[7] |= w7_idle | w7_complete;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_complete;
+		update_interrupt();
 		break;
 	case 0x01:
 		/* buffer sync: means nothing under emulation */
 		logerror("buffer sync\n");
-		tpc->w[7] |= w7_idle | w7_complete;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_complete;
+		update_interrupt();
 		break;
 	case 0x02:
 		/* write EOF - not emulated */
 		logerror("write EOF\n");
 		/* ... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		break;
 	case 0x03:
 		/* record skip reverse - not fully tested */
 		logerror("record skip reverse\n");
-		cmd_record_skip_reverse(device);
+		cmd_record_skip_reverse();
 		break;
 	case 0x04:
 		/* read binary forward */
 		logerror("read binary forward\n");
-		cmd_read_binary_forward(device);
+		cmd_read_binary_forward();
 		break;
 	case 0x05:
 		/* record skip forward - not tested */
 		logerror("record skip forward\n");
-		cmd_record_skip_forward(device);
+		cmd_record_skip_forward();
 		break;
 	case 0x06:
 		/* write binary forward - not emulated */
 		logerror("write binary forward\n");
 		/* ... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		break;
 	case 0x07:
 		/* erase - not emulated */
 		logerror("erase\n");
 		/* ... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		break;
 	case 0x08:
 	case 0x09:
 		/* read transport status */
 		logerror("read transport status\n");
-		read_transport_status(device);
+		read_transport_status();
 		break;
 	case 0x0A:
 		/* rewind - not tested */
 		logerror("rewind\n");
-		cmd_rewind(device);
+		cmd_rewind();
 		break;
 	case 0x0B:
 		/* rewind and offline - not tested */
 		logerror("rewind and offline\n");
-		cmd_rewind_and_offline(device);
+		cmd_rewind_and_offline();
 		break;
 	case 0x0F:
 		/* extended control and status - not emulated */
 		logerror("extended control and status\n");
 		/* ... */
-		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
-		update_interrupt(device);
+		m_w[7] |= w7_idle | w7_error | w7_hard_error;
+		update_interrupt();
 		break;
 	}
 }
@@ -907,11 +851,10 @@ static void execute_command(device_t *device)
 /*
     Read one register in TPCS space
 */
-READ16_DEVICE_HANDLER(ti990_tpc_r)
+READ16_MEMBER( tap_990_device::read )
 {
-	tap_990_t *tpc = get_safe_token(device);
 	if (offset < 8)
-		return tpc->w[offset];
+		return m_w[offset];
 	else
 		return 0;
 }
@@ -919,25 +862,24 @@ READ16_DEVICE_HANDLER(ti990_tpc_r)
 /*
     Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
-WRITE16_DEVICE_HANDLER(ti990_tpc_w)
+WRITE16_MEMBER( tap_990_device::write )
 {
-	tap_990_t *tpc = get_safe_token(device);
 	if (offset < 8)
 	{
 		/* write protect if a command is in progress */
-		if (tpc->w[7] & w7_idle)
+		if (m_w[7] & w7_idle)
 		{
-			UINT16 old_data = tpc->w[offset];
+			UINT16 old_data = m_w[offset];
 
 			/* Only write writable bits AND honor byte accesses (ha!) */
-			tpc->w[offset] = (tpc->w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
+			m_w[offset] = (m_w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
 
 			if ((offset == 0) || (offset == 7))
-				update_interrupt(device);
+				update_interrupt();
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{   /* idle has been cleared: start command execution */
-				execute_command(device);
+				execute_command();
 			}
 		}
 	}
@@ -968,12 +910,14 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+private:
+	int tape_get_id();
 };
 
 const device_type TI990_TAPE = &device_creator<ti990_tape_image_device>;
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TI990_TAPE, "TI990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
+	: device_t(mconfig, TI990_TAPE, "TI-990 Magnetic Tape", tag, owner, clock, "ti990_tape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
@@ -985,17 +929,18 @@ void ti990_tape_image_device::device_config_complete()
 
 void ti990_tape_image_device::device_start()
 {
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(owner());
-	int id = tape_get_id(this);
+	tap_990_device* tpc = downcast<tap_990_device*>(owner());
+	tpc->set_tape(tape_get_id(), this, true, false, false);
+}
 
-	t = &tpc->t[id];
-	memset(t, 0, sizeof(*t));
-
-	t->img = this;
-	t->wp = 1;
-	t->bot = 0;
-	t->eot = 0;
+int ti990_tape_image_device::tape_get_id()
+{
+	int drive =0;
+	if (strcmp(tag(), ":tape0") == 0) drive = 0;
+	if (strcmp(tag(), ":tape1") == 0) drive = 1;
+	if (strcmp(tag(), ":tape2") == 0) drive = 2;
+	if (strcmp(tag(), ":tape3") == 0) drive = 3;
+	return drive;
 }
 
 /*
@@ -1003,17 +948,8 @@ void ti990_tape_image_device::device_start()
 */
 bool ti990_tape_image_device::call_load()
 {
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(owner());
-	int id = tape_get_id(this);
-
-	t = &tpc->t[id];
-	memset(t, 0, sizeof(*t));
-
-	/* tell whether the image is writable */
-	t->wp = is_readonly();
-
-	t->bot = 1;
+	tap_990_device* tpc = downcast<tap_990_device*>(owner());
+	tpc->set_tape(tape_get_id(), this, true, false, is_readonly());
 
 	return IMAGE_INIT_PASS;
 }
@@ -1023,14 +959,8 @@ bool ti990_tape_image_device::call_load()
 */
 void ti990_tape_image_device::call_unload()
 {
-	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(owner());
-	int id = tape_get_id(this);
-
-	t = &tpc->t[id];
-	t->wp = 1;
-	t->bot = 0;
-	t->eot = 0;
+	tap_990_device* tpc = downcast<tap_990_device*>(owner());
+	tpc->set_tape(tape_get_id(), this, false, false, true);
 }
 
 #define MCFG_TI990_TAPE_ADD(_tag)   \
@@ -1044,36 +974,13 @@ static MACHINE_CONFIG_FRAGMENT( tap_990 )
 	MCFG_TI990_TAPE_ADD("tape3")
 MACHINE_CONFIG_END
 
-/*
-    Init the tape controller core
-*/
-static DEVICE_START(tap_990)
-{
-	tap_990_t *tpc = get_safe_token(device);
-	/* verify that we have an interface assigned */
-	assert(device->static_config() != NULL);
-
-	/* copy interface pointer */
-	tpc->intf = (const ti990_tpc_interface*)device->static_config();
-
-	memset(tpc->w, 0, sizeof(tpc->w));
-	/* The PE bit is always set for the MT3200 (but not MT1600) */
-	/* According to MT3200 manual, w7 bit #4 (reserved) is always set */
-	tpc->w[7] = w7_idle /*| w7_PE_format*/ | 0x0800;
-
-	update_interrupt(device);
-}
-
-
 const device_type TI990_TAPE_CTRL = &device_creator<tap_990_device>;
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI990 Tape Controller", tag, owner, clock, "tap_990", __FILE__)
+	: device_t(mconfig, TI990_TAPE_CTRL, "Generic TI-990 Tape Controller", tag, owner, clock, "tap_990", __FILE__),
+	m_int_line(*this)
 {
-	m_token = global_alloc_clear(tap_990_t);
 }
-
-tap_990_device::~tap_990_device() { global_free(m_token); }
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -1091,7 +998,14 @@ void tap_990_device::device_config_complete()
 
 void tap_990_device::device_start()
 {
-	DEVICE_START_NAME( tap_990 )(this);
+	m_int_line.resolve();
+	memset(m_w, 0, sizeof(m_w));
+
+	// The PE bit is always set for the MT3200 (but not MT1600)
+	// According to MT3200 manual, w7 bit #4 (reserved) is always set
+	m_w[7] = w7_idle /*| w7_PE_format*/ | 0x0800;
+
+	update_interrupt();
 }
 
 //-------------------------------------------------

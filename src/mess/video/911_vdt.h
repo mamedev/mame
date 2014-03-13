@@ -1,6 +1,7 @@
 
-#define vdt911_chr_region ":gfx1"
+#include "sound/beep.h"
 
+#define vdt911_chr_region ":gfx1"
 enum
 {
 	/* 10 bytes per character definition */
@@ -38,36 +39,83 @@ struct vdt911_init_params_t
 	void (*int_callback)(running_machine &machine, int state);
 };
 
-void vdt911_init(running_machine &machine);
+
 class vdt911_device : public device_t
 {
 public:
 	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~vdt911_device();
+
+	DECLARE_READ8_MEMBER(cru_r);
+	DECLARE_WRITE8_MEMBER(cru_w);
 
 	DECLARE_PALETTE_INIT(vdt911);
 
-	// access to legacy token
-	struct vdt_t *token() const { assert(m_token != NULL); return m_token; }
-	
+	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object)
+	{
+		return downcast<vdt911_device &>(device).m_int_line.set_callback(object);
+	}
+	static void static_set_params(device_t &device, vdt911_screen_size_t size, vdt911_model_t model)
+	{
+		downcast<vdt911_device &>(device).m_screen_size = size;
+		downcast<vdt911_device &>(device).m_model = model;
+	}
+	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
+	void keyboard();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
+
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 private:
+
 	// internal state
-	struct vdt_t *m_token;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	vdt911_screen_size_t    m_screen_size;  // char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model
+	vdt911_model_t          m_model;        // country code
+
+	UINT8 m_data_reg;                       // dt911 write buffer
+	UINT8 m_display_RAM[2048];              // vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model)
+
+	unsigned int m_cursor_address;          // current cursor address (controlled by the computer, affects both display and I/O protocol)
+	unsigned int m_cursor_address_mask; // 1023 for 960-char model, 2047 for 1920-char model
+
+	emu_timer *m_beep_timer;                // beep clock (beeps ends when timer times out)
+	emu_timer *m_blink_timer;               // cursor blink clock
+
+	UINT8 m_keyboard_data;                  // last code pressed on keyboard
+	bool m_keyboard_data_ready;             // true if there is a new code in keyboard_data
+	bool m_keyboard_interrupt_enable;       // true when keybord interrupts are enabled
+
+	bool m_display_enable;                  // screen is black when false
+	bool m_dual_intensity_enable;           // if true, MSBit of ASCII codes controls character highlight
+	bool m_display_cursor;                  // if true, the current cursor location is displayed on screen
+	bool m_blinking_cursor_enable;          // if true, the cursor will blink when displayed
+	bool m_blink_state;                     // current cursor blink state
+
+	bool m_word_select;                     // CRU interface mode
+	bool m_previous_word_select;            // value of word_select is saved here
+
+	UINT8 m_last_key_pressed;
+	int m_last_modifier_state;
+	char m_foreign_mode;
+
+	required_device<beep_device>        m_beeper;
+	required_device<gfxdecode_device>   m_gfxdecode;
+	required_device<palette_device>     m_palette;
+	devcb2_write_line                   m_int_line;
 };
 
 extern const device_type VDT911;
 
+#define MCFG_VDT911_VIDEO_ADD(_tag, _intcallb, _size, _model) \
+	MCFG_DEVICE_ADD(_tag, VDT911, 0)  \
+	devcb = &vdt911_device::static_set_int_callback( *device, DEVCB2_##_intcallb ); \
+	vdt911_device::static_set_params( *device, _size, _model);
 
-#define MCFG_VDT911_VIDEO_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, VDT911, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
 
 
 	DECLARE_READ8_DEVICE_HANDLER(vdt911_cru_r);

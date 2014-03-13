@@ -18,11 +18,13 @@
     * implement tape interface?
 
     Raphael Nabet 2003
+
+    Rewritten as class
+    Michael Zapf, 2014
 */
 
 #include "emu.h"
 #include "733_asr.h"
-#include "devlegcy.h"
 
 enum
 {
@@ -33,34 +35,6 @@ enum
 	asr_window_width = 640,
 	asr_window_height = 480,
 	asr_scroll_step = 8
-};
-
-struct asr_t
-{
-#if 0
-	UINT8 OutQueue[ASROutQueueSize];
-	int OutQueueHead;
-	int OutQueueLen;
-#endif
-
-	UINT8 recv_buf;
-	UINT8 xmit_buf;
-
-	UINT8 status;
-	UINT8 mode;
-	UINT8 last_key_pressed;
-	int last_modifier_state;
-
-	unsigned char repeat_timer;
-	int new_status_flag;
-
-	int x;
-
-	void (*int_callback)(running_machine &, int state);
-
-	bitmap_ind16 *bitmap;
-	gfxdecode_device *m_gfxdecode;
-	palette_device *m_palette;
 };
 
 enum
@@ -101,11 +75,45 @@ PALETTE_INIT_MEMBER(asr733_device, asr733)
 	palette.set_pen_color(1,rgb_t::black); /* black */
 }
 
-/*
-    Initialize the asr core
-*/
-void asr733_init(running_machine &machine)
+
+const device_type ASR733 = &device_creator<asr733_device>;
+
+asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_int_line(*this)
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void asr733_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void asr733_device::device_start()
+{
+	screen_device *screen = machine().first_screen();
+	int width = screen->width();
+	int height = screen->height();
+	const rectangle &visarea = screen->visible_area();
+
+	m_last_key_pressed = 0x80;
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+
+	m_bitmap->fill(0, visarea);
+
+	m_int_line.resolve();
+
 	UINT8 *dst;
 
 	static const unsigned char fontdata6x8[asrfontdata_size] =
@@ -160,97 +168,9 @@ void asr733_init(running_machine &machine)
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00
 	};
 
-	dst = machine.root_device().memregion(asr733_chr_region)->base();
+	dst = machine().root_device().memregion(asr733_chr_region)->base();
 
 	memcpy(dst, fontdata6x8, asrfontdata_size);
-}
-
-INLINE asr_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ASR733);
-
-	return (asr_t *)downcast<asr733_device *>(device)->token();
-}
-
-static DEVICE_START( asr733 )
-{
-	asr_t *asr = get_safe_token(device);
-	const asr733_init_params_t *params = (const asr733_init_params_t *)device->static_config();
-	screen_device *screen = device->machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
-	const rectangle &visarea = screen->visible_area();
-
-	asr->last_key_pressed = 0x80;
-	asr->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
-
-	asr->bitmap->fill(0, visarea);
-
-	asr->int_callback = params->int_callback;
-}
-
-static void asr_field_interrupt(device_t *device)
-{
-	asr_t *asr = get_safe_token(device);
-	if ((asr->mode & AM_enint_mask) && (asr->new_status_flag))  /* right??? */
-	{
-		asr->status |= AS_int_mask;
-		if (asr->int_callback)
-			(*asr->int_callback)(device->machine(), 1);
-	}
-	else
-	{
-		asr->status &= ~AS_int_mask;
-		if (asr->int_callback)
-			(*asr->int_callback)(device->machine(), 0);
-	}
-}
-
-static DEVICE_RESET( asr733 )
-{
-	asr_t *asr = get_safe_token(device);
-
-	/*asr->OutQueueLen = 0;*/
-
-	asr->status = AS_dsr_mask | AS_wrq_mask;
-	asr->mode = 0;
-
-	asr_field_interrupt(device);
-}
-
-const device_type ASR733 = &device_creator<asr733_device>;
-
-asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
-		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")		
-{
-	m_token = global_alloc_clear(asr_t);
-}
-
-asr733_device::~asr733_device() { global_free(m_token); }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void asr733_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void asr733_device::device_start()
-{
-	asr_t *asr = get_safe_token(this);
-	asr->m_gfxdecode = m_gfxdecode;
-	asr->m_palette = m_palette;
-	DEVICE_START_NAME( asr733 )(this);
 }
 
 //-------------------------------------------------
@@ -259,30 +179,42 @@ void asr733_device::device_start()
 
 void asr733_device::device_reset()
 {
-	DEVICE_RESET_NAME( asr733 )(this);
+	/*m_OutQueueLen = 0;*/
+
+	m_status = AS_dsr_mask | AS_wrq_mask;
+	m_mode = 0;
+
+	set_interrupt_line();
 }
 
-
+void asr733_device::set_interrupt_line()
+{
+	if ((m_mode & AM_enint_mask) && (m_new_status_flag))  /* right??? */
+	{
+		m_status |= AS_int_mask;
+		m_int_line(ASSERT_LINE);
+	}
+	else
+	{
+		m_status &= ~AS_int_mask;
+		m_int_line(CLEAR_LINE);
+	}
+}
 
 /* write a single char on screen */
-static void asr_draw_char(device_t *device, int character, int x, int y, int color)
+void asr733_device::draw_char(int character, int x, int y, int color)
 {
-	asr_t *asr = get_safe_token(device);
-
-	 asr->m_gfxdecode->gfx(0)->opaque(*asr->m_palette,*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
-				x+1, y);
+		m_gfxdecode->gfx(0)->opaque(*m_palette, *m_bitmap, m_bitmap->cliprect(), character-32, color, 0, 0, x+1, y);
 }
 
-static void asr_linefeed(device_t *device)
+void asr733_device::linefeed()
 {
-	asr_t *asr = get_safe_token(device);
 	UINT8 buf[asr_window_width];
-	int y;
 
-	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
+	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		extract_scanline8(*asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf,downcast<asr733_device *>(device)->m_palette->pens());
+		extract_scanline8(*m_bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
+		draw_scanline8(*m_bitmap, asr_window_offset_x, y, asr_window_width, buf, m_palette->pens());
 	}
 
 	const rectangle asr_scroll_clear_window(
@@ -291,13 +223,11 @@ static void asr_linefeed(device_t *device)
 		asr_window_offset_y+asr_window_height-asr_scroll_step,  /* min_y */
 		asr_window_offset_y+asr_window_height-1                 /* max_y */
 	);
-	asr->bitmap->fill(0, asr_scroll_clear_window);
+	m_bitmap->fill(0, asr_scroll_clear_window);
 }
 
-static void asr_transmit(device_t *device, UINT8 data)
+void asr733_device::transmit(UINT8 data)
 {
-	asr_t *asr = get_safe_token(device);
-
 	switch (data)
 	{
 	/* aux device control chars */
@@ -329,18 +259,18 @@ static void asr_transmit(device_t *device, UINT8 data)
 
 	case 0x08:
 		/* BS: backspace */
-		if (asr->x > 0)
-			asr->x--;
+		if (m_x > 0)
+			m_x--;
 		break;
 
 	case 0x0A:
 		/* LF: line feed */
-		asr_linefeed(device);
+		linefeed();
 		break;
 
 	case 0x0D:
 		/* CR: carriage return */
-		asr->x = 0;
+		m_x = 0;
 		break;
 
 
@@ -349,34 +279,33 @@ static void asr_transmit(device_t *device, UINT8 data)
 			/* ignore control characters */
 			break;
 
-		if (asr->x == 80)
+		if (m_x == 80)
 		{
-			asr->x = 0;
-			asr_linefeed(device);
+			m_x = 0;
+			linefeed();
 		}
-		asr_draw_char(device, data, asr_window_offset_x+asr->x*8, asr_window_offset_y+asr_window_height-8, 0);
-		asr->x++;
+		draw_char(data, asr_window_offset_x + m_x*8, asr_window_offset_y+asr_window_height-8, 0);
+		m_x++;
 		break;
 	}
 
-	asr->status |= AS_wrq_mask;
-	asr->new_status_flag = 1;   /* right??? */
-	asr_field_interrupt(device);
+	m_status |= AS_wrq_mask;
+	m_new_status_flag = 1;   /* right??? */
+	set_interrupt_line();
 }
 
 #if 0
-static void asr_receive_callback(int dummy)
+void asr733_device::receive_callback(int dummy)
 {
-	asr_t *asr = get_safe_token(device);
 	(void) dummy;
 
-	asr->recv_buf = asr->OutQueue[asr->OutQueueHead];
-	asr->OutQueueHead = (asr->OutQueueHead + 1) % ASROutQueueSize;
-	asr->OutQueueLen--;
+	m_recv_buf = m_OutQueue[m_OutQueueHead];
+	m_OutQueueHead = (m_OutQueueHead + 1) % ASROutQueueSize;
+	m_OutQueueLen--;
 
-	asr->status |= AS_rrq_mask;
-	asr->new_status_flag = 1;   /* right??? */
-	asr_field_interrupt(device);
+	m_status |= AS_rrq_mask;
+	m_new_status_flag = 1;   /* right??? */
+	set_interrupt_line();
 }
 #endif
 
@@ -392,21 +321,20 @@ static void asr_receive_callback(int dummy)
     14: DSR data set ready, 1 if online
     15: INT interrupt, 1 if interrupt
 */
-READ8_DEVICE_HANDLER( asr733_cru_r )
+READ8_MEMBER( asr733_device::cru_r )
 {
-	asr_t *asr = get_safe_token(device);
 	int reply = 0;
 
 	switch (offset)
 	{
 	case 0:
 		/* receive buffer */
-		reply = asr->recv_buf;
+		reply = m_recv_buf;
 		break;
 
 	case 1:
 		/* status register */
-		reply = asr->status;
+		reply = m_status;
 		break;
 	}
 
@@ -424,10 +352,8 @@ READ8_DEVICE_HANDLER( asr733_cru_r )
     14: enable interrupts, 1 to enable interrupts
     15: diagnostic mode, 0 for normal mode
 */
-WRITE8_DEVICE_HANDLER( asr733_cru_w )
+WRITE8_MEMBER( asr733_device::cru_w )
 {
-	asr_t *asr = get_safe_token(device);
-
 	switch (offset)
 	{
 	case 0:
@@ -440,11 +366,11 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 	case 7:
 		/* transmit buffer */
 		if (data)
-			asr->xmit_buf |= 1 << offset;
+			m_xmit_buf |= 1 << offset;
 		else
-			asr->xmit_buf &= ~ (1 << offset);
-		if ((offset == 7) && (asr->mode & AM_dtr_mask) && (asr->mode & AM_rts_mask))    /* right??? */
-			asr_transmit(device, asr->xmit_buf);
+			m_xmit_buf &= ~ (1 << offset);
+		if ((offset == 7) && (m_mode & AM_dtr_mask) && (m_mode & AM_rts_mask))    /* right??? */
+			transmit(m_xmit_buf);
 		break;
 
 	case 8:     /* not used */
@@ -455,22 +381,22 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 	case 14:    /* enable interrupts, 1 to enable interrupts */
 	case 15:    /* diagnostic mode, 0 for normal mode */
 		if (data)
-			asr->mode |= 1 << (offset - 8);
+			m_mode |= 1 << (offset - 8);
 		else
-			asr->mode &= ~ (1 << (offset - 8));
+			m_mode &= ~ (1 << (offset - 8));
 		if (offset == 14)
-			asr_field_interrupt(device);
+			set_interrupt_line();
 		break;
 
 	case 11:    /* clear write request (write any value to execute) */
 	case 12:    /* clear read request (write any value to execute) */
-		asr->status &= ~ (1 << (offset - 8));
-		asr_field_interrupt(device);
+		m_status &= ~ (1 << (offset - 8));
+		set_interrupt_line();
 		break;
 
 	case 13:    /* clear new status flag - whatever it means (write any value to execute) */
-		asr->new_status_flag = 0;
-		asr_field_interrupt(device);
+		m_new_status_flag = 0;
+		set_interrupt_line();
 		break;
 	}
 }
@@ -478,10 +404,9 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 /*
     Video refresh
 */
-void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y)
+void asr733_device::refresh(bitmap_ind16 &bitmap, int x, int y)
 {
-	asr_t *asr = get_safe_token(device);
-	copybitmap(bitmap, *asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());
+	copybitmap(bitmap, *m_bitmap, 0, 0, x, y, m_bitmap->cliprect());
 }
 
 
@@ -665,9 +590,8 @@ static const unsigned char key_translate[3][51] =
     keyboard handler: should be called regularly by machine code, for instance
     every Video Blank Interrupt.
 */
-void asr733_keyboard(device_t *device)
+void asr733_device::keyboard()
 {
-	asr_t *asr = get_safe_token(device);
 	enum modifier_state_t
 	{
 		/* key modifier states */
@@ -691,7 +615,7 @@ void asr733_keyboard(device_t *device)
 	/* for (i = 0; i < 6; i++) */
 	for (i = 0; i < 4; i++)
 	{
-		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
+		key_buf[i] = machine().root_device().ioport(keynames[i])->read();
 	}
 
 	/* process key modifiers */
@@ -712,40 +636,40 @@ void asr733_keyboard(device_t *device)
 
 	if (! repeat_mode)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
-		asr->repeat_timer = 0;
+		m_repeat_timer = 0;
 
-	if ( ! (asr->last_key_pressed & 0x80) && (key_buf[asr->last_key_pressed >> 4] & (1 << (asr->last_key_pressed & 0xf))))
+	if ( !(m_last_key_pressed & 0x80) && (key_buf[m_last_key_pressed >> 4] & (1 << (m_last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
-		if (modifier_state == asr->last_modifier_state)
+		if (modifier_state == m_last_modifier_state)
 		{
 			/* handle REPEAT mode if applicable */
-			if ((repeat_mode) && (++asr->repeat_timer == repeat_delay))
+			if ((repeat_mode) && (++m_repeat_timer == repeat_delay))
 			{
-				if (asr->status & AS_rrq_mask)
+				if (m_status & AS_rrq_mask)
 				{   /* keyboard buffer full */
-					asr->repeat_timer--;
+					m_repeat_timer--;
 				}
 				else
 				{   /* repeat current key */
-					asr->status |= AS_rrq_mask;
-					asr->new_status_flag = 1;   /* right??? */
-					asr_field_interrupt(device);
-					asr->repeat_timer = 0;
+					m_status |= AS_rrq_mask;
+					m_new_status_flag = 1;   /* right??? */
+					set_interrupt_line();
+					m_repeat_timer = 0;
 				}
 			}
 		}
 		else
 		{
-			asr->repeat_timer = 0;
-			asr->last_modifier_state = special_debounce;
+			m_repeat_timer = 0;
+			m_last_modifier_state = special_debounce;
 		}
 	}
 	else
 	{
-		asr->last_key_pressed = 0x80;
+		m_last_key_pressed = 0x80;
 
-		if (asr->status & AS_rrq_mask)
+		if (m_status & AS_rrq_mask)
 		{   /* keyboard buffer full */
 			/* do nothing */
 		}
@@ -758,13 +682,13 @@ void asr733_keyboard(device_t *device)
 				{
 					if (key_buf[i] & (1 << j))
 					{
-						asr->last_key_pressed = (i << 4) | j;
-						asr->last_modifier_state = modifier_state;
+						m_last_key_pressed = (i << 4) | j;
+						m_last_modifier_state = modifier_state;
 
-						asr->recv_buf = (int)key_translate[modifier_state][asr->last_key_pressed];
-						asr->status |= AS_rrq_mask;
-						asr->new_status_flag = 1;   /* right??? */
-						asr_field_interrupt(device);
+						m_recv_buf = (int)key_translate[modifier_state][m_last_key_pressed];
+						m_status |= AS_rrq_mask;
+						m_new_status_flag = 1;   /* right??? */
+						set_interrupt_line();
 						return;
 					}
 				}

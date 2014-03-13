@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER( external_operation );
 	DECLARE_READ8_MEMBER( interrupt_level );
 	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( asr_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( vdt_interrupt );
 
 	DECLARE_DRIVER_INIT(ti990_4);
 	DECLARE_DRIVER_INIT(ti990_4v);
@@ -182,30 +184,21 @@ WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
 INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 {
 	if (m_video)
-		vdt911_keyboard(m_terminal);
+		downcast<vdt911_device*>(m_terminal)->keyboard();
 	else
-		asr733_keyboard(m_terminal);
+		downcast<asr733_device*>(m_terminal)->keyboard();
 
 	line_interrupt();
 }
 
 /*
     TI990/4 video emulation.
-
     We emulate a single VDT911 CRT terminal.
 */
-
-void ti990_vdt_int(running_machine &machine, int state)
+WRITE_LINE_MEMBER(ti990_4_state::vdt_interrupt)
 {
-	// set_int3
+	set_int3(state);
 }
-
-static const vdt911_init_params_t vdt911_intf =
-{
-	char_1920,
-	vdt911_model_US,
-	ti990_vdt_int
-};
 
 void ti990_4_state::video_start()
 {
@@ -218,17 +211,20 @@ void ti990_4_state::video_start()
 UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video)
-		vdt911_refresh(m_terminal, bitmap, cliprect, 0, 0);
+		downcast<vdt911_device*>(m_terminal)->refresh(bitmap, cliprect, 0, 0);
 	else
-		asr733_refresh(m_terminal, bitmap, 0, 0);
+		downcast<asr733_device*>(m_terminal)->refresh(bitmap, 0, 0);
 
 	return 0;
 }
 
-static const asr733_init_params_t asr733_intf =
+/*
+    Callback from the terminal.
+*/
+WRITE_LINE_MEMBER(ti990_4_state::asr_interrupt)
 {
-	// set_int6
-};
+	set_int6(state);
+}
 
 WRITE8_MEMBER( ti990_4_state::external_operation )
 {
@@ -298,8 +294,8 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
-	AM_RANGE(0x00, 0x01) AM_DEVREAD_LEGACY("asr733", asr733_cru_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE_LEGACY("asr733", asr733_cru_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_device, cru_r)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_device, cru_w)
 
 	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
 	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
@@ -309,8 +305,8 @@ static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti990_4_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map_v, AS_IO, 8, ti990_4_state )
-	AM_RANGE(0x10, 0x11) AM_DEVREAD_LEGACY("vdt911", vdt911_cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE_LEGACY("vdt911", vdt911_cru_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
+	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
 
 	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
 	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
@@ -356,14 +352,12 @@ DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
 {
 	m_video = false;
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
-	asr733_init(machine());
 }
 
 DRIVER_INIT_MEMBER(ti990_4_state, ti990_4v)
 {
 	m_video = true;
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
-	vdt911_init(machine());
 }
 
 static INPUT_PORTS_START(ti990_4)
@@ -390,7 +384,7 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("asr733:palette")
-	MCFG_ASR733_VIDEO_ADD("asr733", asr733_intf)
+	MCFG_ASR733_VIDEO_ADD("asr733", WRITELINE(ti990_4_state, asr_interrupt))
 
 	// Floppy controller
 	MCFG_FD800_ADD("fd800", WRITELINE(ti990_4_state, fd_interrupt))
@@ -413,7 +407,7 @@ static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_PALETTE("vdt911:palette")
-	MCFG_VDT911_VIDEO_ADD("vdt911", vdt911_intf)
+	MCFG_VDT911_VIDEO_ADD("vdt911", WRITELINE(ti990_4_state, vdt_interrupt), char_1920, vdt911_model_US)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
