@@ -48,10 +48,9 @@ void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
  */
 void zx_state::zx_ula_bkgnd(UINT8 color)
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
-	const rectangle &visarea = screen->visible_area();
+	int width = m_screen->width();
+	int height = m_screen->height();
+	const rectangle &visarea = m_screen->visible_area();
 
 	if (m_ula_frame_vsync == 0 && color != m_old_c)
 	{
@@ -103,9 +102,8 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 	 * An NMI is issued on the ZX81 every 64us for the blanked
 	 * scanlines at the top and bottom of the display.
 	 */
-	screen_device *screen = machine().first_screen();
-	int height = screen->height();
-	const rectangle& r1 = screen->visible_area();
+	int height = m_screen->height();
+	const rectangle& r1 = m_screen->visible_area();
 	rectangle r;
 
 	bitmap_ind16 &bitmap = m_bitmap;

@@ -56,7 +56,8 @@ public:
 		m_joy2(*this, CONTROL2_TAG) ,
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_modeFE_trigger_on_next_access(false) { }
+		m_modeFE_trigger_on_next_access(false),
+		m_screen(*this, "screen") { }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
@@ -169,6 +170,7 @@ protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	bool m_modeFE_trigger_on_next_access;
+	required_device<screen_device> m_screen;
 };
 
 
@@ -1453,8 +1455,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
-	screen_device *screen = machine().first_screen();
-	m_current_screen_height = screen->height();
+	m_current_screen_height = m_screen->height();
 	m_extra_RAM = machine().memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
 	memset( m_riot_ram, 0x00, 0x80 );
 	m_current_reset_bank_counter = 0xFF;

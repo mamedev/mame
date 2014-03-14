@@ -20,10 +20,8 @@
 ***************************************************************************/
 void cgenie_state::video_start()
 {
-	screen_device *screen = machine().first_screen();
-
-	screen->register_screen_bitmap(m_dlybitmap);
-	screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_dlybitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 /***************************************************************************

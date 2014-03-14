@@ -105,7 +105,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_mc6846(*this, "mc6846"),
 		m_mc6843(*this, "mc6843"),
-		m_acia6850(*this, "acia6850")
+		m_acia6850(*this, "acia6850"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -321,6 +322,7 @@ protected:
 	optional_device<mc6846_device> m_mc6846;
 	optional_device<mc6843_device> m_mc6843;
 	optional_device<acia6850_device> m_acia6850;
+	required_device<screen_device> m_screen;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;

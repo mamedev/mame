@@ -36,7 +36,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen") { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;
@@ -84,6 +85,7 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 };
 
 

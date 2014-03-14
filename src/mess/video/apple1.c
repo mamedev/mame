@@ -321,7 +321,7 @@ attotime  apple1_state::apple1_vh_dsp_time_to_ready ()
 {
 	int cursor_x, cursor_y;
 	int cursor_scanline;
-	double scanline_period = machine().primary_screen->scan_period().as_double();
+	double scanline_period = m_screen->scan_period().as_double();
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
@@ -340,20 +340,20 @@ attotime  apple1_state::apple1_vh_dsp_time_to_ready ()
 	   for the visible part of the scanline. */
 	cursor_hfrac = (175 + cursor_x * apple1_charlayout.width) / 455;
 
-	if (machine().primary_screen->vpos() == cursor_scanline) {
+	if (m_screen->vpos() == cursor_scanline) {
 		/* video_screen_get_hpos() doesn't account for the horizontal
 		   blanking interval; it acts as if the scanline period is
 		   entirely composed of visible pixel times.  However, we can
 		   still use it to find what fraction of the current scanline
 		   period has elapsed. */
-		double current_hfrac = machine().primary_screen->hpos() /
-								machine().first_screen()->width();
+		double current_hfrac = m_screen->hpos() /
+								m_screen->width();
 		if (current_hfrac < cursor_hfrac)
 			return attotime::from_double(scanline_period * (cursor_hfrac - current_hfrac));
 	}
 
 	return attotime::from_double(
-		machine().primary_screen->time_until_pos(cursor_scanline, 0).as_double() +
+		m_screen->time_until_pos(cursor_scanline, 0).as_double() +
 		scanline_period * cursor_hfrac);
 }
 

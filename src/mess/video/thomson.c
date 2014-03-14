@@ -29,8 +29,7 @@
 
 int thomson_state::thom_update_screen_size()
 {
-	screen_device *screen = machine().first_screen();
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 	UINT8 p = ioport("vconfig")->read();
 	int new_w, new_h, changed = 0;
 
@@ -53,7 +52,7 @@ int thomson_state::thom_update_screen_size()
 	if ( ( visarea.max_x != new_w ) || ( visarea.max_y != new_h ) )
 	{
 		changed = 1;
-		machine().primary_screen->set_visible_area(0, new_w, 0, new_h );
+		m_screen->set_visible_area(0, new_w, 0, new_h );
 	}
 
 	return changed;

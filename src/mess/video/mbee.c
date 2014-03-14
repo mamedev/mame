@@ -291,11 +291,10 @@ void mbee_state::mbee_video_kbd_scan( int param )
 
 READ8_MEMBER( mbee_state::m6545_status_r )
 {
-	screen_device *screen = machine().first_screen();
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	UINT8 data = m_sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
-	int y = machine().primary_screen->vpos();
+	int y = m_screen->vpos();
 
 	if( y < visarea.min_y || y > visarea.max_y )
 		data |= 0x20;   /* vertical blanking */

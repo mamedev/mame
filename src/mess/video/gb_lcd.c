@@ -214,7 +214,7 @@ cgb_lcd_device::cgb_lcd_device(const machine_config &mconfig, const char *tag, d
 
 void gb_lcd_device::common_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 	m_oam = auto_alloc_array_clear(machine(), UINT8, 0x100);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(gb_lcd_device::videoptr_restore), this));
@@ -762,8 +762,7 @@ void gb_lcd_device::update_scanline()
 			{
 				if (m_current_line < 144)
 				{
-					screen_device *screen = machine().first_screen();
-					const rectangle &r = screen->visible_area();
+					const rectangle &r = m_screen->visible_area();
 					rectangle r1(r.min_x, r.max_x, m_current_line, m_current_line);
 					bitmap.fill(0, r1);
 				}
@@ -1411,8 +1410,7 @@ void cgb_lcd_device::update_scanline()
 			{
 				if (m_current_line < 144)
 				{
-					screen_device *screen = machine().first_screen();
-					const rectangle &r1 = screen->visible_area();
+					const rectangle &r1 = m_screen->visible_area();
 					rectangle r(r1.min_x, r1.max_x, m_current_line, m_current_line);
 					bitmap.fill((!m_gbc_mode) ? 0 : 32767 , r);
 				}

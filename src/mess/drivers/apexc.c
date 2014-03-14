@@ -19,7 +19,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")  { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
@@ -49,6 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 void apexc_state::machine_start()
@@ -569,9 +571,8 @@ PALETTE_INIT_MEMBER(apexc_state, apexc)
 
 void apexc_state::video_start()
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);

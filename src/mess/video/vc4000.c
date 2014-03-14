@@ -24,7 +24,6 @@
 
 void vc4000_state::video_start()
 {
-	screen_device *screen = machine().first_screen();
 	int i;
 
 	for (i=0;i<0x20; i++)
@@ -57,7 +56,7 @@ void vc4000_state::video_start()
 	m_video.sprites[3].data = &m_video.reg.d.sprite4;
 	m_video.sprites[3].mask = 1 << 3;
 
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), screen->width(), screen->height());
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), m_screen->width(), m_screen->height());
 }
 
 inline UINT8 vc4000_state::vc4000_joystick_return_to_centre(UINT8 joy)
@@ -517,9 +516,8 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, 
 
 inline void vc4000_state::vc4000_draw_grid(UINT8 *collision)
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 	int i, j, m, x, line=m_video.line-20;
 	int w, k;
 
@@ -575,8 +573,8 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 {
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
-	const rectangle &visarea = machine().primary_screen->visible_area();
-	assert(ARRAY_LENGTH(collision) >= machine().primary_screen->width());
+	const rectangle &visarea = m_screen->visible_area();
+	assert(ARRAY_LENGTH(collision) >= m_screen->width());
 
 	m_video.line++;
 	if (m_irq_pause) m_irq_pause++;

@@ -233,8 +233,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
 
 void vectrex_state::video_start()
 {
-	screen_device *screen = machine().first_screen();
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_x_center=(visarea.width() / 2) << 16;
 	m_y_center=(visarea.height() / 2) << 16;
@@ -416,8 +415,7 @@ WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 
 VIDEO_START_MEMBER(vectrex_state,raaspec)
 {
-	screen_device *screen = machine().first_screen();
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	m_x_center=(visarea.width() / 2) << 16;
 	m_y_center=(visarea.height() / 2) << 16;
