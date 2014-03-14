@@ -53,12 +53,12 @@ static GFXDECODE_START( vdt911 )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_swedish_chr_offset, fontlayout_7bit, 0, 4 )
 	/* Norwegian */
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_norwegian_chr_offset, fontlayout_7bit, 0, 4 )
+	/* FrenchWP */
+	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 	/* Japanese */
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_japanese_chr_offset, fontlayout_8bit, 0, 4 )
 	/* Arabic */
 	/* GFXDECODE_ENTRY( vdt911_chr_region, vdt911_arabic_chr_offset, fontlayout_8bit, 0, 4 ) */
-	/* FrenchWP */
-	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
 static const unsigned char vdt911_colors[] =
@@ -166,11 +166,6 @@ void vdt911_device::device_start()
 {
 	m_last_key_pressed = 0x80;
 
-	if (m_screen_size == char_960)
-		m_cursor_address_mask = 0x3ff;   /* 1kb of RAM */
-	else
-		m_cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
-
 	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
 	/*m_blink_clock =*/
 
@@ -210,6 +205,11 @@ void vdt911_device::device_start()
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
 	apply_char_overrides(sizeof(norwegian_overrides)/sizeof(char_override_t), norwegian_overrides, base);
 
+	/* set up French word processing character definitions */
+	base = chr+vdt911_frenchWP_chr_offset;
+	copy_character_matrix_array(char_defs+char_defs_US_base, base);
+	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
+
 	/* set up Katakana Japanese character definitions */
 	base = chr+vdt911_japanese_chr_offset;
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
@@ -225,11 +225,6 @@ void vdt911_device::device_start()
 	base = chr+vdt911_arabic_chr_offset+128*vdt911_single_char_len;
 	copy_character_matrix_array(char_defs+char_defs_arabic_base, base);
 #endif
-
-	/* set up French word processing character definitions */
-	base = chr+vdt911_frenchWP_chr_offset;
-	copy_character_matrix_array(char_defs+char_defs_US_base, base);
-	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
 }
 
 
@@ -237,6 +232,11 @@ void vdt911_device::device_reset()
 {
 	m_model = (vdt911_model_t)ioport("LOCALE")->read();
 	m_screen_size = (vdt911_screen_size_t)ioport("SCREEN")->read();
+
+	if (m_screen_size == char_960)
+		m_cursor_address_mask = 0x3ff;   /* 1kb of RAM */
+	else
+		m_cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
 }
 
 /*
@@ -248,6 +248,7 @@ void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case BLINK_TIMER:
 		m_blink_state = !m_blink_state;
+		logerror("Blink timer\n");
 		break;
 	case BEEP_TIMER:
 		m_beeper->set_state(0);
