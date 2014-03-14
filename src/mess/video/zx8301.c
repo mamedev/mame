@@ -112,6 +112,7 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
+		m_cpu(*this),
 		m_write_vsync(*this),
 		m_dispoff(1),
 		m_mode8(0),
@@ -129,10 +130,6 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 
 void zx8301_device::device_start()
 {
-	// get the CPU
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	assert(m_cpu != NULL);
-
 	// resolve callbacks
 	m_write_vsync.resolve_safe();
 

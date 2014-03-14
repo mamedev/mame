@@ -45,8 +45,8 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_ZX8301_CPU(_cpu_tag) \
-	zx8301_device::static_set_cpu_tag(*device, _cpu_tag);
+#define MCFG_ZX8301_CPU(_tag) \
+	zx8301_device::static_set_cpu_tag(*device, ":"_tag);
 
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
 	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB2_##_write);
@@ -68,7 +68,7 @@ public:
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb2_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
-	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu_tag = tag; }
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );
@@ -100,10 +100,10 @@ private:
 		TIMER_FLASH
 	};
 
-	devcb2_write_line   m_write_vsync;
+	required_device<cpu_device> m_cpu;
 
-	const char *m_cpu_tag;
-	cpu_device *m_cpu;
+	devcb2_write_line   m_write_vsync;
+	
 	//address_space *m_data;
 
 	int m_dispoff;                  // display off
