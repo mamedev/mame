@@ -512,8 +512,7 @@ static GROM_CONFIG(_conf##0) \
 static GROM_CONFIG(_conf##1) \
 {   false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
 static GROM_CONFIG(_conf##2) \
-{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
-
+{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ };
 GROM_LIBRARY_CONFIG8(pascal1, region_gromlib1)
 GROM_LIBRARY_CONFIG8(pascal2, region_gromlib2)
 GROM_LIBRARY_CONFIG3(pascal3, region_gromlib3)
@@ -522,14 +521,6 @@ static GROMPORT_CONFIG(console_cartslot)
 {
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_cart),
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_reset)
-};
-
-static PERIBOX_CONFIG( peribox_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, extint),         // INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, notconnected),       // INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_pbox),  // READY
-	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 
 READ8_MEMBER( ti99_8_state::cruread )
@@ -1060,7 +1051,10 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_pbox) )
 
 	/* Sound hardware */
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
@@ -1105,7 +1099,10 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_pbox) )
 
 	/* Sound hardware */
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )

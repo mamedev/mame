@@ -709,14 +709,6 @@ static GENEVE_KEYBOARD_CONFIG( geneve_keyb_conf )
 	DEVCB_DRIVER_LINE_MEMBER(geneve_state, keyboard_interrupt)
 };
 
-static PERIBOX_CONFIG( peribox_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, inta),           // INTA
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, intb),           // INTB
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, ext_ready),  // READY
-	0x00000                                         // Address bus prefix (Mapper will produce prefixes)
-};
-
 static GENEVE_MAPPER_CONFIG( mapper_conf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(geneve_state, mapper_ready)    // READY
@@ -784,7 +776,10 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
 
 	// Peripheral expansion box (Geneve composition)
-	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, 0x00000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
 
 	// sound hardware
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )

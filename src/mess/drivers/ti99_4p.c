@@ -797,14 +797,6 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 /*****************************************************************************/
 
-static PERIBOX_CONFIG( peribox_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, extint),            // INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, notconnected),  // INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, console_ready), // READY
-	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
-};
-
 static TMS99xx_CONFIG( sgcpu_cpuconf )
 {
 	DEVCB_DRIVER_MEMBER(ti99_4p_state, external_operation),
@@ -897,7 +889,10 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_sgcpu, 3000000)
 
 	// Peripheral expansion box (SGCPU composition)
-	MCFG_PERIBOX_SG_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_SG_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4p_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4p_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_4p_state, console_ready) )
 
 	// sound hardware
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )

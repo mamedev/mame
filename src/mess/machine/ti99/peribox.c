@@ -29,19 +29,19 @@
                      ||
                      ||
     +--------------+----+----+----+----+----+----+----+----+------------+
-    |              | S  | S  | S  | S  | S  | S  | S  | S  :            |
-    |              | L  | L  | L  | L  | L  | L  | L  | L  :            |
-    |  Power       | O  | O  | O  | O  | O  | O  | O  | O  : Floppy     |
-    |  unit        | T  | T  | T  | T  | T  | T  | T  | T  | drive      |
-    |  and         |    |    |    |    |    |    |    |    | compartment|
-    |  ventilation | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  |            |
+    |              | S  | S  | S  | S  | S  | S  | S  | S  x passthru   |
+    |              | L  | L  | L  | L  | L  | L  | L  | L  x for cable  |
+    |  Power       | O  | O  | O  | O  | O  | O  | O  | O  x            |
+    |  unit        | T  | T  | T  | T  | T  | T  | T  | T  |            |
+    |  and         |    |    |    |    |    |    |    |    | Floppy     |
+    |  ventilation | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | drive      |
+    |              |    |    |    |    |    |    |    |    | compartment|
+    |              |    |    |    |    |    |    |    |    |            |
     |              |    |    |    |    |    |    |    |    | 1 full hgt |
-    |              |    |    |    |    |    |    |    |    | or         |
-    |              |    |    |    |    |    |    |    |    | 2 "slim"   |
-    |              |    |    |    |    |    |    |LED |LED |            |
-    |              +----+----+----+----+----+----+-|--+-|--+            |
-    |              :     seen from above           |    |  |            |
-    +--------------+-------------------------------O----O---------------+
+    |              |    |    |    |    |    |    |    |LED | or 2 "slim"|
+    |              +----+----+----+----+----+----+----+-|--+ (half-hgt) |
+    |              : |   seen from above |    |    |    |  |            |
+    +--------------+-O----O----O----O----O----O----O----O---------------+
 
     All slots are connected in parallel with all signal lines. The cards
     must be equipped with bus drivers (244/245) and are usually activated
@@ -171,7 +171,7 @@ CRUCLK*  51||52  DBIN
     For bus8z_device consult ti99defs.h
     ---------------------
 
-    June 2010: Reimplemented using device structure (MZ) (obsoletes 99_peb.c)
+    June 2010: Reimplemented using device structure (MZ)
     January 2012: Reimplemented as class (MZ)
 
 *****************************************************************************/
@@ -198,8 +198,14 @@ CRUCLK*  51||52  DBIN
 
 #include "formats/ti99_dsk.h"
 
-#define LOG logerror
-#define VERBOSE 1
+// Show interrupt line activity
+#define TRACE_INT 0
+
+// Show ready line activity
+#define TRACE_READY 0
+
+// Show emulation details
+#define TRACE_EMU 0
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -224,13 +230,22 @@ static const floppy_interface ti99_4_floppy_interface =
 };
 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__)
+: bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
+	m_console_inta(*this),
+	m_console_intb(*this),
+	m_datamux_ready(*this)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 }
 
+/*
+    Constructor called from subclasses.
+*/
 peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source)
+: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_console_inta(*this),
+	m_console_intb(*this),
+	m_datamux_ready(*this)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 }
@@ -317,10 +332,12 @@ void peribox_device::set_genmod(bool set)
     pulled up when inactive. If any card asserts the line (pulling down), the
     line state goes down. So we must keep a record which cards pull down the
     line.
+
+    (We're doing a kind of wired-AND here.)
 */
 void peribox_device::inta_join(int slot, int state)
 {
-	if (VERBOSE>7) LOG("Peribox propagating INTA from slot %d to console: %d\n", slot, state);
+	if (TRACE_INT) logerror("Peribox propagating INTA from slot %d to console: %d\n", slot, state);
 	if (state==ASSERT_LINE)
 		m_inta_flag |= (1 << slot);
 	else
@@ -331,7 +348,7 @@ void peribox_device::inta_join(int slot, int state)
 
 void peribox_device::intb_join(int slot, int state)
 {
-	if (VERBOSE>7) LOG("Peribox propagating INTB from slot %d to console: %d\n", slot, state);
+	if (TRACE_INT) logerror("Peribox propagating INTB from slot %d to console: %d\n", slot, state);
 	if (state==ASSERT_LINE)
 		m_intb_flag |= (1 << slot);
 	else
@@ -345,7 +362,7 @@ void peribox_device::intb_join(int slot, int state)
 */
 void peribox_device::ready_join(int slot, int state)
 {
-	if (VERBOSE>7) LOG("peribox: Incoming READY=%d from slot %d\n", state, slot);
+	if (TRACE_READY) logerror("peribox: Incoming READY=%d from slot %d\n", state, slot);
 	// We store the inverse state
 	if (state==CLEAR_LINE)
 		m_ready_flag |= (1 << slot);
@@ -357,39 +374,36 @@ void peribox_device::ready_join(int slot, int state)
 
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
 {
-	if (VERBOSE>6)
+	if (TRACE_EMU)
 	{
-		if (slotdev!=NULL) LOG("Setting slot %d to device %s\n", slot, slotdev->tag());
-		else LOG("Setting slot %d to EMPTY\n", slot);
+		if (slotdev!=NULL) logerror("Setting slot %d to device %s\n", slot, slotdev->tag());
+		else logerror("Setting slot %d to EMPTY\n", slot);
 	}
 	m_slot[slot] = slotdev;
 }
 
 void peribox_device::device_start(void)
 {
-	if (VERBOSE>7) LOG("Peribox started\n");
+	if (TRACE_EMU) logerror("Peribox started\n");
 
 	floppy_drive_set_rpm(subdevice(FLOPPY_0), 300.);
 	floppy_drive_set_rpm(subdevice(FLOPPY_1), 300.);
 	floppy_drive_set_rpm(subdevice(FLOPPY_2), 300.);
 	floppy_drive_set_rpm(subdevice(FLOPPY_3), 300.);
+
+	// Resolve the callback lines to the console
+	m_console_inta.resolve();
+	m_console_intb.resolve();
+	m_datamux_ready.resolve();
+
+	if (TRACE_EMU) logerror("Prefix set to %05x\n", m_address_prefix);
 }
 
 void peribox_device::device_config_complete()
 {
-	// Resolve the callback lines to the console
-	const peribox_config *intf = reinterpret_cast<const peribox_config *>(static_config());
-	assert (intf != NULL);
-	m_console_inta.resolve(intf->inta, *this);
-	m_console_intb.resolve(intf->intb, *this);
-	m_datamux_ready.resolve(intf->ready, *this);
-
 	m_inta_flag = 0;
 	m_intb_flag = 0;
 	m_ready_flag = 0;
-
-	// The TI-99/4(A) Flex Cable Interface (slot 1) pulls up the AMA/AMB/AMC lines to 1/1/1.
-	m_address_prefix = intf->prefix;
 }
 
 SLOT_INTERFACE_START( peribox_slot )
@@ -617,7 +631,7 @@ machine_config_constructor peribox_ev_device::device_mconfig_additions() const
 // TODO: won't be called unless motor_on is triggered
 WRITE_LINE_MEMBER( peribox_device::indexhole )
 {
-	if (VERBOSE>4) LOG("peribox_device: indexhole\n");
+	logerror("peribox_device: indexhole\n");
 }
 
 /***************************************************************************
@@ -685,7 +699,7 @@ void peribox_slot_device::set_genmod(bool set)
 
 void peribox_slot_device::device_start(void)
 {
-	if (VERBOSE>7) LOG("Peribox slot started\n");
+	if (TRACE_EMU) logerror("Peribox slot started\n");
 }
 
 void peribox_slot_device::device_config_complete()

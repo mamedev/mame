@@ -24,19 +24,6 @@ extern const device_type PERIBOX_SG;
 extern const device_type PERIBOX_GEN;
 extern const device_type PERIBOX_998;
 
-#define DSRROM "dsrrom"
-
-struct peribox_config
-{
-	devcb_write_line    inta;
-	devcb_write_line    intb;
-	devcb_write_line    ready;
-	int                 prefix;
-};
-
-#define PERIBOX_CONFIG(name) \
-	const peribox_config(name) =
-
 class ti_expansion_card_device;
 class peribox_slot_device;
 
@@ -52,6 +39,10 @@ public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	template<class _Object> static devcb2_base &static_set_inta_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_inta.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_intb_callback(device_t &device, _Object object)  {  return downcast<peribox_device &>(device).m_console_intb.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<peribox_device &>(device).m_datamux_ready.set_callback(object); }
+
 	// Next seven methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
@@ -61,6 +52,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
+
+	// Part of configuration
+	void set_prefix(int prefix) { m_address_prefix = prefix; }
 
 	// Floppy interface
 	DECLARE_WRITE_LINE_MEMBER( indexhole );
@@ -76,9 +70,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// Next three methods call back the console
-	devcb_resolved_write_line m_console_inta;   // INTA line (Box to console)
-	devcb_resolved_write_line m_console_intb;   // INTB line
-	devcb_resolved_write_line m_datamux_ready;  // READY line (to the datamux)
+	devcb2_write_line m_console_inta;   // INTA line (Box to console)
+	devcb2_write_line m_console_intb;   // INTB line
+	devcb2_write_line m_datamux_ready;  // READY line (to the datamux)
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
 	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
@@ -93,6 +87,7 @@ protected:
 	int m_intb_flag;
 	int m_ready_flag;
 
+	// The TI-99/4(A) Flex Cable Interface (slot 1) pulls up the AMA/AMB/AMC lines to 1/1/1.
 	int m_address_prefix;
 };
 
@@ -233,25 +228,28 @@ protected:
 	int     m_select_value;
 };
 
-#define MCFG_PERIBOX_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX, 0) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_PERIBOX_SET_PREFIX( _prefix ) \
+	downcast<peribox_device *>(device)->set_prefix(_prefix);
 
-#define MCFG_PERIBOX_EV_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_EV, 0) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_PERIBOX_ADD(_tag, _prefix) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX, 0); \
+	MCFG_PERIBOX_SET_PREFIX( _prefix )
 
-#define MCFG_PERIBOX_SG_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_SG, 0) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_PERIBOX_EV_ADD(_tag, _prefix) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_EV, 0) ; \
+	MCFG_PERIBOX_SET_PREFIX( _prefix )
 
-#define MCFG_PERIBOX_GEN_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_GEN, 0) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_PERIBOX_SG_ADD(_tag, _prefix) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_SG, 0) ; \
+	MCFG_PERIBOX_SET_PREFIX( _prefix )
 
-#define MCFG_PERIBOX_998_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_998, 0) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_PERIBOX_GEN_ADD(_tag, _prefix) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_GEN, 0); \
+	MCFG_PERIBOX_SET_PREFIX( _prefix )
+
+#define MCFG_PERIBOX_998_ADD(_tag, _prefix) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_998, 0) ; \
+	MCFG_PERIBOX_SET_PREFIX( _prefix )
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
@@ -260,6 +258,16 @@ protected:
 #define MCFG_PERIBOX_SLOT_ADD_DEF(_tag, _slot_intf, _default) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
+
+#define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
+	devcb = &peribox_device::static_set_inta_callback( *device, DEVCB2_##_inta );
+
+#define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
+	devcb = &peribox_device::static_set_intb_callback( *device, DEVCB2_##_intb );
+
+#define MCFG_PERIBOX_READY_HANDLER( _ready ) \
+	devcb = &peribox_device::static_set_ready_callback( *device, DEVCB2_##_ready );
+
 
 /*
     The following defines are required because the WD17xx DEVICE_START implementation

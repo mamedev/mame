@@ -377,14 +377,6 @@ static GROMPORT_CONFIG(console_cartslot)
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_reset)
 };
 
-static PERIBOX_CONFIG( peribox_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, extint),            // INTA
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, notconnected),  // INTB
-	DEVCB_DEVICE_LINE_MEMBER(DATAMUX_TAG, ti99_datamux_device, ready_line), // READY
-	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
-};
-
 static TI_SOUND_CONFIG( sound_conf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_sound)  // READY
@@ -954,7 +946,10 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -996,7 +991,10 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -1056,7 +1054,10 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -1098,7 +1099,10 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -1157,7 +1161,10 @@ static MACHINE_CONFIG_START( ti99_4qi_60hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -1199,7 +1206,10 @@ static MACHINE_CONFIG_START( ti99_4qi_50hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
@@ -1257,7 +1267,10 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_EV_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_EV_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_4x_state, extint) )
+	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_4x_state, notconnected) )
+	MCFG_PERIBOX_READY_HANDLER( DEVWRITELINE(DATAMUX_TAG, ti99_datamux_device, ready_line) )
 
 	/* sound hardware */
 	MCFG_TI_SOUND_94624_ADD( TISOUND_TAG, sound_conf )
