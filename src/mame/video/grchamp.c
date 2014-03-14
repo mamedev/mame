@@ -11,8 +11,7 @@
 
 #define RGB_MAX     191
 
-
-void grchamp_state::palette_generate()
+PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -47,7 +46,7 @@ void grchamp_state::palette_generate()
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		m_bgcolor[i] = rgb_t(r, g, b);
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -98,7 +97,6 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 
 void grchamp_state::video_start()
 {
-	palette_generate();
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
@@ -357,6 +355,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		rgb_t(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
+	const pen_t *bgpen = m_palette->pens();
 	const UINT8 *amedata = memregion("gfx5")->base();
 	const UINT8 *headdata = memregion("gfx6")->base();
 	const UINT8 *pldata = memregion("gfx7")->base();
@@ -520,7 +519,7 @@ mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 
 			/* otherwise, it's the background, unless it's been KILL'ed */
 			else if (!kill)
-				finalpix = m_bgcolor[mvid | bgcolor];
+				finalpix = bgpen[mvid | bgcolor];
 
 			/* in which case it's black */
 			else

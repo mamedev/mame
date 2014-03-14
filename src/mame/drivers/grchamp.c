@@ -487,10 +487,10 @@ static const gfx_layout tile_layout =
 
 static GFXDECODE_START( grchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,  0, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0x0000, tile_layout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,     0, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 2 )
+	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 2 )
+	GFXDECODE_ENTRY( "gfx4", 0x0000, tile_layout,       0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,     0, 8 )
 GFXDECODE_END
 
 
@@ -681,6 +681,8 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", grchamp)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
