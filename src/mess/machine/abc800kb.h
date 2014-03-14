@@ -56,9 +56,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_write_line   m_out_clock_func;
-	devcb_resolved_write_line   m_out_keydown_func;
-
 	inline void serial_output(int state);
 	inline void serial_clock();
 	inline void key_down(int state);
