@@ -127,27 +127,6 @@ static SLOT_INTERFACE_START( horizon_s100_cards )
 	//SLOT_INTERFACE("fpb", S100_FPB)
 SLOT_INTERFACE_END
 
-static S100_INTERFACE( s100_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, Z80_INPUT_LINE_WAIT),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 
 //**************************************************************************
@@ -185,7 +164,8 @@ static MACHINE_CONFIG_START( horizon, horizon_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_R_TAG, i8251_device, write_dsr))
 
 	// S-100
-	MCFG_S100_BUS_ADD(s100_intf)
+	MCFG_S100_BUS_ADD()
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
 	//MCFG_S100_SLOT_ADD("s100_1", horizon_s100_cards, NULL, NULL) // CPU
 	MCFG_S100_SLOT_ADD("s100_2", horizon_s100_cards, NULL) // RAM
 	MCFG_S100_SLOT_ADD("s100_3", horizon_s100_cards, "mdsad") // MDS

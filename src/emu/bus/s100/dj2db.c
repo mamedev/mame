@@ -94,7 +94,7 @@ void s100_dj2db_device::fdc_intrq_w(bool state)
 	case 5: m_bus->vi5_w(state); break;
 	case 6: m_bus->vi6_w(state); break;
 	case 7: m_bus->vi7_w(state); break;
-	case 8: m_bus->int_w(state); break;
+	case 8: m_bus->irq_w(state); break;
 	}
 }
 
