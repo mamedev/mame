@@ -37,12 +37,7 @@
 #ifndef __ZX8301__
 #define __ZX8301__
 
-
-
-///*************************************************************************
-//  MACROS / CONSTANTS
-///*************************************************************************
-
+#include "emu.h"
 
 
 
@@ -50,12 +45,11 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_ZX8301_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, ZX8301, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_ZX8301_CPU(_cpu_tag) \
+	zx8301_device::static_set_cpu_tag(*device, _cpu_tag);
 
-#define ZX8301_INTERFACE(name) \
-	const zx8301_interface(name) =
+#define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
+	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -63,27 +57,18 @@
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> zx8301_interface
-
-struct zx8301_interface
-{
-	const char *cpu_tag;
-	const char *screen_tag;
-
-	devcb_write_line    out_vsync_cb;
-};
-
-
 // ======================> zx8301_device
 
 class zx8301_device :   public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public zx8301_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu_tag = tag; }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );
@@ -95,7 +80,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -110,11 +94,15 @@ protected:
 	void draw_line_mode8(bitmap_rgb32 &bitmap, int y, UINT16 da);
 
 private:
-	static const device_timer_id TIMER_VSYNC = 0;
-	static const device_timer_id TIMER_FLASH = 1;
+	enum
+	{
+		TIMER_VSYNC,
+		TIMER_FLASH
+	};
 
-	devcb_resolved_write_line   m_out_vsync_func;
+	devcb2_write_line   m_write_vsync;
 
+	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	//address_space *m_data;
 

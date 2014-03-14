@@ -19,7 +19,6 @@
 
 */
 
-#include "emu.h"
 #include "zx8301.h"
 
 
@@ -62,6 +61,7 @@ static ADDRESS_MAP_START( zx8301, AS_0, 8, zx8301_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
@@ -70,27 +70,6 @@ ADDRESS_MAP_END
 const address_space_config *zx8301_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void zx8301_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const zx8301_interface *intf = reinterpret_cast<const zx8301_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<zx8301_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&out_vsync_cb, 0, sizeof(out_vsync_cb));
-	}
 }
 
 
@@ -133,6 +112,7 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(zx8301)),
+		m_write_vsync(*this),
 		m_dispoff(1),
 		m_mode8(0),
 		m_base(0),
@@ -150,11 +130,11 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 void zx8301_device::device_start()
 {
 	// get the CPU
-	m_cpu = machine().device<cpu_device>(cpu_tag);
+	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	assert(m_cpu != NULL);
 
 	// resolve callbacks
-	m_out_vsync_func.resolve(out_vsync_cb, *this);
+	m_write_vsync.resolve_safe();
 
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
@@ -184,7 +164,7 @@ void zx8301_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_VSYNC:
 		//m_vsync = !m_vsync;
-		m_out_vsync_func(m_vsync);
+		m_write_vsync(m_vsync);
 		break;
 
 	case TIMER_FLASH:

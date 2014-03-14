@@ -708,18 +708,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ZX8301_INTERFACE( ql_zx8301_intf )
-//-------------------------------------------------
-
-static ZX8301_INTERFACE( ql_zx8301_intf )
-{
-	M68008_TAG,
-	SCREEN_TAG,
-	DEVCB_DEVICE_LINE_MEMBER(ZX8302_TAG, zx8302_device, vsync_w)
-};
-
-
-//-------------------------------------------------
 //  ZX8302_INTERFACE( ql_zx8302_intf )
 //-------------------------------------------------
 
@@ -996,7 +984,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
+	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
+	MCFG_ZX8301_CPU(M68008_TAG)
+	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
