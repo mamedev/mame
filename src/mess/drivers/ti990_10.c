@@ -89,13 +89,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_ti990_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER( vdt_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( tape_interrupt );
 
-	INTERRUPT_GEN_MEMBER(ti990_10_line_interrupt);
-	void idle_callback(int state);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -111,18 +109,6 @@ void ti990_10_state::machine_reset()
 	ti990_reset_int();
 	ti990_hdc_init(machine(), ti990_set_int13);
 }
-
-INTERRUPT_GEN_MEMBER(ti990_10_state::ti990_10_line_interrupt)
-{
-	downcast<vdt911_device*>(m_terminal)->keyboard();
-	ti990_line_interrupt(machine());
-}
-
-#ifdef UNUSED_FUNCTION
-void ti990_10_state::idle_callback(int state)
-{
-}
-#endif
 
 /*
 static void rset_callback(device_t *device)
@@ -150,15 +136,15 @@ void ti990_10_state::video_start()
 	m_terminal = machine().device("vdt911");
 }
 
-UINT32 ti990_10_state::screen_update_ti990_10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	downcast<vdt911_device*>(m_terminal)->refresh(bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-WRITE_LINE_MEMBER(ti990_10_state::vdt_interrupt)
+WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
 {
 	// set_int10(state);
+}
+
+WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
+{
+	// set_int10(state);
+	ti990_line_interrupt(machine());
 }
 
 /*
@@ -217,26 +203,13 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io, cpuconf)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_10_state, ti990_10_line_interrupt,  120/*or 100 in Europe*/)
 
-
-	/* video hardware - we emulate a single 911 vdt display */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(560, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ti990_10_state, screen_update_ti990_10)
-	MCFG_SCREEN_PALETTE("vdt911:palette")
-
+	// VDT 911 terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_INT_HANDLER(WRITELINE(ti990_10_state, vdt_interrupt))
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_10_state, key_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_10_state, line_interrupt))
 
-	/* 911 VDT has a beep tone generator */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	// Hard disk
 	MCFG_FRAGMENT_ADD( ti990_hdc )
 
 	// Tape controller
@@ -299,9 +272,5 @@ DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 #endif
 }
 
-static INPUT_PORTS_START(ti990_10)
-	VDT911_KEY_PORTS
-INPUT_PORTS_END
-
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   ti990_10, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
+COMP( 1975, ti990_10,   0,      0,      ti990_10,   0, ti990_10_state,   ti990_10,   "Texas Instruments",    "TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )

@@ -28,13 +28,13 @@
     Note that only interrupt levels 3-7 are supported by the board (8-15 are not wired).
 
 TODO:
-* Split into two machines for either ASR or VDT
 * finish ASR emulation
 * programmer panel
 * emulate other devices: card reader, printer
 
     Original implementation: Raphael Nabet
-    Rewritten by Michael Zapf 2013
+
+    Rewritten by Michael Zapf 2014
 */
 
 #include "emu.h"
@@ -56,24 +56,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
 
-	device_t *m_terminal;
 	DECLARE_READ8_MEMBER( panel_read );
 	DECLARE_WRITE8_MEMBER( panel_write );
 	DECLARE_WRITE8_MEMBER( external_operation );
 	DECLARE_READ8_MEMBER( interrupt_level );
 	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( asr_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( vdt_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( asrkey_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 
 	DECLARE_DRIVER_INIT(ti990_4);
 	DECLARE_DRIVER_INIT(ti990_4v);
 
 	DECLARE_MACHINE_RESET(ti990_4);
-
-	virtual void video_start();
-	UINT32 screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ti990_4_line_interrupt);
-	void idle_callback(int state);
 
 private:
 	void        hold_load();
@@ -83,14 +78,8 @@ private:
 	emu_timer*  m_nmi_timer;
 	void        reset_int_lines();
 	void        set_int_line(int line, int state);
-	void        line_interrupt();
 
-	void        set_int3(int state);
-	void        set_int6(int state);
-	void        set_int7(int state);
 	bool        m_ckon_state;
-
-	bool        m_video;
 
 	// Connected devices
 	required_device<tms9900_device>     m_maincpu;
@@ -128,6 +117,7 @@ READ8_MEMBER( ti990_4_state::panel_read )
 
 WRITE8_MEMBER( ti990_4_state::panel_write )
 {
+	logerror("ti990_4: writing to panel @CRU %04x: %02x\n", offset<<1, data);
 }
 
 void ti990_4_state::set_int_line(int line, int state)
@@ -148,29 +138,9 @@ void ti990_4_state::set_int_line(int line, int state)
 		m_maincpu->set_input_line(INT_9900_INTREQ, CLEAR_LINE);
 }
 
-void ti990_4_state::set_int3(int state)
-{
-	set_int_line(3, state);
-}
-
-void ti990_4_state::set_int6(int state)
-{
-	set_int_line(6, state);
-}
-
-void ti990_4_state::set_int7(int state)
-{
-	set_int_line(7, state);
-}
-
 void ti990_4_state::reset_int_lines()
 {
 	m_intlines = 0;
-}
-
-void ti990_4_state::line_interrupt()
-{
-	if (m_ckon_state) set_int_line(5, ASSERT_LINE);
 }
 
 /*
@@ -178,52 +148,28 @@ void ti990_4_state::line_interrupt()
 */
 WRITE_LINE_MEMBER(ti990_4_state::fd_interrupt)
 {
-	set_int7(state);
-}
-
-INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
-{
-	if (m_video)
-		downcast<vdt911_device*>(m_terminal)->keyboard();
-	else
-		downcast<asr733_device*>(m_terminal)->keyboard();
-
-	line_interrupt();
+	set_int_line(7, state);
 }
 
 /*
-    TI990/4 video emulation.
-    We emulate a single VDT911 CRT terminal.
+    Connection to VDT
 */
-WRITE_LINE_MEMBER(ti990_4_state::vdt_interrupt)
+WRITE_LINE_MEMBER(ti990_4_state::vdtkey_interrupt)
 {
-	set_int3(state);
+	set_int_line(3, state);
 }
 
-void ti990_4_state::video_start()
+WRITE_LINE_MEMBER(ti990_4_state::line_interrupt)
 {
-	if (m_video)
-		m_terminal = machine().device("vdt911");
-	else
-		m_terminal = machine().device("asr733");
-}
-
-UINT32 ti990_4_state::screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if (m_video)
-		downcast<vdt911_device*>(m_terminal)->refresh(bitmap, cliprect, 0, 0);
-	else
-		downcast<asr733_device*>(m_terminal)->refresh(bitmap, 0, 0);
-
-	return 0;
+	if (m_ckon_state) set_int_line(5, state);
 }
 
 /*
     Callback from the terminal.
 */
-WRITE_LINE_MEMBER(ti990_4_state::asr_interrupt)
+WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
 {
-	set_int6(state);
+	set_int_line(6, state);
 }
 
 WRITE8_MEMBER( ti990_4_state::external_operation )
@@ -350,44 +296,19 @@ MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 
 DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
 {
-	m_video = false;
 	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
 }
-
-DRIVER_INIT_MEMBER(ti990_4_state, ti990_4v)
-{
-	m_video = true;
-	m_nmi_timer = timer_alloc(NMI_TIMER_ID);
-}
-
-static INPUT_PORTS_START(ti990_4)
-	ASR733_KEY_PORTS
-INPUT_PORTS_END
-
-static INPUT_PORTS_START(ti990_4v)
-	VDT911_KEY_PORTS
-INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, cpuconf)
-
-	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ti990_4_state, screen_update_ti990_4)
-
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_PALETTE("asr733:palette")
 
 	// Terminal
 	MCFG_DEVICE_ADD("asr733", ASR733, 0)
-	MCFG_ASR733_INT_HANDLER(WRITELINE(ti990_4_state, asr_interrupt))
+	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(ti990_4_state, asrkey_interrupt))
+	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", FD800, 0)
@@ -400,26 +321,12 @@ static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v, cpuconf)
-
-	MCFG_CPU_PERIODIC_INT_DRIVER(ti990_4_state, ti990_4_line_interrupt,  120/*or TIME_IN_HZ(100) in Europe*/)
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ti990_4_state, screen_update_ti990_4)
-
-	MCFG_SCREEN_SIZE(560, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_PALETTE("vdt911:palette")
 
 	// Terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_INT_HANDLER(WRITELINE(ti990_4_state, vdt_interrupt))
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_4_state, vdtkey_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", FD800, 0)
@@ -469,5 +376,5 @@ ROM_START(ti990_4v)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976, ti990_4,  0,      0,      ti990_4,    ti990_4, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   ti990_4v, ti990_4_state, ti990_4v,    "Texas Instruments",    "TI 990/4 Minicomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )
