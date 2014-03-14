@@ -46,7 +46,7 @@
 ///*************************************************************************
 
 #define MCFG_ZX8301_CPU(_tag) \
-	zx8301_device::static_set_cpu_tag(*device, ":"_tag);
+	zx8301_device::static_set_cpu_tag(*device, "^"_tag);
 
 #define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
 	devcb = &zx8301_device::set_vsync_wr_callback(*device, DEVCB2_##_write);
