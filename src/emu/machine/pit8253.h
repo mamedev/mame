@@ -52,9 +52,6 @@ struct pit8253_timer
 	double clockin;                 /* input clock frequency in Hz */
 	int clock;                      /* clock signal when clockin is 0 */
 
-	devcb_resolved_read_line    in_gate_func;   /* callback for gate input */
-	devcb_resolved_write_line   out_out_func;   /* callback function for when output changes */
-
 	attotime last_updated;          /* time when last updated */
 
 	emu_timer *updatetimer;         /* MAME timer to process updates */
