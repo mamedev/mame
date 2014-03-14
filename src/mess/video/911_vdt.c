@@ -80,7 +80,7 @@ static const unsigned short vdt911_palette[] =
     Macros for model features
 */
 /* TRUE for japanese and arabic terminals, which use 8-bit charcodes and keyboard shift modes */
-#define USES_8BIT_CHARCODES() ((m_model == vdt911_model_Japanese) /*|| (vdt->model == vdt911_model_Arabic)*/)
+#define USES_8BIT_CHARCODES() ((m_model == vdt911_model_Japanese) /*|| (m_model == vdt911_model_Arabic)*/)
 /* TRUE for keyboards which have this extra key (on the left of TAB/SKIP)
     (Most localized keyboards have it) */
 #define HAS_EXTRA_KEY_67() (! ((m_model == vdt911_model_US) || (m_model == vdt911_model_UK) || (m_model == vdt911_model_French)))
@@ -230,6 +230,13 @@ void vdt911_device::device_start()
 	base = chr+vdt911_frenchWP_chr_offset;
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
 	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
+}
+
+
+void vdt911_device::device_reset()
+{
+	m_model = (vdt911_model_t)ioport("LOCALE")->read();
+	m_screen_size = (vdt911_screen_size_t)ioport("SCREEN")->read();
 }
 
 /*
@@ -639,6 +646,25 @@ void vdt911_device::keyboard()
 	}
 }
 
+INPUT_PORTS_START( vdt911 )
+	PORT_START( "LOCALE" )
+	PORT_CONFNAME( 0x0f, 0x00, "Terminal language" )
+		PORT_CONFSETTING( vdt911_model_US, "English US" )
+		PORT_CONFSETTING( vdt911_model_UK, "English UK" )
+		PORT_CONFSETTING( vdt911_model_French, "French" )
+		PORT_CONFSETTING( vdt911_model_German, "German" )
+		PORT_CONFSETTING( vdt911_model_Swedish, "Swedish" )
+		PORT_CONFSETTING( vdt911_model_Norwegian, "Norwegian" )
+		PORT_CONFSETTING( vdt911_model_FrenchWP, "French Word Processing" )
+		PORT_CONFSETTING( vdt911_model_Japanese, "Japanese" )
+		// PORT_CONFSETTING( vdt911_model_Arabic, "Arabic" )
+
+	PORT_START( "SCREEN" )
+	PORT_CONFNAME( 0x01, char_960, "Terminal screen size" )
+		PORT_CONFSETTING( char_960, "960 chars (12 lines)")
+		PORT_CONFSETTING( char_1920, "1920 chars (24 lines)")
+INPUT_PORTS_END
+
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(3)
@@ -655,4 +681,9 @@ MACHINE_CONFIG_END
 machine_config_constructor vdt911_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vdt911 );
+}
+
+ioport_constructor vdt911_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( vdt911 );
 }

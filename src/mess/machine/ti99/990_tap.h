@@ -57,6 +57,5 @@ private:
 	tape_unit_t m_tape[MAX_TAPE_UNIT];
 };
 
-#define MCFG_TI990_TAPE_CTRL_ADD(_tag, _intcallb)  \
-	MCFG_DEVICE_ADD((_tag),  TI990_TAPE_CTRL, 0)\
+#define MCFG_TI990_TAPE_INT_HANDLER( _intcallb )  \
 	devcb = &tap_990_device::static_set_int_callback( *device, DEVCB2_##_intcallb );

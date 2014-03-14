@@ -384,10 +384,15 @@ static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("asr733:palette")
-	MCFG_ASR733_VIDEO_ADD("asr733", WRITELINE(ti990_4_state, asr_interrupt))
+
+	// Terminal
+	MCFG_DEVICE_ADD("asr733", ASR733, 0)
+	MCFG_ASR733_INT_HANDLER(WRITELINE(ti990_4_state, asr_interrupt))
 
 	// Floppy controller
-	MCFG_FD800_ADD("fd800", WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_DEVICE_ADD("fd800", FD800, 0)
+	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 
@@ -407,13 +412,19 @@ static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	MCFG_SCREEN_SIZE(560, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
 	MCFG_SCREEN_PALETTE("vdt911:palette")
-	MCFG_VDT911_VIDEO_ADD("vdt911", WRITELINE(ti990_4_state, vdt_interrupt), char_1920, vdt911_model_US)
+
+	// Terminal
+	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
+	MCFG_VDT911_INT_HANDLER(WRITELINE(ti990_4_state, vdt_interrupt))
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Floppy controller
-	MCFG_FD800_ADD("fd800", WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_DEVICE_ADD("fd800", FD800, 0)
+	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
 

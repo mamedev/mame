@@ -229,7 +229,8 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ti990_10_state, screen_update_ti990_10)
 	MCFG_SCREEN_PALETTE("vdt911:palette")
 
-	MCFG_VDT911_VIDEO_ADD("vdt911", WRITELINE(ti990_10_state, vdt_interrupt), char_1920, vdt911_model_US)
+	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
+	MCFG_VDT911_INT_HANDLER(WRITELINE(ti990_10_state, vdt_interrupt))
 
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -238,7 +239,9 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 
 	MCFG_FRAGMENT_ADD( ti990_hdc )
 
-	MCFG_TI990_TAPE_CTRL_ADD("tpc", WRITELINE(ti990_10_state, tape_interrupt))
+	// Tape controller
+	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)
+	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(ti990_10_state, tape_interrupt))
 MACHINE_CONFIG_END
 
 

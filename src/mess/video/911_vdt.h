@@ -18,27 +18,19 @@ enum
 	vdt911_chr_region_len   = vdt911_japanese_chr_offset+256*vdt911_single_char_len
 };
 
-enum vdt911_screen_size_t { char_960, char_1920 };
+enum vdt911_screen_size_t { char_960 = 0, char_1920 };
 enum vdt911_model_t
 {
-	vdt911_model_US,
+	vdt911_model_US = 0,
 	vdt911_model_UK,
 	vdt911_model_French,
 	vdt911_model_German,
-	vdt911_model_Swedish,   /* Swedish/Finnish */
-	vdt911_model_Norwegian, /* Norwegian/Danish */
-	vdt911_model_Japanese,  /* Katakana Japanese */
-	/*vdt911_model_Arabic,*//* Arabic */
-	vdt911_model_FrenchWP   /* French word processing */
+	vdt911_model_Swedish,       // Swedish/Finnish
+	vdt911_model_Norwegian,     // Norwegian/Danish
+	vdt911_model_FrenchWP,      // French word processing
+	vdt911_model_Japanese       // Katakana Japanese
+	/*vdt911_model_Arabic,*/    // Arabic
 };
-
-struct vdt911_init_params_t
-{
-	vdt911_screen_size_t screen_size;
-	vdt911_model_t model;
-	void (*int_callback)(running_machine &machine, int state);
-};
-
 
 class vdt911_device : public device_t
 {
@@ -54,19 +46,18 @@ public:
 	{
 		return downcast<vdt911_device &>(device).m_int_line.set_callback(object);
 	}
-	static void static_set_params(device_t &device, vdt911_screen_size_t size, vdt911_model_t model)
-	{
-		downcast<vdt911_device &>(device).m_screen_size = size;
-		downcast<vdt911_device &>(device).m_model = model;
-	}
+
 	void refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 	void keyboard();
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual machine_config_constructor device_mconfig_additions() const;
+	void device_config_complete();
+	void device_start();
+	void device_reset();
+
+	machine_config_constructor device_mconfig_additions() const;
+	ioport_constructor device_input_ports() const;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -111,19 +102,8 @@ private:
 
 extern const device_type VDT911;
 
-#define MCFG_VDT911_VIDEO_ADD(_tag, _intcallb, _size, _model) \
-	MCFG_DEVICE_ADD(_tag, VDT911, 0)  \
-	devcb = &vdt911_device::static_set_int_callback( *device, DEVCB2_##_intcallb ); \
-	vdt911_device::static_set_params( *device, _size, _model);
-
-
-
-	DECLARE_READ8_DEVICE_HANDLER(vdt911_cru_r);
-DECLARE_WRITE8_DEVICE_HANDLER(vdt911_cru_w);
-
-void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
-
-void vdt911_keyboard(device_t *device);
+#define MCFG_VDT911_INT_HANDLER( _intcallb ) \
+	devcb = &vdt911_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
 
 #define VDT911_KEY_PORTS                                                                        \
 	PORT_START("KEY0")  /* keys 1-16 */                                                                 \

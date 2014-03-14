@@ -69,10 +69,8 @@ private:
 
 extern const device_type ASR733;
 
-#define MCFG_ASR733_VIDEO_ADD(_tag, _intcallb) \
-	MCFG_DEVICE_ADD(_tag, ASR733, 0)  \
+#define MCFG_ASR733_INT_HANDLER( _intcallb ) \
 	devcb = &asr733_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
-
 
 #define ASR733_KEY_PORTS                                                                        \
 	PORT_START("KEY0")  /* keys 1-16 */                                                                 \

@@ -66,8 +66,7 @@ private:
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(fd800);
 
-#define MCFG_FD800_ADD(_tag, _intcallb) \
-	MCFG_DEVICE_ADD(_tag, FD800, 0)  \
+#define MCFG_FD800_INT_HANDLER( _intcallb ) \
 	devcb = &fd800_legacy_device::static_set_int_callback( *device, DEVCB2_##_intcallb );
 
 #endif
