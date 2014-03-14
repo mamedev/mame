@@ -1065,6 +1065,11 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
 
+	// disable audiocpu nmi
+	m_audio_cpu_nmi_enabled = false;
+	m_audio_cpu_nmi_pending = false;
+	audio_cpu_check_nmi();
+
 	m_maincpu->reset();
 
 	// FIXME: this doesn't belong in the base system
@@ -1174,11 +1179,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ng_aes_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, soundlatch_clear_byte_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff10) AM_MASK(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)
 	// banking reads are actually NOP on NeoCD? but some games still access them
 //  AM_RANGE(0x08, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xff03) AM_READ(audio_cpu_bank_select_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 
 	// ??
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_WRITENOP

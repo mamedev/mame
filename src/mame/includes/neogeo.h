@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
-	DECLARE_WRITE8_MEMBER(audio_cpu_disable_nmi_w);
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
