@@ -881,8 +881,6 @@ void neogeo_state::machine_start()
 	m_vblank_level = 1;
 	m_raster_level = 2;
 
-	m_audio_cpu_nmi_pending = false;
-	
 	/* start with an IRQ3 - but NOT on a reset */
 	m_irq3_pending = 1;
 

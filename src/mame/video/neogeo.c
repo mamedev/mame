@@ -720,7 +720,7 @@ UINT16 neogeo_state::get_video_control(  )
 	      raster effects on the title screen; sdodgeb loops waiting for the top
 	      bit to be 1; zedblade heavily depends on it to work correctly (it
 	      checks the top bit in the IRQ2 handler).
-	    B is definitely a PAL/NTSC flag. Evidence:
+	    B is definitely a PAL/NTSC flag. (LSPC2 only) Evidence:
 	      1) trally changes the position of the speed indicator depending on
 	         it (0 = lower 1 = higher).
 	      2) samsho3 sets a variable to 60 when the bit is 0 and 50 when it's 1.
@@ -750,7 +750,6 @@ UINT16 neogeo_state::get_video_control(  )
 
 void neogeo_state::set_video_control( UINT16 data )
 {
-	/* this does much more than this, but I'm not sure exactly what */
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
 	set_auto_animation_speed(data >> 8);
@@ -801,7 +800,7 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 		case 0x04: neogeo_set_display_counter_msb(data); break;
 		case 0x05: neogeo_set_display_counter_lsb(data); break;
 		case 0x06: neogeo_acknowledge_interrupt(data); break;
-		case 0x07: break; /* unknown, see get_video_control */
+		case 0x07: break; // d0: pause timer for 32 lines when in PAL mode (LSPC2 only)
 		}
 	}
 }
