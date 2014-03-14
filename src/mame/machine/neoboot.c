@@ -863,22 +863,6 @@ void neogeo_state::svcsplus_px_hack()
 	mem16[0xa110/2] = 0x9750;
 }
 
-#ifdef UNUSED_FUNCTION
-UINT16 mv0_bank_ram[ 0x10/2 ];
-
-READ16_MEMBER( neogeo_state::mv0_bankswitch_r )
-{
-	return mv0_bank_ram[ offset ];
-}
-
-WRITE16_MEMBER( neogeo_state::mv0_bankswitch_w )
-{
-	UINT32 bankaddress = (mv0_bank_ram[ 0 ] >> 8) + (mv0_bank_ram[ 1 ] << 8) + 0x100000;
-	COMBINE_DATA( &mv0_bank_ram[ offset ] );
-	neogeo_set_main_cpu_bank_address( bankaddress );
-}
-#endif
-
 
 /* The King of Fighters 2003 (bootleg set 1) */
 

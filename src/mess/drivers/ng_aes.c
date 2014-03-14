@@ -1030,10 +1030,15 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	m_type = NEOGEO_CD;
 	common_machine_start();
 
+	// set initial audio banks (different on NEOCD)
+	m_bank_audio_cart[0]->set_entry(0x1e);
+	m_bank_audio_cart[1]->set_entry(0x0e);
+	m_bank_audio_cart[2]->set_entry(0x06);
+	m_bank_audio_cart[3]->set_entry(0x02);
+
 	/* irq levels for NEOCD (swapped compared to MVS / AES) */
 	m_vblank_level = 2;
 	m_raster_level = 1;
-
 
 	/* initialize the memcard data structure */
 	/* NeoCD doesn't have memcard slots, rather, it has a larger internal memory which works the same */

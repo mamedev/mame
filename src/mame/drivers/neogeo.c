@@ -173,13 +173,10 @@
 
 void neogeo_state::adjust_display_position_interrupt_timer()
 {
-	if ((m_display_counter + 1) != 0)
-	{
-		attotime period = attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (m_display_counter + 1);
-		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
+	attotime period = attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (m_display_counter + 1);
+	if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
 
-		m_display_position_interrupt_timer->adjust(period);
-	}
+	m_display_position_interrupt_timer->adjust(period);
 }
 
 
@@ -213,9 +210,9 @@ void neogeo_state::neogeo_set_display_counter_lsb( UINT16 data )
 
 void neogeo_state::update_interrupts()
 {
-	m_maincpu->set_input_line(m_vblank_level, m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(m_raster_level, m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(m_raster_level, m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(m_vblank_level, m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -686,15 +683,12 @@ void neogeo_state::neogeo_audio_cpu_banking_init()
 		}
 	}
 
-	/* set initial audio banks --
-	   how does this really work, or is it even necessary? */
-	m_bank_audio_cart[0]->set_entry(0x1e);
-	m_bank_audio_cart[1]->set_entry(0x0e);
-	m_bank_audio_cart[2]->set_entry(0x06);
-	m_bank_audio_cart[3]->set_entry(0x02);
+	// set initial audio banks
+	m_bank_audio_cart[0]->set_entry(0);
+	m_bank_audio_cart[1]->set_entry(0);
+	m_bank_audio_cart[2]->set_entry(0);
+	m_bank_audio_cart[3]->set_entry(0);
 }
-
-
 
 
 
@@ -851,10 +845,6 @@ void neogeo_state::neogeo_postload()
 	_set_main_cpu_bank_address();
 	if (m_type == NEOGEO_MVS) set_outputs();
 }
-
-
-
-
 
 
 void neogeo_state::machine_start()
