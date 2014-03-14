@@ -683,11 +683,17 @@ void neogeo_state::neogeo_audio_cpu_banking_init()
 		}
 	}
 
-	// set initial audio banks
-	m_bank_audio_cart[0]->set_entry(0);
-	m_bank_audio_cart[1]->set_entry(0);
-	m_bank_audio_cart[2]->set_entry(0);
-	m_bank_audio_cart[3]->set_entry(0);
+	// set initial audio banks - THIS IS A HACK
+	// Z80 banking is handled by the NEO-ZMC chip in the cartridge
+	// (in later cartridges, by multifunction banking/protection chips that implement the same bank scheme)
+	// On the real chip, initial banks are all 0.
+	// However, early cartridges with less than 64KB of Z80 code and data don't have ROM banking at all.
+	// These initial bank settings are required so non-banked games will work until we identify them
+	// and use a different Z80 address map for them.
+	m_bank_audio_cart[0]->set_entry(0x1e);
+	m_bank_audio_cart[1]->set_entry(0x0e);
+	m_bank_audio_cart[2]->set_entry(0x06);
+	m_bank_audio_cart[3]->set_entry(0x02);
 }
 
 
