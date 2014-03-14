@@ -287,6 +287,9 @@ int i8089_channel::execute_run()
 				m_r[BC].w--;
 			}
 
+			m_r[BC].w &= 0xffff;
+			m_r[GA + CC_SOURCE].w &= 0xfffff;
+
 			if (VERBOSE_DMA)
 				logerror("[ %04x ]\n", m_dma_value);
 
@@ -333,6 +336,8 @@ int i8089_channel::execute_run()
 				if (VERBOSE_DMA)
 					logerror("[ %02x ]\n", m_dma_value & 0xff);
 			}
+
+			m_r[GB - CC_SOURCE].w &= 0xfffff;
 
 			if (CC_TMC & 0x03)
 				m_dma_state = DMA_COMPARE;
@@ -702,6 +707,13 @@ void i8089_channel::attention()
 		if (VERBOSE)
 			logerror("%s('%s'): command received: update psw\n", shortname(), tag());
 
+		if(executing())
+			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
+		else if(transferring())
+			m_prio = PRIO_DMA;
+		else
+			m_prio = PRIO_IDLE;
+
 		examine_ccw(ccw);
 		break;
 
@@ -820,7 +832,7 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
-	if(transferring())
+	if(transferring() && state)
 		terminate_dma((CC_TX - 1) * 4);
 }
 

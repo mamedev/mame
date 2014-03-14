@@ -38,6 +38,7 @@ protected:
 private:
 	void find_sector();
 	UINT16 read_sector();
+	bool write_sector(UINT16 data);
 
 	required_device<i8089_device> m_dmac;
 	required_device<harddisk_image_device> m_hdd0;
@@ -51,11 +52,13 @@ private:
 	UINT16 m_wakeup, m_secoffset, m_sector[512];
 	const char *m_maincpu_tag;
 	address_space *m_maincpu_mem;
+	UINT32 m_lba[2];
 	UINT16 m_cyl[2];
 	UINT8 m_idcompare[4], m_drive, m_head, m_index;
+	INT8 m_format_bytes;
 	bool m_idfound, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
 
-	bool m_isbx_irq[4], m_fdctc, m_step;
+	bool m_isbx_irq[4], m_fdctc, m_step, m_format;
 
 	const struct hard_disk_info* m_geom[2];
 };
