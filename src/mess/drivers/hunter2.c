@@ -93,6 +93,9 @@ static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(port81_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(port82_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(port84_w)
 	AM_RANGE(0x86, 0x86) AM_WRITE(port86_w)
 	AM_RANGE(0xbb, 0xbb) AM_WRITE(portbb_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
@@ -232,6 +235,7 @@ WRITE8_MEMBER( hunter2_state::port80_w )
 WRITE8_MEMBER( hunter2_state::port81_w )
 {
 	m_rs232->write_txd(data & 0x01);
+	logerror("TXD write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port82_w )
