@@ -473,6 +473,7 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jokrwild)
 	MCFG_PALETTE_ADD("palette", 512)

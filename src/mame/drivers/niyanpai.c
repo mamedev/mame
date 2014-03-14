@@ -960,6 +960,7 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_SCREEN_SIZE(1024, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(niyanpai_state, screen_update_niyanpai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256*3)
 

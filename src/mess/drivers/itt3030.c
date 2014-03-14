@@ -612,6 +612,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*16-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)

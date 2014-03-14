@@ -325,6 +325,7 @@ static MACHINE_CONFIG_START( irobot, irobot_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(irobot_state, screen_update_irobot)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", irobot)
 	MCFG_PALETTE_ADD("palette", 64 + 32)    /* 64 for polygons, 32 for text */

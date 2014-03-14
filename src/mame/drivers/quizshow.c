@@ -390,6 +390,7 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update_quizshow)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quizshow)
 	MCFG_PALETTE_ADD("palette", 8*2)

@@ -374,6 +374,8 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
@@ -463,6 +465,8 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 

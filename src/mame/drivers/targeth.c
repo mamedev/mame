@@ -184,6 +184,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)              /* 1024x512 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 16, 16*16-1)   /* 400x240 */
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update_targeth)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 0x080000)
 	MCFG_PALETTE_ADD("palette", 1024)

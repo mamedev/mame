@@ -843,7 +843,8 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
-
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD("palette", 2)

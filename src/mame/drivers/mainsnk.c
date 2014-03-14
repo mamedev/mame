@@ -400,6 +400,7 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update_mainsnk)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mainsnk)
 	MCFG_PALETTE_ADD("palette", 0x400)

@@ -492,6 +492,7 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update)
 	MCFG_SCREEN_SIZE( 240, 100 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_lcd )
 

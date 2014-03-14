@@ -1562,6 +1562,7 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")

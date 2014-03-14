@@ -385,6 +385,7 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
 	MCFG_SCREEN_VBLANK_DRIVER(inufuku_state, screen_eof_inufuku)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
 	vsystem_spr_device::set_offsets(*device, 0,1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)

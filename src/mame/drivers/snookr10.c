@@ -1040,6 +1040,7 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 	MCFG_SCREEN_SIZE(96*4, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snookr10_state, screen_update_snookr10)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", snookr10)
 	MCFG_PALETTE_ADD("palette", 256)

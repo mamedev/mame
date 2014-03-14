@@ -310,6 +310,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gunbustr)
 	MCFG_PALETTE_ADD("palette", 8192)

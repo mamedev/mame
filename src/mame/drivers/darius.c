@@ -884,6 +884,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("mscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -891,6 +892,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_middle)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -898,6 +900,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)

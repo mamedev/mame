@@ -384,6 +384,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_ironhors)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ironhors)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)

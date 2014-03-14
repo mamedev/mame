@@ -308,6 +308,7 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 513)
 

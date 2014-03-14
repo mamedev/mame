@@ -268,6 +268,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cbasebal)
 

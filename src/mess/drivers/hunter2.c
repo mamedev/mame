@@ -400,6 +400,8 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)

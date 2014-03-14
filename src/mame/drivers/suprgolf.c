@@ -523,6 +523,7 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 	MCFG_SCREEN_UPDATE_DRIVER(suprgolf_state, screen_update_suprgolf)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", suprgolf)
 	MCFG_PALETTE_ADD("palette", 0x800)

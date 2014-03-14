@@ -556,6 +556,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_SIZE(16 + 256 + 16, 16 + 192 + 16) /* border size not accurate */
 	MCFG_SCREEN_VISIBLE_AREA(0, 16 + 256 + 16 - 1, 0, 16 + 192 + 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jr200)
 	MCFG_PALETTE_ADD("palette", 8)

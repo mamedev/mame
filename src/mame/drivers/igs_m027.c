@@ -414,6 +414,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
@@ -442,6 +443,7 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 
 	MCFG_VIDEO_START_OVERRIDE(igs_m027_state, fearless)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_fearless)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 

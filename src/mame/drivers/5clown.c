@@ -1064,6 +1064,7 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", fclown)
 	MCFG_PALETTE_ADD("palette", 256)

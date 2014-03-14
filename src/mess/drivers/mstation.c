@@ -526,6 +526,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mstation_state, screen_update)
 	MCFG_SCREEN_SIZE(320, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)

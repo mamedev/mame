@@ -1098,6 +1098,7 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus)
 
@@ -1136,6 +1137,7 @@ static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(midzeus_state, screen_update_midzeus2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(midzeus_state,midzeus2)
 

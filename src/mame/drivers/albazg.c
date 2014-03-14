@@ -399,6 +399,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(albazg_state, screen_update_yumefuda)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 

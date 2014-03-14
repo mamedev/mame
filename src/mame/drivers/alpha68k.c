@@ -1962,6 +1962,7 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_sstingry)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sstingry)
 
@@ -2009,6 +2010,7 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", kyros)
 
@@ -2055,6 +2057,7 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_kyros)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", jongbou)
 
@@ -2090,6 +2093,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", paddle)
 
@@ -2133,6 +2137,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2182,6 +2187,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_II)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_II)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2225,6 +2231,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2267,6 +2274,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_V_sb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", alpha68k_V)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -2308,6 +2316,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(alpha68k_state, screen_update_alpha68k_I)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tnextspc)
 

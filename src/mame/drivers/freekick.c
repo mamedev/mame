@@ -636,6 +636,7 @@ static MACHINE_CONFIG_START( base, freekick_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x200)

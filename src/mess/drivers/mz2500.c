@@ -2148,6 +2148,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)

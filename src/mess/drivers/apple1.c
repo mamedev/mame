@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_SCREEN_SIZE(40 * 7, 24 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 7 - 1, 0, 24 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update_apple1)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", apple1)
 

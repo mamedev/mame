@@ -760,6 +760,8 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab2)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
@@ -789,6 +791,8 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,homelab3)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
@@ -818,6 +822,8 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_VIDEO_START_OVERRIDE(homelab_state,brailab4)
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 

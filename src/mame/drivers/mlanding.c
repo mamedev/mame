@@ -995,6 +995,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	// Estimated
 	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

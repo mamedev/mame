@@ -624,6 +624,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 

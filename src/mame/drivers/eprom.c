@@ -410,6 +410,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_eprom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
@@ -451,6 +452,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_eprom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,eprom)
 
@@ -491,6 +493,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(eprom_state, screen_update_guts)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(eprom_state,guts)
 

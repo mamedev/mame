@@ -487,6 +487,7 @@ static MACHINE_CONFIG_START( mexico86, mexico86_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mexico86_state, screen_update_mexico86)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mexico86)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)

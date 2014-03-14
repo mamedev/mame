@@ -529,6 +529,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
 	MCFG_SCREEN_VBLANK_DRIVER(pgm_state, screen_eof_pgm)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pgm)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)

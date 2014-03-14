@@ -563,6 +563,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8+1, 48*8-1-8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mwarr)
 	MCFG_PALETTE_ADD("palette", 0x800)

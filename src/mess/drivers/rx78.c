@@ -471,6 +471,8 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
 	MCFG_SCREEN_SIZE(192, 184)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
 	MCFG_GFXDECODE_ADD("gfxdecode", rx78)
 

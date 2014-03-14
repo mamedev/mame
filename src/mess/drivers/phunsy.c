@@ -363,6 +363,8 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	*/
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 480, 0, 64*6, 313, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", phunsy)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)

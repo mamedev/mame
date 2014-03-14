@@ -321,6 +321,7 @@ static MACHINE_CONFIG_START( hitme, hitme_state )
 	MCFG_SCREEN_SIZE(40*8, 19*10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hitme)
 

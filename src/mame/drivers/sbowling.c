@@ -390,6 +390,7 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbowling_state, screen_update_sbowling)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sbowling)
 

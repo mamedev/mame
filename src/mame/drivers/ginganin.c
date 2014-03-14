@@ -272,6 +272,7 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
 	MCFG_SCREEN_UPDATE_DRIVER(ginganin_state, screen_update_ginganin)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ginganin)
 	MCFG_PALETTE_ADD("palette", 1024)

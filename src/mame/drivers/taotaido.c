@@ -346,6 +346,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taotaido_state, screen_update_taotaido)
 	MCFG_SCREEN_VBLANK_DRIVER(taotaido_state, screen_eof_taotaido)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

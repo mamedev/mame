@@ -85,6 +85,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lynx_state, screen_update)
 	MCFG_SCREEN_SIZE(160, 102)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 102-1)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_lynx)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)

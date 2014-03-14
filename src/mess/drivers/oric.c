@@ -380,6 +380,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_SIZE(40*6, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(oric_state, oric)

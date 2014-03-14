@@ -1474,6 +1474,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	/* the board uses a pair of GALs to determine H and V parameters */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigx2_state, screen_update_atarigx2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(atarigx2_state,atarigx2)
 

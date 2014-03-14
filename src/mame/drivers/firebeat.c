@@ -1770,6 +1770,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
@@ -1817,6 +1818,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1824,6 +1826,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 

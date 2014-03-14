@@ -284,6 +284,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(rollerg_state, screen_update_rollerg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()

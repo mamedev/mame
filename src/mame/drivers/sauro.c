@@ -375,6 +375,7 @@ static MACHINE_CONFIG_START( tecfri, sauro_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
 

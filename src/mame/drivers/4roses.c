@@ -400,6 +400,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* guess. taken from funworld games */
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* guess. taken from funworld games */
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 4roses)
 

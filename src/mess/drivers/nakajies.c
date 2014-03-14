@@ -749,6 +749,8 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)

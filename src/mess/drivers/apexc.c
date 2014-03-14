@@ -890,6 +890,7 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)

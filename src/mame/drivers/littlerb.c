@@ -949,6 +949,7 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_SCREEN_SIZE(512+22, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 336-1, 0*8, 288-1)
 	MCFG_SCREEN_UPDATE_DRIVER(littlerb_state, screen_update_littlerb)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("littlerbvdp", LITTLERBVDP, 0)
 #endif
 

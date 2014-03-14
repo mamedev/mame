@@ -71,6 +71,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_SIZE(280*2, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )

@@ -154,6 +154,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
 	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 
@@ -196,6 +197,7 @@ static MACHINE_CONFIG_START( hector1, interact_state )
 	MCFG_SCREEN_SIZE(256, 79)
 	MCFG_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
 	MCFG_SCREEN_UPDATE_DRIVER(interact_state, screen_update_interact)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)             /* 8 colours, but only 4 at a time*/
 

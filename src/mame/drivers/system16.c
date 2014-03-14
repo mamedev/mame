@@ -2006,6 +2006,7 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 	MCFG_SCREEN_SIZE(40*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
 	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
@@ -2153,6 +2154,7 @@ static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 	MCFG_SCREEN_SIZE(40*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
 
@@ -2286,6 +2288,7 @@ static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
 	MCFG_SCREEN_SIZE(40*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sys16)
 	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)

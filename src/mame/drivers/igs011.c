@@ -3936,6 +3936,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs011_state, screen_update_igs011)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 //  MCFG_GFXDECODE_ADD("gfxdecode", igs011)

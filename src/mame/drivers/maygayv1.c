@@ -1033,6 +1033,7 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
 	MCFG_SCREEN_VBLANK_DRIVER(maygayv1_state, screen_eof_maygayv1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 

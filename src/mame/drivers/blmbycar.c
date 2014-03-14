@@ -362,7 +362,8 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0x100-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
-
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", blmbycar)
 	MCFG_PALETTE_ADD("palette", 0x300)
 
@@ -403,6 +404,7 @@ static MACHINE_CONFIG_START( watrball, blmbycar_state )
 	MCFG_SCREEN_SIZE(0x180, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x180-1, 16, 0x100-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blmbycar_state, screen_update_blmbycar)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", blmbycar)
 	MCFG_PALETTE_ADD("palette", 0x300)

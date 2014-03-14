@@ -1089,6 +1089,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_SIZE(0x400, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)

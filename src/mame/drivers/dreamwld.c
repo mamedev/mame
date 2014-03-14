@@ -582,6 +582,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
 	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

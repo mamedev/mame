@@ -791,6 +791,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(px8_state, screen_update)
 	MCFG_SCREEN_SIZE(480, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", px8)
 	MCFG_PALETTE_ADD("palette", 2)

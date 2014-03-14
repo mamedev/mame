@@ -453,6 +453,7 @@ static MACHINE_CONFIG_START( quizdna, quizdna_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quizdna_state, screen_update_quizdna)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", quizdna)
 	MCFG_PALETTE_ADD("palette", 2048)

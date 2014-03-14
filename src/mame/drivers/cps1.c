@@ -3190,6 +3190,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 518, 64, 448, 259, 16, 240) /* guess: assume that CPS-1 uses the same exact timings as CPS-2 */
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)

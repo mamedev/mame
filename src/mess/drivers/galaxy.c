@@ -190,6 +190,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
 
@@ -226,6 +227,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
 

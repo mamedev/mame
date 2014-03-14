@@ -747,6 +747,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(metalmx_state, screen_update_metalmx)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 

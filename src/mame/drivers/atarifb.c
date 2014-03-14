@@ -561,6 +561,7 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", atarifb)
 	MCFG_PALETTE_ADD("palette", 12)

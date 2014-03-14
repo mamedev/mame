@@ -616,6 +616,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(midtunit_state,midtunit)
 MACHINE_CONFIG_END

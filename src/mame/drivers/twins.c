@@ -208,6 +208,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -297,6 +298,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twinsa)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 

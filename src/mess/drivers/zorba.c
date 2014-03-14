@@ -356,6 +356,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_UPDATE_DRIVER(zorba_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 

@@ -522,6 +522,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
@@ -725,6 +726,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 

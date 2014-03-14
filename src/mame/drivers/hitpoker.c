@@ -509,6 +509,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 	MCFG_SCREEN_SIZE(648, 480) //setted by the CRTC
 	MCFG_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitpoker_state, screen_update_hitpoker)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2, mc6845_intf)  /* hand tuned to get ~60 fps */
 

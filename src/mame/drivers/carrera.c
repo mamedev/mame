@@ -345,6 +345,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 

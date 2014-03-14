@@ -326,6 +326,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 4enraya)
 

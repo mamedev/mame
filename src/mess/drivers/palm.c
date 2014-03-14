@@ -235,6 +235,8 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_SCREEN_SIZE( 160, 220 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 159, 0, 219 )
 	MCFG_SCREEN_UPDATE_DEVICE(MC68328_TAG, mc68328_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(palm_state, palm)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

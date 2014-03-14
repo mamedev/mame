@@ -285,6 +285,8 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(myb3k_state, screen_update_myb3k)
+	MCFG_SCREEN_PALETTE("palette")
+		
 	MCFG_GFXDECODE_ADD("gfxdecode", myb3k)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

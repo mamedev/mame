@@ -260,6 +260,7 @@ static MACHINE_CONFIG_START( vega, vegaeo_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(vegaeo_state, screen_update_vega)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 

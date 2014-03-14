@@ -445,6 +445,7 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gcpinbal)

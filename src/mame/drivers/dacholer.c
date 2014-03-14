@@ -671,6 +671,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)

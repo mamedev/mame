@@ -515,6 +515,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", exprraid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)

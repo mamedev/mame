@@ -317,6 +317,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 

@@ -732,6 +732,7 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
@@ -768,6 +769,7 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", color)
 	

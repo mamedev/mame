@@ -1729,6 +1729,7 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
 
@@ -1803,6 +1804,7 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
 
@@ -1850,6 +1852,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", finallap)
 
@@ -1902,6 +1905,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
 
@@ -1956,6 +1960,7 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
 
@@ -2005,6 +2010,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", luckywld)
 
@@ -2057,6 +2063,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", metlhawk)
 

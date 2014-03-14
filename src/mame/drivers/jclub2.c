@@ -691,6 +691,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_darkhors)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", darkhors)
 	MCFG_PALETTE_ADD("palette", 0x10000)
@@ -733,6 +734,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_SIZE(0x190, 0x100+16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", empty)
 	
@@ -804,6 +806,7 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_SIZE(0x190, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2o)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

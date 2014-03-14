@@ -508,6 +508,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update_sandscrp)
 	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof_sandscrp)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", sandscrp)
 	MCFG_PALETTE_ADD("palette", 2048)

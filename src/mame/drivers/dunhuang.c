@@ -837,6 +837,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update_dunhuang)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dunhuang)
 	MCFG_PALETTE_ADD("palette", 0x100)

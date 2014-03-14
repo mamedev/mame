@@ -349,6 +349,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
 	MCFG_GFXDECODE_ADD("gfxdecode", buster)

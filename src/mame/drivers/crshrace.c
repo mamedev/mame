@@ -449,6 +449,7 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
 	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", crshrace)
 	MCFG_PALETTE_ADD("palette", 2048)

@@ -3627,6 +3627,7 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", marvins)
 
@@ -3696,6 +3697,7 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
 
@@ -3774,6 +3776,7 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tnk3)
 
@@ -3858,6 +3861,7 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ikari)
 
@@ -3915,6 +3919,7 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 	MCFG_SCREEN_SIZE(50*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gwar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x400)
@@ -4015,6 +4020,7 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 	MCFG_SCREEN_SIZE(50*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", tdfever)
 

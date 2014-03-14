@@ -210,6 +210,7 @@ static MACHINE_CONFIG_START( mogura, mogura_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mogura)
 	MCFG_PALETTE_ADD("palette", 32)

@@ -780,6 +780,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_SCREEN_UPDATE_DRIVER(clcd_state, screen_update)
 	MCFG_SCREEN_SIZE(480, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)

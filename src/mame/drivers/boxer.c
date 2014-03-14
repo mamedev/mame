@@ -485,6 +485,7 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update_boxer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", boxer)
 	MCFG_PALETTE_ADD("palette", 4)

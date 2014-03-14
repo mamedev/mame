@@ -566,6 +566,7 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)                /* from MC6845 init, registers 00 & 04. (value - 1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* from MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update_gluck2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", gluck2)
 	MCFG_PALETTE_ADD("palette", 0x100)

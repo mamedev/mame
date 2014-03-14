@@ -600,6 +600,7 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cops_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(cops_state,cops)

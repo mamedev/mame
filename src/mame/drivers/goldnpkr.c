@@ -3744,6 +3744,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
 	MCFG_SCREEN_UPDATE_DRIVER(goldnpkr_state, screen_update_goldnpkr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf) /* 68B45 or 6845s @ CPU clock */
 

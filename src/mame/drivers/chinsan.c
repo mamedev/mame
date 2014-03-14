@@ -613,6 +613,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update_chinsan)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", chinsan)
 	MCFG_PALETTE_ADD("palette", 0x100)

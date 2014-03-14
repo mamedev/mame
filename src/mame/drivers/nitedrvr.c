@@ -152,6 +152,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nitedrvr_state, screen_update_nitedrvr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", nitedrvr)
 

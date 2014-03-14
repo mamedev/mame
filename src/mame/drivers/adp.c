@@ -644,6 +644,7 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
 
@@ -680,6 +681,7 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
 
@@ -715,6 +717,7 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
 

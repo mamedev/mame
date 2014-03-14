@@ -117,6 +117,7 @@ static MACHINE_CONFIG_START( cavepc, cavepc_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
 	MCFG_SCREEN_UPDATE_DRIVER(cavepc_state, screen_update_cavepc)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 MACHINE_CONFIG_END

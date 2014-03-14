@@ -494,6 +494,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_tbowl_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -501,7 +502,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_tbowl_right)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

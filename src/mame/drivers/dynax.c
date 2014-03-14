@@ -4094,6 +4094,7 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4152,6 +4153,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4197,6 +4199,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4252,6 +4255,7 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4295,6 +4299,7 @@ static MACHINE_CONFIG_START( mjfriday, dynax_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4446,6 +4451,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_top)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4453,6 +4459,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
@@ -4638,6 +4645,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4707,6 +4715,7 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette

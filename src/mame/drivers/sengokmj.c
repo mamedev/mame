@@ -573,6 +573,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update_sengokmj)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(sengokmj_state, layer_en_w))

@@ -1257,6 +1257,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
+	MCFG_SCREEN_PALETTE("palette")
 /*
     Measured clocks:
         V = 59.6376Hz

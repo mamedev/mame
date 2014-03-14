@@ -736,6 +736,8 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update_z100)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */

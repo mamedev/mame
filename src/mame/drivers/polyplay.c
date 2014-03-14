@@ -284,6 +284,7 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", polyplay)
 	MCFG_PALETTE_ADD("palette", 10)

@@ -564,6 +564,7 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 7168+1)
 	MCFG_PALETTE_ENABLE_SHADOWS()

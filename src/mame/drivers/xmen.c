@@ -358,6 +358,8 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )   /* correct, same issue of TMNT2 */
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -417,6 +419,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -425,6 +428,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
 	MCFG_SCREEN_VBLANK_DRIVER(xmen_state, screen_eof_xmen6p)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 

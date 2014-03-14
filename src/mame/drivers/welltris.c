@@ -712,6 +712,7 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(15, 367-1, 8, 248-1)
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update_welltris)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", welltris)
 	MCFG_PALETTE_ADD("palette", 2048)

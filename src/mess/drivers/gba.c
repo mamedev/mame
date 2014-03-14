@@ -2255,6 +2255,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_SCREEN_ADD("gbalcd", RASTER)   // htot hst vwid vtot vst vis
 	MCFG_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)
 	MCFG_SCREEN_UPDATE_DRIVER(gba_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 32768)

@@ -482,6 +482,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SCREEN_SIZE(35*8, 30*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 0*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bmcbowl_state, screen_update_bmcbowl)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 

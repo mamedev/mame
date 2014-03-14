@@ -1049,6 +1049,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32, mc6845_intf)  /* 53.333 Hz. guess */

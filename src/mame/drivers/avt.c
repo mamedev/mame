@@ -907,6 +907,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", avt)
 

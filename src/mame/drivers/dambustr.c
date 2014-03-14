@@ -266,6 +266,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dambustr)
 	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */

@@ -599,6 +599,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
 	MCFG_PALETTE_FORMAT(XBGR)

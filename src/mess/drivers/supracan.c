@@ -1924,6 +1924,8 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD( "palette", 32768 )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)

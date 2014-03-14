@@ -151,6 +151,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_SCREEN_SIZE(880, 380)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 364-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lisa_state, screen_update_lisa)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

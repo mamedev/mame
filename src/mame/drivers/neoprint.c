@@ -491,6 +491,7 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_neoprint)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -531,6 +532,7 @@ static MACHINE_CONFIG_START( nprsp, neoprint_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(neoprint_state, screen_update_nprsp)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(neoprint_state,nprsp)
 

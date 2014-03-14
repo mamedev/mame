@@ -785,6 +785,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz_state, screen_update_megadpkr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf)
 

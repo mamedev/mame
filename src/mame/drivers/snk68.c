@@ -594,6 +594,7 @@ static MACHINE_CONFIG_START( pow, snk68_state )
 	// rate on a SAR board is 59.16Hz.
 	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update_pow)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pow)
 	MCFG_PALETTE_ADD("palette", 0x800)

@@ -278,6 +278,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

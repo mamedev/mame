@@ -156,8 +156,9 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	// and there is at least 1 pixel between each row of characters
 	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
 	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
-
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* RAM configurations */

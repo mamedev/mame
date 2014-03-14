@@ -481,6 +481,7 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_popeye)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)

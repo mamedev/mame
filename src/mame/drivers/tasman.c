@@ -607,6 +607,7 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_SCREEN_SIZE(96*8, 64*8+16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 80*8-1, 0*8, 64*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 

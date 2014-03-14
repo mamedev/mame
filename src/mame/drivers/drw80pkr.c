@@ -481,6 +481,7 @@ static MACHINE_CONFIG_START( drw80pkr, drw80pkr_state )
 	MCFG_SCREEN_SIZE((31+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", drw80pkr)
 	MCFG_PALETTE_ADD("palette", 16*16)

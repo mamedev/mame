@@ -385,6 +385,7 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", madalien)
 	MCFG_PALETTE_ADD("palette", 0x30)

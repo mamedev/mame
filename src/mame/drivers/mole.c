@@ -329,6 +329,7 @@ static MACHINE_CONFIG_START( mole, mole_state )
 	MCFG_SCREEN_SIZE(40*8, 25*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mole)
 	MCFG_PALETTE_ADD("palette", 8)

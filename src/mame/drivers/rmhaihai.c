@@ -483,6 +483,7 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update_rmhaihai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", rmhaihai)
 

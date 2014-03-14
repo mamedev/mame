@@ -418,6 +418,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(safarir_state, screen_update_safarir)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(safarir_audio)

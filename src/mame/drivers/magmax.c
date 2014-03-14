@@ -361,6 +361,7 @@ static MACHINE_CONFIG_START( magmax, magmax_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update_magmax)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", magmax)
 	MCFG_PALETTE_ADD("palette", 1*16 + 16*16 + 256)

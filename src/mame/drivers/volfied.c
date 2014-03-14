@@ -265,6 +265,7 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update_volfied)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", volfied)
 	MCFG_PALETTE_ADD("palette", 8192)

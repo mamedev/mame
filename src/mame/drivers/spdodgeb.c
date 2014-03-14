@@ -427,6 +427,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12000000/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update_spdodgeb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", spdodgeb)
 	MCFG_PALETTE_ADD("palette", 1024)

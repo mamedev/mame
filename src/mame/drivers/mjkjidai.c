@@ -394,6 +394,7 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 61*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mjkjidai_state, screen_update_mjkjidai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mjkjidai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)

@@ -356,6 +356,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", cham24)
 	MCFG_PALETTE_ADD("palette", 8*4*16)

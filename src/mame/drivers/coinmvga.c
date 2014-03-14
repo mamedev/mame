@@ -687,6 +687,7 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_SIZE(640,480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", coinmvga)
 

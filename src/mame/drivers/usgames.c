@@ -244,6 +244,7 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 57*8-1, 0*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update_usgames)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", usgames)
 	MCFG_PALETTE_ADD("palette", 2*256)

@@ -371,6 +371,7 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 20*16-1, 0*16, 15*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)

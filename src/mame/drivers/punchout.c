@@ -956,6 +956,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -963,6 +964,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_bottom)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

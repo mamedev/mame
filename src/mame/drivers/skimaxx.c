@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", skimaxx )
 

@@ -408,6 +408,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 	MCFG_SCREEN_SIZE(400, 262)  /* needs to be verified */
 	MCFG_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(policetr_state, screen_update_policetr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 

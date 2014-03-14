@@ -73,6 +73,7 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_SCREEN_SIZE( 75, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 74, 0, 63 )
 	MCFG_SCREEN_UPDATE_DRIVER(gamepock_state, screen_update_gamepock)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

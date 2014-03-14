@@ -358,6 +358,7 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(rampart_state, screen_update_rampart)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(rampart_state,rampart)
 

@@ -1416,6 +1416,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
 	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,automat)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
@@ -1475,6 +1476,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
 	MCFG_VIDEO_START_OVERRIDE(dec0_automat_state,automat)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,0,0,0);
@@ -1539,6 +1541,7 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0_base_sound )
 	//MCFG_SCREEN_SIZE(32*8, 32*8)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hbarrel)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( baddudes, dec0_base_sound )
@@ -1559,6 +1562,7 @@ static MACHINE_CONFIG_DERIVED( baddudes, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_baddudes)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( birdtry, dec0_base_sound )
@@ -1579,6 +1583,7 @@ static MACHINE_CONFIG_DERIVED( birdtry, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_birdtry)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( robocop, dec0_base_sound )
@@ -1604,6 +1609,7 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( robocopb, dec0_base_sound )
@@ -1624,6 +1630,7 @@ static MACHINE_CONFIG_DERIVED( robocopb, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_robocop)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
@@ -1649,6 +1656,7 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ffantasybl, dec0_base_sound )
@@ -1674,6 +1682,7 @@ static MACHINE_CONFIG_DERIVED( ffantasybl, dec0_base_sound )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_hippodrm)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(dec0_state,slyspy)
@@ -1700,6 +1709,7 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_slyspy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)
 
@@ -1727,6 +1737,7 @@ static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_state, screen_update_midres)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", midres)
 	MCFG_VIDEO_START_OVERRIDE(dec0_state,dec0_nodma)

@@ -467,6 +467,7 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_bloodbro)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(bloodbro_state, layer_en_w))

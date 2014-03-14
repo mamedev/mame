@@ -512,6 +512,7 @@ static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 8, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)

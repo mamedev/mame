@@ -407,6 +407,8 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", mugsmash)
 
 	MCFG_PALETTE_ADD("palette", 0x300)

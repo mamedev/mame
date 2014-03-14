@@ -769,6 +769,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -777,6 +778,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

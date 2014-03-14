@@ -306,6 +306,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update_hyperspt)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hyperspt)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

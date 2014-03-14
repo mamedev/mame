@@ -564,6 +564,7 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hnayayoi_state, screen_update_hnayayoi)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 

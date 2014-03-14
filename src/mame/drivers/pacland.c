@@ -439,6 +439,7 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update_pacland)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)

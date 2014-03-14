@@ -378,6 +378,7 @@ static MACHINE_CONFIG_START( bestleag, bestleag_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", bestleag)
 	MCFG_PALETTE_ADD("palette", 0x800)

@@ -477,6 +477,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update_mirax)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)

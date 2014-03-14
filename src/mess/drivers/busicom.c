@@ -223,6 +223,7 @@ static MACHINE_CONFIG_START( busicom, busicom_state )
 	MCFG_SCREEN_SIZE(40*17, 44*11)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(busicom_state, busicom)

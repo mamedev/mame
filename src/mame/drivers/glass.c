@@ -203,6 +203,7 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 368-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update_glass)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", glass)
 	MCFG_PALETTE_ADD("palette", 1024)

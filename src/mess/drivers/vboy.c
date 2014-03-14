@@ -1439,11 +1439,13 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_ADD("3dleft", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

@@ -1004,6 +1004,7 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
@@ -1098,6 +1099,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmicg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)

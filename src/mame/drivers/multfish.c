@@ -1057,6 +1057,8 @@ MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", igrosoft_gamble)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 

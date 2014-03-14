@@ -1016,6 +1016,8 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD("palette", 8)
@@ -1034,6 +1036,8 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE_ADD("gfxdecode", pasopia7 )

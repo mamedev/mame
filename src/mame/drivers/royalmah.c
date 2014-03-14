@@ -3241,6 +3241,7 @@ static MACHINE_CONFIG_START( royalmah, royalmah_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(royalmah_state, screen_update_royalmah)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

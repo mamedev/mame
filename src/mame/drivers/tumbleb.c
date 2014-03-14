@@ -2057,6 +2057,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2095,6 +2096,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2136,6 +2138,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_jumpkids)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2173,6 +2176,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2233,6 +2237,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2343,6 +2348,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8-1, 31*8-2)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_suprtrio)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2381,6 +2387,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_pangpang)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);

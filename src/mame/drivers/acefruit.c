@@ -617,6 +617,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)

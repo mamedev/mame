@@ -195,6 +195,8 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_SIZE(256, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tk80bs_state, screen_update_tk80bs)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", tk80bs)
 

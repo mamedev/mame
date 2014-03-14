@@ -406,6 +406,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
 	MCFG_SCREEN_UPDATE_DRIVER(m52_state, screen_update_m52)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

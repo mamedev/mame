@@ -138,6 +138,7 @@ static MACHINE_CONFIG_START( news, news_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", news)
 	MCFG_PALETTE_ADD("palette", 0x100)

@@ -549,6 +549,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_SIZE(3+160+3, 160)
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(svision_palette) * 3)
 	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
@@ -601,6 +602,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_tvlink)
 
 MACHINE_CONFIG_END

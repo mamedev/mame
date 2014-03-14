@@ -335,6 +335,7 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
 	MCFG_SCREEN_VBLANK_DRIVER(photon2_state, screen_eof_spectrum)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)

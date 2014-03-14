@@ -321,6 +321,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

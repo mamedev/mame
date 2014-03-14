@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE((32)*8, (32)*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
-
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", warpspeed)

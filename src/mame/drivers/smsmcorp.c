@@ -583,6 +583,7 @@ static MACHINE_CONFIG_START( sms, smsmfg_state )
 	MCFG_SCREEN_SIZE(0x1b0, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x1af, 0, 0xff)
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(smsmfg_state, smsmfg)

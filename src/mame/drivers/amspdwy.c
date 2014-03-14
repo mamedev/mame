@@ -272,6 +272,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", amspdwy)
 	MCFG_PALETTE_ADD("palette", 32)

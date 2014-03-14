@@ -215,6 +215,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chsuper_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

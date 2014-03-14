@@ -449,6 +449,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
 	MCFG_PALETTE_ADD("palette", 16)

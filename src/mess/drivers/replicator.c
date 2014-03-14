@@ -666,6 +666,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(120, 18*2) //4x20 chars
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18*2-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(replicator_state, replicator)

@@ -300,6 +300,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", orbit)
 

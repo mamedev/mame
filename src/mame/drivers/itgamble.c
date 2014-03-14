@@ -217,6 +217,7 @@ static MACHINE_CONFIG_START( itgamble, itgamble_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itgamble_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", itgamble)
 	MCFG_PALETTE_ADD("palette", 0x200)

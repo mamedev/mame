@@ -560,6 +560,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_galsnew)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)

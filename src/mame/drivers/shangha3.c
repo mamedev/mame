@@ -486,6 +486,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 
@@ -525,6 +526,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 
@@ -565,6 +567,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
 

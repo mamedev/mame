@@ -1165,6 +1165,7 @@ static MACHINE_CONFIG_START( getrivia, gei_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gei_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(gei_state, gei)

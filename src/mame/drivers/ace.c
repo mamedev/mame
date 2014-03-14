@@ -352,6 +352,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", ace)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")

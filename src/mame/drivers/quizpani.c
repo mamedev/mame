@@ -209,6 +209,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update_quizpani)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

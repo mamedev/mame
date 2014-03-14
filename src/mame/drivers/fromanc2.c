@@ -547,6 +547,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -554,6 +555,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
@@ -597,6 +599,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -604,6 +607,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
@@ -644,6 +648,7 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -651,6 +656,7 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_fromanc2_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)
 

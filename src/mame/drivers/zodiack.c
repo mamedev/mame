@@ -573,6 +573,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zodiack_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", zodiack)
 	MCFG_PALETTE_ADD("palette", 4*8+2*8+2*1)

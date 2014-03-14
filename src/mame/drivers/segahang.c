@@ -825,6 +825,7 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

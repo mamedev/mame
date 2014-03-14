@@ -1751,6 +1751,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_captaven)
 	MCFG_SCREEN_VBLANK_DRIVER(deco32_state, screen_eof_captaven)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", captaven)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2013,6 +2014,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	MCFG_SCREEN_VBLANK_DRIVER(dragngun_state, screen_eof_dragngun)
+	//MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
@@ -2190,7 +2192,6 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
@@ -2244,7 +2245,7 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
+	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)	
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

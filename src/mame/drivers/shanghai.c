@@ -452,6 +452,7 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -485,6 +486,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -520,6 +522,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

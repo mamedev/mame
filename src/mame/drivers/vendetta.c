@@ -498,6 +498,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vendetta_state, screen_update_vendetta)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()

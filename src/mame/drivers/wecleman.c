@@ -1147,6 +1147,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SCREEN_SIZE(320 +16, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)

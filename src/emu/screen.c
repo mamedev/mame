@@ -53,14 +53,12 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 		m_yoffset(0.0f),
 		m_xscale(1.0f),
 		m_yscale(1.0f),
-		m_palette_tag(NULL),
-		m_palette_base(0),
+		m_palette(*this),
 		m_video_attributes(0),
 		m_container(NULL),
 		m_width(100),
 		m_height(100),
 		m_visarea(0, 99, 0, 99),
-		m_palette(NULL),
 		m_curbitmap(0),
 		m_curtexture(0),
 		m_changed(true),
@@ -221,11 +219,9 @@ void screen_device::static_set_screen_vblank(device_t &device, screen_vblank_del
 //  configuration
 //-------------------------------------------------
 
-void screen_device::static_set_palette(device_t &device, const char *palette, int base)
+void screen_device::static_set_palette(device_t &device, const char *tag)
 {
-	screen_device &screen = downcast<screen_device &>(device);
-	screen.m_palette_tag = palette;
-	screen.m_palette_base = base;
+	downcast<screen_device &>(device).m_palette.set_tag(tag);
 }
 
 
@@ -265,9 +261,11 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	if (m_refresh == 0)
 		mame_printf_error("Invalid (zero) refresh rate\n");
 	
-	// check for valid palette
-	if (m_palette_tag != NULL && siblingdevice(m_palette_tag) == NULL)
-		mame_printf_error("Unable to location specified palette '%s'\n", m_palette_tag);
+	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+		mame_printf_error("Screen does not have palette defined\n");		
+	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
+		mame_printf_warning("Screen does not need palette defined\n");
 }
 
 
@@ -282,17 +280,6 @@ void screen_device::device_start()
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.bind_relative_to(*owner());
 	
-	// find our palette: first find the specified device, otherwise look for a subdevice 
-	// named 'palette'; finally, look for a global 'palette' at the root
-	if (m_palette_tag != NULL)
-		m_palette = siblingdevice<palette_device>(m_palette_tag);
-	if (m_palette == NULL)
-		m_palette = siblingdevice<palette_device>("palette");
-	if (m_palette == NULL)
-		m_palette = subdevice<palette_device>("palette");
-	if (m_palette == NULL)
-		m_palette = subdevice<palette_device>(":palette");
-
 	// if we have a palette and it's not started, wait for it
 	if (m_palette != NULL && !m_palette->started())
 		throw device_missing_dependencies();
@@ -300,9 +287,6 @@ void screen_device::device_start()
 	// configure bitmap formats and allocate screen bitmaps
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 
-	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
-		throw emu_fatalerror("Screen does not have palette defined\n");
-	
 	for (int index = 0; index < ARRAY_LENGTH(m_bitmap); index++)
 	{
 		m_bitmap[index].set_format(format(), texformat);

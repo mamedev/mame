@@ -229,6 +229,7 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)      /* Taken from 6845 init, registers 01 & 06 */
 	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", dealem)
 

@@ -989,6 +989,7 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1053,6 +1054,7 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 
@@ -1100,6 +1102,7 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon_state, screen_update_ddragon)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(ddragon_state,ddragon)
 

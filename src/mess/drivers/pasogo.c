@@ -978,6 +978,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(pasogo_palette))
 	MCFG_PALETTE_INIT_OWNER(pasogo_state, pasogo)

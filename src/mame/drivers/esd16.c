@@ -620,6 +620,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0+8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(esd16_state, screen_update_hedpanic)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);

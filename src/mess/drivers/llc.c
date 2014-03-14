@@ -216,6 +216,8 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_SIZE(64*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", llc1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
@@ -242,6 +244,8 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", llc2)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

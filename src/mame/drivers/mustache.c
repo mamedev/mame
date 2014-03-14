@@ -185,6 +185,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update_mustache)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", mustache)
 	MCFG_PALETTE_ADD("palette", 8*16+16*8)

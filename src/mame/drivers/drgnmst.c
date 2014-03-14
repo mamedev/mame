@@ -408,6 +408,7 @@ static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update_drgnmst)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

@@ -553,6 +553,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update_shadfrce)
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", shadfrce)
 	MCFG_PALETTE_ADD("palette", 0x4000)

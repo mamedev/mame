@@ -1209,7 +1209,8 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
-
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")

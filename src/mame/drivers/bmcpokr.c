@@ -241,6 +241,8 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bmcpokr_state, screen_update_bmcpokr)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_GFXDECODE_ADD("gfxdecode", bmcpokr)
 

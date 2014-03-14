@@ -106,6 +106,7 @@ static MACHINE_CONFIG_START( shtzone, shtzone_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shtzone_state, screen_update_shtzone)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 

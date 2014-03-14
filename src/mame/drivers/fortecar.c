@@ -692,6 +692,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")

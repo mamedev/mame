@@ -1039,6 +1039,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)               /* through CRTC registers: 768 x 296 */
 	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", majorpkr)
 	MCFG_PALETTE_ADD("palette", 0x100 * 16)

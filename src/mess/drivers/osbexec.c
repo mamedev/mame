@@ -610,6 +610,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 3 )
 	MCFG_PALETTE_INIT_OWNER(osbexec_state, osbexec)

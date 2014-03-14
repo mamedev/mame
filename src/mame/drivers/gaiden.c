@@ -827,6 +827,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", drgnbowl)
 	MCFG_PALETTE_ADD("palette", 4096)

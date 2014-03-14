@@ -591,6 +591,7 @@ static MACHINE_CONFIG_START( eolith45, eolith_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(eolith_state, screen_update_eolith)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 

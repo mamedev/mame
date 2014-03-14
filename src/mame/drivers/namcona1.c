@@ -944,6 +944,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SCREEN_SIZE(38*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update_namcona1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
