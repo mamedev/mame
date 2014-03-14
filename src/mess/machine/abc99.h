@@ -87,9 +87,6 @@ private:
 	inline void key_down(int state);
 	inline void scan_mouse();
 
-	devcb_resolved_write_line   m_out_clock_func;
-	devcb_resolved_write_line   m_out_keydown_func;
-
 	emu_timer *m_serial_timer;
 	emu_timer *m_mouse_timer;
 

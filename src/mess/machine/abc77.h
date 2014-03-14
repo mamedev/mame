@@ -68,9 +68,6 @@ protected:
 	inline void serial_clock();
 	inline void key_down(int state);
 
-	devcb_resolved_write_line   m_out_clock_func;
-	devcb_resolved_write_line   m_out_keydown_func;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport m_x0;
