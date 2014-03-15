@@ -32,7 +32,8 @@ public:
 		m_via_0(*this, VIA6522_0_TAG),
 		m_via_1(*this, VIA6522_1_TAG),
 		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -44,6 +45,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 class ec65k_state : public driver_device
@@ -125,7 +127,7 @@ void ec65_state::video_start()
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
 	ec65_state *state = device->machine().driver_data<ec65_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

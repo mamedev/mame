@@ -16,10 +16,10 @@ class if800_state : public driver_device
 public:
 	if800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_hgdc(*this, "upd7220")
-		,
+		m_hgdc(*this, "upd7220"),
 		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	required_device<upd7220_device> m_hgdc;
 
@@ -27,12 +27,13 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	if800_state *state = device->machine().driver_data<if800_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 
 	int xi,gfx;
 	UINT8 pen;

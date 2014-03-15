@@ -55,7 +55,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
-		m_ay2(*this, "ay2")
+		m_ay2(*this, "ay2"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -79,6 +80,8 @@ public:
 	required_device<ay8910_device> m_ay2;
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
+	required_device<palette_device> m_palette;
+	
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
 	DECLARE_WRITE8_MEMBER(unk_8c_w);
@@ -105,7 +108,7 @@ public:
 static MC6845_UPDATE_ROW( update_row )
 {
 	othello_state *state = device->machine().driver_data<othello_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int cx, x;
 	UINT32 data_address;
 	UINT32 tmp;

@@ -53,7 +53,8 @@ public:
 		m_line2(*this, "LINE2"),
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -86,6 +87,8 @@ private:
 	required_ioport m_line3;
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 static const UINT8 MHB2501[] = {
@@ -407,7 +410,7 @@ UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bit
 static MC6845_UPDATE_ROW( update_row )
 {
 	sapi1_state *state = device->machine().driver_data<sapi1_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

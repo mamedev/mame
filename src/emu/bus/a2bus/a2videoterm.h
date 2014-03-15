@@ -50,6 +50,8 @@ protected:
 
 private:
 	int m_rambank;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 class a2bus_videoterm_device : public a2bus_videx80_device

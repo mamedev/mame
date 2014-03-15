@@ -46,7 +46,8 @@ public:
 		m_io_cline4(*this, "CLINE4"),
 		m_io_cline5(*this, "CLINE5"),
 		m_io_cline6(*this, "CLINE6"),
-		m_io_cline7(*this, "CLINE7") { }
+		m_io_cline7(*this, "CLINE7"),
+		m_palette(*this, "palette") { }
 
 	virtual void video_start();
 
@@ -105,8 +106,10 @@ protected:
 	optional_ioport m_io_cline6;
 	optional_ioport m_io_cline7;
 
-	void radio86_init_keyboard();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void radio86_init_keyboard();
+public:
+	required_device<palette_device> m_palette;
 };
 
 

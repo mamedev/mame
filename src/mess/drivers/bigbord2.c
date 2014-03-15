@@ -116,7 +116,8 @@ public:
 		m_dsw(*this, "DSW"),
 		m_bankr(*this, "bankr"),
 		m_bankv(*this, "bankv"),
-		m_banka(*this, "banka")
+		m_banka(*this, "banka"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -164,6 +165,8 @@ private:
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankv;
 	required_memory_bank m_banka;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 /* Status port
@@ -593,7 +596,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( bigbord2_update_row )
 {
 	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

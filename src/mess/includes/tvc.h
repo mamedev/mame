@@ -86,7 +86,8 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_sound(*this, "custom"),
 			m_cassette(*this, "cassette"),
-			m_centronics(*this, CENTRONICS_TAG)
+			m_centronics(*this, CENTRONICS_TAG),
+			m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -94,6 +95,7 @@ public:
 	required_device<tvc_sound_device> m_sound;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
+	required_device<palette_device> m_palette;
 
 	void machine_start();
 	void machine_reset();

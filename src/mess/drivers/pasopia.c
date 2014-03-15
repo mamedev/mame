@@ -21,13 +21,14 @@ class pasopia_state : public driver_device
 public:
 	pasopia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi0(*this, "ppi8255_0"),
-	m_ppi1(*this, "ppi8255_1"),
-	m_ppi2(*this, "ppi8255_2"),
-	m_ctc(*this, "z80ctc"),
-	m_pio(*this, "z80pio"),
-	m_crtc(*this, "crtc")
+		m_maincpu(*this, "maincpu"),
+		m_ppi0(*this, "ppi8255_0"),
+		m_ppi1(*this, "ppi8255_1"),
+		m_ppi2(*this, "ppi8255_2"),
+		m_ctc(*this, "z80ctc"),
+		m_pio(*this, "z80pio"),
+		m_crtc(*this, "crtc"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -37,6 +38,7 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ8_MEMBER(pasopia_romram_r);
 	DECLARE_WRITE8_MEMBER(pasopia_ram_w);
@@ -86,7 +88,7 @@ void pasopia_state::video_start()
 MC6845_UPDATE_ROW( pasopia_update_row )
 {
 	pasopia_state *state = device->machine().driver_data<pasopia_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *m_p_chargen = state->memregion("chargen")->base();
 	UINT8 chr,gfx,fg=7,bg=0; // colours need to be determined
 	UINT16 mem,x;

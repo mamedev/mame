@@ -32,7 +32,8 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_crtc(*this, "crtc"),
-		m_beep(*this, "beeper")
+		m_beep(*this, "beeper"),
+		m_palette(*this, "palette")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -102,6 +103,8 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 

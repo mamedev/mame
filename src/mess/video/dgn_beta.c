@@ -99,7 +99,7 @@ the access to the video memory is unclear to me at the moment.
 static MC6845_UPDATE_ROW( dgnbeta_update_row )
 {
 	dgn_beta_state *state = device->machine().driver_data<dgn_beta_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *videoram = state->m_videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;

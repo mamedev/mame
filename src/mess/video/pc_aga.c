@@ -64,6 +64,8 @@ static struct {
 	UINT8   hsync;
 
 	UINT8  *videoram;
+	
+	palette_device *palette;	
 } aga;
 
 
@@ -124,7 +126,7 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 
 /* colors need fixing in the mda_text_* functions ! */
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
@@ -185,7 +187,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -246,7 +248,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -275,7 +277,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -304,7 +306,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -337,7 +339,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -372,7 +374,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -398,7 +400,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -431,7 +433,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -456,7 +458,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   fg = aga.cga_color_select & 0x0F;
 	int i;
@@ -719,6 +721,7 @@ VIDEO_START( pc_aga )
 	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	aga.palette = machine.device<palette_device>(":palette");
 }
 
 VIDEO_START( pc200 )
@@ -750,6 +753,7 @@ VIDEO_START( pc200 )
 	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	aga.palette = machine.device<palette_device>(":palette");
 	memset(aga.videoram, 0, sizeof(UINT8) * 0x10000);
 }
 

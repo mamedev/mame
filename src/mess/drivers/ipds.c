@@ -19,12 +19,14 @@ public:
 	ipds_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "i8275")
+		m_crtc(*this, "i8275"),
+		m_palette(*this, "palette")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
+	required_device<palette_device> m_palette;
 	DECLARE_READ8_MEMBER(ipds_b0_r);
 	DECLARE_READ8_MEMBER(ipds_b1_r);
 	DECLARE_READ8_MEMBER(ipds_c0_r);
@@ -81,7 +83,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	ipds_state *state = device->machine().driver_data<ipds_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 

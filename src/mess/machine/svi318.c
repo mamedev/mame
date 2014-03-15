@@ -326,7 +326,7 @@ READ8_MEMBER(svi318_state::svi318_fdc_irqdrq_r)
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 {
 	svi318_state *state = device->machine().driver_data<svi318_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int i;
 
 	for( i = 0; i < x_count; i++ )

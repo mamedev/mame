@@ -62,7 +62,8 @@ public:
 		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
-		m_acia_irq(CLEAR_LINE)
+		m_acia_irq(CLEAR_LINE),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -404,6 +405,7 @@ public: // HACK FOR MC6845
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_fdq_int(int state);
 	unsigned int calculate_video_address(int ma,int ra);
+	required_device<palette_device> m_palette;
 };
 
 

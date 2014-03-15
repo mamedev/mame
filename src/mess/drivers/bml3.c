@@ -74,7 +74,8 @@ public:
 		m_cass(*this, "cassette"),
 		m_speaker(*this, "speaker"),
 		m_ym2203(*this, "ym2203"),
-		m_acia6850(*this, "acia6850")
+		m_acia6850(*this, "acia6850"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -152,6 +153,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
 	required_device<acia6850_device> m_acia6850;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -589,7 +592,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( update_row )
 {
 	bml3_state *state = device->machine().driver_data<bml3_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
 	// 0: blue
 	// 1: red

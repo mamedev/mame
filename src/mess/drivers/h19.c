@@ -59,7 +59,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_ace(*this, "ins8250"),
 		m_beep(*this, "beeper"),
-		m_p_videoram(*this, "videoram")
+		m_p_videoram(*this, "videoram"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -72,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	DECLARE_WRITE8_MEMBER(h19_kbd_put);
 	required_shared_ptr<UINT8> m_p_videoram;
+	required_device<palette_device> m_palette;
 	UINT8 *m_p_chargen;
 	UINT8 m_term_data;
 	virtual void machine_reset();
@@ -321,7 +323,7 @@ void h19_state::video_start()
 static MC6845_UPDATE_ROW( h19_update_row )
 {
 	h19_state *state = device->machine().driver_data<h19_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

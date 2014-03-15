@@ -90,7 +90,8 @@ public:
 			m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette") { }
 
 	required_device<mc6845_device> m_mc6845;
 	required_shared_ptr<UINT8> m_videoram;
@@ -210,6 +211,7 @@ public:
 	void dgn_beta_frame_interrupt (int data);
 	void dgn_beta_line_interrupt (int data);
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 };
 
 

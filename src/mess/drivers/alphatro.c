@@ -66,7 +66,8 @@ public:
 		, m_usart(*this, "usart")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
-		, m_p_ram(*this, "main_ram")
+		, m_p_ram(*this, "main_ram"),
+		m_palette(*this, "palette")
 	{ }
 
 	DECLARE_READ8_MEMBER(port10_r);
@@ -96,6 +97,8 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	required_shared_ptr<UINT8> m_p_ram;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 READ8_MEMBER( alphatro_state::port10_r )
@@ -154,7 +157,7 @@ void alphatro_state::video_start()
 static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
-	const rgb_t *pens = bitmap.palette()->entry_list_raw();
+	const rgb_t *pens = state->m_palette->palette()->entry_list_raw();
 	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
 	if (y==0) state->m_flashcnt++;
 	bool inv;

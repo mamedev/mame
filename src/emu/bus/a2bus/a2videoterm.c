@@ -186,7 +186,8 @@ const rom_entry *a2bus_aevm80_device::device_rom_region() const
 a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
-	m_crtc(*this, VIDEOTERM_MC6845_NAME)
+	m_crtc(*this, VIDEOTERM_MC6845_NAME),
+	m_palette(*this, ":palette")
 {
 }
 
@@ -349,7 +350,7 @@ void a2bus_videx80_device::write_c800(address_space &space, UINT16 offset, UINT8
 static MC6845_UPDATE_ROW( videoterm_update_row )
 {
 	a2bus_videx80_device    *vterm  = downcast<a2bus_videx80_device *>(device->owner());
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = vterm->m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;

@@ -48,11 +48,11 @@ class pyl601_state : public driver_device
 public:
 	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_speaker(*this, "speaker"),
-	m_fdc(*this, "upd765"),
-	m_ram(*this, RAM_TAG)
-	,
-		m_maincpu(*this, "maincpu") { }
+		m_speaker(*this, "speaker"),
+		m_fdc(*this, "upd765"),
+		m_ram(*this, RAM_TAG),
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	UINT8 m_rom_page;
 	UINT32 m_vdisk_addr;
@@ -87,6 +87,7 @@ public:
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -385,7 +386,7 @@ void pyl601_state::video_start()
 static MC6845_UPDATE_ROW( pyl601_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charrom = state->memregion("chargen")->base();
 
 	int column, bit, i;
@@ -428,7 +429,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 static MC6845_UPDATE_ROW( pyl601a_update_row )
 {
 	pyl601_state *state = device->machine().driver_data<pyl601_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charrom = state->memregion("chargen")->base();
 
 	int column, bit, i;

@@ -76,7 +76,8 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_beep(*this, "beeper"),
 		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia")
+		m_acia(*this, "acia"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -105,6 +106,8 @@ private:
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 
@@ -206,7 +209,7 @@ WRITE8_MEMBER( tavernie_state::ds_w )
 static MC6845_UPDATE_ROW( update_row )
 {
 	tavernie_state *state = device->machine().driver_data<tavernie_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx=0;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);

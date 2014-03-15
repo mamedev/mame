@@ -92,7 +92,8 @@ public:
 		m_io_k3a0(*this, "K3a_0"),
 		m_io_k3b0(*this, "K3b_0"),
 		m_io_k0b(*this, "K0b"),
-		m_expansion(*this, "expansion"){ }
+		m_expansion(*this, "expansion"),
+		m_palette(*this, "palette"){ }
 
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
@@ -194,6 +195,8 @@ private:
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
 	required_shared_ptr<UINT16> m_expansion;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 /*
@@ -774,7 +777,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 // Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
 	applix_state *state = device->machine().driver_data<applix_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 i;
 	UINT16 chr,x;
 	UINT32 mem, vidbase = (state->m_video_latch & 15) << 14, *p = &bitmap.pix32(y);

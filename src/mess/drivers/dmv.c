@@ -28,7 +28,8 @@ public:
 			m_fdc(*this, "upd765"),
 			m_floppy0(*this, "upd765:0:525dd"),
 			m_floppy1(*this, "upd765:1:525dd"),
-			m_video_ram(*this, "video_ram")
+			m_video_ram(*this, "video_ram"),
+			m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -58,6 +59,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram;
 	int         m_fdc_int_line;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -151,7 +153,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	dmv_state *state = device->machine().driver_data<dmv_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 * chargen = state->memregion("maincpu")->base() + 0x1000;
 
 	for( int x = 0; x < pitch; x++ )

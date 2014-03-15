@@ -84,7 +84,7 @@ static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 {
 	tim100_state *state = device->machine().driver_data<tim100_state>();
 	int i;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 15) + (charcode << 4)];
 	if (vsp)

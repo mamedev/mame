@@ -57,7 +57,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_fdc (*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1")
+		m_floppy1(*this, "fdc:1"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -95,6 +96,8 @@ private:
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 static ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
@@ -259,7 +262,7 @@ static I8275_DISPLAY_PIXELS( zorba_update_chr )
 {
 	int i;
 	zorba_state *state = device->machine().driver_data<zorba_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 gfx = state->m_p_chargen[(linecount & 15) + (charcode << 4)];
 
 	if (vsp)

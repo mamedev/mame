@@ -76,7 +76,8 @@ public:
 		m_io_x12(*this, "X12"),
 		m_io_x13(*this, "X13"),
 		m_io_x14(*this, "X14"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	DECLARE_WRITE8_MEMBER( mbee_04_w );
 	DECLARE_WRITE8_MEMBER( mbee_06_w );
@@ -220,6 +221,8 @@ private:
 	optional_ioport m_io_x13;
 	optional_ioport m_io_x14;
 	required_device<screen_device> m_screen;
+public:
+	required_device<palette_device> m_palette;
 
 	void machine_reset_common_disk();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

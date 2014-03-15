@@ -92,7 +92,8 @@ public:
 	//m_cass(*this, "cassette"),
 	//m_wave(*this, WAVE_TAG),
 	//m_printer(*this, "centronics"),
-	m_crtc(*this, "crtc")
+	m_crtc(*this, "crtc"),
+	m_palette(*this, "palette")
 	//m_fdc(*this, "fdc")
 	{ }
 
@@ -101,6 +102,7 @@ public:
 	//required_device<> m_wave;
 	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	//optional_device<> m_fdc;
 	DECLARE_WRITE8_MEMBER(lynx48k_bank_w);
 	DECLARE_WRITE8_MEMBER(lynx128k_bank_w);
@@ -383,8 +385,9 @@ PALETTE_INIT_MEMBER(camplynx_state, camplynx)
 
 static MC6845_UPDATE_ROW( lynx48k_update_row )
 {
+	camplynx_state *state = device->machine().driver_data<camplynx_state>();
 	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 
@@ -407,8 +410,9 @@ static MC6845_UPDATE_ROW( lynx48k_update_row )
 
 static MC6845_UPDATE_ROW( lynx128k_update_row )
 {
+	camplynx_state *state = device->machine().driver_data<camplynx_state>();
 	UINT8 *RAM = device->machine().root_device().memregion("maincpu")->base();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 r,g,b;
 	UINT32 x, *p = &bitmap.pix32(y);
 
