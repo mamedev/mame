@@ -49,24 +49,6 @@
 #include "74145.h"
 #include "coreutil.h"
 
-/*****************************************************************************
-    GLOBAL VARIABLES
-*****************************************************************************/
-
-const ttl74145_interface default_ttl74145 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 const device_type TTL74145 = &device_creator<ttl74145_device>;
 
@@ -79,6 +61,16 @@ const device_type TTL74145 = &device_creator<ttl74145_device>;
 
 ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TTL74145, "TTL74145", tag, owner, clock, "ttl74145", __FILE__)
+	, m_output_line_0_cb(*this)
+	, m_output_line_1_cb(*this)
+	, m_output_line_2_cb(*this)
+	, m_output_line_3_cb(*this)
+	, m_output_line_4_cb(*this)
+	, m_output_line_5_cb(*this)
+	, m_output_line_6_cb(*this)
+	, m_output_line_7_cb(*this)
+	, m_output_line_8_cb(*this)
+	, m_output_line_9_cb(*this)
 	, m_number(0)
 {
 }
@@ -91,48 +83,19 @@ ttl74145_device::ttl74145_device(const machine_config &mconfig, const char *tag,
 void ttl74145_device::device_start()
 {
 	/* resolve callbacks */
-	m_output_line_0_func.resolve(m_output_line_0_cb, *this);
-	m_output_line_1_func.resolve(m_output_line_1_cb, *this);
-	m_output_line_2_func.resolve(m_output_line_2_cb, *this);
-	m_output_line_3_func.resolve(m_output_line_3_cb, *this);
-	m_output_line_4_func.resolve(m_output_line_4_cb, *this);
-	m_output_line_5_func.resolve(m_output_line_5_cb, *this);
-	m_output_line_6_func.resolve(m_output_line_6_cb, *this);
-	m_output_line_7_func.resolve(m_output_line_7_cb, *this);
-	m_output_line_8_func.resolve(m_output_line_8_cb, *this);
-	m_output_line_9_func.resolve(m_output_line_9_cb, *this);
+	m_output_line_0_cb.resolve_safe();
+	m_output_line_1_cb.resolve_safe();
+	m_output_line_2_cb.resolve_safe();
+	m_output_line_3_cb.resolve_safe();
+	m_output_line_4_cb.resolve_safe();
+	m_output_line_5_cb.resolve_safe();
+	m_output_line_6_cb.resolve_safe();
+	m_output_line_7_cb.resolve_safe();
+	m_output_line_8_cb.resolve_safe();
+	m_output_line_9_cb.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_number));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ttl74145_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ttl74145_interface *intf = reinterpret_cast<const ttl74145_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ttl74145_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_output_line_0_cb, 0, sizeof(m_output_line_0_cb));
-		memset(&m_output_line_1_cb, 0, sizeof(m_output_line_1_cb));
-		memset(&m_output_line_2_cb, 0, sizeof(m_output_line_2_cb));
-		memset(&m_output_line_3_cb, 0, sizeof(m_output_line_3_cb));
-		memset(&m_output_line_4_cb, 0, sizeof(m_output_line_4_cb));
-		memset(&m_output_line_5_cb, 0, sizeof(m_output_line_5_cb));
-		memset(&m_output_line_6_cb, 0, sizeof(m_output_line_6_cb));
-		memset(&m_output_line_7_cb, 0, sizeof(m_output_line_7_cb));
-		memset(&m_output_line_8_cb, 0, sizeof(m_output_line_8_cb));
-		memset(&m_output_line_9_cb, 0, sizeof(m_output_line_9_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -156,16 +119,16 @@ void ttl74145_device::write(UINT8 data)
 	/* call output callbacks if the number changed */
 	if (new_number != m_number)
 	{
-		m_output_line_0_func(new_number == 0);
-		m_output_line_1_func(new_number == 1);
-		m_output_line_2_func(new_number == 2);
-		m_output_line_3_func(new_number == 3);
-		m_output_line_4_func(new_number == 4);
-		m_output_line_5_func(new_number == 5);
-		m_output_line_6_func(new_number == 6);
-		m_output_line_7_func(new_number == 7);
-		m_output_line_8_func(new_number == 8);
-		m_output_line_9_func(new_number == 9);
+		m_output_line_0_cb(new_number == 0);
+		m_output_line_1_cb(new_number == 1);
+		m_output_line_2_cb(new_number == 2);
+		m_output_line_3_cb(new_number == 3);
+		m_output_line_4_cb(new_number == 4);
+		m_output_line_5_cb(new_number == 5);
+		m_output_line_6_cb(new_number == 6);
+		m_output_line_7_cb(new_number == 7);
+		m_output_line_8_cb(new_number == 8);
+		m_output_line_9_cb(new_number == 9);
 	}
 
 	/* update state */

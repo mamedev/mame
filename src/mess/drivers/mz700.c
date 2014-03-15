@@ -366,7 +366,8 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz_state, pit_irq_2))
 
 	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
-	MCFG_TTL74145_ADD("ls145", default_ttl74145)
+	
+	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 
 	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")

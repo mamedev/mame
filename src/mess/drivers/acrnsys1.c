@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( acrnsys1, acrnsys1_state )
 
 	/* devices */
 	MCFG_INS8154_ADD("b1", ins8154_b1)
-	MCFG_TTL74145_ADD("ic8_7445", default_ttl74145)
+	MCFG_DEVICE_ADD("ic8_7445", TTL74145, 0)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
