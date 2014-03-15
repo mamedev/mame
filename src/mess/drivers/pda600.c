@@ -194,11 +194,6 @@ static GFXDECODE_START( pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x61d3, pda600_charlayout_13a, 0, 1 )
 GFXDECODE_END
 
-static HD64610_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( pda600, pda600_state )
 	/* basic machine hardware */
@@ -222,7 +217,7 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_HD64610_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", HD64610, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -34,40 +34,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_HD64610_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), HD64610, _clock)    \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define HD64610_INTERFACE(name) \
-	const hd64610_interface (name) =
-
-
+#define MCFG_HD64610_OUT_IRQ_CB(_devcb) \
+	devcb = &hd64610_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_HD64610_OUT_1HZ_CB(_devcb) \
+	devcb = &hd64610_device::set_out_1hz_callback(*device, DEVCB2_##_devcb);
+	
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> hd64610_interface
-
-struct hd64610_interface
-{
-	devcb_write_line        m_out_irq_cb;
-	devcb_write_line        m_out_1hz_cb;
-};
-
-
-
 // ======================> hd64610_device
 
 class hd64610_device :  public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface,
-						public hd64610_interface
+						public device_nvram_interface
 {
 public:
 	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_1hz_callback(device_t &device, _Object object) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -77,7 +66,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -98,8 +86,8 @@ private:
 
 	static const device_timer_id TIMER_UPDATE_COUNTER = 0;
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_1hz_func;
+	devcb2_write_line        m_out_irq_cb;
+	devcb2_write_line        m_out_1hz_cb;
 
 	UINT8   m_regs[0x10];       // Internal registers
 	int     m_hline_state;      // H-Start/Stop line

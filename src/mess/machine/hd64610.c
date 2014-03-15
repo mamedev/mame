@@ -88,7 +88,7 @@ inline void hd64610_device::set_irq_line()
 	{
 		if (LOG) logerror("HD64610 '%s' IRQ %u\n", tag(), irq_out);
 
-		m_out_irq_func(irq_out);
+		m_out_irq_cb(irq_out);
 		m_irq_out = irq_out;
 	}
 }
@@ -154,33 +154,12 @@ hd64610_device::hd64610_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HD64610, "HD64610", tag, owner, clock, "hd64610", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_out_irq_cb(*this),
+		m_out_1hz_cb(*this),
 		m_hline_state(1),
 		m_irq_out(1)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd64610_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const hd64610_interface *intf = reinterpret_cast<const hd64610_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<hd64610_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -189,8 +168,8 @@ void hd64610_device::device_config_complete()
 void hd64610_device::device_start()
 {
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_1hz_func.resolve(m_out_1hz_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_out_1hz_cb.resolve_safe();
 
 	// allocate timers
 	m_counter_timer = timer_alloc(TIMER_UPDATE_COUNTER);
@@ -238,7 +217,7 @@ void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 
 			// update 1Hz out
-			m_out_1hz_func(BIT(m_regs[REG_64HZ], 6));
+			m_out_1hz_cb(BIT(m_regs[REG_64HZ], 6));
 
 			// update IRQ
 			check_alarm();
