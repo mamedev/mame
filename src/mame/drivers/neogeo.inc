@@ -1,6 +1,6 @@
 /****************************************************************************
 
-    neodrvr.c
+    neogeo.inc
 
     Neo-Geo hardware
     This file contains all game specific overrides

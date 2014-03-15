@@ -3,7 +3,7 @@
     Neo-Geo hardware
 
     main driver file - please do NOT put anything specific to a
-    particular game in this file, but use neodrvr.c instead
+    particular game in this file, but use neogeo.inc instead
 
     Credits:
         * This driver was made possible by the research done by
@@ -477,7 +477,7 @@ WRITE16_MEMBER(neogeo_state::save_ram_w)
 
 CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 {
-	// D0 and D1 are memcard presence indicators, D2 indicates memcard
+	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
 	return (memcard_present(machine()) == -1) ? 0x07 : 0x00;
 }
@@ -728,9 +728,9 @@ WRITE16_MEMBER(neogeo_state::system_control_w)
 		case 0x06: if (m_type == NEOGEO_MVS) set_save_ram_unlock(bit); break;
 		case 0x07: neogeo_set_palette_bank(bit); break;
 
-		case 0x02: /* unknown - HC32 middle pin 1 */
-		case 0x03: /* unknown - uPD4990 pin ? */
-		case 0x04: /* unknown - HC32 middle pin 10 */
+		case 0x02: // memory card 1: write enable/disable
+		case 0x03: // memory card 2: write disable/enable
+		case 0x04: // memory card: register select enable/set to normal (what does it mean?)
 			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 			break;
 		}
