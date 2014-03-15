@@ -46,14 +46,22 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define CBM2_USER_PORT_INTERFACE(_name) \
-	const cbm2_user_port_interface (_name) =
-
-
-#define MCFG_CBM2_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_CBM2_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, CBM2_USER_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_CBM2_USER_PORT_IRQ_CALLBACK(_write) \
+	devcb = &cbm2_user_port_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CBM2_USER_PORT_SP_CALLBACK(_write) \
+	devcb = &cbm2_user_port_device::set_sp_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CBM2_USER_PORT_CNT_CALLBACK(_write) \
+	devcb = &cbm2_user_port_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CBM2_USER_PORT_FLAG_CALLBACK(_write) \
+	devcb = &cbm2_user_port_device::set_flag_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -61,62 +69,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cbm2_user_port_interface
-
-struct cbm2_user_port_interface
-{
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_sp_cb;
-	devcb_write_line    m_out_cnt_cb;
-	devcb_write_line    m_out_flag_cb;
-};
-
-
-// ======================> cbm2_user_port_device
-
-class device_cbm2_user_port_interface;
-
-class cbm2_user_port_device : public device_t,
-								public cbm2_user_port_interface,
-								public device_slot_interface
-{
-public:
-	// construction/destruction
-	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~cbm2_user_port_device();
-
-	// computer interface
-	DECLARE_READ8_MEMBER( d1_r );
-	DECLARE_WRITE8_MEMBER( d1_w );
-	DECLARE_READ8_MEMBER( d2_r );
-	DECLARE_WRITE8_MEMBER( d2_w );
-	DECLARE_READ_LINE_MEMBER( pb2_r );
-	DECLARE_WRITE_LINE_MEMBER( pb2_w );
-	DECLARE_READ_LINE_MEMBER( pb3_r );
-	DECLARE_WRITE_LINE_MEMBER( pb3_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_w );
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
-
-	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_out_irq_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( cia_sp_w ) { m_out_sp_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w ) { m_out_cnt_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( flag_w ) { m_out_flag_func(state); }
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_sp_func;
-	devcb_resolved_write_line   m_out_cnt_func;
-	devcb_resolved_write_line   m_out_flag_func;
-
-	device_cbm2_user_port_interface *m_card;
-};
-
+class cbm2_user_port_device;
 
 // ======================> device_cbm2_user_port_interface
 
@@ -126,7 +79,7 @@ class device_cbm2_user_port_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_cbm2_user_port_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_cbm2_user_port_interface();
+	virtual ~device_cbm2_user_port_interface() { }
 
 	virtual UINT8 cbm2_d1_r(address_space &space, offs_t offset) { return 0xff; };
 	virtual void cbm2_d1_w(address_space &space, offs_t offset, UINT8 data) { };
@@ -145,6 +98,53 @@ public:
 
 protected:
 	cbm2_user_port_device *m_slot;
+};
+
+
+// ======================> cbm2_user_port_device
+
+class cbm2_user_port_device : public device_t,
+							  public device_slot_interface
+{
+public:
+	// construction/destruction
+	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~cbm2_user_port_device() { }
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_sp.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_flag_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(object); }
+
+	// computer interface
+	DECLARE_READ8_MEMBER( d1_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->cbm2_d1_r(space, offset); return data; }
+	DECLARE_WRITE8_MEMBER( d1_w ) { if (m_card != NULL) m_card->cbm2_d1_w(space, offset, data); }
+	DECLARE_READ8_MEMBER( d2_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->cbm2_d2_r(space, offset); return data; }
+	DECLARE_WRITE8_MEMBER( d2_w ) { if (m_card != NULL) m_card->cbm2_d2_w(space, offset, data); }
+	DECLARE_READ_LINE_MEMBER( pb2_r ) { return m_card ? m_card->cbm2_pb2_r() : 1; }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { if (m_card != NULL) m_card->cbm2_pb2_w(state); }
+	DECLARE_READ_LINE_MEMBER( pb3_r ) { return m_card ? m_card->cbm2_pb3_r() : 1; }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { if (m_card != NULL) m_card->cbm2_pb3_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pc_w ) { if (m_card != NULL) m_card->cbm2_pc_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { if (m_card != NULL) m_card->cbm2_cnt_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( sp_w ) { if (m_card != NULL) m_card->cbm2_sp_w(state); }
+
+	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_sp_w ) { m_write_sp(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w ) { m_write_cnt(state); }
+	DECLARE_WRITE_LINE_MEMBER( flag_w ) { m_write_flag(state); }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_sp;
+	devcb2_write_line   m_write_cnt;
+	devcb2_write_line   m_write_flag;
+
+	device_cbm2_user_port_interface *m_card;
 };
 
 
