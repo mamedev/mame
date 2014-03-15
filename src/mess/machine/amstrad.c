@@ -2678,14 +2678,18 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 
 		if (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
 		{
-			if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+			if(m_system_type != SYSTEM_GX4000)
 			{
-				return m_amx_mouse_data;
+				if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				{
+					return m_amx_mouse_data;
+				}
+				if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				{
+					return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
+				}
 			}
-			if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
-			{
-				return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
-			}
+			
 			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
 		return 0xFF;
@@ -2718,30 +2722,33 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		}
 		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
-	// update AMX mouse inputs (normally done every 1/300th of a second)
-	if(m_io_ctrltype->read_safe(0) == 1)
-	{
-		static UINT8 prev_x,prev_y;
-		UINT8 data_x, data_y;
+	if(m_system_type != SYSTEM_GX4000)
+		{
+			// update AMX mouse inputs (normally done every 1/300th of a second)
+			if(m_io_ctrltype->read_safe(0) == 1)
+			{
+				static UINT8 prev_x,prev_y;
+				UINT8 data_x, data_y;
 
-		m_amx_mouse_data = 0x0f;
-		data_x = m_io_mouse1->read_safe(0) & 0xff;
-		data_y = m_io_mouse2->read_safe(0) & 0xff;
+				m_amx_mouse_data = 0x0f;
+				data_x = m_io_mouse1->read_safe(0) & 0xff;
+				data_y = m_io_mouse2->read_safe(0) & 0xff;
 
-		if(data_x > prev_x)
-			m_amx_mouse_data &= ~0x08;
-		if(data_x < prev_x)
-			m_amx_mouse_data &= ~0x04;
-		if(data_y > prev_y)
-			m_amx_mouse_data &= ~0x02;
-		if(data_y < prev_y)
-			m_amx_mouse_data &= ~0x01;
-		m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
-		prev_x = data_x;
-		prev_y = data_y;
+				if(data_x > prev_x)
+					m_amx_mouse_data &= ~0x08;
+				if(data_x < prev_x)
+					m_amx_mouse_data &= ~0x04;
+				if(data_y > prev_y)
+					m_amx_mouse_data &= ~0x02;
+				if(data_y < prev_y)
+					m_amx_mouse_data &= ~0x01;
+				m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
+				prev_x = data_x;
+				prev_y = data_y;
 
-		m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
-	}
+				m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
+			}
+		}
 	return 0xFF;
 }
 
