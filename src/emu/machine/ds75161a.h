@@ -35,52 +35,82 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_DS75161A_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, DS75161A, 0)  \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_DS75161A_IN_REN_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_ren_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_IFC_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_ifc_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_NDAC_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_ndac_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_NRFD_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_nrfd_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_DAV_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_dav_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_EOI_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_eoi_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_IN_ATN_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_atn_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_DS75161A_IN_SRQ_CB(_devcb) \
+	devcb = &ds75161a_device::set_in_srq_callback(*device, DEVCB2_##_devcb);
 
-#define DS75161A_INTERFACE(name) \
-	const ds75161a_interface (name) =
+#define MCFG_DS75161A_OUT_REN_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_ren_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_IFC_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_ifc_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_NDAC_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_ndac_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_NRFD_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_nrfd_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_DAV_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_dav_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_EOI_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_eoi_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_DS75161A_OUT_ATN_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_atn_callback(*device, DEVCB2_##_devcb);
 
-
+#define MCFG_DS75161A_OUT_SRQ_CB(_devcb) \
+	devcb = &ds75161a_device::set_out_srq_callback(*device, DEVCB2_##_devcb);
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> ds75161a_interface
-
-struct ds75161a_interface
-{
-	devcb_read_line     m_in_ren_cb;
-	devcb_read_line     m_in_ifc_cb;
-	devcb_read_line     m_in_ndac_cb;
-	devcb_read_line     m_in_nrfd_cb;
-	devcb_read_line     m_in_dav_cb;
-	devcb_read_line     m_in_eoi_cb;
-	devcb_read_line     m_in_atn_cb;
-	devcb_read_line     m_in_srq_cb;
-
-	devcb_write_line    m_out_ren_cb;
-	devcb_write_line    m_out_ifc_cb;
-	devcb_write_line    m_out_ndac_cb;
-	devcb_write_line    m_out_nrfd_cb;
-	devcb_write_line    m_out_dav_cb;
-	devcb_write_line    m_out_eoi_cb;
-	devcb_write_line    m_out_atn_cb;
-	devcb_write_line    m_out_srq_cb;
-};
-
-
 // ======================> ds75161a_device
 
-class ds75161a_device : public device_t,
-						public ds75161a_interface
+class ds75161a_device : public device_t
 {
 public:
 	// construction/destruction
 	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_in_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ren_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ifc_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_ndac_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ndac_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_nrfd_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_nrfd_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_dav_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_dav_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_eoi_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_eoi_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_atn_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_atn_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_srq_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_srq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ren_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ifc_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_ndac_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_ndac_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_nrfd_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_nrfd_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dav_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_dav_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_eoi_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_eoi_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_atn_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_atn_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_srq_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_srq_cb.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( te_w );
 	DECLARE_WRITE_LINE_MEMBER( dc_w );
@@ -105,29 +135,28 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
 	void update_signals();
 
-	devcb_resolved_read_line    m_in_ren_func;
-	devcb_resolved_read_line    m_in_ifc_func;
-	devcb_resolved_read_line    m_in_ndac_func;
-	devcb_resolved_read_line    m_in_nrfd_func;
-	devcb_resolved_read_line    m_in_dav_func;
-	devcb_resolved_read_line    m_in_eoi_func;
-	devcb_resolved_read_line    m_in_atn_func;
-	devcb_resolved_read_line    m_in_srq_func;
+	devcb2_read_line     m_in_ren_cb;
+	devcb2_read_line     m_in_ifc_cb;
+	devcb2_read_line     m_in_ndac_cb;
+	devcb2_read_line     m_in_nrfd_cb;
+	devcb2_read_line     m_in_dav_cb;
+	devcb2_read_line     m_in_eoi_cb;
+	devcb2_read_line     m_in_atn_cb;
+	devcb2_read_line     m_in_srq_cb;
 
-	devcb_resolved_write_line   m_out_ren_func;
-	devcb_resolved_write_line   m_out_ifc_func;
-	devcb_resolved_write_line   m_out_ndac_func;
-	devcb_resolved_write_line   m_out_nrfd_func;
-	devcb_resolved_write_line   m_out_dav_func;
-	devcb_resolved_write_line   m_out_eoi_func;
-	devcb_resolved_write_line   m_out_atn_func;
-	devcb_resolved_write_line   m_out_srq_func;
+	devcb2_write_line    m_out_ren_cb;
+	devcb2_write_line    m_out_ifc_cb;
+	devcb2_write_line    m_out_ndac_cb;
+	devcb2_write_line    m_out_nrfd_cb;
+	devcb2_write_line    m_out_dav_cb;
+	devcb2_write_line    m_out_eoi_cb;
+	devcb2_write_line    m_out_atn_cb;
+	devcb2_write_line    m_out_srq_cb;
 
 	int m_ren;
 	int m_ifc;
