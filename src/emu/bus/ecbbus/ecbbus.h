@@ -77,6 +77,13 @@
 	ecbbus_slot_device::static_set_ecbbus_slot(*device, ECBBUS_TAG, _num);
 
 
+#define MCFG_ECBBUS_IRQ_CALLBACK(_write) \
+	devcb = &ecbbus_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_ECBBUS_NMI_CALLBACK(_write) \
+	devcb = &ecbbus_device::set_nmi_wr_callback(*device, DEVCB2_##_write);
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -123,6 +130,9 @@ class ecbbus_device : public device_t
 public:
 	// construction/destruction
 	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ecbbus_device &>(device).m_write_nmi.set_callback(object); }
 
 	void add_card(device_ecbbus_card_interface *card, int pos);
 
