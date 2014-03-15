@@ -517,12 +517,6 @@ GROM_LIBRARY_CONFIG8(pascal1, region_gromlib1)
 GROM_LIBRARY_CONFIG8(pascal2, region_gromlib2)
 GROM_LIBRARY_CONFIG3(pascal3, region_gromlib3)
 
-static GROMPORT_CONFIG(console_cartslot)
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_cart),
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_reset)
-};
-
 READ8_MEMBER( ti99_8_state::cruread )
 {
 //  if (VERBOSE>6) LOG("read access to CRU address %04x\n", offset << 4);
@@ -886,11 +880,6 @@ static TMS9995_CONFIG( ti99_8_processor_config )
 	NO_OVERFLOW_INT
 };
 
-static TI_SOUND_CONFIG( sound_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_sound)   // READY
-};
-
 /*
     Format:
     Name, mode, stop, mask, select, write, read8z function, write8 function
@@ -1003,18 +992,6 @@ static SPEECH8_CONFIG( speech_config )
 	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_speech),  // READY
 };
 
-static JOYPORT_CONFIG( joyport8_60 )
-{
-	DEVCB_NULL,
-	60
-};
-
-static JOYPORT_CONFIG( joyport8_50 )
-{
-	DEVCB_NULL,
-	50
-};
-
 MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
 	m_nready_combined = 0;
@@ -1048,16 +1025,19 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* Main board */
 	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0)
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
+	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_cart) )
+	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_998, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_pbox) )
 
 	/* Sound hardware */
-	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_sound) )
 
 	/* Cassette drives */
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -1079,7 +1059,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport8_60 )
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
 MACHINE_CONFIG_END
 
 
@@ -1096,16 +1076,19 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* Main board */
 	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0 )
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
-	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
+	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
+	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_cart) )
+	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, 0x70000 )
+	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_998, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(ti99_8_state, extint) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(ti99_8_state, notconnected) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_pbox) )
 
 	/* Sound hardware */
-	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_sound) )
 
 	/* Cassette drives */
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -1127,7 +1110,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, joyport8_50 )
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
 MACHINE_CONFIG_END
 
 /*

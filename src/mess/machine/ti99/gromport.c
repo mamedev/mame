@@ -131,9 +131,9 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
 	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock, "gromport", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_connector(NULL),
-		m_reset_on_insert(true)
-{
-}
+		m_reset_on_insert(true),
+		m_console_ready(*this),
+		m_console_reset(*this) { }
 
 /* Only called for addresses 6000-7fff and GROM addresses (see datamux config) */
 READ8Z_MEMBER(gromport_device::readz)
@@ -167,6 +167,8 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 
 void gromport_device::device_start()
 {
+	m_console_ready.resolve();
+	m_console_reset.resolve();
 }
 
 void gromport_device::device_reset()
@@ -198,9 +200,6 @@ void gromport_device::cartridge_inserted()
 
 void gromport_device::device_config_complete()
 {
-	const gromport_config *intf = reinterpret_cast<const gromport_config *>(static_config());
-	m_console_ready.resolve(intf->ready, *this);
-	m_console_reset.resolve(intf->reset, *this);
 	m_connector = static_cast<ti99_cartridge_connector_device*>(first_subdevice());
 	set_grom_base(0x9800, 0xf800);
 }

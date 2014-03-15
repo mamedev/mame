@@ -174,8 +174,8 @@ public:
 	device_t*   get_drive(const char* name);
 
 protected:
-	virtual void device_start(void);
-	virtual void device_config_complete(void);
+	void device_start(void);
+	void device_config_complete(void);
 
 private:
 	int get_index_from_tagname();
@@ -227,29 +227,6 @@ protected:
 	int     m_select_mask;
 	int     m_select_value;
 };
-
-#define MCFG_PERIBOX_SET_PREFIX( _prefix ) \
-	downcast<peribox_device *>(device)->set_prefix(_prefix);
-
-#define MCFG_PERIBOX_ADD(_tag, _prefix) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX, 0); \
-	MCFG_PERIBOX_SET_PREFIX( _prefix )
-
-#define MCFG_PERIBOX_EV_ADD(_tag, _prefix) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_EV, 0) ; \
-	MCFG_PERIBOX_SET_PREFIX( _prefix )
-
-#define MCFG_PERIBOX_SG_ADD(_tag, _prefix) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_SG, 0) ; \
-	MCFG_PERIBOX_SET_PREFIX( _prefix )
-
-#define MCFG_PERIBOX_GEN_ADD(_tag, _prefix) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_GEN, 0); \
-	MCFG_PERIBOX_SET_PREFIX( _prefix )
-
-#define MCFG_PERIBOX_998_ADD(_tag, _prefix) \
-	MCFG_DEVICE_ADD(_tag, PERIBOX_998, 0) ; \
-	MCFG_PERIBOX_SET_PREFIX( _prefix )
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_SLOT, 0) \

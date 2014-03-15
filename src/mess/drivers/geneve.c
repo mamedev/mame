@@ -693,31 +693,10 @@ static TMS9995_CONFIG( geneve_processor_config )
 	NO_OVERFLOW_INT     // The generally available versions of TMS9995 have a deactivated overflow interrupt
 };
 
-static TI_SOUND_CONFIG( sound_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, ext_ready)   // READY
-};
-
 static const mm58274c_interface geneve_mm58274c_interface =
 {
 	1,  /*  mode 24*/
 	0   /*  first day of week */
-};
-
-static GENEVE_KEYBOARD_CONFIG( geneve_keyb_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, keyboard_interrupt)
-};
-
-static GENEVE_MAPPER_CONFIG( mapper_conf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, mapper_ready)    // READY
-};
-
-static JOYPORT_CONFIG( joyport_60 )
-{
-	DEVCB_NULL,
-	60
 };
 
 DRIVER_INIT_MEMBER(geneve_state,geneve)
@@ -772,22 +751,29 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 
 	// Main board components
 	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
-	MCFG_GENEVE_MAPPER_ADD(GMAPPER_TAG, mapper_conf)
+
+	// Mapper
+	MCFG_DEVICE_ADD(GMAPPER_TAG, GENEVE_MAPPER, 0)
+	MCFG_GENEVE_READY_HANDLER( WRITELINE(geneve_state, mapper_ready) )
+
+	// Clock
 	MCFG_MM58274C_ADD(GCLOCK_TAG, geneve_mm58274c_interface)
 
 	// Peripheral expansion box (Geneve composition)
-	MCFG_PERIBOX_GEN_ADD( PERIBOX_TAG, 0x00000 )
+	MCFG_DEVICE_ADD( PERIBOX_TAG, PERIBOX_GEN, 0)
 	MCFG_PERIBOX_INTA_HANDLER( WRITELINE(geneve_state, inta) )
 	MCFG_PERIBOX_INTB_HANDLER( WRITELINE(geneve_state, intb) )
 	MCFG_PERIBOX_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
 
 	// sound hardware
-	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
+	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG )
+	MCFG_TI_SOUND_READY_HANDLER( WRITELINE(geneve_state, ext_ready) )
 
 	// User interface devices
-	MCFG_GENEVE_KEYBOARD_ADD( GKEYBOARD_TAG, geneve_keyb_conf )
+	MCFG_DEVICE_ADD( GKEYBOARD_TAG, GENEVE_KEYBOARD, 0 )
+	MCFG_GENEVE_KBINT_HANDLER( WRITELINE(geneve_state, keyboard_interrupt) )
 	MCFG_GENEVE_MOUSE_ADD( GMOUSE_TAG )
-	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG, joyport_60 )
+	MCFG_GENEVE_JOYPORT_ADD( JOYPORT_TAG, 60 )
 
 MACHINE_CONFIG_END
 

@@ -41,7 +41,6 @@ struct dmux_device_list_entry
 
 struct datamux_config
 {
-	devcb_write_line                ready;
 	const dmux_device_list_entry    *devlist;
 };
 
@@ -78,12 +77,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
+	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object)
+	{
+		return downcast<ti99_datamux_device &>(device).m_ready.set_callback(object);
+	}
+
 protected:
 	/* Constructor */
 	void device_start();
 	void device_stop();
 	void device_reset();
-	void device_config_complete();
 	ioport_constructor device_input_ports() const;
 
 private:
@@ -107,7 +110,7 @@ private:
 	void ready_join();
 
 	// Ready line to the CPU
-	devcb_resolved_write_line m_ready;
+	devcb2_write_line m_ready;
 
 	// Own ready state.
 	line_state  m_muxready;
@@ -149,3 +152,6 @@ private:
 	MCFG_DEVICE_ADD(_tag, DATAMUX, 0) \
 	MCFG_DEVICE_CONFIG( _devices )
 #endif
+
+#define MCFG_DMUX_READY_HANDLER( _intcallb ) \
+	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB2_##_intcallb );

@@ -75,9 +75,8 @@
     Constructor
 */
 ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__)
-{
-}
+: device_t(mconfig, DATAMUX, "Databus multiplexer", tag, owner, clock, "ti99_datamux", __FILE__),
+	m_ready(*this) { }
 
 #define TRACE_READY 0
 #define TRACE_ACCESS 0
@@ -388,19 +387,12 @@ void ti99_datamux_device::device_start(void)
 {
 	m_ram16b = NULL;
 	m_muxready = ASSERT_LINE;
+	m_ready.resolve();
 }
 
 void ti99_datamux_device::device_stop(void)
 {
 	if (m_ram16b) free(m_ram16b);
-}
-
-void ti99_datamux_device::device_config_complete()
-{
-	const datamux_config *conf = reinterpret_cast<const datamux_config *>(static_config());
-	// Must do this here, or ready may be called too early
-	// The device is built below because we need the dip switches.
-	m_ready.resolve(conf->ready, *this);
 }
 
 void ti99_datamux_device::device_reset(void)

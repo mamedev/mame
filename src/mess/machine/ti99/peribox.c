@@ -205,7 +205,7 @@ CRUCLK*  51||52  DBIN
 #define TRACE_READY 0
 
 // Show emulation details
-#define TRACE_EMU 0
+#define TRACE_EMU 1
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -236,6 +236,7 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 	m_datamux_ready(*this)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
+	m_address_prefix = 0x70000;
 }
 
 /*
@@ -396,7 +397,7 @@ void peribox_device::device_start(void)
 	m_console_intb.resolve();
 	m_datamux_ready.resolve();
 
-	if (TRACE_EMU) logerror("Prefix set to %05x\n", m_address_prefix);
+	if (TRACE_EMU) logerror("AMA/B/C address prefix set to %05x\n", m_address_prefix);
 }
 
 void peribox_device::device_config_complete()
@@ -465,6 +466,7 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Geneve", tag, owner, clock, "peribox_gen", __FILE__)
 {
+	m_address_prefix = 0x00000;
 };
 
 // The BwG controller will not run with the Geneve due to its wait state
@@ -519,6 +521,7 @@ machine_config_constructor peribox_gen_device::device_mconfig_additions() const
 peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
 {
+	m_address_prefix = 0x70000;
 };
 
 // The BwG controller will not run with the TI-99/8 for the same reason why
@@ -560,6 +563,7 @@ machine_config_constructor peribox_998_device::device_mconfig_additions() const
 peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : peribox_device(mconfig, PERIBOX_SG, "Peripheral expansion box SGCPU", tag, owner, clock, "peribox_sg", __FILE__)
 {
+	m_address_prefix = 0x70000;
 };
 
 SLOT_INTERFACE_START( peribox_slotp )
@@ -604,6 +608,7 @@ machine_config_constructor peribox_sg_device::device_mconfig_additions() const
 peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : peribox_device(mconfig, PERIBOX_EV, "Peripheral expansion box EVPC", tag, owner, clock, "peribox_ev", __FILE__)
 {
+	m_address_prefix = 0x70000;
 };
 
 MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
@@ -699,7 +704,6 @@ void peribox_slot_device::set_genmod(bool set)
 
 void peribox_slot_device::device_start(void)
 {
-	if (TRACE_EMU) logerror("Peribox slot started\n");
 }
 
 void peribox_slot_device::device_config_complete()

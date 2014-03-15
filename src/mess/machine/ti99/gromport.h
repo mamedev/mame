@@ -17,15 +17,6 @@
 
 extern const device_type GROMPORT;
 
-#define GROMPORT_CONFIG(name) \
-	const gromport_config(name) =
-
-struct gromport_config
-{
-	devcb_write_line    ready;
-	devcb_write_line    reset;
-};
-
 class ti99_cartridge_connector_device;
 
 class gromport_device : public bus8z_device, public device_slot_interface
@@ -37,6 +28,9 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz);
 	DECLARE_WRITE8_MEMBER(cruwrite);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
+
+	template<class _Object> static devcb2_base &static_set_ready_callback(device_t &device, _Object object)  { return downcast<gromport_device &>(device).m_console_ready.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
 	void    set_grom_base(UINT16 grombase, UINT16 grommask);
@@ -51,19 +45,24 @@ protected:
 
 private:
 	ti99_cartridge_connector_device*    m_connector;
-	bool m_reset_on_insert;
-	devcb_resolved_write_line m_console_reset;
-	devcb_resolved_write_line m_console_ready;
-	UINT16      m_grombase;
-	UINT16      m_grommask;
+	bool                m_reset_on_insert;
+	devcb2_write_line   m_console_ready;
+	devcb2_write_line   m_console_reset;
+	UINT16              m_grombase;
+	UINT16              m_grommask;
 };
 
 SLOT_INTERFACE_EXTERN(gromport);
 
-#define MCFG_TI99_GROMPORT_ADD( _tag, _conf )   \
+#define MCFG_TI99_GROMPORT_ADD( _tag )   \
 	MCFG_DEVICE_ADD(_tag, GROMPORT, 0) \
-	MCFG_DEVICE_CONFIG(_conf)   \
 	MCFG_DEVICE_SLOT_INTERFACE(gromport, "single", false)
+
+#define MCFG_GROMPORT_READY_HANDLER( _ready ) \
+	devcb = &gromport_device::static_set_ready_callback( *device, DEVCB2_##_ready );
+
+#define MCFG_GROMPORT_RESET_HANDLER( _reset ) \
+	devcb = &gromport_device::static_set_reset_callback( *device, DEVCB2_##_reset );
 
 /****************************************************************************/
 

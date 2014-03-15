@@ -181,7 +181,8 @@
 #define LOG logerror
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__)
+: device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__),
+	m_ready(*this)
 {
 	m_eprom = NULL;
 }
@@ -1161,8 +1162,6 @@ WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
 
 void geneve_mapper_device::device_start()
 {
-	const geneve_mapper_config *conf = reinterpret_cast<const geneve_mapper_config *>(static_config());
-
 	if (VERBOSE>0) LOG("genboard: Starting Geneve mapper\n");
 	// Get pointers
 	m_peribox = machine().device<bus8z_device>(PERIBOX_TAG);
@@ -1171,7 +1170,7 @@ void geneve_mapper_device::device_start()
 	m_sound = machine().device<bus8z_device>(TISOUND_TAG);
 	m_clock = machine().device<mm58274c_device>(GCLOCK_TAG);
 
-	m_ready.resolve(conf->ready, *this);
+	m_ready.resolve();
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
@@ -1291,7 +1290,8 @@ static const UINT8 MF1_CODE[0xe] =
 };
 
 geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__)
+: device_t(mconfig, GENEVE_KEYBOARD, "Geneve XT-style keyboard", tag, owner, clock, "geneve_keyboard", __FILE__),
+	m_interrupt(*this)
 {
 }
 
@@ -1579,17 +1579,11 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::reset_line )
 	}
 }
 
-void geneve_keyboard_device::device_config_complete()
-{
-	// Resolve the callback lines to the console
-	const geneve_keyboard_config *intf = reinterpret_cast<const geneve_keyboard_config *>(static_config());
-	m_interrupt.resolve(intf->interrupt, *this);
-}
-
 void geneve_keyboard_device::device_start()
 {
 	if (VERBOSE>2) LOG("genboard: Keyboard started\n");
 	m_timer = timer_alloc(0);
+	m_interrupt.resolve();
 }
 
 void geneve_keyboard_device::device_reset()
