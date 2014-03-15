@@ -146,13 +146,13 @@ inline void superpet_device::update_cpu()
 	{
 		// 6502 active
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		machine().firstcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	else
 	{
 		// 6809 active
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine().firstcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 

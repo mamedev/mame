@@ -39,8 +39,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	ATTR_DEPRECATED void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
-	ATTR_DEPRECATED void install_device_write(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_device_func whandler, const char *whandler_name);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 public:
 	required_device<cpu_device>  m_maincpu;
@@ -105,6 +103,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+	
+	DECLARE_READ8_MEMBER(pc_page_r);
+	DECLARE_WRITE8_MEMBER(pc_page_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 
 	const char *m_cputag;
 
