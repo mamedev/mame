@@ -20,7 +20,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
@@ -533,18 +533,11 @@ static const cassette_interface cassette_intf =
 //  COMX_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx35_state::int_w )
+WRITE_LINE_MEMBER( comx35_state::irq_w )
 {
 	m_int = state;
 	check_interrupt();
 }
-
-static COMX_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, int_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 
@@ -646,7 +639,8 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx35_state, irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -694,7 +688,8 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
-	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx35_state, irq_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

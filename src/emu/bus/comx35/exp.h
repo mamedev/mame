@@ -55,14 +55,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define COMX_EXPANSION_INTERFACE(_name) \
-	const comx_expansion_slot_interface (_name) =
-
-
-#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
+	devcb = &comx_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -70,28 +69,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> comx_expansion_slot_interface
-
-struct comx_expansion_slot_interface
-{
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_wait_cb;
-	devcb_write_line    m_out_clear_cb;
-};
-
-
 // ======================> comx_expansion_slot_device
 
 class device_comx_expansion_card_interface;
 
 class comx_expansion_slot_device : public device_t,
-									public comx_expansion_slot_interface,
-									public device_slot_interface
+								   public device_slot_interface
 {
 public:
 	// construction/destruction
 	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~comx_expansion_slot_device();
+	virtual ~comx_expansion_slot_device() { }
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<comx_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 
 	UINT8 mrd_r(address_space &space, offs_t offset, int *extrom);
 	void mwr_w(address_space &space, offs_t offset, UINT8 data);
@@ -104,21 +94,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ds_w );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( wait_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
 
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_wait_func;
-	devcb_resolved_write_line   m_out_clear_func;
+	devcb2_write_line   m_write_irq;
 
 	device_comx_expansion_card_interface *m_card;
 };
@@ -134,7 +116,7 @@ class device_comx_expansion_card_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_comx_expansion_card_interface();
+	virtual ~device_comx_expansion_card_interface() { }
 
 protected:
 	// signals
