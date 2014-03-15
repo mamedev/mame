@@ -109,7 +109,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	konami_sortlayers3(layers, m_layerpri);
 
-	m_k054338->update_all_shadows(0);
+	m_k054338->update_all_shadows(0, m_palette);
 	m_k054338->fill_backcolor(bitmap, 0);
 
 	screen.priority().fill(0, cliprect);

@@ -494,7 +494,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		K054338_update_all_shadows(machine(), rushingheroes_hack);
+		K054338_update_all_shadows(machine(), rushingheroes_hack, m_palette);
 	}
 
 	// pre-sort layers
@@ -804,7 +804,7 @@ void konamigx_state::gx_draw_basic_extended_tilemaps_1(screen_device &screen, bi
 			if (width>512) // vsnetscr case
 				pixeldouble_output = 1;
 
-			K053936GP_0_zoom_draw(screen.machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl);
+			K053936GP_0_zoom_draw(screen.machine(), bitmap, cliprect, sub1, l, k, alpha, pixeldouble_output, m_k053936_0_ctrl_16, m_k053936_0_linectrl_16, m_k053936_0_ctrl, m_k053936_0_linectrl, m_palette);
 		}
 		else
 		{

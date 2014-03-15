@@ -48,7 +48,7 @@ UINT32 bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bit
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
 
-	m_k054338->update_all_shadows(0);
+	m_k054338->update_all_shadows(0, m_palette);
 	m_k054338->fill_backcolor(bitmap, 0);
 
 	for (i = 0; i < 4; i++)

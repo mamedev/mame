@@ -845,7 +845,7 @@ VIDEO_START_MEMBER(gticlub_state,gticlub)
 	debug_tex_palette = 0;
 	*/
 
-	K001006_init(machine());
+	K001006_init(machine(),m_palette);
 	K001005_init(machine());
 }
 

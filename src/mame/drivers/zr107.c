@@ -242,7 +242,7 @@ protected:
 VIDEO_START_MEMBER(zr107_state,jetwave)
 {
 	K001005_init(machine());
-	K001006_init(machine());
+	K001006_init(machine(),m_palette);
 }
 
 
@@ -292,7 +292,7 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	m_k056832->set_layer_offs(6, -29, -27);
 	m_k056832->set_layer_offs(7, -29, -27);
 
-	K001006_init(machine());
+	K001006_init(machine(),m_palette);
 	K001005_init(machine());
 }
 

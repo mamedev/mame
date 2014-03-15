@@ -63,8 +63,9 @@ static UINT32 K001006_addr[MAX_K001006_CHIPS] = { 0, 0 };
 static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
 static UINT32 *K001006_palette[MAX_K001006_CHIPS];
+static palette_device *m_palette;
 
-void K001006_init(running_machine &machine)
+void K001006_init(running_machine &machine, palette_device *palette)
 {
 	int i;
 	for (i=0; i<MAX_K001006_CHIPS; i++)
@@ -74,8 +75,9 @@ void K001006_init(running_machine &machine)
 		K001006_addr[i] = 0;
 		K001006_device_sel[i] = 0;
 		K001006_palette[i] = auto_alloc_array(machine, UINT32, 0x800);
-		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
+		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));		
 	}
+	m_palette = palette;
 }
 
 static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 mem_mask)
@@ -1576,7 +1578,6 @@ void K001005_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void K001005_swap_buffers(running_machine &machine)
 {
-	palette_device *m_palette = machine.first_screen()->palette();
 	K001005_bitmap_page ^= 1;
 
 	//if (K001005_status == 2)
