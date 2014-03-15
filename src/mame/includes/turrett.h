@@ -15,7 +15,8 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_ata(*this, "ata"),
 			m_bank_a(*this, "bank_a"),
-			m_bank_b(*this, "bank_b") {}
+			m_bank_b(*this, "bank_b"),
+			m_screen(*this, "screen") {}
 
 	// constants
 	static const UINT32 X_VISIBLE = 336;
@@ -29,6 +30,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<UINT16> m_bank_a;
 	required_shared_ptr<UINT16> m_bank_b;
+	required_device<screen_device> m_screen;
 
 	// handlers
 	DECLARE_WRITE32_MEMBER(dma_w);

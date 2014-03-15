@@ -156,7 +156,7 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( turrett_state::sbrc2_r )
 {
-	return machine().primary_screen->vblank();
+	return m_screen->vblank();
 }
 
 
