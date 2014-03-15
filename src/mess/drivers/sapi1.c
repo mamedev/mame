@@ -88,7 +88,7 @@ private:
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
 public:	
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 };
 
 static const UINT8 MHB2501[] = {

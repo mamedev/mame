@@ -107,7 +107,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 public:	
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 };
 
 
