@@ -37,21 +37,12 @@ const device_type VIDEOBRAIN_EXPANSION_SLOT = &device_creator<videobrain_expansi
 //  device_videobrain_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom_mask(0),
-		m_ram_mask(0)
+device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_rom_mask(0),
+	m_ram_mask(0)
 {
 	m_slot = dynamic_cast<videobrain_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_videobrain_expansion_card_interface - destructor
-//-------------------------------------------------
-
-device_videobrain_expansion_card_interface::~device_videobrain_expansion_card_interface()
-{
 }
 
 
@@ -99,45 +90,11 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runnin
 //-------------------------------------------------
 
 videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
+	device_slot_interface(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_write_extres(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  videobrain_expansion_slot_device - destructor
-//-------------------------------------------------
-
-videobrain_expansion_slot_device::~videobrain_expansion_slot_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void videobrain_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const videobrain_expansion_slot_interface *intf = reinterpret_cast<const videobrain_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<videobrain_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_extres_cb, 0, sizeof(m_out_extres_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -150,7 +107,7 @@ void videobrain_expansion_slot_device::device_start()
 	m_cart = dynamic_cast<device_videobrain_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_extres_func.resolve(m_out_extres_cb, *this);
+	m_write_extres.resolve_safe();
 }
 
 
@@ -234,17 +191,6 @@ void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset,
 		m_cart->videobrain_bo_w(space, offset, data, cs1, cs2);
 	}
 }
-
-
-READ8_MEMBER( videobrain_expansion_slot_device::cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
-WRITE8_MEMBER( videobrain_expansion_slot_device::cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }
-READ8_MEMBER( videobrain_expansion_slot_device::cs2_r ) { return bo_r(space, offset + 0x1800, 1, 0); }
-WRITE8_MEMBER( videobrain_expansion_slot_device::cs2_w ) { bo_w(space, offset + 0x1800, data, 1, 0); }
-READ8_MEMBER( videobrain_expansion_slot_device::unmap_r ) { return bo_r(space, offset + 0x3000, 1, 0); }
-WRITE8_MEMBER( videobrain_expansion_slot_device::unmap_w ) { bo_w(space, offset + 0x3000, data, 1, 0); }
-
-
-WRITE_LINE_MEMBER( videobrain_expansion_slot_device::extres_w ) { m_out_extres_func(state); }
 
 
 //-------------------------------------------------
