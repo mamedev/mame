@@ -645,12 +645,6 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 	m_adlc->txc_w(state);
 }
 
-static ECONET_INTERFACE( econet_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state, econet_clk_w),
-	DEVCB_DEVICE_LINE_MEMBER("mc6854", mc6854_device, set_rx)
-};
-
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
@@ -991,7 +985,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* econet */
 	MCFG_MC6854_ADD("mc6854", adlc_intf)
-	MCFG_ECONET_ADD(econet_intf)
+	MCFG_ECONET_ADD()
+	MCFG_ECONET_CLK_CALLBACK(WRITELINE(bbc_state, econet_clk_w))
+	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
 	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, NULL)
 MACHINE_CONFIG_END
 

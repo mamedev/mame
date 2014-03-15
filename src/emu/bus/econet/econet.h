@@ -30,13 +30,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ECONET_ADD(_config) \
+#define MCFG_ECONET_ADD() \
 	MCFG_DEVICE_ADD(ECONET_TAG, ECONET, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define ECONET_INTERFACE(_name) \
-	const econet_interface (_name) =
 
 
 #define MCFG_ECONET_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
@@ -45,30 +40,30 @@
 	econet_slot_device::static_set_slot(*device, _num);
 
 
+#define MCFG_ECONET_CLK_CALLBACK(_write) \
+	devcb = &econet_device::set_clk_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_ECONET_DATA_CALLBACK(_write) \
+	devcb = &econet_device::set_data_wr_callback(*device, DEVCB2_##_write);
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> econet_interface
-
-struct econet_interface
-{
-	devcb_write_line    m_out_clk_cb;
-	devcb_write_line    m_out_data_cb;
-};
-
-
 // ======================> econet_device
 
 class device_econet_interface;
 
-class econet_device : public device_t,
-						public econet_interface
+class econet_device : public device_t
 {
 public:
 	// construction/destruction
 	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_clk_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_clk.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<econet_device &>(device).m_write_data.set_callback(object); }
 
 	void add_device(device_t *target, int address);
 
@@ -89,7 +84,6 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 
@@ -109,8 +103,8 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb_resolved_write_line   m_out_clk_func;
-	devcb_resolved_write_line   m_out_data_func;
+	devcb2_write_line   m_write_clk;
+	devcb2_write_line   m_write_data;
 
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);
@@ -150,7 +144,7 @@ class device_econet_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_econet_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_econet_interface();
+	virtual ~device_econet_interface() { }
 
 	device_econet_interface *next() const { return m_next; }
 	device_econet_interface *m_next;
