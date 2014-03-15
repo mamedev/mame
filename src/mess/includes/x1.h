@@ -81,7 +81,8 @@ public:
 	m_crtc(*this, "crtc"),
 	m_ctc(*this, "ctc"),
 	m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette"),
+		m_dma(*this, "dma")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -232,6 +233,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<z80dma_device> m_dma;
 };
 
 /*----------- defined in machine/x1.c -----------*/

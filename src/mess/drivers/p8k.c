@@ -153,7 +153,7 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
-	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
+	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
 ADDRESS_MAP_END
 
 

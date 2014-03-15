@@ -1059,7 +1059,7 @@ static const wd17xx_interface x1_mb8877a_interface =
 
 WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 {
-	z80dma_rdy_w(machine().device("dma"), state ^ 1);
+	m_dma->rdy_w(state ^ 1);
 }
 
 static const wd17xx_interface x1turbo_mb8877a_interface =
@@ -1681,7 +1681,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), space, 0); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return m_dma->read(space, 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)   { return machine().device<z80sio0_device>("sio")->ba_cd_r(space, (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { return m_ctc->read(space,offset-0x1fa0); }
@@ -1734,7 +1734,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), space, 0,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { m_dma->write(space, 0,data); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)   { machine().device<z80sio0_device>("sio")->ba_cd_w(space, (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { m_ctc->write(space,offset-0x1fa0,data); }

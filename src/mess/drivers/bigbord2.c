@@ -366,7 +366,7 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 	if ((data & 7) == 2)
 		dma_rdy = m_fdc_drq;
 
-	z80dma_rdy_w(m_dma, dma_rdy);
+	m_dma->rdy_w(dma_rdy);
 }
 
 
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80CTCA_TAG, z80ctc_device, read, write) //has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTCB_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	//AM_RANGE(0xC0, 0xC3)   eprom programming port
 	AM_RANGE(0xC4, 0xC7) AM_READ(portc4_r)
 	AM_RANGE(0xC8, 0xCB) AM_WRITE(portc8_w)

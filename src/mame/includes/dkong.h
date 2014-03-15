@@ -3,6 +3,8 @@
 #include "machine/tms6100.h"
 #include "cpu/m6502/n2a03.h"
 #include "machine/latch8.h"
+#include "machine/z80dma.h"
+
 
 /*
  * From the schematics:
@@ -106,7 +108,8 @@ public:
 		m_cv4(0),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_z80dma(*this, "z80dma")
 	{ }
 
 	/* devices */
@@ -185,6 +188,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<z80dma_device> m_z80dma;
 	
 	/* radarscp_scanline */
 	int m_counter;

@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)

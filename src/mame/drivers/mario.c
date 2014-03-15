@@ -126,8 +126,7 @@ static Z80DMA_INTERFACE( mario_dma )
 
 WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
 {
-	device_t *device = machine().device("z80dma");
-	z80dma_rdy_w(device, data & 0x01);
+	m_z80dma->rdy_w(data & 0x01);
 }
 
 WRITE8_MEMBER(mario_state::nmi_mask_w)
@@ -181,7 +180,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_io_map, AS_IO, 8, mario_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)   /* dma controller */
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
 ADDRESS_MAP_END
 
 /*************************************

@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	//AM_RANGE(0x25, 0x25) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
 	AM_RANGE(0x24, 0x25) AM_READ(keyboard_r) AM_WRITENOP
 	AM_RANGE(0x26, 0x26) AM_WRITE(intmask_w)
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE_LEGACY("dma", z80dma_r, z80dma_w)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)

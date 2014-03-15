@@ -620,7 +620,7 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_READWRITE(win_r, wstrobe_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(brom_r, brom_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(exdsk_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(exdma_w)
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
 	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(mbank_w)
 	AM_RANGE(0x19, 0x19) AM_READWRITE(scsi_r, scsi_w)
-	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x1b, 0x1b) AM_READ(hwsts_r)
 ADDRESS_MAP_END
 
@@ -815,7 +815,7 @@ void bullet_state::update_dma_rdy()
 		break;
 	}
 
-	z80dma_rdy_w(m_dmac, rdy);
+	m_dmac->rdy_w(rdy);
 }
 
 READ8_MEMBER( bullet_state::dma_mreq_r )
@@ -879,7 +879,7 @@ void bulletf_state::update_dma_rdy()
 		rdy = m_fdrdy;
 	}
 
-	z80dma_rdy_w(m_dmac, rdy);
+	m_dmac->rdy_w(rdy);
 }
 
 READ8_MEMBER( bulletf_state::dma_mreq_r )
