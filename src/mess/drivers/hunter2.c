@@ -32,6 +32,7 @@
 #include "machine/nsc810.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/null_modem.h"
+#include "machine/nvram.h"
 
 class hunter2_state : public driver_device
 {
@@ -41,6 +42,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_rs232(*this, "serial")
+		, m_rom(*this, "roms")
+		, m_ram(*this, "rams")
+		, m_nvram(*this, "nvram")
 	{ }
 
 	DECLARE_READ8_MEMBER(port00_r);
@@ -69,6 +73,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
+	required_memory_region m_rom;
+	required_memory_region m_ram;
+	required_device<nvram_device> m_nvram;
 };
 
 static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
@@ -235,19 +242,19 @@ WRITE8_MEMBER( hunter2_state::port80_w )
 WRITE8_MEMBER( hunter2_state::port81_w )
 {
 	m_rs232->write_txd(data & 0x01);
-	logerror("TXD write %02x\n",data);
+//	logerror("TXD write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port82_w )
 {
 	m_rs232->write_dtr(data & 0x01);
-	logerror("DTR write %02x\n",data);
+//	logerror("DTR write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port84_w )
 {
 	m_rs232->write_rts(data & 0x01);
-	logerror("RTS write %02x\n",data);
+//	logerror("RTS write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -270,8 +277,6 @@ WRITE8_MEMBER( hunter2_state::portbb_w )
 		m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 	if(!(data & 0x02))
 		m_maincpu->set_input_line(NSC800_RSTC, CLEAR_LINE);
-
-	logerror("SYS: IRQ mask set %02x\n",data);
 }
 
 /*
@@ -324,8 +329,8 @@ void hunter2_state::machine_reset()
 // it is presumed that writing to rom will go nowhere
 DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 {
-	UINT8 *rom = memregion("roms")->base();
-	UINT8 *ram = memregion("rams")->base();
+	UINT8 *rom = m_rom->base();
+	UINT8 *ram = m_ram->base();
 	membank("bankr0")->configure_entries( 0, 10, &rom[0x00000], 0x0000);
 	membank("bankr0")->configure_entries(16, 16, &ram[0x00000], 0xc000);
 	membank("bankr1")->configure_entries( 0, 10, &rom[0x04000], 0x0000);
@@ -338,6 +343,8 @@ DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 	membank("bankw1")->configure_entries(16, 16, &ram[0x04000], 0xc000);
 	membank("bankw2")->configure_entries( 0, 10, &ram[0xc0000], 0x0000);
 	membank("bankw2")->configure_entries(16, 16, &ram[0x08000], 0xc000);
+
+	m_nvram->set_base(ram,m_ram->bytes());
 }
 
 PALETTE_INIT_MEMBER(hunter2_state, hunter2)
@@ -427,6 +434,8 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_RS232_PORT_ADD("serial",hunter2_rs232_devices,NULL)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 /* ROM definition */
