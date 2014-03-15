@@ -51,7 +51,6 @@ very fussy with the state machine.
 #include "machine/amigakbd.h"
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
-#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
@@ -106,17 +105,15 @@ static DECLARE_WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
   Battery Backed-Up Clock (MSM6264)
 ***************************************************************************/
 
-static READ16_HANDLER( amiga_clock_r )
+READ16_MEMBER( amiga_state::amiga_clock_r )
 {
-	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
-	return rtc->read(space,offset / 2);
+	return m_rtc->read(space, offset / 2);
 }
 
 
-static WRITE16_HANDLER( amiga_clock_w )
+WRITE16_MEMBER( amiga_state::amiga_clock_w )
 {
-	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
-	rtc->write(space,offset / 2, data);
+	m_rtc->write(space, offset / 2, data);
 }
 
 
@@ -242,7 +239,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(cdtv_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE_LEGACY(amiga_clock_r, amiga_clock_w)
+	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")    /* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
@@ -1115,7 +1112,7 @@ static void amiga_reset(running_machine &machine)
 	if (machine.root_device().ioport("hardware")->read() & 0x08)
 	{
 		/* Install RTC */
-		state->m_maincpu_program_space->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));
+		state->m_maincpu_program_space->install_readwrite_handler(0xdc0000, 0xdc003f, read16_delegate(FUNC(amiga_state::amiga_clock_r), state), write16_delegate(FUNC(amiga_state::amiga_clock_w), state));
 	}
 	else
 	{
