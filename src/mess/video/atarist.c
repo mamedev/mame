@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "video/atarist.h"
 #include "includes/atarist.h"

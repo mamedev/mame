@@ -1409,22 +1409,6 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 	m_mfpdev->clock_w(state);
 }
 
-static MC68901_INTERFACE( mfp_interface )
-{
-	4000000,                                            /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),                      /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tbo_w),    /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_NULL,                                         /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, input_txd), /* serial output */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static struct serial_keyboard_interface x68k_keyboard_interface =
 {
 	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, write_rx)
@@ -1929,7 +1913,13 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	/* device hardware */
-	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, 4000000)
+	MCFG_MC68901_TIMER_CLOCK(4000000)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(x68k_state, mfp_irq_callback))
+	MCFG_MC68901_OUT_TBO_CB(WRITELINE(x68k_state, mfp_tbo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
 
 	MCFG_X68K_KEYBOARD_ADD("keyboard", x68k_keyboard_interface)
 

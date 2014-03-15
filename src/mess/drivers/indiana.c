@@ -98,22 +98,6 @@ SLOT_INTERFACE_START( indiana_isa_cards )
 	SLOT_INTERFACE("ide", ISA16_IDE)
 SLOT_INTERFACE_END
 
-static MC68901_INTERFACE( mfp_interface )
-{
-	XTAL_16MHz/4,                                       /* timer clock */
-	0,                      	                        /* receive clock */
-	0,                          	                    /* transmit clock */
-	DEVCB_NULL,											/* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,											/* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_NULL,                                         /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, input_txd), /* serial output */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static struct serial_keyboard_interface keyboard_interface =
 {
 	DEVCB_DEVICE_LINE_MEMBER(MFP_TAG, mc68901_device, write_rx)
@@ -131,7 +115,12 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa3", indiana_isa_cards, "comat", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa4", indiana_isa_cards, "ide", false)
 
-	MCFG_MC68901_ADD(MFP_TAG, XTAL_16MHz/4, mfp_interface)
+	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL_16MHz/4)
+	MCFG_MC68901_TIMER_CLOCK(XTAL_16MHz/4)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
+	
 	MCFG_SERIAL_KEYBOARD_ADD("keyboard", keyboard_interface, 1200)
 MACHINE_CONFIG_END
 

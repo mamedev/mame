@@ -1864,71 +1864,10 @@ WRITE_LINE_MEMBER(st_state::write_acia_clock)
 }
 
 
-//-------------------------------------------------
-//  MC68901_INTERFACE( mfp_intf )
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 {
 	m_mfp->clock_w(state);
 }
-
-static MC68901_INTERFACE( mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-
-
-//-------------------------------------------------
-//  MC68901_INTERFACE( atariste_mfp_intf )
-//-------------------------------------------------
-
-static MC68901_INTERFACE( atariste_mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-
-
-//-------------------------------------------------
-//  MC68901_INTERFACE( stbook_mfp_intf )
-//-------------------------------------------------
-
-
-// TODO power alarms (i7_w)
-
-#if 0
-static MC68901_INTERFACE( stbook_mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-#endif
 
 void st_state::fdc_intrq_w(bool state)
 {
@@ -2209,7 +2148,13 @@ static MACHINE_CONFIG_START( st, st_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2288,7 +2233,13 @@ static MACHINE_CONFIG_START( megast, megast_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2374,7 +2325,13 @@ static MACHINE_CONFIG_START( ste, ste_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2458,7 +2415,14 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_SOUND_CONFIG(stbook_psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)

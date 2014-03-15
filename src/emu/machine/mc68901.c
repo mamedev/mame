@@ -184,11 +184,11 @@ inline void mc68901_device::check_interrupts()
 {
 	if (m_ipr & m_imr)
 	{
-		m_out_irq_func(ASSERT_LINE);
+		m_out_irq_cb(ASSERT_LINE);
 	}
 	else
 	{
-		m_out_irq_func(CLEAR_LINE);
+		m_out_irq_cb(CLEAR_LINE);
 	}
 }
 
@@ -228,10 +228,10 @@ inline void mc68901_device::timer_count(int index)
 
 		switch (index)
 		{
-		case TIMER_A:   m_out_tao_func(m_to[index]);    break;
-		case TIMER_B:   m_out_tbo_func(m_to[index]);    break;
-		case TIMER_C:   m_out_tco_func(m_to[index]);    break;
-		case TIMER_D:   m_out_tdo_func(m_to[index]);    break;
+		case TIMER_A:   m_out_tao_cb(m_to[index]);    break;
+		case TIMER_B:   m_out_tbo_cb(m_to[index]);    break;
+		case TIMER_C:   m_out_tco_cb(m_to[index]);    break;
+		case TIMER_D:   m_out_tdo_cb(m_to[index]);    break;
 		}
 
 		if (m_ier & INT_MASK_TIMER[index])
@@ -323,7 +323,7 @@ void mc68901_device::gpio_output()
 	if (m_gpio_output != new_gpio_output)
 	{
 		m_gpio_output = new_gpio_output;
-		m_out_gpio_func(0, m_gpio_output);
+		m_out_gpio_cb((offs_t)0, m_gpio_output);
 	}
 }
 
@@ -338,32 +338,23 @@ void mc68901_device::gpio_output()
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
+		m_timer_clock(0),
+		m_rx_clock(0),
+		m_tx_clock(0),
+		m_out_irq_cb(*this),
+		m_out_gpio_cb(*this),
+		m_out_tao_cb(*this),
+		m_out_tbo_cb(*this),
+		m_out_tco_cb(*this),
+		m_out_tdo_cb(*this),
+		m_out_so_cb(*this),
+		//m_out_rr_cb(*this),
+		//m_out_tr_cb(*this),
 		m_aer(0),
 		m_ier(0),
 		m_gpio_input(0),
 		m_gpio_output(0xff)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc68901_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc68901_interface *intf = reinterpret_cast<const mc68901_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc68901_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-//      memset(&in_pa_cb, 0, sizeof(in_pa_cb));
-	}
 }
 
 
@@ -376,13 +367,15 @@ void mc68901_device::device_start()
 	m_start_bit_hack_for_external_clocks = true;
 
 	/* resolve callbacks */
-	m_out_gpio_func.resolve(m_out_gpio_cb, *this);
-	m_out_so_func.resolve(m_out_so_cb, *this);
-	m_out_tao_func.resolve(m_out_tao_cb, *this);
-	m_out_tbo_func.resolve(m_out_tbo_cb, *this);
-	m_out_tco_func.resolve(m_out_tco_cb, *this);
-	m_out_tdo_func.resolve(m_out_tdo_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_out_irq_cb.resolve_safe();
+	m_out_gpio_cb.resolve_safe();
+	m_out_tao_cb.resolve_safe();
+	m_out_tbo_cb.resolve_safe();
+	m_out_tco_cb.resolve_safe();
+	m_out_tdo_cb.resolve_safe();
+	m_out_so_cb.resolve_safe();
+	//m_out_rr_cb.resolve_safe();
+	//m_out_tr_cb.resolve_safe();
 
 	/* create the timers */
 	m_timer[TIMER_A] = timer_alloc(TIMER_A);
@@ -492,7 +485,7 @@ void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void mc68901_device::tra_callback()
 {
-	m_out_so_func(transmit_register_get_data_bit());
+	m_out_so_cb(transmit_register_get_data_bit());
 }
 
 
@@ -740,7 +733,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 			m_to[TIMER_A] = 0;
 
-			m_out_tao_func(m_to[TIMER_A]);
+			m_out_tao_cb(m_to[TIMER_A]);
 		}
 		break;
 
@@ -795,7 +788,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 			m_to[TIMER_B] = 0;
 
-			m_out_tbo_func(m_to[TIMER_B]);
+			m_out_tbo_cb(m_to[TIMER_B]);
 		}
 		break;
 

@@ -307,22 +307,6 @@ static const duart68681_config micro3d_duart68681_config =
 	micro3d_duart_output_w
 };
 
-static MC68901_INTERFACE( mfp_intf )
-{
-	4000000,                                            /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),        /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_NULL,                                         /* TDO */
-	DEVCB_NULL,                                         /* serial output */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /*************************************
  *
@@ -349,7 +333,12 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_IO_MAP(soundmem_io)
 
 	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
-	MCFG_MC68901_ADD("mc68901", 4000000, mfp_intf)
+	
+	MCFG_DEVICE_ADD("mc68901", MC68901, 4000000)
+	MCFG_MC68901_TIMER_CLOCK(4000000)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_4))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
