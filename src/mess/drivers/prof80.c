@@ -440,17 +440,6 @@ static SLOT_INTERFACE_START( prof80_floppies )
 SLOT_INTERFACE_END
 
 
-//-------------------------------------------------
-//  ECB_BUS_INTERFACE( ecb_intf )
-//-------------------------------------------------
-
-static ECBBUS_INTERFACE( ecb_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -527,7 +516,7 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", prof80_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
 	// ECB bus
-	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)
+	MCFG_ECBBUS_ADD()
 	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", ecbbus_cards, "grip21")
 	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", ecbbus_cards, NULL)
 	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", ecbbus_cards, NULL)

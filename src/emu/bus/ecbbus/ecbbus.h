@@ -68,15 +68,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ECBBUS_ADD(_cpu_tag, _config) \
+#define MCFG_ECBBUS_ADD() \
 	MCFG_DEVICE_ADD(ECBBUS_TAG, ECBBUS, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	ecbbus_device::static_set_cputag(*device, _cpu_tag);
-
-
-#define ECBBUS_INTERFACE(_name) \
-	const ecbbus_interface (_name) =
-
 
 #define MCFG_ECBBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
@@ -94,7 +87,7 @@
 class ecbbus_device;
 
 class ecbbus_slot_device : public device_t,
-							public device_slot_interface
+						   public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -120,27 +113,18 @@ extern const device_type ECBBUS_SLOT;
 
 // ======================> ecbbus_interface
 
-struct ecbbus_interface
-{
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_nmi_cb;
-};
-
 class device_ecbbus_card_interface;
 
 
 // ======================> ecbbus_device
 
-class ecbbus_device : public device_t,
-						public ecbbus_interface
+class ecbbus_device : public device_t
 {
 public:
 	// construction/destruction
 	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
 
-	void add_ecbbus_card(device_ecbbus_card_interface *card, int pos);
+	void add_card(device_ecbbus_card_interface *card, int pos);
 
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
@@ -148,24 +132,18 @@ public:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
-	// internal state
-	cpu_device   *m_maincpu;
-
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_nmi_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_nmi;
 
 	device_ecbbus_card_interface *m_ecbbus_device[MAX_ECBBUS_SLOTS];
-	const char *m_cputag;
 };
 
 
@@ -183,7 +161,7 @@ class device_ecbbus_card_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	device_ecbbus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_ecbbus_card_interface();
+	virtual ~device_ecbbus_card_interface() { }
 
 	// optional operation overrides
 	virtual UINT8 ecbbus_mem_r(offs_t offset) { return 0; };
