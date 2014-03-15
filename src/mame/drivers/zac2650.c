@@ -193,6 +193,12 @@ PALETTE_INIT_MEMBER(zac2650_state, zac2650)
 	palette.set_pen_color(3,rgb_t::black);
 }
 
+static const s2636_interface s2636_config =
+{
+	0x100,
+	0, 0
+};
+
 /************************************************************************************************
 
  Video is slightly odd on these zac boards
@@ -258,7 +264,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("s2636snd", S2636, 0)
+	MCFG_S2636_ADD("s2636", s2636_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
