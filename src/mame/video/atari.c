@@ -714,7 +714,7 @@ VIDEO_START( atari )
 	LOG(("atari antic_vh_start\n"));
 	memset(&antic, 0, sizeof(antic));
 
-	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
 
 	antic.renderer = antic_mode_0_xx;
 	antic.cclk_expand = auto_alloc_array(machine, UINT32, 21 * 256);
@@ -758,7 +758,7 @@ VIDEO_START( atari )
 	LOG(("atari prio_init\n"));
 	prio_init();
 
-	for( i = 0; i < machine.primary_screen->height(); i++ )
+	for( i = 0; i < machine.first_screen()->height(); i++ )
 	{
 		antic.video[i] = auto_alloc_clear(machine, VIDEO);
 	}
@@ -947,7 +947,7 @@ static void antic_linerefresh(running_machine &machine)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-	if( ++antic.scanline == machine.primary_screen->height() )
+	if( ++antic.scanline == machine.first_screen()->height() )
 	{
 		/* and return to the top if the frame was complete */
 		antic.scanline = 0;
@@ -1049,12 +1049,12 @@ static void antic_linerefresh(running_machine &machine)
 
 static int cycle(running_machine &machine)
 {
-	return machine.primary_screen->hpos() * CYCLES_PER_LINE / machine.primary_screen->width();
+	return machine.first_screen()->hpos() * CYCLES_PER_LINE / machine.first_screen()->width();
 }
 
 static void after(running_machine &machine, int cycles, timer_expired_func function, const char *funcname)
 {
-	attotime duration = machine.primary_screen->scan_period() * cycles / CYCLES_PER_LINE;
+	attotime duration = machine.first_screen()->scan_period() * cycles / CYCLES_PER_LINE;
 	(void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
 	machine.scheduler().timer_set(duration, function, funcname);
@@ -1355,7 +1355,7 @@ static void antic_scanline_dma(running_machine &machine, int param)
 						/* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = machine.primary_screen->height() - antic.scanline;
+							antic.modelines = machine.first_screen()->height() - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1520,7 +1520,7 @@ static void generic_atari_interrupt(running_machine &machine, int button_count)
 		}
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = machine.primary_screen->height() - VBL_START;
+		antic.modelines = machine.first_screen()->height() - VBL_START;
 		antic.renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */

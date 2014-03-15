@@ -175,7 +175,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }

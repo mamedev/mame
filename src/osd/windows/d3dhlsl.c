@@ -531,7 +531,7 @@ void shaders::begin_avi_recording(const char *name)
 	// build up information about this new movie
 	avi_movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ((window->machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(window->machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_timescale = 1000 * ((window->machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(window->machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = snap_width;

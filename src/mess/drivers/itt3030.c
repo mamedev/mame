@@ -293,12 +293,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 {
 	UINT8 ret = 0;
 
-	if (machine().primary_screen->vblank())
+	if (machine().first_screen()->vblank())
 	{
 		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
-	if (machine().primary_screen->hblank())
+	if (machine().first_screen()->hblank())
 	{
 		ret |= 0x80;    // set only bit 7 if hblank
 	}

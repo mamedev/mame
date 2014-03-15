@@ -220,7 +220,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && machine().first_screen()->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
@@ -254,8 +254,8 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)

@@ -296,11 +296,11 @@ READ16_MEMBER(casloopy_state::casloopy_vregs_r)
 {
 	if(offset == 4/2)
 	{
-		return (machine().primary_screen->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
+		return (machine().first_screen()->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
 	}
 
 	if(offset == 2/2)
-		return machine().rand();/*(machine().primary_screen->hblank() << 8) | (machine().primary_screen->hpos() & 0xff);*/ // hblank + hpos?
+		return machine().rand();/*(machine().first_screen()->hblank() << 8) | (machine().first_screen()->hpos() & 0xff);*/ // hblank + hpos?
 
 	if(offset == 0/2)
 		return machine().rand(); // pccllect

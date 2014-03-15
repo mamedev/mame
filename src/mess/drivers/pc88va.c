@@ -804,7 +804,7 @@ void pc88va_state::execute_sync_cmd()
 
 	refresh = HZ_TO_ATTOSECONDS(60);
 
-	machine().primary_screen->configure(640, 480, visarea, refresh);
+	machine().first_screen()->configure(640, 480, visarea, refresh);
 }
 
 void pc88va_state::execute_dspon_cmd()
@@ -957,7 +957,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 READ16_MEMBER(pc88va_state::sys_port4_r)
 {
 	UINT8 vrtc,sw1;
-	vrtc = (machine().primary_screen->vpos() < 200) ? 0x20 : 0x00; // vblank
+	vrtc = (machine().first_screen()->vpos() < 200) ? 0x20 : 0x00; // vblank
 
 	sw1 = (ioport("DSW")->read() & 1) ? 2 : 0;
 

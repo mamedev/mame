@@ -793,7 +793,7 @@ static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 #define YSIZE 512
 
 	int sx, sy;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	/* Let's draw from the top to the bottom of the visible screen */
 	for (sy = visarea.min_y;sy <= visarea.max_y;sy++)

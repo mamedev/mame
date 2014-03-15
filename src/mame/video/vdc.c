@@ -422,7 +422,7 @@ VIDEO_START( pce )
 	memset(vdc[1].vram, 0, 0x10000);
 
 	/* create display bitmap */
-	vce.bmp = auto_bitmap_ind16_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	vce.bmp = auto_bitmap_ind16_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
 
 	vdc[0].inc = 1;
 	vdc[1].inc = 1;

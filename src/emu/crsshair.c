@@ -235,7 +235,7 @@ void crosshair_init(running_machine &machine)
 				global.visible[player] = (CROSSHAIR_VISIBILITY_DEFAULT == CROSSHAIR_VISIBILITY_OFF) ? FALSE : TRUE;
 
 				/* for now, use the main screen */
-				global.screen[player] = machine.primary_screen;
+				global.screen[player] = machine.first_screen();
 
 				create_bitmap(machine, player);
 			}
@@ -245,8 +245,8 @@ void crosshair_init(running_machine &machine)
 		config_register(machine, "crosshairs", config_saveload_delegate(FUNC(crosshair_load), &machine), config_saveload_delegate(FUNC(crosshair_save), &machine));
 
 	/* register the animation callback */
-	if (machine.primary_screen != NULL)
-		machine.primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(animate), &machine));
+	if (machine.first_screen() != NULL)
+		machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(animate), &machine));
 }
 
 

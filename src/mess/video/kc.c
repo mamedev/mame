@@ -58,7 +58,7 @@ WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
 {
 	if (state)
 	{
-		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		machine().first_screen()->update_partial(machine().first_screen()->vpos());
 
 		m_kc85_blink_state = !m_kc85_blink_state;
 	}

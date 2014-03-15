@@ -660,7 +660,7 @@ UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &b
 	if (w!=width || h!=height)
 	{
 		width = w; height = h;
-//      machine().primary_screen->set_visible_area(0, width - 1, 0, height - 1);
+//      machine().first_screen()->set_visible_area(0, width - 1, 0, height - 1);
 		screen.set_visible_area(0, width - 1, 0, height - 1);
 	}
 #endif

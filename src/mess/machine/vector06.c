@@ -42,7 +42,7 @@ WRITE8_MEMBER( vector06_state::vector06_8255_porta_w )
 void vector06_state::vector06_set_video_mode(int width)
 {
 	rectangle visarea(0, width+64-1, 0, 256+64-1);
-	machine().primary_screen->configure(width+64, 256+64, visarea, machine().primary_screen->frame_period().attoseconds);
+	machine().first_screen()->configure(width+64, 256+64, visarea, machine().first_screen()->frame_period().attoseconds);
 }
 
 WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )

@@ -116,9 +116,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	// HIRES -- XXX
 	if (BIT(data, 7) != BIT(m_video.color_select_68, 7)) {
 		if (BIT(data, 7))
-			machine().primary_screen->set_visible_area(0, 640-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 640-1, 0, 200-1);
 		else
-			machine().primary_screen->set_visible_area(0, 320-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 320-1, 0, 200-1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();

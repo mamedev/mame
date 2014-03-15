@@ -238,7 +238,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi);
 				res_y = y*lr+yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				/*
@@ -271,9 +271,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
 				if(o_line && yi == 0) { tile_data = 0xff; }
 				if(v_line)  { tile_data|=1; }
-				if(blink && device->machine().primary_screen->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
+				if(blink && device->machine().first_screen()->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
 
-				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+				if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)

@@ -128,7 +128,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 				if (spriteram[offs] & 0x8000)
 				{
 					int draw = 0;
-					if (!flash || (machine.primary_screen->frame_number() & 1))
+					if (!flash || (machine.first_screen()->frame_number() & 1))
 					{
 						if (m_priority_type==0) // most cases
 						{

@@ -84,7 +84,7 @@ void iq151_video32_device::device_start()
 
 void iq151_video32_device::device_reset()
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 
 	// if required adjust screen size
 	if (screen->visible_area().max_x < 32*8 - 1)

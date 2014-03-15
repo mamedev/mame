@@ -1894,7 +1894,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 	setIdentity(objectMatrix);
 
 	struct polygon lastPoly = { 0 };
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	/////////////////
 	// HEADER INFO //
@@ -2786,7 +2786,7 @@ static void performFrustumClip(struct polygon *p)
 #ifdef UNUSED_FUNCTION
 static void plot(running_machine &machine, INT32 x, INT32 y, UINT32 color)
 {
-	UINT32* cb = &(colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x]);
+	UINT32* cb = &(colorBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x]);
 	*cb = color;
 }
 
@@ -2903,8 +2903,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 											float s_start, float s_delta, float t_start, float t_delta)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	float*  db = &(state->m_depthBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
-	UINT32* cb = &(state->m_colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
+	float*  db = &(state->m_depthBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x_start]);
+	UINT32* cb = &(state->m_colorBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x_start]);
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;

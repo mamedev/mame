@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(x1_state,x1)
 
 void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
-	if(!machine.primary_screen->visible_area().contains(x, y))
+	if(!machine.first_screen()->visible_area().contains(x, y))
 		return;
 
 	if(width && height)
@@ -429,7 +429,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 && machine.primary_screen->frame_number() & 0x10) //reverse flickering
+						if(color & 0x10 && machine.first_screen()->frame_number() & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))
@@ -1098,11 +1098,11 @@ UINT16 x1_state::check_chr_addr()
 
 UINT16 x1_state::get_pcg_addr( UINT16 width, UINT8 y_char_size )
 {
-	int hbeam = machine().primary_screen->hpos() >> 3;
-	int vbeam = machine().primary_screen->vpos() / y_char_size;
+	int hbeam = machine().first_screen()->hpos() >> 3;
+	int vbeam = machine().first_screen()->vpos() / y_char_size;
 	UINT16 pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
-	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.primary_screen->vpos() & 7,width);
+	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
 
 	return pcg_offset;
 }
@@ -1135,7 +1135,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
-		pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
+		pcg_offset+= machine().first_screen()->vpos() & (y_char_size-1);
 		if(addr) { pcg_offset+= ((addr-1)*0x800); }
 		res = gfx_data[pcg_offset];
 	}
@@ -1175,7 +1175,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 			y_char_size = (m_crtc_vreg[9]+1) > 8 ? (m_crtc_vreg[9]+1)-8 : m_crtc_vreg[9]+1;
 			if(y_char_size == 0) { y_char_size = 1; }
 			pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
-			pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
+			pcg_offset+= machine().first_screen()->vpos() & (y_char_size-1);
 			pcg_offset+= ((addr-1)*0x800);
 
 			m_pcg_ram[pcg_offset] = data;
@@ -1237,10 +1237,10 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	{
 		m_x_r = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1256,10 +1256,10 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	{
 		m_x_g = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-			machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+			machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1275,10 +1275,10 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	{
 		m_x_b = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1804,8 +1804,8 @@ READ8_MEMBER( x1_state::x1_portb_r )
 	UINT8 res = 0;
 	int vblank_line = m_crtc_vreg[6] * (m_crtc_vreg[9]+1);
 	int vsync_line = m_crtc_vreg[7] * (m_crtc_vreg[9]+1);
-	m_vdisp = (machine().primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
-	m_vsync = (machine().primary_screen->vpos() < vsync_line) ? 0x00 : 0x04;
+	m_vdisp = (machine().first_screen()->vpos() < vblank_line) ? 0x80 : 0x00;
+	m_vsync = (machine().first_screen()->vpos() < vsync_line) ? 0x00 : 0x04;
 
 //  popmessage("%d",vsync_line);
 //  popmessage("%d",vblank_line);

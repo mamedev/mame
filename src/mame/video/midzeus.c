@@ -547,7 +547,7 @@ static void zeus_register16_w(running_machine &machine, offs_t offset, UINT16 da
 
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		machine.primary_screen->update_partial(machine.primary_screen->vpos());
+		machine.first_screen()->update_partial(machine.first_screen()->vpos());
 
 	/* write to high part on odd addresses */
 	if (offset & 1)
@@ -573,7 +573,7 @@ static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 da
 
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
-		machine.primary_screen->update_partial(machine.primary_screen->vpos());
+		machine.first_screen()->update_partial(machine.first_screen()->vpos());
 
 	/* always write to low word? */
 	state->m_zeusbase[offset & ~1] = data;
@@ -742,7 +742,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 		case 0xc6:
 		case 0xc8:
 		case 0xca:
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine.first_screen()->update_partial(machine.first_screen()->vpos());
 			{
 				int vtotal = state->m_zeusbase[0xca] >> 16;
 				int htotal = state->m_zeusbase[0xc6] >> 16;
@@ -750,7 +750,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 				rectangle visarea(state->m_zeusbase[0xc6] & 0xffff, htotal - 3, 0, state->m_zeusbase[0xc8] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
+					machine.first_screen()->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -759,7 +759,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 			break;
 
 		case 0xcc:
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine.first_screen()->update_partial(machine.first_screen()->vpos());
 			log_fifo = machine.input().code_pressed(KEYCODE_L);
 			break;
 

@@ -177,7 +177,7 @@ void a7000_state::vidc20_dynamic_screen_change()
 		{
 			/* finally ready to change the resolution */
 			int hblank_period,vblank_period;
-			rectangle visarea = machine().primary_screen->visible_area();
+			rectangle visarea = machine().first_screen()->visible_area();
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
@@ -186,7 +186,7 @@ void a7000_state::vidc20_dynamic_screen_change()
 			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
 			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
 
-			machine().primary_screen->configure(hblank_period, vblank_period, visarea, machine().primary_screen->frame_period().attoseconds );
+			machine().first_screen()->configure(hblank_period, vblank_period, visarea, machine().first_screen()->frame_period().attoseconds );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
 						(m_vidc20_horz_reg[HDER]-m_vidc20_horz_reg[HDSR]),(m_vidc20_vert_reg[VDER]-m_vidc20_vert_reg[VDSR]),
 						(m_vidc20_horz_reg[HBER]-m_vidc20_horz_reg[HBSR]),(m_vidc20_vert_reg[VBER]-m_vidc20_vert_reg[VBSR]),
@@ -257,7 +257,7 @@ WRITE32_MEMBER( a7000_state::a7000_vidc20_w )
 			if(vert_reg == 4)
 			{
 				if(m_vidc20_vert_reg[VDER] != 0)
-					m_flyback_timer->adjust(machine().primary_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
+					m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
 				else
 					m_flyback_timer->adjust(attotime::never);
 			}
@@ -608,7 +608,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::flyback_timer_callback)
 		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
 	}
 
-	m_flyback_timer->adjust(machine().primary_screen->time_until_pos(m_vidc20_vert_reg[VDER]));
+	m_flyback_timer->adjust(machine().first_screen()->time_until_pos(m_vidc20_vert_reg[VDER]));
 }
 
 void a7000_state::viddma_transfer_start()
@@ -643,7 +643,7 @@ READ32_MEMBER( a7000_state::a7000_iomd_r )
 			UINT8 flyback;
 			int vert_pos;
 
-			vert_pos = machine().primary_screen->vpos();
+			vert_pos = machine().first_screen()->vpos();
 			flyback = (vert_pos <= m_vidc20_vert_reg[VDSR] || vert_pos >= m_vidc20_vert_reg[VDER]) ? 0x80 : 0x00;
 
 			return m_IOMD_IO_ctrl | 0x34 | flyback;

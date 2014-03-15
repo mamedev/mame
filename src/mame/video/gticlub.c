@@ -235,14 +235,14 @@ void K001005_init(running_machine &machine)
 {
 	int i,k;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine.first_screen()->width();
+	int height = machine.first_screen()->height();
 	K001005_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
 
 	gfxrom = machine.root_device().memregion("gfx1")->base();
 
-	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
-	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
+	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
 
 	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
@@ -833,7 +833,7 @@ static void draw_scanline_gouraud_blend(void *dest, INT32 scanline, const poly_e
 
 static void render_polygons(running_machine &machine)
 {
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.first_screen()->visible_area();
 	poly_vertex v[4];
 	int poly_type;
 	int brightness;

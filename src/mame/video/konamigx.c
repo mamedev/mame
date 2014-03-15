@@ -292,7 +292,7 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 
 static void gx_wipezbuf(running_machine &machine, int noshadow)
 {
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	int w = visarea.width();
 	int h = visarea.height();

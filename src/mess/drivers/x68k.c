@@ -1715,15 +1715,15 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_crtc.reg[7] = 552;  // Vertical end
 	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	m_scanline = machine().primary_screen->vpos();// = m_crtc.reg[6];  // Vertical start
+	m_scanline = machine().first_screen()->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	m_crtc.vblank = 1;
-	irq_time = machine().primary_screen->time_until_pos(m_crtc.reg[6],2);
+	irq_time = machine().first_screen()->time_until_pos(m_crtc.reg[6],2);
 	m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	m_scanline_timer->adjust(machine().primary_screen->scan_period(), 1);
+	m_scanline_timer->adjust(machine().first_screen()->scan_period(), 1);
 
 	/// TODO: get callbacks to trigger these
 	m_mfpdev->i0_w(1); // alarm

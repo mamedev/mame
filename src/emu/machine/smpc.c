@@ -209,7 +209,7 @@ static TIMER_CALLBACK( smpc_slave_enable )
 	state->m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
 	state->m_smpc.slave_on = param;
-//  printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+//  printf("%d %d\n",machine.first_screen()->hpos(),machine.first_screen()->vpos());
 }
 
 static TIMER_CALLBACK( smpc_sound_enable )
@@ -254,7 +254,7 @@ static TIMER_CALLBACK( smpc_change_clock )
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT32 xtal;
 
-	if(LOG_SMPC) printf ("Clock change execute at (%d %d)\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+	if(LOG_SMPC) printf ("Clock change execute at (%d %d)\n",machine.first_screen()->hpos(),machine.first_screen()->vpos());
 
 	xtal = param ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
@@ -525,7 +525,7 @@ static TIMER_CALLBACK( intback_peripheral )
 	/* doesn't work? */
 	//pad_num = state->m_smpc.intback_stage - 1;
 
-	if(LOG_PAD_CMD) printf("%d %d %d\n",state->m_smpc.intback_stage - 1,machine.primary_screen->vpos(),(int)machine.primary_screen->frame_number());
+	if(LOG_PAD_CMD) printf("%d %d %d\n",state->m_smpc.intback_stage - 1,machine.first_screen()->vpos(),(int)machine.first_screen()->frame_number());
 
 	offset = 0;
 
@@ -660,7 +660,7 @@ static TIMER_CALLBACK( smpc_nmi_set )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-//  printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+//  printf("%d %d\n",machine.first_screen()->hpos(),machine.first_screen()->vpos());
 	state->m_NMI_reset = param;
 	/* put issued command in OREG31 */
 	state->m_smpc.OREG[31] = 0x19 + param;
@@ -695,7 +695,7 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 		//case 0x01: Master OFF?
 		case 0x02:
 		case 0x03:
-			if(LOG_SMPC) printf ("SMPC: Slave %s %d %d\n",(data & 1) ? "off" : "on",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+			if(LOG_SMPC) printf ("SMPC: Slave %s %d %d\n",(data & 1) ? "off" : "on",space.machine().first_screen()->hpos(),space.machine().first_screen()->vpos());
 			space.machine().scheduler().timer_set(attotime::from_usec(15), FUNC(smpc_slave_enable),data & 1);
 			break;
 		case 0x06:
@@ -717,7 +717,7 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			break;
 		case 0x0e:
 		case 0x0f:
-			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+			if(LOG_SMPC) printf ("SMPC: Change Clock to %s (%d %d)\n",data & 1 ? "320" : "352",space.machine().first_screen()->hpos(),space.machine().first_screen()->vpos());
 
 			/* on ST-V timing of this is pretty fussy, you get 2 credits at start-up otherwise
 			   My current theory is that SMPC first stops all CPUs until it executes the whole snippet for this,
@@ -729,14 +729,14 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			state->m_slave->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			state->m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-			space.machine().scheduler().timer_set(space.machine().primary_screen->time_until_pos(state->get_vblank_start_position()*state->get_ystep_count(), 0), FUNC(smpc_change_clock),data & 1);
+			space.machine().scheduler().timer_set(space.machine().first_screen()->time_until_pos(state->get_vblank_start_position()*state->get_ystep_count(), 0), FUNC(smpc_change_clock),data & 1);
 			break;
 		/*"Interrupt Back"*/
 		case 0x10:
 			if(0)
 			{
 				saturn_state *state = space.machine().driver_data<saturn_state>();
-				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space.machine().primary_screen->vpos());
+				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space.machine().first_screen()->vpos());
 			}
 
 			int timing;
@@ -764,7 +764,7 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			}
 			else
 			{
-				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space.machine().primary_screen->vpos(),(int)space.machine().primary_screen->frame_number());
+				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space.machine().first_screen()->vpos(),(int)space.machine().first_screen()->frame_number());
 				space.machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
 			}
 			break;
@@ -785,7 +785,7 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 		case 0x19:
 		case 0x1a:
 			/* TODO: timing */
-			if(LOG_SMPC) printf ("SMPC: NMI %sable %d %d\n",data & 1 ? "Dis" : "En",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+			if(LOG_SMPC) printf ("SMPC: NMI %sable %d %d\n",data & 1 ? "Dis" : "En",space.machine().first_screen()->hpos(),space.machine().first_screen()->vpos());
 			space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_nmi_set),data & 1);
 			break;
 		default:
@@ -1001,7 +1001,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 
 	if (offset == 0x63)
 	{
-		//printf("SF %d %d\n",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+		//printf("SF %d %d\n",space.machine().first_screen()->hpos(),space.machine().first_screen()->vpos());
 		return_data = m_smpc.SF;
 	}
 

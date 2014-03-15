@@ -372,8 +372,8 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
-	m_via_1->write_cb1(machine().primary_screen->vblank()); 
-	m_via_1->write_cb2(machine().primary_screen->vblank());
+	m_via_1->write_cb1(machine().first_screen()->vblank()); 
+	m_via_1->write_cb2(machine().first_screen()->vblank());
 }
 
 UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)

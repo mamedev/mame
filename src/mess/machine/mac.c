@@ -1251,9 +1251,9 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().primary_screen)
+	if (machine().first_screen())
 	{
-		if (machine().primary_screen->vpos() >= MAC_V_VIS)
+		if (machine().first_screen()->vpos() >= MAC_V_VIS)
 			val |= 0x40;
 	}
 
@@ -1298,9 +1298,9 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().primary_screen)
+	if (machine().first_screen())
 	{
-		if (machine().primary_screen->vpos() >= MAC_V_VIS)
+		if (machine().first_screen()->vpos() >= MAC_V_VIS)
 			val |= 0x40;
 	}
 
@@ -1742,10 +1742,10 @@ void mac_state::machine_start()
 		}
 	}
 
-	if (machine().primary_screen)
+	if (machine().first_screen())
 	{
 		this->m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_scanline_tick),this));
-		this->m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+		this->m_scanline_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
 	}
 
 	m_6015_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::mac_6015_tick),this));
@@ -2218,7 +2218,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 		}
 	}
 
-	scanline = machine().primary_screen->vpos();
+	scanline = machine().first_screen()->vpos();
 	if (scanline == MAC_V_VIS)
 		vblank_irq();
 
@@ -2229,7 +2229,7 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 			mouse_callback();
 	}
 
-	m_scanline_timer->adjust(machine().primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
+	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
 WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)

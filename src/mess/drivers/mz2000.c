@@ -635,7 +635,7 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	else
 		res |= 0x20;
 
-	res |= (machine().primary_screen->vblank()) ? 0x00 : 0x01;
+	res |= (machine().first_screen()->vblank()) ? 0x00 : 0x01;
 
 	return res;
 }

@@ -316,7 +316,7 @@ PALETTE_INIT_MEMBER(osbexec_state, osbexec)
 
 void osbexec_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -515,7 +515,7 @@ static const floppy_interface osbexec_floppy_interface =
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
-	int y = machine().primary_screen->vpos();
+	int y = machine().first_screen()->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
@@ -562,7 +562,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 		}
 	}
 
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( y + 1, 0 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -587,7 +587,7 @@ void osbexec_state::machine_reset()
 
 	set_banks( machine() );
 
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
 
 	m_rtc = 0;
 }

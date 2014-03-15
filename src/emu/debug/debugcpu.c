@@ -150,8 +150,8 @@ void debug_cpu_init(running_machine &machine)
 	global->visiblecpu = machine.firstcpu;
 
 	/* add callback for breaking on VBLANK */
-	if (machine.primary_screen != NULL)
-		machine.primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(on_vblank), &machine));
+	if (machine.first_screen() != NULL)
+		machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(on_vblank), &machine));
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_cpu_exit), &machine));
 }

@@ -985,7 +985,7 @@ void nes_mk2_device::hblank_irq( int scanline, int vblank, int blanked )
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-						machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+						machine().first_screen()->vpos(), machine().first_screen()->hpos()));
 			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}

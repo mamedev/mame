@@ -41,7 +41,7 @@ stic_device::~stic_device()
 
 void stic_device::device_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_stic_registers));
 	save_item(NAME(m_gramdirty));

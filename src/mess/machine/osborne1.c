@@ -325,7 +325,7 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 {
-	int y = machine().primary_screen->vpos();
+	int y = machine().first_screen()->vpos();
 	UINT8 ra=0,chr,gfx,dim;
 	UINT16 x,ma;
 
@@ -378,7 +378,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 		m_beep->set_state( 0 );
 	}
 
-	m_video_timer->adjust(machine().primary_screen->time_until_pos(y + 1, 0 ));
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0 ));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
@@ -443,7 +443,7 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
 	m_video_timer = timer_alloc(TIMER_VIDEO);
-	m_video_timer->adjust(machine().primary_screen->time_until_pos(1, 0 ));
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0 ));
 
 	timer_set(attotime::zero, TIMER_SETUP);
 }
@@ -451,7 +451,7 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 
 void osborne1_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

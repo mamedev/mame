@@ -808,7 +808,7 @@ void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
 			/* get the vertical position of the lightgun */
 			dclg_vpos = analog->input(joystick, 1);
 
-			if (machine().primary_screen->vpos() == dclg_vpos)
+			if (machine().first_screen()->vpos() == dclg_vpos)
 			{
 				/* if gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				m_dclg_output_h |= 0x02;
@@ -820,7 +820,7 @@ void coco_state::poll_joystick(bool *joyin, UINT8 *buttons)
 			if (m_dclg_state == 7)
 			{
 				/* while in state 7, prepare to check next video frame for a hit */
-				attotime dclg_time = machine().primary_screen->time_until_pos(dclg_vpos, 0);
+				attotime dclg_time = machine().first_screen()->time_until_pos(dclg_vpos, 0);
 				m_diecom_lightgun_timer->adjust(dclg_time);
 			}
 			break;

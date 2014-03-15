@@ -675,7 +675,7 @@ UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 		if(!(m_crtc.param[0][2] & 0x20))
 			return 1;
 
-		if(((machine().primary_screen->frame_number() / blink_speed) & 1) == 0)
+		if(((machine().first_screen()->frame_number() / blink_speed) & 1) == 0)
 			return 1;
 
 		return 0;
@@ -754,7 +754,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 				res_x = x*8+xi*(width+1);
 				res_y = y*y_height+yi;
 
-				if(!machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(gfx_mode)
@@ -771,7 +771,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 					UINT8 blink_mask;
 
 					blink_mask = 0;
-					if(blink && ((machine().primary_screen->frame_number() / blink_speed) & 3) == 1)
+					if(blink && ((machine().first_screen()->frame_number() / blink_speed) & 3) == 1)
 						blink_mask = 1;
 
 					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
@@ -799,7 +799,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 					bitmap.pix16(res_y, res_x) = m_palette->pen(color);
 					if(width)
 					{
-						if(!machine().primary_screen->visible_area().contains(res_x+1, res_y))
+						if(!machine().first_screen()->visible_area().contains(res_x+1, res_y))
 							continue;
 
 						bitmap.pix16(res_y, res_x+1) = m_palette->pen(color);
@@ -1241,7 +1241,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ext_rom_bank_w)
 
 UINT8 pc8801_state::pc8801_pixel_clock(void)
 {
-	int ysize = machine().primary_screen->height(); /* TODO: correct condition*/
+	int ysize = machine().first_screen()->height(); /* TODO: correct condition*/
 
 	return (ysize >= 400);
 }
@@ -1269,7 +1269,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
 
-	machine().primary_screen->configure(xsize, ysize, visarea, refresh);
+	machine().first_screen()->configure(xsize, ysize, visarea, refresh);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)

@@ -114,7 +114,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 void psxgpu_device::DebugMeshInit( void )
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -131,7 +131,7 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	int width = screen->width();
 	int height = screen->height();
 
@@ -330,7 +330,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 
 	if( m_debug.b_texture )
 	{
-		screen_device *screen = machine().primary_screen;
+		screen_device *screen = machine().first_screen();
 		int width = screen->width();
 		int height = screen->height();
 
@@ -442,7 +442,7 @@ void psxgpu_device::updatevisiblearea()
 #endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
-	machine().primary_screen->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
+	machine().first_screen()->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 void psxgpu_device::psx_gpu_init( int n_gputype )

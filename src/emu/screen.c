@@ -808,7 +808,7 @@ void screen_device::vblank_begin()
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine().first_screen() && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// call the screen specific callbacks
@@ -842,7 +842,7 @@ void screen_device::vblank_end()
 		m_screen_vblank(*this, false);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine().primary_screen && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine().first_screen() && (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine().video().frame_update();
 
 	// increment the frame number counter

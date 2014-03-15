@@ -343,8 +343,8 @@ void ldplayer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 				process_commands();
 
 			// set a timer to go off on the next VBLANK
-			int vblank_scanline = machine().primary_screen->visible_area().max_y + 1;
-			attotime target = machine().primary_screen->time_until_pos(vblank_scanline);
+			int vblank_scanline = machine().first_screen()->visible_area().max_y + 1;
+			attotime target = machine().first_screen()->time_until_pos(vblank_scanline);
 			timer_set(target, TIMER_ID_VSYNC_UPDATE);
 			break;
 		}

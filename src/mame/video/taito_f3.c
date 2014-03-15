@@ -2835,7 +2835,7 @@ inline void taito_f3_state::f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangl
 static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_ptr)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 	const int min_x=visarea.min_x,max_x=visarea.max_x;
 	const int min_y=visarea.min_y,max_y=visarea.max_y;
 	int offs,spritecont,flipx,flipy,/*old_x,*/color,x,y;

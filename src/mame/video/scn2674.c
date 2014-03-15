@@ -636,12 +636,12 @@ void scn2674_device::scn2674_line(running_machine &machine)
 		m_scn2674_status_register |= 0x04;
 		if (m_scn2674_irq_mask&0x04)
 		{
-			machine.primary_screen->update_partial(m_linecounter);
+			machine.first_screen()->update_partial(m_linecounter);
 			m_scn2674_irq_register |= 0x04;
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			m_scn2674_irq_state = 1;
 			m_interrupt_callback(1);
-//          machine.primary_screen->update_partial(m_linecounter);
+//          machine.first_screen()->update_partial(m_linecounter);
 		}
 	}
 
@@ -656,12 +656,12 @@ void scn2674_device::scn2674_line(running_machine &machine)
 		m_scn2674_status_register |= 0x01;
 		if (m_scn2674_irq_mask&0x01)
 		{
-			machine.primary_screen->update_partial(m_linecounter);
+			machine.first_screen()->update_partial(m_linecounter);
 			LOG2674(("SCN2674 Split Screen 2 irq\n"));
 			m_scn2674_irq_state = 1;
 			m_scn2674_irq_register |= 0x01;
 			m_interrupt_callback(1);
-			//machine.primary_screen->update_partial(m_linecounter);
+			//machine.first_screen()->update_partial(m_linecounter);
 		}
 	}
 

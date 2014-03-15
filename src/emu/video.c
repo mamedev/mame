@@ -115,7 +115,7 @@ video_manager::video_manager(running_machine &machine)
 
 	// create a render target for snapshots
 	const char *viewname = machine.options().snap_view();
-	m_snap_native = (machine.primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
+	m_snap_native = (machine.first_screen() != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
 
 	// the native target is hard-coded to our internal layout and has all options disabled
 	if (m_snap_native)
@@ -152,7 +152,7 @@ video_manager::video_manager(running_machine &machine)
 		begin_recording(filename, MF_AVI);
 
 	// if no screens, create a periodic timer to drive updates
-	if (machine.primary_screen == NULL)
+	if (machine.first_screen() == NULL)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
@@ -240,8 +240,8 @@ void video_manager::frame_update(bool debug)
 	if (phase == MACHINE_PHASE_RUNNING)
 	{
 		// reset partial updates if we're paused or if the debugger is active
-		if (machine().primary_screen != NULL && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
-			machine().primary_screen->reset_partial_updates();
+		if (machine().first_screen() != NULL && (machine().paused() || debug || debugger_within_instruction_hook(machine())))
+			machine().first_screen()->reset_partial_updates();
 	}
 }
 
@@ -375,7 +375,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		// build up information about this new movie
 		avi_movie_info info;
 		info.video_format = 0;
-		info.video_timescale = 1000 * ((machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+		info.video_timescale = 1000 * ((machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
 		info.video_sampletime = 1000;
 		info.video_numsamples = 0;
 		info.video_width = m_snap_bitmap.width();
@@ -431,7 +431,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		if (filerr == FILERR_NONE)
 		{
 			// start the capture
-			int rate = (machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
+			int rate = (machine().first_screen() != NULL) ? ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE;
 			png_error pngerr = mng_capture_start(*m_mngfile, m_snap_bitmap, rate);
 			if (pngerr != PNGERR_NONE)
 				return end_recording();
@@ -1003,13 +1003,13 @@ void video_manager::recompute_speed(attotime emutime)
 	// if we're past the "time-to-execute" requested, signal an exit
 	if (m_seconds_to_run != 0 && emutime.seconds >= m_seconds_to_run)
 	{
-		if (machine().primary_screen != NULL)
+		if (machine().first_screen() != NULL)
 		{
 			// create a final screenshot
 			emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = file.open(machine().basename(), PATH_SEPARATOR "final.png");
 			if (filerr == FILERR_NONE)
-				save_snapshot(machine().primary_screen, file);
+				save_snapshot(machine().first_screen(), file);
 		}
 
 		// schedule our demise
@@ -1228,8 +1228,8 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().primary_screen->palette() != NULL) ? machine().primary_screen->palette()->palette()->entry_list_adjusted() : NULL;
-			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().primary_screen->palette()->entries(), palette);
+			const rgb_t *palette = (machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : NULL;
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().first_screen()->palette()->entries(), palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{

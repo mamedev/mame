@@ -493,7 +493,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0004/4:
-			retval = (m_DISPSTAT & 0xffff) | (machine().primary_screen->vpos()<<16);
+			retval = (m_DISPSTAT & 0xffff) | (machine().first_screen()->vpos()<<16);
 			break;
 		case 0x0008/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -1767,7 +1767,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0200/4:
 			if( (mem_mask) & 0x0000ffff )
 			{
-//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, machine.primary_screen->vpos(), space.device().safe_pc());
+//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, machine.first_screen()->vpos(), space.device().safe_pc());
 				m_IE = ( m_IE & ~mem_mask ) | ( data & mem_mask );
 #if 0
 				if (m_IE & m_IF)
@@ -1943,7 +1943,7 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 {
 	int ch, ctrl;
-	int scanline = machine().primary_screen->vpos();
+	int scanline = machine().first_screen()->vpos();
 
 	// draw only visible scanlines
 	if (scanline < 160)
@@ -1977,7 +1977,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 	// clear hblank and raster IRQ flags
 	m_DISPSTAT &= ~(DISPSTAT_HBL|DISPSTAT_VCNT);
 
-	scanline = machine().primary_screen->vpos();
+	scanline = machine().first_screen()->vpos();
 
 	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
@@ -2043,8 +2043,8 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 		}
 	}
 
-	m_hbl_timer->adjust(machine().primary_screen->time_until_pos(scanline, 240));
-	m_scan_timer->adjust(machine().primary_screen->time_until_pos(( scanline + 1 ) % 228, 0));
+	m_hbl_timer->adjust(machine().first_screen()->time_until_pos(scanline, 240));
+	m_scan_timer->adjust(machine().first_screen()->time_until_pos(( scanline + 1 ) % 228, 0));
 }
 
 void gba_state::machine_reset()
@@ -2070,7 +2070,7 @@ void gba_state::machine_reset()
 
 	m_bios_protected = 0;
 
-	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
 	m_hbl_timer->adjust(attotime::never);
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
@@ -2092,7 +2092,7 @@ void gba_state::machine_start()
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_scan),this));
 	m_hbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_hbl),this));
-	m_scan_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	m_scan_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
 
 	/* and one for each DMA channel */
 	m_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::dma_complete),this));

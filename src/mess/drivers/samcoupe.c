@@ -125,7 +125,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
-	screen_device *scr = machine().primary_screen;
+	screen_device *scr = machine().first_screen();
 	UINT8 data;
 
 	if (offset & 0x100)

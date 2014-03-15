@@ -166,7 +166,7 @@ void hdgsp_read_from_shiftreg(address_space &space, UINT32 address, UINT16 *shif
 static void update_palette_bank(running_machine &machine, int newbank)
 {
 	harddriv_state *state = machine.driver_data<harddriv_state>();
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	machine.first_screen()->update_partial(machine.first_screen()->vpos());
 	state->m_gfx_palettebank = newbank;
 }
 

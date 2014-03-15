@@ -127,7 +127,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		{
 			tile_data = state->m_char_ram[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x && device->machine().primary_screen->frame_number() & 0x10)
+			if(cursor_on && cursor_addr == addr+x && device->machine().first_screen()->frame_number() & 0x10)
 				tile_data^=0xff;
 
 			for( xi = 0; xi < 8; xi++)
@@ -141,12 +141,12 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(yi >= 8) { pen = 0; }
 
 				/* TODO: pitch is currently 40, this should actually go in the upd7220 device */
-				if(!device->machine().primary_screen->visible_area().contains(res_x*2+0, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x*2+0, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x*2+0) = palette[pen];
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x*2+1, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x*2+1, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x*2+1) = palette[pen];

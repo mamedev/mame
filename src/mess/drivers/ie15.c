@@ -382,13 +382,13 @@ READ8_MEMBER( ie15_state::flag_r ) {
 	switch (offset)
 	{
 		case 0: // hsync pulse (not hblank)
-			ret = machine().primary_screen->hpos() < IE15_HORZ_START;
+			ret = machine().first_screen()->hpos() < IE15_HORZ_START;
 			break;
 		case 1: // marker scanline
-			ret = (machine().primary_screen->vpos() % 11) > 7;
+			ret = (machine().first_screen()->vpos() % 11) > 7;
 			break;
 		case 2: // vblank
-			ret = !machine().primary_screen->vblank();
+			ret = !machine().first_screen()->vblank();
 			break;
 		case 4:
 			ret = m_ruslat;
@@ -519,7 +519,7 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline, UINT8
 	UINT16 x,chr;
 
 	bg = 0; fg = 1; ra = scanline % 8;
-	blink = (machine().primary_screen->frame_number() % 10) >= 5;
+	blink = (machine().first_screen()->frame_number() % 10) >= 5;
 	red = m_io_keyboard->read() & 0x01;
 
 	DBG_LOG(2,"draw_scanline",
@@ -577,9 +577,9 @@ UINT32 ie15_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline, UINT8
 
 TIMER_DEVICE_CALLBACK_MEMBER(ie15_state::scanline_callback)
 {
-	UINT16 y = machine().primary_screen->vpos();
+	UINT16 y = machine().first_screen()->vpos();
 //  DBG_LOG(2,"scanline",
-//      ("addr %03x frame %lld x %04d y %03d\n", m_videoptr_2, machine().primary_screen->frame_number(), machine().primary_screen->hpos(), y));
+//      ("addr %03x frame %lld x %04d y %03d\n", m_videoptr_2, machine().first_screen()->frame_number(), machine().first_screen()->hpos(), y));
 	if (y>=IE15_VERT_START) {
 		y -= IE15_VERT_START;
 		if (y < IE15_DISP_VERT) {

@@ -376,7 +376,7 @@ inline void huc6270_device::next_horz_state()
 	{
 	case HUC6270_HDS:
 		m_bxr_latched = m_bxr;
-//if (LOG) printf("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
+//if (LOG) printf("latched bxr vpos=%d, hpos=%d\n", video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()));
 		m_horz_state = HUC6270_HDW;
 		m_horz_to_go = ( m_hdr & 0x7F ) + 1;
 		{
@@ -656,18 +656,18 @@ WRITE8_MEMBER( huc6270_device::write )
 //                      m_status |= HUC6270_RR;
 //                      m_irq_changed( ASSERT_LINE );
 //                  }
-//if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
+//if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BXR:       /* background x-scroll register LSB */
 					m_bxr = ( m_bxr & 0x0300 ) | data;
-//if (LOG) printf("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
+//if (LOG) printf("*********************** BXR written %d at %d,%d\n", m_bxr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case BYR:       /* background y-scroll register LSB */
 					m_byr = ( m_byr & 0x0100 ) | data;
 					m_byr_latched = m_byr;
-//if (LOG) printf("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen) );
+//if (LOG) printf("******************** BYR written %d at %d,%d\n", huc6270->m_byr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
 
 				case MWR:       /* memory width register LSB */

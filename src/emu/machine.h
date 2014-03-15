@@ -265,9 +265,11 @@ public:
 	// CPU information
 	cpu_device *            firstcpu;           // first CPU
 
+private:
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or NULL if screenless
 
+public:
 	// debugger-related information
 	UINT32                  debug_flags;        // the current debug flags
 

@@ -712,7 +712,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine().primary_screen->configure(720, 480, visarea, machine().primary_screen->frame_period().attoseconds);
+	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds);
 
 	/* calculate CG window parameters here */
 	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
@@ -1032,8 +1032,8 @@ READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
 	UINT8 vblank_bit, hblank_bit;
 
-	vblank_bit = machine().primary_screen->vblank() ? 0 : 1;
-	hblank_bit = machine().primary_screen->hblank() ? 0 : 2;
+	vblank_bit = machine().first_screen()->vblank() ? 0 : 1;
+	hblank_bit = machine().first_screen()->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }
@@ -1307,7 +1307,7 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 	{
 		UINT8 vblank_bit;
 
-		vblank_bit = machine().primary_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
+		vblank_bit = machine().first_screen()->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
 		return vblank_bit;
 	}
@@ -1884,7 +1884,7 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 {
 	UINT8 vblank_bit;
 
-	vblank_bit = machine().primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+	vblank_bit = machine().first_screen()->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }

@@ -63,7 +63,7 @@ private:
 
 void uzebox_state::machine_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 void uzebox_state::machine_reset()

@@ -804,8 +804,8 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().primary_screen->visible_area().max_y + 1);
-//  interlace_on = ((device->machine().primary_screen->visible_area().max_y + 1) >= 400) ? 1 : 0;
+//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().first_screen()->visible_area().max_y + 1);
+//  interlace_on = ((device->machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
 	interlace_on = state->m_video_ff[INTERLACE_REG];
 	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
@@ -816,13 +816,13 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			if(!device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+			if(!device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 				return;
 
 			pen = state->m_ext_gvram[(address*8+xi)+(state->m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
+			if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
 		}
 	}
@@ -841,10 +841,10 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 			if(interlace_on)
 			{
-				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
 				/* TODO: it looks like that PC-98xx can only display even lines ... */
-				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
+				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 			}
 			else
@@ -931,7 +931,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					res_x = ((x+kanji_lr)*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
 					res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
 
-					if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+					if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 						continue;
 
 					tile_data = 0;
@@ -972,10 +972,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
-					if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+					if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
-					if(blink && device->machine().primary_screen->frame_number() & 0x10)
+					if(blink && device->machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
 					if(yi >= char_size)
@@ -988,7 +988,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 					if(state->m_video_ff[WIDTH40_REG])
 					{
-						if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
+						if(!device->machine().first_screen()->visible_area().contains(res_x+1, res_y))
 							continue;
 
 						if(pen != -1)

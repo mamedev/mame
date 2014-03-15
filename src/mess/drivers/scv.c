@@ -420,7 +420,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 		case TIMER_VB:
 			{
-				int vpos = machine().primary_screen->vpos();
+				int vpos = machine().first_screen()->vpos();
 
 				switch( vpos )
 				{
@@ -432,7 +432,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 					break;
 				}
 
-				m_vb_timer->adjust(machine().primary_screen->time_until_pos((vpos + 1) % 262, 0));
+				m_vb_timer->adjust(machine().first_screen()->time_until_pos((vpos + 1) % 262, 0));
 			}
 			break;
 
@@ -791,7 +791,7 @@ void scv_state::machine_start()
 
 void scv_state::machine_reset()
 {
-	m_vb_timer->adjust(machine().primary_screen->time_until_pos(0, 0));
+	m_vb_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
 	scv_set_banks();
 }
 

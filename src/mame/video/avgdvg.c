@@ -1488,7 +1488,7 @@ static void register_state (running_machine &machine)
 
 static VIDEO_START( avg_common )
 {
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine.root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine.root_device().memshare("vectorram")->bytes();
@@ -1525,7 +1525,7 @@ static VIDEO_START( avg_common )
 
 VIDEO_START( dvg )
 {
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine.root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine.root_device().memshare("vectorram")->bytes();

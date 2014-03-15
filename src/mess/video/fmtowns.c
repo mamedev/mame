@@ -122,7 +122,7 @@ void towns_state::towns_crtc_refresh_mode()
 	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
 		return;
 
-	machine().primary_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
+	machine().first_screen()->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
 READ8_MEMBER( towns_state::towns_gfx_high_r )
@@ -365,8 +365,8 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 			if(m_video.towns_crtc_sel == 30)
 			{
 				// check video position
-				xpos = space.machine().primary_screen->hpos();
-				ypos = space.machine().primary_screen->vpos();
+				xpos = space.machine().first_screen()->hpos();
+				ypos = space.machine().first_screen()->vpos();
 
 				if(xpos < (m_video.towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
@@ -521,7 +521,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 			return m_video.towns_degipal[offset-0x08];
 		case 0x10:  // "sub status register"
 			// check video position
-			xpos = space.machine().primary_screen->hpos();
+			xpos = space.machine().first_screen()->hpos();
 
 			if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;
@@ -1655,7 +1655,7 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	dev->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
+	machine().scheduler().timer_set(machine().first_screen()->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)

@@ -738,7 +738,7 @@ static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 {
 	device_t *device = (device_t *)ptr;
 	s3c24xx_t *s3c24xx = get_token( device);
-	screen_device *screen = machine.primary_screen;
+	screen_device *screen = machine.first_screen();
 	UINT32 tpalen;
 	verboselog( machine, 2, "LCD timer callback\n");
 	s3c24xx->lcd.vpos = screen->vpos();
@@ -782,7 +782,7 @@ static TIMER_CALLBACK( s3c24xx_lcd_timer_exp )
 static void s3c24xx_video_start( device_t *device, running_machine &machine)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	screen_device *screen = machine.primary_screen;
+	screen_device *screen = machine.first_screen();
 	s3c24xx->lcd.bitmap[0] = auto_bitmap_rgb32_alloc(machine, screen->width(), screen->height());
 	s3c24xx->lcd.bitmap[1] = auto_bitmap_rgb32_alloc(machine, screen->width(), screen->height());
 }
@@ -846,7 +846,7 @@ READ32_DEVICE_HANDLER( s3c2440_lcd_r )
 		case S3C24XX_LCDCON1 :
 		{
 			// make sure line counter is going
-			UINT32 vpos = device->machine().primary_screen->vpos();
+			UINT32 vpos = device->machine().first_screen()->vpos();
 			if (vpos < s3c24xx->lcd.vpos_min) vpos = s3c24xx->lcd.vpos_min;
 			if (vpos > s3c24xx->lcd.vpos_max) vpos = s3c24xx->lcd.vpos_max;
 			data = (data & ~0xFFFC0000) | ((s3c24xx->lcd.vpos_max - vpos) << 18);
@@ -854,7 +854,7 @@ READ32_DEVICE_HANDLER( s3c2440_lcd_r )
 		break;
 		case S3C24XX_LCDCON5 :
 		{
-			UINT32 vpos = device->machine().primary_screen->vpos();
+			UINT32 vpos = device->machine().first_screen()->vpos();
 			data = data & ~0x00018000;
 			if (vpos < s3c24xx->lcd.vpos_min) data = data | 0x00000000;
 			if (vpos > s3c24xx->lcd.vpos_max) data = data | 0x00018000;
@@ -869,7 +869,7 @@ READ32_DEVICE_HANDLER( s3c2440_lcd_r )
 static int s3c24xx_lcd_configure_tft( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	screen_device *screen = device->machine().primary_screen;
+	screen_device *screen = device->machine().first_screen();
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	UINT32 width, height;
@@ -910,7 +910,7 @@ static int s3c24xx_lcd_configure_tft( device_t *device)
 static int s3c24xx_lcd_configure_stn( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	screen_device *screen = device->machine().primary_screen;
+	screen_device *screen = device->machine().first_screen();
 	UINT32 pnrmode, bppmode, clkval, lineval, wdly, hozval, lineblank, wlh, hclk;
 	double vclk, framerate;
 	UINT32 width, height;
@@ -973,7 +973,7 @@ static int s3c24xx_lcd_configure( device_t *device)
 static void s3c24xx_lcd_start( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	screen_device *screen = device->machine().primary_screen;
+	screen_device *screen = device->machine().first_screen();
 	verboselog( device->machine(), 1, "LCD start\n");
 	if (s3c24xx_lcd_configure( device))
 	{

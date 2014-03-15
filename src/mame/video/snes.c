@@ -1820,8 +1820,8 @@ static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
 void snes_ppu_class::latch_counters( running_machine &machine )
 {
-	m_beam.current_horz = machine.primary_screen->hpos() / m_htmult;
-	m_beam.latch_vert = machine.primary_screen->vpos();
+	m_beam.current_horz = machine.first_screen()->hpos() / m_htmult;
+	m_beam.latch_vert = machine.first_screen()->vpos();
 	m_beam.latch_horz = m_beam.current_horz;
 	m_stat78 |= 0x40;   // indicate we latched
 //  m_read_ophct = m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
@@ -1831,7 +1831,7 @@ void snes_ppu_class::latch_counters( running_machine &machine )
 
 void snes_ppu_class::dynamic_res_change( running_machine &machine )
 {
-	rectangle visarea = machine.primary_screen->visible_area();
+	rectangle visarea = machine.first_screen()->visible_area();
 	attoseconds_t refresh;
 
 	visarea.min_x = visarea.min_y = 0;
@@ -1848,12 +1848,12 @@ void snes_ppu_class::dynamic_res_change( running_machine &machine )
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
-		machine.primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
+		machine.first_screen()->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
-		machine.primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
+		machine.first_screen()->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }
 

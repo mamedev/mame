@@ -210,7 +210,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
-			if(attr & 0x80 && device->machine().primary_screen->frame_number() & 0x10) //TODO: check for blinking interval
+			if(attr & 0x80 && device->machine().first_screen()->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
@@ -220,7 +220,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16)

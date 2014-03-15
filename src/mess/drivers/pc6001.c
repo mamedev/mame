@@ -1337,14 +1337,14 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 	{
 		/* Apparently bitmap modes changes the screen res to 320 x 200 */
 		{
-			rectangle visarea = machine().primary_screen->visible_area();
+			rectangle visarea = machine().first_screen()->visible_area();
 			int y_height;
 
 			y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
 
 			visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-			machine().primary_screen->configure(320, 240, visarea, machine().primary_screen->frame_period().attoseconds);
+			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds);
 		}
 	}
 

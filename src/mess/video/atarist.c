@@ -134,8 +134,8 @@ inline pen_t st_state::shift_mode_2()
 
 void st_state::shifter_tick()
 {
-	int y = machine().primary_screen->vpos();
-	int x = machine().primary_screen->hpos();
+	int y = machine().first_screen()->vpos();
+	int x = machine().first_screen()->hpos();
 
 	pen_t pen;
 
@@ -193,8 +193,8 @@ inline void st_state::shifter_load()
 
 void st_state::glue_tick()
 {
-	int y = machine().primary_screen->vpos();
-	int x = machine().primary_screen->hpos();
+	int y = machine().first_screen()->vpos();
+	int x = machine().first_screen()->hpos();
 
 	int v = (y >= m_shifter_y_start) && (y < m_shifter_y_end);
 	int h = (x >= m_shifter_x_start) && (x < m_shifter_x_end);
@@ -1069,10 +1069,10 @@ void st_state::video_start()
 	m_shifter_timer = timer_alloc(TIMER_SHIFTER_TICK);
 	m_glue_timer = timer_alloc(TIMER_GLUE_TICK);
 
-//  m_shifter_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
-	m_glue_timer->adjust(machine().primary_screen->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
+//  m_shifter_timer->adjust(machine().first_screen()->time_until_pos(0), 0, attotime::from_hz(Y2/4)); // 125 ns
+	m_glue_timer->adjust(machine().first_screen()->time_until_pos(0), 0, attotime::from_hz(Y2/16)); // 500 ns
 
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
 	/* register for state saving */
 	save_item(NAME(m_shifter_base));

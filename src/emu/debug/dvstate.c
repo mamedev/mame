@@ -211,7 +211,7 @@ void debug_view_state::view_update()
 		curitem = curitem->m_next;
 
 	// loop over visible rows
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	debug_view_char *dest = m_viewdata;
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{

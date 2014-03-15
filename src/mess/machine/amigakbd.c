@@ -75,7 +75,7 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	/* if we still have more data, schedule another update */
 	if ( m_buf_pos != m_cur_pos )
 	{
-		m_timer->adjust(machine().primary_screen->frame_period() / 4);
+		m_timer->adjust(machine().first_screen()->frame_period() / 4);
 	}
 }
 
@@ -116,7 +116,7 @@ INPUT_CHANGED_MEMBER(amigakbd_device::kbd_update)
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( m_buf_pos != m_cur_pos ) )
 		{
-			m_timer->adjust(machine().primary_screen->frame_period() / 4);
+			m_timer->adjust(machine().first_screen()->frame_period() / 4);
 		}
 	}
 }

@@ -1896,7 +1896,7 @@ void fm7_state::machine_reset()
 	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
-		m_fm77av_vsync_timer->adjust(machine().primary_screen->time_until_vblank_end());
+		m_fm77av_vsync_timer->adjust(machine().first_screen()->time_until_vblank_end());
 
 	m_irq_mask = 0x00;
 	m_irq_flags = 0x00;

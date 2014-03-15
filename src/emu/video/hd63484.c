@@ -1557,7 +1557,7 @@ READ16_MEMBER( hd63484_device::data_r )
 	int res;
 
 	if (m_regno == 0x80)
-		res = machine().primary_screen->vpos();
+		res = machine().first_screen()->vpos();
 	else if (m_regno == 0)
 	{
 #if LOG_COMMANDS

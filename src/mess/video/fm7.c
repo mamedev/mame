@@ -1063,7 +1063,7 @@ READ8_MEMBER(fm7_state::fm77av_video_flags_r)
 {
 	UINT8 ret = 0xff;
 
-	if(machine().primary_screen->vblank())
+	if(machine().first_screen()->vblank())
 		ret &= ~0x80;
 
 	if(m_alu.busy != 0)
@@ -1104,7 +1104,7 @@ READ8_MEMBER(fm7_state::fm77av_sub_modestatus_r)
 	ret |= 0xbc;
 	ret |= (m_video.modestatus & 0x40);
 
-	if(!machine().primary_screen->vblank())
+	if(!machine().first_screen()->vblank())
 		ret |= 0x02;
 
 	if(m_video.vsync_flag != 0)
@@ -1119,12 +1119,12 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_modestatus_w)
 	if(data & 0x40)
 	{
 		rectangle rect(0, 320-1, 0, 200-1);
-		machine().primary_screen->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
+		machine().first_screen()->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 	else
 	{
 		rectangle rect(0, 640-1, 0, 200-1);
-		machine().primary_screen->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
+		machine().first_screen()->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 }
 
@@ -1355,7 +1355,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
 	else
 	{
 		m_video.vsync_flag = 0;
-		m_fm77av_vsync_timer->adjust(machine().primary_screen->time_until_vblank_end());
+		m_fm77av_vsync_timer->adjust(machine().first_screen()->time_until_vblank_end());
 	}
 }
 

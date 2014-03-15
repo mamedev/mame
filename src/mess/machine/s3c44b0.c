@@ -567,7 +567,7 @@ READ32_MEMBER( s3c44b0_device::lcd_r )
 
 void s3c44b0_device::lcd_configure()
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	int dismode, clkval, lineval, wdly, hozval, lineblank, wlh, mclk;
 	double vclk, framerate;
 	int width, height;
@@ -620,7 +620,7 @@ void s3c44b0_device::lcd_configure()
 
 void s3c44b0_device::lcd_start()
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	verboselog(machine(), 1, "LCD start\n");
 	lcd_configure();
 	lcd_dma_init();

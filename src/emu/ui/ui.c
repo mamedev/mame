@@ -2017,8 +2017,8 @@ static INT32 slider_refresh(running_machine &machine, void *arg, astring *string
 		screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
 	}
 	if (string != NULL)
-		string->printf("%.3ffps", ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds));
-	refresh = ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds);
+		string->printf("%.3ffps", ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds));
+	refresh = ATTOSECONDS_TO_HZ(machine.first_screen()->frame_period().attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 

@@ -572,7 +572,7 @@ void wswan_state::wswan_refresh_scanline()
 
 void wswan_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 	save_item(NAME(m_bitmap));
 }
 

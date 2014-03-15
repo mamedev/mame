@@ -250,7 +250,7 @@ void kaypro_state::mc6845_screen_configure()
 
 	/* Resize the screen */
 	if ((width < 640) && (height < 400) && (bytes < 0x800)) /* bounds checking to prevent an assert or violation */
-		machine().primary_screen->set_visible_area(0, width, 0, height);
+		machine().first_screen()->set_visible_area(0, width, 0, height);
 }
 
 

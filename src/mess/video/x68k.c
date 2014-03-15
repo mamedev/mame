@@ -166,8 +166,8 @@ void x68k_state::x68k_crtc_refresh_mode()
 
 //  logerror("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n",m_crtc.reg[0],m_crtc.reg[1],m_crtc.reg[2],m_crtc.reg[3],
 //      m_crtc.reg[4],m_crtc.reg[5],m_crtc.reg[6],m_crtc.reg[7],m_crtc.reg[8],m_crtc.reg[9]);
-	logerror("video_screen_configure(machine.primary_screen,%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
-	machine().primary_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
+	logerror("video_screen_configure(machine.first_screen(),%i,%i,[%i,%i,%i,%i],55.45)\n",scr.max_x,scr.max_y,visiblescr.min_x,visiblescr.min_y,visiblescr.max_x,visiblescr.max_y);
+	machine().first_screen()->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
@@ -183,31 +183,31 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 		{
 			if(m_oddscanline == 1)
 			{
-				int scan = machine().primary_screen->vpos();
+				int scan = machine().first_screen()->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
-				hsync_time = machine().primary_screen->time_until_pos(scan,(m_crtc.htotal + m_crtc.hend) / 2);
+				hsync_time = machine().first_screen()->time_until_pos(scan,(m_crtc.htotal + m_crtc.hend) / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((ioport("options")->read() & 0x04))
 					{
-						machine().primary_screen->update_partial(scan);
+						machine().first_screen()->update_partial(scan);
 					}
 				}
 			}
 			else
 			{
-				int scan = machine().primary_screen->vpos();
+				int scan = machine().first_screen()->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
-				hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend / 2);
+				hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
 					if((ioport("options")->read() & 0x04))
 					{
-						machine().primary_screen->update_partial(scan);
+						machine().first_screen()->update_partial(scan);
 					}
 				}
 			}
@@ -216,18 +216,18 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 		{
 			if(m_oddscanline == 1)
 			{
-				int scan = machine().primary_screen->vpos();
+				int scan = machine().first_screen()->vpos();
 				if(scan > m_crtc.vend)
 					scan = m_crtc.vbegin;
 				else
 					scan++;
-				hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hbegin / 2);
+				hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hbegin / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = 0;
 			}
 			else
 			{
-				hsync_time = machine().primary_screen->time_until_pos(machine().primary_screen->vpos(),(m_crtc.htotal + m_crtc.hbegin) / 2);
+				hsync_time = machine().first_screen()->time_until_pos(machine().first_screen()->vpos(),(m_crtc.htotal + m_crtc.hbegin) / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = 1;
 			}
@@ -237,22 +237,22 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 	{
 		if(hstate == 1)
 		{
-			int scan = machine().primary_screen->vpos();
+			int scan = machine().first_screen()->vpos();
 			if(scan > m_crtc.vend)
 				scan = 0;
-			hsync_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend);
+			hsync_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend);
 			m_scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
 				if((ioport("options")->read() & 0x04))
 				{
-					machine().primary_screen->update_partial(scan);
+					machine().first_screen()->update_partial(scan);
 				}
 			}
 		}
 		if(hstate == 0)
 		{
-			hsync_time = machine().primary_screen->time_until_pos(machine().primary_screen->vpos()+1,m_crtc.hbegin);
+			hsync_time = machine().first_screen()->time_until_pos(machine().first_screen()->vpos()+1,m_crtc.hbegin);
 			m_scanline_timer->adjust(hsync_time, 1);
 		}
 	}
@@ -272,13 +272,13 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 	if(scan <= m_crtc.vtotal)
 	{
 		m_mfpdev->i6_w(0);
-		machine().primary_screen->update_partial(scan);
-		irq_time = machine().primary_screen->time_until_pos(scan,m_crtc.hbegin);
+		machine().first_screen()->update_partial(scan);
+		irq_time = machine().first_screen()->time_until_pos(scan,m_crtc.hbegin);
 		// end of HBlank period clears GPIP6 also?
-		end_time = machine().primary_screen->time_until_pos(scan,m_crtc.hend);
+		end_time = machine().first_screen()->time_until_pos(scan,m_crtc.hend);
 		m_raster_irq->adjust(irq_time, scan);
 		timer_set(end_time, TIMER_X68K_CRTC_RASTER_END);
-		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine().primary_screen->vpos());
+		logerror("GPIP6: Raster triggered at line %i (%i)\n",scan,machine().first_screen()->vpos());
 	}
 }
 
@@ -292,7 +292,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 	{
 		m_crtc.vblank = 1;
 		vblank_line = m_crtc.vbegin;
-		irq_time = machine().primary_screen->time_until_pos(vblank_line,2);
+		irq_time = machine().first_screen()->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time);
 		logerror("CRTC: VBlank on\n");
 	}
@@ -302,7 +302,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 		vblank_line = m_crtc.vend;
 		if(vblank_line > m_crtc.vtotal)
 			vblank_line = m_crtc.vtotal;
-		irq_time = machine().primary_screen->time_until_pos(vblank_line,2);
+		irq_time = machine().first_screen()->time_until_pos(vblank_line,2);
 		m_vblank_irq->adjust(irq_time, 1);
 		logerror("CRTC: VBlank off\n");
 	}
@@ -379,7 +379,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			attotime irq_time;
-			irq_time = machine().primary_screen->time_until_pos((data) / m_crtc.vmultiple,2);
+			irq_time = machine().first_screen()->time_until_pos((data) / m_crtc.vmultiple,2);
 
 			if(irq_time.as_double() > 0)
 				m_raster_irq->adjust(irq_time, (data) / m_crtc.vmultiple);

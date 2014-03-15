@@ -208,7 +208,7 @@ mach8_device::mach8_device(const machine_config &mconfig, const char *tag, devic
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
-	m_vblank_timer->adjust( machine().primary_screen->time_until_pos(vga.crtc.vert_blank_start) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::device_start()
@@ -347,7 +347,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
-		vga.cursor.visible = machine().primary_screen->frame_number() & 0x10;
+		vga.cursor.visible = machine().first_screen()->frame_number() & 0x10;
 	else
 		vga.cursor.visible = 0;
 
@@ -360,7 +360,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			attr = vga.memory[(pos<<1) + 1];
 			font_base = 0x20000+(ch<<5);
 			font_base += ((attr & 8) ? vga.sequencer.char_sel.A : vga.sequencer.char_sel.B)*0x2000;
-			blink_en = (vga.attribute.data[0x10]&8&&machine().primary_screen->frame_number() & 0x20) ? attr & 0x80 : 0;
+			blink_en = (vga.attribute.data[0x10]&8&&machine().first_screen()->frame_number() & 0x20) ? attr & 0x80 : 0;
 
 			fore_col = attr & 0xf;
 			back_col = (attr & 0x70) >> 4;
@@ -378,7 +378,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					else
 						pen = vga.pens[back_col];
 
-					if(!machine().primary_screen->visible_area().contains(column*width+w, line+h))
+					if(!machine().first_screen()->visible_area().contains(column*width+w, line+h))
 						continue;
 					bitmapline[column*width+w] = pen;
 
@@ -391,7 +391,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					else
 						pen = vga.pens[back_col];
 
-					if(!machine().primary_screen->visible_area().contains(column*width+w, line+h))
+					if(!machine().first_screen()->visible_area().contains(column*width+w, line+h))
 						continue;
 					bitmapline[column*width+w] = pen;
 				}
@@ -402,7 +402,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						(h<=vga.crtc.cursor_scan_end)&&(h<height)&&(line+h<TEXT_LINES);
 						h++)
 				{
-					if(!machine().primary_screen->visible_area().contains(column*width, line+h))
+					if(!machine().first_screen()->visible_area().contains(column*width, line+h))
 						continue;
 					bitmap.plot_box(column*width, line+h, width, 1, vga.pens[attr&0xf]);
 				}
@@ -447,7 +447,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 					data[2]>>=1;
 					data[3]>>=1;
 
-					if(!machine().primary_screen->visible_area().contains(c+i-pel_shift, line + yi))
+					if(!machine().first_screen()->visible_area().contains(c+i-pel_shift, line + yi))
 						continue;
 					bitmapline[c+i-pel_shift] = pen;
 				}
@@ -491,7 +491,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					for(xi=0;xi<8;xi++)
 					{
-						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
+						if(!machine().first_screen()->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
 						bitmapline[c+xi-(pel_shift)] = m_palette->pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
 					}
@@ -518,7 +518,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					for(xi=0;xi<0x10;xi++)
 					{
-						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
+						if(!machine().first_screen()->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
 						bitmapline[c+xi-pel_shift] = m_palette->pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
 					}
@@ -552,7 +552,7 @@ void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				for(xi=0;xi<4;xi++)
 				{
 					pen = vga.pens[(vga.memory[addr] >> (6-xi*2)) & 3];
-					if(!machine().primary_screen->visible_area().contains(x+xi, y * height + yi))
+					if(!machine().first_screen()->visible_area().contains(x+xi, y * height + yi))
 						continue;
 					bitmapline[x+xi] = pen;
 				}
@@ -587,7 +587,7 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				for(xi=0;xi<8;xi++)
 				{
 					pen = vga.pens[(vga.memory[addr] >> (7-xi)) & 1];
-					if(!machine().primary_screen->visible_area().contains(x+xi, y * height + yi))
+					if(!machine().first_screen()->visible_area().contains(x+xi, y * height + yi))
 						continue;
 					bitmapline[x+xi] = pen;
 				}
@@ -640,7 +640,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					for(xi=0;xi<8;xi++)
 					{
-						if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
+						if(!machine().first_screen()->visible_area().contains(c+xi, line + yi))
 							continue;
 						bitmapline[c+xi] = m_palette->pen(vga.memory[(pos+(xi))]);
 					}
@@ -679,7 +679,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int r,g,b;
 
-				if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
+				if(!machine().first_screen()->visible_area().contains(c+xi, line + yi))
 					continue;
 
 				r = (MV(pos+xm)&0x7c00)>>10;
@@ -723,7 +723,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int r,g,b;
 
-				if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
+				if(!machine().first_screen()->visible_area().contains(c+xi, line + yi))
 					continue;
 
 				r = (MV(pos+xm)&0xf800)>>11;
@@ -767,7 +767,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int r,g,b;
 
-				if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
+				if(!machine().first_screen()->visible_area().contains(c+xi, line + yi))
 					continue;
 
 				r = (MD(pos+xm)&0xff0000)>>16;
@@ -808,7 +808,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				int r,g,b;
 
-				if(!machine().primary_screen->visible_area().contains(c+xi, line + yi))
+				if(!machine().first_screen()->visible_area().contains(c+xi, line + yi))
 					continue;
 
 				r = (MD(pos+xm)&0xff0000)>>16;
@@ -1317,9 +1317,9 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
-	machine().primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
+	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( machine().primary_screen->time_until_pos(vga.crtc.vert_blank_start) );
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::recompute_params()
@@ -1506,7 +1506,7 @@ UINT8 vga_device::vga_vblank()
 	res = 0;
 	vblank_start = vga.crtc.vert_blank_start;
 	vblank_end = vga.crtc.vert_blank_start + vga.crtc.vert_blank_end;
-	vpos = machine().primary_screen->vpos();
+	vpos = machine().first_screen()->vpos();
 
 	/* check if we are under vblank period */
 	if(vblank_end > vga.crtc.vert_total)
@@ -1542,8 +1542,8 @@ READ8_MEMBER(vga_device::vga_crtc_r)
 		vga.attribute.state = 0;
 		data = 0;
 
-		hsync = space.machine().primary_screen->hblank() & 1;
-		vsync = vga_vblank(); //space.machine().primary_screen->vblank() & 1;
+		hsync = space.machine().first_screen()->hblank() & 1;
+		vsync = vga_vblank(); //space.machine().first_screen()->vblank() & 1;
 
 		data |= (hsync | vsync) & 1; // DD - display disable register
 		data |= (vsync & 1) << 3; // VRetrace register
@@ -1594,10 +1594,10 @@ WRITE8_MEMBER(vga_device::vga_crtc_w)
 			}
 
 			crtc_reg_write(vga.crtc.index,data);
-			//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+			//space.machine().first_screen()->update_partial(space.machine().first_screen()->vpos());
 			#if 0
 			if((vga.crtc.index & 0xfe) != 0x0e)
-				printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().primary_screen->vpos());
+				printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().first_screen()->vpos());
 			#endif
 			break;
 
@@ -2530,7 +2530,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03d0_w)
 				vga.crtc.data[vga.crtc.index] = data;
 				tseng_crtc_reg_write(vga.crtc.index,data);
 				//if((vga.crtc.index & 0xfe) != 0x0e)
-				//  printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().primary_screen->vpos());
+				//  printf("%02x %02x %d\n",vga.crtc.index,data,space.machine().first_screen()->vpos());
 				break;
 			case 8:
 				et4k.reg_3d8 = data;

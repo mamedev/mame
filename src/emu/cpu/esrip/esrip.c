@@ -411,7 +411,7 @@ offs_t esrip_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 int esrip_device::get_hblank()
 {
-	return machine().primary_screen->hblank();
+	return machine().first_screen()->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
