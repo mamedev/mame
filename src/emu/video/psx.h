@@ -3,7 +3,7 @@
 /*
  * PlayStation GPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2014 smf
  *
  */
 
@@ -304,6 +304,7 @@ private:
 	devcb2_write_line m_vblank_handler;
 
 #if defined(DEBUG_VIEWER) && DEBUG_VIEWER
+	required_device<screen_device> m_screen;
 	void DebugMeshInit( void );
 	void DebugMesh( int n_coordx, int n_coordy );
 	void DebugMeshEnd( void );

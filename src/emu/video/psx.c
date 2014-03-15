@@ -3,7 +3,7 @@
 /*
  * PlayStation GPU emulator
  *
- * Copyright 2003-2013 smf
+ * Copyright 2003-2014 smf
  *
  */
 
@@ -25,6 +25,10 @@ const device_type CXD8654Q = &device_creator<cxd8654q_device>;
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_vblank_handler(*this)
+#if DEBUG_VIEWER
+,
+	m_screen(*this, "screen")
+#endif
 {
 }
 
@@ -114,9 +118,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, 
 
 void psxgpu_device::DebugMeshInit( void )
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_debug.b_mesh = 0;
 	m_debug.b_texture = 0;
@@ -131,9 +134,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 {
 	int n_coord;
 	int n_colour;
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	n_coordx += m_n_displaystartx;
 	n_coordy += n_displaystarty;
@@ -330,9 +332,8 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 
 	if( m_debug.b_texture )
 	{
-		screen_device *screen = machine().first_screen();
-		int width = screen->width();
-		int height = screen->height();
+		int width = m_screen->width();
+		int height = m_screen->height();
 
 		for( n_y = 0; n_y < height; n_y++ )
 		{
@@ -360,7 +361,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_ind16 &bitmap )
 				}
 				p_n_interleave[ n_x ] = p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, screen->palette()->pens() );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, m_screen->palette()->pens() );
 		}
 	}
 	return m_debug.b_texture;
