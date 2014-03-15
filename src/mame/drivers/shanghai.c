@@ -475,7 +475,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
+	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(shangha2_map)
 	MCFG_CPU_IO_MAP(shangha2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
@@ -508,17 +508,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,16000000/2) /* ? */
+	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
 
-	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_16MHz/4)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(30) /* Should be 57Hz, but plays too fast */
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
@@ -533,12 +533,12 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
-	MCFG_SOUND_ADD("ym1", YM2203, 14318180/4)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, ym2203_irqhandler))
 	MCFG_YM2203_AY8910_INTF(&kothello_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 14318180/4)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
@@ -556,7 +556,17 @@ ROM_START( shanghai )
 	ROM_LOAD16_BYTE( "shg-21a.rom", 0xa0000, 0x10000, CRC(4ab06d32) SHA1(02667d1270b101386b947d5b9bfe64052e498041) )
 	ROM_LOAD16_BYTE( "shg-28a.rom", 0xc0001, 0x10000, CRC(983ec112) SHA1(110e120e35815d055d6108a7603e83d2d990c666) )
 	ROM_LOAD16_BYTE( "shg-27a.rom", 0xc0000, 0x10000, CRC(41af0945) SHA1(dfc4638a17f716ccc8e59f275571d6dc1093a745) )
-	ROM_LOAD16_BYTE( "shg-37b.rom", 0xe0001, 0x10000, CRC(3f192da0) SHA1(e70d5da5d702e9bf9ac6b77df62bcf51894aadcf) )
+	ROM_LOAD16_BYTE( "shg-37b.bin", 0xe0001, 0x10000, CRC(ead3d66c) SHA1(f9be9a4773ea6c9ba931f7aa8c79121caacc231c) ) /* Single byte difference from shg-37b.rom  0xD58C == 0x01 */
+	ROM_LOAD16_BYTE( "shg-36b.rom", 0xe0000, 0x10000, CRC(a1d6af96) SHA1(01c4c22bf03b3d260fffcbc6dfc5f2dd2bcba14a) )
+ROM_END
+
+ROM_START( shanghaij )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "shg-22a.rom", 0xa0001, 0x10000, CRC(e0a085be) SHA1(e281043f97c4cd34a33eb1ec7154abbe67a9aa03) )
+	ROM_LOAD16_BYTE( "shg-21a.rom", 0xa0000, 0x10000, CRC(4ab06d32) SHA1(02667d1270b101386b947d5b9bfe64052e498041) )
+	ROM_LOAD16_BYTE( "shg-28a.rom", 0xc0001, 0x10000, CRC(983ec112) SHA1(110e120e35815d055d6108a7603e83d2d990c666) )
+	ROM_LOAD16_BYTE( "shg-27a.rom", 0xc0000, 0x10000, CRC(41af0945) SHA1(dfc4638a17f716ccc8e59f275571d6dc1093a745) )
+	ROM_LOAD16_BYTE( "shg-37b.rom", 0xe0001, 0x10000, CRC(3f192da0) SHA1(e70d5da5d702e9bf9ac6b77df62bcf51894aadcf) ) /* Single byte difference from shg-37b.bin  0xD58C == 0x00 */
 	ROM_LOAD16_BYTE( "shg-36b.rom", 0xe0000, 0x10000, CRC(a1d6af96) SHA1(01c4c22bf03b3d260fffcbc6dfc5f2dd2bcba14a) )
 ROM_END
 
@@ -570,7 +580,6 @@ ROM_END
 
 ROM_START( shangha2a ) // content is the same, just different ROM sizes
 	ROM_REGION( 0x100000, "maincpu", 0 )
-
 	ROM_LOAD16_BYTE( "3.bin", 0x80001, 0x10000, CRC(93aacccb) SHA1(8b29b9b24cf268a4376b7f653c19d6f46d698552) )
 	ROM_LOAD16_BYTE( "1.bin", 0x80000, 0x10000, CRC(0fb2d8ee) SHA1(fee8074d8116f551c634f088b8121d48a9b4a008) )
 	ROM_LOAD16_BYTE( "7.bin", 0xa0001, 0x10000, CRC(f9e06880) SHA1(7840b6672cc02fd70f478a5c9f11cfc26ddfca52) )
@@ -654,7 +663,8 @@ ROM_END
 
 
 
-GAME( 1988, shanghai, 0, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, shangha2, 0, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", 0 )
+GAME( 1988, shanghai,  0,        shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (World)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, shanghaij, shanghai, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, shangha2,  0,        shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", 0 )
 GAME( 1989, shangha2a, shangha2, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", 0 )
-GAME( 1990, kothello, 0, kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, kothello,  0,        kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
