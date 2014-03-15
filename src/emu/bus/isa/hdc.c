@@ -110,9 +110,6 @@ static const char *const hdc_command_names[] =
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL  /* 0xF8-0xFF */
 };
 
-static DECLARE_READ8_DEVICE_HANDLER(pc_HDC_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(pc_HDC_w);
-
 static MACHINE_CONFIG_FRAGMENT( hdc_config )
 	MCFG_HARDDISK_ADD("primary")
 	MCFG_HARDDISK_ADD("slave")
@@ -171,7 +168,7 @@ void isa8_hdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
-	m_isa->install_device(this, 0x0320, 0x0323, 0, 0, FUNC(pc_HDC_r), FUNC(pc_HDC_w) );
+	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
 	m_isa->set_dma_channel(3, this, FALSE);
 	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);
 	timer = machine().scheduler().timer_alloc(FUNC(pc_hdc_command), this);
@@ -781,37 +778,35 @@ UINT8 isa8_hdc_device::pc_hdc_dipswitch_r()
  *      hard disk controller
  *
  *************************************************************************/
-static READ8_DEVICE_HANDLER(pc_HDC_r )
+READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
 {
 	UINT8 data = 0xff;
-	isa8_hdc_device *hdc  = downcast<isa8_hdc_device *>(device);
 
 	switch( offset )
 	{
-		case 0: data = hdc->pc_hdc_data_r();     break;
-		case 1: data = hdc->pc_hdc_status_r();   break;
-		case 2: data = hdc->pc_hdc_dipswitch_r(); break;
+		case 0: data = pc_hdc_data_r();     break;
+		case 1: data = pc_hdc_status_r();   break;
+		case 2: data = pc_hdc_dipswitch_r(); break;
 		case 3: break;
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("%s pc_HDC_r(): offs=%d result=0x%02x\n", space.machine().describe_context(), offset, data);
+		logerror("%s pc_hdc_r(): offs=%d result=0x%02x\n", machine().describe_context(), offset, data);
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pc_HDC_w )
+WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
 {
-	isa8_hdc_device *hdc  = downcast<isa8_hdc_device *>(device);
 	if (LOG_HDC_CALL)
-		logerror("%s pc_HDC_w(): offs=%d data=0x%02x\n", space.machine().describe_context(), offset, data);
+		logerror("%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);
 
 	switch( offset )
 	{
-		case 0: hdc->pc_hdc_data_w(data);    break;
-		case 1: hdc->pc_hdc_reset_w(data);   break;
-		case 2: hdc->pc_hdc_select_w(data);  break;
-		case 3: hdc->pc_hdc_control_w(data); break;
+		case 0: pc_hdc_data_w(data);    break;
+		case 1: pc_hdc_reset_w(data);   break;
+		case 2: pc_hdc_select_w(data);  break;
+		case 3: pc_hdc_control_w(data); break;
 	}
 }
 

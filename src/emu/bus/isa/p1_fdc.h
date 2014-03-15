@@ -36,7 +36,8 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
+	DECLARE_READ8_MEMBER(p1_fdc_r);
+	DECLARE_WRITE8_MEMBER(p1_fdc_w);
 protected:
 	// device-level overrides
 	virtual void device_start();

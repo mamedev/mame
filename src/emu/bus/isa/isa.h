@@ -168,9 +168,7 @@ public:
 		}
 	}
 
-	ATTR_DEPRECATED void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
-	ATTR_DEPRECATED void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name);
 	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff)) 
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);	
@@ -212,8 +210,6 @@ public:
 	const address_space_config m_program_config, m_io_config, m_program16_config, m_io16_config;
 
 protected:
-	ATTR_DEPRECATED void install_space(address_spacenum spacenum, device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
-	ATTR_DEPRECATED void install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name);
 	void install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 
 	// device-level overrides

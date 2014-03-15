@@ -38,7 +38,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	TIMER_CALLBACK_MEMBER( motor_callback );
 
-
+	DECLARE_READ8_MEMBER(mc1502_fdc_r);
+	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
 protected:
 	// device-level overrides
 	virtual void device_start();
