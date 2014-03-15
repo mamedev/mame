@@ -43,15 +43,15 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(io_control_w);
+	DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_WRITE16_MEMBER(audio_command_w);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
-	DECLARE_WRITE16_MEMBER(system_control_w);
+	DECLARE_WRITE8_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
 	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
@@ -136,7 +136,6 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
 
 	// MVS-specific
-	DECLARE_WRITE16_MEMBER(watchdog_w);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);

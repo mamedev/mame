@@ -1062,7 +1062,7 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		system_control_w(space, offs, 0, 0x00ff);
+		system_control_w(space, offs, 0);
 
 	// disable audiocpu nmi
 	m_audio_cpu_nmi_enabled = false;
@@ -1117,12 +1117,12 @@ static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("cartridge")
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE(audio_command_w)
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE(system_control_w)
+	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
@@ -1140,12 +1140,12 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_READ(aes_in0_r)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE(audio_command_w)
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ(aes_in1_r)
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE(system_control_w)
+	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)

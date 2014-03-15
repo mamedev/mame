@@ -100,6 +100,37 @@
           |---------------------------------------------------------------------|
 
 
+    Watchdog
+    ========
+
+    The watchdog timer will reset the system after ~0.13 seconds
+    On an MV-1F MVS system, the following code was used to test:
+        000100  203C 0001 4F51             MOVE.L   #0x14F51,D0
+        000106  13C0 0030 0001             MOVE.B   D0,0x300001
+        00010C  5380                       SUBQ.L   #1,D0
+        00010E  64FC                       BCC.S    *-0x2 [0x10C]
+        000110  13C0 0030 0001             MOVE.B   D0,0x300001
+        000116  60F8                       BRA.S    *-0x6 [0x110]
+    This code loops long enough to sometimes cause a reset, sometimes not.
+    The move takes 16 cycles, subq 8, bcc 10 if taken and 8 if not taken, so:
+    (0x14F51 * 18 + 14) cycles / 12000000 cycles per second = 0.128762 seconds
+    Newer games force a reset using the following code (this from kof99):
+        009CDA  203C 0003 0D40             MOVE.L   #0x30D40,D0
+        009CE0  5380                       SUBQ.L   #1,D0
+        009CE2  64FC                       BCC.S    *-0x2 [0x9CE0]
+    Note however that there is a valid code path after this loop.
+
+    The watchdog is used as a form of protecetion on a number of games,
+    previously this was implemented as a specific hack which locked a single
+    address of SRAM.
+
+    What actually happens is if the game doesn't find valid data in the
+    backup ram it will initialize it, then sit in a loop.  The watchdog
+    should then reset the system while it is in this loop.  If the watchdog
+    fails to reset the system the code will continue and set a value in
+    backup ram to indiate that the protection check has failed.
+
+
     Known driver issues/to-do's:
     ============================
 
@@ -385,22 +416,37 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 }
 #endif
 
-WRITE16_MEMBER(neogeo_state::io_control_w)
+WRITE8_MEMBER(neogeo_state::io_control_w)
 {
 	switch (offset)
 	{
-	case 0x00: select_controller(data & 0x00ff); break;
-	case 0x18: if (m_type == NEOGEO_MVS) set_output_latch(data & 0x00ff); break;
-	case 0x20: if (m_type == NEOGEO_MVS) set_output_data(data & 0x00ff); break;
-	case 0x28: if (m_type == NEOGEO_MVS) m_upd4990a->control_16_w(space, 0, data, mem_mask); break;
+		case 0x00:
+			select_controller(data);
+			break;
+
+		case 0x18:
+			if (m_type == NEOGEO_MVS)
+				set_output_latch(data);
+			break;
+
+		case 0x20:
+			if (m_type == NEOGEO_MVS)
+				set_output_data(data);
+			break;
+
+		case 0x28:
+			if (m_type == NEOGEO_MVS)
+				m_upd4990a->control_16_w(space, 0, data, 0x00ff);
+			break;
+
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
 //  case 0x32: break; // coin lockout
 //  case 0x33: break; // coui lockout
 
-	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);
-		break;
+		default:
+			logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);
+			break;
 	}
 }
 
@@ -534,19 +580,15 @@ MEMCARD_HANDLER( neogeo )
  *
  *************************************/
 
-WRITE16_MEMBER(neogeo_state::audio_command_w)
+WRITE8_MEMBER(neogeo_state::audio_command_w)
 {
-	/* accessing the LSB only is not mapped */
-	if (ACCESSING_BITS_8_15)
-	{
-		soundlatch_write(data >> 8);
+	soundlatch_write(data);
 
-		m_audio_cpu_nmi_pending = true;
-		audio_cpu_check_nmi();
+	m_audio_cpu_nmi_pending = true;
+	audio_cpu_check_nmi();
 
-		/* boost the interleave to let the audio CPU read the command */
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
-	}
+	/* boost the interleave to let the audio CPU read the command */
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
 
@@ -704,83 +746,49 @@ void neogeo_state::neogeo_audio_cpu_banking_init()
  *
  *************************************/
 
-WRITE16_MEMBER(neogeo_state::system_control_w)
+WRITE8_MEMBER(neogeo_state::system_control_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		UINT8 bit = (offset >> 3) & 0x01;
+	UINT8 bit = (offset >> 3) & 0x01;
 
-		switch (offset & 0x07)
-		{
+	switch (offset & 0x07)
+	{
 		default:
-		case 0x00: neogeo_set_screen_dark(bit); break;
-		case 0x01: if (m_type == NEOGEO_CD)
-						printf("NeoCD: write to regular vector change address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
-					else
-						m_bank_vectors->set_entry(bit);
-					break;
-		case 0x05: if (m_type == NEOGEO_MVS)
-					{
-						neogeo_set_fixed_layer_source(bit);
-						m_bank_audio_main->set_entry(bit);
-					}
-					break;
-		case 0x06: if (m_type == NEOGEO_MVS) set_save_ram_unlock(bit); break;
-		case 0x07: neogeo_set_palette_bank(bit); break;
+		case 0x00:
+			neogeo_set_screen_dark(bit);
+			break;
+
+		case 0x01:
+			if (m_type == NEOGEO_CD)
+				printf("NeoCD: write to regular vector change address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+			else
+				m_bank_vectors->set_entry(bit);
+			break;
+
+		case 0x05:
+			if (m_type == NEOGEO_MVS)
+			{
+				neogeo_set_fixed_layer_source(bit);
+				m_bank_audio_main->set_entry(bit);
+			}
+			break;
+
+		case 0x06:
+			if (m_type == NEOGEO_MVS)
+				set_save_ram_unlock(bit);
+			break;
+
+		case 0x07:
+			neogeo_set_palette_bank(bit);
+			break;
 
 		case 0x02: // memory card 1: write enable/disable
 		case 0x03: // memory card 2: write disable/enable
 		case 0x04: // memory card: register select enable/set to normal (what does it mean?)
 			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 			break;
-		}
-
-		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 	}
-}
 
-
-/*************************************
- *
- *  Watchdog
- *
- *
- *    - The watchdog timer will reset the system after ~0.13 seconds
- *     On an MV-1F MVS system, the following code was used to test:
- *        000100  203C 0001 4F51             MOVE.L   #0x14F51,D0
- *        000106  13C0 0030 0001             MOVE.B   D0,0x300001
- *        00010C  5380                       SUBQ.L   #1,D0
- *        00010E  64FC                       BCC.S    *-0x2 [0x10C]
- *        000110  13C0 0030 0001             MOVE.B   D0,0x300001
- *        000116  60F8                       BRA.S    *-0x6 [0x110]
- *     This code loops long enough to sometimes cause a reset, sometimes not.
- *     The move takes 16 cycles, subq 8, bcc 10 if taken and 8 if not taken, so:
- *     (0x14F51 * 18 + 14) cycles / 12000000 cycles per second = 0.128762 seconds
- *     Newer games force a reset using the following code (this from kof99):
- *        009CDA  203C 0003 0D40             MOVE.L   #0x30D40,D0
- *        009CE0  5380                       SUBQ.L   #1,D0
- *        009CE2  64FC                       BCC.S    *-0x2 [0x9CE0]
- *     Note however that there is a valid code path after this loop.
- *
- *     The watchdog is used as a form of protecetion on a number of games,
- *     previously this was implemented as a specific hack which locked a single
- *     address of SRAM.
- *
- *     What actually happens is if the game doesn't find valid data in the
- *     backup ram it will initialize it, then sit in a loop.  The watchdog
- *     should then reset the system while it is in this loop.  If the watchdog
- *     fails to reset the system the code will continue and set a value in
- *     backup ram to indiate that the protection check has failed.
- *
- *************************************/
-
-WRITE16_MEMBER(neogeo_state::watchdog_w)
-{
-	/* only an LSB write resets the watchdog */
-	if (ACCESSING_BITS_0_7)
-	{
-		watchdog_reset16_w(space, offset, data, mem_mask);
-	}
+	if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset & 0x07, bit);
 }
 
 
@@ -911,7 +919,7 @@ void neogeo_state::machine_reset()
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		system_control_w(space, offs, 0, 0x00ff);
+		system_control_w(space, offs, 0);
 
 	// disable audiocpu nmi
 	m_audio_cpu_nmi_enabled = false;
@@ -948,13 +956,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ_PORT("P1/DSW")
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("TEST")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_WRITE(watchdog_w)
-	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO/COIN") AM_WRITE(audio_command_w)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_WRITE8(watchdog_reset_w, 0x00ff)
+	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO/COIN") AM_WRITE8(audio_command_w, 0xff00)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ_PORT("P2")
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE(system_control_w)
+	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(neogeo_video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(neogeo_video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
