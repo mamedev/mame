@@ -9,15 +9,14 @@
 
 **********************************************************************/
 
-#include "emu.h"
-#include "emuopts.h"
 #include "wangpc.h"
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
+const device_type WANGPC_BUS = &device_creator<wangpcbus_device>;
 const device_type WANGPC_BUS_SLOT = &device_creator<wangpcbus_slot_device>;
 
 
@@ -31,8 +30,8 @@ const device_type WANGPC_BUS_SLOT = &device_creator<wangpcbus_slot_device>;
 //-------------------------------------------------
 
 wangpcbus_slot_device::wangpcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock, "wangpcbus_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+	device_t(mconfig, WANGPC_BUS_SLOT, "Wang PC bus slot", tag, owner, clock, "wangpcbus_slot", __FILE__),
+	device_slot_interface(mconfig, *this)
 {
 }
 
@@ -51,61 +50,26 @@ void wangpcbus_slot_device::device_start()
 {
 	m_bus = machine().device<wangpcbus_device>(WANGPC_BUS_TAG);
 	device_wangpcbus_card_interface *dev = dynamic_cast<device_wangpcbus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_wangpcbus_card(dev, m_sid);
+	if (dev) m_bus->add_card(dev, m_sid);
 }
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type WANGPC_BUS = &device_creator<wangpcbus_device>;
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wangpcbus_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const wangpcbus_interface *intf = reinterpret_cast<const wangpcbus_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<wangpcbus_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq2_cb, 0, sizeof(m_out_irq2_cb));
-		memset(&m_out_irq3_cb, 0, sizeof(m_out_irq3_cb));
-		memset(&m_out_irq4_cb, 0, sizeof(m_out_irq4_cb));
-		memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
-		memset(&m_out_irq6_cb, 0, sizeof(m_out_irq6_cb));
-		memset(&m_out_irq7_cb, 0, sizeof(m_out_irq7_cb));
-		memset(&m_out_drq1_cb, 0, sizeof(m_out_drq1_cb));
-		memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
-		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
-		memset(&m_out_ioerror_cb, 0, sizeof(m_out_ioerror_cb));
-	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  wangpcbus_device - constructor
 //-------------------------------------------------
 
 wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock, "wangpcbus", __FILE__)
+	device_t(mconfig, WANGPC_BUS, "Wang PC bus", tag, owner, clock, "wangpcbus", __FILE__),
+	m_write_irq2(*this),
+	m_write_irq3(*this),
+	m_write_irq4(*this),
+	m_write_irq5(*this),
+	m_write_irq6(*this),
+	m_write_irq7(*this),
+	m_write_drq1(*this),
+	m_write_drq2(*this),
+	m_write_drq3(*this),
+	m_write_ioerror(*this)
 {
 }
 
@@ -117,33 +81,24 @@ wangpcbus_device::wangpcbus_device(const machine_config &mconfig, const char *ta
 void wangpcbus_device::device_start()
 {
 	// resolve callbacks
-	m_out_irq2_func.resolve(m_out_irq2_cb, *this);
-	m_out_irq3_func.resolve(m_out_irq3_cb, *this);
-	m_out_irq4_func.resolve(m_out_irq4_cb, *this);
-	m_out_irq5_func.resolve(m_out_irq5_cb, *this);
-	m_out_irq6_func.resolve(m_out_irq6_cb, *this);
-	m_out_irq7_func.resolve(m_out_irq7_cb, *this);
-	m_out_drq1_func.resolve(m_out_drq1_cb, *this);
-	m_out_drq2_func.resolve(m_out_drq2_cb, *this);
-	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
-	m_out_ioerror_func.resolve(m_out_ioerror_cb, *this);
+	m_write_irq2.resolve_safe();
+	m_write_irq3.resolve_safe();
+	m_write_irq4.resolve_safe();
+	m_write_irq5.resolve_safe();
+	m_write_irq6.resolve_safe();
+	m_write_irq7.resolve_safe();
+	m_write_drq1.resolve_safe();
+	m_write_drq2.resolve_safe();
+	m_write_drq3.resolve_safe();
+	m_write_ioerror.resolve_safe();
 }
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  add_card - add card
 //-------------------------------------------------
 
-void wangpcbus_device::device_reset()
-{
-}
-
-
-//-------------------------------------------------
-//  add_wangpcbus_card - add S100 card
-//-------------------------------------------------
-
-void wangpcbus_device::add_wangpcbus_card(device_wangpcbus_card_interface *card, int sid)
+void wangpcbus_device::add_card(device_wangpcbus_card_interface *card, int sid)
 {
 	m_device_list.append(*card);
 
@@ -224,18 +179,6 @@ WRITE16_MEMBER( wangpcbus_device::sad_w )
 }
 
 
-WRITE_LINE_MEMBER( wangpcbus_device::irq2_w ) { m_out_irq2_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::irq3_w ) { m_out_irq3_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::irq4_w ) { m_out_irq4_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::irq5_w ) { m_out_irq5_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::irq6_w ) { m_out_irq6_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::irq7_w ) { m_out_irq7_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::drq1_w ) { m_out_drq1_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::drq2_w ) { m_out_drq2_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::drq3_w ) { m_out_drq3_func(state); }
-WRITE_LINE_MEMBER( wangpcbus_device::ioerror_w ) { m_out_ioerror_func(state); }
-
-
 //-------------------------------------------------
 //  dack_r - DMA read
 //-------------------------------------------------
@@ -279,15 +222,6 @@ void wangpcbus_device::dack_w(address_space &space, int line, UINT8 data)
 	}
 }
 
-READ8_MEMBER( wangpcbus_device::dack0_r ) { return dack_r(space, 0); }
-WRITE8_MEMBER( wangpcbus_device::dack0_w ) { dack_w(space, 0, data); }
-READ8_MEMBER( wangpcbus_device::dack1_r ) { return dack_r(space, 1); }
-WRITE8_MEMBER( wangpcbus_device::dack1_w ) { dack_w(space, 1, data); }
-READ8_MEMBER( wangpcbus_device::dack2_r ) { return dack_r(space, 2); }
-WRITE8_MEMBER( wangpcbus_device::dack2_w ) { dack_w(space, 2, data); }
-READ8_MEMBER( wangpcbus_device::dack3_r ) { return dack_r(space, 3); }
-WRITE8_MEMBER( wangpcbus_device::dack3_w ) { dack_w(space, 3, data); }
-
 
 //-------------------------------------------------
 //  tc_w - terminal count
@@ -314,19 +248,10 @@ WRITE_LINE_MEMBER( wangpcbus_device::tc_w )
 //  device_wangpcbus_card_interface - constructor
 //-------------------------------------------------
 
-device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_wangpcbus_card_interface::device_wangpcbus_card_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device)
 {
 	m_slot = dynamic_cast<wangpcbus_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_wangpcbus_card_interface - destructor
-//-------------------------------------------------
-
-device_wangpcbus_card_interface::~device_wangpcbus_card_interface()
-{
 }
 
 
