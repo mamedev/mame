@@ -1941,7 +1941,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0xfff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")

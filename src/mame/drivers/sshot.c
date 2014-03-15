@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( supershot, supershot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supershot)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supershot)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

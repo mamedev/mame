@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
 	MCFG_PALETTE_ADD("palette", 512)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

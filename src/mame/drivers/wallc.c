@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( wallc, wallc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update_wallc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wallc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wallc)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 

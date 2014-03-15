@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", yunsun16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", yunsun16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yunsun16)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

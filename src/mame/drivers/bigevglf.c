@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bigevglf_state, screen_update_bigevglf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bigevglf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigevglf)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	/* sound hardware */

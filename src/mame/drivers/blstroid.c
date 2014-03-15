@@ -182,7 +182,7 @@ static MACHINE_CONFIG_START( blstroid, blstroid_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", blstroid)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blstroid)
 	
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

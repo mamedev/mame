@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddealer)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

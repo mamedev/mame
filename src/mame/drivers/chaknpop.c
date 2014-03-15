@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update_chaknpop)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chaknpop)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chaknpop)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
 

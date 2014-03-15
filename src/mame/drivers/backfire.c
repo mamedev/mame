@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", backfire)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

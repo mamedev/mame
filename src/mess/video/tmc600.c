@@ -142,7 +142,7 @@ MACHINE_CONFIG_FRAGMENT( tmc600_video )
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, CDP1869_DOT_CLK_PAL)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", tmc600_state, blink_tick, attotime::from_hz(2))
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", tmc600)
+	MCFG_GFXDECODE_ADD("gfxdecode", CDP1869_TAG":palette", tmc600)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

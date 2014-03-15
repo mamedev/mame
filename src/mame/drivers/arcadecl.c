@@ -326,7 +326,7 @@ static MACHINE_CONFIG_START( arcadecl, arcadecl_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", arcadecl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)

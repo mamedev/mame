@@ -151,7 +151,7 @@ static MACHINE_CONFIG_START( starcrus, starcrus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update_starcrus)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", starcrus)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", starcrus)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

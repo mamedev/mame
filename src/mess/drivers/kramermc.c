@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( kramermc, kramermc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kramermc )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kramermc )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

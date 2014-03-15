@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blktiger)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

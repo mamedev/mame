@@ -265,7 +265,7 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update_dynadice)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dynadice)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynadice)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(dynadice_state, dynadice)
 

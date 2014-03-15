@@ -454,7 +454,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sub)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(sub_state, sub)

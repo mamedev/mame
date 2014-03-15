@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_CPU_PROGRAM_MAP(good_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", good)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

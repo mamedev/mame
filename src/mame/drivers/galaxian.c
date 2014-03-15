@@ -5168,7 +5168,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 

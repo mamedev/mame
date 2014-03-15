@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update_welltris)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", welltris)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", welltris)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

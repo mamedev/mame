@@ -1064,7 +1064,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wecleman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wecleman)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 
@@ -1149,7 +1149,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hotchase)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hotchase)
 	MCFG_PALETTE_ADD("palette", 2048*2)
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,hotchase)

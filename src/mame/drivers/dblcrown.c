@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dblcrown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblcrown)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)

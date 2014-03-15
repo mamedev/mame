@@ -563,7 +563,7 @@ static MACHINE_CONFIG_START( sderby, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( sderbya, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -615,7 +615,7 @@ static MACHINE_CONFIG_START( luckboom, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_sderby)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( spacewin, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( pmroulet, sderby_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sderby_state, screen_update_pmroulet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sderby)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 

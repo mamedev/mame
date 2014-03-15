@@ -639,7 +639,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
@@ -681,7 +681,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")

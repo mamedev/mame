@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( dynashot, homerun_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", homerun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homerun)
 	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */

@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarisy2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)

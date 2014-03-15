@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wink)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

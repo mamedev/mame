@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 	MCFG_SCREEN_UPDATE_DRIVER(paso1600_state, screen_update_paso1600)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", paso1600)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paso1600)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
 

@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( funybubl, funybubl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update_funybubl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", funybubl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funybubl)
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 

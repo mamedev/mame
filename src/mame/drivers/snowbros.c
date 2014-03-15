@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", snowbros)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1650,7 +1650,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", honeydol)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", honeydol)
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1689,7 +1689,7 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twinadv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1763,7 +1763,7 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

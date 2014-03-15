@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", crbaloon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crbaloon)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(crbaloon_state, crbaloon)
 

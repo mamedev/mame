@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update_retofinv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", retofinv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", retofinv)
 	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)

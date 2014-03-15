@@ -985,7 +985,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
@@ -1107,7 +1107,7 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_GFXDECODE("gfxdecode")

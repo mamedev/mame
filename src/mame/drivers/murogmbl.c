@@ -192,7 +192,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", murogmbl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogmbl)
 
 
 	/* video hardware */

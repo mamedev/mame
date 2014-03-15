@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bladestl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)

@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mustache_state, screen_update_mustache)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mustache)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
 	MCFG_PALETTE_ADD("palette", 8*16+16*8)
 	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
 

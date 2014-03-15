@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ksayakyu)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ksayakyu)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 

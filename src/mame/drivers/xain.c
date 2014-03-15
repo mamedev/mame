@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update_xain)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xain)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

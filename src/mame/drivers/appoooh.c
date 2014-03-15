@@ -456,7 +456,7 @@ static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", appoooh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", appoooh)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", robowres)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robowres)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)

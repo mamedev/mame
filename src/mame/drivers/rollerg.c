@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")

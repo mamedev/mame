@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( crimfght, crimfght_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", crimfght_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")

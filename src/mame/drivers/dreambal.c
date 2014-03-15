@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 
 	MCFG_PALETTE_ADD("palette", 0x400/2)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", dreambal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreambal)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
 

@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nsmpoker_state, screen_update_nsmpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nsmpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nsmpoker)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(nsmpoker_state, nsmpoker)

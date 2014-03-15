@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarig1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarig1)
 	MCFG_PALETTE_ADD("palette", 1280)
 
 	/* initialize the playfield */

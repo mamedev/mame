@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
-	MCFG_GFXDECODE_ADD("gfxdecode", psion)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psion)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

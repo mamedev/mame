@@ -291,7 +291,7 @@ static MACHINE_CONFIG_START( holeland, holeland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_holeland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", holeland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", holeland)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,holeland)
 
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( crzrally, holeland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(holeland_state, screen_update_crzrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", crzrally)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crzrally)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(holeland_state,crzrally)
 

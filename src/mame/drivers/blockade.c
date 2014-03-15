@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update_blockade)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blockade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blockade)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 

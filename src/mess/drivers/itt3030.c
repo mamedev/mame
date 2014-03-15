@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", itt3030)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

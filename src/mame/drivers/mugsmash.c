@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", mugsmash)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mugsmash)
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

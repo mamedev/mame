@@ -1962,7 +1962,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
 	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pdp1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pdp1)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(pdp1_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)

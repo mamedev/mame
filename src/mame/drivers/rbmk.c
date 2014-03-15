@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_CPU_IO_MAP(rbmk_mcu_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rbmk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( jrpacman, jrpacman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jrpacman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)

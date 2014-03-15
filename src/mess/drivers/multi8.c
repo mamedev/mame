@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(multi8_state, multi8)
-	MCFG_GFXDECODE_ADD("gfxdecode", multi8)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

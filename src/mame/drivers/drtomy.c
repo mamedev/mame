@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( drtomy, drtomy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", drtomy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drtomy)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nevada)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nevada)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
 

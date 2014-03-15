@@ -595,7 +595,7 @@ static MACHINE_CONFIG_START( fp200, fp200_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 8*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fp200)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp200)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(fp200_state, fp200)

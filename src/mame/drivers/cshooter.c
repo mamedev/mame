@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cshooter_state, screen_update_airraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cshooter)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cshooter)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(cshooter_state, cshooter)

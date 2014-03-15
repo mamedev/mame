@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddragon3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddragon3)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -914,7 +914,7 @@ static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wwfwfest)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfwfest)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

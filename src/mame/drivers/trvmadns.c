@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", trvmadns)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

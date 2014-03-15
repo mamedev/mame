@@ -170,7 +170,7 @@ static MACHINE_CONFIG_START( headonb, headonb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update_headonb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", headonb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

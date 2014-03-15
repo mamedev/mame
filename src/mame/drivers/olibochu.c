@@ -471,7 +471,7 @@ static MACHINE_CONFIG_START( olibochu, olibochu_state )
 	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", olibochu)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", olibochu)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
 

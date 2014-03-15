@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kingdrby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kingdrby)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)

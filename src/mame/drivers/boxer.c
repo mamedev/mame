@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( boxer, boxer_state )
 	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update_boxer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", boxer)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boxer)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(boxer_state, boxer)
 

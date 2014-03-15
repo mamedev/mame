@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( d9final, d9final_state )
 	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update_d9final)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", d9final)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", d9final)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", v6809)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

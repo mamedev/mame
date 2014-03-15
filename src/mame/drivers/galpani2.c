@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( galpani2, galpani2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galpani2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpani2)
 	MCFG_PALETTE_ADD("palette", 0x4000 + 0x200 + 0x8000)    // sprites, bg8, bg15
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 	MCFG_PALETTE_INIT_OWNER(galpani2_state, galpani2)

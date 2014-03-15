@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update_bogeyman)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bogeyman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
 	MCFG_PALETTE_ADD("palette", 16+256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)

@@ -1052,7 +1052,7 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_zwackery)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zwackery)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,zwackery)
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mcr68)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)

@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", seabattl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seabattl)
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 

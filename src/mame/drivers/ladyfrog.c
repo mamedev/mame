@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ladyfrog)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ladyfrog)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

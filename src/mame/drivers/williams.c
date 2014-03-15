@@ -1672,7 +1672,7 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", williams2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", williams2)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)

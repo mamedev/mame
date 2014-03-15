@@ -959,7 +959,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", magicfly)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magicfly)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 

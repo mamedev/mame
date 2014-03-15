@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( tank8, tank8_state )
 	MCFG_SCREEN_VBLANK_DRIVER(tank8_state, screen_eof_tank8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tank8)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
 	MCFG_PALETTE_ADD("palette", 20)
 	MCFG_PALETTE_INDIRECT_ENTRIES(10)
 	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)

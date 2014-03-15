@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( mosaic, mosaic_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update_mosaic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mosaic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mosaic)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

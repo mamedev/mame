@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tunhunt_state, screen_update_tunhunt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tunhunt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tunhunt)
 	MCFG_PALETTE_ADD("palette", 0x1a)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(tunhunt_state, tunhunt)

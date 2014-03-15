@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skydiver_state, screen_update_skydiver)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", skydiver)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skydiver)
 	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
 	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
 

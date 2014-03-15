@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_PALETTE_ADD("palette", 256)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", megaphx)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaphx)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 

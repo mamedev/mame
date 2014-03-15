@@ -3272,7 +3272,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas16b_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", segas16b)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16b)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

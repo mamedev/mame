@@ -855,7 +855,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m10)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m10)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( m15, m10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_PALETTE_ADD("palette", 2*8)
 
 	MCFG_PALETTE_INIT_OWNER(m10_state,m10)

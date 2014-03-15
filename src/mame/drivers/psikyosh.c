@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram32_device, vblank_copy_rising)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psikyosh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyosh)
 	MCFG_PALETTE_ADD("palette", 0x5000/4)
 	MCFG_PALETTE_FORMAT(RGBX)
 

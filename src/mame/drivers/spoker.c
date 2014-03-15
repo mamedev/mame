@@ -542,7 +542,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update_spoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spoker)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

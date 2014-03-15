@@ -754,7 +754,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", perfrman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,perfrman)
 
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
@@ -846,7 +846,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 
@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", slapfght)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
 

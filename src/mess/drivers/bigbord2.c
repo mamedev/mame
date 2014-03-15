@@ -651,7 +651,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", bigbord2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigbord2)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* keyboard */

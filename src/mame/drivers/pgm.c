@@ -531,7 +531,7 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 	MCFG_SCREEN_VBLANK_DRIVER(pgm_state, screen_eof_pgm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pgm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)
 	MCFG_PALETTE_ADD("palette", 0x1200/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

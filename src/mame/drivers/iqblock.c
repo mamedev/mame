@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( iqblock, iqblock_state )
 	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update_iqblock)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", iqblock)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", iqblock)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

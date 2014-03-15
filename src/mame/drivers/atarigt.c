@@ -830,7 +830,7 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarigt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigt)
 	MCFG_PALETTE_ADD("palette", 32768)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)

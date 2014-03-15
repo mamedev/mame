@@ -217,6 +217,8 @@ public:
 	// construction/destruction
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_PALETTE_INIT(cdp1869);
+
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
 	virtual DECLARE_ADDRESS_MAP(page_map, 8);
@@ -236,10 +238,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
 
+	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_post_load();
@@ -264,7 +268,6 @@ protected:
 	inline UINT16 get_pma();
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
-	void initialize_palette();
 	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
@@ -280,7 +283,7 @@ private:
 	sound_stream *m_stream;
 
 	// video state
-	rgb_t m_palette[8+64];
+	required_device<palette_device> m_palette;
 	int m_prd;                      // predisplay
 	int m_dispoff;                  // display off
 	int m_fresvert;                 // full resolution vertical

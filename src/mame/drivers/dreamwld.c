@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dreamwld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreamwld)
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

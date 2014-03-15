@@ -819,7 +819,7 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", segahang)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segahang)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

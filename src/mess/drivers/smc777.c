@@ -1094,7 +1094,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 

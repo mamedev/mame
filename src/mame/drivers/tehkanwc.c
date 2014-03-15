@@ -668,7 +668,7 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tehkanwc_state, screen_update_tehkanwc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tehkanwc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tehkanwc)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_SCREEN_VBLANK_DRIVER(crshrace_state, screen_eof_crshrace)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", crshrace)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 

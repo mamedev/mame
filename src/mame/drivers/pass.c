@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( pass, pass_state )
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", pass)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pass)
 
 
 	/* sound hardware */

@@ -537,7 +537,7 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", fromanc2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromanc2)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -589,7 +589,7 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", fromancr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromancr)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", fromancr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromancr)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

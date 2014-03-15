@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( safarir, safarir_state )
 	MCFG_PALETTE_ADD("palette", 2*8)
 	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", safarir)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", safarir)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)

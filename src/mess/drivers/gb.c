@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( gameboy, gb_state )
 	MCFG_SCREEN_SIZE( 458, 154 )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(gb_state,gb)
 
@@ -871,7 +871,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 20*8-1, 0*8, 18*8-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", gb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gb)
 	
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(megaduck_state,megaduck)

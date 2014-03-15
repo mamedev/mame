@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

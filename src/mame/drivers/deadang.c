@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update_deadang)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", deadang)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deadang)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

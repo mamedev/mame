@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_ambush)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ambush)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ambush)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ambush_state, ambush)
 

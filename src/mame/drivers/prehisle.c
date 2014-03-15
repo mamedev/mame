@@ -217,7 +217,7 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", prehisle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prehisle)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

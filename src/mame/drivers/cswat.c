@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( cswat, cswat_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(cswat_state, screen_update_cswat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cswat)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cswat)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */

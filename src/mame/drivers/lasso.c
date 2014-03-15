@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_lasso)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lasso)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lasso)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

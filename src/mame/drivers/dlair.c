@@ -776,7 +776,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dlair)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)

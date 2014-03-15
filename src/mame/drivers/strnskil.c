@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( strnskil, strnskil_state )
 	MCFG_SCREEN_UPDATE_DRIVER(strnskil_state, screen_update_strnskil)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", strnskil)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strnskil)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(strnskil_state, strnskil)

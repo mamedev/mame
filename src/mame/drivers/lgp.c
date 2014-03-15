@@ -384,7 +384,7 @@ static MACHINE_CONFIG_START( lgp, lgp_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	/* MCFG_PALETTE_INIT_OWNER(lgp_state,lgp) */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lgp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lgp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

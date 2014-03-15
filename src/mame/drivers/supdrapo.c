@@ -467,7 +467,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supdrapo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 

@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( quizpun2, quizpun2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quizpun2_state, screen_update_quizpun2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", quizpun2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpun2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

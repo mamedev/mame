@@ -1259,7 +1259,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 	MCFG_SCREEN_UPDATE_DRIVER(multigam_state, screen_update_multigam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", multigam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multigam)
 	MCFG_PALETTE_ADD("palette", 8*4*16)
 	MCFG_PALETTE_INIT_OWNER(multigam_state, multigam)
 

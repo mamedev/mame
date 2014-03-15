@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1945kiii)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

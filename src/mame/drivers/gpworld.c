@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( gpworld, gpworld_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gpworld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gpworld)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */

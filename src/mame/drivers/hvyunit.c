@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_SCREEN_VBLANK_DRIVER(hvyunit_state, screen_eof_hvyunit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvyunit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvyunit)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

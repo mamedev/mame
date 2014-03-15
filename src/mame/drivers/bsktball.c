@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bsktball_state, screen_update_bsktball)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bsktball)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bsktball)
 	MCFG_PALETTE_ADD("palette", 2*4 + 4*4*4*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(4)
 	MCFG_PALETTE_INIT_OWNER(bsktball_state, bsktball)

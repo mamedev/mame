@@ -152,7 +152,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", ipds)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_I8275_ADD  ( "i8275", ipds_i8275_interface)

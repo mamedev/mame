@@ -620,7 +620,7 @@ static MACHINE_CONFIG_START( acommand, acommand_state )
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", acommand)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acommand)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

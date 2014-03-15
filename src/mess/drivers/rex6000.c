@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_GFXDECODE_ADD("gfxdecode", rex6000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rex6000)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)

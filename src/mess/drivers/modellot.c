@@ -168,7 +168,7 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", modellot )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", modellot )
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 	
 	/* Devices */

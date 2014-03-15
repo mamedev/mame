@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", sbrkout)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbrkout)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224)

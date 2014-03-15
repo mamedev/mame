@@ -990,7 +990,7 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update_wgp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wgp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wgp)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

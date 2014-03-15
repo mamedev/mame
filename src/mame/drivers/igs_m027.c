@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs_m027)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs_m027)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

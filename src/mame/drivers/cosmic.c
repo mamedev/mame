@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_CPU_PROGRAM_MAP(cosmica_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", cosmica)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cosmica)
 	MCFG_PALETTE_ADD("palette", 8+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
@@ -1122,7 +1122,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
@@ -1155,7 +1155,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)

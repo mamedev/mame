@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", shuuz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))

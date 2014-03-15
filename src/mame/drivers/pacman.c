@@ -3328,7 +3328,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", pacman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pacman_state,pacman)

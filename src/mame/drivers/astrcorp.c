@@ -485,7 +485,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 

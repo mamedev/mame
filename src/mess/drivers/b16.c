@@ -315,7 +315,7 @@ static MACHINE_CONFIG_START( b16, b16_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_I8237_ADD("8237dma", XTAL_14_31818MHz/2, b16_dma8237_interface)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", b16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", b16)
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
 

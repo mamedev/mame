@@ -1809,7 +1809,7 @@ static MACHINE_CONFIG_START( nomcu, taitosj_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitosj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitosj)
 	MCFG_PALETTE_ADD("palette", 64)
 
 

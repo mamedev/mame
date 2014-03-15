@@ -2587,7 +2587,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

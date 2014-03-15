@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( m57, m57_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m57_state, screen_update_m57)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m57)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m57)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+16)
 	MCFG_PALETTE_INIT_OWNER(m57_state, m57)

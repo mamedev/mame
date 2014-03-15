@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( pacland, pacland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update_pacland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pacland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)

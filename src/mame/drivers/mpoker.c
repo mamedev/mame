@@ -606,7 +606,7 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpoker)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mpoker_state, mpoker)
 

@@ -1801,7 +1801,7 @@ static MACHINE_CONFIG_START( m72_base, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,m72)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1857,7 +1857,7 @@ static MACHINE_CONFIG_START( rtype, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,m72)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1895,7 +1895,7 @@ static MACHINE_CONFIG_START( xmultipl, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1937,7 +1937,7 @@ static MACHINE_CONFIG_START( xmultiplm72, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1979,7 +1979,7 @@ static MACHINE_CONFIG_START( dbreed, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2021,7 +2021,7 @@ static MACHINE_CONFIG_START( dbreedm72, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2063,7 +2063,7 @@ static MACHINE_CONFIG_START( rtype2, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,m72)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2105,7 +2105,7 @@ static MACHINE_CONFIG_START( majtitle, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,m72)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", majtitle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majtitle)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2147,7 +2147,7 @@ static MACHINE_CONFIG_START( hharry, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2189,7 +2189,7 @@ static MACHINE_CONFIG_START( hharryu, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2231,7 +2231,7 @@ static MACHINE_CONFIG_START( dkgenm72, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m72)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,m72)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2315,7 +2315,7 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,kengo)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rtype2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rtype2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

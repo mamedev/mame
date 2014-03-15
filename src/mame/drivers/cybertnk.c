@@ -861,7 +861,7 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cybertnk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybertnk)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

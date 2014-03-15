@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( astron, segald_state )
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segald)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segald)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */

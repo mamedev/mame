@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fortecar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 

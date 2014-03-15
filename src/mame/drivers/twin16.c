@@ -674,7 +674,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()

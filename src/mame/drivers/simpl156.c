@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_GFXDECODE_ADD("gfxdecode", simpl156)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", simpl156)
 
 	MCFG_DECO16IC_ADD("tilegen1", simpl156_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

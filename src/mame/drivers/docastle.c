@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", docastle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", docastle)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 

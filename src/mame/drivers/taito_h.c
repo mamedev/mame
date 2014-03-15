@@ -695,7 +695,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_syvalion)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", syvalion)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", syvalion)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -740,7 +740,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_recordbr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", recordbr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", recordbr)
 	MCFG_PALETTE_ADD("palette", 32*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoh_state, screen_update_dleague)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dleague)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dleague)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

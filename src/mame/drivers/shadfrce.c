@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_SCREEN_VBLANK_DRIVER(shadfrce_state, screen_eof_shadfrce)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shadfrce)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shadfrce)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( himesiki, himesiki_state )
 	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", himesiki)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", himesiki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

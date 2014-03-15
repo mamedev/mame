@@ -1421,7 +1421,7 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
 	MCFG_PALETTE_ADD("palette", 0x4440/4)
-	MCFG_GFXDECODE_ADD("gfxdecode", djmain)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", djmain)
 
 	MCFG_K056832_ADD("k056832", djmain_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")

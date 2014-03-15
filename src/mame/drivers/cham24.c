@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cham24_state, screen_update_cham24)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cham24)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cham24)
 	MCFG_PALETTE_ADD("palette", 8*4*16)
 	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
 

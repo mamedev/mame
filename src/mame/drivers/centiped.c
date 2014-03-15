@@ -1752,7 +1752,7 @@ static MACHINE_CONFIG_START( centiped_base, centiped_state )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_centiped)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
@@ -1905,7 +1905,7 @@ static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 	MCFG_SCREEN_UPDATE_DRIVER(centiped_state, screen_update_bullsdrt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", centiped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", centiped)
 	MCFG_PALETTE_ADD("palette", 4+4*4*4*4)
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)

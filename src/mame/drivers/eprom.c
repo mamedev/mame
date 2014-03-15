@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", eprom)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", eprom)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", eprom)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", eprom)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", guts)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", guts)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, eprom_state, guts_get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)

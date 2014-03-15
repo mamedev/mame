@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", dblewing)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblewing)
 
 	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")

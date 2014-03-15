@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goal92)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goal92)
 	MCFG_PALETTE_ADD("palette", 128*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

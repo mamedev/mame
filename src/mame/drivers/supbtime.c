@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supbtime)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supbtime)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", supbtime)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supbtime)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

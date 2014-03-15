@@ -50,6 +50,7 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
+	optional_device<palette_device> m_palette;
 	required_ioport m_io_term_conf;
 
 	virtual void term_write(UINT8 data);

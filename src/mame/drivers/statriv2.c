@@ -628,7 +628,7 @@ static MACHINE_CONFIG_START( statriv2, statriv2_state )
 
 	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", horizontal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
 	MCFG_PALETTE_ADD("palette", 2*64)
 	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
 

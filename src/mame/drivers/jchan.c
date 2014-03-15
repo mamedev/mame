@@ -590,7 +590,7 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jchan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

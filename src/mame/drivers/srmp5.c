@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 
 	MCFG_PALETTE_ADD("palette", 0x1800)
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode", srmp5 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
 #endif
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 

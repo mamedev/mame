@@ -850,7 +850,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(portfolio_state, portfolio)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", portfolio)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portfolio)
 
 	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL_4_9152MHz/2/2)
 	MCFG_HD61830_RD_CALLBACK(READ8(portfolio_state, hd61830_rd_r))

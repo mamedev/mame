@@ -676,7 +676,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vpoker)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(vpoker_state, vpoker)
 

@@ -1854,7 +1854,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PALETTE_ADD("palette", 32)
 //  MCFG_PALETTE_INIT_OWNER(pc88va_state, pc8801 )
-	MCFG_GFXDECODE_ADD("gfxdecode", pc88va )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc88va )
 
 	MCFG_I8255_ADD( "d8255_2", master_fdd_intf )
 	MCFG_I8255_ADD( "d8255_3", r232c_ctrl_intf )

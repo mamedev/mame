@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dfruit_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dfruit )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)

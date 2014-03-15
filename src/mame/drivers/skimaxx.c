@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_PALETTE("palette")
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", skimaxx )
+//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", skimaxx )
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 

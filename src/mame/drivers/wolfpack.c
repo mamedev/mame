@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	MCFG_SCREEN_VBLANK_DRIVER(wolfpack_state, screen_eof_wolfpack)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", wolfpack)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wolfpack)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)

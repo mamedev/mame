@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spool99_state,  irq0_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spool99)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spool99)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

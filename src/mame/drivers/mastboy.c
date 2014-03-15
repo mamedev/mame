@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mastboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 

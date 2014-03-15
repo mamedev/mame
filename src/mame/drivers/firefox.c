@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", firefox)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)
 	MCFG_PALETTE_ADD("palette", 512)
 
 

@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SCREEN_PALETTE("palette")
 	
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_GFXDECODE_ADD("gfxdecode", bmcpokr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmcpokr)
 
 MACHINE_CONFIG_END
 

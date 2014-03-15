@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update_gluck2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gluck2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gluck2)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(gluck2_state, gluck2)
 

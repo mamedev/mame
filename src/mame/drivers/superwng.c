@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", superwng)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superwng)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)

@@ -410,7 +410,7 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", z1013)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z1013)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

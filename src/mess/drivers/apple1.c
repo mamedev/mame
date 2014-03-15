@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update_apple1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apple1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple1)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

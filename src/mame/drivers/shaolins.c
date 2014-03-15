@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update_shaolins)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shaolins)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shaolins)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)

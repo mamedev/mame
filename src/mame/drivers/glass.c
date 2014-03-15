@@ -205,7 +205,7 @@ static MACHINE_CONFIG_START( glass, glass_state )
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update_glass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", glass)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glass)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

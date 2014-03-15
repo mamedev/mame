@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	MCFG_SCREEN_UPDATE_STATIC( pce )
 	MCFG_SCREEN_PALETTE("palette")
 
-	/* MCFG_GFXDECODE_ADD("gfxdecode", pce_gfxdecodeinfo ) */
+	/* MCFG_GFXDECODE_ADD("gfxdecode", "palette", pce_gfxdecodeinfo ) */
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_LEGACY( vce )
 

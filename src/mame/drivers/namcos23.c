@@ -3472,7 +3472,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3517,7 +3517,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3578,7 +3578,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos23)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

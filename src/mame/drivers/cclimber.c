@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( root, cclimber_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cclimber)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cclimber)
 	MCFG_PALETTE_ADD("palette", 16*4+8*4)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", swimmer)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", swimmer)
 	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
 
 	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)

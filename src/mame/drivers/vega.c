@@ -857,7 +857,7 @@ static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", test_decode)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", test_decode)
 
 	/* sound hardware */
 

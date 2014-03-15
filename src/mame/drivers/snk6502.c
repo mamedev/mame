@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( sasuke, snk6502_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sasuke)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sasuke)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,satansat)
@@ -905,7 +905,7 @@ static MACHINE_CONFIG_START( vanguard, snk6502_state )
 	MCFG_SCREEN_UPDATE_DRIVER(snk6502_state, screen_update_snk6502)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vanguard)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vanguard)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(snk6502_state,snk6502)

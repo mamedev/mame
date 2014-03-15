@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(bloodbro_state, layer_scroll_w))
 	
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bloodbro)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bloodbro)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

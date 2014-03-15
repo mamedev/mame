@@ -349,10 +349,25 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_stream(NULL),
+		m_palette(*this, "palette"),
 		m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
 }
 
+static MACHINE_CONFIG_FRAGMENT( cdp1869 )
+        MCFG_PALETTE_ADD("palette", 8+64)
+        MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor cdp1869_device::device_mconfig_additions() const
+{
+        return MACHINE_CONFIG_NAME( cdp1869 );
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -398,7 +413,6 @@ void cdp1869_device::device_start()
 	update_prd_changed_timer();
 
 	// initialize palette
-	initialize_palette();
 	m_bkg = 0;
 
 	// create sound stream
@@ -485,14 +499,14 @@ const address_space_config *cdp1869_device::memory_space_config(address_spacenum
 //  initialize_palette - initialize palette
 //-------------------------------------------------
 
-void cdp1869_device::initialize_palette()
+PALETTE_INIT_MEMBER(cdp1869_device, cdp1869)
 {
 	// color-on-color display (CFC=0)
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		m_palette[i] = get_rgb(i, i, 15);
+		palette.set_pen_color(i, get_rgb(i, i, 15));
 	}
 
 	// tone-on-tone display (CFC=1)
@@ -500,7 +514,7 @@ void cdp1869_device::initialize_palette()
 	{
 		for (int l = 0; l < 8; l++)
 		{
-			m_palette[i] = get_rgb(i, c, l);
+			palette.set_pen_color(i, get_rgb(i, c, l));
 			i++;
 		}
 	}
@@ -578,6 +592,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color)
 {
 	int i;
+	pen_t fg = m_palette->pen(color);
 
 	data <<= 2;
 
@@ -585,20 +600,20 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 	{
 		if (data & 0x80)
 		{
-			bitmap.pix32(y, x) = m_palette[color];
+			bitmap.pix32(y, x) = fg;
 
 			if (!m_fresvert)
 			{
-				bitmap.pix32(y + 1, x) = m_palette[color];
+				bitmap.pix32(y + 1, x) = fg;
 			}
 
 			if (!m_freshorz)
 			{
-				bitmap.pix32(y, x + 1) = m_palette[color];
+				bitmap.pix32(y, x + 1) = fg;
 
 				if (!m_fresvert)
 				{
-					bitmap.pix32(y + 1, x + 1) = m_palette[color];
+					bitmap.pix32(y + 1, x + 1) = fg;
 				}
 			}
 		}
@@ -971,7 +986,7 @@ UINT32 cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 
 	outer &= cliprect;
-	bitmap.fill(m_palette[m_bkg], outer);
+	bitmap.fill(m_palette->pen(m_bkg), outer);
 
 	if (!m_dispoff)
 	{

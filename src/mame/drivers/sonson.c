@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( sonson, sonson_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sonson)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sonson)
 
 	MCFG_PALETTE_ADD("palette", 64*4+32*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)

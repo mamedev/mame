@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(dcon_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(dcon_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dcon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dcon)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

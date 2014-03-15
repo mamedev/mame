@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", yumefuda )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yumefuda )
 	MCFG_PALETTE_ADD("palette", 0x80)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

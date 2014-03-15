@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rabbit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rabbit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

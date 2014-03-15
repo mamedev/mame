@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( aquarium, aquarium_state )
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", aquarium)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarium)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

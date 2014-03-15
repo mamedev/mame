@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SCREEN_VBLANK_DRIVER(zx_state, screen_eof_zx)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zx80)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zx80)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(zx_state,zx)
 

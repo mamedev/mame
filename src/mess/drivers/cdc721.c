@@ -125,7 +125,7 @@ static MACHINE_CONFIG_START( cdc721, cdc721_state )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
-	MCFG_GFXDECODE_ADD("gfxdecode", cdc721)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )

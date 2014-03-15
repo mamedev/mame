@@ -186,7 +186,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update_targeth)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 0x080000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x080000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

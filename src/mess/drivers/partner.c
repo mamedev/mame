@@ -207,7 +207,7 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", partner)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", partner)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(partner_state,radio86)
 

@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blueprnt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
 	MCFG_PALETTE_ADD("palette", 128*4+8)
 	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
 

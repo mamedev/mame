@@ -1702,7 +1702,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", aristmk4)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aristmk4)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state, aristmk4)
 

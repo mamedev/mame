@@ -970,7 +970,7 @@ static MACHINE_CONFIG_START( skylncr, skylncr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", skylncr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skylncr)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
 	/* sound hardware */

@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( ppmast93, ppmast93_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ppmast93_state, screen_update_ppmast93)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ppmast93)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppmast93)
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 

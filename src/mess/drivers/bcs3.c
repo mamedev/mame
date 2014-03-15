@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", bcs3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 

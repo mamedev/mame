@@ -942,7 +942,7 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m92_state, screen_update_m92)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m92)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m92)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

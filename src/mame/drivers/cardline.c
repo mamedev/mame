@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cardline)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
 

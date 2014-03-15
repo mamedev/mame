@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lordgun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware
@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lordgun_state, screen_update_lordgun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lordgun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lordgun)
 	MCFG_PALETTE_ADD("palette", 0x800 * 8)  // 0x800 real colors, repeated per priority level
 
 	// sound hardware

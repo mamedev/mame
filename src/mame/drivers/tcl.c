@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tcl_state, screen_update_tcl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tcl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tcl)
 	MCFG_PALETTE_ADD("palette", 16*16)
 
 

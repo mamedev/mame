@@ -2345,7 +2345,7 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,galaxold)
 
@@ -2554,7 +2554,7 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gmgalax)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gmgalax)
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
@@ -2619,7 +2619,7 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 	
@@ -2645,7 +2645,7 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_CPU_IO_MAP(hexpoola_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxold_state,  hunchbks_vh_interrupt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxold_state,rockclim)
 

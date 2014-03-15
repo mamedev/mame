@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rastan_state, screen_update_rastan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rastan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rastan)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

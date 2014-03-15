@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE_ADD("gfxdecode", pcxt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcxt)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")

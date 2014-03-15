@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", lcmate2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)

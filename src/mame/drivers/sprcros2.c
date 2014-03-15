@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sprcros2_state, screen_update_sprcros2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sprcros2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprcros2)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)

@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update_warpspeed)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", warpspeed)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warpspeed)
 	MCFG_PALETTE_ADD("palette", 2+8)
 	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_END

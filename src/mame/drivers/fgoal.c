@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( fgoal, fgoal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update_fgoal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fgoal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fgoal)
 	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
 	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
 

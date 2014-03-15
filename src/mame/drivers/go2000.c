@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( go2000, go2000_state )
 	MCFG_CPU_IO_MAP(go2000_sound_io)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", go2000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", go2000)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kncljoe_state, screen_update_kncljoe)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kncljoe)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kncljoe)
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
 	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)

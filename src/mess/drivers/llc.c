@@ -218,7 +218,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", llc1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", llc2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

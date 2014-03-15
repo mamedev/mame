@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tail2nos)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tail2nos)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

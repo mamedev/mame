@@ -156,7 +156,7 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 	MCFG_SCREEN_VBLANK_DRIVER(ssrj_state, screen_eof_ssrj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ssrj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
 

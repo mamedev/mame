@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 4roses)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4roses)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)

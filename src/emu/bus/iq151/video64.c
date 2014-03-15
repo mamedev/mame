@@ -40,7 +40,7 @@ static GFXDECODE_START( video64 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( video64 )
-	MCFG_GFXDECODE_ADD("gfxdecode", video64)
+	MCFG_GFXDECODE_ADD("gfxdecode", "^^palette", video64)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -61,7 +61,7 @@ iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const 
 		: device_t(mconfig, IQ151_VIDEO64, "IQ151 video64", tag, owner, clock, "iq151_video64", __FILE__),
 		device_iq151cart_interface( mconfig, *this ),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, ":palette")
+		m_palette(*this, "^^palette")
 {
 }
 

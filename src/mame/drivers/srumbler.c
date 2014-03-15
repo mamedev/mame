@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", srumbler)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)

@@ -340,7 +340,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz700)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz700)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(mz_state, mz)

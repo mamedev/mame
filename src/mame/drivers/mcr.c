@@ -1851,7 +1851,7 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mcr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 

@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 	MCFG_SCREEN_UPDATE_DRIVER(msisaac_state, screen_update_msisaac)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msisaac)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msisaac)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

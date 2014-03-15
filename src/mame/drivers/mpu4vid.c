@@ -1422,7 +1422,7 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4vid_state, screen_update_mpu4_vid)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, WRITELINE(mpu4vid_state, update_mpu68_interrupts));
 	MCFG_SCN2674_GFXDECODE("gfxdecode")

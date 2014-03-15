@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SCREEN_UPDATE_DRIVER(r2dx_v33_state, screen_update_rdx_v33)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", rdx_v33)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rdx_v33)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

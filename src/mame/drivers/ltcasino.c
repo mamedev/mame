@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ltcasino_state, screen_update_ltcasino)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ltcasino)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ltcasino)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 

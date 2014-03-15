@@ -553,7 +553,7 @@ static MACHINE_CONFIG_START( mil4000, mil4000_state )
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mil4000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mil4000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

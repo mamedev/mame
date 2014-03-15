@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nascom1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_AY31015_ADD( "hd6402", nascom1_ay31015_config )

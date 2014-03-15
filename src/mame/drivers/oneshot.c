@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", oneshot)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oneshot)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

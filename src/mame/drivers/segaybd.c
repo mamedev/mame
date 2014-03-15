@@ -1188,7 +1188,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(segaybd_state,screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_SEGA_SYS16B_SPRITES_ADD("bsprites")
 	MCFG_SEGA_YBOARD_SPRITES_ADD("ysprites")

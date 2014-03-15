@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( quasar, quasar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", quasar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quasar)
 	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x500)
 	MCFG_PALETTE_INIT_OWNER(quasar_state,quasar)

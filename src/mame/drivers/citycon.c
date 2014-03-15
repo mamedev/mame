@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( citycon, citycon_state )
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", citycon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", citycon)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

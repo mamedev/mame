@@ -870,7 +870,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz2000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2000)
 	MCFG_PALETTE_ADD("palette", 8)
 
 

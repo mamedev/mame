@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update_sidepckt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sidepckt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 

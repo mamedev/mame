@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superchs_state, screen_update_superchs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", superchs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superchs)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 

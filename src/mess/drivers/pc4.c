@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc4)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc4)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

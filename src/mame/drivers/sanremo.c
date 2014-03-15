@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sanremo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sanremo)
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(sanremo_state, sanremo)
 

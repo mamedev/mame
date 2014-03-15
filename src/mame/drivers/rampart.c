@@ -346,7 +346,7 @@ static MACHINE_CONFIG_START( rampart, rampart_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", rampart)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rampart)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", rampart_state::s_mob_config)

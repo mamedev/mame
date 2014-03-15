@@ -708,7 +708,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", spectrum)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spectrum)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */

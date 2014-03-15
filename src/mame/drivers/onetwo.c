@@ -378,7 +378,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", onetwo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", onetwo)
 	MCFG_PALETTE_ADD("palette", 0x80)
 
 

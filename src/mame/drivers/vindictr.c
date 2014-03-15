@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", vindictr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vindictr)
 	MCFG_PALETTE_ADD("palette", 2048*8)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, vindictr_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)

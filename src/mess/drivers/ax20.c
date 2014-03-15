@@ -121,7 +121,7 @@ static MACHINE_CONFIG_START( ax20, ax20_state )
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", ax20)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ax20)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */

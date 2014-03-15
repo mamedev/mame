@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl3_state, screen_update_itgambl3)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", itgambl3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgambl3)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
 

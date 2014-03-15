@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", phoenix)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,phoenix)
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( survival, phoenix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(phoenix_state, screen_update_phoenix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", phoenix)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phoenix)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(phoenix_state,survival)

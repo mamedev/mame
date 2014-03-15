@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_SCREEN_PALETTE("palette")
 	
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_GFXDECODE_ADD("gfxdecode", rx78)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")

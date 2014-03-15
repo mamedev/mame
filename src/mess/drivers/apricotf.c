@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_SCREEN_PALETTE("palette")
 	
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", act_f1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
 
 	/* Devices */
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)

@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( bmjr, bmjr_state )
 	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(bmjr_state, bmjr)
-	MCFG_GFXDECODE_ADD("gfxdecode", bmjr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

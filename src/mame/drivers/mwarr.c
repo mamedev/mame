@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mwarr_state, screen_update_mwarr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mwarr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mwarr)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

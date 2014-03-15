@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", interleaved)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", interleaved)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
@@ -476,7 +476,7 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", cyberbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyberbal)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, cyberbal_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)

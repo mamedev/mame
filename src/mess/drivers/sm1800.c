@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sm1800)	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)	
 
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )

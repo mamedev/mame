@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_SCREEN_UPDATE_DRIVER(videopin_state, screen_update_videopin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", videopin)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

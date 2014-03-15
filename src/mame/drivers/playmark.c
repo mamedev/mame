@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( bigtwin, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", playmark)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playmark)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1095,7 +1095,7 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bigtwinb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigtwinb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1134,7 +1134,7 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wbeachvl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wbeachvl)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1170,7 +1170,7 @@ static MACHINE_CONFIG_START( excelsr, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", excelsr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", excelsr)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1209,7 +1209,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
@@ -1249,7 +1249,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hrdtimes)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hrdtimes)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 

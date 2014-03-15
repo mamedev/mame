@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sbasketb_state, screen_update_sbasketb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sbasketb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbasketb)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)

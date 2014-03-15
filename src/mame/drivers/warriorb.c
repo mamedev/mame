@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_TC0220IOC_ADD("tc0220ioc", darius2d_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", warriorb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 
@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_TC0510NIO_ADD("tc0510nio", warriorb_io_intf)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", warriorb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_ADD("palette2", 4096)
 

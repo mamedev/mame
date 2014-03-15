@@ -563,7 +563,7 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(atarifb_state, screen_update_atarifb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", atarifb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarifb)
 	MCFG_PALETTE_ADD("palette", 12)
 	MCFG_PALETTE_INIT_OWNER(atarifb_state, atarifb)
 

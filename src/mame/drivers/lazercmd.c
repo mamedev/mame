@@ -647,7 +647,7 @@ static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lazercmd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
 	MCFG_PALETTE_ADD("palette", 5)
 	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
 

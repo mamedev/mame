@@ -197,7 +197,7 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update_scotrsht)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scotrsht)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)

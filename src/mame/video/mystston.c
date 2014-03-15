@@ -311,7 +311,7 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mystston)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mystston)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

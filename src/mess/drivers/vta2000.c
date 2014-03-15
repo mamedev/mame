@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	
 	MCFG_PALETTE_ADD("palette", 3)	
 	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", vta2000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vta2000)
 MACHINE_CONFIG_END
 
 

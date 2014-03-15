@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_SCREEN_PALETTE("palette")
 	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", tk80bs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tk80bs)
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi", ppi_intf)

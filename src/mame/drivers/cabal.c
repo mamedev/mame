@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -547,7 +547,7 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

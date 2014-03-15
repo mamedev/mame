@@ -1925,7 +1925,7 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segas16a)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware

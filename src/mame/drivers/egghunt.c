@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", egghunt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", egghunt)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

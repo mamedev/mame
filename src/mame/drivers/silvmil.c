@@ -325,7 +325,7 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", silvmil)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silvmil)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

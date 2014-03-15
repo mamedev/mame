@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1k)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
 
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
@@ -771,7 +771,7 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update_geebee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", color)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
 	
 	MCFG_PALETTE_ADD("palette", 2*256+1)
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)

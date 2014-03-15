@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
-	MCFG_GFXDECODE_ADD("gfxdecode", mirax)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)

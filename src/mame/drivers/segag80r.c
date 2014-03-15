@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", segag80r)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

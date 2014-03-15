@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", pda600)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

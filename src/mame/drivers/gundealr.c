@@ -418,7 +418,7 @@ static MACHINE_CONFIG_START( gundealr, gundealr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update_gundealr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gundealr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gundealr)
 	MCFG_PALETTE_ADD("palette", 512)
 
 

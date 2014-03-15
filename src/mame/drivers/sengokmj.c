@@ -579,7 +579,7 @@ static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(sengokmj_state, layer_en_w))
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(sengokmj_state, layer_scroll_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sengokmj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sengokmj)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

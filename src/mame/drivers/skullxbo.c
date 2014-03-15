@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", skullxbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skullxbo)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, skullxbo_state, get_playfield_tile_info, 16,8, SCAN_COLS, 64,64)

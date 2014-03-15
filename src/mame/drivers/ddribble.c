@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddribble)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64)
 	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)

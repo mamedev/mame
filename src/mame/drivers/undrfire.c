@@ -733,7 +733,7 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", undrfire)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", undrfire)
 	MCFG_PALETTE_ADD("palette", 16384)
 
 
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cbombers)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbombers)
 	MCFG_PALETTE_ADD("palette", 16384)
 
 

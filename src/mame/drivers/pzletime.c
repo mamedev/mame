@@ -343,7 +343,7 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", pzletime)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pzletime)
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)

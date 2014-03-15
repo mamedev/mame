@@ -393,7 +393,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ti99_2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ti99_2)
 	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
 MACHINE_CONFIG_END
 

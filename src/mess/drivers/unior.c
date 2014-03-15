@@ -438,7 +438,7 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", unior)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unior)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(unior_state,unior)
 

@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( mayumi, mayumi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mayumi_state, screen_update_mayumi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mayumi)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mayumi)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

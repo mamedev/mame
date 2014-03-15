@@ -3496,7 +3496,7 @@ static MACHINE_CONFIG_START( iqblocka, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3562,7 +3562,7 @@ static MACHINE_CONFIG_START( mgcs, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017_flipped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_flipped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3605,7 +3605,7 @@ static MACHINE_CONFIG_START( lhzb2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3650,7 +3650,7 @@ static MACHINE_CONFIG_START( lhzb2a, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3683,7 +3683,7 @@ static MACHINE_CONFIG_START( slqz2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3731,7 +3731,7 @@ static MACHINE_CONFIG_START( sdmg2, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3784,7 +3784,7 @@ static MACHINE_CONFIG_START( mgdha, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017_swapped)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017_swapped)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3817,7 +3817,7 @@ static MACHINE_CONFIG_START( tjsb, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -3853,7 +3853,7 @@ static MACHINE_CONFIG_START( spkrform, igs017_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igs017_state, screen_update_igs017)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igs017)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs017)
 	MCFG_PALETTE_ADD("palette", 0x100*2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

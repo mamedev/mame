@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( m14, m14_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", m14)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m14)
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
 

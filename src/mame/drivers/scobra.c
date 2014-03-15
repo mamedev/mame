@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scobra)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scobra)
 	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,scrambold)
@@ -891,7 +891,7 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scobra)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scobra)
 	MCFG_PALETTE_ADD("palette", 32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
 
 	MCFG_PALETTE_INIT_OWNER(scobra_state,galaxold)

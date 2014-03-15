@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(groundfx_state, screen_update_groundfx)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", groundfx)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", groundfx)
 	MCFG_PALETTE_ADD("palette", 16384)
 
 

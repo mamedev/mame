@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( plan80, plan80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*6-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", plan80)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plan80)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 MACHINE_CONFIG_END
 

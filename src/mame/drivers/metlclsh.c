@@ -289,7 +289,7 @@ static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", metlclsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlclsh)
 	MCFG_PALETTE_ADD("palette", 3 * 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

@@ -85,6 +85,7 @@ class towns_state : public driver_device
 			m_pit(*this, "pit"),
 			m_dma_1(*this, "dma_1"),
 			m_dma_2(*this, "dma_2"),
+			m_palette(*this, "palette"),
 			m_ram(*this, RAM_TAG),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
@@ -116,6 +117,7 @@ class towns_state : public driver_device
 	required_device<pit8253_device> m_pit;
 	required_device<upd71071_device> m_dma_1;
 	required_device<upd71071_device> m_dma_2;
+	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
 	device_t* m_fdc;
 	ram_device* m_messram;
@@ -328,6 +330,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
+	void towns_update_palette();
 	void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect);
 	void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect);
 	void draw_sprites(const rectangle* rect);

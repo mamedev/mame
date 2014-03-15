@@ -2593,7 +2593,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ssv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssv)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	/* sound hardware */

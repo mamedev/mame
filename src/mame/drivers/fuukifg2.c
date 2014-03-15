@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update_fuuki16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fuuki16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki16)
 	MCFG_PALETTE_ADD("palette", 0x800*4)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

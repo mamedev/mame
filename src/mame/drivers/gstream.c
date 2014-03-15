@@ -886,7 +886,7 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gstream)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstream)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -918,7 +918,7 @@ static MACHINE_CONFIG_START( x2222, gstream_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update_gstream)
 
 	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // doesn't use a palette, but keep fake gfxdecode happy
-	MCFG_GFXDECODE_ADD("gfxdecode", x2222)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x2222)
 
 	// unknown sound hw (no sound roms dumped)
 

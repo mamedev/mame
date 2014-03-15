@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvysmsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvysmsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 

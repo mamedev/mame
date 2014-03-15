@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( higemaru, higemaru_state )
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", higemaru)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", higemaru)
 
 	MCFG_PALETTE_ADD("palette", 32*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)

@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( namcond1, namcond1_state )
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcond1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcond1)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */

@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vvillage)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 

@@ -721,7 +721,7 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", thepit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thepit)
 	MCFG_PALETTE_ADD("palette", 32+8)
 	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
 

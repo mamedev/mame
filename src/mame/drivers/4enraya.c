@@ -328,7 +328,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 4enraya)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4enraya)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(_4enraya_state, _4enraya)

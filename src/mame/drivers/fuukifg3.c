@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SCREEN_VBLANK_DRIVER(fuuki32_state, screen_eof_fuuki32)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fuuki32)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki32)
 	MCFG_PALETTE_ADD("palette", 0x4000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

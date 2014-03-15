@@ -478,7 +478,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 	MCFG_SCREEN_VBLANK_DRIVER(lastbank_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lastbank )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 	
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)

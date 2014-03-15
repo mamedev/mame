@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", midas)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", midas)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", midas)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(XRGB)
 

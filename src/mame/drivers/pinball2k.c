@@ -597,7 +597,7 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pinball2k_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", CGA)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */

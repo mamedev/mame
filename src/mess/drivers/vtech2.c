@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vtech2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vtech2 )
 	MCFG_PALETTE_ADD("palette", 512+16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)

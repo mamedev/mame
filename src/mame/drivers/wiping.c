@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( wiping, wiping_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update_wiping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wiping)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiping)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)

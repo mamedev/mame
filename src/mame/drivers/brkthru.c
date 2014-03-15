@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)

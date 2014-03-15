@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( koikoi, koikoi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", koikoi)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(koikoi_state, koikoi)

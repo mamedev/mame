@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( firetrk, firetrk_state )
 	MCFG_PALETTE_ADD("palette", 28)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", firetrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firetrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

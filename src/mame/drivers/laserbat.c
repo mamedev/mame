@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", laserbat)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)

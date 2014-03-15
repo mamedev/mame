@@ -1632,7 +1632,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048 + 32768)   /* 32768 static colors for the bg */
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 	MCFG_PALETTE_INIT_OWNER(kaneko16_berlwall_state,berlwall)
@@ -1688,7 +1688,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1761,7 +1761,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1824,7 +1824,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x8bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x8bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -1946,7 +1946,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_2x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
@@ -2074,7 +2074,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1x4bit_1x4bit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

@@ -770,7 +770,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -831,7 +831,7 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -867,7 +867,7 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )	
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 

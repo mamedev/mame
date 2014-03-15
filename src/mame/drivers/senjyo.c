@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update_senjyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", senjyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
 

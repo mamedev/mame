@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( cgenie_common, cgenie_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cgenie_state, screen_update_cgenie)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cgenie )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cgenie )
 	MCFG_PALETTE_ADD("palette", 108)
 	MCFG_PALETTE_INDIRECT_ENTRIES(49)
 

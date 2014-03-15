@@ -1203,7 +1203,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", segaorun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
 	MCFG_PALETTE_ADD("palette", 4096*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

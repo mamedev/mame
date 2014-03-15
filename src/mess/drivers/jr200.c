@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jr200_state, screen_update_jr200)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jr200)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr200)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(jr200_state, jr200)
 

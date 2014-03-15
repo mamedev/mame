@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dwarfd_state, screen_update_dwarfd)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dwarfd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 

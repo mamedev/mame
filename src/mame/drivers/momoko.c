@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 	MCFG_SCREEN_UPDATE_DRIVER(momoko_state, screen_update_momoko)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", momoko)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", momoko)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

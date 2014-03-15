@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_SCREEN_VBLANK_DRIVER(galpanic_state, screen_eof_galpanic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galpanic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galpanic)
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
 

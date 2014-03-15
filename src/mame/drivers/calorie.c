@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", calorie)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calorie)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

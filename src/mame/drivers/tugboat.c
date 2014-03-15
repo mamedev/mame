@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tugboat)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 

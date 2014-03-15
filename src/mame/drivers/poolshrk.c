@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( poolshrk, poolshrk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update_poolshrk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", poolshrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poolshrk)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
 

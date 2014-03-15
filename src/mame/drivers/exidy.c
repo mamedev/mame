@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( base, exidy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", exidy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -1162,7 +1162,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namconb1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namconb1)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(namconb1_state, screen_update_namconb2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 

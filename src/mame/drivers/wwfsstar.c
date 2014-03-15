@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update_wwfsstar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wwfsstar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfsstar)
 	MCFG_PALETTE_ADD("palette", 384)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

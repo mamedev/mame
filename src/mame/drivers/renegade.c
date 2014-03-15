@@ -894,7 +894,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update_renegade)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", renegade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", renegade)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

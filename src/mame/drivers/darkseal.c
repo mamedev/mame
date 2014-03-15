@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update_darkseal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", darkseal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

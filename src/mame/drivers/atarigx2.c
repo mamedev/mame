@@ -1462,7 +1462,7 @@ static MACHINE_CONFIG_START( atarigx2, atarigx2_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarigx2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigx2)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)

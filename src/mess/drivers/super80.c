@@ -652,7 +652,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", super80)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80)
 
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / SUPER80V_DOTS, super80v_crtc)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", super80v)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80v)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
 	MCFG_VIDEO_START_OVERRIDE(super80_state,super80v)
 

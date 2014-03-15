@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_SCREEN_UPDATE_DRIVER(battlera_state, screen_update_battlera)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", battlera)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlera)
 	MCFG_PALETTE_ADD("palette", 512)
 
 

@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( gotya, gotya_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gotya_state, screen_update_gotya)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gotya)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotya)
 	MCFG_PALETTE_ADD("palette", 16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gotya_state, gotya)

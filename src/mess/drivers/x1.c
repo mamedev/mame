@@ -2587,7 +2587,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", x1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 

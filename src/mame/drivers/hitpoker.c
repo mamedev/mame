@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( hitpoker, hitpoker_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2, mc6845_intf)  /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hitpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 

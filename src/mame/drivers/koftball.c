@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	
 	MCFG_PALETTE_ADD("palette", 256)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", koftball)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	

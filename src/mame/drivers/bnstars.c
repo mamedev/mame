@@ -1334,7 +1334,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bnstars)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bnstars)
 	MCFG_PALETTE_ADD("palette", 0x8000*2)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

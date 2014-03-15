@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(silkroad_state, screen_update_silkroad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", silkroad)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", silkroad)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

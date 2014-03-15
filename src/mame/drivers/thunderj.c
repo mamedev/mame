@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", thunderj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))

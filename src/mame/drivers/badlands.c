@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", badlands)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", badlandsb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlandsb)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)

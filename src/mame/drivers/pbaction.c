@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pbaction_state, screen_update_pbaction)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pbaction)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbaction)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

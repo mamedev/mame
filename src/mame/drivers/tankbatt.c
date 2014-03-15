@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update_tankbatt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tankbatt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbatt)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)

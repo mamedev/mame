@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1940,7 +1940,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
-	MCFG_GFXDECODE_ADD("gfxdecode", hprot1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hprot1)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

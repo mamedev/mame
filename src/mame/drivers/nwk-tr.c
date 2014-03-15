@@ -774,7 +774,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")

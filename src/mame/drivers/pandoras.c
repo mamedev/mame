@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( pandoras, pandoras_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pandoras_state, screen_update_pandoras)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pandoras)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pandoras)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pandoras_state, pandoras)

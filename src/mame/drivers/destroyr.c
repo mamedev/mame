@@ -492,7 +492,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(destroyr_state, screen_update_destroyr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", destroyr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", destroyr)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(destroyr_state, destroyr)
 

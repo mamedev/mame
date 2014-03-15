@@ -686,7 +686,7 @@ static MACHINE_CONFIG_START( looping, looping_state )
 	MCFG_SCREEN_UPDATE_DRIVER(looping_state, screen_update_looping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", looping)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", looping)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(looping_state, looping)

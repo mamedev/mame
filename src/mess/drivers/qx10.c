@@ -827,7 +827,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", qx10)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qx10)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
 

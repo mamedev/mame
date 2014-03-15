@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update_bankp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bankp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bankp)
 	MCFG_PALETTE_ADD("palette", 32*4+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)

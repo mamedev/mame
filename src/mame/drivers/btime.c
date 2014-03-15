@@ -1318,7 +1318,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", btime)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", btime)
 	
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(btime_state,btime)

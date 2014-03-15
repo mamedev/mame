@@ -675,7 +675,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_GFXDECODE_ADD("gfxdecode", dacholer)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dacholer)
 
 
 	/* sound hardware */

@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update_vroulet)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vroulet)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vroulet)
 	MCFG_PALETTE_ADD("palette", 128*4)
 
 

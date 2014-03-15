@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( pokechmp, pokechmp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pokechmp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

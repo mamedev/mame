@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update_speedbal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", speedbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

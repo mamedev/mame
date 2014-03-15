@@ -512,7 +512,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update_discoboy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", discoboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", discoboy)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 

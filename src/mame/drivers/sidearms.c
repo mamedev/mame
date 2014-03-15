@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sidearms)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidearms)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -669,7 +669,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", turtship)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
 	
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)

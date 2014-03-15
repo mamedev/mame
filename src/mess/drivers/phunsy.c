@@ -365,7 +365,7 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", phunsy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phunsy)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
 

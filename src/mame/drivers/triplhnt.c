@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update_triplhnt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", triplhnt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", triplhnt)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 

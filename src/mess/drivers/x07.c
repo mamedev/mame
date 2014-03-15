@@ -1511,7 +1511,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", x07)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x07)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )

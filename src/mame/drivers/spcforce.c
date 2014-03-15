@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update_spcforce)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spcforce)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spcforce)
 	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
 	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 

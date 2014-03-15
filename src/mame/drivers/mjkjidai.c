@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mjkjidai_state, screen_update_mjkjidai)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mjkjidai)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mjkjidai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 
 	/* sound hardware */

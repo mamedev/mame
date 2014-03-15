@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", comquest )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comquest )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 

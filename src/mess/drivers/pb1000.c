@@ -523,7 +523,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
-	MCFG_GFXDECODE_ADD("gfxdecode", pb1000 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pb1000 )
 
 	MCFG_HD44352_ADD("hd44352", 910000, hd44352_pb1000_conf)
 

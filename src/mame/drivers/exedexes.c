@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", exedexes)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exedexes)
 	
 	MCFG_PALETTE_ADD("palette", 64*4+64*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

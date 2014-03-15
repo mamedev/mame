@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", espial)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", espial)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
 

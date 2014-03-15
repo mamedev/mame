@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_SCREEN_UPDATE_DRIVER(buggychl_state, screen_update_buggychl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", buggychl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buggychl)
 	MCFG_PALETTE_ADD("palette", 128+128)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

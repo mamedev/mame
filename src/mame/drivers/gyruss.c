@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gyruss)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gyruss)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(gyruss_state, gyruss)

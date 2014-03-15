@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( cabaret, cabaret_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cabaret)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabaret)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -548,7 +548,7 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", adder2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", adder2)
 
 	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap

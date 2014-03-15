@@ -1414,7 +1414,7 @@ static MACHINE_CONFIG_START( jalmah, jalmah_state )
 
 	//M50747 MCU
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jalmah)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jalmah)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

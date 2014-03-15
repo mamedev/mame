@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tigeroad)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tigeroad)
 
 	MCFG_PALETTE_ADD("palette", 576)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

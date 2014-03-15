@@ -516,7 +516,7 @@ static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_bigkarnk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -549,7 +549,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( squash, gaelco_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -613,7 +613,7 @@ static MACHINE_CONFIG_START( thoop, gaelco_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 0x100000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

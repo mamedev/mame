@@ -1596,7 +1596,7 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)
 	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tx0)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tx0)
 	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(tx0_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
 	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)

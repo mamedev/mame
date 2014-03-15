@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jr100)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jr100)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_14_31818MHz / 16)

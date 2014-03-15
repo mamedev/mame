@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( m63, m63_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", m63)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m63)
 	MCFG_PALETTE_ADD("palette", 256+4)
 
 	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( fghtbskt, m63_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fghtbskt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghtbskt)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 

@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( contra, contra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", contra)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", contra)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_INIT_OWNER(contra_state, contra)

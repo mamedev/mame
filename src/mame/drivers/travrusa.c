@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", travrusa)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", travrusa)
 
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)

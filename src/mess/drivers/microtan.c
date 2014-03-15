@@ -230,7 +230,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", microtan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", microtan)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

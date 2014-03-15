@@ -2649,7 +2649,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", calomega)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calomega)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
 

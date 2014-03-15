@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dassault)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

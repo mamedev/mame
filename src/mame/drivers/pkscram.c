@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( pkscramble, pkscram_state )
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", pkscram)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkscram)
 
 
 	/* sound hardware */

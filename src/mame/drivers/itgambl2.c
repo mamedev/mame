@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl2_state, screen_update_itgambl2)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", itgambl2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itgambl2)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(itgambl2_state, itgambl2)
 

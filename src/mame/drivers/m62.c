@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( ldrun, m62_state )
 	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ldrun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ldrun)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(m62_state,m62)
 

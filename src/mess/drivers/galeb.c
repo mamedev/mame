@@ -139,7 +139,7 @@ static MACHINE_CONFIG_START( galeb, galeb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galeb )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galeb )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

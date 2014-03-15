@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 
@@ -969,7 +969,7 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 

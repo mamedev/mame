@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc2000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc2000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_HD44780_ADD("hd44780")

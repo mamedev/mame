@@ -206,7 +206,7 @@ static MACHINE_CONFIG_START( batman, batman_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", batman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batman)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))

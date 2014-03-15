@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", firebatl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
 	MCFG_PALETTE_ADD("palette", 512+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
@@ -282,7 +282,7 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", clshroad)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)

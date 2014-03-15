@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( ikki, ikki_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ikki)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)

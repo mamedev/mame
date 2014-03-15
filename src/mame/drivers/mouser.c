@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mouser)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
 

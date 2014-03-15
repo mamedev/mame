@@ -3084,7 +3084,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3152,7 +3152,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3222,7 +3222,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_contcirc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3288,7 +3288,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_bshark)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3364,7 +3364,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_sci)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3431,7 +3431,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_chasehq)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chasehq)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chasehq)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3501,7 +3501,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_aquajack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3568,7 +3568,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_spacegun)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taitoz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitoz)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3634,7 +3634,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_dblaxle)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -3701,7 +3701,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoz_state, screen_update_racingb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dblaxle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblaxle)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)

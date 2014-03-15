@@ -789,7 +789,7 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", megadpkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megadpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(blitz_state, blitz)
 MACHINE_CONFIG_END

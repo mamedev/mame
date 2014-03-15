@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update_carjmbre)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", carjmbre)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
 

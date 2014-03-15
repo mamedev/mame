@@ -297,7 +297,7 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update_skyarmy)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", skyarmy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(skyarmy_state, skyarmy)
 

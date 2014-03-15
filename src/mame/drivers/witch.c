@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", witch)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", witch)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

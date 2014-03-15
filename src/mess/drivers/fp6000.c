@@ -323,7 +323,7 @@ static MACHINE_CONFIG_START( fp6000, fp6000_state )
 
 	MCFG_PALETTE_ADD("palette", 8)
 //  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", fp6000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp6000)
 
 MACHINE_CONFIG_END
 

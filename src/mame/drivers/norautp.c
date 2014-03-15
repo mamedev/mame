@@ -1272,7 +1272,7 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(norautp_state, screen_update_norautp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", norautp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", norautp)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(norautp_state, norautp)

@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_SCREEN_UPDATE_DRIVER(famibox_state, screen_update_famibox)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", famibox)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", famibox)
 	MCFG_PALETTE_ADD("palette", 8*4*16)
 	MCFG_PALETTE_INIT_OWNER(famibox_state, famibox)
 

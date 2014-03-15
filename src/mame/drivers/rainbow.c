@@ -667,7 +667,7 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rbisland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbisland)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jumping)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jumping)
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

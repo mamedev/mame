@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( sf, sf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update_sf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)
 	
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)

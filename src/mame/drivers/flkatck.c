@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 	MCFG_SCREEN_UPDATE_DRIVER(flkatck_state, screen_update_flkatck)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flkatck)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flkatck)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)

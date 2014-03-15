@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( bombjack, bombjack_state )
 	MCFG_SCREEN_UPDATE_DRIVER(bombjack_state, screen_update_bombjack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bombjack)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombjack)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

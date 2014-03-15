@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( pbillian, superqix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pbillian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -1042,7 +1042,7 @@ static MACHINE_CONFIG_START( hotsmash, superqix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pbillian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_START( sqix, superqix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sqix)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 
@@ -1127,7 +1127,7 @@ static MACHINE_CONFIG_START( sqixbl, superqix_state )
 	MCFG_SCREEN_UPDATE_DRIVER(superqix_state, screen_update_superqix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sqix)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sqix)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGRRII)
 

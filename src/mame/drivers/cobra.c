@@ -3234,7 +3234,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_M48T58_ADD("m48t58")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K001604_ADD("k001604", cobra_k001604_intf)     // on the LAN board in Racing Jam DX
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")

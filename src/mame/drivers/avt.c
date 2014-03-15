@@ -909,7 +909,7 @@ static MACHINE_CONFIG_START( avt, avt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", avt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avt)
 
 	MCFG_PALETTE_ADD("palette", 8*16)
 	MCFG_PALETTE_INIT_OWNER(avt_state, avt)

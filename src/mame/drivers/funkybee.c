@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", funkybee)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkybee)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
 

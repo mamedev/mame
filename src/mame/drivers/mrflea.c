@@ -368,7 +368,7 @@ static MACHINE_CONFIG_START( mrflea, mrflea_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mrflea_state, screen_update_mrflea)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mrflea)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrflea)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

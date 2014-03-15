@@ -719,7 +719,7 @@ UINT32 asr733_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 static MACHINE_CONFIG_FRAGMENT( asr733 )
-	MCFG_GFXDECODE_ADD("gfxdecode", asr733)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asr733)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)

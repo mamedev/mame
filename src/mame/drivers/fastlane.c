@@ -208,7 +208,7 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fastlane)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)

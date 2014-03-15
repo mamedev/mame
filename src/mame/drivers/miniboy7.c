@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_UPDATE_DRIVER(miniboy7_state, screen_update_miniboy7)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", miniboy7)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)

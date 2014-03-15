@@ -533,7 +533,7 @@ static MACHINE_CONFIG_START( mpu12wbk, mpu12wbk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mpu12wbk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpu12wbk)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
 

@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( pturn, pturn_state )
 
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 0x100)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pturn)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pturn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

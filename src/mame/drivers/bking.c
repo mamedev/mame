@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( bking, bking_state )
 	MCFG_SCREEN_VBLANK_DRIVER(bking_state, screen_eof_bking)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bking)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bking)
 	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
 	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 

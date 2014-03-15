@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", acefruit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

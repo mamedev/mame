@@ -286,7 +286,7 @@ static MACHINE_CONFIG_START( polyplay, polyplay_state )
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", polyplay)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polyplay)
 	MCFG_PALETTE_ADD("palette", 10)
 	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
 

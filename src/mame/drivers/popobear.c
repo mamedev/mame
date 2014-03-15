@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

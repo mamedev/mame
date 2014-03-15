@@ -372,7 +372,7 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", poker72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poker72)
 	MCFG_PALETTE_ADD("palette", 0xe00)
 	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 

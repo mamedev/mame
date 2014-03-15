@@ -1845,7 +1845,7 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spi)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -1943,7 +1943,7 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_spi)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", spi)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spi)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 6144)
 
@@ -1996,7 +1996,7 @@ static MACHINE_CONFIG_START( sys386f, seibuspi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sys386f)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sys386f)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 

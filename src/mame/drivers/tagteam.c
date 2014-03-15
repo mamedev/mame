@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update_tagteam)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tagteam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
 

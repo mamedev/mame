@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,mainevt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", mainevt_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	MCFG_VIDEO_START_OVERRIDE(mainevt_state,dv)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", dv_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")

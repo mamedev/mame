@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update_vaportra)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", vaportra)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vaportra)
 	MCFG_PALETTE_ADD("palette", 1280)
 
 

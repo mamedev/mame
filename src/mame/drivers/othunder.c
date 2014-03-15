@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update_othunder)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", othunder)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
 

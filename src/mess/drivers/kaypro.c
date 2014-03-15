@@ -211,7 +211,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kayproii)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", kayproii)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kayproii)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_VIDEO_START_OVERRIDE(kaypro_state, kaypro )
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_kaypro2x)	
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", kaypro2x)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kaypro2x)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(kaypro_state,kaypro)
 

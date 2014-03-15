@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", dietgo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dietgo)
 
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")

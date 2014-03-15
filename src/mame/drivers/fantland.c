@@ -861,7 +861,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -906,7 +906,7 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fantland)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -237,7 +237,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galspnbl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
 
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)

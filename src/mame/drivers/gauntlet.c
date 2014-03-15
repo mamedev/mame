@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", gauntlet)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gauntlet)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

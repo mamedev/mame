@@ -1346,7 +1346,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(peplus_state, screen_update_peplus)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", peplus)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", peplus)
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 

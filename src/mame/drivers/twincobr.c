@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram16", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twincobr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twincobr)
 	MCFG_PALETTE_ADD("palette", 1792)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

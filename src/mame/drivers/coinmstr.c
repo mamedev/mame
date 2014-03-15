@@ -1171,7 +1171,7 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", coinmstr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 

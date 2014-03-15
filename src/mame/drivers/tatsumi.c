@@ -896,7 +896,7 @@ static MACHINE_CONFIG_START( apache3, tatsumi_state )
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
 	MCFG_SCREEN_UPDATE_DRIVER(tatsumi_state, screen_update_apache3)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apache3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apache3)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -938,7 +938,7 @@ static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tatsumi_state, screen_update_roundup5)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", roundup5)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", roundup5)
 	MCFG_PALETTE_ADD("palette", 1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -981,7 +981,7 @@ static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tatsumi_state, screen_update_cyclwarr)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cyclwarr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1024,7 +1024,7 @@ static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tatsumi_state, screen_update_bigfight)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cyclwarr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclwarr)
 	MCFG_PALETTE_ADD("palette", 8192 + 8192)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

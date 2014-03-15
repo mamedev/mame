@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( cmmb, cmmb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cmmb_state, screen_update_cmmb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmmb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmmb)
 	
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)

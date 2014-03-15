@@ -154,7 +154,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nitedrvr_state, screen_update_nitedrvr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nitedrvr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nitedrvr)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

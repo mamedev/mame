@@ -105,7 +105,7 @@ static MACHINE_CONFIG_START( neptunp2, neptunp2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", neptunp2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */

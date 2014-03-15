@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab2)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */
@@ -824,7 +824,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(homelab_state, screen_update_homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", homelab)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homelab)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */

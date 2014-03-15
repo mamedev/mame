@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", diverboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", diverboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

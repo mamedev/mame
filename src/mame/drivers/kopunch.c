@@ -195,7 +195,7 @@ static MACHINE_CONFIG_START( kopunch, kopunch_state )
 	MCFG_SCREEN_UPDATE_DRIVER(kopunch_state, screen_update_kopunch)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kopunch)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kopunch)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(kopunch_state, kopunch)
 

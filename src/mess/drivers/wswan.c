@@ -143,7 +143,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wswan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wswan)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 

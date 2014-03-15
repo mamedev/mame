@@ -3748,7 +3748,7 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK, mc6845_intf) /* 68B45 or 6845s @ CPU clock */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldnpkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldnpkr_state, goldnpkr)
 MACHINE_CONFIG_END

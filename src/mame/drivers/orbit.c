@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", orbit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( cultures, cultures_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", culture)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
 	MCFG_PALETTE_ADD("palette", 0x2000)
 
 

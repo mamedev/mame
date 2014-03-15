@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( chinhero, shangkid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_shangkid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chinhero)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chinhero)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( dynamski, shangkid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_dynamski)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dynamski)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynamski)
 	MCFG_PALETTE_ADD("palette", 16*4+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)

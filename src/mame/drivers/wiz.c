@@ -794,7 +794,7 @@ static MACHINE_CONFIG_START( kungfut, wiz_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", stinger)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stinger)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
 

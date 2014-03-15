@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( usg32, usgames_state )
 	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update_usgames)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", usgames)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 

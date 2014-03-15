@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( markham, markham_state )
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", markham)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", markham)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(markham_state, markham)

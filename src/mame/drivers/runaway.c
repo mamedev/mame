@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( runaway, runaway_state )
 	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", runaway)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", runaway)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

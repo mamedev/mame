@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update_naughtyb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", naughtyb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update_naughtyb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", naughtyb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 

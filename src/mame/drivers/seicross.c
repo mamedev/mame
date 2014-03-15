@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( nvram, seicross_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update_seicross)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", seicross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicross)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 

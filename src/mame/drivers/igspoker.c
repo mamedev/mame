@@ -1789,7 +1789,7 @@ static MACHINE_CONFIG_START( igspoker, igspoker_state )
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", igspoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igspoker)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

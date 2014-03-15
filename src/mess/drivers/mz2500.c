@@ -2153,7 +2153,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz2500)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

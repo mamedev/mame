@@ -183,7 +183,7 @@ static MACHINE_CONFIG_START( subs, subs_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", subs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subs)
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)

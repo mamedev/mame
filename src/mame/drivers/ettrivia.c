@@ -319,7 +319,7 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ettrivia)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ettrivia)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
 

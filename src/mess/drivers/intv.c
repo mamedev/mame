@@ -871,7 +871,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", intvkbd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 	

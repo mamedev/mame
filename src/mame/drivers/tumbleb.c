@@ -2065,7 +2065,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)	
 
@@ -2104,7 +2104,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2146,7 +2146,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2185,7 +2185,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fncywld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -2245,7 +2245,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2356,7 +2356,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suprtrio)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprtrio)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2395,7 +2395,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

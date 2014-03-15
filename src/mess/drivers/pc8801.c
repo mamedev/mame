@@ -2672,7 +2672,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pc8801 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc8801 )
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
 

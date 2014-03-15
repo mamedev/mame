@@ -1043,7 +1043,7 @@ static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fromance)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_START( idolmj, fromance_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fromance)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
@@ -1121,7 +1121,7 @@ static MACHINE_CONFIG_START( fromance, fromance_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fromance)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)

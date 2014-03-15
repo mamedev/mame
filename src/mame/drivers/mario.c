@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( mario_base, mario_state )
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update_mario)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", mario)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)
 

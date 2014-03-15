@@ -243,7 +243,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update_darkmist)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", darkmist)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkmist)
 	MCFG_PALETTE_ADD("palette", 0x100*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)

@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ec65)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)
@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( ec65k, ec65k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ec65)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)

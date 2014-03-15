@@ -73,7 +73,7 @@ const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
 gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
-		m_palette(NULL),
+		m_palette(*this),
 		m_gfxdecodeinfo(NULL)
 {
 }
@@ -85,6 +85,11 @@ gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *ta
 void gfxdecode_device::static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info)
 {
 	downcast<gfxdecode_device &>(device).m_gfxdecodeinfo = info;
+}
+
+void gfxdecode_device::static_set_palette(device_t &device, const char *tag)
+{
+	downcast<gfxdecode_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

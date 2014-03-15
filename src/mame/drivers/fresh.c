@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_PALETTE_ADD("palette", 0x1000) // or 0xc00
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fresh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fresh)
 
 	/* sound hw? */
 MACHINE_CONFIG_END

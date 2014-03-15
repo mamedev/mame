@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gunsmoke_state, screen_update_gunsmoke)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gunsmoke)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunsmoke)
 	
 	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)

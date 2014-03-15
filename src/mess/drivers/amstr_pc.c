@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
-	MCFG_GFXDECODE_ADD("gfxdecode", pc200)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -414,7 +414,7 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
-	MCFG_GFXDECODE_ADD("gfxdecode", pc200)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc200)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

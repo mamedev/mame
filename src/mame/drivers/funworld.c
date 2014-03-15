@@ -2951,7 +2951,7 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fw1stpal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fw1stpal)
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(funworld_state, funworld)

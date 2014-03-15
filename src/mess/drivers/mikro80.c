@@ -184,7 +184,7 @@ static MACHINE_CONFIG_START( mikro80, mikro80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mikro80)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 

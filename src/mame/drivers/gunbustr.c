@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gunbustr_state, screen_update_gunbustr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gunbustr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 

@@ -543,7 +543,7 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", stuntair)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stuntair)
 	MCFG_PALETTE_ADD("palette", 0x100+2)
 
 	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)

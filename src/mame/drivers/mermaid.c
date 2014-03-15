@@ -450,7 +450,7 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mermaid_state, screen_eof_mermaid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mermaid)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mermaid)
 	MCFG_PALETTE_ADD("palette", 4*16+2*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(64+1)
 	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)

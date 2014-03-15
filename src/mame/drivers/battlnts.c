@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", battlnts)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlnts)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

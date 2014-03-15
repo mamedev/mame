@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", pc100)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc100)
 	MCFG_PALETTE_ADD("palette", 16)
 //  MCFG_PALETTE_INIT(black_and_white)
 

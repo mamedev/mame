@@ -247,7 +247,7 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update_timelimt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", timelimt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timelimt)
 	MCFG_PALETTE_ADD("palette", 64+32)
 	MCFG_PALETTE_INIT_OWNER(timelimt_state, timelimt)
 

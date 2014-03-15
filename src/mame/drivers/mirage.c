@@ -333,7 +333,7 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mirage)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirage)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( flipjack, flipjack_state )
 
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flipjack)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flipjack)
 
 	MCFG_PALETTE_ADD("palette", 128+8)
 	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)

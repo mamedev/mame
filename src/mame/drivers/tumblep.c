@@ -305,7 +305,7 @@ static MACHINE_CONFIG_START( tumblep, tumblep_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tumblep_state, screen_update_tumblep)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumblep)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumblep)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

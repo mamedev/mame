@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rungun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rungun)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 

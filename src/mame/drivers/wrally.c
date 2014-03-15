@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( wrally, wrally_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update_wrally)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wrally)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
 	MCFG_PALETTE_ADD("palette", 1024*8)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 

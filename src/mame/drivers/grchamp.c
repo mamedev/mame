@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( grchamp, grchamp_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", grchamp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grchamp)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
 

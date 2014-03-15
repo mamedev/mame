@@ -2027,7 +2027,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2080,7 +2080,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2133,7 +2133,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gondo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2186,7 +2186,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gondo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gondo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2243,7 +2243,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ghostb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2302,7 +2302,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shackled)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2363,7 +2363,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", oscar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2407,7 +2407,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", srdarwin)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
 	MCFG_PALETTE_ADD("palette", 144)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2464,7 +2464,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cobracom)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

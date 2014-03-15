@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update_hyprduel)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 14220)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 14220)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(hyprduel_state,hyprduel_14220)
@@ -703,7 +703,7 @@ static MACHINE_CONFIG_START( magerror, hyprduel_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hyprduel_state, screen_update_hyprduel)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 14220)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 14220)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(hyprduel_state,magerror_14220)

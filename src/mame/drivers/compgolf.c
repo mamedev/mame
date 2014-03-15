@@ -258,7 +258,7 @@ static MACHINE_CONFIG_START( compgolf, compgolf_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
-	MCFG_GFXDECODE_ADD("gfxdecode", compgolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", compgolf)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

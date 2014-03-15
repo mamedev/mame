@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( taxidriv, taxidriv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update_taxidriv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", taxidriv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taxidriv)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
 

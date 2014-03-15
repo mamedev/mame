@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( tattack, tattack_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tattack)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattack)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
 

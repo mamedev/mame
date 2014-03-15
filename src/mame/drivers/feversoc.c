@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( feversoc, feversoc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", feversoc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

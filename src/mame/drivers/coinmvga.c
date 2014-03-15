@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", coinmvga)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(coinmvga_state, coinmvga)

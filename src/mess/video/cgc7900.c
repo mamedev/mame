@@ -24,16 +24,16 @@
 #define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 12)
 #define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 11)
 
-static const rgb_t PALETTE_CGC[] =
+PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
 {
-	rgb_t::black,
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white
+	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(3, rgb_t(0x00, 0xff, 0xff));
+	palette.set_pen_color(4, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff));
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(7, rgb_t::white);
 };
 
 /***************************************************************************
@@ -133,6 +133,7 @@ void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap)
 
 void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 {
+	const pen_t *pen = m_palette->pens();
 	for (int y = 0; y < 768; y++)
 	{
 		int sy = y / 8;
@@ -152,18 +153,18 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 				{
 					if (!OVERLAY_CURSOR_BLINK || m_blink)
 					{
-						bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[7];
+						bitmap.pix32(y, (sx * 8) + x) = pen[7];
 					}
 				}
 				else
 				{
 					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || m_blink))
 					{
-						if (OVERLAY_VF) bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[fg];
+						if (OVERLAY_VF) bitmap.pix32(y, (sx * 8) + x) = pen[fg];
 					}
 					else
 					{
-						if (OVERLAY_VB) bitmap.pix32(y, (sx * 8) + x) = PALETTE_CGC[bg];
+						if (OVERLAY_VB) bitmap.pix32(y, (sx * 8) + x) = pen[bg];
 					}
 				}
 			}
@@ -228,7 +229,9 @@ MACHINE_CONFIG_FRAGMENT( cgc7900_video )
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cgc7900)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cgc7900)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(cgc7900_state, cgc7900)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL_28_48MHz/7500000))
 MACHINE_CONFIG_END

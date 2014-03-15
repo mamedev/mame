@@ -604,7 +604,7 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blackt96)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

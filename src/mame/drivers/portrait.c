@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update_portrait)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", portrait)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portrait)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x40)
 	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)

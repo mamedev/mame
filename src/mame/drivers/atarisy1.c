@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarisy1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)

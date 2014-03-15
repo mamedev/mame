@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16, mc6845_intf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", carrera)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 	

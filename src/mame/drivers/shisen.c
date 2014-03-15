@@ -223,7 +223,7 @@ static MACHINE_CONFIG_START( shisen, shisen_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shisen_state, screen_update_sichuan2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shisen)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shisen)
 	MCFG_PALETTE_ADD("palette", 256)
 
 

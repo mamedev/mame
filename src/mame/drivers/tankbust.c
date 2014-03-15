@@ -347,7 +347,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update_tankbust)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tankbust )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbust )
 
 	MCFG_PALETTE_ADD( "palette", 128 )
 	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)

@@ -1405,7 +1405,7 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ms32)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms32)
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 

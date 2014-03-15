@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( summit, summit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(summit_state, screen_update_summit)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", summit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", summit)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(summit_state, summit)

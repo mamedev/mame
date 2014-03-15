@@ -488,7 +488,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)

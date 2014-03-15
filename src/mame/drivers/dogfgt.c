@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update_dogfgt)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dogfgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dogfgt)
 	MCFG_PALETTE_ADD("palette", 16+64)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)

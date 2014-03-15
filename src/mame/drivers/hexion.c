@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update_hexion)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hexion)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

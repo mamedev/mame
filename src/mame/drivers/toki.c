@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toki)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tokib)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

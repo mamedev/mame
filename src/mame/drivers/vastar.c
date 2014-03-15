@@ -444,7 +444,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update_vastar)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vastar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vastar)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

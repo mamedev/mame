@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( namcofl, namcofl_state )
 
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2)
 
 	MCFG_VIDEO_START_OVERRIDE(namcofl_state,namcofl)
 

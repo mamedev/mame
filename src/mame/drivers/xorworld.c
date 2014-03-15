@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update_xorworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", xorworld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xorworld)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
 

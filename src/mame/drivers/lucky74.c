@@ -1551,7 +1551,7 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lucky74)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lucky74)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(lucky74_state, lucky74)

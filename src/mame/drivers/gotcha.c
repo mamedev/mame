@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gotcha)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

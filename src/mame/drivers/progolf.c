@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update_progolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", progolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", progolf)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 

@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(taitoo_state, screen_update_parentj)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", parentj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", parentj)
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

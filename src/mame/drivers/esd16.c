@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", esd16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esd16)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( istellar, istellar_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(istellar_state, istellar)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", istellar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

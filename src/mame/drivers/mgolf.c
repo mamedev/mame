@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update_mgolf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mgolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgolf)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
 

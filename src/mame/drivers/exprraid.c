@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", exprraid)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exprraid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

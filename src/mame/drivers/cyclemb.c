@@ -919,7 +919,7 @@ static MACHINE_CONFIG_START( cyclemb, cyclemb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cyclemb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cyclemb)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
 

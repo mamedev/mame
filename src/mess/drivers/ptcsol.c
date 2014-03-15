@@ -759,7 +759,7 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", sol20)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

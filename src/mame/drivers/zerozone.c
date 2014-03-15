@@ -185,7 +185,7 @@ static MACHINE_CONFIG_START( zerozone, zerozone_state )
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 47*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zerozone)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zerozone)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)

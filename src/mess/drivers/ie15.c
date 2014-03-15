@@ -635,7 +635,7 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 		IE15_VERT_START+IE15_DISP_VERT);
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ie15)	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)	
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(ie15_state, ie15)
 

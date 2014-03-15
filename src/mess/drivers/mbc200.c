@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( mbc200, mbc200_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbc200_state, screen_update_mbc200)
 	MCFG_SCREEN_PALETTE("palette")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", mbc200)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 

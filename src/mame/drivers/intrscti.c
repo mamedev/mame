@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	MCFG_SCREEN_UPDATE_DRIVER(intrscti_state, screen_update_intrscti)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", intrscti)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intrscti)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 

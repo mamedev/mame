@@ -432,7 +432,7 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( f1gpb, f1gp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1gp_state, screen_update_f1gpb)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", f1gp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

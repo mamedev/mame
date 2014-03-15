@@ -821,7 +821,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -880,7 +880,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -929,7 +929,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suna16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_bestbest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bestbest)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bestbest)
 	MCFG_PALETTE_ADD("palette", 256*8)
 
 

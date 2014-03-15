@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SCREEN_UPDATE_DRIVER(zac2650_state, screen_update_tinvader)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tinvader)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tinvader)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(zac2650_state, zac2650)
 

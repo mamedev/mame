@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psikyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psikyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1132,7 +1132,7 @@ static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based o
 	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psikyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -1182,7 +1182,7 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_SCREEN_VBLANK_DRIVER(psikyo_state, screen_eof_psikyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", psikyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psikyo)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

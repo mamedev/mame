@@ -248,7 +248,7 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update_madmotor)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", madmotor)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

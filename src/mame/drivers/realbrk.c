@@ -769,7 +769,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_realbrk)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", realbrk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
