@@ -502,10 +502,9 @@ WRITE8_MEMBER(mz_state::pio_port_c_w)
     Z80 PIO
 ***************************************************************************/
 
-static void mz800_z80pio_irq(device_t *device, int which)
+WRITE_LINE_MEMBER(mz_state::mz800_z80pio_irq)
 {
-	mz_state *state = device->machine().driver_data<mz_state>();
-	state->m_maincpu->set_input_line(0, which);
+	m_maincpu->set_input_line(0, state);
 }
 
 WRITE_LINE_MEMBER(mz_state::write_centronics_busy)
@@ -537,7 +536,7 @@ WRITE8_MEMBER(mz_state::mz800_z80pio_port_a_w)
 
 const z80pio_interface mz800_z80pio_config =
 {
-	DEVCB_DEVICE_LINE("z80pio", mz800_z80pio_irq),
+	DEVCB_DRIVER_LINE_MEMBER(mz_state,mz800_z80pio_irq),
 	DEVCB_DRIVER_MEMBER(mz_state,mz800_z80pio_port_a_r),
 	DEVCB_DRIVER_MEMBER(mz_state,mz800_z80pio_port_a_w),
 	DEVCB_NULL,
