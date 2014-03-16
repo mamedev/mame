@@ -5,8 +5,5 @@
 MACHINE_START( amigacd );
 MACHINE_RESET( amigacd );
 
-/* 6525tpi */
-WRITE_LINE_DEVICE_HANDLER( amigacd_tpi6525_irq );
-
 
 #endif /* __AMIGACD_H__ */

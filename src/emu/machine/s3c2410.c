@@ -134,9 +134,9 @@ void s3c2410_touch_screen( device_t *device, int state)
 	s3c24xx_touch_screen( device, state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( s3c2410_pin_frnb_w )
+WRITE_LINE_MEMBER( s3c2410_device::frnb_w )
 {
-	s3c24xx_pin_frnb_w( device, state);
+	s3c24xx_pin_frnb_w(this, state);
 }
 
 void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)

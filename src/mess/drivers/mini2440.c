@@ -228,7 +228,7 @@ static S3C2440_INTERFACE( mini2440_s3c2440_intf )
 static NAND_INTERFACE( mini2440_nand_intf )
 {
 	NAND_CHIP_K9F1G08U0B,
-	DEVCB_DEVICE_LINE( "s3c2440", s3c2440_pin_frnb_w)
+	DEVCB_DEVICE_LINE_MEMBER("s3c2440", s3c2440_device, frnb_w)
 };
 
 static MACHINE_CONFIG_START( mini2440, mini2440_state )

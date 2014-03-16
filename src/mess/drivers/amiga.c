@@ -566,7 +566,7 @@ static const legacy_mos6526_interface cia_1_cdtv_intf =
 
 static const tpi6525_interface cdtv_tpi_intf =
 {
-	DEVCB_DEVICE_LINE("tpi6525", amigacd_tpi6525_irq),
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amigacd_tpi6525_irq),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

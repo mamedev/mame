@@ -526,6 +526,7 @@ public:
 
 	DECLARE_READ8_MEMBER( amigacd_tpi6525_portc_r );
 	DECLARE_WRITE8_MEMBER( amigacd_tpi6525_portb_w );
+	DECLARE_WRITE_LINE_MEMBER( amigacd_tpi6525_irq );
 
 	int m_centronics_busy;
 	int m_centronics_perror;

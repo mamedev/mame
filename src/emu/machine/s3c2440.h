@@ -52,6 +52,9 @@ public:
 
 	// access to legacy token
 	struct s3c24xx_t *token() const { assert(m_token != NULL); return m_token; }
+
+	DECLARE_WRITE_LINE_MEMBER( frnb_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -134,7 +137,6 @@ void s3c2440_touch_screen( device_t *device, int state);
 void s3c2440_request_irq( device_t *device, UINT32 int_type);
 void s3c2440_request_eint( device_t *device, UINT32 number);
 
-WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w );
 
 /*******************************************************************************
     MACROS & CONSTANTS

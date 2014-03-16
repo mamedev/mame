@@ -148,7 +148,7 @@ void s3c2440_request_eint( device_t *device, UINT32 number)
 	s3c24xx_request_eint( device, number);
 }
 
-WRITE_LINE_DEVICE_HANDLER( s3c2440_pin_frnb_w )
+WRITE_LINE_MEMBER( s3c2440_device::frnb_w )
 {
-	s3c24xx_pin_frnb_w( device, state);
+	s3c24xx_pin_frnb_w(this, state);
 }

@@ -52,6 +52,9 @@ public:
 
 	// access to legacy token
 	struct s3c24xx_t *token() const { assert(m_token != NULL); return m_token; }
+
+	DECLARE_WRITE_LINE_MEMBER( frnb_w );
+	
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();

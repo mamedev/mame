@@ -492,9 +492,11 @@ static void amigacd_tpi6525_irq_trampoline(device_t *device, int level)
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( amigacd_tpi6525_irq )
+WRITE_LINE_MEMBER( amiga_state::amigacd_tpi6525_irq )
 {
-	amigacd_tpi6525_irq_trampoline(device, state);
+	tpi6525_device *tpi = machine().device<tpi6525_device>("tpi6525");
+
+	amigacd_tpi6525_irq_trampoline(tpi, state);
 }
 
 static void cdrom_status_enabled( running_machine &machine, int level )

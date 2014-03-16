@@ -296,7 +296,7 @@ static S3C2410_INTERFACE( palmz22_s3c2410_intf )
 static NAND_INTERFACE( palmz22_nand_intf )
 {
 	NAND_CHIP_K9F5608U0D_J,
-	DEVCB_DEVICE_LINE( "s3c2410", s3c2410_pin_frnb_w)
+	DEVCB_DEVICE_LINE_MEMBER("s3c2410", s3c2410_device, frnb_w)
 };
 
 static MACHINE_CONFIG_START( palmz22, palmz22_state )
