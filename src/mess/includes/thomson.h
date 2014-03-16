@@ -296,7 +296,10 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_floppy_w );
 	DECLARE_READ8_MEMBER( to9_floppy_r );
 	DECLARE_WRITE8_MEMBER( to9_floppy_w );
-	WRITE_LINE_MEMBER( fdc_index_w );
+	WRITE_LINE_MEMBER( fdc_index_0_w );
+	WRITE_LINE_MEMBER( fdc_index_1_w );
+	WRITE_LINE_MEMBER( fdc_index_2_w );
+	WRITE_LINE_MEMBER( fdc_index_3_w );
 	void thomson_index_callback(device_t *device, int state);
 	DECLARE_PALETTE_INIT(thom);
 	

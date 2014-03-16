@@ -564,16 +564,66 @@ static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER( thomson_state::fdc_index_w )
+WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
 {
-  device_t *device = machine().device<wd2793_device>("wd2793");
-  thomson_index_callback(device, state);
+  thomson_index_callback(machine().device(FLOPPY_0), state);
 }
 
-
-static const floppy_interface thomson_floppy_interface =
+WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
 {
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_w),
+  thomson_index_callback(machine().device(FLOPPY_1), state);
+}
+
+WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
+{
+  thomson_index_callback(machine().device(FLOPPY_2), state);
+}
+
+WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
+{
+  thomson_index_callback(machine().device(FLOPPY_3), state);
+}
+
+static const floppy_interface thomson_floppy_interface_0 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_0_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+
+static const floppy_interface thomson_floppy_interface_1 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_1_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+static const floppy_interface thomson_floppy_interface_2 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_2_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+static const floppy_interface thomson_floppy_interface_3 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_3_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -651,7 +701,14 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 /* floppy */
 	MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
 	MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_0)
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_1)
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_2)
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_3)
 
 /* network */
 	MCFG_MC6854_ADD( "mc6854", to7_network_iface )
