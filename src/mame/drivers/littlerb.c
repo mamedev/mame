@@ -100,7 +100,8 @@ public:
 			m_dacl(*this, "dacl"),
 			m_dacr(*this, "dacr"),
 #if USE_TMS
-			m_vram(*this, "vram")
+			m_vram(*this, "vram"),
+			m_palette(*this, "palette")
 #else
 			m_region4(*this, "region4"),
 			m_1ff80804(-1)
@@ -125,6 +126,7 @@ public:
 
 #if USE_TMS
 	required_shared_ptr<UINT16> m_vram;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(tms_host_r);
 	DECLARE_WRITE16_MEMBER(tms_host_w);
@@ -426,7 +428,7 @@ static void littlerb_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
 	UINT16 *vram = &state->m_vram[(((params->rowaddr << 8)) & 0x3ff00) ];
 	UINT32 *dest = &bitmap.pix32(scanline);
 
-	const pen_t *paldata = screen.machine().pens;
+	const pen_t *paldata = state->m_palette->pens();
 
 	int coladdr = params->coladdr;
 	int x;
