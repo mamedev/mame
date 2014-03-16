@@ -62,6 +62,9 @@ void k037122_device::device_start()
 	8*128
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x200000 / 4);
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);
 	m_reg = auto_alloc_array_clear(machine(), UINT32, 0x400 / 4);

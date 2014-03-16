@@ -99,6 +99,9 @@ void deco_bac06_device::static_set_gfxdecode_tag(device_t &device, const char *t
 
 void deco_bac06_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_pf_data = auto_alloc_array_clear(machine(), UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
 	m_pf_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);
 	m_pf_colscroll = auto_alloc_array_clear(machine(), UINT16, 0x2000 / 2);

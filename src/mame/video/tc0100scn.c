@@ -203,6 +203,9 @@ void tc0100scn_device::device_start()
 	16*8    /* every sprite takes 16 consecutive bytes */
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int xd, yd;
 
 	/* Set up clipping for multi-TC0100SCN games. We assume

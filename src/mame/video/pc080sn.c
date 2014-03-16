@@ -106,6 +106,9 @@ void pc080sn_device::device_config_complete()
 
 void pc080sn_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	/* use the given gfx set for bg tiles */
 	if (!m_dblwidth) /* standard tilemaps */
 	{

@@ -514,6 +514,9 @@ void ygv608_device::register_state_save()
 
 void ygv608_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	memset(&m_ports, 0, sizeof(m_ports));
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_pattern_name_table, 0, sizeof(m_pattern_name_table));

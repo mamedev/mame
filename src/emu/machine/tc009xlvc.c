@@ -261,6 +261,9 @@ static const gfx_layout char_layout =
 
 void tc0091lvc_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	memset(m_palette_ram, 0, sizeof(m_palette_ram));
 	memset(m_vregs, 0, sizeof(m_palette_ram));
 	memset(m_bitmap_ram, 0, sizeof(m_palette_ram));

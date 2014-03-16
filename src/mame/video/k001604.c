@@ -90,6 +90,9 @@ void k001604_device::device_start()
 		16*256
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int roz_tile_size;
 
 	m_gfx_index[0] = m_gfx_index_1;

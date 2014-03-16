@@ -203,6 +203,9 @@ void tc0480scp_device::device_config_complete()
 
 void tc0480scp_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int i, xd, yd;
 
 	m_x_offs = m_x_offset + m_pixels;

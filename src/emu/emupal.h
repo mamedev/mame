@@ -333,7 +333,7 @@ public:
 	
 	// getters
 	int entries() const { return m_entries; }
-	int indirect_entries() const { return m_indirect_colors.count(); }
+	int indirect_entries() const { return m_indirect_entries; }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -412,7 +412,7 @@ protected:
 private:
 	// configuration state
 	int					m_entries;				// number of entries in the palette
-	int					m_indirect_entries;		// number of initial indirect entries in the palette
+	int					m_indirect_entries;		// number of indirect colors in the palette
 	bool				m_enable_shadows;		// are shadows enabled?
 	bool				m_enable_hilights;		// are hilights enabled?
 	endianness_t		m_endianness;			// endianness of palette RAM

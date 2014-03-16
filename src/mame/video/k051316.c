@@ -110,6 +110,9 @@ void k051316_device::device_config_complete()
 
 void k051316_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int is_tail2nos = 0;
 	UINT32 total;
 

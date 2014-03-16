@@ -1442,6 +1442,9 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	// create a gfx_element describing the road graphics
 	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
 

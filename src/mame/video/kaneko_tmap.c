@@ -146,6 +146,9 @@ TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_1) { get_tile_in
 
 void kaneko_view2_tilemap_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_vram[0] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
 	m_vram[1] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);
 	m_vscroll[0] = (UINT16*)auto_alloc_array_clear(this->machine(), UINT16, 0x1000/2);

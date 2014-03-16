@@ -382,6 +382,9 @@ void k056832_device::finalize_init(running_machine &machine)
 
 void k056832_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 

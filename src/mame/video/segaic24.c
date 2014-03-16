@@ -96,6 +96,9 @@ TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
 
 void segas24_tile::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
 		if (m_gfxdecode->gfx(char_gfx_index) == 0)
 			break;

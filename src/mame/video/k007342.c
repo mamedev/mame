@@ -71,6 +71,9 @@ void k007342_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 
 void k007342_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	// bind the init function
     m_callback.bind_relative_to(*owner());
 	
