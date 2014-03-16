@@ -544,6 +544,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_EF9345_ADD("ef9345", "screen")
+	MCFG_EF9345_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */

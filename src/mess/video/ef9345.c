@@ -103,8 +103,19 @@ ef9345_device::ef9345_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9345, "EF9345", tag, owner, clock, "ef9345", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(ef9345)),
+	m_palette(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -120,7 +131,6 @@ void ef9345_device::device_start()
 	m_charset = region();
 
 	m_screen_out.allocate(496, m_screen->height());
-	m_screen_out.set_palette(m_screen->palette()->palette());
 
 	m_blink_timer->adjust(attotime::from_msec(500), 0, attotime::from_msec(500));
 
@@ -206,7 +216,7 @@ void ef9345_device::draw_char_40(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 8 >= m_screen->width())
 		return;
 
-	const rgb_t *palette = m_screen_out.palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 8; j++)
 				m_screen_out.pix32(y * 10 + i, x * 8 + j)  = palette[c[8 * i + j] & 0x07];
@@ -219,7 +229,7 @@ void ef9345_device::draw_char_80(UINT8 *c, UINT16 x, UINT16 y)
 	if (y * 10 >= m_screen->height() || x * 6 >= m_screen->width())
 		return;
 
-	const rgb_t *palette = m_screen_out.palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	for(int i = 0; i < 10; i++)
 		for(int j = 0; j < 6; j++)
 				m_screen_out.pix32(y * 10 + i, x * 6 + j)  = palette[c[6 * i + j] & 0x07];

@@ -316,7 +316,6 @@ static GFXDECODE_START( fp1100 )
 	//GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )
 GFXDECODE_END
 
-//static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
 
 
 static MC6845_INTERFACE( mc6845_intf )
