@@ -49,6 +49,9 @@ const device_type PIT8253 = &device_creator<pit8253_device>;
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PIT8253, "Intel PIT8253", tag, owner, clock, "pit8253", __FILE__),
+	m_clk0(0),
+	m_clk1(0),
+	m_clk2(0),
 	m_out0_handler(*this),
 	m_out1_handler(*this),
 	m_out2_handler(*this)
@@ -60,6 +63,9 @@ pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, d
 
 pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_clk0(0),
+	m_clk1(0),
+	m_clk2(0),
 	m_out0_handler(*this),
 	m_out1_handler(*this),
 	m_out2_handler(*this)
