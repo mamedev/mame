@@ -108,7 +108,9 @@ public:
 	required_device<mc6845_device> m_crtc;
 	INTERRUPT_GEN_MEMBER(amusco_vblank_irq);
 	INTERRUPT_GEN_MEMBER(amusco_timer_irq);
-	UINT16 m_address;
+	UINT16 m_mc6845_address;
+	UINT16 m_video_update_address;
+	DECLARE_PALETTE_INIT(amusco_palette_init);
 };
 
 
@@ -120,6 +122,17 @@ WRITE16_MEMBER(amusco_state::amusco_videoram_w)
 {
 
 }
+
+PALETTE_INIT_MEMBER(amusco_state, amusco_palette_init)
+{
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
+	}
+}
+
 
 
 TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
@@ -134,8 +147,8 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 
 	SET_TILE_INFO_MEMBER(
 							0 /* bank */,
-							code,
-							2 /* color */,
+							code & 0x3ff,
+							0 /* color */,
 							0
 						);
 }
@@ -182,18 +195,25 @@ READ8_MEMBER( amusco_state::mc6845_r)
 WRITE8_MEMBER( amusco_state::mc6845_w)
 {
 	if(offset & 1)
+	{
 		m_crtc->register_w(space, 0,data);
-
-	m_crtc->address_w(space,0,data);
+		if(m_mc6845_address == 0x12)
+			m_video_update_address = ((data & 0xff) << 8) | (m_video_update_address & 0x00ff);
+		if(m_mc6845_address == 0x13)
+			m_video_update_address = ((data & 0xff) << 0) | (m_video_update_address & 0xff00);
+	}
+	else
+	{
+		m_crtc->address_w(space,0,data);
+		m_mc6845_address = data;
+	}
 }
 
 WRITE16_MEMBER( amusco_state::vram_w)
 {
-	/* WRONG! */
-	m_videoram[m_address] = data;
-	m_bg_tilemap->mark_tile_dirty(m_address);
-	m_address++;
-	m_address&=0x7ff;
+	m_videoram[m_video_update_address] = data;
+	m_bg_tilemap->mark_tile_dirty(m_video_update_address);
+//	printf("%04x %04x\n",m_video_update_address,data);
 }
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 16, amusco_state )
@@ -206,8 +226,8 @@ static ADDRESS_MAP_START( amusco_io_map, AS_IO, 16, amusco_state )
 	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
 //	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN1")
 //	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
-	AM_RANGE(0x0030, 0x0031) AM_READ_PORT("IN2") AM_WRITENOP // lamps?
-	AM_RANGE(0x0040, 0x0041) AM_READ_PORT("IN3")
+	AM_RANGE(0x0030, 0x0031) AM_READ_PORT("DSW1") AM_WRITENOP // lamps?
+	AM_RANGE(0x0040, 0x0041) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 /* I/O byte R/W
@@ -280,7 +300,7 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -304,9 +324,33 @@ static INPUT_PORTS_START( amusco )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW1-2" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -330,6 +374,30 @@ static INPUT_PORTS_START( amusco )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW2-1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -395,7 +463,7 @@ static const gfx_layout charlayout =
 	8, 10,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
 	16*8
@@ -417,8 +485,8 @@ GFXDECODE_END
 
 MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
-	amusco_state *state = device->machine().driver_data<amusco_state>();
-	state->m_address = address;
+//	amusco_state *state = device->machine().driver_data<amusco_state>();
+//	state->m_video_update_address = address;
 }
 
 static MC6845_INTERFACE( mc6845_intf )
@@ -445,6 +513,7 @@ INTERRUPT_GEN_MEMBER(amusco_state::amusco_vblank_irq)
 
 INTERRUPT_GEN_MEMBER(amusco_state::amusco_timer_irq)
 {
+	/* This probably goes inside on mc6845 update change */
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x84/4); // sets 0x918 bit 3
 }
 
@@ -460,7 +529,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_CPU_PROGRAM_MAP(amusco_mem_map)
 	MCFG_CPU_IO_MAP(amusco_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amusco_state, amusco_vblank_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(amusco_state, amusco_timer_irq,  60*2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(amusco_state, amusco_timer_irq,  60*32)
 
 	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
@@ -475,7 +544,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
+	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco_palette_init)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK, mc6845_intf) /* guess */
 
