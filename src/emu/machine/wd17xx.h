@@ -34,7 +34,7 @@ private:
 	struct wd1770_state *m_token;
 };
 
-extern const device_type WD1770;
+extern ATTR_DEPRECATED const device_type WD1770;
 
 class fd1771_device : public wd1770_device
 {
@@ -42,7 +42,7 @@ public:
 	fd1771_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1771;
+extern ATTR_DEPRECATED const device_type FD1771;
 
 class fd1781_device : public wd1770_device
 {
@@ -50,7 +50,7 @@ public:
 	fd1781_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1781;
+extern ATTR_DEPRECATED const device_type FD1781;
 
 class fd1791_device : public wd1770_device
 {
@@ -58,7 +58,7 @@ public:
 	fd1791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1791;
+extern ATTR_DEPRECATED const device_type FD1791;
 
 class fd1792_device : public wd1770_device
 {
@@ -66,7 +66,7 @@ public:
 	fd1792_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1792;
+extern ATTR_DEPRECATED const device_type FD1792;
 
 class fd1793_device : public wd1770_device
 {
@@ -74,7 +74,7 @@ public:
 	fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1793;
+extern ATTR_DEPRECATED const device_type FD1793;
 
 class fd1794_device : public wd1770_device
 {
@@ -82,7 +82,7 @@ public:
 	fd1794_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1794;
+extern ATTR_DEPRECATED const device_type FD1794;
 
 class fd1795_device : public wd1770_device
 {
@@ -90,7 +90,7 @@ public:
 	fd1795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1795;
+extern ATTR_DEPRECATED const device_type FD1795;
 
 class fd1797_device : public wd1770_device
 {
@@ -98,7 +98,7 @@ public:
 	fd1797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1797;
+extern ATTR_DEPRECATED const device_type FD1797;
 
 class fd1761_device : public wd1770_device
 {
@@ -106,7 +106,7 @@ public:
 	fd1761_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1761;
+extern ATTR_DEPRECATED const device_type FD1761;
 
 class fd1762_device : public wd1770_device
 {
@@ -114,7 +114,7 @@ public:
 	fd1762_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1762;
+extern ATTR_DEPRECATED const device_type FD1762;
 
 class fd1763_device : public wd1770_device
 {
@@ -122,7 +122,7 @@ public:
 	fd1763_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1763;
+extern ATTR_DEPRECATED const device_type FD1763;
 
 class fd1764_device : public wd1770_device
 {
@@ -130,7 +130,7 @@ public:
 	fd1764_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1764;
+extern ATTR_DEPRECATED const device_type FD1764;
 
 class fd1765_device : public wd1770_device
 {
@@ -138,7 +138,7 @@ public:
 	fd1765_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1765;
+extern ATTR_DEPRECATED const device_type FD1765;
 
 class fd1767_device : public wd1770_device
 {
@@ -146,7 +146,7 @@ public:
 	fd1767_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type FD1767;
+extern ATTR_DEPRECATED const device_type FD1767;
 
 class wd2791_device : public wd1770_device
 {
@@ -154,7 +154,7 @@ public:
 	wd2791_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type WD2791;
+extern ATTR_DEPRECATED const device_type WD2791;
 
 class wd2793_device : public wd1770_device
 {
@@ -162,7 +162,7 @@ public:
 	wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type WD2793;
+extern ATTR_DEPRECATED const device_type WD2793;
 
 class wd2795_device : public wd1770_device
 {
@@ -170,7 +170,7 @@ public:
 	wd2795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type WD2795;
+extern ATTR_DEPRECATED const device_type WD2795;
 
 class wd2797_device : public wd1770_device
 {
@@ -178,7 +178,7 @@ public:
 	wd2797_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type WD2797;
+extern ATTR_DEPRECATED const device_type WD2797;
 
 class wd1772_device : public wd1770_device
 {
@@ -189,7 +189,7 @@ protected:
 	virtual void device_start();
 };
 
-extern const device_type WD1772;
+extern ATTR_DEPRECATED const device_type WD1772;
 
 class wd1773_device : public wd1770_device
 {
@@ -197,7 +197,7 @@ public:
 	wd1773_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type WD1773;
+extern ATTR_DEPRECATED const device_type WD1773;
 
 class mb8866_device : public wd1770_device
 {
@@ -205,7 +205,7 @@ public:
 	mb8866_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type MB8866;
+extern ATTR_DEPRECATED const device_type MB8866;
 
 class mb8876_device : public wd1770_device
 {
@@ -213,7 +213,7 @@ public:
 	mb8876_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type MB8876;
+extern ATTR_DEPRECATED const device_type MB8876;
 
 class mb8877_device : public wd1770_device
 {
@@ -221,7 +221,7 @@ public:
 	mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type MB8877;
+extern ATTR_DEPRECATED const device_type MB8877;
 
 
 
