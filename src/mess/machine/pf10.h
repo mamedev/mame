@@ -36,9 +36,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// floppy disk controller
-	DECLARE_READ8_HANDLER( fdc_r );
-	DECLARE_WRITE8_HANDLER( fdc_w );
-	DECLARE_WRITE8_HANDLER( fdc_tc_w );
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
+	DECLARE_WRITE8_MEMBER( fdc_tc_w );
 
 	// hd6303 i/o
 	DECLARE_READ8_MEMBER( port1_r );
