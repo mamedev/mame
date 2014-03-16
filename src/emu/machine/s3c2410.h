@@ -136,9 +136,6 @@ struct s3c2410_interface
 void s3c2410_uart_fifo_w( device_t *device, int uart, UINT8 data);
 void s3c2410_touch_screen( device_t *device, int state);
 void s3c2410_request_eint( device_t *device, UINT32 number);
-
-WRITE_LINE_DEVICE_HANDLER( s3c2410_pin_frnb_w );
-
 void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc);
 
 /*******************************************************************************

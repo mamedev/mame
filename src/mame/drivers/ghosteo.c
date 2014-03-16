@@ -273,7 +273,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 		case 0xFF :
 		{
 			nand.mode = NAND_M_INIT;
-			s3c2410_pin_frnb_w( m_s3c2410, 1);
+			 m_s3c2410->frnb_w(1);
 		}
 		break;
 		case 0x00 :
@@ -313,8 +313,8 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 			nand.addr_load_ptr++;
 			if ((nand.mode == NAND_M_READ) && (nand.addr_load_ptr == 4))
 			{
-				s3c2410_pin_frnb_w( m_s3c2410, 0);
-				s3c2410_pin_frnb_w( m_s3c2410, 1);
+				m_s3c2410->frnb_w(0);
+				m_s3c2410->frnb_w(1);
 			}
 		}
 		break;
