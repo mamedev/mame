@@ -91,89 +91,20 @@
 // DEVICE CONFIGURATION MACROS
 //***************************************************************************
 
-#define MCFG_MOS6566_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS6566, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6566_device, screen_update)
+#define MCFG_MOS6566_CPU(_tag) \
+	mos6566_device::static_set_cpu_tag(*device, "^"_tag);
 
-#define MCFG_MOS6567_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS6567, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6567_device, screen_update)
+#define MCFG_MOS6566_IRQ_CALLBACK(_write) \
+	devcb = &mos6566_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS8562, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update)
+#define MCFG_MOS6566_BA_CALLBACK(_write) \
+	devcb = &mos6566_device::set_ba_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_MOS8564_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
-	MCFG_DEVICE_ADD(_tag, MOS8564, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8564_device, screen_update)
+#define MCFG_MOS6566_AEC_CALLBACK(_write) \
+	devcb = &mos6566_device::set_aec_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6569_device, screen_update)
-
-#define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS8565, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(NULL, DEVCB2_##_irq, DEVCB2_NULL); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update)
-
-#define MCFG_MOS8566_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
-	MCFG_DEVICE_ADD(_tag, MOS8566, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6566_device *>(device)->set_callbacks(_cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_REFRESH_RATE(VIC6569_VRETRACERATE) \
-	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8566_device, screen_update)
+#define MCFG_MOS8564_K_CALLBACK(_write) \
+	devcb = &mos6566_device::set_k_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -284,11 +215,11 @@ public:
 	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq, class _k> void set_callbacks(const char *cpu_tag, _irq irq, _k k) {
-		m_cpu_tag = cpu_tag;
-		m_write_irq.set_callback(irq);
-		m_write_k.set_callback(k);
-	}
+	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<mos6566_device &>(device).m_cpu.set_tag(tag); }
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ba_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_ba.set_callback(object); }
+	template<class _Object> static devcb2_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_aec.set_callback(object); }
+	template<class _Object> static devcb2_base &set_k_wr_callback(device_t &device, _Object object) { return downcast<mos6566_device &>(device).m_write_k.set_callback(object); }
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -362,8 +293,7 @@ protected:
 	devcb2_write_line       m_write_aec;
 	devcb2_write8           m_write_k;
 
-	const char *m_cpu_tag;
-	cpu_device *m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	int m_phi0;
 	int m_ba;

@@ -591,7 +591,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, d
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
-		m_write_k(*this)
+		m_write_k(*this),
+		m_cpu(*this)
 {
 }
 
@@ -608,6 +609,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		m_write_ba(*this),
 		m_write_aec(*this),
 		m_write_k(*this),
+		m_cpu(*this),
 		m_phi0(1),
 		m_ba(ASSERT_LINE),
 		m_aec(ASSERT_LINE)
@@ -653,11 +655,6 @@ void mos6566_device::device_start()
 	m_write_ba.resolve_safe();
 	m_write_aec.resolve_safe();
 	m_write_k.resolve_safe();
-
-	if (m_cpu_tag != NULL)
-		m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	else
-		m_cpu = machine().firstcpu;
 
 	m_screen->register_screen_bitmap(m_bitmap);
 

@@ -43,7 +43,7 @@
 // DEVICE CONFIGURATION MACROS
 //***************************************************************************
 
-#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _potx, _poty) \
+#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -52,11 +52,10 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
-#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _potx, _poty) \
+#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -65,7 +64,6 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
@@ -78,9 +76,15 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<mos6560_device *>(device)->set_callbacks(DEVCB2_NULL, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
+
+
+#define MCFG_MOS6560_POTX_CALLBACK(_read) \
+	devcb = &mos6560_device::set_potx_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MOS6560_POTY_CALLBACK(_read) \
+	devcb = &mos6560_device::set_poty_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -134,11 +138,9 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	template<class _potx, class _poty> void set_callbacks(_potx potx, _poty poty) {
-		m_read_potx.set_callback(potx);
-		m_read_poty.set_callback(poty);
-	}
+	
+	template<class _Object> static devcb2_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
