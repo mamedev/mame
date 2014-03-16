@@ -286,9 +286,9 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_SHARE("flip_screen")
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(nmi_mask_w) //used by Crazy Kong Bootleg with alt levels and speed up
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cclimber_sample_volume_w)
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
@@ -309,9 +309,9 @@ static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_SHARE("flip_screen")
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cclimber_sample_volume_w)
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
@@ -371,10 +371,10 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_SHARE("flip_screen")
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device,  sample_trigger_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cclimber_sample_volume_w)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -382,8 +382,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimber_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("cclimber_audio:aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("cclimber_audio:aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yamato_portmap, AS_IO, 8, cclimber_state )
@@ -1009,12 +1009,7 @@ static MACHINE_CONFIG_DERIVED( cclimber, root )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
-	MCFG_SOUND_CONFIG(cclimber_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SAMPLES_ADD("samples", cclimber_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
 
 

@@ -1,8 +1,59 @@
-#include "sound/samples.h"
-#include "sound/ay8910.h"
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/***************************************************************************
 
-extern const ay8910_interface cclimber_ay8910_interface;
-extern const samples_interface cclimber_samples_interface;
-DECLARE_WRITE8_HANDLER( cclimber_sample_trigger_w );
-DECLARE_WRITE8_HANDLER( cclimber_sample_rate_w );
-DECLARE_WRITE8_HANDLER( cclimber_sample_volume_w );
+    cclimber.h
+
+    Functions to emulate the cclimber audio boards
+
+***************************************************************************/
+
+#pragma once
+
+#ifndef __CCLIMBER_AUDIO__
+#define __CCLIMBER_AUDIO__
+
+#include "emu.h"
+#include "sound/samples.h"
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+extern const device_type CCLIMBER_AUDIO;
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CCLIMBER_AUDIO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CCLIMBER_AUDIO, 0)
+
+	
+// ======================> cclimber_audio_device
+
+class cclimber_audio_device : public device_t
+{
+public:
+	// construction/destruction
+	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE8_MEMBER( sample_trigger_w );
+	DECLARE_WRITE8_MEMBER( sample_rate_w );
+	DECLARE_WRITE8_MEMBER( sample_volume_w );
+	DECLARE_WRITE8_MEMBER( sample_select_w );
+		
+protected:
+	// device level overrides	
+	virtual void device_start();	
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	void play_sample(int start,int freq,int volume);
+private:	
+	int m_sample_num;
+	int m_sample_freq;
+	int m_sample_volume;
+	required_device<samples_device> m_samples;
+};
+
+
+#endif

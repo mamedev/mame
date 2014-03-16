@@ -1193,21 +1193,21 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_0->address_w(space, offset, data);
+		m_ay8910_cclimber->address_w(space, offset, data);
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_0->data_w(space, offset, data);
+		m_ay8910_cclimber->data_w(space, offset, data);
 }
 
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
 	if (!m_mshuttle_ay8910_cs)
-		return m_ay8910_0->data_r(space, offset);
+		return m_ay8910_cclimber->data_r(space, offset);
 	return 0xff;
 }
 
@@ -1731,12 +1731,12 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxian_flip_screen_xy_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(mshuttle_ay8910_cs_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(cclimber_sample_rate_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(cclimber_sample_volume_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -5406,12 +5406,7 @@ static MACHINE_CONFIG_DERIVED( mshuttle, galaxian_base )
 	MCFG_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
-	MCFG_SOUND_CONFIG(cclimber_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SAMPLES_ADD("samples", cclimber_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
 
 
