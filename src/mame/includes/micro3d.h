@@ -137,7 +137,7 @@ public:
 	required_device<i8051_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<cpu_device> m_drmath;
-	required_device<cpu_device> m_vgb;
+	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
 
 protected:

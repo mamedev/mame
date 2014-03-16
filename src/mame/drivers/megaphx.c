@@ -86,7 +86,8 @@ public:
 		m_dac2(*this, "dac2" ),
 		m_dac3(*this, "dac3" ),
 		port_c_value(0),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_tms(*this, "tms")
 	{ 
 	}
 
@@ -158,6 +159,7 @@ public:
 
 	UINT8 port_c_value;
 	required_device<palette_device> m_palette;
+	required_device<tms34010_device> m_tms;
 	int m_soundsent;
 	UINT8 m_sounddata;
 	UINT8 m_soundback;
@@ -175,13 +177,13 @@ CUSTOM_INPUT_MEMBER(megaphx_state::megaphx_rand_r)
 
 READ16_MEMBER(megaphx_state::tms_host_r)
 {
-	return tms34010_host_r(machine().device("tms"), offset);
+	return m_tms->host_r(offset);
 }
 
 
 WRITE16_MEMBER(megaphx_state::tms_host_w)
 {
-	tms34010_host_w(machine().device("tms"), offset, data);
+	m_tms->host_w(offset, data);
 }
 
 READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
@@ -242,7 +244,7 @@ static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, megaphx_state )
 	AM_RANGE(0x04000030, 0x0400003f) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
 	AM_RANGE(0x04000090, 0x0400009f) AM_WRITENOP
 
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 

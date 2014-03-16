@@ -96,13 +96,13 @@ void artmagic_state::machine_reset()
 
 READ16_MEMBER(artmagic_state::tms_host_r)
 {
-	return tms34010_host_r(machine().device("tms"), offset);
+	return m_tms->host_r(offset);
 }
 
 
 WRITE16_MEMBER(artmagic_state::tms_host_w)
 {
-	tms34010_host_w(machine().device("tms"), offset, data);
+	m_tms->host_w(offset, data);
 }
 
 
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
 	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
 	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 

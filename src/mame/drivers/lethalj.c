@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
 	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
 	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
 	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP    /* seems to be a bug in their code, one of many. */
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

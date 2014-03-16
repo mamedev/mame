@@ -156,7 +156,7 @@ READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = tms34010_host_r(m_gsp, offset);
+	result = m_gsp->host_r(offset);
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -166,7 +166,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
 {
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	tms34010_host_w(m_gsp, offset, data);
+	m_gsp->host_w(offset, data);
 	m_hd34010_host_access = FALSE;
 }
 
@@ -183,7 +183,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = (m_msp != NULL) ? tms34010_host_r(m_msp, offset) : 0xffff;
+	result = (m_msp != NULL) ? m_msp->host_r(offset) : 0xffff;
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -195,7 +195,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 	if (m_msp != NULL)
 	{
 		m_hd34010_host_access = TRUE;
-		tms34010_host_w(m_msp, offset, data);
+		m_msp->host_w(offset, data);
 		m_hd34010_host_access = FALSE;
 	}
 }
@@ -498,10 +498,10 @@ WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
 	}
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
-	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(space, offset, 0xffff))
+	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(space, offset, 0xffff))
 		m_screen->update_partial(m_screen->vpos() - 1);
 
-	tms34010_io_register_w(space, offset, data, mem_mask);
+	m_gsp->io_register_w(space, offset, data, mem_mask);
 }
 
 

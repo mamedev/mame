@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("vgb", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("tms34010", 0)
 ADDRESS_MAP_END
 

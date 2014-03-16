@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8("ym2", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8("ym2", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8("ym2", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -467,7 +467,7 @@ static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -477,7 +477,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xfc000000, 0xfc00000f) AM_READ(rapidfir_gun1_r)
 	AM_RANGE(0xfc000100, 0xfc00010f) AM_READ(rapidfir_gun2_r)
 	AM_RANGE(0xfc000400, 0xfc00040f) AM_READ(ffff_r)

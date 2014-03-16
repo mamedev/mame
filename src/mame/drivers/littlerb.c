@@ -403,12 +403,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_scanline)
 #if USE_TMS
 READ16_MEMBER(littlerb_state::tms_host_r)
 {
-	return tms34010_host_r(machine().device("tms"), offset);
+	return m_tms->host_r(offset);
 }
 
 WRITE16_MEMBER(littlerb_state::tms_host_w)
 {
-	tms34010_host_w(machine().device("tms"), offset, data);
+	m_tms->host_w(offset, data);
 }
 
 static ADDRESS_MAP_START( littlerb_tms_map, AS_PROGRAM, 16, littlerb_state )
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( littlerb_tms_map, AS_PROGRAM, 16, littlerb_state )
 	AM_RANGE(0x04000000, 0x0400000f) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
 	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
 	AM_RANGE(0x04000030, 0x0400003f) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 

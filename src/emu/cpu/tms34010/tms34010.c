@@ -693,7 +693,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		(downcast<tms34010_device*>(device))->io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1184,9 +1184,9 @@ static const char *const ioreg_name[] =
 };
 #endif
 
-WRITE16_HANDLER( tms34010_io_register_w )
+WRITE16_MEMBER( tms34010_device::io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1329,9 +1329,9 @@ static const char *const ioreg020_name[] =
 };
 #endif
 
-WRITE16_HANDLER( tms34020_io_register_w )
+WRITE16_MEMBER( tms34020_device::io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1492,9 +1492,9 @@ WRITE16_HANDLER( tms34020_io_register_w )
     I/O REGISTER READS
 ***************************************************************************/
 
-READ16_HANDLER( tms34010_io_register_r )
+READ16_MEMBER( tms34010_device::io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1535,9 +1535,9 @@ READ16_HANDLER( tms34010_io_register_r )
 }
 
 
-READ16_HANDLER( tms34020_io_register_r )
+READ16_MEMBER( tms34020_device::io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1588,9 +1588,9 @@ static void tms34010_state_postload(tms34010_state *tms)
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-void tms34010_host_w(device_t *cpu, int reg, int data)
+void tms34010_device::host_w(int reg, int data)
 {
-	tms34010_state *tms = get_safe_token(cpu);
+	tms34010_state *tms = get_safe_token(this);
 	unsigned int addr;
 
 	switch (reg)
@@ -1626,8 +1626,8 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
 		{
 			tms->external_host_access = TRUE;
 			address_space &space = tms->device->space(AS_PROGRAM);
-			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
-			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
+			io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
+			io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;
 			break;
 		}
@@ -1645,9 +1645,9 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
     HOST INTERFACE READS
 ***************************************************************************/
 
-int tms34010_host_r(device_t *cpu, int reg)
+int tms34010_device::host_r(int reg)
 {
-	tms34010_state *tms = get_safe_token(cpu);
+	tms34010_state *tms = get_safe_token(this);
 	unsigned int addr;
 	int result = 0;
 

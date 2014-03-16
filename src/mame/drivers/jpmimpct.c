@@ -175,12 +175,12 @@ MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
 
 WRITE16_MEMBER(jpmimpct_state::m68k_tms_w)
 {
-	tms34010_host_w(machine().device("dsp"), offset, data);
+	m_dsp->host_w(offset, data);
 }
 
 READ16_MEMBER(jpmimpct_state::m68k_tms_r)
 {
-	return tms34010_host_r(machine().device("dsp"), offset);
+	return m_dsp->host_r(offset);
 }
 
 
@@ -665,7 +665,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, jpmimpct_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("dsp", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
 	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)

@@ -63,7 +63,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
-	optional_device<cpu_device> m_msp;
+	optional_device<tms34010_device> m_msp;
 	required_device<adsp21xx_device> m_adsp;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_sounddsp;

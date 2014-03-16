@@ -49,7 +49,8 @@ public:
 		m_fpga_ctrl(*this, "fpga_ctrl"),
 		m_fg_buffer(*this, "fg_buffer"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu") { }
+		m_subcpu(*this, "subcpu"),
+		m_tms(*this, "tms") { }
 
 	required_shared_ptr<UINT32> m_blitter_regs;
 	required_shared_ptr<UINT32> m_fpga_ctrl;
@@ -77,6 +78,7 @@ public:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<tms34010_device> m_tms;
 };
 
 
@@ -225,12 +227,12 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE32_MEMBER(skimaxx_state::m68k_tms_w)
 {
-	tms34010_host_w(machine().device("tms"), offset, data);
+	m_tms->host_w(offset, data);
 }
 
 READ32_MEMBER(skimaxx_state::m68k_tms_r)
 {
-	return tms34010_host_r(machine().device("tms"), offset);
+	return m_tms->host_r(offset);
 }
 
 
@@ -376,7 +378,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
 	AM_RANGE(0x02100000, 0x0210000f) AM_RAM
 	AM_RANGE(0x04000000, 0x047fffff) AM_ROM AM_REGION("tmsgfx", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("tms", 0)
 ADDRESS_MAP_END
 

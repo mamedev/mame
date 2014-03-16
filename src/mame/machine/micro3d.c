@@ -227,12 +227,12 @@ READ32_MEMBER(micro3d_state::micro3d_scc_r)
 
 READ16_MEMBER(micro3d_state::micro3d_tms_host_r)
 {
-	return tms34010_host_r(m_vgb, offset);
+	return m_vgb->host_r(offset);
 }
 
 WRITE16_MEMBER(micro3d_state::micro3d_tms_host_w)
 {
-	tms34010_host_w(m_vgb, offset, data);
+	m_vgb->host_w(offset, data);
 }
 
 
