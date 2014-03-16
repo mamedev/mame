@@ -13,13 +13,14 @@
 #include "emu.h"
 #include "h63484.h"
 
-#define LOG 1
+#define LOG 0
 #define FIFO_LOG 0
+#define CMD_LOG 0
 
 // default address map
-static ADDRESS_MAP_START( h63484_vram, AS_0, 8, h63484_device )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0xfffff) AM_NOP
+static ADDRESS_MAP_START( h63484_vram, AS_0, 16, h63484_device )
+//  AM_RANGE(0x00000, 0x7ffff) AM_RAM
+//  AM_RANGE(0x80000, 0xfffff) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -44,7 +45,7 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_cl0(0),
 	m_cl1(0),
 	m_dcr(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
 }
 
@@ -362,22 +363,22 @@ const rom_entry *h63484_device::device_rom_region() const
 }
 
 //-------------------------------------------------
-//  readbyte - read a byte at the given address
+//  readword - read a word at the given address
 //-------------------------------------------------
 
-inline UINT8 h63484_device::readbyte(offs_t address)
+inline UINT16 h63484_device::readword(offs_t address)
 {
-	return space().read_byte(address);
+	return space().read_word(address << 1);
 }
 
 
 //-------------------------------------------------
-//  writebyte - write a byte at the given address
+//  writeword - write a word at the given address
 //-------------------------------------------------
 
-inline void h63484_device::writebyte(offs_t address, UINT8 data)
+inline void h63484_device::writeword(offs_t address, UINT16 data)
 {
-	space().write_byte(address, data);
+	space().write_word(address << 1, data);
 }
 
 
@@ -521,22 +522,26 @@ inline void h63484_device::recompute_parameters()
 	if(m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
 		return;
 
-	printf("HC %d HSW %d HDS %d HDW %d HWS %d HWW %d\n",m_hc,m_hsw,m_hds,m_hdw,m_hws,m_hww);
-	printf("VC %d VDS %d VSW %d VWS %d VWW %d\n",m_vc,m_vds,m_vsw,m_vws,m_vww);
-}
+	if (LOG)
+	{
+		printf("HC %d HSW %d HDS %d HDW %d HWS %d HWW %d\n",m_hc,m_hsw,m_hds,m_hdw,m_hws,m_hww);
+		printf("VC %d VDS %d VSW %d VWS %d VWW %d\n",m_vc,m_vds,m_vsw,m_vws,m_vww);
+		printf("SP0 %d SP1 %d SP2 %d\n",m_sp[0],m_sp[1],m_sp[2]);
+	}
 
-/*-------------------------------------------------
-    ADDRESS_MAP( h63484 )
--------------------------------------------------*/
+	int gai = (m_omr>>4) & 0x07;
+	if (gai > 3)    printf("unsupported GAI=%d\n", gai);
+	int acm = (m_omr & 0x08) ? 2 : 1;
+	int ppw = 16 / get_bpp();
+	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
+	int vbstart = m_vds + m_sp[1];
+	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
+	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
-READ8_MEMBER( h63484_device::vram_r )
-{
-	return m_vram[offset];
-}
-
-WRITE8_MEMBER( h63484_device::vram_w )
-{
-	m_vram[offset] = data;
+	rectangle visarea = m_screen->visible_area();
+	visarea.set((m_hsw + m_hds) * ppmc, (m_hsw + m_hds + m_hdw) * ppmc - 1, m_vds, vbstart - 1);
+	attoseconds_t frame_period = m_screen->frame_period().attoseconds; // TODO: use clock() to calculate the frame_period
+	m_screen->configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
 
 
@@ -628,6 +633,307 @@ inline void h63484_device::command_end_seq()
 	/* TODO: we might need to be more aggressive and clear the params in there */
 }
 
+int h63484_device::get_bpp()
+{
+	int gbm = (m_ccr >> 8) & 0x07;
+
+	if (gbm <= 4)
+		return 1 << gbm;
+
+	//logerror ("Invalid Graphic Bit Mode (%d)\n", gbm);
+	return 1;
+}
+
+void h63484_device::calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos)
+{
+	int bpp = get_bpp();
+	int ppw = 16 / bpp;
+	int gbm = (m_ccr >> 8) & 0x07;
+	x += (m_org_dpd >> gbm);
+	if (x >= 0)
+	{
+		offset = x / ppw;
+		bit_pos = x % ppw;
+	}
+	else
+	{
+		offset = x / ppw;
+		bit_pos= (-x) % ppw;
+		if (bit_pos != 0)
+		{
+			offset--;
+			bit_pos = ppw - bit_pos;
+		}
+	}
+
+	offset += m_org_dpa - y * m_mwr[m_org_dn];
+	bit_pos *= bpp;
+}
+
+UINT16 h63484_device::get_dot(INT16 x, INT16 y)
+{
+	UINT8 bpp = get_bpp();
+	UINT32 offset = 0;
+	UINT8 bit_pos = 0;
+
+	calc_offset(x, y, offset, bit_pos);
+
+	return (readword(offset) >> bit_pos) & ((1 << bpp) - 1);
+}
+
+bool h63484_device::set_dot(INT16 x, INT16 y, INT16 px, INT16 py)
+{
+	int xs = m_pex - m_psx + 1;
+	int ys = m_pey - m_psy + 1;
+	int zx = m_pzx + 1;
+	int zy = m_pzy + 1;
+	int xp = m_psx + ((px % (xs * zx)) / zx);
+	int yp = m_psy + ((py % (ys * zy)) / zy);
+
+	if (xp < m_psx)
+		xp = (m_pex + 1) - (m_psx - xp);
+
+	if (yp < m_psy)
+		yp = (m_pey + 1) - (m_psy - yp);
+
+	int pix = (m_pram[yp & 0x0f] >> (xp & 0x0f)) & 0x01;
+
+	UINT8 col = (m_cr >> 3) & 0x03;
+	UINT8 bpp = get_bpp();
+	UINT16 mask = (1 << bpp) - 1;
+	UINT16 xmask = (16 / bpp) - 1;
+	UINT16 cl0 = (m_cl0 >> ((x & xmask) * bpp)) & mask;
+	UINT16 cl1 = (m_cl1 >> ((x & xmask) * bpp)) & mask;
+
+	switch (col)
+	{
+		case 0x00:
+			return set_dot(x, y, pix ? cl1 : cl0);
+		case 0x01:
+			if (pix)
+				return set_dot(x, y, cl1);
+			break;
+		case 0x02:
+			if (!pix)
+				return set_dot(x, y, cl0);
+			break;
+		case 0x03:
+			fatalerror("HD63484 color modes (Pattern RAM indirect)\n");
+			// TODO
+			break;
+	}
+
+	return false;
+}
+
+bool h63484_device::set_dot(INT16 x, INT16 y, UINT16 color)
+{
+	UINT8 bpp = get_bpp();
+	UINT32 offset = 0;
+	UINT8 bit_pos = 0;
+	UINT8 opm = m_cr & 0x07;
+	UINT8 area = (m_cr >> 5) & 0x07;
+
+	calc_offset(x, y, offset, bit_pos);
+
+	UINT16 mask = ((1 << bpp) - 1) << bit_pos;
+	UINT16 color_shifted = (color << bit_pos) & mask;
+
+	UINT16 data = readword(offset);
+	UINT16 res = data;
+
+	switch (opm)
+	{
+		case 0:
+			res = (data & ~mask) | color_shifted;
+			break;
+		case 1:
+			res = (data & ~mask) | ((data & mask) | color_shifted);
+			break;
+		case 2:
+			res = (data & ~mask) | ((data & mask) & color_shifted);
+			break;
+		case 3:
+			res = (data & ~mask) | ((data & mask) ^ color_shifted);
+			break;
+		case 4:
+			if (get_dot(x, y) == ((m_ccmp & mask) >> bit_pos))
+				res = (data & ~mask) | color_shifted;
+			break;
+		case 5:
+			if (get_dot(x, y) != ((m_ccmp & mask) >> bit_pos))
+				res = (data & ~mask) | color_shifted;
+			break;
+		case 6:
+			if (get_dot(x, y) < ((m_cl0 & mask) >> bit_pos))
+				res = (data & ~mask) | color_shifted;
+			break;
+		case 7:
+			if (get_dot(x, y) > ((m_cl1 & mask) >> bit_pos))
+				res = (data & ~mask) | color_shifted;
+			break;
+	}
+
+	writeword(offset, res);
+
+	if (area)
+		logerror("HD63484 '%s': unsupported area detection %x (%d %d)\n", tag(), area, x, y);
+
+	return false;   // TODO: return area detection status
+}
+
+void h63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
+{
+	UINT16 delta_x = abs(ex - sx) * 2;
+	UINT16 delta_y = abs(ey - sy) * 2;
+	int dir_x = (ex < sx) ? -1 : ((ex > sx) ? +1 : 0);
+	int dir_y = (ey < sy) ? -1 : ((ey > sy) ? +1 : 0);
+	int pram_pos = 0;
+
+	if(delta_x > delta_y)
+	{
+		int delta = delta_y - delta_x / 2;
+		while(sx != ex)
+		{
+			set_dot(sx, sy, pram_pos, 0);
+
+			if(delta >= 0)
+			{
+				sy += dir_y;
+				delta -= delta_x;
+			}
+			pram_pos++;
+			sx += dir_x;
+			delta += delta_y;
+		}
+	}
+	else
+	{
+		int delta = delta_x - delta_y / 2;
+		while(sy != ey)
+		{
+			set_dot(sx, sy, pram_pos, 0);
+
+			if(delta >= 0)
+			{
+				sx += dir_x;
+				delta -= delta_y;
+			}
+			pram_pos++;
+			sy += dir_y;
+			delta += delta_x;
+		}
+	}
+}
+
+void h63484_device::draw_circle(INT16 cx, INT16 cy, double r, double s_angol, double e_angol, bool c)
+{
+	double inc = 1.0 / (r * 100);
+	for (double angol = s_angol; fabs(angol - e_angol) >= inc*2; angol += inc * (c ? -1 : +1))
+	{
+		if (angol > DEGREE_TO_RADIAN(360))    angol -= DEGREE_TO_RADIAN(360);
+		if (angol < DEGREE_TO_RADIAN(0))      angol += DEGREE_TO_RADIAN(360);
+
+		double px = cos(angol) * r;
+		double py = sin(angol) * r;
+		set_dot(cx + round(px), cy + round(py), 0, 0);
+	}
+}
+
+void h63484_device::paint(INT16 sx, INT16 sy)
+{
+/*
+    This is not accurate since real hardware can only paint 4 'unpaintable' areas,
+    the other 'unpaintable' points are pushed into the read FIFO to be processed
+    later by the program, but currently is impossible suspend/resume the command
+    in case the read FIFO is full, so all 'unpaintable' areas are painted.
+    Also CP is not in the correct position after this command.
+*/
+	UINT8 e = BIT(m_cr, 8);
+	UINT8 bpp = get_bpp();
+	UINT16 mask = (1 << bpp) - 1;
+	UINT16 xmask = (16 / bpp) - 1;
+
+	for (int ydir=0; ydir<2; ydir++)
+		for(UINT16 y=0;y<0x7fff; y++)
+		{
+			bool limit = true;
+			bool unpaintable_up = false;
+			bool unpaintable_dn = false;
+
+			for (int xdir=0; xdir<2; xdir++)
+				for(UINT16 x=0; x<0x7fff; x++)
+				{
+					INT16 px = sx + (xdir ? -x : x);
+					INT16 py = sy + (ydir ? -y : y);
+
+					UINT16 dot = get_dot(px, py);
+					UINT16 edg = (m_edg >> (px & xmask) * bpp) & mask;
+					UINT16 cl0 = (m_cl0 >> (px & xmask) * bpp) & mask;
+					UINT16 cl1 = (m_cl1 >> (px & xmask) * bpp) & mask;
+
+					if ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1)
+						break;
+
+					if ((!ydir && !xdir && x && y) || (xdir && y) || (ydir && x) || (ydir && xdir))
+						set_dot(px, py, px - m_cpx, py - m_cpy);
+
+					dot = get_dot(px, py + 1);
+					if (unpaintable_up && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
+						paint(px, py + 1);
+					else if (!unpaintable_up && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
+						unpaintable_up = true;
+
+					dot = get_dot(px, py - 1);
+					if (unpaintable_dn && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
+						paint(px, py - 1);
+					else if (!unpaintable_dn && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
+						unpaintable_dn = true;
+
+					limit = false;
+				}
+				if (limit)     break;
+			}
+}
+
+UINT16 h63484_device::command_rpr_exec()
+{
+	switch(m_cr & 0x1f)
+	{
+		case 0x00: // color 0
+			return m_cl0;
+		case 0x01: // color 1
+			return m_cl1;
+		case 0x02: // color comparison
+			return m_ccmp;
+		case 0x03: // edge color
+			return m_edg;
+		case 0x04: // mask
+			return m_mask;
+		case 0x05: // Pattern RAM Control 1
+			return (m_ppy << 12) | (m_pzcy << 8) | (m_ppx << 4) | m_pzcx;
+		case 0x06: // Pattern RAM Control 2
+			return (m_psy << 12) | (m_psx << 4);
+		case 0x07: // Pattern RAM Control 3
+			return (m_pey << 12) | (m_pzy << 8) | (m_pex << 4) | m_pzx;
+		case 0x08: // Area Definition XMIN
+			return m_xmin;
+		case 0x09: // Area Definition YMIN
+			return m_ymin;
+		case 0x0a: // Area Definition XMAX
+			return m_xmax;
+		case 0x0b: // Area Definition YMAX
+			return m_ymax;
+		case 0x0c: // Read Write Pointer H
+			return (m_rwp_dn << 14) | ((m_rwp[m_rwp_dn] >> 12) & 0xff);
+		case 0x0d: // Read Write Pointer L
+			return (m_rwp[m_rwp_dn] & 0x0fff) << 4;
+		default:
+			if(LOG) printf("Read %sx\n", wpr_regnames[m_cr & 0x1f]);
+			return 0;
+	}
+}
+
 void h63484_device::command_wpr_exec()
 {
 	switch(m_cr & 0x1f)
@@ -637,6 +943,43 @@ void h63484_device::command_wpr_exec()
 			break;
 		case 0x01: // color 1
 			m_cl1 = m_pr[0];
+			break;
+		case 0x02: // color comparison
+			m_ccmp = m_pr[0];
+			break;
+		case 0x03: // edge color
+			m_edg = m_pr[0];
+			break;
+		case 0x04: // mask
+			m_mask = m_pr[0];
+			break;
+		case 0x05: // Pattern RAM Control 1
+			m_pzcx = (m_pr[0] >> 0) & 0x0f;
+			m_ppx = (m_pr[0] >> 4) & 0x0f;
+			m_pzcy = (m_pr[0] >> 8) & 0x0f;
+			m_ppy = (m_pr[0] >> 12) & 0x0f;
+			break;
+		case 0x06: // Pattern RAM Control 2
+			m_psx = (m_pr[0] >> 4) & 0x0f;
+			m_psy = (m_pr[0] >> 12) & 0x0f;
+			break;
+		case 0x07: // Pattern RAM Control 3
+			m_pzx = (m_pr[0] >> 0) & 0x0f;
+			m_pex = (m_pr[0] >> 4) & 0x0f;
+			m_pzy = (m_pr[0] >> 8) & 0x0f;
+			m_pey = (m_pr[0] >> 12) & 0x0f;
+			break;
+		case 0x08: // Area Definition XMIN
+			m_xmin = m_pr[0];
+			break;
+		case 0x09: // Area Definition YMIN
+			m_ymin = m_pr[0];
+			break;
+		case 0x0a: // Area Definition XMAX
+			m_xmax = m_pr[0];
+			break;
+		case 0x0b: // Area Definition YMAX
+			m_ymax = m_pr[0];
 			break;
 		case 0x0c: // Read Write Pointer H
 			m_rwp_dn = (m_pr[0] & 0xc000) >> 14;
@@ -653,107 +996,149 @@ void h63484_device::command_wpr_exec()
 
 void h63484_device::command_clr_exec()
 {
-	INT16 ax, ay;
-	UINT16 d;
-	INT16 x,y;
-	int inc_x,inc_y;
-	UINT32 offset;
-	UINT8 data_r;
-	UINT8 res;
+	UINT8 mm = m_cr & 0x03;
+	UINT16 d = m_pr[0];
+	INT16 ax = (INT16)m_pr[1];
+	INT16 ay = (INT16)m_pr[2];
 
-	d = m_pr[0];
-	ax = m_pr[1];
-	ay = m_pr[2];
+	int d0_inc = (ax < 0) ? -1 : 1;
+	int d1_inc = (ay < 0) ? -1 : 1;
 
-	inc_x = (ax < 0) ? -1 : 1;
-	inc_y = (ay < 0) ? -1 : 1;
-
-	offset = m_rwp[m_rwp_dn] & 0xfffff;
-
-	for(y=0;y!=ay;y+=inc_y)
+	for(INT16 d1=0; d1!=ay+d1_inc; d1+=d1_inc)
 	{
-		for(x=0;x!=ax;x+=inc_x)
+		for(INT16 d0=0; d0!=ax+d0_inc; d0+=d0_inc)
 		{
-			offset = (m_rwp[m_rwp_dn] + (x >> 1) + y * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
-			data_r = readbyte(offset);
-			res = (d >> (((x & 2) << 2) ^ 8)) & 0xff;
+			UINT32 offset = m_rwp[m_rwp_dn] - d1 * m_mwr[m_rwp_dn] + d0;
+			UINT16 data = readword(offset);
+			UINT16 res = 0;
 
-			switch(m_cr & 3)
+			if (BIT(m_cr, 10))
 			{
-				case 0: // replace
-					if(x & 1)
-						res = (res & 0x0f) | (data_r & 0xf0);
-					else
-						res = (res & 0xf0) | (data_r & 0x0f);
-					break;
-				case 1: // OR
-					if(x & 1)
-						res = (res & 0xff) | (data_r & 0xf0);
-					else
-						res = (res & 0xff) | (data_r & 0x0f);
-					break;
-				case 2: // AND
-					if(x & 1)
-						res = (res & 0x0f) | ((res & 0xf0) & (data_r & 0xf0));
-					else
-						res = (res & 0xf0) | ((res & 0x0f) & (data_r & 0x0f));
-					break;
-				case 3: // EOR
-					if(x & 1)
-						res = (res & 0x0f) | ((res & 0xf0) ^ (data_r & 0xf0));
-					else
-						res = (res & 0xf0) | ((res & 0x0f) ^ (data_r & 0x0f));
-					break;
+				switch(mm)
+				{
+					case 0: // replace
+						res = (data & ~m_mask) | (d & m_mask);
+						break;
+					case 1: // OR
+						res = (data & ~m_mask) | ((data | d) & m_mask);
+						break;
+					case 2: // AND
+						res = (data & ~m_mask) | ((data & d) & m_mask);
+						break;
+					case 3: // EOR
+						res = (data & ~m_mask) | ((data ^ d) & m_mask);
+						break;
+				}
 			}
+			else
+				res = d;
 
-			writebyte(offset,res);
+			writeword(offset, res);
 		}
 	}
 
-	m_rwp[m_rwp_dn] = offset;
+	m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
+	m_rwp[m_rwp_dn] &= 0xfffff;
 }
 
 void h63484_device::command_cpy_exec()
 {
-	INT16 ax, ay;
-	UINT32 src_offset,dst_offset;
-	//int inc_x,inc_y;
+	UINT8 mm = m_cr & 0x03;
+	UINT8 dsd = (m_cr >> 8) & 0x07;
+	UINT8 s = BIT(m_cr, 11);
+	UINT32 SA = ((m_pr[0] & 0xff) << 12) | ((m_pr[1]&0xfff0) >> 4);
+	INT16 DX = (INT16)m_pr[s ? 3 : 2];
+	INT16 DY = (INT16)m_pr[s ? 2 : 3];
 
-	src_offset = ((m_pr[0] & 0xff) << 12) | ((m_pr[1]&0xfff0) >> 4);
-	ax = m_pr[2];
-	ay = m_pr[3];
+	int sd0_inc = (DX < 0) ? -1 : 1;
+	int sd1_inc = (DY < 0) ? -1 : 1;
+	int dd0_inc, dd1_inc;
+	if (dsd & 0x04)
+	{
+		dd0_inc = dsd & 0x01 ? -1 : +1;
+		dd1_inc = dsd & 0x02 ? -1 : +1;
+	}
+	else
+	{
+		dd0_inc = dsd & 0x02 ? -1 : +1;
+		dd1_inc = dsd & 0x01 ? -1 : +1;
+	}
 
-	//inc_x = (ax < 0) ? -1 : 1;
-	//inc_y = (ay < 0) ? -1 : 1;
+	for(INT16 sd1=0, dd1=0; sd1!=DY+sd1_inc; sd1+=sd1_inc, dd1+=dd1_inc)
+	{
+		for(INT16 sd0=0, dd0=0; sd0!=DX+sd0_inc; sd0+=sd0_inc, dd0+=dd0_inc)
+		{
+			UINT32 src_offset, dst_offset;
 
-	dst_offset = m_rwp[m_rwp_dn] & 0xfffff;
+			if (s)
+				src_offset = SA + sd1 - sd0 * m_mwr[m_rwp_dn];
+			else
+				src_offset = SA + sd0 - sd1 * m_mwr[m_rwp_dn];
 
-	printf("%08x %08x %d %d\n",src_offset,dst_offset,ax,ay);
+			if (BIT(dsd, 2))
+				dst_offset = m_rwp[m_rwp_dn] + dd1 - dd0 * m_mwr[m_rwp_dn];
+			else
+				dst_offset = m_rwp[m_rwp_dn] + dd0 - dd1 * m_mwr[m_rwp_dn];
 
-	// ...
+			UINT16 src_data = readword(src_offset);
+			UINT16 dst_data = readword(dst_offset);
+
+			if (BIT(m_cr, 12))
+			{
+				switch(mm)
+				{
+					case 0: // replace
+						dst_data = (dst_data & ~m_mask) | (src_data & m_mask);
+						break;
+					case 1: // OR
+						dst_data = (dst_data & ~m_mask) | ((dst_data | src_data) & m_mask);
+						break;
+					case 2: // AND
+						dst_data = (dst_data & ~m_mask) | ((dst_data & src_data) & m_mask);
+						break;
+					case 3: // EOR
+						dst_data = (dst_data & ~m_mask) | ((dst_data ^ src_data) & m_mask);
+						break;
+				}
+			}
+			else
+				dst_data = src_data;
+
+			writeword(dst_offset, dst_data);
+		}
+	}
+
+	m_rwp[m_rwp_dn] += dsd & 0x04 ? (DY + dd1_inc) : (-(DY + dd1_inc) * m_mwr[m_rwp_dn]);
+	m_rwp[m_rwp_dn] &= 0xfffff;
+}
+
+void h63484_device::command_line_exec()
+{
+	INT16 x = (INT16)m_pr[0];
+	INT16 y = (INT16)m_pr[1];
+
+	if (BIT(m_cr, 10))
+	{
+		x += m_cpx;
+		y += m_cpy;
+	}
+
+	draw_line(m_cpx, m_cpy, x, y);
+
+	m_cpx = x;
+	m_cpy = y;
 }
 
 void h63484_device::command_rct_exec()
 {
-	INT16 dX, dY;
-	UINT8 col; //, area, opm;
-	UINT32 offset;
-	int inc_x,inc_y;
-	int i;
-	UINT8 res,data_r;
+	INT16 dX = m_pr[0];
+	INT16 dY = m_pr[1];
 
-//  area = (m_cr & 0xe0) >> 5;
-	col = (m_cr & 0x18) >> 3;
-//  opm = (m_cr & 0x07);
-	dX = m_pr[0];
-	dY = m_pr[1];
-
-	offset = m_rwp[m_rwp_dn] & 0xfffff;
-
-	inc_x = (dX < 0) ? -1 : 1;
-	inc_y = (dY < 0) ? -1 : 1;
-
-	printf("%d %d\n",dX,dY);
+	if (BIT(m_cr, 10))  // relative (RRCT)
+	{
+		dX += m_cpx;
+		dY += m_cpy;
+	}
 
 	/*
 	3<-2
@@ -763,64 +1148,235 @@ void h63484_device::command_rct_exec()
 	*/
 
 	/* 0 -> 1 */
-	for(i=0;i<dX;i+=inc_x)
-	{
-		offset = (((i + m_cpx) >> 1) + (0 + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
-		data_r = readbyte(offset);
-
-		if((i + m_cpx) & 1)
-			res = (col & 0x0f) | (data_r & 0xf0);
-		else
-			res = (col & 0xf0) | (data_r & 0x0f);
-
-		writebyte(offset,res);
-	}
+	draw_line(m_cpx, m_cpy, dX, m_cpy);
 
 	/* 1 -> 2 */
-	for(i=0;i<dY;i+=inc_y)
-	{
-		offset = (((dX + m_cpx) >> 1) + (i + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
-		data_r = readbyte(offset);
-
-		if((dX + m_cpx) & 1)
-			res = (col & 0x0f) | (data_r & 0xf0);
-		else
-			res = (col & 0xf0) | (data_r & 0x0f);
-
-		writebyte(offset,res);
-	}
+	draw_line(dX, m_cpy, dX, dY);
 
 	/* 2 -> 3 */
-	for(i=0;i<dX;i+=inc_x)
-	{
-		offset = (((i + m_cpx) >> 1) + (dY + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
-		data_r = readbyte(offset);
-
-		if((i + m_cpx) & 1)
-			res = (col & 0x0f) | (data_r & 0xf0);
-		else
-			res = (col & 0xf0) | (data_r & 0x0f);
-
-		writebyte(offset,res);
-	}
+	draw_line(dX, dY, m_cpx, dY);
 
 	/* 3 -> 4 */
-	for(i=0;i<dY;i+=inc_y)
+	draw_line(m_cpx, dY, m_cpx, m_cpy);
+}
+
+void h63484_device::command_gcpy_exec()
+{
+	UINT8 dsd = (m_cr >> 8) & 0x07;
+	UINT8 s = BIT(m_cr, 11);
+	INT16 Xs = (INT16)m_pr[0];
+	INT16 Ys = (INT16)m_pr[1];
+	INT16 DX = (INT16)m_pr[s ? 3 : 2];
+	INT16 DY = (INT16)m_pr[s ? 2 : 3];
+
+	if (BIT(m_cr, 12))  // relative (RGCPY)
 	{
-		offset = (((0 + m_cpx) >> 1) + (i + m_cpy) * m_mwr[m_rwp_dn]) & 0xfffff; /* TODO: address if bpp != 4 */
-		data_r = readbyte(offset);
-
-		if((0 + m_cpx) & 1)
-			res = (col & 0x0f) | (data_r & 0xf0);
-		else
-			res = (col & 0xf0) | (data_r & 0x0f);
-
-		writebyte(offset,res);
+		Xs += m_cpx;
+		Ys += m_cpy;
 	}
 
+	int sd0_inc = (DX < 0) ? -1 : 1;
+	int sd1_inc = (DY < 0) ? -1 : 1;
+	int dd0_inc, dd1_inc;
+	if (dsd & 0x04)
+	{
+		dd0_inc = dsd & 0x01 ? -1 : +1;
+		dd1_inc = dsd & 0x02 ? -1 : +1;
+	}
+	else
+	{
+		dd0_inc = dsd & 0x02 ? -1 : +1;
+		dd1_inc = dsd & 0x01 ? -1 : +1;
+	}
 
-	m_cpx += dX;
-	m_cpy += dY;
+	for(INT16 sd1=0, dd1=0; sd1!=DY+sd1_inc; sd1+=sd1_inc, dd1+=dd1_inc)
+	{
+		for(INT16 sd0=0, dd0=0; sd0!=DX+sd0_inc; sd0+=sd0_inc, dd0+=dd0_inc)
+		{
+			UINT16 color;
+			if (s)
+				color = get_dot(Xs + sd1, Ys + sd0);
+			else
+				color = get_dot(Xs + sd0, Ys + sd1);
+
+			if (BIT(dsd, 2))
+				set_dot(m_cpx + dd1, m_cpy + dd0, color);
+			else
+				set_dot(m_cpx + dd0, m_cpy + dd1, color);
+		}
+	}
+
+	if (dsd & 0x04)
+		m_cpx += DY + dd1_inc;
+	else
+		m_cpy += DY + dd1_inc;
+
+}
+
+void h63484_device::command_frct_exec()
+{
+	INT16 X = (INT16)m_pr[0];
+	INT16 Y = (INT16)m_pr[1];
+
+	if (!BIT(m_cr, 10))
+	{
+		X -= m_cpx;
+		Y -= m_cpy;
+	}
+
+	int d0_inc = (X < 0) ? -1 : 1;
+	int d1_inc = (Y < 0) ? -1 : 1;
+
+	for(INT16 d1=0; d1!=Y+d1_inc; d1+=d1_inc)
+	{
+		for(INT16 d0=0; d0!=X+d0_inc; d0+=d0_inc)
+			set_dot(m_cpx + d0, m_cpy + d1, d0, d1);
+	}
+
+	m_cpy += (Y + d1_inc);
+}
+
+void h63484_device::command_ptn_exec()
+{
+	INT16 szx = ((m_pr[0] >> 0) & 0xff);
+	INT16 szy = ((m_pr[0] >> 8) & 0xff);
+	UINT8 sl_sd = (m_cr >> 8) & 0x0f;
+	INT16 px = 0;
+	INT16 py = 0;
+
+	for(INT16 d1=0; d1!=szy+1; d1++)
+	{
+		switch (sl_sd)
+		{
+			case 0x00: px = 0;    py = d1;   break;
+			case 0x01: px = -d1;  py = d1;   break;
+			case 0x02: py = 0;    px = -d1;  break;
+			case 0x03: px = -d1;  py = -d1;  break;
+			case 0x04: px = 0;    py = -d1;  break;
+			case 0x05: px = d1;   py = -d1;  break;
+			case 0x06: py = 0;    px = d1;   break;
+			case 0x07: px = d1;   py = d1;   break;
+			case 0x08: px = d1;   py = d1;   break;
+			case 0x09: px = 0;    py = d1;   break;
+			case 0x0a: px = -d1;  py = d1;   break;
+			case 0x0b: px = -d1;  py = 0;    break;
+			case 0x0c: px = -d1;  py = -d1;  break;
+			case 0x0d: px = 0;    py = -d1;  break;
+			case 0x0e: px = +d1;  py = -d1;  break;
+			case 0x0f: px = +d1;  py = 0;    break;
+		}
+
+		for(INT16 d0=0; d0!=szx+1; d0++)
+		{
+			set_dot(m_cpx + px, m_cpy + py, d0, d1);
+
+			switch (sl_sd)
+			{
+				case 0x00: px++;        break;
+				case 0x01: px++; py++;  break;
+				case 0x02: py++;        break;
+				case 0x03: px--; py++;  break;
+				case 0x04: px--;        break;
+				case 0x05: px--; py--;  break;
+				case 0x06: py--;        break;
+				case 0x07: px++; py--;  break;
+				case 0x08: px++;        break;
+				case 0x09: px++; py++;  break;
+				case 0x0a: py++;        break;
+				case 0x0b: px--; py++;  break;
+				case 0x0c: px--;        break;
+				case 0x0d: px--; py--;  break;
+				case 0x0e: py--;        break;
+				case 0x0f: px++; py--;  break;
+			}
+		}
+	}
+
+	switch (sl_sd)
+	{
+		case 0x00: m_cpy += (szy + 1); break;
+		case 0x01: m_cpx -= (szx + 1); m_cpy += (szy + 1); break;
+		case 0x02: m_cpx -= (szx + 1); break;
+		case 0x03: m_cpx -= (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x04: m_cpy -= (szy + 1); break;
+		case 0x05: m_cpx += (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x06: m_cpx += (szx + 1); break;
+		case 0x07: m_cpx += (szx + 1); m_cpy += (szy + 1); break;
+		case 0x08: m_cpx += (szx + 1); m_cpy += (szy + 1); break;
+		case 0x09: m_cpy += (szy + 1); break;
+		case 0x0a: m_cpx -= (szx + 1); m_cpy += (szy + 1); break;
+		case 0x0b: m_cpx -= (szx + 1); break;
+		case 0x0c: m_cpx -= (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x0d: m_cpy -= (szy + 1); break;
+		case 0x0e: m_cpx += (szx + 1); m_cpy -= (szy + 1); break;
+		case 0x0f: m_cpx += (szx + 1); break;
+	}
+}
+
+void h63484_device::command_plg_exec()
+{
+	int sx = m_cpx;
+	int sy = m_cpy;
+	int ex=0;
+	int ey=0;
+
+	for (int i = 0; i < m_dn; i++)
+	{
+		if (BIT(m_cr, 10))
+		{
+			ex = sx + (INT16)m_pr[1 + i * 2];
+			ey = sy + (INT16)m_pr[1 + i * 2 + 1];
+		}
+		else
+		{
+			ex = (INT16)m_pr[1 + i * 2];
+			ey = (INT16)m_pr[1 + i * 2 + 1];
+		}
+
+		draw_line(sx, sy, ex, ey);
+
+		sx = ex;
+		sy = ey;
+	}
+
+	if (m_cr & 0x2000)
+	{
+		// APLG/RPLG
+		draw_line(sx, sy, m_cpx, m_cpy);
+	}
+	else
+	{
+		// APLL/RPLL
+		m_cpx = ex;
+		m_cpy = ey;
+	}
+}
+
+void h63484_device::command_arc_exec()
+{
+	INT16 xc = (INT16)m_pr[0];
+	INT16 yc = (INT16)m_pr[1];
+	INT16 xe = (INT16)m_pr[2];
+	INT16 ye = (INT16)m_pr[3];
+
+	if (BIT(m_cr, 10))
+	{
+		xc += m_cpx;
+		yc += m_cpy;
+		xe += m_cpx;
+		ye += m_cpy;
+	}
+
+	double r = sqrt(pow(xc - m_cpx, 2) + pow(yc - m_cpy, 2));
+	double s_angol = atan2(m_cpy - yc, m_cpx - xc);
+	double e_angol = atan2(ye - yc, xe - xc);
+	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
+	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
+
+	draw_circle(xc, yc, r, s_angol, e_angol, BIT(m_cr, 8));
+
+	m_cpx = xe;
+	m_cpy = ye;
 }
 
 void h63484_device::process_fifo()
@@ -848,6 +1404,7 @@ void h63484_device::process_fifo()
 	switch (translate_command(m_cr))
 	{
 		case COMMAND_INVALID:
+			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
 			printf("H63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 			m_sr |= H63484_SR_CER; // command error
 			break;
@@ -855,10 +1412,11 @@ void h63484_device::process_fifo()
 		case COMMAND_ORG:
 			if (m_param_ptr == 2)
 			{
+				if (CMD_LOG)    logerror("HD63484 '%s': ORG 0x%04x, 0x%04x\n", tag(), m_pr[0], m_pr[1]);
 				m_org_dn = (m_pr[0] & 0xc000) >> 14;
 				m_org_dpa = ((m_pr[0] & 0xff) << 12) | ((m_pr[1] & 0xfff0) >> 4);
 				m_org_dpd = (m_pr[1] & 0xf);
-				// TODO: CP = 0
+				m_cpx = m_cpy = 0;
 				command_end_seq();
 			}
 			break;
@@ -866,7 +1424,19 @@ void h63484_device::process_fifo()
 		case COMMAND_WPR: // 0x0800 & ~0x1f
 			if (m_param_ptr == 1)
 			{
+				if (CMD_LOG)    logerror("HD63484 '%s': WPR (%d) 0x%04x\n", tag(), m_cr & 0x1f, m_pr[0]);
 				command_wpr_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_RPR:
+			if (m_param_ptr == 0)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': RPR (%d)\n", tag(), m_cr & 0x1f);
+				UINT16 data = command_rpr_exec();
+				queue_r((data >> 8) & 0xff);
+				queue_r((data >> 0) & 0xff);
 				command_end_seq();
 			}
 			break;
@@ -882,23 +1452,64 @@ void h63484_device::process_fifo()
 
 			if(m_param_ptr == (1 + m_dn))
 			{
+				if (CMD_LOG)    logerror("HD63484 '%s': WPTN (%d) %d", tag(), m_cr & 0x0f, m_pr[0]);
+
 				int pra = m_cr & 0xf;
-				int i;
-
-				for(i=0;i<m_dn;i++)
+				for(int i=0; i<m_dn; i++)
+				{
+					if (CMD_LOG)    logerror(", 0x%04x", m_pr[1 + i]);
 					m_pram[(i + pra) & 0xf] = m_pr[1 + i];
+				}
 
+				if (CMD_LOG)    logerror("\n");
 				command_end_seq();
 			}
+			break;
 
+		case COMMAND_RPTN:
+			if(m_param_ptr == 1)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': RPTN (%d) %d\n", tag(), m_cr & 0x0f, m_pr[0]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_RPTN!\n");
+			}
+			break;
+
+		case COMMAND_DRD:
+			if (m_param_ptr == 2)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), m_pr[0], m_pr[1]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_DRD!\n");
+			}
+			break;
+
+		case COMMAND_DWT:
+			if (m_param_ptr == 2)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), m_pr[0], m_pr[1]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_DWT!\n");
+			}
+			break;
+
+		case COMMAND_DMOD:
+			if (m_param_ptr == 2)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, m_pr[0], m_pr[1]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_DMOD!\n");
+			}
 			break;
 
 		case COMMAND_RD:
 			if (m_param_ptr == 0)
 			{
-				queue_r(readbyte((m_rwp[m_rwp_dn]+0) & 0xfffff));
-				queue_r(readbyte((m_rwp[m_rwp_dn]+1) & 0xfffff));
-				m_rwp[m_rwp_dn]+=2;
+				if (CMD_LOG)    logerror("HD63484 '%s': RD\n", tag());
+				UINT16 data = readword(m_rwp[m_rwp_dn]);
+				queue_r((data >> 8) & 0xff);
+				queue_r((data >> 0) & 0xff);
+				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
 				command_end_seq();
 			}
@@ -907,51 +1518,221 @@ void h63484_device::process_fifo()
 		case COMMAND_WT:
 			if (m_param_ptr == 1)
 			{
-				writebyte(((m_rwp[m_rwp_dn]+0) & 0xfffff),(m_pr[0] & 0xff00) >> 8);
-				writebyte(((m_rwp[m_rwp_dn]+1) & 0xfffff),(m_pr[0] & 0x00ff) >> 0);
-				m_rwp[m_rwp_dn]+=2;
+				if (CMD_LOG)    logerror("HD63484 '%s': WT 0x%04x\n", tag(), m_pr[0]);
+				writeword(m_rwp[m_rwp_dn], m_pr[0]);
+				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
 				command_end_seq();
 			}
+			break;
+
+		case COMMAND_MOD:
+			if(m_param_ptr == 1)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': MOD (%d) 0x%04x\n", tag(), m_cr & 0x03, m_pr[0]);
+				UINT16 d = m_pr[0];
+				UINT16 data = readword(m_rwp[m_rwp_dn]);
+				UINT16 res = 0;
+
+				switch(m_cr & 0x03)
+				{
+					case 0: // replace
+						res = (data & ~m_mask) | (d & m_mask);
+						break;
+					case 1: // OR
+						res = (data & ~m_mask) | ((data | d) & m_mask);
+						break;
+					case 2: // AND
+						res = (data & ~m_mask) | ((data & d) & m_mask);
+						break;
+					case 3: // EOR
+						res = (data & ~m_mask) | ((data ^ d) & m_mask);
+						break;
+				}
+
+				writeword(m_rwp[m_rwp_dn], res);
+				command_end_seq();
+			}
+			break;
 
 		case COMMAND_CLR:
+		case COMMAND_SCLR:
 			if (m_param_ptr == 3)
 			{
+				if (CMD_LOG)
+				{
+					if (BIT(m_cr, 10))
+						logerror("HD63484 '%s': SCLR (%d) 0x%04x,  %d, %d\n", tag(), m_cr & 0x03, m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
+					else
+						logerror("HD63484 '%s': CLR 0x%04x, %d, %d\n", tag(), m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2]);
+				}
+
 				command_clr_exec();
 				command_end_seq();
 			}
 			break;
 
 		case COMMAND_CPY:
+		case COMMAND_SCPY:
 			if (m_param_ptr == 4)
 			{
+				if (CMD_LOG)
+				{
+					if (BIT(m_cr, 12))
+						logerror("HD63484 '%s': SCPY (%d, %d, %d) 0x%x, 0x%x, %d, %d\n", tag(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_cr & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
+					else
+						logerror("HD63484 '%s': CPY (%d, %d) 0x%x, 0x%x, %d, %d\n", tag(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (INT16)m_pr[2], (INT16)m_pr[3]);
+				}
+
 				command_cpy_exec();
 				command_end_seq();
 			}
 			break;
 
 		case COMMAND_AMOVE:
+		case COMMAND_RMOVE:
 			if (m_param_ptr == 2)
 			{
-				m_cpx = m_pr[0];
-				m_cpy = m_pr[1];
+				if (CMD_LOG)    logerror("HD63484 '%s': %cMOVE %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (INT16)m_pr[0], (INT16)m_pr[1]);
+				if (BIT(m_cr, 10))
+				{
+					m_cpx += (INT16)m_pr[0];
+					m_cpy += (INT16)m_pr[1];
+				}
+				else
+				{
+					m_cpx = (INT16)m_pr[0];
+					m_cpy = (INT16)m_pr[1];
+				}
 				command_end_seq();
 			}
 			break;
 
 		case COMMAND_RRCT:
+		case COMMAND_ARCT:
 			if (m_param_ptr == 2)
 			{
+				if (CMD_LOG)    logerror("HD63484 '%s': %cRTC (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
 				command_rct_exec();
 				command_end_seq();
 			}
 			break;
 
-		case COMMAND_RMOVE:
+		case COMMAND_RLINE:
+		case COMMAND_ALINE:
 			if (m_param_ptr == 2)
 			{
-				m_cpx += (INT16)m_pr[0];
-				m_cpy += (INT16)m_pr[1];
+				if (CMD_LOG)    logerror("HD63484 '%s': %cLINE (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
+				command_line_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_APLG:
+		case COMMAND_RPLG:
+		case COMMAND_APLL:
+		case COMMAND_RPLL:
+			if(m_param_ptr == 1)
+				m_dn = m_pr[0]; // number of param words
+
+			if(m_param_ptr == (1 + m_dn*2))
+			{
+				if (CMD_LOG)
+				{
+					logerror("HD63484 '%s': %cPL%c (%d, %d, %d) %d", tag(), BIT(m_cr, 10) ? 'R' : 'A', m_cr & 0x2000 ? 'G' : 'L', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+					for (int i=0; i<m_dn; i++)
+						logerror(", %d, %d", (INT16)m_pr[1 + i * 2], (INT16)m_pr[1 + i * 2 + 1]);
+					logerror("\n");
+				}
+
+				command_plg_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_CRCL:
+			if(m_param_ptr == 1)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+				draw_circle(m_cpx, m_cpy, m_pr[0] & 0x1fff, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_ELPS:
+			if(m_param_ptr == 3)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_ELPS!\n");
+			}
+			break;
+
+		case COMMAND_AARC:
+		case COMMAND_RARC:
+			if(m_param_ptr == 4)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': %cARC (%d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
+				command_arc_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_AEARC:
+		case COMMAND_REARC:
+			if(m_param_ptr == 6)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': %cEARC (%d, %d, %d, %d) %d, %d, %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2], m_pr[3], m_pr[4], m_pr[5]);
+				command_end_seq();
+				fatalerror("HD63484 COMMAND_AEARC!\n");
+			}
+			break;
+
+		case COMMAND_AFRCT:
+		case COMMAND_RFRCT:
+			if (m_param_ptr == 2)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': %cFRCT (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1]);
+
+				command_frct_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_PAINT:
+			if (m_param_ptr == 0)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': PAINT (%d, %d, %d, %d)\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
+				paint(m_cpx, m_cpy);
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_DOT:
+			if (m_param_ptr == 0)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': DOT (%d, %d, %d)\n", tag(), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
+				set_dot(m_cpx, m_cpy, 0, 0);
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_PTN:
+			if (m_param_ptr == 1)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': PTN (%d, %d, %d, %d, %d) 0x%04x\n", tag(), (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
+				command_ptn_exec();
+				command_end_seq();
+			}
+			break;
+
+		case COMMAND_RGCPY:
+		case COMMAND_AGCPY:
+			if (m_param_ptr == 4)
+			{
+				if (CMD_LOG)    logerror("HD63484 '%s': %cGCPY (%d, %d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 12) ? 'R' : 'A', (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (INT16)m_pr[0], (INT16)m_pr[1], (INT16)m_pr[2], (INT16)m_pr[3]);
+
+				command_gcpy_exec();
 				command_end_seq();
 			}
 			break;
@@ -1024,8 +1805,13 @@ void h63484_device::video_registers_w(int offset)
 			m_ccr = vreg_data;
 			break;
 
+		case 0x04:
+			m_omr = vreg_data;
+			break;
+
 		case 0x06:
 			m_dcr = vreg_data;
+			recompute_parameters();
 			break;
 
 		case 0x82: // Horizontal Sync Register
@@ -1035,12 +1821,12 @@ void h63484_device::video_registers_w(int offset)
 			break;
 		case 0x84: // Horizontal Display Register
 			m_hds = ((vreg_data & 0xff00) >> 8) + 1;
-			m_hdw = ((vreg_data & 0x00ff) >> 8) + 1;
+			m_hdw = ((vreg_data & 0x00ff) >> 0) + 1;
 			recompute_parameters();
 			break;
 		case 0x92: // Horizontal Window Register
 			m_hws = ((vreg_data & 0xff00) >> 8) + 1;
-			m_hww = ((vreg_data & 0x00ff) >> 8) + 1;
+			m_hww = ((vreg_data & 0x00ff) >> 0) + 1;
 			recompute_parameters();
 			break;
 
@@ -1051,6 +1837,18 @@ void h63484_device::video_registers_w(int offset)
 		case 0x88: // Vertical Display Register
 			m_vds = ((vreg_data & 0xff00) >> 8) + 1;
 			m_vsw = (vreg_data & 0x1f);
+			recompute_parameters();
+			break;
+		case 0x8a:  // Split Screen Width 1
+			m_sp[1] = vreg_data & 0x0fff;
+			recompute_parameters();
+			break;
+		case 0x8c:  // Split Screen Width 0
+			m_sp[0] = vreg_data & 0x0fff;
+			recompute_parameters();
+			break;
+		case 0x8e:  // Split Screen Width 2
+			m_sp[2] = vreg_data & 0x0fff;
 			recompute_parameters();
 			break;
 		case 0x94: // Vertical Window Register A
@@ -1143,7 +1941,6 @@ WRITE16_MEMBER( h63484_device::data_w )
 void h63484_device::device_start()
 {
 	//h63484->space = device->memory().space(AS_0);
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 1 << 20);
 }
 
 //-------------------------------------------------
@@ -1152,35 +1949,96 @@ void h63484_device::device_start()
 
 void h63484_device::device_reset()
 {
-	// ...
+	m_sr = H63484_SR_CED | H63484_SR_WFR | H63484_SR_WFE;
+	m_ccr = m_omr = m_edg = m_dcr = m_hsw = 0;
+	m_hc = m_hds = m_hdw = m_hws = m_hww = 0;
+	m_vc = m_vws = m_vww = m_vds = m_vsw = 0;
+	m_sp[0] = m_sp[1] = m_sp[2] = 0;
+	m_ppx = m_ppy = 0;
+	m_cl0 = m_cl1 = 0;
+	m_xmin = m_ymin = m_xmax = m_ymax = 0;
+	m_ppx = m_pzcx = m_psx = m_pzx = m_pex = 0;
+	m_ppy = m_pzcy=  m_psy = m_pzy = m_pey = 0;
+	m_ar = m_cr = 0;
+	m_param_ptr = 0;
+	m_rwp_dn = 0;
+	m_org_dpa = 0;
+	m_org_dn = 0;
+	m_org_dpd = 0;
+	m_ccmp = 0;
+	m_mask = -1;
+	m_cpx = m_cpy = 0;
+	m_dn = 0;
+
+	memset(m_vreg, 0, sizeof(m_vreg));
+	memset(m_fifo, 0, sizeof(m_fifo));
+	memset(m_fifo_r, 0, sizeof(m_fifo_r));
+	memset(m_pr, 0, sizeof(m_pr));
+	memset(m_rwp, 0, sizeof(m_rwp));
+	memset(m_mwr, 0, sizeof(m_mwr));
+	memset(m_mwr_chr, 0, sizeof(m_mwr_chr));
+	memset(m_sar, 0, sizeof(m_sar));
+	memset(m_sda, 0, sizeof(m_sda));
+	memset(m_pram, 0, sizeof(m_pram));
 }
 
 //-------------------------------------------------
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int layer_n)
+void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window)
 {
-	int x;
-	int pitch;
-	int base_offs;
+	int bpp = get_bpp();
+	int ppw = 16 / bpp;
+	UINT32 mask = (1 << bpp) - 1;
+	UINT32 base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n];
+	UINT32 wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3];
+	int step = (m_omr & 0x08) ? 2 : 1;
+	int gai = 1 << ((m_omr>>4) & 0x07);   // TODO: GAI > 3
+	int hs = m_hsw + m_hds;
+	int ws = m_hsw + m_hws;
+	int wsa = ws;
 
-	pitch = m_mwr[layer_n];
-	base_offs = m_sar[layer_n];
-
-	for(x=0;x<pitch * 4;x+=4)
+	if (m_omr & 0x08)
 	{
-		UINT16 data;
+		/*
+		    According to the datasheet, in interleaved and superimposed modes:
+		    - HDW and HWW must be even
+		    - the relation between HDS and HWS must be even/even or odd/odd
+		*/
 
-		data = readbyte(base_offs + (x >> 1) + y * pitch * 2);
+		if (m_hww & 1)
+		{
+			wsa++;
+			ws += step;
+		}
+	}
 
-		m_display_cb(this, bitmap, y, x+3, (data >> 4) & 0xf);
-		m_display_cb(this, bitmap, y, x+2, data & 0xf);
+	for(int mc=hs; mc<m_hc; mc+=step)
+	{
+		int sx = mc * gai * ppw / step;
+		for(int g=0; g<gai; g++)
+		{
+			UINT16 data = 0;
+			if (ins_window && mc >= ws && mc < ws + m_hww)
+				data = readword(wind_offs + (mc - wsa) * gai / step + g);
+			else if (active)
+				data = readword(base_offs + (mc - hs) * gai / step + g);
 
-		data = readbyte(base_offs + ((x + 2) >> 1) + y * pitch * 2);
+			for (int b=0; b<ppw; b++)
+			{
+				int x = sx + g * ppw + b;
+				if (cliprect.contains(x, y))
+				{
+					if (m_display_cb)
+						m_display_cb(this, bitmap, y, x, data & mask);
+					else
+						bitmap.pix16(y, x) = data & mask;
+				}
 
-		m_display_cb(this, bitmap, y, x+1, (data >> 4) & 0xf);
-		m_display_cb(this, bitmap, y, x+0, data & 0xf);
+				data >>= bpp;
+			}
+		}
 	}
 }
 
@@ -1190,14 +2048,22 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 
 UINT32 h63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if(m_dcr & 0x8000) // correct?
-	{
-		int y;
+	int l0 = m_vds + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+	int l1 = l0 + m_sp[1];
+	int l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
 
-		for(y=cliprect.min_y;y<cliprect.max_y;y++)
+	if(m_omr & 0x4000)
+	{
+		for(int y=m_vds; y<m_vc; y++)
 		{
-			if (m_display_cb)
-				draw_graphics_line(bitmap,cliprect, y, 1);
+			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
+
+			if (BIT(m_dcr, 13) && y >= m_vds && y < l0)
+				draw_graphics_line(bitmap, cliprect, m_vds, y, 0, BIT(m_dcr, 12), ins_window);
+			else if (y >= l0 && y < l1)
+				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
+			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
+				draw_graphics_line(bitmap, cliprect, l1, y, 2, BIT(m_dcr, 10), ins_window);
 		}
 	}
 	return 0;
