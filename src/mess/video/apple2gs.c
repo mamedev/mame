@@ -24,14 +24,15 @@ VIDEO_START_MEMBER(apple2gs_state,apple2gs)
 
 
 
-UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 *vram;
-	UINT16 *scanline;
+	UINT32 *scanline;
 	UINT8 scb, b;
 	int col, palette;
-	UINT16 last_pixel = 0, pixel;
+	UINT32 last_pixel = 0, pixel;
 	int beamy;
+	UINT16 *a2pixel;
 
 	beamy = cliprect.min_y;
 
@@ -46,10 +47,10 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 				return 0;
 			}
 
-			scanline = &bitmap.pix16(beamy);
+			scanline = &bitmap.pix32(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
-				scanline[col] = m_bordercolor;
+				scanline[col] = m_a2_palette[m_bordercolor];
 			}
 		}
 		else    // regular screen area
@@ -57,16 +58,16 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 			int shrline = beamy - BORDER_TOP;
 
 			scb = m_slowmem[0x19D00 + shrline];
-			palette = ((scb & 0x0f) << 4) + 16;
+			palette = ((scb & 0x0f) << 4);
 
 			vram = &m_slowmem[0x12000 + (shrline * 160)];
-			scanline = &bitmap.pix16(beamy);
+			scanline = &bitmap.pix32(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT; col++)
 			{
-				scanline[col] = m_bordercolor;
-				scanline[col+BORDER_LEFT+640] = m_bordercolor;
+				scanline[col] = m_a2_palette[m_bordercolor];
+				scanline[col+BORDER_LEFT+640] = m_a2_palette[m_bordercolor];
 			}
 
 			if (scb & 0x80) // 640 mode
@@ -74,10 +75,10 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 				for (col = 0; col < 160; col++)
 				{
 					b = vram[col];
-					scanline[col * 4 + 0 + BORDER_LEFT] = palette +  0 + ((b >> 6) & 0x03);
-					scanline[col * 4 + 1 + BORDER_LEFT] = palette +  4 + ((b >> 4) & 0x03);
-					scanline[col * 4 + 2 + BORDER_LEFT] = palette +  8 + ((b >> 2) & 0x03);
-					scanline[col * 4 + 3 + BORDER_LEFT] = palette + 12 + ((b >> 0) & 0x03);
+					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[palette +  0 + ((b >> 6) & 0x03)];
+					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[palette +  4 + ((b >> 4) & 0x03)];
+					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[palette +  8 + ((b >> 2) & 0x03)];
+					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[palette + 12 + ((b >> 0) & 0x03)];
 				}
 			}
 			else        // 320 mode
@@ -92,8 +93,8 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 					else
 						last_pixel = pixel;
 					pixel += palette;
-					scanline[col * 4 + 0 + BORDER_LEFT] = pixel;
-					scanline[col * 4 + 1 + BORDER_LEFT] = pixel;
+					scanline[col * 4 + 0 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 4 + 1 + BORDER_LEFT] = m_shr_palette[pixel];
 
 					b = vram[col];
 					pixel = (b >> 0) & 0x0f;
@@ -103,8 +104,8 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 					else
 						last_pixel = pixel;
 					pixel += palette;
-					scanline[col * 4 + 2 + BORDER_LEFT] = pixel;
-					scanline[col * 4 + 3 + BORDER_LEFT] = pixel;
+					scanline[col * 4 + 2 + BORDER_LEFT] = m_shr_palette[pixel];
+					scanline[col * 4 + 3 + BORDER_LEFT] = m_shr_palette[pixel];
 				}
 			}
 		}
@@ -135,24 +136,28 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 				return 0;
 			}
 
-			scanline = &bitmap.pix16(beamy);
+			scanline = &bitmap.pix32(beamy);
 			for (col = 0; col < BORDER_LEFT+BORDER_RIGHT+640; col++)
 			{
-				scanline[col] = m_bordercolor;
+				scanline[col] = m_a2_palette[m_bordercolor];
 			}
 		}
 		else
 		{
-			scanline = &bitmap.pix16(beamy);
+			scanline = &bitmap.pix32(beamy);
 
 			// draw left and right borders
 			for (col = 0; col < BORDER_LEFT + 40; col++)
 			{
-				scanline[col] = m_bordercolor;
-				scanline[col+BORDER_LEFT+600] = m_bordercolor;
+				scanline[col] = m_a2_palette[m_bordercolor];
+				scanline[col+BORDER_LEFT+600] = m_a2_palette[m_bordercolor];
 			}
 
-			memcpy(scanline + 40 + BORDER_LEFT, &m_legacy_gfx->pix16(beamy-(BORDER_TOP+4)), 560 * sizeof(UINT16));
+			a2pixel = &m_legacy_gfx->pix16(beamy-(BORDER_TOP+4));
+			for (int x = 0; x < 560; x++)
+			{
+				scanline[40 + BORDER_LEFT + x] = m_a2_palette[*a2pixel++];
+			}
 		}
 	}
 	return 0;

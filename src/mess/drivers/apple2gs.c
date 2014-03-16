@@ -151,6 +151,8 @@ PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 			apple2gs_palette[(3*i)]*17,
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
+
+		m_a2_palette[i] = rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17);
 	}
 }
 
@@ -343,10 +345,9 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SCREEN_SIZE(704, 262)  // 640+32+32 for the borders
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update_apple2gs)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 16+256 )
-	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs )
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
