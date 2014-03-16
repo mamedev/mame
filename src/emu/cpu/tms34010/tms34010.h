@@ -214,8 +214,8 @@ public:
 	UINT32 tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	DECLARE_WRITE16_HANDLER( io_register_w );
-	DECLARE_READ16_HANDLER( io_register_r );
+	DECLARE_WRITE16_MEMBER( io_register_w );
+	DECLARE_READ16_MEMBER( io_register_r );
 	
 	void  host_w(int reg, int data);
 	int   host_r(int reg);	
@@ -228,8 +228,8 @@ class tms34020_device : public tms34010_device
 public:
 	tms34020_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	DECLARE_WRITE16_HANDLER( io_register_w );
-	DECLARE_READ16_HANDLER( io_register_r );
+	DECLARE_WRITE16_MEMBER( io_register_w );
+	DECLARE_READ16_MEMBER( io_register_r );
 };
 
 extern const device_type TMS34020;
