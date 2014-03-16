@@ -50,8 +50,6 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_READ8_MEMBER( fk5_r );
 	DECLARE_WRITE8_MEMBER( fk5_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 protected:
 	// device-level overrides

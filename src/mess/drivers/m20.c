@@ -112,7 +112,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void fdc_intrq_w(bool state);
 	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
 
@@ -813,7 +812,6 @@ IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 
 void m20_state::machine_start()
 {
-	m_fd1797->setup_intrq_cb(fd1797_t::line_cb(FUNC(m20_state::fdc_intrq_w), this));
 
 	install_memory();
 }
@@ -865,11 +863,6 @@ static I8255A_INTERFACE( ppi_interface )
 WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 {
 	m_i8259->ir4_w(state);
-}
-
-void m20_state::fdc_intrq_w(bool state)
-{
-	m_i8259->ir0_w(state);
 }
 
 static unsigned char kbxlat[] =
@@ -945,6 +938,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	/* Devices */
 	MCFG_FD1797x_ADD("fd1797", 1000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))	
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */

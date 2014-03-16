@@ -125,8 +125,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	UINT8 read_io(offs_t offset);
 	void write_io(offs_t offset, UINT8 data);

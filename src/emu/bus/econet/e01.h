@@ -65,8 +65,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
-	void fdc_irq_w(bool state);
-	void fdc_drq_w(bool state);
 
 protected:
 	// device-level overrides

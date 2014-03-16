@@ -225,8 +225,7 @@ public:
 	DECLARE_READ8_MEMBER( ikbd_port4_r );
 	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 

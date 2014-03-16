@@ -489,14 +489,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-void xerox820_state::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-void xerox820_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
@@ -579,10 +579,6 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 void xerox820_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_keydata));
 	save_item(NAME(m_scroll));
@@ -706,6 +702,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
 	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
 
@@ -765,6 +763,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 

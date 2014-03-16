@@ -1060,17 +1060,7 @@ static SLOT_INTERFACE_START( bullet_35_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-void bullet_state::fdc_intrq_w(bool state)
-{
-	m_dart->dcda_w(state);
-}
-
-void bulletf_state::fdc_intrq_w(bool state)
-{
-	m_dart->rib_w(state);
-}
-
-void bullet_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( bullet_state::fdc_drq_w )
 {
 	m_fdrdy = !state;
 	update_dma_rdy();
@@ -1125,10 +1115,6 @@ static const z80_daisy_config daisy_chain[] =
 
 void bullet_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_segst));
 	save_item(NAME(m_brom));
@@ -1153,10 +1139,6 @@ void bullet_state::machine_start()
 
 void bulletf_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_fdrdy));
 	save_item(NAME(m_rome));
@@ -1244,6 +1226,8 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
@@ -1295,6 +1279,8 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)

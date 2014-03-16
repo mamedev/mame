@@ -105,8 +105,6 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
 

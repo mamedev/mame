@@ -101,8 +101,6 @@ public:
 	DECLARE_WRITE8_MEMBER( palette_w );
 	DECLARE_WRITE16_MEMBER( video_w );
 	DECLARE_WRITE8_MEMBER( lat_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 	void lat_ls259_w(offs_t offset, int state);
 

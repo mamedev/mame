@@ -49,8 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(common_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
-	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
 	DECLARE_MACHINE_START(kayproii);
@@ -90,8 +90,6 @@ private:
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;

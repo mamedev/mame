@@ -45,6 +45,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( mc1502_fdc )
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, mc1502_fdc_device, mc1502_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -144,7 +146,7 @@ UINT8 mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-void mc1502_fdc_device::mc1502_fdc_irq_drq(bool state)
+WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -217,8 +219,6 @@ void mc1502_fdc_device::device_start()
         WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
     m_isa->install_device(0x0100, 0x010b, 0, 0, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 */
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));
-	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));
 	motor_on = 0;

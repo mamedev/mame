@@ -1869,12 +1869,7 @@ WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 	m_mfp->clock_w(state);
 }
 
-void st_state::fdc_intrq_w(bool state)
-{
-	m_mfp->i5_w(!state);
-}
-
-void st_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
 		fdc_dma_transfer();
@@ -1997,9 +1992,6 @@ void st_state::machine_start()
 		else
 			floppy_devices[i] = 0;
 	}
-
-	m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_drq_w), this));
-	m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_intrq_w), this));
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -2140,6 +2132,8 @@ static MACHINE_CONFIG_START( st, st_state )
 	// devices
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2225,6 +2219,8 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2317,6 +2313,8 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	// devices
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2424,6 +2422,8 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 

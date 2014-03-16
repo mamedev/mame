@@ -141,8 +141,6 @@ public:
 private:
 	UINT8 m_term_data;
 	UINT8 m_term_status;
-	bool m_fdc_irq;                     /* interrupt request */
-	bool m_fdc_drq;                     /* data request */
 	int m_c8[8];
 	floppy_image_device *m_floppy;
 	virtual void machine_start();
@@ -364,7 +362,7 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 
 	bool dma_rdy = 0;
 	if ((data & 7) == 2)
-		dma_rdy = m_fdc_drq;
+		dma_rdy = m_fdc->drq_r();
 
 	m_dma->rdy_w(dma_rdy);
 }
@@ -516,16 +514,6 @@ static SLOT_INTERFACE_START( bigbord2_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void bigbord2_state::fdc_intrq_w(bool state)
-{
-	m_fdc_irq = state;
-}
-
-void bigbord2_state::fdc_drq_w(bool state)
-{
-	m_fdc_drq = state;
-}
-
 
 /* Video */
 
@@ -544,8 +532,6 @@ void bigbord2_state::machine_start()
 {
 	/* register for state saving */
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_fdc_irq));
-	save_item(NAME(m_fdc_drq));
 }
 
 void bigbord2_state::machine_reset()
@@ -568,8 +554,6 @@ DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 	m_bankr->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 	m_bankv->configure_entries(0, 2, &RAM[0x6000], 0x10000);
 	m_banka->configure_entries(0, 2, &RAM[0x7000], 0x10000);
-	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_drq_w), this));
 }
 
 

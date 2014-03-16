@@ -69,8 +69,8 @@ public:
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	void bankswitch();
 

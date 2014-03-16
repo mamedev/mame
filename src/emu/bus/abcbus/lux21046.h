@@ -79,8 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

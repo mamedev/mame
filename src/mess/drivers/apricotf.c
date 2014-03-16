@@ -158,8 +158,6 @@ WRITE8_MEMBER( f1_state::system_w )
 
 void f1_state::machine_start()
 {
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_drq_w), this));
 }
 
 
@@ -295,15 +293,6 @@ static Z80CTC_INTERFACE( ctc_intf )
 //  floppy
 //-------------------------------------------------
 
-void f1_state::wd2797_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);}
-
-void f1_state::wd2797_drq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_TEST, state);
-}
-
 static SLOT_INTERFACE_START( apricotf_floppies )
 	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
 	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
@@ -349,6 +338,9 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 
 	// floppy
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

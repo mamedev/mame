@@ -166,8 +166,6 @@ private:
 	size_t m_size;
 	UINT8 m_clock_pulse;
 	UINT8 m_mbee256_key_available;
-	UINT8 m_fdc_intrq;
-	UINT8 m_fdc_drq;
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;
@@ -226,8 +224,6 @@ public:
 
 	void machine_reset_common_disk();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 };
 
 

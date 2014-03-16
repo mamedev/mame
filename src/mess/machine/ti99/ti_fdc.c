@@ -72,14 +72,14 @@ void ti_fdc_device::operate_ready_line()
 /*
  * Callbacks from the FD1771 chip
  */
-void ti_fdc_device::irq_w(bool state)
+WRITE_LINE_MEMBER( ti_fdc_device::fdc_irq_w )
 {
 	m_IRQ = state? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_SIGNALS) logerror("tifdc: INTRQ callback = %d\n", m_IRQ);
 	operate_ready_line();
 }
 
-void ti_fdc_device::drq_w(bool state)
+WRITE_LINE_MEMBER( ti_fdc_device::fdc_drq_w )
 {
 	m_DRQ = state? ASSERT_LINE : CLEAR_LINE;
 	if (TRACE_SIGNALS) logerror("tifdc: DRQ callback = %d\n", m_DRQ);
@@ -344,8 +344,6 @@ void ti_fdc_device::device_start()
 	m_dsrrom = memregion(DSRROM)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
-	m_fd1771->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(ti_fdc_device::irq_w), this));
-	m_fd1771->setup_drq_cb(wd_fdc_t::line_cb(FUNC(ti_fdc_device::drq_w), this));
 	// In case we implement a callback after all:
 	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(FUNC(ti_fdc_device::dvena_r), this));
 }
@@ -406,6 +404,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( ti_fdc )
 	MCFG_FD1771x_ADD(FDC_TAG, XTAL_1MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, ti_fdc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, ti_fdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("2", tifdc_floppies, NULL, ti_fdc_device::floppy_formats)

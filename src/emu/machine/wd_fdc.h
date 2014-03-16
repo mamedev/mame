@@ -111,20 +111,31 @@
 #define MCFG_WD_FDC_FORCE_READY \
 	downcast<wd_fdc_t *>(device)->set_force_ready(true);
 
+#define MCFG_WD_FDC_INTRQ_CALLBACK(_write) \
+	devcb = &wd_fdc_t::set_intrq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_WD_FDC_DRQ_CALLBACK(_write) \
+	devcb = &wd_fdc_t::set_drq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_WD_FDC_HLD_CALLBACK(_write) \
+	devcb = &wd_fdc_t::set_hld_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_WD_FDC_ENP_CALLBACK(_write) \
+	devcb = &wd_fdc_t::set_enp_wr_callback(*device, DEVCB2_##_write);
+
 class wd_fdc_t : public device_t {
 public:
-	typedef delegate<void (bool state)> line_cb;
-
 	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hld_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).hld_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_enp_wr_callback(device_t &device, _Object object) { return downcast<wd_fdc_t &>(device).enp_cb.set_callback(object); }
 
 	void soft_reset();
 
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
-	void setup_intrq_cb(line_cb cb);
-	void setup_drq_cb(line_cb cb);
-	void setup_hld_cb(line_cb cb);
-	void setup_enp_cb(line_cb cb);
 	void set_force_ready(bool force_ready);
 
 	void cmd_w(UINT8 val);
@@ -352,7 +363,8 @@ private:
 	int cmd_buffer, track_buffer, sector_buffer;
 
 	live_info cur_live, checkpoint_live;
-	line_cb intrq_cb, drq_cb, hld_cb, enp_cb;
+
+	devcb2_write_line intrq_cb, drq_cb, hld_cb, enp_cb;
 
 	UINT8 format_last_byte;
 	int format_last_byte_count;

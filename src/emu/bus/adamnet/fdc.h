@@ -47,8 +47,6 @@ public:
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
-	void fdc_intrq_w(bool state);
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

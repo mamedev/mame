@@ -262,8 +262,7 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-void kaypro_state::fdc_intrq_w (bool state)
-//WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
+WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
 {
 	if (state)
 		timer_set(attotime::zero, TIMER_FLOPPY);
@@ -271,8 +270,7 @@ void kaypro_state::fdc_intrq_w (bool state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void kaypro_state::fdc_drq_w (bool state)
-//WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
+WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
 {
 	if (state)
 		timer_set(attotime::zero, TIMER_FLOPPY);

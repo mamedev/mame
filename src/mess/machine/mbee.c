@@ -100,23 +100,12 @@ const z80pio_interface mbee_z80pio_intf =
 
 *************************************************************************************/
 
-void mbee_state::fdc_intrq_w (bool state)
-{
-	m_fdc_intrq = state ? 0x80 : 0;
-}
-
-void mbee_state::fdc_drq_w (bool state)
-{
-	m_fdc_drq = state ? 0x80 : 0;
-}
-
-
 READ8_MEMBER( mbee_state::mbee_fdc_status_r )
 {
 /*  d7 indicate if IRQ or DRQ is occuring (1=happening)
     d6..d0 not used */
 
-	return 0x7f | m_fdc_intrq | m_fdc_drq;
+	return 0x7f | ((m_fdc->intrq_r() || m_fdc->drq_r()) ? 0x80 : 0);
 }
 
 WRITE8_MEMBER( mbee_state::mbee_fdc_motor_w )
@@ -682,8 +671,6 @@ DRIVER_INIT_MEMBER(mbee_state,mbee56)
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_boot->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 	m_size = 0xe000;
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee64)
@@ -699,8 +686,6 @@ DRIVER_INIT_MEMBER(mbee_state,mbee64)
 	m_boot->configure_entry(1, &RAM[0x0000]);
 
 	m_size = 0xf000;
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee128)
@@ -721,8 +706,6 @@ DRIVER_INIT_MEMBER(mbee_state,mbee128)
 	m_bank8h->configure_entry(0, &RAM[0x0800]); // rom
 
 	m_size = 0x8000;
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbee256)
@@ -746,8 +729,6 @@ DRIVER_INIT_MEMBER(mbee_state,mbee256)
 	timer_set(attotime::from_hz(25), TIMER_MBEE256_KBD);   /* timer for kbd */
 
 	m_size = 0x8000;
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(mbee_state::fdc_drq_w), this));
 }
 
 DRIVER_INIT_MEMBER(mbee_state,mbeett)

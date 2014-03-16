@@ -94,8 +94,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pit_out0_w );
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// keyboard state

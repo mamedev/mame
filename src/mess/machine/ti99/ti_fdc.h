@@ -36,8 +36,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void irq_w(bool state);
-	void drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	// bool dvena_r();
 
 protected:

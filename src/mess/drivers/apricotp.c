@@ -498,17 +498,6 @@ static LEGACY_FLOPPY_OPTIONS_START( act )
 LEGACY_FLOPPY_OPTIONS_END
 */
 
-void fp_state::fdc_intrq_w(bool state)
-{
-	m_pic->ir1_w(state);
-}
-
-void fp_state::fdc_drq_w(bool state)
-{
-	m_dmac->dreq1_w(state);
-}
-
-
 WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
@@ -540,10 +529,6 @@ WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
 
 void fp_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_drq_w), this));
-
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fp_state::fp_irq_callback),this));
 
@@ -625,6 +610,9 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
 

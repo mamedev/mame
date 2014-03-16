@@ -190,14 +190,14 @@ static SLOT_INTERFACE_START( e01_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // NEC FD1036 A
 SLOT_INTERFACE_END
 
-void e01_device::fdc_irq_w(bool state)
+WRITE_LINE_MEMBER( e01_device::fdc_irq_w )
 {
 	m_fdc_irq = state;
 
 	update_interrupts();
 }
 
-void e01_device::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( e01_device::fdc_drq_w ) 
 {
 	m_fdc_drq = state;
 
@@ -265,6 +265,8 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, e01_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, e01_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
 
@@ -431,10 +433,6 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 
 void e01_device::device_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(e01_device::fdc_irq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(e01_device::fdc_drq_w), this));
-
 	// allocate timers
 	m_clk_timer = timer_alloc();
 

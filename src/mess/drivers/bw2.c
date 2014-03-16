@@ -532,12 +532,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-void bw2_state::fdc_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void bw2_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 {
 	if (state)
 	{
@@ -580,10 +575,6 @@ PALETTE_INIT_MEMBER(bw2_state, bw2)
 
 void bw2_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bw2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bw2_state::fdc_drq_w), this));
-
 	// register for state saving
 	save_item(NAME(m_kb));
 	save_item(NAME(m_bank));
@@ -646,6 +637,9 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bw2_state, fdc_drq_w))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, NULL,   bw2_state::floppy_formats)
 	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL_16MHz, bw2_expansion_cards, NULL)

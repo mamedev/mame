@@ -704,16 +704,6 @@ static SLOT_INTERFACE_START( trs80m2_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
 SLOT_INTERFACE_END
 
-void trs80m2_state::fdc_intrq_w(bool state)
-{
-	m_pio->port_a_write(state);
-}
-
-void trs80m2_state::fdc_drq_w(bool state)
-{
-	m_dmac->rdy_w(state);
-}
-
 
 //-------------------------------------------------
 //  z80_daisy_config trs80m2_daisy_chain
@@ -750,10 +740,6 @@ IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
 
 void trs80m2_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_drq_w), this));
-
 	// register for state saving
 	save_item(NAME(m_boot_rom));
 	save_item(NAME(m_bank));
@@ -834,6 +820,13 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
@@ -845,13 +838,8 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
@@ -894,6 +882,13 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
@@ -905,13 +900,8 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
 

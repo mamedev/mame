@@ -72,8 +72,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	DECLARE_DRIVER_INIT(mirage);
 	virtual void video_start();
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -91,16 +89,6 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
-
-void mirage_state::fdc_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-void mirage_state::fdc_drq_w(bool state)
-{
-	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
-}
 
 static void mirage_doc_irq(device_t *device, int state)
 {
@@ -234,6 +222,9 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, firq_line))
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
+
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", mirage_state::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -254,8 +245,6 @@ DRIVER_INIT_MEMBER(mirage_state,mirage)
 	if (floppy)
 	{
 		m_fdc->set_floppy(floppy);
-		m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), this));
-		m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_drq_w), this));
 
 		floppy->ss_w(0);
 	}

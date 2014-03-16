@@ -234,6 +234,8 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )  /* start at 300 baud */
 
 	MCFG_FD1793x_ADD("fdc", XTAL_20MHz / 20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kayproii_floppy_formats)
@@ -288,6 +290,8 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )
 	MCFG_Z80SIO_ADD( "z80sio_2x", 4800, kaypro_sio_intf )   /* extra sio for modem and printer */
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(kaypro_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(kaypro_state, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
 	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", kaypro_floppies, "525dd", kaypro_state::kaypro2x_floppy_formats)
@@ -302,9 +306,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 {
-	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(kaypro_state::fdc_drq_w), this));
-
 	UINT8 *main = memregion("roms")->base();
 	UINT8 *ram = memregion("rambank")->base();
 

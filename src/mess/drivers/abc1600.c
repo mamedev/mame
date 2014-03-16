@@ -812,12 +812,7 @@ static SLOT_INTERFACE_START( abc1600_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-void abc1600_state::fdc_intrq_w(bool state)
-{
-	m_cio->pb7_w(state);
-}
-
-void abc1600_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( abc1600_state::fdc_drq_w )
 {
 	update_drdy0();
 }
@@ -874,10 +869,6 @@ void abc1600_state::machine_start()
 {
 	// interrupt callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(abc1600_state::abc1600_int_ack),this));
-
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_drq_w), this));
 
 	// state saving
 	save_item(NAME(m_dmadis));
@@ -947,6 +938,9 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_FD1797x_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))
+	
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)

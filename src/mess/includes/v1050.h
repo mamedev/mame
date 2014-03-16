@@ -115,8 +115,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kb_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_txrdy_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_READ8_MEMBER( attr_r );
 	DECLARE_WRITE8_MEMBER( attr_w );
 	DECLARE_READ8_MEMBER( videoram_r );

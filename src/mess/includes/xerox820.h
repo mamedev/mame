@@ -92,11 +92,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	void bankswitch(int bank);
 	void update_nmi();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 	/* keyboard state */
 	int m_keydata;                      /* keyboard data */

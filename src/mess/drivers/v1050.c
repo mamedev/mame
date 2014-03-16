@@ -999,14 +999,14 @@ static SLOT_INTERFACE_START( v1050_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD 55-FV-35-U
 SLOT_INTERFACE_END
 
-void v1050_state::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 
 	update_fdc();
 }
 
-void v1050_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
@@ -1040,10 +1040,6 @@ IRQ_CALLBACK_MEMBER(v1050_state::v1050_int_ack)
 void v1050_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(v1050_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(v1050_state::fdc_drq_w), this));
 
 	// initialize I8214
 	m_pic->etlg_w(1);
@@ -1164,6 +1160,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v1050_state, write_sio_clock))
 
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(v1050_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(v1050_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)

@@ -178,7 +178,7 @@ I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 	DEVCB_DRIVER_MEMBER(b2m_state,b2m_8255_portc_w)
 };
 
-void b2m_state::b2m_fdc_drq(bool state)
+WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 {
 	/* Clears HALT state of CPU when data is ready to read */
 	if (state)
@@ -305,8 +305,6 @@ void b2m_state::machine_start()
 {
 	m_pic = machine().device<pic8259_device>("pic8259");
 	m_fdc = machine().device<fd1793_t>("fd1793");
-
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(b2m_state::b2m_fdc_drq), this));
 
 	/* register for state saving */
 	save_item(NAME(m_b2m_8255_porta));

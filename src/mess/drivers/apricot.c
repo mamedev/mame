@@ -82,8 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER( i8255_portc_w );
 	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
 	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
-	void wd2793_intrq_w(bool state);
-	void wd2793_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( wd2793_intrq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
@@ -238,15 +237,10 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 //  FLOPPY
 //**************************************************************************
 
-void apricot_state::wd2793_intrq_w(bool state)
+WRITE_LINE_MEMBER( apricot_state::wd2793_intrq_w )
 {
 	m_pic->ir4_w(state);
 	m_iop->ext1_w(state);
-}
-
-void apricot_state::wd2793_drq_w(bool state)
-{
-	m_iop->drq1_w(state);
 }
 
 static SLOT_INTERFACE_START( apricot_floppies )
@@ -333,10 +327,6 @@ void apricot_state::machine_start()
 
 	// setup interrupt acknowledge callback for the main cpu
 	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
-
-	// setup floppy disk controller callbacks
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_drq_w), this));
 
 	// motor on is connected to gnd
 	m_floppy0->get_device()->mon_w(0);
@@ -446,6 +436,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	// floppy
 	MCFG_WD2793x_ADD("ic68", XTAL_4MHz / 2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(apricot_state, wd2793_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

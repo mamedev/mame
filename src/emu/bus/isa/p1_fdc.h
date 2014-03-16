@@ -38,6 +38,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_READ8_MEMBER(p1_fdc_r);
 	DECLARE_WRITE8_MEMBER(p1_fdc_w);
+	DECLARE_WRITE_LINE_MEMBER( p1_fdc_irq_drq );
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -50,8 +51,6 @@ public:
 	void p1_wd17xx_aux_w(int data);
 	UINT8 p1_wd17xx_aux_r();
 	UINT8 p1_wd17xx_motor_r();
-	void p1_fdc_irq_drq(bool state);
-
 };
 
 
