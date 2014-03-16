@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")             // bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gx_workram")
-	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE_LEGACY(K054000_lsb_r,K054000_lsb_w)
+	AM_RANGE(0x660000, 0x6600ff) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
@@ -1172,6 +1172,8 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, gaiapols_k053252_intf) // 6 MHz?
+	
+	MCFG_K054000_ADD("k054000")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gaiapols)
 
