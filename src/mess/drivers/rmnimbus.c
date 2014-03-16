@@ -75,7 +75,7 @@ static const ay8910_interface nimbus_ay8910_interface =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(nimbus_msm5205_vck), /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

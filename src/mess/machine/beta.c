@@ -72,31 +72,27 @@ void beta_disk_device::clear_status()
 	m_betadisk_status = 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER(wd179x_intrq_w)
+WRITE_LINE_MEMBER(beta_disk_device::wd179x_intrq_w)
 {
-	beta_disk_device *beta = dynamic_cast<beta_disk_device *>(device->owner());
-	
 	if (state)
-		beta->m_betadisk_status |= (1<<7);
+		m_betadisk_status |= (1<<7);
 	else
-		beta->m_betadisk_status &=~(1<<7);
+		m_betadisk_status &=~(1<<7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER(wd179x_drq_w)
+WRITE_LINE_MEMBER(beta_disk_device::wd179x_drq_w)
 {
-	beta_disk_device *beta = dynamic_cast<beta_disk_device *>(device->owner());
-	
 	if (state)
-		beta->m_betadisk_status |= (1<<6);
+		m_betadisk_status |= (1<<6);
 	else
-		beta->m_betadisk_status &=~(1<<6);
+		m_betadisk_status &=~(1<<6);
 }
 
 static const wd17xx_interface beta_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(wd179x_intrq_w),
-	DEVCB_LINE(wd179x_drq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, beta_disk_device, wd179x_intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, beta_disk_device, wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 

@@ -44,6 +44,9 @@ public:
 
 		void set_intrq(UINT8 val) { m_intrq = val; }
 		void set_drq(UINT8 val) { m_drq = val; }
+		
+		DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+		DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 protected:
 		// device-level overrides
 		virtual void device_start();

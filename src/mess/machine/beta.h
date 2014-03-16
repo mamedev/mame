@@ -31,6 +31,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sector_w);
 	DECLARE_WRITE8_MEMBER(data_w);
 	
+	DECLARE_WRITE_LINE_MEMBER(wd179x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(wd179x_drq_w);
+	
 	int is_active();
 	void enable();
 	void disable();

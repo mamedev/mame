@@ -2765,11 +2765,10 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 	}
 }
 
-void nimbus_msm5205_vck(device_t *device, int st)
+WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 {
-	rmnimbus_state *state = device->machine().driver_data<rmnimbus_state>();
-	if(state->m_iou_reg092 & MSM5205_INT_ENABLE)
-		state->external_int(0,EXTERNAL_INT_MSM5205);
+	if(m_iou_reg092 & MSM5205_INT_ENABLE)
+		external_int(0,EXTERNAL_INT_MSM5205);
 }
 
 static const int MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };

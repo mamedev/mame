@@ -130,11 +130,10 @@ coco_rtc_type_t coco_fdc_device::real_time_clock()
     fdc_intrq_w - callback from the FDC
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
+WRITE_LINE_MEMBER( coco_fdc_device::fdc_intrq_w )
 {
-	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
-	fdc->set_intrq(state);
-	fdc->update_lines();
+	set_intrq(state);
+	update_lines();
 }
 
 
@@ -142,11 +141,10 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
     fdc_drq_w - callback from the FDC
 -------------------------------------------------*/
 
-static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+WRITE_LINE_MEMBER( coco_fdc_device::fdc_drq_w )
 {
-	coco_fdc_device *fdc = dynamic_cast<coco_fdc_device *>(device->owner());
-	fdc->set_drq(state);
-	fdc->update_lines();
+	set_drq(state);
+	update_lines();
 }
 
 
@@ -157,8 +155,8 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static const wd17xx_interface coco_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(fdc_intrq_w),
-	DEVCB_LINE(fdc_drq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_fdc_device, fdc_intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_fdc_device, fdc_drq_w),
 	{FLOPPY_0,FLOPPY_1,FLOPPY_2,FLOPPY_3}
 };
 

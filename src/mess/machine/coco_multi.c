@@ -82,29 +82,29 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
-WRITE_LINE_DEVICE_HANDLER(multi_cart_w)
+WRITE_LINE_MEMBER(coco_multipak_device::multi_cart_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
-	cart->m_cart_callback.writeline(device,state);
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
+	cart->m_cart_callback.writeline(this,state);
 }
 
-WRITE_LINE_DEVICE_HANDLER(multi_nmi_w)
+WRITE_LINE_MEMBER(coco_multipak_device::multi_nmi_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
-	cart->m_nmi_callback.writeline(device,state);
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
+	cart->m_nmi_callback.writeline(this,state);
 }
 
-WRITE_LINE_DEVICE_HANDLER(multi_halt_w)
+WRITE_LINE_MEMBER(coco_multipak_device::multi_halt_w)
 {
-	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(device->owner()->owner());
-	cart->m_halt_callback.writeline(device,state);
+	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
+	cart->m_halt_callback.writeline(this,state);
 }
 
 static const cococart_interface multi_cococart_interface =
 {
-	DEVCB_LINE(multi_cart_w),
-	DEVCB_LINE(multi_nmi_w),
-	DEVCB_LINE(multi_halt_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_cart_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_nmi_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, coco_multipak_device, multi_halt_w)
 };
 
 static MACHINE_CONFIG_FRAGMENT(coco_multi)

@@ -33,18 +33,17 @@ static const floppy_interface bml3_mp1802_floppy_interface =
 	NULL
 };
 
-static WRITE_LINE_DEVICE_HANDLER( bml3_wd17xx_intrq_w )
+WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
 {
-	bml3bus_mp1802_device *fdc = dynamic_cast<bml3bus_mp1802_device *>(device->owner());
 	if (state) {
-		fdc->m_bml3bus->set_nmi_line(PULSE_LINE);
+		m_bml3bus->set_nmi_line(PULSE_LINE);
 	}
 }
 
 const wd17xx_interface bml3_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(bml3_wd17xx_intrq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, bml3bus_mp1802_device, bml3_wd17xx_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1}
 };

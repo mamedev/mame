@@ -35,6 +35,9 @@ public:
 
 	virtual UINT8* get_cart_base();
 
+	DECLARE_WRITE_LINE_MEMBER(multi_cart_w);
+	DECLARE_WRITE_LINE_MEMBER(multi_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(multi_halt_w);
 protected:
 	// device-level overrides
 	virtual void device_start();

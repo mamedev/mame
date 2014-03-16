@@ -33,7 +33,7 @@ public:
 
 	DECLARE_READ8_MEMBER(bml3_mp1802_r);
 	DECLARE_WRITE8_MEMBER(bml3_mp1802_w);
-
+	DECLARE_WRITE_LINE_MEMBER(bml3_wd17xx_intrq_w);
 protected:
 	virtual void device_start();
 	virtual void device_reset();
