@@ -24,9 +24,8 @@
 static VIDEO_START( pc_aga );
 static PALETTE_INIT( pc_aga );
 static MC6845_UPDATE_ROW( aga_update_row );
-static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed );
-static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed );
 static VIDEO_START( pc200 );
+static MC6845_END_UPDATE( aga_end_update );
 
 
 static MC6845_INTERFACE( mc6845_aga_intf )
@@ -36,11 +35,11 @@ static MC6845_INTERFACE( mc6845_aga_intf )
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	aga_update_row,     /* update_row */
-	NULL,               /* end_update */
+	aga_end_update,     /* end_update */
 	DEVCB_NULL,         /* on_de_chaged */
 	DEVCB_NULL,         /* on_cur_chaged */
-	DEVCB_LINE(aga_hsync_changed),  /* on_hsync_changed */
-	DEVCB_LINE(aga_vsync_changed),  /* on_vsync_changed */
+	DEVCB_NULL,  /* on_hsync_changed */
+	DEVCB_NULL,  /* on_vsync_changed */
 	NULL
 };
 
@@ -60,8 +59,6 @@ static struct {
 
 	mc6845_update_row_func  update_row;
 	UINT8   cga_palette_lut_2bpp[4];
-	UINT8   vsync;
-	UINT8   hsync;
 
 	UINT8  *videoram;
 	
@@ -104,17 +101,8 @@ static MC6845_UPDATE_ROW( aga_update_row ) {
 	}
 }
 
-
-static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed ) {
-	aga.hsync = state ? 1 : 0;
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
-	aga.vsync = state ? 8 : 0;
-	if ( state ) {
-		aga.pc_framecnt++;
-	}
+static MC6845_END_UPDATE( aga_end_update ) {
+	aga.pc_framecnt++;
 }
 
 
@@ -565,7 +553,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 			data = mc6845->register_r( space, offset);
 			break;
 		case 10:
-			data = aga.vsync | ( ( data & 0x40 ) >> 4 ) | aga.hsync;
+			data = (mc6845->vsync_r() ? 8 : 0) | ( ( data & 0x40 ) >> 4 ) | mc6845->hsync_r();
 			break;
 		}
 	}

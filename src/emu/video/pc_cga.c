@@ -173,8 +173,7 @@ INPUT_PORTS_END
 static DECLARE_READ8_HANDLER( pc_cga8_r );
 static DECLARE_WRITE8_HANDLER( pc_cga8_w );
 static MC6845_UPDATE_ROW( cga_update_row );
-static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed );
-static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed );
+static MC6845_END_UPDATE( cga_end_update );
 static VIDEO_START( pc1512 );
 static SCREEN_UPDATE_RGB32( mc6845_pc1512 );
 
@@ -189,11 +188,11 @@ static MC6845_INTERFACE( mc6845_cga_intf )
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */
 	cga_update_row,                 /* update_row */
-	NULL,                           /* end_update */
+	cga_end_update,                 /* end_update */
 	DEVCB_NULL,                     /* on_de_changed */
 	DEVCB_NULL,                     /* on_cur_changed */
-	DEVCB_LINE(cga_hsync_changed),  /* on_hsync_changed */
-	DEVCB_LINE(cga_vsync_changed),  /* on_vsync_changed */
+	DEVCB_NULL,  /* on_hsync_changed */
+	DEVCB_NULL,  /* on_vsync_changed */
 	NULL
 };
 
@@ -269,8 +268,6 @@ static struct
 
 	mc6845_update_row_func  update_row;
 	UINT8   palette_lut_2bpp[4];
-	UINT8   vsync;
-	UINT8   hsync;
 	UINT8   p3df;
 
 	size_t  videoram_size;
@@ -929,22 +926,10 @@ static MC6845_UPDATE_ROW( cga_update_row )
 	}
 }
 
-// bit 0 is actually display enable (vblank OR hblank enabled)
-static WRITE_LINE_DEVICE_HANDLER( cga_hsync_changed )
+static MC6845_END_UPDATE( cga_end_update )
 {
-	cga.hsync = state ? 1 : 0;
+	cga.frame++;
 }
-
-
-static WRITE_LINE_DEVICE_HANDLER( cga_vsync_changed )
-{
-	cga.vsync = state ? 9 : 0;
-	if ( state )
-	{
-		cga.frame++;
-	}
-}
-
 
 static void pc_cga_set_palette_luts(void)
 {
@@ -1174,7 +1159,8 @@ static READ8_HANDLER( pc_cga8_r )
 			data = mc6845->register_r( space, offset );
 			break;
 		case 10:
-			data = cga.vsync | ( ( data & 0x40 ) >> 4 ) | cga.hsync;
+			// bit 0 is actually display enable (vblank OR hblank enabled)
+			data = (mc6845->vsync_r() ? 9 : 0) | ( ( data & 0x40 ) >> 4 ) | mc6845->hsync_r();
 			break;
 		case 0x0f:
 			data = cga.p3df;

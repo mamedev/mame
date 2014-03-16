@@ -167,9 +167,6 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 
 #define DEVCB_NULL                              { DEVCB_TYPE_NULL }
 
-// legacy calls, to be removed
-#define DEVCB_LINE(func)                        { DEVCB_TYPE_DEVICE, 0, "", #func, func, NULL, NULL }
-
 // line or read/write handlers for the driver device
 #define DEVCB_DRIVER_LINE_MEMBER(cls,memb)      { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DRIVER_MEMBER(cls,memb)           { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
