@@ -564,15 +564,16 @@ static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-static WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)
+WRITE_LINE_MEMBER( thomson_state::fdc_index_w )
 {
-	device->machine().driver_data<thomson_state>()->thomson_index_callback(device, state);
+  device_t *device = machine().device<wd2793_device>("wd2793");
+  thomson_index_callback(device, state);
 }
 
 
 static const floppy_interface thomson_floppy_interface =
 {
-	DEVCB_LINE(thomson_index_callback),
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
