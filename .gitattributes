@@ -3917,6 +3917,7 @@ src/mame/drivers/amaticmg.c svneol=native#text/plain
 src/mame/drivers/ambush.c svneol=native#text/plain
 src/mame/drivers/ampoker2.c svneol=native#text/plain
 src/mame/drivers/amspdwy.c svneol=native#text/plain
+src/mame/drivers/amusco.c svneol=native#text/plain
 src/mame/drivers/angelkds.c svneol=native#text/plain
 src/mame/drivers/appoooh.c svneol=native#text/plain
 src/mame/drivers/aquarium.c svneol=native#text/plain

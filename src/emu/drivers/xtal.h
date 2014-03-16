@@ -128,7 +128,7 @@ enum
 	XTAL_14_31818MHz    = 14318181,     /* Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	XTAL_14_705882MHz   = 14705882,     /* Aleck64 */
 	XTAL_14_7456MHz     = 14745600,     /* Namco System 12 & System Super 22/23 for H8/3002 CPU */
-	XTAL_15MHz          = 15000000,     /* Sinclair QL */
+	XTAL_15MHz          = 15000000,     /* Sinclair QL, Amusco Poker */
 	XTAL_15_36MHz       = 15360000,     /* Visual 1050 */
 	XTAL_15_468MHz      = 15468480,     /* Bank Panic h/w, Sega G80 */
 	XTAL_15_8976MHz     = 15897600,     /* IAI Swyft */
@@ -138,7 +138,7 @@ enum
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
 	XTAL_17_73447MHz    = 17734470,     /* (~4x PAL subcarrier) */
 	XTAL_17_734472MHz   = 17734472,     /* actually ~4x PAL subcarrier */
-	XTAL_17_9712MHz		= 17971200,
+	XTAL_17_9712MHz	    = 17971200,
 	XTAL_18MHz          = 18000000,     /* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz      = 18432000,     /* Extremely common, used on 100's of PCBs (48000 * 384) */
 	XTAL_18_720MHz      = 18720000,     /* Nokia MikroMikko 1 */
@@ -153,7 +153,7 @@ enum
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	XTAL_22MHz          = 22000000,
-	XTAL_22_1184MHz     = 22118400,
+	XTAL_22_1184MHz     = 22118400,     /* Amusco Poker */
 	XTAL_23_9616MHz     = 23961600,     /* Osborne 4 (Vixen) */
 	XTAL_24MHz          = 24000000,     /* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_0734MHz     = 24073400,     /* DEC Rainbow 100 */

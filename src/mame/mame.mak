@@ -2047,6 +2047,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
+	$(DRIVERS)/amusco.o \
 	$(DRIVERS)/arachnid.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/astrafr.o \
