@@ -119,7 +119,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<palette_device> m_palette;
-	required_device<tms34010_device> m_dsp;
+	optional_device<tms34010_device> m_dsp;
 };
 
 
