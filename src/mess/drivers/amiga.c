@@ -97,9 +97,6 @@ public:
 
 
 
-static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
-static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
-static DECLARE_WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)
@@ -513,8 +510,8 @@ static const legacy_mos6526_interface cia_0_ntsc_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -525,8 +522,8 @@ static const legacy_mos6526_interface cia_0_pal_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -549,8 +546,8 @@ static const legacy_mos6526_interface cia_0_cdtv_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_cdtv_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_cdtv_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -573,8 +570,8 @@ static const tpi6525_interface cdtv_tpi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portb_w),
-	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portc_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portb_w),
+	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portc_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1035,7 +1032,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
+READ8_MEMBER( amiga_state::amiga_cia_0_portA_r )
 {
 	UINT8 ret = space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;   /* Gameport 1 and 0 buttons */
 	ret |= space.machine().device<amiga_fdc>("fdc")->ciaapra_r();
@@ -1043,28 +1040,27 @@ static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 }
 
 
-static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
+READ8_MEMBER( amiga_state::amiga_cia_0_cdtv_portA_r )
 {
 	return space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;    /* Gameport 1 and 0 buttons */
 }
 
 
-static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
+WRITE8_MEMBER( amiga_state::amiga_cia_0_portA_w )
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
-	state->m_bank1->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
-		UINT32 mirror_mask = state->m_chip_ram.bytes();
+		UINT32 mirror_mask = m_chip_ram.bytes();
 
 		while( (mirror_mask<<1) < 0x100000 ) {
 			mirror_mask |= ( mirror_mask << 1 );
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		state->m_maincpu_program_space->install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
+		m_maincpu_program_space->install_write_bank(0x000000, m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
 		if (space.machine().root_device().memregion("user2")->base() != NULL)
@@ -1072,7 +1068,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		state->m_maincpu_program_space->unmap_write(0x000000, state->m_chip_ram.bytes() - 1);
+		m_maincpu_program_space->unmap_write(0x000000, m_chip_ram.bytes() - 1);
 
 	set_led_status( space.machine(), 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);

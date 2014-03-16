@@ -497,6 +497,9 @@ public:
 	TIMER_CALLBACK_MEMBER(finish_serial_write);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
+	DECLARE_READ8_MEMBER( amiga_cia_0_portA_r );
+	DECLARE_READ8_MEMBER( amiga_cia_0_cdtv_portA_r );
+	DECLARE_WRITE8_MEMBER( amiga_cia_0_portA_w );
 	
 	DECLARE_READ16_MEMBER( amiga_clock_r );
 	DECLARE_WRITE16_MEMBER( amiga_clock_w );
@@ -520,6 +523,9 @@ public:
 	DECLARE_READ16_MEMBER( amiga_ar23_mode_r );
 	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
 	void amiga_ar23_init( running_machine &machine, int ar3 );
+
+	DECLARE_READ8_MEMBER( amigacd_tpi6525_portc_r );
+	DECLARE_WRITE8_MEMBER( amigacd_tpi6525_portb_w );
 
 	int m_centronics_busy;
 	int m_centronics_perror;

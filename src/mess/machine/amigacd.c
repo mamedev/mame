@@ -428,7 +428,7 @@ static const amiga_autoconfig_device dmac_device =
 
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
+READ8_MEMBER( amiga_state::amigacd_tpi6525_portc_r )
 {
 	int ret = 0;
 
@@ -445,7 +445,7 @@ READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 	return ret;
 }
 
-WRITE8_DEVICE_HANDLER( amigacd_tpi6525_portb_w )
+WRITE8_MEMBER( amiga_state::amigacd_tpi6525_portb_w )
 {
 	tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
 
