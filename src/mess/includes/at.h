@@ -22,7 +22,6 @@
 #include "bus/pci/i82439tx.h"
 #include "machine/cs8221.h"
 #include "machine/pit8253.h"
-#include "video/pc_cga.h"
 
 #include "machine/idectrl.h"
 #include "machine/at_keybc.h"
