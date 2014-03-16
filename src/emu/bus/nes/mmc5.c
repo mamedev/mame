@@ -82,9 +82,7 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_split_yst));
 	save_item(NAME(m_split_bank));
 	save_item(NAME(m_vcount));
-
-	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x400);
-	save_pointer(NAME(m_exram), 0x400);
+	save_item(NAME(m_exram));
 }
 
 void nes_exrom_device::pcb_reset()
@@ -153,12 +151,12 @@ void nes_exrom_device::prgram_bank8_x(int start, int bank)
 {
 	assert(start < 4);
 	assert(bank >= 0);
-	assert(m_prgram_size + m_battery_size);
+	assert(m_prgram.count() + m_battery.count());
 
 	// currently we use 4x8k BWRAM + 4x8k WRAM banks, independently from the actual PRG-RAM size
 	// mirroring of the actual size is taken care of at bank setup (even if no known commercial game relies on it!)
-	//bank &= (m_prgram_size / 0x2000) - 1;
-	if (!m_prgram_size || !m_battery_size)
+	//bank &= (m_prgram.count() / 0x2000) - 1;
+	if (!m_prgram.count() || !m_battery.count())
 		bank &= 3;
 
 	// PRG RAM is mapped after PRG ROM
@@ -638,14 +636,14 @@ READ8_MEMBER(nes_exrom_device::read_m)
 	if (m_battery && m_prgram)  // 2 chips present: first is BWRAM, second is WRAM
 	{
 		if (m_wram_base & 0x04)
-			return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram_size - 1)];
+			return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)];
 		else
-			return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery_size - 1)];
+			return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.count() - 1)];
 	}
 	else if (m_prgram)  // 1 chip, WRAM
-		return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram_size - 1)];
+		return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)];
 	else if (m_battery) // 1 chip, BWRAM
-		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery_size - 1)];
+		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.count() - 1)];
 	else
 		return m_open_bus;
 }
@@ -656,9 +654,9 @@ WRITE8_MEMBER(nes_exrom_device::write_m)
 		return;
 
 	if (m_battery && m_wram_base < 4)
-		m_battery[(offset + m_wram_base * 0x2000) & (m_battery_size - 1)] = data;
+		m_battery[(offset + m_wram_base * 0x2000) & (m_battery.count() - 1)] = data;
 	else if (m_prgram)
-		m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram_size - 1)] = data;
+		m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)] = data;
 }
 
 // some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
@@ -671,7 +669,7 @@ WRITE8_MEMBER(nes_exrom_device::write_h)
 
 	bank = m_prg_bank[bank] - m_prg_chunks;
 	if (m_battery && m_prg_bank[bank] < m_prg_chunks + 4)
-		m_battery[((bank * 0x2000) + (offset & 0x1fff)) & (m_battery_size - 1)] = data;
+		m_battery[((bank * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)] = data;
 	else if (m_prgram)
-		m_prgram[(((bank & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram_size - 1)] = data;
+		m_prgram[(((bank & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)] = data;
 }

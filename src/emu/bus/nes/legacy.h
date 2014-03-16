@@ -47,9 +47,9 @@ protected:
 	emu_timer *irq_timer;
 
 	UINT8 m_latch;
-	UINT8 *m_exram;
 	int m_exram_enabled;
 	int m_exram_bank;
+	UINT8 m_exram[0x8000];
 };
 
 

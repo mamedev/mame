@@ -168,7 +168,7 @@ public:
 	void reset_irq(UINT8 source);
 	void update_volume_ramps();
 
-	UINT8* m_wave_ram;
+	dynamic_buffer m_wave_ram;
 
 protected:
 	// device-level overrides

@@ -102,7 +102,7 @@ private:
 	int command_status;
 
 	// data buffer
-	UINT8 *sector_buffer;
+	dynamic_buffer sector_buffer;
 	UINT8 *data_buffer;
 	int data_length;
 	int data_index;

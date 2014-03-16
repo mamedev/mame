@@ -274,8 +274,7 @@ void omti8621_device::device_start()
 
 	m_installed = false;
 
-	sector_buffer = auto_alloc_array(machine(), UINT8, OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
-	assert(sector_buffer != NULL);
+	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
 	m_timer = timer_alloc(0, NULL);
 

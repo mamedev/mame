@@ -445,13 +445,13 @@ void nes_fjump2_device::set_prg()
 READ8_MEMBER(nes_fjump2_device::read_m)
 {
 	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
-	return m_battery[offset & (m_battery_size - 1)];
+	return m_battery[offset & (m_battery.count() - 1)];
 }
 
 WRITE8_MEMBER(nes_fjump2_device::write_m)
 {
 	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
-	m_battery[offset & (m_battery_size - 1)] = data;
+	m_battery[offset & (m_battery.count() - 1)] = data;
 }
 
 WRITE8_MEMBER(nes_fjump2_device::write_h)

@@ -759,7 +759,7 @@ WRITE8_MEMBER(nes_asn_device::write_h)
 READ8_MEMBER(nes_asn_device::read_m)
 {
 	LOG_MMC(("Ai Senshi Nicol read_m, offset: %04x\n", offset));
-	return m_prg[((m_latch * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[((m_latch * 0x2000) + (offset & 0x1fff)) & (m_prg.count() - 1)];
 }
 
 
@@ -923,7 +923,7 @@ WRITE8_MEMBER(nes_whirl2706_device::write_h)
 READ8_MEMBER(nes_whirl2706_device::read_m)
 {
 	LOG_MMC(("whirl2706 read_m, offset: %04x\n", offset));
-	return m_prg[(m_latch * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[(m_latch * 0x2000 + (offset & 0x1fff)) & (m_prg.count() - 1)];
 }
 
 /*-------------------------------------------------
@@ -1060,7 +1060,7 @@ WRITE8_MEMBER(nes_smb2ja_device::write_h)
 READ8_MEMBER(nes_smb2ja_device::read_m)
 {
 	LOG_MMC(("smb2ja read_m, offset: %04x\n", offset));
-	return m_prg[(0xfe * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[(0xfe * 0x2000 + (offset & 0x1fff)) & (m_prg.count() - 1)];
 }
 
 /*-------------------------------------------------
@@ -1118,7 +1118,7 @@ WRITE8_MEMBER(nes_smb2jb_device::write_l)
 READ8_MEMBER(nes_smb2jb_device::read_m)
 {
 	LOG_MMC(("smb2jb read_m, offset: %04x\n", offset));
-	return m_prg[((0x0f * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[((0x0f * 0x2000) + (offset & 0x1fff)) & (m_prg.count() - 1)];
 }
 
 /* This goes to 0x4020-0x403f & 0x40a0-0x40bf */

@@ -201,8 +201,8 @@ void nes_cart_slot_device::call_load_unif()
 	bool mapr_chunk_found = FALSE, small_prg = FALSE;
 
 	// allocate space to temporarily store PRG & CHR banks
-	UINT8 *temp_prg = auto_alloc_array(machine(), UINT8, 256 * 0x4000);
-	UINT8 *temp_chr = auto_alloc_array(machine(), UINT8, 256 * 0x2000);
+	dynamic_buffer temp_prg(256 * 0x4000);
+	dynamic_buffer temp_chr(256 * 0x2000);
 	UINT8 temp_byte = 0;
 
 	fseek(4, SEEK_SET);
@@ -407,15 +407,11 @@ void nes_cart_slot_device::call_load_unif()
 
 	if (!mapr_chunk_found)
 	{
-		auto_free(machine(), temp_prg);
-		auto_free(machine(), temp_chr);
 		fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted\n");
 	}
 
 	if (!prg_start)
 	{
-		auto_free(machine(), temp_prg);
-		auto_free(machine(), temp_chr);
 		fatalerror("No PRG found. Please report the problem at MESS Board.\n");
 	}
 
@@ -470,13 +466,13 @@ void nes_cart_slot_device::call_load_unif()
 	// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
 	if (prg_size == 0x4000)
 	{
-		m_cart->prg_alloc(machine(), 0x8000);
+		m_cart->prg_alloc(0x8000);
 		memcpy(m_cart->get_prg_base(), temp_prg, 0x4000);
 		memcpy(m_cart->get_prg_base() + 0x4000, m_cart->get_prg_base(), 0x4000);
 	}
 	else
 	{
-		m_cart->prg_alloc(machine(), prg_size);
+		m_cart->prg_alloc(prg_size);
 		memcpy(m_cart->get_prg_base(), temp_prg, prg_size);
 	}
 
@@ -485,7 +481,7 @@ void nes_cart_slot_device::call_load_unif()
 
 	if (vrom_size)
 	{
-		m_cart->vrom_alloc(machine(), vrom_size);
+		m_cart->vrom_alloc(vrom_size);
 		memcpy(m_cart->get_vrom_base(), temp_chr, vrom_size);
 	}
 
@@ -522,33 +518,26 @@ void nes_cart_slot_device::call_load_unif()
 		fclose(chrout);
 	}
 #endif
-	// free the temporary copy of PRG/CHR
-	auto_free(machine(), temp_prg);
-	auto_free(machine(), temp_chr);
-
 	// SETUP steps 7: allocate the remaining pointer, when needed
 	if (vram_size)
-		m_cart->vram_alloc(machine(), vram_size);
+		m_cart->vram_alloc(vram_size);
 	if (prgram_size)
-		m_cart->prgram_alloc(machine(), prgram_size);
+		m_cart->prgram_alloc(prgram_size);
 
 	// Attempt to load a battery file for this ROM
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+		dynamic_buffer temp_nvram(tot_size);
 		battery_load(temp_nvram, tot_size, 0x00);
 		if (battery_size)
 		{
-			m_cart->battery_alloc(machine(), battery_size);
+			m_cart->battery_alloc(battery_size);
 			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
 		}
 		if (mapper_sram_size)
 			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, mapper_sram_size);
-
-		if (temp_nvram)
-			auto_free(machine(), temp_nvram);
 	}
 
 	logerror("UNIF support is only very preliminary.\n");

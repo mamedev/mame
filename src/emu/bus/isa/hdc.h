@@ -57,7 +57,7 @@ private:
 		emu_timer *timer;
 
 		int data_cnt;                /* data count */
-		UINT8 *buffer;                  /* data buffer */
+		dynamic_buffer buffer;                  /* data buffer */
 		UINT8 *buffer_ptr;          /* data pointer */
 		UINT8 hdc_control;
 

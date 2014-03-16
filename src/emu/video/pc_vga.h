@@ -79,7 +79,7 @@ protected:
 			int crtc_regcount;
 		} svga_intf;
 
-		UINT8 *memory;
+		dynamic_buffer memory;
 		UINT32 pens[16]; /* the current 16 pens */
 
 		UINT8 miscellaneous_output;

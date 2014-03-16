@@ -104,21 +104,9 @@ const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
 
 device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconfig, device_t &device)
 						: device_slot_card_interface(mconfig, device),
-						m_prg(NULL),
-						m_prgram(NULL),
-						m_vrom(NULL),
-						m_vram(NULL),
-						m_battery(NULL),
 						m_ciram(NULL),
-						m_prg_size(0),
-						m_prgram_size(0),
-						m_vrom_size(0),
-						m_vram_size(0),
-						m_battery_size(0),
 						m_mapper_sram(NULL),
-						m_ext_ntram(NULL),
 						m_mapper_sram_size(0),
-						m_ext_ntram_size(0),
 						m_ce_mask(0),
 						m_ce_state(0),
 						m_vrc_ls_prg_a(0),
@@ -135,8 +123,7 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 						m_prg_mask(0xffff),
 						m_chr_source(CHRRAM),
 						m_vrom_chunks(0),
-						m_vram_chunks(0),
-						m_prg_bank_map(NULL)
+						m_vram_chunks(0)
 {
 }
 
@@ -153,12 +140,11 @@ device_nes_cart_interface::~device_nes_cart_interface()
 //  pointer allocators
 //-------------------------------------------------
 
-void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
+void device_nes_cart_interface::prg_alloc(size_t size)
 {
 	if (m_prg == NULL)
 	{
-		m_prg = auto_alloc_array_clear(machine, UINT8, size);
-		m_prg_size = size;
+		m_prg.resize(size);
 		m_prg_chunks = size / 0x4000;
 		if (size % 0x2000)
 		{
@@ -191,7 +177,7 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 			mapsize = (1 << mask_bits)/2;
 
 			// 2. create a bank_map for banks in the range mask/2 -> mask
-			m_prg_bank_map = auto_alloc_array_clear(machine, UINT16, mapsize);
+			m_prg_bank_map.resize(mapsize);
 
 			// 3. fill the bank_map accounting for mirrors
 			int j;
@@ -220,42 +206,34 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 	}
 }
 
-void device_nes_cart_interface::prgram_alloc(running_machine &machine, size_t size)
+void device_nes_cart_interface::prgram_alloc(size_t size)
 {
 	if (m_prgram == NULL)
-	{
-		m_prgram = auto_alloc_array_clear(machine, UINT8, size);
-		m_prgram_size = size;
-	}
+		m_prgram.resize(size);
 }
 
-void device_nes_cart_interface::vrom_alloc(running_machine &machine, size_t size)
+void device_nes_cart_interface::vrom_alloc(size_t size)
 {
 	if (m_vrom == NULL)
 	{
-		m_vrom = auto_alloc_array_clear(machine, UINT8, size);
-		m_vrom_size = size;
+		m_vrom.resize(size);
 		m_vrom_chunks = size / 0x2000;
 	}
 }
 
-void device_nes_cart_interface::vram_alloc(running_machine &machine, size_t size)
+void device_nes_cart_interface::vram_alloc(size_t size)
 {
 	if (m_vram == NULL)
 	{
-		m_vram = auto_alloc_array_clear(machine, UINT8, size);
-		m_vram_size = size;
+		m_vram.resize(size);
 		m_vram_chunks = size / 0x2000;
 	}
 }
 
-void device_nes_cart_interface::battery_alloc(running_machine &machine, size_t size)
+void device_nes_cart_interface::battery_alloc(size_t size)
 {
 	if (m_battery == NULL)
-	{
-		m_battery = auto_alloc_array_clear(machine, UINT8, size);
-		m_battery_size = size;
-	}
+		m_battery.resize(size);
 }
 
 
@@ -661,9 +639,9 @@ READ8_MEMBER(device_nes_cart_interface::read_l)
 READ8_MEMBER(device_nes_cart_interface::read_m)
 {
 	if (m_battery)
-		return m_battery[offset & (m_battery_size - 1)];
+		return m_battery[offset & (m_battery.count() - 1)];
 	if (m_prgram)
-		return m_prgram[offset & (m_prgram_size - 1)];
+		return m_prgram[offset & (m_prgram.count() - 1)];
 
 	return m_open_bus;
 }
@@ -675,9 +653,9 @@ WRITE8_MEMBER(device_nes_cart_interface::write_l)
 WRITE8_MEMBER(device_nes_cart_interface::write_m)
 {
 	if (m_battery)
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 	if (m_prgram)
-		m_prgram[offset & (m_prgram_size - 1)] = data;
+		m_prgram[offset & (m_prgram.count() - 1)] = data;
 }
 
 WRITE8_MEMBER(device_nes_cart_interface::write_h)
@@ -694,22 +672,22 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	m_prg_bank_mem[3] = machine.root_device().membank("prg3");
 	for (int i = 0; i < 4; i++)
 	{
-		int next_bank = m_prg_size / 0x2000;
-		m_prg_bank_mem[i]->configure_entries(0, m_prg_size / 0x2000, m_prg, 0x2000);
+		int next_bank = m_prg.count() / 0x2000;
+		m_prg_bank_mem[i]->configure_entries(0, m_prg.count() / 0x2000, m_prg, 0x2000);
 		// MMC5 (and a few other PCBs) can also map WRAM/BWRAM in these banks, so we add here 4x8K banks for each RAM chip
 		// No boards with 64Kb of WRAM/BWRAM has been found so far, otherwise the code has to be updated!
 		if (m_battery)
 		{
-			if (m_battery_size / 0x2000 == 4)
+			if (m_battery.count() / 0x2000 == 4)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank, 4, m_battery, 0x2000);
 			}
-			if (m_battery_size / 0x2000 == 2)
+			if (m_battery.count() / 0x2000 == 2)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 2, m_battery, 0x2000);
 				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 2, m_battery, 0x2000);
 			}
-			if (m_battery_size / 0x2000 == 1)
+			if (m_battery.count() / 0x2000 == 1)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 1, m_battery, 0x2000);
 				m_prg_bank_mem[i]->configure_entries(next_bank + 1, 1, m_battery, 0x2000);
@@ -720,16 +698,16 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 		}
 		if (m_prgram)
 		{
-			if (m_prgram_size / 0x2000 == 4)
+			if (m_prgram.count() / 0x2000 == 4)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank, 4, m_prgram, 0x2000);
 			}
-			if (m_prgram_size / 0x2000 == 2)
+			if (m_prgram.count() / 0x2000 == 2)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 2, m_prgram, 0x2000);
 				m_prg_bank_mem[i]->configure_entries(next_bank + 2, 2, m_prgram, 0x2000);
 			}
-			if (m_prgram_size / 0x2000 == 1)
+			if (m_prgram.count() / 0x2000 == 1)
 			{
 				m_prg_bank_mem[i]->configure_entries(next_bank + 0, 1, m_prgram, 0x2000);
 				m_prg_bank_mem[i]->configure_entries(next_bank + 1, 1, m_prgram, 0x2000);
@@ -753,21 +731,20 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 
 	if (m_four_screen_vram)
 	{
-		m_ext_ntram_size = 0x2000;
-		m_ext_ntram = auto_alloc_array_clear(machine, UINT8, m_ext_ntram_size);
-		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_ext_ntram, m_ext_ntram_size);
+		m_ext_ntram.resize(0x2000);
+		device().save_item(NAME(m_ext_ntram));
 	}
 
 	// at loading time we have configured m_mirroring, now setup NT pages
 	set_nt_mirroring(m_mirroring);
 
 	// save the on-cart RAM pointers
-	if (m_prgram_size)
-		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_prgram, m_prgram_size);
-	if (m_vram_size)
-		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_vram, m_vram_size);
-	if (m_battery_size)
-		state_save_register_item_pointer(machine, "NES_CART", this->device().tag(), 0, m_battery, m_battery_size);
+	if (m_prgram.count())
+		device().save_item(NAME(m_prgram));
+	if (m_vram.bytes())
+		device().save_item(NAME(m_vram));
+	if (m_battery.count())
+		device().save_item(NAME(m_battery));
 }
 
 void device_nes_cart_interface::pcb_reg_postload(running_machine &machine)
@@ -939,15 +916,13 @@ void nes_cart_slot_device::call_unload()
 		if (m_cart->get_battery_size() || m_cart->get_mapper_sram_size())
 		{
 			UINT32 tot_size = m_cart->get_battery_size() + m_cart->get_mapper_sram_size();
-			UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+			dynamic_buffer temp_nvram(tot_size);
 			if (m_cart->get_battery_size())
 				memcpy(temp_nvram, m_cart->get_battery_base(), m_cart->get_battery_size());
 			if (m_cart->get_mapper_sram_size())
 				memcpy(temp_nvram + m_cart->get_battery_size(), m_cart->get_mapper_sram_base(), m_cart->get_mapper_sram_size());
 
 			battery_save(temp_nvram, tot_size);
-			if (temp_nvram)
-				auto_free(machine(), temp_nvram);
 		}
 	}
 }

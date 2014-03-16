@@ -354,8 +354,7 @@ void sc499_device::device_start()
 		LOG2(("start sc499: cartridge tape image is %s",m_image->filename()));
 	}
 
-	m_ctape_block_buffer = auto_alloc_array(machine(), UINT8, SC499_CTAPE_BLOCK_SIZE);
-	assert(m_ctape_block_buffer!= NULL);
+	m_ctape_block_buffer.resize(SC499_CTAPE_BLOCK_SIZE);
 }
 
 //-------------------------------------------------

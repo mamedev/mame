@@ -177,11 +177,11 @@ public:
 	virtual DECLARE_READ8_MEMBER(nt_r);
 	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
-	void prg_alloc(running_machine &machine, size_t size);
-	void prgram_alloc(running_machine &machine, size_t size);
-	void vrom_alloc(running_machine &machine, size_t size);
-	void vram_alloc(running_machine &machine, size_t size);
-	void battery_alloc(running_machine &machine, size_t size);
+	void prg_alloc(size_t size);
+	void prgram_alloc(size_t size);
+	void vrom_alloc(size_t size);
+	void vram_alloc(size_t size);
+	void battery_alloc(size_t size);
 
 	int get_mirroring() { return m_mirroring; }
 	void set_mirroring(int val) { m_mirroring = val; }
@@ -205,11 +205,11 @@ public:
 	UINT8* get_battery_base() { return m_battery; }
 	UINT8* get_mapper_sram_base() { return m_mapper_sram; }
 
-	UINT32 get_prg_size() { return m_prg_size; }
-	UINT32 get_prgram_size() { return m_prgram_size; }
-	UINT32 get_vrom_size() { return m_vrom_size; }
-	UINT32 get_vram_size() { return m_vram_size; }
-	UINT32 get_battery_size() { return m_battery_size; }
+	UINT32 get_prg_size() { return m_prg.bytes(); }
+	UINT32 get_prgram_size() { return m_prgram.bytes(); }
+	UINT32 get_vrom_size() { return m_vrom.bytes(); }
+	UINT32 get_vram_size() { return m_vram.bytes(); }
+	UINT32 get_battery_size() { return m_battery.bytes(); }
 	UINT32 get_mapper_sram_size() { return m_mapper_sram_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
@@ -227,25 +227,18 @@ public:
 protected:
 
 	// internal state
-	UINT8 *m_prg;
-	UINT8 *m_prgram;
-	UINT8 *m_vrom;
-	UINT8 *m_vram;
-	UINT8 *m_battery;
+	dynamic_buffer m_prg;
+	dynamic_buffer m_prgram;
+	dynamic_buffer m_vrom;
+	dynamic_buffer m_vram;
+	dynamic_buffer m_battery;
 	UINT8 *m_ciram;
-
-	UINT32 m_prg_size;
-	UINT32 m_prgram_size;
-	UINT32 m_vrom_size;
-	UINT32 m_vram_size;
-	UINT32 m_battery_size;
 
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	UINT8 *m_mapper_sram;
-	UINT8 *m_ext_ntram;
+	dynamic_buffer m_ext_ntram;
 	UINT32 m_mapper_sram_size;
-	UINT32 m_ext_ntram_size;
 
 	int m_ce_mask;
 	int m_ce_state;
@@ -322,7 +315,7 @@ protected:
 	void set_nt_page(int page, int source, int bank, int writable);
 	void set_nt_mirroring(int mirroring);
 
-	UINT16 *m_prg_bank_map;
+	dynamic_array<UINT16> m_prg_bank_map;
 };
 
 void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);

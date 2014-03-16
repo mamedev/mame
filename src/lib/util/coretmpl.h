@@ -85,6 +85,7 @@ public:
 
 	// simple getters
 	int count() const { return m_count; }
+	int bytes() const { return m_count * sizeof(_ElementType); }
 
 	// core operations
 	_ElementType &append() { if (m_count == m_allocated) expand_and_keep_internal((m_allocated == 0) ? 16 : (m_allocated << 1)); return m_array[m_count++]; }

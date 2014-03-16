@@ -385,10 +385,6 @@ void md_rom_svp_device::device_start()
 	m_xst2 = 0;
 
 	// SVP stuff
-	// DRAM
-	m_dram = auto_alloc_array(machine(), UINT8, 0x20000);
-	// IRAM
-	m_iram = auto_alloc_array(machine(), UINT8, 0x800);
 	this->membank("iram_svp")->set_base(m_iram);
 	// the other bank, "cart_svp", is setup at call_load
 
@@ -400,8 +396,8 @@ void md_rom_svp_device::device_start()
 	save_item(NAME(m_pmc.d));
 	save_item(NAME(m_pmc.w.l));
 	save_item(NAME(m_pmc.w.h));
-	save_pointer(NAME(m_dram), 0x20000);
-	save_pointer(NAME(m_iram), 0x800);
+	save_item(NAME(m_dram));
+	save_item(NAME(m_iram));
 }
 
 READ16_MEMBER(md_rom_svp_device::read)

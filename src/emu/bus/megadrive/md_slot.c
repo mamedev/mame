@@ -62,11 +62,7 @@ const device_type COPERA_CART_SLOT = &device_creator<copera_cart_slot_device>;
 //-------------------------------------------------
 
 device_md_cart_interface::device_md_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_nvram(NULL),
-		m_rom_size(0),
-		m_nvram_size(0)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -83,13 +79,10 @@ device_md_cart_interface::~device_md_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_md_cart_interface::rom_alloc(running_machine &machine, size_t size)
+void device_md_cart_interface::rom_alloc(size_t size)
 {
 	if (m_rom == NULL)
-	{
-		m_rom = auto_alloc_array_clear(machine, UINT16, size/sizeof(UINT16));
-		m_rom_size = size;
-	}
+		m_rom.resize(size/sizeof(UINT16));
 }
 
 
@@ -97,13 +90,12 @@ void device_md_cart_interface::rom_alloc(running_machine &machine, size_t size)
 //  nvram_alloc - alloc the space for the nvram
 //-------------------------------------------------
 
-void device_md_cart_interface::nvram_alloc(running_machine &machine, size_t size)
+void device_md_cart_interface::nvram_alloc(size_t size)
 {
 	if (m_nvram == NULL)
 	{
-		m_nvram = auto_alloc_array_clear(machine, UINT16, size/sizeof(UINT16));
-		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "MD_CART", this->device().tag(), 0, m_nvram, m_nvram_size/sizeof(UINT16));
+		m_nvram.resize(size/sizeof(UINT16));
+		device().save_item(NAME(m_nvram));
 	}
 }
 
@@ -375,7 +367,7 @@ int base_md_cart_slot_device::load_list()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	length = m_cart->get_padded_size(length);
 
-	m_cart->rom_alloc(machine(), length);
+	m_cart->rom_alloc(length);
 	ROM = m_cart->get_rom_base();
 	memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
 
@@ -487,7 +479,7 @@ int base_md_cart_slot_device::load_nonlist()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	len = m_cart->get_padded_size(tmplen - offset);
 	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
-	m_cart->rom_alloc(machine(), (len == 0x500000) ? 0x900000 : len);
+	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len);
 
 
 	// STEP 3: copy the game data in the appropriate way
@@ -611,8 +603,8 @@ void base_md_cart_slot_device::setup_nvram()
 			if (!(m_cart->m_nvram_end & 1))
 				m_cart->m_nvram_end += 1;
 
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			// don't trust too much header?
@@ -624,8 +616,8 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
 			logerror("No SRAM detected from header, using fallback SRAM in case this is a broken header\n");
 
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			break;
 
@@ -633,15 +625,15 @@ void base_md_cart_slot_device::setup_nvram()
 		case SEGA_SRAM:
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
-			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			if (m_cart->m_rom.bytes() <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
 		case SEGA_FRAM:
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("fram") - 1;
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
@@ -650,27 +642,27 @@ void base_md_cart_slot_device::setup_nvram()
 		case HARDBALL95:
 			m_cart->m_nvram_start = 0x300000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
 		case XINQIG:
 			m_cart->m_nvram_start = 0x400000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
 		case BEGGARP:
 			m_cart->m_nvram_start = 0x400000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
-			m_cart->nvram_alloc(machine(), 0x8000); // 32K mirrored
+			m_cart->nvram_alloc(0x8000); // 32K mirrored
 			m_cart->m_nvram_active = 1;
 			break;
 		case WUKONG:
 			m_cart->m_nvram_start = 0x3c0000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0x3fff;
-			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			break;
 	}

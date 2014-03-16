@@ -112,8 +112,8 @@ void gba_rom_eeprom_device::device_start()
 	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
 
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
-	nvram_alloc(machine(), 0x200);
-	m_eeprom = auto_alloc(machine(), gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 6));
+	nvram_alloc(0x200);
+	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 6)));
 }
 
 void gba_rom_eeprom64_device::device_start()
@@ -122,8 +122,8 @@ void gba_rom_eeprom64_device::device_start()
 	m_rom = (UINT32 *)memregion(this->subtag(tempstring, "cartridge"))->base();
 
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
-	nvram_alloc(machine(), 0x2000);
-	m_eeprom = auto_alloc(machine(), gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14));
+	nvram_alloc(0x2000);
+	m_eeprom.reset(global_alloc(gba_eeprom_device(machine(), (UINT8*)get_nvram_base(), get_nvram_size(), 14)));
 }
 
 
@@ -138,7 +138,7 @@ void gba_rom_eeprom64_device::device_start()
 
 READ32_MEMBER(gba_rom_sram_device::read_ram)
 {
-	if (m_nvram && offset < m_nvram_size/4)
+	if (m_nvram && offset < m_nvram.count())
 		return m_nvram[offset];
 	else    // this cannot actually happen...
 		return 0xffffffff;
@@ -146,7 +146,7 @@ READ32_MEMBER(gba_rom_sram_device::read_ram)
 
 WRITE32_MEMBER(gba_rom_sram_device::write_ram)
 {
-	if (m_nvram && offset < m_nvram_size/4)
+	if (m_nvram && offset < m_nvram.count())
 		COMBINE_DATA(&m_nvram[offset]);
 }
 

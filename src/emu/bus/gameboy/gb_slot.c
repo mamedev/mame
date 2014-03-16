@@ -36,13 +36,9 @@ const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device
 
 device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ram(NULL),
-		m_rom_size(0),
-		m_ram_size(0),
-		has_rumble(FALSE), 
-		has_timer(FALSE), 
-		has_battery(FALSE)
+		has_rumble(false), 
+		has_timer(false), 
+		has_battery(false)
 {
 }
 
@@ -59,13 +55,10 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
+void device_gb_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
-	{
-		m_rom = auto_alloc_array_clear(machine, UINT8, size);
-		m_rom_size = size;
-	}
+		m_rom.resize(size);
 }
 
 
@@ -73,13 +66,12 @@ void device_gb_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gb_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
+void device_gb_cart_interface::ram_alloc(UINT32 size)
 {
 	if (m_ram == NULL)
 	{
-		m_ram = auto_alloc_array_clear(machine, UINT8, size);
-		m_ram_size = size;
-		state_save_register_item_pointer(machine, "GB_CART", this->device().tag(), 0, m_ram, m_ram_size);
+		m_ram.resize(size);
+		device().save_item(NAME(m_ram));
 	}
 }
 
@@ -285,7 +277,7 @@ bool base_gb_cart_slot_device::call_load()
 			}
 		}
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -314,20 +306,20 @@ bool base_gb_cart_slot_device::call_load()
 
 			if (get_software_region("nvram"))
 			{
-				m_cart->set_has_battery(TRUE);
+				m_cart->set_has_battery(true);
 				rambanks = get_software_region_length("nvram") / 0x2000;
 			}
 
 			if (get_feature("rumble"))
 			{
 				if (!mame_stricmp(get_feature("rumble"), "yes"))
-					m_cart->set_has_rumble(TRUE);
+					m_cart->set_has_rumble(true);
 			}
 
 			if (get_feature("rtc"))
 			{
 				if (!mame_stricmp(get_feature("rtc"), "yes"))
-					m_cart->set_has_timer(TRUE);
+					m_cart->set_has_timer(true);
 			}
 		}
 		else
@@ -336,21 +328,21 @@ bool base_gb_cart_slot_device::call_load()
 			switch (ROM[0x0147 + offset])
 			{
 				case 0x03:  case 0x06:  case 0x09:  case 0x0d:  case 0x13:  case 0x17:  case 0x1b:  case 0x22:
-					m_cart->set_has_battery(TRUE);
+					m_cart->set_has_battery(true);
 					break;
 
 				case 0x0f:  case 0x10:
-					m_cart->set_has_battery(TRUE);
-					m_cart->set_has_timer(TRUE);
+					m_cart->set_has_battery(true);
+					m_cart->set_has_timer(true);
 					break;
 
 				case 0x1c:  case 0x1d:
-					m_cart->set_has_rumble(TRUE);
+					m_cart->set_has_rumble(true);
 					break;
 
 				case 0x1e:
-					m_cart->set_has_battery(TRUE);
-					m_cart->set_has_rumble(TRUE);
+					m_cart->set_has_battery(true);
+					m_cart->set_has_rumble(true);
 					break;
 			}
 
@@ -410,7 +402,7 @@ bool megaduck_cart_slot_device::call_load()
 		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -440,7 +432,7 @@ void base_gb_cart_slot_device::call_unload()
 
 void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 {
-	m_cart->ram_alloc(machine(), banks * 0x2000);
+	m_cart->ram_alloc(banks * 0x2000);
 	memset(m_cart->get_ram_base(), 0xff, m_cart->get_ram_size());
 	m_cart->ram_map_setup(banks);
 }
@@ -454,14 +446,14 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
 	load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
+	return true;
 }
 
 // This fails to catch Mani 4-in-1 carts... even when they match this, then they have MBC1/3 in the internal header instead of MMM01...
 bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 {
 	if (len < 0x8147)
-		return FALSE;
+		return false;
 
 	static const UINT8 nintendo_logo[0x18] = {
 		0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
@@ -476,9 +468,9 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 	}
 
 	if (bytes_matched == 0x18 && ROM[(len - 0x8000) + 0x147] >= 0x0b && ROM[(len - 0x8000) + 0x147] <= 0x0d)
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)

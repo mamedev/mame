@@ -718,9 +718,9 @@ void nes_cart_slot_device::call_load_ines()
 
 	// SETUP step 5: allocate pointers for PRG/VROM
 	if (prg_size)
-		m_cart->prg_alloc(machine(), prg_size);
+		m_cart->prg_alloc(prg_size);
 	if (vrom_size)
-		m_cart->vrom_alloc(machine(), vrom_size);
+		m_cart->vrom_alloc(vrom_size);
 
 	// if there is a trainer, skip it for the moment
 	if (m_cart->get_trainer())
@@ -775,13 +775,13 @@ void nes_cart_slot_device::call_load_ines()
 
 	// SETUP steps 7: allocate the remaining pointer, when needed
 	if (vram_size)
-		m_cart->vram_alloc(machine(), vram_size);
+		m_cart->vram_alloc(vram_size);
 	if (prgram_size || m_cart->get_trainer())
 	{
 		if (prgram_size)
-			m_cart->prgram_alloc(machine(), prgram_size);
+			m_cart->prgram_alloc(prgram_size);
 		else
-			m_cart->prgram_alloc(machine(), 0x2000);
+			m_cart->prgram_alloc(0x2000);
 		if (m_cart->get_trainer())
 		{
 			fseek(0x10, SEEK_SET);
@@ -795,19 +795,16 @@ void nes_cart_slot_device::call_load_ines()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+		dynamic_buffer temp_nvram(tot_size);
 		battery_load(temp_nvram, tot_size, 0x00);
 		if (battery_size)
 		{
 			//printf("here %d\n", battery_size);
-			m_cart->battery_alloc(machine(), battery_size);
+			m_cart->battery_alloc(battery_size);
 			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
 		}
 		if (mapper_sram_size)
 			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, m_cart->get_mapper_sram_size());
-
-		if (temp_nvram)
-			auto_free(machine(), temp_nvram);
 	}
 }
 

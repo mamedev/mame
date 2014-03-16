@@ -55,7 +55,7 @@ public:
 
 private:
 	UINT8 m_latch;
-	UINT8 *m_ram;
+	UINT8 m_ram[0xb00];
 };
 
 

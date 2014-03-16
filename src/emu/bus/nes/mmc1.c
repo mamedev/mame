@@ -274,9 +274,9 @@ WRITE8_MEMBER(nes_sxrom_device::write_m)
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
 	{
 		if (m_battery)
-			m_battery[((bank * 0x2000) + offset) & (m_battery_size - 1)] = data;
+			m_battery[((bank * 0x2000) + offset) & (m_battery.count() - 1)] = data;
 		if (m_prgram)
-			m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)] = data;
+			m_prgram[((bank * 0x2000) + offset) & (m_prgram.count() - 1)] = data;
 	}
 }
 
@@ -288,9 +288,9 @@ READ8_MEMBER(nes_sxrom_device::read_m)
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
 	{
 		if (m_battery)
-			return m_battery[((bank * 0x2000) + offset) & (m_battery_size - 1)];
+			return m_battery[((bank * 0x2000) + offset) & (m_battery.count() - 1)];
 		if (m_prgram)
-			return m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)];
+			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.count() - 1)];
 	}
 
 	return m_open_bus;   // open bus
@@ -305,9 +305,9 @@ WRITE8_MEMBER(nes_sorom_device::write_m)
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
 	{
 		if (type)
-			m_battery[offset & (m_battery_size - 1)] = data;
+			m_battery[offset & (m_battery.count() - 1)] = data;
 		else
-			m_prgram[offset & (m_prgram_size - 1)] = data;
+			m_prgram[offset & (m_prgram.count() - 1)] = data;
 	}
 }
 
@@ -319,9 +319,9 @@ READ8_MEMBER(nes_sorom_device::read_m)
 	if (!BIT(m_reg[3], 4))  // WRAM enabled
 	{
 		if (type)
-			return m_battery[offset & (m_battery_size - 1)];
+			return m_battery[offset & (m_battery.count() - 1)];
 		else
-			return m_prgram[offset & (m_prgram_size - 1)];
+			return m_prgram[offset & (m_prgram.count() - 1)];
 	}
 
 	return m_open_bus;   // open bus
@@ -334,9 +334,9 @@ WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 	LOG_MMC(("sxrom_a write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_battery)
-		m_battery[((bank * 0x2000) + offset) & (m_battery_size - 1)] = data;
+		m_battery[((bank * 0x2000) + offset) & (m_battery.count() - 1)] = data;
 	if (m_prgram)
-		m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)] = data;
+		m_prgram[((bank * 0x2000) + offset) & (m_prgram.count() - 1)] = data;
 }
 
 READ8_MEMBER(nes_sxrom_a_device::read_m)
@@ -345,9 +345,9 @@ READ8_MEMBER(nes_sxrom_a_device::read_m)
 	LOG_MMC(("sxrom_a read_m, offset: %04x\n", offset));
 
 	if (m_battery)
-		return m_battery[((bank * 0x2000) + offset) & (m_battery_size - 1)];
+		return m_battery[((bank * 0x2000) + offset) & (m_battery.count() - 1)];
 	if (m_prgram)
-		return m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)];
+		return m_prgram[((bank * 0x2000) + offset) & (m_prgram.count() - 1)];
 
 	return m_open_bus;   // open bus
 }
@@ -358,9 +358,9 @@ WRITE8_MEMBER(nes_sorom_a_device::write_m)
 	LOG_MMC(("sorom_a write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (type)
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 	else
-		m_prgram[offset & (m_prgram_size - 1)] = data;
+		m_prgram[offset & (m_prgram.count() - 1)] = data;
 }
 
 READ8_MEMBER(nes_sorom_a_device::read_m)
@@ -369,7 +369,7 @@ READ8_MEMBER(nes_sorom_a_device::read_m)
 	LOG_MMC(("sorom_a read_m, offset: %04x\n", offset));
 
 	if (type)
-		return m_battery[offset & (m_battery_size - 1)];
+		return m_battery[offset & (m_battery.count() - 1)];
 	else
-		return m_prgram[offset & (m_prgram_size - 1)];
+		return m_prgram[offset & (m_prgram.count() - 1)];
 }

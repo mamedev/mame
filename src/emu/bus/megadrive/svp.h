@@ -56,14 +56,14 @@ public:
 
 	UINT32 pm_io(int reg, int write, UINT32 d);
 
-	UINT8 *m_iram; // IRAM (0-0x7ff)
-	UINT8 *m_dram; // [0x20000];
 	UINT32 m_pmac_read[6];  // read modes/addrs for PM0-PM5
 	UINT32 m_pmac_write[6]; // write ...
 	PAIR m_pmc;
 	UINT32 m_emu_status;
 	UINT16 m_xst;       // external status, mapped at a15000 and a15002 on 68k side.
 	UINT16 m_xst2;      // status of XST (bit1 set when 68k writes to XST)
+	UINT8 m_iram[0x800]; // IRAM (0-0x7ff)
+	UINT8 m_dram[0x20000]; // [0x20000];
 };
 
 

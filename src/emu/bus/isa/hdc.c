@@ -170,7 +170,7 @@ void isa8_hdc_device::device_start()
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, "hdc", "hdc");
 	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
 	m_isa->set_dma_channel(3, this, FALSE);
-	buffer = auto_alloc_array(machine(), UINT8, 17*4*512);
+	buffer.resize(17*4*512);
 	timer = machine().scheduler().timer_alloc(FUNC(pc_hdc_command), this);
 }
 
@@ -690,7 +690,7 @@ void isa8_hdc_device::pc_hdc_reset_w(int data)
 	sector[0] = sector[1] = 0;
 	csb = 0;
 	status = STA_COMMAND | STA_READY;
-	memset(buffer, 0, 17*4*512);
+	memset(buffer, 0, buffer.count());
 	buffer_ptr = buffer;
 	data_cnt = 0;
 }

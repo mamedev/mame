@@ -175,7 +175,7 @@ void isa8_mda_device::device_start()
 		throw device_missing_dependencies();
 
 	set_isa_device();
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_videoram.resize(0x1000);
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
 	m_isa->install_bank(0xb0000, 0xb0fff, 0, 0x07000, "bank_mda", m_videoram);
 
@@ -583,7 +583,7 @@ void isa8_hercules_device::device_start()
 	if (m_palette != NULL && !m_palette->started())
 		throw device_missing_dependencies();
 
-	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_videoram.resize(0x10000);
 	set_isa_device();
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
 	m_isa->install_bank(0xb0000, 0xbffff, 0, 0, "bank_hercules", m_videoram);

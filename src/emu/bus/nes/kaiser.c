@@ -378,7 +378,7 @@ WRITE8_MEMBER(nes_ks7032_device::ks7032_write)
 READ8_MEMBER(nes_ks7032_device::read_m)
 {
 	LOG_MMC(("ks7032 read_m, offset: %04x\n", offset));
-	return m_prg[((m_reg[4] * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
+	return m_prg[((m_reg[4] * 0x2000) + (offset & 0x1fff)) & (m_prg.count() - 1)];
 }
 
 /*-------------------------------------------------

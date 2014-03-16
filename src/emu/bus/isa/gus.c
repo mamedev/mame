@@ -391,8 +391,7 @@ void gf1_device::device_start()
 	m_rxirq_handler.resolve_safe();
 
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
-	m_wave_ram = auto_alloc_array(machine(),UINT8,1024*1024);
-	memset(m_wave_ram,0,1024*1024);
+	m_wave_ram.resize_and_clear(1024*1024);
 
 	m_stream = stream_alloc(0,2,44100);
 
@@ -402,7 +401,7 @@ void gf1_device::device_start()
 	m_dmatimer = timer_alloc(DMA_TIMER);
 	m_voltimer = timer_alloc(VOL_RAMP_TIMER);
 
-	save_pointer(NAME(m_wave_ram),1024*1024);
+	save_item(NAME(m_wave_ram));
 
 	m_wave_irq_func.resolve(wave_irq_cb, *this);
 	m_ramp_irq_func.resolve(ramp_irq_cb, *this);

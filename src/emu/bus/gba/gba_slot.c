@@ -27,9 +27,7 @@ const device_type GBA_CART_SLOT = &device_creator<gba_cart_slot_device>;
 device_gba_cart_interface::device_gba_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_rom(NULL),
-		m_nvram(NULL),
-		m_rom_size(0),
-		m_nvram_size(0)
+		m_rom_size(0)
 {
 }
 
@@ -46,13 +44,12 @@ device_gba_cart_interface::~device_gba_cart_interface()
 //  nvram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gba_cart_interface::nvram_alloc(running_machine &machine, UINT32 size)
+void device_gba_cart_interface::nvram_alloc(UINT32 size)
 {
 	if (m_nvram == NULL)
 	{
-		m_nvram = auto_alloc_array_clear(machine, UINT32, size/sizeof(UINT32));
-		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "GBA_CART", this->device().tag(), 0, m_nvram, m_nvram_size/sizeof(UINT32));
+		m_nvram.resize(size/sizeof(UINT32));
+		device().save_item(NAME(m_nvram));
 	}
 }
 
@@ -195,7 +192,7 @@ bool gba_cart_slot_device::call_load()
 		}
 
 		if (m_type == GBA_SRAM)
-			m_cart->nvram_alloc(machine(), 0x10000);
+			m_cart->nvram_alloc(0x10000);
 
 		// mirror the ROM
 		switch (cart_size)

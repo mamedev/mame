@@ -69,7 +69,7 @@ protected:
 	UINT8 m_mmc6_reg;
 
 	// MMC-6 contains 1K of internal ram, battery backed up
-	UINT8 *m_mmc6_ram;
+	UINT8 m_mmc6_ram[0x400];
 };
 
 

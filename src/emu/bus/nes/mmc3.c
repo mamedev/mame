@@ -146,8 +146,7 @@ void nes_hkrom_device::device_start()
 	save_item(NAME(m_mmc6_reg));
 	save_item(NAME(m_wram_enable));
 
-	m_mmc6_ram = auto_alloc_array_clear(machine(), UINT8, 0x400);
-	save_pointer(NAME(m_mmc6_ram), 0x400);
+	save_item(NAME(m_mmc6_ram));
 
 	m_mapper_sram_size = 0x400;
 	m_mapper_sram = m_mmc6_ram;
@@ -322,9 +321,9 @@ WRITE8_MEMBER(nes_txrom_device::write_m)
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{
 		if (m_battery)
-			m_battery[offset & (m_battery_size - 1)] = data;
+			m_battery[offset & (m_battery.count() - 1)] = data;
 		if (m_prgram)
-			m_prgram[offset & (m_prgram_size - 1)] = data;
+			m_prgram[offset & (m_prgram.count() - 1)] = data;
 	}
 }
 
@@ -335,9 +334,9 @@ READ8_MEMBER(nes_txrom_device::read_m)
 	if (BIT(m_wram_protect, 7))
 	{
 		if (m_battery)
-			return m_battery[offset & (m_battery_size - 1)];
+			return m_battery[offset & (m_battery.count() - 1)];
 		if (m_prgram)
-			return m_prgram[offset & (m_prgram_size - 1)];
+			return m_prgram[offset & (m_prgram.count() - 1)];
 	}
 
 	return m_open_bus;   // open bus

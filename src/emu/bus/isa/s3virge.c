@@ -39,8 +39,8 @@ void s3virge_vga_device::device_start()
 	vga.svga_intf.seq_regcount = 0x1c;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x400000;
-	vga.memory  = auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
-	save_pointer(vga.memory,"Video RAM",vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	save_item(vga.memory,"Video RAM");
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);

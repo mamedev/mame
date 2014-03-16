@@ -157,9 +157,9 @@ private:
 		UINT8 get(int i) { return m_data[i]; };
 		UINT16 get_word(int i) { return (m_data[i*2+1] << 8) + m_data[i*2]; };
 		int is_empty() {return  m_length == 0; };
-		int is_full() {return  m_length >= m_size; };
+		int is_full() {return  m_length >= m_data.count(); };
 		UINT16 get_length() { return m_length; };
-		UINT16 get_size() { return m_size; };
+		UINT16 get_size() { return m_data.count(); };
 		UINT8 *get_data() { return m_data; };
 		void copy(data_buffer *db) const;
 		void log(const char *title) const;
@@ -167,8 +167,7 @@ private:
 	private:
 		threecom3c505_device *m_device; // pointer back to our device
 		UINT16 m_length;
-		UINT16 m_size;
-		UINT8 *m_data;
+		dynamic_buffer m_data;
 	};
 
 	/* data_buffer fifo (used to buffer the received data) */
