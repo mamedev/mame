@@ -130,31 +130,25 @@ ADDRESS_MAP_END
 static CDP1869_INTERFACE( destryer_vis_intf )
 {
 	0,
-	CDP1869_PAL,
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
-	cidelsa_charram_w,
-	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
+	cidelsa_charram_w
 };
 
 static CDP1869_INTERFACE( altair_vis_intf )
 {
 	0,
-	CDP1869_PAL,
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
-	cidelsa_charram_w,
-	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
+	cidelsa_charram_w
 };
 
 static CDP1869_INTERFACE( draco_vis_intf )
 {
 	0,
-	CDP1869_PAL,
 	draco_pcb_r,
 	draco_charram_r,
-	draco_charram_w,
-	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
+	draco_charram_w
 };
 
 /* Video Start */
@@ -209,6 +203,8 @@ MACHINE_CONFIG_FRAGMENT( destryer_video )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1869_ADD(CDP1869_TAG, DESTRYER_CHR2, destryer_vis_intf, cidelsa_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(cidelsa_state, prd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -218,6 +214,8 @@ MACHINE_CONFIG_FRAGMENT( altair_video )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1869_ADD(CDP1869_TAG, ALTAIR_CHR2, altair_vis_intf, cidelsa_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(cidelsa_state, prd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -227,6 +225,8 @@ MACHINE_CONFIG_FRAGMENT( draco_video )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1869_ADD(CDP1869_TAG, DRACO_CHR2, draco_vis_intf, draco_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1))
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, DRACO_SND_CHR1)
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

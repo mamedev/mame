@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 inline bool cdp1869_device::is_ntsc()
 {
-	return m_in_pal_ntsc_func() ? false : true;
+	return m_read_pal_ntsc() ? false : true;
 }
 
 
@@ -343,20 +343,22 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //  cdp1869_device - constructor
 //-------------------------------------------------
 
-cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_stream(NULL),
-		m_palette(*this, "palette"),
-		m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
+cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock, "cdp1869", __FILE__),
+	device_sound_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	m_read_pal_ntsc(*this),
+	m_write_prd(*this),
+	m_stream(NULL),
+	m_palette(*this, "palette"),
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
 }
 
 static MACHINE_CONFIG_FRAGMENT( cdp1869 )
-        MCFG_PALETTE_ADD("palette", 8+64)
-        MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
+	MCFG_PALETTE_ADD("palette", 8+64)
+	MCFG_PALETTE_INIT_OWNER(cdp1869_device, cdp1869)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -385,8 +387,6 @@ void cdp1869_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&in_pal_ntsc_cb, 0, sizeof(in_pal_ntsc_cb));
-		memset(&out_prd_cb, 0, sizeof(out_prd_cb));
 		in_pcb_cb = NULL;
 		in_char_ram_cb = NULL;
 		out_char_ram_cb = NULL;
@@ -401,8 +401,8 @@ void cdp1869_device::device_config_complete()
 void cdp1869_device::device_start()
 {
 	// resolve callbacks
-	m_in_pal_ntsc_func.resolve(in_pal_ntsc_cb, *this);
-	m_out_prd_func.resolve(out_prd_cb, *this);
+	m_read_pal_ntsc.resolve_safe(0);
+	m_write_prd.resolve_safe();
 	m_in_pcb_func = in_pcb_cb;
 	m_in_char_ram_func = in_char_ram_cb;
 	m_out_char_ram_func = out_char_ram_cb;
@@ -477,7 +477,7 @@ void cdp1869_device::device_post_load()
 
 void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_out_prd_func(param);
+	m_write_prd(param);
 	m_prd = param;
 
 	update_prd_changed_timer();
@@ -950,7 +950,7 @@ READ_LINE_MEMBER( cdp1869_device::predisplay_r )
 
 READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 {
-	return m_in_pal_ntsc_func();
+	return m_read_pal_ntsc();
 }
 
 

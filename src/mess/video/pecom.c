@@ -83,11 +83,9 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 static CDP1869_INTERFACE( pecom_cdp1869_intf )
 {
 	CDP1869_COLOR_CLK_PAL,
-	CDP1869_PAL,
 	pecom_pcb_r,
 	pecom_char_ram_r,
-	pecom_char_ram_w,
-	DEVCB_DRIVER_LINE_MEMBER(pecom_state,pecom_prd_w)
+	pecom_char_ram_w
 };
 
 VIDEO_START_MEMBER(pecom_state,pecom)
@@ -109,6 +107,8 @@ MACHINE_CONFIG_FRAGMENT( pecom_video )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pecom_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(pecom_state, pecom_prd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

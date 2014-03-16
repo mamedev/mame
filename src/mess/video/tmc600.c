@@ -101,11 +101,9 @@ static CDP1869_PCB_READ( tmc600_pcb_r )
 static CDP1869_INTERFACE( vis_intf )
 {
 	CDP1869_COLOR_CLK_PAL,
-	CDP1869_PAL,
 	tmc600_pcb_r,
 	tmc600_char_ram_r,
-	NULL,
-	DEVCB_NULL // ?
+	NULL
 };
 
 void tmc600_state::video_start()
@@ -147,5 +145,6 @@ MACHINE_CONFIG_FRAGMENT( tmc600_video )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, vis_intf, cdp1869_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
