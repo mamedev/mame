@@ -183,7 +183,7 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 #define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)  { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DEVICE_MEMBER(tag,cls,memb)       { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 #define DEVCB_DEVICE_MEMBER16(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-//#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
 //#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
 
 // constant values

@@ -83,11 +83,11 @@ public:
 	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
 	TIMER_CALLBACK_MEMBER(ai_timer_callback);
 	TIMER_CALLBACK_MEMBER(pi_dma_callback);
-
-	UINT32 sp_reg_r(UINT32 offset);
-	void sp_reg_w(UINT32 offset, UINT32 data, UINT32 mem_mask);
-
-	void sp_set_status(UINT32 status);
+	DECLARE_READ32_MEMBER( dp_reg_r );
+	DECLARE_WRITE32_MEMBER( dp_reg_w );
+	DECLARE_READ32_MEMBER( sp_reg_r );
+	DECLARE_WRITE32_MEMBER( sp_reg_w );
+	DECLARE_WRITE32_MEMBER(sp_set_status);
 	void signal_rcp_interrupt(int interrupt);
 	void check_interrupts();
 
@@ -284,10 +284,5 @@ extern UINT32 *rsp_dmem;
 
 extern void dp_full_sync(running_machine &machine);
 extern void signal_rcp_interrupt(running_machine &machine, int interrupt);
-
-extern DECLARE_READ32_DEVICE_HANDLER( n64_sp_reg_r );
-extern DECLARE_WRITE32_DEVICE_HANDLER( n64_sp_reg_w );
-extern DECLARE_READ32_DEVICE_HANDLER( n64_dp_reg_r );
-extern DECLARE_WRITE32_DEVICE_HANDLER( n64_dp_reg_w );
 
 #endif
