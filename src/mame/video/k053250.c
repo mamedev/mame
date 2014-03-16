@@ -3,21 +3,22 @@
 const device_type K053250 = &device_creator<k053250_device>;
 
 k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053250, "K053250", tag, owner, clock, "k053250", __FILE__)
+	: device_t(mconfig, K053250, "K053250", tag, owner, clock, "k053250", __FILE__),
+		device_video_interface(mconfig, *this),
+		m_palette(*this)
 {
 }
 
-void k053250_device::static_set_screen_tag(device_t &device, const char *screen_tag)
+void k053250_device::static_set_palette_tag(device_t &device, const char *tag)
 {
-	k053250_device &dev = downcast<k053250_device &>(device);
-	dev.screen_tag = screen_tag;
+        downcast<k053250_device &>(device).m_palette.set_tag(tag);
 }
 
 void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
 {
 	k053250_device &dev = downcast<k053250_device &>(device);
-	dev.offx = offx;
-	dev.offy = offy;
+	dev.m_offx = offx;
+	dev.m_offy = offy;
 }
 
 void k053250_device::unpack_nibbles()
@@ -27,34 +28,35 @@ void k053250_device::unpack_nibbles()
 
 	const UINT8 *base = m_region->base();
 	int size = m_region->bytes();
-	unpacked = auto_alloc_array(machine(), UINT8, size*2);
-	for(int i=0; i<size; i++) {
-		unpacked[2*i] = base[i] >> 4;
-		unpacked[2*i+1] = base[i] & 15;
+
+	m_unpacked_rom.resize(size*2);
+
+	for(int i=0; i<size; i++)
+	{
+		m_unpacked_rom[2*i] = base[i] >> 4;
+		m_unpacked_rom[2*i+1] = base[i] & 0xf;
 	}
-	unpacked_size = 2*size;
 }
 
 void k053250_device::device_start()
 {
-	screen = machine().device<screen_device>(screen_tag);
-	ram = auto_alloc_array_clear(machine(), UINT16, 0x6000/2);
-	buffer[0] = ram + 0x2000;
-	buffer[1] = ram + 0x2800;
+	m_ram.resize(0x6000/2);
+	m_buffer[0] = &m_ram[0x2000];
+	m_buffer[1] = &m_ram[0x2800];
 
 	unpack_nibbles();
 
-	save_pointer(NAME(ram), 0x6000/2);
-	save_item(NAME(regs));
-	save_item(NAME(page));
-	save_item(NAME(frame));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_regs));
+	save_item(NAME(m_page));
+	save_item(NAME(m_frame));
 }
 
 void k053250_device::device_reset()
 {
-	page = 0;
-	frame = -1;
-	memset(regs, 0, sizeof(regs));
+	m_page = 0;
+	m_frame = -1;
+	memset(m_regs, 0, sizeof(m_regs));
 }
 
 // utility function to render a clipped scanline vertically or horizontally
@@ -230,10 +232,10 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	int color, offset, zoom, scroll, passes, i;
 	bool wrap500 = false;
 
-	UINT16 *line_ram = buffer[page];                // pointer to physical line RAM
-	int map_scrollx = short(regs[0] << 8 | regs[1]) - offx; // signed horizontal scroll value
-	int map_scrolly = short(regs[2] << 8 | regs[3]) - offy; // signed vertical scroll value
-	UINT8 ctrl = regs[4];                                   // register four is the main control register
+	UINT16 *line_ram = m_buffer[m_page];                // pointer to physical line RAM
+	int map_scrollx = short(m_regs[0] << 8 | m_regs[1]) - m_offx; // signed horizontal scroll value
+	int map_scrolly = short(m_regs[2] << 8 | m_regs[3]) - m_offy; // signed vertical scroll value
+	UINT8 ctrl = m_regs[4];                                   // register four is the main control register
 
 	// copy visible boundary values to more accessible locations
 	int dst_minx  = cliprect.min_x;
@@ -356,7 +358,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	linedata_offs += line_start * linedata_adv;     // pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = screen->palette()->pens() + (colorbase << 4) % screen->palette()->entries();
+	pal_base = m_palette->pens() + (colorbase << 4) % m_palette->entries();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)
@@ -375,7 +377,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 
 		// calculate physical pixel location
 		// each offset unit represents 256 pixels and should wrap at ROM boundary for safety
-		pix_ptr = unpacked + ((offset << 8) % unpacked_size);
+		pix_ptr = &m_unpacked_rom[((offset << 8) % m_unpacked_rom.count())];
 
 		// get scanline zoom factor
 		// For example, 0x20 doubles the length, 0x40 maintains a one-to-one length,
@@ -425,19 +427,19 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 
 void k053250_device::dma(int limiter)
 {
-	int current_frame = screen->frame_number();
+	int current_frame = m_screen->frame_number();
 
-	if (limiter && current_frame == frame)
+	if (limiter && current_frame == m_frame)
 		return; // make sure we only do DMA transfer once per frame
 
-	frame = current_frame;
-	memcpy(buffer[page], ram, 0x1000);
-	page ^= 1;
+	m_frame = current_frame;
+	memcpy(m_buffer[m_page], m_ram, 0x1000);
+	m_page ^= 1;
 }
 
 READ16_MEMBER(k053250_device::reg_r)
 {
-	return regs[offset];
+	return m_regs[offset];
 }
 
 WRITE16_MEMBER(k053250_device::reg_w)
@@ -445,24 +447,24 @@ WRITE16_MEMBER(k053250_device::reg_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (regs[4] & 2))
+		if (offset == 4 && !(data & 2) && (m_regs[4] & 2))
 			dma(1);
 
-		regs[offset] = data;
+		m_regs[offset] = data;
 	}
 }
 
 READ16_MEMBER(k053250_device::ram_r)
 {
-	return ram[offset];
+	return m_ram[offset];
 }
 
 WRITE16_MEMBER(k053250_device::ram_w)
 {
-	COMBINE_DATA(ram+offset);
+	COMBINE_DATA(&m_ram[offset]);
 }
 
 READ16_MEMBER(k053250_device::rom_r)
 {
-	return m_region->base()[0x80000 * regs[6] + 0x800 * regs[7] + offset/2];
+	return m_region->base()[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
 }

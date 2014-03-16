@@ -370,8 +370,8 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_PALETTE("palette")
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053250_ADD("k053250_1", "screen", 0, 0)
-	MCFG_K053250_ADD("k053250_2", "screen", 0, 0)
+	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
+	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
 	MCFG_K053252_ADD("k053252", 24000000/4, overdriv_k053252_intf)
 
 	/* sound hardware */

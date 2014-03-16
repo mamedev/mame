@@ -1121,7 +1121,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, metamrph_k053252_intf) // 6 MHz?
-	MCFG_K053250_ADD("k053250_1", "screen", -7, 0)
+	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state,metamrph)
