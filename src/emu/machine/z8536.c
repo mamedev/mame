@@ -39,170 +39,8 @@ const device_type Z8536 = &device_creator<z8536_device>;
 #define LOG 0
 
 
-// states
-enum
-{
-	STATE_RESET = -1,
-	STATE_0,
-	STATE_1
-};
-
-
-// ports
-enum
-{
-	PORT_C = 0,
-	PORT_B,
-	PORT_A,
-	CONTROL
-};
-
-
-// registers
-enum
-{
-	MASTER_INTERRUPT_CONTROL = 0,
-	MASTER_CONFIGURATION_CONTROL,
-	PORT_A_INTERRUPT_VECTOR,
-	PORT_B_INTERRUPT_VECTOR,
-	COUNTER_TIMER_INTERRUPT_VECTOR,
-	PORT_C_DATA_PATH_POLARITY,
-	PORT_C_DATA_DIRECTION,
-	PORT_C_SPECIAL_IO_CONTROL,
-	PORT_A_COMMAND_AND_STATUS,
-	PORT_B_COMMAND_AND_STATUS,
-	COUNTER_TIMER_1_COMMAND_AND_STATUS,
-	COUNTER_TIMER_2_COMMAND_AND_STATUS,
-	COUNTER_TIMER_3_COMMAND_AND_STATUS,
-	PORT_A_DATA,
-	PORT_B_DATA,
-	PORT_C_DATA,
-	COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE,
-	COUNTER_TIMER_1_CURRENT_COUNT_LS_BYTE,
-	COUNTER_TIMER_2_CURRENT_COUNT_MS_BYTE,
-	COUNTER_TIMER_2_CURRENT_COUNT_LS_BYTE,
-	COUNTER_TIMER_3_CURRENT_COUNT_MS_BYTE,
-	COUNTER_TIMER_3_CURRENT_COUNT_LS_BYTE,
-	COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE,
-	COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE,
-	COUNTER_TIMER_2_TIME_CONSTANT_MS_BYTE,
-	COUNTER_TIMER_2_TIME_CONSTANT_LS_BYTE,
-	COUNTER_TIMER_3_TIME_CONSTANT_MS_BYTE,
-	COUNTER_TIMER_3_TIME_CONSTANT_LS_BYTE,
-	COUNTER_TIMER_1_MODE_SPECIFICATION,
-	COUNTER_TIMER_2_MODE_SPECIFICATION,
-	COUNTER_TIMER_3_MODE_SPECIFICATION,
-	CURRENT_VECTOR,
-	PORT_A_MODE_SPECIFICATION,
-	PORT_A_HANDSHAKE_SPECIFICATION,
-	PORT_A_DATA_PATH_POLARITY,
-	PORT_A_DATA_DIRECTION,
-	PORT_A_SPECIAL_IO_CONTROL,
-	PORT_A_PATTERN_POLARITY,
-	PORT_A_PATTERN_TRANSITION,
-	PORT_A_PATTERN_MASK,
-	PORT_B_MODE_SPECIFICATION,
-	PORT_B_HANDSHAKE_SPECIFICATION,
-	PORT_B_DATA_PATH_POLARITY,
-	PORT_B_DATA_DIRECTION,
-	PORT_B_SPECIAL_IO_CONTROL,
-	PORT_B_PATTERN_POLARITY,
-	PORT_B_PATTERN_TRANSITION,
-	PORT_B_PATTERN_MASK
-};
-
-
-// interrupt control
-enum
-{
-	IC_NULL = 0,
-	IC_CLEAR_IP_IUS,
-	IC_SET_IUS,
-	IC_CLEAR_IUS,
-	IC_SET_IP,
-	IC_CLEAR_IP,
-	IC_SET_IE,
-	IC_CLEAR_IE
-};
-
-
-// counter/timer link control
-enum
-{
-	LC_INDEPENDENT = 0,
-	LC_CT1_GATES_CT2,
-	LC_CT1_TRIGGERS_CT2,
-	LC_CT1_COUNTS_CT2
-};
-
-
-// port type select
-enum
-{
-	PTS_BIT = 0,
-	PTS_INPUT,
-	PTS_OUTPUT,
-	PTS_BIDIRECTIONAL
-};
-
 static const char *PMS_PTS[] = { "Bit", "Input", "Output", "Bidirectional" };
-
-
-// pattern mode specification
-enum
-{
-	PMS_DISABLE = 0,
-	PMS_AND,
-	PMS_OR,
-	PMS_OR_PEV
-};
-
 static const char *PMS_PMS[] = { "Disabled", "AND", "OR", "OR-PEV" };
-
-
-// handshake specification
-enum
-{
-	HTS_INTERLOCKED = 0,
-	HTS_STROBED,
-	HTS_PULSED,
-	HTS_3_WIRE
-};
-
-
-// request/wait specification
-enum
-{
-	RWS_DISABLED = 0,
-	RWS_OUTPUT_WAIT,
-	RWS_INPUT_WAIT = 3,
-	RWS_SPECIAL_REQUEST,
-	RWS_OUTPUT_REQUEST,
-	RWS_INPUT_REQUEST = 7
-};
-
-
-// pattern specification
-enum
-{
-	BIT_MASKED_OFF = 0,
-	ANY_TRANSITION,
-	ZERO = 4,
-	ONE,
-	ONE_TO_ZERO,
-	ZERO_TO_ONE
-};
-
-
-// output duty cycle
-enum
-{
-	DCS_PULSE,
-	DCS_ONE_SHOT,
-	DCS_SQUARE_WAVE,
-	DCS_DO_NOT_USE
-};
-
 static const char *CTMS_DCS[] = { "Pulse", "One-shot", "Square Wave", "Do not use" };
 
 
@@ -284,7 +122,7 @@ static const char *CTMS_DCS[] = { "Pulse", "One-shot", "Square Wave", "Do not us
 //  get_interrupt_vector -
 //-------------------------------------------------
 
-inline void z8536_device::get_interrupt_vector()
+void z8536_device::get_interrupt_vector()
 {
 	UINT8 vector = 0xff;
 
@@ -377,7 +215,7 @@ inline void z8536_device::get_interrupt_vector()
 //  check_interrupt - check interrupt status
 //-------------------------------------------------
 
-inline void z8536_device::check_interrupt()
+void z8536_device::check_interrupt()
 {
 	int state = ASSERT_LINE;
 
@@ -401,11 +239,11 @@ inline void z8536_device::check_interrupt()
 		state = CLEAR_LINE;
 	}
 
-	if (m_int != state)
+	if (m_irq != state)
 	{
 		if (LOG) logerror("%s Z8536 '%s' Interrupt: %u\n", machine().describe_context(), tag(), state);
-		m_int = state;
-		m_out_int_func(state);
+		m_irq = state;
+		m_write_irq(state);
 	}
 }
 
@@ -414,22 +252,22 @@ inline void z8536_device::check_interrupt()
 //  read_register - read from register
 //-------------------------------------------------
 
-inline UINT8 z8536_device::read_register(offs_t offset)
+UINT8 z8536_device::read_register(offs_t offset)
 {
 	UINT8 data = 0;
 
 	switch (offset)
 	{
 	case PORT_A_DATA:
-		data = m_in_pa_func(0);
+		data = m_read_pa(0);
 		break;
 
 	case PORT_B_DATA:
-		data = m_in_pb_func(0);
+		data = m_read_pb(0);
 		break;
 
 	case PORT_C_DATA:
-		data = 0xf0 | (m_in_pc_func(0) & 0x0f);
+		data = 0xf0 | (m_read_pc(0) & 0x0f);
 		break;
 
 	case COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE:
@@ -491,7 +329,7 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 //  read_register - masked read from register
 //-------------------------------------------------
 
-inline UINT8 z8536_device::read_register(offs_t offset, UINT8 mask)
+UINT8 z8536_device::read_register(offs_t offset, UINT8 mask)
 {
 	return read_register(offset) & mask;
 }
@@ -501,7 +339,7 @@ inline UINT8 z8536_device::read_register(offs_t offset, UINT8 mask)
 //  write_register - write to register
 //-------------------------------------------------
 
-inline void z8536_device::write_register(offs_t offset, UINT8 data)
+void z8536_device::write_register(offs_t offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -656,11 +494,11 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		break;
 
 	case PORT_A_DATA:
-		m_out_pa_func(0, data);
+		m_write_pa((offs_t)0, data);
 		break;
 
 	case PORT_B_DATA:
-		m_out_pb_func(0, data);
+		m_write_pb((offs_t)0, data);
 		break;
 
 	case PORT_C_DATA:
@@ -669,7 +507,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
-		m_out_pc_func(0, m_output[PORT_C]);
+		m_write_pc((offs_t)0, m_output[PORT_C]);
 		}
 		break;
 
@@ -794,7 +632,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 //  write_register - masked write to register
 //-------------------------------------------------
 
-inline void z8536_device::write_register(offs_t offset, UINT8 data, UINT8 mask)
+void z8536_device::write_register(offs_t offset, UINT8 data, UINT8 mask)
 {
 	UINT8 combined_data = (data & mask) | (m_register[offset] & (mask ^ 0xff));
 
@@ -806,7 +644,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data, UINT8 mask)
 //   counter_enabled - is counter enabled?
 //-------------------------------------------------
 
-inline bool z8536_device::counter_enabled(device_timer_id id)
+bool z8536_device::counter_enabled(device_timer_id id)
 {
 	bool enabled = false;
 
@@ -833,7 +671,7 @@ inline bool z8536_device::counter_enabled(device_timer_id id)
 //   counter_external_output -
 //-------------------------------------------------
 
-inline bool z8536_device::counter_external_output(device_timer_id id)
+bool z8536_device::counter_external_output(device_timer_id id)
 {
 	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_EOE) ? true : false;
 }
@@ -843,7 +681,7 @@ inline bool z8536_device::counter_external_output(device_timer_id id)
 //   counter_external_count -
 //-------------------------------------------------
 
-inline bool z8536_device::counter_external_count(device_timer_id id)
+bool z8536_device::counter_external_count(device_timer_id id)
 {
 	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_ECE) ? true : false;
 }
@@ -853,7 +691,7 @@ inline bool z8536_device::counter_external_count(device_timer_id id)
 //   counter_external_trigger -
 //-------------------------------------------------
 
-inline bool z8536_device::counter_external_trigger(device_timer_id id)
+bool z8536_device::counter_external_trigger(device_timer_id id)
 {
 	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_ETE) ? true : false;
 }
@@ -863,7 +701,7 @@ inline bool z8536_device::counter_external_trigger(device_timer_id id)
 //   counter_external_gate -
 //-------------------------------------------------
 
-inline bool z8536_device::counter_external_gate(device_timer_id id)
+bool z8536_device::counter_external_gate(device_timer_id id)
 {
 	return (m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_EDE) ? true : false;
 }
@@ -873,7 +711,7 @@ inline bool z8536_device::counter_external_gate(device_timer_id id)
 //   counter_gated -
 //-------------------------------------------------
 
-inline bool z8536_device::counter_gated(device_timer_id id)
+bool z8536_device::counter_gated(device_timer_id id)
 {
 	return (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_GCB) ? true : false;
 }
@@ -883,7 +721,7 @@ inline bool z8536_device::counter_gated(device_timer_id id)
 //   count - count down
 //-------------------------------------------------
 
-inline void z8536_device::count(device_timer_id id)
+void z8536_device::count(device_timer_id id)
 {
 	if (!counter_gated(id)) return;
 	if (!(m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
@@ -928,7 +766,7 @@ inline void z8536_device::count(device_timer_id id)
 //  trigger -
 //-------------------------------------------------
 
-inline void z8536_device::trigger(device_timer_id id)
+void z8536_device::trigger(device_timer_id id)
 {
 	// ignore triggers during countdown if retrigger is disabled
 	if (!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_REB) && (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
@@ -947,7 +785,7 @@ inline void z8536_device::trigger(device_timer_id id)
 //  gate -
 //-------------------------------------------------
 
-inline void z8536_device::gate(device_timer_id id, int state)
+void z8536_device::gate(device_timer_id id, int state)
 {
 	// TODO
 }
@@ -957,7 +795,7 @@ inline void z8536_device::gate(device_timer_id id, int state)
 //  match_pattern -
 //-------------------------------------------------
 
-inline void z8536_device::match_pattern(int port)
+void z8536_device::match_pattern(int port)
 {
 	UINT8 pms = m_register[PORT_A_MODE_SPECIFICATION + (port << 3)];
 	UINT8 pm = m_register[PORT_A_PATTERN_MASK + (port << 3)];
@@ -983,7 +821,7 @@ inline void z8536_device::match_pattern(int port)
 //  external_port_w - external port write
 //-------------------------------------------------
 
-inline void z8536_device::external_port_w(int port, int bit, int state)
+void z8536_device::external_port_w(int port, int bit, int state)
 {
 	switch (port)
 	{
@@ -1017,38 +855,18 @@ inline void z8536_device::external_port_w(int port, int bit, int state)
 //  z8536_device - constructor
 //-------------------------------------------------
 
-z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock, "z8536", __FILE__),
-		device_z80daisy_interface(mconfig, *this),
-		m_int(CLEAR_LINE)
+z8536_device::z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, Z8536, "Zilog Z8536", tag, owner, clock, "z8536", __FILE__),
+	device_z80daisy_interface(mconfig, *this),
+	m_write_irq(*this),
+	m_read_pa(*this),
+	m_write_pa(*this),
+	m_read_pb(*this),
+	m_write_pb(*this),
+	m_read_pc(*this),
+	m_write_pc(*this),
+	m_irq(CLEAR_LINE)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z8536_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const z8536_interface *intf = reinterpret_cast<const z8536_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<z8536_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-		memset(&m_in_pc_cb, 0, sizeof(m_in_pc_cb));
-		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-	}
 }
 
 
@@ -1071,13 +889,13 @@ void z8536_device::device_start()
 	m_timer->adjust(attotime::from_hz(clock() / 2), 0, attotime::from_hz(clock() / 2));
 
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_in_pa_func.resolve(m_in_pa_cb, *this);
-	m_out_pa_func.resolve(m_out_pa_cb, *this);
-	m_in_pb_func.resolve(m_in_pb_cb, *this);
-	m_out_pb_func.resolve(m_out_pb_cb, *this);
-	m_in_pc_func.resolve(m_in_pc_cb, *this);
-	m_out_pc_func.resolve(m_out_pc_cb, *this);
+	m_write_irq.resolve_safe();
+	m_read_pa.resolve_safe(0);
+	m_write_pa.resolve_safe();
+	m_read_pb.resolve_safe(0);
+	m_write_pb.resolve_safe();
+	m_read_pc.resolve_safe(0);
+	m_write_pc.resolve_safe();
 }
 
 
@@ -1305,41 +1123,3 @@ int z8536_device::intack_r()
 
 	return data;
 }
-
-
-//-------------------------------------------------
-//  pa*_w - port A bits 0-7 write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( z8536_device::pa0_w ) { external_port_w(PORT_A, 0, state); }
-WRITE_LINE_MEMBER( z8536_device::pa1_w ) { external_port_w(PORT_A, 1, state); }
-WRITE_LINE_MEMBER( z8536_device::pa2_w ) { external_port_w(PORT_A, 2, state); }
-WRITE_LINE_MEMBER( z8536_device::pa3_w ) { external_port_w(PORT_A, 3, state); }
-WRITE_LINE_MEMBER( z8536_device::pa4_w ) { external_port_w(PORT_A, 4, state); }
-WRITE_LINE_MEMBER( z8536_device::pa5_w ) { external_port_w(PORT_A, 5, state); }
-WRITE_LINE_MEMBER( z8536_device::pa6_w ) { external_port_w(PORT_A, 6, state); }
-WRITE_LINE_MEMBER( z8536_device::pa7_w ) { external_port_w(PORT_A, 7, state); }
-
-
-//-------------------------------------------------
-//  pb*_w - port B bits 0-7 write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( z8536_device::pb0_w ) { external_port_w(PORT_B, 0, state); }
-WRITE_LINE_MEMBER( z8536_device::pb1_w ) { external_port_w(PORT_B, 1, state); }
-WRITE_LINE_MEMBER( z8536_device::pb2_w ) { external_port_w(PORT_B, 2, state); }
-WRITE_LINE_MEMBER( z8536_device::pb3_w ) { external_port_w(PORT_B, 3, state); }
-WRITE_LINE_MEMBER( z8536_device::pb4_w ) { external_port_w(PORT_B, 4, state); }
-WRITE_LINE_MEMBER( z8536_device::pb5_w ) { external_port_w(PORT_B, 5, state); }
-WRITE_LINE_MEMBER( z8536_device::pb6_w ) { external_port_w(PORT_B, 6, state); }
-WRITE_LINE_MEMBER( z8536_device::pb7_w ) { external_port_w(PORT_B, 7, state); }
-
-
-//-------------------------------------------------
-//  pc*_w - port C bits 0-3 write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( z8536_device::pc0_w ) { external_port_w(PORT_C, 0, state); }
-WRITE_LINE_MEMBER( z8536_device::pc1_w ) { external_port_w(PORT_C, 1, state); }
-WRITE_LINE_MEMBER( z8536_device::pc2_w ) { external_port_w(PORT_C, 2, state); }
-WRITE_LINE_MEMBER( z8536_device::pc3_w ) { external_port_w(PORT_C, 3, state); }

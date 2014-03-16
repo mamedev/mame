@@ -803,17 +803,6 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	m_nvram->sk_w(clock);
 }
 
-static Z8536_INTERFACE( cio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_2),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_w)
-};
-
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -947,7 +936,14 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
 	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16, line_cb_t(FUNC(abc1600_state::scc_irq), static_cast<abc1600_state *>(owner)))
-	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
+	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL_64MHz/16)
+	MCFG_Z8536_IRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_2))
+	MCFG_Z8536_PA_IN_CALLBACK(READ8(abc1600_state, cio_pa_r))
+	MCFG_Z8536_PB_IN_CALLBACK(READ8(abc1600_state, cio_pb_r))
+	MCFG_Z8536_PB_OUT_CALLBACK(WRITE8(abc1600_state, cio_pb_w))
+	MCFG_Z8536_PC_IN_CALLBACK(READ8(abc1600_state, cio_pc_r))
+	MCFG_Z8536_PC_OUT_CALLBACK(WRITE8(abc1600_state, cio_pc_w))
+
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_FD1797x_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)

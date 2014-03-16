@@ -43,22 +43,29 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_Z8536_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, Z8536, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_Z8536_IRQ_CALLBACK(_write) \
+	devcb = &z8536_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-#define Z8536_INTERFACE(name) \
-	const z8536_interface (name)=
+#define MCFG_Z8536_PA_IN_CALLBACK(_read) \
+	devcb = &z8536_device::set_pa_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_Z8536_PA_OUT_CALLBACK(_write) \
+	devcb = &z8536_device::set_pa_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_Z8536_PB_IN_CALLBACK(_read) \
+	devcb = &z8536_device::set_pb_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_Z8536_PB_OUT_CALLBACK(_write) \
+	devcb = &z8536_device::set_pb_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_Z8536_PC_IN_CALLBACK(_read) \
+	devcb = &z8536_device::set_pc_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_Z8536_PC_OUT_CALLBACK(_write) \
+	devcb = &z8536_device::set_pc_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -66,64 +73,53 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> z8536_interface
-
-struct z8536_interface
-{
-	devcb_write_line        m_out_int_cb;
-
-	devcb_read8             m_in_pa_cb;
-	devcb_write8            m_out_pa_cb;
-
-	devcb_read8             m_in_pb_cb;
-	devcb_write8            m_out_pb_cb;
-
-	devcb_read8             m_in_pc_cb;
-	devcb_write8            m_out_pc_cb;
-};
-
-
 // ======================> z8536_device
 
 class z8536_device :  public device_t,
-						public device_z80daisy_interface,
-						public z8536_interface
+					  public device_z80daisy_interface
 {
 public:
 	// construction/destruction
 	z8536_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pa.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pa.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pc_rd_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_read_pc.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<z8536_device &>(device).m_write_pc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 	int intack_r();
 
-	DECLARE_WRITE_LINE_MEMBER( pa0_w );
-	DECLARE_WRITE_LINE_MEMBER( pa1_w );
-	DECLARE_WRITE_LINE_MEMBER( pa2_w );
-	DECLARE_WRITE_LINE_MEMBER( pa3_w );
-	DECLARE_WRITE_LINE_MEMBER( pa4_w );
-	DECLARE_WRITE_LINE_MEMBER( pa5_w );
-	DECLARE_WRITE_LINE_MEMBER( pa6_w );
-	DECLARE_WRITE_LINE_MEMBER( pa7_w );
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { external_port_w(PORT_A, 0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { external_port_w(PORT_A, 1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { external_port_w(PORT_A, 2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { external_port_w(PORT_A, 3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { external_port_w(PORT_A, 4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { external_port_w(PORT_A, 5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { external_port_w(PORT_A, 6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { external_port_w(PORT_A, 7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pb0_w );
-	DECLARE_WRITE_LINE_MEMBER( pb1_w );
-	DECLARE_WRITE_LINE_MEMBER( pb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pb3_w );
-	DECLARE_WRITE_LINE_MEMBER( pb4_w );
-	DECLARE_WRITE_LINE_MEMBER( pb5_w );
-	DECLARE_WRITE_LINE_MEMBER( pb6_w );
-	DECLARE_WRITE_LINE_MEMBER( pb7_w );
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { external_port_w(PORT_B, 0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { external_port_w(PORT_B, 1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { external_port_w(PORT_B, 2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { external_port_w(PORT_B, 3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { external_port_w(PORT_B, 4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { external_port_w(PORT_B, 5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { external_port_w(PORT_B, 6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { external_port_w(PORT_B, 7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pc0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc3_w );
+	DECLARE_WRITE_LINE_MEMBER( pc0_w ) { external_port_w(PORT_C, 0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc1_w ) { external_port_w(PORT_C, 1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc2_w ) { external_port_w(PORT_C, 2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc3_w ) { external_port_w(PORT_C, 3, state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -134,47 +130,206 @@ protected:
 	virtual void z80daisy_irq_reti();
 
 private:
-	static const device_timer_id TIMER_1 = 0;
-	static const device_timer_id TIMER_2 = 1;
-	static const device_timer_id TIMER_3 = 2;
+	enum
+	{
+		TIMER_1 = 0,
+		TIMER_2,
+		TIMER_3
+	};
 
-	static const int PORT_A = 0;
-	static const int PORT_B = 1;
-	static const int PORT_C = 2;
+	// states
+	enum
+	{
+		STATE_RESET = -1,
+		STATE_0,
+		STATE_1
+	};
 
-	inline void get_interrupt_vector();
-	inline void check_interrupt();
 
-	inline UINT8 read_register(offs_t offset);
-	inline UINT8 read_register(offs_t offset, UINT8 mask);
-	inline void write_register(offs_t offset, UINT8 data);
-	inline void write_register(offs_t offset, UINT8 data, UINT8 mask);
+	// ports
+	enum
+	{
+		PORT_C = 0,
+		PORT_B,
+		PORT_A,
+		CONTROL
+	};
 
-	inline bool counter_enabled(device_timer_id id);
-	inline bool counter_external_output(device_timer_id id);
-	inline bool counter_external_count(device_timer_id id);
-	inline bool counter_external_trigger(device_timer_id id);
-	inline bool counter_external_gate(device_timer_id id);
-	inline bool counter_gated(device_timer_id id);
-	inline void count(device_timer_id id);
-	inline void trigger(device_timer_id id);
-	inline void gate(device_timer_id id, int state);
-	inline void match_pattern(int port);
-	inline void external_port_w(int port, int bit, int state);
 
-	devcb_resolved_write_line       m_out_int_func;
+	// registers
+	enum
+	{
+		MASTER_INTERRUPT_CONTROL = 0,
+		MASTER_CONFIGURATION_CONTROL,
+		PORT_A_INTERRUPT_VECTOR,
+		PORT_B_INTERRUPT_VECTOR,
+		COUNTER_TIMER_INTERRUPT_VECTOR,
+		PORT_C_DATA_PATH_POLARITY,
+		PORT_C_DATA_DIRECTION,
+		PORT_C_SPECIAL_IO_CONTROL,
+		PORT_A_COMMAND_AND_STATUS,
+		PORT_B_COMMAND_AND_STATUS,
+		COUNTER_TIMER_1_COMMAND_AND_STATUS,
+		COUNTER_TIMER_2_COMMAND_AND_STATUS,
+		COUNTER_TIMER_3_COMMAND_AND_STATUS,
+		PORT_A_DATA,
+		PORT_B_DATA,
+		PORT_C_DATA,
+		COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE,
+		COUNTER_TIMER_1_CURRENT_COUNT_LS_BYTE,
+		COUNTER_TIMER_2_CURRENT_COUNT_MS_BYTE,
+		COUNTER_TIMER_2_CURRENT_COUNT_LS_BYTE,
+		COUNTER_TIMER_3_CURRENT_COUNT_MS_BYTE,
+		COUNTER_TIMER_3_CURRENT_COUNT_LS_BYTE,
+		COUNTER_TIMER_1_TIME_CONSTANT_MS_BYTE,
+		COUNTER_TIMER_1_TIME_CONSTANT_LS_BYTE,
+		COUNTER_TIMER_2_TIME_CONSTANT_MS_BYTE,
+		COUNTER_TIMER_2_TIME_CONSTANT_LS_BYTE,
+		COUNTER_TIMER_3_TIME_CONSTANT_MS_BYTE,
+		COUNTER_TIMER_3_TIME_CONSTANT_LS_BYTE,
+		COUNTER_TIMER_1_MODE_SPECIFICATION,
+		COUNTER_TIMER_2_MODE_SPECIFICATION,
+		COUNTER_TIMER_3_MODE_SPECIFICATION,
+		CURRENT_VECTOR,
+		PORT_A_MODE_SPECIFICATION,
+		PORT_A_HANDSHAKE_SPECIFICATION,
+		PORT_A_DATA_PATH_POLARITY,
+		PORT_A_DATA_DIRECTION,
+		PORT_A_SPECIAL_IO_CONTROL,
+		PORT_A_PATTERN_POLARITY,
+		PORT_A_PATTERN_TRANSITION,
+		PORT_A_PATTERN_MASK,
+		PORT_B_MODE_SPECIFICATION,
+		PORT_B_HANDSHAKE_SPECIFICATION,
+		PORT_B_DATA_PATH_POLARITY,
+		PORT_B_DATA_DIRECTION,
+		PORT_B_SPECIAL_IO_CONTROL,
+		PORT_B_PATTERN_POLARITY,
+		PORT_B_PATTERN_TRANSITION,
+		PORT_B_PATTERN_MASK
+	};
 
-	devcb_resolved_read8            m_in_pa_func;
-	devcb_resolved_write8           m_out_pa_func;
 
-	devcb_resolved_read8            m_in_pb_func;
-	devcb_resolved_write8           m_out_pb_func;
+	// interrupt control
+	enum
+	{
+		IC_NULL = 0,
+		IC_CLEAR_IP_IUS,
+		IC_SET_IUS,
+		IC_CLEAR_IUS,
+		IC_SET_IP,
+		IC_CLEAR_IP,
+		IC_SET_IE,
+		IC_CLEAR_IE
+	};
 
-	devcb_resolved_read8            m_in_pc_func;
-	devcb_resolved_write8           m_out_pc_func;
+
+	// counter/timer link control
+	enum
+	{
+		LC_INDEPENDENT = 0,
+		LC_CT1_GATES_CT2,
+		LC_CT1_TRIGGERS_CT2,
+		LC_CT1_COUNTS_CT2
+	};
+
+
+	// port type select
+	enum
+	{
+		PTS_BIT = 0,
+		PTS_INPUT,
+		PTS_OUTPUT,
+		PTS_BIDIRECTIONAL
+	};
+
+
+
+	// pattern mode specification
+	enum
+	{
+		PMS_DISABLE = 0,
+		PMS_AND,
+		PMS_OR,
+		PMS_OR_PEV
+	};
+
+	// handshake specification
+	enum
+	{
+		HTS_INTERLOCKED = 0,
+		HTS_STROBED,
+		HTS_PULSED,
+		HTS_3_WIRE
+	};
+
+
+	// request/wait specification
+	enum
+	{
+		RWS_DISABLED = 0,
+		RWS_OUTPUT_WAIT,
+		RWS_INPUT_WAIT = 3,
+		RWS_SPECIAL_REQUEST,
+		RWS_OUTPUT_REQUEST,
+		RWS_INPUT_REQUEST = 7
+	};
+
+
+	// pattern specification
+	enum
+	{
+		BIT_MASKED_OFF = 0,
+		ANY_TRANSITION,
+		ZERO = 4,
+		ONE,
+		ONE_TO_ZERO,
+		ZERO_TO_ONE
+	};
+
+
+	// output duty cycle
+	enum
+	{
+		DCS_PULSE,
+		DCS_ONE_SHOT,
+		DCS_SQUARE_WAVE,
+		DCS_DO_NOT_USE
+	};
+
+	void get_interrupt_vector();
+	void check_interrupt();
+
+	UINT8 read_register(offs_t offset);
+	UINT8 read_register(offs_t offset, UINT8 mask);
+	void write_register(offs_t offset, UINT8 data);
+	void write_register(offs_t offset, UINT8 data, UINT8 mask);
+
+	bool counter_enabled(device_timer_id id);
+	bool counter_external_output(device_timer_id id);
+	bool counter_external_count(device_timer_id id);
+	bool counter_external_trigger(device_timer_id id);
+	bool counter_external_gate(device_timer_id id);
+	bool counter_gated(device_timer_id id);
+	void count(device_timer_id id);
+	void trigger(device_timer_id id);
+	void gate(device_timer_id id, int state);
+	void match_pattern(int port);
+	void external_port_w(int port, int bit, int state);
+
+	devcb2_write_line       m_write_irq;
+
+	devcb2_read8            m_read_pa;
+	devcb2_write8           m_write_pa;
+
+	devcb2_read8            m_read_pb;
+	devcb2_write8           m_write_pb;
+
+	devcb2_read8            m_read_pc;
+	devcb2_write8           m_write_pc;
 
 	// interrupt state
-	int m_int;
+	int m_irq;
 
 	// register state
 	int m_state;
