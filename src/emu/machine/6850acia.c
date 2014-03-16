@@ -356,9 +356,12 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 					}
 					else
 					{
-						m_rx_counter = 0;
+						if (m_rx_counter != 1)
+						{
+							if (LOG) logerror("MC6850 '%s': RX FALSE START BIT\n", tag());
+						}
 
-						if (LOG) logerror("MC6850 '%s': RX FALSE START BIT\n", tag());
+						m_rx_counter = 0;
 					}
 					break;
 
