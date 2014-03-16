@@ -176,6 +176,7 @@ void s3virge_vga_device::s3_define_video_mode()
 	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
 	double m,n;
 	int r;
+	double freq;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
@@ -183,7 +184,8 @@ void s3virge_vga_device::s3_define_video_mode()
 		m = vga.sequencer.data[0x13] & 0x7f;
 		n = vga.sequencer.data[0x12] & 0x1f;
 		r = (vga.sequencer.data[0x12] & 0x60) >> 5;
-		xtal = (double)((m+2.0f) / ((n+2.0f)*(double)(1<<r))) * 16000000;
+		freq = ((double)(m+2) / (double)((n+2)*(pow(2.0,r)))) * 14.318f; // clock between XIN and XOUT
+		xtal = freq * 1000000;
 		//printf("DCLK set to %dHz M=%f N=%f R=%i\n",xtal,m,n,r);
 	}
 
