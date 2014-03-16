@@ -234,6 +234,9 @@ public:
 	DECLARE_READ8_MEMBER(amstrad_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
+	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
+	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
+
 	void aleste_interrupt(bool state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -319,13 +322,6 @@ protected:
 
 
 /*----------- defined in machine/amstrad.c -----------*/
-
-
-WRITE_LINE_DEVICE_HANDLER( cpc_irq_w );
-WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
-WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
-WRITE_LINE_DEVICE_HANDLER( cpc_romen );
-
 
 extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;

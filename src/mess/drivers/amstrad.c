@@ -844,8 +844,8 @@ CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
 	DEVCB_NULL,  // RESET
-	DEVCB_LINE(cpc_romdis),  // ROMDIS
-	DEVCB_LINE(cpc_romen)  // /ROMEN
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romdis),  // ROMDIS
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romen)  // /ROMEN
 };
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )

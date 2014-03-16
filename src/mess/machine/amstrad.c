@@ -1142,33 +1142,19 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	return NULL;
 }
 
-WRITE_LINE_DEVICE_HANDLER(cpc_irq_w)
+WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	m_gate_array.romdis = state;
+	amstrad_rethinkMemory();
 }
 
-WRITE_LINE_DEVICE_HANDLER(cpc_nmi_w)
+WRITE_LINE_MEMBER(amstrad_state::cpc_romen)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
-{
-	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
-
-	tstate->m_gate_array.romdis = state;
-	tstate->amstrad_rethinkMemory();
-}
-
-WRITE_LINE_DEVICE_HANDLER(cpc_romen)
-{
-	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
-
 	if(state != 0)
-		tstate->m_gate_array.mrer &= ~0x04;
+		m_gate_array.mrer &= ~0x04;
 	else
-		tstate->m_gate_array.mrer |= 0x04;
-	tstate->amstrad_rethinkMemory();
+		m_gate_array.mrer |= 0x04;
+	amstrad_rethinkMemory();
 }
 
 
