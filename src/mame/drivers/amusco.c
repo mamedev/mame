@@ -5,6 +5,12 @@
 
   Preliminary driver by Roberto Fresca.
 
+  TODO:
+  - i8259 and irqs
+  - understand how videoram works (tied to port $70?)
+  - inputs
+  - everything else;
+
 *******************************************************************************
 
   Hardware Notes:
@@ -69,6 +75,7 @@
 #include "video/mc6845.h"
 #include "machine/i8255.h"
 #include "sound/sn76496.h"
+#include "machine/pic8259.h"
 
 
 class amusco_state : public driver_device
@@ -78,7 +85,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_pic(*this, "pic8259"),
+		m_crtc(*this, "crtc")
+		{ }
 
 	required_shared_ptr<UINT16> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -86,11 +96,19 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(amusco);
+	DECLARE_READ8_MEMBER(mc6845_r);
+	DECLARE_WRITE8_MEMBER(mc6845_w);
+	DECLARE_WRITE16_MEMBER(vram_w);
+
 	UINT32 screen_update_amusco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amusco_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	INTERRUPT_GEN_MEMBER(amusco_irq);
+	required_device<pic8259_device> m_pic;
+	required_device<mc6845_device> m_crtc;
+	INTERRUPT_GEN_MEMBER(amusco_vblank_irq);
+	INTERRUPT_GEN_MEMBER(amusco_timer_irq);
+	UINT16 m_address;
 };
 
 
@@ -100,8 +118,7 @@ public:
 
 WRITE16_MEMBER(amusco_state::amusco_videoram_w)
 {
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+
 }
 
 
@@ -118,7 +135,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(
 							0 /* bank */,
 							code,
-							0 /* color */,
+							2 /* color */,
 							0
 						);
 }
@@ -149,26 +166,55 @@ PALETTE_INIT_MEMBER(amusco_state, amusco)
 *************************/
 
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 16, amusco_state )
-	AM_RANGE(0x0c000, 0x0c3ff) AM_WRITE(amusco_videoram_w) AM_SHARE("videoram")	// placeholder
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")	// placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
+READ8_MEMBER( amusco_state::mc6845_r)
+{
+	if(offset & 1)
+		return m_crtc->register_r(space, 0);
+
+	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
+}
+
+WRITE8_MEMBER( amusco_state::mc6845_w)
+{
+	if(offset & 1)
+		m_crtc->register_w(space, 0,data);
+
+	m_crtc->address_w(space,0,data);
+}
+
+WRITE16_MEMBER( amusco_state::vram_w)
+{
+	/* WRONG! */
+	m_videoram[m_address] = data;
+	m_bg_tilemap->mark_tile_dirty(m_address);
+	m_address++;
+	m_address&=0x7ff;
+}
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 16, amusco_state )
-	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0x00ff)
-	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE8(mc6845_r, mc6845_w, 0xffff)
+//	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0x00ff)
+//	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff ) //PPI 8255
+
 	AM_RANGE(0x0060, 0x0061) AM_DEVWRITE8("sn", sn76489_device, write, 0x00ff)								/* sound */
+	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
 //	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN1")
 //	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
-//	AM_RANGE(0x0014, 0x0015) AM_READ_PORT("IN3")
-//	AM_RANGE(0x0016, 0x0017) AM_READ_PORT("IN3")
+	AM_RANGE(0x0030, 0x0031) AM_READ_PORT("IN2") AM_WRITENOP // lamps?
+	AM_RANGE(0x0040, 0x0041) AM_READ_PORT("IN3")
 ADDRESS_MAP_END
 
 /* I/O byte R/W
 
   0000 writes CRTC register (high nibble)    screen size: 88*8 27*10  -  visible scr: 74*8 24*10
   0000 writes CRTC address (low nibble)      reg values: 57, 4a, 4b, 0b, 1a, 08, 18, 19, 48, 09, 40, 00, 00, 00, 00, 00, 00.
-  
+
    -----------------
 
    unknown writes:
@@ -210,6 +256,7 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN2-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("IN3-1")
@@ -220,6 +267,7 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
@@ -367,6 +415,12 @@ GFXDECODE_END
 *    CRTC Interface    *
 ************************/
 
+MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
+{
+	amusco_state *state = device->machine().driver_data<amusco_state>();
+	state->m_address = address;
+}
+
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
@@ -379,15 +433,20 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL, /* callback for cursor state changes */
 	DEVCB_NULL, /* HSYNC callback */
 	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
+	crtc_addr        /* update address callback */
 };
 
 
-INTERRUPT_GEN_MEMBER(amusco_state::amusco_irq)
+INTERRUPT_GEN_MEMBER(amusco_state::amusco_vblank_irq)
 {
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80/4); // sets 0x665 to 0xff
 }
 
+
+INTERRUPT_GEN_MEMBER(amusco_state::amusco_timer_irq)
+{
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x84/4); // sets 0x918 bit 3
+}
 
 /*************************
 *    Machine Drivers     *
@@ -400,13 +459,16 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_CPU_ADD("maincpu", I8086, CPU_CLOCK)        // 5 MHz ?
 	MCFG_CPU_PROGRAM_MAP(amusco_mem_map)
 	MCFG_CPU_IO_MAP(amusco_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amusco_state, amusco_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amusco_state, amusco_vblank_irq)
+	MCFG_CPU_PERIODIC_INT_DRIVER(amusco_state, amusco_timer_irq,  60*2)
+
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(88*8, 27*10)							// screen size: 88*8 27*10 
+	MCFG_SCREEN_SIZE(88*8, 27*10)							// screen size: 88*8 27*10
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)	// visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DRIVER(amusco_state, screen_update_amusco)
 
@@ -415,7 +477,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK, mc6845_intf) /* guess */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

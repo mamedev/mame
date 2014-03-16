@@ -108,7 +108,7 @@ struct mc6845_interface
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	devcb_write_line            m_out_vsync_func;
 
-	/* Called whenenever the update address changes
+	/* Called whenever the update address changes
 	 * For vblank/hblank timing strobe indicates the physical update.
 	 * vblank/hblank timing not supported yet! */
 
