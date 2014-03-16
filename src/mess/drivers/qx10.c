@@ -408,8 +408,8 @@ static I8237_INTERFACE( qx10_dma8237_1_interface )
 	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_DRIVER_MEMBER(qx10_state, memory_read_byte),
 	DEVCB_DRIVER_MEMBER(qx10_state, memory_write_byte),
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_r)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_w)*/ DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 

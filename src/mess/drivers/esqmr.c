@@ -37,6 +37,8 @@ public:
 
 public:
 	DECLARE_DRIVER_INIT(mr);
+	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	DECLARE_READ16_MEMBER(esq5506_read_adc);	
 };
 
 void esqmr_state::machine_reset()
@@ -50,11 +52,11 @@ static ADDRESS_MAP_START( mr_map, AS_PROGRAM, 32, esqmr_state )
 //    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static void esq5506_otto_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
 {
 }
 
-static READ16_DEVICE_HANDLER(esq5506_read_adc)
+READ16_MEMBER(esqmr_state::esq5506_read_adc)
 {
 	return 0;
 }
@@ -66,8 +68,8 @@ static const es5506_interface es5506_config =
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
 	1,          /* channels */
-	DEVCB_LINE(esq5506_otto_irq), /* irq */
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
+	DEVCB_DRIVER_LINE_MEMBER(esqmr_state,esq5506_otto_irq), /* irq */
+	DEVCB_DRIVER_MEMBER16(esqmr_state, esq5506_read_adc)
 };
 
 static const es5506_interface es5506_2_config =

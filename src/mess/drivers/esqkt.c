@@ -66,6 +66,7 @@ public:
 	DECLARE_DRIVER_INIT(kt);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };
 
 void esqkt_state::machine_reset()
@@ -138,11 +139,9 @@ WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 	#endif
 }
 
-static READ16_DEVICE_HANDLER(esq5506_read_adc)
+READ16_MEMBER(esqkt_state::esq5506_read_adc)
 {
-	esqkt_state *state = device->machine().driver_data<esqkt_state>();
-
-	switch ((state->m_duart_io & 7) ^ 7)
+	switch ((m_duart_io & 7) ^ 7)
 	{
 		case 0:     // vRef to check battery
 			return 0x5b00;
@@ -154,7 +153,7 @@ static READ16_DEVICE_HANDLER(esq5506_read_adc)
 			return 0;
 	}
 
-	if (state->m_duart_io & 1)
+	if (m_duart_io & 1)
 	{
 		return 0x5b00;              // vRef
 	}
@@ -194,7 +193,7 @@ static const es5506_interface es5506_config =
 	"waverom4", /* Bank 1 */
 	1,          /* channels */
 	DEVCB_DRIVER_LINE_MEMBER(esqkt_state,esq5506_otto_irq), /* irq */
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
+	DEVCB_DRIVER_MEMBER16(esqkt_state, esq5506_read_adc)
 };
 
 static const es5506_interface es5506_2_config =

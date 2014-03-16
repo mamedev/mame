@@ -43,8 +43,7 @@ const wd17xx_interface partner_wd17xx_interface =
 
 MACHINE_START_MEMBER(partner_state,partner)
 {
-	device_t *fdc = machine().device("wd1793");
-	wd17xx_set_pause_time(fdc, 10);
+	wd17xx_set_pause_time(m_fdc, 10);
 }
 
 void partner_state::partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom)
@@ -78,16 +77,14 @@ void partner_state::partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom)
 	}
 }
 
-READ8_MEMBER(partner_state::partner_floppy_r){
-	device_t *fdc = machine().device("wd1793");
-
+READ8_MEMBER(partner_state::partner_floppy_r){	
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return wd17xx_status_r(fdc,space, 0);
-			case 0x01 : return wd17xx_track_r(fdc,space, 0);
-			case 0x02 : return wd17xx_sector_r(fdc,space, 0);
+			case 0x00 : return wd17xx_status_r(m_fdc,space, 0);
+			case 0x01 : return wd17xx_track_r(m_fdc,space, 0);
+			case 0x02 : return wd17xx_sector_r(m_fdc,space, 0);
 			default   :
-						return wd17xx_data_r(fdc,space, 0);
+						return wd17xx_data_r(m_fdc,space, 0);
 		}
 	} else {
 		return 0;
@@ -95,29 +92,27 @@ READ8_MEMBER(partner_state::partner_floppy_r){
 }
 
 WRITE8_MEMBER(partner_state::partner_floppy_w){
-	device_t *fdc = machine().device("wd1793");
-
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : wd17xx_command_w(fdc,space, 0,data); break;
-			case 0x01 : wd17xx_track_w(fdc,space, 0,data);break;
-			case 0x02 : wd17xx_sector_w(fdc,space, 0,data);break;
-			default   : wd17xx_data_w(fdc,space, 0,data);break;
+			case 0x00 : wd17xx_command_w(m_fdc,space, 0,data); break;
+			case 0x01 : wd17xx_track_w(m_fdc,space, 0,data);break;
+			case 0x02 : wd17xx_sector_w(m_fdc,space, 0,data);break;
+			default   : wd17xx_data_w(m_fdc,space, 0,data);break;
 		}
 	} else {
 		floppy_mon_w(floppy_get_device(machine(), 0), 1);
 		floppy_mon_w(floppy_get_device(machine(), 1), 1);
 		if (((data >> 6) & 1)==1) {
-			wd17xx_set_drive(fdc,0);
+			wd17xx_set_drive(m_fdc,0);
 			floppy_mon_w(floppy_get_device(machine(), 0), 0);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
-			wd17xx_set_drive(fdc,1);
+			wd17xx_set_drive(m_fdc,1);
 			floppy_mon_w(floppy_get_device(machine(), 1), 0);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
 		}
-		wd17xx_set_side(fdc,data >> 7);
+		wd17xx_set_side(m_fdc,data >> 7);
 	}
 }
 
@@ -363,6 +358,15 @@ WRITE_LINE_MEMBER(partner_state::hrq_w)
 	machine().device<i8257_device>("dma8257")->i8257_hlda_w(state);
 }
 
+READ8_MEMBER(partner_state::partner_fdc_r)
+{
+	return wd17xx_data_r(m_fdc,space,offset);
+}
+WRITE8_MEMBER(partner_state::partner_fdc_w)
+{
+	wd17xx_data_w(m_fdc,space,offset,data);
+}
+
 I8257_INTERFACE( partner_dma )
 {
 	DEVCB_DRIVER_LINE_MEMBER(partner_state,hrq_w),
@@ -370,8 +374,8 @@ I8257_INTERFACE( partner_dma )
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(radio86_state, memory_read_byte),
 	DEVCB_DRIVER_MEMBER(radio86_state, memory_write_byte),
-	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
+	{ DEVCB_DRIVER_MEMBER(partner_state, partner_fdc_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(partner_state, partner_fdc_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
 };
 
 

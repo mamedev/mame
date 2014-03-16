@@ -17,7 +17,8 @@ class partner_state : public radio86_state
 public:
 	partner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_fdc(*this, "wd1793") { }
 
 	UINT8 m_mem_page;
 	UINT8 m_win_mem_page;
@@ -30,11 +31,17 @@ public:
 	DECLARE_MACHINE_RESET(partner);
 	DECLARE_WRITE_LINE_MEMBER(partner_wd17xx_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	
+	//to remove trampoline once it use new wd17xx core
+	DECLARE_READ8_MEMBER(partner_fdc_r);
+	DECLARE_WRITE8_MEMBER(partner_fdc_w);
+	
 	void partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_iomap_bank(UINT8 *rom);
 	void partner_bank_switch();
 	required_device<ram_device> m_ram;
+	required_device<fd1793_device> m_fdc;
 };
 
 
