@@ -650,11 +650,6 @@ WRITE8_MEMBER( abc1600_state::scc_w )
 	m_scc->reg_w(space, A1_A2, data);
 }
 
-void abc1600_state::scc_irq(bool status)
-{
-	m_maincpu->set_input_line(M68K_IRQ_5, status ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 //-------------------------------------------------
 //  Z8536_INTERFACE( cio_intf )
@@ -926,7 +921,8 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
-	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16, line_cb_t(FUNC(abc1600_state::scc_irq), static_cast<abc1600_state *>(owner)))
+	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL_64MHz/16)
+	MCFG_Z8530_INTRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))
 	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL_64MHz/16)
 	MCFG_Z8536_IRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_2))
 	MCFG_Z8536_PA_IN_CALLBACK(READ8(abc1600_state, cio_pa_r))

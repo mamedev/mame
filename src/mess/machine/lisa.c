@@ -1932,7 +1932,3 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 		break;
 	}
 }
-
-void lisa_state::set_scc_interrupt(bool value)
-{
-}

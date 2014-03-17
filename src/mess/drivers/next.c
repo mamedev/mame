@@ -737,7 +737,7 @@ void next_state::timer_start()
 	timer_tm->adjust(attotime::from_usec(timer_vbase));
 }
 
-void next_state::scc_irq(bool state)
+WRITE_LINE_MEMBER(next_state::scc_irq)
 {
 	irq_set(17, state);
 }
@@ -967,7 +967,8 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
 						line_cb_t(), line_cb_t(), line_cb_t())
-	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("scc", SCC8530, XTAL_25MHz)
+	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(next_state, scc_irq))
 	MCFG_NEXTKBD_ADD("keyboard",
 						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
 						line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),

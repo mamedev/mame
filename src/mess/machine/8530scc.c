@@ -23,14 +23,12 @@ const device_type SCC8530 = &device_creator<scc8530_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, SCC8530, "Zilog 8530 SCC", tag, owner, clock, "scc8530", __FILE__)
+scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+	device_t(mconfig, SCC8530, "Zilog 8530 SCC", tag, owner, clock, "scc8530", __FILE__),
+	intrq_cb(*this)
 {
 }
 
-void scc8530_t::set_intrq_cb(line_cb_t cb)
-{
-	intrq_cb = cb;
-}
 
 /*-------------------------------------------------
     scc_updateirqs
@@ -158,6 +156,8 @@ void scc8530_t::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 void scc8530_t::device_start()
 {
+	intrq_cb.resolve();
+
 	memset(channel, 0, sizeof(channel));
 
 	mode = 0;

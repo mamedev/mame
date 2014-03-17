@@ -9,9 +9,8 @@
 #ifndef __8530SCC_H__
 #define __8530SCC_H__
 
-#define MCFG_SCC8530_ADD(_tag, _clock, _intrq_cb)   \
-	MCFG_DEVICE_ADD(_tag, SCC8530, _clock)  \
-	downcast<scc8530_t *>(device)->set_intrq_cb(_intrq_cb);
+#define MCFG_Z8530_INTRQ_CALLBACK(_write) \
+	devcb = &scc8530_t::set_intrq_wr_callback(*device, DEVCB2_##_write);
 
 class scc8530_t : public device_t
 {
@@ -29,7 +28,8 @@ public:
 	};
 
 	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	void set_intrq_cb(line_cb_t cb);
+
+	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<scc8530_t &>(device).intrq_cb.set_callback(object); }
 
 	UINT8 get_reg_a(int reg);
 	UINT8 get_reg_b(int reg);
@@ -81,7 +81,7 @@ private:
 
 	Chan channel[2];
 
-	line_cb_t intrq_cb;
+	devcb2_write_line intrq_cb;
 
 	void updateirqs();
 	void initchannel(int ch);

@@ -138,8 +138,6 @@ public:
 	void update_drdy1();
 	void update_drdy2();
 
-	void scc_irq(bool status);
-
 	// DMA
 	int m_dmadis;
 	int m_sysscc;

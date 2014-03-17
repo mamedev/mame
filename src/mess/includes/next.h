@@ -94,7 +94,7 @@ public:
 
 	UINT32 eventc_latch;
 
-	void scc_irq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(scc_irq);
 	void keyboard_irq(bool state);
 	void power_irq(bool state);
 	void nmi_irq(bool state);
