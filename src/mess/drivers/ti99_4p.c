@@ -50,8 +50,6 @@
 #include "machine/ti99/peribox.h"
 #include "machine/ti99/joyport.h"
 
-#include "drivlgcy.h"
-
 #define TMS9901_TAG "tms9901"
 #define SGCPU_TAG "sgcpu"
 
