@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "dmadac.h"
-#include "devlegcy.h"
 
 
 
@@ -35,94 +34,35 @@
 #define BUFFER_SIZE                 32768
 
 
-
-/*************************************
- *
- *  Types
- *
- *************************************/
-
-struct dmadac_state
-{
-	/* sound stream and buffers */
-	sound_stream *  channel;
-	INT16 *         buffer;
-	UINT32          bufin;
-	UINT32          bufout;
-
-	/* per-channel parameters */
-	INT16           volume;
-	UINT8           enabled;
-	double          frequency;
-};
-
-
-INLINE dmadac_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == DMADAC);
-	return (dmadac_state *)downcast<dmadac_sound_device *>(device)->token();
-}
-
-
-/*************************************
- *
- *  Stream callback
- *
- *************************************/
-
-static STREAM_UPDATE( dmadac_update )
-{
-	dmadac_state *ch = (dmadac_state *)param;
-	stream_sample_t *output = outputs[0];
-	INT16 *source = ch->buffer;
-	UINT32 curout = ch->bufout;
-	UINT32 curin = ch->bufin;
-	int volume = ch->volume;
-
-	/* feed as much as we can */
-	while (curout != curin && samples-- > 0)
-	{
-		*output++ = (source[curout] * volume) >> 8;
-		curout = (curout + 1) % BUFFER_SIZE;
-	}
-
-	/* fill the rest with silence */
-	while (samples-- > 0)
-		*output++ = 0;
-
-	/* save the new output pointer */
-	ch->bufout = curout;
-}
-
-
-
 /*************************************
  *
  *  Sound hardware init
  *
  *************************************/
 
-static DEVICE_START( dmadac )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void dmadac_sound_device::device_start()
 {
-	dmadac_state *info = get_safe_token(device);
 
 	/* allocate a clear a buffer */
-	info->buffer = auto_alloc_array_clear(device->machine(), INT16, BUFFER_SIZE);
+	m_buffer = auto_alloc_array_clear(machine(), INT16, BUFFER_SIZE);
 
 	/* reset the state */
-	info->volume = 0x100;
+	m_volume = 0x100;
 
 	/* allocate a stream channel */
-	info->channel = device->machine().sound().stream_alloc(*device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, DEFAULT_SAMPLE_RATE, this);
 
 	/* register with the save state system */
-	device->save_item(NAME(info->bufin));
-	device->save_item(NAME(info->bufout));
-	device->save_item(NAME(info->volume));
-	device->save_item(NAME(info->enabled));
-	device->save_item(NAME(info->frequency));
-	device->save_pointer(NAME(info->buffer), BUFFER_SIZE);
+	save_item(NAME(m_bufin));
+	save_item(NAME(m_bufout));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_enabled));
+	save_item(NAME(m_frequency));
+	save_pointer(NAME(m_buffer), BUFFER_SIZE);
 }
 
 
@@ -135,38 +75,49 @@ static DEVICE_START( dmadac )
 
 void dmadac_transfer(dmadac_sound_device **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
 {
-	int i, j;
+	int i;
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		dmadac_state *info = get_safe_token(devlist[i]);
-		info->channel->update();
+		devlist[i]->flush();
 	}
 
 	/* loop over all channels and accumulate the data */
 	for (i = 0; i < num_channels; i++)
 	{
-		dmadac_state *ch = get_safe_token(devlist[i]);
-		if (ch->enabled)
+		devlist[i]->transfer(i, channel_spacing, frame_spacing, total_frames, data);
+	}
+}
+
+void dmadac_sound_device::flush()
+{
+	m_channel->update();
+}
+
+void dmadac_sound_device::transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
+{
+	int j;
+
+	/* loop over all channels and accumulate the data */
+	if (m_enabled)
+	{
+		int maxin = (m_bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
+		INT16 *src = data + channel * channel_spacing;
+		int curin = m_bufin;
+
+		/* copy the data */
+		for (j = 0; j < total_frames && curin != maxin; j++)
 		{
-			int maxin = (ch->bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
-			INT16 *src = data + i * channel_spacing;
-			int curin = ch->bufin;
-
-			/* copy the data */
-			for (j = 0; j < total_frames && curin != maxin; j++)
-			{
-				ch->buffer[curin] = *src;
-				curin = (curin + 1) % BUFFER_SIZE;
-				src += frame_spacing;
-			}
-			ch->bufin = curin;
-
-			/* log overruns */
-			if (j != total_frames)
-				logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
+			m_buffer[curin] = *src;
+			curin = (curin + 1) % BUFFER_SIZE;
+			src += frame_spacing;
 		}
+		m_bufin = curin;
+
+		/* log overruns */
+		if (j != total_frames)
+			logerror("dmadac_transfer: buffer overrun (short %d frames)\n", total_frames - j);
 	}
 
 	//LOG(("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, (int)(total_frames * (double)DEFAULT_SAMPLE_RATE / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos));
@@ -187,15 +138,18 @@ void dmadac_enable(dmadac_sound_device **devlist, UINT8 num_channels, UINT8 enab
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		dmadac_state *info = get_safe_token(devlist[i]);
-		info->channel->update();
-		info->enabled = enable;
-		if (!enable)
-			info->bufin = info->bufout = 0;
+		devlist[i]->enable(enable);
 	}
 }
 
 
+void dmadac_sound_device::enable(UINT8 enable)
+{
+	m_channel->update();
+	m_enabled = enable;
+	if (!enable)
+		m_bufin = m_bufout = 0;
+}
 
 /*************************************
  *
@@ -210,12 +164,15 @@ void dmadac_set_frequency(dmadac_sound_device **devlist, UINT8 num_channels, dou
 	/* set the sample rate on each channel */
 	for (i = 0; i < num_channels; i++)
 	{
-		dmadac_state *info = get_safe_token(devlist[i]);
-		info->channel->set_sample_rate(frequency);
+		devlist[i]->set_frequency(frequency);
 	}
 }
 
 
+void dmadac_sound_device::set_frequency(double frequency)
+{
+	m_channel->set_sample_rate(frequency);
+}
 
 /*************************************
  *
@@ -229,11 +186,15 @@ void dmadac_set_volume(dmadac_sound_device **devlist, UINT8 num_channels, UINT16
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
-	{
-		dmadac_state *info = get_safe_token(devlist[i]);
-		info->channel->update();
-		info->volume = volume;
+	{		
+		devlist[i]->set_volume(volume);
 	}
+}
+
+void dmadac_sound_device::set_volume(UINT16 volume)
+{
+	m_channel->update();
+	m_volume = volume;
 }
 
 const device_type DMADAC = &device_creator<dmadac_sound_device>;
@@ -242,31 +203,6 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, DMADAC, "DMA-driven DAC", tag, owner, clock, "dmadac", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(dmadac_state);
-}
-
-dmadac_sound_device::~dmadac_sound_device()
-{
-	global_free(m_token);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void dmadac_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void dmadac_sound_device::device_start()
-{
-	DEVICE_START_NAME( dmadac )(this);
 }
 
 //-------------------------------------------------
@@ -275,6 +211,23 @@ void dmadac_sound_device::device_start()
 
 void dmadac_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	stream_sample_t *output = outputs[0];
+	INT16 *source = m_buffer;
+	UINT32 curout = m_bufout;
+	UINT32 curin = m_bufin;
+	int volume = m_volume;
+
+	/* feed as much as we can */
+	while (curout != curin && samples-- > 0)
+	{
+		*output++ = (source[curout] * volume) >> 8;
+		curout = (curout + 1) % BUFFER_SIZE;
+	}
+
+	/* fill the rest with silence */
+	while (samples-- > 0)
+		*output++ = 0;
+
+	/* save the new output pointer */
+	m_bufout = curout;
 }

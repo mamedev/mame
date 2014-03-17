@@ -18,20 +18,31 @@ class dmadac_sound_device : public device_t,
 {
 public:
 	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~dmadac_sound_device();
 
-	// access to legacy token
-	struct dmadac_state *token() const { assert(m_token != NULL); return m_token; }
+	void flush();
+	void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data);
+	void enable(UINT8 enable);
+	void set_frequency(double frequency);
+	void set_volume(UINT16 volume);
+	
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 private:
 	// internal state
-	struct dmadac_state *m_token;
+	/* sound stream and buffers */
+	sound_stream *  m_channel;
+	INT16 *         m_buffer;
+	UINT32          m_bufin;
+	UINT32          m_bufout;
+
+	/* per-channel parameters */
+	INT16           m_volume;
+	UINT8           m_enabled;
+	double          m_frequency;
 };
 
 extern const device_type DMADAC;
