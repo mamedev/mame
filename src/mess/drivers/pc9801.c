@@ -3420,7 +3420,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
 
 	m_rtc->cs_w(1);
-	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode
+	m_rtc->oe_w(1);
 
 	m_ipl_rom = memregion("ipl")->base();
 	m_sound_bios = memregion("sound_bios")->base();
