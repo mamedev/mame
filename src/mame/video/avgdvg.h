@@ -20,6 +20,4 @@ VIDEO_START( avg_quantum );
 VIDEO_START( avg_bzone );
 VIDEO_START( avg_tomcat );
 
-MACHINE_RESET( avgdvg );
-
 #endif

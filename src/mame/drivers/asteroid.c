@@ -690,14 +690,12 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_CPU_PROGRAM_MAP(llander_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  (double)MASTER_CLOCK/4096/12)
 
-	MCFG_MACHINE_RESET(avgdvg)
+	MCFG_MACHINE_RESET_OVERRIDE(asteroid_state, llander)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-
-	MCFG_VIDEO_START(dvg)
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)

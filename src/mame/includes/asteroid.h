@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_sounds_w);
+	DECLARE_MACHINE_RESET(llander);
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -136,3 +136,8 @@ void asteroid_state::machine_reset()
 	asteroid_bank_switch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 	avgdvg_reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
+
+MACHINE_RESET_MEMBER(asteroid_state, llander)
+{
+	avgdvg_reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+}
