@@ -2,9 +2,9 @@
 
         Commodore LCD prototype
 
-        G65SC102PI-2
-        G65SC51P-1
-        R65C22P2 x 2
+        GTE G65SC102PI-2
+        GTE G65SC51P-1
+        Rockwell R65C22P2 x 2
         AMI S3530X Bell 103/V.21 Single chip modem
 
 ****************************************************************************/
