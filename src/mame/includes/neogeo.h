@@ -17,7 +17,7 @@
 #define NEOGEO_VTOTAL                           (0x108)
 #define NEOGEO_VBEND                            (0x010)
 #define NEOGEO_VBSTART                          (0x0f0)
-#define NEOGEO_VSSTART                          (0x000)
+#define NEOGEO_VSSTART                          (0x100)
 
 
 class neogeo_state : public driver_device
