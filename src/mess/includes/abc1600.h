@@ -9,7 +9,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8530scc.h"
-#include "machine/abckb.h"
+#include "bus/abckb/abckb.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"

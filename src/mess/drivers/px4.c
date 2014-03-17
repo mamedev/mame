@@ -13,7 +13,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "machine/epson_sio.h"
+#include "bus/epson_sio/epson_sio.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"

@@ -11,7 +11,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "machine/i8251.h"
-#include "machine/pf10.h"
+#include "bus/epson_sio/pf10.h"
 #include "sound/wave.h"
 
 #define UPD70008_TAG    "4a"

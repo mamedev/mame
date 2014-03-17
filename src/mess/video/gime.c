@@ -79,7 +79,7 @@
 #include "emu.h"
 #include "video/gime.h"
 #include "machine/6883sam.h"
-#include "machine/cococart.h"
+#include "bus/coco/cococart.h"
 #include "machine/ram.h"
 
 

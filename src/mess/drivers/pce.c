@@ -59,7 +59,7 @@ Super System Card:
 #include "emu.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/pce.h"
-#include "machine/pce_rom.h"
+#include "bus/pce/pce_rom.h"
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"

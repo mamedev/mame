@@ -23,10 +23,10 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "imagedev/cassette.h"
-#include "machine/bml3bus.h"
-#include "machine/bml3mp1802.h"
-#include "machine/bml3mp1805.h"
-#include "machine/bml3kanji.h"
+#include "bus/bml3/bml3bus.h"
+#include "bus/bml3/bml3mp1802.h"
+#include "bus/bml3/bml3mp1805.h"
+#include "bus/bml3/bml3kanji.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 

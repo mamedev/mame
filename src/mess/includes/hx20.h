@@ -6,7 +6,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
-#include "machine/epson_sio.h"
+#include "bus/epson_sio/epson_sio.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"
 #include "video/upd7227.h"

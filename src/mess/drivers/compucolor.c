@@ -27,7 +27,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/compclr_flp.h"
+#include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
