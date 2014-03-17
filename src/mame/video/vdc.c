@@ -7,17 +7,6 @@
 #define STATE_VDW       2
 #define STATE_VCR       3
 
-/* todo: replace this with the PAIR structure */
-union pair
-{
-#ifdef LSB_FIRST
-	struct { unsigned char l,h; } b;
-#else
-	struct { unsigned char h,l; } b;
-#endif
-	unsigned short int w;
-};
-
 /* the VDC context */
 
 struct VDC
@@ -36,15 +25,15 @@ struct VDC
 	UINT8   inc;
 	UINT8 vdc_register;
 	UINT8 vdc_latch;
-	pair vdc_data[32];
+	PAIR16 vdc_data[32];
 	int status;
 	int y_scroll;
 };
 
 struct VCE {
 	UINT8   vce_control;            /* VCE control register */
-	pair    vce_address;            /* Current address in the palette */
-	pair    vce_data[512];          /* Palette data */
+	PAIR16    vce_address;            /* Current address in the palette */
+	PAIR16    vce_data[512];          /* Palette data */
 	int     current_bitmap_line;    /* The current line in the display we are on */
 	bitmap_ind16    *bmp;
 };
@@ -58,9 +47,9 @@ struct VPC_PRIO {
 struct VPC {
 	VPC_PRIO vpc_prio[4];
 	UINT8   prio_map[512];      /* Pre-calculated priority map */
-	pair    priority;           /* Priority settings registers */
-	pair    window1;            /* Window 1 setting */
-	pair    window2;            /* Window 2 setting */
+	PAIR16    priority;           /* Priority settings registers */
+	PAIR16    window1;            /* Window 1 setting */
+	PAIR16    window2;            /* Window 2 setting */
 	UINT8   vdc_select;         /* Which VDC do the ST0, ST1, and ST2 instructions write to */
 };
 
