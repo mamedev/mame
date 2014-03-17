@@ -632,8 +632,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_WD1773x_ADD(FDC_TAG, XTAL_8MHz)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, snug_bwg_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, snug_bwg_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
 	MCFG_MM58274C_ADD(CLOCK_TAG, bwg_mm58274c_interface)
 
 	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)

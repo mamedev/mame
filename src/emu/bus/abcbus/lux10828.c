@@ -349,8 +349,8 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
 	MCFG_MB8876x_ADD(MB8876_TAG, XTAL_4MHz/2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, luxor_55_10828_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, luxor_55_10828_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)

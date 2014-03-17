@@ -102,13 +102,13 @@ const rom_entry *comx_eb_device::device_rom_region() const
 
 static MACHINE_CONFIG_FRAGMENT( comx_eb )
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, comx_eb_device, slot1_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, comx_eb_device, slot2_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot2_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, "joy")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, comx_eb_device, slot3_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot3_irq_w))
 	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
-	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, comx_eb_device, slot4_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot4_irq_w))
 MACHINE_CONFIG_END
 
 

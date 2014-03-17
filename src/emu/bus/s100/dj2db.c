@@ -113,8 +113,8 @@ static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 
 	MCFG_MB8866x_ADD(MB8866_TAG, XTAL_10MHz/5)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, s100_dj2db_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, s100_dj2db_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, NULL,    floppy_image_device::default_floppy_formats)

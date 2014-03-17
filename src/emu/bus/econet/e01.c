@@ -265,8 +265,8 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, e01_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, e01_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(e01_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(e01_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)
 

@@ -45,8 +45,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( fdc_b504 )
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, p1_fdc_device, p1_fdc_irq_drq))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
