@@ -109,7 +109,7 @@
 
 #define PALETTE_INIT_NAME(_Name) palette_init_##_Name
 #define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
-#define PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &dummy, palette_device &palette)
+#define PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &dummy, palette_device &palette) // legacy
 #define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
 
 // standard 3-3-2 formats
