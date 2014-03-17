@@ -1490,7 +1490,7 @@ $(MAMEOBJ)/pce.a: \
 	$(DRIVERS)/paranoia.o \
 	$(DRIVERS)/tourvis.o \
 	$(DRIVERS)/uapce.o \
-	$(MACHINE)/pcecommn.o $(VIDEO)/vdc.o \
+	$(MACHINE)/pcecommn.o \
 
 $(MAMEOBJ)/phoenix.a: \
 	$(DRIVERS)/naughtyb.o $(VIDEO)/naughtyb.o \

@@ -57,3 +57,15 @@ DRIVER_INIT_MEMBER(pce_common_state,pce_common)
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
+
+UINT32 pce_common_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_huc6260->video_update( bitmap, cliprect );
+	return 0;
+}
+
+WRITE_LINE_MEMBER(pce_common_state::pce_irq_changed)
+{
+	m_maincpu->set_input_line(0, state);
+}
+

@@ -17,7 +17,6 @@
 #include "includes/x1.h"
 
 #include "includes/pce.h"
-#include "video/vdc.h"
 //#include "cpu/h6280/h6280.h"
 //#include "sound/c6280.h"
 
@@ -59,7 +58,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, x1twin_state )
 	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_r, vdc_w )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
 	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_device, c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
@@ -68,7 +67,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, x1twin_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pce_io, AS_IO, 8, x1twin_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_r, vdc_w )
 ADDRESS_MAP_END
 #endif
 
@@ -557,7 +556,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SCREEN_ADD("pce_screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, HUC6260_WPF, 70, 70 + 512 + 32, HUC6260_LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
 	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48), mc6845_intf) //unknown divider

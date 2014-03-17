@@ -31,13 +31,11 @@ class ggconnie_state : public pce_common_state
 {
 public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_huc6260(*this, "huc6260"),
+		: pce_common_state(mconfig, type, tag),		
 		m_rtc(*this, "rtc"),
 		m_oki(*this, "oki")
 		{ }
 
-	required_device <huc6260_device> m_huc6260;
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
 	DECLARE_WRITE8_MEMBER(lamp_w);
@@ -45,16 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
-	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-UINT32 ggconnie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_huc6260->video_update( bitmap, cliprect );
-	return 0;
-}
 
 WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
@@ -191,41 +180,17 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-WRITE_LINE_MEMBER(ggconnie_state::pce_irq_changed)
-{
-	m_maincpu->set_input_line(0, state);
-}
-
-
-#if 0
-static const huc6270_interface pce_huc6270_config =
-{
-	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(ggconnie_state,pce_irq_changed)
-};
-
-
-static const huc6260_interface pce_huc6260_config =
-{
-	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, next_pixel ),
-	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, time_until_next_event ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, vsync_changed ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, hsync_changed )
-};
-#endif
-
-
 static const huc6270_interface sgx_huc6270_0_config =
 {
 	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(ggconnie_state,pce_irq_changed)
+	DEVCB_DRIVER_LINE_MEMBER(pce_common_state,pce_irq_changed)
 };
 
 
 static const huc6270_interface sgx_huc6270_1_config =
 {
 	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(ggconnie_state,pce_irq_changed)
+	DEVCB_DRIVER_LINE_MEMBER(pce_common_state,pce_irq_changed)
 };
 
 
