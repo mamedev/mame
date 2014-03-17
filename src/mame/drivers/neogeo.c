@@ -196,6 +196,14 @@
  *
  *************************************/
 
+// On scanline 224, /VBLANK goes low 56 mclks (14 pixels) from the rising edge of /HSYNC.
+// Two mclks after /VBLANK goes low, the hardware sets a pending IRQ1 flip-flop.
+#define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))
+
+// The display counter is automatically reloaded with the load register contents on scanline 224,
+// 1146 mclks from the rising edge of /HSYNC.
+#define NEOGEO_VBLANK_RELOAD_HTIM (attotime::from_ticks(1146, NEOGEO_MASTER_CLOCK))
+
 #define IRQ2CTRL_ENABLE             (0x10)
 #define IRQ2CTRL_LOAD_RELATIVE      (0x20)
 #define IRQ2CTRL_AUTOLOAD_VBLANK    (0x40)
@@ -289,7 +297,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
 	}
 
 	/* set timer for next screen */
-	m_display_position_vblank_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
+	m_display_position_vblank_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART) + NEOGEO_VBLANK_RELOAD_HTIM);
 }
 
 
@@ -301,7 +309,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 	update_interrupts();
 
 	/* set timer for next screen */
-	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART));
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART) + NEOGEO_VBLANK_IRQ_HTIM);
 }
 
 
@@ -315,8 +323,8 @@ void neogeo_state::create_interrupt_timers()
 
 void neogeo_state::start_interrupt_timers()
 {
-	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART));
-	m_display_position_vblank_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS));
+	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART) + NEOGEO_VBLANK_IRQ_HTIM);
+	m_display_position_vblank_timer->adjust(m_screen->time_until_pos(NEOGEO_VBSTART) + NEOGEO_VBLANK_RELOAD_HTIM);
 }
 
 
