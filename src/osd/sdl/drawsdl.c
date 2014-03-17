@@ -255,7 +255,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 
 	if (sdl->yuv_bitmap)
 	{
-		global_free(sdl->yuv_bitmap);
+		global_free_array(sdl->yuv_bitmap);
 		sdl->yuv_bitmap = NULL;
 	}
 
@@ -320,7 +320,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 
 	if (sdl->yuv_bitmap != NULL)
 	{
-		global_free(sdl->yuv_bitmap);
+		global_free_array(sdl->yuv_bitmap);
 	}
 
 	mame_printf_verbose("SDL: Creating %d x %d YUV-Overlay ...\n", minimum_width, minimum_height);
