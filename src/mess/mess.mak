@@ -751,7 +751,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/astrocde.o    \
 	$(MAME_MACHINE)/kabuki.o    \
 	$(MAME_VIDEO)/pk8000.o      \
-	$(MAME_VIDEO)/vdc.o         \
 	$(MAME_VIDEO)/ppu2c0x.o     \
 	$(MAME_AUDIO)/snes_snd.o    \
 	$(MAME_MACHINE)/snes.o      \
