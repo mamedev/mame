@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "machine/pd4990a.h"
+#include "machine/upd1990a.h"
 
 #define NEOGEO_MASTER_CLOCK                     (24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
@@ -29,7 +29,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -137,7 +136,6 @@ public:
 
 	// MVS-specific
 	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_controller_r);
@@ -332,7 +330,7 @@ protected:
 	memory_bank           *m_bank_audio_cart[4];
 
 	// MVS-specific devices
-	optional_device<upd4990a_old_device> m_upd4990a;
+	optional_device<upd4990a_device> m_upd4990a;
 	optional_shared_ptr<UINT16> m_save_ram;
 
 	required_device<screen_device> m_screen;

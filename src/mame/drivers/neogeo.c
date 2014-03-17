@@ -297,12 +297,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 {
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
-	/* add a timer tick to the upd4990a */
-	/* FIXME: upd4990a being clocked by vblank is nonsense; it has its own xtal */
-	if (m_type == NEOGEO_MVS) m_upd4990a->addretrace();
-
 	m_vblank_interrupt_pending = 1;
-
 	update_interrupts();
 
 	/* set timer for next screen */
@@ -436,7 +431,11 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
 
 		case 0x28:
 			if (m_type == NEOGEO_MVS)
-				m_upd4990a->control_16_w(space, 0, data, 0x00ff);
+			{
+				m_upd4990a->data_in_w(data >> 0 & 1);
+				m_upd4990a->clk_w(data >> 1 & 1);
+				m_upd4990a->stb_w(data >> 2 & 1);
+			}
 			break;
 
 //  case 0x30: break; // coin counters
@@ -475,20 +474,6 @@ READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
 	}
 	return ret;
 }
-
-
-
-/*************************************
- *
- *  uPD4990A calendar chip
- *
- *************************************/
-
-CUSTOM_INPUT_MEMBER(neogeo_state::get_calendar_status)
-{
-	return (m_upd4990a->databit_r(generic_space(), 0) << 1) | m_upd4990a->testbit_r(generic_space(), 0);
-}
-
 
 
 
@@ -883,6 +868,13 @@ void neogeo_state::machine_start()
 	/* start with an IRQ3 - but NOT on a reset */
 	m_irq3_pending = 1;
 
+	// enable rtc and serial mode
+	m_upd4990a->cs_w(1);
+	m_upd4990a->oe_w(1);
+	m_upd4990a->c0_w(1);
+	m_upd4990a->c1_w(1);
+	m_upd4990a->c2_w(1);
+
 	/* register state save */
 	save_item(NAME(m_display_position_interrupt_control));
 	save_item(NAME(m_display_counter));
@@ -1041,14 +1033,14 @@ static INPUT_PORTS_START( neogeo )
 	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("P2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1068,8 +1060,7 @@ static INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show */
-													/* a piracy warning screen if the hardware and BIOS don't match */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO/COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1078,7 +1069,8 @@ static INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 ) /* What is this? "us-e" BIOS uses it as a coin input; Universe BIOS uses it to detect MVS or AES hardware */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 ) /* What is this? "us-e" BIOS uses it as a coin input; Universe BIOS uses it to detect MVS or AES hardware */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? When ACTIVE_HIGH + IN4 bit 6 ACTIVE_LOW MVS-4 slot is detected */
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, tp_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, data_out_r)
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
 
 	PORT_START("TEST")
@@ -1222,8 +1214,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
 
-	/* NEC uPD4990A RTC */
-	MCFG_UPD4990A_OLD_ADD("upd4990a")
+	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
 	MCFG_MEMCARD_HANDLER(neogeo)
