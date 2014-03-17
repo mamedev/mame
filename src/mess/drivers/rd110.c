@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/msm6222b.h"
+#include "video/msm6222b.h"
 #include "cpu/mcs96/i8x9x.h"
 
 static INPUT_PORTS_START( d110 )
