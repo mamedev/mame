@@ -109,7 +109,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pve500 )
 	ROM_REGION( 0xC000, "maincpu", 0 )
-	ROM_LOAD("pve500.icb7",  0x00000, 0xC000, CRC(7b1dc6ef) SHA1(141e2baa10e27e1d1bdb15ed3401bc9d0a775f22) ) //48kbyte main-cpu program
+	ROM_LOAD("pve500.icb7",  0x00000, 0x10000, CRC(1036709c) SHA1(207d6fcad5c2f081a138184060ce7bd02736965b) ) //48kbyte main-cpu program + 16kbyte of unreachable memory
 
 	ROM_REGION( 0x8000, "subcpu", 0 )
 	ROM_LOAD("pve500.icg5",  0x00000, 0x8000, CRC(28cca60a) SHA1(308d70062653769250327ede7a4e1a8a76fc9ab9) ) //32kbyte sub-cpu program
