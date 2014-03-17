@@ -49,8 +49,6 @@
 #include "sound/dac.h"
 #include "machine/ram.h"
 #include "hashfile.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #define ATARI_5200  0
 #define ATARI_400   1
@@ -262,11 +260,11 @@ enum
 };
 
 
-class a400_state : public driver_device
+class a400_state : public atari_common_state
 {
 public:
 	a400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: atari_common_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_pia(*this, "pia"),
@@ -326,7 +324,7 @@ public:
 	void ms_atari_machine_start(int type, int has_cart);
 	void ms_atari800xl_machine_start(int type, int has_cart);
 
-	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(machine(), data); }
+	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -2000,7 +1998,7 @@ MACHINE_START_MEMBER( a400_state, xegs )
 	UINT8 *cart = m_region_user1->base();
 	UINT8 *cpu  = m_region_maincpu->base();
 
-	atari_machine_start(machine());
+	atari_machine_start();
 	space.install_write_handler(0xd500, 0xd5ff, write8_delegate(FUNC(a400_state::xegs_bankswitch),this));
 
 	if (m_xegs_cart)
@@ -2344,28 +2342,28 @@ DEVICE_IMAGE_UNLOAD_MEMBER( a400_state, xegs_cart )
 
 MACHINE_START_MEMBER( a400_state, a400 )
 {
-	atari_machine_start(machine());
+	atari_machine_start();
 	ms_atari_machine_start(ATARI_400, TRUE);
 }
 
 
 MACHINE_START_MEMBER( a400_state, a800 )
 {
-	atari_machine_start(machine());
+	atari_machine_start();
 	ms_atari_machine_start(ATARI_800, TRUE);
 }
 
 
 MACHINE_START_MEMBER( a400_state, a800xl )
 {
-	atari_machine_start(machine());
+	atari_machine_start();
 	ms_atari800xl_machine_start(ATARI_800XL, TRUE);
 }
 
 
 MACHINE_START_MEMBER( a400_state, a5200 )
 {
-	atari_machine_start(machine());
+	atari_machine_start();
 	ms_atari_machine_start(ATARI_800XL, TRUE);
 }
 
@@ -2481,13 +2479,11 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
-	MCFG_SCREEN_UPDATE_STATIC(atari)
+	MCFG_SCREEN_UPDATE_DRIVER(atari_common_state, screen_update_atari)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", sizeof(atari_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(a400_state, a400)
-
-	MCFG_VIDEO_START(atari)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
@@ -2522,7 +2518,7 @@ static MACHINE_CONFIG_DERIVED( a400, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a400_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
@@ -2541,7 +2537,7 @@ static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a400_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a400_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
@@ -2560,7 +2556,7 @@ static MACHINE_CONFIG_DERIVED( a800, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a800_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
@@ -2579,7 +2575,7 @@ static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a800_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
@@ -2598,7 +2594,7 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)    // FIXME?
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a600xl_pia_pb_w))
@@ -2624,7 +2620,7 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
@@ -2690,7 +2686,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a5200_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a5200_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_REMOVE("pokey")
 	MCFG_POKEY_ADD("pokey", FREQ_17_EXACT)

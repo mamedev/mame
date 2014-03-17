@@ -14,12 +14,6 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-char atari_frame_message[64+1];
-int atari_frame_counter;
-
-/* flag for displaying television artifacts in ANTIC mode F (15) */
-static UINT32 tv_artifacts = 0;
-
 /*************************************************************************
  * The priority tables tell which playfield, player or missile colors
  * have precedence about the others, depending on the contents of the
@@ -410,7 +404,7 @@ static const UINT8 _pm_colors[32][8*2*8] = {
  * prio_init
  * Initialize player/missile priority lookup tables
  ************************************************************************/
-static void prio_init(void)
+void atari_common_state::prio_init()
 {
 	int i, j, pm, p, c;
 	const UINT8 * prio;
@@ -448,7 +442,7 @@ static void prio_init(void)
  * cclk_init
  * Initialize "color clock" lookup tables
  ************************************************************************/
-static void cclk_init(void)
+void atari_common_state::cclk_init()
 {
 	static const UINT8 _pf_21[4] =   {T00,T01,T10,T11};
 	static const UINT8 _pf_1b[4] =   {G00,G01,G10,G11};
@@ -706,18 +700,18 @@ static void cclk_init(void)
  * atari_vh_start
  * Initialize the ATARI800 video emulation
  ************************************************************************/
-VIDEO_START( atari )
+void atari_common_state::video_start()
 {
-	palette_device *m_palette = machine.first_screen()->palette();
+	palette_device *m_palette = machine().first_screen()->palette();
 	int i;
 
 	LOG(("atari antic_vh_start\n"));
 	memset(&antic, 0, sizeof(antic));
 
-	antic.bitmap = auto_bitmap_ind16_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
+	antic.bitmap = auto_bitmap_ind16_alloc(machine(), machine().first_screen()->width(), machine().first_screen()->height());
 
 	antic.renderer = antic_mode_0_xx;
-	antic.cclk_expand = auto_alloc_array(machine, UINT32, 21 * 256);
+	antic.cclk_expand = auto_alloc_array(machine(), UINT32, 21 * 256);
 
 	antic.pf_21       = &antic.cclk_expand[ 0 * 256];
 	antic.pf_x10b     = &antic.cclk_expand[ 1 * 256];
@@ -729,7 +723,7 @@ VIDEO_START( atari )
 	antic.pf_gtia2    = &antic.cclk_expand[19 * 256];
 	antic.pf_gtia3    = &antic.cclk_expand[20 * 256];
 
-	antic.used_colors = auto_alloc_array(machine, UINT8, 21 * 256);
+	antic.used_colors = auto_alloc_array(machine(), UINT8, 21 * 256);
 
 	memset(antic.used_colors, 0, 21 * 256 * sizeof(UINT8));
 
@@ -752,15 +746,15 @@ VIDEO_START( atari )
 
 	for( i = 0; i < 64; i++ )
 	{
-		antic.prio_table[i] = auto_alloc_array(machine, UINT8, 8*256);
+		antic.prio_table[i] = auto_alloc_array(machine(), UINT8, 8*256);
 	}
 
 	LOG(("atari prio_init\n"));
 	prio_init();
 
-	for( i = 0; i < machine.first_screen()->height(); i++ )
+	for( i = 0; i < machine().first_screen()->height(); i++ )
 	{
-		antic.video[i] = auto_alloc_clear(machine, VIDEO);
+		antic.video[i] = auto_alloc_clear(machine(), VIDEO);
 	}
 }
 
@@ -769,7 +763,7 @@ VIDEO_START( atari )
  * Refresh screen bitmap.
  * Note: Actual drawing is done scanline wise during atari_interrupt
  ************************************************************************/
-SCREEN_UPDATE_IND16( atari )
+UINT32 atari_common_state::screen_update_atari(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT32 new_tv_artifacts;
 
@@ -780,17 +774,11 @@ SCREEN_UPDATE_IND16( atari )
 	{
 		tv_artifacts = new_tv_artifacts;
 	}
-	if( atari_frame_counter > 0 )
-	{
-		if( --atari_frame_counter )
-		{
-//          ui_draw_text(atari_frame_message, 0, height - 10);
-		}
-	}
+
 	return 0;
 }
 
-static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
+void atari_common_state::artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
 	int x;
 	UINT8 n, bits = 0;
@@ -864,7 +852,7 @@ static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	}
 }
 
-static void artifacts_txt(UINT8 * src, UINT8 * dst, int width)
+void atari_common_state::artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 {
 	int x;
 	UINT8 n, bits = 0;
@@ -939,7 +927,7 @@ static void artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 }
 
 
-static void antic_linerefresh(running_machine &machine)
+void atari_common_state::antic_linerefresh()
 {
 	int x, y;
 	UINT8 *src;
@@ -947,7 +935,7 @@ static void antic_linerefresh(running_machine &machine)
 	UINT32 scanline[4 + (HCHARS * 2) + 4];
 
 	/* increment the scanline */
-	if( ++antic.scanline == machine.first_screen()->height() )
+	if( ++antic.scanline == machine().first_screen()->height() )
 	{
 		/* and return to the top if the frame was complete */
 		antic.scanline = 0;
@@ -1047,30 +1035,30 @@ static void antic_linerefresh(running_machine &machine)
 	draw_scanline8(*antic.bitmap, 12, y, MIN(antic.bitmap->width() - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
-static int cycle(running_machine &machine)
+int atari_common_state::cycle()
 {
-	return machine.first_screen()->hpos() * CYCLES_PER_LINE / machine.first_screen()->width();
+	return machine().first_screen()->hpos() * CYCLES_PER_LINE / machine().first_screen()->width();
 }
 
-static void after(running_machine &machine, int cycles, timer_expired_func function, const char *funcname)
+void atari_common_state::after(int cycles, timer_expired_delegate function)
 {
-	attotime duration = machine.first_screen()->scan_period() * cycles / CYCLES_PER_LINE;
-	(void)funcname;
-	LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
-	machine.scheduler().timer_set(duration, function, funcname);
+	attotime duration = machine().first_screen()->scan_period() * cycles / CYCLES_PER_LINE;
+	//(void)funcname;
+	//LOG(("           after %3d (%5.1f us) %s\n", cycles, duration.as_double() * 1.0e6, funcname));
+	machine().scheduler().timer_set(duration, function);
 }
 
-static TIMER_CALLBACK( antic_issue_dli )
+TIMER_CALLBACK_MEMBER( atari_common_state::antic_issue_dli )
 {
 	if( antic.w.nmien & DLI_NMI )
 	{
-		LOG(("           @cycle #%3d issue DLI\n", cycle(machine)));
+		LOG(("           @cycle #%3d issue DLI\n", cycle()));
 		antic.r.nmist |= DLI_NMI;
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
-		LOG(("           @cycle #%3d DLI not enabled\n", cycle(machine)));
+		LOG(("           @cycle #%3d DLI not enabled\n", cycle()));
 	}
 }
 
@@ -1128,23 +1116,23 @@ static const atari_renderer_func renderer[2][19][5] = {
  *  Antic Line Done
  *
  *****************************************************************************/
-static TIMER_CALLBACK( antic_line_done )
+TIMER_CALLBACK_MEMBER( atari_common_state::antic_line_done )
 {
-	LOG(("           @cycle #%3d antic_line_done\n", cycle(machine)));
+	LOG(("           @cycle #%3d antic_line_done\n", cycle()));
 	if( antic.w.wsync )
 	{
-		LOG(("           @cycle #%3d release WSYNC\n", cycle(machine)));
+		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
 		/* release the CPU if it was actually waiting for HSYNC */
-		machine.scheduler().trigger(TRIGGER_HSYNC);
+		machine().scheduler().trigger(TRIGGER_HSYNC);
 		/* and turn off the 'wait for hsync' flag */
 		antic.w.wsync = 0;
 	}
-	LOG(("           @cycle #%3d release CPU\n", cycle(machine)));
+	LOG(("           @cycle #%3d release CPU\n", cycle()));
 	/* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	machine.scheduler().trigger(TRIGGER_STEAL);
+	machine().scheduler().trigger(TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
-	antic_linerefresh(machine);
+	antic_linerefresh();
 }
 
 /*****************************************************************************
@@ -1156,12 +1144,12 @@ static TIMER_CALLBACK( antic_line_done )
  *  TRIGGER_HSYNC if WSYNC (D01A) was accessed
  *
  *****************************************************************************/
-static TIMER_CALLBACK( antic_steal_cycles )
+TIMER_CALLBACK_MEMBER( atari_common_state::antic_steal_cycles )
 {
-	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
-	after(machine, antic.steal_cycles, FUNC(antic_line_done));
+	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), antic.steal_cycles));
+	after(antic.steal_cycles, timer_expired_delegate(FUNC(atari_common_state::antic_line_done),this));
 	antic.steal_cycles = 0;
-	machine.device("maincpu")->execute().spin_until_trigger(TRIGGER_STEAL );
+	machine().device("maincpu")->execute().spin_until_trigger(TRIGGER_STEAL );
 }
 
 
@@ -1173,12 +1161,12 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *  of the GTIA if enabled (DMA_PLAYER or DMA_MISSILE)
  *
  *****************************************************************************/
-static TIMER_CALLBACK( antic_scanline_render )
+TIMER_CALLBACK_MEMBER( atari_common_state::antic_scanline_render )
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	VIDEO *video = antic.video[antic.scanline];
-	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
+	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(), (antic.cmd & 0x0f), antic.modelines));
 
 	(*antic.renderer)(space, video);
 
@@ -1230,12 +1218,12 @@ static TIMER_CALLBACK( antic_scanline_render )
 
 	antic.steal_cycles += CYCLES_REFRESH;
 	LOG(("           run CPU for %d cycles\n", CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles));
-	after(machine, CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, FUNC(antic_steal_cycles));
+	after(CYCLES_HSYNC - CYCLES_HSTART - antic.steal_cycles, timer_expired_delegate(FUNC(atari_common_state::antic_steal_cycles),this));
 }
 
 
 
-INLINE void LMS(running_machine &machine, int new_cmd)
+void atari_common_state::LMS(int new_cmd)
 {
 	/**************************************************************
 	 * If the LMS bit (load memory scan) of the current display
@@ -1245,7 +1233,7 @@ INLINE void LMS(running_machine &machine, int new_cmd)
 	 **************************************************************/
 	if( new_cmd & ANTIC_LMS )
 	{
-		address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		int addr = RDANTIC(space);
 		antic.doffs = (antic.doffs + 1) & DOFFS;
 		addr += 256 * RDANTIC(space);
@@ -1268,10 +1256,10 @@ INLINE void LMS(running_machine &machine, int new_cmd)
  *  if so, read a new command and set up the renderer function
  *
  *****************************************************************************/
-static void antic_scanline_dma(running_machine &machine, int param)
+void atari_common_state::antic_scanline_dma(int param)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	LOG(("           @cycle #%3d DMA fetch\n", cycle()));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;
 	if( antic.w.dmactl & DMA_ANTIC )
@@ -1342,7 +1330,7 @@ static void antic_scanline_dma(running_machine &machine, int param)
 					{
 						/* remove the DLI bit */
 						new_cmd &= ~ANTIC_DLI;
-						after(machine, CYCLES_DLI_NMI, FUNC(antic_issue_dli));
+						after(CYCLES_DLI_NMI, timer_expired_delegate(FUNC(atari_common_state::antic_issue_dli),this));
 					}
 					/* load memory scan bit set ? */
 					if( new_cmd & ANTIC_LMS )
@@ -1355,7 +1343,7 @@ static void antic_scanline_dma(running_machine &machine, int param)
 						/* produce empty scanlines until vblank start */
 						antic.modelines = VBL_START + 1 - antic.scanline;
 						if( antic.modelines < 0 )
-							antic.modelines = machine.first_screen()->height() - antic.scanline;
+							antic.modelines = machine().first_screen()->height() - antic.scanline;
 						LOG(("           JVB $%04x\n", antic.dpage|antic.doffs));
 					}
 					else
@@ -1371,77 +1359,77 @@ static void antic_scanline_dma(running_machine &machine, int param)
 					}
 					break;
 				case 0x02:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x03:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 10 - (vscrol_subtract & 9);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x04:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x05:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 16 - (vscrol_subtract & 15);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x06:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfe) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x07:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfe) << 8;
 					antic.modelines = 16 - (vscrol_subtract & 15);
 					if( antic.w.chactl & 4 )    /* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x08:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					break;
 				case 0x09:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 4 - (vscrol_subtract & 3);
 					break;
 				case 0x0a:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 4 - (vscrol_subtract & 3);
 					break;
 				case 0x0b:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 2 - (vscrol_subtract & 1);
 					break;
 				case 0x0c:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 1;
 					break;
 				case 0x0d:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 2 - (vscrol_subtract & 1);
 					break;
 				case 0x0e:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					antic.modelines = 1;
 					break;
 				case 0x0f:
-					LMS(machine, new_cmd);
+					LMS(new_cmd);
 					/* bits 6+7 of the priority select register determine */
 					/* if newer GTIA or plain graphics modes are used */
 					switch (gtia.w.prior >> 6)
@@ -1474,9 +1462,9 @@ static void antic_scanline_dma(running_machine &machine, int param)
 
 	antic.r.nmist &= ~DLI_NMI;
 	if( antic.modelines == 1 && (antic.cmd & antic.w.nmien & DLI_NMI) )
-		after(machine, CYCLES_DLI_NMI, FUNC(antic_issue_dli));
+		after(CYCLES_DLI_NMI, timer_expired_delegate(FUNC(atari_common_state::antic_issue_dli),this));
 
-	after(machine, CYCLES_HSTART, FUNC(antic_scanline_render));
+	after(CYCLES_HSTART, timer_expired_delegate(FUNC(atari_common_state::antic_scanline_render),this));
 }
 
 /*****************************************************************************
@@ -1488,21 +1476,21 @@ static void antic_scanline_dma(running_machine &machine, int param)
  *
  *****************************************************************************/
 
-static void generic_atari_interrupt(running_machine &machine, int button_count)
+void atari_common_state::generic_atari_interrupt(int button_count)
 {
 	int button_port, i;
 
-	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle(machine)));
+	LOG(("ANTIC #%3d @cycle #%d scanline interrupt\n", antic.scanline, cycle()));
 
 	if( antic.scanline < VBL_START )
 	{
-		antic_scanline_dma(machine, 0);
+		antic_scanline_dma(0);
 		return;
 	}
 
 	if( antic.scanline == VBL_START )
 	{
-		button_port = machine.root_device().ioport("djoy_b")->read_safe(0);
+		button_port = machine().root_device().ioport("djoy_b")->read_safe(0);
 
 		/* specify buttons relevant to this Atari variant */
 		for (i = 0; i < button_count; i++)
@@ -1520,7 +1508,7 @@ static void generic_atari_interrupt(running_machine &machine, int button_count)
 		}
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = machine.first_screen()->height() - VBL_START;
+		antic.modelines = machine().first_screen()->height() - VBL_START;
 		antic.renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */
@@ -1529,34 +1517,34 @@ static void generic_atari_interrupt(running_machine &machine, int button_count)
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
 	/* refresh the display (translate color clocks to pixels) */
-	antic_linerefresh(machine);
+	antic_linerefresh();
 }
 
 
 
-TIMER_DEVICE_CALLBACK( a400_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a400_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), 4);
+	generic_atari_interrupt(4);
 }
 
-TIMER_DEVICE_CALLBACK( a800_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), 4);
+	generic_atari_interrupt(4);
 }
 
-TIMER_DEVICE_CALLBACK( a800xl_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a800xl_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), 2);
+	generic_atari_interrupt(2);
 }
 
-TIMER_DEVICE_CALLBACK( a5200_interrupt )
+TIMER_DEVICE_CALLBACK_MEMBER( atari_common_state::a5200_interrupt )
 {
-	generic_atari_interrupt(timer.machine(), 4);
+	generic_atari_interrupt(4);
 }
 
 /**************************************************************
@@ -1651,7 +1639,7 @@ static const UINT8 atari_palette[256*3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT( atari )
+PALETTE_INIT_MEMBER(atari_common_state, atari)
 {
 	int i;
 

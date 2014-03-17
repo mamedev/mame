@@ -18,17 +18,15 @@
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
 #include "video/gtia.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #include "maxaflex.lh"
 
 
-class maxaflex_state : public driver_device
+class maxaflex_state : public atari_common_state
 {
 public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: atari_common_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_speaker(*this, "speaker") { }
@@ -62,12 +60,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
-	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(machine(), data); }
+	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
 	WRITE_LINE_MEMBER(atari_pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	DECLARE_DRIVER_INIT(a600xl);
 	DECLARE_MACHINE_RESET(supervisor_board);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
+	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<speaker_sound_device> m_speaker;
@@ -392,12 +391,16 @@ READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 }
 
 
+void maxaflex_state::machine_start()
+{
+	atari_machine_start();
+}
 
 static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", atari_common_state, a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M68705, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
@@ -416,14 +419,12 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
 	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
 	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
-	MCFG_SCREEN_UPDATE_STATIC(atari)
+	MCFG_SCREEN_UPDATE_DRIVER(atari_common_state, screen_update_atari)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_LEGACY(atari)
+	MCFG_PALETTE_INIT_OWNER(atari_common_state, atari)
 	MCFG_DEFAULT_LAYOUT(layout_maxaflex)
-
-	MCFG_VIDEO_START(atari)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -437,8 +438,6 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_MACHINE_START( atarixl )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maxaflex, a600xl )
