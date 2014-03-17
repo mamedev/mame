@@ -1215,7 +1215,7 @@ void tms5110_device::set_frequency(int frequency)
 
 /******************************************************************************
 
-     DEVICE_START( tmsprom ) -- allocate buffers initialize
+     device_start( tmsprom ) -- allocate buffers initialize
 
 ******************************************************************************/
 

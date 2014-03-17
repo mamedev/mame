@@ -247,7 +247,7 @@ protected:
 
 
 /*
-    The following defines are required because the WD17xx DEVICE_START implementation
+    The following defines are required because the WD17xx device start implementation
     assumes that the floppy devices are either at root level or at the parent
     level. Our floppy devices, however, are at the grandparent level as seen from
     the controller.

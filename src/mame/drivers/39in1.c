@@ -1514,7 +1514,7 @@ UINT32 _39in1_state::screen_update_39in1(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-/* To be moved to DEVICE_START( pxa255 ) upon completion */
+/* To be moved to device start of pxa255 upon completion */
 void _39in1_state::pxa255_start()
 {
 	int index = 0;

@@ -181,7 +181,7 @@ ppu2c07_device::ppu2c07_device(const machine_config &mconfig, const char *tag, d
 	m_scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
 }
 
-// The PPU_2C05 variants have different protection value, set at DEVICE_START, but otherwise are all the same...
+// The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
 ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C05_01, "2C05_01 PPU", tag, owner, clock, "ppu2c05_01", __FILE__)
 {
