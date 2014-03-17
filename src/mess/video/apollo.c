@@ -17,7 +17,6 @@
 #define VERBOSE 0
 
 #include "includes/apollo.h"
-#include "scrlegcy.h"
 
 #include "apollo.lh"
 #include "apollo_15i.lh"
@@ -2096,12 +2095,9 @@ static void register_vblank_callback(device_t *device)
 			FUNC(vblank_state_changed),device) );
 }
 
-static SCREEN_UPDATE_RGB32( apollo_screen )
+UINT32 apollo_graphics_15i::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// FIXME: omit using APOLLO_SCREEN_TAG
-	device_t *apollo_screen = screen.machine().device(APOLLO_SCREEN_TAG);
-	apollo_graphics *apollo_graphics = get_safe_token(apollo_screen);
-
+	apollo_graphics *apollo_graphics = get_safe_token(this);
 	return apollo_graphics->screen_update(bitmap, cliprect);
 }
 
@@ -2117,8 +2113,8 @@ MACHINE_CONFIG_FRAGMENT( apollo_graphics )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(657))
 	MCFG_SCREEN_SIZE(1024, 800)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 799)
-	MCFG_SCREEN_UPDATE_STATIC(apollo_screen)
-	MACHINE_CONFIG_END
+	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_15i, screen_update)
+MACHINE_CONFIG_END
 
 const device_type APOLLO_GRAPHICS = &device_creator<apollo_graphics_15i> ;
 
@@ -2203,7 +2199,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_mono19i )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(616))
 	MCFG_SCREEN_SIZE(1280, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_SCREEN_UPDATE_STATIC(apollo_screen)
+	MCFG_SCREEN_UPDATE_DEVICE(APOLLO_SCREEN_TAG, apollo_graphics_19i, screen_update)
 	MACHINE_CONFIG_END
 
 const device_type APOLLO_MONO19I = &device_creator<apollo_graphics_19i> ;

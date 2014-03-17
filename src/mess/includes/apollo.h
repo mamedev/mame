@@ -303,6 +303,8 @@ public:
 
 	// access to legacy token
 	class apollo_graphics *token() const { assert(m_token != NULL); return m_token; }
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
