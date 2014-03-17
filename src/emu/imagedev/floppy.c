@@ -783,7 +783,7 @@ ui_menu_control_floppy_image::ui_menu_control_floppy_image(running_machine &mach
 
 ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
 {
-	global_free(format_array);
+	global_free_array(format_array);
 }
 
 void ui_menu_control_floppy_image::do_load_create()

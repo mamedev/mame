@@ -126,7 +126,7 @@ static void drawgdi_window_destroy(win_window_info *window)
 
 	// free the bitmap memory
 	if (gdi->bmdata != NULL)
-		global_free(gdi->bmdata);
+		global_free_array(gdi->bmdata);
 	global_free(gdi);
 	window->drawdata = NULL;
 }
@@ -173,7 +173,7 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	if (pitch * height * 4 > gdi->bmsize)
 	{
 		gdi->bmsize = pitch * height * 4 * 2;
-		global_free(gdi->bmdata);
+		global_free_array(gdi->bmdata);
 		gdi->bmdata = global_alloc_array(UINT8, gdi->bmsize);
 	}
 

@@ -516,7 +516,7 @@ int base_md_cart_slot_device::load_nonlist()
 		fread(ROM, len);
 	}
 
-	global_free(tmpROM);
+	global_free_array(tmpROM);
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
 	if (len > (tmplen - offset))

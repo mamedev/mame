@@ -85,7 +85,7 @@ bool ipf_format::parse(UINT8 *data, UINT32 size, floppy_image *image)
 	bool res = scan_all_tags(data, size);
 	if(res)
 		res = generate_tracks(image);
-	global_free(tinfos);
+	global_free_array(tinfos);
 	return res;
 }
 
@@ -119,7 +119,7 @@ ipf_format::track_info *ipf_format::get_index(UINT32 idx)
 	if(idx >= tcount) {
 		track_info *ti1 = global_alloc_array_clear(track_info, idx+1);
 		memcpy(ti1, tinfos, tcount*sizeof(tinfos));
-		global_free(tinfos);
+		global_free_array(tinfos);
 		tcount = idx+1;
 		tinfos = ti1;
 	}
