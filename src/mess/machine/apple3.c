@@ -524,7 +524,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 
 void apple3_state::apple3_irq_update()
 {
-	if (m_via_1_irq || m_via_0_irq)
+	if (m_acia_irq || m_via_1_irq || m_via_0_irq)
 	{
 		// HACK: SOS floppy driver enables ROM at Fxxx *before* trying to
 		// suppress IRQs.  IRQ hits at inopportune time -> bad vector -> system crash.
@@ -547,6 +547,13 @@ void apple3_state::apple3_irq_update()
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		m_via_1->write_pa7(1);
 	}
+}
+
+WRITE_LINE_MEMBER(apple3_state::apple3_acia_irq_func)
+{
+//	printf("acia IRQ: %d\n", state);
+	m_acia_irq = state;
+	apple3_irq_update();
 }
 
 WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
@@ -658,12 +665,13 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	apple3_update_drives(machine().device("fdc"));
 
 	m_flags = 0;
+	m_acia_irq = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
 	m_via_0_irq = 0;
 	m_via_1_irq = 0;
 
-	// kludge round +12v pull up resistors, which after conversion will bring this low when nothing is plugged in.
+	// kludge round +12v pull up resistors, which after conversion will bring this low when nothing is plugged in. issue also affects dcd/dsr but those don't affect booting.
 	m_acia->write_cts(0);
 
 	/* these are here to appease the Apple /// confidence tests */
@@ -687,6 +695,7 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 
 	apple3_update_memory();
 
+	save_item(NAME(m_acia_irq));
 	save_item(NAME(m_via_0_a));
 	save_item(NAME(m_via_0_b));
 	save_item(NAME(m_via_1_a));
