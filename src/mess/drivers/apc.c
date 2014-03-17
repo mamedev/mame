@@ -144,11 +144,6 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-
 	DECLARE_DRIVER_INIT(apc);
 	DECLARE_PALETTE_INIT(apc);
 
@@ -741,18 +736,6 @@ CASETBL:
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 INPUT_PORTS_END
 
-void apc_state::fdc_drq(bool state)
-{
-//  printf("%02x DRQ\n",state);
-	m_dmac->dreq1_w(state);
-}
-
-void apc_state::fdc_irq(bool state)
-{
-//  printf("IRQ %d\n",state);
-	machine().device<pic8259_device>("pic8259_slave")->ir4_w(state);
-}
-
 IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 {
 	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
@@ -763,8 +746,6 @@ void apc_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
 
 	m_fdc->set_rate(500000);
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
 
 	m_rtc->cs_w(1);
 //  m_rtc->oe_w(1);
@@ -1003,6 +984,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")

@@ -210,12 +210,6 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 }
 
 
-void amstrad_state::aleste_interrupt(bool state)
-{
-	m_aleste_fdc_int = state;
-}
-
-
 /* Some games set the 8255 to mode 1 and expect a strobe signal */
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
 TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
@@ -2564,7 +2558,7 @@ READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 
 	if(m_aleste_mode & 0x04)
 	{
-		if(m_aleste_fdc_int == 0)
+		if(m_fdc->get_irq() == 0)
 			data &= ~0x02;
 		else
 			data |= 0x02;

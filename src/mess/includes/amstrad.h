@@ -179,7 +179,6 @@ public:
 	UINT8 m_ppi_port_inputs[3];
 	UINT8 m_ppi_port_outputs[3];
 	int m_aleste_rtc_function;
-	int m_aleste_fdc_int;
 	int m_prev_reg;
 	UINT16 m_GateArray_render_colours[17];
 	UINT8 m_mode0_lookup[256];
@@ -199,7 +198,6 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_cpc_io_w);
 	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
 	void amstrad_plus_seqcheck(int data);
-	DECLARE_DRIVER_INIT(aleste);
 	DECLARE_MACHINE_START(amstrad);
 	DECLARE_MACHINE_RESET(amstrad);
 	DECLARE_VIDEO_START(amstrad);
@@ -222,7 +220,6 @@ public:
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
 	TIMER_CALLBACK_MEMBER(cb_set_resolution);
-	DECLARE_WRITE_LINE_MEMBER(aleste_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_vsync_changed);
@@ -236,8 +233,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
 	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
-
-	void aleste_interrupt(bool state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

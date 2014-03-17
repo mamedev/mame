@@ -80,6 +80,8 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_Z80CTC_ADD( Z80CTC_TAG, XTAL_8MHz/2, kc_d004_ctc_intf )
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", kc_d004_device::floppy_formats)
@@ -159,9 +161,6 @@ void kc_d004_device::device_start()
 
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_tc_clear_timer = timer_alloc(TIMER_TC_CLEAR);
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(kc_d004_device::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(kc_d004_device::fdc_drq), this));
 }
 
 //-------------------------------------------------
@@ -364,7 +363,7 @@ WRITE8_MEMBER(kc_d004_device::hw_terminal_count_w)
 	m_tc_clear_timer->adjust(attotime::from_nsec(200));
 }
 
-void kc_d004_device::fdc_irq(bool state)
+WRITE_LINE_MEMBER(kc_d004_device::fdc_irq)
 {
 	if (state)
 		m_hw_input_gate &= ~0x40;
@@ -372,7 +371,7 @@ void kc_d004_device::fdc_irq(bool state)
 		m_hw_input_gate |= 0x40;
 }
 
-void kc_d004_device::fdc_drq(bool state)
+WRITE_LINE_MEMBER(kc_d004_device::fdc_drq)
 {
 	if (state)
 		m_hw_input_gate &= ~0x80;

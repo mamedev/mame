@@ -953,14 +953,14 @@ FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-void wangpc_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( wangpc_state::fdc_irq )
 {
 	if (LOG) logerror("FDC INT %u\n", state);
 
 	check_level2_interrupts();
 }
 
-void wangpc_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( wangpc_state::fdc_drq )
 {
 	if (LOG) logerror("FDC DRQ %u\n", state);
 
@@ -1042,9 +1042,6 @@ void wangpc_state::machine_start()
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
 	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk1_load), this));
 	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk1_unload), this));
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(wangpc_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(wangpc_state::fdc_drq), this));
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1152,6 +1149,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
 	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(wangpc_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(wangpc_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 

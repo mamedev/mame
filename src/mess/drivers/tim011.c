@@ -32,8 +32,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
 	DECLARE_READ8_MEMBER(print_r);
 	DECLARE_READ8_MEMBER(scroll_r);
-	void irq_w(bool state);
-	void drq_w(bool state);
 	UINT8 m_scroll;
 
 	required_device<cpu_device> m_maincpu;
@@ -65,16 +63,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( tim011 )
 INPUT_PORTS_END
 
-void tim011_state::irq_w(bool state)
-{
-	m_maincpu->set_input_line(2, state);
-}
-
-void tim011_state::drq_w(bool state)
-{
-	printf("drq_w\n");
-}
-
 void tim011_state::machine_reset()
 {
 	// motor is actually connected on TXS pin of CPU
@@ -82,9 +70,6 @@ void tim011_state::machine_reset()
 	m_floppy1->mon_w(0);
 	m_floppy2->mon_w(0);
 	m_floppy3->mon_w(0);
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(tim011_state::irq_w), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(tim011_state::drq_w), this));
 }
 
 void tim011_state::video_start()
@@ -144,6 +129,8 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 
 	// FDC9266 location U43 XTAL_8MHz
 	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
+
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", tim011_floppy_formats)

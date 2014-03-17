@@ -132,11 +132,6 @@ static I8255_INTERFACE( amstrad_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)  /* port C write */
 };
 
-DRIVER_INIT_MEMBER(amstrad_state,aleste)
-{
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(amstrad_state::aleste_interrupt), this));
-}
-
 
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
@@ -1153,7 +1148,6 @@ ROM_START(cpc6128p)
 	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
-
 #define rom_cpc464p  rom_cpc6128p
 #define rom_gx4000  rom_cpc6128p
 
@@ -1194,4 +1188,4 @@ COMP( 1990, cpc464p,  0,        0,      cpcplus, plus, driver_device,     0,    
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp, driver_device,   0,       "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste, amstrad_state,   aleste,  "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )

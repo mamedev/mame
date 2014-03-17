@@ -31,12 +31,12 @@ const device_type ISBC_218A = &device_creator<isbc_218a_device>;
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-void isbc_218a_device::fdc_irq(bool state)
+WRITE_LINE_MEMBER( isbc_218a_device::fdc_irq )
 {
 	m_slot->mintr1_w(state);
 }
 
-void isbc_218a_device::fdc_drq(bool state)
+WRITE_LINE_MEMBER( isbc_218a_device::fdc_drq )
 {
 	m_slot->mdrqt_w(state);
 }
@@ -56,6 +56,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( isbc_218a )
 	MCFG_I8272A_ADD(I8272_TAG, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isbc_218a_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", isbc_218a_floppies, "525dd", isbc_218a_device::floppy_formats)
 MACHINE_CONFIG_END
 
@@ -95,8 +97,6 @@ isbc_218a_device::isbc_218a_device(const machine_config &mconfig, const char *ta
 
 void isbc_218a_device::device_start()
 {
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(isbc_218a_device::fdc_irq), this));
-	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(isbc_218a_device::fdc_drq), this));
 }
 
 

@@ -856,7 +856,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -977,7 +978,8 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1066,7 +1068,8 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1142,6 +1145,8 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1219,6 +1224,8 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1397,7 +1404,8 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 
@@ -1482,7 +1490,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1553,7 +1562,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1623,7 +1633,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1693,7 +1704,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1763,7 +1775,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 

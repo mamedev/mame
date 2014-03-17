@@ -143,7 +143,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcw16_com_rts_1);
 
 	void trigger_fdc_int();
-	void fdc_interrupt(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	inline void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);

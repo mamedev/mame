@@ -729,7 +729,7 @@ READ16_MEMBER(x68k_state::x68k_fdc_r)
 	return 0xff;
 }
 
-void x68k_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
@@ -753,7 +753,7 @@ static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 	return state->m_fdc.fdc->dma_w(data);
 }
 
-void x68k_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( x68k_state::fdc_drq )
 {
 	bool ostate = m_fdc.drq_state;
 	m_fdc.drq_state = state;
@@ -1782,8 +1782,6 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 	// check for disks
 	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
-	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
-	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
 
 	for(int drive=0;drive<4;drive++)
 	{
@@ -1826,8 +1824,6 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 
 	// check for disks
 	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
-	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
-	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
 
 	for(int drive=0;drive<4;drive++)
 	{
@@ -1963,6 +1959,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_UPD72065_ADD("upd72065", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(x68k_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(x68k_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", x68k_state::floppy_formats)

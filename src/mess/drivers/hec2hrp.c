@@ -329,7 +329,6 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
 	hector_init();
-	hector_disc2_init(); // Init of the Disc II !
 }
 /*****************************************************************************/
 MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
@@ -533,6 +532,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
@@ -586,6 +587,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
@@ -687,6 +690,8 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hec2hrp_state, disc2_fdc_dma_irq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

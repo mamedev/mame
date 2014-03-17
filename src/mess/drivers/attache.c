@@ -159,8 +159,6 @@ public:
 	DECLARE_WRITE8_MEMBER(memmap_w);
 	DECLARE_READ8_MEMBER(dma_mem_r);
 	DECLARE_WRITE8_MEMBER(dma_mem_w);
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
@@ -739,16 +737,6 @@ WRITE8_MEMBER(attache_state::dma_mem_w)
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-void attache_state::fdc_intrq_w(bool state)
-{
-	m_ctc->trg3(state);
-}
-
-void attache_state::fdc_drq_w(bool state)
-{
-	m_dma->dreq0_w(state ^ 1);
-}
-
 WRITE_LINE_MEMBER( attache_state::hreq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -996,10 +984,6 @@ void attache_state::machine_start()
 	memset(m_attr_ram,0,128*32);
 	memset(m_char_ram,0,128*32);
 	memset(m_gfx_ram,0,128*32*5);
-
-	// FDC callbacks
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(attache_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(attache_state::fdc_drq_w), this));
 }
 
 void attache_state::machine_reset()
@@ -1039,7 +1023,8 @@ static MACHINE_CONFIG_START( attache, attache_state )
 	MCFG_AM9517A_ADD("dma",XTAL_8MHz / 4, dma_interface)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
-
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg3))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats)
 

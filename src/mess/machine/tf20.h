@@ -50,8 +50,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
 
-	void fdc_irq(bool state);
-
 protected:
 	// device-level overrides
 	virtual void device_start();

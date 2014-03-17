@@ -800,17 +800,12 @@ I8255_INTERFACE( pcjr_ppi8255_interface )
  *
  **********************************************************/
 
-void pc_state::fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( pc_state::fdc_interrupt )
 {
 	if (m_pic8259)
 	{
 		m_pic8259->ir6_w(state);
 	}
-}
-
-void pc_state::fdc_dma_drq(bool state)
-{
-	m_dma8237->dreq2_w( state );
 }
 
 static void pc_set_irq_line(running_machine &machine,int irq, int state)
@@ -1058,10 +1053,6 @@ IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 MACHINE_START_MEMBER(pc_state,pc)
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
-
-	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
-	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
-	fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_dma_drq), this));
 }
 
 

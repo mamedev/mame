@@ -575,12 +575,7 @@ static I8255A_INTERFACE( ppi_intf )
 
 // Intel 8272 Interface
 
-void tandy2k_state::fdc_irq(bool state)
-{
-	m_pic0->ir4_w(state);
-}
-
-void tandy2k_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( tandy2k_state::fdc_drq )
 {
 	dma_request(0, state);
 }
@@ -628,9 +623,6 @@ void tandy2k_state::machine_start()
 	int ram_size = m_ram->size();
 
 	program.install_ram(0x00000, ram_size - 1, ram);
-
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_drq), this));
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -702,6 +694,8 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 

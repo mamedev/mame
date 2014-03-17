@@ -1122,7 +1122,7 @@ WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 	nc200_refresh_uart_interrupt();
 }
 
-void nc_state::nc200_fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( nc_state::nc200_fdc_interrupt )
 {
 #if 0
 	m_irq_latch &=~(1<<5);
@@ -1178,9 +1178,6 @@ MACHINE_START_MEMBER(nc_state,nc200)
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
-
-	/* serial timer */
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(nc_state::nc200_fdc_interrupt), this));
 }
 
 /*
@@ -1526,6 +1523,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_DEVICE_REMOVE("rtc")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(nc_state, nc200_fdc_interrupt))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 

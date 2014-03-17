@@ -118,6 +118,7 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 
 	// upd7201 serial interface
 	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("19b", INPUT_LINE_IRQ0))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("5a", true, true)
@@ -176,8 +177,6 @@ void epson_tf20_device::device_start()
 
 	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(epson_tf20_device::fdc_irq), this));
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
@@ -257,11 +256,6 @@ READ8_MEMBER( epson_tf20_device::rom_disable_r )
 //-------------------------------------------------
 //  fdc interrupt
 //-------------------------------------------------
-
-void epson_tf20_device::fdc_irq(bool state)
-{
-	m_cpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 READ8_MEMBER( epson_tf20_device::upd765_tc_r )
 {

@@ -1027,13 +1027,13 @@ void pc1512_state::update_fdc_drq()
 		m_dmac->dreq2_w(0);
 }
 
-void pc1512_state::fdc_int_w(bool state)
+WRITE_LINE_MEMBER( pc1512_state::fdc_int_w )
 {
 	m_dint = state;
 	update_fdc_int();
 }
 
-void pc1512_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( pc1512_state::fdc_drq_w )
 {
 	m_ddrq = state;
 	update_fdc_drq();
@@ -1140,8 +1140,6 @@ void pc1512_state::machine_start()
 {
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
-	m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_int_w), this));
-	m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_drq_w), this));
 
 	// set RAM size
 	size_t ram_size = m_ram->size();
@@ -1222,8 +1220,6 @@ void pc1640_state::machine_start()
 {
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
-	m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_int_w), this));
-	m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(pc1512_state::fdc_drq_w), this));
 
 	// state saving
 	save_item(NAME(m_pit1));
@@ -1303,6 +1299,8 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
@@ -1389,6 +1387,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_MC146818_ADD(MC146818_TAG, XTAL_32_768kHz)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc1512_state, fdc_int_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(pc1512_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)

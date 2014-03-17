@@ -54,11 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-
 	required_shared_ptr<UINT8> m_video_ram;
-	int         m_fdc_int_line;
 	required_device<palette_device> m_palette;
 };
 
@@ -81,16 +77,6 @@ WRITE8_MEMBER(dmv_state::leds_w)
 
 	for(int i=0; i<8; i++)
 		output_set_led_value(8-i, BIT(data, i));
-}
-
-void dmv_state::fdc_irq(bool state)
-{
-	m_fdc_int_line = state;
-}
-
-void dmv_state::fdc_drq(bool state)
-{
-	m_dmac->dreq3_w(state);
 }
 
 READ8_MEMBER(dmv_state::fdc_dma_r)
@@ -129,7 +115,7 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	// 16-bit CPU not available
 	data |= 0x02;
 
-	if (m_fdc_int_line)
+	if (m_fdc->get_irq())
 		data |= 0x08;
 
 	return data;
@@ -235,8 +221,6 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_drq), this));
 }
 
 void dmv_state::machine_reset()
@@ -341,6 +325,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_UPD7220_ADD( "upd7220", XTAL_5MHz/2, hgdc_intf, upd7220_map ) // unk clock
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
 	MCFG_UPD765A_ADD( "upd765", true, true )
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

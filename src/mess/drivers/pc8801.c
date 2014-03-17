@@ -2415,7 +2415,6 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 void pc8801_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc8801_state::pc8801_irq_callback),this));
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
@@ -2564,11 +2563,6 @@ PALETTE_INIT_MEMBER(pc8801_state, pc8801)
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-void pc8801_state::fdc_irq_w(bool state)
-{
-	m_fdccpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /* YM2203 Interface */
 
 READ8_MEMBER(pc8801_state::opn_porta_r)
@@ -2650,6 +2644,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+    MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif

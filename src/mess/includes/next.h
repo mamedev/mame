@@ -102,8 +102,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 
 	void net_tx_irq(bool state);
 	void net_rx_irq(bool state);

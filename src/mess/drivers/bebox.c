@@ -229,6 +229,8 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	MCFG_SMC37C78_ADD("smc37c78")
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bebox_state, fdc_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )

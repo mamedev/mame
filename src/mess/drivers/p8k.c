@@ -84,8 +84,7 @@ public:
 	DECLARE_MACHINE_RESET(p8k);
 	DECLARE_MACHINE_RESET(p8k_16);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 
 	virtual void machine_start();
 
@@ -399,27 +398,15 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 /* Intel 8272 Interface */
 
-void p8k_state::fdc_irq(bool state)
+DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
 {
 	z80pio_device *z80pio = machine().device<z80pio_device>("z80pio_2");
 
 	z80pio->port_b_write(state ? 0x10 : 0x00);
 }
 
-void p8k_state::fdc_drq(bool state)
-{
-	z80dma_device *z80dma = machine().device<z80dma_device>("z80dma");
-	z80dma->rdy_w(state);
-}
-
 void p8k_state::machine_start()
 {
-	i8272a_device *fdc = machine().device<i8272a_device>("i8272");
-	if (fdc)
-	{
-		fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_irq), this));
-		fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(p8k_state::fdc_drq), this));
-	}
 }
 
 static SLOT_INTERFACE_START( p8k_floppies )
@@ -816,6 +803,7 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_Z80PIO_ADD("z80pio_1", 1229000, p8k_pio_1_intf)
 	MCFG_Z80PIO_ADD("z80pio_2", 1229000, p8k_pio_2_intf)
 	MCFG_I8272A_ADD("i8272", true)
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 

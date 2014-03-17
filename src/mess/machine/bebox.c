@@ -392,16 +392,10 @@ const ins8250_interface bebox_uart_inteface_3 =
  *
  *************************************/
 
-void bebox_state::fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
 {
 	bebox_set_irq_bit(machine(), 13, state);
 	m_pic8259_1->ir6_w(state);
-}
-
-
-void bebox_state::fdc_dma_drq(bool state)
-{
-	m_dma8237_1->dreq2_w(state);
 }
 
 /*************************************
@@ -866,9 +860,6 @@ void bebox_state::machine_reset()
 
 void bebox_state::machine_start()
 {
-	smc37c78_device *fdc = machine().device<smc37c78_device>("smc37c78");
-	fdc->setup_intrq_cb(smc37c78_device::line_cb(FUNC(bebox_state::fdc_interrupt), this));
-	fdc->setup_drq_cb(smc37c78_device::line_cb(FUNC(bebox_state::fdc_dma_drq), this));
 }
 
 DRIVER_INIT_MEMBER(bebox_state,bebox)

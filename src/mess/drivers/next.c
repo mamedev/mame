@@ -757,12 +757,12 @@ void next_state::nmi_irq(bool state)
 	irq_set(31, state);
 }
 
-void next_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( next_state::fdc_irq )
 {
 	irq_set(7, state);
 }
 
-void next_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( next_state::fdc_drq )
 {
 	dma_drq_w(1, state);
 }
@@ -831,11 +831,6 @@ void next_state::machine_start()
 	save_item(NAME(eventc_latch));
 
 	timer_tm = timer_alloc(0);
-
-	if(fdc) {
-		fdc->setup_intrq_cb(n82077aa_device::line_cb(FUNC(next_state::fdc_irq), this));
-		fdc->setup_drq_cb(n82077aa_device::line_cb(FUNC(next_state::fdc_drq), this));
-	}
 }
 
 void next_state::machine_reset()
@@ -1000,6 +995,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(next_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(next_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list

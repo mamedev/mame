@@ -881,7 +881,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 	}
 }
 
-void pcw16_state::fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( pcw16_state::fdc_interrupt )
 {
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */
@@ -1008,8 +1008,6 @@ void pcw16_state::machine_start()
 	m_system_status = 0;
 	m_interrupt_counter = 0;
 
-	m_fdc->setup_intrq_cb(pc_fdc_superio_device::line_cb(FUNC(pcw16_state::fdc_interrupt), this));
-
 	/* initialise keyboard */
 	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
@@ -1065,6 +1063,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_PC_LPT_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pcw16_state, fdc_interrupt))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats)
 

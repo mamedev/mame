@@ -94,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
 	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mz3500);
@@ -765,18 +762,6 @@ static GFXDECODE_START( mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
 GFXDECODE_END
 
-void mz3500_state::fdc_irq(bool state)
-{
-//  printf("%d IRQ\n",state);
-	m_master->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-
-}
-
-void mz3500_state::fdc_drq(bool state)
-{
-	printf("%02x DRQ\n",state);
-}
-
 void mz3500_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
@@ -802,9 +787,6 @@ void mz3500_state::machine_reset()
 
 	if (fdc)
 	{
-		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_irq), this));
-		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_drq), this));
-
 		m_fdd_sel = 0;
 		{
 			static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
@@ -864,6 +846,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_I8255A_ADD( "i8255", i8255_intf )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)

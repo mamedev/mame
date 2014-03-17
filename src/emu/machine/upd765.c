@@ -98,7 +98,10 @@ ADDRESS_MAP_END
 
 int upd765_family_device::rates[4] = { 500000, 300000, 250000, 1000000 };
 
-upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source)
+upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source),
+	intrq_cb(*this),
+	drq_cb(*this)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -123,18 +126,11 @@ void upd765_family_device::set_mode(int _mode)
 	mode = _mode;
 }
 
-void upd765_family_device::setup_intrq_cb(line_cb cb)
-{
-	intrq_cb = cb;
-}
-
-void upd765_family_device::setup_drq_cb(line_cb cb)
-{
-	drq_cb = cb;
-}
-
 void upd765_family_device::device_start()
 {
+	intrq_cb.resolve();
+	drq_cb.resolve();
+	
 	for(int i=0; i != 4; i++) {
 		char name[2];
 		flopi[i].tm = timer_alloc(i);

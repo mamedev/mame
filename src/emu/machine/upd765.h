@@ -55,17 +55,19 @@
 #define MCFG_MCS3201_INPUT_HANDLER(_devcb) \
 	devcb = &mcs3201_device::set_input_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_UPD765_INTRQ_CALLBACK(_write) \
+	devcb = &upd765_family_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UPD765_DRQ_CALLBACK(_write) \
+	devcb = &upd765_family_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
 public:
-	typedef delegate<void (bool state)> line_cb;
 	typedef delegate<UINT8 ()> byte_read_cb;
 	typedef delegate<void (UINT8)> byte_write_cb;
 
 	pc_fdc_interface(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source) {}
-
-	virtual void setup_intrq_cb(line_cb cb) = 0;
-	virtual void setup_drq_cb(line_cb cb) = 0;
 
 	/* Note that the address map must cover and handle the whole 0-7
 	 * range.  The upd765, while conforming to the rest of the
@@ -87,8 +89,8 @@ public:
 
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	void setup_intrq_cb(line_cb cb);
-	void setup_drq_cb(line_cb cb);
+	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 
@@ -302,7 +304,7 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	line_cb intrq_cb, drq_cb;
+	devcb2_write_line intrq_cb, drq_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
 	floppy_info flopi[4];
 

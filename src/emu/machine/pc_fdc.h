@@ -16,14 +16,20 @@
 #define MCFG_PC_FDC_AT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
 
+#define MCFG_PC_FDC_INTRQ_CALLBACK(_write) \
+	devcb = &pc_fdc_family_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_PC_FDC_DRQ_CALLBACK(_write) \
+	devcb = &pc_fdc_family_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
 	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	required_device<upd765a_device> fdc;
+	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).intrq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<pc_fdc_family_device &>(device).drq_cb.set_callback(object); }
 
-	virtual void setup_intrq_cb(line_cb cb);
-	virtual void setup_drq_cb(line_cb cb);
+	required_device<upd765a_device> fdc;
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -36,20 +42,20 @@ public:
 	WRITE8_MEMBER(dor_w);
 	READ8_MEMBER(dir_r);
 	WRITE8_MEMBER(ccr_w);
+	DECLARE_WRITE_LINE_MEMBER( irq_w );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	line_cb intrq_cb, drq_cb;
 	bool irq, drq, fdc_drq, fdc_irq;
+	devcb2_write_line intrq_cb, drq_cb;
 	UINT8 dor;
 
 	floppy_image_device *floppy[4];
 
-	void irq_w(bool state);
-	void drq_w(bool state);
 	void check_irq();
 	void check_drq();
 };

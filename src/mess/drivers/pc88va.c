@@ -162,8 +162,8 @@ public:
 	DECLARE_READ16_MEMBER(fdc_dma_r);
 	DECLARE_WRITE16_MEMBER(fdc_dma_w);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	IRQ_CALLBACK_MEMBER(pc88va_irq_callback);
@@ -1687,8 +1687,6 @@ void pc88va_state::machine_start()
 
 	m_t3_mouse_timer = timer_alloc(TIMER_T3_MOUSE_CALLBACK);
 	m_t3_mouse_timer->adjust(attotime::never);
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_drq), this));
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_irq), this));
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765:0")->get_device();
 	if(floppy)
@@ -1749,13 +1747,13 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 	}
 }
 
-void pc88va_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( pc88va_state::fdc_drq )
 {
 	printf("%02x DRQ\n",state);
 	m_dmac->dmarq(state, 2);
 }
 
-void pc88va_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 {
 	if(m_fdc_mode && state)
 	{
@@ -1868,6 +1866,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_UPD71071_ADD("dmac", pc88va_dma_config)
 
 	MCFG_UPD765A_ADD("upd765", false, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")

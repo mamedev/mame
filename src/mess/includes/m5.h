@@ -77,7 +77,6 @@ public:
 	DECLARE_DRIVER_INIT(ntsc);
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 
-	void fdc_irq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 

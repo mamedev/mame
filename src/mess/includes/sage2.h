@@ -76,7 +76,7 @@ public:
 
 	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
 
-	void fdc_irq(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
 	const UINT8 *m_rom;
 	int m_reset;
