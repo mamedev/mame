@@ -196,7 +196,6 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "includes/asteroid.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
-#include "drivlgcy.h"
 
 #include "astdelux.lh"
 
@@ -249,7 +248,7 @@ static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)    /* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)    /* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)   /* DSW1 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("dvg", dvg_device, go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(asteroid_bank_switch_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
@@ -272,7 +271,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)   /* DSW1 */
 	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE("pokey", pokey_device, read, write)
 	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("dvg", dvg_device, go_w)
 	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
@@ -295,7 +294,7 @@ static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)    /* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)   /* DSW1 */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("THRUST")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("dvg", dvg_device, go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(llander_sounds_w)
@@ -323,7 +322,7 @@ static INPUT_PORTS_START( asteroid )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, asteroid_state,clock_r, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -377,7 +376,7 @@ static INPUT_PORTS_START( asteroidb )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Bit 7 is VG_HALT */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -414,7 +413,7 @@ static INPUT_PORTS_START( asterock )
 
 	PORT_MODIFY("IN0")
 	/* Bit 0 is VG_HALT and Bit 2 is the 3 KHz source */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, asteroid_state,clock_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)        /* hyperspace */
@@ -457,7 +456,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* According to schematics */
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, asteroid_state,clock_r, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)       /* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)    /* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -539,7 +538,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( llander )
 	PORT_START("IN0")
 	/* Bit 0 is VG_HALT */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	/* Of the rest, Bit 6 is the 3KHz source. 3,4 and 5 are unknown */
@@ -645,8 +644,9 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_VIDEO_START(dvg)
-
+	MCFG_DEVICE_ADD("dvg", DVG, 0)
+	MCFG_AVGDVG_VECTOR("vector")
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

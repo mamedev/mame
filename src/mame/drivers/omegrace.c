@@ -219,7 +219,6 @@
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 #include "omegrace.lh"
 
@@ -230,10 +229,12 @@ public:
 	omegrace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_dvg(*this, "dvg") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<dvg_device> m_dvg;
 
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
@@ -254,7 +255,7 @@ void omegrace_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
-	avgdvg_reset_w(space, 0, 0);
+m_dvg->reset_w(space, 0, 0);
 }
 
 
@@ -267,7 +268,7 @@ void omegrace_state::machine_reset()
 
 READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	avgdvg_go_w(space, 0, 0);
+	m_dvg->go_w(space, 0, 0);
 	return 0;
 }
 
@@ -359,7 +360,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("dvg", dvg_device, reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")             /* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")               /* DIP SW C4 */
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")               /* DIP SW C6 */
@@ -476,7 +477,7 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_COCKTAIL
 
 	PORT_START("AVGDVG")    /* port 0x0b */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
 INPUT_PORTS_END
 
 
@@ -518,7 +519,8 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_VIDEO_START(dvg)
+	MCFG_DEVICE_ADD("dvg", DVG, 0)
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
