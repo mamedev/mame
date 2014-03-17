@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// license:MAME
+// copyright-holders:smf
 /**********************************************************************
 
     MOS Technology 6551 Asynchronous Communication Interface Adapter
@@ -9,399 +9,782 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - receiver disable
-    - IRQ on DCD/DSR change
-    - parity
-    - framing error
-
-*/
-
 #include "mos6551.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
 
 #define LOG 0
 
-
-const int mos6551_device::brg_divider[] = {
-	0, 2304, 1536, 1048, 856, 768, 384, 192, 96, 64, 48, 32, 24, 16, 12, 6
-};
-
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-// device type definition
 const device_type MOS6551 = &device_creator<mos6551_device>;
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mos6551_device - constructor
-//-------------------------------------------------
-
-mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
-		device_serial_interface(mconfig, *this),
-		m_irq_handler(*this),
-		m_txd_handler(*this),
-		m_rts_handler(*this),
-		m_dtr_handler(*this),
-		m_ctrl(0),
-		m_cmd(CMD_RIE),
-		m_st(ST_TDRE),
-		m_ext_rxc(0),
-		m_cts(1),
-		m_dsr(1),
-		m_dcd(1),
-		m_chip_type(MOS6551_TYPE_MOS)
+mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
+	m_internal_clock(*this, "clock"),
+	m_irq_handler(*this),
+	m_txd_handler(*this),
+	m_rxc_handler(*this),
+	m_rts_handler(*this),
+	m_dtr_handler(*this),
+	m_irq(0),
+	m_txd(0),
+	m_rxc(0),
+	m_rts(0),
+	m_dtr(0),
+	m_xtal(0),
+	m_cts(1),
+	m_dsr(1),
+	m_dcd(1),
+	m_rxd(1),
+	m_tx_output(OUTPUT_MARK)
 {
 }
 
+const int mos6551_device::internal_divider[] =
+{
+	0, 2304, 1536, 1048, 856, 768, 384, 192, 96, 64, 48, 32, 24, 16, 12, 6
+};
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+const int mos6551_device::transmitter_controls[4][3] =
+{
+	//tx irq, tx ena, brk
+	{0, 0, 0},
+	{1, 1, 0},
+	{0, 1, 0},
+	{0, 1, 1}
+};
+
+static MACHINE_CONFIG_FRAGMENT( mos6551 )
+	MCFG_DEVICE_ADD("clock", CLOCK, 0)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mos6551_device, internal_clock))
+MACHINE_CONFIG_END
+
+machine_config_constructor mos6551_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( mos6551 );
+}
 
 void mos6551_device::device_start()
 {
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_txd_handler.resolve_safe();
+	m_rxc_handler.resolve_safe();
 	m_rts_handler.resolve_safe();
 	m_dtr_handler.resolve_safe();
 
 	// state saving
-	save_item(NAME(m_ctrl));
-	save_item(NAME(m_cmd));
-	save_item(NAME(m_st));
+	save_item(NAME(m_control));
+	save_item(NAME(m_command));
+	save_item(NAME(m_status));
 	save_item(NAME(m_tdr));
-	save_item(NAME(m_ext_rxc));
+	save_item(NAME(m_rdr));
+
+	save_item(NAME(m_irq_state));
+
+	save_item(NAME(m_irq));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rxc));
+	save_item(NAME(m_rts));
+	save_item(NAME(m_dtr));
+
+	save_item(NAME(m_xtal));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
 	save_item(NAME(m_dcd));
+	save_item(NAME(m_rxd));
+
+	save_item(NAME(m_wordlength));
+	save_item(NAME(m_extrastop));
+	save_item(NAME(m_brk));
+	save_item(NAME(m_echo_mode));
+	save_item(NAME(m_parity));
+
+	save_item(NAME(m_rx_state));
+	save_item(NAME(m_rx_clock));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_rx_counter));
+	save_item(NAME(m_rx_irq_enable));
+	save_item(NAME(m_rx_internal_clock));
+
+	save_item(NAME(m_tx_state));
+	save_item(NAME(m_tx_output));
+	save_item(NAME(m_tx_clock));
+	save_item(NAME(m_tx_bits));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_tx_parity));
+	save_item(NAME(m_tx_counter));
+	save_item(NAME(m_tx_enable));
+	save_item(NAME(m_tx_irq_enable));
+	save_item(NAME(m_tx_internal_clock));
+
+	m_internal_clock->set_unscaled_clock(m_xtal);
+
+	output_irq(1);
+	output_txd(1);
+	output_rxc(1);
+	output_rts(1);
+	output_dtr(1);
 }
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void mos6551_device::device_reset()
 {
-	m_ctrl = 0;
+	m_status = SR_TDRE;
 
-	switch (m_chip_type)
+	if (m_dsr)
 	{
-		case MOS6551_TYPE_MOS:
-			m_cmd = CMD_RIE; 
-			break;
-
-		case MOS6551_TYPE_ROCKWELL:
-			m_cmd = 0;
-			break;
-
-		default:
-			fatalerror("mos6551: unknown type %d", m_chip_type);
+		m_status |= SR_DSR;
 	}
 
-	transmit_register_reset();
-	receive_register_reset();
-
-	update_serial();
-}
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void mos6551_device::static_set_type(device_t &device, int type)
-{
-	mos6551_device &mos = downcast<mos6551_device &>(device);
-	mos.m_chip_type = type;
-}
-
-void mos6551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-
-//-------------------------------------------------
-//  tra_callback -
-//-------------------------------------------------
-
-void mos6551_device::tra_callback()
-{
-	m_txd_handler(transmit_register_get_data_bit());
-}
-
-
-//-------------------------------------------------
-//  tra_complete -
-//-------------------------------------------------
-
-void mos6551_device::tra_complete()
-{
-	if (!(m_st & ST_TDRE))
+	if (m_dcd)
 	{
-		transmit_register_setup(m_tdr);
-		m_st |= ST_TDRE;
+		m_status |= SR_DCD;
+	}
 
-		if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
+	m_rx_state = STATE_START;
+	m_rx_counter = 0;
+
+	write_command(0);
+	write_control(0);
+}
+
+void mos6551_device::output_irq(int irq)
+{
+	if (m_irq != irq)
+	{
+		m_irq = irq;
+
+		if (m_irq)
 		{
-			m_st |= ST_IRQ;
-			m_irq_handler(ASSERT_LINE);
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  rcv_complete -
-//-------------------------------------------------
-
-void mos6551_device::rcv_complete()
-{
-	if (m_st & ST_RDRF)
-	{
-		m_st |= ST_OR;
-	}
-
-	m_st &= ~(ST_FE | ST_PE);
-
-	m_st |= ST_RDRF;
-
-	if (!(m_cmd & CMD_RIE))
-	{
-		m_st |= ST_IRQ;
-		m_irq_handler(ASSERT_LINE);
-	}
-}
-
-
-//-------------------------------------------------
-//  update_serial -
-//-------------------------------------------------
-
-void mos6551_device::update_serial()
-{
-	int brg = m_ctrl & CTRL_BRG_MASK;
-
-	int data_bits_count;
-	switch (m_ctrl & CTRL_WL_MASK)
-	{
-	case CTRL_WL_8: default: data_bits_count = 8; break;
-	case CTRL_WL_7: data_bits_count = 7; break;
-	case CTRL_WL_6: data_bits_count = 6; break;
-	case CTRL_WL_5: data_bits_count = 5; break;
-	}
-
-	parity_t parity = PARITY_NONE;
-	stop_bits_t stop_bits = STOP_BITS_1;
-
-	set_data_frame(1, data_bits_count, parity, stop_bits);
-
-	if (brg == CTRL_BRG_16X_EXTCLK)
-	{
-		set_rcv_rate(m_ext_rxc / 16);
-		set_tra_rate(m_ext_rxc / 16);
-	}
-	else
-	{
-		int baud = clock() / brg_divider[brg] / 16;
-
-		set_tra_rate(baud);
-
-		if (m_ctrl & CTRL_RXC_BRG)
-		{
-			set_rcv_rate(baud);
+			m_status &= ~SR_IRQ;
 		}
 		else
 		{
-			set_rcv_rate(m_ext_rxc / 16);
+			m_status |= SR_IRQ;
 		}
+
+		m_irq_handler(!m_irq);
 	}
-
-
-	m_dtr_handler(!(m_cmd & CMD_DTR));
-	m_rts_handler(!((m_cmd & CMD_TC_MASK) == CMD_TC_RTS_HI));
 }
 
+void mos6551_device::output_txd(int txd)
+{
+	switch (m_tx_output)
+	{
+	case OUTPUT_MARK:
+		txd = 1;
+		break;
 
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
+	case OUTPUT_BREAK:
+		txd = 0;
+		break;
+	}
+
+	if (m_txd != txd)
+	{
+		m_txd = txd;
+		m_txd_handler(m_txd);
+	}
+}
+
+void mos6551_device::output_rxc(int rxc)
+{
+	if (m_rxc != rxc)
+	{
+		m_rxc = rxc;
+		m_rxc_handler(m_rxc);
+	}
+}
+
+void mos6551_device::output_rts(int rts)
+{
+	if (m_rts != rts)
+	{
+		m_rts = rts;
+		m_rts_handler(m_rts);
+	}
+}
+
+void mos6551_device::output_dtr(int dtr)
+{
+	if (m_dtr != dtr)
+	{
+		m_dtr = dtr;
+		m_dtr_handler(m_dtr);
+	}
+}
+
+void mos6551_device::update_irq()
+{
+	if (m_irq_state != 0)
+	{
+		output_irq(0);
+	}
+	else
+	{
+		output_irq(1);
+	}
+}
+
+UINT8 mos6551_device::read_rdr()
+{
+	m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
+	return m_rdr;
+}
+
+UINT8 mos6551_device::read_status()
+{
+	UINT8 status = m_status;
+
+	if (m_cts)
+	{
+		status &= ~SR_TDRE;
+	}
+
+	if (m_irq_state != 0)
+	{
+		m_irq_state = 0;
+		update_irq();
+	}
+
+	return status;
+}
+
+UINT8 mos6551_device::read_command()
+{
+	return m_command;
+}
+
+UINT8 mos6551_device::read_control()
+{
+	return m_control;
+}
+
+void mos6551_device::write_tdr(UINT8 data)
+{
+	m_tdr = data;
+	m_status &= ~SR_TDRE;
+}
+
+void mos6551_device::write_reset(UINT8 data)
+{
+	m_status &= ~SR_OVERRUN;
+	m_irq_state &= ~(IRQ_DCD | IRQ_DSR);
+
+	write_command(m_command & ~0x1f);
+}
+
+void mos6551_device::write_control(UINT8 data)
+{
+	m_control = data;
+
+	// bits 0-3
+	double scale = internal_divider[(m_control >> 0) & 0xf];
+	if (scale != 0)
+	{
+		m_tx_internal_clock = true;
+		scale = (double) 1 / scale;
+	}
+	else
+	{
+		m_tx_internal_clock = false;
+	}
+
+	m_internal_clock->set_clock_scale(scale);
+
+	// bit 4
+	m_rx_internal_clock = (m_control >> 4) & 1;
+
+	// bits 5-6
+	m_wordlength = 8 - ((m_control >> 5) & 3);
+
+	// bit 7
+	m_extrastop = (m_control >> 7) & 1;
+
+	if (!m_rx_internal_clock)
+	{
+		output_rxc(1);
+	}
+}
+
+void mos6551_device::write_command(UINT8 data)
+{
+	m_command = data;
+
+	// bit 0
+	output_dtr(!((m_command >> 0) & 1));
+
+	// bit 1
+	m_rx_irq_enable = !((m_command >> 1) & 1) && !m_dtr;
+
+	// bits 2-3
+	int transmitter_control = (m_command >> 2) & 3;
+	m_tx_irq_enable = transmitter_controls[transmitter_control][0] && !m_dtr;
+	m_tx_enable = transmitter_controls[transmitter_control][1];
+	m_brk = transmitter_controls[transmitter_control][2];
+
+	// bit 4
+	m_echo_mode = (m_command >> 4) & 1;
+
+	// bits 5-7
+	m_parity = (m_command >> 5) & 7;
+	if (!(m_parity & 1))
+	{
+		m_parity = PARITY_NONE;
+	}
+
+	output_rts(!(m_tx_enable || m_echo_mode));
+
+	if (m_dtr || m_rts)
+	{
+		m_tx_output = OUTPUT_MARK;
+		output_txd(1);
+	}
+}
 
 READ8_MEMBER( mos6551_device::read )
 {
-	UINT8 data = 0;
-
 	switch (offset & 0x03)
 	{
 	case 0:
-		if (is_receive_register_full())
-		{
-			receive_register_extract();
-			data = get_received_char();
-		}
-
-		m_st &= ~(ST_RDRF | ST_OR | ST_FE | ST_PE);
-		break;
+		return read_rdr();
 
 	case 1:
-		data = (m_dsr << 6) | (m_dcd << 5) | m_st;
-		m_st &= ~ST_IRQ;
-		m_irq_handler(CLEAR_LINE);
-		break;
+		return read_status();
 
 	case 2:
-		data = m_cmd;
-		break;
+		return read_command();
 
 	case 3:
-		data = m_ctrl;
-		break;
+	default:
+		return read_control();
 	}
-
-	return data;
 }
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
 
 WRITE8_MEMBER( mos6551_device::write )
 {
 	switch (offset & 0x03)
 	{
 	case 0:
-		m_tdr = data;
-		m_st &= ~ST_TDRE;
-
-		if (is_transmit_register_empty())
-		{
-			transmit_register_setup(m_tdr);
-			m_st |= ST_TDRE;
-
-			if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
-			{
-				m_st |= ST_IRQ;
-				m_irq_handler(ASSERT_LINE);
-			}
-		}
+		write_tdr(data);
 		break;
 
 	case 1:
-		// programmed reset
-		m_cmd = (m_cmd & 0xe0);
-		if (m_chip_type == MOS6551_TYPE_MOS)
-		{
-			m_cmd |= CMD_RIE;
-		}
-		m_st &= ~ST_OR;
-		update_serial();
+		write_reset(data);
 		break;
 
 	case 2:
-		m_cmd = data;
-		update_serial();
+		write_command(data);
 		break;
 
 	case 3:
-		m_ctrl = data;
-		update_serial();
+		write_control(data);
 		break;
 	}
 }
 
-
-//-------------------------------------------------
-//  set_rxc - set external receiver clock
-//-------------------------------------------------
-
-void mos6551_device::set_rxc(int clock)
+int mos6551_device::stoplength()
 {
-	m_ext_rxc = clock;
+	if (m_extrastop == 1)
+	{
+		if (m_wordlength == 5 && m_parity == PARITY_NONE)
+		{
+			return m_divide + (m_divide / 2);
+		}
 
-	update_serial();
+		if (m_wordlength < 8 || m_parity == PARITY_NONE)
+		{
+			return m_divide * 2;
+		}
+	}
+
+	return m_divide;
 }
 
-
-//-------------------------------------------------
-//  rxd_w - receive data write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6551_device::rxd_w )
+void mos6551_device::set_xtal(UINT32 xtal)
 {
-	device_serial_interface::rx_w(state);
+	m_xtal = xtal;
+
+	if (started())
+	{
+		m_internal_clock->set_unscaled_clock(m_xtal);
+	}
 }
 
-
-//-------------------------------------------------
-//  rxc_w - receive clock write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6551_device::rxc_w )
+WRITE_LINE_MEMBER( mos6551_device::internal_clock )
 {
-	rx_clock_w(state);
-	tx_clock_w(state);
+	if (m_tx_internal_clock)
+	{
+		transmitter_clock(state);
+	}
 }
 
-
-//-------------------------------------------------
-//  cts_w - clear to send write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6551_device::cts_w )
+WRITE_LINE_MEMBER(mos6551_device::write_xtal1)
 {
-	m_cts = state;
+	if (!m_tx_internal_clock)
+	{
+		transmitter_clock(state);
+	}
 }
 
+WRITE_LINE_MEMBER( mos6551_device::write_rxd )
+{
+	m_rxd = state;
+}
 
-//-------------------------------------------------
-//  dsr_w - data set ready write
-//-------------------------------------------------
+WRITE_LINE_MEMBER( mos6551_device::write_rxc )
+{
+	if (!m_rx_internal_clock)
+	{
+		receiver_clock(state);
+	}
+}
 
-WRITE_LINE_MEMBER( mos6551_device::dsr_w )
+WRITE_LINE_MEMBER( mos6551_device::write_cts )
+{
+	if (m_cts != state)
+	{
+		m_cts = state;
+
+		if (m_cts)
+		{
+			if (m_tx_output == OUTPUT_TXD)
+			{
+				m_tx_output = OUTPUT_MARK;
+				output_txd(1);
+			}
+		}
+	}
+}
+
+WRITE_LINE_MEMBER( mos6551_device::write_dsr )
 {
 	if (m_dsr != state)
 	{
-		m_st |= ST_IRQ;
-		m_irq_handler(ASSERT_LINE);
+		m_dsr = state;
 	}
-
-	m_dsr = state;
 }
 
-
-//-------------------------------------------------
-//  dcd_w - data carrier detect write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mos6551_device::dcd_w )
+WRITE_LINE_MEMBER( mos6551_device::write_dcd )
 {
 	if (m_dcd != state)
 	{
-		m_st |= ST_IRQ;
-		m_irq_handler(ASSERT_LINE);
+		m_dcd = state;
+	}
+}
+
+WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
+{
+	if (m_rx_clock != state)
+	{
+		m_rx_clock = state;
+
+		if (m_rx_clock)
+		{
+			/// TODO: find out whether this should be here or in write_dcd
+			if ((m_irq_state & IRQ_DCD) == 0 && !m_dcd != !(m_status & SR_DCD))
+			{
+				m_status ^= SR_DCD;
+
+				if (!m_dtr)
+				{
+					m_irq_state |= IRQ_DCD;
+					update_irq();
+				}
+			}
+
+			/// TODO: find out whether this should be here or in write_dsr
+			if ((m_irq_state & IRQ_DSR) == 0 && !m_dsr != !(m_status & SR_DSR))
+			{
+				m_status ^= SR_DSR;
+
+				if (!m_dtr)
+				{
+					m_irq_state |= IRQ_DSR;
+					update_irq();
+				}
+			}
+
+			m_rx_counter++;
+
+			switch (m_rx_state)
+			{
+			case STATE_START:
+				if (m_rx_counter == 1)
+				{
+					if (!m_rxd && !m_dtr)
+					{
+						if (LOG) logerror("MOS6551 '%s': RX START BIT\n", tag());
+					}
+					else
+					{
+						m_rx_counter = 0;
+					}
+				}
+
+				if (m_rx_counter >= m_divide / 2)
+				{
+					if (!m_rxd)
+					{
+						m_rx_state = STATE_DATA;
+						m_rx_counter = 0;
+						m_rx_shift = 0;
+						m_rx_parity = 0;
+						m_rx_bits = 0;
+					}
+					else
+					{
+						m_rx_counter = 0;
+
+						if (LOG) logerror("MOS6551 '%s': RX FALSE START BIT\n", tag());
+					}
+				}
+				break;
+
+			case STATE_DATA:
+				if (m_rx_counter == m_divide)
+				{
+					m_rx_counter = 0;
+
+					if (m_rx_bits < m_wordlength)
+					{
+						if (LOG) logerror("MOS6551 '%s': RX DATA BIT %d %d\n", tag(), m_rx_bits, m_rxd);
+					}
+					else
+					{
+						if (LOG) logerror("MOS6551 '%s': RX PARITY BIT %x\n", tag(), m_rxd);
+					}
+
+					if (m_rxd)
+					{
+						m_rx_shift |= 1 << m_rx_bits;
+					}
+
+					m_rx_bits++;
+
+					m_rx_parity ^= m_rxd;
+
+					if ((m_rx_bits == m_wordlength && m_parity == PARITY_NONE) ||
+						(m_rx_bits == (m_wordlength + 1) && m_parity == PARITY_NONE))
+					{
+						m_rx_state = STATE_STOP;
+					}
+				}
+				break;
+
+			case STATE_STOP:
+				if (m_rx_counter >= stoplength())
+				{
+					m_rx_counter = 0;
+
+					if (LOG) logerror("MOS6551 '%s': RX STOP BIT\n", tag());
+		
+					if (!(m_status & SR_RDRF))
+					{
+						if (!m_rxd)
+						{
+							m_status |= SR_FRAMING_ERROR;
+						}
+
+						if ((m_parity == PARITY_ODD && !m_rx_parity) ||
+							(m_parity == PARITY_EVEN && m_rx_parity))
+						{
+							m_status |= SR_PARITY_ERROR;
+						}
+
+						m_rdr = m_rx_shift;
+
+						if (m_wordlength == 7 && m_parity != PARITY_NONE)
+						{
+							m_rdr &= 0x7f;
+						}
+
+						m_status |= SR_RDRF;
+					}
+					else
+					{
+						m_status |= SR_OVERRUN;
+					}
+
+					if (m_rx_irq_enable)
+					{
+						m_irq_state |= IRQ_RDRF;
+						update_irq();
+					}
+
+					m_rx_state = STATE_START;
+				}
+				break;
+			}
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(mos6551_device::transmitter_clock)
+{
+	if (m_rx_internal_clock)
+	{
+		output_rxc(state);
+		receiver_clock(state);
 	}
 
-	m_dcd = state;
+	if (m_tx_clock != state)
+	{
+		m_tx_clock = state;
+
+		if (!m_tx_clock && !m_dtr)
+		{
+			if (m_echo_mode)
+			{
+				if (!(m_status & SR_OVERRUN))
+				{
+					output_txd(m_rxd);
+				}
+				else
+				{
+					output_txd(1);
+				}
+			}
+
+			if (m_tx_enable)
+			{
+				if (!m_cts && m_tx_output == OUTPUT_MARK && !(m_status & SR_TDRE))
+				{
+					m_tx_state = STATE_START;
+					m_tx_counter = 0;
+				}
+
+				m_tx_counter++;
+
+				switch (m_tx_state)
+				{
+				case STATE_START:
+					m_tx_counter = 0;
+
+					m_tx_state = STATE_DATA;
+					m_tx_shift = m_tdr;
+					m_tx_bits = 0;
+					m_tx_parity = 0;
+
+					if (m_cts)
+					{
+						m_tx_output = OUTPUT_MARK;
+					}
+					else if (!(m_status & SR_TDRE))
+					{
+						if (LOG) logerror("MOS6551 '%s': TX DATA %x\n", tag(), m_tdr);
+
+						m_tx_output = OUTPUT_TXD;
+
+						if (LOG) logerror("MOS6551 '%s': TX START BIT\n", tag());
+
+						m_status |= SR_TDRE;
+					}
+					else if (m_brk)
+					{
+						m_tx_output = OUTPUT_BREAK;
+
+						if (LOG) logerror("MOS6551 '%s': TX BREAK START\n", tag());
+					}
+					else
+					{
+						m_tx_output = OUTPUT_MARK;
+					}
+
+					if (m_tx_irq_enable && m_tx_output != OUTPUT_BREAK)
+					{
+						m_irq_state |= IRQ_TDRE;
+						update_irq();
+					}
+
+					output_txd(0);
+					break;
+
+				case STATE_DATA:
+					if (m_tx_counter == m_divide)
+					{
+						m_tx_counter = 0;
+
+						if (m_tx_bits < m_wordlength)
+						{
+							output_txd((m_tx_shift >> m_tx_bits) & 1);
+
+							m_tx_bits++;
+							m_tx_parity ^= m_txd;
+
+							if (m_tx_output == OUTPUT_TXD)
+							{
+								if (LOG) logerror("MOS6551 '%s': TX DATA BIT %d %d\n", tag(), m_tx_bits, m_txd);
+							}
+						}
+						else if (m_tx_bits == m_wordlength && m_parity != PARITY_NONE)
+						{
+							m_tx_bits++;
+
+							switch (m_parity)
+							{
+							case PARITY_ODD:
+								m_tx_parity = !m_tx_parity;
+								break;
+
+							case PARITY_MARK:
+								m_tx_parity = 1;
+								break;
+
+							case PARITY_SPACE:
+								m_tx_parity = 0;
+								break;
+							}
+
+							output_txd(m_tx_parity);
+
+							if (m_tx_output == OUTPUT_TXD)
+							{
+								if (LOG) logerror("MOS6551 '%s': TX PARITY BIT %d\n", tag(), m_txd);
+							}
+						}
+						else
+						{
+							m_tx_state = STATE_STOP;
+
+							output_txd(1);
+
+							if (m_tx_output == OUTPUT_TXD)
+							{
+								if (LOG) logerror("MOS6551 '%s': TX STOP BIT\n", tag());
+							}
+						}
+					}
+					break;
+
+				case STATE_STOP:
+					if (m_tx_counter >= stoplength())
+					{
+						if (m_tx_output == OUTPUT_BREAK)
+						{
+							if (!m_brk)
+							{
+								if (LOG) logerror("MOS6551 '%s': TX BREAK END\n", tag());
+
+								m_tx_counter = 0;
+								m_tx_state = STATE_STOP;
+								m_tx_output = OUTPUT_TXD;
+
+								output_txd(1);
+							}
+							else
+							{
+								m_tx_counter--;
+							}
+						}
+						else
+						{
+							m_tx_state = STATE_START;
+							m_tx_counter = 0;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
 }

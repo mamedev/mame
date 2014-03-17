@@ -28,6 +28,7 @@ public:
 	clcd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_acia(*this, "acia"),
 		m_via0(*this, "via0"),
 		m_rtc(*this, "rtc"),
 		m_centronics(*this, "centronics"),
@@ -87,9 +88,10 @@ public:
 		save_item(NAME(m_key_shift));
 
 		m_rtc->cs1_w(1);
+		m_acia->write_cts(0);
 	}
 
-	DECLARE_PALETTE_INIT(hprot1)
+	DECLARE_PALETTE_INIT(clcd)
 	{
 		palette.set_pen_color(0, rgb_t(36,72,36));
 		palette.set_pen_color(1, rgb_t(2,4,2));
@@ -521,6 +523,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<mos6551_device> m_acia;
 	required_device<via6522_device> m_via0;
 	required_device<msm58321_device> m_rtc;
 	required_device<centronics_device> m_centronics;
@@ -710,32 +713,33 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START(clcd, clcd_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65C02, 2000000)
+	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
 
-	MCFG_DEVICE_ADD("via0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via0", VIA6522, 2000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via0_pb_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(clcd_state, via0_cb1_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
 
-	MCFG_DEVICE_ADD("via1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via1", VIA6522, 2000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via1_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_XOR(1)
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("via1", via6522_device, write_pb4))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
@@ -784,7 +788,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(clcd_state, hprot1)
+	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

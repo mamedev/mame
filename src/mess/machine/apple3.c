@@ -663,6 +663,9 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_0_irq = 0;
 	m_via_1_irq = 0;
 
+	// kludge round +12v pull up resistors, which after conversion will bring this low when nothing is plugged in.
+	m_acia->write_cts(0);
+
 	/* these are here to appease the Apple /// confidence tests */
 	m_via_1->write_pa0(1);
 	m_via_1->write_pa1(1);
