@@ -118,10 +118,10 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 
 	// upd7201 serial interface
 	MCFG_UPD7201_ADD("3a", XTAL_CR1 / 2, tf20_upd7201_intf)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("19b", INPUT_LINE_IRQ0))
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("5a", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("19b", INPUT_LINE_IRQ0))
 
 	// floppy drives
 	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
