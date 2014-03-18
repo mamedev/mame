@@ -2390,9 +2390,9 @@ void namcos22_state::init_tables()
 
 	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
 
-	// textures
+	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->decode(i);
+		m_gfxdecode->gfx(1)->get_data(i);
 
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);

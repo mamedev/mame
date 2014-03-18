@@ -201,18 +201,22 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 {
 	int color = (m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO_MEMBER(2,
-			(0x80 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
+			m_bgvideoram[tile_index] >> 4,
 			color,
 			0);
+	if (tile_index & 0x80)
+		tileinfo.pen_data = m_empty_tile;
 }
 
 TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 {
 	int color = (m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO_MEMBER(2,
-			(0x00 == (tile_index & 0x80)) ? 16 : m_bgvideoram[tile_index] >> 4,
+			m_bgvideoram[tile_index] >> 4,
 			color,
 			TILE_FLIPY);
+	if (!(tile_index & 0x80))
+		tileinfo.pen_data = m_empty_tile;
 }
 
 TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
@@ -676,9 +680,8 @@ void decocass_state::video_start()
 	m_gfxdecode->gfx(2)->set_source(m_tileram);
 	m_gfxdecode->gfx(3)->set_source(m_objectram);
 
-	/* This should ensure that the fake 17th tile is left blank
-	 * now that dirty-tile tracking is handled by the core */
-	m_gfxdecode->gfx(2)->decode(16);
+	/* create an empty tile */
+	memset(m_empty_tile, 0, sizeof(m_empty_tile));
 }
 
 UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

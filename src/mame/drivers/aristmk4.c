@@ -368,7 +368,7 @@ void aristmk4_state::video_start()
 	int tile;
 	for (tile = 0; tile < m_gfxdecode->gfx(0)->elements(); tile++)
 	{
-		m_gfxdecode->gfx(0)->decode(tile);
+		m_gfxdecode->gfx(0)->get_data(tile);
 	}
 }
 
@@ -424,7 +424,7 @@ UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind1
 			tile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0x3ff;
 			bgtile = (m_mkiv_vram[count+1]|m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
 			uBackgroundColour();   // read sw7
-			gfx->decode(bgtile);    // force the machine to update only the first 256 tiles.
+			gfx->mark_dirty(bgtile);    // force the machine to update only the first 256 tiles.
 								// as we only update the background, not the entire display.
 			flipx = ((m_mkiv_vram[count]) & 0x04);
 			flipy = ((m_mkiv_vram[count]) & 0x08);

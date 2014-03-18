@@ -7,8 +7,7 @@
 /.cproject
 /.project
 /cfg
-/depend_emu.mak
-/depend_mess.mak
+/depend_*.mak
 /diff
 /nvram
 /obj

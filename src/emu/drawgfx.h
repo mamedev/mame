@@ -169,7 +169,6 @@ public:
 	// operations
 	void mark_dirty(UINT32 code) { if (code < elements()) { m_dirty[code] = 1; m_dirtyseq++; } }
 	void mark_all_dirty() { memset(&m_dirty[0], 1, elements()); }
-	void decode(UINT32 code);
 
 	const UINT8 *get_data(UINT32 code)
 	{
@@ -251,6 +250,9 @@ public:
 	void alphastore(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect,UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,int fixedalpha, UINT8 *alphatable);
 	void alphatable(palette_device &palette, bitmap_rgb32 &dest, const rectangle &cliprect, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, int fixedalpha ,UINT8 *alphatable);
 private:
+	// internal helpers
+	void decode(UINT32 code);
+
 	// internal state
 	palette_device  *m_palette;             // palette used for drawing
 

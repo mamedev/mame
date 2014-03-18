@@ -644,7 +644,7 @@ static const gfx_layout spritelayout =
 static const gfx_layout tilelayout =
 {
 	16,16,
-	16+1,       /* 16 tiles (+1 empty tile used in the half-width bg tilemaps) */
+	16,
 	3,
 	{ 2*16*16*16+4, 2*16*16*16+0, 4 },
 	{ STEP4(3*16*8,1), STEP4(2*16*8,1), STEP4(1*16*8,1), STEP4(0*16*8,1) },
