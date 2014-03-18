@@ -1,24 +1,26 @@
 /************************************************************************************************************
 
-   Bowling Try
+	Bowling Try
 
-   (c)200? Atlus
+	(c)200? Atlus
 
+	TODO:
+	- needs H83008 core features kicked in to proceed.
 
-   ATLUS PCB  BT-208001
-   ------------------------
+	ATLUS PCB  BT-208001
+	------------------------
 
-   At U12 the chip is Toshiba TA8428FG
+	At U12 the chip is Toshiba TA8428FG
 
-   At U1 the chip is H8/3008
+	At U1 the chip is H8/3008
 
-   At X1 on the crystal it is printed S753
+	At X1 on the crystal it is printed S753
 
-   big gfx chip marked
+	big gfx chip marked
 
-   YAMAHA JAPAN
-   YGV631-B
-   0806LU004
+	YAMAHA JAPAN
+	YGV631-B
+	0806LU004
 
 ************************************************************************************************************/
 
@@ -42,8 +44,12 @@ protected:
 public:
 };
 
+
 static ADDRESS_MAP_START( bowltry_map, AS_PROGRAM, 16, bowltry_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE( 0x080000, 0x08ffff ) AM_RAM
+	AM_RANGE( 0x600000, 0x60ffff ) AM_RAM
+	AM_RANGE( 0xfee000, 0xffffff ) AM_RAM // CPU i/o goes here?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bowltry )
@@ -59,6 +65,7 @@ UINT32 bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_ind16 
 static MACHINE_CONFIG_START( bowltry, bowltry_state )
 	MCFG_CPU_ADD("maincpu", H83002, 16000000 ) // H83008 (!)
 	MCFG_CPU_PROGRAM_MAP( bowltry_map )
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
