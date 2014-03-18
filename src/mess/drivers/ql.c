@@ -762,26 +762,6 @@ READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
 	return m_mdv1->data2_r() | m_mdv2->data2_r();
 }
 
-static ZX8302_INTERFACE( ql_zx8302_intf )
-{
-	X2,
-	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
-	DEVCB_NULL, // TXD1
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_NULL, // NETOUT
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
-	DEVCB_DEVICE_LINE_MEMBER(MDV_1, microdrive_image_device, comms_in_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdrdw_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_erase_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_r),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_r)
-};
-
-
 //-------------------------------------------------
 //  floppy_interface ql_floppy_interface
 //-------------------------------------------------
@@ -987,9 +967,27 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
 	MCFG_ZX8301_CPU(M68008_TAG)
 	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
+	
+	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
+	MCFG_ZX8302_RTC_CLOCK(X2)
+	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
+	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(ql_state, ql_baudx4_w))
+	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(ql_state, ql_comdata_w))
+	// TXD1
+	MCFG_ZX8302_OUT_TXD2_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	// NETOUT
+	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(ql_state, zx8302_mdselck_w))
+	MCFG_ZX8302_OUT_MDSELD_CB(DEVWRITELINE(MDV_1, microdrive_image_device, comms_in_w))
+	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(ql_state, zx8302_mdrdw_w))
+	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(ql_state, zx8302_erase_w))
+	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(ql_state, zx8302_raw1_w))
+	MCFG_ZX8302_IN_RAW1_CB(READLINE(ql_state, zx8302_raw1_r))
+	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
+	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
+	
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
