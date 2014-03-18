@@ -100,27 +100,19 @@
           |---------------------------------------------------------------------|
 
 
-    Watchdog
-    ========
+    Watchdog:
+    =========
 
-    The watchdog timer will reset the system after ~0.13 seconds
-    On an MV-1F MVS system, the following code was used to test:
-        000100  203C 0001 4F51             MOVE.L   #0x14F51,D0
-        000106  13C0 0030 0001             MOVE.B   D0,0x300001
-        00010C  5380                       SUBQ.L   #1,D0
-        00010E  64FC                       BCC.S    *-0x2 [0x10C]
-        000110  13C0 0030 0001             MOVE.B   D0,0x300001
-        000116  60F8                       BRA.S    *-0x6 [0x110]
-    This code loops long enough to sometimes cause a reset, sometimes not.
-    The move takes 16 cycles, subq 8, bcc 10 if taken and 8 if not taken, so:
-    (0x14F51 * 18 + 14) cycles / 12000000 cycles per second = 0.128762 seconds
+    The watchdog timer will reset the system after ~0.13 seconds.
+    By cgfm's research, exactly 3,244,030 cycles (based on 24MHz clock).
+
     Newer games force a reset using the following code (this from kof99):
         009CDA  203C 0003 0D40             MOVE.L   #0x30D40,D0
         009CE0  5380                       SUBQ.L   #1,D0
         009CE2  64FC                       BCC.S    *-0x2 [0x9CE0]
     Note however that there is a valid code path after this loop.
 
-    The watchdog is used as a form of protecetion on a number of games,
+    The watchdog is used as a form of protection on a number of games,
     previously this was implemented as a specific hack which locked a single
     address of SRAM.
 
@@ -1213,14 +1205,14 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(135167917))
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NULL, NULL)
 
