@@ -110,8 +110,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(net_tx_drq);
 	DECLARE_WRITE_LINE_MEMBER(net_rx_drq);
 
-	void mo_irq(bool state);
-	void mo_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(mo_irq);
+	DECLARE_WRITE_LINE_MEMBER(mo_drq);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	static const cdrom_interface cdrom_intf;

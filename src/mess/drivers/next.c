@@ -787,12 +787,12 @@ WRITE_LINE_MEMBER(next_state::net_rx_drq)
 	dma_drq_w(21, state);
 }
 
-void next_state::mo_irq(bool state)
+WRITE_LINE_MEMBER(next_state::mo_irq)
 {
 	irq_set(13, state);
 }
 
-void next_state::mo_drq(bool state)
+WRITE_LINE_MEMBER(next_state::mo_drq)
 {
 	dma_drq_w(5, state);
 }
@@ -983,9 +983,9 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(next_state, net_tx_drq))
 	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(next_state, net_rx_drq))
 
-	MCFG_NEXTMO_ADD("mo",
-					line_cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
+	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(next_state, mo_irq))
+	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(next_state, mo_drq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
