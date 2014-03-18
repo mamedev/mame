@@ -141,7 +141,7 @@ static MACHINE_CONFIG_START( besta, besta_state )
 	MCFG_CPU_PROGRAM_MAP(besta_mem)
 
 #if 0
-	MCFG_MPCC68561_ADD("mpcc", XTAL_25MHz, line_cb_t());    // confirm internal oscillator frequency
+	MCFG_DEVICE_ADD("mpcc", MPCC68561, XTAL_25MHz);    // confirm internal oscillator frequency
 #endif
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END

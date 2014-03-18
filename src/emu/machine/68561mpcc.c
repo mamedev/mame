@@ -27,13 +27,10 @@ const device_type MPCC68561 = &device_creator<mpcc68561_t>;
     IMPLEMENTATION
 ***************************************************************************/
 
-mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock, "mpcc68561", __FILE__)
+mpcc68561_t::mpcc68561_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MPCC68561, "Rockwell 68561 MPCC", tag, owner, clock, "mpcc68561", __FILE__),
+	intrq_cb(*this)
 {
-}
-
-void mpcc68561_t::set_intrq_cb(line_cb_t cb)
-{
-	intrq_cb = cb;
 }
 
 /*-------------------------------------------------
@@ -162,6 +159,8 @@ void mpcc68561_t::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void mpcc68561_t::device_start()
 {
+	intrq_cb.resolve_safe();
+	
 	memset(channel, 0, sizeof(channel));
 
 	mode = 0;
