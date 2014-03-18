@@ -272,10 +272,10 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 	switch (offset)
 	{
-		case 0x0000 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0001 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0002 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0003 : result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0000 : result=m_fdc->read(space, offset); break;
+		case 0x0001 : result=m_fdc->read(space, offset); break;
+		case 0x0002 : result=m_fdc->read(space, offset); break;
+		case 0x0003 : result=m_fdc->read(space, offset); break;
 		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
@@ -289,10 +289,10 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 
 	switch (offset)
 	{
-		case 0x0000 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0001 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0002 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0003 : wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0000 : m_fdc->write(space, offset, data); break;
+		case 0x0001 : m_fdc->write(space, offset, data); break;
+		case 0x0002 : m_fdc->write(space, offset, data); break;
+		case 0x0003 : m_fdc->write(space, offset, data); break;
 		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
 		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)
@@ -332,12 +332,12 @@ READ8_MEMBER( ql_state::cart_rom_r )
 void ql_state::trump_card_set_control(UINT8 data)
 {
 	if(data & TRUMP_DRIVE0_MASK)
-		wd17xx_set_drive(m_fdc,0);
+		m_fdc->set_drive(0);
 
 	if(data & TRUMP_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);
+		m_fdc->set_drive(1);
 
-	wd17xx_set_side(m_fdc,(data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
+	m_fdc->set_side((data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
 }
 
 void ql_state::sandy_set_control(UINT8 data)
@@ -347,12 +347,12 @@ void ql_state::sandy_set_control(UINT8 data)
 	m_disk_io_byte=data;
 
 	if(data & SANDY_DRIVE0_MASK)
-		wd17xx_set_drive(m_fdc,0);
+		m_fdc->set_drive(0);
 
 	if(data & SANDY_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);
+		m_fdc->set_drive(1);
 
-	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
+	m_fdc->set_side((data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
 	if ((data & SANDY_SIDE_MASK) & (LOG_DISK_READ | LOG_DISK_WRITE))
 	{
 		logerror("Accessing side 1\n");

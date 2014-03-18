@@ -459,10 +459,10 @@ static ADDRESS_MAP_START( rainbowz80_io, AS_IO, 8, rainbow_state)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
 	AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x62, 0x62) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("wd1793", fd1793_device ,status_r, command_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("wd1793", fd1793_device, track_r, track_w)
+	AM_RANGE(0x62, 0x62) AM_DEVREADWRITE("wd1793", fd1793_device, sector_r, sector_w)
+	AM_RANGE(0x63, 0x63) AM_DEVREADWRITE("wd1793", fd1793_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -902,39 +902,39 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 // **********************************************************************
 READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 {
-static int last_track;
-int track = wd17xx_track_r(m_fdc, space, 0);
+	static int last_track;
+	int track = m_fdc->track_r( space, 0);
 
-if (track != last_track)
-	printf("\n%02d",track);
-last_track = track;
+	if (track != last_track)
+		printf("\n%02d",track);
+	last_track = track;
 
-// 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
+	// 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
 
-// AND 00111011 - return what was WRITTEN to D5-D3, D1, D0 previously
-//                (except D7,D6,D2)
-int data = m_z80_diskcontrol && 0x3b;
+	// AND 00111011 - return what was WRITTEN to D5-D3, D1, D0 previously
+	//                (except D7,D6,D2)
+	int data = m_z80_diskcontrol && 0x3b;
 
-// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
-// '1' indicates that FDC has read data OR requires new write data.
-data |= wd17xx_drq_r(m_fdc) ? 0x80 : 0x00;
+	// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
+	// '1' indicates that FDC has read data OR requires new write data.
+	data |= m_fdc->drq_r() ? 0x80 : 0x00;
 
-// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a
-//          status bit has changed. Set to 1 at the completion of any
-//          command (.. see page 207 or 5-25).
-data |= wd17xx_intrq_r(m_fdc) ? 0x40 : 0x00;
+	// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a
+	//          status bit has changed. Set to 1 at the completion of any
+	//          command (.. see page 207 or 5-25).
+	data |= m_fdc->intrq_r() ? 0x40 : 0x00;
 
-// D5: SIDE 0H: status of side select signal at J2 + J3 of RX50 controller.
-//              For 1 sided drives, this bit will always read low (0).
+	// D5: SIDE 0H: status of side select signal at J2 + J3 of RX50 controller.
+	//              For 1 sided drives, this bit will always read low (0).
 
-// D4: MOTOR 1 ON L: 0 = indicates MOTOR 1 ON bit is set in drive control reg.
-// D3: MOTOR 0 ON L: 0 = indicates MOTOR 0 ON bit is set in drive  "
+	// D4: MOTOR 1 ON L: 0 = indicates MOTOR 1 ON bit is set in drive control reg.
+	// D3: MOTOR 0 ON L: 0 = indicates MOTOR 0 ON bit is set in drive  "
 
-// D2: TG43 L :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
-data |= ( track > 43) ? 0x00 : 0x04;
+	// D2: TG43 L :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
+	data |= ( track > 43) ? 0x00 : 0x04;
 
-// D1: DS1 H: reflect status of bits 0 and 1 form disk.control reg.
-// D0: DS0 H: "
+	// D1: DS1 H: reflect status of bits 0 and 1 form disk.control reg.
+	// D0: DS0 H: "
 	return data;
 }
 
@@ -960,14 +960,14 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	if (flopimg_get_image( floppy_get_device( machine(), drive ) ) != NULL)
 	{   selected_drive = drive;
-		wd17xx_set_drive(m_fdc, selected_drive);
+		m_fdc->set_drive(selected_drive);
 	}
 
 	// WD emulation (wd17xx.c) will ignore 'side select' if set to WD1793.
 	// Is it safe to * always assume * single sided 400 K disks?
-	wd17xx_set_side(m_fdc, (data & 20) ? 1 : 0);
+	m_fdc->set_side((data & 20) ? 1 : 0);
 
-	wd17xx_dden_w(m_fdc, 0); /* SEE 'WRITE_TRACK' : 1 = SD; 0 = DD; enable double density */
+	m_fdc->dden_w(0); /* SEE 'WRITE_TRACK' : 1 = SD; 0 = DD; enable double density */
 
 	output_set_value("driveled0",  (selected_drive == 0) ? 1 : 0 );
 	output_set_value("driveled1",  (selected_drive == 1) ? 1 : 0 );
@@ -1065,7 +1065,7 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 
 	// reset device when going from high to low,
 	// restore command when going from low to high :
-	wd17xx_mr_w(m_fdc, (data & 1) ? 1 : 0);
+	m_fdc->mr_w((data & 1) ? 1 : 0);
 
 	m_diagnostic = data;
 }

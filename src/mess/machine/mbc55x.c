@@ -82,8 +82,8 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portb_w )
 
 WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 {
-	wd17xx_set_drive(m_fdc,(data & 0x03));
-	wd17xx_set_side(m_fdc, BIT(data, 2));
+	m_fdc->set_drive((data & 0x03));
+	m_fdc->set_side(BIT(data, 2));
 }
 
 I8255_INTERFACE( mbc55x_ppi8255_interface )
@@ -156,12 +156,12 @@ WRITE8_MEMBER( mbc55x_state::vram_page_w )
 
 READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
 {
-	return wd17xx_r(m_fdc, space, offset>>1);
+	return m_fdc->read(space, offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
 {
-	wd17xx_w(m_fdc, space, offset>>1, data);
+	m_fdc->write(space, offset>>1, data);
 }
 
 WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_intrq_w )

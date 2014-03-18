@@ -432,19 +432,19 @@ WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 
 READ8_MEMBER(fm7_state::fm7_fdc_r)
 {
-	device_t* dev = machine().device("fdc");
+	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
 	{
 		case 0:
-			return wd17xx_status_r(dev,space, offset);
+			return fdc->status_r(space, offset);
 		case 1:
-			return wd17xx_track_r(dev,space, offset);
+			return fdc->track_r(space, offset);
 		case 2:
-			return wd17xx_sector_r(dev,space, offset);
+			return fdc->sector_r(space, offset);
 		case 3:
-			return wd17xx_data_r(dev,space, offset);
+			return fdc->data_r(space, offset);
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -466,24 +466,24 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 
 WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 {
-	device_t* dev = machine().device("fdc");
+	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	switch(offset)
 	{
 		case 0:
-			wd17xx_command_w(dev,space, offset,data);
+			fdc->command_w(space, offset,data);
 			break;
 		case 1:
-			wd17xx_track_w(dev,space, offset,data);
+			fdc->track_w(space, offset,data);
 			break;
 		case 2:
-			wd17xx_sector_w(dev,space, offset,data);
+			fdc->sector_w(space, offset,data);
 			break;
 		case 3:
-			wd17xx_data_w(dev,space, offset,data);
+			fdc->data_w(space, offset,data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
-			wd17xx_set_side(dev,data & 0x01);
+			fdc->set_side(data & 0x01);
 			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
 			break;
 		case 5:
@@ -494,7 +494,7 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 			}
 			else
 			{
-				wd17xx_set_drive(dev,data & 0x03);
+				fdc->set_drive(data & 0x03);
 				floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
 				floppy_drive_set_ready_state(floppy_get_device(machine(), data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);

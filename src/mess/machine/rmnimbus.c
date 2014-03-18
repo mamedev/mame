@@ -2202,13 +2202,13 @@ READ16_MEMBER(rmnimbus_state::sio_serial_receive)
 
 void rmnimbus_state::fdc_reset()
 {
-	device_t *fdc = machine().device(FDC_TAG);
+	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 
 	m_nimbus_drives.reg400=0;
 	m_nimbus_drives.reg410_in=0;
 	m_nimbus_drives.reg410_out=0;
 	m_nimbus_drives.int_ff=0;
-	wd17xx_set_pause_time(fdc,FDC_PAUSE);
+	fdc->set_pause_time(FDC_PAUSE);
 }
 
 void rmnimbus_state::set_disk_int(int state)
@@ -2271,7 +2271,7 @@ UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)
 READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 {
 	int result = 0;
-	device_t *fdc = machine().device(FDC_TAG);
+	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 
 	int pc=space.device().safe_pc();
 	device_t *drive = machine().device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
@@ -2279,17 +2279,17 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 	switch(offset*2)
 	{
 		case 0x08 :
-			result = wd17xx_status_r(fdc, space, 0);
+			result = fdc->status_r(space, 0);
 			if (LOG_DISK_FDD) logerror("Disk status=%2.2X\n",result);
 			break;
 		case 0x0A :
-			result = wd17xx_track_r(fdc, space, 0);
+			result = fdc->track_r(space, 0);
 			break;
 		case 0x0C :
-			result = wd17xx_sector_r(fdc, space, 0);
+			result = fdc->sector_r(space, 0);
 			break;
 		case 0x0E :
-			result = wd17xx_data_r(fdc, space, 0);
+			result = fdc->data_r(space, 0);
 			break;
 		case 0x10 :
 			m_nimbus_drives.reg410_in &= ~FDC_BITS_410;
@@ -2337,7 +2337,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 {
-	device_t *fdc = machine().device(FDC_TAG);
+	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 	int                 pc=space.device().safe_pc();
 	UINT8               reg400_old = m_nimbus_drives.reg400;
 
@@ -2351,11 +2351,11 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 	{
 		case 0x00 :
 			m_nimbus_drives.reg400=data;
-			wd17xx_set_drive(fdc,FDC_DRIVE());
-			wd17xx_set_side(fdc, FDC_SIDE());
+			fdc->set_drive(FDC_DRIVE());
+			fdc->set_side(FDC_SIDE());
 
 			// Nimbus FDC is hard wired for double density
-			//wd17xx_set_density(fdc, DEN_MFM_LO);
+			//fdc->set_density(DEN_MFM_LO);
 
 			// if we enable hdc drq with a pending condition, act on it
 			if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
@@ -2363,16 +2363,16 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 
 			break;
 		case 0x08 :
-			wd17xx_command_w(fdc, space, 0, data);
+			fdc->command_w(space, 0, data);
 			break;
 		case 0x0A :
-			wd17xx_track_w(fdc, space, 0, data);
+			fdc->track_w(space, 0, data);
 			break;
 		case 0x0C :
-			wd17xx_sector_w(fdc, space, 0, data);
+			fdc->sector_w(space, 0, data);
 			break;
 		case 0x0E :
-			wd17xx_data_w(fdc, space, 0, data);
+			fdc->data_w(space, 0, data);
 			break;
 		case 0x10 :
 			hdc_ctrl_write(data);

@@ -120,7 +120,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_mb8877a;
+	required_device<mb8877_device> m_mb8877a;
 	required_device<pit8253_device> m_pit8253;
 	required_device<beep_device> m_beeper;
 	required_memory_region m_region_tvram;
@@ -343,7 +343,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 READ8_MEMBER(mz2000_state::mz2000_wd17xx_r)
 {
 	if(m_has_fdc)
-		return wd17xx_r(m_mb8877a, space, offset) ^ 0xff;
+		return m_mb8877a->read(space, offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -351,7 +351,7 @@ READ8_MEMBER(mz2000_state::mz2000_wd17xx_r)
 WRITE8_MEMBER(mz2000_state::mz2000_wd17xx_w)
 {
 	if(m_has_fdc)
-		wd17xx_w(m_mb8877a, space, offset, data ^ 0xff);
+		m_mb8877a->write(space, offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
@@ -359,12 +359,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			wd17xx_set_drive(m_mb8877a,data & 3);
+			m_mb8877a->set_drive(data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
-			wd17xx_set_side(m_mb8877a,(data & 1));
+			m_mb8877a->set_side((data & 1));
 			break;
 	}
 }

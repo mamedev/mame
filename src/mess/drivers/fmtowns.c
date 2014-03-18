@@ -499,20 +499,19 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 
 READ8_MEMBER(towns_state::towns_floppy_r)
 {
-	device_t* fdc = m_fdc;
 	device_image_interface* image;
 	UINT8 ret;
 
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(fdc,space, offset/2);
+			return m_fdc->status_r(space, offset/2);
 		case 0x02:
-			return wd17xx_track_r(fdc,space, offset/2);
+			return m_fdc->track_r(space, offset/2);
 		case 0x04:
-			return wd17xx_sector_r(fdc,space, offset/2);
+			return m_fdc->sector_r(space, offset/2);
 		case 0x06:
-			return wd17xx_data_r(fdc,space, offset/2);
+			return m_fdc->data_r(space, offset/2);
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
 			ret = 0x80;  // always set
@@ -548,8 +547,6 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 
 WRITE8_MEMBER(towns_state::towns_floppy_w)
 {
-	device_t* fdc = m_fdc;
-
 	switch(offset)
 	{
 		case 0x00:
@@ -558,16 +555,16 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				return;
 			if(data == 0xfe)
 				return;
-			wd17xx_command_w(fdc,space, offset/2,data);
+			m_fdc->command_w(space, offset/2,data);
 			break;
 		case 0x02:
-			wd17xx_track_w(fdc,space, offset/2,data);
+			m_fdc->track_w(space, offset/2,data);
 			break;
 		case 0x04:
-			wd17xx_sector_w(fdc,space, offset/2,data);
+			m_fdc->sector_w(space, offset/2,data);
 			break;
 		case 0x06:
-			wd17xx_data_w(fdc,space, offset/2,data);
+			m_fdc->data_w(space, offset/2,data);
 			break;
 		case 0x08:
 			// bit 5 - CLKSEL
@@ -576,8 +573,8 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				floppy_mon_w(floppy_get_device(space.machine(), m_towns_selected_drive-1), !BIT(data, 4));
 				floppy_drive_set_ready_state(floppy_get_device(space.machine(), m_towns_selected_drive-1), data & 0x10,0);
 			}
-			wd17xx_set_side(fdc,(data & 0x04)>>2);
-			wd17xx_dden_w(fdc, BIT(~data, 1));
+			m_fdc->set_side((data & 0x04)>>2);
+			m_fdc->dden_w(BIT(~data, 1));
 
 			m_towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
@@ -590,19 +587,19 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 					break;
 				case 0x01:
 					m_towns_selected_drive = 1;
-					wd17xx_set_drive(fdc,0);
+					m_fdc->set_drive(0);
 					break;
 				case 0x02:
 					m_towns_selected_drive = 2;
-					wd17xx_set_drive(fdc,1);
+					m_fdc->set_drive(1);
 					break;
 				case 0x04:
 					m_towns_selected_drive = 3;
-					wd17xx_set_drive(fdc,2);
+					m_fdc->set_drive(2);
 					break;
 				case 0x08:
 					m_towns_selected_drive = 4;
-					wd17xx_set_drive(fdc,3);
+					m_fdc->set_drive(3);
 					break;
 			}
 			logerror("FDC: drive select %02x\n",data);
@@ -613,15 +610,13 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{
-	device_t* fdc = m_fdc;
-	return wd17xx_data_r(fdc,generic_space(), 0);
+{	
+	return m_fdc->data_r(generic_space(), 0);
 }
 
 WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
 {
-	device_t* fdc = m_fdc;
-	wd17xx_data_w(fdc,generic_space(), 0,data);
+	m_fdc->data_w(generic_space(), 0,data);
 }
 
 /*
@@ -2601,7 +2596,7 @@ void marty_state::driver_start()
 void towns_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_fdc = machine().device("fdc");
+	m_fdc = machine().device<mb8877_device>("fdc");
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device<cdda_device>("cdda");

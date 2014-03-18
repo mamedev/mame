@@ -641,23 +641,23 @@ WRITE_LINE_MEMBER(oric_state::oric_jasmin_wd179x_drq_w)
 
 READ8_MEMBER(oric_state::oric_jasmin_r)
 {
-	device_t *fdc = machine().device("wd179x");
+	wd1770_device *fdc = machine().device<wd1770_device>("wd179x");
 	unsigned char data = 0x0ff;
 
 	switch (offset & 0x0f)
 	{
 		/* jasmin floppy disc interface */
 		case 0x04:
-			data = wd17xx_status_r(fdc, space, 0);
+			data = fdc->status_r(space, 0);
 			break;
 		case 0x05:
-			data =wd17xx_track_r(fdc, space, 0);
+			data = fdc->track_r(space, 0);
 			break;
 		case 0x06:
-			data = wd17xx_sector_r(fdc, space, 0);
+			data = fdc->sector_r(space, 0);
 			break;
 		case 0x07:
-			data = wd17xx_data_r(fdc, space, 0);
+			data = fdc->data_r(space, 0);
 			break;
 		default:
 			data = m_via6522_0->read(space,offset & 0x0f);
@@ -671,29 +671,29 @@ READ8_MEMBER(oric_state::oric_jasmin_r)
 
 WRITE8_MEMBER(oric_state::oric_jasmin_w)
 {
-	device_t *fdc = machine().device("wd179x");
+	wd1770_device *fdc = machine().device<wd1770_device>("wd179x");
 	switch (offset & 0x0f)
 	{
 		/* microdisc floppy disc interface */
 		case 0x04:
-			wd17xx_command_w(fdc, space, 0, data);
+			fdc->command_w( space, 0, data);
 			break;
 		case 0x05:
-			wd17xx_track_w(fdc, space, 0, data);
+			fdc->track_w(space, 0, data);
 			break;
 		case 0x06:
-			wd17xx_sector_w(fdc, space, 0, data);
+			fdc->sector_w(space, 0, data);
 			break;
 		case 0x07:
-			wd17xx_data_w(fdc, space, 0, data);
+			fdc->data_w(space, 0, data);
 			break;
 		/* bit 0 = side */
 		case 0x08:
-			wd17xx_set_side(fdc,data & 0x01);
+			fdc->set_side(data & 0x01);
 			break;
 		/* any write will cause wd179x to reset */
 		case 0x09:
-			wd17xx_reset(fdc);
+			fdc->reset();
 			break;
 		case 0x0a:
 			//logerror("jasmin overlay ram w: %02x PC: %04x\n", data, m_maincpu->pc());
@@ -710,7 +710,7 @@ WRITE8_MEMBER(oric_state::oric_jasmin_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			wd17xx_set_drive(fdc,offset & 0x03);
+			fdc->set_drive(offset & 0x03);
 			break;
 
 		default:
@@ -856,22 +856,22 @@ void oric_state::oric_microdisc_set_mem_0x0c000()
 READ8_MEMBER(oric_state::oric_microdisc_r)
 {
 	unsigned char data = 0x0ff;
-	device_t *fdc = machine().device("wd179x");
+	wd1770_device *fdc = machine().device<wd1770_device>("wd179x");
 
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			data = wd17xx_status_r(fdc, space, 0);
+			data = fdc->status_r(space, 0);
 			break;
 		case 0x01:
-			data =wd17xx_track_r(fdc, space, 0);
+			data = fdc->track_r(space, 0);
 			break;
 		case 0x02:
-			data = wd17xx_sector_r(fdc, space, 0);
+			data = fdc->sector_r(space, 0);
 			break;
 		case 0x03:
-			data = wd17xx_data_r(fdc, space, 0);
+			data = fdc->data_r(space, 0);
 			break;
 		case 0x04:
 			data = m_port_314_r | 0x07f;
@@ -893,21 +893,21 @@ READ8_MEMBER(oric_state::oric_microdisc_r)
 
 WRITE8_MEMBER(oric_state::oric_microdisc_w)
 {
-	device_t *fdc = machine().device("wd179x");
+	wd1770_device *fdc = machine().device<wd1770_device>("wd179x");
 	switch (offset & 0x0ff)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			wd17xx_command_w(fdc, space, 0, data);
+			fdc->command_w(space, 0, data);
 			break;
 		case 0x01:
-			wd17xx_track_w(fdc, space, 0, data);
+			fdc->track_w(space, 0, data);
 			break;
 		case 0x02:
-			wd17xx_sector_w(fdc, space, 0, data);
+			fdc->sector_w(space, 0, data);
 			break;
 		case 0x03:
-			wd17xx_data_w(fdc, space, 0, data);
+			fdc->data_w(space, 0, data);
 			break;
 		case 0x04:
 		{
@@ -919,9 +919,9 @@ WRITE8_MEMBER(oric_state::oric_microdisc_w)
 			/* bit 4: side */
 			/* bit 3: double density enable */
 			/* bit 0: enable FDC IRQ to trigger IRQ on CPU */
-			wd17xx_set_drive(fdc,(data>>5) & 0x03);
-			wd17xx_set_side(fdc,(data>>4) & 0x01);
-			wd17xx_dden_w(fdc, !BIT(data, 3));
+			fdc->set_drive((data>>5) & 0x03);
+			fdc->set_side((data>>4) & 0x01);
+			fdc->dden_w(!BIT(data, 3));
 
 			oric_microdisc_set_mem_0x0c000();
 			oric_microdisc_refresh_wd179x_ints();

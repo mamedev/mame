@@ -811,7 +811,7 @@ READ8Z_MEMBER(snug_bwg_legacy_device::readz)
 					// .... ..11 1111 0xx0
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
-					if (!space.debugger_access()) *value = wd17xx_r(m_wd1773, space, (m_address >> 1)&0x03);
+					if (!space.debugger_access()) *value = m_wd1773->read(space, (m_address >> 1)&0x03);
 					if (TRACE_RW) logerror("bwg: read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 					if (TRACE_DATA)
 					{
@@ -895,7 +895,7 @@ WRITE8_MEMBER(snug_bwg_legacy_device::write)
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
 					if (TRACE_RW) logerror("bwg: write FDC: %04x <- %02x\n", m_address & 0xffff, data);
-					if (!space.debugger_access()) wd17xx_w(m_wd1773, space, (m_address >> 1)&0x03, data);
+					if (!space.debugger_access()) m_wd1773->write(space, (m_address >> 1)&0x03, data);
 				}
 				else
 				{
@@ -998,7 +998,7 @@ WRITE8_MEMBER(snug_bwg_legacy_device::cruwrite)
 					if (m_DSEL != 0)
 						logerror("bwg: Multiple drives selected, %02x\n", m_DSEL);
 					m_DSEL |= drivebit;
-					wd17xx_set_drive(m_wd1773, drive);
+					m_wd1773->set_drive(drive);
 				}
 			}
 			else
@@ -1009,13 +1009,13 @@ WRITE8_MEMBER(snug_bwg_legacy_device::cruwrite)
 			/* Select side of disk (bit 7) */
 			m_SIDE = data;
 			if (TRACE_CRU) logerror("bwg: set side (bit 7) = %d\n", data);
-			wd17xx_set_side(m_wd1773, m_SIDE);
+			m_wd1773->set_side(m_SIDE);
 			break;
 
 		case 10:
 			/* double density enable (active low) */
 			if (TRACE_CRU) logerror("bwg: set double density (bit 10) = %d\n", data);
-			wd17xx_dden_w(m_wd1773, (data != 0) ? ASSERT_LINE : CLEAR_LINE);
+			m_wd1773->dden_w((data != 0) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 11:

@@ -323,74 +323,74 @@ WRITE8_MEMBER( cgenie_state::cgenie_psg_port_b_w )
 
 READ8_MEMBER( cgenie_state::cgenie_status_r )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, return 0 */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0;
-	return wd17xx_status_r(fdc, space, offset);
+	return fdc->status_r(space, offset);
 }
 
 READ8_MEMBER( cgenie_state::cgenie_track_r )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_track_r(fdc, space, offset);
+	return fdc->track_r(space, offset);
 }
 
 READ8_MEMBER( cgenie_state::cgenie_sector_r )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_sector_r(fdc, space, offset);
+	return fdc->sector_r(space, offset);
 }
 
 READ8_MEMBER( cgenie_state::cgenie_data_r )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
-	return wd17xx_data_r(fdc, space, offset);
+	return fdc->data_r(space, offset);
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_command_w )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, return immediately */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_command_w(fdc, space, offset, data);
+	fdc->command_w(space, offset, data);
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_track_w )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_track_w(fdc, space, offset, data);
+	fdc->track_w(space, offset, data);
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_sector_w )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_sector_w(fdc, space, offset, data);
+	fdc->sector_w(space, offset, data);
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_data_w )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
 	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
-	wd17xx_data_w(fdc, space, offset, data);
+	fdc->data_w(space, offset, data);
 }
 
 READ8_MEMBER( cgenie_state::cgenie_irq_status_r )
@@ -440,7 +440,7 @@ const wd17xx_interface cgenie_wd17xx_interface =
 
 WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	UINT8 drive = 255;
 
 	logerror("cgenie motor_w $%02X\n", data);
@@ -463,8 +463,8 @@ WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
 	/* currently selected drive */
 	m_motor_drive = drive;
 
-	wd17xx_set_drive(fdc,drive);
-	wd17xx_set_side(fdc,m_head);
+	fdc->set_drive(drive);
+	fdc->set_side(m_head);
 }
 
 /*************************************

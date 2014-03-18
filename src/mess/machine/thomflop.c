@@ -273,10 +273,10 @@ static UINT8 to7_5p14_select;
 
 READ8_MEMBER( thomson_state::to7_5p14_r )
 {
-	device_t *fdc = machine().device("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 
 	if ( offset < 4 )
-		return wd17xx_r( fdc, space, offset );
+		return fdc->read(space, offset );
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
@@ -288,9 +288,9 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 WRITE8_HANDLER( thomson_state::to7_5p14_w )
 {
-	device_t *fdc = machine().device("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	if ( offset < 4 )
-		wd17xx_w( fdc, space, offset, data );
+		fdc->write(space, offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
@@ -307,15 +307,15 @@ WRITE8_HANDLER( thomson_state::to7_5p14_w )
 			logerror( "%f $%04x to7_5p14_w: invalid drive select pattern $%02X\n", machine().time().as_double(), m_maincpu->pc(), data );
 		}
 
-		wd17xx_dden_w(fdc, BIT(data, 7));
+		fdc->dden_w(BIT(data, 7));
 
 		to7_5p14_select = data;
 
 		if ( drive != -1 )
 		{
 			thom_floppy_active( 0 );
-			wd17xx_set_drive( fdc, drive );
-			wd17xx_set_side( fdc, side );
+			fdc->set_drive( drive );
+			fdc->set_side( side );
 			LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n",
 					machine().time().as_double(), m_maincpu->pc(),
 					data, drive, side, (BIT(data, 7) ? "FM" : "MFM")));
@@ -330,9 +330,9 @@ WRITE8_HANDLER( thomson_state::to7_5p14_w )
 
 void thomson_state::to7_5p14_reset()
 {
-	device_t *fdc = machine().device("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
-	wd17xx_reset(fdc);
+	fdc->reset();
 }
 
 
@@ -1926,7 +1926,7 @@ void thomson_state::thomson_index_callback(device_t *device, int state)
 		break;
 
 	case 2:
-		wd17xx_index_pulse_callback(machine().device("wd2793"), device, state);
+		machine().device<wd2793_device>("wd2793")->index_pulse_callback(device, state);
 		break;
 
 	case 3:

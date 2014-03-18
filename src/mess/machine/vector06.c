@@ -157,8 +157,8 @@ WRITE8_MEMBER( vector06_state::vector06_disc_w )
 {
 // something here needs to turn the motor on
 
-	wd17xx_set_side (m_fdc,BIT(data, 2) ^ 1);
-	wd17xx_set_drive(m_fdc,BIT(data, 0));
+	m_fdc->set_side (BIT(data, 2) ^ 1);
+	m_fdc->set_drive(BIT(data, 0));
 }
 
 void vector06_state::machine_start()

@@ -7,6 +7,8 @@
 #include "cococart.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
+#include "machine/wd17xx.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,7 +64,7 @@ protected:
 		UINT8 m_drq : 1;
 		UINT8 m_intrq : 1;
 
-		device_t *m_wd17xx;              /* WD17xx */
+		wd2797_device *m_wd17xx;              /* WD17xx */
 		ds1315_device *m_ds1315;         /* DS1315 */
 
 		/* Disto RTC */

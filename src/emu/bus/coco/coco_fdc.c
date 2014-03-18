@@ -70,7 +70,6 @@
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "includes/coco.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/coco_dsk.h"
 
@@ -200,7 +199,7 @@ void coco_fdc_device::device_start()
 	m_drq               = 1;
 	m_disto_msm6242     = subdevice<msm6242_device>(DISTO_TAG);
 	m_ds1315            = subdevice<ds1315_device>(CLOUD9_TAG);
-	m_wd17xx            = subdevice(WD_TAG);
+	m_wd17xx            = subdevice<wd2797_device>(WD_TAG);
 	m_dskreg            = 0x00;
 	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
@@ -312,9 +311,9 @@ void coco_fdc_device::dskreg_w(UINT8 data)
 
 	update_lines();
 
-	wd17xx_set_drive(m_wd17xx, drive);
-	wd17xx_set_side(m_wd17xx, head);
-	wd17xx_dden_w(m_wd17xx, !BIT(m_dskreg, 5));
+	m_wd17xx->set_drive(drive);
+	m_wd17xx->set_side(head);
+	m_wd17xx->dden_w(!BIT(m_dskreg, 5));
 }
 
 /*-------------------------------------------------
@@ -328,16 +327,16 @@ READ8_MEMBER(coco_fdc_device::read)
 	switch(offset & 0xEF)
 	{
 		case 8:
-			result = wd17xx_status_r(m_wd17xx, space, 0);
+			result = m_wd17xx->status_r(space, 0);
 			break;
 		case 9:
-			result = wd17xx_track_r(m_wd17xx, space, 0);
+			result = m_wd17xx->track_r(space, 0);
 			break;
 		case 10:
-			result = wd17xx_sector_r(m_wd17xx, space, 0);
+			result = m_wd17xx->sector_r(space, 0);
 			break;
 		case 11:
-			result = wd17xx_data_r(m_wd17xx, space, 0);
+			result = m_wd17xx->data_r(space, 0);
 			break;
 	}
 
@@ -382,16 +381,16 @@ WRITE8_MEMBER(coco_fdc_device::write)
 			dskreg_w(data);
 			break;
 		case 8:
-			wd17xx_command_w(m_wd17xx, space, 0, data);
+			m_wd17xx->command_w(space, 0, data);
 			break;
 		case 9:
-			wd17xx_track_w(m_wd17xx, space, 0, data);
+			m_wd17xx->track_w(space, 0, data);
 			break;
 		case 10:
-			wd17xx_sector_w(m_wd17xx, space, 0, data);
+			m_wd17xx->sector_w(space, 0, data);
 			break;
 		case 11:
-			wd17xx_data_w(m_wd17xx, space, 0, data);
+			m_wd17xx->data_w(space, 0, data);
 			break;
 	};
 
@@ -448,7 +447,7 @@ void dragon_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 	m_drq               = 0;
-	m_wd17xx            = subdevice(WD_TAG);
+	m_wd17xx            = subdevice<wd2797_device>(WD_TAG);
 	m_dskreg            = 0x00;
 	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
@@ -514,9 +513,9 @@ void dragon_fdc_device::dskreg_w(UINT8 data)
 	}
 
 	if (data & 0x04)
-		wd17xx_set_drive(m_wd17xx, data & 0x03);
+		m_wd17xx->set_drive(data & 0x03);
 
-	wd17xx_dden_w(m_wd17xx, BIT(data, 3));
+	m_wd17xx->dden_w(BIT(data, 3));
 	m_dskreg = data;
 }
 
@@ -532,16 +531,16 @@ READ8_MEMBER(dragon_fdc_device::read)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			result = wd17xx_status_r(m_wd17xx, space, 0);
+			result = m_wd17xx->status_r(space, 0);
 			break;
 		case 1:
-			result = wd17xx_track_r(m_wd17xx, space, 0);
+			result = m_wd17xx->track_r(space, 0);
 			break;
 		case 2:
-			result = wd17xx_sector_r(m_wd17xx, space, 0);
+			result = m_wd17xx->sector_r(space, 0);
 			break;
 		case 3:
-			result = wd17xx_data_r(m_wd17xx, space, 0);
+			result = m_wd17xx->data_r(space, 0);
 			break;
 	}
 	return result;
@@ -558,21 +557,21 @@ WRITE8_MEMBER(dragon_fdc_device::write)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			wd17xx_command_w(m_wd17xx, space, 0, data);
+			m_wd17xx->command_w(space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
 			if (data & 0x80)
-				wd17xx_set_side(m_wd17xx, (data & 0x02) ? 1 : 0);
+				m_wd17xx->set_side((data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			wd17xx_track_w(m_wd17xx, space, 0, data);
+			m_wd17xx->track_w(space, 0, data);
 			break;
 		case 2:
-			wd17xx_sector_w(m_wd17xx, space, 0, data);
+			m_wd17xx->sector_w(space, 0, data);
 			break;
 		case 3:
-			wd17xx_data_w(m_wd17xx, space, 0, data);
+			m_wd17xx->data_w(space, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:

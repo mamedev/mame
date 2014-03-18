@@ -208,7 +208,7 @@ WRITE8_MEMBER( rm380z_state::keyboard_put )
 
 WRITE8_MEMBER( rm380z_state::disk_0_control )
 {
-	device_t *fdc = machine().device("wd1771");
+	fd1771_device *fdc = machine().device<fd1771_device>("wd1771");
 
 	//printf("disk drive port0 write [%x]\n",data);
 
@@ -216,13 +216,13 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 	if (data&0x01)
 	{
 		// drive select bit 0
-		wd17xx_set_drive(fdc,0);
+		fdc->set_drive(0);
 	}
 
 	if (data&0x02)
 	{
 		// drive select bit 1
-		wd17xx_set_drive(fdc,1);
+		fdc->set_drive(1);
 	}
 
 	if (data&0x08)
@@ -233,11 +233,11 @@ WRITE8_MEMBER( rm380z_state::disk_0_control )
 	// "MSEL (dir/side select bit)"
 	if (data&0x20)
 	{
-		wd17xx_set_side(fdc,1);
+		fdc->set_side(1);
 	}
 	else
 	{
-		wd17xx_set_side(fdc,0);
+		fdc->set_side(0);
 	}
 
 	// set drive en- (?)
@@ -274,7 +274,7 @@ void rm380z_state::machine_reset()
 	memset(m_vram,0,RM380Z_SCREENSIZE);
 
 	config_memory_map();
-	wd17xx_reset(machine().device("wd1771"));
+	machine().device("wd1771")->reset();
 
 	init_graphic_chars();
 }

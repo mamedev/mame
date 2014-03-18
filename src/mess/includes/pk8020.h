@@ -11,6 +11,7 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
+#include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
@@ -81,7 +82,7 @@ protected:
 	required_device<i8251_device> m_rs232;
 	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_wd1793;
+	required_device<fd1793_device> m_wd1793;
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259;
 	required_device<speaker_sound_device> m_speaker;

@@ -2,6 +2,7 @@
 #define __CONCEPT_EXP__
 
 #include "emu.h"
+#include "machine/wd17xx.h"
 
 
 class concept_exp_card_device;
@@ -84,7 +85,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-	device_t *m_wd179x;
+	fd1793_device *m_wd179x;
 
 	UINT8 m_fdc_local_status;
 	UINT8 m_fdc_local_command;

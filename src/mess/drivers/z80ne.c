@@ -98,9 +98,6 @@
 #include "formats/z80ne_dsk.h"
 #include "machine/ram.h"
 
-/* peripheral chips */
-#include "machine/wd17xx.h"
-
 /* Layout */
 #include "z80ne.lh"
 #include "z80net.lh"

@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "imagedev/flopdrv.h"
 #include "formats/trd_dsk.h"
-#include "machine/wd17xx.h"
 #include "machine/beta.h"
 
 
@@ -41,7 +40,7 @@ void beta_disk_device::device_start()
 
 	/* find our WD179x */
 	tempstring.printf("%s:%s", tag(), "wd179x");
-	m_wd179x = machine().device(tempstring);
+	m_wd179x = machine().device<wd2793_device>(tempstring);
 }
 
 //-------------------------------------------------
@@ -99,7 +98,7 @@ static const wd17xx_interface beta_wd17xx_interface =
 READ8_MEMBER(beta_disk_device::status_r)
 {
 	if (m_betadisk_active==1) {
-		return wd17xx_status_r(m_wd179x, space, offset);
+		return m_wd179x->status_r(space, offset);
 	} else {
 		return 0xff;
 	}
@@ -108,7 +107,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 READ8_MEMBER(beta_disk_device::track_r)
 {
 	if (m_betadisk_active==1) {
-		return wd17xx_track_r(m_wd179x, space, offset);
+		return m_wd179x->track_r(space, offset);
 	} else {
 		return 0xff;
 	}
@@ -117,7 +116,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 READ8_MEMBER(beta_disk_device::sector_r)
 {
 	if (m_betadisk_active==1) {
-		return wd17xx_sector_r(m_wd179x, space, offset);
+		return m_wd179x->sector_r(space, offset);
 	} else {
 		return 0xff;
 	}
@@ -126,7 +125,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 READ8_MEMBER(beta_disk_device::data_r)
 {
 	if (m_betadisk_active==1) {
-		return wd17xx_data_r(m_wd179x, space, offset);
+		return m_wd179x->data_r(space, offset);
 	} else {
 		return 0xff;
 	}
@@ -144,12 +143,12 @@ READ8_MEMBER(beta_disk_device::state_r)
 WRITE8_MEMBER(beta_disk_device::param_w)
 {
 	if (m_betadisk_active==1) {
-		wd17xx_set_drive(m_wd179x, data & 3);
-		wd17xx_set_side (m_wd179x,(data & 0x10) ? 0 : 1 );
-		wd17xx_dden_w(m_wd179x, !BIT(data, 5));
+		m_wd179x->set_drive(data & 3);
+		m_wd179x->set_side ((data & 0x10) ? 0 : 1 );
+		m_wd179x->dden_w(!BIT(data, 5));
 		if ((data & 0x04) == 0) // reset
 		{
-			wd17xx_reset(m_wd179x);
+			m_wd179x->reset();
 		}
 		m_betadisk_status = (data & 0x3f) | m_betadisk_status;
 	}
@@ -158,28 +157,28 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 WRITE8_MEMBER(beta_disk_device::command_w)
 {
 	if (m_betadisk_active==1) {
-		wd17xx_command_w(m_wd179x, space, offset, data);
+		m_wd179x->command_w(space, offset, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::track_w)
 {
 	if (m_betadisk_active==1) {
-		wd17xx_track_w(m_wd179x, space, offset, data);
+		m_wd179x->track_w(space, offset, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::sector_w)
 {
 	if (m_betadisk_active==1) {
-		wd17xx_sector_w(m_wd179x, space, offset, data);
+		m_wd179x->sector_w(space, offset, data);
 	}
 }
 
 WRITE8_MEMBER(beta_disk_device::data_w)
 {
 	if (m_betadisk_active==1) {
-		wd17xx_data_w(m_wd179x, space, offset, data);
+		m_wd179x->data_w(space, offset, data);
 	}
 }
 

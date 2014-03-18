@@ -126,10 +126,10 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
-	wd17xx_set_drive(m_fdc, data & 3);
+	m_fdc->set_drive(data & 3);
 	floppy_mon_w(floppy_get_device(machine(), data & 3), !(data & 4) ? 1: 0);
 	floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x4,0);
-	//wd17xx_set_side(m_fdc, (data & 0x10)>>4);
+	//m_fdc->set_side((data & 0x10)>>4);
 }
 
 static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(myb3k_6845_address_w)
 	AM_RANGE(0x1d, 0x1d) AM_WRITE(myb3k_6845_data_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("fdc",wd17xx_r,wd17xx_w) //FDC, almost likely wd17xx
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("fdc", mb8877_device, read, write) //FDC, almost likely wd17xx
 	AM_RANGE(0x24, 0x24) AM_WRITE(myb3k_fdc_output_w)
 //  AM_RANGE(0x520,0x524) mirror of above
 ADDRESS_MAP_END

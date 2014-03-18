@@ -1231,7 +1231,7 @@ MSX_SLOT_INIT(diskrom)
 MSX_SLOT_RESET(diskrom)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	wd17xx_reset(drvstate->m_wd179x);
+	drvstate->m_wd179x->reset();
 }
 
 static READ8_HANDLER (msx_diskrom_page1_r)
@@ -1239,10 +1239,10 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 	msx_state *state = space.machine().driver_data<msx_state>();
 	switch (offset)
 	{
-	case 0: return wd17xx_status_r (state->m_wd179x, space, 0);
-	case 1: return wd17xx_track_r (state->m_wd179x, space, 0);
-	case 2: return wd17xx_sector_r (state->m_wd179x, space, 0);
-	case 3: return wd17xx_data_r (state->m_wd179x, space, 0);
+	case 0: return state->m_wd179x->status_r (space, 0);
+	case 1: return state->m_wd179x->track_r (space, 0);
+	case 2: return state->m_wd179x->sector_r (space, 0);
+	case 3: return state->m_wd179x->data_r (space, 0);
 	case 7: return state->m_dsk_stat;
 	default:
 		return state->m_state[1]->m_mem[offset + 0x3ff8];
@@ -1257,13 +1257,13 @@ static READ8_HANDLER (msx_diskrom_page2_r)
 		switch (offset)
 		{
 		case 0x7f8:
-			return wd17xx_status_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->status_r (space, 0);
 		case 0x7f9:
-			return wd17xx_track_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->track_r (space, 0);
 		case 0x7fa:
-			return wd17xx_sector_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->sector_r (space, 0);
 		case 0x7fb:
-			return wd17xx_data_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->data_r (space, 0);
 		case 0x7ff:
 			return state->m_dsk_stat;
 		default:
@@ -1314,23 +1314,23 @@ MSX_SLOT_WRITE(diskrom)
 	switch (addr)
 	{
 	case 0x7ff8:
-		wd17xx_command_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->command_w (space, 0, val);
 		break;
 	case 0x7ff9:
-		wd17xx_track_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->track_w (space, 0, val);
 		break;
 	case 0x7ffa:
-		wd17xx_sector_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->sector_w (space, 0, val);
 		break;
 	case 0x7ffb:
-		wd17xx_data_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->data_w (space, 0, val);
 		break;
 	case 0x7ffc:
-		wd17xx_set_side (drvstate->m_wd179x,val & 1);
+		drvstate->m_wd179x->set_side (val & 1);
 		state->m_mem[0x3ffc] = val | 0xfe;
 		break;
 	case 0x7ffd:
-		wd17xx_set_drive (drvstate->m_wd179x,val & 1);
+		drvstate->m_wd179x->set_drive (val & 1);
 		if ((state->m_mem[0x3ffd] ^ val) & 0x40)
 		{
 			set_led_status (machine, 0, !(val & 0x40));
@@ -1358,7 +1358,7 @@ MSX_SLOT_INIT(diskrom2)
 MSX_SLOT_RESET(diskrom2)
 {
 	msx_state *drvstate = machine.driver_data<msx_state>();
-	wd17xx_reset (drvstate->m_wd179x);
+	drvstate->m_wd179x->reset();
 }
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
@@ -1366,10 +1366,10 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 	msx_state *state = space.machine().driver_data<msx_state>();
 	switch (offset)
 	{
-	case 0: return wd17xx_status_r(state->m_wd179x, space, 0);
-	case 1: return wd17xx_track_r(state->m_wd179x, space, 0);
-	case 2: return wd17xx_sector_r(state->m_wd179x, space, 0);
-	case 3: return wd17xx_data_r(state->m_wd179x, space, 0);
+	case 0: return state->m_wd179x->status_r(space, 0);
+	case 1: return state->m_wd179x->track_r(space, 0);
+	case 2: return state->m_wd179x->sector_r(space, 0);
+	case 3: return state->m_wd179x->data_r(space, 0);
 	case 4: return state->m_dsk_stat;
 	default:
 		return state->m_state[1]->m_mem[offset + 0x3ff8];
@@ -1384,13 +1384,13 @@ static  READ8_HANDLER (msx_diskrom2_page2_r)
 		switch (offset)
 		{
 		case 0x7b8:
-			return wd17xx_status_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->status_r (space, 0);
 		case 0x7b9:
-			return wd17xx_track_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->track_r (space, 0);
 		case 0x7ba:
-			return wd17xx_sector_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->sector_r (space, 0);
 		case 0x7bb:
-			return wd17xx_data_r (state->m_wd179x, space, 0);
+			return state->m_wd179x->data_r (space, 0);
 		case 0x7bc:
 			return state->m_dsk_stat;
 		default:
@@ -1440,21 +1440,21 @@ MSX_SLOT_WRITE(diskrom2)
 	switch (addr)
 	{
 	case 0x7fb8:
-		wd17xx_command_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->command_w (space, 0, val);
 		break;
 	case 0x7fb9:
-		wd17xx_track_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->track_w (space, 0, val);
 		break;
 	case 0x7fba:
-		wd17xx_sector_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->sector_w (space, 0, val);
 		break;
 	case 0x7fbb:
-		wd17xx_data_w (drvstate->m_wd179x, space, 0, val);
+		drvstate->m_wd179x->data_w (space, 0, val);
 		break;
 	case 0x7fbc:
-		wd17xx_set_side (drvstate->m_wd179x,val & 1);
+		drvstate->m_wd179x->set_side (val & 1);
 		state->m_mem[0x3fbc] = val | 0xfe;
-		wd17xx_set_drive (drvstate->m_wd179x,val & 1);
+		drvstate->m_wd179x->set_drive (val & 1);
 		if ((state->m_mem[0x3fbc] ^ val) & 0x40)
 		{
 			set_led_status (machine, 0, !(val & 0x40));

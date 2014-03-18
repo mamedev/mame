@@ -144,19 +144,19 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 12:
-			result = wd17xx_data_r(m_fdc, space, 0);
+			result = m_fdc->data_r(space, 0);
 			break;
 
 		case 13:
-			result = wd17xx_sector_r(m_fdc, space, 0);
+			result = m_fdc->sector_r(space, 0);
 			break;
 
 		case 14:
-			result = wd17xx_track_r(m_fdc, space, 0);
+			result = m_fdc->track_r(space, 0);
 			break;
 
 		case 15:
-			result = wd17xx_status_r(m_fdc, space, 0);
+			result = m_fdc->status_r(space, 0);
 			break;
 	}
 	return result;
@@ -185,19 +185,19 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 12:
-			wd17xx_data_w(m_fdc, space, 0, data);
+			m_fdc->data_w(space, 0, data);
 			break;
 		case 13:
-			wd17xx_sector_w(m_fdc, space, 0, data);
+			m_fdc->sector_w(space, 0, data);
 			break;
 		case 14:
-			wd17xx_track_w(m_fdc, space, 0, data);
+			m_fdc->track_w(space, 0, data);
 			break;
 		case 15:
-			wd17xx_command_w(m_fdc, space, 0, data);
+			m_fdc->command_w(space, 0, data);
 
 			/* disk head is encoded in the command byte */
-			wd17xx_set_side(m_fdc,(data & 0x02) ? 1 : 0);
+			m_fdc->set_side((data & 0x02) ? 1 : 0);
 			break;
 	}
 }
@@ -317,16 +317,16 @@ WRITE8_MEMBER( dragon_alpha_state::psg_porta_write )
 	switch (data & 0xF)
 	{
 		case(0x01) :
-			wd17xx_set_drive(m_fdc, 0);
+			m_fdc->set_drive(0);
 			break;
 		case(0x02) :
-			wd17xx_set_drive(m_fdc, 1);
+			m_fdc->set_drive(1);
 			break;
 		case(0x04) :
-			wd17xx_set_drive(m_fdc, 2);
+			m_fdc->set_drive(2);
 			break;
 		case(0x08) :
-			wd17xx_set_drive(m_fdc, 3);
+			m_fdc->set_drive(3);
 			break;
 	}
 }

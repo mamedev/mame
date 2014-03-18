@@ -14,7 +14,6 @@
 #include "machine/concept_exp.h"
 
 // FDC controller
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
@@ -167,7 +166,7 @@ enum
 
 void concept_fdc_device::device_start()
 {
-	m_wd179x = subdevice("wd179x");
+	m_wd179x = subdevice<fd1793_device>("wd179x");
 
 	save_item(NAME(m_fdc_local_status));
 	save_item(NAME(m_fdc_local_command));
@@ -213,16 +212,16 @@ READ8_MEMBER(concept_fdc_device::reg_r)
 			return m_fdc_local_status;
 
 		case  8:    // FDC STATUS REG
-			return wd17xx_status_r(m_wd179x, space, offset);
+			return m_wd179x->status_r(space, offset);
 
 		case  9:    // FDC TRACK REG
-			return wd17xx_track_r(m_wd179x, space, offset);
+			return m_wd179x->track_r(space, offset);
 
 		case 10:    // FDC SECTOR REG
-			return wd17xx_sector_r(m_wd179x, space, offset);
+			return m_wd179x->sector_r(space, offset);
 
 		case 11:    // FDC DATA REG
-			return wd17xx_data_r(m_wd179x, space, offset);
+			return m_wd179x->data_r(space, offset);
 	}
 
 	return 0;
@@ -237,30 +236,30 @@ WRITE8_MEMBER(concept_fdc_device::reg_w)
 		case 0:     // LOCAL COMMAND REG
 			m_fdc_local_command = data;
 
-			wd17xx_set_side(m_wd179x, (data & LC_FLPSD1_mask) != 0);
+			m_wd179x->set_side((data & LC_FLPSD1_mask) != 0);
 			current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
-			wd17xx_set_drive(m_wd179x, current_drive);
+			m_wd179x->set_drive(current_drive);
 			/*motor_on = (data & LC_MOTOROF_mask) == 0;*/
 			// floppy_drive_set_motor_state(floppy_get_device(machine(),  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 			/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
-			wd17xx_dden_w(m_wd179x, BIT(data, 7));
+			m_wd179x->dden_w(BIT(data, 7));
 			floppy_drive_set_ready_state(floppy_get_device(machine(), current_drive), 1, 0);
 			break;
 
 		case  8:    // FDC COMMAMD REG
-			wd17xx_command_w(m_wd179x, space, offset, data);
+			m_wd179x->command_w(space, offset, data);
 			break;
 
 		case  9:    // FDC TRACK REG
-			wd17xx_track_w(m_wd179x, space, offset, data);
+			m_wd179x->track_w(space, offset, data);
 			break;
 
 		case 10:    // FDC SECTOR REG
-			wd17xx_sector_w(m_wd179x, space, offset, data);
+			m_wd179x->sector_w(space, offset, data);
 			break;
 
 		case 11:    // FDC DATA REG
-			wd17xx_data_w(m_wd179x, space, offset, data);
+			m_wd179x->data_w(space, offset, data);
 			break;
 	}
 }

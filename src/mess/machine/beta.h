@@ -10,6 +10,8 @@
 #ifndef __BETA_H__
 #define __BETA_H__
 
+#include "machine/wd17xx.h"
+
 
 #define BETA_DISK_TAG   "beta"
 
@@ -51,7 +53,7 @@ protected:
 
 private:
 	// internal state
-	device_t *m_wd179x;
+	wd2793_device *m_wd179x;
 };
 
 extern const device_type BETA_DISK;

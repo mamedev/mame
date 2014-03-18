@@ -146,7 +146,7 @@ public:
 	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;
 	optional_device<rp5c01_device> m_rtc;
-	optional_device<device_t> m_wd179x;
+	optional_device<fd1793_device> m_wd179x;
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);

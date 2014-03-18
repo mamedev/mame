@@ -508,7 +508,7 @@ READ8Z_MEMBER(ti_fdc_legacy_device::readz)
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
-			if (!space.debugger_access()) reply = wd17xx_r(m_fd1771, space, (offset >> 1)&0x03);
+			if (!space.debugger_access()) reply = m_fd1771->read(space, (offset >> 1)&0x03);
 			if (TRACE_DATA)
 			{
 				if ((m_address & 0xffff)==0x5ff6) logerror("%02x ", ~reply & 0xff);
@@ -534,7 +534,7 @@ WRITE8_MEMBER(ti_fdc_legacy_device::write)
 		// 0101 1111 1111 1xx0
 		if (m_WDsel && ((m_address & 9)==8))
 		{
-			if (!space.debugger_access()) wd17xx_w(m_fd1771, space, (offset >> 1)&0x03, data);
+			if (!space.debugger_access()) m_fd1771->write(space, (offset >> 1)&0x03, data);
 		}
 	}
 }
@@ -626,7 +626,7 @@ WRITE8_MEMBER(ti_fdc_legacy_device::cruwrite)
 					if (m_DSEL != 0)
 						logerror("tifdc: Multiple drives selected, %02x\n", m_DSEL);
 					m_DSEL |= drivebit;
-					wd17xx_set_drive(m_fd1771, drive);
+					m_fd1771->set_drive(drive);
 				}
 			}
 			else
@@ -637,7 +637,7 @@ WRITE8_MEMBER(ti_fdc_legacy_device::cruwrite)
 			/* Select side of disk (bit 7) */
 			m_SIDSEL = data;
 			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
-			wd17xx_set_side(m_fd1771, data);
+			m_fd1771->set_side(data);
 			break;
 		}
 	}

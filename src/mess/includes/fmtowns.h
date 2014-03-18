@@ -119,7 +119,7 @@ class towns_state : public driver_device
 	required_device<upd71071_device> m_dma_2;
 	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
-	device_t* m_fdc;
+	mb8877_device* m_fdc;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;

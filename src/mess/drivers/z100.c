@@ -358,10 +358,10 @@ READ8_MEMBER( z100_state::z207_fdc_r )
 
 	switch(offset)
 	{
-		case 0: res = wd17xx_status_r(m_fdc,space, offset); break;
-		case 1: res = wd17xx_track_r(m_fdc,space, offset);  break;
-		case 2: res = wd17xx_sector_r(m_fdc,space, offset); break;
-		case 3: res = wd17xx_data_r(m_fdc,space, offset); break;
+		case 0: res = m_fdc->status_r(space, offset); break;
+		case 1: res = m_fdc->track_r(space, offset);  break;
+		case 2: res = m_fdc->sector_r(space, offset); break;
+		case 3: res = m_fdc->data_r(space, offset); break;
 	}
 
 	return res;
@@ -371,12 +371,12 @@ WRITE8_MEMBER( z100_state::z207_fdc_w )
 {
 	switch(offset)
 	{
-		case 0: wd17xx_command_w(m_fdc,space, offset,data); break;
-		case 1: wd17xx_track_w(m_fdc,space, offset,data); break;
-		case 2: wd17xx_sector_w(m_fdc,space, offset,data); break;
-		case 3: wd17xx_data_w(m_fdc,space, offset,data); break;
+		case 0: m_fdc->command_w(space, offset,data); break;
+		case 1: m_fdc->track_w(space, offset,data); break;
+		case 2: m_fdc->sector_w(space, offset,data); break;
+		case 3: m_fdc->data_w(space, offset,data); break;
 		case 4: // disk control
-			wd17xx_set_drive(m_fdc,data & 3);
+			m_fdc->set_drive(data & 3);
 			m_z207_cur_drive = data & 3;
 			break;
 		case 5: // aux control

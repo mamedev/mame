@@ -402,13 +402,13 @@ READ8_MEMBER(smc777_state::smc777_fdc1_r)
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->status_r(space, offset) ^ 0xff;
 		case 0x01:
-			return wd17xx_track_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->track_r(space, offset) ^ 0xff;
 		case 0x02:
-			return wd17xx_sector_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->sector_r(space, offset) ^ 0xff;
 		case 0x03:
-			return wd17xx_data_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->data_r(space, offset) ^ 0xff;
 		case 0x04: //irq / drq status
 			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
 
@@ -425,21 +425,21 @@ WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 	switch(offset)
 	{
 		case 0x00:
-			wd17xx_command_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->command_w(space, offset,data ^ 0xff);
 			break;
 		case 0x01:
-			wd17xx_track_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->track_w(space, offset,data ^ 0xff);
 			break;
 		case 0x02:
-			wd17xx_sector_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->sector_w(space, offset,data ^ 0xff);
 			break;
 		case 0x03:
-			wd17xx_data_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->data_w(space, offset,data ^ 0xff);
 			break;
 		case 0x04:
 			// ---- xxxx select floppy drive (yes, 15 of them, A to P)
-			wd17xx_set_drive(m_fdc,data & 0x01);
-			//  wd17xx_set_side(m_fdc,(data & 0x10)>>4);
+			m_fdc->set_drive(data & 0x01);
+			//  m_fdc->set_side((data & 0x10)>>4);
 			if(data & 0xf0)
 				printf("floppy access %02x\n",data);
 			break;

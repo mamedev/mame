@@ -291,15 +291,15 @@ const wd17xx_interface svi_wd17xx_interface =
 
 WRITE8_MEMBER(svi318_state::svi318_fdc_drive_motor_w)
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	switch (data & 3)
 	{
 	case 1:
-		wd17xx_set_drive(fdc,0);
+		fdc->set_drive(0);
 		m_fdc.driveselect = 0;
 		break;
 	case 2:
-		wd17xx_set_drive(fdc,1);
+		fdc->set_drive(1);
 		m_fdc.driveselect = 1;
 		break;
 	}
@@ -307,10 +307,10 @@ WRITE8_MEMBER(svi318_state::svi318_fdc_drive_motor_w)
 
 WRITE8_MEMBER(svi318_state::svi318_fdc_density_side_w)
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
-	wd17xx_dden_w(fdc, BIT(data, 0));
-	wd17xx_set_side(fdc, BIT(data, 1));
+	fdc->dden_w(BIT(data, 0));
+	fdc->set_side(BIT(data, 1));
 }
 
 READ8_MEMBER(svi318_state::svi318_fdc_irqdrq_r)
@@ -741,6 +741,8 @@ READ8_MEMBER(svi318_state::svi318_io_ext_r)
 	{
 		return 0xff;
 	}
+	
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
 	switch( offset )
 	{
@@ -771,20 +773,16 @@ READ8_MEMBER(svi318_state::svi318_io_ext_r)
 		break;
 
 	case 0x30:
-		device = machine().device("wd179x");
-		data = wd17xx_status_r(device, space, 0);
+		data = fdc->status_r(space, 0);
 		break;
 	case 0x31:
-		device = machine().device("wd179x");
-		data = wd17xx_track_r(device, space, 0);
+		data = fdc->track_r(space, 0);
 		break;
 	case 0x32:
-		device = machine().device("wd179x");
-		data = wd17xx_sector_r(device, space, 0);
+		data = fdc->sector_r(space, 0);
 		break;
 	case 0x33:
-		device = machine().device("wd179x");
-		data = wd17xx_data_r(device, space, 0);
+		data = fdc->data_r(space, 0);
 		break;
 	case 0x34:
 		data = svi318_fdc_irqdrq_r(space, 0);
@@ -806,6 +804,8 @@ WRITE8_MEMBER(svi318_state::svi318_io_ext_w)
 	{
 		return;
 	}
+	
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
 	switch( offset )
 	{
@@ -840,20 +840,16 @@ WRITE8_MEMBER(svi318_state::svi318_io_ext_w)
 		break;
 
 	case 0x30:
-		device = machine().device("wd179x");
-		wd17xx_command_w(device, space, 0, data);
+		fdc->command_w(space, 0, data);
 		break;
 	case 0x31:
-		device = machine().device("wd179x");
-		wd17xx_track_w(device, space, 0, data);
+		fdc->track_w(space, 0, data);
 		break;
 	case 0x32:
-		device = machine().device("wd179x");
-		wd17xx_sector_w(device, space, 0, data);
+		fdc->sector_w(space, 0, data);
 		break;
 	case 0x33:
-		device = machine().device("wd179x");
-		wd17xx_data_w(device, space, 0, data);
+		fdc->data_w(space, 0, data);
 		break;
 	case 0x34:
 		svi318_fdc_drive_motor_w(space, 0, data);

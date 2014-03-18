@@ -1184,17 +1184,17 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 
 WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 {
-	device_t* dev = machine().device("mb8877a");
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
 
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			wd17xx_set_drive(dev,data & 3);
+			fdc->set_drive(data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
-			wd17xx_set_side(dev,(data & 1));
+			fdc->set_side((data & 1));
 			break;
 	}
 }
@@ -1282,14 +1282,14 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
 {
-	device_t *device = machine().device("mb8877a");
-	return wd17xx_r(device, space, offset) ^ m_fdc_reverse;
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
+	return fdc->read(space, offset) ^ m_fdc_reverse;
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_wd17xx_w)
 {
-	device_t *device = machine().device("mb8877a");
-	wd17xx_w(device, space, offset, data ^ m_fdc_reverse);
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
+	fdc->write(space, offset, data ^ m_fdc_reverse);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)

@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)               /* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY("mb8877", wd17xx_r, wd17xx_w )                /* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", mb8877_device, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w ) /* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)               /* 6821 PIA @ UD8 */
 	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ(osbexec_kbd_r )                    /* KBD */
@@ -384,14 +384,14 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 	switch ( data & 0x06 )
 	{
 	case 0x02:
-		wd17xx_set_drive( m_mb8877, 1 );
+		m_mb8877->set_drive( 1 );
 		break;
 	case 0x04:
-		wd17xx_set_drive( m_mb8877, 0 );
+		m_mb8877->set_drive( 0 );
 		break;
 	}
 
-	wd17xx_dden_w( m_mb8877, ( data & 0x01 ) ? 1 : 0 );
+	m_mb8877->dden_w(( data & 0x01 ) ? 1 : 0 );
 }
 
 

@@ -70,10 +70,10 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 
 	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
 
-	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w,0x00ff)
-	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w,0x00ff)
-	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w,0x00ff)
-	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w,0x00ff)
+	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8("vg93", fd1793_device, status_r, command_w,0x00ff)
+	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8("vg93", fd1793_device, track_r, track_w,0x00ff)
+	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8("vg93", fd1793_device, sector_r, sector_w,0x00ff)
+	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8("vg93", fd1793_device, data_r, data_w,0x00ff)
 
 	//AM_RANGE(0177700, 0177701) // read data
 	//AM_RANGE(0177720, 0177721) // write data     // protocol S2

@@ -87,7 +87,7 @@ const rom_entry *bml3bus_mp1802_device::device_rom_region() const
 
 READ8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_r)
 {
-	return wd17xx_drq_r(m_wd17xx) ? 0x00 : 0x80;
+	return m_wd17xx->drq_r() ? 0x00 : 0x80;
 }
 
 WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
@@ -111,10 +111,10 @@ WRITE8_MEMBER( bml3bus_mp1802_device::bml3_mp1802_w)
 		break;
 	}
 	device_t *floppy = subdevice(floppy_name);
-	wd17xx_set_drive(m_wd17xx,drive);
+	m_wd17xx->set_drive(drive);
 	floppy_mon_w(floppy, !motor);
 	floppy_drive_set_ready_state(floppy, ASSERT_LINE, 0);
-	wd17xx_set_side(m_wd17xx,side);
+	m_wd17xx->set_side(side);
 }
 
 
@@ -143,8 +143,8 @@ void bml3bus_mp1802_device::device_start()
 
 	// install into memory
 	address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
-	space_prg.install_legacy_readwrite_handler(m_wd17xx, 0xff00, 0xff03, FUNC(wd17xx_r), FUNC(wd17xx_w));
-	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate( FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this) );
+	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_device::read),(mb8866_device*)m_wd17xx), write8_delegate(FUNC(mb8866_device::write),(mb8866_device*)m_wd17xx));
+	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this) );
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	UINT8 *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);

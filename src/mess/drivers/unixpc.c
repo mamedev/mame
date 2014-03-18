@@ -91,7 +91,7 @@ READ16_MEMBER( unixpc_state::line_printer_r )
 	data |= 1; // no dial tone detected
 	data |= 1 << 1; // no parity error
 	data |= 0 << 2; // hdc intrq
-	data |= wd17xx_intrq_r(m_wd2797) << 3;
+	data |= m_wd2797->intrq_r() << 3;
 
 	logerror("line_printer_r: %04x\n", data);
 
@@ -120,7 +120,7 @@ WRITE16_MEMBER( unixpc_state::disk_control_w )
 	floppy_mon_w(m_floppy, !BIT(data, 5));
 
 	// bit 6 = floppy selected / not selected
-	wd17xx_set_drive(m_wd2797, 0);
+	m_wd2797->set_drive(0);
 }
 
 WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_MIRROR(0x7fc000) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8_LEGACY("wd2797", wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0xe10000, 0xe10007) AM_DEVREADWRITE8("wd2797", wd2797_device, read, write, 0x00ff)
 	AM_RANGE(0xe43000, 0xe43001) AM_WRITE(romlmap_w)
 ADDRESS_MAP_END
 

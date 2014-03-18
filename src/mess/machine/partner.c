@@ -43,7 +43,7 @@ const wd17xx_interface partner_wd17xx_interface =
 
 MACHINE_START_MEMBER(partner_state,partner)
 {
-	wd17xx_set_pause_time(m_fdc, 10);
+	m_fdc->set_pause_time(10);
 }
 
 void partner_state::partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom)
@@ -80,11 +80,11 @@ void partner_state::partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom)
 READ8_MEMBER(partner_state::partner_floppy_r){	
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return wd17xx_status_r(m_fdc,space, 0);
-			case 0x01 : return wd17xx_track_r(m_fdc,space, 0);
-			case 0x02 : return wd17xx_sector_r(m_fdc,space, 0);
+			case 0x00 : return m_fdc->status_r(space, 0);
+			case 0x01 : return m_fdc->track_r(space, 0);
+			case 0x02 : return m_fdc->sector_r(space, 0);
 			default   :
-						return wd17xx_data_r(m_fdc,space, 0);
+						return m_fdc->data_r(space, 0);
 		}
 	} else {
 		return 0;
@@ -94,25 +94,25 @@ READ8_MEMBER(partner_state::partner_floppy_r){
 WRITE8_MEMBER(partner_state::partner_floppy_w){
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : wd17xx_command_w(m_fdc,space, 0,data); break;
-			case 0x01 : wd17xx_track_w(m_fdc,space, 0,data);break;
-			case 0x02 : wd17xx_sector_w(m_fdc,space, 0,data);break;
-			default   : wd17xx_data_w(m_fdc,space, 0,data);break;
+			case 0x00 : m_fdc->command_w(space, 0,data); break;
+			case 0x01 : m_fdc->track_w(space, 0,data);break;
+			case 0x02 : m_fdc->sector_w(space, 0,data);break;
+			default   : m_fdc->data_w(space, 0,data);break;
 		}
 	} else {
 		floppy_mon_w(floppy_get_device(machine(), 0), 1);
 		floppy_mon_w(floppy_get_device(machine(), 1), 1);
 		if (((data >> 6) & 1)==1) {
-			wd17xx_set_drive(m_fdc,0);
+			m_fdc->set_drive(0);
 			floppy_mon_w(floppy_get_device(machine(), 0), 0);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
-			wd17xx_set_drive(m_fdc,1);
+			m_fdc->set_drive(1);
 			floppy_mon_w(floppy_get_device(machine(), 1), 0);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
 		}
-		wd17xx_set_side(m_fdc,data >> 7);
+		m_fdc->set_side(data >> 7);
 	}
 }
 
@@ -360,11 +360,11 @@ WRITE_LINE_MEMBER(partner_state::hrq_w)
 
 READ8_MEMBER(partner_state::partner_fdc_r)
 {
-	return wd17xx_data_r(m_fdc,space,offset);
+	return m_fdc->data_r(space,offset);
 }
 WRITE8_MEMBER(partner_state::partner_fdc_w)
 {
-	wd17xx_data_w(m_fdc,space,offset,data);
+	m_fdc->data_w(space,offset,data);
 }
 
 I8257_INTERFACE( partner_dma )

@@ -995,13 +995,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return wd17xx_status_r(m_fdc,space, offset);
+			return m_fdc->status_r(space, offset);
 		case 0x0ff9:
-			return wd17xx_track_r(m_fdc,space, offset);
+			return m_fdc->track_r(space, offset);
 		case 0x0ffa:
-			return wd17xx_sector_r(m_fdc,space, offset);
+			return m_fdc->sector_r(space, offset);
 		case 0x0ffb:
-			return wd17xx_data_r(m_fdc,space, offset);
+			return m_fdc->data_r(space, offset);
 		case 0x0ffc:
 			printf("FDC: read FM type\n");
 			return 0xff;
@@ -1024,22 +1024,22 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			wd17xx_command_w(m_fdc,space, offset,data);
+			m_fdc->command_w(space, offset,data);
 			break;
 		case 0x0ff9:
-			wd17xx_track_w(m_fdc,space, offset,data);
+			m_fdc->track_w(space, offset,data);
 			break;
 		case 0x0ffa:
-			wd17xx_sector_w(m_fdc,space, offset,data);
+			m_fdc->sector_w(space, offset,data);
 			break;
 		case 0x0ffb:
-			wd17xx_data_w(m_fdc,space, offset,data);
+			m_fdc->data_w(space, offset,data);
 			break;
 		case 0x0ffc:
-			wd17xx_set_drive(m_fdc,data & 3);
+			m_fdc->set_drive(data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), !BIT(data, 7));
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x80,0);
-			wd17xx_set_side(m_fdc, BIT(data, 4));
+			m_fdc->set_side(BIT(data, 4));
 			break;
 		case 0x0ffd:
 		case 0x0ffe:
