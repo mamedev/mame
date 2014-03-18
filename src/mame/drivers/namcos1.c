@@ -2693,11 +2693,11 @@ ROM_END
 
 
 GAME( 1987, shadowld, 0,        ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Shadowland (YD3)", 0 )
-GAME( 1987, youkaidk2,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version ((YD2, Rev B))", 0 )
-GAME( 1987, youkaidk1,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version ((YD1))", 0 )
-GAME( 1987, dspirit,  0,        ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version ((DS3))", 0 )
+GAME( 1987, youkaidk2,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, new version (YD2, Rev B))", 0 )
+GAME( 1987, youkaidk1,shadowld, ns1,     shadowld, namcos1_state, shadowld, ROT180, "Namco", "Yokai Douchuuki (Japan, old version (YD1))", 0 )
+GAME( 1987, dspirit,  0,        ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (new version (DS3))", 0 )
 GAME( 1987, dspirit2, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", 0 ) /* Atari had rights to US market */
-GAME( 1987, dspirit1, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version ((DS1))", 0 )
+GAME( 1987, dspirit1, dspirit,  ns1,     dspirit, namcos1_state,  dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", 0 )
 GAME( 1987, blazer,   0,        ns1,     ns1, namcos1_state,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
 GAME( 1987, quester,  0,        ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
 GAME( 1987, questers, quester,  ns1,     quester, namcos1_state,  quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
@@ -2711,8 +2711,8 @@ GAME( 1988, berabohmb,berabohm, ns1,     berabohm, namcos1_state, berabohm, ROT1
 GAME( 1988, mmaze,    0,        ns1,     mmaze, namcos1_state,    alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
 GAME( 1988, bakutotu, 0,        ns1,     bakutotu, namcos1_state, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
 GAME( 1988, wldcourt, 0,        ns1,     wldcourt, namcos1_state, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
-GAME( 1988, splatter, 0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version ((SH3))", 0 )
-GAME( 1988, splatter2,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version ((SH2))", 0 )
+GAME( 1988, splatter, 0,        ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", 0 )
+GAME( 1988, splatter2,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", 0 )
 GAME( 1988, splatterj,splatter, ns1,     splatter, namcos1_state, splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", 0 )
 GAME( 1988, faceoff,  0,        ns1,     faceoff, namcos1_state,  faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
 GAME( 1989, rompers,  0,        ns1,     ns1, namcos1_state,      rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", 0 )
