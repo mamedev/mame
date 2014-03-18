@@ -87,6 +87,7 @@ public:
 		m_tms(*this, "tms")
 	{ 
 		m_shiftfull = 0;
+		m_soundirq = 0;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -104,9 +105,6 @@ public:
 
 	DECLARE_DRIVER_INIT(megaphx);
 	DECLARE_MACHINE_RESET(megaphx);
-
-
-	DECLARE_CUSTOM_INPUT_MEMBER(megaphx_rand_r);
 
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
@@ -160,14 +158,31 @@ public:
 	UINT8 m_soundback;
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
+
+	// hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
+	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r)  { logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; };
+	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r)  { logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; };
+	DECLARE_READ8_MEMBER(megaphx_0309_hack_r)  { logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; };
+	DECLARE_READ8_MEMBER(megaphx_0323_hack_r)  { logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; };
+
+	void install_sound_hacks(void)
+	{
+		address_space &space = m_audiocpu->space(AS_PROGRAM);
+		space.install_read_handler(0x02cc, 0x02cc, read8_delegate(FUNC(megaphx_state::megaphx_02cc_hack_r), this));
+		space.install_read_handler(0x02e6, 0x02e6, read8_delegate(FUNC(megaphx_state::megaphx_02e6_hack_r), this));
+		space.install_read_handler(0x0309, 0x0309, read8_delegate(FUNC(megaphx_state::megaphx_0309_hack_r), this));
+		space.install_read_handler(0x0323, 0x0323, read8_delegate(FUNC(megaphx_state::megaphx_0323_hack_r), this));
+	}
+
+	int m_soundirq;
+	void update_sound_irqs(void)
+	{
+		if (m_soundirq) m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+
+
 };
-
-
-CUSTOM_INPUT_MEMBER(megaphx_state::megaphx_rand_r)
-{
-	return rand();
-}
-
 
 
 
@@ -677,36 +692,51 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch0)
 {
-	int bank = m_soundbank[0] & 7;
-	membank("snddata")->set_entry(bank);
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+//	int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x1;
+	else m_soundirq &= ~0x1;
+
+	update_sound_irqs();
 }
 
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch1)
 {
-	int bank = m_soundbank[1] & 7;
-	membank("snddata")->set_entry(bank);
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+//	int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x2;
+	else m_soundirq &= ~0x2;
+
+	update_sound_irqs();
 }
 
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch2)
 {
-	int bank = m_soundbank[2] & 7;
-	membank("snddata")->set_entry(bank);
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+//	int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x4;
+	else m_soundirq &= ~0x4;
+
+	update_sound_irqs();
 }
+
+
 
 
 WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch3)
 {
-	int bank = m_soundbank[3] & 7;
-	membank("snddata")->set_entry(bank);
-	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+//	int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x8;
+	else m_soundirq &= ~0x8;
+
+	update_sound_irqs();
 }
 
 	
+
 
 static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
 {
@@ -733,11 +763,10 @@ static GFXDECODE_START( megaphx )
 	GFXDECODE_ENTRY( "roms67", 0, megaphxlay,     0x0000, 1 )
 GFXDECODE_END
 
-#define FAKE_BOOST 1
 
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000 * FAKE_BOOST) // ??  can't read xtal due to reflections, CPU is an 8Mhz part  // CLEARLY the 'rand' flags have more meaning (but don't seem to be vblank) I shouldn't have to do a *16 on the 68k clock just to get all the gfx!
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 //	MCFG_CPU_VBLANK_INT_DRIVER("screen", megaphx_state,  irq6_line_hold)
 
@@ -746,7 +775,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_CPU_CONFIG(tms_config_megaphx)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 * FAKE_BOOST) // unk freq
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // unk freq
 	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
@@ -792,6 +821,8 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 
 	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
 	membank("snddata")->set_entry(0);
+
+	install_sound_hacks();
 }
 
 
