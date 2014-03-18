@@ -645,8 +645,9 @@ ROM_START( shangha3 ) /* PCB labeled SUN04C - Has two additional tiles sets to c
 	ROM_LOAD16_BYTE( "ic3",  0x0000, 0x40000, CRC(4a9cdcfd) SHA1(c27b767ef2de90b36095b49baae9fa514f461c2c) ) /* ST M27C2001 EPROM with no label */
 	ROM_LOAD16_BYTE( "ic2",  0x0001, 0x40000, CRC(714bfdbc) SHA1(0ce611624e8a5e28cba5443b63b8872eed9f68fc) ) /* ST M27C2001 EPROM with no label */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
+	ROM_LOAD( "27c4000.ic44", 0x200000, 0x080000, CRC(6344ffb7) SHA1(06bc5bcf94973ec152e7abf9cc658ef319eb4b65) ) // korean fonts, vs mode how to play etc? (probably for Korean program roms we don't have, but was on World board)
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
 	ROM_LOAD( "s3j_v10.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )

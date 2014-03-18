@@ -2285,6 +2285,7 @@ contcircua      // B33 (c) 1987 Taito America Corporation (US)
 contcircj       // B33 (c) 1987 Taito Corporation (Japan)
 chasehq         // B52 (c) 1988 Taito Corporation Japan (World)
 chasehqj        // B52 (c) 1988 Taito Corporation (Japan)
+chasehqju		// B52 (c) 1988 Taito Corporation (Japan)
 chasehqu        // B52 (c) 1988 Taito America Corporation (US)
 enforce         // B58 (c) 1988 Taito Corporation Japan (World)
 enforcej        // B58 (c) 1988 Taito Corporation (Japan)
@@ -2941,6 +2942,7 @@ trojan          //  4/1986 (c) 1986 (US)
 trojana         //  4/1986 (c) 1986 (US)
 trojanr         //  4/1986 (c) 1986 + Romstar
 trojanj         //  4/1986 (c) 1986 (Japan)
+trojanb			// bootleg
 srumbler        //  9/1986 (c) 1986
 srumbler2       //  9/1986 (c) 1986
 srumbler3       //  9/1986 (c) 1986 + Tecfri
@@ -3133,6 +3135,7 @@ sf2acca         // hack
 sf2ceblp			// hack
 sf2accp2        // hack
 sf2amf          // bootleg
+sf2amf2			// bootleg
 sf2dkot2        // hack
 sf2m1           // hack
 sf2m2           // hack
@@ -3147,6 +3150,7 @@ sf2koryu        // hack
 sf2dongb        // hack
 sf2mdt          // bootleg
 sf2mdta         // bootleg
+sf2mdtb			// bootleg
 cworld2j        // 11/06/1992 (c) 1992 (Japan)
 varth           // 14/07/1992 (c) 1992 (World)
 varthr1         // 12/06/1992 (c) 1992 (World)

@@ -8747,6 +8747,49 @@ ROM_START( sf2amf )
 	ROM_LOAD( "1.amf", 0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
+ROM_START( sf2amf2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "m5m27c401.u222",          0x000000, 0x80000, CRC(03991fba) SHA1(6c42bf15248640fdb3e98fb01b0a870649deb410) ) // ==  5.amf                 sf2amf
+	ROM_LOAD16_BYTE( "m5m27c401.u196",          0x000001, 0x80000, CRC(39f15a1e) SHA1(901c4fea76bf5bff7330ed07ffde54cdccdaa680) ) // ==  4.amf                 sf2amf
+
+	ROM_LOAD16_BYTE( "27020.u221",   0x100000, 0x40000, CRC(aa4d55a6) SHA1(8fd1c21816886a7734aae42e9336d5f66ddab7bc) ) // different
+	ROM_LOAD16_BYTE( "27020.u195",   0x100001, 0x40000, CRC(2bffa6f9) SHA1(eb1222356d89849edb08ea1898399cf90cf127f5) ) // different
+
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROMX_LOAD( "fun-u70.bin", 0x000004, 0x80000, CRC(a94a8b19) SHA1(49ba9e6032a0b33d7db9fe609710575f2f75e695), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x000000, 0x80000)
+	ROMX_LOAD( "fun-u68.bin", 0x000006, 0x80000, CRC(0405f21f) SHA1(dbebd2c2c46d5aae8db905f2eb51abd4a5c4ea97), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x000002, 0x80000)
+	ROMX_LOAD( "fun-u69.bin", 0x200004, 0x80000, CRC(05dc2043) SHA1(d16b89a48d2dd7cdfafc79567ce1e230d4bd41c1), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x200000, 0x80000)
+	ROMX_LOAD( "fun-u67.bin", 0x200006, 0x80000, CRC(055b64f1) SHA1(3dd68f52b81ed1b300b65c900ef6bfe435d41e4b), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x200002, 0x80000)
+	ROMX_LOAD( "fun-u19.bin", 0x400004, 0x80000, CRC(1a518609) SHA1(18ffca70d6cefb399ba6e3008e5c29dc37de52a0), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x400000, 0x80000)
+	ROMX_LOAD( "fun-u18.bin", 0x400006, 0x80000, CRC(84f9354f) SHA1(ecc190950b1f45b268da380c17859a8d0715b58f), ROM_GROUPWORD | ROM_SKIP(6) )  // different
+	ROM_CONTINUE(             0x400002, 0x80000)
+	/* extra gfx layer roms loaded over the former ones to remove the capcom copyright logo */
+	ROMX_LOAD( "grp1.u31",    0x400004, 0x10000, CRC(6de44671) SHA1(dc6abba639e0c27033e391c7438d88dc89a93351), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400000, 0x10000 )
+	ROMX_LOAD( "grp3.u29",    0x400006, 0x10000, CRC(e8f14362) SHA1(a20eb75e322011e2a8d8bf2acebe713bef3d3941), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400002, 0x10000 )
+	ROMX_LOAD( "grp2.u30",    0x400005, 0x10000, CRC(bf0cd819) SHA1(f04a098fce07949277268327871c5e5520e3bb3c), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400001, 0x10000 )
+	ROMX_LOAD( "grp4.u28",    0x400007, 0x10000, CRC(76f9f91f) SHA1(58a34062d2c8378558a7f1629140330279af9a43), ROM_SKIP(7) )  // different
+	ROM_CONTINUE(             0x400003, 0x10000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "27512.u191", 0x00000, 0x08000, CRC(a4823a1b) SHA1(7b6bf59dfd578bfbbdb64c27988796783442d659) )
+	ROM_CONTINUE(      0x10000, 0x08000 )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* unknown (bootleg priority?) */
+	ROM_LOAD( "27512.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "fun-u210.bin", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+ROM_END
+
 ROM_START( sf2dkot2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	/* The game reads values from 0x201201 and 0x281201 (at PC=E5452) and uses their difference to form a jump offset. */
@@ -11492,6 +11535,7 @@ GAME( 1992, sf2acc,      sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     
 GAME( 1992, sf2acca,     sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 2)", GAME_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", GAME_SUPPORTS_SAVE )        // 920313 - based on World version
 GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )     // 920313 - based on World version
+GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg)", GAME_SUPPORTS_SAVE )     // 920313 - based on World version
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", GAME_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state,   sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", GAME_SUPPORTS_SAVE )          // 920313 - based on USA version
 GAME( 1992, sf2m2,       sf2ce,    cps1_12MHz, sf2m2,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M2, bootleg)", GAME_SUPPORTS_SAVE )               // 920313 - based on World version
