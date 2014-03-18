@@ -1212,7 +1212,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_nsec(135167917))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NULL, NULL)
 
