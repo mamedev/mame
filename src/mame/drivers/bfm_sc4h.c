@@ -610,7 +610,7 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
+	m68307_set_duart68681(m_maincpu, m_m68307_68681);
 
 
 
@@ -672,46 +672,30 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	awp_draw_reel(5);
 }
 
-void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(sc4_state::m68307_duart_irq_handler)
 {
-	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	logerror("m68307_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_serial_interrupt(drvstate->m_maincpu, vector);
+		m68307_serial_interrupt(m_maincpu, m_m68307_68681->get_irq_vector());
 	}
 }
 
-void m68307_duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 {
-	if (channel==0)
-	{
-		logerror("m68307_duart_tx %02x\n",data);
-	}
-	else
-	{
-		printf("(illegal channel 1) m68307_duart_tx %02x\n",data);
-	}
+	logerror("m68307_duart_tx %02x\n",state);
 }
 
-UINT8 m68307_duart_input_r(device_t *device)
+READ8_MEMBER(sc4_state::m68307_duart_input_r)
 {
 	logerror("m68307_duart_input_r\n");
 	return 0x00;
 }
 
-void m68307_duart_output_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
 {
 	logerror("m68307_duart_output_w %02x\n", data);
 }
-
-static const duart68681_config m68307_duart68681_config =
-{
-	m68307_duart_irq_handler,
-	m68307_duart_tx,
-	m68307_duart_input_r,
-	m68307_duart_output_w
-};
 
 /* default dmd */
 static void bfmdm01_busy(running_machine &machine, int state)
@@ -731,7 +715,11 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	// internal duart of the 68307... paired in machine start
-	MCFG_DUART68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
+	MCFG_DUARTN68681_ADD("m68307_68681", 16000000/4) // ?? Mhz
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(sc4_state, m68307_duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(sc4_state, m68307_duart_txa))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(sc4_state, m68307_duart_input_r))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(sc4_state, m68307_duart_output_w))
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
