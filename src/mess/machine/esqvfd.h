@@ -23,8 +23,6 @@
 
 class esqvfd_t : public device_t {
 public:
-	typedef delegate<void (bool state)> line_cb;
-
 	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
