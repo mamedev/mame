@@ -89,6 +89,7 @@ public:
 		m_palette(*this, "palette"),
 		m_tms(*this, "tms")
 	{ 
+		m_shiftfull = 0;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -160,6 +161,8 @@ public:
 	int m_soundsent;
 	UINT8 m_sounddata;
 	UINT8 m_soundback;
+
+	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
 };
 
 
@@ -388,16 +391,28 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 
 }
 
+
 static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
 	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-	memcpy(shiftreg, &state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], TOBYTE(0x2000));
+
+	if (state->m_shiftfull == 0)
+	{
+		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+
+		memcpy(shiftreg, &state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], TOBYTE(0x2000));
+		state->m_shiftfull = 1;
+	}
 }
 
 static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
+//	printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+
 	megaphx_state *state = space.machine().driver_data<megaphx_state>();
 	memcpy(&state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], shiftreg, TOBYTE(0x2000));
+
+	state->m_shiftfull = 0;
 }
 
 MACHINE_RESET_MEMBER(megaphx_state,megaphx)
