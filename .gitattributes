@@ -1,8 +1,6 @@
 * text=auto !eol
 artwork/aperture.png -text svneol=unset#image/png
 artwork/white.png -text svneol=unset#image/png
-/depend_emu.mak svneol=native#text/plain
-/depend_mess.mak svneol=native#text/plain
 docs/SDL.txt svneol=native#text/plain
 docs/config.txt svneol=native#text/plain
 docs/floppy.txt svneol=native#text/plain
