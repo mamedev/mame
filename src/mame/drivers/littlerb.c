@@ -5,8 +5,6 @@ Pierpaolo Prazzoli
 David Haywood
 */
 
-// this should use a TMS.. the test mode being the same as MegaPhoenix was a givewaway.. maybe also made by Dinamic / Inder for TCH?
-#define USE_TMS 1
 
 #define littlerb_printf logerror
 #define littlerb_alt_printf logerror
@@ -14,22 +12,6 @@ David Haywood
 /*
 
 Notes:
-
-VDP (Blitter) handling is not 100% correct
-A brief original video (recorded by Dox) can be seen at https://www.youtube.com/watch?v=8THpeogarUk
-
-Overall addressing / auto-increment etc. of the VDP device is not fully understood, but for now
-appears to be good enough for the game.
-
-How we distinguish between mode setting (clear, copy, cliprect etc.) VDP commands and actual sprite
-commands is not yet understood.  All 'sprite' sections of the blit list seem to be terminated with
-a 0x0000 word, but it isn't clear how the blocks are started, the current method relies on some bits
-of the sprite data offset to determine if we're sprite data, or a command.  Maybe this is just a
-quirk of the hardware, and you can't have sprites at those offsets?
-
-Copy / Scroll are not yet implemented, see the Smileys between scenes in the original video.
- (Clipping is implemented, but might be per layer, so you do see the sprites vanish, but no
-   smileys are drawn)
 
 How big are the actual framebuffers?  Are both also double buffered?
 
@@ -86,9 +68,7 @@ Dip sw.2
 #include "cpu/m68000/m68000.h"
 #include "video/ramdac.h"
 #include "sound/dac.h"
-#if USE_TMS
 #include "cpu/tms34010/tms34010.h"
-#endif
 
 class littlerb_state : public driver_device
 {
@@ -331,7 +311,7 @@ static void littlerb_to_shiftreg(address_space &space, UINT32 address, UINT16 *s
 	if (state->m_shiftfull == 0)
 	{
 		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
-		memcpy(shiftreg, &state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], TOBYTE(0x2000));
+		memcpy(shiftreg, &state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000));
 		state->m_shiftfull = 1;
 	}
 }
@@ -339,7 +319,7 @@ static void littlerb_to_shiftreg(address_space &space, UINT32 address, UINT16 *s
 static void littlerb_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
 	littlerb_state *state = space.machine().driver_data<littlerb_state>();
-	memcpy(&state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], shiftreg, TOBYTE(0x2000));
+	memcpy(&state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
 
 	state->m_shiftfull = 0;
 }

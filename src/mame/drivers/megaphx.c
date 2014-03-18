@@ -5,30 +5,27 @@
  
  also known to exist on this hardware:
    Hammer Boy
-   Nonamed (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
+   Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
+   After The War
 
 
 
-  trivia: Test mode graphics are the same as Little Robin(?!)
+  trivia: Test mode graphics are the same as Little Robin(?!), TMS is very similar too, suggesting they share a common codebase.
 
-*/
 
-/*
-
- need to work out what rand() bits are
-  - game is very timing sensitive, to get all the gfx to copy i'm having to OC the 68k x 16 and it still glitches (phoenix ship is broken, round 4 gfx don't copy properly)
-    probably due to above or irq handling
+ ToDo:
   - where should roms 6/7 map, they contain the 68k vectors, but the game expects RAM at 0, and it doesn't seem to read any of the other data from those roms.. they contain
     a cross hatch pattern amongst other things?
+ Sound:
+  - how does banking work? when the irq callbacks happen for each irq level? currently no way to access this because it's a daisy chain setup with the ctc?
+  - even if i hack that the title screen speech doesn't work properly - is there a timing register like little robin?
+ I/O:
+  - port_c_r / port_c_w should go through the 8255 but I don't see how to hook them up that way? various bits of the writes are lost?
 
-
-
+  Misc:
+  - some of the large phoenix graphics during stages 3/4 are corrupt for a frame when they re-enter at the top of the screen, possible original game bug?
   
-  - sound..
-
-  /
-
-
+  
   --
 
 
@@ -400,7 +397,7 @@ static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *sh
 	{
 		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
 
-		memcpy(shiftreg, &state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], TOBYTE(0x2000));
+		memcpy(shiftreg, &state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
 		state->m_shiftfull = 1;
 	}
 }
@@ -410,7 +407,7 @@ static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *
 //	printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
 
 	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-	memcpy(&state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], shiftreg, TOBYTE(0x2000));
+	memcpy(&state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
 
 	state->m_shiftfull = 0;
 }
@@ -465,7 +462,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 
-	PORT_START("PIC1") // via PIC
+	PORT_START("PIC1") // via PIC  (check the other bits aren't used for anything, eg. screen timing for sound playback like little robin)
 	PORT_DIPNAME( 0x0001, 0x0001, "XX" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -518,25 +515,24 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0002, IP_ACTIVE_HIGH ) 
-	PORT_DIPNAME( 0x0004, 0x0004, "DSW2-04"  )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x001c, 0x0010, "Difficulty?"  ) // in hammer boy at least..
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0004, "1" )
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x000c, "3" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPSETTING(      0x0014, "5" )
+	PORT_DIPSETTING(      0x0018, "6" )
+	PORT_DIPSETTING(      0x001c, "7" )
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW2-20" ) // something to do with time in hammer boy??
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DSW2-08"  )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "DSW2-10"  )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DSW2-20"  )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DSW2-40"  )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "DSW2-40" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "DSW2-80" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, megaphx_state )
@@ -800,7 +796,7 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 
 
 ROM_START( megaphx )
-	ROM_REGION16_BE( 0x40000, "roms67", 0 )
+	ROM_REGION16_BE( 0x40000, "roms67", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
 	ROM_LOAD16_BYTE( "mph6.u32", 0x000001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
 	ROM_LOAD16_BYTE( "mph7.u21", 0x000000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
 
@@ -830,4 +826,4 @@ ROM_START( megaphx )
 	// there is a PIC responsible for some I/O tasks (what type? what internal rom size?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
