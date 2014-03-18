@@ -742,17 +742,17 @@ WRITE_LINE_MEMBER(next_state::scc_irq)
 	irq_set(17, state);
 }
 
-void next_state::keyboard_irq(bool state)
+WRITE_LINE_MEMBER(next_state::keyboard_irq)
 {
 	irq_set(3, state);
 }
 
-void next_state::power_irq(bool state)
+WRITE_LINE_MEMBER(next_state::power_irq)
 {
 	irq_set(2, state);
 }
 
-void next_state::nmi_irq(bool state)
+WRITE_LINE_MEMBER(next_state::nmi_irq)
 {
 	irq_set(31, state);
 }
@@ -963,10 +963,10 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL_32_768kHz)
 	MCFG_DEVICE_ADD("scc", SCC8530, XTAL_25MHz)
 	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(next_state, scc_irq))
-	MCFG_NEXTKBD_ADD("keyboard",
-						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
-						line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
-						line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
+	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(next_state, keyboard_irq))
+	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(next_state, power_irq))
+	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(next_state, nmi_irq))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, false)

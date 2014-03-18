@@ -9,19 +9,20 @@ DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 	AM_RANGE(0x8, 0xb) AM_READWRITE(data_r,  data_w)
 ADDRESS_MAP_END
 
-nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__)
+nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__),
+	int_change_cb(*this),
+	int_power_cb(*this),
+	int_nmi_cb(*this)
 {
-}
-
-void nextkbd_device::setup(line_cb_t _int_change_cb, line_cb_t _int_power_cb, line_cb_t _int_nmi_cb)
-{
-	int_change_cb = _int_change_cb;
-	int_power_cb = _int_power_cb;
-	int_nmi_cb = _int_nmi_cb;
 }
 
 void nextkbd_device::device_start()
 {
+	int_change_cb.resolve_safe();
+	int_power_cb.resolve_safe();
+	int_nmi_cb.resolve_safe();
+
 	kbd_timer = timer_alloc(0);
 
 	save_item(NAME(control));
