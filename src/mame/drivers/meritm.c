@@ -2205,7 +2205,7 @@ GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, driver_devic
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 NON-touchscreen based */
-GAME( 1995, realbrod,  0,      meritm_crt260, meritm_crt250, driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, realbrod,  0,      meritm_crt260, meritm_crt250, driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 /* CRT 260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", GAME_IMPERFECT_GRAPHICS )
