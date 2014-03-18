@@ -757,32 +757,32 @@ void next_state::nmi_irq(bool state)
 	irq_set(31, state);
 }
 
-WRITE_LINE_MEMBER( next_state::fdc_irq )
+WRITE_LINE_MEMBER(next_state::fdc_irq)
 {
 	irq_set(7, state);
 }
 
-WRITE_LINE_MEMBER( next_state::fdc_drq )
+WRITE_LINE_MEMBER(next_state::fdc_drq)
 {
 	dma_drq_w(1, state);
 }
 
-void next_state::net_tx_irq(bool state)
+WRITE_LINE_MEMBER(next_state::net_tx_irq)
 {
 	irq_set(10, state);
 }
 
-void next_state::net_rx_irq(bool state)
+WRITE_LINE_MEMBER(next_state::net_rx_irq)
 {
 	irq_set(9, state);
 }
 
-void next_state::net_tx_drq(bool state)
+WRITE_LINE_MEMBER(next_state::net_tx_drq)
 {
 	dma_drq_w(17, state);
 }
 
-void next_state::net_rx_drq(bool state)
+WRITE_LINE_MEMBER(next_state::net_rx_drq)
 {
 	dma_drq_w(21, state);
 }
@@ -978,11 +978,12 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 
-	MCFG_MB8795_ADD("net",
-					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_rx_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_tx_drq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_rx_drq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("net", MB8795, 0)
+	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(next_state, net_tx_irq))
+	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(next_state, net_rx_irq))
+	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(next_state, net_tx_drq))
+	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(next_state, net_rx_drq))
+
 	MCFG_NEXTMO_ADD("mo",
 					line_cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))

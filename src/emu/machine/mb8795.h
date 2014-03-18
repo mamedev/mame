@@ -6,14 +6,28 @@
 	downcast<mb8795_device *>(device)->set_irq_cb(_tx_irq, _rx_irq); \
 	downcast<mb8795_device *>(device)->set_drq_cb(_tx_drq, _rx_drq);
 
+#define MCFG_MB8795_TX_IRQ_CALLBACK(_write) \
+	devcb = &mb8795_device::set_tx_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MB8795_RX_IRQ_CALLBACK(_write) \
+	devcb = &mb8795_device::set_rx_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MB8795_TX_DRQ_CALLBACK(_write) \
+	devcb = &mb8795_device::set_tx_drq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MB8795_RX_DRQ_CALLBACK(_write) \
+	devcb = &mb8795_device::set_rx_drq_wr_callback(*device, DEVCB2_##_write);
+
 class mb8795_device :   public device_t,
 						public device_network_interface
 {
 public:
 	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_irq_cb(line_cb_t tx, line_cb_t rx);
-	void set_drq_cb(line_cb_t tx, line_cb_t rx);
+	template<class _Object> static devcb2_base &set_tx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_tx_drq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rx_drq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(object); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -92,7 +106,7 @@ private:
 	bool drq_tx, drq_rx, irq_tx, irq_rx;
 	emu_timer *timer_tx, *timer_rx;
 
-	line_cb_t irq_tx_cb, irq_rx_cb, drq_tx_cb, drq_rx_cb;
+	devcb2_write_line irq_tx_cb, irq_rx_cb, drq_tx_cb, drq_rx_cb;
 
 	void check_irq();
 	void start_send();

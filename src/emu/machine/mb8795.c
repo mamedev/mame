@@ -16,22 +16,14 @@ DEVICE_ADDRESS_MAP_START(map, 8, mb8795_device)
 	AM_RANGE(0x8, 0xf) AM_READWRITE(mac_r, mac_w) // Mapping limitation, real is up to 0xd
 ADDRESS_MAP_END
 
-mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
-		device_network_interface(mconfig, *this, 10)
+mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
+	device_network_interface(mconfig, *this, 10),
+	irq_tx_cb(*this),
+	irq_rx_cb(*this),
+	drq_tx_cb(*this),
+	drq_rx_cb(*this)
 {
-}
-
-void mb8795_device::set_irq_cb(line_cb_t tx, line_cb_t rx)
-{
-	irq_tx_cb = tx;
-	irq_rx_cb = rx;
-}
-
-void mb8795_device::set_drq_cb(line_cb_t tx, line_cb_t rx)
-{
-	drq_tx_cb = tx;
-	drq_rx_cb = rx;
 }
 
 void mb8795_device::check_irq()
@@ -48,6 +40,11 @@ void mb8795_device::check_irq()
 
 void mb8795_device::device_start()
 {
+	irq_tx_cb.resolve();
+	irq_rx_cb.resolve();
+	drq_tx_cb.resolve();
+	drq_rx_cb.resolve();
+
 	memset(mac, 0, 6);
 	timer_tx = timer_alloc(TIMER_TX);
 	timer_rx = timer_alloc(TIMER_RX);

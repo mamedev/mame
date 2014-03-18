@@ -105,10 +105,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 
-	void net_tx_irq(bool state);
-	void net_rx_irq(bool state);
-	void net_tx_drq(bool state);
-	void net_rx_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(net_tx_irq);
+	DECLARE_WRITE_LINE_MEMBER(net_rx_irq);
+	DECLARE_WRITE_LINE_MEMBER(net_tx_drq);
+	DECLARE_WRITE_LINE_MEMBER(net_rx_drq);
 
 	void mo_irq(bool state);
 	void mo_drq(bool state);
