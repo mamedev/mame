@@ -1390,6 +1390,26 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
 ROM_END
 
+/*
+The Real Broadway - Standard 5 card draw poker.
+
+ Single rom at U38 on a Merit CTR-260 PCB with a Dallas DS1204U-3 security key.
+ Uses standard draw poker keys - NOT a touchscreen based game.
+ Dipswitches are used for in game functions.
+*/
+
+ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0A */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	/* U32 Empty */
+	/* U36 Empty */
+	/* U37 Empty */
+	ROM_LOAD( "9131-20-00_u38-r0a", 0x300000, 0x080000, CRC(28e2b4f2) SHA1(d4441034aa85fee61b93b99867ab21203165a6f5) ) /* Location U38, 9131-20-00 R0A 04/07/1995   14:45:21 */
+	ROM_RELOAD(                     0x380000, 0x080000)
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9131-20-00-u5-r0a", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) /* WRONG!! Taken from megat2 */
+ROM_END
+
 
 /*
     Mega Touch
@@ -2183,6 +2203,9 @@ GAME( 1993, pbst30b,   pbst30, meritm_crt250_crt252_crt258, pbst30, driver_devic
 GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  driver_device, 0,        ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
+
+/* CRT 260 NON-touchscreen based */
+GAME( 1995, realbrod,  0,      meritm_crt260, meritm_crt250, driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", GAME_IMPERFECT_GRAPHICS )
