@@ -130,7 +130,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "cpu/es5510/es5510.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
@@ -175,7 +175,7 @@ public:
 	{ }
 
 	required_device<m68000_device> m_maincpu;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump> m_pump;
@@ -373,7 +373,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
 	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -626,7 +626,7 @@ static const es5505_interface es5505_config =
 
 static const esqpanel_interface esqpanel_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w),
+	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w),
 	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
 };
 
@@ -639,15 +639,15 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
@@ -700,15 +700,15 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

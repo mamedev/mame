@@ -1,6 +1,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 
 class taito_en_device : public device_t
 
@@ -41,7 +41,7 @@ private:
 
 	UINT32   *m_snd_shared_ram;
 
-	duartn68681_device *m_duart68681;
+	mc68681_device *m_duart68681;
 
 };
 

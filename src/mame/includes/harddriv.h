@@ -14,7 +14,7 @@
 #include "audio/atarijsa.h"
 #include "sound/dac.h"
 #include "machine/atarigen.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/asic65.h"
 #include "machine/timekpr.h"
 
@@ -289,7 +289,7 @@ public:
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	optional_device<dac_device> m_dac;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	optional_device<asic65_device> m_asic65;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
 

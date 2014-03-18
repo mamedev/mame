@@ -365,7 +365,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/clock.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
@@ -409,7 +409,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	//optional_device<nvram_device> m_nvram;
-	optional_device<duartn68681_device> m_duart; // only cat uses this
+	optional_device<mc68681_device> m_duart; // only cat uses this
 	optional_device<centronics_device> m_ctx;
 	optional_device<output_latch_device> m_ctx_data_out;
 	optional_device<acia6850_device> m_acia6850; // only swyft uses this
@@ -939,8 +939,8 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
 	AM_RANGE(0x80000e, 0x80000f) AM_READWRITE(cat_battery_r,cat_printer_control_w) AM_MIRROR(0x18FFE0) // Centronics Printer Control, keyboard led and country code enable
 	AM_RANGE(0x800010, 0x80001f) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
-	//AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff00 ) AM_MIRROR(0x18FFE0)
-	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
+	//AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff00 ) AM_MIRROR(0x18FFE0)
+	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x18FFE0)
 	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
 	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
 	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
@@ -1239,15 +1239,15 @@ static MACHINE_CONFIG_START( cat, cat_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_DUARTN68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
+	MCFG_MC68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_CENTRONICS_ADD("ctx", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(cat_state, prn_ack_ff))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, ip4_w)) MCFG_DEVCB_XOR(1)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

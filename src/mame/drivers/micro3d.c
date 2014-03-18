@@ -25,7 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP                 /* Lamps */
 	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8("mc68901", mc68901_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff00)
+	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff00)
 	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(micro3d_encoder_l_r)
 ADDRESS_MAP_END
@@ -323,11 +323,11 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
 
-	MCFG_DUARTN68681_ADD("duart68681", XTAL_3_6864MHz)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
+	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
 	
 	MCFG_DEVICE_ADD("mc68901", MC68901, 4000000)
 	MCFG_MC68901_TIMER_CLOCK(4000000)

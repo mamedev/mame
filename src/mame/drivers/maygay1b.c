@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", duartn68681_device, read, write )
+	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
 
 	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
@@ -843,9 +843,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
-	MCFG_DUARTN68681_ADD("duart68681", M1_DUART_CLOCK)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
+	MCFG_MC68681_ADD("duart68681", M1_DUART_CLOCK)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))

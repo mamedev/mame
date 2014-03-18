@@ -150,7 +150,7 @@ Video board has additional chips:
 #include "sound/ay8910.h"
 #include "video/h63484.h"
 #include "machine/microtch.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 
 class adp_state : public driver_device
 {
@@ -168,7 +168,7 @@ public:
 	required_device<h63484_device> m_h63484;
 	required_device<microtouch_serial_device> m_microtouch;
 	required_device<cpu_device> m_maincpu;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -426,7 +426,7 @@ static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w) // bad
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w) // bad
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10003f) AM_RAM
 	AM_RANGE(0x200000, 0x20003f) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM //work RAM
 	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
 ADDRESS_MAP_END
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x800088, 0x80008d) AM_WRITE8(ramdac_io_w, 0x00ff)
 	AM_RANGE(0x800100, 0x800101) AM_RAM //???
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w)
 	AM_RANGE(0x800100, 0x800101) AM_RAM //???
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -631,12 +631,12 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -668,12 +668,12 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -701,12 +701,12 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)

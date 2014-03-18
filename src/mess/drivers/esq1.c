@@ -181,7 +181,7 @@ NOTES:
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/esqpanel.h"
 
@@ -391,7 +391,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_t> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
@@ -495,7 +495,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
 	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write)
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", mc68681_device, read, write)
 	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
 	AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
@@ -578,24 +578,24 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 
 static const esqpanel_interface esqpanel_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
+	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w)
 };
 
 static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000)
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
+	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

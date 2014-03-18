@@ -10,7 +10,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"       //Fruit Machines Only
 #include "machine/6821pia.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"   // vfd
 #include "machine/steppers.h"   // stepper motor
@@ -51,7 +51,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<roc10937_t> m_vfd;
 	optional_device<okim6376_device> m_msm6376;
-	required_device<duartn68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart68681;
 
 	UINT8 m_lamppos;
 	int m_alpha_clock;

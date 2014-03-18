@@ -7,7 +7,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 
 
 #define HOST_MONITOR_DISPLAY        0
@@ -145,7 +145,7 @@ public:
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
-	required_device<duartn68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart68681;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

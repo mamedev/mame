@@ -7,7 +7,7 @@
 #include "machine/bfm_bda.h"
 
 #include "sound/ymz280b.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/68307.h"
 #include "machine/68340.h"
@@ -28,7 +28,7 @@ public:
 
 public:
 
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	optional_device<bfm_bda_t> m_vfd0;
 	optional_device<bfmdm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
@@ -75,7 +75,7 @@ public:
 	}
 
 	required_device<m68307cpu_device> m_maincpu;
-	required_device<duartn68681_device> m_m68307_68681;
+	required_device<mc68681_device> m_m68307_68681;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;

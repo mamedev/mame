@@ -51,7 +51,7 @@ void taito_en_device::device_start()
 	save_item(NAME(m_es5510_gpr_latch));
 	save_item(NAME(m_es5510_ram_sel));
 
-	m_duart68681 = machine().device<duartn68681_device>("duart68681");
+	m_duart68681 = machine().device<mc68681_device>("duart68681");
 }
 
 //-------------------------------------------------
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( en_sound_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x140000, 0x140fff) AM_DEVREADWRITE("taito_en", taito_en_device, en_68000_share_r, en_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE("taito_en", taito_en_device, es5510_dsp_r, es5510_dsp_w) //todo: hook up cpu/es5510
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("taito_en", taito_en_device, en_es5505_bank_w)
 	AM_RANGE(0x340000, 0x340003) AM_DEVWRITE("taito_en", taito_en_device, en_volume_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
@@ -342,9 +342,9 @@ MACHINE_CONFIG_FRAGMENT( taito_en_sound )
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)
 
-	MCFG_DUARTN68681_ADD("duart68681", XTAL_16MHz / 4)
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
-	MCFG_DUARTN68681_IRQ_CALLBACK(DEVWRITELINE("taito_en", taito_en_device, duart_irq_handler))
+	MCFG_MC68681_ADD("duart68681", XTAL_16MHz / 4)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
+	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("taito_en", taito_en_device, duart_irq_handler))
 
 	MCFG_MB87078_ADD("mb87078", taito_en_mb87078_intf)
 

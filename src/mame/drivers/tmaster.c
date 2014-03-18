@@ -106,7 +106,7 @@ To Do:
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/microtch.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/ds1204.h"
 
@@ -137,7 +137,7 @@ public:
 	required_shared_ptr<UINT16> m_regs;
 	optional_shared_ptr<UINT16> m_galgames_ram;
 	required_device<okim6295_device> m_oki;
-	optional_device<duartn68681_device> m_duart;
+	optional_device<mc68681_device> m_duart;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -549,7 +549,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ_PORT("COIN")
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 
 	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE_PORT("OUT")
 
@@ -919,11 +919,11 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

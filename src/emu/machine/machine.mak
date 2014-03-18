@@ -118,11 +118,11 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/n68681.h,MACHINES += 68681
+#@src/emu/machine/mc68681.h,MACHINES += 68681
 #-------------------------------------------------
 
 ifneq ($(filter 68681,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/n68681.o
+MACHINEOBJS += $(MACHINEOBJ)/mc68681.o
 endif
 
 #-------------------------------------------------

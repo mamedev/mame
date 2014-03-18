@@ -25,7 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/es5510/es5510.h"
 #include "sound/es5506.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/esqpanel.h"
 
 class esqkt_state : public driver_device
@@ -42,7 +42,7 @@ public:
 
 	required_device<m68ec020_device> m_maincpu;
 	required_device<es5510_device> m_esp;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<esqpanel2x40_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
 	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x280000, 0x2801ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0xffffffff)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0xffffffff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
@@ -209,7 +209,7 @@ static const es5506_interface es5506_2_config =
 
 static const esqpanel_interface esqpanel_config =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
+	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w)
 };
 
 static MACHINE_CONFIG_START( kt, esqkt_state )
@@ -221,16 +221,16 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 
 	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 

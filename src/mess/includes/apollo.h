@@ -21,7 +21,7 @@
 #include "machine/terminal.h"
 #include "machine/ram.h"
 #include "machine/6840ptm.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
@@ -124,8 +124,8 @@ public:
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
 	required_device<ptm6840_device> m_ptm;
-	required_device<duartn68681_device> m_sio;
-	optional_device<duartn68681_device> m_sio2;
+	required_device<mc68681_device> m_sio;
+	optional_device<mc68681_device> m_sio2;
 	required_device<mc146818_device> m_rtc;
 	required_device<isa16_device> m_isa;
 

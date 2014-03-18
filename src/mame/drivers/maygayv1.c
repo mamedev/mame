@@ -129,7 +129,7 @@ Find lamps/reels after UPD changes.
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/6821pia.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
@@ -227,7 +227,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
-	required_device<duartn68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart68681;
 	required_device<palette_device> m_palette;
 
 	int m_vsync_latch_preset;
@@ -699,7 +699,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff)
+	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff)
 	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREAD8("pia", pia6821_device, read, 0x00ff)
 	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVWRITE8("pia", pia6821_device, write, 0xff00)
 ADDRESS_MAP_END
@@ -1037,9 +1037,9 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
+	MCFG_MC68681_ADD("duart68681", DUART_CLOCK)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

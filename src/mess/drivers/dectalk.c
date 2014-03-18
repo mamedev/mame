@@ -276,7 +276,7 @@ dgc (dg(no!spam)cx@mac.com)
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
 
@@ -323,7 +323,7 @@ public:
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_device> m_dac;
 	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_irq_handler);
@@ -788,7 +788,7 @@ static ADDRESS_MAP_START(m68k_mem, AS_PROGRAM, 16, dectalk_state )
 	AM_RANGE(0x094000, 0x0943ff) AM_WRITE8(led_write, 0x00FF) AM_MIRROR(0x763C00) /* LED array */
 	AM_RANGE(0x094000, 0x0941ff) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
 	AM_RANGE(0x094200, 0x0943ff) AM_READWRITE8(nvram_recall, nvram_store, 0xFF00) AM_MIRROR(0x763C00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8("duartn68681", duartn68681_device, read, write, 0xff ) AM_MIRROR(0x763FE0) /* DUART */
+	AM_RANGE(0x098000, 0x09801f) AM_DEVREADWRITE8("duartn68681", mc68681_device, read, write, 0xff ) AM_MIRROR(0x763FE0) /* DUART */
 	AM_RANGE(0x09C000, 0x09C001) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) AM_MIRROR(0x763FF8) /* SPC flags reg */
 	AM_RANGE(0x09C002, 0x09C003) AM_WRITE(m68k_infifo_w) AM_MIRROR(0x763FF8) /* SPC fifo reg */
 	AM_RANGE(0x09C004, 0x09C005) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) AM_MIRROR(0x763FF8) /* telephone status flags */
@@ -881,12 +881,12 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
-	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_3_6864MHz ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
-	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
+	MCFG_MC68681_ADD( "duartn68681", XTAL_3_6864MHz ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
 	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
@@ -909,7 +909,7 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, rx_b_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duartn68681", mc68681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 

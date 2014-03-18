@@ -131,7 +131,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/msm6242.h"
@@ -160,9 +160,9 @@ public:
 			m_backup(*this, "backup")
 		{ }
 
-	required_device<duartn68681_device> m_duart18_68681;
-	required_device<duartn68681_device> m_duart39_68681;
-	required_device<duartn68681_device> m_duart40_68681;
+	required_device<mc68681_device> m_duart18_68681;
+	required_device<mc68681_device> m_duart39_68681;
+	required_device<mc68681_device> m_duart40_68681;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_serial_device> m_microtouch;
@@ -539,9 +539,9 @@ static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
 	AM_RANGE(0x00a40000, 0x00A40001) AM_READWRITE( nevada_sec_r, nevada_sec_w)
 		//AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM_WRITE(nevada_videoram_w) AM_BASE_MEMBER(nevada_state, m_videoram)
 			AM_RANGE(0x00b00000, 0x00b01fff) AM_RAM // Video
-	AM_RANGE(0x00b10000, 0x00b100ff) AM_DEVREADWRITE8( "duart40_68681", duartn68681_device, read, write, 0x00ff ) // Lower byte
-	AM_RANGE(0x00b20000, 0x00b200ff) AM_DEVREADWRITE8( "duart39_68681", duartn68681_device, read, write, 0x00ff ) // Lower byte
-	AM_RANGE(0x00e00000, 0x00e000ff) AM_DEVREADWRITE8( "duart18_68681", duartn68681_device, read, write, 0xff00 ) // Upper byte
+	AM_RANGE(0x00b10000, 0x00b100ff) AM_DEVREADWRITE8( "duart40_68681", mc68681_device, read, write, 0x00ff ) // Lower byte
+	AM_RANGE(0x00b20000, 0x00b200ff) AM_DEVREADWRITE8( "duart39_68681", mc68681_device, read, write, 0x00ff ) // Lower byte
+	AM_RANGE(0x00e00000, 0x00e000ff) AM_DEVREADWRITE8( "duart18_68681", mc68681_device, read, write, 0xff00 ) // Upper byte
 	AM_RANGE(0x00fa0000, 0x00fbffff) AM_RAM  // not used
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM  // ROM ext + ROM boot
 ADDRESS_MAP_END
@@ -638,20 +638,20 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DUARTN68681_ADD( "duart18_68681", XTAL_3_6864MHz )  // UARTA = Modem 1200Baud
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MCFG_MC68681_ADD( "duart18_68681", XTAL_3_6864MHz )  // UARTA = Modem 1200Baud
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_DUARTN68681_ADD( "duart39_68681", XTAL_3_6864MHz )  // UARTA = Printer
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW2"))
+	MCFG_MC68681_ADD( "duart39_68681", XTAL_3_6864MHz )  // UARTA = Printer
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
 
-	MCFG_DUARTN68681_ADD( "duart40_68681", XTAL_3_6864MHz )  // UARTA = Touch , UARTB = Bill Acceptor
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW3"))
+	MCFG_MC68681_ADD( "duart40_68681", XTAL_3_6864MHz )  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", duartn68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
 	
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
