@@ -108,7 +108,7 @@ The PVE-500 board uses both the internal and additional external CTCs and SIOs
 MACHINE_CONFIG_END
 
 ROM_START( pve500 )
-	ROM_REGION( 0xC000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("pve500.icb7",  0x00000, 0x10000, CRC(1036709c) SHA1(207d6fcad5c2f081a138184060ce7bd02736965b) ) //48kbyte main-cpu program + 16kbyte of unreachable memory
 
 	ROM_REGION( 0x8000, "subcpu", 0 )
