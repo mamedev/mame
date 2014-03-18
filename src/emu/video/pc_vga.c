@@ -293,8 +293,8 @@ void s3_vga_device::device_start()
 	// set device ID
 	s3.id_high = 0x88;  // CR2D
 	s3.id_low = 0x11;   // CR2E
-	s3.revision = 0x40; // CR2F
-	s3.id_cr30 = 0xe0;  // CR30
+	s3.revision = 0x00; // CR2F
+	s3.id_cr30 = 0xe1;  // CR30
 }
 
 void tseng_vga_device::device_start()
@@ -3135,7 +3135,6 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 			case 0x67:
 				s3.ext_misc_ctrl_2 = data;
 				s3_define_video_mode();
-				//printf("%02x X\n",data);
 				break;
 			case 0x69:
 				vga.crtc.start_addr_latch &= ~0x1f0000;
