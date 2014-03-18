@@ -127,9 +127,6 @@ public:
 #if USE_TMS
 	required_shared_ptr<UINT16> m_vram;
 	required_device<palette_device> m_palette;
-
-	DECLARE_READ16_MEMBER(tms_host_r);
-	DECLARE_WRITE16_MEMBER(tms_host_w);
 #else
 	required_shared_ptr<UINT16> m_region4;
 	UINT16 m_vdp_address_low;
@@ -271,7 +268,7 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // main ram?
 #if USE_TMS
-	AM_RANGE(0x700000, 0x700007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 #else
 	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
 #endif
@@ -401,15 +398,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_scanline)
 
 
 #if USE_TMS
-READ16_MEMBER(littlerb_state::tms_host_r)
-{
-	return m_tms->host_r(offset);
-}
 
-WRITE16_MEMBER(littlerb_state::tms_host_w)
-{
-	m_tms->host_w(offset, data);
-}
 
 static ADDRESS_MAP_START( littlerb_tms_map, AS_PROGRAM, 16, littlerb_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")

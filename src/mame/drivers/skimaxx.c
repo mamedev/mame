@@ -66,8 +66,6 @@ public:
 	UINT32 m_blitter_src_dy;
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
-	DECLARE_WRITE32_MEMBER(m68k_tms_w);
-	DECLARE_READ32_MEMBER(m68k_tms_r);
 	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(skimaxx_unk1_r);
@@ -219,22 +217,6 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-/*************************************
- *
- *  TMS34010 host interface
- *
- *************************************/
-
-WRITE32_MEMBER(skimaxx_state::m68k_tms_w)
-{
-	m_tms->host_w(offset, data);
-}
-
-READ32_MEMBER(skimaxx_state::m68k_tms_r)
-{
-	return m_tms->host_r(offset);
-}
-
 
 /*************************************
  *
@@ -316,7 +298,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
-	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
+	AM_RANGE(0x10100000, 0x1010000f) AM_DEVREADWRITE16("tms", tms34010_device, host_r, host_w, 0x0000ffff)
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")  // above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP // watchdog_r?

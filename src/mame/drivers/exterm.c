@@ -78,13 +78,13 @@
 
 WRITE16_MEMBER(exterm_state::exterm_host_data_w)
 {
-	m_slave->host_w(offset / TOWORD(0x00100000), data);
+	m_slave->host_w(space,offset / TOWORD(0x00100000), data, 0xffff);
 }
 
 
 READ16_MEMBER(exterm_state::exterm_host_data_r)
 {
-	return m_slave->host_r(offset / TOWORD(0x00100000));
+	return m_slave->host_r(space,offset / TOWORD(0x00100000), 0xffff);
 }
 
 

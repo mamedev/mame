@@ -156,7 +156,7 @@ READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = m_gsp->host_r(offset);
+	result = m_gsp->host_r(space, offset, 0xffff);
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -166,7 +166,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
 {
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	m_gsp->host_w(offset, data);
+	m_gsp->host_w(space, offset, data, 0xffff);
 	m_hd34010_host_access = FALSE;
 }
 
@@ -183,7 +183,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = TRUE;
-	result = (m_msp != NULL) ? m_msp->host_r(offset) : 0xffff;
+	result = (m_msp != NULL) ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
 	m_hd34010_host_access = FALSE;
 	return result;
 }
@@ -195,7 +195,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 	if (m_msp != NULL)
 	{
 		m_hd34010_host_access = TRUE;
-		m_msp->host_w(offset, data);
+		m_msp->host_w(space, offset, data, 0xffff);
 		m_hd34010_host_access = FALSE;
 	}
 }

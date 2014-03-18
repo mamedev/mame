@@ -90,25 +90,6 @@ void artmagic_state::machine_reset()
 
 /*************************************
  *
- *  TMS34010 interface
- *
- *************************************/
-
-READ16_MEMBER(artmagic_state::tms_host_r)
-{
-	return m_tms->host_r(offset);
-}
-
-
-WRITE16_MEMBER(artmagic_state::tms_host_w)
-{
-	m_tms->host_w(offset, data);
-}
-
-
-
-/*************************************
- *
  *  Misc control memory accesses
  *
  *************************************/
@@ -439,7 +420,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 ADDRESS_MAP_END
 
 
@@ -458,7 +439,7 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 ADDRESS_MAP_END
 
 READ16_MEMBER(artmagic_state::unk_r)
@@ -484,7 +465,7 @@ static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 ADDRESS_MAP_END
 
 

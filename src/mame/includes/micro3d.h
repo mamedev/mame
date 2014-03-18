@@ -95,8 +95,6 @@ public:
 	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
 	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
 	DECLARE_READ32_MEMBER(micro3d_scc_r);
-	DECLARE_READ16_MEMBER(micro3d_tms_host_r);
-	DECLARE_WRITE16_MEMBER(micro3d_tms_host_w);
 	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
 	DECLARE_READ32_MEMBER(micro3d_mac2_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);

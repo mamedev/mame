@@ -167,22 +167,6 @@ MACHINE_RESET_MEMBER(jpmimpct_state,jpmimpct)
 }
 
 
-/*************************************
- *
- *  TMS34010 host interface
- *
- *************************************/
-
-WRITE16_MEMBER(jpmimpct_state::m68k_tms_w)
-{
-	m_dsp->host_w(offset, data);
-}
-
-READ16_MEMBER(jpmimpct_state::m68k_tms_r)
-{
-	return m_dsp->host_r(offset);
-}
-
 
 /*************************************
  *
@@ -614,7 +598,7 @@ static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
 	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
 	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
+	AM_RANGE(0x00800000, 0x00800007) AM_DEVREADWRITE("dsp", tms34010_device, host_r, host_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM

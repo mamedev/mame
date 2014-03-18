@@ -81,8 +81,6 @@ public:
 	optional_device<roc10937_t> m_vfd;
 	optional_shared_ptr<UINT16> m_vram;
 	struct bt477_t m_bt477;
-	DECLARE_WRITE16_MEMBER(m68k_tms_w);
-	DECLARE_READ16_MEMBER(m68k_tms_r);
 	DECLARE_READ16_MEMBER(duart_1_r);
 	DECLARE_WRITE16_MEMBER(duart_1_w);
 	DECLARE_READ16_MEMBER(duart_2_r);

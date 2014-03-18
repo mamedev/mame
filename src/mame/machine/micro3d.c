@@ -205,22 +205,6 @@ READ32_MEMBER(micro3d_state::micro3d_scc_r)
 }
 
 
-/*************************************
- *
- *  Host<->TMS34010 interface
- *
- *************************************/
-
-READ16_MEMBER(micro3d_state::micro3d_tms_host_r)
-{
-	return m_vgb->host_r(offset);
-}
-
-WRITE16_MEMBER(micro3d_state::micro3d_tms_host_w)
-{
-	m_vgb->host_w(offset, data);
-}
-
 
 /*************************************
  *

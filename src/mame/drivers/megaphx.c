@@ -110,9 +110,6 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(megaphx_rand_r);
 
-	DECLARE_READ16_MEMBER(tms_host_r);
-	DECLARE_WRITE16_MEMBER(tms_host_w);
-
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
@@ -175,16 +172,6 @@ CUSTOM_INPUT_MEMBER(megaphx_state::megaphx_rand_r)
 
 
 
-READ16_MEMBER(megaphx_state::tms_host_r)
-{
-	return m_tms->host_r(offset);
-}
-
-
-WRITE16_MEMBER(megaphx_state::tms_host_w)
-{
-	m_tms->host_w(offset, data);
-}
 
 READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
 {
@@ -213,7 +200,7 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
 
-	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(megaphx_0x050000_w) // z80 comms?
 	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_0x050002_r) // z80 comms?
@@ -735,7 +722,7 @@ static GFXDECODE_START( megaphx )
 	GFXDECODE_ENTRY( "roms67", 0, megaphxlay,     0x0000, 1 )
 GFXDECODE_END
 
-#define FAKE_BOOST 16
+#define FAKE_BOOST 1
 
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 

@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("INPUTS_A_B")
 	AM_RANGE(0x960000, 0x960001) AM_WRITE(micro3d_reset_w)
 	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE("vgb", tms34010_device, host_r, host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP                 /* Lamps */
 	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8("mc68901", mc68901_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff00)

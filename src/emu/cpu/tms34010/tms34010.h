@@ -217,8 +217,8 @@ public:
 	DECLARE_WRITE16_MEMBER( io_register_w );
 	DECLARE_READ16_MEMBER( io_register_r );
 	
-	void  host_w(int reg, int data);
-	int   host_r(int reg);	
+	DECLARE_WRITE16_MEMBER(host_w);
+	DECLARE_READ16_MEMBER(host_r);
 };
 
 extern const device_type TMS34010;
