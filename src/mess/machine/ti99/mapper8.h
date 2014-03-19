@@ -69,9 +69,11 @@ struct mapper8_list_entry
 #define MAPPER8_CONFIG(name) \
 	const mapper8_config(name) =
 
+#define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
+	devcb = &mainboard8_device::set_ready_wr_callback(*device, DEVCB2_##_write);
+
 struct mapper8_config
 {
-	devcb_write_line                ready;
 	const mapper8_list_entry        *devlist;
 };
 
@@ -139,6 +141,9 @@ class mainboard8_device : public bus8z_device
 {
 public:
 	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<mainboard8_device &>(device).m_ready.set_callback(object); }
+
 	DECLARE_READ8_MEMBER( readm);       // used from address map
 	DECLARE_WRITE8_MEMBER( writem );    // used from address map
 
@@ -166,7 +171,7 @@ private:
 	void mapwrite(int offset, UINT8 data);
 
 	// Ready line to the CPU
-	devcb_resolved_write_line m_ready;
+	devcb2_write_line m_ready;
 
 	// All devices that are attached to the 16-bit address bus.
 	simple_list<logically_addressed_device> m_logcomp;

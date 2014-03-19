@@ -983,7 +983,6 @@ static const mapper8_list_entry mapper_devices[] =
 
 static MAPPER8_CONFIG( mapper_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_mapper),   // READY
 	mapper_devices
 };
 
@@ -1025,6 +1024,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	/* Main board */
 	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0)
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
+	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_mapper))
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_cart) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )

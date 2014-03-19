@@ -205,6 +205,7 @@
 
 mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: bus8z_device(mconfig, MAINBOARD8, "TI-99/8 Main board", tag, owner, clock, "ti998_mainboard", __FILE__),
+	m_ready(*this),
 	m_oso(*this, OSO_TAG)
 	{ }
 
@@ -691,7 +692,7 @@ void mainboard8_device::device_start()
 	const mapper8_config *conf = reinterpret_cast<const mapper8_config *>(static_config());
 
 	const mapper8_list_entry *entry = conf->devlist;
-	m_ready.resolve(conf->ready, *this);
+	m_ready.resolve_safe();
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
