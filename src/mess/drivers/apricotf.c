@@ -214,16 +214,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  APRICOT_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static APRICOT_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  Z80SIO_INTERFACE( sio_intf )
 //-------------------------------------------------
 
@@ -327,7 +317,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
 
 	/* Devices */
-	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
+	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
 

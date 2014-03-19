@@ -27,27 +27,6 @@ const device_type APRICOT_KEYBOARD = &device_creator<apricot_keyboard_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void apricot_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const apricot_keyboard_interface *intf = reinterpret_cast<const apricot_keyboard_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<apricot_keyboard_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( apricot_keyboard )
 //-------------------------------------------------
 
@@ -70,7 +49,8 @@ const rom_entry *apricot_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 //  ADDRESS_MAP( kb_io )
 //-------------------------------------------------
-/*
+
+#ifdef UPD7507_EMULATED
 static ADDRESS_MAP_START( apricot_keyboard_io, AS_IO, 8, apricot_keyboard_device )
     AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
     AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
@@ -80,7 +60,7 @@ static ADDRESS_MAP_START( apricot_keyboard_io, AS_IO, 8, apricot_keyboard_device
     AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
     AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
 ADDRESS_MAP_END
-*/
+#endif
 
 
 //-------------------------------------------------
@@ -88,10 +68,10 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( apricot_keyboard )
-/*
+#ifdef UPD7507_EMULATED
     MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
     MCFG_CPU_IO_MAP(apricot_keyboard_io)
-*/
+#endif
 MACHINE_CONFIG_END
 
 
@@ -266,22 +246,23 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //  apricot_keyboard_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_ya(*this, "YA"),
-		m_yb(*this, "YB"),
-		m_yc(*this, "YC"),
-		m_modifiers(*this, "MODIFIERS")
+apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
+	m_write_txd(*this),
+	m_y0(*this, "Y0"),
+	m_y1(*this, "Y1"),
+	m_y2(*this, "Y2"),
+	m_y3(*this, "Y3"),
+	m_y4(*this, "Y4"),
+	m_y5(*this, "Y5"),
+	m_y6(*this, "Y6"),
+	m_y7(*this, "Y7"),
+	m_y8(*this, "Y8"),
+	m_y9(*this, "Y9"),
+	m_ya(*this, "YA"),
+	m_yb(*this, "YB"),
+	m_yc(*this, "YC"),
+	m_modifiers(*this, "MODIFIERS")
 {
 }
 
@@ -293,7 +274,7 @@ apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, 
 void apricot_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_out_txd_func.resolve(m_out_txd_cb, *this);
+	m_write_txd.resolve_safe();
 }
 
 

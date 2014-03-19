@@ -405,16 +405,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  APRICOT_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static APRICOT_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
@@ -598,7 +588,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
+	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 

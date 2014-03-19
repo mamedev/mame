@@ -12,7 +12,6 @@
 #ifndef __APRICOT_KEYBOARD__
 #define __APRICOT_KEYBOARD__
 
-
 #include "emu.h"
 
 
@@ -29,13 +28,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_APRICOT_KEYBOARD_ADD(_config) \
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define APRICOT_KEYBOARD_INTERFACE(_name) \
-	const apricot_keyboard_interface (_name) =
+#define MCFG_APRICOT_KEYBOARD_TXD_CALLBACK(_write) \
+	devcb = &apricot_keyboard_device::set_tcd_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -54,12 +48,14 @@ struct apricot_keyboard_interface
 // ======================> apricot_keyboard_device
 
 class apricot_keyboard_device :  public device_t,
-									public apricot_keyboard_interface
+								 public apricot_keyboard_interface
 {
 public:
 	// construction/destruction
 	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
+	
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -80,10 +76,9 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 private:
-	devcb_resolved_write_line   m_out_txd_func;
+	devcb2_write_line   m_write_txd;
 
 	required_ioport m_y0;
 	required_ioport m_y1;
