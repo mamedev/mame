@@ -452,16 +452,6 @@ static const riot6532_interface gottlieb_riot6532_intf =
 
 
 //-------------------------------------------------
-//  VOTRAX interface
-//-------------------------------------------------
-
-static const votrax_sc01_interface gottlieb_votrax_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, gottlieb_sound_r1_device, votrax_request)
-};
-
-
-//-------------------------------------------------
 //  audio CPU map
 //-------------------------------------------------
 
@@ -498,7 +488,8 @@ MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
 	MCFG_FRAGMENT_ADD(gottlieb_sound_r1)
 
 	// add the VOTRAX
-	MCFG_VOTRAX_SC01_ADD("votrax", 720000, gottlieb_votrax_interface)
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
+	MCFG_VOTRAX_SC01_REQUEST_CB(DEVWRITELINE(DEVICE_SELF_OWNER, gottlieb_sound_r1_device, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
 MACHINE_CONFIG_END
 

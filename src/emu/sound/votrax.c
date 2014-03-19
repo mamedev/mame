@@ -98,23 +98,10 @@ votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char
 	: device_t(mconfig, VOTRAX_SC01, "Votrax SC-01", tag, owner, clock, "votrax", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
-		m_phoneme_timer(NULL)
+		m_phoneme_timer(NULL),
+		m_request_cb(*this)
 {
 }
-
-
-//-------------------------------------------------
-//  static_set_interface - configuration helper
-//  to set the interface
-//-------------------------------------------------
-
-void votrax_sc01_device::static_set_interface(device_t &device, const votrax_sc01_interface &interface)
-{
-	votrax_sc01_device &votrax = downcast<votrax_sc01_device &>(device);
-	static_cast<votrax_sc01_interface &>(votrax) = interface;
-}
-
-
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -144,7 +131,7 @@ mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=
 	m_latch_92 = 0;
 
 	// clear the request signal
-	m_request_func(m_request_state = m_internal_request = CLEAR_LINE);
+	m_request_cb(m_request_state = m_internal_request = CLEAR_LINE);
 	m_phoneme_timer->adjust(attotime::zero);
 }
 
@@ -1145,7 +1132,7 @@ void votrax_sc01_device::device_start()
 	m_phoneme = 0x3f;
 
 	// reset outputs
-	m_request_func.resolve(m_request_cb, *this);
+	m_request_cb.resolve_safe();
 	m_request_state = ASSERT_LINE;
 	m_internal_request = ASSERT_LINE;
 
@@ -1237,7 +1224,7 @@ void votrax_sc01_device::device_reset()
 
 	// reset inputs
 	m_phoneme = 0x3f;
-	m_request_func(m_internal_request = m_request_state = ASSERT_LINE);
+	m_request_cb(m_internal_request = m_request_state = ASSERT_LINE);
 
 	// reset timing circuit
 	m_master_clock = 0;
@@ -1356,7 +1343,7 @@ void votrax_sc01_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	if (m_internal_request == ASSERT_LINE)
 	{
 mame_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
-		m_request_func(m_request_state = ASSERT_LINE);
+		m_request_cb(m_request_state = ASSERT_LINE);
 		return;
 	}
 

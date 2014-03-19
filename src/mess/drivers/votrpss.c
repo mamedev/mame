@@ -256,10 +256,6 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_NULL      // port B write
 };
 
-static struct votrax_sc01_interface votrax_interface =
-{
-};
-
 WRITE8_MEMBER( votrpss_state::kbd_put )
 {
 	m_term_data = data;
@@ -294,7 +290,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrax_interface ) /* 720 kHz? needs verify */
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720 kHz? needs verify */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */

@@ -97,10 +97,6 @@ WRITE_LINE_MEMBER(votrtnt_state::write_acia_clock)
 	m_acia->write_rxc(state);
 }
 
-static struct votrax_sc01_interface votrtnt_votrax_interface =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
-};
 
 /******************************************************************************
  Machine Drivers
@@ -128,7 +124,8 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_VOTRAX_SC01_ADD("votrax", 720000, votrtnt_votrax_interface ) /* 720kHz? needs verify */
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720kHz? needs verify */
+	MCFG_VOTRAX_SC01_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
