@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   arm7core.c
+ *   arm7core.inc
  *   Portable ARM7TDMI Core Emulator
  *
  *   Copyright Steve Ellenoff, all rights reserved.

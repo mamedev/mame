@@ -829,7 +829,7 @@ inline UINT32 adsp21xx_device::opcode_read()
     IMPORT CORE UTILITIES
 ***************************************************************************/
 
-#include "2100ops.c"
+#include "2100ops.inc"
 
 
 

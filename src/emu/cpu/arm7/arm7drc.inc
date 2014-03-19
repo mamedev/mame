@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   arm7.c
+ *   arm7drc.inc
  *   Portable CPU Emulator for 32-bit ARM v3/4/5/6
  *
  *   Copyright Steve Ellenoff, all rights reserved.
@@ -50,7 +50,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#include "arm7tdrc.c"
+#include "arm7tdrc.inc"
 
 /* map variables */
 #define MAPVAR_PC                       uml::M0

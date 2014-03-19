@@ -109,9 +109,9 @@ $(CPUOBJ)/arm7/arm7.o:  $(CPUSRC)/arm7/arm7.c \
 						$(CPUSRC)/arm7/arm7help.h \
 						$(CPUSRC)/arm7/arm7thmb.c \
 						$(CPUSRC)/arm7/arm7ops.c \
-						$(CPUSRC)/arm7/arm7core.c \
-						$(CPUSRC)/arm7/arm7drc.c \
-						$(CPUSRC)/arm7/arm7tdrc.c
+						$(CPUSRC)/arm7/arm7core.inc \
+						$(CPUSRC)/arm7/arm7drc.inc \
+						$(CPUSRC)/arm7/arm7tdrc.inc
 
 $(CPUOBJ)/arm7/arm7ops.o:   $(CPUSRC)/arm7/arm7ops.c \
 						$(CPUSRC)/arm7/arm7.h \
@@ -168,7 +168,7 @@ endif
 
 $(CPUOBJ)/adsp2100/adsp2100.o:  $(CPUSRC)/adsp2100/adsp2100.c \
 								$(CPUSRC)/adsp2100/adsp2100.h \
-								$(CPUSRC)/adsp2100/2100ops.c
+								$(CPUSRC)/adsp2100/2100ops.inc
 
 
 
@@ -222,7 +222,7 @@ CPUOBJS += $(CPUOBJ)/dsp16/dsp16.o
 DASMOBJS += $(CPUOBJ)/dsp16/dsp16dis.o
 endif
 
-$(CPUOBJ)/dsp16/dsp16.o:    $(CPUSRC)/dsp16/dsp16ops.c \
+$(CPUOBJ)/dsp16/dsp16.o:    $(CPUSRC)/dsp16/dsp16ops.inc \
 							$(CPUSRC)/dsp16/dsp16.c \
 							$(CPUSRC)/dsp16/dsp16.h
 
@@ -369,7 +369,7 @@ endif
 
 $(CPUOBJ)/cop400/cop400.o:  $(CPUSRC)/cop400/cop400.c \
 							$(CPUSRC)/cop400/cop400.h \
-							$(CPUSRC)/cop400/cop400op.c
+							$(CPUSRC)/cop400/cop400op.inc
 
 
 
