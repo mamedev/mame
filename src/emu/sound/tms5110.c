@@ -84,7 +84,7 @@
 #define CTL_STATE_NEXT_OUTPUT   (2)
 
 /* Pull in the ROM tables */
-#include "tms5110r.c"
+#include "tms5110r.inc"
 
 #define DEBUG_5110  0
 
