@@ -201,7 +201,13 @@ const device_type DMADAC = &device_creator<dmadac_sound_device>;
 
 dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DMADAC, "DMA-driven DAC", tag, owner, clock, "dmadac", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_buffer(NULL),
+		m_bufin(0),
+		m_bufout(0),
+		m_volume(0),
+		m_enabled(0),
+		m_frequency(0)
 {
 }
 
