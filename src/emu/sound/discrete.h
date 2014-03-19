@@ -337,7 +337,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_inp.c
+ * from from disc_inp.inc
  =======================================================================
  ***********************************************************************
  *
@@ -451,7 +451,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_wav.c
+ * from from disc_wav.inc
  * Generic modules
  =======================================================================
  ***********************************************************************
@@ -797,7 +797,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_wav.c
+ * from from disc_wav.inc
  * Component specific modules
  =======================================================================
  ***********************************************************************
@@ -1165,7 +1165,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_wav.c
+ * from from disc_wav.inc
  * Not yet implemented
  =======================================================================
  ***********************************************************************
@@ -1197,7 +1197,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_mth.c
+ * from from disc_mth.inc
  * Generic modules
  =======================================================================
  ***********************************************************************
@@ -1798,7 +1798,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_mth.c
+ * from from disc_mth.inc
  * Component specific modules
  =======================================================================
  ***********************************************************************
@@ -2214,7 +2214,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_flt.c
+ * from from disc_flt.inc
  * Generic modules
  =======================================================================
  ***********************************************************************
@@ -2254,7 +2254,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_flt.c
+ * from from disc_flt.inc
  * Component specific modules
  =======================================================================
  ***********************************************************************
@@ -2946,7 +2946,7 @@
  *
  ***********************************************************************
  =======================================================================
- * from from disc_dev.c
+ * from from disc_dev.inc
  * Component specific modules
  =======================================================================
  ***********************************************************************
@@ -4545,7 +4545,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 
 /*      Module Name                                                       out,  enum value,      #in,   {variable inputs},              {static inputs},    data pointer,   "name" */
 
-/* from disc_inp.c */
+/* from disc_inp.inc */
 #define DISCRETE_ADJUSTMENT(NODE,MIN,MAX,LOGLIN,TAG)                    DSC_SND_ENTRY( NODE, dss_adjustment  , DSS_NODE        , 6, DSE( NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( MIN,MAX,LOGLIN,0   ,0   ,100  ), TAG   , "DISCRETE_ADJUSTMENT" ),
 #define DISCRETE_ADJUSTMENTX(NODE,MIN,MAX,LOGLIN,TAG,PMIN,PMAX)         DSC_SND_ENTRY( NODE, dss_adjustment  , DSS_NODE        , 6, DSE( NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( MIN,MAX,LOGLIN,0   ,PMIN,PMAX ), TAG   , "DISCRETE_ADJUSTMENTX"  ),
 #define DISCRETE_CONSTANT(NODE,CONST)                                   DSC_SND_ENTRY( NODE, dss_constant    , DSS_NODE        , 1, DSE( NODE_NC ), DSE( CONST ) ,NULL  ,"DISCRETE_CONSTANT" ),
@@ -4562,7 +4562,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 
 #define DISCRETE_INPUT_BUFFER(NODE, NUM)                                DSC_SND_ENTRY( NODE, dss_input_buffer, DSS_NODE        , 3, DSE( NUM,NODE_NC,NODE_NC ), DSE( NUM,1,0 ), NULL, "DISCRETE_INPUT_BUFFER" ),
 
-/* from disc_wav.c */
+/* from disc_wav.inc */
 /* generic modules */
 #define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE) DSC_SND_ENTRY( NODE, dss_counter     , DSS_NODE        , 8, DSE( ENAB,RESET,CLK,NODE_NC,NODE_NC,DIR,INIT0,NODE_NC ), DSE( ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE ), NULL, "DISCRETE_COUNTER" ),
 #define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              DSC_SND_ENTRY( NODE, dss_counter     , DSS_NODE        , 8, DSE( ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC ), DSE( ENAB,RESET,CLK,CLKTYPE,0,1,0,DISC_COUNTER_IS_7492 ), NULL, "DISCRETE_COUNTER_7492" ),
@@ -4584,7 +4584,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 /* Not yet implemented */
 #define DISCRETE_ADSR_ENV(NODE,ENAB,TRIGGER,GAIN,ADSRTB)                DSC_SND_ENTRY( NODE, dss_adsr        , DSS_NODE        , 3, DSE( ENAB,TRIGGER,GAIN ), DSE( ENAB,TRIGGER,GAIN ), ADSRTB, "DISCRETE_ADSR_ENV" ),
 
-/* from disc_mth.c */
+/* from disc_mth.inc */
 /* generic modules */
 #define DISCRETE_ADDER2(NODE,ENAB,INP0,INP1)                            DSC_SND_ENTRY( NODE, dst_adder       , DSS_NODE        , 3, DSE( ENAB,INP0,INP1 ), DSE( ENAB,INP0,INP1 ), NULL, "DISCRETE_ADDER2" ),
 #define DISCRETE_ADDER3(NODE,ENAB,INP0,INP1,INP2)                       DSC_SND_ENTRY( NODE, dst_adder       , DSS_NODE        , 4, DSE( ENAB,INP0,INP1,INP2 ), DSE( ENAB,INP0,INP1,INP2 ), NULL, "DISCRETE_ADDER3" ),
@@ -4659,7 +4659,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 #define DISCRETE_XTIME_XOR(NODE,IN0,IN1,LOW,HIGH)                       DSC_SND_ENTRY( NODE, dst_xtime_xor   , DSS_NODE        , 5, DSE( IN0,IN1,LOW,HIGH,NODE_NC ), DSE( IN0,IN1,LOW,HIGH,0 ), NULL, "DISCRETE_XTIME_XOR" ),
 #define DISCRETE_XTIME_XNOR(NODE,IN0,IN1,LOW,HIGH)                      DSC_SND_ENTRY( NODE, dst_xtime_xnor  , DSS_NODE        , 5, DSE( IN0,IN1,LOW,HIGH,NODE_NC ), DSE( IN0,IN1,LOW,HIGH,1 ), NULL, "DISCRETE_XTIME_XNOR" ),
 
-/* from disc_flt.c */
+/* from disc_flt.inc */
 /* generic modules */
 #define DISCRETE_FILTER1(NODE,ENAB,INP0,FREQ,TYPE)                      DSC_SND_ENTRY( NODE, dst_filter1     , DSS_NODE        , 4, DSE( ENAB,INP0,NODE_NC,NODE_NC ), DSE( ENAB,INP0,FREQ,TYPE ), NULL, "DISCRETE_FILTER1" ),
 #define DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)                 DSC_SND_ENTRY( NODE, dst_filter2     , DSS_NODE        , 5, DSE( ENAB,INP0,NODE_NC,NODE_NC,NODE_NC ), DSE( ENAB,INP0,FREQ,DAMP,TYPE ), NULL, "DISCRETE_FILTER2" ),
@@ -4684,7 +4684,7 @@ discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_
 #define DISCRETE_RCDISC2N(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)       DSC_SND_ENTRY( NODE, dst_rcdisc2n    , DSS_NODE        , 6, DSE( SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC ), DSE( SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL ), NULL, "DISCRETE_RCDISC2N" ),
 #define DISCRETE_RCFILTERN(NODE,ENAB,INP0,RVAL,CVAL)                    DSC_SND_ENTRY( NODE, dst_rcfiltern   , DSS_NODE        , 4, DSE( ENAB,INP0,NODE_NC,NODE_NC ), DSE( ENAB,INP0,RVAL,CVAL ), NULL, "DISCRETE_RCFILTERN" ),
 
-/* from disc_dev.c */
+/* from disc_dev.inc */
 /* generic modules */
 #define DISCRETE_CUSTOM1(NODE,CLASS,IN0,INFO)                                 DSC_SND_ENTRY( NODE, CLASS, DST_CUSTOM      , 1, DSE( IN0 ), DSE( IN0 ), INFO, "DISCRETE_CUSTOM1" ),
 #define DISCRETE_CUSTOM2(NODE,CLASS,IN0,IN1,INFO)                             DSC_SND_ENTRY( NODE, CLASS, DST_CUSTOM      , 2, DSE( IN0,IN1 ), DSE( IN0,IN1 ), INFO, "DISCRETE_CUSTOM2" ),
