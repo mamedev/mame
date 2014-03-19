@@ -15,9 +15,20 @@
 #define LOG_REG        1
 
 const device_type S3VIRGE = &device_creator<s3virge_vga_device>;
+const device_type S3VIRGEDX = &device_creator<s3virgedx_vga_device>;
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: s3_vga_device(mconfig, S3VIRGE, "S3VIRGE", tag, owner, clock, "s3virge_vga", __FILE__)
+{
+}
+
+s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: s3_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: s3virge_vga_device(mconfig, S3VIRGEDX, "S3VIRGEDX", tag, owner, clock, "s3virgedx_vga", __FILE__)
 {
 }
 
@@ -57,6 +68,17 @@ void s3virge_vga_device::device_start()
 	// set device ID
 	s3.id_high = 0x56;  // CR2D
 	s3.id_low = 0x31;   // CR2E
+	s3.revision = 0x00; // CR2F  (value unknown)
+	s3.id_cr30 = 0xe1;  // CR30
+}
+
+void s3virgedx_vga_device::device_start()
+{
+	s3virge_vga_device::device_start();
+
+	// set device ID
+	s3.id_high = 0x8a;  // CR2D
+	s3.id_low = 0x01;   // CR2E
 	s3.revision = 0x00; // CR2F  (value unknown)
 	s3.id_cr30 = 0xe1;  // CR30
 }
@@ -174,19 +196,15 @@ void s3virge_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
 	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
-	double m,n;
-	int r;
 	double freq;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
 		// Dot clock is set via SR12 and SR13
-		m = vga.sequencer.data[0x13] & 0x7f;
-		n = vga.sequencer.data[0x12] & 0x1f;
-		r = (vga.sequencer.data[0x12] & 0x60) >> 5;
-		freq = ((double)(m+2) / (double)((n+2)*(pow(2.0,r)))) * 14.318f; // clock between XIN and XOUT
+		// DCLK calculation
+		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r)))) * 14.318f; // clock between XIN and XOUT
 		xtal = freq * 1000000;
-		//printf("DCLK set to %dHz M=%f N=%f R=%i\n",xtal,m,n,r);
+		//printf("DCLK set to %dHz M=%i N=%i R=%i\n",xtal,s3.clk_pll_m,s3.clk_pll_n,s3.clk_pll_r);
 	}
 
 	if((s3.ext_misc_ctrl_2) >> 4)
@@ -543,7 +561,7 @@ READ8_MEMBER(s3virge_vga_device::port_03c0_r)
 	switch(offset)
 	{
 		default:
-			res = vga_device::port_03c0_r(space,offset,mem_mask);
+			res = s3_vga_device::port_03c0_r(space,offset,mem_mask);
 			break;
 	}
 
@@ -555,7 +573,7 @@ WRITE8_MEMBER(s3virge_vga_device::port_03c0_w)
 	switch(offset)
 	{
 		default:
-			vga_device::port_03c0_w(space,offset,data,mem_mask);
+			s3_vga_device::port_03c0_w(space,offset,data,mem_mask);
 			break;
 	}
 }

@@ -201,6 +201,16 @@ void isa16_s3virge_device::device_reset()
  *  S3 ViRGE/DX
  */
 
+static MACHINE_CONFIG_FRAGMENT( vga_s3virgedx )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+	MCFG_DEVICE_ADD("vga", S3VIRGEDX, 0)
+MACHINE_CONFIG_END
+
 ROM_START( s3virgedx )
 	ROM_REGION(0x8000,"s3virgedx", 0)
 	ROM_LOAD("s3virgedx.bin", 0x00000, 0x8000, CRC(0da83bd3) SHA1(228a2d644e1732cb5a2eb1291608c7050cf39229) )
@@ -220,7 +230,7 @@ const device_type ISA16_S3VIRGEDX = &device_creator<isa16_s3virgedx_device>;
 
 machine_config_constructor isa16_s3virgedx_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( vga_s3virge );
+	return MACHINE_CONFIG_NAME( vga_s3virgedx );
 }
 
 //-------------------------------------------------
@@ -255,7 +265,7 @@ void isa16_s3virgedx_device::device_start()
 {
 	set_isa_device();
 
-	m_vga = subdevice<s3virge_vga_device>("vga");
+	m_vga = subdevice<s3virgedx_vga_device>("vga");
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "s3virgedx");
 

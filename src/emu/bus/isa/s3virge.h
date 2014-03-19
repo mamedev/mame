@@ -18,6 +18,7 @@ class s3virge_vga_device :  public s3_vga_device
 public:
 	// construction/destruction
 	s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(port_03b0_r);
 	virtual WRITE8_MEMBER(port_03b0_w);
@@ -40,7 +41,22 @@ private:
 	// has no 8514/A device
 };
 
+
+// ======================> s3virgedx_vga_device
+
+class s3virgedx_vga_device :  public s3virge_vga_device
+{
+public:
+	// construction/destruction
+	s3virgedx_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
 // device type definition
 extern const device_type S3VIRGE;
+extern const device_type S3VIRGEDX;
 
 #endif /* S3VIRGE_H_ */
