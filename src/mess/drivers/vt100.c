@@ -54,7 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
 	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
 	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
-	DECLARE_WRITE8_MEMBER(vt100_clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
 	required_shared_ptr<UINT8> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
@@ -369,7 +369,7 @@ READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
 	return m_p_ram[offset];
 }
 
-WRITE8_MEMBER( vt100_state::vt100_clear_video_interrupt )
+WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
 {
 	m_vertical_int = 0;
 }
@@ -377,8 +377,6 @@ WRITE8_MEMBER( vt100_state::vt100_clear_video_interrupt )
 static const vt_video_interface vt100_video_interface =
 {
 	"chargen",
-	DEVCB_DRIVER_MEMBER(vt100_state, vt100_read_video_ram_r),
-	DEVCB_DRIVER_MEMBER(vt100_state, vt100_clear_video_interrupt)
 };
 
 INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
@@ -428,6 +426,8 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
 	MCFG_VT100_VIDEO_ADD("vt100_video", "screen", vt100_video_interface)
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
+	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
 
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

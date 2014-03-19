@@ -221,7 +221,7 @@ public:
 	}
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
-	DECLARE_WRITE8_MEMBER(clear_video_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(clear_video_interrupt);
 
 	DECLARE_READ8_MEMBER(diagnostic_r);
 	DECLARE_WRITE8_MEMBER(diagnostic_w);
@@ -1010,7 +1010,7 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 	raise_8088_irq(IRQ_8088_VBL);
 }
 
-WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
+WRITE_LINE_MEMBER( rainbow_state::clear_video_interrupt )
 {
 	lower_8088_irq(IRQ_8088_VBL);
 }
@@ -1146,8 +1146,6 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 static const vt_video_interface video_interface =
 {
 	"chargen",
-	DEVCB_DRIVER_MEMBER(rainbow_state, read_video_ram_r),
-	DEVCB_DRIVER_MEMBER(rainbow_state, clear_video_interrupt)
 };
 
 /* F4 Character Displayer */
@@ -1214,6 +1212,8 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
 	
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", "screen", video_interface)
+	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
+	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)

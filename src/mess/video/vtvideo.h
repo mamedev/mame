@@ -15,13 +15,15 @@
 
 #include "emu.h"
 
+#define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
+	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
+	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB2_##_write);
+
 struct vt_video_interface
 {
 	const char *m_char_rom_tag; /* character rom region */
-
-	/* this gets called for every memory read */
-	devcb_read8         m_in_ram_cb;
-	devcb_write8        m_clear_video_cb;
 };
 
 
@@ -33,6 +35,9 @@ public:
 	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~vt100_video_device() {}
+
+	template<class _Object> static devcb2_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
+	template<class _Object> static devcb2_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
@@ -52,8 +57,8 @@ protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 
-	devcb_resolved_read8        m_in_ram_func;
-	devcb_resolved_write8       m_clear_video_interrupt;
+	devcb2_read8        m_read_ram;
+	devcb2_write8       m_write_clear_video_interrupt;
 
 	UINT8 *m_gfx;     /* content of char rom */
 
