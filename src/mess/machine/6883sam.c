@@ -70,6 +70,7 @@ const device_type SAM6883 = &device_creator<sam6883_device>;
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock, "sam6883", __FILE__),
+		m_read_res(*this),
 		m_space_0000(*this),
 		m_space_8000(*this),
 		m_space_A000(*this),
@@ -98,7 +99,7 @@ void sam6883_device::device_start()
 	m_cpu_space = &m_cpu->space(config->m_cpu_space);
 
 	// resolve callbacks
-	m_res_input_func.resolve(config->m_input_func, *this);
+	m_read_res.resolve_safe(0);
 
 	// install SAM handlers
 	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, 0, 0, read8_delegate(FUNC(sam6883_device::read), this));

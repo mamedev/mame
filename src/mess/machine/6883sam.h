@@ -17,6 +17,8 @@
 	MCFG_DEVICE_ADD(_tag, SAM6883, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
+#define MCFG_SAM6883_RES_CALLBACK(_read) \
+	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB2_##_read);
 
 /* interface */
 struct sam6883_interface
@@ -24,9 +26,6 @@ struct sam6883_interface
 	/* the CPU/space from which the SAM reads data */
 	const char *        m_cpu_tag;
 	address_spacenum    m_cpu_space;
-
-	/* function for reading from memory for video */
-	devcb_read8         m_input_func;
 };
 
 
@@ -96,6 +95,8 @@ class sam6883_device : public device_t, public sam6883_friend_device
 public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_res_rd_callback(device_t &device, _Object object) { return downcast<sam6883_device &>(device).m_read_res.set_callback(object); }
+
 	// called to configure banks
 	void configure_bank(int bank, UINT8 *memory, UINT32 memory_size, bool is_read_only);
 	void configure_bank(int bank, read8_delegate rhandler, write8_delegate whandler);
@@ -120,7 +121,7 @@ public:
 			if (bit3_carry)
 				counter_carry_bit3();
 		}
-		return m_res_input_func((m_counter & m_counter_mask) | m_counter_or);
+		return m_read_res((m_counter & m_counter_mask) | m_counter_or);
 	}
 
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
@@ -169,7 +170,7 @@ private:
 
 	// incidentals
 	address_space *             m_cpu_space;
-	devcb_resolved_read8        m_res_input_func;
+	devcb2_read8        		m_read_res;
 	sam_bank                    m_banks[8];
 	sam_space<0x0000, 0x7FFF>   m_space_0000;
 	sam_space<0x8000, 0x9FFF>   m_space_8000;

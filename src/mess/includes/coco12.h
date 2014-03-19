@@ -48,6 +48,8 @@ public:
 	static const mc6847_interface mc6847_config;
 	static const sam6883_interface sam6883_config;
 
+	DECLARE_READ8_MEMBER( sam_read );
+
 protected:
 	virtual void device_start();
 	virtual void update_cart_base(UINT8 *cart_base);
@@ -58,8 +60,6 @@ protected:
 private:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
-
-	DECLARE_READ8_MEMBER( sam_read );
 
 	void configure_sam(void);
 };
