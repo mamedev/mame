@@ -130,7 +130,7 @@ inline void rp5c15_device::set_alarm_line()
 	{
 		if (LOG) logerror("RP5C15 '%s' Alarm %u\n", tag(), alarm);
 
-		m_out_alarm_func(alarm);
+		m_out_alarm_cb(alarm);
 		m_alarm = alarm;
 	}
 }
@@ -188,6 +188,8 @@ inline void rp5c15_device::check_alarm()
 rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RP5C15, "RP5C15", tag, owner, clock, "rp5c15", __FILE__),
 		device_rtc_interface(mconfig, *this),
+		m_out_alarm_cb(*this),
+		m_out_clkout_cb(*this),
 		m_alarm(1),
 		m_alarm_on(1),
 		m_1hz(1),
@@ -196,29 +198,6 @@ rp5c15_device::rp5c15_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void rp5c15_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const rp5c15_interface *intf = reinterpret_cast<const rp5c15_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<rp5c15_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_alarm_cb, 0, sizeof(m_out_alarm_cb));
-		memset(&m_out_clkout_cb, 0, sizeof(m_out_clkout_cb));
-	}
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -226,8 +205,8 @@ void rp5c15_device::device_config_complete()
 void rp5c15_device::device_start()
 {
 	// resolve callbacks
-	m_out_alarm_func.resolve(m_out_alarm_cb, *this);
-	m_out_clkout_func.resolve(m_out_clkout_cb, *this);
+	m_out_alarm_cb.resolve_safe();
+	m_out_clkout_cb.resolve_safe();
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
@@ -296,7 +275,7 @@ void rp5c15_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	case TIMER_CLKOUT:
 		m_clkout = !m_clkout;
-		m_out_clkout_func(m_clkout);
+		m_out_clkout_cb(m_clkout);
 		break;
 	}
 }

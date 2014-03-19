@@ -221,12 +221,6 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
@@ -258,7 +252,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_RP5C15_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 /* ROM definition */

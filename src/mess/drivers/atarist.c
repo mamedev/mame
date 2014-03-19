@@ -1876,17 +1876,6 @@ WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 }
 
 
-//-------------------------------------------------
-//  RP5C15_INTERFACE( rtc_intf )
-//-------------------------------------------------
-
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -2216,7 +2205,7 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
@@ -2377,7 +2366,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
 	/* internal ram */

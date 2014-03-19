@@ -2090,12 +2090,6 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(mz2500_state,mz2500_rtc_alarm_irq),
-	DEVCB_NULL
-};
-
 static Z80SIO_INTERFACE( mz2500_sio_intf )
 {
 	0, 0, 0, 0,
@@ -2131,8 +2125,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
+	
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))

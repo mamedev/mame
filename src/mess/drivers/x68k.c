@@ -1444,12 +1444,6 @@ static const okim6258_interface x68k_okim6258_interface =
 	OUTPUT_10BITS,
 };
 
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
-	DEVCB_NULL
-};
-
 static INPUT_PORTS_START( x68000 )
 	PORT_START("ctrltype")
 	PORT_CONFNAME(0x0f, 0x00, "Joystick Port 1")
@@ -1925,7 +1919,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	MCFG_DEVICE_ADD( "scc", SCC8530, 5000000 )
 
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
