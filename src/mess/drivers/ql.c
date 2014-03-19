@@ -833,7 +833,6 @@ wd17xx_interface ql_wd17xx_interface =
 
 static MICRODRIVE_CONFIG( mdv1_config )
 {
-	DEVCB_DEVICE_LINE_MEMBER(MDV_2, microdrive_image_device, comms_in_w),
 	NULL,
 	NULL,
 };
@@ -845,7 +844,6 @@ static MICRODRIVE_CONFIG( mdv1_config )
 
 static MICRODRIVE_CONFIG( mdv2_config )
 {
-	DEVCB_NULL,
 	NULL,
 	NULL
 };
@@ -990,6 +988,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
+	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE

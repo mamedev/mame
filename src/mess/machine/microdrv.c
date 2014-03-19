@@ -41,9 +41,10 @@ const device_type MICRODRIVE = &device_creator<microdrive_image_device>;
 //  microdrive_image_device - constructor
 //-------------------------------------------------
 
-microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock, "microdrive_image", __FILE__),
-		device_image_interface(mconfig, *this)
+microdrive_image_device::microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock, "microdrive_image", __FILE__),
+	device_image_interface(mconfig, *this),
+	m_write_comms_out(*this)
 {
 }
 
@@ -71,7 +72,6 @@ void microdrive_image_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_comms_out_cb, 0, sizeof(m_out_comms_out_cb));
 		memset(&m_interface, 0, sizeof(m_interface));
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
@@ -84,7 +84,7 @@ void microdrive_image_device::device_config_complete()
 void microdrive_image_device::device_start()
 {
 	// resolve callbacks
-	m_out_comms_out_func.resolve(m_out_comms_out_cb, *this);
+	m_write_comms_out.resolve_safe();
 
 	// allocate track buffers
 	m_left = auto_alloc_array(machine(), UINT8, MDV_IMAGE_LENGTH / 2);
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( microdrive_image_device::clk_w )
 	{
 		m_comms_out = m_comms_in;
 		if (LOG) logerror("Microdrive '%s' COMMS OUT: %u\n", tag(), m_comms_out);
-		m_out_comms_out_func(m_comms_out);
+		m_write_comms_out(m_comms_out);
 		m_bit_timer->enable(m_comms_out);
 	}
 	m_clk = state;

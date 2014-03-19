@@ -11,14 +11,37 @@
 #ifndef __MICRODRV__
 #define __MICRODRV__
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MDV_1 "mdv1"
+#define MDV_2 "mdv2"
+
+
+#define MCFG_MICRODRIVE_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0) \
+	MCFG_DEVICE_CONFIG(_config)
+
+#define MICRODRIVE_CONFIG(_name) \
+	const microdrive_interface (_name) =
+
+
+#define MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(_write) \
+	devcb = &microdrive_image_device::set_comms_out_wr_callback(*device, DEVCB2_##_write);
+
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
 // ======================> microdrive_interface
 
 struct microdrive_interface
 {
-	devcb_write_line                m_out_comms_out_cb;
 	const char *                    m_interface;
 	device_image_display_info_func  m_device_displayinfo;
 };
@@ -33,6 +56,8 @@ public:
 	// construction/destruction
 	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~microdrive_image_device();
+
+	template<class _Object> static devcb2_base &set_comms_out_wr_callback(device_t &device, _Object object) { return downcast<microdrive_image_device &>(device).m_write_comms_out.set_callback(object); }
 
 	// image-level overrides
 	virtual bool call_load();
@@ -66,7 +91,7 @@ protected:
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
-	devcb_resolved_write_line m_out_comms_out_func;
+	devcb2_write_line m_write_comms_out;
 
 	int m_clk;
 	int m_comms_in;
@@ -83,21 +108,10 @@ private:
 	emu_timer *m_bit_timer;
 };
 
+
 // device type definition
 extern const device_type MICRODRIVE;
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
 
-#define MDV_1 "mdv1"
-#define MDV_2 "mdv2"
-
-#define MCFG_MICRODRIVE_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MICRODRIVE_CONFIG(_name) \
-	const microdrive_interface (_name) =
 
 #endif
