@@ -436,7 +436,8 @@ INPUT_PORTS_END
 //  kc_keyboard_device - constructor
 //-------------------------------------------------
 kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, KC_KEYBOARD, "KC Keyboard", tag, owner, clock, "kc_keyboard", __FILE__)
+	device_t(mconfig, KC_KEYBOARD, "KC Keyboard", tag, owner, clock, "kc_keyboard", __FILE__),
+	m_write_out(*this)
 {
 }
 
@@ -455,7 +456,7 @@ kc_keyboard_device::~kc_keyboard_device()
 void kc_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_keyboard_out_func.resolve(m_keyboard_out_cb, *this);
+	m_write_out.resolve_safe();
 
 	m_timer_transmit_pulse = timer_alloc(TIMER_TRANSMIT_PULSE);
 
@@ -469,34 +470,12 @@ void kc_keyboard_device::device_start()
 void kc_keyboard_device::device_reset()
 {
 	// set initial state
-	m_keyboard_out_func(CLEAR_LINE);
+	m_write_out(CLEAR_LINE);
 
 	m_transmit_buffer.pulse_sent = 0;
 	m_transmit_buffer.pulse_count = 0;
 
 	memset(&m_transmit_buffer, 0, sizeof(m_transmit_buffer));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kc_keyboard_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const kc_keyb_interface *intf = reinterpret_cast<const kc_keyb_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<kc_keyb_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_keyboard_out_func, 0, sizeof(m_keyboard_out_func));
-	}
 }
 
 //-------------------------------------------------
@@ -530,7 +509,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			LOG(("KC keyboard sending pulse: %02x\n", pulse_state));
 
 			// send pulse
-			m_keyboard_out_func(pulse_state ? ASSERT_LINE : CLEAR_LINE);
+			m_write_out(pulse_state ? ASSERT_LINE : CLEAR_LINE);
 
 			// update counts
 			m_transmit_buffer.pulse_sent++;
