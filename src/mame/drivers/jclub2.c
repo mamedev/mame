@@ -446,8 +446,8 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_SHARE("tmapram2")
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
 ADDRESS_MAP_END
@@ -470,10 +470,10 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
-	AM_RANGE(0x880000, 0x89ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY   // this should still be palette ram!
+	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 
-	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
+//	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
 	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
@@ -499,7 +499,7 @@ static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x580200, 0x580203) AM_READNOP	//????
 
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
 	AM_RANGE(0x6C0000, 0x6C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
@@ -1273,7 +1273,7 @@ ROM_START( jclub2o )
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 	
 	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
-	ROM_LOAD16_WORD_SWAP( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )	//jclub2ob ones
+	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )	//jclub2ob ones
 ROM_END
 
 /*
@@ -1294,7 +1294,7 @@ ROM_START( jclub2ob )
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 	
 	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
-	ROM_LOAD16_WORD_SWAP( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )
+	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )
 ROM_END
 
 /***************************************************************************
