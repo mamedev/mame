@@ -32,10 +32,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PC1512_KEYBOARD_ADD(_clock, _data) \
-	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0) \
-	downcast<pc1512_keyboard_device *>(device)->set_clock_callback(DEVCB2_##_clock); \
-	downcast<pc1512_keyboard_device *>(device)->set_data_callback(DEVCB2_##_data);
+#define MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(_write) \
+	devcb = &pc1512_keyboard_device::set_clock_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_PC1512_KEYBOARD_DATA_CALLBACK(_write) \
+	devcb = &pc1512_keyboard_device::set_data_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -51,8 +52,8 @@ public:
 	// construction/destruction
 	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _clock> void set_clock_callback(_clock clock) { m_write_clock.set_callback(clock); }
-	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
+	template<class _Object> static devcb2_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_clock.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_data.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
