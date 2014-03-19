@@ -696,7 +696,8 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_MC6846_ADD( "mc6846", to7_timer )
 
 /* speech synthesis */
-	MCFG_MEA8000_ADD( "mea8000", to7_speech )
+  MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
+  MCFG_MEA8000_DAC("speech")
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)

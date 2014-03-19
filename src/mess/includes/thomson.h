@@ -557,7 +557,6 @@ protected:
 /*----------- defined in machine/thomson.c -----------*/
 
 extern const mc6846_interface to7_timer;
-extern const mea8000_interface to7_speech;
 extern const mc6846_interface to770_timer;
 extern const mc6846_interface to9_timer;
 

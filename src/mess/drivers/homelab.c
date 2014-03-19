@@ -643,8 +643,6 @@ static GFXDECODE_START( homelab )
 	GFXDECODE_ENTRY( "chargen", 0x0000, homelab_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const mea8000_interface brailab4_speech_intf = { "speech", DEVCB_NULL };
-
 QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -835,9 +833,10 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD ( "speech", DAC, 0 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
+	MCFG_MEA8000_DAC("speech")
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_MEA8000_ADD("mea8000", brailab4_speech_intf)
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 

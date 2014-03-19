@@ -11,6 +11,11 @@
 
 #include "sound/dac.h"
 
+#define MCFG_MEA8000_DAC(_tag) \
+	mea8000_device::static_set_dac_tag(*device, _tag);
+
+#define MCFG_MEA8000_REQ_CALLBACK(_write) \
+	devcb = &mea8000_device::set_reqwr_callback(*device, DEVCB2_##_write);
 
 /* table amplitude [-QUANT,QUANT] */
 #define QUANT 512
@@ -47,30 +52,20 @@ struct filter_t
 #endif
 };
 
-
-struct mea8000_interface
-{
-	/* output channel */
-	const char *   m_channel;
-
-	/* 1-bit 'ready' output, not negated */
-	devcb_write8   m_req_out_cb;
-};
-
-
-class mea8000_device : public device_t,
-						public mea8000_interface
+class mea8000_device : public device_t
 {
 public:
 	mea8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mea8000_device() {}
+
+	static void static_set_dac_tag(device_t &device, const char *tag) { downcast<mea8000_device &>(device).m_dac.set_tag(tag); }
+	template<class _Object> static devcb2_base &set_req_wr_callback(device_t &device, _Object object) { return downcast<mea8000_device &>(device).m_write_req.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -101,7 +96,9 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_expire);
 
-	dac_device *m_dac;
+	devcb2_write8 m_write_req;
+
+	required_device<dac_device> m_dac;
 
 	/* state */
 	mea8000_state m_state; /* current state */
@@ -128,9 +125,6 @@ private:
 
 	emu_timer *m_timer;
 
-	devcb_resolved_write8 m_req_out;
-
-
 	int m_cos_table[TABLE_LEN];  /* fm => cos coefficient */
 	int m_exp_table[TABLE_LEN];  /* bw => exp coefficient */
 	int m_exp2_table[TABLE_LEN]; /* bw => 2*exp coefficient */
@@ -139,11 +133,6 @@ private:
 };
 
 extern const device_type MEA8000;
-
-
-#define MCFG_MEA8000_ADD(_tag, _intrf)        \
-	MCFG_DEVICE_ADD(_tag, MEA8000, 0)         \
-	MCFG_DEVICE_CONFIG(_intrf)
 
 
 #endif
