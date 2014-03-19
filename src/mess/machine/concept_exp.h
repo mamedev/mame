@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "machine/wd17xx.h"
 
+// FIXME: Concept expansion ports should just use the Apple II Bus device!
+// The code below is outdated and inaccurate!
 
 class concept_exp_card_device;
 
@@ -30,7 +32,7 @@ protected:
 
 
 // device type definition
-extern const device_type CONCEPT_EXP_PORT;
+extern const ATTR_DEPRECATED device_type CONCEPT_EXP_PORT;
 
 
 //**************************************************************************
@@ -111,7 +113,7 @@ protected:
 };
 
 
-extern const device_type CONCEPT_FDC;
-extern const device_type CONCEPT_HDC;
+extern const ATTR_DEPRECATED device_type CONCEPT_FDC;
+extern const ATTR_DEPRECATED device_type CONCEPT_HDC;
 
 #endif
