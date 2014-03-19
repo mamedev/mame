@@ -3583,13 +3583,9 @@ WRITE_LINE_MEMBER( pc9801_state::keyboard_irq )
 	m_pic1->ir1_w(state);
 }
 
-static PC9801_KBD_INTERFACE( pc9801_keyboard_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, keyboard_irq )
-};
-
 static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
-	MCFG_PC9801_KBD_ADD( "keyb", 53, pc9801_keyboard_intf )
+    MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
+    MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE(pc9801_state, keyboard_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )

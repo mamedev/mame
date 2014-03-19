@@ -35,8 +35,9 @@ const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
 //  pc9801_kbd_device - constructor
 //-------------------------------------------------
 
-pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock, "pc9801_kbd_", __FILE__)
+pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock, "pc9801_kbd_", __FILE__),
+	m_write_irq(*this)
 {
 }
 
@@ -237,7 +238,8 @@ void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_kbd_device::device_start()
 {
-	m_irq_func.resolve(m_irq_cb, *this);
+	m_write_irq.resolve_safe();
+
 	m_rxtimer = timer_alloc(RX_TIMER);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
@@ -261,26 +263,6 @@ void pc9801_kbd_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc9801_kbd_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pc9801_kbd_interface *intf = reinterpret_cast<const pc9801_kbd_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<pc9801_kbd_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
@@ -295,7 +277,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		{
 			m_caps_lock_state = ioport("KEYE")->read() & (1 << 1);
 			m_keyb_tx = 0x71;
-			m_irq_func(ASSERT_LINE);
+			m_write_irq(ASSERT_LINE);
 			return;
 		}
 
@@ -303,7 +285,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		{
 			m_kana_lock_state = ioport("KEYE")->read() & (1 << 2);
 			m_keyb_tx = 0x72;
-			m_irq_func(ASSERT_LINE);
+			m_write_irq(ASSERT_LINE);
 			return;
 		}
 
@@ -317,7 +299,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			if(m_rx_buf[i] == 2)
 			{
 				m_keyb_tx = i | 0x80;
-				m_irq_func(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 				m_rx_buf[i] = 0;
 				return;
 			}
@@ -332,7 +314,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 			if(m_rx_buf[i] == 1)
 			{
 				m_keyb_tx = i;
-				m_irq_func(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 				m_rx_buf[i] = 0;
 				return;
 			}
@@ -346,7 +328,7 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 READ8_MEMBER( pc9801_kbd_device::rx_r )
 {
-	m_irq_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
 	if(!offset)
 		return m_keyb_tx;
 	return 1 | 4 | 2;
