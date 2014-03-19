@@ -64,11 +64,13 @@ protected:
 		UINT8 m_drq : 1;
 		UINT8 m_intrq : 1;
 
-		wd2797_device *m_wd17xx;              /* WD17xx */
-		ds1315_device *m_ds1315;         /* DS1315 */
+		optional_device<wd1773_device> m_wd17xx;              /* WD17xx */
+		optional_device<wd2797_device> m_wd2797;              /* WD2797 */		
+		optional_device<ds1315_device> m_ds1315;         /* DS1315 */
 
 		/* Disto RTC */
-		msm6242_device *m_disto_msm6242;        /* 6242 RTC on Disto interface */
+		optional_device<msm6242_device> m_disto_msm6242;        /* 6242 RTC on Disto interface */
+		
 		offs_t m_msm6242_rtc_address;
 };
 

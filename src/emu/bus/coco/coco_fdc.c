@@ -80,6 +80,7 @@
 
 #define LOG_FDC                 0
 #define WD_TAG                  "wd17xx"
+#define WD2797_TAG				"wd2797"
 #define DISTO_TAG               "disto"
 #define CLOUD9_TAG              "cloud9"
 
@@ -179,13 +180,21 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cococart_interface( mconfig, *this )
+		device_cococart_interface( mconfig, *this ),
+		m_wd17xx(*this, WD_TAG),
+		m_wd2797(*this, WD2797_TAG),
+		m_ds1315(*this, CLOUD9_TAG),
+		m_disto_msm6242(*this, DISTO_TAG)
 {
 }
 
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__),
-		device_cococart_interface( mconfig, *this )
+		device_cococart_interface( mconfig, *this ),
+		m_wd17xx(*this, WD_TAG),
+		m_wd2797(*this, WD2797_TAG),
+		m_ds1315(*this, CLOUD9_TAG),
+		m_disto_msm6242(*this, DISTO_TAG)
 {
 }
 
@@ -197,9 +206,6 @@ void coco_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 	m_drq               = 1;
-	m_disto_msm6242     = subdevice<msm6242_device>(DISTO_TAG);
-	m_ds1315            = subdevice<ds1315_device>(CLOUD9_TAG);
-	m_wd17xx            = subdevice<wd2797_device>(WD_TAG);
 	m_dskreg            = 0x00;
 	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
@@ -415,7 +421,7 @@ WRITE8_MEMBER(coco_fdc_device::write)
 //**************************************************************************
 
 static MACHINE_CONFIG_FRAGMENT(dragon_fdc)
-	MCFG_WD2797_ADD(WD_TAG, coco_wd17xx_interface)
+	MCFG_WD2797_ADD(WD2797_TAG, coco_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)
 MACHINE_CONFIG_END
 
@@ -431,7 +437,7 @@ const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
 //  dragon_fdc_device - constructor
 //-------------------------------------------------
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)	  
 {
 }
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -447,7 +453,6 @@ void dragon_fdc_device::device_start()
 {
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 	m_drq               = 0;
-	m_wd17xx            = subdevice<wd2797_device>(WD_TAG);
 	m_dskreg            = 0x00;
 	m_intrq             = 0;
 	m_msm6242_rtc_address = 0;
@@ -513,9 +518,9 @@ void dragon_fdc_device::dskreg_w(UINT8 data)
 	}
 
 	if (data & 0x04)
-		m_wd17xx->set_drive(data & 0x03);
+		m_wd2797->set_drive(data & 0x03);
 
-	m_wd17xx->dden_w(BIT(data, 3));
+	m_wd2797->dden_w(BIT(data, 3));
 	m_dskreg = data;
 }
 
@@ -531,16 +536,16 @@ READ8_MEMBER(dragon_fdc_device::read)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			result = m_wd17xx->status_r(space, 0);
+			result = m_wd2797->status_r(space, 0);
 			break;
 		case 1:
-			result = m_wd17xx->track_r(space, 0);
+			result = m_wd2797->track_r(space, 0);
 			break;
 		case 2:
-			result = m_wd17xx->sector_r(space, 0);
+			result = m_wd2797->sector_r(space, 0);
 			break;
 		case 3:
-			result = m_wd17xx->data_r(space, 0);
+			result = m_wd2797->data_r(space, 0);
 			break;
 	}
 	return result;
@@ -557,21 +562,21 @@ WRITE8_MEMBER(dragon_fdc_device::write)
 	switch(offset & 0xEF)
 	{
 		case 0:
-			m_wd17xx->command_w(space, 0, data);
+			m_wd2797->command_w(space, 0, data);
 
 			/* disk head is encoded in the command byte */
 			/* Only for type 3 & 4 commands */
 			if (data & 0x80)
-				m_wd17xx->set_side((data & 0x02) ? 1 : 0);
+				m_wd2797->set_side((data & 0x02) ? 1 : 0);
 			break;
 		case 1:
-			m_wd17xx->track_w(space, 0, data);
+			m_wd2797->track_w(space, 0, data);
 			break;
 		case 2:
-			m_wd17xx->sector_w(space, 0, data);
+			m_wd2797->sector_w(space, 0, data);
 			break;
 		case 3:
-			m_wd17xx->data_w(space, 0, data);
+			m_wd2797->data_w(space, 0, data);
 			break;
 		case 8: case 9: case 10: case 11:
 		case 12: case 13: case 14: case 15:
