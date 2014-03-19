@@ -152,12 +152,13 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 //	MCFG_SCREEN_SIZE(32*8, 32*8)
 //	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240) /* generic video timing, change accordingly */
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxx)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 //  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
