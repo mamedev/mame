@@ -1,5 +1,5 @@
 #include "machine/eepromser.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 

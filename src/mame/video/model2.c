@@ -87,7 +87,7 @@
 *********************************************************************************************************************************/
 #include "emu.h"
 #include "video/segaic24.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "includes/model2.h"
 
 #define MODEL2_VIDEO_DEBUG 0

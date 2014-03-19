@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "includes/galastrm.h"
 
 #define X_OFFSET 96

@@ -6,7 +6,7 @@
 
 #include "machine/eeprompar.h"
 #include "video/rgbutil.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 
 enum
 {

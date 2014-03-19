@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 
 
 class atarisy4_state : public driver_device

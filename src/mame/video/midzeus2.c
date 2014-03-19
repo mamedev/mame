@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "includes/midzeus.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/rgbutil.h"
 
 

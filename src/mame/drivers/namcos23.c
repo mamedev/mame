@@ -1225,7 +1225,7 @@ Notes:
 
 #include "emu.h"
 #include <float.h>
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h8.h"
 #include "cpu/sh2/sh2.h"

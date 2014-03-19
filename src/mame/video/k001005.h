@@ -2,7 +2,7 @@
 #ifndef __K001005_H__
 #define __K001005_H__
 
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "cpu/sharc/sharc.h"
 
 #define POLY_DEVICE 0

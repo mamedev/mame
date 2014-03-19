@@ -384,11 +384,11 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/video/poly.h,VIDEOS += POLY
+#@src/emu/video/polylgcy.h,VIDEOS += POLY
 #-------------------------------------------------
 
 ifneq ($(filter POLY,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/poly.o
+VIDEOOBJS+= $(VIDEOOBJ)/polylgcy.o
 endif
 
 #-------------------------------------------------

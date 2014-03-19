@@ -145,7 +145,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define EXPAND_RASTERIZERS
 
 #include "emu.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"

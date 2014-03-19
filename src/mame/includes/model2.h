@@ -1,4 +1,4 @@
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "machine/eepromser.h"

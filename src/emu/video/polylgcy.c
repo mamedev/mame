@@ -1,13 +1,13 @@
 /***************************************************************************
 
-    poly.c
+    polylgcy.c
 
-    Helper routines for polygon rendering.
+    Legacy helper routines for polygon rendering.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "poly.h"
+#include "polylgcy.h"
 
 
 /***************************************************************************

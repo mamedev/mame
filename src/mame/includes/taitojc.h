@@ -1,4 +1,4 @@
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "machine/taitoio.h"
 
 #define TAITOJC_POLYGON_FIFO_SIZE       0x20000

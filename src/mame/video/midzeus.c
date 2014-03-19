@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/midzeus.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/rgbutil.h"
 
 

@@ -177,7 +177,7 @@ Notes:
 #include "machine/ataintf.h"
 #include "machine/idehd.h"
 #include "machine/nvram.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 
 /*
     Interesting mem areas

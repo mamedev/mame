@@ -320,7 +320,7 @@
 #include "machine/jvsdev.h"
 #include "machine/timekpr.h"
 #include "video/k001604.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "video/rgbgen.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"

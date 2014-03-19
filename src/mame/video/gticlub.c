@@ -3,7 +3,7 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/voodoo.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/k001604.h"
 #include "video/gticlub.h"
 
