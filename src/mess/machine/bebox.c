@@ -93,7 +93,7 @@
 
 /* Components */
 #include "video/pc_vga.h"
-#include "video/cirrus.h"
+#include "bus/pci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/ins8250.h"
 #include "machine/upd765.h"
