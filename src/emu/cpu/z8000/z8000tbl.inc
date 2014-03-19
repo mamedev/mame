@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   z8000tbl.c
+ *   z8000tbl.inc
  *   Portable Z8000(2) emulator
  *   Opcode table (including mnemonics) and initialization
  *

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   tms70op.c (Op code functions)
+ *   tms70op.inc (Op code functions)
  *   Portable TMS7000 emulator (Texas Instruments 7000)
  *
  *   Copyright tim lindner, all rights reserved.

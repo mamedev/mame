@@ -8,9 +8,9 @@
 
 
 // Addressing mode functions and tables
-#include "am1.c" // ReadAM
-#include "am2.c" // ReadAMAddress
-#include "am3.c" // WriteAM
+#include "am1.inc" // ReadAM
+#include "am2.inc" // ReadAMAddress
+#include "am3.inc" // WriteAM
 
 /*
   Input:

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   tms70tb.c (function table)
+ *   tms70tb.inc (function table)
  *   Portable TMS7000 emulator (Texas Instruments 7000)
  *
  *   Copyright tim lindner, all rights reserved.

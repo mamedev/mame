@@ -81,8 +81,8 @@ offs_t saturn_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
  * include the opcode macros, functions and tables
  ***************************************************************/
 
-#include "satops.c"
-#include "sattable.c"
+#include "satops.inc"
+#include "sattable.inc"
 
 /*****************************************************************************
  *

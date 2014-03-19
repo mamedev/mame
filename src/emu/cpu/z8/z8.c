@@ -542,7 +542,7 @@ INSTRUCTION( illegal )
 	logerror("Z8: PC = %04x, Illegal opcode = %02x\n", m_pc - 1, opcode);
 }
 
-#include "z8ops.c"
+#include "z8ops.inc"
 
 /***************************************************************************
     OPCODE TABLES

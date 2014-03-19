@@ -185,13 +185,13 @@ endif
 
 $(CPUOBJ)/sharc/sharc.o:    $(CPUSRC)/sharc/sharc.c \
 							$(CPUSRC)/sharc/sharc.h \
-							$(CPUSRC)/sharc/sharcops.c \
+							$(CPUSRC)/sharc/sharcops.inc \
 							$(CPUSRC)/sharc/sharcops.h \
 							$(CPUSRC)/sharc/sharcdsm.c \
 							$(CPUSRC)/sharc/sharcdsm.h \
-							$(CPUSRC)/sharc/compute.c \
-							$(CPUSRC)/sharc/sharcdma.c \
-							$(CPUSRC)/sharc/sharcmem.c
+							$(CPUSRC)/sharc/compute.inc \
+							$(CPUSRC)/sharc/sharcdma.inc \
+							$(CPUSRC)/sharc/sharcmem.inc
 
 
 
@@ -418,8 +418,8 @@ endif
 
 $(CPUOBJ)/t11/t11.o:    $(CPUSRC)/t11/t11.c \
 						$(CPUSRC)/t11/t11.h \
-						$(CPUSRC)/t11/t11ops.c \
-						$(CPUSRC)/t11/t11table.c
+						$(CPUSRC)/t11/t11ops.inc \
+						$(CPUSRC)/t11/t11table.inc
 
 
 
@@ -1581,18 +1581,18 @@ CPUOBJS += $(CPUOBJ)/v60/v60.o
 DASMOBJS += $(CPUOBJ)/v60/v60d.o
 endif
 
-$(CPUOBJ)/v60/v60.o:    $(CPUSRC)/v60/am.c \
-						$(CPUSRC)/v60/am1.c \
-						$(CPUSRC)/v60/am2.c \
-						$(CPUSRC)/v60/am3.c \
-						$(CPUSRC)/v60/op12.c \
-						$(CPUSRC)/v60/op2.c \
-						$(CPUSRC)/v60/op3.c \
-						$(CPUSRC)/v60/op4.c \
-						$(CPUSRC)/v60/op5.c \
-						$(CPUSRC)/v60/op6.c \
-						$(CPUSRC)/v60/op7a.c \
-						$(CPUSRC)/v60/optable.c \
+$(CPUOBJ)/v60/v60.o:    $(CPUSRC)/v60/am.inc \
+						$(CPUSRC)/v60/am1.inc \
+						$(CPUSRC)/v60/am2.inc \
+						$(CPUSRC)/v60/am3.inc \
+						$(CPUSRC)/v60/op12.inc \
+						$(CPUSRC)/v60/op2.inc \
+						$(CPUSRC)/v60/op3.inc \
+						$(CPUSRC)/v60/op4.inc \
+						$(CPUSRC)/v60/op5.inc \
+						$(CPUSRC)/v60/op6.inc \
+						$(CPUSRC)/v60/op7a.inc \
+						$(CPUSRC)/v60/optable.inc \
 						$(CPUSRC)/v60/v60.c \
 						$(CPUSRC)/v60/v60.h \
 						$(CPUSRC)/v60/v60d.c
@@ -1717,8 +1717,8 @@ DASMOBJS += $(CPUOBJ)/saturn/saturnds.o
 endif
 
 $(CPUOBJ)/saturn/saturn.o:  $(CPUSRC)/saturn/saturn.c \
-							$(CPUSRC)/saturn/sattable.c \
-							$(CPUSRC)/saturn/satops.c \
+							$(CPUSRC)/saturn/sattable.inc \
+							$(CPUSRC)/saturn/satops.inc \
 							$(CPUSRC)/saturn/saturn.h
 
 
@@ -1752,8 +1752,8 @@ DASMOBJS += $(CPUOBJ)/sc61860/scdasm.o
 endif
 
 $(CPUOBJ)/sc61860/sc61860.o:    $(CPUSRC)/sc61860/sc61860.h \
-								$(CPUSRC)/sc61860/scops.c \
-								$(CPUSRC)/sc61860/sctable.c
+								$(CPUSRC)/sc61860/scops.inc \
+								$(CPUSRC)/sc61860/sctable.inc
 
 
 
@@ -1871,8 +1871,8 @@ endif
 
 $(CPUOBJ)/tms7000/tms7000.o:    $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/tms7000.c \
-								$(CPUSRC)/tms7000/tms70op.c \
-								$(CPUSRC)/tms7000/tms70tb.c
+								$(CPUSRC)/tms7000/tms70op.inc \
+								$(CPUSRC)/tms7000/tms70tb.inc
 
 $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/7000dasm.c
@@ -2074,7 +2074,7 @@ DASMOBJS += $(CPUOBJ)/tlcs900/dasm900.o
 endif
 
 $(CPUOBJ)/tlcs900/tlcs900.o:    $(CPUSRC)/tlcs900/tlcs900.c \
-								$(CPUSRC)/tlcs900/900tbl.c \
+								$(CPUSRC)/tlcs900/900tbl.inc \
 								$(CPUSRC)/tlcs900/tlcs900.h
 
 $(CPUOBJ)/tlcs900/dasm900.o:    $(CPUSRC)/tlcs900/dasm900.c
@@ -2128,14 +2128,14 @@ endif
 
 $(CPUOBJ)/z180/z180.o:  $(CPUSRC)/z180/z180.c \
 						$(CPUSRC)/z180/z180.h \
-						$(CPUSRC)/z180/z180op.c \
+						$(CPUSRC)/z180/z180op.inc \
 						$(CPUSRC)/z180/z180ops.h \
 						$(CPUSRC)/z180/z180tbl.h \
-						$(CPUSRC)/z180/z180cb.c \
-						$(CPUSRC)/z180/z180dd.c \
-						$(CPUSRC)/z180/z180ed.c \
-						$(CPUSRC)/z180/z180fd.c \
-						$(CPUSRC)/z180/z180xy.c
+						$(CPUSRC)/z180/z180cb.inc \
+						$(CPUSRC)/z180/z180dd.inc \
+						$(CPUSRC)/z180/z180ed.inc \
+						$(CPUSRC)/z180/z180fd.inc \
+						$(CPUSRC)/z180/z180xy.inc
 
 
 
@@ -2154,8 +2154,8 @@ $(CPUOBJ)/z8000/z8000.o:    $(CPUSRC)/z8000/z8000.c \
 							$(CPUSRC)/z8000/z8000.h \
 							$(CPUSRC)/z8000/z8000cpu.h \
 							$(CPUSRC)/z8000/z8000dab.h \
-							$(CPUSRC)/z8000/z8000ops.c \
-							$(CPUSRC)/z8000/z8000tbl.c
+							$(CPUSRC)/z8000/z8000ops.inc \
+							$(CPUSRC)/z8000/z8000tbl.inc
 
 
 
@@ -2171,7 +2171,7 @@ DASMOBJS += $(CPUOBJ)/z8/z8dasm.o
 endif
 
 $(CPUOBJ)/z8/z8.o:  $(CPUSRC)/z8/z8.c \
-					$(CPUSRC)/z8/z8ops.c \
+					$(CPUSRC)/z8/z8ops.inc \
 					$(CPUSRC)/z8/z8.h
 
 

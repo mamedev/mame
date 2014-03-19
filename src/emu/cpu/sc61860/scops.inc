@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   scops.c
+ *   scops.inc
  *   portable sharp 61860 emulator interface
  *   (sharp pocket computers)
  *
