@@ -136,4 +136,5 @@ GAME_CUSTOM( 199?, m4nudgwc__d,    m4nudgwc,   "nawsl10p.bin", 0x0000, 0x010000,
 GAME_CUSTOM( 199?, m4nudgwc__e,    m4nudgwc,   "nawsl13n.bin", 0x0000, 0x010000, CRC(92ee524c) SHA1(88467af5d9e6db69969aaf9d8540828a1c058362), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4nudgwc__f,    m4nudgwc,   "nawsl14n.bin", 0x0000, 0x010000, CRC(5217e17e) SHA1(449ff0c43bde5b4fecc7e5d31652648f7094e89d), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4nudgwc__g,    m4nudgwc,   "nawsl7.bin",   0x0000, 0x010000, CRC(261192f6) SHA1(d754c0db8ee3986c33ea903c2efe86f14240afcf), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 8)" )
+//Strange ROM, 0x20000 in length, but only 0x10000 worth of content, suspect overdump
 GAME_CUSTOM( 199?, m4nudgwc__h,    m4nudgwc,   "naw0_4.bin",   0x0000, 0x020000, CRC(0201f6f9) SHA1(48772611db7ae0cda48b8d725fdc8ef50e64d6ad), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 9)" ) // rom too big, cut?

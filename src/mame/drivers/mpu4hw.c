@@ -2094,6 +2094,7 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 		LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
 		return m_current_chr_table[m_prot_col].response;
 	}
+		
 	if (offset == 3)
 	{
 		LOG_CHR(("Characteriser read data off 3 %02X \n",m_current_chr_table[m_lamp_col+64].response));
@@ -2394,7 +2395,7 @@ static mpu4_chr_table blsbys_data[8] = {
 	//      6  0  7  0  8  0  7  0  0  8
 //request 36 42 27 42 09 42 27 42 42 09
 //verify  00 04 04 0C 0C 1C 14 2C 5C 2C
-
+	
 DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 {
 	m_reel_mux=SIX_REEL_1TO8;
@@ -2406,6 +2407,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 	stepper_config(machine(), 3, &barcrest_opto1_interface);
 	stepper_config(machine(), 4, &barcrest_opto1_interface);
 	stepper_config(machine(), 5, &barcrest_opto1_interface);
+	DRIVER_INIT_CALL(m4default_banks);
 
 	m_current_chr_table = oldtmr_data;
 }
@@ -2421,26 +2423,19 @@ DRIVER_INIT_MEMBER(mpu4_state,m4altreels)
 	stepper_config(machine(), 3, &barcrest_opto1_interface);
 	stepper_config(machine(), 4, &barcrest_opto1_interface);
 	stepper_config(machine(), 5, &barcrest_opto1_interface);
+	DRIVER_INIT_CALL(m4default_banks);
 }
 
 
 DRIVER_INIT_MEMBER(mpu4_state,m_ccelbr)
 {
-	m_reel_mux=STANDARD_REEL;
-	m_reels = 4;
-	// setup 4 default 96 half step reels ///////////////////////////////////
-	mpu4_config_common_reels(4);
-
+	DRIVER_INIT_CALL(m4default);
 	m_current_chr_table = ccelbr_data;
 }
 
 DRIVER_INIT_MEMBER(mpu4_state,m4gambal)
 {
-	m_reel_mux=STANDARD_REEL;
-	m_reels = 4;
-	// setup 4 default 96 half step reels ///////////////////////////////////
-	mpu4_config_common_reels(4);
-
+	DRIVER_INIT_CALL(m4default);
 	m_current_chr_table = gmball_data;
 }
 
@@ -2451,6 +2446,8 @@ DRIVER_INIT_MEMBER(mpu4_state,m_grtecp)
 	m_lamp_extender=SMALL_CARD;
 	// setup 4 default 96 half step reels with the mux board
 	mpu4_config_common_reels(5);
+	DRIVER_INIT_CALL(m4default_banks);
+
 	m_current_chr_table = grtecp_data;
 }
 
@@ -2466,30 +2463,23 @@ DRIVER_INIT_MEMBER(mpu4_state,m_blsbys)
 	stepper_config(machine(), 4, &bwb_opto1_interface);
 	m_bwb_chr_table1 = blsbys_data1;
 	m_current_chr_table = blsbys_data;
+	DRIVER_INIT_CALL(m4default_big);
 }
 
-DRIVER_INIT_MEMBER(mpu4_state,m4tst2)
-{
-	m_reel_mux=STANDARD_REEL;
-	m_reels = 4;
-	mpu4_config_common_reels(4);
-}
-
-DRIVER_INIT_MEMBER(mpu4_state,m4tst)
-{
-	m_reel_mux=STANDARD_REEL;
-	m_reels = 4;
-	mpu4_config_common_reels(4);
-}
-
-
-
-DRIVER_INIT_MEMBER(mpu4_state,m4default)
+DRIVER_INIT_MEMBER(mpu4_state,m4default_reels)
 {
 	m_reel_mux=STANDARD_REEL;
 	m_reels = 4;
 	mpu4_config_common_reels(4);
 	m_bwb_bank=0;
+}
+
+DRIVER_INIT_MEMBER(mpu4_state,m4default_banks)
+{
+	//Initialise paging for non-extended ROM space
+	UINT8 *rom = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &rom[0x01000], 0x10000);
+	membank("bank1")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
@@ -2504,20 +2494,27 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
 	stepper_config(machine(), 5, &barcrest_opto2_interface);
 	stepper_config(machine(), 6, &barcrest_opto2_interface);
 	stepper_config(machine(), 7, &barcrest_opto2_interface);
+	DRIVER_INIT_CALL(m4default_banks);
 
 	m_bwb_bank=0;
 }
 
+DRIVER_INIT_MEMBER(mpu4_state,m4default)
+{
+	DRIVER_INIT_CALL(m4default_reels);
+	DRIVER_INIT_CALL(m4default_banks);
+}
 
 DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	DRIVER_INIT_CALL(m4default);
 
 	int size = memregion( "maincpu" )->bytes();
 	if (size<=0x10000)
 	{
 		printf("extended banking selected on set <=0x10000 in size, ignoring");
+		DRIVER_INIT_CALL(m4default_reels);
+		DRIVER_INIT_CALL(m4default_banks);
 	}
 	else
 	{
@@ -2724,7 +2721,7 @@ MACHINE_CONFIG_START( mpu4base, mpu4_state )
 MACHINE_CONFIG_END
 
 
-	MACHINE_CONFIG_DERIVED( mod2    , mpu4base )
+MACHINE_CONFIG_DERIVED( mod2    , mpu4base )
 	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

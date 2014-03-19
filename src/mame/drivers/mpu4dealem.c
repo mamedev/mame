@@ -8,7 +8,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 //     - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
 //     - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
-//                to give black on green.
+//                to give black on green. (Possibly colour 0 being used in place of colour 10?)
 
 
 #include "emu.h"

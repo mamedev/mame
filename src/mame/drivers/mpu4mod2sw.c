@@ -50,6 +50,7 @@ DRIVER_INIT_MEMBER (mpu4_state, connect4)
 	mpu4_state *state = machine().driver_data<mpu4_state>();
 	state->m_reels = 0; //reel-free game
 	state->m_led_lamp=1;
+	DRIVER_INIT_CALL( m4default_banks );
 }
 
 
@@ -1975,5 +1976,5 @@ GAME(199?, m4joltava,m4joltav   ,mod2       ,mpu4               , mpu4_state,m4d
 GAME(199?, m4joltavb,m4joltav   ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Jolly Taverner (Barcrest) (MPU4) (set 3)",GAME_FLAGS )
 
 // Bad CHR Alarm
-GAME(199?, m4btclok     ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",GAME_FLAGS )
-GAME(199?, m4brktak     ,0          ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4btclok     ,0      ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Beat The Clock (Barcrest) (MPU4)",GAME_FLAGS )
+GAME(199?, m4brktak     ,0      ,mod2       ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Break & Take (Barcrest) (MPU4)",GAME_FLAGS )

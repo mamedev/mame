@@ -202,7 +202,7 @@ GAME_CUSTOM( 199?, m4jungjk__a,    m4jungjk,   "70000102.bin",                 0
 GAME_CUSTOM( 199?, m4jungjk__b,    m4jungjk,   "jj.bin",                       0x0000, 0x040000, CRC(9e15c1b6) SHA1(9d4f3707f2cc2f0e8eb9051181bf8b368be3cbcf), "Qps","Jungle Jackpots (Qps) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4jungjk__c,    m4jungjk,   "jjlump_v400_19a3.bin",         0x0000, 0x040000, CRC(bc86c415) SHA1(6cd828578835dafe5d8d46810dc70d47abd4e8b2), "Qps","Jungle Jackpots (Qps) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4jungjk__d,    m4jungjk,   "70000092.bin",                 0x0000, 0x040000, CRC(6530bc6c) SHA1(27819e760c84fbb40f354e87910fb15b3058e2a8), "Qps","Jungle Jackpots (Qps) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4jungjk__e,    m4jungjk,   "jungle.p1",                    0x0000, 0x080000, CRC(ed0eb72c) SHA1(e32590cb3eb7d07fb210bee1be3c0ee01554cb47), "Qps","Jungle Jackpots (Qps) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4jungjk__e,    m4jungjk,   "jungle.p1",                    0x0000, 0x040000, CRC(1dbba129) SHA1(ac71bdb3082caf727736b26cf8727f966a8be243), "Qps","Jungle Jackpots (Qps) (MPU4) (set 6)" )
 
 
 
@@ -219,32 +219,32 @@ GAME_CUSTOM( 199?, m4jungjk__e,    m4jungjk,   "jungle.p1",                    0
 		M4RHNOTE_EXTRA_ROMS \
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
-GAME_CUSTOM( 199?, m4rhnote,       0,          "70000120.bin",                 0x0000, 0x040000, CRC(d1ce1e1c) SHA1(2fc2b041b4e9fcade4b2ce6a0bc709f4174e2d88), "Qps","Red Hot Notess (Qps) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4rhnote__a,    m4rhnote,   "70000121.bin",                 0x0000, 0x040000, CRC(1e1a26c0) SHA1(8a80a94d280c82887a0f7da607988597df23e1fb), "Qps","Red Hot Notess (Qps) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4rhnote__b,    m4rhnote,   "70000125.bin",                 0x0000, 0x080000, CRC(67a617a2) SHA1(3900c0cc3f8e4d52105096c1e21903cb83b8c1b7), "Qps","Red Hot Notess (Qps) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4rhnote__c,    m4rhnote,   "70000126.bin",                 0x0000, 0x080000, CRC(68deffbe) SHA1(9b94776aa0416309204987ac9109a65ad3234f1b), "Qps","Red Hot Notess (Qps) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4rhnote__d,    m4rhnote,   "70000132.bin",                 0x0000, 0x080000, CRC(50c06d0d) SHA1(8d629d77390b92c5e30104237245f92dc8f52a6c), "Qps","Red Hot Notess (Qps) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4rhnote__e,    m4rhnote,   "70000133.bin",                 0x0000, 0x080000, CRC(fb198e1b) SHA1(6fb03680ad29ca750fe2e75f48a05f538ddac9b7), "Qps","Red Hot Notess (Qps) (MPU4) (set 6)" )
-GAME_CUSTOM( 199?, m4rhnote__f,    m4rhnote,   "70000135.bin",                 0x0000, 0x080000, CRC(02531c21) SHA1(de9da10bc81ab02ba131da1a1733eda1948dc3cc), "Qps","Red Hot Notess (Qps) (MPU4) (set 7)" )
-GAME_CUSTOM( 199?, m4rhnote__g,    m4rhnote,   "70001122.bin",                 0x0000, 0x040000, CRC(13171ffc) SHA1(e49a2080afd27c0de183da64baa2060020910155), "Qps","Red Hot Notess (Qps) (MPU4) (set 8)" )
-GAME_CUSTOM( 199?, m4rhnote__h,    m4rhnote,   "70001124.bin",                 0x0000, 0x040000, CRC(8acb2d7d) SHA1(ffd4f0e1f80b41b6f54af31e5dcd41fe12e4ea0b), "Qps","Red Hot Notess (Qps) (MPU4) (set 9)" )
-GAME_CUSTOM( 199?, m4rhnote__i,    m4rhnote,   "70001125.bin",                 0x0000, 0x080000, CRC(6b202a88) SHA1(63f7325c8dc373f771f02e5bf9ac0c0d33a906bd), "Qps","Red Hot Notess (Qps) (MPU4) (set 10)" )
-GAME_CUSTOM( 199?, m4rhnote__j,    m4rhnote,   "70001126.bin",                 0x0000, 0x080000, CRC(0db90e12) SHA1(0b010ca878ecabb47c0a0eec0badd595b2bafbfb), "Qps","Red Hot Notess (Qps) (MPU4) (set 11)" )
-GAME_CUSTOM( 199?, m4rhnote__k,    m4rhnote,   "70001135.bin",                 0x0000, 0x080000, CRC(a9ed9178) SHA1(446919e869a9cc20f469954504adf448474d702b), "Qps","Red Hot Notess (Qps) (MPU4) (set 12)" )
-GAME_CUSTOM( 199?, m4rhnote__l,    m4rhnote,   "70001150.bin",                 0x0000, 0x040000, CRC(3c3f4e45) SHA1(114c18e0fa8de224992138b72bf789ace39dffa0), "Qps","Red Hot Notess (Qps) (MPU4) (set 13)" )
-GAME_CUSTOM( 199?, m4rhnote__m,    m4rhnote,   "70001151.bin",                 0x0000, 0x040000, CRC(0cb1f440) SHA1(7ebdac6ea495d96c7713a284fdad4da0874de3f2), "Qps","Red Hot Notess (Qps) (MPU4) (set 14)" )
-GAME_CUSTOM( 199?, m4rhnote__n,    m4rhnote,   "70001153.bin",                 0x0000, 0x040000, CRC(e8ba9b3a) SHA1(71af6dd77da419868391e01f565c24a70d55b396), "Qps","Red Hot Notess (Qps) (MPU4) (set 15)" ) // rhn_gala_hopper_120.bin
-GAME_CUSTOM( 199?, m4rhnote__o,    m4rhnote,   "70001160.bin",                 0x0000, 0x040000, CRC(2d532681) SHA1(fb4321b6922cf35780adbdc5f030ef0df8d6cc9a), "Qps","Red Hot Notess (Qps) (MPU4) (set 16)" )
-GAME_CUSTOM( 199?, m4rhnote__p,    m4rhnote,   "70001161.bin",                 0x0000, 0x040000, CRC(e9a49319) SHA1(001163ece7a405a27fd71fdeb97489db143749a7), "Qps","Red Hot Notess (Qps) (MPU4) (set 17)" )
-GAME_CUSTOM( 199?, m4rhnote__q,    m4rhnote,   "70001502.bin",                 0x0000, 0x040000, CRC(d1b332f1) SHA1(07db228705b0bce47107cf5458986e830b988cee), "Qps","Red Hot Notess (Qps) (MPU4) (set 18)" )
-GAME_CUSTOM( 199?, m4rhnote__r,    m4rhnote,   "70001503.bin",                 0x0000, 0x040000, CRC(2a44069a) SHA1(0a1581ba552e0e93d6bc3b7298014ea4b6793da1), "Qps","Red Hot Notess (Qps) (MPU4) (set 19)" )
-GAME_CUSTOM( 199?, m4rhnote__s,    m4rhnote,   "70001510.bin",                 0x0000, 0x080000, CRC(87cb4cae) SHA1(49c97e0e79a8cd1417e9e07a13afe736d00ef3df), "Qps","Red Hot Notess (Qps) (MPU4) (set 20)" )
-GAME_CUSTOM( 199?, m4rhnote__t,    m4rhnote,   "rhn_data_110_lv.bin",          0x0000, 0x040000, CRC(1f74c472) SHA1(86a170ddb001f817e960e7c166399280ad620bf0), "Qps","Red Hot Notess (Qps) (MPU4) (set 21)" )
-GAME_CUSTOM( 199?, m4rhnote__u,    m4rhnote,   "rhn_gala_hopper_120_lv.bin",   0x0000, 0x040000, CRC(521b6402) SHA1(7d260c45fa339f5ca34f8e335875ad47bb093a04), "Qps","Red Hot Notess (Qps) (MPU4) (set 22)" )
-GAME_CUSTOM( 199?, m4rhnote__v,    m4rhnote,   "rhn_mecca_120.bin",            0x0000, 0x040000, CRC(f131e386) SHA1(73672e6e66400b953dda7f2254082eff73dbf058), "Qps","Red Hot Notess (Qps) (MPU4) (set 23)" )
-GAME_CUSTOM( 199?, m4rhnote__w,    m4rhnote,   "rhn_mecca_120_lv.bin",         0x0000, 0x040000, CRC(471e5263) SHA1(79c205e0d8e748aa72f9f3fadad248edf71f5ae0), "Qps","Red Hot Notess (Qps) (MPU4) (set 24)" )
-GAME_CUSTOM( 199?, m4rhnote__x,    m4rhnote,   "rhn_std_110.bin",              0x0000, 0x040000, CRC(439f27d2) SHA1(4ad01c4dc9bbab7520fb281198777aea56f600b0), "Qps","Red Hot Notess (Qps) (MPU4) (set 25)" )
-GAME_CUSTOM( 199?, m4rhnote__y,    m4rhnote,   "rhn_std_110_lv.bin",           0x0000, 0x040000, CRC(922b8196) SHA1(6fdbf301aaadacaeabf29ad11c67b22122954051), "Qps","Red Hot Notess (Qps) (MPU4) (set 26)" )
+GAME_CUSTOM( 199?, m4rhnote,       0,          "70000120.bin",                 0x0000, 0x040000, CRC(d1ce1e1c) SHA1(2fc2b041b4e9fcade4b2ce6a0bc709f4174e2d88), "Qps","Red Hot Notes (Qps) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4rhnote__a,    m4rhnote,   "70000121.bin",                 0x0000, 0x040000, CRC(1e1a26c0) SHA1(8a80a94d280c82887a0f7da607988597df23e1fb), "Qps","Red Hot Notes (Qps) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4rhnote__b,    m4rhnote,   "70000125.bin",                 0x0000, 0x080000, CRC(67a617a2) SHA1(3900c0cc3f8e4d52105096c1e21903cb83b8c1b7), "Qps","Red Hot Notes (Qps) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4rhnote__c,    m4rhnote,   "70000126.bin",                 0x0000, 0x080000, CRC(68deffbe) SHA1(9b94776aa0416309204987ac9109a65ad3234f1b), "Qps","Red Hot Notes (Qps) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4rhnote__d,    m4rhnote,   "70000132.bin",                 0x0000, 0x080000, CRC(50c06d0d) SHA1(8d629d77390b92c5e30104237245f92dc8f52a6c), "Qps","Red Hot Notes (Qps) (MPU4) (set 5)" )
+GAME_CUSTOM( 199?, m4rhnote__e,    m4rhnote,   "70000133.bin",                 0x0000, 0x080000, CRC(fb198e1b) SHA1(6fb03680ad29ca750fe2e75f48a05f538ddac9b7), "Qps","Red Hot Notes (Qps) (MPU4) (set 6)" )
+GAME_CUSTOM( 199?, m4rhnote__f,    m4rhnote,   "70000135.bin",                 0x0000, 0x080000, CRC(02531c21) SHA1(de9da10bc81ab02ba131da1a1733eda1948dc3cc), "Qps","Red Hot Notes (Qps) (MPU4) (set 7)" )
+GAME_CUSTOM( 199?, m4rhnote__g,    m4rhnote,   "70001122.bin",                 0x0000, 0x040000, CRC(13171ffc) SHA1(e49a2080afd27c0de183da64baa2060020910155), "Qps","Red Hot Notes (Qps) (MPU4) (set 8)" )
+GAME_CUSTOM( 199?, m4rhnote__h,    m4rhnote,   "70001124.bin",                 0x0000, 0x040000, CRC(8acb2d7d) SHA1(ffd4f0e1f80b41b6f54af31e5dcd41fe12e4ea0b), "Qps","Red Hot Notes (Qps) (MPU4) (set 9)" )
+GAME_CUSTOM( 199?, m4rhnote__i,    m4rhnote,   "70001125.bin",                 0x0000, 0x080000, CRC(6b202a88) SHA1(63f7325c8dc373f771f02e5bf9ac0c0d33a906bd), "Qps","Red Hot Notes (Qps) (MPU4) (set 10)" )
+GAME_CUSTOM( 199?, m4rhnote__j,    m4rhnote,   "70001126.bin",                 0x0000, 0x080000, CRC(0db90e12) SHA1(0b010ca878ecabb47c0a0eec0badd595b2bafbfb), "Qps","Red Hot Notes (Qps) (MPU4) (set 11)" )
+GAME_CUSTOM( 199?, m4rhnote__k,    m4rhnote,   "70001135.bin",                 0x0000, 0x080000, CRC(a9ed9178) SHA1(446919e869a9cc20f469954504adf448474d702b), "Qps","Red Hot Notes (Qps) (MPU4) (set 12)" )
+GAME_CUSTOM( 199?, m4rhnote__l,    m4rhnote,   "70001150.bin",                 0x0000, 0x040000, CRC(3c3f4e45) SHA1(114c18e0fa8de224992138b72bf789ace39dffa0), "Qps","Red Hot Notes (Qps) (MPU4) (set 13)" )
+GAME_CUSTOM( 199?, m4rhnote__m,    m4rhnote,   "70001151.bin",                 0x0000, 0x040000, CRC(0cb1f440) SHA1(7ebdac6ea495d96c7713a284fdad4da0874de3f2), "Qps","Red Hot Notes (Qps) (MPU4) (set 14)" )
+GAME_CUSTOM( 199?, m4rhnote__n,    m4rhnote,   "70001153.bin",                 0x0000, 0x040000, CRC(e8ba9b3a) SHA1(71af6dd77da419868391e01f565c24a70d55b396), "Qps","Red Hot Notes (Qps) (MPU4) (set 15)" ) // rhn_gala_hopper_120.bin
+GAME_CUSTOM( 199?, m4rhnote__o,    m4rhnote,   "70001160.bin",                 0x0000, 0x040000, CRC(2d532681) SHA1(fb4321b6922cf35780adbdc5f030ef0df8d6cc9a), "Qps","Red Hot Notes (Qps) (MPU4) (set 16)" )
+GAME_CUSTOM( 199?, m4rhnote__p,    m4rhnote,   "70001161.bin",                 0x0000, 0x040000, CRC(e9a49319) SHA1(001163ece7a405a27fd71fdeb97489db143749a7), "Qps","Red Hot Notes (Qps) (MPU4) (set 17)" )
+GAME_CUSTOM( 199?, m4rhnote__q,    m4rhnote,   "70001502.bin",                 0x0000, 0x040000, CRC(d1b332f1) SHA1(07db228705b0bce47107cf5458986e830b988cee), "Qps","Red Hot Notes (Qps) (MPU4) (set 18)" )
+GAME_CUSTOM( 199?, m4rhnote__r,    m4rhnote,   "70001503.bin",                 0x0000, 0x040000, CRC(2a44069a) SHA1(0a1581ba552e0e93d6bc3b7298014ea4b6793da1), "Qps","Red Hot Notes (Qps) (MPU4) (set 19)" )
+GAME_CUSTOM( 199?, m4rhnote__s,    m4rhnote,   "70001510.bin",                 0x0000, 0x080000, CRC(87cb4cae) SHA1(49c97e0e79a8cd1417e9e07a13afe736d00ef3df), "Qps","Red Hot Notes (Qps) (MPU4) (set 20)" )
+GAME_CUSTOM( 199?, m4rhnote__t,    m4rhnote,   "rhn_data_110_lv.bin",          0x0000, 0x040000, CRC(1f74c472) SHA1(86a170ddb001f817e960e7c166399280ad620bf0), "Qps","Red Hot Notes (Qps) (MPU4) (set 21)" )
+GAME_CUSTOM( 199?, m4rhnote__u,    m4rhnote,   "rhn_gala_hopper_120_lv.bin",   0x0000, 0x040000, CRC(521b6402) SHA1(7d260c45fa339f5ca34f8e335875ad47bb093a04), "Qps","Red Hot Notes (Qps) (MPU4) (set 22)" )
+GAME_CUSTOM( 199?, m4rhnote__v,    m4rhnote,   "rhn_mecca_120.bin",            0x0000, 0x040000, CRC(f131e386) SHA1(73672e6e66400b953dda7f2254082eff73dbf058), "Qps","Red Hot Notes (Qps) (MPU4) (set 23)" )
+GAME_CUSTOM( 199?, m4rhnote__w,    m4rhnote,   "rhn_mecca_120_lv.bin",         0x0000, 0x040000, CRC(471e5263) SHA1(79c205e0d8e748aa72f9f3fadad248edf71f5ae0), "Qps","Red Hot Notes (Qps) (MPU4) (set 24)" )
+GAME_CUSTOM( 199?, m4rhnote__x,    m4rhnote,   "rhn_std_110.bin",              0x0000, 0x040000, CRC(439f27d2) SHA1(4ad01c4dc9bbab7520fb281198777aea56f600b0), "Qps","Red Hot Notes (Qps) (MPU4) (set 25)" )
+GAME_CUSTOM( 199?, m4rhnote__y,    m4rhnote,   "rhn_std_110_lv.bin",           0x0000, 0x040000, CRC(922b8196) SHA1(6fdbf301aaadacaeabf29ad11c67b22122954051), "Qps","Red Hot Notes (Qps) (MPU4) (set 26)" )
 
 #define M4RHROCK_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) /* intelhex, needs converting */ \
@@ -329,7 +329,6 @@ GAME_CUSTOM( 199?, m4shoknr,       0,          "snr_v300_1218_3019_lv.bin",    0
 GAME_CUSTOM( 199?, m4shoknr__a,    m4shoknr,   "snr_v300_1221_c8ff_nlv.bin",   0x0000, 0x040000, CRC(d191b361) SHA1(4146e509e77878a51e32de877768504b3c85e6f8), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4shoknr__b,    m4shoknr,   "snr_v200_1145_047f_lv.bin",    0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4shoknr__c,    m4shoknr,   "snr_v200_1655_5a69_nlv.bin",   0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 4)" )
-GAME_CUSTOM( 199?, m4shoknr__d,    m4shoknr,   "shock.p1",                     0x0000, 0x080000, CRC(65fb2f47) SHA1(33b997843a705fc446f33beb127b672a282286c4), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 5)" ) // check if it's just an overdump of above sets
 
 #define M4TORNAD_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
@@ -373,7 +372,13 @@ GAME_CUSTOM( 199?, m4tornad__g,    m4tornad,   "tornsp_v200_1626_ec93_lv.bin",  
 GAME_CUSTOM( 199?, m4shkwav,       0,          "swave_v210_1135_08dd_lv.bin",      0x0000, 0x040000, CRC(ca9d40a3) SHA1(65c9e4aa022eb6fe70d619f67638c37ad578ddbf), "Qps","Shockwave (Qps) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4shkwav__a,    m4shkwav,   "swave_v210_11376_0bb3_nlv.bin",    0x0000, 0x040000, CRC(3fcaf973) SHA1(28258c8c60e6b542e1789cd8a4cfd530d1ed6084), "Qps","Shockwave (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4shkwav__b,    m4shkwav,   "swsplv.bin",                       0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de), "Qps","Shockwave (Qps) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4shkwav__c,    m4shkwav,   "sho1_0lv.bin",                     0x0000, 0x080000, CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87), "Qps","Shockwave (Qps) (MPU4) (set 4)" )
+//This rom is possibly bad, data content isn't multiple of 0x800, padding with low bits rather than high
+	ROM_START( m4shkwav__c ) 
+		ROM_REGION( 0x080000, "maincpu", 0 ) 
+		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) ) 
+		M4SHKWAV_EXTRA_ROMS 
+	ROM_END 
+GAME(199?, m4shkwav__c, m4shkwav ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,"Qps","Shockwave (Qps) (MPU4) (set 4)",GAME_FLAGS )
 GAME_CUSTOM( 199?, m4shkwav__d,    m4shkwav,   "swave_v300_1552_13ed_nlv.bin",     0x0000, 0x040000, CRC(b0e03f04) SHA1(fdd113af30fd9e87b171ecdf3be7e720366476b3), "Qps","Shockwave (Qps) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4shkwav__e,    m4shkwav,   "swave_v300_1555_119d_lv.bin",      0x0000, 0x040000, CRC(45b786d4) SHA1(24fd4fdea684103334385ca329f384796b496e2c), "Qps","Shockwave (Qps) (MPU4) (set 6)" )
 GAME_CUSTOM( 199?, m4shkwav__f,    m4shkwav,   "swsp_v300_1602_e1b2_nlv.bin",      0x0000, 0x040000, CRC(4ed74015) SHA1(0ab2167ba0ce6f1a1317c2087091187b9fa94c27), "Qps","Shockwave (Qps) (MPU4) (set 7)" )

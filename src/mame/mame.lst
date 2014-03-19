@@ -21851,6 +21851,7 @@ m3tlktwn    // Talk of The Town (Unknown)
 
 m4tst       // MPU4 Unit Test (Program 4)
 m4tst2      // MPU4 Unit Test (Program 2)
+m4rltst     // MPU4 Reel Test (3.0)
 m4clr       // MPU4 Meter Clear ROM
 
 
@@ -26042,7 +26043,6 @@ m4rhfev__a  //
 m4rhfev__b  //
 m4rhfev__c  //
 m4rhfev__d  //
-m4rhfev__e  //
 m4rhs       // Rocky Horror Show (Bwb)
 m4rhs__a    //
 m4rhs__b    //
@@ -26853,7 +26853,6 @@ m4shoknr    // Shock 'n' Roll (Mazooma - Qps)
 m4shoknr__a //
 m4shoknr__b //
 m4shoknr__c //
-m4shoknr__d //
 m4shkwav    // Shockwave (Mazooma - Qps)
 m4shkwav__a //
 m4shkwav__b //

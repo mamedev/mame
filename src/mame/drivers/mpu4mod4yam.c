@@ -13,6 +13,8 @@ INPUT_PORTS_EXTERN( mpu4 );
 
 DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
 {
+	DRIVER_INIT_CALL( m4default );
+
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
 	UINT8 *src = memregion( "maincpu" )->base();
@@ -249,10 +251,10 @@ GAME_CUSTOM( 199?, m4cojok__f,  m4cojok,    "cojxy.p1",     0x0000, 0x010000, CR
 	ROM_END \
 	GAMEL(year, setname, parent ,mod4yam    ,mpu4 , mpu4_state,m4gambal ,ROT0,company,title,GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )
 
-GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gambal (Barcrest) (MPU4) (set 1)" )
-GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gambal (Barcrest) (MPU4) (set 2)" )
-GAME_CUSTOM( 199?, m4gambal__b,    m4gambal,   "gabx.p1",  0x0000, 0x010000, CRC(74a8ed7e) SHA1(7363031c8a634ac13de957c62f32611963f797bd), "Barcrest","Gambal (Barcrest) (MPU4) (set 3)" )
-GAME_CUSTOM( 199?, m4gambal__c,    m4gambal,   "gbll20-6", 0x0000, 0x010000, CRC(f34d233a) SHA1(3f13563b2821b2f36267470c36ba346879521bc9), "Barcrest","Gambal (Barcrest) (MPU4) (set 4)" )
+GAME_CUSTOM( 199?, m4gambal,       0,          "gbbx.p1",  0x0000, 0x010000, CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc), "Barcrest","Gamball (Barcrest) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4gambal__a,    m4gambal,   "gabcx.p1", 0x0000, 0x010000, CRC(52c35266) SHA1(bda49005de88094fbc84621f63b33f0e0a9c0bd3), "Barcrest","Gamball (Barcrest) (MPU4) (set 2)" )
+GAME_CUSTOM( 199?, m4gambal__b,    m4gambal,   "gabx.p1",  0x0000, 0x010000, CRC(74a8ed7e) SHA1(7363031c8a634ac13de957c62f32611963f797bd), "Barcrest","Gamball (Barcrest) (MPU4) (set 3)" )
+GAME_CUSTOM( 199?, m4gambal__c,    m4gambal,   "gbll20-6", 0x0000, 0x010000, CRC(f34d233a) SHA1(3f13563b2821b2f36267470c36ba346879521bc9), "Barcrest","Gamball (Barcrest) (MPU4) (set 4)" )
 
 
 #undef GAME_CUSTOM
