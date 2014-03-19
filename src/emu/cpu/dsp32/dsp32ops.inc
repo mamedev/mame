@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dsp32ops.c
+    dsp32ops.inc
     Core implementation for the portable DSP32 emulator.
 
 ****************************************************************************/

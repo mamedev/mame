@@ -240,7 +240,7 @@ endif
 
 $(CPUOBJ)/dsp32/dsp32.o:    $(CPUSRC)/dsp32/dsp32.c \
 							$(CPUSRC)/dsp32/dsp32.h \
-							$(CPUSRC)/dsp32/dsp32ops.c
+							$(CPUSRC)/dsp32/dsp32ops.inc
 
 
 
@@ -652,7 +652,7 @@ endif
 
 $(CPUOBJ)/e132xs/e132xs.o:  $(CPUSRC)/e132xs/e132xs.c \
 							$(CPUSRC)/e132xs/e132xs.h \
-							$(CPUSRC)/e132xs/e132xsop.c
+							$(CPUSRC)/e132xs/e132xsop.inc
 
 
 
@@ -780,7 +780,7 @@ endif
 
 $(CPUOBJ)/mcs51/mcs51.o:    $(CPUSRC)/mcs51/mcs51.c \
 							$(CPUSRC)/mcs51/mcs51.h \
-							$(CPUSRC)/mcs51/mcs51ops.c
+							$(CPUSRC)/mcs51/mcs51ops.inc
 
 #-------------------------------------------------
 # Intel MCS-96
@@ -858,12 +858,12 @@ $(CPUOBJ)/i86/i286.o:   $(CPUSRC)/i86/i286.c \
 $(CPUOBJ)/i386/i386.o:  $(CPUSRC)/i386/i386.c \
 						$(CPUSRC)/i386/i386.h \
 						$(CPUSRC)/i386/i386priv.h \
-						$(CPUSRC)/i386/i386op16.c \
-						$(CPUSRC)/i386/i386op32.c \
-						$(CPUSRC)/i386/i386ops.c \
-						$(CPUSRC)/i386/i486ops.c \
-						$(CPUSRC)/i386/pentops.c \
-						$(CPUSRC)/i386/x87ops.c \
+						$(CPUSRC)/i386/i386op16.inc \
+						$(CPUSRC)/i386/i386op32.inc \
+						$(CPUSRC)/i386/i386ops.inc \
+						$(CPUSRC)/i386/i486ops.inc \
+						$(CPUSRC)/i386/pentops.inc \
+						$(CPUSRC)/i386/x87ops.inc \
 						$(CPUSRC)/i386/i386ops.h \
 						$(CPUSRC)/i386/cycles.h
 
@@ -882,7 +882,7 @@ endif
 
 $(CPUOBJ)/i860/i860.o:  $(CPUSRC)/i860/i860.c \
 												$(CPUSRC)/i860/i860.h \
-												$(CPUSRC)/i860/i860dec.c
+												$(CPUSRC)/i860/i860dec.inc
 
 #-------------------------------------------------
 # Intel i960
@@ -912,7 +912,7 @@ DASMOBJS += $(CPUOBJ)/lh5801/5801dasm.o
 endif
 
 $(CPUOBJ)/lh5801/lh5801.o:  $(CPUSRC)/lh5801/lh5801.c \
-							$(CPUSRC)/lh5801/5801tbl.c \
+							$(CPUSRC)/lh5801/5801tbl.inc \
 							$(CPUSRC)/lh5801/lh5801.h
 
 
@@ -1288,8 +1288,8 @@ endif
 
 $(CPUOBJ)/m6800/m6800.o:    $(CPUSRC)/m6800/m6800.c \
 							$(CPUSRC)/m6800/m6800.h \
-							$(CPUSRC)/m6800/6800ops.c \
-							$(CPUSRC)/m6800/6800tbl.c
+							$(CPUSRC)/m6800/6800ops.inc \
+							$(CPUSRC)/m6800/6800tbl.inc
 
 
 
@@ -1306,7 +1306,7 @@ endif
 
 $(CPUOBJ)/m6805/m6805.o:    $(CPUSRC)/m6805/m6805.c \
 							$(CPUSRC)/m6805/m6805.h \
-							$(CPUSRC)/m6805/6805ops.c
+							$(CPUSRC)/m6805/6805ops.inc
 
 
 
@@ -1367,7 +1367,9 @@ DASMOBJS += $(CPUOBJ)/mc68hc11/hc11dasm.o
 endif
 
 $(CPUOBJ)/mc68hc11/mc68hc11.o:  $(CPUSRC)/mc68hc11/mc68hc11.c \
-								$(CPUSRC)/mc68hc11/hc11ops.c
+								$(CPUSRC)/mc68hc11/mc68hc11.h \
+								$(CPUSRC)/mc68hc11/hc11ops.inc \
+								$(CPUSRC)/mc68hc11/hc11ops.h
 
 
 
@@ -1413,7 +1415,7 @@ endif
 
 # rule to ensure we build the header before building the core CPU file
 $(CPUOBJ)/m68000/m68kcpu.o:     $(CPUOBJ)/m68000/m68kops.c \
-								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.c $(CPUSRC)/m68000/m68kmmu.h
+								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.inc $(CPUSRC)/m68000/m68kmmu.h
 
 # m68kcpu.h now includes m68kops.h; m68kops.h won't exist until m68kops.c has been made
 $(CPUSRC)/m68000/m68kcpu.h: $(CPUOBJ)/m68000/m68kops.c
@@ -1444,7 +1446,8 @@ $(CPUOBJ)/dsp56k/dsp56pcu.o:    $(CPUSRC)/dsp56k/dsp56pcu.c \
 								$(CPUSRC)/dsp56k/dsp56pcu.h
 
 $(CPUOBJ)/dsp56k/dsp56k.o:  $(CPUSRC)/dsp56k/dsp56k.c \
-							$(CPUSRC)/dsp56k/dsp56k.h
+							$(CPUSRC)/dsp56k/dsp56k.h \
+							$(CPUSRC)/dsp56k/dsp56ops.inc
 
 $(CPUOBJ)/dsp56k/opcode.o:  $(CPUSRC)/dsp56k/opcode.c \
 							$(CPUSRC)/dsp56k/opcode.h
@@ -1542,7 +1545,7 @@ endif
 $(CPUOBJ)/nec/nec.o:    $(CPUSRC)/nec/nec.c \
 						$(CPUSRC)/nec/nec.h \
 						$(CPUSRC)/nec/necea.h \
-						$(CPUSRC)/nec/necinstr.c \
+						$(CPUSRC)/nec/necinstr.inc \
 						$(CPUSRC)/nec/necinstr.h \
 						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
@@ -1551,8 +1554,8 @@ $(CPUOBJ)/nec/nec.o:    $(CPUSRC)/nec/nec.c \
 $(CPUOBJ)/nec/v25.o:    $(CPUSRC)/nec/v25.c \
 						$(CPUSRC)/nec/nec.h \
 						$(CPUSRC)/nec/necea.h \
-						$(CPUSRC)/nec/necinstr.c \
-						$(CPUSRC)/nec/v25instr.c \
+						$(CPUSRC)/nec/necinstr.inc \
+						$(CPUSRC)/nec/v25instr.inc \
 						$(CPUSRC)/nec/v25instr.h \
 						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
