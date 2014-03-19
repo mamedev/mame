@@ -1726,9 +1726,9 @@ ifneq ($(filter I8255,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/i8255.o
 endif
 
-$(MACHINEOBJ)/s3c2400.o:    $(MACHINESRC)/s3c24xx.c
-$(MACHINEOBJ)/s3c2410.o:    $(MACHINESRC)/s3c24xx.c
-$(MACHINEOBJ)/s3c2440.o:    $(MACHINESRC)/s3c24xx.c
+$(MACHINEOBJ)/s3c2400.o:    $(MACHINESRC)/s3c24xx.inc
+$(MACHINEOBJ)/s3c2410.o:    $(MACHINESRC)/s3c24xx.inc
+$(MACHINEOBJ)/s3c2440.o:    $(MACHINESRC)/s3c24xx.inc
 
 #-------------------------------------------------
 #
