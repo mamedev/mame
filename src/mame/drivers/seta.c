@@ -7285,6 +7285,8 @@ static GFXDECODE_START( orbs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
+
+
 /***************************************************************************
                                 Wiggie Waggle / Super Bar
 ****************************************************************************/
@@ -8469,11 +8471,13 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 MACHINE_CONFIG_END
 
 
+
+
 /***************************************************************************
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( keroppi, seta_state )
+static MACHINE_CONFIG_START( keroppij, seta_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
@@ -8509,6 +8513,9 @@ static MACHINE_CONFIG_START( keroppi, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( keroppi, keroppij )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Krazy Bowl
@@ -10441,6 +10448,20 @@ ROM_END
 
 ROM_START( keroppi )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "keroppi jr. code (u10) v1.0.u10",  0x000000, 0x040000, CRC(1fc2e895) SHA1(08f1f48d4f601cf51583bf8854a9fa7016337cfc) )
+	ROM_LOAD16_BYTE( "keroppi jr. code (u9) v1.0.u9",    0x000001, 0x040000, CRC(e0599e7b) SHA1(46b5ecc2864ab9e75540764453df5a2e6b6195e0) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "keroppi jr. chr(u11) v1.0.u11",  0x000000, 0x080000, CRC(74148c23) SHA1(26e642e2e0ad2b2af749355e9c46605061b100bc) )
+	ROM_LOAD( "keroppi jr. chr(u12) v1.0.u12",  0x080000, 0x080000, CRC(6f4dae98) SHA1(da88837278cea956485f11ef55da8a4e9504c97a) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "keroppi jr. snd (u15) v1.0.u15",  0x000000, 0x080000, CRC(c98dacf0) SHA1(b508433e2383af1e8bd5fda253c9925c48443490) ) // == = ft-001-007.u15
+	ROM_LOAD( "keroppi jr. snd (u16) v1.0.u16",  0x080000, 0x080000, CRC(d61e5a32) SHA1(aa2edf39e72ac15a8c8dd016b87bea17472f0f94) )
+ROM_END
+
+ROM_START( keroppij )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "ft-001-001.u10",  0x000000, 0x080000, CRC(37861e7d) SHA1(4bf75f119b0ef1420c96844224850867fa8e273f) )
 	ROM_LOAD16_BYTE( "ft-001-002.u9",   0x000001, 0x080000, CRC(f531d4ef) SHA1(75a99695679de083765700c250bd1fdfd8be9981) )
 
@@ -11293,7 +11314,8 @@ GAME( 1994, magspeed, 0,        magspeed, magspeed, driver_device, 0,        ROT
 
 GAME( 1994, orbs,     0,        orbs,     orbs, driver_device,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
 
-GAME( 1993, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1995, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "American Sammy",         "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
+GAME( 1993, keroppij, keroppi,  keroppij, keroppi, driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
 
