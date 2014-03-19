@@ -1405,7 +1405,7 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
-	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
+	//MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 
