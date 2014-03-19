@@ -40,12 +40,6 @@ WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
 	}
 }
 
-const mc6843_interface bml3_6843_if =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, bml3bus_mp1805_device, bml3_mc6843_intrq_w)
-};
-
-
 #define MP1805_ROM_REGION  "mp1805_rom"
 
 ROM_START( mp1805 )
@@ -55,7 +49,8 @@ ROM_START( mp1805 )
 ROM_END
 
 MACHINE_CONFIG_FRAGMENT( mp1805 )
-	MCFG_MC6843_ADD( "mc6843", bml3_6843_if )
+	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
+	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
 MACHINE_CONFIG_END
 

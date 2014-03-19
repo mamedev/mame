@@ -14,7 +14,6 @@
 #include "machine/mc6843.h"
 #include "machine/mc6854.h"
 
-extern const mc6843_interface to7_6843_itf;
 extern const mc6854_interface to7_network_iface;
 
 extern UINT8 to7_controller_type; /* set during init */

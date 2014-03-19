@@ -699,8 +699,8 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_MEA8000_ADD( "mea8000", to7_speech )
 
 /* floppy */
-	MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
-	MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
+	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
+	MCFG_WD2793_ADD("wd2793", default_wd17xx_interface )
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(thomson_floppy_interface_0)
 	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)

@@ -74,6 +74,7 @@ const device_type MC6843 = &device_creator<mc6843_device>;
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC6843, "Motorola MC6843 floppy controller", tag, owner, clock, "mc6843", __FILE__),
+	m_write_irq(*this),
 	m_CTAR(0),
 	m_CMR(0),
 	m_ISR(0),
@@ -99,32 +100,14 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6843_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc6843_interface *intf = reinterpret_cast<const mc6843_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<mc6843_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mc6843_device::device_start()
 {
-	m_timer_cont = timer_alloc(TIMER_CONT) ;
+	m_write_irq.resolve_safe();
+
+	m_timer_cont = timer_alloc(TIMER_CONT);
 
 	save_item(NAME(m_CTAR));
 	save_item(NAME(m_CMR));
@@ -162,8 +145,6 @@ void mc6843_device::device_reset()
 		floppy_drive_set_rpm( img, 300. );
 	}
 	
-	m_irq_func.resolve(m_irq_cb, *this);
-
 	/* reset registers */
 	m_CMR &= 0xf0; /* zero only command */
 	m_ISR = 0;
@@ -248,11 +229,8 @@ void mc6843_device::status_update( )
 			irq = 1;
 	}
 
-	if ( !m_irq_func.isnull() )
-	{
-		m_irq_func( irq );
-		LOG(( "status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, m_CMR, m_ISR ));
-	}
+	m_write_irq( irq );
+	LOG(( "status_update: irq=%i (CMR=%02X, ISR=%02X)\n", irq, m_CMR, m_ISR ));
 }
 
 

@@ -439,11 +439,6 @@ void thomson_state::to7_5p14sd_reset()
 }
 
 
-
-const mc6843_interface to7_6843_itf = { DEVCB_NULL };
-
-
-
 void thomson_state::to7_5p14sd_init()
 {
 	LOG(( "to7_5p14sd_init: CD 90-015 controller\n" ));
