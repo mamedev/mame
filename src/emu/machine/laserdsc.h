@@ -73,6 +73,8 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_overlay_position(*device, _posx, _posy);
 #define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
 	laserdisc_device::static_set_overlay_scale(*device, _scalex, _scaley);
+#define MCFG_LASERDISC_OVERLAY_PALETTE(_palette_tag) \
+	laserdisc_device::static_set_overlay_palette(*device, "^" _palette_tag);
 
 // use these to add laserdisc screens with proper video update parameters
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
@@ -165,6 +167,7 @@ public:
 	static void static_set_overlay_clip(device_t &device, INT32 minx, INT32 maxx, INT32 miny, INT32 maxy);
 	static void static_set_overlay_position(device_t &device, float posx, float posy);
 	static void static_set_overlay_scale(device_t &device, float scalex, float scaley);
+	static void static_set_overlay_palette(device_t &device, const char *tag);
 
 protected:
 	// timer IDs
@@ -236,6 +239,7 @@ protected:
 	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_validity_check(validity_checker &valid) const;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -342,6 +346,7 @@ private:
 	screen_bitmap       m_overbitmap[2];        // overlay bitmaps
 	int                 m_overindex;            // index of the overlay bitmap
 	render_texture *    m_overtex;              // texture for the overlay
+	optional_device<palette_device> m_overlay_palette; // overlay screen palette
 };
 
 // iterator - interface iterator works for subclasses too
