@@ -973,59 +973,6 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 	for (i=5; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
-static const k053252_interface mystwarr_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	24, 16
-};
-
-static const k053252_interface viostorm_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	40, 16
-};
-
-static const k053252_interface metamrph_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	24, 24
-};
-
-static const k053252_interface martchmp_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	32, 24-1
-};
-
-static const k053252_interface dadandrm_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	24, 16+1
-};
-
-static const k053252_interface gaiapols_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	40, 16
-};
 
 static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
@@ -1040,8 +987,10 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
-	MCFG_K053252_ADD("k053252", 6000000, mystwarr_k053252_intf) // 6 MHz?
-
+	
+	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
+	MCFG_K053252_OFFSETS(24, 16)
+	
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
@@ -1089,9 +1038,9 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	MCFG_DEVICE_REMOVE("k053252")
-	MCFG_K053252_ADD("k053252", 16000000/2, viostorm_k053252_intf)
-
+	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
+	MCFG_K053252_OFFSETS(40, 16)
+	
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(viostorm_map)
@@ -1119,8 +1068,9 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
 
-	MCFG_DEVICE_REMOVE("k053252")
-	MCFG_K053252_ADD("k053252", 6000000, metamrph_k053252_intf) // 6 MHz?
+	MCFG_DEVICE_MODIFY("k053252")
+	MCFG_K053252_OFFSETS(24, 24)
+	
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
 	/* video hardware */
@@ -1144,8 +1094,8 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_REMOVE("k053252")
-	MCFG_K053252_ADD("k053252", 6000000, dadandrm_k053252_intf) // 6 MHz?
+	MCFG_DEVICE_MODIFY("k053252")
+	MCFG_K053252_OFFSETS(24, 16+1)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dadandrn)
 
@@ -1170,8 +1120,8 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
 	MCFG_DEVICE_REMOVE("scantimer")
 
-	MCFG_DEVICE_REMOVE("k053252")
-	MCFG_K053252_ADD("k053252", 6000000, gaiapols_k053252_intf) // 6 MHz?
+	MCFG_DEVICE_MODIFY("k053252")
+	MCFG_K053252_OFFSETS(40, 16)
 	
 	MCFG_K054000_ADD("k054000")
 
@@ -1199,8 +1149,8 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
 
-	MCFG_DEVICE_REMOVE("k053252")
-	MCFG_K053252_ADD("k053252", 16000000/2, martchmp_k053252_intf)
+	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
+	MCFG_K053252_OFFSETS(32, 24-1)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(XRGB)

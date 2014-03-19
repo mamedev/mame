@@ -484,15 +484,6 @@ static const k053247_interface xexex_k053246_intf =
 	xexex_sprite_callback
 };
 
-static const k053252_interface xexex_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	0, 0
-};
-
 void xexex_state::xexex_postload()
 {
 	parse_control2();
@@ -579,7 +570,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K053246_PALETTE("palette")
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, xexex_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
 	MCFG_K054338_ADD("k054338", xexex_k054338_intf)
 
 	/* sound hardware */

@@ -239,15 +239,6 @@ WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static const k053252_interface rollerg_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(rollerg_state,rollerg_irq_ack_w),
-	DEVCB_NULL,
-	14*8, 2*8
-};
-
 void rollerg_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -300,7 +291,9 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_PALETTE("palette")
 	
-	MCFG_K053252_ADD("k053252", 3000000*2, rollerg_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
+	MCFG_K053252_OFFSETS(14*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

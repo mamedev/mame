@@ -65,33 +65,17 @@ const device_type K053252 = &device_creator<k053252_device>;
 
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053252, "Konami 053252", tag, owner, clock, "k053252", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_int1_en_cb(*this),
+		m_int2_en_cb(*this),
+		m_int1_ack_cb(*this),
+		m_int2_ack_cb(*this),
+		//m_int_time_cb(*this),
+		m_offsx(0),
+		m_offsy(0)
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053252_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k053252_interface *intf = reinterpret_cast<const k053252_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<k053252_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_int1_en, 0, sizeof(m_int1_en));
-	memset(&m_int2_en, 0, sizeof(m_int2_en));
-	memset(&m_int1_ack, 0, sizeof(m_int1_ack));
-	memset(&m_int2_ack, 0, sizeof(m_int2_ack));
-	//memset(&m_int_time, 0, sizeof(m_int_time));
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -100,11 +84,11 @@ void k053252_device::device_config_complete()
 void k053252_device::device_start()
 {
 	save_item(NAME(m_regs));
-	m_int1_en_func.resolve(m_int1_en, *this);
-	m_int2_en_func.resolve(m_int2_en, *this);
-	m_int1_ack_func.resolve(m_int1_ack, *this);
-	m_int2_ack_func.resolve(m_int2_ack, *this);
-	//m_int_time_func.resolve(m_int_time, *this);
+	m_int1_en_cb.resolve_safe();
+	m_int2_en_cb.resolve_safe();
+	m_int1_ack_cb.resolve_safe();
+	m_int2_ack_cb.resolve_safe();
+	//m_int_time_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -205,8 +189,8 @@ WRITE8_MEMBER( k053252_device::write )
 			logerror("%d (%04x) HBP set\n",m_hbp,m_hbp);
 			res_change();
 			break;
-		case 0x06: m_int1_en_func(data); break;
-		case 0x07: m_int2_en_func(data); break;
+		case 0x06: m_int1_en_cb(data); break;
+		case 0x07: m_int2_en_cb(data); break;
 		case 0x08:
 		case 0x09:
 			m_vc  = (m_regs[9]&0xff);
@@ -231,7 +215,7 @@ WRITE8_MEMBER( k053252_device::write )
 			res_change();
 			break;
 		//case 0x0d: m_int_time(data); break;
-		case 0x0e: m_int1_ack_func(1); break;
-		case 0x0f: m_int2_ack_func(1); break;
+		case 0x0e: m_int1_ack_cb(1); break;
+		case 0x0f: m_int2_ack_cb(1); break;
 	}
 }

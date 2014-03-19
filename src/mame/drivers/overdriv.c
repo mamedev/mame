@@ -312,15 +312,6 @@ void overdriv_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const k053252_interface overdriv_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	13*8, 2*8
-};
-
 
 static MACHINE_CONFIG_START( overdriv, overdriv_state )
 
@@ -372,7 +363,9 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
 	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
-	MCFG_K053252_ADD("k053252", 24000000/4, overdriv_k053252_intf)
+	
+	MCFG_DEVICE_ADD("k053252", K053252, 24000000/4)
+	MCFG_K053252_OFFSETS(13*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

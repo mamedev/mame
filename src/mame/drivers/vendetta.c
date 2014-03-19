@@ -433,14 +433,6 @@ static const k053247_interface esckids_k053246_intf =
 	vendetta_sprite_callback
 };
 
-static const k053252_interface esckids_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	12*8, 1*8
-};
 
 void vendetta_state::machine_start()
 {
@@ -546,7 +538,8 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_K053246_ADD("k053246", esckids_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", 6000000, esckids_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
+	MCFG_K053252_OFFSETS(12*8, 1*8)
 MACHINE_CONFIG_END
 
 

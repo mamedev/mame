@@ -565,24 +565,6 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	qdrmfgp2_tile_callback, "none"
 };
 
-static const k053252_interface qdrmfgp_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	40, 16
-};
-
-static const k053252_interface qdrmfgp2_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	40, 16
-};
-
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
 	save_item(NAME(m_control));
@@ -643,7 +625,9 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp_k053252_intf)
+	
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -685,7 +669,9 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, qdrmfgp2_k053252_intf)
+	
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

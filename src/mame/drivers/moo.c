@@ -547,15 +547,6 @@ static const k054338_interface moo_k054338_intf =
 	"none"
 };
 
-static const k053252_interface moo_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	40, 16
-};
-
 static k054539_interface k054539_config;
 
 static MACHINE_CONFIG_START( moo, moo_state )
@@ -573,7 +564,8 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, moo_k053252_intf) // 8MHz
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4) // 8MHz
+	MCFG_K053252_OFFSETS(40, 16)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

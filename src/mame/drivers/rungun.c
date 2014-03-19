@@ -344,15 +344,6 @@ static const k053247_interface rng_k055673_intf =
 	rng_sprite_callback
 };
 
-static const k053252_interface rng_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	9*8, 24
-};
-
 void rungun_state::machine_start()
 {
 	UINT8 *ROM = memregion("soundcpu")->base();
@@ -411,7 +402,9 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", 16000000/2, rng_k053252_intf)
+	
+	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
+	MCFG_K053252_OFFSETS(9*8, 24)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
