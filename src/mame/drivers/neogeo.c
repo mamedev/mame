@@ -133,6 +133,8 @@
           - Some raster effects are imperfect (off by a couple of lines)
         * Multi-cart support not implemented - the MVS can take up to
           6 cartridges depending on the board being used
+        * 68000 waitstates on ROM region access, determined by jumpers on cart
+          (garou train stage 3 background bug is probably related to this)
 
 
     Confirmed non-bugs:
@@ -516,6 +518,8 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 
 READ16_MEMBER(neogeo_state::memcard_r)
 {
+	m_maincpu->eat_cycles(2); // insert waitstate
+	
 	UINT16 ret;
 
 	if (memcard_present(machine()) != -1)
@@ -529,6 +533,8 @@ READ16_MEMBER(neogeo_state::memcard_r)
 
 WRITE16_MEMBER(neogeo_state::memcard_w)
 {
+	m_maincpu->eat_cycles(2); // insert waitstate
+
 	if (ACCESSING_BITS_0_7)
 	{
 		if (memcard_present(machine()) != -1)
