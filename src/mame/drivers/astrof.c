@@ -192,7 +192,7 @@ rgb_t astrof_state::make_pen( UINT8 data )
 }
 
 
-void astrof_state::astrof_get_pens( pen_t *pens )
+void astrof_state::astrof_get_pens( rgb_t *pens )
 {
 	offs_t i;
 	UINT8 bank = (m_astrof_palette_bank ? 0x10 : 0x00);
@@ -228,7 +228,7 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 }
 
 
-void astrof_state::tomahawk_get_pens( pen_t *pens )
+void astrof_state::tomahawk_get_pens( rgb_t *pens )
 {
 	offs_t i;
 	UINT8 *prom = memregion("proms")->base();
@@ -352,7 +352,7 @@ WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
 }
 
 
-void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens )
+void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t *pens )
 {
 	offs_t offs;
 
@@ -363,8 +363,8 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 
 		UINT8 color = m_colorram[offs >> 1];
 
-		pen_t back_pen = pens[color | 0x00];
-		pen_t fore_pen = pens[color | 0x01];
+		rgb_t back_pen = pens[color | 0x00];
+		rgb_t fore_pen = pens[color | 0x01];
 
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
@@ -382,7 +382,7 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
+			rgb_t pen = (data & 0x01) ? fore_pen : back_pen;
 
 			if (m_flipscreen)
 				bitmap.pix32(y, 255 - x) = pen;
@@ -398,7 +398,7 @@ void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &c
 
 UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[ASTROF_NUM_PENS];
+	rgb_t pens[ASTROF_NUM_PENS];
 
 	astrof_get_pens(pens);
 
@@ -410,7 +410,7 @@ UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &b
 
 UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pen_t pens[TOMAHAWK_NUM_PENS];
+	rgb_t pens[TOMAHAWK_NUM_PENS];
 
 	tomahawk_get_pens(pens);
 
