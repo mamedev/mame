@@ -44,7 +44,7 @@
 				// driver code indicates should be 4, but sounds distorted then
 
 // include the LFO handling code
-#include "scsplfo.c"
+#include "scsplfo.inc"
 
 /*
     SCSP features 32 programmable slots

@@ -1641,8 +1641,8 @@ DASMOBJS += $(CPUOBJ)/upd7810/7810dasm.o
 endif
 
 $(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
-								$(CPUSRC)/upd7810/7810tbl.c \
-								$(CPUSRC)/upd7810/7810ops.c \
+								$(CPUSRC)/upd7810/7810tbl.inc \
+								$(CPUSRC)/upd7810/7810ops.inc \
 								$(CPUSRC)/upd7810/upd7810.h
 
 

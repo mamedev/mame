@@ -21,7 +21,7 @@
 #define EG_SHIFT    16
 
 // include the LFO handling code
-#include "aicalfo.c"
+#include "aicalfo.inc"
 
 /*
     AICA features 64 programmable slots

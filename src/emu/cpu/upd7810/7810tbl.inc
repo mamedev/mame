@@ -3,7 +3,7 @@
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.2
  *   Copyright Juergen Buchmueller, all rights reserved.
  *
- *   7810tbl.c  - function pointer tables
+ *   7810tbl.inc  - function pointer tables
  *
  *****************************************************************************/
 

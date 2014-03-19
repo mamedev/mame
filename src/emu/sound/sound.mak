@@ -536,8 +536,8 @@ ifneq ($(filter AICA,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/aica.o $(SOUNDOBJ)/aicadsp.o
 endif
 
-$(SOUNDOBJ)/scsp.o: $(SOUNDSRC)/scsplfo.c
-$(SOUNDOBJ)/aica.o: $(SOUNDSRC)/aicalfo.c
+$(SOUNDOBJ)/scsp.o: $(SOUNDSRC)/scsplfo.inc
+$(SOUNDOBJ)/aica.o: $(SOUNDSRC)/aicalfo.inc
 
 
 
