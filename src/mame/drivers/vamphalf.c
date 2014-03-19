@@ -945,28 +945,6 @@ static GFXDECODE_START( vamphalf )
 GFXDECODE_END
 
 
-
-
-static QS1000_INTERFACE( qs1000_intf )
-{
-	/* External ROM */
-	true,
-
-	/* P1-P3 read handlers */
-	DEVCB_DRIVER_MEMBER(vamphalf_state, qs1000_p1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	/* P1-P3 write handlers */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vamphalf_state, qs1000_p3_w),
-};
-
-
-
-
-
 static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
@@ -1018,7 +996,10 @@ static MACHINE_CONFIG_FRAGMENT( sound_qs1000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_QS1000_EXTERNAL_ROM(true)
+	MCFG_QS1000_IN_P1_CB(READ8(vamphalf_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(vamphalf_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

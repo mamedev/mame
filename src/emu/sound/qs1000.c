@@ -183,6 +183,14 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, QS1000, "QS1000", tag, owner, clock, "qs1000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
+		m_external_rom(false),
+		m_in_p1_cb(*this),
+		m_in_p2_cb(*this),
+		m_in_p3_cb(*this),
+		m_out_p1_cb(*this),
+		m_out_p2_cb(*this),
+		m_out_p3_cb(*this),
+		//m_serial_w_cb(*this),
 		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
 		m_stream(NULL),
 		m_direct(NULL),
@@ -226,13 +234,15 @@ void qs1000_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 32);
 
 	// Resolve CPU port callbacks
-	m_p1_r_func.resolve(m_in_p1_cb, *this);
-	m_p2_r_func.resolve(m_in_p2_cb, *this);
-	m_p3_r_func.resolve(m_in_p3_cb, *this);
+	m_in_p1_cb.resolve_safe(0);
+	m_in_p2_cb.resolve_safe(0);
+	m_in_p3_cb.resolve_safe(0);
 
-	m_p1_w_func.resolve(m_out_p1_cb, *this);
-	m_p2_w_func.resolve(m_out_p2_cb, *this);
-	m_p3_w_func.resolve(m_out_p3_cb, *this);
+	m_out_p1_cb.resolve_safe();
+	m_out_p2_cb.resolve_safe();
+	m_out_p3_cb.resolve_safe();
+	
+	//m_serial_w_cb.resolve_safe();
 
 	m_cpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(qs1000_device::data_to_i8052),this));
 
@@ -270,18 +280,6 @@ void qs1000_device::set_irq(int state)
 READ8_MEMBER(qs1000_device::data_to_i8052)
 {
 	return m_serial_data_in;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete
-//-------------------------------------------------
-void qs1000_device::device_config_complete()
-{
-	const qs1000_interface *intf = reinterpret_cast<const qs1000_interface *>(static_config());
-
-	if (intf != NULL)
-		*static_cast<qs1000_interface *>(this) = *intf;
 }
 
 
@@ -330,7 +328,7 @@ READ8_MEMBER( qs1000_device::p0_r )
 //-------------------------------------------------
 READ8_MEMBER( qs1000_device::p1_r )
 {
-	return m_p1_r_func(0);
+	return m_in_p1_cb(0);
 }
 
 
@@ -339,7 +337,7 @@ READ8_MEMBER( qs1000_device::p1_r )
 //-------------------------------------------------
 READ8_MEMBER( qs1000_device::p2_r )
 {
-	return m_p2_r_func(0);
+	return m_in_p2_cb(0);
 }
 
 
@@ -348,12 +346,12 @@ READ8_MEMBER( qs1000_device::p2_r )
 //-------------------------------------------------
 READ8_MEMBER( qs1000_device::p3_r )
 {
-	return m_p3_r_func(0);
+	return m_in_p3_cb(0);
 }
 
 
 //-------------------------------------------------
-//  p1_w
+//  p0_w
 //-------------------------------------------------
 WRITE8_MEMBER( qs1000_device::p0_w )
 {
@@ -366,7 +364,7 @@ WRITE8_MEMBER( qs1000_device::p0_w )
 
 WRITE8_MEMBER( qs1000_device::p1_w )
 {
-	m_p1_w_func(0, data);
+	m_out_p1_cb((offs_t)0, data);
 }
 
 
@@ -376,7 +374,7 @@ WRITE8_MEMBER( qs1000_device::p1_w )
 
 WRITE8_MEMBER( qs1000_device::p2_w )
 {
-	m_p2_w_func(0, data);
+	m_out_p2_cb((offs_t)0, data);
 }
 
 
@@ -386,7 +384,7 @@ WRITE8_MEMBER( qs1000_device::p2_w )
 
 WRITE8_MEMBER( qs1000_device::p3_w )
 {
-	m_p3_w_func(0, data);
+	m_out_p3_cb((offs_t)0, data);
 }
 
 

@@ -711,26 +711,6 @@ GFXDECODE_END
 
 
 /*****************************************************************************************************
- INTERFACES
- *****************************************************************************************************/
-
-static QS1000_INTERFACE( qs1000_intf )
-{
-	/* External ROM */
-	true,
-
-	/* P1-P3 read handlers */
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	/* P1-P3 write handlers */
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_w),
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p2_w),
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p3_w),
-};
-
-/*****************************************************************************************************
   MACHINE DRIVERS
 *****************************************************************************************************/
 
@@ -759,7 +739,12 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_QS1000_EXTERNAL_ROM(true)
+	MCFG_QS1000_IN_P1_CB(READ8(limenko_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(limenko_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(limenko_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(limenko_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
