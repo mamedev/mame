@@ -729,6 +729,7 @@ endif
 ifneq ($(filter PCI,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/pci
 BUSOBJS += $(BUSOBJ)/pci/pci.o
+BUSOBJS += $(BUSOBJ)/pci/cirrus.o
 BUSOBJS += $(BUSOBJ)/pci/i82371ab.o
 BUSOBJS += $(BUSOBJ)/pci/i82371sb.o
 BUSOBJS += $(BUSOBJ)/pci/i82439tx.o

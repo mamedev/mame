@@ -1011,7 +1011,6 @@ $(MESSOBJ)/bandai.a:            \
 $(MESSOBJ)/be.a:                \
 	$(MESS_DRIVERS)/bebox.o     \
 	$(MESS_MACHINE)/bebox.o     \
-	$(MESS_VIDEO)/cirrus.o      \
 
 $(MESSOBJ)/bnpo.a:              \
 	$(MESS_DRIVERS)/b2m.o       \
