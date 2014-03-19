@@ -107,7 +107,12 @@
 //-------------------------------------------------
 
 gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
+		m_write_hsync(*this),
+		m_write_fsync(*this),
+		m_write_irq(*this),
+		m_write_firq(*this),
+		m_read_floating_bus(*this)
 {
 }
 
@@ -162,11 +167,11 @@ void gime_base_device::device_start(void)
 	}
 
 	// resolve callbacks
-	m_res_out_hsync_func.resolve(config->m_out_hsync_func, *this);
-	m_res_out_fsync_func.resolve(config->m_out_fsync_func, *this);
-	m_res_out_irq_func.resolve(config->m_out_irq_func, *this);
-	m_res_out_firq_func.resolve(config->m_out_firq_func, *this);
-	m_res_in_floating_bus_func.resolve(config->m_in_floating_bus_func, *this);
+	m_write_hsync.resolve_safe();
+	m_write_fsync.resolve_safe();
+	m_write_irq.resolve_safe();
+	m_write_firq.resolve_safe();
+	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
 	m_rom = machine().root_device().memregion(config->m_maincpu_tag)->base();
@@ -756,9 +761,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_palette_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_floating_bus(void)
 {
-	return m_res_in_floating_bus_func.isnull()
-		? 0
-		: m_res_in_floating_bus_func(0);
+	return m_read_floating_bus(0);
 }
 
 
@@ -1096,8 +1099,7 @@ void gime_base_device::interrupt_rising_edge(UINT8 interrupt)
 
 void gime_base_device::recalculate_irq(void)
 {
-	if (!m_res_out_irq_func.isnull())
-		m_res_out_irq_func(irq_r());
+	m_write_irq(irq_r());
 }
 
 
@@ -1108,8 +1110,7 @@ void gime_base_device::recalculate_irq(void)
 
 void gime_base_device::recalculate_firq(void)
 {
-	if (!m_res_out_firq_func.isnull())
-		m_res_out_firq_func(firq_r());
+	m_write_firq(firq_r());
 }
 
 

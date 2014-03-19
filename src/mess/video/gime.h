@@ -21,6 +21,21 @@
 //  GIME CONFIG/INTERFACE
 //**************************************************************************
 
+#define MCFG_GIME_HSYNC_CALLBACK(_write) \
+	devcb = &gime_base_device::set_hsync_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_GIME_FSYNC_CALLBACK(_write) \
+	devcb = &gime_base_device::set_fsync_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_GIME_IRQ_CALLBACK(_write) \
+	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_GIME_FIRQ_CALLBACK(_write) \
+	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
+	devcb = &gime_base_device::set_floating_bus_rd_callback(*device, DEVCB2_##_read);
+
 /* interface */
 struct gime_interface
 {
@@ -28,21 +43,6 @@ struct gime_interface
 	const char *m_maincpu_tag;  /* tag of main CPU */
 	const char *m_ram_tag;      /* tag of RAM device */
 	const char *m_ext_tag;      /* tag of expansion device */
-
-	/* if specified, this gets called for every change of the HSYNC pin */
-	devcb_write_line            m_out_hsync_func;
-
-	/* if specified, this gets called for every change of the FSYNC pin */
-	devcb_write_line            m_out_fsync_func;
-
-	/* if specified, this gets called for every change of the IRQ pin */
-	devcb_write_line            m_out_irq_func;
-
-	/* if specified, this gets called for every change of the FIRQ pin */
-	devcb_write_line            m_out_firq_func;
-
-	/* if specified, this reads from the floating bus */
-	devcb_read8                 m_in_floating_bus_func;
 };
 
 
@@ -56,6 +56,12 @@ class cococart_slot_device;
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
+	template<class _Object> static devcb2_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_hsync.set_callback(object); }
+	template<class _Object> static devcb2_base &set_fsync_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_fsync.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
+
 	// read/write
 	DECLARE_READ8_MEMBER( read ) { return read(offset); }
 	DECLARE_WRITE8_MEMBER( write ) { write(offset, data); }
@@ -156,9 +162,11 @@ private:
 	static const UINT8 hires_font[128][12];
 
 	// callbacks
-	devcb_resolved_write_line   m_res_out_irq_func;
-	devcb_resolved_write_line   m_res_out_firq_func;
-	devcb_resolved_read8        m_res_in_floating_bus_func;
+	devcb2_write_line   m_write_hsync;
+	devcb2_write_line   m_write_fsync;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_firq;
+	devcb2_read8        m_read_floating_bus;
 
 	// device state
 	UINT8                       m_gime_registers[16];
