@@ -1367,23 +1367,23 @@ void ti99_cartridge_device::device_config_complete()
 
 static GROM_CONFIG(grom3_config)
 {
-	false, 3, CARTGROM_TAG, 0x0000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 3, CARTGROM_TAG, 0x0000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom4_config)
 {
-	false, 4, CARTGROM_TAG, 0x2000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 4, CARTGROM_TAG, 0x2000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom5_config)
 {
-	false, 5, CARTGROM_TAG, 0x4000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 5, CARTGROM_TAG, 0x4000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom6_config)
 {
-	false, 6, CARTGROM_TAG, 0x6000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 6, CARTGROM_TAG, 0x6000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom7_config)
 {
-	false, 7, CARTGROM_TAG, 0x8000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 7, CARTGROM_TAG, 0x8000, 0x1800, GROMFREQ
 };
 
 /*
@@ -1391,10 +1391,15 @@ static GROM_CONFIG(grom7_config)
 */
 static MACHINE_CONFIG_FRAGMENT( ti99_cartridge )
 	MCFG_GROM_ADD( GROM3_TAG, grom3_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, grom4_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, grom5_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM6_TAG, grom6_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM7_TAG, grom7_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 MACHINE_CONFIG_END
 
 machine_config_constructor ti99_cartridge_device::device_mconfig_additions() const

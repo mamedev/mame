@@ -440,17 +440,17 @@ INPUT_PORTS_END
 
 static GROM_CONFIG(grom0_config)
 {
-	false, 0, region_sysgrom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ
+	false, 0, region_sysgrom, 0x0000, 0x1800, GROMFREQ
 };
 
 static GROM_CONFIG(grom1_config)
 {
-	false, 1, region_sysgrom, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ
+	false, 1, region_sysgrom, 0x2000, 0x1800, GROMFREQ
 };
 
 static GROM_CONFIG(grom2_config)
 {
-	false, 2, region_sysgrom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ
+	false, 2, region_sysgrom, 0x4000, 0x1800, GROMFREQ
 };
 
 /****************************************************
@@ -490,29 +490,29 @@ static GROM_CONFIG(grom2_config)
 
 #define GROM_LIBRARY_CONFIG8(_conf, _region) \
 static GROM_CONFIG(_conf##0) \
-{   false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 0, _region, 0x0000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##1) \
-{   false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 1, _region, 0x2000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##2) \
-{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 2, _region, 0x4000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##3) \
-{   false, 3, _region, 0x6000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 3, _region, 0x6000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##4) \
-{   false, 4, _region, 0x8000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 4, _region, 0x8000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##5) \
-{   false, 5, _region, 0xa000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 5, _region, 0xa000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##6) \
-{   false, 6, _region, 0xc000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 6, _region, 0xc000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##7) \
-{   false, 7, _region, 0xe000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ };
+{   false, 7, _region, 0xe000, 0x1800, GROMFREQ };
 
 #define GROM_LIBRARY_CONFIG3(_conf, _region) \
 static GROM_CONFIG(_conf##0) \
-{   false, 0, _region, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 0, _region, 0x0000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##1) \
-{   false, 1, _region, 0x2000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ }; \
+{   false, 1, _region, 0x2000, 0x1800, GROMFREQ }; \
 static GROM_CONFIG(_conf##2) \
-{   false, 2, _region, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_grom), GROMFREQ };
+{   false, 2, _region, 0x4000, 0x1800, GROMFREQ };
 GROM_LIBRARY_CONFIG8(pascal1, region_gromlib1)
 GROM_LIBRARY_CONFIG8(pascal2, region_gromlib2)
 GROM_LIBRARY_CONFIG3(pascal3, region_gromlib3)
@@ -1047,8 +1047,11 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 
 	/* Console GROMs */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 
 	/* Pascal GROM libraries. */
 	MCFG_GROM_LIBRARY_ADD8(pascal1_grom, pascal1)
@@ -1098,8 +1101,11 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 
 	/* Console GROMs */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_grom))
 
 	/* Pascal GROM libraries. */
 	MCFG_GROM_LIBRARY_ADD8(pascal1_grom, pascal1)

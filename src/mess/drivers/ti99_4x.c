@@ -358,17 +358,17 @@ INPUT_PORTS_END
 
 static GROM_CONFIG(grom0_config)
 {
-	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
+	false, 0, region_grom, 0x0000, 0x1800, GROMFREQ
 };
 
 static GROM_CONFIG(grom1_config)
 {
-	false, 1, region_grom, 0x2000, 0x1800,  DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
+	false, 1, region_grom, 0x2000, 0x1800, GROMFREQ
 };
 
 static GROM_CONFIG(grom2_config)
 {
-	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
+	false, 2, region_grom, 0x4000, 0x1800, GROMFREQ
 };
 
 READ8_MEMBER( ti99_4x_state::cruread )
@@ -931,8 +931,11 @@ static MACHINE_CONFIG_START( ti99_4_60hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG, 60 )
@@ -982,8 +985,11 @@ static MACHINE_CONFIG_START( ti99_4_50hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG, 50 )
@@ -1050,8 +1056,11 @@ static MACHINE_CONFIG_START( ti99_4a_60hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
@@ -1099,8 +1108,11 @@ static MACHINE_CONFIG_START( ti99_4a_50hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
@@ -1165,8 +1177,11 @@ static MACHINE_CONFIG_START( ti99_4qi_60hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
@@ -1214,8 +1229,11 @@ static MACHINE_CONFIG_START( ti99_4qi_50hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
@@ -1279,8 +1297,11 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 
 	/* GROM devices */
 	MCFG_GROM_ADD( GROM0_TAG, grom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM1_TAG, grom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
