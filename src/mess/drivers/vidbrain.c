@@ -458,13 +458,6 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 	return prog_space.read_byte(offset);
 }
 
-static UV201_INTERFACE( uv_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
-	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, hblank_w),
-	DEVCB_DRIVER_MEMBER(vidbrain_state, memory_read_byte)
-};
-
 
 
 //**************************************************************************
@@ -557,8 +550,12 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
-	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
 	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
+
+	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
+	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(vidbrain_state, ext_int_w))
+	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(vidbrain_state, hblank_w))
+	MCFG_UV201_DB_CALLBACK(READ8(vidbrain_state, memory_read_byte))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

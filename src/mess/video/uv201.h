@@ -68,16 +68,21 @@
 //**************************************************************************
 
 #define MCFG_UV201_ADD(_tag, _screen_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, UV201, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, uv201_device, screen_update) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262)
+	MCFG_SCREEN_RAW_PARAMS(_clock, 232, 18, 232, 262, 21, 262) \
+	MCFG_DEVICE_ADD(_tag, UV201, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 
-#define UV201_INTERFACE(name) \
-	const uv201_interface (name) =
+#define MCFG_UV201_EXT_INT_CALLBACK(_write) \
+	devcb = &uv201_device::set_ext_int_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UV201_HBLANK_CALLBACK(_write) \
+	devcb = &uv201_device::set_hblank_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UV201_DB_CALLBACK(_read) \
+	devcb = &uv201_device::set_db_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -85,25 +90,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> uv201_interface
-
-struct uv201_interface
-{
-	devcb_write_line        m_out_ext_int_cb;
-	devcb_write_line        m_out_hblank_cb;
-	devcb_read8             m_in_db_cb;
-};
-
-
 // ======================> uv201_device
 
 class uv201_device :    public device_t,
-						public device_video_interface,
-						public uv201_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	uv201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_ext_int_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_ext_int.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hblank_wr_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_write_hblank.set_callback(object); }
+	template<class _Object> static devcb2_base &set_db_rd_callback(device_t &device, _Object object) { return downcast<uv201_device &>(device).m_read_db.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -115,7 +113,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -135,9 +132,9 @@ private:
 	void set_y_interrupt();
 	void do_partial_update();
 
-	devcb_resolved_write_line   m_out_ext_int_func;
-	devcb_resolved_write_line   m_out_hblank_func;
-	devcb_resolved_read8        m_in_db_func;
+	devcb2_write_line   m_write_ext_int;
+	devcb2_write_line   m_write_hblank;
+	devcb2_read8        m_read_db;
 
 	rgb_t m_palette_val[32];
 	UINT8 m_ram[0x90];
