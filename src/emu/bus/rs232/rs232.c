@@ -77,7 +77,13 @@ WRITE_LINE_MEMBER( rs232_port_device::write_dtr )
 WRITE_LINE_MEMBER( rs232_port_device::write_rts )
 {
 	if(m_dev)
-		return m_dev->input_rts(state);
+		m_dev->input_rts(state);
+}
+
+WRITE_LINE_MEMBER( rs232_port_device::write_etc )
+{
+	if(m_dev)
+		m_dev->input_etc(state);
 }
 
 device_rs232_port_interface::device_rs232_port_interface(const machine_config &mconfig, device_t &device)
