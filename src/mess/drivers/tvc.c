@@ -657,11 +657,6 @@ static const cassette_interface tvc_cassette_interface =
 	NULL
 };
 
-static tvc_sound_interface  tvc_sound_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tvc_state, tvc_int_ff_set),
-};
-
 static const tvcexp_interface tvc_exp_interface =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),
@@ -700,7 +695,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("custom", TVC_SOUND, 0)
-	MCFG_SOUND_CONFIG(tvc_sound_intf)
+	MCFG_TVC_SOUND_SNDINT_CALLBACK(WRITELINE(tvc_state, tvc_int_ff_set))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
