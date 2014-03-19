@@ -297,6 +297,10 @@ private:
 	int     m_nready_prev;
 	void    console_ready_join(int id, int state);
 
+	// Latch for 9901 INT2, INT1 lines
+	int     m_9901_int;
+	void    set_9901_int(int line, line_state state);
+
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
 	required_device<tms9901_device>     m_tms9901;
@@ -563,8 +567,8 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 	case TMS9901_CB_INT7:
 		// Read pins INT3*-INT7* of TI99's 9901.
 		//
-		// (bit 1: INT1 status)
-		// (bit 2: INT2 status)
+		// bit 1: INT1 status
+		// bit 2: INT2 status
 		// bits 3-4: unused?
 		// bit 5: ???
 		// bit 6-7: keyboard status bits 0 through 1
@@ -580,7 +584,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		{
 			answer = ioport(column[m_keyboard_column])->read();
 		}
-		answer = (answer << 6) & 0xc0;
+		answer = (answer << 6) | m_9901_int;
 
 		break;
 
@@ -714,37 +718,47 @@ WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9995_INT1, data);
 }
 
+/*
 const tms9901_interface tms9901_wiring_ti99_8 =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,
+    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,
 
-	// read handler
-	DEVCB_DRIVER_MEMBER(ti99_8_state, read_by_9901),
+    // read handler
+    DEVCB_DRIVER_MEMBER(ti99_8_state, read_by_9901),
 
-	// write handlers
-	{
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC0),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC1),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC2),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC3),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, CRUS),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, PTGEN),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_motor),
-		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, audio_gate),
-		DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_output),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+    // write handlers
+    {
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC0),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC1),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC2),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, keyC3),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, CRUS),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, PTGEN),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_motor),
+        DEVCB_NULL,
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, audio_gate),
+        DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, cassette_output),
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL
+    },
 
-	DEVCB_DRIVER_MEMBER(ti99_8_state, tms9901_interrupt)
+    DEVCB_DRIVER_MEMBER(ti99_8_state, tms9901_interrupt)
 };
+*/
 
 /*****************************************************************************/
+
+void ti99_8_state::set_9901_int( int line, line_state state)
+{
+	m_tms9901->set_single_int(line, state);
+	// We latch the value for the read operation. Mind the negative logic.
+	if (state==CLEAR_LINE) m_9901_int |= (1<<line);
+	else m_9901_int &= ~(1<<line);
+}
 
 /*
     set the state of TMS9901's INT2 (called by the tms9928 core)
@@ -752,7 +766,7 @@ const tms9901_interface tms9901_wiring_ti99_8 =
 WRITE_LINE_MEMBER( ti99_8_state::set_tms9901_INT2 )
 {
 	if (TRACE_INTERRUPTS) LOG("ti99_8: VDP int 2 on tms9901, level=%02x\n", state);
-	m_tms9901->set_single_int(2, state);
+	set_9901_int(2, (line_state)state);
 }
 
 /***********************************************************
@@ -829,8 +843,7 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 WRITE_LINE_MEMBER( ti99_8_state::extint )
 {
 	if (TRACE_READY) LOG("ti99_8: EXTINT level = %02x\n", state);
-	if (m_tms9901 != NULL)
-		m_tms9901->set_single_int(1, state);
+	set_9901_int(1, (line_state)state);
 }
 
 WRITE_LINE_MEMBER( ti99_8_state::notconnected )
@@ -1004,6 +1017,9 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 	// But we assert the line here so that the system starts running
 	m_nready_combined = 0;
 	m_gromport->set_grom_base(0x9800, 0xfff1);
+
+	// Clear INT1 and INT2 latch (negative logic)
+	m_9901_int = 0x03;
 }
 
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
@@ -1017,7 +1033,19 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_TI998_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9118, ti99_8_tms9118a_interface)
 
 	/* Main board */
-	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0)
+	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_8_state, read_by_9901) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_8_state, keyC0) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( ti99_8_state, keyC1) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_8_state, keyC2) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_8_state, keyC3) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_8_state, CRUS) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_8_state, PTGEN) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_8_state, cassette_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_8_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_8_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_8_state, tms9901_interrupt) )
+
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
 	MCFG_MAINBOARD8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_mapper))
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
@@ -1073,7 +1101,19 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_TI998_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9129, ti99_8_tms9118a_interface)
 
 	/* Main board */
-	MCFG_TMS9901_ADD( TMS9901_TAG, tms9901_wiring_ti99_8, XTAL_10_738635MHz/4.0 )
+	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_8_state, read_by_9901) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_8_state, keyC0) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( ti99_8_state, keyC1) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_8_state, keyC2) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_8_state, keyC3) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_8_state, CRUS) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_8_state, PTGEN) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_8_state, cassette_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_8_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_8_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_8_state, tms9901_interrupt) )
+
 	MCFG_MAINBOARD8_ADD( MAINBOARD8_TAG, mapper_conf )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_8_state, console_ready_cart) )

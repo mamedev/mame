@@ -275,10 +275,6 @@ public:
 	line_state  m_video_wait; // reflects the line to the mapper for CRU query
 
 	int m_ready_line, m_ready_line1;
-
-private:
-	//int     m_joystick_select;
-	// Some values to keep. Rest is on the geneve_mapper.
 };
 
 /*
@@ -551,40 +547,43 @@ WRITE8_MEMBER( geneve_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9995_INT1, data);
 }
 
-/* tms9901 setup */
+/*
+// tms9901 setup
 const tms9901_interface tms9901_wiring_geneve =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,   /* only input pins whose state is always known */
+    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT8 | TMS9901_INTB | TMS9901_INTC,
 
-	// read handler
-	DEVCB_DRIVER_MEMBER(geneve_state, read_by_9901),
+    // read handler
+    DEVCB_DRIVER_MEMBER(geneve_state, read_by_9901),
 
-	{   /* write handlers */
-		DEVCB_DRIVER_LINE_MEMBER(geneve_state, peripheral_bus_reset),
-		DEVCB_DRIVER_LINE_MEMBER(geneve_state, VDP_reset),
-		DEVCB_DRIVER_LINE_MEMBER(geneve_state, joystick_select),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DEVICE_LINE_MEMBER(GKEYBOARD_TAG, geneve_keyboard_device, reset_line),
-		DEVCB_DRIVER_LINE_MEMBER(geneve_state, extbus_wait_states),
-		DEVCB_NULL,
-		DEVCB_DRIVER_LINE_MEMBER(geneve_state, video_wait_states),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+    {   // write handlers
+        DEVCB_DRIVER_LINE_MEMBER(geneve_state, peripheral_bus_reset),
+        DEVCB_DRIVER_LINE_MEMBER(geneve_state, VDP_reset),
+        DEVCB_DRIVER_LINE_MEMBER(geneve_state, joystick_select),
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_DEVICE_LINE_MEMBER(GKEYBOARD_TAG, geneve_keyboard_device, reset_line),
+        DEVCB_DRIVER_LINE_MEMBER(geneve_state, extbus_wait_states),
+        DEVCB_NULL,
+        DEVCB_DRIVER_LINE_MEMBER(geneve_state, video_wait_states),
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL
+    },
 
-	/* interrupt handler */
-	DEVCB_DRIVER_MEMBER(geneve_state, tms9901_interrupt)
+    // interrupt handler
+    DEVCB_DRIVER_MEMBER(geneve_state, tms9901_interrupt)
 };
+*/
 
 /*******************************************************************
     Signal lines
 *******************************************************************/
+
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
@@ -748,7 +747,15 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve_state, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components
-	MCFG_TMS9901_ADD(TMS9901_TAG, tms9901_wiring_geneve, 3000000)
+	MCFG_DEVICE_ADD(TMS9901_TAG, TMS9901, 3000000)
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(geneve_state, read_by_9901) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( geneve_state, peripheral_bus_reset) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( geneve_state, VDP_reset) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( geneve_state, joystick_select) )
+	MCFG_TMS9901_P6_HANDLER( DEVWRITELINE( GKEYBOARD_TAG, geneve_keyboard_device, reset_line) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( geneve_state, extbus_wait_states) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( geneve_state, video_wait_states) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( geneve_state, tms9901_interrupt) )
 
 	// Mapper
 	MCFG_DEVICE_ADD(GMAPPER_TAG, GENEVE_MAPPER, 0)

@@ -23,10 +23,11 @@ extern const device_type TMS9901;
     MACROS
 ***************************************************************************/
 
-/* Masks for the interrupts levels available on TMS9901 */
+// Masks for the interrupts levels available on TMS9901
+
 #define TMS9901_INT1 0x0002
 #define TMS9901_INT2 0x0004
-#define TMS9901_INT3 0x0008     // overriden by the timer interrupt
+#define TMS9901_INT3 0x0008     // overridden by the timer interrupt
 #define TMS9901_INT4 0x0010
 #define TMS9901_INT5 0x0020
 #define TMS9901_INT6 0x0040
@@ -52,14 +53,6 @@ enum
     CLASS DEFINITION
 ***************************************************************************/
 
-struct tms9901_interface
-{
-	int                 interrupt_mask;         // a bit for each input pin whose state is always notified to the TMS9901 core
-	devcb_read8         read_handler;           // 4*8 bits, to be selected using the offset (0-3)
-	devcb_write_line    write_handler[16];      // 16 Pn outputs
-	devcb_write8        interrupt_callback;     // called when interrupt bus state changes
-};
-
 class tms9901_device : public device_t
 {
 public:
@@ -70,6 +63,27 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	template<class _Object> static devcb2_base &static_set_readblock_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_read_block.set_callback(object); }
+
+	template<class _Object> static devcb2_base &static_set_p0_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p0.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p1_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p1.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p2_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p2.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p3_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p3.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p4_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p4.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p5_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p5.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p6_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p6.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p7_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p7.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p8_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p8.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p9_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p9.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p10_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p10.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p11_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p11.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p12_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p12.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p13_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p13.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p14_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p14.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_p15_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_write_p15.set_callback(object); }
+
+	template<class _Object> static devcb2_base &static_set_intlevel_callback(device_t &device, _Object object)  { return downcast<tms9901_device &>(device).m_interrupt.set_callback(object); }
+
 private:
 	static const device_timer_id DECREMENTER = 0;
 
@@ -77,18 +91,14 @@ private:
 	void timer_reload(void);
 	void field_interrupts(void);
 
-	virtual void device_start(void);
-	virtual void device_stop(void);
-	virtual void device_reset(void);
+	void device_start(void);
+	void device_stop(void);
+	void device_reset(void);
 
-	/* interrupt registers */
-	// mask:  bit #n is set if pin #n is supported as an interrupt pin,
-	// i.e. the driver sends a notification whenever the pin state changes
-	// setting these bits is not required, but it saves you the trouble of
-	// saving the state of interrupt pins and feeding it to the port read
-	// handlers again
-	int m_supported_int_mask;
-	int m_int_state;            // state of the int1-int15 lines (must be inverted when queried)
+	// State of the INT1-INT15 lines (must be inverted when queried)
+	// Note that the levels must also be delivered when reading the pins, which
+	// may require to latch the int levels.
+	int m_int_state;
 	int m_old_int_state;        // stores the previous value to avoid useless INT line assertions
 	int m_enabled_ints;         // interrupt enable mask
 
@@ -127,18 +137,88 @@ private:
 
 	// =======================================================================
 
-	// Callbacks
-	devcb_resolved_read8        m_read_block;
-	devcb_resolved_write_line   m_write_line[16];
-	devcb_resolved_write8       m_interrupt;  // also delivers the interrupt level
+	// Read callback.
+	devcb2_read8        m_read_block;
+
+	// I/O lines, used for output. When used as inputs, the levels are delivered via the m_read_block
+	devcb2_write_line   m_write_p0;
+	devcb2_write_line   m_write_p1;
+	devcb2_write_line   m_write_p2;
+	devcb2_write_line   m_write_p3;
+	devcb2_write_line   m_write_p4;
+	devcb2_write_line   m_write_p5;
+	devcb2_write_line   m_write_p6;
+	devcb2_write_line   m_write_p7;
+	devcb2_write_line   m_write_p8;
+	devcb2_write_line   m_write_p9;
+	devcb2_write_line   m_write_p10;
+	devcb2_write_line   m_write_p11;
+	devcb2_write_line   m_write_p12;
+	devcb2_write_line   m_write_p13;
+	devcb2_write_line   m_write_p14;
+	devcb2_write_line   m_write_p15;
+
+	// The invocation corresponds to the INTREQ signal (with the level passed as data)
+	// and the address delivers the interrupt level (0-15)
+	devcb2_write8       m_interrupt;
 };
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_TMS9901_ADD(_tag, _intrf, _rate) \
-	MCFG_DEVICE_ADD(_tag, TMS9901, _rate) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_TMS9901_READBLOCK_HANDLER( _read ) \
+	devcb = &tms9901_device::static_set_readblock_callback( *device, DEVCB2_##_read );
+
+#define MCFG_TMS9901_P0_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p0_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P1_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p1_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P2_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p2_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P3_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p3_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P4_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p4_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P5_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p5_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P6_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p6_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P7_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p7_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P8_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p8_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P9_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p9_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P10_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p10_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P11_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p11_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P12_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p12_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P13_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p13_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P14_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p14_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_P15_HANDLER( _write ) \
+	devcb = &tms9901_device::static_set_p15_callback( *device, DEVCB2_##_write );
+
+#define MCFG_TMS9901_INTLEVEL_HANDLER( _intlevel ) \
+	devcb = &tms9901_device::static_set_intlevel_callback( *device, DEVCB2_##_intlevel );
 
 #endif /* __TMS9901_H__ */

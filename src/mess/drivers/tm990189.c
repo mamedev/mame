@@ -70,6 +70,8 @@
 #include "tm990189.lh"
 #include "tm990189v.lh"
 
+#define TMS9901_0_TAG "tms9901_usr"
+#define TMS9901_1_TAG "tms9901_sys"
 
 class tm990189_state : public driver_device
 {
@@ -81,7 +83,9 @@ public:
 	m_cass(*this, "cassette"),
 	m_tms9918(*this, "tms9918" ),
 	m_maincpu(*this, "maincpu"),
-	m_cassette(*this, "cassette") { }
+	m_cassette(*this, "cassette"),
+	m_tms9901_usr(*this, TMS9901_0_TAG),
+	m_tms9901_sys(*this, TMS9901_1_TAG) { }
 
 	required_device<tms9980a_device> m_tms9980a;
 	required_device<speaker_sound_device> m_speaker;
@@ -158,6 +162,8 @@ private:
 	void digitsel(int offset, bool state);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<tms9901_device>     m_tms9901_usr;
+	required_device<tms9901_device>     m_tms9901_sys;
 };
 
 
@@ -304,7 +310,9 @@ WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
 
 WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
 {
-	machine().device<tms9901_device>("tms9901_0")->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
+	// machine().device<tms9901_device>("tms9901_0")->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
+	// TODO: Check this
+	m_tms9901_usr->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
 }
 
 READ8_MEMBER( tm990189_state::sys9901_r )
@@ -624,69 +632,74 @@ WRITE8_MEMBER( tm990189_state::video_joy_w )
 	m_joy2y_timer->reset(attotime::from_usec(ioport("JOY2_Y")->read()*28+28));
 }
 
-/* user tms9901 setup */
+/*
+// user tms9901 setup
 static const tms9901_interface usr9901reset_param =
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    /* only input pins whose state is always known */
+    TMS9901_INT1 | TMS9901_INT2 | TMS9901_INT3 | TMS9901_INT4 | TMS9901_INT5 | TMS9901_INT6,    // only input pins whose state is always known
 
-	/* Read handler. Covers all input lines (see tms9901.h) */
-	DEVCB_NULL,
+    // Read handler. Covers all input lines (see tms9901.h)
+    DEVCB_NULL,
 
-	/* write handlers */
-	{
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led0_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led1_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led2_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led3_w),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+    // write handlers
+    {
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led0_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led1_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led2_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led3_w),
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL,
+        DEVCB_NULL
+    },
 
-	/* interrupt handler */
-	DEVCB_DRIVER_MEMBER(tm990189_state, usr9901_interrupt_callback)
+    // interrupt handler
+    DEVCB_DRIVER_MEMBER(tm990189_state, usr9901_interrupt_callback)
 };
+*/
 
-/* system tms9901 setup */
+/*
+// system tms9901 setup
 static const tms9901_interface sys9901reset_param =
 {
-	0,  /* only input pins whose state is always known */
+    0,  // only input pins whose state is always known
 
-	/* Read handler. Covers all input lines (see tms9901.h) */
-	DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_r),
+    // Read handler. Covers all input lines (see tms9901.h)
+    DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_r),
 
-	/* write handlers */
-	{
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel0_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel1_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel2_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel3_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment0_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment1_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment2_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment3_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment4_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment5_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment6_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment7_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_dsplytrgr_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_shiftlight_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_spkrdrive_w),
-		DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_tapewdata_w)
-	},
+    // write handlers
+    {
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel0_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel1_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel2_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel3_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment0_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment1_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment2_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment3_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment4_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment5_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment6_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment7_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_dsplytrgr_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_shiftlight_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_spkrdrive_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_tapewdata_w)
+    },
 
-	/* interrupt handler */
-	DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_interrupt_callback)
+    // interrupt handler
+    DEVCB_DRIVER_MEMBER(tm990189_state, sys9901_interrupt_callback)
 };
+
+*/
 
 /*
     Memory map:
@@ -800,12 +813,12 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901_0", tms9901_device, read)      /* user I/O tms9901 */
-	AM_RANGE(0x0040, 0x006f) AM_DEVREAD("tms9901_1", tms9901_device, read)      /* system I/O tms9901 */
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TMS9901_0_TAG, tms9901_device, read)      /* user I/O tms9901 */
+	AM_RANGE(0x0040, 0x006f) AM_DEVREAD(TMS9901_1_TAG, tms9901_device, read)      /* system I/O tms9901 */
 	AM_RANGE(0x0080, 0x00cf) AM_DEVREAD("tms9902", tms9902_device, cruread)     /* optional tms9902 */
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901_0", tms9901_device, write)    /* user I/O tms9901 */
-	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE("tms9901_1", tms9901_device, write)    /* system I/O tms9901 */
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TMS9901_0_TAG, tms9901_device, write)    /* user I/O tms9901 */
+	AM_RANGE(0x0200, 0x03ff) AM_DEVWRITE(TMS9901_1_TAG, tms9901_device, write)    /* system I/O tms9901 */
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
@@ -837,8 +850,34 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param, 2000000)
-	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
+
+	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, usr9901_led0_w) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, usr9901_led1_w) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, usr9901_led2_w) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, usr9901_led3_w) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, usr9901_interrupt_callback) )
+
+	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(tm990189_state, sys9901_r) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel0_w) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel1_w) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel2_w) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel3_w) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( tm990189_state, sys9901_segment0_w) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( tm990189_state, sys9901_segment1_w) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( tm990189_state, sys9901_segment2_w) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( tm990189_state, sys9901_segment3_w) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( tm990189_state, sys9901_segment4_w) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( tm990189_state, sys9901_segment5_w) )
+	MCFG_TMS9901_P10_HANDLER( WRITELINE( tm990189_state, sys9901_segment6_w) )
+	MCFG_TMS9901_P11_HANDLER( WRITELINE( tm990189_state, sys9901_segment7_w) )
+	MCFG_TMS9901_P12_HANDLER( WRITELINE( tm990189_state, sys9901_dsplytrgr_w) )
+	MCFG_TMS9901_P13_HANDLER( WRITELINE( tm990189_state, sys9901_shiftlight_w) )
+	MCFG_TMS9901_P14_HANDLER( WRITELINE( tm990189_state, sys9901_spkrdrive_w) )
+	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
+
 	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
@@ -869,8 +908,33 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_TMS9901_ADD("tms9901_0", usr9901reset_param, 2000000)
-	MCFG_TMS9901_ADD("tms9901_1", sys9901reset_param, 2000000)
+	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, usr9901_led0_w) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, usr9901_led1_w) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, usr9901_led2_w) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, usr9901_led3_w) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, usr9901_interrupt_callback) )
+
+	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(tm990189_state, sys9901_r) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel0_w) )
+	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel1_w) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel2_w) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel3_w) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( tm990189_state, sys9901_segment0_w) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( tm990189_state, sys9901_segment1_w) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( tm990189_state, sys9901_segment2_w) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( tm990189_state, sys9901_segment3_w) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( tm990189_state, sys9901_segment4_w) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( tm990189_state, sys9901_segment5_w) )
+	MCFG_TMS9901_P10_HANDLER( WRITELINE( tm990189_state, sys9901_segment6_w) )
+	MCFG_TMS9901_P11_HANDLER( WRITELINE( tm990189_state, sys9901_segment7_w) )
+	MCFG_TMS9901_P12_HANDLER( WRITELINE( tm990189_state, sys9901_dsplytrgr_w) )
+	MCFG_TMS9901_P13_HANDLER( WRITELINE( tm990189_state, sys9901_shiftlight_w) )
+	MCFG_TMS9901_P14_HANDLER( WRITELINE( tm990189_state, sys9901_spkrdrive_w) )
+	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
+
 	MCFG_TMS9902_ADD("tms9902", tms9902_params, 2000000)
 	MCFG_TM990_189_RS232_ADD("rs232")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
