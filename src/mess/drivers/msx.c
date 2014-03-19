@@ -1167,11 +1167,6 @@ MACHINE_CONFIG_END
 #define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( msx2, msx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)       /* 3.579545 MHz */
@@ -1227,7 +1222,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_CASSETTE_ADD( "cassette", msx_cassette_interface )
 
 	/* real time clock */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 
@@ -1297,7 +1292,7 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_CASSETTE_ADD( "cassette", msx_cassette_interface )
 
 	/* real time clock */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	MCFG_FD1793_ADD("wd179x", msx_wd17xx_interface ) // TODO confirm type
 

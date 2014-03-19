@@ -212,11 +212,6 @@ void pc4_state::machine_start()
 	m_blink = 0;
 }
 
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( pc4, pc4_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -241,7 +236,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )

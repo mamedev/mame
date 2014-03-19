@@ -634,11 +634,6 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(rex6000_state, alarm_irq)
-};
-
 static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
@@ -666,7 +661,8 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	/*
 	Fujitsu 29DL16X have feature which is capability of reading data from one

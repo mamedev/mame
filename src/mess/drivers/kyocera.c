@@ -942,12 +942,6 @@ static INPUT_PORTS_START( olivm10 )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
 INPUT_PORTS_END
 
-/* RP5C01A Interface */
-
-static RP5C01_INTERFACE( tandy200_rtc_intf )
-{
-	DEVCB_NULL                              /* alarm */
-};
 
 /* 8155 Interface */
 
@@ -1549,7 +1543,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
-	MCFG_RP5C01_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rtc_intf)
+	MCFG_DEVICE_ADD(RP5C01A_TAG, RP5C01, XTAL_32_768kHz)
 
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0) /*XTAL_4_9152MHz/2,*/
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

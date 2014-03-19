@@ -34,39 +34,25 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RP5C01_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), RP5C01, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define RP5C01_INTERFACE(name) \
-	const rp5c01_interface (name) =
-
+#define MCFG_RP5C01_OUT_ALARM_CB(_devcb) \
+	devcb = &rp5c01_device::set_out_alarm_callback(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> rp5c01_interface
-
-struct rp5c01_interface
-{
-	devcb_write_line        m_out_alarm_cb;
-};
-
-
-
 // ======================> rp5c01_device
 
 class rp5c01_device :   public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface,
-						public rp5c01_interface
+						public device_nvram_interface
 {
 public:
 	// construction/destruction
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -74,7 +60,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -97,7 +82,7 @@ private:
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_16HZ = 1;
 
-	devcb_resolved_write_line   m_out_alarm_func;
+	devcb2_write_line        m_out_alarm_cb;
 
 	UINT8 m_reg[2][13];         // clock registers
 	UINT8 m_ram[13];            // RAM

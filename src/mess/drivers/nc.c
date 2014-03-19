@@ -796,12 +796,6 @@ WRITE_LINE_MEMBER(nc_state::nc100_rxrdy_callback)
 	nc_update_interrupts();
 }
 
-
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_tc8521_alarm_callback)
-};
-
 WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
 {
 	m_centronics_ack = state;
@@ -1465,7 +1459,8 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

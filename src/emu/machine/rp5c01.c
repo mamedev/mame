@@ -119,7 +119,7 @@ inline void rp5c01_device::set_alarm_line()
 	{
 		if (LOG) logerror("RP5C01 '%s' Alarm %u\n", tag(), alarm);
 
-		m_out_alarm_func(alarm);
+		m_out_alarm_cb(alarm);
 		m_alarm = alarm;
 	}
 }
@@ -178,6 +178,7 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock, "rp5c01", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_out_alarm_cb(*this),
 		m_mode(0),
 		m_reset(0),
 		m_alarm(1),
@@ -187,28 +188,6 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void rp5c01_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const rp5c01_interface *intf = reinterpret_cast<const rp5c01_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<rp5c01_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_alarm_cb, 0, sizeof(m_out_alarm_cb));
-	}
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -216,7 +195,7 @@ void rp5c01_device::device_config_complete()
 void rp5c01_device::device_start()
 {
 	// resolve callbacks
-	m_out_alarm_func.resolve(m_out_alarm_cb, *this);
+	m_out_alarm_cb.resolve_safe();
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
