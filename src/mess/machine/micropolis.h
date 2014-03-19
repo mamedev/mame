@@ -17,12 +17,18 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+#define MCFG_MICROPOLIS_DDEN_CALLBACK(_read) \
+	devcb = &micropolis_device::set_dden_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MICROPOLIS_INTRQ_CALLBACK(_write) \
+	devcb = &micropolis_device::set_intrq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MICROPOLIS_DRQ_CALLBACK(_write) \
+	devcb = &micropolis_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+
 /* Interface */
 struct micropolis_interface
 {
-	devcb_read_line m_in_dden_cb;
-	devcb_write_line m_out_intrq_cb;
-	devcb_write_line m_out_drq_cb;
 	const char *m_floppy_drive_tags[4];
 };
 
@@ -31,11 +37,15 @@ struct micropolis_interface
 ***************************************************************************/
 
 class micropolis_device : public device_t,
-									public micropolis_interface
+						  public micropolis_interface
 {
 public:
 	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~micropolis_device() {}
+
+	template<class _Object> static devcb2_base &set_dden_rd_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_read_dden.set_callback(object); }
+	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_intrq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<micropolis_device &>(device).m_write_drq.set_callback(object); }
 
 	void set_drive(UINT8 drive); // set current drive (0-3)
 
@@ -57,9 +67,9 @@ protected:
 private:
 	// internal state
 
-	devcb_resolved_read_line m_in_dden_func;
-	devcb_resolved_write_line m_out_intrq_func;
-	devcb_resolved_write_line m_out_drq_func;
+	devcb2_read_line m_read_dden;
+	devcb2_write_line m_write_intrq;
+	devcb2_write_line m_write_drq;
 
 	/* register */
 	UINT8 m_data;

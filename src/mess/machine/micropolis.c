@@ -64,13 +64,13 @@ static const UINT8 track_SD[][2] = {
 
 const micropolis_interface default_micropolis_interface =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
 #if 0
 const micropolis_interface default_micropolis_interface_2_drives =
 {
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, { FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 #endif
 
@@ -83,6 +83,9 @@ const device_type MICROPOLIS = &device_creator<micropolis_device>;
 
 micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
+	m_read_dden(*this),
+	m_write_intrq(*this),
+	m_write_drq(*this),
 	m_data(0),
 	m_drive_num(0),
 	m_track(0),
@@ -117,9 +120,6 @@ void micropolis_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_dden_cb, 0, sizeof(m_in_dden_cb));
-		memset(&m_out_intrq_cb, 0, sizeof(m_out_intrq_cb));
-		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
 		m_floppy_drive_tags[0] = "";
 		m_floppy_drive_tags[1] = "";
 		m_floppy_drive_tags[2] = "";
@@ -133,9 +133,9 @@ void micropolis_device::device_config_complete()
 
 void micropolis_device::device_start()
 {
-	m_in_dden_func.resolve(m_in_dden_cb, *this);
-	m_out_intrq_func.resolve(m_out_intrq_cb, *this);
-	m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_read_dden.resolve_safe(1);
+	m_write_intrq.resolve_safe();
+	m_write_drq.resolve_safe();
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_drive_num));
