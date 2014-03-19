@@ -213,7 +213,7 @@ static int *tex_mirror_table[2][8];
 
 static int K001005_bitmap_page = 0;
 
-static poly_manager *poly;
+static legacy_poly_manager *poly;
 static poly_vertex prev_v[4];
 
 static UINT32 fog_r, fog_g, fog_b;

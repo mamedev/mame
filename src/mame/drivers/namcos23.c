@@ -1331,7 +1331,7 @@ struct c404_t
 
 struct render_t
 {
-	poly_manager *polymgr;
+	legacy_poly_manager *polymgr;
 	int cur;
 	int poly_count;
 	int count[2];

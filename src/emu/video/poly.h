@@ -55,7 +55,7 @@
 ***************************************************************************/
 
 /* opaque reference to the poly manager */
-struct poly_manager;
+struct legacy_poly_manager;
 
 
 /* input vertex data */
@@ -97,50 +97,50 @@ typedef void (*poly_draw_scanline_func)(void *dest, INT32 scanline, const poly_e
 /* ----- initialization/teardown ----- */
 
 /* allocate a new poly manager that can render triangles */
-poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags);
+legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags);
 
 /* free a poly manager */
-void poly_free(poly_manager *poly);
+void poly_free(legacy_poly_manager *poly);
 
 
 
 /* ----- common functions ----- */
 
 /* wait until all polygons in the queue have been rendered */
-void poly_wait(poly_manager *poly, const char *debug_reason);
+void poly_wait(legacy_poly_manager *poly, const char *debug_reason);
 
 /* get a pointer to the extra data for the next polygon */
-void *poly_get_extra_data(poly_manager *poly);
+void *poly_get_extra_data(legacy_poly_manager *poly);
 
 
 
 /* ----- core triangle rendering ----- */
 
 /* render a single triangle given 3 vertexes */
-UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3);
+UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3);
 
 /* render a set of triangles in a fan */
-UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
+UINT32 poly_render_triangle_fan(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
 
 /* perform a custom render of an object, given specific extents */
-UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents);
+UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents);
 
 
 
 /* ----- core quad rendering ----- */
 
 /* render a single quad given 4 vertexes */
-UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4);
+UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4);
 
 /* render a set of quads in a fan */
-UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
+UINT32 poly_render_quad_fan(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
 
 
 
 /* ----- core polygon rendering ----- */
 
 /* render a single polygon up to 32 vertices */
-UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
+UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v);
 
 
 

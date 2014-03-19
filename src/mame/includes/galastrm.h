@@ -55,7 +55,7 @@ public:
 	struct tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
 	bitmap_ind16 m_polybitmap;
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	int m_rsxb;
 	int m_rsyb;
 	int m_rsxoffs;

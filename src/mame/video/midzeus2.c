@@ -57,7 +57,7 @@ struct poly_extra_data
  *
  *************************************/
 
-static poly_manager *poly;
+static legacy_poly_manager *poly;
 static UINT8 log_fifo;
 
 static UINT32 zeus_fifo[20];

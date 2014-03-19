@@ -101,7 +101,7 @@ public:
 	VECTOR3 m_parallel_light;
 	float m_parallel_light_intensity;
 	float m_ambient_light_intensity;
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	int m_list_depth;
 	int m_tick;
 	int m_debug_layer_disable;

@@ -77,7 +77,7 @@ private:
 
 	int m_bitmap_page;
 
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	poly_vertex m_prev_v[4];
 	int m_prev_poly_type;
 

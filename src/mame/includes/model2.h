@@ -95,7 +95,7 @@ public:
 	int m_jnet_time_out;
 	UINT32 m_geo_read_start_address;
 	UINT32 m_geo_write_start_address;
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;

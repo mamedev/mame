@@ -123,7 +123,7 @@ union work_unit
 /* polygon_info describes a single polygon, which includes the poly_params */
 struct polygon_info
 {
-	poly_manager *      poly;                   /* pointer back to the poly manager */
+	legacy_poly_manager *      poly;                   /* pointer back to the poly manager */
 	void *              dest;                   /* pointer to the destination we are rendering to */
 	void *              extra;                  /* extra data pointer */
 	UINT8               numparams;              /* number of parameters for this polygon  */
@@ -136,7 +136,7 @@ struct polygon_info
 
 
 /* full poly manager description */
-struct poly_manager
+struct legacy_poly_manager
 {
 	/* queue management */
 	osd_work_queue *    queue;                  /* work queue */
@@ -194,7 +194,7 @@ struct poly_manager
 
 static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 itemcount);
 static void *poly_item_callback(void *param, int threadid);
-static void poly_state_presave(poly_manager *poly);
+static void poly_state_presave(legacy_poly_manager *poly);
 
 
 
@@ -274,7 +274,7 @@ INLINE void copy_vertex(poly_vertex *outv, const poly_vertex *v, int paramcount)
     object, blocking if we run out
 -------------------------------------------------*/
 
-INLINE polygon_info *allocate_polygon(poly_manager *poly, int miny, int maxy)
+INLINE polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny, int maxy)
 {
 	/* wait for a work item if we have to */
 	if (poly->polygon_next + 1 > poly->polygon_count)
@@ -308,12 +308,12 @@ INLINE polygon_info *allocate_polygon(poly_manager *poly, int miny, int maxy)
     manager
 -------------------------------------------------*/
 
-poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags)
+legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, UINT8 flags)
 {
-	poly_manager *poly;
+	legacy_poly_manager *poly;
 
 	/* allocate the manager itself */
-	poly = auto_alloc_clear(machine, poly_manager);
+	poly = auto_alloc_clear(machine, legacy_poly_manager);
 	poly->flags = flags;
 
 	/* allocate polygons */
@@ -348,7 +348,7 @@ poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_d
     poly_free - free a polygon manager
 -------------------------------------------------*/
 
-void poly_free(poly_manager *poly)
+void poly_free(legacy_poly_manager *poly)
 {
 #if KEEP_STATISTICS
 {
@@ -387,7 +387,7 @@ void poly_free(poly_manager *poly)
     to complete
 -------------------------------------------------*/
 
-void poly_wait(poly_manager *poly, const char *debug_reason)
+void poly_wait(legacy_poly_manager *poly, const char *debug_reason)
 {
 	osd_ticks_t time;
 
@@ -431,7 +431,7 @@ void poly_wait(poly_manager *poly, const char *debug_reason)
     extra data for the next polygon
 -------------------------------------------------*/
 
-void *poly_get_extra_data(poly_manager *poly)
+void *poly_get_extra_data(legacy_poly_manager *poly)
 {
 	/* wait for a work item if we have to */
 	if (poly->extra_next + 1 > poly->extra_count)
@@ -460,7 +460,7 @@ void *poly_get_extra_data(poly_manager *poly)
     triangle given 3 vertexes
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3)
+UINT32 poly_render_triangle(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3)
 {
 	float dxdy_v1v2, dxdy_v1v3, dxdy_v2v3;
 	const poly_vertex *tv;
@@ -643,7 +643,7 @@ UINT32 poly_render_triangle(poly_manager *poly, void *dest, const rectangle &cli
     triangles in a fan
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_triangle_fan(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	UINT32 pixels = 0;
 	int vertnum;
@@ -660,7 +660,7 @@ UINT32 poly_render_triangle_fan(poly_manager *poly, void *dest, const rectangle 
     render of an object, given specific extents
 -------------------------------------------------*/
 
-UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents)
+UINT32 poly_render_triangle_custom(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int startscanline, int numscanlines, const poly_extent *extents)
 {
 	INT32 curscan, scaninc;
 	polygon_info *polygon;
@@ -756,7 +756,7 @@ UINT32 poly_render_triangle_custom(poly_manager *poly, void *dest, const rectang
     given 4 vertexes
 -------------------------------------------------*/
 
-UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4)
+UINT32 poly_render_quad(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, const poly_vertex *v1, const poly_vertex *v2, const poly_vertex *v3, const poly_vertex *v4)
 {
 	poly_edge fedgelist[3], bedgelist[3];
 	const poly_edge *ledge, *redge;
@@ -976,7 +976,7 @@ UINT32 poly_render_quad(poly_manager *poly, void *dest, const rectangle &cliprec
     quads in a fan
 -------------------------------------------------*/
 
-UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_quad_fan(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	UINT32 pixels = 0;
 	int vertnum;
@@ -998,7 +998,7 @@ UINT32 poly_render_quad_fan(poly_manager *poly, void *dest, const rectangle &cli
     to 32 vertices
 -------------------------------------------------*/
 
-UINT32 poly_render_polygon(poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
+UINT32 poly_render_polygon(legacy_poly_manager *poly, void *dest, const rectangle &cliprect, poly_draw_scanline_func callback, int paramcount, int numverts, const poly_vertex *v)
 {
 	poly_edge fedgelist[MAX_POLYGON_VERTS - 1], bedgelist[MAX_POLYGON_VERTS - 1];
 	const poly_edge *ledge, *redge;
@@ -1351,7 +1351,7 @@ static void *poly_item_callback(void *param, int threadid)
     ensure everything is synced before saving
 -------------------------------------------------*/
 
-static void poly_state_presave(poly_manager *poly)
+static void poly_state_presave(legacy_poly_manager *poly)
 {
 	poly_wait(poly, "pre-save");
 }
