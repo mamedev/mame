@@ -22,7 +22,7 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_NICK_ADD(_tag, _screen_tag, _clock, _virq) \
+#define MCFG_NICK_ADD(_tag, _screen_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(50) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -30,8 +30,11 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, nick_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, NICK, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<nick_device *>(device)->set_virq_callback(DEVCB2_##_virq);
+	MCFG_VIDEO_SET_SCREEN(_screen_tag)
+
+
+#define MCFG_NICK_VIRQ_CALLBACK(_write) \
+	devcb = &nick_device::set_virq_wr_callback(*device, DEVCB2_##_write);
 
 
 /* there are 64us per line, although in reality
@@ -73,7 +76,7 @@ public:
 	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _virq> void set_virq_callback(_virq virq) { m_write_virq.set_callback(virq); }
+	template<class _Object> static devcb2_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
