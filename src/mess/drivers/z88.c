@@ -621,10 +621,6 @@ static UPD65031_INTERFACE( z88_blink_intf )
 {
 	z88_screen_update,                                      // callback for update the LCD
 	z88_bankswitch_update,                                  // callback for update the bankswitch
-	DEVCB_DRIVER_MEMBER(z88_state, kb_r),                   // kb read input
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),                     // INT line out
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),        // NMI line out
-	DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w)         // Speaker line out
 };
 
 static const z88cart_interface z88_cart_interface =
@@ -664,6 +660,10 @@ static MACHINE_CONFIG_START( z88, z88_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_UPD65031_ADD("blink", XTAL_9_8304MHz, z88_blink_intf)
+	MCFG_UPD65031_KB_CALLBACK(READ8(z88_state, kb_r))
+	MCFG_UPD65031_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_UPD65031_NMI_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_UPD65031_SPKR_CALLBACK(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
