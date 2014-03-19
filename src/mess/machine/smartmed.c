@@ -75,11 +75,13 @@ enum
 const device_type NAND = &device_creator<nand_device>;
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__)
+	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
+	  m_write_rnb(*this)
 {
 }
 nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	  m_write_rnb(*this)
 {
 }
 
@@ -105,7 +107,6 @@ void nand_device::device_config_complete()
 	else
 	{
 		memset(&m_chip, 0, sizeof(m_chip));
-		memset(&m_devcb_write_line_cb, 0, sizeof(m_devcb_write_line_cb));
 		m_id_len = 0;
 		m_page_data_size = 0;
 		m_page_total_size = 0;
@@ -137,7 +138,7 @@ void nand_device::device_start()
 	#ifdef SMARTMEDIA_IMAGE_SAVE
 	m_image_format = 0;
 	#endif
-	m_devcb_write_line_rnb.resolve( m_devcb_write_line_cb, *this);
+	m_write_rnb.resolve_safe();
 }
 
 /*
@@ -408,10 +409,10 @@ void nand_device::command_w(UINT8 data)
 		m_status = (m_status & 0x80) | 0x40;
 		m_accumulated_status = 0;
 		m_mode_3065 = 0;
-		if (!m_devcb_write_line_rnb.isnull())
+		if (!m_write_rnb.isnull())
 		{
-			m_devcb_write_line_rnb( 0);
-			m_devcb_write_line_rnb( 1);
+			m_write_rnb( 0);
+			m_write_rnb( 1);
 		}
 		break;
 	case 0x00: // Read (1st cycle)
@@ -475,10 +476,10 @@ void nand_device::command_w(UINT8 data)
 			else
 				m_accumulated_status = 0;
 			m_mode = SM_M_INIT;
-			if (!m_devcb_write_line_rnb.isnull())
+			if (!m_write_rnb.isnull())
 			{
-				m_devcb_write_line_rnb( 0);
-				m_devcb_write_line_rnb( 1);
+				m_write_rnb( 0);
+				m_write_rnb( 1);
 			}
 		}
 		break;
@@ -504,10 +505,10 @@ void nand_device::command_w(UINT8 data)
 			m_mode = SM_M_INIT;
 			if (m_pointer_mode == SM_PM_B)
 				m_pointer_mode = SM_PM_A;
-			if (!m_devcb_write_line_rnb.isnull())
+			if (!m_write_rnb.isnull())
 			{
-				m_devcb_write_line_rnb( 0);
-				m_devcb_write_line_rnb( 1);
+				m_write_rnb( 0);
+				m_write_rnb( 1);
 			}
 		}
 		break;
@@ -541,10 +542,10 @@ void nand_device::command_w(UINT8 data)
 			}
 			else
 			{
-				if (!m_devcb_write_line_rnb.isnull())
+				if (!m_write_rnb.isnull())
 				{
-					m_devcb_write_line_rnb( 0);
-					m_devcb_write_line_rnb( 1);
+					m_write_rnb( 0);
+					m_write_rnb( 1);
 				}
 			}
 		}

@@ -295,8 +295,7 @@ static S3C2410_INTERFACE( palmz22_s3c2410_intf )
 
 static NAND_INTERFACE( palmz22_nand_intf )
 {
-	NAND_CHIP_K9F5608U0D_J,
-	DEVCB_DEVICE_LINE_MEMBER("s3c2410", s3c2410_device, frnb_w)
+	NAND_CHIP_K9F5608U0D_J
 };
 
 static MACHINE_CONFIG_START( palmz22, palmz22_state )
@@ -314,10 +313,10 @@ static MACHINE_CONFIG_START( palmz22, palmz22_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2410", s3c2410_device, screen_update)
 
-
 	MCFG_S3C2410_ADD("s3c2410", 12000000, palmz22_s3c2410_intf, "palette")
 
 	MCFG_NAND_ADD("nand", palmz22_nand_intf)
+	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, frnb_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( palmz22 )

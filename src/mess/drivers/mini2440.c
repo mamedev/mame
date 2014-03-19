@@ -227,8 +227,7 @@ static S3C2440_INTERFACE( mini2440_s3c2440_intf )
 
 static NAND_INTERFACE( mini2440_nand_intf )
 {
-	NAND_CHIP_K9F1G08U0B,
-	DEVCB_DEVICE_LINE_MEMBER("s3c2440", s3c2440_device, frnb_w)
+	NAND_CHIP_K9F1G08U0B
 };
 
 static MACHINE_CONFIG_START( mini2440, mini2440_state )
@@ -246,7 +245,6 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("dac1", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -256,6 +254,7 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_S3C2440_ADD("s3c2440", 12000000, mini2440_s3c2440_intf, "palette")
 
 	MCFG_NAND_ADD("nand", mini2440_nand_intf)
+	MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2440", s3c2440_device, frnb_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mini2440 )
