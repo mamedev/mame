@@ -37,18 +37,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> apricot_keyboard_interface
-
-struct apricot_keyboard_interface
-{
-	devcb_write_line    m_out_txd_cb;
-};
-
-
 // ======================> apricot_keyboard_device
 
-class apricot_keyboard_device :  public device_t,
-								 public apricot_keyboard_interface
+class apricot_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
