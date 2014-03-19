@@ -986,11 +986,6 @@ static MAPPER8_CONFIG( mapper_conf )
 	mapper_devices
 };
 
-static SPEECH8_CONFIG( speech_config )
-{
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, console_ready_speech),  // READY
-};
-
 MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 {
 	m_nready_combined = 0;
@@ -1059,7 +1054,8 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_GROM_LIBRARY_ADD3(pascal3_grom, pascal3)
 
 	/* Devices */
-	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
+	MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
+  MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
@@ -1113,7 +1109,8 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_GROM_LIBRARY_ADD3(pascal3_grom, pascal3)
 
 	/* Devices */
-	MCFG_TISPEECH8_ADD(SPEECH_TAG, speech_config)
+  MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
+  MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
