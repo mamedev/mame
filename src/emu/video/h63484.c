@@ -1367,9 +1367,9 @@ void h63484_device::command_arc_exec()
 		ye += m_cpy;
 	}
 
-	double r = sqrt(pow(xc - m_cpx, 2) + pow(yc - m_cpy, 2));
-	double s_angol = atan2(m_cpy - yc, m_cpx - xc);
-	double e_angol = atan2(ye - yc, xe - xc);
+	double r = sqrt(pow((double)(xc - m_cpx), 2) + pow((double)(yc - m_cpy), 2));
+	double s_angol = atan2((double)(m_cpy - yc), (double)(m_cpx - xc));
+	double e_angol = atan2((double)(ye - yc), (double)(xe - xc));
 	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
 	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
 
