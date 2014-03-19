@@ -1,1 +1,1 @@
-#include "../portmedia/pmmidi.c"
+#include "../portmedia/pmmidi.inc"
