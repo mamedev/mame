@@ -244,21 +244,11 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const e05a03_interface lx800_e05a03_intf =
-{
-	DEVCB_DRIVER_MEMBER(lx800_state, lx800_centronics_data_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_paperempty_led_w),
-	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_centronics_pe_w),
-	DEVCB_DRIVER_LINE_MEMBER(lx800_state, lx800_reset_w)
-};
-
 static MACHINE_CONFIG_START( lx800, lx800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
 	MCFG_CPU_IO_MAP(lx800_io)
-
 
 	MCFG_DEFAULT_LAYOUT(layout_lx800)
 
@@ -268,7 +258,11 @@ static MACHINE_CONFIG_START( lx800, lx800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* gate array */
-	MCFG_E05A03_ADD("ic3b", lx800_e05a03_intf)
+	MCFG_DEVICE_ADD("ic3b", E05A03, 0)
+	MCFG_E05A03_PE_LP_CALLBACK(WRITELINE(lx800_state, lx800_paperempty_led_w))
+	MCFG_E05A03_RESO_CALLBACK(WRITELINE(lx800_state, lx800_reset_w))
+	MCFG_E05A03_PE_CALLBACK(WRITELINE(lx800_state, lx800_centronics_pe_w))
+	MCFG_E05A03_DATA_CALLBACK(READ8(lx800_state, lx800_centronics_data_r))
 MACHINE_CONFIG_END
 
 

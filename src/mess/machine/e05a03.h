@@ -10,32 +10,41 @@
 #ifndef __E05A03_H__
 #define __E05A03_H__
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_E05A03_NLQ_LP_CALLBACK(_write) \
+	devcb = &e05a03_device::set_nlq_lp_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_E05A03_PE_LP_CALLBACK(_write) \
+	devcb = &e05a03_device::set_pe_lp_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_E05A03_RESO_CALLBACK(_write) \
+	devcb = &e05a03_device::set_reso_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_E05A03_PE_CALLBACK(_write) \
+	devcb = &e05a03_device::set_pe_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_E05A03_DATA_CALLBACK(_read) \
+	devcb = &e05a03_device::set_data_rd_callback(*device, DEVCB2_##_read);
+
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct e05a03_interface
-{
-	devcb_read8 m_in_data_cb;
-
-	devcb_write_line m_out_nlq_lp_cb;
-	devcb_write_line m_out_pe_lp_cb;
-	devcb_write_line m_out_pe_cb;
-	devcb_write_line m_out_reso_cb;
-};
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-class e05a03_device : public device_t,
-								public e05a03_interface
+class e05a03_device : public device_t
 {
 public:
 	e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~e05a03_device() {}
+
+	template<class _Object> static devcb2_base &set_nlq_lp_wr_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_write_nlq_lp.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pe_lp_wr_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_write_pe_lp.set_callback(object); }
+	template<class _Object> static devcb2_base &set_reso_wr_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_write_reso.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pe_wr_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_write_pe.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_read_data.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -49,12 +58,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
 	// internal state
+	/* callbacks */
+	devcb2_write_line m_write_nlq_lp; /* pin 2, nlq lamp output */
+	devcb2_write_line m_write_pe_lp;  /* pin 3, paper empty lamp output */
+	devcb2_write_line m_write_reso;   /* pin 25, reset output */
+	devcb2_write_line m_write_pe;     /* pin 35, centronics pe output */
+	devcb2_read8 m_read_data;         /* pin 47-54, centronics data input */
 
 	/* 24-bit shift register, port 0x00, 0x01 and 0x02 */
 	UINT32 m_shift;
@@ -78,21 +92,9 @@ private:
 
 	/* port 0x07 (4-bit) */
 	UINT8 m_cr_motor;
-
-	/* callbacks */
-	devcb_resolved_write_line m_out_nlq_lp_func; /* pin 2, nlq lamp output */
-	devcb_resolved_write_line m_out_pe_lp_func;  /* pin 3, paper empty lamp output */
-	devcb_resolved_write_line m_out_reso_func;   /* pin 25, reset output */
-	devcb_resolved_write_line m_out_pe_func;     /* pin 35, centronics pe output */
-	devcb_resolved_read8 m_in_data_func;         /* pin 47-54, centronics data input */
 };
 
 extern const device_type E05A03;
-
-
-#define MCFG_E05A03_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, E05A03, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
 
 
 #endif /* __E05A03_H__ */

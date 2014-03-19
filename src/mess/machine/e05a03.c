@@ -19,6 +19,11 @@ const device_type E05A03 = &device_creator<e05a03_device>;
 
 e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, E05A03, "E05A03", tag, owner, clock, "e05a03", __FILE__),
+	m_write_nlq_lp(*this),
+	m_write_pe_lp(*this),
+	m_write_reso(*this),
+	m_write_pe(*this),
+	m_read_data(*this),
 	m_shift(0),
 	m_busy_leading(0),
 	m_busy_software(0),
@@ -35,41 +40,17 @@ e05a03_device::e05a03_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void e05a03_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const e05a03_interface *intf = reinterpret_cast<const e05a03_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<e05a03_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_data_cb, 0 , sizeof(m_in_data_cb));
-		memset(&m_out_nlq_lp_cb, 0 , sizeof(m_out_nlq_lp_cb));
-		memset(&m_out_pe_lp_cb, 0 , sizeof(m_out_pe_lp_cb));
-		memset(&m_out_pe_cb, 0 , sizeof(m_out_pe_cb));
-		memset(&m_out_reso_cb, 0 , sizeof(m_out_reso_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void e05a03_device::device_start()
 {
 	/* resolve callbacks */
-	m_out_nlq_lp_func.resolve(m_out_nlq_lp_cb, *this);
-	m_out_pe_lp_func.resolve(m_out_pe_lp_cb, *this);
-	m_out_reso_func.resolve(m_out_reso_cb, *this);
-	m_out_pe_func.resolve(m_out_pe_cb, *this);
-	m_in_data_func.resolve(m_in_data_cb, *this);
+	m_write_nlq_lp.resolve_safe();
+	m_write_pe_lp.resolve_safe();
+	m_write_reso.resolve_safe();
+	m_write_pe.resolve_safe();
+	m_read_data.resolve_safe(0);
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
@@ -96,8 +77,8 @@ void e05a03_device::device_reset()
 	m_pf_motor = 0x00;
 	m_cr_motor = 0x0f;
 
-	m_out_pe_func(0);
-	m_out_pe_lp_func(1);
+	m_write_pe(0);
+	m_write_pe_lp(1);
 
 	m_busy_software = 1;
 	m_nlqlp = 1;
@@ -127,8 +108,8 @@ WRITE8_MEMBER( e05a03_device::write )
 		m_nlqlp = BIT(data, 4);
 		m_cndlp = BIT(data, 3);
 
-		m_out_pe_func(BIT(data, 2));
-		m_out_pe_lp_func(!BIT(data, 2));
+		m_write_pe(BIT(data, 2));
+		m_write_pe_lp(!BIT(data, 2));
 
 #if 0
 		m_pe = BIT(data, 2);
@@ -162,7 +143,7 @@ READ8_MEMBER( e05a03_device::read )
 		break;
 
 	case 0x02:
-		result = m_in_data_func(0);
+		result = m_read_data(0);
 		break;
 
 	case 0x03:
@@ -198,7 +179,7 @@ WRITE_LINE_MEMBER( e05a03_device::resi_w )
 	if (!state)
 	{
 		device_reset();
-		m_out_reso_func(1);
+		m_write_reso(1);
 	}
 }
 
