@@ -411,48 +411,48 @@ public:
 				{
 					if (nozoom)
 					{
-						m_gfx->prio_transtable(m_palette,bitmap,cliprect,
+						m_gfx->prio_transtable(bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
 								sx,sy,
 								m_screen->priority(),primask,
-								whichtable,m_palette->shadow_table());
+								whichtable);
 					}
 					else
 					{
-						m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
+						m_gfx->prio_zoom_transtable(bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
 								sx,sy,
 								(zw << 16) >> 4,(zh << 16) >> 4,
 								m_screen->priority(),primask,
-								whichtable,m_palette->shadow_table());
+								whichtable);
 					}
 
 					if (mirrory && height == 1)  /* Simpsons shadows */
 					{
 						if (nozoom)
 						{
-							m_gfx->prio_transtable(m_palette,bitmap,cliprect,
+							m_gfx->prio_transtable(bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
 									sx,sy,
 									m_screen->priority(),primask,
-									whichtable,m_palette->shadow_table());
+									whichtable);
 						}
 						else
 						{
-							m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
+							m_gfx->prio_zoom_transtable(bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
 									sx,sy,
 									(zw << 16) >> 4,(zh << 16) >> 4,
 									m_screen->priority(),primask,
-									whichtable,m_palette->shadow_table());
+									whichtable);
 						}
 					}
 				}

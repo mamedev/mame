@@ -121,7 +121,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 				bitmap.pix16(y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				m_color_ram[offs] & 0x3f,
 				0,0,
@@ -131,7 +131,7 @@ UINT32 quasar_state::screen_update_quasar(screen_device &screen, bitmap_ind16 &b
 		/* background for Collision Detection (it can only hit certain items) */
 		if((m_color_ram[offs] & 7) == 0)
 		{
-			m_gfxdecode->gfx(0)->opaque(m_palette,m_collision_background,cliprect,
+			m_gfxdecode->gfx(0)->opaque(m_collision_background,cliprect,
 					code,
 					64,
 					0,0,

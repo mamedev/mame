@@ -89,7 +89,7 @@ void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipr
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
@@ -209,7 +209,7 @@ void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

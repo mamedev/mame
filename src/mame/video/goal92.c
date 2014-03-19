@@ -121,7 +121,7 @@ void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		y = 256 - (y + 7);
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}

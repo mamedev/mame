@@ -377,7 +377,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 			if(bpp)
 				color&=0x3;
 
-			m_gfxdecode->gfx(bpp)->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
 			count++;
 
 		}

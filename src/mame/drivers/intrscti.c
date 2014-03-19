@@ -56,7 +56,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,dat/*+0x100*/,0,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -68,7 +68,7 @@ UINT32 intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_ind1
 		{
 			int dat;
 			dat = m_vram[count];
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,dat+0x100,0,0,0,x*8,y*8,0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,dat+0x100,0,0,0,x*8,y*8,0);
 			count++;
 		}
 	}

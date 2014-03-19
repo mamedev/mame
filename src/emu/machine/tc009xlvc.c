@@ -336,7 +336,7 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			fy = !fy;
 		}
 
-		gfx->prio_transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
+		gfx->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
 	}
 }
 

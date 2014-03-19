@@ -275,7 +275,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				sprite,
 				color,flipx,flipy,x,y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0));

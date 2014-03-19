@@ -199,20 +199,20 @@ void paradise_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 0xf0 - y;   flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x,y, 0xff );
 
 		/* wrap around x */
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x - 256,y, 0xff );
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code + (attr << 8),
 				0,
 				flipx, flipy,

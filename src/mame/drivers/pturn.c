@@ -204,7 +204,7 @@ UINT32 pturn_state::screen_update_pturn(screen_device &screen, bitmap_ind16 &bit
 
 		if(sx|sy)
 		{
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,

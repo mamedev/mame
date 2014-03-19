@@ -772,7 +772,7 @@ void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if (m_gfxdecode->gfx(map+5))
 				drawgfx_transpen_x2222(bitmap,cliprect,m_gfxdecode->gfx(map),m_gfxdecode->gfx(map+5),code,0,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 			else
-				m_gfxdecode->gfx(map)->transpen(m_palette,bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
+				m_gfxdecode->gfx(map)->transpen(bitmap,cliprect,code,pal,0,0,(x*32)-(scrollx&0x1f)-m_xoffset,(y*32)-(scrolly&0x1f),0);
 
 			basex++;
 		}
@@ -828,10 +828,10 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 
 		}
 		else
 		{
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset, y-0x100, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap, cliprect, code, col, 0, 0, x - m_xoffset - 0x200, y-0x100, 0);
 
 		}
 	}

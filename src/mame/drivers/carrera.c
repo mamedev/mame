@@ -265,7 +265,7 @@ UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 
 		{
 			int tile = m_tileram[count&0x7ff] | m_tileram[(count&0x7ff)+0x800]<<8;
 
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 			count++;
 		}
 	}

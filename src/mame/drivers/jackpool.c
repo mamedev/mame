@@ -72,7 +72,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 				int tile = (m_vram[count+(0x2000/2)] & 0x7fff);
 				int attr = (m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
-				gfx->opaque(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8);
+				gfx->opaque(bitmap,cliprect,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
@@ -89,7 +89,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 					int attr = (m_vram[count+0x800] & 0x1f00)>>8;
 					int t_pen = (m_vram[count+0x800] & 0x1000);
 
-					gfx->transpen(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
+					gfx->transpen(bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
 
 				count++;

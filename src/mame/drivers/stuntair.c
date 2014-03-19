@@ -215,7 +215,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		y = 240 - y;
 
-		gfx->transpen(m_palette,bitmap,cliprect,tile,colour,flipx,flipy,x,y,0);
+		gfx->transpen(bitmap,cliprect,tile,colour,flipx,flipy,x,y,0);
 	}
 }
 

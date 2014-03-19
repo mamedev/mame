@@ -122,22 +122,22 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 					flipy = !flipy;
 				}
 
-				gfx1->transpen(m_palette,bitmap,cliprect,
+				gfx1->transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
 						flipx?sx+16:sx,flipy?sy+16:sy,0);
-				gfx1->transpen(m_palette,bitmap,cliprect,
+				gfx1->transpen(bitmap,cliprect,
 						code + 1,
 						color,
 						flipx,flipy,
 						flipx?sx:sx+16,flipy?sy+16:sy,0);
-				gfx1->transpen(m_palette,bitmap,cliprect,
+				gfx1->transpen(bitmap,cliprect,
 						code + 2,
 						color,
 						flipx,flipy,
 						flipx?sx+16:sx,flipy?sy:sy+16,0);
-				gfx1->transpen(m_palette,bitmap,cliprect,
+				gfx1->transpen(bitmap,cliprect,
 						code + 3,
 						color,
 						flipx,flipy,
@@ -155,7 +155,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 
 				if (size == 0x00)   /* 16x16 */
 				{
-					gfx1->transpen(m_palette,bitmap,cliprect,
+					gfx1->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx,flipy,
@@ -167,12 +167,12 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 
 					if (size == 0x04)   /* 16x8 */
 					{
-						gfx2->transpen(m_palette,bitmap,cliprect,
+						gfx2->transpen(bitmap,cliprect,
 								code & ~1,
 								color,
 								flipx,flipy,
 								flipx?sx+8:sx,sy,0);
-						gfx2->transpen(m_palette,bitmap,cliprect,
+						gfx2->transpen(bitmap,cliprect,
 								code | 1,
 								color,
 								flipx,flipy,
@@ -180,12 +180,12 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 					}
 					else if (size == 0x08)  /* 8x16 */
 					{
-						gfx2->transpen(m_palette,bitmap,cliprect,
+						gfx2->transpen(bitmap,cliprect,
 								code & ~2,
 								color,
 								flipx,flipy,
 								sx,flipy?sy+8:sy,0);
-						gfx2->transpen(m_palette,bitmap,cliprect,
+						gfx2->transpen(bitmap,cliprect,
 								code | 2,
 								color,
 								flipx,flipy,
@@ -193,7 +193,7 @@ UINT32 finalizr_state::screen_update_finalizr(screen_device &screen, bitmap_ind1
 					}
 					else if (size == 0x0c)  /* 8x8 */
 					{
-						gfx2->transpen(m_palette,bitmap,cliprect,
+						gfx2->transpen(bitmap,cliprect,
 								code,
 								color,
 								flipx,flipy,

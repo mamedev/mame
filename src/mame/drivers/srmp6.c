@@ -277,7 +277,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						m_gfxdecode->gfx(0)->alpha(m_palette,bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						m_gfxdecode->gfx(0)->alpha(bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}

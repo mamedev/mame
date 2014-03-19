@@ -306,7 +306,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	ypos = ypos + (22 - 8);
 
 	
-		m_gfxdecode->gfx(image)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -314,7 +314,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		ypos, 0);
 
 	
-		m_gfxdecode->gfx(image)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
 		flip_screen(),
@@ -408,7 +408,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 		clip = cliprect;
 #endif
 
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,clip,
+		m_gfxdecode->gfx(1)->transmask(bitmap,clip,
 			code, color, flipx, flipy, sx, sy,
 			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512 + 32));
 	}

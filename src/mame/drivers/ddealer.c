@@ -225,7 +225,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
 		}
 		count = 0;
@@ -238,7 +238,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
 		}
 	}
@@ -257,7 +257,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
 		}
 		count = 0;
@@ -270,7 +270,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
 		}
 	}

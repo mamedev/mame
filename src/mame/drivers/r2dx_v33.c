@@ -167,7 +167,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 					}
@@ -177,7 +177,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
 					}
@@ -190,7 +190,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
 					}
@@ -200,7 +200,7 @@ void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
 					}

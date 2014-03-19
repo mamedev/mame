@@ -99,7 +99,7 @@ UINT32 cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitma
 		{
 			int tile = videoram[count] & 0x3f;
 			int colour = (videoram[count] & 0xc0)>>6;
-			gfx->opaque(m_palette,bitmap,cliprect,tile,colour,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tile,colour,0,0,x*8,y*8);
 
 			count++;
 		}

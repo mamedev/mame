@@ -154,26 +154,26 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if(m_vregs[0x00/2] & 0x1000)
 			color &= 7;
 
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16) : (sx),sy,15);
 
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,
 					flipx ? (sx) : (sx+16),sy,15);
 
 		/* wraparound x */
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, 0,
 					flipx ? (sx+16 - 512) : (sx - 512),sy,15);
 
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code+1,
 					color,
 					flipx, 0,

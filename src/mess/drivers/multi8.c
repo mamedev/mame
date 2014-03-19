@@ -183,7 +183,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				}
 			}
 
-			// m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
+			// m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)

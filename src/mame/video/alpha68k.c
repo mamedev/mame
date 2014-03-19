@@ -104,7 +104,7 @@ void alpha68k_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 
 			if (color)
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					tile,
 					color,
 					fx,fy,
@@ -249,7 +249,7 @@ void alpha68k_state::draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &clip
 			}
 
 			if (color)
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					tile,
 					color,
 					fx,fy,
@@ -345,7 +345,7 @@ void alpha68k_state::draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &clip
 			fy = data & 0x4000;
 			color = color_prom[tile << 1 | data >> 15];
 
-			 gfx->transpen(m_palette,bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
+			 gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
 
 			my = (my + 8) & 0xff;
 		}
@@ -467,7 +467,7 @@ void alpha68k_state::kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 					else
 						jongbou_video_banking(&bank, data);
 
-					m_gfxdecode->gfx(bank)->transpen(m_palette,bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
+					m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
 				}
 			}
 //ZT
@@ -526,7 +526,7 @@ void alpha68k_state::sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 				color = (data >> 7 & 0x18) | (data >> 13 & 7);
 				tile = data & 0x3ff;
 				bank = data >> 10 & 3;
-				m_gfxdecode->gfx(bank)->transpen(m_palette,bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
+				m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
 			}
 //ZT
 			if(m_flipscreen)

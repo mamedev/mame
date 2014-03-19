@@ -169,7 +169,7 @@ void yunsun16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			flipy = !flipy;     y = max_y - y - 16;
 		}
 
-		m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 					code,
 					attr & 0x1f,
 					flipx, flipy,

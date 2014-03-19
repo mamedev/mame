@@ -59,7 +59,7 @@ UINT32 summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 &b
 		for (x=0;x<32;x++)
 		{
 			int tile = (m_vram[count] | ((m_attr[count]&1)<<8) );
-			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
 
 			count++;
 		}

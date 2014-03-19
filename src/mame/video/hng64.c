@@ -253,8 +253,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 				if (!chaini)
 				{
-					if (!blend) gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
@@ -273,8 +273,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 						pal&=0xf;
 					}
 
-					if (!blend) gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					source +=8;
 				}
 

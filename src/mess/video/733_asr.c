@@ -209,7 +209,7 @@ void asr733_device::set_interrupt_line()
 /* write a single char on screen */
 void asr733_device::draw_char(int character, int x, int y, int color)
 {
-		m_gfxdecode->gfx(0)->opaque(*m_palette, *m_bitmap, m_bitmap->cliprect(), character-32, color, 0, 0, x+1, y);
+		m_gfxdecode->gfx(0)->opaque(*m_bitmap, m_bitmap->cliprect(), character-32, color, 0, 0, x+1, y);
 }
 
 void asr733_device::linefeed()

@@ -348,7 +348,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		}
 
 		
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -357,7 +357,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (sx > 0xf0)
 		{
 			
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx - 0x100, sy, 0);

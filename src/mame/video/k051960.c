@@ -523,20 +523,18 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						m_gfx->prio_transtable(m_palette,bitmap,cliprect,
-								c,
-								color,
+						m_gfx->prio_transtable(bitmap,cliprect,
+								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								priority_bitmap,pri,
-								drawmode_table,m_palette->shadow_table());
+								drawmode_table);
 					else
-						m_gfx->transtable(m_palette,bitmap,cliprect,
-								c,
-								color,
+						m_gfx->transtable(bitmap,cliprect,
+								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								drawmode_table,m_palette->shadow_table());
+								drawmode_table);
 				}
 			}
 		}
@@ -566,22 +564,20 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						c += yoffset[y];
 
 					if (max_priority == -1)
-						m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
-								c,
-								color,
+						m_gfx->prio_zoom_transtable(bitmap,cliprect,
+								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
 								priority_bitmap,pri,
-								drawmode_table,m_palette->shadow_table());
+								drawmode_table);
 					else
-						m_gfx->zoom_transtable(m_palette,bitmap,cliprect,
-								c,
-								color,
+						m_gfx->zoom_transtable(bitmap,cliprect,
+								c,color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
 								(zw << 16) / 16,(zh << 16) / 16,
-								drawmode_table,m_palette->shadow_table());
+								drawmode_table);
 				}
 			}
 		}

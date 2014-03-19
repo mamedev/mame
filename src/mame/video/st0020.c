@@ -393,7 +393,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(bitmap,cliprect,
 									code++,
 									color,
 									flipx, flipy,

@@ -332,7 +332,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 					}
 
 					if (pri_mask != -1)
-						gfx->prio_transmask(m_palette,bitmap,cliprect,
+						gfx->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,
@@ -340,7 +340,7 @@ void k007121_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 							priority_bitmap,pri_mask,
 							transparent_mask);
 					else
-						gfx->transmask(m_palette,bitmap,cliprect,
+						gfx->transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
 							flipx,flipy,

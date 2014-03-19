@@ -44,7 +44,7 @@ void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		ypos -= 16;
 
 		
-				gfx->transpen(m_palette,
+				gfx->transpen(
 				bitmap,
 				cliprect,
 				num,

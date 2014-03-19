@@ -173,7 +173,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				y -= 14;
 				x -= 7;
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						m_spriteram[offs + 2],
 						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
 						!(m_spriteram[offs + 1] & 0x80),!(m_spriteram[offs + 1] & 0x40),
@@ -183,7 +183,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				y += 1;
 				x -= 8;
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						m_spriteram[offs + 2],
 						(m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank + 32 * m_monitor,
 						(m_spriteram[offs + 1] & 0x80),(m_spriteram[offs + 1] & 0x40),

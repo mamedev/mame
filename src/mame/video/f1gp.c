@@ -294,7 +294,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			gfx = 0;
 		}
 
-		m_gfxdecode->gfx(1 + gfx)->prio_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,
@@ -303,7 +303,7 @@ void f1gp_state::f1gpb_draw_sprites( screen_device &screen,bitmap_ind16 &bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
-		m_gfxdecode->gfx(1 + gfx)->prio_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1 + gfx)->prio_transpen(bitmap,cliprect,
 			code,
 			color,
 			flipx,flipy,

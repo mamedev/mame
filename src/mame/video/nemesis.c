@@ -386,7 +386,7 @@ void nemesis_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, c
 						flipy = !flipy;
 					}
 
-					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(char_type)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,

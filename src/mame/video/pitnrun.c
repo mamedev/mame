@@ -194,7 +194,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,

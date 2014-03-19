@@ -126,7 +126,7 @@ void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
 
-		m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				code,
 				attr & 7,
 				flipx,flipy,

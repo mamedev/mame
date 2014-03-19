@@ -31,7 +31,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 
 
 /* --- SPRITES --- */
-void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr, palette_device& palette )
+void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr)
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -112,7 +112,7 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				for (i = xstart; i != xend; i += xinc)
 				{
-					 gfx->transpen(palette,bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
+					 gfx->transpen(bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
 					loopnum++;
 				}
 			}
@@ -127,14 +127,16 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x800, cliprect);
-	draw_sprites(bitmap, cliprect, 0x0000, m_palette);
+	m_gfxdecode->gfx(0)->set_palette(m_palette);
+	draw_sprites(bitmap, cliprect, 0x0000);
 	return 0;
 }
 
 UINT32 psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x800, cliprect);
-	draw_sprites(bitmap, cliprect, 0x2000, m_palette2);
+	m_gfxdecode->gfx(0)->set_palette(m_palette2);
+	draw_sprites(bitmap, cliprect, 0x2000);
 	return 0;
 }
 

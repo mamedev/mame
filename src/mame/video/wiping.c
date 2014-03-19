@@ -117,7 +117,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 			sy = 27 - sy;
 		}
 
-		m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				m_videoram[offs],
 				m_colorram[offs] & 0x3f,
 				m_flipscreen,m_flipscreen,
@@ -145,7 +145,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			color,
 			flipx,flipy,
@@ -185,7 +185,7 @@ UINT32 wiping_state::screen_update_wiping(screen_device &screen, bitmap_ind16 &b
 				sy = 27 - sy;
 			}
 
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 					m_videoram[offs],
 					m_colorram[offs] & 0x3f,
 					m_flipscreen,m_flipscreen,

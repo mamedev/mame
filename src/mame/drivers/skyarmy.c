@@ -149,7 +149,7 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			spriteram[offs+1]&0x3f,
 			pal,
 			flipx,flipy,

@@ -267,7 +267,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 
 			tile &= 0x7ff; //???
 
-			gfx->transpen(m_palette,bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
+			gfx->transpen(bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
 
 			count+=2;
 		}

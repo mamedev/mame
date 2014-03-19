@@ -122,7 +122,7 @@ int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, i
 	{
 		/* draw the current player sprite into a work bitmap */
 		
-			m_gfxdecode->gfx(4)->opaque(m_palette,m_work_bitmap,
+			m_gfxdecode->gfx(4)->opaque(m_work_bitmap,
 			m_work_bitmap.cliprect(),
 			m_cpu0_out[4]&0xf,
 			1, /* color */
@@ -188,7 +188,7 @@ void grchamp_state::draw_sprites(grchamp_state *state, bitmap_ind16 &bitmap, con
 		int color = source[2];
 		int code = source[1);
 		
-			gfx->transpen(m_palette,bitmap,cliprect,
+			gfx->transpen(bitmap,cliprect,
 			bank + (code & 0x3f),
 			color,
 			code & 0x40,

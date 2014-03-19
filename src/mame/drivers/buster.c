@@ -51,7 +51,7 @@ UINT32 buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 &b
 		{
 			int tile = (m_vram[count+1])|(m_vram[count]<<8);
 			//int colour = tile>>12;
-			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*8,y*4);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*4);
 
 			count+=2;
 		}

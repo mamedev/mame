@@ -549,7 +549,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 				gfx_element gfx(m_palette, base_gfx8 + gfxstart, width, height, width, m_palette->entries(), 0, 256);
 
-				gfx.prio_zoom_transpen(m_palette, bitmap,cliprect,
+				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,
 								color_start >> 4,
 								flipx, flipy,
@@ -565,7 +565,7 @@ void hyprduel_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 				gfx_element gfx(m_palette, base_gfx4 + 2 * gfxstart, width, height, width, m_palette->entries(), 0, 16);
 
-				gfx.prio_zoom_transpen(m_palette, bitmap,cliprect,
+				gfx.prio_zoom_transpen(bitmap,cliprect,
 								0,
 								color + color_start,
 								flipx, flipy,

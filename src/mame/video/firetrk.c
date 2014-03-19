@@ -262,7 +262,7 @@ void firetrk_state::firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &clip
 		y = 104;
 	}
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
+	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 }
 
 
@@ -274,7 +274,7 @@ void firetrk_state::superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cli
 	int flip_x = *m_car_rot & 0x04;
 	int flip_y = *m_car_rot & 0x08;
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, 144, 104, 0);
+	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, 144, 104, 0);
 }
 
 
@@ -303,21 +303,21 @@ void firetrk_state::montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cli
 		y = 104;
 	}
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
+	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 }
 
 
-void firetrk_state::draw_text(palette_device &palette, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *alpha_ram,
+void firetrk_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *alpha_ram,
 						int x, int count, int height)
 {
 	int i;
 
 	for (i = 0; i < count; i++)
-		 m_gfxdecode->gfx(0)->opaque(palette,bitmap,cliprect, alpha_ram[i], 0, 0, 0, x, i * height);
+		 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, alpha_ram[i], 0, 0, 0, x, i * height);
 }
 
 
-void firetrk_state::check_collision(firetrk_state *state, int which)
+void firetrk_state::check_collision(int which)
 {
 	int y, x;
 
@@ -348,8 +348,8 @@ UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 
 	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	firetrk_draw_car(bitmap, playfield_window, 0, m_flash);
 	firetrk_draw_car(bitmap, playfield_window, 1, m_flash);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
@@ -357,11 +357,11 @@ UINT32 firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind16 
 
 		m_helper2.fill(0xff, playfield_window);
 		firetrk_draw_car(m_helper2, playfield_window, 0, FALSE);
-		check_collision(this, 0);
+		check_collision(0);
 
 		m_helper2.fill(0xff, playfield_window);
 		firetrk_draw_car(m_helper2, playfield_window, 1, FALSE);
-		check_collision(this, 1);
+		check_collision(1);
 
 		*m_blink = FALSE;
 	}
@@ -381,8 +381,8 @@ UINT32 firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind16
 	bitmap.fill(0, cliprect);
 	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	superbug_draw_car(bitmap, playfield_window, m_flash);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
@@ -390,7 +390,7 @@ UINT32 firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind16
 
 		m_helper2.fill(0xff, playfield_window);
 		superbug_draw_car(m_helper2, playfield_window, FALSE);
-		check_collision(this, 0);
+		check_collision(0);
 
 		*m_blink = FALSE;
 	}
@@ -411,8 +411,8 @@ UINT32 firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind16
 	m_tilemap1->draw(screen, bitmap, playfield_window, 0, 0);
 	montecar_draw_car(bitmap, playfield_window, 0, FALSE);
 	montecar_draw_car(bitmap, playfield_window, 1, FALSE);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
-	draw_text(m_palette, bitmap, cliprect, m_alpha_num_ram + 0x20, 16, 0x20, 0x08);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
+	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
 	if (cliprect.max_y == screen.visible_area().max_y)
 	{
@@ -420,11 +420,11 @@ UINT32 firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind16
 
 		m_helper2.fill(0xff, playfield_window);
 		montecar_draw_car(m_helper2, playfield_window, 0, TRUE);
-		check_collision(this, 0);
+		check_collision(0);
 
 		m_helper2.fill(0xff, playfield_window);
 		montecar_draw_car(m_helper2, playfield_window, 1, TRUE);
-		check_collision(this, 1);
+		check_collision(1);
 	}
 
 	return 0;

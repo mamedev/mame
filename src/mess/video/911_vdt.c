@@ -500,7 +500,7 @@ void vdt911_device::refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 
 				address++;
 
-				gfx->opaque(*m_palette, bitmap, cliprect, cur_char, color, 0, 0,
+				gfx->opaque(bitmap, cliprect, cur_char, color, 0, 0,
 					x+j*7, y+i*10);
 			}
 		}

@@ -223,10 +223,10 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			for (xct = 0; xct < xsize; xct++)
 			{
-				 gfx->transpen(m_palette,bitmap,cliprect, redirect[tileno], colour, xflip, yflip, xpos + xct * xinc, ypos + yct * yinc, 0);
-				 gfx->transpen(m_palette,bitmap,cliprect, redirect[tileno], colour, xflip, yflip, (xpos + xct * xinc) - 0x200, ypos + yct * yinc, 0);
-				 gfx->transpen(m_palette,bitmap,cliprect, redirect[tileno], colour, xflip, yflip, (xpos + xct * xinc) - 0x200, (ypos + yct * yinc) - 0x200, 0);
-				 gfx->transpen(m_palette,bitmap,cliprect, redirect[tileno], colour, xflip, yflip, xpos + xct * xinc, (ypos + yct * yinc) - 0x200 , 0);
+				 gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, xpos + xct * xinc, ypos + yct * yinc, 0);
+				 gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, (xpos + xct * xinc) - 0x200, ypos + yct * yinc, 0);
+				 gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, (xpos + xct * xinc) - 0x200, (ypos + yct * yinc) - 0x200, 0);
+				 gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, xpos + xct * xinc, (ypos + yct * yinc) - 0x200 , 0);
 
 				tileno++;
 			}

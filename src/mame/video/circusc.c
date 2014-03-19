@@ -183,7 +183,7 @@ void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				code, color,
 				flipx,flipy,
 				sx,sy,

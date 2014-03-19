@@ -457,7 +457,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 496 - sy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,

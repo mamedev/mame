@@ -241,7 +241,7 @@ void pc090oj_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		x += m_x_offset;
 		y += m_y_offset;
 
-		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxnum)->prio_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

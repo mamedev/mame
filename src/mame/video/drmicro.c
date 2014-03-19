@@ -142,7 +142,7 @@ UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 
 			else
 				x = (240 - x) & 0xff;
 
-			m_gfxdecode->gfx(3-g)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(3-g)->transpen(bitmap,cliprect,
 					chr,
 					col,
 					fx,fy,
@@ -150,7 +150,7 @@ UINT32 drmicro_state::screen_update_drmicro(screen_device &screen, bitmap_ind16 
 
 			if (x > 240)
 			{
-				m_gfxdecode->gfx(3-g)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(3-g)->transpen(bitmap,cliprect,
 						chr,
 						col,
 						fx,fy,

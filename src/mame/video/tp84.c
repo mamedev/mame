@@ -161,7 +161,7 @@ void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int flip_x = ~m_spriteram[offs + 2] & 0x40;
 		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flip_x, flip_y, x, y,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flip_x, flip_y, x, y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, palette_base));
 
 	}

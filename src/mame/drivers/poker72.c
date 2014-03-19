@@ -64,7 +64,7 @@ UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 
 
 			tile|= m_tile_bank << 12;
 
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}

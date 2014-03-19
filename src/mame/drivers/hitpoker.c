@@ -119,7 +119,7 @@ UINT32 hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind1
 			gfx_bpp = (m_colorram[count] & 0x80)>>7; //flag between 4 and 8 bpp
 			color = gfx_bpp ? ((m_colorram[count] & 0x70)>>4) : (m_colorram[count] & 0xf);
 
-			m_gfxdecode->gfx(gfx_bpp)->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(gfx_bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
 
 			count+=2;
 		}

@@ -179,7 +179,7 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		tileno >>=1;
 
 		// 255 for 8bpp
-		gfx->transpen(m_palette,bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
+		gfx->transpen(bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
 	}
 }
 

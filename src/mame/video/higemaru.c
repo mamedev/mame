@@ -122,14 +122,14 @@ void higemaru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,15);
 
 		/* draw again with wraparound */
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				col,
 				flipx,flipy,

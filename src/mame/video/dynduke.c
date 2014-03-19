@@ -154,7 +154,7 @@ void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,
 			if (fy) fy=0; else fy=1;
 		}
 
-		m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,15);
 	}

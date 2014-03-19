@@ -105,14 +105,14 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		px &= 0x1ff;
 
-		gfx->transpen(m_palette,bitmap,cliprect,
+		gfx->transpen(bitmap,cliprect,
 			chr,
 			col,
 			fx,fy,
 			px,py,0);
 
 		if (px>0x1e0)
-			gfx->transpen(m_palette,bitmap,cliprect,
+			gfx->transpen(bitmap,cliprect,
 				chr,
 				col,
 				fx,fy,

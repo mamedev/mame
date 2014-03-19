@@ -740,7 +740,7 @@ void scn2674_device::scn2574_draw_common( running_machine &machine, _BitmapClass
 			attr = tiledat >>12;
 
 			if (attr)
-				m_gfxdecode->gfx(gfxregion)->opaque(m_palette,bitmap,cliprect,tiledat,0,0,0,(x*8),(y*8));
+				m_gfxdecode->gfx(gfxregion)->opaque(bitmap,cliprect,tiledat,0,0,0,(x*8),(y*8));
 
 		}
 		if (dbl_size&2)

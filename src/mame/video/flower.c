@@ -82,7 +82,7 @@ void flower_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 				if (xblock) sxoffs+=xblocksizeinpixels;
 				if (yblock) syoffs+=yblocksizeinpixels;
 
-				gfx->zoom_transpen(m_palette,bitmap,cliprect,
+				gfx->zoom_transpen(bitmap,cliprect,
 						code+yoffs+xoffs,
 						color,
 						flipx,flipy,

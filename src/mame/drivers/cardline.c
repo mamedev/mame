@@ -52,7 +52,7 @@ public:
 
 
 
-#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,\
+#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,\
 					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
 					(m_colorram[index+offset]&0x80)>>7,\
 					0,0,\

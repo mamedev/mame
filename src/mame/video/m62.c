@@ -382,7 +382,7 @@ void m62_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 			do
 			{
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code + i * incr,col,
 						flipx,flipy,
 						sx,sy + 16 * i,0);

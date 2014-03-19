@@ -39,28 +39,28 @@ void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		{
 			if (flipx)
 			{
-				gfx->transpen(m_palette,bitmap,cliprect,number,  colr,1,0,xpos+8,ypos,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+1,colr,1,0,xpos+8,ypos+8,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+2,colr,1,0,xpos,  ypos,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+3,colr,1,0,xpos,  ypos+8,0);
+				gfx->transpen(bitmap,cliprect,number,  colr,1,0,xpos+8,ypos,0);
+				gfx->transpen(bitmap,cliprect,number+1,colr,1,0,xpos+8,ypos+8,0);
+				gfx->transpen(bitmap,cliprect,number+2,colr,1,0,xpos,  ypos,0);
+				gfx->transpen(bitmap,cliprect,number+3,colr,1,0,xpos,  ypos+8,0);
 			}
 			else
 			{
-				gfx->transpen(m_palette,bitmap,cliprect,number,  colr,0,0,xpos,  ypos,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+1,colr,0,0,xpos,  ypos+8,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+2,colr,0,0,xpos+8,ypos,0);
-				gfx->transpen(m_palette,bitmap,cliprect,number+3,colr,0,0,xpos+8,ypos+8,0);
+				gfx->transpen(bitmap,cliprect,number,  colr,0,0,xpos,  ypos,0);
+				gfx->transpen(bitmap,cliprect,number+1,colr,0,0,xpos,  ypos+8,0);
+				gfx->transpen(bitmap,cliprect,number+2,colr,0,0,xpos+8,ypos,0);
+				gfx->transpen(bitmap,cliprect,number+3,colr,0,0,xpos+8,ypos+8,0);
 			}
 		}
 		else
 		{
 			if (flipx)
 			{
-				gfx->transpen(m_palette,bitmap,cliprect,number ^ 2,colr,1,0,xpos,ypos,0);
+				gfx->transpen(bitmap,cliprect,number ^ 2,colr,1,0,xpos,ypos,0);
 			}
 			else
 			{
-				gfx->transpen(m_palette,bitmap,cliprect,number,colr,0,0,xpos,ypos,0);
+				gfx->transpen(bitmap,cliprect,number,colr,0,0,xpos,ypos,0);
 			}
 		}
 

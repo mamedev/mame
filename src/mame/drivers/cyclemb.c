@@ -190,15 +190,15 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 			if(flip_screen())
 			{
-				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
 				/* wrap-around */
-				gfx->opaque(m_palette,bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
 			}
 			else
 			{
-				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx,(y*8));
 				/* wrap-around */
-				gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,0,0,(x*8)-scrollx+512,(y*8));
 			}
 
 			count++;
@@ -259,7 +259,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -297,9 +297,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 				scrolly = m_vram[(x-32)*64+1];
 
 
-			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
-			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
-			gfx->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
+			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
 
 
 		}
@@ -355,7 +355,7 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			fx = !fx;
 			fy = !fy;
 		}
-		m_gfxdecode->gfx(region)->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 

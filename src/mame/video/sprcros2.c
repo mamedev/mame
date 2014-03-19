@@ -166,7 +166,7 @@ void sprcros2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				m_spriteram[offs],
 				color,
 				flipx,flipy,

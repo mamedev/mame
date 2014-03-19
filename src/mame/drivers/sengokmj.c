@@ -273,11 +273,11 @@ void sengokmj_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		for (ax=0; ax<dx; ax++)
 			for (ay=0; ay<dy; ay++) {
 				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 				else
-					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						sprite++,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
 			}

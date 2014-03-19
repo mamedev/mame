@@ -72,7 +72,7 @@ UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		{
 			int tile = ((m_vram[count+1]<<8) | m_vram[count]) & 0xffff;
 
-			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*4,y*8);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}

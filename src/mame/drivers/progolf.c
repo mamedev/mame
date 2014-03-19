@@ -127,9 +127,9 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 			{
 				int tile = videoram[count];
 
-				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}

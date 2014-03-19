@@ -226,7 +226,7 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 		sy  =   -sy;
 		sy  +=  0xf8;
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code/2, color,
 					flipx,  flipy,  sx, sy, 0);
 	}

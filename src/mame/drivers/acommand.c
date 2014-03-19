@@ -177,7 +177,7 @@ void acommand_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xx = w;
 				do
 				{
-					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							code,
 							color,
 							flipx, flipy,

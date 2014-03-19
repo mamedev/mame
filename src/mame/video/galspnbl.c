@@ -35,7 +35,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 
 	draw_background(bitmap, cliprect);
 
-	galspnbl_draw_sprites(screen, m_gfxdecode, m_palette, bitmap, cliprect, 0,  m_spriteram, m_spriteram.bytes());
+	galspnbl_draw_sprites(screen, m_gfxdecode, bitmap, cliprect, 0,  m_spriteram, m_spriteram.bytes());
 
 	for (offs = 0; offs < 0x1000 / 2; offs++)
 	{
@@ -50,7 +50,7 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,
 					color,
 					0,0,
@@ -59,6 +59,6 @@ UINT32 galspnbl_state::screen_update_galspnbl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	galspnbl_draw_sprites(screen, m_gfxdecode, m_palette, bitmap, cliprect, 1, m_spriteram, m_spriteram.bytes());
+	galspnbl_draw_sprites(screen, m_gfxdecode, bitmap, cliprect, 1, m_spriteram, m_spriteram.bytes());
 	return 0;
 }

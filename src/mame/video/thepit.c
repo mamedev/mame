@@ -267,13 +267,13 @@ static void draw_sprites(running_machine &machine,
 			if (offs < 16) y++;
 
 			
-					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(state->m_palette,bitmap,cliprect,
+					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(bitmap,cliprect,
 					state->m_spriteram[offs + 1] & 0x3f,
 					state->m_spriteram[offs + 2],
 					flipx, flipy, x, y, 0);
 
 			
-					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(state->m_palette,bitmap,cliprect,
+					state->m_gfxdecode->gfx(2 * state->m_graphics_bank + 1)->transpen(bitmap,cliprect,
 					state->m_spriteram[offs + 1] & 0x3f,
 					state->m_spriteram[offs + 2],
 					flipx, flipy, x-256, y, 0);

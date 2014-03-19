@@ -240,13 +240,13 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		}
 		else sy2 = sy + 16;
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 				color,
 				fx,flip_screen(),
 				sx,sy,0);
 		if (multi)
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code+1,
 				color,
 				fx,flip_screen(),

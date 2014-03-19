@@ -223,13 +223,13 @@ void kingdrby_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
 		}
 	}
 }

@@ -809,7 +809,7 @@ static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			state->m_gfxdecode->gfx(0)->transpen(state->m_palette,bitmap,cliprect,
+			state->m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code++,
 					color,
 					0,0,

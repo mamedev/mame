@@ -1011,7 +1011,7 @@ void x68k_state::x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle
 			sx += m_crtc.bg_hshift;
 			sx += m_sprite_shift;
 
-			m_gfxdecode->gfx(1)->zoom_transpen(m_palette,bitmap,cliprect,code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
+			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour+0x10,xflip,yflip,m_crtc.hbegin+sx,m_crtc.vbegin+(sy*m_crtc.bg_double),0x10000,0x10000*m_crtc.bg_double,0x00);
 		}
 	}
 }

@@ -151,7 +151,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 					if (draw)
 					{
-						m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 							code - y * incy,
 							color & col_mask,
 							flipx,flipy,
@@ -191,7 +191,7 @@ void deco_mxc06_device::draw_sprites_bootleg( running_machine &machine, bitmap_i
 
 		sx -= 0x100;
 
-		m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 			code,
 			color & col_mask,
 			flipx,flipy,
