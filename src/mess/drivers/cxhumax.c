@@ -823,7 +823,7 @@ void cxhumax_state::video_start()
 {
 }
 
-/* copy from emu/rendersw.c */
+/* copy from emu/rendersw.inc */
 /*------------------------------------------------------------------------
     ycc_to_rgb - convert YCC to RGB; the YCC pixel
     contains Y in the LSB, Cb << 8, and Cr << 16

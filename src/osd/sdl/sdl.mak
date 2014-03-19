@@ -771,7 +771,7 @@ $(OBJ)/emu/video/tms9927.o : CCOMFLAGS += -Wno-error
 endif # solaris
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SDLSRC)/drawogl.c
+$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.inc $(SDLSRC)/drawogl.c
 $(SDLOBJ)/drawogl.o : $(SDLSRC)/texcopy.c $(SDLSRC)/texsrc.h
 
 # draw13 depends on blit13.h

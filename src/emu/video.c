@@ -16,7 +16,7 @@
 #include "ui/ui.h"
 #include "aviio.h"
 #include "crsshair.h"
-#include "rendersw.c"
+#include "rendersw.inc"
 #include "output.h"
 
 #include "snap.lh"

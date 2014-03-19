@@ -349,8 +349,8 @@ endif
 CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 
 # extra dependencies
-$(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.c
-$(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.c
+$(WINOBJ)/drawdd.o :    $(SRC)/emu/rendersw.inc
+$(WINOBJ)/drawgdi.o :   $(SRC)/emu/rendersw.inc
 $(WINOBJ)/winmidi.o:    $(SRC)/osd/portmedia/pmmidi.c
 
 ifndef USE_QTDEBUG

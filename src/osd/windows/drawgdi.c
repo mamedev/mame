@@ -12,7 +12,7 @@
 
 // MAME headers
 #include "emu.h"
-#include "rendersw.c"
+#include "rendersw.inc"
 
 // MAMEOS headers
 #include "window.h"

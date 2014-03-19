@@ -16,7 +16,7 @@
 // MAME headers
 #include "emu.h"
 #include "ui/ui.h"
-#include "rendersw.c"
+#include "rendersw.inc"
 
 // standard SDL headers
 #include "sdlinc.h"
