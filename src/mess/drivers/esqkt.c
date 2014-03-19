@@ -207,11 +207,6 @@ static const es5506_interface es5506_2_config =
 	DEVCB_NULL
 };
 
-static const esqpanel_interface esqpanel_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w)
-};
-
 static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
@@ -219,7 +214,8 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))

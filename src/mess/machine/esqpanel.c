@@ -26,25 +26,12 @@ const device_type ESQPANEL2x40_SQ1 = &device_creator<esqpanel2x40_sq1_device>;
 
 esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	device_serial_interface(mconfig, *this)
+	device_serial_interface(mconfig, *this),
+	m_write_tx(*this),
+	m_write_analog(*this)
 {
 }
 
-void esqpanel_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const esqpanel_interface *intf = reinterpret_cast<const esqpanel_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<esqpanel_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
-		memset(&m_analog_value_cb, 0, sizeof(m_analog_value_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -52,8 +39,8 @@ void esqpanel_device::device_config_complete()
 
 void esqpanel_device::device_start()
 {
-	m_out_tx_func.resolve(m_out_tx_cb, *this);
-	m_analog_value_func.resolve(m_analog_value_cb, *this);
+	m_write_tx.resolve_safe();
+	m_write_analog.resolve_safe();
 }
 
 
@@ -180,7 +167,7 @@ void esqpanel_device::tra_complete()    // Tx completed sending byte
 
 void esqpanel_device::tra_callback()    // Tx send bit
 {
-	m_out_tx_func(transmit_register_get_data_bit());
+	m_write_tx(transmit_register_get_data_bit());
 }
 
 void esqpanel_device::xmit_char(UINT8 data)
@@ -206,10 +193,7 @@ void esqpanel_device::xmit_char(UINT8 data)
 
 void esqpanel_device::set_analog_value(offs_t offset, UINT16 value)
 {
-	if (!m_analog_value_func.isnull())
-	{
-		m_analog_value_func(offset, value);
-	}
+	m_write_analog(offset, value);
 }
 
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */

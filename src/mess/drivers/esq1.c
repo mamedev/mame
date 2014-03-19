@@ -576,11 +576,6 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static const esqpanel_interface esqpanel_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w)
-};
-
 static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
@@ -592,7 +587,8 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
 
-	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx

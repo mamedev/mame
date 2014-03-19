@@ -624,12 +624,6 @@ static const es5505_interface es5505_config =
 	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_r) /* ADC */
 };
 
-static const esqpanel_interface esqpanel_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("duart", mc68681_device, rx_b_w),
-	DEVCB_DRIVER_MEMBER16(esq5505_state, analog_w)
-};
-
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
@@ -637,7 +631,9 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
@@ -674,7 +670,9 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
 	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL1x22_ADD("panel", esqpanel_config)
+	MCFG_ESQPANEL1x22_ADD("panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
@@ -698,7 +696,9 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
 	MCFG_MC68681_ADD("duart", 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
@@ -738,7 +738,9 @@ static MACHINE_CONFIG_DERIVED(sq1, vfx)
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
 	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL2x40_SQ1_ADD("panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_SQ1_ADD("panel")
+	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )
