@@ -199,7 +199,7 @@ int glsl_shader_free(glsl_shader_info *shinfo)
 
 int glsl_shader_add_mamebm(glsl_shader_info *shinfo, const char * custShaderPrefix, int idx)
 {
-	int i, err;
+	int err;
 	static char fname[8192];
 
 	snprintf(fname, 8192, "%s.vsh", custShaderPrefix); fname[8191]=0;
