@@ -104,25 +104,6 @@ INLINE UINT32 ycc_to_rgb(unsigned y, unsigned cb, unsigned cr)
 #define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED
 #include "texcopy.c"
 
-#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16_ARGB1555
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_ARGB1555
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
-#include "texcopy.c"
-
-#if 0 //def SDLMAME_MACOSX /* native MacOS X composite texture format */
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_YUY16
-#include "texcopy.c"
-
-#define SDL_TEXFORMAT SDL_TEXFORMAT_YUY16_PALETTED
-#include "texcopy.c"
-
-#endif
-
 //============================================================
 //  MANUAL TEXCOPY FUNCS
 //  (YUY format is weird and doesn't fit the assumptions of the

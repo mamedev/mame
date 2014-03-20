@@ -2,7 +2,7 @@
 //
 //  drawogl.c - SDL software and OpenGL implementation
 //
-//  Copyright (c) 1996-2011, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -251,12 +251,9 @@ struct sdl_info
 										// as input, otherwise the screen bitmap.
 										// All progs >= glsl_program_mb2sc using the screen bitmap
 										// as output, otherwise the mame bitmap.
-	int             glsl_vid_attributes;// glsl brightness, contrast and gamma for RGB bitmaps
 	int             usetexturerect;     // use ARB_texture_rectangle for non-power-of-2, general use
 
 	int             init_context;       // initialize context before next draw
-
-	int             totalColors;        // total colors from machine/sdl_window_config/sdl_window_info
 
 	float           last_hofs;
 	float           last_vofs;
@@ -398,14 +395,6 @@ static void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource
 static void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
 static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
-#if 0 //def SDLMAME_MACOSX
-static void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
-#endif
-// 16 bpp destination texture texcopy functions
-static void texcopy_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
 
 //============================================================
 //  Textures
@@ -622,7 +611,6 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 	SDL_WM_SetCaption(window->title, "SDLMAME");
 
 #endif
-	sdl->totalColors = window->totalColors;
 	sdl->blittimer = 0;
 	sdl->surf_w = 0;
 	sdl->surf_h = 0;
@@ -766,8 +754,6 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 			mame_printf_verbose("OpenGL: GLSL not supported\n");
 		}
 	}
-
-	sdl->glsl_vid_attributes = video_config.glsl_vid_attributes;
 
 	if (osd_getenv(SDLENV_VMWARE) != NULL)
 	{
@@ -1149,17 +1135,6 @@ static void loadGLExtensions(sdl_window_info *window)
 			}
 		}
 
-		if (_once)
-		{
-			if ( sdl->glsl_vid_attributes )
-			{
-				mame_printf_verbose("OpenGL: GLSL direct brightness, contrast setting for RGB games\n");
-			}
-			else
-			{
-				mame_printf_verbose("OpenGL: GLSL paletted gamma, brightness, contrast setting for RGB games\n");
-			}
-		}
 	} else {
 		if (_once)
 		{
@@ -1594,16 +1569,11 @@ static const GLint texture_gl_properties_srcNative_intNative[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#if 0 //def SDLMAME_MACOSX
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
-#else
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-#endif
-	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, sizeof(UINT16) }, // SDL_TEXFORMAT_PALETTE16
-	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, sizeof(UINT16) }, // SDL_TEXFORMAT_RGB15
-	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, sizeof(UINT16) }, // SDL_TEXFORMAT_RGB15_PALETTED
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
 };
 
@@ -1611,16 +1581,11 @@ static const GLint texture_gl_properties_srcNative_int32bpp[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#if 0 //def SDLMAME_MACOSX
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
-#else
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-#endif
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, sizeof(UINT16) },   // SDL_TEXFORMAT_RGB15
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, sizeof(UINT16) },   // SDL_TEXFORMAT_RGB15_PALETTED
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
 };
 
@@ -1628,13 +1593,8 @@ static const GLint texture_gl_properties_srcCopy_int32bpp[9][6] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-#if 0 //def SDLMAME_MACOSX
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
-#else
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-#endif
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
@@ -1645,17 +1605,11 @@ static const texture_copy_func texcopy_dstNative_f[9] = {
 	texcopy_argb32,
 	texcopy_rgb32,
 	texcopy_rgb32_paletted,
-#if 0 //def SDLMAME_MACOSX
-	texcopy_yuv16_apple,
-	texcopy_yuv16_paletted_apple,
-#else
 	texcopy_yuv16,
 	texcopy_yuv16_paletted,
-#endif
-
-	texcopy_palette16_argb1555,
-	texcopy_rgb15_argb1555,
-	texcopy_rgb15_paletted_argb1555,
+	texcopy_palette16,
+	texcopy_rgb15,
+	texcopy_rgb15_paletted,
 	texcopy_palette16a
 };
 
@@ -1663,14 +1617,8 @@ static const texture_copy_func texcopy_dst32bpp_f[9] = {
 	texcopy_argb32,
 	texcopy_rgb32,
 	texcopy_rgb32_paletted,
-#if 0 //def SDLMAME_MACOSX
-	texcopy_yuv16_apple,
-	texcopy_yuv16_paletted_apple,
-#else
 	texcopy_yuv16,
 	texcopy_yuv16_paletted,
-#endif
-
 	texcopy_palette16,
 	texcopy_rgb15,
 	texcopy_rgb15_paletted,
@@ -1763,7 +1711,6 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 	if ( texture->type == TEXTURE_TYPE_NONE &&
 			sdl->useglsl &&
 			(
-			texture->format==SDL_TEXFORMAT_PALETTE16 ||       // glsl idx16 lut
 				texture->format==SDL_TEXFORMAT_RGB32_PALETTED ||  // glsl rgb32 lut/direct
 				texture->format==SDL_TEXFORMAT_RGB32 ||
 				texture->format==SDL_TEXFORMAT_RGB15_PALETTED ||    // glsl rgb15 lut/direct
@@ -1806,7 +1753,7 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
 		}
 
-		if ( texture->type!=TEXTURE_TYPE_SHADER && video_config.prefer16bpp_tex )
+		if ( texture->type!=TEXTURE_TYPE_SHADER )
 		{
 				texture->texProperties = texture_gl_properties_srcNative_intNative[texture->format];
 				texture->texCopyFn     = texcopy_dstNative_f[texture->format];
@@ -1928,7 +1875,7 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 		)
 	{
 		mame_printf_verbose("GL texture: copy %d, shader %d, dynamic %d, %dx%d %dx%d [%s, Equal: %d, Palette: %d,\n"
-					"            scale %dx%d, border %d, pitch %d,%d/%d], colors: %d, bytes/pix %d\n",
+					"            scale %dx%d, border %d, pitch %d,%d/%d], bytes/pix %d\n",
 			!texture->nocopy, texture->type==TEXTURE_TYPE_SHADER, texture->type==TEXTURE_TYPE_DYNAMIC,
 			finalwidth, finalheight, finalwidth_create, finalheight_create,
 			texfmt_to_string[texture->format],
@@ -1936,7 +1883,7 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 			(int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
 			texture->xprescale, texture->yprescale,
 			texture->borderpix, texsource->rowpixels, finalwidth, sdl->texture_max_width,
-			sdl->totalColors, (int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
+			(int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
 			);
 	}
 
@@ -2038,9 +1985,7 @@ static int texture_shader_create(sdl_window_info *window,
 	int uniform_location;
 	int lut_table_width_pow2=0;
 	int lut_table_height_pow2=0;
-	int glsl_shader_type_rgb32 = ( sdl->glsl_vid_attributes ) ? GLSL_SHADER_TYPE_RGB32_DIRECT : GLSL_SHADER_TYPE_RGB32_LUT;
-	int glsl_shader_type, i;
-	int lut_texture_width;
+	int i;
 	int surf_w_pow2  = get_valid_pow2_value (window->width, texture->texpow2);
 	int surf_h_pow2  = get_valid_pow2_value (window->height, texture->texpow2);
 
@@ -2052,21 +1997,18 @@ static int texture_shader_create(sdl_window_info *window,
 	{
 		case SDL_TEXFORMAT_RGB32_PALETTED:
 		case SDL_TEXFORMAT_RGB32:
-			glsl_shader_type          = glsl_shader_type_rgb32;
 			texture->lut_table_width  = 1 << 8; // 8 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
 			break;
 
 		case SDL_TEXFORMAT_RGB15_PALETTED:
 		case SDL_TEXFORMAT_RGB15:
-			glsl_shader_type          = glsl_shader_type_rgb32;
 			texture->lut_table_width  = 1 << 5; // 5 bits per component
 			texture->lut_table_width *= 3;      // BGR ..
 			break;
 
 		case SDL_TEXFORMAT_PALETTE16:
-			glsl_shader_type          = GLSL_SHADER_TYPE_IDX16;
-			texture->lut_table_width  = sdl->totalColors;
+			texture->lut_table_width  = (1 << 8) * 3;
 			break;
 
 		default:
@@ -2075,39 +2017,7 @@ static int texture_shader_create(sdl_window_info *window,
 			exit(1);
 	}
 
-	/**
-	 * We experience some GLSL LUT calculation inaccuracy on some GL drivers.
-	 * while using the correct lut calculations.
-	 * This error is due to the color index value to GLSL/texture passing process:
-	 *   mame:uint16_t -> OpenGL: GLfloat(alpha texture) -> GLSL:uint16_t (value regeneration)
-	 * The latter inaccurate uint16_t value regeneration is buggy on some drivers/cards,
-	 * therefor we always widen the lut size to pow2,
-	 * and shape it equaly into 2D space (max texture size restriction).
-	 * This is a practical GL driver workaround to minimize the chance for
-	 * floating point arithmetic errors in the GLSL engine.
-	 *
-	 * Shape the lut texture to achieve texture max size compliance and equal 2D partitioning
-	 */
-
-	if ( texture->format == SDL_TEXFORMAT_PALETTE16 )
-	{
-		lut_texture_width  = sqrt((double)(texture->lut_table_width));
-		lut_texture_width  = get_valid_pow2_value (lut_texture_width, 1);
-
-		texture->lut_table_height = texture->lut_table_width / lut_texture_width;
-
-		if ( lut_texture_width*texture->lut_table_height < texture->lut_table_width )
-		{
-			texture->lut_table_height  += 1;
-		}
-
-		texture->lut_table_width   = lut_texture_width;
-	}
-	else
-	{
-		lut_texture_width = texture->lut_table_width;
-		texture->lut_table_height = 1;
-	}
+	texture->lut_table_height = 1;
 
 	/**
 	 * always use pow2 for LUT, to minimize the chance for floating point arithmetic errors
@@ -2115,14 +2025,6 @@ static int texture_shader_create(sdl_window_info *window,
 	 */
 	lut_table_height_pow2 = get_valid_pow2_value (texture->lut_table_height, 1 /* texture->texpow2 */);
 	lut_table_width_pow2  = get_valid_pow2_value (texture->lut_table_width,  1 /* texture->texpow2 */);
-
-	if ( !sdl->glsl_vid_attributes || texture->format==SDL_TEXFORMAT_PALETTE16 )
-	{
-		mame_printf_verbose("GL texture: lut_texture_width %d, lut_table_sz %dx%d, lut_table_sz_pow2 %dx%d\n",
-				lut_texture_width, texture->lut_table_width, texture->lut_table_height,
-				lut_table_width_pow2, lut_table_height_pow2);
-	}
-
 
 	if ( lut_table_width_pow2 > sdl->texture_max_width || lut_table_height_pow2 > sdl->texture_max_height )
 	{
@@ -2149,33 +2051,11 @@ static int texture_shader_create(sdl_window_info *window,
 	{
 		if ( i<=sdl->glsl_program_mb2sc )
 		{
-			sdl->glsl_program[i] = glsl_shader_get_program_mamebm(glsl_shader_type, glsl_shader_feature, i);
+			sdl->glsl_program[i] = glsl_shader_get_program_mamebm(glsl_shader_feature, i);
 		} else {
 			sdl->glsl_program[i] = glsl_shader_get_program_scrn(i-1-sdl->glsl_program_mb2sc);
 		}
 		pfn_glUseProgramObjectARB(sdl->glsl_program[i]);
-
-		if ( i<=sdl->glsl_program_mb2sc && !(sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16) )
-		{
-			// GL_TEXTURE1 GLSL Uniforms
-			uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "colortable_texture");
-			pfn_glUniform1iARB(uniform_location, 1);
-			GL_CHECK_ERROR_NORMAL();
-
-			{
-				GLfloat colortable_sz[2] = { (GLfloat)texture->lut_table_width, (GLfloat)texture->lut_table_height };
-				uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "colortable_sz");
-				pfn_glUniform2fvARB(uniform_location, 1, &(colortable_sz[0]));
-				GL_CHECK_ERROR_NORMAL();
-			}
-
-			{
-				GLfloat colortable_pow2_sz[2] = { (GLfloat)lut_table_width_pow2, (GLfloat)lut_table_height_pow2 };
-				uniform_location = pfn_glGetUniformLocationARB(sdl->glsl_program[i], "colortable_pow2_sz");
-				pfn_glUniform2fvARB(uniform_location, 1, &(colortable_pow2_sz[0]));
-				GL_CHECK_ERROR_NORMAL();
-			}
-		}
 
 		if ( i<=sdl->glsl_program_mb2sc )
 		{
@@ -2264,50 +2144,6 @@ static int texture_shader_create(sdl_window_info *window,
 			window->width, window->height, surf_w_pow2, surf_h_pow2);
 	}
 
-	if ( !(sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16) )
-	{
-		// GL_TEXTURE1
-		glGenTextures(1, (GLuint *)&texture->lut_texture);
-		pfn_glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture->lut_texture);
-
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, lut_table_width_pow2);
-
-		{
-			GLint _width, _height;
-			if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8, lut_table_width_pow2, lut_table_height_pow2,
-						0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, &_width, &_height, 1) )
-			{
-				mame_printf_error("cannot create lut table texture, req: %dx%d, avail: %dx%d - bail out\n",
-					lut_table_width_pow2, lut_table_height_pow2, (int)_width, (int)_height);
-				return -1;
-			}
-		}
-
-		{
-			UINT32 * dummy = (UINT32 *) malloc(lut_table_width_pow2*lut_table_height_pow2 * sizeof(UINT32)); // blank out the whole pal.
-			memset(dummy, 0, lut_table_width_pow2*lut_table_height_pow2 * sizeof(UINT32));
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, lut_table_width_pow2, lut_table_height_pow2,
-					0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, dummy );
-			glFinish(); // should not be necessary, .. but make sure we won't access the memory after free
-			free(dummy);
-		}
-
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->lut_table_width);
-
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture->lut_table_width, texture->lut_table_height,
-					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texsource->palette );
-
-		// non-screen textures will never be filtered
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-		assert ( texture->lut_texture );
-	}
-
 	// GL_TEXTURE0
 	// get a name for this texture
 	glGenTextures(1, (GLuint *)&texture->texture);
@@ -2316,91 +2152,57 @@ static int texture_shader_create(sdl_window_info *window,
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth_create);
 
-	if(texture->format!=SDL_TEXFORMAT_PALETTE16)
+	UINT32 * dummy = NULL;
+	GLint _width, _height;
+	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
+					texture->rawwidth_create, texture->rawheight_create,
+					0,
+					texture->texProperties[SDL_TEXFORMAT_FORMAT],
+					texture->texProperties[SDL_TEXFORMAT_TYPE],
+					&_width, &_height, 1) )
 	{
-		UINT32 * dummy = NULL;
-		GLint _width, _height;
-		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
-						texture->rawwidth_create, texture->rawheight_create,
-						0,
-						texture->texProperties[SDL_TEXFORMAT_FORMAT],
-						texture->texProperties[SDL_TEXFORMAT_TYPE],
-						&_width, &_height, 1) )
-		{
-			mame_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
-				texture->rawwidth_create, texture->rawheight_create, (int)_width, (int)_height);
-			return -1;
-		}
+		mame_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
+			texture->rawwidth_create, texture->rawheight_create, (int)_width, (int)_height);
+		return -1;
+	}
 
-		dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create *
-								texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-		memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create *
-								texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-		glTexImage2D(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
-				texture->rawwidth_create, texture->rawheight_create,
-				0,
-				texture->texProperties[SDL_TEXFORMAT_FORMAT],
-				texture->texProperties[SDL_TEXFORMAT_TYPE], dummy);
-				glFinish(); // should not be necessary, .. but make sure we won't access the memory after free
-		free(dummy);
+	dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create *
+							texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+	memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create *
+							texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+	glTexImage2D(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
+			texture->rawwidth_create, texture->rawheight_create,
+			0,
+			texture->texProperties[SDL_TEXFORMAT_FORMAT],
+			texture->texProperties[SDL_TEXFORMAT_TYPE], dummy);
+			glFinish(); // should not be necessary, .. but make sure we won't access the memory after free
+	free(dummy);
 
-		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
-		{
-			assert( glsl_shader_feature == GLSL_SHADER_FEAT_PLAIN );
+	if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
+	{
+		assert( glsl_shader_feature == GLSL_SHADER_FEAT_PLAIN );
 
-			// screen textures get the user's choice of filtering
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}
-		else
-		{
-			// non-screen textures will never be filtered
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		}
-
-		// set wrapping mode appropriately
-		if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		}
-		else
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		}
-	} else {
-		UINT32 * dummy = NULL;
-		GLint _width, _height;
-		if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_ALPHA16, texture->rawwidth_create, texture->rawheight_create,
-					0, GL_ALPHA, GL_UNSIGNED_SHORT, &_width, &_height, 1) )
-		{
-			mame_printf_error("cannot create lut bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
-				texture->rawwidth_create, texture->rawheight_create,
-				(int)_width, (int)_height);
-			return -1;
-		}
-		dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create * sizeof(UINT16));
-		memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create * sizeof(UINT16));
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA16,
-				texture->rawwidth_create, texture->rawheight_create,
-				0,
-				GL_ALPHA, GL_UNSIGNED_SHORT, dummy);
-				glFinish(); // should not be necessary, .. but make sure we won't access the memory after free
-		free(dummy);
+		// screen textures get the user's choice of filtering
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	else
+	{
+		// non-screen textures will never be filtered
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		}
-		else
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		}
+	}
+
+	// set wrapping mode appropriately
+	if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	}
 
 	GL_CHECK_ERROR_NORMAL();
@@ -2662,17 +2464,9 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->texinfo.rowpixels);
 
 		// and upload the image
-		if(texture->format!=SDL_TEXFORMAT_PALETTE16)
-		{
-			glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-					texture->texProperties[SDL_TEXFORMAT_FORMAT],
-					texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
-		}
-		else
-		{
-			glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-					GL_ALPHA, GL_UNSIGNED_SHORT, texture->data);
-		}
+		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
+				texture->texProperties[SDL_TEXFORMAT_FORMAT],
+				texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
 	}
 	else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2939,8 +2733,6 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 		int uniform_location, scrnum;
 		render_container *container;
 		GLfloat vid_attributes[4]; // gamma, contrast, brightness, effect
-
-		assert ( sdl->glsl_vid_attributes && texture->format!=SDL_TEXFORMAT_PALETTE16 );
 
 		scrnum = 0;
 		container = (render_container *)NULL;

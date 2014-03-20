@@ -103,7 +103,7 @@ static void get_resolution(const char *defdata, const char *data, sdl_window_con
 
 int sdlvideo_init(running_machine &machine)
 {
-	int index, tc;
+	int index;
 
 	// extract data from the options
 	extract_video_config(machine);
@@ -121,11 +121,6 @@ int sdlvideo_init(running_machine &machine)
 	if (sdlwindow_init(machine))
 		return 1;
 
-	if (machine.first_screen()!=NULL && machine.first_screen()->palette()!=NULL)
-		tc = machine.first_screen()->palette()->entries();
-	else
-		tc = 0;
-
 	// create the windows
 	sdl_options &options = downcast<sdl_options &>(machine.options());
 	for (index = 0; index < video_config.numscreens; index++)
@@ -133,7 +128,6 @@ int sdlvideo_init(running_machine &machine)
 		sdl_window_config conf;
 		memset(&conf, 0, sizeof(conf));
 		extract_window_config(machine, index, &conf);
-		conf.totalColors = tc;
 		if (sdlwindow_video_window_create(machine, index, pick_monitor(options, index), &conf))
 			return 1;
 	}
@@ -732,20 +726,6 @@ static void extract_video_config(running_machine &machine)
 					video_config.glsl_shader_scrn[i] = NULL;
 				}
 			}
-
-			video_config.glsl_vid_attributes = options.glsl_vid_attr();
-			{
-				// Disable feature: glsl_vid_attributes, as long we have the gamma calculation
-				// disabled within the direct shaders .. -> too slow.
-				// IMHO the gamma setting should be done global anyways, and for the whole system,
-				// not just MAME ..
-				float gamma = options.gamma();
-				if (gamma != 1.0 && video_config.glsl_vid_attributes && video_config.glsl)
-				{
-					video_config.glsl_vid_attributes = FALSE;
-					mame_printf_warning("OpenGL: GLSL - disable handling of brightness and contrast, gamma is set to %f\n", gamma);
-				}
-			}
 		} else {
 			int i;
 			video_config.glsl_filter = 0;
@@ -759,7 +739,6 @@ static void extract_video_config(running_machine &machine)
 			{
 				video_config.glsl_shader_scrn[i] = NULL;
 			}
-			video_config.glsl_vid_attributes = 0;
 		}
 
 	#endif /* USE_OPENGL */

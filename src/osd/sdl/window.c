@@ -698,7 +698,6 @@ int sdlwindow_video_window_create(running_machine &machine, int index, sdl_monit
 		window->windowed_width = config->width;
 		window->windowed_height = config->height;
 	}
-	window->totalColors = config->totalColors;
 
 	// add us to the list
 	*last_window_ptr = window;

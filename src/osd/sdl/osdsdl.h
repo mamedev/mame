@@ -90,7 +90,6 @@
 #define SDLOPTION_GL_VBO                "gl_vbo"
 #define SDLOPTION_GL_NOTEXTURERECT      "gl_notexturerect"
 #define SDLOPTION_GL_FORCEPOW2TEXTURE   "gl_forcepow2texture"
-#define SDLOPTION_GL_GLSL_VID_ATTR      "gl_glsl_vid_attr"
 
 #define SDLOPTION_AUDIODRIVER           "audiodriver"
 #define SDLOPTION_VIDEODRIVER           "videodriver"
@@ -179,7 +178,6 @@ public:
 	bool glsl_filter() const { return bool_value(SDLOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SHADER_MAME, index)); }
 	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_SHADER_SCREEN, index)); }
-	bool glsl_vid_attr() const { return bool_value(SDLOPTION_GL_GLSL_VID_ATTR); }
 
 	// per-window options
 	const char *screen() const { return value(SDLOPTION_SCREEN); }

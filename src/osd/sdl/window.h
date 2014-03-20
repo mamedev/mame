@@ -84,7 +84,6 @@ struct sdl_window_info
 	int                 blitwidth;
 	int                 blitheight;
 
-	int                 totalColors;        // total colors from machine/sdl_window_config
 	int                 start_viewscreen;
 
 	// GL specific
