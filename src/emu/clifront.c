@@ -634,7 +634,7 @@ void cli_frontend::listdevices(const char *gamename)
 						depth++;
 					}
 			}
-			printf("   %*s%-*s%s", depth * 2, "", 24 - depth * 2, tag, device->name());
+			printf("   %*s%-*s %s", depth * 2, "", 30 - depth * 2, tag, device->name());
 
 			// add more information
 			UINT32 clock = device->clock();
