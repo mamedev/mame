@@ -480,11 +480,6 @@ WRITE_LINE_MEMBER(ip20_state::scsi_irq)
 {
 }
 
-static const struct WD33C93interface wd33c93_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ip20_state,scsi_irq)      /* command completion IRQ */
-};
-
 DRIVER_INIT_MEMBER(ip20_state,ip204415)
 {
 }
@@ -613,7 +608,8 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
-	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
+	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, ip20_state, scsi_irq))      /* command completion IRQ */
 
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)

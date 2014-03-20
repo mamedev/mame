@@ -2328,11 +2328,6 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 //static sh2_cpu_core sh2cp_conf_slave  = { 1, NULL };
 
 
-static const struct WD33C93interface wd33c93_intf =
-{
-	DEVCB_NULL            /* command completion IRQ */
-};
-
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
@@ -2567,7 +2562,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_1)
-	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
