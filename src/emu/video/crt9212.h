@@ -47,42 +47,39 @@ const int CRT9212_RAM_SIZE  = 135;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CRT9212_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, CRT9212, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CRT9212_OUT_ROF_CB(_devcb) \
+	devcb = &crt9212_device::set_out_rof_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_CRT9212_OUT_WOF_CB(_devcb) \
+	devcb = &crt9212_device::set_out_wof_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_CRT9212_IN_REN_CB(_devcb) \
+	devcb = &crt9212_device::set_in_ren_callback(*device, DEVCB2_##_devcb);
 
-#define CRT9212_INTERFACE(name) \
-	const crt9212_interface (name) =
+#define MCFG_CRT9212_IN_WEN_CB(_devcb) \
+	devcb = &crt9212_device::set_in_wen_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_CRT9212_IN_WEN2_CB(_devcb) \
+	devcb = &crt9212_device::set_in_wen2_callback(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
-// ======================> crt9212_interface
-
-struct crt9212_interface
-{
-	devcb_write_line        m_out_rof_cb;
-	devcb_write_line        m_out_wof_cb;
-	devcb_read_line         m_in_ren_cb;
-	devcb_read_line         m_in_wen_cb;
-	devcb_read_line         m_in_wen2_cb;
-};
-
-
-
 // ======================> crt9212_device
 
-class crt9212_device :  public device_t,
-						public crt9212_interface
+class crt9212_device :  public device_t
 {
 public:
 	// construction/destruction
 	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_rof_callback(device_t &device, _Object object) { return downcast<crt9212_device &>(device).m_out_rof_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_wof_callback(device_t &device, _Object object) { return downcast<crt9212_device &>(device).m_out_wof_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_ren_callback(device_t &device, _Object object) { return downcast<crt9212_device &>(device).m_in_ren_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_wen_callback(device_t &device, _Object object) { return downcast<crt9212_device &>(device).m_in_wen_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_wen2_callback(device_t &device, _Object object) { return downcast<crt9212_device &>(device).m_in_wen2_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -93,15 +90,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
-	devcb_resolved_write_line   m_out_rof_func;
-	devcb_resolved_write_line   m_out_wof_func;
-	devcb_resolved_read_line    m_in_ren_func;
-	devcb_resolved_read_line    m_in_wen_func;
-	devcb_resolved_read_line    m_in_wen2_func;
+	devcb2_write_line        m_out_rof_cb;
+	devcb2_write_line        m_out_wof_cb;
+	devcb2_read_line         m_in_ren_cb;
+	devcb2_read_line         m_in_wen_cb;
+	devcb2_read_line         m_in_wen2_cb;
 
 	UINT8 m_ram[CRT9212_RAM_SIZE][2];
 

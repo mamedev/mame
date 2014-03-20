@@ -22,19 +22,19 @@
 
 
 #define REN \
-	m_in_ren_func()
+	m_in_ren_cb()
 
 #define WEN \
-	m_in_wen_func()
+	m_in_wen_cb()
 
 #define WEN2 \
-	m_in_wen2_func()
+	m_in_wen2_cb()
 
 #define ROF(_state) \
-	m_out_rof_func(_state);
+	m_out_rof_cb(_state);
 
 #define WOF(_state) \
-	m_out_wof_func(_state);
+	m_out_wof_cb(_state);
 
 
 
@@ -55,35 +55,14 @@ const device_type CRT9212 = &device_creator<crt9212_device>;
 //-------------------------------------------------
 
 crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9212, "SMC CRT9212", tag, owner, clock, "crt9212", __FILE__)
+	: device_t(mconfig, CRT9212, "SMC CRT9212", tag, owner, clock, "crt9212", __FILE__),
+		m_out_rof_cb(*this),
+		m_out_wof_cb(*this),
+		m_in_ren_cb(*this),
+		m_in_wen_cb(*this),
+		m_in_wen2_cb(*this)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void crt9212_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const crt9212_interface *intf = reinterpret_cast<const crt9212_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<crt9212_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_rof_cb, 0, sizeof(m_out_rof_cb));
-		memset(&m_out_wof_cb, 0, sizeof(m_out_wof_cb));
-		memset(&m_in_ren_cb, 0, sizeof(m_in_ren_cb));
-		memset(&m_in_wen_cb, 0, sizeof(m_in_wen_cb));
-		memset(&m_in_wen2_cb, 0, sizeof(m_in_wen2_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -92,11 +71,11 @@ void crt9212_device::device_config_complete()
 void crt9212_device::device_start()
 {
 	// resolve callbacks
-	m_out_rof_func.resolve(m_out_rof_cb, *this);
-	m_out_wof_func.resolve(m_out_wof_cb, *this);
-	m_in_ren_func.resolve(m_in_ren_cb, *this);
-	m_in_wen_func.resolve(m_in_wen_cb, *this);
-	m_in_wen2_func.resolve(m_in_wen2_cb, *this);
+	m_out_rof_cb.resolve_safe();
+	m_out_wof_cb.resolve_safe();
+	m_in_ren_cb.resolve_safe(0);
+	m_in_wen_cb.resolve_safe(0);
+	m_in_wen2_cb.resolve_safe(0);
 
 	// register for state saving
 	save_item(NAME(m_input));
