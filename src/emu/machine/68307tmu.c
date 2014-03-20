@@ -162,6 +162,7 @@ void m68307_timer::write_ter(UINT16 data, UINT16 mem_mask, int which)
 void m68307_timer::write_tmr(UINT16 data, UINT16 mem_mask, int which)
 {
 	m68307cpu_device* m68k = parent;
+	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	m68307_single_timer* tptr = &singletimer[which];
 
 	COMBINE_DATA(&tptr->regs[m68307TIMER_TMR]);
