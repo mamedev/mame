@@ -380,6 +380,8 @@ UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clip
 		for (int x = 0; x < m_hp; x++)
 		{
 			bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
+			assert(y >= 0 && y < bitmap.height());
+			assert(((sx * m_hp) + x + m_hp) >= 0 && ((sx * m_hp) + x + m_hp) < bitmap.width());
 			bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
 		}
 	}
