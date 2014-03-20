@@ -18,7 +18,6 @@
 #include "formats/basicdsk.h"
 
 // HDC controller
-#include "includes/corvushd.h"
 #include "imagedev/harddriv.h"
 
 //**************************************************************************
@@ -123,7 +122,8 @@ concept_fdc_device::concept_fdc_device(const machine_config &mconfig, const char
 
 concept_hdc_device::concept_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, CONCEPT_HDC, "Corvus Concept HDC controller", tag, owner, clock, "concept_hdc", __FILE__),
-						concept_exp_card_device( mconfig, *this )
+						concept_exp_card_device( mconfig, *this ),
+						m_hdc(*this, "hdc")
 {
 }
 
@@ -343,7 +343,6 @@ machine_config_constructor concept_fdc_device::device_mconfig_additions() const
 
 void concept_hdc_device::device_start()
 {
-	corvus_hdc_init(machine());
 }
 
 
@@ -358,10 +357,10 @@ READ8_MEMBER(concept_hdc_device::reg_r)
 	switch (offset)
 	{
 		case 0:     // HDC Data Register
-			return corvus_hdc_data_r(space, offset);
+			return m_hdc->read(space, offset);
 
 		case 1:     // HDC Status Register
-			return corvus_hdc_status_r(space, offset);
+			return m_hdc->status_r(space, offset);
 	}
 
 	return 0;
@@ -373,7 +372,7 @@ WRITE8_MEMBER(concept_hdc_device::reg_w)
 	switch (offset)
 	{
 		case 0:     // HDC Data Register
-			corvus_hdc_data_w(space, offset, data);
+			m_hdc->write(space, offset, data);
 			break;
 	}
 }
@@ -388,6 +387,7 @@ READ8_MEMBER(concept_hdc_device::rom_r)
 
 
 static MACHINE_CONFIG_FRAGMENT( hdc )
+	MCFG_DEVICE_ADD("hdc", CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD( "harddisk1" )
 MACHINE_CONFIG_END
 

@@ -13,6 +13,9 @@
 #ifndef CORVUSHD_H_
 #define CORVUSHD_H_
 
+#include "emu.h"
+#include "imagedev/harddriv.h"
+#include <ctype.h>
 
 //
 // Controller Commands
@@ -171,17 +174,330 @@
 #define CONTROLLER_BUSY         0x80    // Set = Busy, Clear = Ready
 #define CONTROLLER_DIRECTION    0x40    // Set = Controller->Host, Clear = Host->Controller
 
+#define MAX_COMMAND_SIZE 4096   // The maximum size of a command packet (the controller only has 5K of RAM...)
 
-/*----------- defined in machine/corvushd.c -----------*/
+class corvus_hdc_t :  public device_t
+{
+public:
+	// construction/destruction
+	corvus_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-//
-// Prototypes
-//
-UINT8 corvus_hdc_init( running_machine &machine );
-UINT8 corvus_hdc_init( device_t *device );
-DECLARE_READ8_HANDLER ( corvus_hdc_status_r );
-DECLARE_READ8_HANDLER ( corvus_hdc_data_r );
-DECLARE_WRITE8_HANDLER ( corvus_hdc_data_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( status_r );
 
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	enum
+	{
+		TIMER_TIMEOUT,
+		TIMER_COMMAND
+	};
+
+	// Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
+	struct dadr_t {
+		UINT8 address_msn_and_drive;// Most significant nibble: Most signficant nibble of sector address, Least significant nibble: Drive #
+		UINT8 address_lsb;          // Least significant byte of sector address
+		UINT8 address_mid;          // Middle byte of sector address
+	};
+
+	UINT8   m_status;             // Controller status byte (DIRECTION + BUSY/READY)
+	bool    m_prep_mode;          // Whether the controller is in Prep Mode or not
+	// Physical drive info
+	UINT8   m_sectors_per_track;  // Number of sectors per track for this drive
+	UINT8   m_tracks_per_cylinder;// Number of tracks per cylinder (heads)
+	UINT16  m_cylinders_per_drive;// Number of cylinders per drive
+	// Command Processing
+	UINT16  m_offset;             // Current offset into raw_data buffer
+	bool    m_awaiting_modifier;  // We've received a two-byte command and we're waiting for the mod
+	UINT16  m_recv_bytes;         // Number of bytes expected to be received from Host
+	UINT16  m_xmit_bytes;         // Number of bytes expected to be transmitted to host
+	// Timing-related values
+	UINT16  m_last_cylinder;      // Last cylinder accessed - for calculating seek times
+	UINT32  m_delay;              // Delay in microseconds for callback
+	emu_timer   *m_timeout_timer; // Four-second timer for timeouts
+	emu_timer *m_cmd_timer;
+	bool   m_invalid_command_flag;       // I hate this, but it saves a lot more tests
+
+	//
+	// Union below represents both an input and output buffer and interpretations of it
+	//
+	union {
+		//
+		// Raw Buffer
+		//
+		UINT8       raw_data[MAX_COMMAND_SIZE];
+		//
+		// Basic interpretation of code and modifier
+		//
+		struct {
+			UINT8   code;       // First byte of data is the code (command)
+			UINT8   modifier;   // Second byte of data is the modifier
+		} command;
+		//
+		// Basic response code
+		//
+		struct {
+			UINT8   status;     // Status code returned by the command executed
+		} single_byte_response;
+		//
+		// Read sector command
+		//
+		struct {
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to read
+		} read_sector_command;
+		//
+		// 128-byte Read Sector response
+		//
+		struct {
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[128];  // Data returned from read
+		} read_128_response;
+		//
+		// 256-byte Read Sector response
+		//
+		struct {
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[256];  // Data returned from read
+		} read_256_reponse;
+		//
+		// 512-byte Read Sector response
+		//
+		struct {
+			UINT8   status;     // Status code returned by command executed
+			UINT8   data[512];  // Data returned by read
+		} read_512_response;
+		//
+		// Write 128-byte sector command
+		//
+		struct {
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[128];  // Data to be written
+		} write_128_command;
+		//
+		// Write 256-byte sector command
+		//
+		struct {
+			UINT8   code;       // Command code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[256];  // Data to be written
+		} write_256_command;
+		//
+		// Write 512-byte sector command
+		//
+		struct {
+			UINT8   code;       // Command Code
+			dadr_t  dadr;       // Encoded drive and sector to write
+			UINT8   data[512];  // Data to be written
+		} write_512_command;
+		//
+		// Semaphore Lock command
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   name[8];    // Semaphore name
+		} lock_semaphore_command;
+		//
+		// Semaphore Unlock command
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   name[8];    // Semaphore name
+		} unlock_semaphore_command;
+		//
+		// Semaphore Lock/Unlock response
+		//
+		struct {
+			UINT8   status;     // Disk access status
+			UINT8   result;     // Semaphore action status
+			UINT8   unused[10]; // Unused
+		} semaphore_locking_response;
+		//
+		// Initialize Semaphore table command
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   unused[3];  // Unused
+		} init_semaphore_command;
+		//
+		// Semaphore Status command
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   modifier;   // Command code modifier
+			UINT8   zero_three; // Don't ask me...
+			UINT8   unused[2];  // Unused
+		} semaphore_status_command;
+		//
+		// Semaphore Status response
+		//
+		struct {
+			UINT8   status;     // Disk access status
+			UINT8   table[256]; // Contents of the semaphore table
+		} semaphore_status_response;
+		//
+		// Get Drive Parameters command (0x10)
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   drive;      // Drive number (starts at 1)
+		} get_drive_parameters_command;
+		//
+		// Get Drive Parameters command response
+		//
+		struct {
+			UINT8   status;                     // Status code returned by command executed
+			UINT8   firmware[33];               // Firmware message
+			UINT8   rom_version;                // ROM Version
+			struct {
+				UINT8   sectors_per_track;      // Sectors/Track
+				UINT8   tracks_per_cylinder;    // Tracks/Cylinder (heads)
+				struct {
+					UINT8   lsb;
+					UINT8   msb;
+				} cylinders_per_drive;          // Byte-flipped Cylinders/Drive
+			} track_info;
+			struct {
+				UINT8   lsb;                    // Least significant byte
+				UINT8   midb;                   // Middle byte
+				UINT8   msb;                    // Most significant byte
+			} capacity;                         // 24-bit value, byte-flipped (lsb..msb)
+			UINT8   unused[16];
+			UINT8   interleave;                 // Interleave factor
+			struct {
+				UINT8   mux_parameters[12];
+				UINT8   pipe_name_table_ptr[2]; // Pointer to table of 64 entries, 8 bytes each (table of names)
+				UINT8   pipe_ptr_table_ptr[2];  // Pointer to table of 64 entries, 8 bytes each.  See pp. 29 - Mass Storage GTI
+				UINT8   pipe_area_size[2];      // Size of pipe area (lsb, msb)
+				struct {
+					UINT8   track_offset[2];
+				} vdo_table[7];                 // Virtual drive table
+				UINT8   lsi11_vdo_table[8];
+				UINT8   lsi11_spare_table[8];
+			} table_info;
+			UINT8   drive_number;               // Physical drive number
+			struct {
+				UINT8   lsb;                    // Least
+				UINT8   midb;                   // Middle
+				UINT8   msb;                    // Most
+			} physical_capacity;                // Physical capacity of drive
+		} drive_param_response;
+		//
+		// 2-byte Boot command (0x14)
+		//
+		struct {
+			UINT8   code;       // Command code
+			UINT8   boot_block; // Which boot block to read (0-7)
+		} old_boot_command;
+		//
+		// Read Firmware command (Prep Mode 0x32)
+		//
+		struct {
+			UINT8   code;       // Command Code
+			UINT8   encoded_h_s;// Encoded Head (bits 7-5) / Sector (bits 4-0)
+		} read_firmware_command;
+		//
+		// Write Firmware command (Prep Mode 0x33)
+		//
+		struct {
+			UINT8   code;       // Command Code
+			UINT8   encoded_h_s; // Encoded Head (bits 7-5) / Sector (bits 4-0)
+			UINT8   data[512];  // Data to be written
+		} write_firmware_command;
+		//
+		// Format Drive command (Prep Mode 0x01)
+		//
+		// Note that the following is a BLATANT ASSUMPTION.  Technically, the Format Drive command
+		// uses a variable-length buffer for the pattern.  Unfortunately, the docs don't explain how to determine the
+		// length of the buffer passed.  I assume it's a timeout; however, the docs happen to say that
+		// all Corvus diagnostic programs send 513 bytes total, including the command, so I'm going with that.
+		//
+		struct {
+			UINT8   code;       // Command Code
+			UINT8   pattern[512]; // Pattern to be written
+		} format_drive_revbh_command;
+	} m_buffer;
+
+	// Structure of Block #1, the Disk Parameter Block
+	struct disk_parameter_block_t {
+		struct {
+			UINT8   lsb;
+			UINT8   msb;
+		} spared_track[8];          // Spared track table (0xffff indicates end)
+		UINT8   interleave;         // Interleave factor
+		UINT8   reserved;
+		struct {
+			UINT8 track_offset[2];  // Virtual drive offsets (lsb, msb) 0xffff indicates unused
+		} vdo_table[7];
+		UINT8   lsi11_vdo_table[8];
+		UINT8   lsi11_spare_table[8];
+		UINT8   reserved2[432];
+		struct {
+			UINT8   lsb;
+			UINT8   msb;
+		} revh_spare_table[16];
+	};
+
+	// Structure of Block #3, the Constellation Parameter Block
+	struct constellation_parameter_block_t {
+		UINT8   mux_parameters[12];
+		UINT8   pipe_name_table_ptr[2];
+		UINT8   pipe_ptr_table_ptr[2];
+		UINT8   pipe_area_size[2];
+		UINT8   reserved[470];
+		UINT8   software_protection[12];
+		UINT8   serial_number[12];
+	};
+
+	// Structure of Block #7, the Semaphore Table Block
+	struct semaphore_table_block_t {
+		union {
+			UINT8   semaphore_table[256];           // Table consists of 256 bytes
+			struct {
+				UINT8   semaphore_name[8];          // Each semaphore name is 8 bytes
+			} semaphore_entry[32];                  // 32 Entries
+		} semaphore_block;
+		UINT8   unused[256];                        // Remaining half of block is unused
+	};
+
+	// Command size structure (number of bytes to xmit and recv for each command)
+	struct corvus_cmd_t {
+		UINT16  recv_bytes;                         // Number of bytes from host for this command
+		UINT16  xmit_bytes;                         // Number of bytes to return to host
+	};
+
+	void dump_buffer(UINT8 *buffer, UINT16 length);
+	bool parse_hdc_command(UINT8 data);
+	UINT8 corvus_write_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len);
+	UINT8 corvus_write_logical_sector(dadr_t *dadr, UINT8 *buffer, int len);
+	UINT8 corvus_read_sector(UINT8 drv, UINT32 sector, UINT8 *buffer, int len);
+	UINT8 corvus_read_logical_sector(dadr_t *dadr, UINT8 *buffer, int len);
+	UINT8 corvus_lock_semaphore(UINT8 *name);
+	UINT8 corvus_unlock_semaphore(UINT8 *name);
+	UINT8 corvus_init_semaphore_table();
+	UINT8 corvus_get_drive_parameters(UINT8 drv);
+	UINT8 corvus_read_boot_block(UINT8 block);
+	UINT8 corvus_read_firmware_block(UINT8 head, UINT8 sector);
+	UINT8 corvus_write_firmware_block(UINT8 head, UINT8 sector, UINT8 *buffer);
+	UINT8 corvus_format_drive(UINT8 *pattern, UINT16 len);
+	hard_disk_file *corvus_hdc_file(int id);
+	void corvus_process_command_packet(bool local_invalid_command_flag);
+
+	corvus_cmd_t corvus_cmd[0xf5][0xc1];     // Command sizes and their return sizes
+	corvus_cmd_t corvus_prep_cmd[0x82];      // Prep Command sizes and their return sizes
+};
+
+
+// device type definition
+extern const device_type CORVUS_HDC;
 
 #endif /* CORVUSHD_H_ */

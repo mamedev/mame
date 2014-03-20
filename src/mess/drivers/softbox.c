@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( softbox_io, AS_IO, 8, softbox_state )
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dbrg_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_READWRITE_LEGACY(corvus_hdc_data_r, corvus_hdc_data_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_t, read, write)
 ADDRESS_MAP_END
 
 
@@ -276,7 +276,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 
 	*/
 
-	UINT8 status = corvus_hdc_status_r(space, 0);
+	UINT8 status = m_hdc->status_r(space, 0);
 	UINT8 data = 0;
 
 	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
@@ -339,7 +339,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void softbox_state::machine_start()
 {
-	corvus_hdc_init(machine());
 }
 
 
@@ -414,6 +413,8 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
 
 	MCFG_CBM_IEEE488_ADD("c8050")
+	
+	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")

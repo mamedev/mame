@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "machine/wd17xx.h"
+#include "includes/corvushd.h"
 
 // FIXME: Concept expansion ports should just use the Apple II Bus device!
 // The code below is outdated and inaccurate!
@@ -110,6 +111,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
+	required_device<corvus_hdc_t> m_hdc;
 };
 
 

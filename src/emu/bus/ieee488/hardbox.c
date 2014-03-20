@@ -43,11 +43,6 @@
 
 
 #include "hardbox.h"
-#include "cpu/z80/z80.h"
-#include "machine/i8251.h"
-#include "machine/i8255.h"
-#include "imagedev/harddriv.h"
-#include "includes/corvushd.h"
 
 
 
@@ -58,6 +53,7 @@
 #define Z80_TAG         "z80"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
+#define CORVUS_HDC_TAG	"corvus"
 
 
 
@@ -126,7 +122,7 @@ static ADDRESS_MAP_START( hardbox_io, AS_IO, 8, hardbox_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(I8255_0_TAG, i8255_device, read, write)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(I8255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_READWRITE_LEGACY(corvus_hdc_data_r, corvus_hdc_data_w)
+	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE(CORVUS_HDC_TAG, corvus_hdc_t, read, write)
 ADDRESS_MAP_END
 
 
@@ -247,7 +243,7 @@ READ8_MEMBER( hardbox_device::ppi1_pc_r )
 
 	*/
 
-	UINT8 status = corvus_hdc_status_r(space, 0);
+	UINT8 status = m_hdc->status_r(space, 0);
 	UINT8 data = 0;
 
 	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
@@ -302,6 +298,8 @@ static MACHINE_CONFIG_FRAGMENT( hardbox )
 	// devices
 	MCFG_I8255A_ADD(I8255_0_TAG, ppi0_intf)
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
+
+	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
@@ -365,7 +363,8 @@ ioport_constructor hardbox_device::device_input_ports() const
 hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HARDBOX, "HardBox", tag, owner, clock, "hardbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG)
+		m_maincpu(*this, Z80_TAG),
+		m_hdc(*this, CORVUS_HDC_TAG)
 {
 }
 
@@ -376,7 +375,6 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
-	corvus_hdc_init(this);
 }
 
 
