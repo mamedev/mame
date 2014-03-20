@@ -559,6 +559,8 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
 			numentries = m_bitmap->palette()->num_colors() * m_bitmap->palette()->num_groups();
 			m_bcglookup.resize(numentries);
+
+			adjusted = m_bitmap->palette()->entry_list_adjusted();
 			for (int index = 0; index < numentries; index++)
 			{
 				UINT8 r = container.apply_brightness_contrast_gamma(adjusted[index].r());
@@ -566,6 +568,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 				UINT8 b = container.apply_brightness_contrast_gamma(adjusted[index].b());
 				m_bcglookup[index] = rgb_t(adjusted[index].a(), r, g, b);
 			}
+
 			return m_bcglookup;
 
 		case TEXFORMAT_RGB32:
@@ -751,7 +754,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-			return (palette != NULL && palette == &m_palclient->palette()) ? m_bcglookup : NULL;
+			return (m_palclient != NULL && palette != NULL && palette == &m_palclient->palette()) ? m_bcglookup : NULL;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
