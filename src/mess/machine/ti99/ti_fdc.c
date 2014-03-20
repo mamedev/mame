@@ -447,7 +447,7 @@ const wd17xx_interface ti_wd17xx_interface =
 };
 
 ti_fdc_legacy_device::ti_fdc_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_FDC_LEG, "TI-99 Standard DSSD Floppy Controller (legacy)", tag, owner, clock, "ti99_fdc", __FILE__),
+			: ti_expansion_card_device(mconfig, TI99_FDC_LEG, "TI-99 Standard DSSD Floppy Controller LEGACY", tag, owner, clock, "ti99_fdc_leg", __FILE__),
 			m_fd1771(*this, FDCLEG_TAG) { }
 
 /*
