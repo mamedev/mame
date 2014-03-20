@@ -500,11 +500,6 @@ void pb1000_state::machine_start()
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));
 }
 
-static const hd44352_interface hd44352_pb1000_conf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", HD61700_ON_INT)
-};
-
 static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD61700, 910000)
@@ -525,7 +520,8 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 	MCFG_PALETTE_INIT_OWNER(pb1000_state, pb1000)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pb1000 )
 
-	MCFG_HD44352_ADD("hd44352", 910000, hd44352_pb1000_conf)
+	MCFG_DEVICE_ADD("hd44352", HD44352, 910000)
+	MCFG_HD44352_ON_CB(INPUTLINE("maincpu", HD61700_ON_INT))
 
 	MCFG_NVRAM_ADD_0FILL("nvram1")
 	MCFG_NVRAM_ADD_0FILL("nvram2")

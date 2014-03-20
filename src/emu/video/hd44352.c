@@ -35,28 +35,9 @@ const device_type HD44352 = &device_creator<hd44352_device>;
 //-------------------------------------------------
 
 hd44352_device::hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
-	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__)
+	device_t(mconfig, HD44352, "hd44352", tag, owner, clock, "hd44352", __FILE__),
+	m_on_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd44352_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const hd44352_interface *intf = reinterpret_cast<const hd44352_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<hd44352_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_on, 0, sizeof(m_on));
-	}
 }
 
 //-------------------------------------------------
@@ -73,7 +54,7 @@ void hd44352_device::device_validity_check(validity_checker &valid) const
 
 void hd44352_device::device_start()
 {
-	m_on.resolve(m_on_cb, *this);
+	m_on_cb.resolve_safe();
 
 	m_on_timer = timer_alloc(ON_TIMER);
 	m_on_timer->adjust(attotime::from_hz(m_clock/16384), 0, attotime::from_hz(m_clock/16384));
@@ -140,8 +121,8 @@ void hd44352_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case ON_TIMER:
 			if (m_control_lines & 0x40)
 			{
-				m_on(ASSERT_LINE);
-				m_on(CLEAR_LINE);
+				m_on_cb(ASSERT_LINE);
+				m_on_cb(CLEAR_LINE);
 			}
 			break;
 	}
