@@ -46,10 +46,14 @@
 
 *****************************************************************************
 
-    The Neo-Geo Multi Video System (MVS), is an arcade system board, being the first product in the Neo-Geo family, and released in 1990 by SNK.
-    It was known to the coin-op industry, and offered arcade operators the ability to put up to 6 different arcade titles into a single cabinet,
-    a key economic consideration for operators with limited floorspace (games for the Neo-Geo are cartridge based and are easily exchangeable).
-    It comes in many different cabinets but basically consists of an add on board that can be linked to a standard Jamma system.
+    The Neo-Geo Multi Video System (MVS), is an arcade system board, being
+    the first product in the Neo-Geo family, designed by Alpha Denshi(ADK)
+    and released in 1990 by SNK. It was known to the coin-op industry, and
+    offered arcade operators the ability to put up to 6 different arcade
+    titles into a single cabinet, a key economic consideration for operators
+    with limited floorspace (games for the Neo-Geo are cartridge based and are
+    easily exchangeable). It comes in many different cabinets but basically
+    consists of an add on board that can be linked to a standard Jamma system.
     The system was discontinued in 2004.
     Source (modified): http://en.wikipedia.org/wiki/Neo_Geo
 
@@ -11417,7 +11421,7 @@ GAME( 1999, preisle2,   neogeo,   neogeo,   neogeo, neogeo_state,   preisle2, RO
 GAME( 1993, spinmast,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Spin Master / Miracle Adventure", GAME_SUPPORTS_SAVE )
 GAME( 1994, wjammers,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Windjammers / Flying Power Disc", GAME_SUPPORTS_SAVE )
 GAME( 1994, karnovr,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Karnov's Revenge / Fighter's History Dynamite", GAME_SUPPORTS_SAVE )
-GAME( 1994, strhoop,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Street Hoop / Street Slam / Dunk Dream (DEM-004) (DEH-004)", GAME_SUPPORTS_SAVE )
+GAME( 1994, strhoop,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Street Hoop / Street Slam / Dunk Dream (DEM-004)(DEH-004)", GAME_SUPPORTS_SAVE )
 GAME( 1996, ghostlop,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Ghostlop (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1996, magdrop2,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Magical Drop II", GAME_SUPPORTS_SAVE )
 GAME( 1997, magdrop3,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "Data East Corporation", "Magical Drop III", GAME_SUPPORTS_SAVE )
