@@ -46,42 +46,31 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CRT9021_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, CRT9021, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CRT9021_IN_DATA_CB(_devcb) \
+	devcb = &crt9021_device::set_in_data_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_CRT9021_IN_ATTR_CB(_devcb) \
+	devcb = &crt9021_device::set_in_attr_callback(*device, DEVCB2_##_devcb);
 
-#define CRT9021_INTERFACE(name) \
-	const crt9021_interface (name) =
-
-
+#define MCFG_CRT9021_IN_ATTEN_CB(_devcb) \
+	devcb = &crt9021_device::set_in_atten_callback(*device, DEVCB2_##_devcb);	
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
-// ======================> crt9021_interface
-
-struct crt9021_interface
-{
-	devcb_read8             in_data_cb;
-	devcb_read8             in_attr_cb;
-
-	devcb_read_line         in_atten_cb;
-};
-
-
-
 // ======================> crt9021_device
 
 class crt9021_device :  public device_t,
-						public device_video_interface,
-						public crt9021_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_in_data_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_data_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_attr_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_attr_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_atten_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_atten_cb.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( slg_w );
 	DECLARE_WRITE_LINE_MEMBER( sld_w );
@@ -93,15 +82,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_clock_changed();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_read8            m_in_data_func;
-	devcb_resolved_read8            m_in_attr_func;
-	devcb_resolved_read_line        m_in_atten_func;
+	devcb2_read8             m_in_data_cb;
+	devcb2_read8             m_in_attr_cb;
+
+	devcb2_read_line         m_in_atten_cb;
 
 	int m_slg;
 	int m_sld;
