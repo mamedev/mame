@@ -60,7 +60,7 @@ static const res_net_decode_info popeye_7051_decode_info =
 {
 	1,		/*  one prom 5 lines */
 	0,		/*  start at 0 */
-	31,		/*  end at 31  */
+	15,		/*  end at 15 (banked) */
 	/*  R,   G,   B,  */
 	{   0,   0,   0 },		/*  offsets */
 	{   0,   3,   6 },		/*  shifts */
@@ -224,7 +224,7 @@ void popeye_state::set_background_palette(int bank)
 	for (i=0; i<16; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
-	compute_res_net_all(rgb, cpi, popeye_7051_decode_info, popeye_7051_bck_net_info);
+	compute_res_net_all(rgb, &cpi[0], popeye_7051_decode_info, popeye_7051_bck_net_info);
 	m_palette->set_pen_colors(0, rgb, 16);
 
 #else
@@ -234,19 +234,19 @@ void popeye_state::set_background_palette(int bank)
 		int r,g,b;
 
 		/* red component */
-		bit0 = ((*color_prom ^ m_invertmask) >> 0) & 0x01;
-		bit1 = ((*color_prom ^ m_invertmask) >> 1) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 2) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 0) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 1) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 2) & 0x01;
 		r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* green component */
-		bit0 = ((*color_prom ^ m_invertmask) >> 3) & 0x01;
-		bit1 = ((*color_prom ^ m_invertmask) >> 4) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 5) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 3) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 4) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 5) & 0x01;
 		g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = ((*color_prom ^ m_invertmask) >> 6) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 7) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 6) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 7) & 0x01;
 		if (m_bitmap_type == TYPE_SKYSKIPR)
 		{
 			/* Sky Skipper has different weights */
