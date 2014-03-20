@@ -14,4 +14,17 @@
 		</part>
 	</software>
 
+	<software name="corvusm11">
+		<description>SoftBox CP/M 2.2 (Corvus Model 11)</description>
+		<year>1981</year>
+		<publisher>Small Systems Engineering</publisher>
+
+		<!-- Corvus Model 11 (10 MB): IMI 5012H -->
+		<part name="hdd" interface="corvus_hdd">
+			<diskarea name="harddriv">
+				<disk name="imi5012h" sha1="ae7bdad4dfeee1351e67ffcbf8c634006c03697f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

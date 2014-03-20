@@ -415,10 +415,10 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_CBM_IEEE488_ADD("c8050")
 	
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_CONFIG_ADD("harddisk1", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk2", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk3", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk4", corvus_hdc_t::hd_intf)
 
 	MCFG_IMI7000_BUS_ADD("imi5000h", NULL, NULL, NULL)
 

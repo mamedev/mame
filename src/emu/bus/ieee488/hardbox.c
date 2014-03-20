@@ -300,10 +300,10 @@ static MACHINE_CONFIG_FRAGMENT( hardbox )
 	MCFG_I8255A_ADD(I8255_1_TAG, ppi1_intf)
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
-	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_HARDDISK_ADD("harddisk2")
-	MCFG_HARDDISK_ADD("harddisk3")
-	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_CONFIG_ADD("harddisk1", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk2", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk3", corvus_hdc_t::hd_intf)
+	MCFG_HARDDISK_CONFIG_ADD("harddisk4", corvus_hdc_t::hd_intf)
 MACHINE_CONFIG_END
 
 
