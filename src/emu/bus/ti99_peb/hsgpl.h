@@ -17,7 +17,6 @@
 #define __HSGPL__
 
 #include "emu.h"
-#include "ti99defs.h"
 #include "peribox.h"
 #include "machine/at29040a.h"
 

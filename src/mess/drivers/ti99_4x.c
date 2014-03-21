@@ -51,7 +51,7 @@
 #include "machine/ti99/grom.h"
 #include "machine/ti99/gromport.h"
 #include "machine/ti99/joyport.h"
-#include "machine/ti99/peribox.h"
+#include "bus/ti99_peb/peribox.h"
 
 // Debugging
 #define TRACE_READY 0

@@ -14,8 +14,6 @@
 #ifndef __TI32K__
 #define __TI32K__
 
-#include "ti99defs.h"
-
 extern const device_type TI_32KMEM;
 
 class ti_32k_expcard_device : public ti_expansion_card_device

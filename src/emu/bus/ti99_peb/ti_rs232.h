@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "ti99defs.h"
 #include "machine/tms9902.h"
 
 extern const device_type TI99_RS232;

@@ -31,7 +31,7 @@
 #include "peribox.h"
 #include "machine/ataintf.h"
 #include "tn_ide.h"
-#include "ti99_hd.h"
+#include "machine/ti99/ti99_hd.h"
 
 #define CRU_BASE 0x1000
 

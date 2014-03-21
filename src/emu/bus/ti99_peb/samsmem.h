@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "ti99defs.h"
 
 extern const device_type TI99_SAMSMEM;
 

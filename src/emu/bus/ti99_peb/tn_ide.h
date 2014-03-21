@@ -15,7 +15,6 @@
 #define __TNIDE__
 
 #include "emu.h"
-#include "ti99defs.h"
 #include "machine/ataintf.h"
 #include "machine/rtc65271.h"
 

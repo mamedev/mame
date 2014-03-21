@@ -27,7 +27,7 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "ti32kmem.h"
+#include "ti_32kmem.h"
 
 #define RAMREGION "ram"
 

@@ -14,7 +14,6 @@
 #ifndef __TIFDC__
 #define __TIFDC__
 
-#include "ti99defs.h"
 #include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
 

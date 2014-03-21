@@ -16,7 +16,6 @@
 #define __EVPC__
 
 #include "emu.h"
-#include "ti99defs.h"
 #include "peribox.h"
 
 extern const device_type TI99_EVPC;

@@ -563,6 +563,7 @@ BUSES += SEGA8
 BUSES += SMS_CTRL
 BUSES += SMS_EXP
 BUSES += SNES
+BUSES += TI99PEB
 BUSES += TVC
 BUSES += VCS
 BUSES += VIC10
@@ -1857,26 +1858,10 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_MACHINE)/ti99/joyport.o  \
 	$(MESS_MACHINE)/ti99/mecmouse.o  \
 	$(MESS_MACHINE)/ti99/handset.o  \
-	$(MESS_MACHINE)/ti99/peribox.o  \
-	$(MESS_MACHINE)/ti99/ti32kmem.o  \
-	$(MESS_MACHINE)/ti99/ti_fdc.o  \
-	$(MESS_MACHINE)/ti99/bwg.o  \
-	$(MESS_MACHINE)/ti99/hfdc.o \
 	$(MESS_MACHINE)/ti99/ti99_hd.o  \
-	$(MESS_MACHINE)/ti99/p_code.o \
-	$(MESS_MACHINE)/ti99/myarcmem.o \
-	$(MESS_MACHINE)/ti99/samsmem.o \
-	$(MESS_MACHINE)/ti99/tn_ide.o \
-	$(MESS_MACHINE)/ti99/tn_usbsm.o \
-	$(MESS_MACHINE)/ti99/evpc.o \
-	$(MESS_MACHINE)/ti99/hsgpl.o\
-	$(MESS_MACHINE)/ti99/ti_rs232.o \
-	$(MESS_MACHINE)/ti99/spchsyn.o  \
 	$(MESS_MACHINE)/ti99/speech8.o  \
 	$(MESS_MACHINE)/ti99/mapper8.o  \
 	$(MESS_MACHINE)/ti99/genboard.o \
-	$(MESS_MACHINE)/ti99/memex.o    \
-	$(MESS_MACHINE)/ti99/horizon.o  \
 	$(MESS_DRIVERS)/ti990_4.o   \
 	$(MESS_DRIVERS)/ti99_4x.o   \
 	$(MESS_DRIVERS)/ti99_4p.o   \

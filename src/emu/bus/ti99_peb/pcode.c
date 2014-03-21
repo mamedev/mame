@@ -72,7 +72,7 @@
 
 *****************************************************************************/
 
-#include "p_code.h"
+#include "pcode.h"
 
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"

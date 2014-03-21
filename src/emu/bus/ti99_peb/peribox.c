@@ -179,12 +179,15 @@ CRUCLK*  51||52  DBIN
 #include "emu.h"
 #include "peribox.h"
 
+// MFM hard drives
+#include "machine/ti99/ti99_hd.h"
+
 // The cards
-#include "ti32kmem.h"
+#include "ti_32kmem.h"
 #include "ti_fdc.h"
 #include "bwg.h"
 #include "hfdc.h"
-#include "p_code.h"
+#include "pcode.h"
 #include "myarcmem.h"
 #include "samsmem.h"
 #include "tn_ide.h"
@@ -196,8 +199,12 @@ CRUCLK*  51||52  DBIN
 #include "memex.h"
 #include "horizon.h"
 
+// Disk formats
 #include "formats/ti99_dsk.h"
 
+/*
+    Debugging flags. Set to 0 or 1.
+*/
 // Show interrupt line activity
 #define TRACE_INT 0
 

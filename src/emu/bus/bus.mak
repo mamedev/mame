@@ -886,6 +886,31 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/ti99_peb/peribox.h,BUSES += TI99PEB
+#-------------------------------------------------
+
+ifneq ($(filter TI99PEB,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ti99_peb
+BUSOBJS += $(BUSOBJ)/ti99_peb/peribox.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/bwg.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/evpc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/hfdc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/horizon.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/hsgpl.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/memex.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/myarcmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/pcode.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/samsmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/spchsyn.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_32kmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_fdc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_rs232.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/tn_ide.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/tn_usbsm.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/gameboy/gb_slot.h,BUSES += GAMEBOY
 #-------------------------------------------------
 

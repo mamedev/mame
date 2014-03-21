@@ -14,7 +14,6 @@
 #define __MEMEXMEM__
 
 #include "emu.h"
-#include "ti99defs.h"
 #include "peribox.h"
 
 extern const device_type TI99_MEMEX;

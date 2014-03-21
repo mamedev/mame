@@ -14,7 +14,6 @@
 #ifndef __BWG__
 #define __BWG__
 
-#include "ti99defs.h"
 #include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"

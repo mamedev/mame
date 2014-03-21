@@ -43,11 +43,9 @@
 #include "sound/dac.h"
 
 #include "machine/tms9901.h"
-#include "machine/ti99/peribox.h"
-
 #include "imagedev/cassette.h"
 #include "machine/ti99/videowrp.h"
-#include "machine/ti99/peribox.h"
+#include "bus/ti99_peb/peribox.h"
 #include "machine/ti99/joyport.h"
 
 #define TMS9901_TAG "tms9901"

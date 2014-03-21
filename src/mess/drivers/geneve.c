@@ -210,7 +210,7 @@
 #include "sound/sn76496.h"
 
 #include "machine/ti99/genboard.h"
-#include "machine/ti99/peribox.h"
+#include "bus/ti99_peb/peribox.h"
 #include "machine/ti99/videowrp.h"
 
 #include "machine/ti99/joyport.h"

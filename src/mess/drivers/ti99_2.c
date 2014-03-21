@@ -81,6 +81,11 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
 
+// FIXME: The following includes are here for the sole purpose of forcing the linker to include the specified objects
+#include "machine/smc92x4.h"
+#include "machine/ti99/ti99_hd.h"
+#include "machine/strata.h"
+
 class ti99_2_state : public driver_device
 {
 public:
@@ -89,7 +94,11 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_dummy1(*this, "linkingdummy1"),
+		m_dummy2(*this, "linkingdummy2"),
+		m_dummy3(*this, "linkingdummy3")
+		{ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_ROM_paged;
@@ -107,6 +116,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<smc92x4_device> m_dummy1;
+	optional_device<mfm_harddisk_device> m_dummy2;
+	optional_device<strataflash_device> m_dummy3;
 };
 
 
