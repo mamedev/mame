@@ -576,9 +576,8 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 {
-	device_t *aica = machine().device("aica");
 	dc_state::machine_reset();
-	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
+	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
 }
 
 WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
@@ -595,14 +594,6 @@ WRITE_LINE_MEMBER(dc_cons_state::sh4_aica_irq)
 
 	dc_update_interrupt_status();
 }
-
-static const aica_interface dc_aica_interface =
-{
-	TRUE,
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq),
-	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,sh4_aica_irq)
-};
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -642,7 +633,9 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)
-	MCFG_SOUND_CONFIG(dc_aica_interface)
+	MCFG_AICA_MASTER
+	MCFG_AICA_IRQ_CB(WRITELINE(dc_cons_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_cons_state, sh4_aica_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 

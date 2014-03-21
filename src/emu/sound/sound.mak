@@ -536,10 +536,6 @@ ifneq ($(filter AICA,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/aica.o $(SOUNDOBJ)/aicadsp.o
 endif
 
-$(SOUNDOBJ)/aica.o: $(SOUNDSRC)/aicalfo.inc
-
-
-
 #-------------------------------------------------
 # Seta custom sound chips
 #@src/emu/sound/st0016.h,SOUNDS += ST0016

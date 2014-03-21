@@ -8,7 +8,6 @@
 #include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
-#include "sound/aica.h"
 #include "machine/mie.h"
 #include "machine/naomig1.h"
 #include "video/powervr2.h"
@@ -681,7 +680,7 @@ READ32_MEMBER(dc_state::dc_aica_reg_r)
 	if(offset == 0x2c00/4)
 		return m_armrst;
 
-	return aica_r(machine().device("aica"), space, offset*2, 0xffff);
+	return m_aica->read(space, offset*2, 0xffff);
 }
 
 WRITE32_MEMBER(dc_state::dc_aica_reg_w)
@@ -705,19 +704,19 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 		}
 	}
 
-	aica_w(machine().device("aica"), space, offset*2, data, 0xffff);
+	m_aica->write(space, offset*2, data, 0xffff);
 
 //  mame_printf_verbose("AICA REG: [%08x=%x] write %x to %x, mask %" I64FMT "x\n", 0x700000+reg*4, data, offset, mem_mask);
 }
 
 READ32_MEMBER(dc_state::dc_arm_aica_r)
 {
-	return aica_r(machine().device("aica"), space, offset*2, 0xffff) & 0xffff;
+	return m_aica->read(space, offset*2, 0xffff) & 0xffff;
 }
 
 WRITE32_MEMBER(dc_state::dc_arm_aica_w)
 {
-	aica_w(machine().device("aica"), space, offset*2, data, mem_mask&0xffff);
+	m_aica->write(space, offset*2, data, mem_mask&0xffff);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)

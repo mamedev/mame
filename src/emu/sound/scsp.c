@@ -204,13 +204,10 @@ void scsp_device::device_start()
 	init();
 
 	// set up the IRQ callbacks
-	{
-		m_irq_cb.resolve_safe();
-
-		m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100, this);
-	}
-
+	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();	
+
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100, this);
 }
 
 //-------------------------------------------------

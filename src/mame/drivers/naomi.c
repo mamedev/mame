@@ -1812,15 +1812,6 @@ WRITE_LINE_MEMBER(naomi_state::sh4_aica_irq)
 	dc_update_interrupt_status();
 }
 
-static const aica_interface aica_config =
-{
-	TRUE,
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(naomi_state,aica_irq),
-	DEVCB_DRIVER_LINE_MEMBER(naomi_state,sh4_aica_irq)
-};
-
-
 static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, naomi_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
@@ -2487,7 +2478,7 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER(naomi_state,naomi)
 {
 	naomi_state::machine_reset();
-	aica_set_ram_base(machine().device("aica"), dc_sound_ram, 8*1024*1024);
+	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);
 }
 
 /*
@@ -2521,7 +2512,10 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)
-	MCFG_SOUND_CONFIG(aica_config)
+	MCFG_AICA_MASTER
+	MCFG_AICA_IRQ_CB(WRITELINE(naomi_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(naomi_state, sh4_aica_irq))
+	
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 

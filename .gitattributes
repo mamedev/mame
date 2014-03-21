@@ -2735,7 +2735,6 @@ src/emu/sound/aica.c svneol=native#text/plain
 src/emu/sound/aica.h svneol=native#text/plain
 src/emu/sound/aicadsp.c svneol=native#text/plain
 src/emu/sound/aicadsp.h svneol=native#text/plain
-src/emu/sound/aicalfo.inc svneol=native#text/plain
 src/emu/sound/asc.c svneol=native#text/plain
 src/emu/sound/asc.h svneol=native#text/plain
 src/emu/sound/astrocde.c svneol=native#text/plain
