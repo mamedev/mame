@@ -23,9 +23,9 @@
 
 #define MCFG_NAMCO_62XX_OUTPUT_1_CB(_devcb) \
 	devcb = &namco_62xx_device::set_output_1_callback(*device, DEVCB2_##_devcb);
-	
-class namco_62xx_device : public device_t,
-							public namco_62xx_interface
+
+
+class namco_62xx_device : public device_t
 {
 public:
 	namco_62xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
