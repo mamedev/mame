@@ -324,7 +324,10 @@ public:
 	void ms_atari_machine_start(int type, int has_cart);
 	void ms_atari800xl_machine_start(int type, int has_cart);
 
-	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
+	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
+	
+	DECLARE_READ8_MEMBER(atari_pia_pa_r);
+	DECLARE_READ8_MEMBER(atari_pia_pb_r);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -2412,14 +2415,14 @@ static const pokey_interface atari_pokey_interface =
  *
  **************************************************************/
 
-READ8_DEVICE_HANDLER(atari_pia_pa_r)
+READ8_MEMBER(a400_state::atari_pia_pa_r)
 {
-	return space.machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return ioport("djoy_0_1")->read_safe(0);
 }
 
-READ8_DEVICE_HANDLER(atari_pia_pb_r)
+READ8_MEMBER(a400_state::atari_pia_pb_r)
 {
-	return space.machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return ioport("djoy_2_3")->read_safe(0);
 }
 
 // FIXME: should there be anything connected where other system have the fdc?
