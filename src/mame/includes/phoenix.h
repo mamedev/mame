@@ -101,7 +101,7 @@ private:
 	UINT8               m_sound_latch_a;
 	sound_stream *      m_channel;
 	UINT32 *                m_poly18;
-	device_t *m_discrete;
+	discrete_device *m_discrete;
 	tms36xx_device *m_tms;
 
 	int update_c24(int samplerate);

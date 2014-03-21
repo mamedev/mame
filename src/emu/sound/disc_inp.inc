@@ -20,19 +20,6 @@
 #define DSS_INPUT__OFFSET   DISCRETE_INPUT(1)
 #define DSS_INPUT__INIT     DISCRETE_INPUT(2)
 
-READ8_DEVICE_HANDLER(discrete_sound_r)
-{
-	discrete_device *disc_device = downcast<discrete_device *>(device);
-	return  disc_device->read( space, offset, 0xff);
-}
-
-
-WRITE8_DEVICE_HANDLER(discrete_sound_w)
-{
-	discrete_device *disc_device = downcast<discrete_device *>(device);
-	disc_device->write(space, offset, data, 0xff);
-}
-
 /************************************************************************
  *
  * DSS_ADJUSTMENT - UI Adjustable constant node to emulate trimmers

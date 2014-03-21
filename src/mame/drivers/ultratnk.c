@@ -142,19 +142,19 @@ WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_fire_1_w)
 {
-	discrete_sound_w(m_discrete, space, ULTRATNK_FIRE_EN_1, offset & 1);
+	m_discrete->write(space, ULTRATNK_FIRE_EN_1, offset & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_fire_2_w)
 {
-	discrete_sound_w(m_discrete, space, ULTRATNK_FIRE_EN_2, offset & 1);
+	m_discrete->write(space, ULTRATNK_FIRE_EN_2, offset & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_attract_w)
 {
-	discrete_sound_w(m_discrete, space, ULTRATNK_ATTRACT_EN, data & 1);
+	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
 }
 WRITE8_MEMBER(ultratnk_state::ultratnk_explosion_w)
 {
-	discrete_sound_w(m_discrete, space, ULTRATNK_EXPLOSION_DATA, data & 15);
+	m_discrete->write(space, ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 

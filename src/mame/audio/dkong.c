@@ -1253,7 +1253,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 
 WRITE8_MEMBER(dkong_state::dkong_p1_w)
 {
-	discrete_sound_w(m_discrete,space,DS_DAC,data);
+	m_discrete->write(space,DS_DAC,data);
 }
 
 

@@ -292,10 +292,10 @@ WRITE8_MEMBER(skyraid_state::skyraid_sound_w)
 	/* BIT4 => PLANE ON    */
 	/* BIT5 => ATTRACT     */
 
-	discrete_sound_w(m_discrete, space, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
-	discrete_sound_w(m_discrete, space, SKYRAID_MISSILE_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, SKYRAID_EXPLOSION_EN, data & 0x04);
+	m_discrete->write(space, SKYRAID_PLANE_SWEEP_EN, data & 0x01);
+	m_discrete->write(space, SKYRAID_MISSILE_EN, data & 0x02);
+	m_discrete->write(space, SKYRAID_EXPLOSION_EN, data & 0x04);
 	set_led_status(machine(), 0, !(data & 0x08));
-	discrete_sound_w(m_discrete, space, SKYRAID_PLANE_ON_EN, data & 0x10);
-	discrete_sound_w(m_discrete, space, SKYRAID_ATTRACT_EN, data & 0x20);
+	m_discrete->write(space, SKYRAID_PLANE_ON_EN, data & 0x10);
+	m_discrete->write(space, SKYRAID_ATTRACT_EN, data & 0x20);
 }

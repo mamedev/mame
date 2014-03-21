@@ -616,7 +616,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 	}
 
 	// beep
-	discrete_sound_w(m_discrete, space, NODE_01, BIT(data, 4));
+	m_discrete->write(space, NODE_01, BIT(data, 4));
 
 	// transmit data
 	serial_output(BIT(data, 5));

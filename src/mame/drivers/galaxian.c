@@ -579,7 +579,7 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 
 WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	device_t *discrete = machine().device("konami");
+	discrete_device *discrete = machine().device<discrete_device>("konami");
 	static const char *const ayname[2] = { "8910.0", "8910.1" };
 	int which, chan;
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete_sound_w(discrete, space, NODE(3 * which + chan + 11), bits);
+				discrete->write(space, NODE(3 * which + chan + 11), bits);
 			}
 }
 

@@ -163,7 +163,7 @@ READ8_MEMBER( abc800_state::pling_r )
 {
 	m_pling = !m_pling;
 
-	discrete_sound_w(m_discrete, space, NODE_01, m_pling);
+	m_discrete->write(space, NODE_01, m_pling);
 
 	return 0xff;
 }
@@ -177,7 +177,7 @@ READ8_MEMBER( abc802_state::pling_r )
 {
 	m_pling = !m_pling;
 
-	discrete_sound_w(m_discrete, space, NODE_01, m_pling);
+	m_discrete->write(space, NODE_01, m_pling);
 
 	return 0xff;
 }

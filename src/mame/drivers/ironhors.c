@@ -43,10 +43,10 @@ WRITE8_MEMBER(ironhors_state::ironhors_sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::ironhors_filter_w)
 {
-	device_t *device = machine().device("disc_ih");
-	discrete_sound_w(device, space, NODE_11, (data & 0x04) >> 2);
-	discrete_sound_w(device, space, NODE_12, (data & 0x02) >> 1);
-	discrete_sound_w(device, space, NODE_13, (data & 0x01) >> 0);
+	discrete_device *m_disc_ih = machine().device<discrete_device>("disc_ih");
+	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
+	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
+	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
 }
 
 /*************************************

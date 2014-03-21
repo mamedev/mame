@@ -426,7 +426,7 @@ void galaxian_sound_device::device_start()
 /* IC 9J */
 WRITE8_MEMBER( galaxian_sound_device::pitch_w )
 {
-	discrete_sound_w(m_discrete, space, GAL_INP_PITCH, data );
+	m_discrete->write(space, GAL_INP_PITCH, data );
 }
 
 WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
@@ -436,28 +436,28 @@ WRITE8_MEMBER( galaxian_sound_device::lfo_freq_w )
 	if (m_lfo_val != lfo_val_new)
 	{
 		m_lfo_val = lfo_val_new;
-		discrete_sound_w(m_discrete, space, GAL_INP_BG_DAC, m_lfo_val);
+		m_discrete->write(space, GAL_INP_BG_DAC, m_lfo_val);
 	}
 }
 
 WRITE8_MEMBER( galaxian_sound_device::background_enable_w )
 {
-	discrete_sound_w(m_discrete, space, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
+	m_discrete->write(space, NODE_RELATIVE(GAL_INP_FS1, offset), data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::noise_enable_w )
 {
-	discrete_sound_w(m_discrete, space, GAL_INP_HIT, data & 0x01);
+	m_discrete->write(space, GAL_INP_HIT, data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::vol_w )
 {
-	discrete_sound_w(m_discrete, space, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
+	m_discrete->write(space, NODE_RELATIVE(GAL_INP_VOL1,offset), data & 0x01);
 }
 
 WRITE8_MEMBER( galaxian_sound_device::fire_enable_w )
 {
-	discrete_sound_w(m_discrete, space, GAL_INP_FIRE, data & 0x01);
+	m_discrete->write(space, GAL_INP_FIRE, data & 0x01);
 }
 
 /* FIXME: May be replaced by one call! */

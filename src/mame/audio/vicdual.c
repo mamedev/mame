@@ -148,12 +148,12 @@ WRITE8_MEMBER( vicdual_state::frogs_audio_w )
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  discrete_sound_w(m_discrete, space, FROGS_HOP_EN, data & 0x01);
-//  discrete_sound_w(m_discrete, space, FROGS_JUMP_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, FROGS_TONGUE_EN, data & 0x04);
-//  discrete_sound_w(m_discrete, space, FROGS_CAPTURE_EN, data & 0x08);
-//  discrete_sound_w(m_discrete, space, FROGS_FLY_EN, data & 0x10);
-//  discrete_sound_w(m_discrete, space, FROGS_SPLASH_EN, data & 0x80);
+//  m_discrete->write(space, FROGS_HOP_EN, data & 0x01);
+//  m_discrete->write(space, FROGS_JUMP_EN, data & 0x02);
+	m_discrete->write(space, FROGS_TONGUE_EN, data & 0x04);
+//  m_discrete->write(space, FROGS_CAPTURE_EN, data & 0x08);
+//  m_discrete->write(space, FROGS_FLY_EN, data & 0x10);
+//  m_discrete->write(space, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
 		m_samples->start(3, 3);   // Hop
@@ -460,13 +460,13 @@ WRITE8_MEMBER( vicdual_state::headon_audio_w )
 {
 	if (m_discrete == NULL)
 		return;
-	discrete_sound_w(m_discrete, space, HEADON_HISPEED_PC_EN, data & 0x01);
-	discrete_sound_w(m_discrete, space, HEADON_SCREECH1_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, HEADON_CRASH_EN, data & 0x04);
-	discrete_sound_w(m_discrete, space, HEADON_HISPEED_CC_EN, data & 0x08);
-	discrete_sound_w(m_discrete, space, HEADON_SCREECH2_EN, data & 0x10);
-	discrete_sound_w(m_discrete, space, HEADON_BONUS_EN, data & 0x20);
-	discrete_sound_w(m_discrete, space, HEADON_CAR_ON_EN, data & 0x40);
+	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x01);
+	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x02);
+	m_discrete->write(space, HEADON_CRASH_EN, data & 0x04);
+	m_discrete->write(space, HEADON_HISPEED_CC_EN, data & 0x08);
+	m_discrete->write(space, HEADON_SCREECH2_EN, data & 0x10);
+	m_discrete->write(space, HEADON_BONUS_EN, data & 0x20);
+	m_discrete->write(space, HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
@@ -474,13 +474,13 @@ WRITE8_MEMBER( vicdual_state::invho2_audio_w )
 {
 	if (m_discrete == NULL)
 		return;
-	discrete_sound_w(m_discrete, space, HEADON_HISPEED_PC_EN, data & 0x10);
-	discrete_sound_w(m_discrete, space, HEADON_SCREECH1_EN, data & 0x08);
-	discrete_sound_w(m_discrete, space, HEADON_CRASH_EN, data & 0x80);
-	discrete_sound_w(m_discrete, space, HEADON_HISPEED_CC_EN, data & 0x40);
-	discrete_sound_w(m_discrete, space, HEADON_SCREECH2_EN, data & 0x04);
-	discrete_sound_w(m_discrete, space, HEADON_BONUS_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, HEADON_CAR_ON_EN, data & 0x20);
+	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x10);
+	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x08);
+	m_discrete->write(space, HEADON_CRASH_EN, data & 0x80);
+	m_discrete->write(space, HEADON_HISPEED_CC_EN, data & 0x40);
+	m_discrete->write(space, HEADON_SCREECH2_EN, data & 0x04);
+	m_discrete->write(space, HEADON_BONUS_EN, data & 0x02);
+	m_discrete->write(space, HEADON_CAR_ON_EN, data & 0x20);
 
 }
 

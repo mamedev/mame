@@ -38,7 +38,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(blockade_state::blockade_sound_freq_w)
 {
-	discrete_sound_w(m_discrete,space,BLOCKADE_NOTE_DATA, data);
+	m_discrete->write(space,BLOCKADE_NOTE_DATA, data);
 	return;
 }
 

@@ -83,13 +83,13 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(asteroid_state::llander_snd_reset_w)
 {
 	/* Resets the LFSR that is used for the white noise generator       */
-	discrete_sound_w(m_discrete, space, LLANDER_NOISE_RESET, 0);                /* Reset */
+	m_discrete->write(space, LLANDER_NOISE_RESET, 0);                /* Reset */
 }
 
 WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 {
-	discrete_sound_w(m_discrete, space, LLANDER_THRUST_DATA, data & 0x07);      /* Thrust volume */
-	discrete_sound_w(m_discrete, space, LLANDER_TONE3K_EN, data & 0x10);        /* Tone 3KHz enable */
-	discrete_sound_w(m_discrete, space, LLANDER_TONE6K_EN, data & 0x20);        /* Tone 6KHz enable */
-	discrete_sound_w(m_discrete, space, LLANDER_EXPLOD_EN, data & 0x08);        /* Explosion */
+	m_discrete->write(space, LLANDER_THRUST_DATA, data & 0x07);      /* Thrust volume */
+	m_discrete->write(space, LLANDER_TONE3K_EN, data & 0x10);        /* Tone 3KHz enable */
+	m_discrete->write(space, LLANDER_TONE6K_EN, data & 0x20);        /* Tone 6KHz enable */
+	m_discrete->write(space, LLANDER_EXPLOD_EN, data & 0x08);        /* Explosion */
 }

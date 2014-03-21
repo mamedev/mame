@@ -72,7 +72,7 @@ void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(m_discrete, space, ORBIT_WARNING_EN, BIT(m_misc_flags, 7));
+	m_discrete->write(space, ORBIT_WARNING_EN, BIT(m_misc_flags, 7));
 
 	set_led_status(machine(), 0, BIT(m_misc_flags, 3));
 	set_led_status(machine(), 1, BIT(m_misc_flags, 6));

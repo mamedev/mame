@@ -71,16 +71,16 @@ WRITE8_MEMBER( namco_54xx_device::O_w )
 {
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		discrete_sound_w(m_discrete, space, NAMCO_54XX_1_DATA(m_basenode), out);
+		m_discrete->write(space, NAMCO_54XX_1_DATA(m_basenode), out);
 	else
-		discrete_sound_w(m_discrete, space, NAMCO_54XX_0_DATA(m_basenode), out);
+		m_discrete->write(space, NAMCO_54XX_0_DATA(m_basenode), out);
 }
 
 WRITE8_MEMBER( namco_54xx_device::R1_w )
 {
 	UINT8 out = (data & 0x0f);
 
-	discrete_sound_w(m_discrete, space, NAMCO_54XX_2_DATA(m_basenode), out);
+	m_discrete->write(space, NAMCO_54XX_2_DATA(m_basenode), out);
 }
 
 

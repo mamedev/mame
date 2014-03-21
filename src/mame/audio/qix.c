@@ -28,12 +28,12 @@ Audio handlers
 
 WRITE8_MEMBER(qix_state::qix_dac_w)
 {
-	discrete_sound_w(m_discrete, space, QIX_DAC_DATA, data);
+	m_discrete->write(space, QIX_DAC_DATA, data);
 }
 
 WRITE8_MEMBER(qix_state::qix_vol_w)
 {
-	discrete_sound_w(m_discrete, space, QIX_VOL_DATA, data);
+	m_discrete->write(space, QIX_VOL_DATA, data);
 }
 
 

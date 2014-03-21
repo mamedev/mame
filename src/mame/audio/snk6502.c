@@ -860,7 +860,7 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(space.machine().device("discrete"), space, FANTASY_BOMB_EN, data & 0x80);
+		machine().device<discrete_device>("discrete")->write(space, FANTASY_BOMB_EN, data & 0x80);
 
 		m_LastPort1 = data;
 		break;

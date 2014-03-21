@@ -260,7 +260,7 @@ MACHINE_CONFIG_EXTERN( tornbase_audio );
 MACHINE_CONFIG_EXTERN( zzzap_audio );
 
 MACHINE_CONFIG_EXTERN( maze_audio );
-void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state);
+void maze_write_discrete(discrete_device *device, UINT8 maze_tone_timing_state);
 
 MACHINE_CONFIG_EXTERN( boothill_audio );
 

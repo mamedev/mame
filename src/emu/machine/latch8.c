@@ -22,14 +22,14 @@ void latch8_device::update(UINT8 new_val, UINT8 mask)
 		UINT8 changed = old_val ^ m_value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0) && m_node_map[i] != 0) {
-				if (i==0 && m_node_device_0!=NULL) discrete_sound_w(m_node_device_0, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==1 && m_node_device_1!=NULL) discrete_sound_w(m_node_device_1, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==2 && m_node_device_2!=NULL) discrete_sound_w(m_node_device_2, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==3 && m_node_device_3!=NULL) discrete_sound_w(m_node_device_3, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==4 && m_node_device_4!=NULL) discrete_sound_w(m_node_device_4, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==5 && m_node_device_5!=NULL) discrete_sound_w(m_node_device_5, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==6 && m_node_device_6!=NULL) discrete_sound_w(m_node_device_6, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
-				if (i==7 && m_node_device_7!=NULL) discrete_sound_w(m_node_device_7, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==0 && m_node_device_0!=NULL) m_node_device_0->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==1 && m_node_device_1!=NULL) m_node_device_1->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==2 && m_node_device_2!=NULL) m_node_device_2->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==3 && m_node_device_3!=NULL) m_node_device_3->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==4 && m_node_device_4!=NULL) m_node_device_4->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==5 && m_node_device_5!=NULL) m_node_device_5->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==6 && m_node_device_6!=NULL) m_node_device_6->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==7 && m_node_device_7!=NULL) m_node_device_7->write(machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
 			}
 	}
 }

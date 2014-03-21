@@ -702,27 +702,27 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
 	switch (offset)
 	{
 		case 0x00:
-			discrete_sound_w(m_discrete, space, COPSNROB_MOTOR3_INV, special_data);
+			m_discrete->write(space, COPSNROB_MOTOR3_INV, special_data);
 			break;
 
 		case 0x01:
-			discrete_sound_w(m_discrete, space, COPSNROB_MOTOR2_INV, special_data);
+			m_discrete->write(space, COPSNROB_MOTOR2_INV, special_data);
 			break;
 
 		case 0x02:
-			discrete_sound_w(m_discrete, space, COPSNROB_MOTOR1_INV, special_data);
+			m_discrete->write(space, COPSNROB_MOTOR1_INV, special_data);
 			break;
 
 		case 0x03:
-			discrete_sound_w(m_discrete, space, COPSNROB_MOTOR0_INV, special_data);
+			m_discrete->write(space, COPSNROB_MOTOR0_INV, special_data);
 			break;
 
 		case 0x04:
-			discrete_sound_w(m_discrete, space, COPSNROB_SCREECH_INV, special_data);
+			m_discrete->write(space, COPSNROB_SCREECH_INV, special_data);
 			break;
 
 		case 0x05:
-			discrete_sound_w(m_discrete, space, COPSNROB_CRASH_INV, special_data);
+			m_discrete->write(space, COPSNROB_CRASH_INV, special_data);
 			break;
 
 		case 0x06:
@@ -731,7 +731,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
 			break;
 
 		case 0x07:
-			discrete_sound_w(m_discrete, space, COPSNROB_AUDIO_ENABLE, special_data);
+			m_discrete->write(space, COPSNROB_AUDIO_ENABLE, special_data);
 			//machine().sound().system_mute(special_data);
 			break;
 

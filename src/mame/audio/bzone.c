@@ -391,7 +391,7 @@ static const pokey_interface bzone_pokey_interface =
 
 WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
-	discrete_sound_w(m_discrete, space, BZ_INPUT, data);
+	m_discrete->write(space, BZ_INPUT, data);
 
 	output_set_value("startled", (data >> 6) & 1);
 	machine().sound().system_enable(data & 0x20);
