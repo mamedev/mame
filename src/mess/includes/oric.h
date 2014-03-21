@@ -151,6 +151,7 @@ public:
 	DECLARE_READ8_MEMBER(telestrat_via2_in_b_func);
 	DECLARE_WRITE8_MEMBER(telestrat_via2_out_b_func);
 	DECLARE_WRITE_LINE_MEMBER(telestrat_via2_irq_func);
+	DECLARE_WRITE_LINE_MEMBER(telestrat_acia_callback);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -195,7 +196,6 @@ protected:
 	void oric_vh_update_flash();
 	void oric_refresh_charset();
 	void oric_vh_render_6pixels(bitmap_ind16 &bitmap, int x, UINT8 y, UINT8 fg, UINT8 bg, UINT8 data, bool invert_flag);
-	void telestrat_acia_callback(int irq_state);
 };
 
 /*----------- defined in machine/oric.c -----------*/

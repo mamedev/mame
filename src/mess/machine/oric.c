@@ -1296,20 +1296,18 @@ WRITE_LINE_MEMBER(oric_state::telestrat_via2_irq_func)
 	oric_refresh_ints();
 }
 
-#if 0
 /* interrupt state from acia6551 */
-void oric_state::telestrat_acia_callback(int irq_state)
+WRITE_LINE_MEMBER(oric_state::telestrat_acia_callback)
 {
 	m_irqs&=~(1<<3);
 
-	if (irq_state)
+	if (state)
 	{
 		m_irqs |= (1<<3);
 	}
 
 	oric_refresh_ints();
 }
-#endif
 
 MACHINE_START_MEMBER(oric_state,telestrat)
 {
