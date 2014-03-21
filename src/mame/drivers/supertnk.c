@@ -415,19 +415,6 @@ static INPUT_PORTS_START( supertnk )
 INPUT_PORTS_END
 
 
-/************
-  CPU config
-*************/
-
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,     // External operation
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 /*************************************
  *
  *  Machine driver
@@ -436,10 +423,9 @@ static TMS9980A_CONFIG( cpuconf )
 
 static MACHINE_CONFIG_START( supertnk, supertnk_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map, cpuconf)
+	// CPU TMS9980A; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
-
 
 	/* video hardware */
 

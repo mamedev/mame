@@ -34,7 +34,7 @@
   1x 2114       (1024 words x 4 bits RAM).
 
   3x 2732 labelled 1, 2 and 3.
-  3x 2764 labelled Red, Blue and Green (the last one also has '22-3-85'). 
+  3x 2764 labelled Red, Blue and Green (the last one also has '22-3-85').
 
   1x 6.0 MHz crystal.
   1x Panasonic BR-2/3A lithium battery (3V, 1200 mAh).
@@ -158,7 +158,7 @@
   - Adjusted the screen pos 8 pixels, to get a bit centered.
   - Fixed palette to 8 colors.
   - Added technical notes.
- 
+
   [2014-02-17]
 
   - Corrected the crystal value and derivate clocks via #DEFINE.
@@ -213,7 +213,7 @@ public:
 
 	UINT8 mux_sel;
 	UINT8 muxlamps;
-	
+
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -258,7 +258,7 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
 	int bank = (attr & 0x03);
-	int color = 0;	/* fixed colors: one rom for each R, G and B. */
+	int color = 0;  /* fixed colors: one rom for each R, G and B. */
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
@@ -294,15 +294,15 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	
+
 /*  Video RAM =   3000-33FF
     Working RAM = 3400-37FF
     Color RAM =   3800-3BFF (lower 4-bits)
 */
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")	/* TC5517AP battery backed RAM */
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")  /* TC5517AP battery backed RAM */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM */
 
-/*	CRTC *is* mapped here. Read 00-01 and then write on them.
+/*  CRTC *is* mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization seems incomplete since
     set till register 0x0D. Maybe the last registers are unused.
 */
@@ -358,7 +358,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     0CD0 = HOLD3 lamp.
     0CD2 = HOLD2 lamp.
     0CD4 = HOLD1 lamp.
-	
+
     Can't find more. Could be a kind of multiplexion.
     The input selectors don't seems to be completely involved,
     but 0CC6 is set to 1 when hold 1-2-3 turn on, thing that
@@ -367,7 +367,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     Writes to analize:
     0CC0 (write too often... maybe input selector)
     0CCC (write a bit less often...)
-	
+
     0CE6 = could be either a 'Insert Coin' lamp,
     or coin lockout (inverted), since is active
     low during the game. when the game is over,
@@ -386,7 +386,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     Pressing reset ----> writes 1 to 0CF8
     Pressing deal -----> writes 1 to 0D00
 
-	(See below, in sound writes...)
+    (See below, in sound writes...)
 */
 
 	if (((offset<<1)==0x0ccc)&&(data==1))
@@ -399,7 +399,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	}
 
 /*  the following structure has 3 states, because I tested the inputs
-    selectors 0CC2-0CC4-0CC6 as lamps multiplexers unsuccessfuly.   
+    selectors 0CC2-0CC4-0CC6 as lamps multiplexers unsuccessfuly.
 */
 	if (((offset<<1)==0x0cd0)&&(data==1))
 	{
@@ -407,63 +407,63 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 			{
 				output_set_lamp_value(0, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 0");
+//              popmessage("LAMP 0");
 			}
 		if (muxlamps == 2)
 			{
 				output_set_lamp_value(3, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 3");
+//              popmessage("LAMP 3");
 			}
 		if (muxlamps == 3)
 			{
 				output_set_lamp_value(6, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 6");
+//              popmessage("LAMP 6");
 			}
 	}
-	
+
 	if (((offset<<1)==0x0cd2)&&(data==1))
 	{
 		if (muxlamps == 1)
 			{
 				output_set_lamp_value(1, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 1");
+//              popmessage("LAMP 1");
 			}
 		if (muxlamps == 2)
 			{
 				output_set_lamp_value(4, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 4");
+//              popmessage("LAMP 4");
 			}
 		if (muxlamps == 3)
 			{
 				output_set_lamp_value(7, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 7");
+//              popmessage("LAMP 7");
 			}
 	}
-	
+
 	if (((offset<<1)==0x0cd4)&&(data==1))
 	{
 		if (muxlamps == 1)
 			{
 				output_set_lamp_value(2, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 2");
+//              popmessage("LAMP 2");
 			}
 		if (muxlamps == 2)
 			{
 				output_set_lamp_value(5, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 5");
+//              popmessage("LAMP 5");
 			}
 		if (muxlamps == 3)
 			{
 				output_set_lamp_value(8, (data & 1));  /* lamp */
 				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
-//				popmessage("LAMP 8");
+//              popmessage("LAMP 8");
 			}
 	}
 
@@ -483,65 +483,65 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     Pressing reset ----> writes 1 to 0CF8
     Pressing deal -----> writes 1 to 0D00
 */
-	
+
 	if (((offset<<1)==0x0ce8)&&(data==1))
 	{
 		logerror("CRU: SOUND 'CANCEL' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'CANCEL': %04x", offset<<1);
+//      popmessage("SOUND 'CANCEL': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cea)&&(data==1))
 	{
 		logerror("CRU: SOUND 'BET' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'BET': %04x", offset<<1);
+//      popmessage("SOUND 'BET': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cec)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HOLD4' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HOLD 4': %04x", offset<<1);
+//      popmessage("SOUND 'HOLD 4': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cee)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HOLD5' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HOLD 5': %04x", offset<<1);
+//      popmessage("SOUND 'HOLD 5': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cf0)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HAND PAY' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HAND PAY': %04x", offset<<1);
+//      popmessage("SOUND 'HAND PAY': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cf2)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HOLD1' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HOLD 1': %04x", offset<<1);
+//      popmessage("SOUND 'HOLD 1': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cf4)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HOLD2' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HOLD 2': %04x", offset<<1);
+//      popmessage("SOUND 'HOLD 2': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cf6)&&(data==1))
 	{
 		logerror("CRU: SOUND 'HOLD3' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'HOLD 3': %04x", offset<<1);
+//      popmessage("SOUND 'HOLD 3': %04x", offset<<1);
 	}
-	
+
 	if (((offset<<1)==0x0cf8)&&(data==1))
 	{
 		logerror("CRU: SOUND 'RESET' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'RESET': %04x", offset<<1);
+//      popmessage("SOUND 'RESET': %04x", offset<<1);
 	}
 
 	if (((offset<<1)==0x0d00)&&(data==1))
 	{
 		logerror("CRU: SOUND 'DEAL' write to address %04x: %d\n", offset<<1, data & 1);
-//		popmessage("SOUND 'DEAL': %04x", offset<<1);
+//      popmessage("SOUND 'DEAL': %04x", offset<<1);
 	}
 
 
@@ -555,7 +555,7 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 	switch( mux_sel )
 	{
 		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();	/* muxed credits input is here! */
+		case 0x02: return ioport("IN1")->read();    /* muxed credits input is here! */
 		case 0x03: return ioport("IN2")->read();
 	}
 
@@ -564,7 +564,7 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
-	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)	/* multiplexed input port */
+	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)    /* multiplexed input port */
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(unk_w)
 ADDRESS_MAP_END
 
@@ -590,18 +590,18 @@ static INPUT_PORTS_START( jubileep )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )    PORT_NAME("Bet / Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )   PORT_NAME("Hold 4 / Half Gamble")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )   PORT_NAME("Hold 5 / Red")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )       PORT_NAME("Hand Pay")             PORT_CODE(KEYCODE_8) 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )       PORT_NAME("Hand Pay")             PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )   PORT_NAME("Hold 1 / Black")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )   PORT_NAME("Hold 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )   PORT_NAME("Hold 3")
 
 	PORT_START("IN1")
 /*  Don't know if this needs a custom port. Bits 0 and 1 together are the credits input.
-	Bit 1 alone could be "Attendant Paid Status (reset)" that does a reset and update the
-	paid status, or just is for edge coin-in timeouts... Impossible to say without a PCB.
+    Bit 1 alone could be "Attendant Paid Status (reset)" that does a reset and update the
+    paid status, or just is for edge coin-in timeouts... Impossible to say without a PCB.
 */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_IMPULSE (2)
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Attendant Paid Status (reset)")  PORT_CODE(KEYCODE_7) 
+//  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Attendant Paid Status (reset)")  PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -642,7 +642,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jubileep )		/* 4 different graphics banks */
+static GFXDECODE_START( jubileep )      /* 4 different graphics banks */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 1 )
@@ -669,23 +669,14 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL          /* update address callback */
 };
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,     /* Instruction acquisition */
-	DEVCB_NULL,     /* Clock out */
-	DEVCB_NULL,     /* Hold acknowledge */
-	DEVCB_NULL      /* DBIN */
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
 
 static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map, cpuconf)
+	// Main CPU TMS9980A, no line connections.
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("videoworkram")

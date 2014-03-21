@@ -61,21 +61,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jpmsru )
 INPUT_PORTS_END
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,     // External operation
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 static MACHINE_CONFIG_START( jpmsru, jpmsru_state )
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_map, jpmsru_io, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_map, jpmsru_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jpmsru_4, jpmsru_state )
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(jpmsru_state,jpmsru)

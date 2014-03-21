@@ -564,26 +564,14 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-/***********************
-*    CPU Interface    *
-************************/
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,     // External operation
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
 
 static MACHINE_CONFIG_START( tmspoker, tmspoker_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map, cpuconf)
+	// CPU TMS9980A; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmspoker_state,  tmspoker_interrupt)
 
 //  MCFG_NVRAM_HANDLER(generic_0fill)

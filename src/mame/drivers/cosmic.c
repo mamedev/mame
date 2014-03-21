@@ -1072,19 +1072,10 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 
 MACHINE_CONFIG_END
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,     // External operation
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
 		/* 9.828 MHz Crystal */
 		/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
 		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under

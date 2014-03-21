@@ -348,21 +348,10 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru, cpuconf95)
+	// CPU TMS9995, standard variant; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
 
 	/* video hardware */
