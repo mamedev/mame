@@ -28,12 +28,15 @@
 
 /*
     For comments on real timing see ti99/spchsyn.c
+
+    Note that before the REAL_TIMING can be used we must first establish
+    the set_address logic in mapper8.
 */
 /****************************************************************************/
 
 ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : bus8z_device(mconfig, TI99_SPEECH8, "TI-99/8 Speech synthesizer (onboard)", tag, owner, clock, "ti99_speech8", __FILE__),
-  m_ready(*this)
+	m_ready(*this)
 {
 }
 
