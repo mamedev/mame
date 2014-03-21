@@ -13,11 +13,6 @@
 
 #define QSOUND_CLOCK 4000000    /* default 4MHz clock */
 
-#define QSOUND_CLOCKDIV 166     /* Clock divider */
-#define QSOUND_CHANNELS 16
-typedef INT8 QSOUND_SRC_SAMPLE; /* 8 bit source ROM samples */
-typedef stream_sample_t QSOUND_SAMPLE;
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -29,31 +24,6 @@ typedef stream_sample_t QSOUND_SAMPLE;
 	MCFG_DEVICE_REPLACE(_tag, QSOUND, _clock)
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-struct QSOUND_CHANNEL
-{
-	INT32 bank;     // bank (x16)
-	INT32 address;  // start address
-	INT32 pitch;    // pitch
-	INT32 reg3;     // unknown (always 0x8000)
-	INT32 loop;     // loop address
-	INT32 end;      // end address
-	INT32 vol;      // master volume
-	INT32 pan;      // Pan value
-	INT32 reg9;     // unknown
-
-	/* Work variables */
-	INT32 key;      // Key on / key off
-	INT32 lvol;     // left volume
-	INT32 rvol;     // right volume
-	INT32 lastdt;   // last sample value
-	INT32 offset;   // current offset counter
-};
-
-
 // ======================> qsound_device
 
 class qsound_device : public device_t,
@@ -63,36 +33,45 @@ public:
 	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~qsound_device() { }
 
+	DECLARE_WRITE8_MEMBER(qsound_w);
+	DECLARE_READ8_MEMBER(qsound_r);
+
 protected:
 	// device-level overrides
 	const rom_entry *device_rom_region() const;
 	machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-	virtual void device_stop();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-public:
-	DECLARE_WRITE8_MEMBER( qsound_w );
-	DECLARE_READ8_MEMBER( qsound_r );
-
 private:
-	void qsound_set_command(int data, int value);
+	struct qsound_channel
+	{
+		UINT32 bank;        // bank
+		UINT32 address;     // start/cur address
+		UINT16 loop;        // loop address
+		UINT16 end;         // end address
+		UINT32 freq;        // frequency
+		UINT16 vol;         // master volume
 
-private:
-	int m_data;                 // register latch data
-	sound_stream *m_stream;     // Audio stream
-	QSOUND_CHANNEL m_channel[QSOUND_CHANNELS];
+		// work variables
+		bool enabled;       // key on / key off
+		int lvol;           // left volume
+		int rvol;           // right volume
+		INT8 sample;        // last sample value
+		UINT32 step_ptr;    // current offset counter
+	} m_channel[16];
+
+	int m_pan_table[33];    // pan volume table
+	UINT16 m_data;          // register latch data
+	sound_stream *m_stream; // audio stream
 	UINT32 m_sample_rom_length;
-	QSOUND_SRC_SAMPLE *m_sample_rom;    // Q sound sample ROM
+	INT8 *m_sample_rom;     // Q-Sound sample ROM
 	dsp16_device *m_cpu;
 
-	int m_pan_table[33];    // Pan volume table
-	float m_frq_ratio;      // Frequency ratio
-
-	FILE *m_fpRawDataL;
-	FILE *m_fpRawDataR;
+	inline INT8 read_sample(UINT32 offset) { return m_sample_rom[offset % m_sample_rom_length]; }
+	void write_data(UINT8 address, UINT16 data);
 };
 
 extern const device_type QSOUND;
