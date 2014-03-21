@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
+	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
@@ -507,14 +507,13 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 
 static void esq_dma_end(running_machine &machine, int channel, int irq)
 {
-	device_t *device = machine.device("mc68450");
 	esq5505_state *state = machine.driver_data<esq5505_state>();
 
 	if (irq != 0)
 	{
-		printf("DMAC IRQ, vector = %x\n", hd63450_get_vector(device, channel));
+		printf("DMAC IRQ, vector = %x\n", state->m_dmac->get_vector(channel));
 		state->dmac_irq_state = 1;
-		state->dmac_irq_vector = hd63450_get_vector(device, channel);
+		state->dmac_irq_vector = state->m_dmac->get_vector(channel);
 	}
 	else
 	{
@@ -526,14 +525,13 @@ static void esq_dma_end(running_machine &machine, int channel, int irq)
 
 static void esq_dma_error(running_machine &machine, int channel, int irq)
 {
-	device_t *device = machine.device("mc68450");
 	esq5505_state *state = machine.driver_data<esq5505_state>();
 
 	if(irq != 0)
 	{
-		printf("DMAC error, vector = %x\n", hd63450_get_error_vector(device, channel));
+		printf("DMAC error, vector = %x\n", state->m_dmac->get_error_vector(channel));
 		state->dmac_irq_state = 1;
-		state->dmac_irq_vector = hd63450_get_vector(device, channel);
+		state->dmac_irq_vector = state->m_dmac->get_vector(channel);
 	}
 	else
 	{
@@ -604,7 +602,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static const hd63450_intf dmac_interface =
+static const hd63450_interface dmac_interface =
 {
 	"maincpu",  // CPU - 68000
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)

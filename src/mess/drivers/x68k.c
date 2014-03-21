@@ -122,7 +122,6 @@
 #include "sound/2151intf.h"
 #include "sound/okim6258.h"
 #include "machine/8530scc.h"
-#include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
 #include "formats/xdf_dsk.h"
@@ -206,19 +205,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 			output_set_indexed_value("ctrl_drv",drive,1);
 	}
 
-}
-
-// 4 channel DMA controller (Hitachi HD63450)
-WRITE16_MEMBER(x68k_state::x68k_dmac_w)
-{
-	device_t* device = machine().device("hd63450");
-	hd63450_w(device, space, offset, data, mem_mask);
-}
-
-READ16_MEMBER(x68k_state::x68k_dmac_r)
-{
-	device_t* device = machine().device("hd63450");
-	return hd63450_r(device, space, offset, mem_mask);
 }
 
 
@@ -349,7 +335,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 
 void x68k_state::x68k_set_adpcm()
 {
-	device_t *dev = machine().device("hd63450");
 	UINT32 rate = 0;
 
 	switch(m_adpcm.rate & 0x0c)
@@ -369,7 +354,7 @@ void x68k_state::x68k_set_adpcm()
 	}
 	if(m_adpcm.clock != 0)
 		rate = rate/2;
-	hd63450_set_timer(dev,3,attotime::from_hz(rate));
+	m_hd63450->set_timer(3,attotime::from_hz(rate));
 }
 
 // Megadrive 3 button gamepad
@@ -759,8 +744,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_drq )
 	m_fdc.drq_state = state;
 	if(state && !ostate)
 	{
-		device_t* device = machine().device("hd63450");
-		hd63450_single_transfer(device, 0);
+		m_hd63450->single_transfer(0);
 	}
 }
 
@@ -1176,8 +1160,7 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 static void x68k_dma_irq(running_machine &machine, int channel)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	device_t *device = machine.device("hd63450");
-	state->m_current_vector[3] = hd63450_get_vector(device, channel);
+	state->m_current_vector[3] = state->m_hd63450->get_vector(channel);
 	state->m_current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->m_current_vector[3]);
 	state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
@@ -1199,10 +1182,9 @@ static void x68k_dma_end(running_machine &machine, int channel,int irq)
 static void x68k_dma_error(running_machine &machine, int channel, int irq)
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	device_t *device = machine.device("hd63450");
 	if(irq != 0)
 	{
-		state->m_current_vector[3] = hd63450_get_error_vector(device,channel);
+		state->m_current_vector[3] = state->m_hd63450->get_error_vector(channel);
 		state->m_current_irq_line = 3;
 		state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
 	}
@@ -1297,7 +1279,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
+	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
 	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
@@ -1335,7 +1317,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
+	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE("hd63450", hd63450_device, read, write)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
 	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
@@ -1375,7 +1357,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram32")
 	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16(x68k_dmac_r, x68k_dmac_w,0xffffffff)
+	AM_RANGE(0xe84000, 0xe85fff) AM_DEVREADWRITE16("hd63450", hd63450_device, read, write, 0xffffffff)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
 	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff00ff)
 	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff00ff)
@@ -1424,7 +1406,7 @@ static I8255A_INTERFACE( ppi_interface )
 	DEVCB_DRIVER_MEMBER(x68k_state,ppi_port_c_w)
 };
 
-static const hd63450_intf dmac_interface =
+static const hd63450_interface dmac_interface =
 {
 	"maincpu",  // CPU - 68000
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
