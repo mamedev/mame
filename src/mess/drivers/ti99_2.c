@@ -81,7 +81,6 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
 
-
 class ti99_2_state : public driver_device
 {
 public:
@@ -365,21 +364,11 @@ static INPUT_PORTS_START(ti99_2)
 
 INPUT_PORTS_END
 
-
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, ti99_2_memmap, ti99_2_io, cpuconf95)
+	// basic machine hardware
+	// TMS9995, standard variant
+	// We have no lines connected yet
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, ti99_2_memmap, ti99_2_io)
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
 

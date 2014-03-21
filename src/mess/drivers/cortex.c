@@ -75,17 +75,6 @@ void cortex_state::machine_reset()
 	m_maincpu->set_ready(ASSERT_LINE);
 }
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static TMS9928A_INTERFACE(cortex_tms9929a_interface)
 {
 	0x4000,     // vram size
@@ -95,7 +84,9 @@ static TMS9928A_INTERFACE(cortex_tms9929a_interface)
 static MACHINE_CONFIG_START( cortex, cortex_state )
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io, cpuconf95)
+	// Standard variant, no overflow int
+	// No lines connected yet
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, cortex_mem, cortex_io)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9929A, cortex_tms9929a_interface )

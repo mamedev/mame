@@ -754,21 +754,11 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,        // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,        // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,        // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static MACHINE_CONFIG_START( tutor, tutor_state )
-	/* basic machine hardware */
-	/* TMS9995 CPU @ 10.7 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, tutor_memmap, tutor_io, cpuconf95)
+	// basic machine hardware
+	// TMS9995 CPU @ 10.7 MHz
+	// No lines connected yet
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, tutor_tms9928a_interface )

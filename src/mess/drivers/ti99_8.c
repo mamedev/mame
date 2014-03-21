@@ -878,22 +878,6 @@ WRITE_LINE_MEMBER( ti99_8_state::clock_out )
 /*****************************************************************************/
 
 /*
-    MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
-    Also, the overflow interrupt is disabled; in the available documentation
-    this feature is said to be disabled and is announced for a later version.
-*/
-static TMS9995_CONFIG( ti99_8_processor_config )
-{
-	DEVCB_DRIVER_MEMBER(ti99_8_state, external_operation),
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(ti99_8_state, clock_out),
-	DEVCB_NULL,     // HOLDA
-	DEVCB_NULL,      // DBIN
-	NO_INTERNAL_RAM,
-	NO_OVERFLOW_INT
-};
-
-/*
     Format:
     Name, mode, stop, mask, select, write, read8z function, write8 function
 
@@ -1023,9 +1007,13 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 }
 
 static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
-	/* basic machine hardware */
-	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, memmap, crumap, ti99_8_processor_config)
+	// basic machine hardware */
+	// TMS9995-MP9537 CPU @ 10.7 MHz
+	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
+	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL_10_738635MHz, memmap, crumap)
+	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(ti99_8_state, external_operation) )
+	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(ti99_8_state, clock_out) )
+
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
@@ -1083,7 +1071,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
-  MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
+	MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
@@ -1093,7 +1081,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	/* basic machine hardware */
 	/* TMS9995-MP9537 CPU @ 10.7 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, memmap, crumap, ti99_8_processor_config)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL_10_738635MHz, memmap, crumap)
+	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(ti99_8_state, external_operation) )
+	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(ti99_8_state, clock_out) )
+
 	MCFG_MACHINE_START_OVERRIDE(ti99_8_state, ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
@@ -1149,8 +1140,8 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_GROM_LIBRARY_ADD3(pascal3_grom, pascal3)
 
 	/* Devices */
-  MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
-  MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
+	MCFG_DEVICE_ADD(SPEECH_TAG, TI99_SPEECH8, 0)
+	MCFG_SPEECH8_READY_CALLBACK(WRITELINE(ti99_8_state, console_ready_speech))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )

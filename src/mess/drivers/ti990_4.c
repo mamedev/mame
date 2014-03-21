@@ -275,17 +275,6 @@ static const floppy_interface ti990_4_floppy_interface =
 	NULL
 };
 
-static TMS99xx_CONFIG( cpuconf )
-{
-	DEVCB_DRIVER_MEMBER(ti990_4_state, external_operation),
-	DEVCB_DRIVER_MEMBER(ti990_4_state, interrupt_level),
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // wait
-	DEVCB_NULL,      // Hold acknowledge
-	DEVCB_NULL     // data bus in
-};
-
 MACHINE_RESET_MEMBER(ti990_4_state,ti990_4)
 {
 	hold_load();
@@ -302,7 +291,10 @@ DRIVER_INIT_MEMBER(ti990_4_state, ti990_4)
 static MACHINE_CONFIG_START( ti990_4, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
+
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
@@ -320,7 +312,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ti990_4v, ti990_4_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
@@ -376,5 +370,5 @@ ROM_START(ti990_4v)
 ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI 990/4 Minicomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4,  0,      0,      ti990_4,    0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System" , GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1976, ti990_4v, ti990_4,      0,      ti990_4v,   0, ti990_4_state, ti990_4,    "Texas Instruments",    "TI Model 990/4 Microcomputer System with Video Display Terminal" , GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -225,7 +225,14 @@ class geneve_state : public driver_device
 {
 public:
 	geneve_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_cpu(*this, "maincpu"),
+		m_tms9901(*this, TMS9901_TAG),
+		m_keyboard(*this, GKEYBOARD_TAG),
+		m_mapper(*this, GMAPPER_TAG),
+		m_peribox(*this, PERIBOX_TAG),
+		m_mouse(*this, GMOUSE_TAG),
+		m_joyport(*this,JOYPORT_TAG)    { }
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
@@ -248,13 +255,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_interrupt );
 
-	geneve_keyboard_device* m_keyboard;
-	geneve_mouse_device*    m_mouse;
-	tms9901_device*         m_tms9901;
-	geneve_mapper_device*   m_mapper;
-	peribox_device*         m_peribox;
-	tms9995_device*         m_cpu;
-	joyport_device*         m_joyport;
+	required_device<tms9995_device>         m_cpu;
+	required_device<tms9901_device>         m_tms9901;
+	required_device<geneve_keyboard_device> m_keyboard;
+	required_device<geneve_mapper_device>   m_mapper;
+	required_device<peribox_device>         m_peribox;
+	required_device<geneve_mouse_device>    m_mouse;
+	required_device<joyport_device>         m_joyport;
 
 	DECLARE_WRITE_LINE_MEMBER( inta );
 	DECLARE_WRITE_LINE_MEMBER( intb );
@@ -679,17 +686,6 @@ WRITE_LINE_MEMBER( geneve_state::dbin_line )
 	m_mapper->dbin_in(state);
 }
 
-static TMS9995_CONFIG( geneve_processor_config )
-{
-	DEVCB_DRIVER_MEMBER(geneve_state, external_operation),
-	DEVCB_NULL,         // Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, clock_out),
-	DEVCB_NULL,         // HOLDA
-	DEVCB_DRIVER_LINE_MEMBER(geneve_state, dbin_line),      // DBIN
-	INTERNAL_RAM,       // use internal RAM
-	NO_OVERFLOW_INT     // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static const mm58274c_interface geneve_mm58274c_interface =
 {
 	1,  /*  mode 24*/
@@ -702,13 +698,6 @@ DRIVER_INIT_MEMBER(geneve_state,geneve)
 
 void geneve_state::machine_start()
 {
-	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-	m_mapper = static_cast<geneve_mapper_device*>(machine().device(GMAPPER_TAG));
-	m_keyboard = static_cast<geneve_keyboard_device*>(machine().device(GKEYBOARD_TAG));
-	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-	m_mouse =  static_cast<geneve_mouse_device*>(machine().device(GMOUSE_TAG));
-	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 }
 
 /*
@@ -735,7 +724,10 @@ void geneve_state::machine_reset()
 static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap, geneve_processor_config)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
+	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(geneve_state, external_operation) )
+	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(geneve_state, clock_out) )
+	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(geneve_state, dbin_line) )
 
 	// video hardware
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

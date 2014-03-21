@@ -64,7 +64,13 @@ class ti99_4p_state : public driver_device
 public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cassette(*this, "cassette") { }
+		m_cpu(*this, "maincpu"),
+		m_tms9901(*this, TMS9901_TAG),
+		m_sound(*this, TISOUND_TAG),
+		m_video(*this, VIDEO_SYSTEM_TAG),
+		m_cassette(*this, "cassette"),
+		m_peribox(*this, PERIBOX_TAG),
+		m_joyport(*this, JOYPORT_TAG)   { }
 
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
@@ -102,13 +108,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
-	tms9900_device*         m_cpu;
-	tms9901_device*         m_tms9901;
-	ti_sound_system_device* m_sound;
-	ti_exp_video_device*    m_video;
-	required_device<cassette_image_device> m_cassette;
-	peribox_device*         m_peribox;
-	joyport_device*         m_joyport;
+	required_device<tms9900_device>             m_cpu;
+	required_device<tms9901_device>             m_tms9901;
+	required_device<ti_sound_system_device> m_sound;
+	required_device<ti_exp_video_device>        m_video;
+	required_device<cassette_image_device>  m_cassette;
+	required_device<peribox_device>             m_peribox;
+	required_device<joyport_device>             m_joyport;
 
 	// Pointer to ROM0
 	UINT16  *m_rom0;
@@ -808,25 +814,8 @@ WRITE8_MEMBER( ti99_4p_state::external_operation )
 
 /*****************************************************************************/
 
-static TMS99xx_CONFIG( sgcpu_cpuconf )
-{
-	DEVCB_DRIVER_MEMBER(ti99_4p_state, external_operation),
-	DEVCB_DRIVER_MEMBER(ti99_4p_state, interrupt_level),
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4p_state, clock_out),
-	DEVCB_NULL,     // wait
-	DEVCB_NULL      // Hold acknowledge
-};
-
 void ti99_4p_state::machine_start()
 {
-	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
-	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-	m_sound = static_cast<ti_sound_system_device*>(machine().device(TISOUND_TAG));
-	m_video = static_cast<ti_exp_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
-	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
-
 	m_ram = (UINT16*)(*memregion(SAMSMEM_TAG));
 	m_scratchpad = (UINT16*)(*memregion(PADMEM_TAG));
 
@@ -875,7 +864,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti99_4p_state::sgcpu_hblank_interrupt)
 static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map, sgcpu_cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4p_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4p_state, interrupt_level) )
+	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4p_state, clock_out) )
 
 	/* video hardware */
 	// Although we should have a 60 Hz screen rate, we have to set it to 30 here.

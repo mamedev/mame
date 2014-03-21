@@ -188,21 +188,10 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 	// set_int9(state);
 }
 
-static TMS99xx_CONFIG( cpuconf )
-{
-	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(ti990_10_state, external_operation),
-	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(ti990_10_state, interrupt_level),
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,     // wait
-	DEVCB_NULL,      // Hold acknowledge
-	DEVCB_NULL     // data bus in
-};
-
 static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )
 
 	// VDT 911 terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
