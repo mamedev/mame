@@ -7428,6 +7428,7 @@ src/mess/drivers/amiga.c svneol=native#text/plain
 src/mess/drivers/ampro.c svneol=native#text/plain
 src/mess/drivers/amstr_pc.c svneol=native#text/plain
 src/mess/drivers/amstrad.c svneol=native#text/plain
+src/mess/drivers/amust.c svneol=native#text/plain
 src/mess/drivers/apc.c svneol=native#text/plain
 src/mess/drivers/apexc.c svneol=native#text/plain
 src/mess/drivers/apf.c svneol=native#text/plain
