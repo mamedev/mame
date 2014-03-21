@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "machine/macpds.h"
+#include "macpds.h"
 
 
 //**************************************************************************

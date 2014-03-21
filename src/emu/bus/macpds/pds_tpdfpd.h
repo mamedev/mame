@@ -4,7 +4,7 @@
 #define __PDS_SEDISPLAY_H__
 
 #include "emu.h"
-#include "machine/macpds.h"
+#include "macpds.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

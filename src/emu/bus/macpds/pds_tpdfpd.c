@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/pds_tpdfpd.h"
+#include "pds_tpdfpd.h"
 #include "cpu/m68000/m68000.h"
 
 #define SEDISPLAY_SCREEN_NAME "fpd_screen"
