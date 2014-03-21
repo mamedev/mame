@@ -33,8 +33,8 @@ ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, d
 void ics2115_device::device_start()
 {
 	m_rom = *region();
-	m_timer[0].timer = machine().scheduler().timer_alloc(FUNC(timer_cb_0), this);
-	m_timer[1].timer = machine().scheduler().timer_alloc(FUNC(timer_cb_1), this);
+	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
+	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);
 
 	//Exact formula as per patent 5809466
@@ -761,22 +761,20 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 	}
 }
 
-//UINT8 ics2115_device::read (offs_t offset)
-READ8_DEVICE_HANDLER(ics2115_device::read)
+READ8_MEMBER(ics2115_device::read)
 {
-	ics2115_device *chip = downcast<ics2115_device *>(device);
 	UINT8 ret = 0;
 
 	switch(offset) {
 		case 0:
 			//TODO: check this suspect code
-			if (chip->m_irq_on) {
+			if (m_irq_on) {
 				ret |= 0x80;
-				if (chip->m_irq_enabled && (chip->m_irq_pending & 3))
+				if (m_irq_enabled && (m_irq_pending & 3))
 					ret |= 1;
-				for (int i = 0; i <= chip->m_active_osc; i++) {
-					if (//chip->m_voice[i].vol_ctrl.irq_pending ||
-						chip->m_voice[i].osc_conf.irq_pending) {
+				for (int i = 0; i <= m_active_osc; i++) {
+					if (//m_voice[i].vol_ctrl.irq_pending ||
+						m_voice[i].osc_conf.irq_pending) {
 						ret |= 2;
 						break;
 					}
@@ -785,13 +783,13 @@ READ8_DEVICE_HANDLER(ics2115_device::read)
 
 			break;
 		case 1:
-			ret = chip->m_reg_select;
+			ret = m_reg_select;
 			break;
 		case 2:
-			ret = (UINT8)(chip->reg_read());
+			ret = (UINT8)(reg_read());
 			break;
 		case 3:
-			ret = chip->reg_read() >> 8;
+			ret = reg_read() >> 8;
 			break;
 		default:
 #ifdef ICS2115_DEBUG
@@ -802,19 +800,17 @@ READ8_DEVICE_HANDLER(ics2115_device::read)
 	return ret;
 }
 
-//UINT8 ics2115_device::write(offs_t offset, UINT8 data)
-WRITE8_DEVICE_HANDLER(ics2115_device::write)
+WRITE8_MEMBER(ics2115_device::write)
 {
-	ics2115_device *chip = downcast<ics2115_device *>(device);
 	switch(offset) {
 		case 1:
-			chip->m_reg_select = data;
+			m_reg_select = data;
 			break;
 		case 2:
-			chip->reg_write(data,0);
+			reg_write(data,0);
 			break;
 		case 3:
-			chip->reg_write(data,1);
+			reg_write(data,1);
 			break;
 		default:
 #ifdef ICS2115_DEBUG
@@ -866,18 +862,16 @@ void ics2115_device::recalc_irq()
 		m_irq_cb(this, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK( ics2115_device::timer_cb_0 )
+TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
 {
-	ics2115_device *chip = (ics2115_device *)ptr;
-	chip->m_irq_pending |= 1 << 0;
-	chip->recalc_irq();
+	m_irq_pending |= 1 << 0;
+	recalc_irq();
 }
 
-TIMER_CALLBACK( ics2115_device::timer_cb_1 )
+TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
 {
-	ics2115_device *chip = (ics2115_device *)ptr;
-	chip->m_irq_pending |= 1 << 1;
-	chip->recalc_irq();
+	m_irq_pending |= 1 << 1;
+	recalc_irq();
 }
 
 void ics2115_device::recalc_timer(int timer)

@@ -302,7 +302,7 @@ ADDRESS_MAP_START( pgm_z80_mem, AS_PROGRAM, 8, pgm_state )
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8, pgm_state )
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE_LEGACY("ics", ics2115_device::read, ics2115_device::write)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_device, read, write)
 	AM_RANGE(0x8100, 0x81ff) AM_READ(soundlatch3_byte_r) AM_WRITE(z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w)
 	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_byte_r, soundlatch2_byte_w)

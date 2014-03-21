@@ -98,12 +98,12 @@ public:
 	// inline configuration helpers
 	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
 
-	static DECLARE_READ8_DEVICE_HANDLER(read);
-	static DECLARE_WRITE8_DEVICE_HANDLER(write);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 	//UINT8 read(offs_t offset);
 	//void write(offs_t offset, UINT8 data);
-	static TIMER_CALLBACK(timer_cb_0);
-	static TIMER_CALLBACK(timer_cb_1);
+	TIMER_CALLBACK_MEMBER(timer_cb_0);
+	TIMER_CALLBACK_MEMBER(timer_cb_1);
 
 	sound_stream *m_stream;
 
