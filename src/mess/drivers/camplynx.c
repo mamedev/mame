@@ -87,30 +87,31 @@ class camplynx_state : public driver_device
 {
 public:
 	camplynx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	//m_cass(*this, "cassette"),
-	//m_wave(*this, WAVE_TAG),
-	//m_printer(*this, "centronics"),
-	m_crtc(*this, "crtc"),
-	m_palette(*this, "palette")
-	//m_fdc(*this, "fdc")
+		: driver_device(mconfig, type, tag)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		//, m_cass(*this, "cassette")
+		//, m_wave(*this, WAVE_TAG)
+		//, m_printer(*this, "centronics")
+		, m_crtc(*this, "crtc")
+		//, m_fdc(*this, "fdc")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(lynx48k_bank_w);
+	DECLARE_WRITE8_MEMBER(lynx128k_bank_w);
+	DECLARE_WRITE8_MEMBER(lynx128k_irq);
+	DECLARE_DRIVER_INIT(lynx48k);
+	DECLARE_PALETTE_INIT(camplynx);
+	DECLARE_MACHINE_RESET(lynx128k);
+	required_device<palette_device> m_palette;
+private:
+	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	//required_device<cassette_image_device> m_cass;
 	//required_device<> m_wave;
 	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	required_device<palette_device> m_palette;
 	//optional_device<> m_fdc;
-	DECLARE_WRITE8_MEMBER(lynx48k_bank_w);
-	DECLARE_WRITE8_MEMBER(lynx128k_bank_w);
-	DECLARE_WRITE8_MEMBER(lynx128k_irq);
-	DECLARE_DRIVER_INIT(lynx48k);
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(camplynx);
-	DECLARE_MACHINE_RESET(lynx128k);
 };
 
 /* These bankswitch handlers are very incomplete, just enough to get the
