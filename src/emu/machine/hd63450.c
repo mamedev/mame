@@ -16,9 +16,9 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 		{
 			memset(&m_reg[i], 0, sizeof(m_reg[i]));
 			m_timer[i] = NULL;
-			m_in_progress[i] = NULL;
-			m_transfer_size[i] = NULL;
-			m_halted[i] = NULL;
+			m_in_progress[i] = 0;
+			m_transfer_size[i] = 0;
+			m_halted[i] = 0;
 		}
 }
 
