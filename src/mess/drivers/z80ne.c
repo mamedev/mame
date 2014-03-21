@@ -427,12 +427,6 @@ static const cassette_interface z80ne_cassetteb_config =
 	NULL
 };
 
-static const kr2376_interface lx388_kr2376_interface =
-{
-	50000,
-	DEVCB_NULL
-};
-
 static const floppy_interface z80netf_floppy_interface =
 {
 	DEVCB_NULL,
@@ -493,7 +487,7 @@ static MACHINE_CONFIG_DERIVED( z80net, z80ne )
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state, z80net )
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state, z80net )
 
-	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
+	MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -521,7 +515,7 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
 
-	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
+    MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -549,7 +543,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
 
-	MCFG_KR2376_ADD( "lx388_kr2376", lx388_kr2376_interface)
+    MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")

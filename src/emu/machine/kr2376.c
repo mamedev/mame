@@ -68,30 +68,11 @@ static const UINT8 KR2376_KEY_CODES[3][8][11] =
 const device_type KR2376 = &device_creator<kr2376_device>;
 
 kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__)
+	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__),
+	m_write_strobe(*this)
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kr2376_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const kr2376_interface *intf = reinterpret_cast<const kr2376_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<kr2376_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_our_clock = 0;
-		memset(&m_on_strobe_changed_cb, 0, sizeof(m_on_strobe_changed_cb));
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -99,7 +80,7 @@ void kr2376_device::device_config_complete()
 
 void kr2376_device::device_start()
 {
-	m_on_strobe_changed.resolve(m_on_strobe_changed_cb, *this);
+	m_write_strobe.resolve_safe();
 
 	/* set initial values */
 	m_ring11 = 0;
@@ -113,7 +94,7 @@ void kr2376_device::device_start()
 
 	/* create the timers */
 	m_scan_timer = timer_alloc(TIMER_SCAN_TICK);
-	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(m_our_clock));
+	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	/* register for state saving */
 	save_item(NAME(m_ring11));
@@ -162,8 +143,7 @@ void kr2376_device::change_output_lines()
 			m_pins[KR2376_PO] = m_parity ^ m_pins[KR2376_PII];
 		}
 		m_pins[KR2376_SO] = m_strobe ^ m_pins[KR2376_DSII];
-		if (!m_on_strobe_changed.isnull())
-			m_on_strobe_changed(m_strobe ^ m_pins[KR2376_DSII]);
+		m_write_strobe(m_strobe ^ m_pins[KR2376_DSII]);
 	}
 }
 
