@@ -2528,7 +2528,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 	// when nescesarry copy (and convert) the data
 	if (!texture->nocopy)
 	{
-		int x, y;
+		int y;
 		UINT8 *dst;
 
 		for (y = 0; y < texsource->height; y++)
