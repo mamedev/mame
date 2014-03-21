@@ -4,13 +4,13 @@
 #define __XEROX820__
 
 #include "emu.h"
+#include "bus/scsi/sa1403d.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/i86/i86.h"
 #include "machine/com8116.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/sa1403d.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"

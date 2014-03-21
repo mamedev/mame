@@ -4,7 +4,7 @@
  */
 
 #include "emu.h"
-#include "machine/acb4070.h"
+#include "acb4070.h"
 
 // device type definition
 const device_type ACB4070 = &device_creator<acb4070_device>;

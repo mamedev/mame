@@ -557,6 +557,7 @@ BUSES += PLUS4
 BUSES += RS232
 BUSES += S100
 BUSES += SATURN
+BUSES += SCSI
 BUSES += SEGA8
 BUSES += SMS_CTRL
 BUSES += SMS_EXP
@@ -847,8 +848,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/appldriv.o  \
 	$(MESS_MACHINE)/applefdc.o  \
 	$(MESS_MACHINE)/microdrv.o  \
-	$(MESS_MACHINE)/s1410.o     \
-	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/smartmed.o  \
 	$(MESS_MACHINE)/smc92x4.o   \
 	$(MESS_MACHINE)/strata.o    \
@@ -1619,7 +1618,6 @@ $(MESSOBJ)/rm.a:                \
 	$(MESS_DRIVERS)/rmnimbus.o  \
 	$(MESS_MACHINE)/rmnimbus.o  \
 	$(MESS_VIDEO)/rmnimbus.o    \
-	$(MESS_MACHINE)/acb4070.o   \
 
 $(MESSOBJ)/robotron.a:          \
 	$(MESS_DRIVERS)/a5105.o     \

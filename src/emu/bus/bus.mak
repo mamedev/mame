@@ -281,7 +281,6 @@ BUSOBJS += $(BUSOBJ)/ieee488/c2040fdc.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8050.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8280.o
 BUSOBJS += $(BUSOBJ)/ieee488/d9060.o
-BUSOBJS += $(BUSOBJ)/ieee488/d9060hd.o
 BUSOBJS += $(BUSOBJ)/ieee488/softbox.o
 BUSOBJS += $(BUSOBJ)/ieee488/hardbox.o
 BUSOBJS += $(BUSOBJ)/ieee488/shark.o
@@ -998,4 +997,16 @@ endif
 ifneq ($(filter COMPUCOLOR,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/compucolor
 BUSOBJS += $(BUSOBJ)/compucolor/floppy.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/scsi/???.h,BUSES += SCSI
+#-------------------------------------------------
+ifneq ($(filter SCSI,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/scsi
+BUSOBJS += $(BUSOBJ)/scsi/acb4070.o
+BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
+BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o
+BUSOBJS += $(BUSOBJ)/scsi/s1410.o
 endif

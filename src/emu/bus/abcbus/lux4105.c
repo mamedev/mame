@@ -13,7 +13,7 @@
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
-#include "machine/s1410.h"
+#include "bus/scsi/s1410.h"
 
 
 
