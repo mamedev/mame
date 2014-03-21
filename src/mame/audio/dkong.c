@@ -1362,11 +1362,11 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 	MCFG_LATCH8_INVERT(0x0F)
 
 	MCFG_LATCH8_ADD("ls259.6h")
-	MCFG_LATCH8_DISCRETE_NODE_0("discrete",DS_SOUND0_INP)
-	MCFG_LATCH8_DISCRETE_NODE_1("discrete",DS_SOUND1_INP)
-	MCFG_LATCH8_DISCRETE_NODE_2("discrete",DS_SOUND2_INP)
-	MCFG_LATCH8_DISCRETE_NODE_6("discrete",DS_SOUND6_INP)
-	MCFG_LATCH8_DISCRETE_NODE_7("discrete",DS_SOUND7_INP)
+	MCFG_LATCH8_WRITE_0(DEVWRITE8("discrete", discrete_device, write),DS_SOUND0_INP)
+	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write),DS_SOUND1_INP)
+	MCFG_LATCH8_WRITE_2(DEVWRITE8("discrete", discrete_device, write),DS_SOUND2_INP)
+	MCFG_LATCH8_WRITE_6(DEVWRITE8("discrete", discrete_device, write),DS_SOUND6_INP)
+	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write),DS_SOUND7_INP)
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
 	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarscp1)
@@ -1377,8 +1377,8 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 
 	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
 	MCFG_LATCH8_INVERT( 0x20 )      /* signal is inverted       */
-	MCFG_LATCH8_DEVREAD_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_DISCRETE_NODE_7("discrete", DS_DISCHARGE_INV)
+	MCFG_LATCH8_READ_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
+	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_DISCHARGE_INV)
 
 	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
@@ -1404,8 +1404,8 @@ MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MCFG_LATCH8_ADD( "virtual_p1" ) /* virtual latch for port A */
 	MCFG_LATCH8_INVERT( 0x80 )      /* signal is inverted       */
-	MCFG_LATCH8_DEVREAD_7(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_DEVREAD_6(READ8(dkong_state,M58817_status_r), 0)
+	MCFG_LATCH8_READ_7(DEVREAD8("ls259.6h", latch8_device, read), 3)
+	MCFG_LATCH8_READ_6(READ8(dkong_state,M58817_status_r), 0)
 
 	/* tms memory controller */
 	MCFG_DEVICE_ADD("m58819", M58819, 0)
@@ -1424,22 +1424,22 @@ MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
 	MCFG_LATCH8_MASKOUT(0xE0)
 
 	MCFG_LATCH8_ADD( "ls259.6h")
-	MCFG_LATCH8_DISCRETE_NODE_0("discrete", DS_SOUND0_INP)
-	MCFG_LATCH8_DISCRETE_NODE_1("discrete", DS_SOUND1_INP)
-	MCFG_LATCH8_DISCRETE_NODE_2("discrete", DS_SOUND2_INP)
-	MCFG_LATCH8_DISCRETE_NODE_7("discrete", DS_SOUND7_INP)
+	MCFG_LATCH8_WRITE_0(DEVWRITE8("discrete", discrete_device, write), DS_SOUND0_INP)
+	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write), DS_SOUND1_INP)
+	MCFG_LATCH8_WRITE_2(DEVWRITE8("discrete", discrete_device, write), DS_SOUND2_INP)
+	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_SOUND7_INP)
 
 	MCFG_LATCH8_ADD( "ls259.5h")
-	MCFG_LATCH8_DISCRETE_NODE_1("discrete", DS_SOUND9_INP)
+	MCFG_LATCH8_WRITE_1(DEVWRITE8("discrete", discrete_device, write), DS_SOUND9_INP)
 
 	MCFG_LATCH8_ADD( "ls259.4h")
 
 	MCFG_LATCH8_ADD( "virtual_p2" ) /* virtual latch for port B */
 	MCFG_LATCH8_INVERT( 0x70 )      /* all signals are inverted */
-	MCFG_LATCH8_DEVREAD_6(DEVREAD8("ls259.4h", latch8_device, read), 1)
-	MCFG_LATCH8_DEVREAD_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
-	MCFG_LATCH8_DEVREAD_4(DEVREAD8("ls259.6h", latch8_device, read), 6)
-	MCFG_LATCH8_DISCRETE_NODE_7("discrete", DS_DISCHARGE_INV)
+	MCFG_LATCH8_READ_6(DEVREAD8("ls259.4h", latch8_device, read), 1)
+	MCFG_LATCH8_READ_5(DEVREAD8("ls259.6h", latch8_device, read), 3)
+	MCFG_LATCH8_READ_4(DEVREAD8("ls259.6h", latch8_device, read), 6)
+	MCFG_LATCH8_WRITE_7(DEVWRITE8("discrete", discrete_device, write), DS_DISCHARGE_INV)
 
 	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
