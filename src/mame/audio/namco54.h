@@ -7,13 +7,6 @@
 #include "cpu/mb88xx/mb88xx.h"
 
 
-struct namco_54xx_config
-{
-	const char *discrete;   /* name of the discrete sound device */
-	int         firstnode;  /* index of the first node */
-};
-
-
 #define MCFG_NAMCO_54XX_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_54XX, _clock)
 
@@ -22,9 +15,6 @@ struct namco_54xx_config
 
 #define MCFG_NAMCO_54XX_BASENODE(_node) \
 	namco_54xx_device::set_basenote(*device, _node);
-
-
-DECLARE_WRITE8_DEVICE_HANDLER( namco_54xx_write );
 
 
 class namco_54xx_device : public device_t
