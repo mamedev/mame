@@ -3,8 +3,7 @@
   Capcom System QSound(tm)
   ========================
 
-  Driver by Paul Leaman (paul@vortexcomputing.demon.co.uk)
-        and Miguel Angel Horna (mahorna@teleline.es)
+  Driver by Paul Leaman and Miguel Angel Horna
 
   A 16 channel stereo sample player.
 
@@ -12,10 +11,13 @@
 
   Many thanks to CAB (the author of Amuse), without whom this probably would
   never have been finished.
-
-  If anybody has some information about this hardware, please send it to me
-  to mahorna@teleline.es or 432937@cepsz.unizar.es.
-  http://teleline.terra.es/personal/mahorna
+  
+  TODO:
+  - hook up the DSP
+  - is master volume really linear?
+  - understand higher bits of reg 0
+  - understand reg 9
+  - understand other writes to $90-$ff area
 
 ***************************************************************************/
 
