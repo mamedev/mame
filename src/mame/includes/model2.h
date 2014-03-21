@@ -3,6 +3,7 @@
 #include "audio/segam1audio.h"
 #include "machine/eepromser.h"
 #include "cpu/i960/i960.h"
+#include "sound/scsp.h"
 
 struct raster_state;
 struct geo_state;
@@ -31,7 +32,8 @@ public:
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_scsp(*this, "scsp") { }
 
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_bufferram;
@@ -53,6 +55,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<scsp_device> m_scsp;
 
 	UINT32 m_intreq;
 	UINT32 m_intena;
@@ -91,7 +94,6 @@ public:
 	int m_zflagi;
 	int m_zflag;
 	int m_sysres;
-	int m_scsp_last_line;
 	int m_jnet_time_out;
 	UINT32 m_geo_read_start_address;
 	UINT32 m_geo_write_start_address;
@@ -190,7 +192,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 	void model2_exit();
-	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	DECLARE_WRITE8_MEMBER(scsp_irq);
 	DECLARE_READ_LINE_MEMBER(copro_tgp_fifoin_pop_ok);
 	DECLARE_READ32_MEMBER(copro_tgp_fifoin_pop);
 	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);

@@ -3,6 +3,7 @@
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
+#include "sound/scsp.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -21,16 +22,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_lsi53c810(*this, "scsi:lsi53c810"),
+		m_audiocpu(*this, "audiocpu"),
+		m_scsp1(*this, "scsp1"),
+		m_eeprom(*this, "eeprom"),
+		m_screen(*this, "screen"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_soundram(*this, "soundram"),
-		m_audiocpu(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom"),
-		m_screen(*this, "screen"){ }
+		m_soundram(*this, "soundram") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
+	required_device<cpu_device> m_audiocpu;
+	required_device<scsp_device> m_scsp1;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<screen_device> m_screen;	
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
@@ -68,7 +74,6 @@ public:
 	UINT64 m_real3d_status;
 	UINT64 *m_network_ram;
 	int m_prot_data_ptr;
-	int m_scsp_last_line;
 	UINT32 *m_vrom;
 	int m_step;
 	int m_m3_step;
@@ -208,10 +213,7 @@ public:
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
-	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
-	required_device<cpu_device> m_audiocpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<screen_device> m_screen;	
+	DECLARE_WRITE8_MEMBER(scsp_irq);
 };
 
 

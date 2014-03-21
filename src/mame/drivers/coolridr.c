@@ -379,7 +379,6 @@ public:
 
 	bitmap_ind16 m_screen1_bitmap;
 	bitmap_ind16 m_screen2_bitmap;
-	int m_scsp_last_line;
 	UINT8 an_mux_data;
 	UINT8 sound_data, sound_fifo;
 
@@ -438,7 +437,7 @@ public:
 	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
-	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	DECLARE_WRITE8_MEMBER(scsp_irq);
 
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
 
@@ -3002,9 +3001,9 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
 
 	AM_RANGE(0x03000000, 0x0307ffff) AM_READWRITE16(h1_soundram_r, h1_soundram_w,0xffffffff) //AM_SHARE("soundram")
-	AM_RANGE(0x03100000, 0x03100fff) AM_DEVREADWRITE16_LEGACY("scsp1", scsp_r, scsp_w, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100fff) AM_DEVREADWRITE16("scsp1", scsp_device, read, write, 0xffffffff)
 	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
-	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
+	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16("scsp2", scsp_device, read, write, 0xffffffff)
 
 	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_sound_dma_r,sysh1_sound_dma_w) AM_SHARE("sound_dma")
 //  AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* unknown */
@@ -3036,9 +3035,9 @@ WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
+	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
 	AM_RANGE(0x800000, 0x80ffff) AM_MIRROR(0x200000) AM_RAM
 	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
 ADDRESS_MAP_END
@@ -3545,15 +3544,9 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp_irq)
+WRITE8_MEMBER(coolridr_state::scsp_irq)
 {
-	if (state > 0)
-	{
-		m_scsp_last_line = state;
-		m_soundcpu->set_input_line(state, ASSERT_LINE);
-	}
-	else
-		m_soundcpu->set_input_line(-state, CLEAR_LINE);
+	m_soundcpu->set_input_line(offset, data);		
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
@@ -3573,21 +3566,6 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 	else
 		sound_data &= ~0x20;
 }
-
-static const scsp_interface scsp_config =
-{
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state,scsp_irq),
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp1_to_sh1_irq)
-};
-
-static const scsp_interface scsp2_interface =
-{
-	0,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp2_to_sh1_irq)
-};
-
 
 #define MAIN_CLOCK XTAL_28_63636MHz
 
@@ -3627,12 +3605,13 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(coolridr_state, scsp_irq))
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp1_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp2_interface)
+	MCFG_SCSP_MAIN_IRQ_CB(WRITELINE(coolridr_state, scsp2_to_sh1_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END

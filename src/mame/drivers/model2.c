@@ -95,7 +95,6 @@
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/z80/z80.h"
-#include "sound/scsp.h"
 #include "sound/2612intf.h"
 #include "includes/model2.h"
 
@@ -401,7 +400,7 @@ MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base() + 0x80000, 16);
 	m_audiocpu->reset();
-	scsp_set_ram_base(machine().device("scsp"), m_soundram);
+	m_scsp->set_ram_base(m_soundram);
 }
 
 MACHINE_RESET_MEMBER(model2_state,model2)
@@ -1049,7 +1048,7 @@ WRITE32_MEMBER(model2_state::model2_serial_w)
 			m_m1audio->write_fifo(data & 0xff);
 		}
 
-		scsp_midi_in(machine().device("scsp"), space, 0, data&0xff, 0);
+		m_scsp->midi_in(space, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		space.device().execute().spin_until_time(attotime::from_usec(40));
@@ -1849,7 +1848,7 @@ WRITE16_MEMBER(model2_state::model2snd_ctrl)
 
 static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
@@ -1858,24 +1857,10 @@ static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(model2_state::scsp_irq)
+WRITE8_MEMBER(model2_state::scsp_irq)
 {
-	if (state > 0)
-	{
-		m_scsp_last_line = state;
-		m_audiocpu->set_input_line(state, ASSERT_LINE);
-	}
-	else
-		m_audiocpu->set_input_line(-state, CLEAR_LINE);
+	m_audiocpu->set_input_line(offset, data);
 }
-
-static const scsp_interface scsp_config =
-{
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(model2_state,scsp_irq),
-	DEVCB_NULL
-};
-
 
 
 /*****************************************************************************/
@@ -2042,7 +2027,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -2146,7 +2131,7 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model2_state,scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -2195,7 +2180,7 @@ static MACHINE_CONFIG_START( model2c, model2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("scsp", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model2_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
