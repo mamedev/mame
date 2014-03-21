@@ -8964,8 +8964,6 @@ src/osd/sdl/strconv.c svneol=native#text/plain
 src/osd/sdl/strconv.h svneol=native#text/plain
 src/osd/sdl/taputil.sh svneol=LF#text/plain eol=lf
 src/osd/sdl/testkeys.c svneol=native#text/plain
-src/osd/sdl/texcopy.c svneol=native#text/plain
-src/osd/sdl/texsrc.h svneol=native#text/plain
 src/osd/sdl/video.c svneol=native#text/plain
 src/osd/sdl/video.h svneol=native#text/plain
 src/osd/sdl/watchdog.c svneol=native#text/plain

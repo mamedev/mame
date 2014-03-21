@@ -117,12 +117,8 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define GL_DEPTH_COMPONENT32                0x81A7
 #endif
 
-//#define OLD_CODE  1
-
-#ifndef OLD_CODE
 #define HASH_SIZE       ((1<<10)+1)
 #define OVERFLOW_SIZE   (1<<10)
-#endif
 
 // OSD headers
 #include "osdsdl.h"
@@ -162,16 +158,9 @@ enum
 
 struct texture_info;
 
-#if USE_OPENGL
-typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
-#endif
-
 /* texture_info holds information about a texture */
 struct texture_info
 {
-#ifdef OLD_CODE
-	texture_info *      next;               // next texture in the list
-#endif
 	HashT               hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              flags;              // rendering flags
 	render_texinfo      texinfo;            // copy of the texture info
@@ -187,8 +176,6 @@ struct texture_info
 
 	UINT32              texture;            // OpenGL texture "name"/ID
 
-	const GLint *       texProperties;      // texture properties
-	texture_copy_func   texCopyFn;          // texture copy function, !=NULL if !nocopy
 	GLenum              texTarget;          // OpenGL texture target
 	int                 texpow2;            // Is this texture pow2
 
@@ -227,11 +214,7 @@ struct sdl_info
 
 	int             initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
-#ifdef OLD_CODE
-	texture_info *  texlist;        // list of active textures
-#else
 	texture_info *  texhash[HASH_SIZE + OVERFLOW_SIZE];
-#endif
 	int             last_blendmode;     // previous blendmode
 	INT32           texture_max_width;      // texture maximum width
 	INT32           texture_max_height;     // texture maximum height
@@ -292,19 +275,12 @@ static const line_aa_step line_aa_4step[] =
 //  INLINES
 //============================================================
 
-#ifdef OLD_CODE
-INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
-{
-	return (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
-}
-#else
 INLINE HashT texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 {
 	HashT h = (HashT)texture->base ^ (flags & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK));
 	//printf("hash %d\n", (int) h % HASH_SIZE);
 	return (h >> 8) % HASH_SIZE;
 }
-#endif
 
 INLINE void set_blendmode(sdl_info *sdl, int blendmode)
 {
@@ -383,24 +359,10 @@ static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC pfn_glFramebufferTexture2D  = NULL;
 static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 
 //============================================================
-//  TEXCOPY FUNCS
-//============================================================
-
-static void texcopy_argb32(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb32(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb32_paletted(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_palette16(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_palette16a(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb15(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_yuv16(texture_info *texture, const render_texinfo *texsource);
-static void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
-
-//============================================================
 //  Textures
 //============================================================
 
-static void texture_set_data(texture_info *texture, const render_texinfo *texsource);
+static void texture_set_data(texture_info *texture, const render_texinfo *texsource, UINT32 flags);
 static texture_info *texture_create(sdl_window_info *window, const render_texinfo *texsource, UINT32 flags);
 static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim);
 static texture_info * texture_update(sdl_window_info *window, const render_primitive *prim, int shaderIdx);
@@ -1561,70 +1523,6 @@ static const GLint texture_copy_properties[9][2] = {
 	{ FALSE, TRUE  }    // SDL_TEXFORMAT_PALETTE16A
 };
 
-// 6 properties (per format)
-// right order according to glTexImage2D: internal, format, type, ..
-enum { SDL_TEXFORMAT_INTERNAL, SDL_TEXFORMAT_FORMAT, SDL_TEXFORMAT_TYPE, SDL_TEXFORMAT_PIXEL_SIZE };
-
-static const GLint texture_gl_properties_srcNative_intNative[9][6] = {
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
-};
-
-static const GLint texture_gl_properties_srcNative_int32bpp[9][6] = {
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
-};
-
-static const GLint texture_gl_properties_srcCopy_int32bpp[9][6] = {
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
-};
-
-static const texture_copy_func texcopy_dstNative_f[9] = {
-	texcopy_argb32,
-	texcopy_rgb32,
-	texcopy_rgb32_paletted,
-	texcopy_yuv16,
-	texcopy_yuv16_paletted,
-	texcopy_palette16,
-	texcopy_rgb15,
-	texcopy_rgb15_paletted,
-	texcopy_palette16a
-};
-
-static const texture_copy_func texcopy_dst32bpp_f[9] = {
-	texcopy_argb32,
-	texcopy_rgb32,
-	texcopy_rgb32_paletted,
-	texcopy_yuv16,
-	texcopy_yuv16_paletted,
-	texcopy_palette16,
-	texcopy_rgb15,
-	texcopy_rgb15_paletted,
-	texcopy_palette16a
-};
-
 //============================================================
 //  drawogl_exit
 //============================================================
@@ -1706,65 +1604,31 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
 	}
 
-	// currently glsl supports idx and rgb palette lookups,
-	// no special quality scaling, so we could drop the prescale criteria below ..
-	if ( texture->type == TEXTURE_TYPE_NONE &&
-			sdl->useglsl &&
-			(
-				texture->format==SDL_TEXFORMAT_RGB32_PALETTED ||  // glsl rgb32 lut/direct
-				texture->format==SDL_TEXFORMAT_RGB32 ||
-				texture->format==SDL_TEXFORMAT_RGB15_PALETTED ||    // glsl rgb15 lut/direct
-				texture->format==SDL_TEXFORMAT_RGB15
-			) &&
-			texture->xprescale == 1 && texture->yprescale == 1 &&
-			texsource->rowpixels <= sdl->texture_max_width
-		)
-	{
-		texture->type      = TEXTURE_TYPE_SHADER;
-		texture->nocopy    = TRUE;
-				texture->texTarget = GL_TEXTURE_2D;
-				texture->texpow2   = sdl->texpoweroftwo;
-	}
-
 	// determine if we can skip the copy step
 	// if this was not already decided by the shader condition above
-	if ( !texture->nocopy &&
-			texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
+	if    ( texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
 			!texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE] &&
 			texture->xprescale == 1 && texture->yprescale == 1 &&
-			!texture->borderpix &&
+			!texture->borderpix && !texsource->palette &&
 			texsource->rowpixels <= sdl->texture_max_width )
 	{
 		texture->nocopy = TRUE;
-		}
+	}
 
 	if( texture->type == TEXTURE_TYPE_NONE &&
 		sdl->usepbo && !texture->nocopy )
 	{
 		texture->type      = TEXTURE_TYPE_DYNAMIC;
-				texture->texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
-				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
+		texture->texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
+		texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
 	}
 
 	if( texture->type == TEXTURE_TYPE_NONE )
 	{
 		texture->type      = TEXTURE_TYPE_SURFACE;
-				texture->texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
-				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
-		}
-
-		if ( texture->type!=TEXTURE_TYPE_SHADER )
-		{
-				texture->texProperties = texture_gl_properties_srcNative_intNative[texture->format];
-				texture->texCopyFn     = texcopy_dstNative_f[texture->format];
-		} else if ( texture->nocopy )
-		{
-				texture->texProperties = texture_gl_properties_srcNative_int32bpp[texture->format];
-				texture->texCopyFn     = NULL;
-		} else {
-				texture->texProperties = texture_gl_properties_srcCopy_int32bpp[texture->format];
-				texture->texCopyFn     = texcopy_dst32bpp_f[texture->format];
-		}
+		texture->texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
+		texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;
+	}
 }
 
 INLINE int get_valid_pow2_value(int v, int needPow2)
@@ -1883,7 +1747,7 @@ static void texture_compute_size_type(sdl_window_info *window, const render_texi
 			(int)texture_copy_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
 			texture->xprescale, texture->yprescale,
 			texture->borderpix, texsource->rowpixels, finalwidth, sdl->texture_max_width,
-			(int)texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]
+			(int)sizeof(UINT32)
 			);
 	}
 
@@ -2154,11 +2018,10 @@ static int texture_shader_create(sdl_window_info *window,
 
 	UINT32 * dummy = NULL;
 	GLint _width, _height;
-	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
+	if ( gl_texture_check_size(GL_TEXTURE_2D, 0, GL_RGBA8,
 					texture->rawwidth_create, texture->rawheight_create,
 					0,
-					texture->texProperties[SDL_TEXFORMAT_FORMAT],
-					texture->texProperties[SDL_TEXFORMAT_TYPE],
+					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
 					&_width, &_height, 1) )
 	{
 		mame_printf_error("cannot create bitmap texture, req: %dx%d, avail: %dx%d - bail out\n",
@@ -2166,15 +2029,12 @@ static int texture_shader_create(sdl_window_info *window,
 		return -1;
 	}
 
-	dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create *
-							texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-	memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create *
-							texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
-	glTexImage2D(GL_TEXTURE_2D, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
+	dummy = (UINT32 *) malloc(texture->rawwidth_create * texture->rawheight_create * sizeof(UINT32));
+	memset(dummy, 0, texture->rawwidth_create * texture->rawheight_create * sizeof(UINT32));
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
 			texture->rawwidth_create, texture->rawheight_create,
 			0,
-			texture->texProperties[SDL_TEXFORMAT_FORMAT],
-			texture->texProperties[SDL_TEXFORMAT_TYPE], dummy);
+			GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, dummy);
 			glFinish(); // should not be necessary, .. but make sure we won't access the memory after free
 	free(dummy);
 
@@ -2306,11 +2166,10 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 		glBindTexture(texture->texTarget, texture->texture);
 
 		// this doesn't actually upload, it just sets up the PBO's parameters
-		glTexImage2D(texture->texTarget, 0, texture->texProperties[SDL_TEXFORMAT_INTERNAL],
+		glTexImage2D(texture->texTarget, 0, GL_RGBA8,
 				texture->rawwidth_create, texture->rawheight_create,
 				texture->borderpix ? 1 : 0,
-				texture->texProperties[SDL_TEXFORMAT_FORMAT],
-				texture->texProperties[SDL_TEXFORMAT_TYPE], NULL);
+				GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
 
 		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
 		{
@@ -2356,21 +2215,17 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 
 		// set up the PBO dimension, ..
 		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
-							texture->rawwidth * texture->rawheight * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE],
+							texture->rawwidth * texture->rawheight * sizeof(UINT32),
 					NULL, GL_STREAM_DRAW);
 	}
 
 	if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
 	{
-		texture->data = (UINT32 *) malloc(texture->rawwidth* texture->rawheight * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+		texture->data = (UINT32 *) malloc(texture->rawwidth* texture->rawheight * sizeof(UINT32));
 		texture->data_own=TRUE;
 	}
 
 	// add us to the texture list
-#ifdef OLD_CODE
-	texture->next = sdl->texlist;
-	sdl->texlist = texture;
-#else
 	if (sdl->texhash[texture->hash] == NULL)
 		sdl->texhash[texture->hash] = texture;
 	else
@@ -2384,7 +2239,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 			}
 		assert(i < HASH_SIZE + OVERFLOW_SIZE);
 	}
-#endif
+
 	if(sdl->usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
@@ -2403,10 +2258,249 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 }
 
 //============================================================
+//  copyline_palette16
+//============================================================
+
+INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+{
+	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
+	if (xborderpix)
+		*dst++ = 0xff000000 | palette[*src];
+	for (x = 0; x < width; x++)
+		*dst++ = 0xff000000 | palette[*src++];
+	if (xborderpix)
+		*dst++ = 0xff000000 | palette[*--src];
+}
+
+
+
+//============================================================
+//  copyline_palettea16
+//============================================================
+
+INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+{
+	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
+	if (xborderpix)
+		*dst++ = palette[*src];
+	for (x = 0; x < width; x++)
+		*dst++ = palette[*src++];
+	if (xborderpix)
+		*dst++ = palette[*--src];
+}
+
+
+
+//============================================================
+//  copyline_rgb32
+//============================================================
+
+INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+{
+	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (xborderpix)
+		{
+			rgb_t srcpix = *src;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+		for (x = 0; x < width; x++)
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+		if (xborderpix)
+		{
+			rgb_t srcpix = *--src;
+			*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (xborderpix)
+			*dst++ = 0xff000000 | *src;
+		for (x = 0; x < width; x++)
+			*dst++ = 0xff000000 | *src++;
+		if (xborderpix)
+			*dst++ = 0xff000000 | *--src;
+	}
+}
+
+//============================================================
+//  copyline_argb32
+//============================================================
+
+INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
+{
+	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (xborderpix)
+		{
+			rgb_t srcpix = *src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+		for (x = 0; x < width; x++)
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+		if (xborderpix)
+		{
+			rgb_t srcpix = *--src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (xborderpix)
+			*dst++ = *src;
+		for (x = 0; x < width; x++)
+			*dst++ = *src++;
+		if (xborderpix)
+			*dst++ = *--src;
+	}
+}
+
+INLINE UINT32 ycc_to_rgb(UINT8 y, UINT8 cb, UINT8 cr)
+{
+	/* original equations:
+
+	    C = Y - 16
+	    D = Cb - 128
+	    E = Cr - 128
+
+	    R = clip(( 298 * C           + 409 * E + 128) >> 8)
+	    G = clip(( 298 * C - 100 * D - 208 * E + 128) >> 8)
+	    B = clip(( 298 * C + 516 * D           + 128) >> 8)
+
+	    R = clip(( 298 * (Y - 16)                    + 409 * (Cr - 128) + 128) >> 8)
+	    G = clip(( 298 * (Y - 16) - 100 * (Cb - 128) - 208 * (Cr - 128) + 128) >> 8)
+	    B = clip(( 298 * (Y - 16) + 516 * (Cb - 128)                    + 128) >> 8)
+
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+
+	    R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
+	    G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
+	    B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+	*/
+	int r, g, b, common;
+
+	common = 298 * y - 298 * 16;
+	r = (common +                        409 * cr - 409 * 128 + 128) >> 8;
+	g = (common - 100 * cb + 100 * 128 - 208 * cr + 208 * 128 + 128) >> 8;
+	b = (common + 516 * cb - 516 * 128                        + 128) >> 8;
+
+	if (r < 0) r = 0;
+	else if (r > 255) r = 255;
+	if (g < 0) g = 0;
+	else if (g > 255) g = 255;
+	if (b < 0) b = 0;
+	else if (b > 255) b = 255;
+
+	return rgb_t(0xff, r, g, b);
+}
+
+//============================================================
+//  copyline_yuy16_to_argb
+//============================================================
+
+INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
+{
+	int x;
+
+	assert(xborderpix == 0 || xborderpix == 2);
+	assert(width % 2 == 0);
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (xborderpix)
+		{
+			UINT16 srcpix0 = src[0];
+			UINT16 srcpix1 = src[1];
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+		}
+		for (x = 0; x < width / 2; x++)
+		{
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+		}
+		if (xborderpix)
+		{
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (xborderpix)
+		{
+			UINT16 srcpix0 = src[0];
+			UINT16 srcpix1 = src[1];
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+		}
+		for (x = 0; x < width; x += 2)
+		{
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+		}
+		if (xborderpix)
+		{
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+		}
+	}
+}
+
+//============================================================
 //  texture_set_data
 //============================================================
 
-static void texture_set_data(texture_info *texture, const render_texinfo *texsource)
+static void texture_set_data(texture_info *texture, const render_texinfo *texsource, UINT32 flags)
 {
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2420,29 +2514,63 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 	// they cannot be both true, thus this cannot lead to the
 	// borderpix code below writing to texsource->base .
 	if (texture->nocopy)
+	{
 		texture->data = (UINT32 *) texsource->base;
+	}
 
 	// always fill non-wrapping textures with an extra pixel on the top
 	if (texture->borderpix)
 	{
 		memset(texture->data, 0,
-				(texsource->width * texture->xprescale + 2) * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+				(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
 	}
 
 	// when nescesarry copy (and convert) the data
 	if (!texture->nocopy)
 	{
-		assert(texture->texCopyFn);
-		texture->texCopyFn(texture, texsource);
+		int x, y;
+		UINT8 *dst;
+
+		for (y = 0; y < texsource->height; y++)
+		{
+			dst = (UINT8 *)(texture->data + (y * texture->yprescale + texture->borderpix) * texture->rawwidth);
+
+			switch (PRIMFLAG_GET_TEXFORMAT(flags))
+			{
+				case TEXFORMAT_PALETTE16:
+					copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					break;
+
+				case TEXFORMAT_PALETTEA16:
+					copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					break;
+
+				case TEXFORMAT_RGB32:
+					copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					break;
+
+				case TEXFORMAT_ARGB32:
+					copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					break;
+
+				case TEXFORMAT_YUY16:
+					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					break;
+
+				default:
+					mame_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
+					break;
+			}
+		}
 	}
 
 	// always fill non-wrapping textures with an extra pixel on the bottom
 	if (texture->borderpix)
 	{
 		memset((UINT8 *)texture->data +
-				(texsource->height + 1) * texture->rawwidth * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE],
+				(texsource->height + 1) * texture->rawwidth * sizeof(UINT32),
 				0,
-			(texsource->width * texture->xprescale + 2) * texture->texProperties[SDL_TEXFORMAT_PIXEL_SIZE]);
+			(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
 	}
 
 	if ( texture->type == TEXTURE_TYPE_SHADER )
@@ -2465,8 +2593,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 
 		// and upload the image
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-				texture->texProperties[SDL_TEXFORMAT_FORMAT],
-				texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
+				GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texture->data);
 	}
 	else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
@@ -2479,8 +2606,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 
 		// kick off the DMA
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-					texture->texProperties[SDL_TEXFORMAT_FORMAT],
-				texture->texProperties[SDL_TEXFORMAT_TYPE], NULL);
+					GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
 	}
 	else
 	{
@@ -2494,8 +2620,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 
 		// and upload the image
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
-				texture->texProperties[SDL_TEXFORMAT_FORMAT],
-		texture->texProperties[SDL_TEXFORMAT_TYPE], texture->data);
+						GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texture->data);
 	}
 }
 
@@ -2503,46 +2628,13 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 //  texture_find
 //============================================================
 
-#ifdef OLD_CODE
-static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
-{
-	HashT texhash = texture_compute_hash(&prim->texture, prim->flags);
-	texture_info *texture;
-
-	// find a match
-	for (texture = sdl->texlist; texture != NULL; texture = texture->next)
-		if (texture->hash == texhash &&
-			texture->texinfo.base == prim->texture.base &&
-			texture->texinfo.width == prim->texture.width &&
-			texture->texinfo.height == prim->texture.height &&
-			texture->texinfo.rowpixels == prim->texture.rowpixels &&
-			((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
-			return texture;
-
-	// nothing found
-	return NULL;
-}
-#else
-
-#if 0
-static int compare_texinfo(render_texinfo *t1, render_texinfo *t2)
-{
-	if (t1->base == t2->base &&
-			t1->width == t2->width &&
-			t1->height == t2->height &&
-			t1->rowpixels == t2->rowpixels)
-		return 1;
-	else
-		return 0;
-}
-#endif
-
 static int compare_texture_primitive(const texture_info *texture, const render_primitive *prim)
 {
 	if (texture->texinfo.base == prim->texture.base &&
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
+		texture->texinfo.palette == prim->texture.palette &&
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else
@@ -2569,8 +2661,6 @@ static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
 	}
 	return NULL;
 }
-
-#endif
 
 //============================================================
 //  texture_update
@@ -2784,8 +2874,7 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 	// if we didn't find one, create a new texture
 	if (texture == NULL && prim->texture.base != NULL)
 	{
-			texture = texture_create(window, &prim->texture, prim->flags);
-
+		texture = texture_create(window, &prim->texture, prim->flags);
 	}
 	else if (texture != NULL)
 	{
@@ -2823,7 +2912,7 @@ static texture_info * texture_update(sdl_window_info *window, const render_primi
 				texture->texinfo.seqid = prim->texture.seqid;
 
 				// if we found it, but with a different seqid, copy the data
-				texture_set_data(texture, &prim->texture);
+				texture_set_data(texture, &prim->texture, prim->flags);
 				texBound=1;
 			}
 		}
@@ -2908,11 +2997,7 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 	texture_info *texture = NULL;
 	int lock=FALSE;
-#ifdef OLD_CODE
-	texture_info *next_texture=NULL;
-#else
 	int i;
-#endif
 
 	if (sdl == NULL)
 		return;
@@ -2936,12 +3021,6 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 	glFinish();
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-#ifdef OLD_CODE
-	texture = sdl->texlist;
-	while (texture)
-	{
-		next_texture = texture->next;
-#else
 	i=0;
 	while (i<HASH_SIZE+OVERFLOW_SIZE)
 	{
@@ -2949,8 +3028,6 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 		sdl->texhash[i] = NULL;
 		if (texture != NULL)
 		{
-#endif
-
 		if(sdl->usevbo)
 		{
 			pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
@@ -2988,15 +3065,9 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 			texture->data_own=FALSE;
 		}
 		free(texture);
-#ifdef OLD_CODE
-		texture = next_texture;
-	}
-	sdl->texlist = NULL;
-#else
 		}
 		i++;
 	}
-#endif
 	if ( sdl->useglsl )
 	{
 		glsl_shader_free(sdl->glsl);
@@ -3021,9 +3092,3 @@ static void drawogl_window_clear(sdl_window_info *window)
 	sdl->blittimer = 3;
 }
 
-
-//============================================================
-//  TEXCOPY FUNCS
-//============================================================
-
-#include "texcopy.c"
