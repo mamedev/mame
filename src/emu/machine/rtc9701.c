@@ -203,11 +203,6 @@ WRITE_LINE_MEMBER( rtc9701_device::write_bit )
 }
 
 
-READ_LINE_DEVICE_HANDLER( rtc9701_read_bit )
-{
-	return downcast<rtc9701_device *>(device)->read_bit();
-}
-
 READ_LINE_MEMBER( rtc9701_device::read_bit )
 {
 	if (rtc_state == RTC9701_RTC_READ)

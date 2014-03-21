@@ -445,10 +445,3 @@ void i8257_device::i8257_drq_w(int channel, int state)
 
 	synchronize(TIMER_DRQ_SYNC, param);
 }
-
-WRITE_LINE_DEVICE_HANDLER( i8257_hlda_w ) { }
-WRITE_LINE_DEVICE_HANDLER( i8257_ready_w ) { }
-WRITE_LINE_DEVICE_HANDLER( i8257_drq0_w ) { downcast<i8257_device*>(device)->i8257_drq_w(0, state); }
-WRITE_LINE_DEVICE_HANDLER( i8257_drq1_w ) { downcast<i8257_device*>(device)->i8257_drq_w(1, state); }
-WRITE_LINE_DEVICE_HANDLER( i8257_drq2_w ) { downcast<i8257_device*>(device)->i8257_drq_w(2, state); }
-WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w ) { downcast<i8257_device*>(device)->i8257_drq_w(3, state); }

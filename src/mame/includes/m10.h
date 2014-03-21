@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "sound/samples.h"
+#include "machine/74123.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
 
@@ -44,6 +45,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
+		m_ic8j1(*this, "ic8j1"),
+		m_ic8j2(*this, "ic8j2"),		
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -72,8 +75,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_ic8j1;
-	device_t *m_ic8j2;
+	optional_device<ttl74123_device> m_ic8j1;
+	optional_device<ttl74123_device> m_ic8j2;
 	required_device<samples_device> m_samples;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

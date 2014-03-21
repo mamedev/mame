@@ -95,7 +95,11 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_audiocpu2(*this, "audio2"){ }
+		m_audiocpu2(*this, "audio2"),
+		m_ic48_1(*this, "ic48_1"),
+		m_mc6845(*this, "crtc"),
+		m_pia1(*this, "pia1"),
+		m_pia2(*this, "pia2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram1;
@@ -113,10 +117,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audiocpu2;
-	device_t *m_ic48_1;
-	mc6845_device *m_mc6845;
-	pia6821_device *m_pia1;
-	pia6821_device *m_pia2;
+	required_device<ttl74123_device> m_ic48_1;
+	required_device<mc6845_device> m_mc6845;
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
+	
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
@@ -385,7 +390,7 @@ static MC6845_END_UPDATE( end_update )
 
 WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 {
-	ttl74123_a_w(m_ic48_1, generic_space(), 0, state);
+	m_ic48_1->a_w(generic_space(), 0, state);
 }
 
 
@@ -639,11 +644,6 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
-	m_ic48_1 = machine().device("ic48_1");
-	m_mc6845 = machine().device<mc6845_device>("crtc");
-	m_pia1 = machine().device<pia6821_device>("pia1");
-	m_pia2 = machine().device<pia6821_device>("pia2");
-
 	/* setup for save states */
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_star_enable));
