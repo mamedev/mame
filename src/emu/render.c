@@ -536,40 +536,20 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 
 const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 {
-	const rgb_t *adjusted;
-	int numentries;
-
 	// override the palette with our adjusted palette
 	switch (m_format)
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
 
-			// if no adjustment necessary, return the raw palette
 			assert(m_bitmap->palette() != NULL);
-			adjusted = m_bitmap->palette()->entry_list_adjusted();
+
+			// if no adjustment necessary, return the raw palette
 			if (!container.has_brightness_contrast_gamma_changes())
-				return adjusted;
+				return m_bitmap->palette()->entry_list_adjusted();
 
-			// if this is the machine palette, return our precomputed adjusted palette
-			adjusted = container.bcg_lookup_table(m_format, m_bitmap->palette());
-			if (adjusted != NULL)
-				return adjusted;
-
-			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			numentries = m_bitmap->palette()->num_colors() * m_bitmap->palette()->num_groups();
-			m_bcglookup.resize(numentries);
-
-			adjusted = m_bitmap->palette()->entry_list_adjusted();
-			for (int index = 0; index < numentries; index++)
-			{
-				UINT8 r = container.apply_brightness_contrast_gamma(adjusted[index].r());
-				UINT8 g = container.apply_brightness_contrast_gamma(adjusted[index].g());
-				UINT8 b = container.apply_brightness_contrast_gamma(adjusted[index].b());
-				m_bcglookup[index] = rgb_t(adjusted[index].a(), r, g, b);
-			}
-
-			return m_bcglookup;
+			// otherwise, return our adjusted palette
+			return container.bcg_lookup_table(m_format, m_bitmap->palette());
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -604,10 +584,6 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_overlaybitmap(NULL),
 		m_overlaytexture(NULL)
 {
-	// all palette entries are opaque by default
-	for (int color = 0; color < ARRAY_LENGTH(m_bcglookup); color++)
-		m_bcglookup[color] = rgb_t(0xff,0x00,0x00,0x00);
-
 	// make sure it is empty
 	empty();
 
@@ -619,9 +595,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
-		// allocate a client to the main palette
-		if (m_screen->palette() != NULL)
-			m_palclient.reset(global_alloc(palette_client(*m_screen->palette()->palette())));
+		// can't allocate palette client yet since palette and screen devices aren't started yet
 	}
 
 	recompute_lookups();
@@ -754,7 +728,15 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-			return (m_palclient != NULL && palette != NULL && palette == &m_palclient->palette()) ? m_bcglookup : NULL;
+			if (m_palclient == NULL) // if adjusted palette hasn't been created yet, create it
+			{
+				assert(palette == m_screen->palette()->palette());
+				m_palclient.reset(global_alloc(palette_client(*palette)));
+				m_bcglookup.resize(palette->num_colors() * palette->num_groups());
+				recompute_lookups();
+			}
+			assert (palette == &m_palclient->palette());
+			return m_bcglookup;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:

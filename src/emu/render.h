@@ -451,7 +451,6 @@ private:
 	bitmap_t *          m_bitmap;                   // pointer to the original bitmap
 	rectangle           m_sbounds;                  // source bounds within the bitmap
 	texture_format      m_format;                   // format of the texture data
-	dynamic_array<rgb_t> m_bcglookup;               // dynamically allocated B/C/G lookup table
 	UINT64              m_osddata;                  // aux data to pass to osd
 
 	// scaling state (ARGB32 only)
@@ -575,9 +574,9 @@ private:
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
-	auto_pointer<palette_client> m_palclient;       // client to the system palette
+	auto_pointer<palette_client> m_palclient;       // client to the screen palette
+	dynamic_array<rgb_t>    m_bcglookup;            // full palette lookup with bcg adjustments
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
-	rgb_t                   m_bcglookup[0x10000];   // full palette lookup with bcg adjustements
 };
 
 
