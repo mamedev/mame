@@ -12,20 +12,6 @@
 #include "debugger.h"
 #include "tms99com.h"
 
-struct tms99xx_config
-{
-	devcb_write8        external_callback;
-	devcb_read8         irq_level;
-	devcb_write_line    instruction_acquisition;
-	devcb_write_line    clock_out;
-	devcb_write_line    wait_line;
-	devcb_write_line    holda_line;
-	devcb_write_line    dbin_line;
-};
-
-#define TMS99xx_CONFIG(name) \
-	const tms99xx_config(name) =
-
 class ti990_10_device : public cpu_device
 {
 public:
