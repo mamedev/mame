@@ -87,34 +87,26 @@ void ti99_handset_device::write_dev(UINT8 data)
 */
 void ti99_handset_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id==DELAY_TIMER)
+	m_clock_high = !m_clock_high;
+	m_buf >>= 4;
+	m_buflen--;
+
+	// Clear the INT12 line
+	m_joyport->set_interrupt(CLEAR_LINE);
+
+	if (m_buflen == 1)
 	{
-		m_clock_high = !m_clock_high;
-		m_buf >>= 4;
-		m_buflen--;
-
-		// Clear the INT12 line
-		m_joyport->set_interrupt(CLEAR_LINE);
-
-		if (m_buflen == 1)
-		{
-			// Unless I am missing something, the third and last nibble of the
-			// message is not acknowledged by the DSR in any way, and the first nibble
-			// of next message is not requested for either, so we need to decide on
-			// our own when we can post a new event.  Currently, we wait for 1000us
-			// after the DSR acknowledges the second nybble.
-			m_delay_timer->adjust(attotime::from_usec(1000));
-		}
-
-		if (m_buflen == 0)
-			/* See if we need to post a new event */
-			do_task();
+		// Unless I am missing something, the third and last nibble of the
+		// message is not acknowledged by the DSR in any way, and the first nibble
+		// of next message is not requested for either, so we need to decide on
+		// our own when we can post a new event.  Currently, we wait for 1000us
+		// after the DSR acknowledges the second nybble.
+		m_delay_timer->adjust(attotime::from_usec(1000));
 	}
-	else
-	{
-		// Poll timer
-		do_task();
-	}
+
+	if (m_buflen == 0)
+		/* See if we need to post a new event */
+	do_task();
 }
 
 /*
@@ -318,18 +310,21 @@ void ti99_handset_device::do_task()
 	}
 }
 
+void ti99_handset_device::pulse_clock()
+{
+	logerror("handset: pulse_clock\n");
+	do_task();
+}
+
 void ti99_handset_device::device_start(void)
 {
 	m_delay_timer = timer_alloc(DELAY_TIMER);
-	m_poll_timer = timer_alloc(POLL_TIMER);
-	m_poll_timer->adjust(attotime::from_hz(m_joyport->clock()), 0, attotime::from_hz(m_joyport->clock()));
 }
 
 void ti99_handset_device::device_reset(void)
 {
 	if (VERBOSE>5) LOG("ti99_handset_device: Reset\n");
 	m_delay_timer->enable(true);
-	m_poll_timer->enable(true);
 	m_buf = 0;
 	m_buflen = 0;
 	m_clock_high = false;

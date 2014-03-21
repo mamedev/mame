@@ -99,13 +99,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( console_ready_cart );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_grom );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
-	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
 
 	// Connections with the system interface chip 9901
-	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
-	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT12 );
-	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2_from_v9938);
+	DECLARE_WRITE_LINE_MEMBER( extint );
+	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
+	DECLARE_WRITE_LINE_MEMBER( handset_interrupt_in );
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -135,7 +134,7 @@ private:
 	void    console_ready_join(int id, int state);
 
 	// Console type
-	int     m_console;
+	int     m_model;
 
 	// Latch for 9901 INT1, INT2, and INT12 lines
 	line_state  m_int1;
@@ -384,7 +383,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 	// Also, we translate the bit addresses to base addresses
 
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (m_console != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
+	if (m_model != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
 	m_peribox->crureadz(space, offset<<4, &value);
 
 	return value;
@@ -394,7 +393,7 @@ WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
 	if (TRACE_CRU) logerror("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (m_console != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
+	if (m_model != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
 	m_peribox->cruwrite(space, offset<<1, data);
 }
 
@@ -452,7 +451,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 		//
 		// |K|K|K|K|K|I2|I1|C|
 		//
-		if (m_keyboard_column >= (m_console==MODEL_4? 5:6)) // joy 1, 2, handset
+		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) // joy 1, 2, handset
 		{
 			answer = m_joyport->read_port();
 			// The hardware bug of the TI-99/4A: you have to release the
@@ -463,7 +462,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((ioport("ALPHABUG")!=0) && (m_console!=MODEL_4)) answer |= ioport("ALPHA")->read();
+			if ((ioport("ALPHABUG")!=0) && (m_model!=MODEL_4)) answer |= ioport("ALPHA")->read();
 		}
 		else
 		{
@@ -481,10 +480,10 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 	case TMS9901_INT8_INT15:
 		// |1|1|1|INT12|0|K|K|K|
-		if (m_keyboard_column >= (m_console==MODEL_4? 5:6)) answer = 0x07;
+		if (m_keyboard_column >= (m_model==MODEL_4? 5:6)) answer = 0x07;
 		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
 		answer |= 0xe0;
-		if (m_console != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
+		if (m_model != MODEL_4 || m_int12==CLEAR_LINE) answer |= 0x10;
 		break;
 
 	case TMS9901_P0_P7:
@@ -530,9 +529,9 @@ void ti99_4x_state::set_keyboard_column(int number, int data)
 	else
 		m_keyboard_column &= ~ (1 << number);
 
-	if (m_keyboard_column >= (m_console==MODEL_4? 5:6))
+	if (m_keyboard_column >= (m_model==MODEL_4? 5:6))
 	{
-		m_joyport->write_port(m_keyboard_column - (m_console==MODEL_4? 5:6) + 1);
+		m_joyport->write_port(m_keyboard_column - (m_model==MODEL_4? 5:6) + 1);
 	}
 
 	// TI-99/4:  joystick 1 = column 5
@@ -640,16 +639,13 @@ WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
 /*
     set the state of TMS9901's INT2 (called by the tms9928 core)
 */
-WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT2 )
+WRITE_LINE_MEMBER( ti99_4x_state::video_interrupt_in )
 {
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 on tms9901, level=%d\n", state);
-	m_int2 = (line_state)state;
-	m_tms9901->set_single_int(2, state);
-}
 
-WRITE_LINE_MEMBER(ti99_4x_state::set_tms9901_INT2_from_v9938)
-{
-	if (TRACE_INTERRUPTS) logerror("ti99_4x: VDP INT2 on tms9901, level=%d\n", state);
+	// Pulse for the handset
+	if (m_model == MODEL_4) m_joyport->pulse_clock();
+
 	m_int2 = (line_state)state;
 	m_tms9901->set_single_int(2, state);
 }
@@ -657,7 +653,7 @@ WRITE_LINE_MEMBER(ti99_4x_state::set_tms9901_INT2_from_v9938)
 /*
     set the state of TMS9901's INT12 (called by the handset prototype of TI-99/4)
 */
-WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT12)
+WRITE_LINE_MEMBER( ti99_4x_state::handset_interrupt_in)
 {
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: joyport INT12 on tms9901, level=%d\n", state);
 	m_int12 = (line_state)state;
@@ -746,7 +742,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::extint )
 {
 	if (TRACE_INTERRUPTS) logerror("ti99_4x: EXTINT level = %02x\n", state);
 	m_int1 = (line_state)state;
-	m_tms9901->set_single_int(11, state);
+	m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
@@ -759,7 +755,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 static TMS9928A_INTERFACE(ti99_4_tms9928a_interface)
 {
 	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, set_tms9901_INT2)
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, video_interrupt_in)
 };
 
 /*
@@ -815,7 +811,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
-	m_console = MODEL_4;
+	m_model = MODEL_4;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
@@ -889,6 +885,10 @@ static MACHINE_CONFIG_START( ti99_4, ti99_4x_state )
 	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
 	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
+
+	// Joystick port
+	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG )
+	MCFG_JOYPORT_INT_HANDLER( WRITELINE(ti99_4x_state, handset_interrupt_in) )
 MACHINE_CONFIG_END
 
 /*
@@ -896,10 +896,6 @@ MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_60hz, ti99_4 )
 	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG, 60 )
-	MCFG_JOYPORT_INT_HANDLER( WRITELINE(ti99_4x_state, set_tms9901_INT12) )
 MACHINE_CONFIG_END
 
 /*
@@ -907,10 +903,6 @@ MACHINE_CONFIG_END
 */
 static MACHINE_CONFIG_DERIVED( ti99_4_50hz, ti99_4 )
 	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4_ADD( JOYPORT_TAG, 50 )
-	MCFG_JOYPORT_INT_HANDLER( WRITELINE(ti99_4x_state, set_tms9901_INT12) )
 MACHINE_CONFIG_END
 
 /**********************************************************************
@@ -922,7 +914,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_nready_combined = 0;
-	m_console = MODEL_4A;
+	m_model = MODEL_4A;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
@@ -992,28 +984,23 @@ static MACHINE_CONFIG_START( ti99_4a, ti99_4x_state )
 	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 	MCFG_GROM_ADD( GROM2_TAG, grom2_config )
 	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
+
+	// Joystick port
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
 MACHINE_CONFIG_END
 
 /*
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_60hz, ti99_4a )
-	// Video hardware
 	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4a_50hz, ti99_4a )
-	// Video hardware
 	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -1029,7 +1016,7 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
-	m_console = MODEL_4QI;
+	m_model = MODEL_4QI;
 	m_nready_combined = 0;
 }
 
@@ -1041,22 +1028,14 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
-	/* Video hardware */
 	MCFG_TI_TMS991x_ADD_NTSC(VIDEO_SYSTEM_TAG, TMS9918A, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
 MACHINE_CONFIG_END
 
 /*
     European version: 50 Hz, PAL
 */
 static MACHINE_CONFIG_DERIVED( ti99_4qi_50hz, ti99_4qi )
-	// Video hardware
 	MCFG_TI_TMS991x_ADD_PAL(VIDEO_SYSTEM_TAG, TMS9929A, ti99_4_tms9928a_interface)
-
-	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 50 )
 MACHINE_CONFIG_END
 
 /************************************************************************
@@ -1085,7 +1064,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	// interlace mode, but in non-interlace modes only half of the lines are
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, ti99_4x_state, set_tms9901_INT2_from_v9938)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, ti99_4x_state, video_interrupt_in)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4x_state, ti99_4ev_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	/* Main board */
@@ -1137,7 +1116,7 @@ static MACHINE_CONFIG_START( ti99_4ev_60hz, ti99_4x_state )
 	MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_4x_state, console_ready_grom))
 
 	// Joystick port
-	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG, 60 )
+	MCFG_TI_JOYPORT4A_ADD( JOYPORT_TAG )
 
 MACHINE_CONFIG_END
 

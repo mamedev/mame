@@ -32,6 +32,8 @@ public:
 	UINT8 read_dev();
 	void  write_dev(UINT8 data);
 
+	void pulse_clock();
+
 protected:
 	virtual void device_start(void);
 	virtual void device_reset(void);
@@ -54,7 +56,6 @@ private:
 	UINT8   previous_key[MAX_HANDSETS];
 
 	emu_timer *m_delay_timer;
-	emu_timer *m_poll_timer;
 };
 
 #define MCFG_HANDSET_ADD(_tag, _intf, _clock )  \
