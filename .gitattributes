@@ -2882,7 +2882,6 @@ src/emu/sound/scsp.c svneol=native#text/plain
 src/emu/sound/scsp.h svneol=native#text/plain
 src/emu/sound/scspdsp.c svneol=native#text/plain
 src/emu/sound/scspdsp.h svneol=native#text/plain
-src/emu/sound/scsplfo.inc svneol=native#text/plain
 src/emu/sound/segapcm.c svneol=native#text/plain
 src/emu/sound/segapcm.h svneol=native#text/plain
 src/emu/sound/sid.c svneol=native#text/plain

@@ -752,7 +752,7 @@ void saturn_state::m68k_reset_callback(device_t *device)
 	printf("m68k RESET opcode triggered\n");
 }
 
-WRITE_LINE_MEMBER(saturn_state::scsp_irq)
+WRITE8_MEMBER(saturn_state::scsp_irq)
 {
 	// don't bother the 68k if it's off
 	if (!m_en_68k)
@@ -760,18 +760,14 @@ WRITE_LINE_MEMBER(saturn_state::scsp_irq)
 		return;
 	}
 
-	if (state > 0)
+	if (offset != 0)
 	{
-		m_scsp_last_line = state;
-		m_audiocpu->set_input_line(state, ASSERT_LINE);
-	}
-	else if (state < 0)
-	{
-		m_audiocpu->set_input_line(-state, CLEAR_LINE);
-	}
+		if (data == ASSERT_LINE) m_scsp_last_line = offset;		
+		m_audiocpu->set_input_line(offset, data);
+	}	
 	else
 	{
-		m_audiocpu->set_input_line(m_scsp_last_line, CLEAR_LINE);
+		m_audiocpu->set_input_line(m_scsp_last_line, data);
 	}
 }
 
