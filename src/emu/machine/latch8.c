@@ -7,254 +7,172 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "sound/discrete.h"
 #include "latch8.h"
-#include "devlegcy.h"
 
-struct latch8_t
-{
-	latch8_config   *intf;
-	UINT8            value;
-	UINT8            has_node_map;
-	UINT8            has_devread;
-	UINT8            has_read;
-	device_t    *devices[8];
-};
-
-/* ----------------------------------------------------------------------- */
-
-INLINE latch8_t *get_safe_token(device_t *device) {
-	assert( device != NULL );
-	assert( device->type() == LATCH8 );
-	return ( latch8_t * ) downcast<latch8_device *>(device)->token();
-}
-
-static void update(device_t *device, UINT8 new_val, UINT8 mask)
+void latch8_device::update(UINT8 new_val, UINT8 mask)
 {
 	/*  temporary hack until the discrete system is a device */
-	latch8_t *latch8 = get_safe_token(device);
-	UINT8 old_val = latch8->value;
+	UINT8 old_val = m_value;
 
-	latch8->value = (latch8->value & ~mask) | (new_val & mask);
+	m_value = (m_value & ~mask) | (new_val & mask);
 
-	if (latch8->has_node_map)
+	if (m_has_node_map)
 	{
 		int i;
-		UINT8 changed = old_val ^ latch8->value;
+		UINT8 changed = old_val ^ m_value;
 		for (i=0; i<8; i++)
-			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
-				discrete_sound_w(device->machine().device(latch8->intf->node_device[i]), device->machine().driver_data()->generic_space(), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
+			if (((changed & (1<<i)) != 0) && m_node_map[i] != 0) {
+				if (i==0 && m_node_device_0!=NULL) discrete_sound_w(m_node_device_0, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==1 && m_node_device_1!=NULL) discrete_sound_w(m_node_device_1, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==2 && m_node_device_2!=NULL) discrete_sound_w(m_node_device_2, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==3 && m_node_device_3!=NULL) discrete_sound_w(m_node_device_3, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==4 && m_node_device_4!=NULL) discrete_sound_w(m_node_device_4, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==5 && m_node_device_5!=NULL) discrete_sound_w(m_node_device_5, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==6 && m_node_device_6!=NULL) discrete_sound_w(m_node_device_6, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+				if (i==7 && m_node_device_7!=NULL) discrete_sound_w(m_node_device_7, machine().driver_data()->generic_space(), m_node_map[i] , (m_value >> i) & 1);
+			}
 	}
 }
 
-static TIMER_CALLBACK( latch8_timerproc )
+TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
 {
-	device_t *device = (device_t *)ptr;
 	UINT8 new_val = param & 0xFF;
 	UINT8 mask = param >> 8;
 
-	update(device, new_val, mask);
+	update( new_val, mask);
 }
 
 /* ----------------------------------------------------------------------- */
 
-READ8_DEVICE_HANDLER( latch8_r )
+READ8_MEMBER( latch8_device::read )
 {
-	latch8_t *latch8 = get_safe_token(device);
 	UINT8 res;
 
 	assert(offset == 0);
 
-	res = latch8->value;
-	if (latch8->has_devread)
+	res = m_value;
+	if (m_has_devread)
 	{
 		int i;
 		for (i=0; i<8; i++)
-		{
-			device_t *read_dev = latch8->devices[i];
-			if (read_dev != NULL)
-			{
-				res &= ~( 1 << i);
-				res |= ((latch8->intf->devread[i].devread_handler(read_dev, device->machine().driver_data()->generic_space(), 0, 0xff) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
-			}
+		{			
+			if (i==0 && !m_devread_0.isnull()) { res &= ~( 1 << i); res |= ((m_devread_0(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==1 && !m_devread_1.isnull()) { res &= ~( 1 << i); res |= ((m_devread_1(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==2 && !m_devread_2.isnull()) { res &= ~( 1 << i); res |= ((m_devread_2(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==3 && !m_devread_3.isnull()) { res &= ~( 1 << i); res |= ((m_devread_3(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==4 && !m_devread_4.isnull()) { res &= ~( 1 << i); res |= ((m_devread_4(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==5 && !m_devread_5.isnull()) { res &= ~( 1 << i); res |= ((m_devread_5(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==6 && !m_devread_6.isnull()) { res &= ~( 1 << i); res |= ((m_devread_6(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i; }
+			if (i==7 && !m_devread_7.isnull()) { res &= ~( 1 << i); res |= ((m_devread_7(space, 0, 0xff) >> m_from_bit[i]) & 0x01) << i;	}			
 		}
 	}
-	if (latch8->has_read)
-	{
-		/*  temporary hack until all relevant systems are devices */
-		address_space &space = device->machine().driver_data()->generic_space();
-		int i;
-		for (i=0; i<8; i++)
-		{
-			if (latch8->intf->devread[i].read_handler != NULL)
-			{
-				res &= ~( 1 << i);
-				res |= ((latch8->intf->devread[i].read_handler(space, 0, 0xff) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
-			}
-		}
-	}
-
-	return (res & ~latch8->intf->maskout) ^ latch8->intf->xorvalue;
+	return (res & ~m_maskout) ^ m_xorvalue;
 }
 
 
-WRITE8_DEVICE_HANDLER( latch8_w )
+WRITE8_MEMBER( latch8_device::write )
 {
-	latch8_t *latch8 = get_safe_token(device);
 	assert(offset == 0);
 
-	if (latch8->intf->nosync != 0xff)
-		device->machine().scheduler().synchronize(FUNC(latch8_timerproc), (0xFF << 8) | data, (void *)device);
+	if (m_nosync != 0xff)
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (0xFF << 8) | data);
 	else
-		update(device, data, 0xFF);
+		update(data, 0xFF);
 }
 
 
-WRITE8_DEVICE_HANDLER( latch8_reset)
+WRITE8_MEMBER( latch8_device::reset_w )
 {
-	latch8_t *latch8 = get_safe_token(device);
-
 	assert(offset == 0);
 
-	latch8->value = 0;
+	m_value = 0;
 }
 
 /* read bit x                 */
 /* return (latch >> x) & 0x01 */
 
-INLINE UINT8 latch8_bitx_r(device_t *device, offs_t offset, int bit)
+UINT8 latch8_device::bitx_r( offs_t offset, int bit)
 {
-	latch8_t *latch8 = get_safe_token(device);
-
 	assert( offset == 0);
 
-	return (latch8->value >> bit) & 0x01;
+	return (m_value >> bit) & 0x01;
 }
 
-READ8_DEVICE_HANDLER( latch8_bit0_r) { return latch8_bitx_r(device, offset, 0); }
-READ8_DEVICE_HANDLER( latch8_bit1_r) { return latch8_bitx_r(device, offset, 1); }
-READ8_DEVICE_HANDLER( latch8_bit2_r) { return latch8_bitx_r(device, offset, 2); }
-READ8_DEVICE_HANDLER( latch8_bit3_r) { return latch8_bitx_r(device, offset, 3); }
-READ8_DEVICE_HANDLER( latch8_bit4_r) { return latch8_bitx_r(device, offset, 4); }
-READ8_DEVICE_HANDLER( latch8_bit5_r) { return latch8_bitx_r(device, offset, 5); }
-READ8_DEVICE_HANDLER( latch8_bit6_r) { return latch8_bitx_r(device, offset, 6); }
-READ8_DEVICE_HANDLER( latch8_bit7_r) { return latch8_bitx_r(device, offset, 7); }
+READ8_MEMBER( latch8_device::bit0_r) { return bitx_r(offset, 0); }
+READ8_MEMBER( latch8_device::bit1_r) { return bitx_r(offset, 1); }
+READ8_MEMBER( latch8_device::bit2_r) { return bitx_r(offset, 2); }
+READ8_MEMBER( latch8_device::bit3_r) { return bitx_r(offset, 3); }
+READ8_MEMBER( latch8_device::bit4_r) { return bitx_r(offset, 4); }
+READ8_MEMBER( latch8_device::bit5_r) { return bitx_r(offset, 5); }
+READ8_MEMBER( latch8_device::bit6_r) { return bitx_r(offset, 6); }
+READ8_MEMBER( latch8_device::bit7_r) { return bitx_r(offset, 7); }
 
-READ8_DEVICE_HANDLER( latch8_bit0_q_r) { return latch8_bitx_r(device, offset, 0) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit1_q_r) { return latch8_bitx_r(device, offset, 1) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit2_q_r) { return latch8_bitx_r(device, offset, 2) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit3_q_r) { return latch8_bitx_r(device, offset, 3) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit4_q_r) { return latch8_bitx_r(device, offset, 4) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit5_q_r) { return latch8_bitx_r(device, offset, 5) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit6_q_r) { return latch8_bitx_r(device, offset, 6) ^ 1; }
-READ8_DEVICE_HANDLER( latch8_bit7_q_r) { return latch8_bitx_r(device, offset, 7) ^ 1; }
+READ8_MEMBER( latch8_device::bit0_q_r) { return bitx_r(offset, 0) ^ 1; }
+READ8_MEMBER( latch8_device::bit1_q_r) { return bitx_r(offset, 1) ^ 1; }
+READ8_MEMBER( latch8_device::bit2_q_r) { return bitx_r(offset, 2) ^ 1; }
+READ8_MEMBER( latch8_device::bit3_q_r) { return bitx_r(offset, 3) ^ 1; }
+READ8_MEMBER( latch8_device::bit4_q_r) { return bitx_r(offset, 4) ^ 1; }
+READ8_MEMBER( latch8_device::bit5_q_r) { return bitx_r(offset, 5) ^ 1; }
+READ8_MEMBER( latch8_device::bit6_q_r) { return bitx_r(offset, 6) ^ 1; }
+READ8_MEMBER( latch8_device::bit7_q_r) { return bitx_r(offset, 7) ^ 1; }
 
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-INLINE void latch8_bitx_w(device_t *device, int bit, offs_t offset, UINT8 data)
+void latch8_device::bitx_w(int bit, offs_t offset, UINT8 data)
 {
-	latch8_t *latch8 = get_safe_token(device);
 	UINT8 mask = (1<<offset);
 	UINT8 masked_data = (((data >> bit) & 0x01) << offset);
 
 	assert( offset < 8);
 
 	/* No need to synchronize ? */
-	if (latch8->intf->nosync & mask)
-		update(device, masked_data, mask);
+	if (m_nosync & mask)
+		update(masked_data, mask);
 	else
-		device->machine().scheduler().synchronize(FUNC(latch8_timerproc), (mask << 8) | masked_data, (void *) device);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (mask << 8) | masked_data);
 }
 
-WRITE8_DEVICE_HANDLER( latch8_bit0_w ) { latch8_bitx_w(device, 0, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit1_w ) { latch8_bitx_w(device, 1, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit2_w ) { latch8_bitx_w(device, 2, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit3_w ) { latch8_bitx_w(device, 3, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit4_w ) { latch8_bitx_w(device, 4, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit5_w ) { latch8_bitx_w(device, 0, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit6_w ) { latch8_bitx_w(device, 0, offset, data); }
-WRITE8_DEVICE_HANDLER( latch8_bit7_w ) { latch8_bitx_w(device, 0, offset, data); }
-
-/* ----------------------------------------------------------------------- */
-
-/* device interface */
-
-static DEVICE_START( latch8 )
-{
-	latch8_t *latch8 = get_safe_token(device);
-	int i;
-
-	/* validate arguments */
-	latch8->intf = (latch8_config *)&downcast<latch8_device *>(device)->m_inline_config;
-
-	latch8->value = 0x0;
-
-	/* setup nodemap */
-	for (i=0; i<8; i++)
-		if (latch8->intf->node_map[i] )
-		{
-			if (!latch8->intf->node_device[i])
-				fatalerror("Device %s: Bit %d has invalid discrete device\n", device->tag(), i);
-			latch8->has_node_map = 1;
-		}
-
-	/* setup device read handlers */
-	for (i=0; i<8; i++)
-		if (latch8->intf->devread[i].tag != NULL)
-		{
-			if (latch8->devices[i] != NULL)
-				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag(), i);
-			latch8->devices[i] = device->machine().device(latch8->intf->devread[i].tag);
-			if (latch8->devices[i] == NULL)
-				fatalerror("Device %s: Unable to find device %s\n", device->tag(), latch8->intf->devread[i].tag);
-			latch8->has_devread = 1;
-		}
-
-	/* setup machine read handlers */
-	for (i=0; i<8; i++)
-		if (latch8->intf->devread[i].read_handler != NULL)
-		{
-			if (latch8->devices[i] != NULL)
-				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag(), i);
-			latch8->has_read = 1;
-		}
-
-	device->save_item(NAME(latch8->value));
-}
-
-
-static DEVICE_RESET( latch8 )
-{
-	latch8_t *latch8 = get_safe_token(device);
-
-	latch8->value = 0;
-}
-
+WRITE8_MEMBER( latch8_device::bit0_w ) { bitx_w(0, offset, data); }
+WRITE8_MEMBER( latch8_device::bit1_w ) { bitx_w(1, offset, data); }
+WRITE8_MEMBER( latch8_device::bit2_w ) { bitx_w(2, offset, data); }
+WRITE8_MEMBER( latch8_device::bit3_w ) { bitx_w(3, offset, data); }
+WRITE8_MEMBER( latch8_device::bit4_w ) { bitx_w(4, offset, data); }
+WRITE8_MEMBER( latch8_device::bit5_w ) { bitx_w(0, offset, data); }
+WRITE8_MEMBER( latch8_device::bit6_w ) { bitx_w(0, offset, data); }
+WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(0, offset, data); }
 
 const device_type LATCH8 = &device_creator<latch8_device>;
 
 latch8_device::latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__)
+		: device_t(mconfig, LATCH8, "8 bit latch", tag, owner, clock, "latch8", __FILE__),
+		m_value(0),
+		m_has_node_map(0),
+		m_has_devread(0),
+		m_maskout(0),
+		m_xorvalue(0),
+		m_nosync(0),	
+		m_node_device_0(*this),
+		m_node_device_1(*this),
+		m_node_device_2(*this),
+		m_node_device_3(*this),
+		m_node_device_4(*this),
+		m_node_device_5(*this),
+		m_node_device_6(*this),
+		m_node_device_7(*this),
+		m_devread_0(*this),
+		m_devread_1(*this),
+		m_devread_2(*this),
+		m_devread_3(*this),
+		m_devread_4(*this),
+		m_devread_5(*this),
+		m_devread_6(*this),
+		m_devread_7(*this)
 {
-	m_token = global_alloc_clear(latch8_t);
-	memset((void*)&m_inline_config,0,sizeof(m_inline_config));
+	memset(m_node_map, 0, sizeof(m_node_map));
+	memset(m_from_bit, 0, sizeof(m_from_bit));
 }
 
-latch8_device::~latch8_device()
-{
-	global_free(m_token);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void latch8_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -262,7 +180,54 @@ void latch8_device::device_config_complete()
 
 void latch8_device::device_start()
 {
-	DEVICE_START_NAME( latch8 )(this);
+	m_devread_0.resolve();
+	m_devread_1.resolve();
+	m_devread_2.resolve();
+	m_devread_3.resolve();
+	m_devread_4.resolve();
+	m_devread_5.resolve();
+	m_devread_6.resolve();
+	m_devread_7.resolve();
+	
+	/* setup nodemap */
+	for (int i=0; i<8; i++)
+		if (m_node_map[i] )
+		{
+			if (i==0 && m_node_device_0==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==1 && m_node_device_1==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==2 && m_node_device_2==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==3 && m_node_device_3==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==4 && m_node_device_4==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==5 && m_node_device_5==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==6 && m_node_device_6==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+			if (i==7 && m_node_device_7==NULL) fatalerror("Device %s: Bit %d has invalid discrete device\n", tag(), i);
+
+			m_has_node_map = 1;
+		}
+
+	/* setup device read handlers */
+	if (!m_devread_0.isnull()) m_has_devread = 1;
+	if (!m_devread_1.isnull()) m_has_devread = 1;
+	if (!m_devread_2.isnull()) m_has_devread = 1;
+	if (!m_devread_3.isnull()) m_has_devread = 1;
+	if (!m_devread_4.isnull()) m_has_devread = 1;
+	if (!m_devread_5.isnull()) m_has_devread = 1;
+	if (!m_devread_6.isnull()) m_has_devread = 1;
+	if (!m_devread_7.isnull()) m_has_devread = 1;
+
+	for (int i=0; i<8; i++) 
+	{
+		if (!m_devread_0.isnull() && m_node_device_0!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_1.isnull() && m_node_device_1!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_2.isnull() && m_node_device_2!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_3.isnull() && m_node_device_3!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_4.isnull() && m_node_device_4!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_5.isnull() && m_node_device_5!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_6.isnull() && m_node_device_6!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+		if (!m_devread_7.isnull() && m_node_device_7!=NULL) fatalerror("Device %s: Bit %d already has a handler.\n", tag(), i);
+	}	
+
+	save_item(NAME(m_value));
 }
 
 //-------------------------------------------------
@@ -271,5 +236,5 @@ void latch8_device::device_start()
 
 void latch8_device::device_reset()
 {
-	DEVICE_RESET_NAME( latch8 )(this);
+	m_value = 0;
 }
