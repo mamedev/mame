@@ -8,6 +8,7 @@ Amust Compak
 
 An unusual-looking CP/M computer.
 There are no manuals or schematics known to exist.
+The entire driver is guesswork.
 A blurry photo of the board shows 2x 8251, 2x 8255, 8253, uPD765 and a 6845.
 The videoram is a 6116 RAM. There is a piezo beeper. There are 3 crystals,
 but the writing is too blurred.
@@ -15,6 +16,11 @@ but the writing is too blurred.
 The main rom is identical between the 2 halves, except that the initial
 crtc parameters are slightly different. I've chosen to ignore the first
 half.
+
+
+Monitor Commands:
+B = Boot from floppy
+(YES! Most useless monitor ever)
 
 
 ToDo:
@@ -27,6 +33,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/upd765.h"
+#include "machine/keyboard.h"
 
 
 class amust_state : public driver_device
@@ -43,11 +50,21 @@ public:
 
 	DECLARE_DRIVER_INIT(amust);
 	DECLARE_MACHINE_RESET(amust);
+	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_WRITE8_MEMBER(port08_w);
+	DECLARE_READ8_MEMBER(port09_r);
+	DECLARE_READ8_MEMBER(port0a_r);
 	DECLARE_WRITE8_MEMBER(port0a_w);
+	DECLARE_WRITE8_MEMBER(port0d_w);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	INTERRUPT_GEN_MEMBER(irq_vs);
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	required_device<palette_device> m_palette;
 private:
+	UINT8 m_port08;
+	UINT8 m_port0a;
+	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -67,7 +84,6 @@ private:
 
 static ADDRESS_MAP_START(amust_mem, AS_PROGRAM, 8, amust_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	//AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 ADDRESS_MAP_END
@@ -75,10 +91,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(port0a_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(port08_w)
+	AM_RANGE(0x09, 0x09) AM_READ(port09_r)
+	AM_RANGE(0x0a, 0x0a) AM_READWRITE(port0a_r,port0a_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(port0d_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	//AM_RANGE(0xxx, 0xxx) AM_DEVREADWRITE("fdc", upd765a, read, write)
+	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( amust_floppies )
@@ -89,11 +109,56 @@ SLOT_INTERFACE_END
 static INPUT_PORTS_START( amust )
 INPUT_PORTS_END
 
-// no idea which port actually does this
+READ8_MEMBER( amust_state::port00_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+WRITE8_MEMBER( amust_state::port08_w )
+{
+	m_port08 = data;
+}
+
+// bit 4: H = go to monitor; L = boot from disk
+READ8_MEMBER( amust_state::port09_r )
+{
+	return 0xff;
+}
+
+READ8_MEMBER( amust_state::port0a_r )
+{
+	return m_port0a;
+}
+
 WRITE8_MEMBER( amust_state::port0a_w )
 {
-	membank("bankr0")->set_entry(1);
+	m_port0a = data;
 }
+
+WRITE8_MEMBER( amust_state::port0d_w )
+{
+	UINT16 video_address = m_port08 | ((m_port0a & 7) << 8);
+	m_p_videoram[video_address] = data;
+}
+
+// bodgy
+INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
+{
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+}
+
+WRITE8_MEMBER( amust_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DRIVER_MEMBER(amust_state, kbd_put)
+};
+
 
 /* F4 Character Displayer */
 static const gfx_layout amust_charlayout =
@@ -127,7 +192,7 @@ MC6845_UPDATE_ROW( amust_update_row )
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_p_videoram[mem];
 		if (ra < 8)
-			gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+			gfx = state->m_p_chargen[(chr<<3) | ra] ^ inv;
 		else
 			gfx = inv;
 
@@ -155,7 +220,7 @@ static MC6845_INTERFACE( amust_crtc )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	NULL//amust_update_addr       /* handler to process transparent mode */
+	NULL
 };
 
 MACHINE_RESET_MEMBER( amust_state, amust )
@@ -164,6 +229,8 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	m_p_videoram = memregion("videoram")->base();
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.write_byte(8, 0xc9);
 	m_maincpu->set_state_int(Z80_PC, 0xf800);
 }
 
@@ -181,6 +248,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4) // guess clock
 	MCFG_CPU_PROGRAM_MAP(amust_mem)
 	MCFG_CPU_IO_MAP(amust_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
 	/* video hardware */
@@ -195,6 +263,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_16MHz / 8, amust_crtc)
+	MCFG_ASCII_KEYBOARD_ADD("keybd", keyboard_intf)
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
