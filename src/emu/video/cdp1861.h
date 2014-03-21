@@ -67,13 +67,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CDP1861_ADD(_tag, _screen_tag, _clock, _irq, _dma_out, _efx) \
-	MCFG_DEVICE_ADD(_tag, CDP1861, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<cdp1861_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
-	downcast<cdp1861_device *>(device)->set_dma_out_callback(DEVCB2_##_dma_out); \
-	downcast<cdp1861_device *>(device)->set_efx_callback(DEVCB2_##_efx);
-
 #define MCFG_CDP1861_IRQ_CALLBACK(_write) \
 	devcb = &cdp1861_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
@@ -82,6 +75,7 @@
 
 #define MCFG_CDP1861_EFX_CALLBACK(_write) \
 	devcb = &cdp1861_device::set_efx_wr_callback(*device, DEVCB2_##_write);
+
 
 #define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_tag) \
