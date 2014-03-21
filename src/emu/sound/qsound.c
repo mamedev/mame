@@ -109,16 +109,21 @@ void qsound_device::device_start()
 	m_sample_rom = (INT8*)*region();
 	m_sample_rom_length = region()->bytes();
 
-	memset(m_channel, 0, sizeof(m_channel));
-
-	/* Create pan table */
-	for (int i = 0; i < 33; i++)
-		m_pan_table[i] = (int)((256 / sqrt(32.0)) * sqrt((double)i));
-
-	/* Allocate stream */
 	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider
 
-	/* state save */
+	// create pan table
+	for (int i = 0; i < 33; i++)
+		m_pan_table[i] = (int)((256 / sqrt(32.0)) * sqrt((double)i));
+	
+	// init sound regs
+	memset(m_channel, 0, sizeof(m_channel));
+
+	for (int adr = 0x7f; adr >= 0; adr--)
+		write_data(adr, 0);
+	for (int adr = 0x80; adr < 0x90; adr++)
+		write_data(adr, 0x120);
+
+	// state save
 	for (int i = 0; i < 16; i++)
 	{
 		save_item(NAME(m_channel[i].bank), i);
@@ -130,7 +135,6 @@ void qsound_device::device_start()
 		save_item(NAME(m_channel[i].enabled), i);
 		save_item(NAME(m_channel[i].lvol), i);
 		save_item(NAME(m_channel[i].rvol), i);
-		save_item(NAME(m_channel[i].sample), i);
 		save_item(NAME(m_channel[i].step_ptr), i);
 	}
 }
@@ -152,37 +156,38 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		{
 			stream_sample_t *lmix=outputs[0];
 			stream_sample_t *rmix=outputs[1];
-			int rvol = (m_channel[ch].rvol * m_channel[ch].vol) >> 8;
-			int lvol = (m_channel[ch].lvol * m_channel[ch].vol) >> 8;
 
 			// Go through the buffer and add voice contributions
 			for (int i = 0; i < samples; i++)
 			{
-				if (m_channel[ch].step_ptr & ~0xfff)
-				{
-					m_channel[ch].address += (m_channel[ch].step_ptr >> 12);
-					m_channel[ch].step_ptr &= 0xfff;
-					
-					if (m_channel[ch].address >= m_channel[ch].end)
-					{
-						if (m_channel[ch].loop)
-						{
-							// Reached the end, restart the loop
-							m_channel[ch].address = (m_channel[ch].end - m_channel[ch].loop) & 0xffff;
-						}
-						else
-						{
-							// Reached the end of a non-looped sample
-							m_channel[ch].enabled = false;
-							break;
-						}
-					}
-					m_channel[ch].sample = read_sample(m_channel[ch].bank | m_channel[ch].address);
-				}
-
-				*lmix++ += ((m_channel[ch].sample * lvol) >> 6);
-				*rmix++ += ((m_channel[ch].sample * rvol) >> 6);
+				m_channel[ch].address += (m_channel[ch].step_ptr >> 12);
+				m_channel[ch].step_ptr &= 0xfff;
 				m_channel[ch].step_ptr += m_channel[ch].freq;
+				
+				if (m_channel[ch].address >= m_channel[ch].end)
+				{
+					if (m_channel[ch].loop)
+					{
+						// Reached the end, restart the loop
+						m_channel[ch].address -= m_channel[ch].loop;
+						
+						// Make sure we don't overflow (what does the real chip do in this case?)
+						if (m_channel[ch].address >= m_channel[ch].end)
+							m_channel[ch].address = m_channel[ch].end - m_channel[ch].loop;
+						
+						m_channel[ch].address &= 0xffff;
+					}
+					else
+					{
+						// Reached the end of a non-looped sample
+						m_channel[ch].enabled = false;
+						break;
+					}
+				}
+				
+				INT8 sample = read_sample(m_channel[ch].bank | m_channel[ch].address);
+				*lmix++ += ((sample * m_channel[ch].lvol * m_channel[ch].vol) >> 14);
+				*rmix++ += ((sample * m_channel[ch].rvol * m_channel[ch].vol) >> 14);
 			}
 		}
 	}
@@ -202,6 +207,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 			break;
 
 		case 2:
+			m_stream->update();
 			write_data(data, m_data);
 			break;
 
@@ -223,11 +229,14 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 {
 	int ch = 0, reg = 0;
 
+	// direct sound reg
 	if (address < 0x80)
 	{
 		ch = address >> 3;
 		reg = address & 7;
 	}
+	
+	// >= 0x80 is probably for the dsp?
 	else if (address < 0x90)
 	{
 		ch = address & 0xf;
@@ -249,7 +258,7 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 		case 0:
 			// bank, high bits unknown
 			ch = (ch + 1) & 0xf; // strange ...
-			m_channel[ch].bank = (data & 0x7f) << 16;
+			m_channel[ch].bank = data << 16;
 			break;
 
 		case 1:
@@ -267,8 +276,10 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 			}
 			break;
 
-		case 3: 
-			// unknown, always 0x8000?
+		case 3:
+			// key on (does the value matter? it always writes 0x8000)
+			m_channel[ch].enabled = true;
+			m_channel[ch].step_ptr = 0;
 			break;
 
 		case 4:
@@ -283,18 +294,6 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 
 		case 6:
 			// master volume
-			if (data == 0)
-			{
-				// key off
-				m_channel[ch].enabled = false;
-			}
-			else if (!m_channel[ch].enabled)
-			{
-				// key off -> key on
-				m_channel[ch].enabled = true;
-				m_channel[ch].step_ptr = 0;
-				m_channel[ch].sample = 0;
-			}
 			m_channel[ch].vol = data;
 			break;
 
@@ -305,18 +304,20 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 		case 8:
 		{
 			// panning (left=0x0110, centre=0x0120, right=0x0130)
-			int pandata = (data - 0x10) & 0x3f;
-			if (pandata > 32)
-			{
-				pandata = 32;
-			}
-			m_channel[ch].rvol = m_pan_table[pandata];
-			m_channel[ch].lvol = m_pan_table[32 - pandata];
+			// looks like it doesn't write other values than that
+			int pan = (data & 0x3f) - 0x10;
+			if (pan > 0x20)
+				pan = 0x20;
+			if (pan < 0)
+				pan = 0;
+			
+			m_channel[ch].rvol = m_pan_table[pan];
+			m_channel[ch].lvol = m_pan_table[0x20 - pan];
 			break;
 		}
 		
 		case 9:
-			// unknown (most fixed samples use 0 for this register)
+			// unknown
 			break;
 
 		default:

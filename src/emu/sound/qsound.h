@@ -59,7 +59,6 @@ private:
 		bool enabled;       // key on / key off
 		int lvol;           // left volume
 		int rvol;           // right volume
-		INT8 sample;        // last sample value
 		UINT32 step_ptr;    // current offset counter
 	} m_channel[16];
 
