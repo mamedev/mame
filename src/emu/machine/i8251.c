@@ -696,7 +696,7 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 
 WRITE_LINE_MEMBER(i8251_device::write_dsr)
 {
-	m_dsr = state;
+	m_dsr = !state;
 }
 
 WRITE_LINE_MEMBER(i8251_device::write_rxc)
