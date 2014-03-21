@@ -1010,3 +1010,13 @@ BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
 BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o
 BUSOBJS += $(BUSOBJ)/scsi/s1410.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/macpds/macpds.h,BUSES += MACPDS
+#-------------------------------------------------
+ifneq ($(filter MACPDS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/macpds
+BUSOBJS += $(BUSOBJ)/macpds/macpds.o
+BUSOBJS += $(BUSOBJ)/macpds/pds_tpdfpd.o
+endif

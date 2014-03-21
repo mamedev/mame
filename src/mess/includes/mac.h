@@ -15,7 +15,7 @@
 #include "machine/egret.h"
 #include "machine/cuda.h"
 #include "bus/nubus/nubus.h"
-#include "machine/macpds.h"
+#include "bus/macpds/macpds.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/mackbd.h"

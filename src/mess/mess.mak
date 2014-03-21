@@ -544,6 +544,7 @@ BUSES += IQ151
 BUSES += ISA
 BUSES += ISBX
 BUSES += KC
+BUSES += MACPDS
 BUSES += MIDI
 BUSES += MEGADRIVE
 BUSES += NES
@@ -955,8 +956,6 @@ $(MESSOBJ)/apple.a:             \
 	$(MESS_MACHINE)/cuda.o      \
 	$(MESS_MACHINE)/mackbd.o    \
 	$(MESS_MACHINE)/swim.o      \
-	$(MESS_MACHINE)/macpds.o \
-	$(MESS_VIDEO)/pds_tpdfpd.o \
 
 $(MESSOBJ)/applied.a:           \
 	$(MESS_VIDEO)/mbee.o        \
