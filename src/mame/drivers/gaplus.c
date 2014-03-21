@@ -208,21 +208,6 @@ WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
 	m_namco56xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static const namco_62xx_interface namco_62xx_intf =
-{
-	{   /* port read handlers */
-		DEVCB_NULL, //DEVCB_INPUT_PORT("IN0L"),
-		DEVCB_NULL, //DEVCB_INPUT_PORT("IN0H"),
-		DEVCB_NULL, //DEVCB_INPUT_PORT("IN1L"),
-		DEVCB_NULL  //DEVCB_INPUT_PORT("IN1H")
-	},
-	{   /* port write handlers */
-		DEVCB_NULL, //DEVCB_DRIVER_MEMBER(out_0),
-		DEVCB_NULL  //DEVCB_DRIVER_MEMBER(out_1)
-	}
-};
-
-
 void gaplus_state::machine_reset()
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
@@ -584,8 +569,14 @@ static MACHINE_CONFIG_START( gaplus, gaplus_state )
 	MCFG_NAMCO56XX_ADD("namcoio_1", intf0_lamps)
 	MCFG_NAMCO58XX_ADD("namcoio_2", intf1)
 
-	MCFG_NAMCO_62XX_ADD("62xx", 24576000/6/2, namco_62xx_intf)  /* totally made up - TODO: fix */
-
+	MCFG_NAMCO_62XX_ADD("62xx", 24576000/6/2)  /* totally made up - TODO: fix */
+	//MCFG_NAMCO_62XX_INPUT_0_CB(IOPORT("IN0L"))
+	//MCFG_NAMCO_62XX_INPUT_1_CB(IOPORT("IN0H"))
+	//MCFG_NAMCO_62XX_INPUT_2_CB(IOPORT("IN1L"))
+	//MCFG_NAMCO_62XX_INPUT_3_CB(IOPORT("IN1H"))
+	//MCFG_NAMCO_62XX_OUTPUT_0_CB(WRITE8(gaplus_state,out_0))
+	//MCFG_NAMCO_62XX_OUTPUT_1_CB(WRITE8(gaplus_state,out_1))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)

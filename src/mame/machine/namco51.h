@@ -3,32 +3,46 @@
 #ifndef NAMCO51_H
 #define NAMCO51_H
 
+#include "cpu/mb88xx/mb88xx.h"
 
 
-struct namco_51xx_interface
-{
-	devcb_read8     in[4];      /* read handlers for ports A-D */
-	devcb_write8    out[2];     /* write handlers for ports A-B */
-};
+#define MCFG_NAMCO_51XX_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock) 
 
+#define MCFG_NAMCO_51XX_INPUT_0_CB(_devcb) \
+	devcb = &namco_51xx_device::set_input_0_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_NAMCO_51XX_ADD(_tag, _clock, _interface) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock) \
-	MCFG_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO_51XX_INPUT_1_CB(_devcb) \
+	devcb = &namco_51xx_device::set_input_1_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_NAMCO_51XX_INPUT_2_CB(_devcb) \
+	devcb = &namco_51xx_device::set_input_2_callback(*device, DEVCB2_##_devcb);
 
-DECLARE_READ8_DEVICE_HANDLER( namco_51xx_read );
-DECLARE_WRITE8_DEVICE_HANDLER( namco_51xx_write );
+#define MCFG_NAMCO_51XX_INPUT_3_CB(_devcb) \
+	devcb = &namco_51xx_device::set_input_3_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_NAMCO_51XX_OUTPUT_0_CB(_devcb) \
+	devcb = &namco_51xx_device::set_output_0_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_NAMCO_51XX_OUTPUT_1_CB(_devcb) \
+	devcb = &namco_51xx_device::set_output_1_callback(*device, DEVCB2_##_devcb);
 
 class namco_51xx_device : public device_t
 {
 public:
 	namco_51xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~namco_51xx_device();
 
-	// access to legacy token
-	struct namco_51xx_state *token() const { assert(m_token != NULL); return m_token; }
+	template<class _Object> static devcb2_base &set_input_0_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_0.set_callback(object); }
+	template<class _Object> static devcb2_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_1.set_callback(object); }
+	template<class _Object> static devcb2_base &set_input_2_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_2.set_callback(object); }
+	template<class _Object> static devcb2_base &set_input_3_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_3.set_callback(object); }
+	
+	template<class _Object> static devcb2_base &set_output_0_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_out_0.set_callback(object); }
+	template<class _Object> static devcb2_base &set_output_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_out_1.set_callback(object); }
+	
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -37,7 +51,23 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	// internal state
-	struct namco_51xx_state *m_token;
+	required_device<mb88_cpu_device> m_cpu;
+	devcb2_read8 m_in_0;
+	devcb2_read8 m_in_1;
+	devcb2_read8 m_in_2;
+	devcb2_read8 m_in_3;
+	devcb2_write8 m_out_0;
+	devcb2_write8 m_out_1;
+	INT32 m_lastcoins;
+	INT32 m_lastbuttons;
+	INT32 m_credits;
+	INT32 m_coins[2];
+	INT32 m_coins_per_cred[2];
+	INT32 m_creds_per_coin[2];
+	INT32 m_in_count;
+	INT32 m_mode;
+	INT32 m_coincred_mode;
+	INT32 m_remap_joy;
 };
 
 extern const device_type NAMCO_51XX;
