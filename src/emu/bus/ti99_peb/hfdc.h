@@ -16,7 +16,7 @@
 
 #include "emu.h"
 #include "peribox.h"
-#include "machine/ti99/ti99_hd.h"
+#include "machine/ti99_hd.h"
 #include "machine/smc92x4.h"
 #include "machine/mm58274c.h"
 

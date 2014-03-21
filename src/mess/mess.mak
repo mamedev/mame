@@ -511,6 +511,9 @@ MACHINES += Z80PIO
 MACHINES += Z80SIO
 MACHINES += Z80STI
 MACHINES += Z8536
+MACHINES += SMC92X4
+MACHINES += TI99_HD
+MACHINES += STRATA
 
 #-------------------------------------------------
 # specify available bus cores
@@ -851,8 +854,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/applefdc.o  \
 	$(MESS_MACHINE)/microdrv.o  \
 	$(MESS_MACHINE)/smartmed.o  \
-	$(MESS_MACHINE)/smc92x4.o   \
-	$(MESS_MACHINE)/strata.o    \
 	$(MESS_MACHINE)/sonydriv.o  \
 	$(MESS_MACHINE)/z80bin.o    \
 
@@ -1858,7 +1859,6 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_MACHINE)/ti99/joyport.o  \
 	$(MESS_MACHINE)/ti99/mecmouse.o  \
 	$(MESS_MACHINE)/ti99/handset.o  \
-	$(MESS_MACHINE)/ti99/ti99_hd.o  \
 	$(MESS_MACHINE)/ti99/speech8.o  \
 	$(MESS_MACHINE)/ti99/mapper8.o  \
 	$(MESS_MACHINE)/ti99/genboard.o \

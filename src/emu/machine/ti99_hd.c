@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "harddisk.h"
-#include "machine/smc92x4.h"
+#include "smc92x4.h"
 
 #include "ti99_hd.h"
 

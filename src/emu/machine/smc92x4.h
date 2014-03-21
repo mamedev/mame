@@ -3,7 +3,7 @@
 #ifndef __SMC92X4_H__
 #define __SMC92X4_H__
 
-#include "ti99/ti99_hd.h"
+#include "ti99_hd.h"
 #include "imagedev/flopdrv.h"
 #include "formats/imageutl.h"
 #include "imagedev/harddriv.h"

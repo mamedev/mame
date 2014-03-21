@@ -180,7 +180,7 @@ CRUCLK*  51||52  DBIN
 #include "peribox.h"
 
 // MFM hard drives
-#include "machine/ti99/ti99_hd.h"
+#include "machine/ti99_hd.h"
 
 // The cards
 #include "ti_32kmem.h"

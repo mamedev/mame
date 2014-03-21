@@ -1811,3 +1811,30 @@ endif
 ifneq ($(filter AT_KEYBC,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/at_keybc.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/smc92x4.h,MACHINES += SMC92X4
+#-------------------------------------------------
+
+ifneq ($(filter SMC92X4,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/smc92x4.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/ti99_hd.h,MACHINES += TI99_HD
+#-------------------------------------------------
+
+ifneq ($(filter TI99_HD,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/ti99_hd.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/strata.h,MACHINES += STRATA
+#-------------------------------------------------
+
+ifneq ($(filter STRATA,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/strata.o
+endif
