@@ -281,17 +281,10 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 	soundlatch3_byte_w(space, 0, data);
 }
 
-void pgm_sound_irq( device_t *device, int level )
+WRITE_LINE_MEMBER(pgm_state::pgm_sound_irq)
 {
-	pgm_state *state = device->machine().driver_data<pgm_state>();
-	state->m_soundcpu->set_input_line(0, level);
+	m_soundcpu->set_input_line(0, state);
 }
-
-/*static const ics2115_interface pgm_ics2115_interface =
-{
-    sound_irq
-};*/
-
 
 /*** Memory Maps *************************************************************/
 
@@ -539,7 +532,8 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ICS2115_ADD("ics", 0, pgm_sound_irq)
+	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_IRQ_CB(WRITELINE(pgm_state, pgm_sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 

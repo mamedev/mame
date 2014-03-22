@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
+	DECLARE_WRITE_LINE_MEMBER(pgm_sound_irq);
 
 	DECLARE_DRIVER_INIT(pgm);
 

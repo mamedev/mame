@@ -187,6 +187,7 @@ public:
 	DECLARE_WRITE16_MEMBER(lhb_okibank_w);
 	DECLARE_READ16_MEMBER(ics2115_word_r);
 	DECLARE_WRITE16_MEMBER(ics2115_word_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(lhbv33c);
 	DECLARE_DRIVER_INIT(drgnwrldv21j);
 	DECLARE_DRIVER_INIT(wlcc);
@@ -4056,7 +4057,7 @@ MACHINE_CONFIG_END
 
 
 
-static void sound_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(igs011_state::sound_irq)
 {
 //   m_maincpu->set_input_line(3, state);
 }
@@ -4074,7 +4075,8 @@ static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_ICS2115_ADD("ics", 0, sound_irq)
+	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_IRQ_CB(WRITELINE(igs011_state, sound_irq))
 //  MCFG_SOUND_ADD("ics", ICS2115, 0)
 //  MCFG_SOUND_CONFIG(vbowl_ics2115_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)

@@ -17,16 +17,10 @@
 // device type definition
 const device_type ICS2115 = &device_creator<ics2115_device>;
 
-void ics2115_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
-{
-	ics2115_device &ics2115 = downcast<ics2115_device &>(device);
-	ics2115.m_irq_cb = irqf;
-}
-
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_irq_cb(NULL)
+		m_irq_cb(*this)
 {
 }
 
@@ -36,6 +30,8 @@ void ics2115_device::device_start()
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);
+	
+	m_irq_cb.resolve_safe();
 
 	//Exact formula as per patent 5809466
 	//This seems to give the ok fit but it is not good enough.
@@ -858,8 +854,8 @@ void ics2115_device::recalc_irq()
 	for(int i = 0; (!irq) && (i < 32); i++)
 		irq |=  m_voice[i].vol_ctrl.irq_pending && m_voice[i].osc_conf.irq_pending;
 	m_irq_on = irq;
-	if(m_irq_cb)
-		m_irq_cb(this, irq ? ASSERT_LINE : CLEAR_LINE);
+	if(!m_irq_cb.isnull())
+		m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
