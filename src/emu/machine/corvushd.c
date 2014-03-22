@@ -872,6 +872,13 @@ hard_disk_file *corvus_hdc_t::corvus_hdc_file(int id) {
 	static const char *const tags[] = {
 		"harddisk1", "harddisk2", "harddisk3", "harddisk4"
 	};
+
+	// we only support 4 drives, as per the tags[] table, so prevent a crash
+	if (id > 3)
+	{
+		return NULL;
+	}
+
 	harddisk_image_device *img = siblingdevice<harddisk_image_device>(tags[id]);
 
 	if ( !img )
