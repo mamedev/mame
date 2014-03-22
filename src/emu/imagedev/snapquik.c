@@ -59,9 +59,6 @@ TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
 	/* invoke the load */
 	m_load(*this, filetype(), length());
-
-	/* unload the device */
-	unload();
 }
 
 //-------------------------------------------------
