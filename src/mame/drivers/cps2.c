@@ -1166,65 +1166,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics layouts
- *
- *************************************/
-
-static const gfx_layout cps1_layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
-};
-
-static const gfx_layout cps1_layout8x8_2 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
-};
-
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ STEP16(0,4*16) },
-	4*16*16
-};
-
-static const gfx_layout layout32x32 =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4,
-		17*4, 16*4, 19*4, 18*4, 21*4, 20*4, 23*4, 22*4, 25*4, 24*4, 27*4, 26*4, 29*4, 28*4, 31*4, 30*4 },
-	{ STEP32(0,4*32) },
-	4*32*32
-};
-
-static GFXDECODE_START( cps2 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, layout16x16, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, layout32x32, 0, 0x100 )
-GFXDECODE_END
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -1269,7 +1210,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
          8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
         16MHz -> same as 8 but with a /2 divider; also a possibility
 */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state, cps2)

@@ -317,7 +317,6 @@ public:
 
 	/* cps video */
 	void cps1_get_video_base();
-	void cps1_gfx_decode();
 	void unshuffle(UINT64 *buf, int len);
 	void cps2_gfx_decode();
 	int gfxrom_bank_mapper(int type, int code);

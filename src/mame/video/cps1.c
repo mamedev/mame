@@ -1719,39 +1719,6 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 }
 
 
-
-void cps_state::cps1_gfx_decode()
-{
-	int size = memregion("gfx")->bytes();
-	int i, j, gfxsize;
-	UINT8 *cps1_gfx = memregion("gfx")->base();
-
-	gfxsize = size / 4;
-
-	for (i = 0; i < gfxsize; i++)
-	{
-		UINT32 src = cps1_gfx[4 * i] + (cps1_gfx[4 * i + 1] << 8) + (cps1_gfx[4 * i + 2] << 16) + (cps1_gfx[4 * i + 3] << 24);
-		UINT32 dwval = 0;
-
-		for (j = 0; j < 8; j++)
-		{
-			int n = 0;
-			UINT32 mask = (0x80808080 >> j) & src;
-
-			if (mask & 0x000000ff) n |= 1;
-			if (mask & 0x0000ff00) n |= 2;
-			if (mask & 0x00ff0000) n |= 4;
-			if (mask & 0xff000000) n |= 8;
-
-			dwval |= n << (j * 4);
-		}
-		cps1_gfx[4 *i    ] = dwval >> 0;
-		cps1_gfx[4 *i + 1] = dwval >> 8;
-		cps1_gfx[4 *i + 2] = dwval >> 16;
-		cps1_gfx[4 *i + 3] = dwval >> 24;
-	}
-}
-
 void cps_state::unshuffle( UINT64 *buf, int len )
 {
 	int i;
@@ -1775,6 +1742,7 @@ void cps_state::unshuffle( UINT64 *buf, int len )
 	}
 }
 
+
 void cps_state::cps2_gfx_decode()
 {
 	const int banksize = 0x200000;
@@ -1783,15 +1751,11 @@ void cps_state::cps2_gfx_decode()
 
 	for (i = 0; i < size; i += banksize)
 		unshuffle((UINT64 *)(memregion("gfx")->base() + i), banksize / 8);
-
-	cps1_gfx_decode();
 }
 
 
 DRIVER_INIT_MEMBER(cps_state,cps1)
 {
-	cps1_gfx_decode();
-
 	m_scanline1 = 0;
 	m_scanline2 = 0;
 	m_scancalls = 0;
