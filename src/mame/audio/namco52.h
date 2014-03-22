@@ -9,7 +9,7 @@
 #define MCFG_NAMCO_52XX_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_52XX, _clock)
 
-#define MCFG_NAMCO_52XX_DICRETE(_tag) \
+#define MCFG_NAMCO_52XX_DISCRETE(_tag) \
 	namco_52xx_device::set_discrete(*device, "^" _tag);
 
 #define MCFG_NAMCO_52XX_BASENODE(_node) \
