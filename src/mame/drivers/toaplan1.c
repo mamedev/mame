@@ -623,8 +623,8 @@ To Do:
 #define PIXEL_CLOCK         (XTAL_28MHz/4)
 
 /* freq      V Hz       H kHz
-Fire Shark   57.6132    14.82  -->  472.33 * 257.23
-Vimana       57.6125    14.78  -->  473.61 * 256.54
+Fire Shark   57.6132    14.82  -->  472.33 * 257.23 *note: H may be inaccurate
+Vimana       57.6125    14.78  -->  473.61 * 256.54 *note: H may be inaccurate
 
 ** earlier measurements from another pcb owner, why are some of these off by 2Hz???
 Hellfire     57.59      ?
@@ -633,11 +633,11 @@ Rally Bike   55.14      ?
 Vimana       55.14      ?
 
 */
-#define HTOTAL              (473)
+#define HTOTAL              (464)
 #define HBEND               (0)
 #define HBSTART             (320)
 
-#define VTOTAL              (257)
+#define VTOTAL              (262)
 #define VBEND               (0)
 #define VBSTART             (240)
 
