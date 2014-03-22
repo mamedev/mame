@@ -35,6 +35,7 @@ protected:
 		// device-level overrides
 		virtual void device_start();
 		virtual void device_reset();
+		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
 		int drv;                            /* 0 master, 1 slave drive */
 		int cylinders[2];       /* number of cylinders */
@@ -84,8 +85,8 @@ protected:
 		void get_drive();
 		void get_chsn();
 		int test_ready();
-		TIMER_CALLBACK_MEMBER(hdc_command);
 public:
+		void hdc_command();
 		void pc_hdc_data_w(int data);
 		void pc_hdc_reset_w(int data);
 		void pc_hdc_select_w(int data);

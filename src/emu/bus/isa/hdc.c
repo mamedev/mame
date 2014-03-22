@@ -171,7 +171,7 @@ void isa8_hdc_device::device_start()
 	m_isa->install_device(0x0320, 0x0323, 0, 0, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
 	m_isa->set_dma_channel(3, this, FALSE);
 	buffer.resize(17*4*512);
-	timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(isa8_hdc_device::hdc_command),this));
+	timer = timer_alloc();
 }
 
 //-------------------------------------------------
@@ -483,7 +483,7 @@ int isa8_hdc_device::test_ready()
 	return 1;
 }
 
-TIMER_CALLBACK_MEMBER(isa8_hdc_device::hdc_command)
+void isa8_hdc_device::hdc_command()
 {
 	int set_error_info = 1;
 	int old_error = error;          /* Previous error data is needed for CMD_SENSE */
@@ -584,6 +584,13 @@ TIMER_CALLBACK_MEMBER(isa8_hdc_device::hdc_command)
 	}
 	if(no_dma()) pc_hdc_result(set_error_info);
 }
+
+
+void isa8_hdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	hdc_command();
+}
+
 
 /*  Command format
  *  Bits     Description
