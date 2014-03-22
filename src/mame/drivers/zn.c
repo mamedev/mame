@@ -699,7 +699,7 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
@@ -715,7 +715,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
@@ -872,7 +872,7 @@ static MACHINE_CONFIG_DERIVED(coh3002c, zn2)
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 

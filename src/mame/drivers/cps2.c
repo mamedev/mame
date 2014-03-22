@@ -128,7 +128,7 @@ Notes:
 
       Custom IC's -
                    DL-030P - KABUKI Custom encrypted Z80, running at 8.000MHz, manufactured by VLSI
-                             Technology (DIP40)
+                             Technology (DIP40), INT frequency ~249.932Hz-250.070Hz
                              On most PCB's this is a regular Zilog Z80 (Z0840008PSC)
                    DL-1425 - CAPCOM-Q1 QSound Processor, DSP-16A (C) 92 AT&T, clock input of
                              60.000MHz (PLCC84)
@@ -1243,18 +1243,18 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 251)    /* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cps2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 518, 64, 448, 259, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1272,7 +1272,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps2)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps2)
+	MCFG_VIDEO_START_OVERRIDE(cps_state, cps2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
