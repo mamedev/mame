@@ -683,7 +683,9 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 
-	MCFG_AMIGA_KEYBOARD_ADD("kbd")
+	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
+	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, sp_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000ntsc, ntsc )
@@ -890,7 +892,9 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 
-	MCFG_AMIGA_KEYBOARD_ADD("kbd")
+	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
+	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, sp_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1200_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
@@ -998,7 +1002,9 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 
-	MCFG_AMIGA_KEYBOARD_ADD("kbd")
+	MCFG_DEVICE_ADD("kbd", AMIGAKBD, 0)
+	MCFG_AMIGA_KEYBOARD_KCLK_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, cnt_w))
+	MCFG_AMIGA_KEYBOARD_KDAT_CALLBACK(DEVWRITELINE("cia_0", legacy_mos6526_device, sp_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")

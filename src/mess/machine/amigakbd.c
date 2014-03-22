@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "includes/amiga.h"
 #include "amigakbd.h"
-#include "machine/6526cia.h"
 
 
 #define KEYBOARD_BUFFER_SIZE    256
@@ -20,7 +19,9 @@ const device_type AMIGAKBD = &device_creator<amigakbd_device>;
 //-------------------------------------------------
 
 amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AMIGAKBD, "Amiga Keyboard", tag, owner, clock, "amigakbd", __FILE__)
+	: device_t(mconfig, AMIGAKBD, "Amiga Keyboard", tag, owner, clock, "amigakbd", __FILE__),
+	m_write_kclk(*this),
+	m_write_kdat(*this)
 {
 }
 
@@ -30,6 +31,9 @@ amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag,
 
 void amigakbd_device::device_start()
 {
+	m_write_kclk.resolve_safe();
+	m_write_kdat.resolve_safe();
+
 	/* allocate a keyboard buffer */
 	m_buf = auto_alloc_array(machine(), UINT8, KEYBOARD_BUFFER_SIZE);
 	m_buf_pos = 0;
@@ -41,14 +45,13 @@ void amigakbd_device::device_start()
 void amigakbd_device::kbd_sendscancode(UINT8 scancode )
 {
 	int j;
-	device_t *cia = machine().device(":cia_0");
 
 	/* send over to the cia A */
 	for( j = 0; j < 8; j++ )
 	{
-		mos6526_cnt_w( cia, 0 );    /* lower cnt */
-		mos6526_sp_w( cia, BIT(scancode << j, 7) ); /* set the serial data */
-		mos6526_cnt_w( cia, 1 );    /* raise cnt */
+		m_write_kclk(0);    /* lower cnt */
+		m_write_kdat(BIT(scancode << j, 7)); /* set the serial data */
+		m_write_kclk(1);    /* raise cnt */
 	}
 }
 
