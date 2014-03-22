@@ -262,7 +262,7 @@ void dm7000_state::video_start()
 {
 }
 
-UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -323,9 +323,6 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
