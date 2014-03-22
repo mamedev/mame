@@ -27,7 +27,6 @@
 struct k053260_interface
 {
 	const char *rgnoverride;
-	timer_expired_func irq;         /* called on SH1 complete cycle ( clock / 32 ) */
 };
 
 

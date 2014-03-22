@@ -89,10 +89,6 @@ void k053260_device::device_start()
 		save_item(NAME(m_channels[i].ppcm), i);
 		save_item(NAME(m_channels[i].ppcm_data), i);
 	}
-
-	/* setup SH1 timer if necessary */
-	if ( m_intf->irq )
-		machine().scheduler().timer_pulse( attotime::from_hz(clock()) * 32, m_intf->irq, "m_intf->irq" );
 }
 
 
