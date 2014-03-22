@@ -132,7 +132,7 @@ public:
 	/* serial port */
 	UINT8 sp_r() { return m_sp; }
 	void sp_w(UINT8 state) { m_sp = state; }
-	DECLARE_WRITE_LINE_MEMBER( sp_w ) { cnt_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( sp_w ) { sp_w(state); }
 
 	/* flag */
 	void flag_w(UINT8 state);
