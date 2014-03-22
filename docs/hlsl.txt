@@ -8,9 +8,6 @@ yiq_enable              0/1             Enables YIQ-colorspace post-processing. 
                                         NTSC TV appearance on TV-based systems when configured
                                         properly.
 hlslpath                [path]          Path to the .fx files that are in use.  (default: hlsl)
-hlsl_ini_read           0/1             Enable HLSL INI reading.  (default: 0) 
-hlsl_ini_write          0/1             Enable HLSL INI writing.  (default: 0)
-hlslini             	%g              HLSL INI file name for running game.  (default: %g)
 hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
 hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
 hlsl_preset             -1 through 3    HLSL preset to use.  (default: -1)
