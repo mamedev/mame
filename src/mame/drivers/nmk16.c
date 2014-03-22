@@ -7404,6 +7404,31 @@ ROM_START( spec2k )
 	ROM_LOAD( "yonatech3.u106", 0x00000, 0x80000, CRC(6644c404) SHA1(b7ad3f9f08971432d024ef8be3fa3140f0bbae67) )
 ROM_END
 
+ROM_START( spec2kv )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg1", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "prg2", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 Code */
+	ROM_LOAD( "z80", 0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "sprites",0 ) /* Sprites, 16x16x4 */
+	ROM_LOAD( "uc1", 0x00000, 0x200000, CRC(3139a213) SHA1(5ec4be0e27cbf1c4556ab10d7e1408ea64aa9e17) )
+
+	ROM_REGION( 0x400000, "bgtile", 0 ) /* Layer 0, 16x16x8 */
+	ROM_LOAD( "uc3", 0x000000, 0x200000, CRC(1d087122) SHA1(9e82c5f26c1387c6006cbd9248b333921388146c) )
+	ROM_LOAD( "uc2", 0x200000, 0x200000, CRC(998dc05c) SHA1(cadf8bb0b8944372fbce9934b93684749ebc3ba0) )
+
+	ROM_REGION( 0x20000, "fgtile", ROMREGION_ERASEFF )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "fgtiles", 0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
+	ROM_LOAD( "samples1", 0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
+	ROM_LOAD( "samples2", 0x00000, 0x80000, NO_DUMP )
+ROM_END
+
 /***************************************************************************
     1995, Afega
 
@@ -7559,6 +7584,7 @@ GAME( 2000, mangchi,  0,        popspops, mangchi, nmk16_state,    bubl2000, ROT
 
 // these two are very similar games, but the exact parent/clone relationship is unknown
 GAME( 2000, spec2k,   0,        firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (Euro)", 0 )
+GAME( 2000, spec2kv,  spec2k,   firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", 0 )
 GAME( 2001, firehawk, 0,        firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
