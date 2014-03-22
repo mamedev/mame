@@ -59,6 +59,8 @@ class c65_state : public driver_device
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_cia0(*this, "cia_0"),
+			m_cia1(*this, "cia_1"),
 			m_iec(*this, CBM_IEC_TAG),
 			m_colorram(*this, "colorram"),
 			m_basic(*this, "basic"),
@@ -70,6 +72,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
+	required_device<mos6526_device> m_cia0;
+	required_device<mos6526_device> m_cia1;
 	optional_device<cbm_iec_device> m_iec;
 
 	required_shared_ptr<UINT8> m_colorram;

@@ -11,7 +11,6 @@
 #include "includes/amiga.h"
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
-#include "machine/6526cia.h"
 
 const device_type AMIGA_FDC = &device_creator<amiga_fdc>;
 
