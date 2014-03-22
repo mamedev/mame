@@ -615,7 +615,7 @@ Notes:
       93C46  - 128Bytes EEPROM
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 45570 9420S 40 (C)92 AT&T (PLCC84)
-      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208)
+      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? sound effect?
       Z80 clock - 4.000MHz(?) but Z80 chip label is rated at 8MHz and some music effects(portamento, vibrato) are wrong at 4MHz 
 
       Unpopulated sockets - 1.3B, 2.2E, 3.3E, 8.2K, 9.3K, 10.4K, 11.5K, 12.6K & 13.7K
@@ -834,7 +834,7 @@ Notes:
       93C46  - 128Bytes EEPROM
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 11008 9741T 74 (C)92 LUCENT (PLCC84)
-      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208)
+      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? sound effect?
       Z80 clock - 4.000MHz(?) but Z80 chip label is rated at 8MHz and some music effects(portamento, vibrato) are wrong at 4MHz 
       ROMs      -
                   SFEX2
