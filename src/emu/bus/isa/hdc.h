@@ -84,9 +84,8 @@ protected:
 		void get_drive();
 		void get_chsn();
 		int test_ready();
-		static TIMER_CALLBACK(pc_hdc_command);
+		TIMER_CALLBACK_MEMBER(hdc_command);
 public:
-		void hdc_command();
 		void pc_hdc_data_w(int data);
 		void pc_hdc_reset_w(int data);
 		void pc_hdc_select_w(int data);
