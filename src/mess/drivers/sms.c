@@ -21,6 +21,16 @@
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
    that has software support (at least a test tool made by Charles MacDonald)
+ - Figure out how korean SMS versions have support for the Light Phaser gun
+
+ Light Phaser support of korean SMS consoles is shown in some korean adverts:
+ www.smspower.org/forums/viewtopic.php?p=45903#45903
+ The support requires read of TH input state through the 2 upper bits of
+ port $dd. Because the korean driver is set to Japan region, it behaves like
+ the japanese SMS, which sets those bits with TH direction state, not input.
+ The first korean SMS is derivered from the japanese SMS, but only the units
+ with plug-in AC adaptor have the FM chip. Games only play FM sound when detect
+ the japanese region by testing how the 2 upper bits of port $dd behave.
 
  The Game Gear SIO hardware is not emulated but has some
  placeholders in 'machine/sms.c'
@@ -757,6 +767,14 @@ static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
 
+	// Mark III does not have TH connected. Also, according with Enri's docs
+	// (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm), the Japanese SMS
+	// only allows read of TH direction, through port $dd, not its input state.
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -764,12 +782,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
-
-	// Mark III does not have TH input
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
 
 	MCFG_DEVICE_REMOVE("slot")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)

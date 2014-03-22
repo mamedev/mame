@@ -86,7 +86,8 @@ void sms_state::sms_get_inputs( address_space &space )
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
 	// Sega Mark III does not have TH line connected.
-	if (!m_is_mark_iii)
+	// Also, the japanese Master System does not set port $dd with TH input.
+	if (!m_is_region_japan)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -268,17 +269,29 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 
 	sms_get_inputs(space);
 
-	// Reset Button
-	if ( m_port_reset )
-	{
-		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
-	}
-
 	// Check if TR of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x04))
 	{
 		// Read TR state set through IO control port
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
+	}
+
+	if (m_is_region_japan)
+	{
+		// For japanese Master System, set upper 4 bits with TH/TR
+		// direction bits of IO control register, according to Enri's
+		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
+		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
+		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
+		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);
+		m_port_dd_reg &= ~0x80 | ((m_io_ctrl_reg & 0x08) << 4);
+		return m_port_dd_reg;
+	}
+
+	// Reset Button
+	if ( m_port_reset )
+	{
+		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
 	}
 
 	// Check if TH of controller port 1 is set to output (0)
@@ -334,8 +347,8 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 
 READ8_MEMBER(sms_state::gg_input_port_2_r)
 {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80)), activecpu_get_pc());
-	return ((m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80));
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", (m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80), activecpu_get_pc());
+	return (m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
 }
 
 
