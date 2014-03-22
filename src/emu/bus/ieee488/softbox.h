@@ -18,7 +18,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
-#include "includes/corvushd.h"
+#include "machine/corvushd.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

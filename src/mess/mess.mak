@@ -514,6 +514,7 @@ MACHINES += Z8536
 MACHINES += SMC92X4
 MACHINES += TI99_HD
 MACHINES += STRATA
+MACHINES += CORVUSHD
 
 #-------------------------------------------------
 # specify available bus cores
@@ -1112,7 +1113,6 @@ $(MESSOBJ)/concept.a:           \
 	$(MESS_DRIVERS)/concept.o   \
 	$(MESS_MACHINE)/concept.o   \
 	$(MESS_MACHINE)/concept_exp.o   \
-	$(MESS_MACHINE)/corvushd.o  \
 
 $(MESSOBJ)/conitec.a:           \
 	$(MESS_DRIVERS)/prof80.o    \

@@ -1838,3 +1838,12 @@ endif
 ifneq ($(filter STRATA,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/strata.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/corvushd.h,MACHINES += CORVUSHD
+#-------------------------------------------------
+ifneq ($(filter CORVUSHD,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/corvushd.o
+endif
+

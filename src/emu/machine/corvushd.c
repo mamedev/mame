@@ -64,7 +64,7 @@
 
 #include "emu.h"
 #include "imagedev/harddriv.h"
-#include "includes/corvushd.h"
+#include "machine/corvushd.h"
 #include <ctype.h>
 
 
