@@ -13,7 +13,7 @@
   never have been finished.
   
   TODO:
-  - hook up the DSP
+  - hook up the DSP!
   - is master volume really linear?
   - understand higher bits of reg 0
   - understand reg 9
@@ -111,7 +111,7 @@ void qsound_device::device_start()
 	m_sample_rom = (INT8*)*region();
 	m_sample_rom_length = region()->bytes();
 
-	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider
+	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider?
 
 	// create pan table
 	for (int i = 0; i < 33; i++)

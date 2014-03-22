@@ -11,7 +11,7 @@
 
 #include "cpu/dsp16/dsp16.h"
 
-#define QSOUND_CLOCK 4000000    /* default 4MHz clock */
+#define QSOUND_CLOCK 4000000    /* default 4MHz clock (60MHz/15?) */
 
 
 //**************************************************************************
