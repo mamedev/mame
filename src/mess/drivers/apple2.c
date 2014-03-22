@@ -210,6 +210,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "bus/a2bus/a2applicard.h"
 #include "bus/a2bus/a2ultraterm.h"
 #include "bus/a2bus/a2pic.h"
+#include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
@@ -997,6 +998,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
 	SLOT_INTERFACE("aevm80", A2BUS_VTC2)    /* Applied Engineering ViewMaster 80 */
 	SLOT_INTERFACE("parallel", A2BUS_PIC)	/* Apple Parallel Interface Card */
+	SLOT_INTERFACE("corvus", A2BUS_CORVUS)	/* Corvus flat-cable HDD interface (must go in slot 6) */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

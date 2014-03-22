@@ -651,6 +651,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2pic.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2estd80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2corvus.o
 endif
 
 #-------------------------------------------------
