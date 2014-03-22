@@ -726,16 +726,14 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 	}
 }
 
-static int x68k_fdc_read_byte(running_machine &machine,int addr)
+READ8_MEMBER(x68k_state::fdc_read_byte)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	return state->m_fdc.fdc->dma_r();
+	return m_fdc.fdc->dma_r();
 }
 
-static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
+WRITE8_MEMBER(x68k_state::fdc_write_byte)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	return state->m_fdc.fdc->dma_w(data);
+	return m_fdc.fdc->dma_w(data);
 }
 
 WRITE_LINE_MEMBER( x68k_state::fdc_drq )
@@ -1157,36 +1155,33 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 	}
 }
 
-static void x68k_dma_irq(running_machine &machine, int channel)
+void x68k_state::dma_irq(int channel)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_current_vector[3] = state->m_hd63450->get_vector(channel);
-	state->m_current_irq_line = 3;
-	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->m_current_vector[3]);
-	state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
+	m_current_vector[3] = m_hd63450->get_vector(channel);
+	m_current_irq_line = 3;
+	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,m_current_vector[3]);
+	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 }
 
-static void x68k_dma_end(running_machine &machine, int channel,int irq)
+WRITE8_MEMBER(x68k_state::dma_end)
 {
-	if(irq != 0)
+	if(data != 0)
 	{
-		x68k_dma_irq(machine, channel);
+		dma_irq(offset);
 	}
-	if(channel == 0)
+	if(offset == 0)
 	{
-		x68k_state *state = machine.driver_data<x68k_state>();
-		state->m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
+		m_fdc_tc->adjust(attotime::from_usec(1), 0, attotime::never);
 	}
 }
 
-static void x68k_dma_error(running_machine &machine, int channel, int irq)
+WRITE8_MEMBER(x68k_state::dma_error)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	if(irq != 0)
+	if(data != 0)
 	{
-		state->m_current_vector[3] = state->m_hd63450->get_error_vector(channel);
-		state->m_current_irq_line = 3;
-		state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
+		m_current_vector[3] = m_hd63450->get_error_vector(offset);
+		m_current_irq_line = 3;
+		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 	}
 }
 
@@ -1411,12 +1406,6 @@ static const hd63450_interface dmac_interface =
 	"maincpu",  // CPU - 68000
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
-	x68k_dma_end,
-	x68k_dma_error,
-	{ x68k_fdc_read_byte, 0, 0, 0 },
-	{ x68k_fdc_write_byte, 0, 0, 0 }
-//  { 0, 0, 0, 0 },
-//  { 0, 0, 0, 0 }
 };
 
 static const okim6258_interface x68k_okim6258_interface =
@@ -1897,7 +1886,12 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 
-	MCFG_HD63450_ADD( "hd63450", dmac_interface )
+	MCFG_DEVICE_ADD( "hd63450", HD63450, 0 )
+	MCFG_DEVICE_CONFIG(dmac_interface)
+	MCFG_HD63450_DMA_END_CB(WRITE8(x68k_state, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(x68k_state, dma_error))
+	MCFG_HD63450_DMA_READ_0_CB(READ8(x68k_state, fdc_read_byte))
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(x68k_state, fdc_write_byte))
 
 	MCFG_DEVICE_ADD( "scc", SCC8530, 5000000 )
 

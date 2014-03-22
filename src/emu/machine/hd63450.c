@@ -10,7 +10,17 @@ const device_type HD63450 = &device_creator<hd63450_device>;
 
 hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, HD63450, "Hitachi HD63450", tag, owner, clock, "hd63450", __FILE__),
-	m_cpu(NULL)
+		m_dma_end(*this),
+		m_dma_error(*this),
+		m_dma_read_0(*this),
+		m_dma_read_1(*this),
+		m_dma_read_2(*this),
+		m_dma_read_3(*this),
+		m_dma_write_0(*this),
+		m_dma_write_1(*this),
+		m_dma_write_2(*this),
+		m_dma_write_3(*this),
+		m_cpu(NULL)
 {
 	for (int i = 0; i < 4; i++)
 		{
@@ -51,6 +61,18 @@ void hd63450_device::device_start()
 	// get the CPU device
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	assert(m_cpu != NULL);
+	
+	// resolve callbacks
+	m_dma_end.resolve();
+	m_dma_error.resolve_safe();
+	m_dma_read_0.resolve();
+	m_dma_read_1.resolve();
+	m_dma_read_2.resolve();
+	m_dma_read_3.resolve();
+	m_dma_write_0.resolve();
+	m_dma_write_1.resolve();
+	m_dma_write_2.resolve();
+	m_dma_write_3.resolve();
 	
 	// Initialise timers and registers
 	for (int x = 0; x < 4 ; x++)
@@ -147,7 +169,7 @@ WRITE16_MEMBER(hd63450_device::write)
 		if(ACCESSING_BITS_0_7)
 		{
 			m_reg[channel].ccr = data & 0x00ff;
-			if((data & 0x0080))// && !dma_read[channel] && !dma_write[channel])
+			if((data & 0x0080))// && !m_dma_read[channel] && !m_dma_write[channel])
 				dma_transfer_start(channel,0);
 			if(data & 0x0010)  // software abort
 				dma_transfer_abort(channel);
@@ -300,9 +322,33 @@ void hd63450_device::single_transfer(int x)
 		{
 			if(m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 			{
-				if(dma_read[x])
+				if((x == 0) && !m_dma_read_0.isnull())
 				{
-					data = dma_read[x](machine(),m_reg[x].mar);
+					data = m_dma_read_0(m_reg[x].mar);
+					if(data == -1)
+						return;  // not ready to receive data
+					space.write_byte(m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 1) && !m_dma_read_1.isnull())
+				{
+					data = m_dma_read_1(m_reg[x].mar);
+					if(data == -1)
+						return;  // not ready to receive data
+					space.write_byte(m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 2) && !m_dma_read_2.isnull())
+				{
+					data = m_dma_read_2(m_reg[x].mar);
+					if(data == -1)
+						return;  // not ready to receive data
+					space.write_byte(m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 3) && !m_dma_read_3.isnull())
+				{
+					data = m_dma_read_3(m_reg[x].mar);
 					if(data == -1)
 						return;  // not ready to receive data
 					space.write_byte(m_reg[x].mar,data);
@@ -340,10 +386,28 @@ void hd63450_device::single_transfer(int x)
 			}
 			else  // memory -> device
 			{
-				if(dma_write[x])
+				if((x == 0) && !m_dma_write_0.isnull())
 				{
 					data = space.read_byte(m_reg[x].mar);
-					dma_write[x](machine(), m_reg[x].mar,data);
+					m_dma_write_0((offs_t)m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 1) && !m_dma_write_1.isnull())
+				{
+					data = space.read_byte(m_reg[x].mar);
+					m_dma_write_1((offs_t)m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 2) && !m_dma_write_2.isnull())
+				{
+					data = space.read_byte(m_reg[x].mar);
+					m_dma_write_2((offs_t)m_reg[x].mar,data);
+					datasize = 1;
+				}
+				else if((x == 3) && !m_dma_write_3.isnull())
+				{
+					data = space.read_byte(m_reg[x].mar);
+					m_dma_write_3((offs_t)m_reg[x].mar,data);
 					datasize = 1;
 				}
 				else
@@ -417,8 +481,8 @@ void hd63450_device::single_transfer(int x)
 					m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				}
 
-				if(dma_end)
-					dma_end(machine(),x,m_reg[x].ccr & 0x08);
+				if(!m_dma_end.isnull())
+					m_dma_end((offs_t)x, m_reg[x].ccr & 0x08);
 			}
 		}
 }

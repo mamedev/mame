@@ -247,6 +247,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
+	
+	//dmac
+	void dma_irq(int channel);
+	DECLARE_WRITE8_MEMBER(dma_end);
+	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_READ8_MEMBER(fdc_read_byte);
+	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 
 	int x68k_read_mouse();
 	void x68k_set_adpcm();
