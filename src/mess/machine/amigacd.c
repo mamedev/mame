@@ -13,7 +13,6 @@ DMAC controller.
 #include "includes/amiga.h"
 #include "amigacd.h"
 #include "machine/6525tpi.h"
-#include "machine/6526cia.h"
 #include "imagedev/chd_cd.h"
 #include "machine/matsucd.h"
 
