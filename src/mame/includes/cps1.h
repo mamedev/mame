@@ -1,3 +1,9 @@
+/***************************************************************************
+
+   Capcom CPS1/2 hardware
+
+***************************************************************************/
+
 #ifndef _CPS1_H_
 #define _CPS1_H_
 
@@ -6,6 +12,21 @@
 #include "sound/okim6295.h"
 #include "machine/timekpr.h"
 #include "cpu/m68000/m68000.h"
+
+// Video raw params
+// measured clocks:
+// CPS2(Guru): V = 59.6376Hz, H = 15,4445kHz *H is probably measured too low!
+// CPS1 GNG: V = 59.61Hz
+#define CPS_PIXEL_CLOCK  (XTAL_16MHz/2)
+
+#define CPS_HTOTAL       (512)
+#define CPS_HBEND        (64)
+#define CPS_HBSTART      (448)
+
+#define CPS_VTOTAL       (262)
+#define CPS_VBEND        (16)
+#define CPS_VBSTART      (240)
+
 
 struct gfx_range
 {

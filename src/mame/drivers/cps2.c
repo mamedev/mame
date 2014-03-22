@@ -125,6 +125,7 @@ Notes:
       PAL4      - MMI PAL16L8 (DIP20, stamped 'BGSA1')
       PAL5      - MMI PAL16L8 (DIP20, stamped 'BGSA2')
       VSync     - 59.6388Hz
+      HSync     - 15,4445kHz
 
       Custom IC's -
                    DL-030P - KABUKI Custom encrypted Z80, running at 8.000MHz, manufactured by VLSI
@@ -596,9 +597,9 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
-#include "sound/okim6295.h" // gigaman2 bootleg
+#include "sound/okim6295.h"
 
-#include "includes/cps1.h"       /* External CPS1 definitions */
+#include "includes/cps1.h" // External CPS1 definitions
 
 
 /*************************************
@@ -1195,21 +1196,11 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 518, 64, 448, 259, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_SCREEN_PALETTE("palette")
-/*
-    Measured clocks:
-        V = 59.6376Hz
-        H = 15.4445kHz
-        H/V = 258.973 ~ 259 lines
 
-    Possible video clocks:
-        60MHz / 15.4445kHz = 3884.878 / 8 = 485.610 -> unlikely
-         8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
-        16MHz -> same as 8 but with a /2 divider; also a possibility
-*/
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
