@@ -613,6 +613,7 @@ mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, d
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(TYPE_6526),
+		m_tod_clock(0),
 		m_write_irq(*this),
 		m_write_pc(*this),
 		m_write_cnt(*this),

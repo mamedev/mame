@@ -581,12 +581,18 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_QUICKLOAD_ADD("quickload", c65_state, cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
-	MCFG_MOS6526_ADD("cia_0", 3500000, 60, WRITELINE(c65_state, c65_cia0_interrupt))
-	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia0_port_a_r), NULL)
-	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c65_state, c65_cia0_port_b_r), WRITE8(c65_state, c65_cia0_port_b_w), NULL)
+	MCFG_DEVICE_ADD("cia_0", MOS6526, 3500000)
+	MCFG_MOS6526_TOD(60)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia0_interrupt))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_a_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c65_state, c65_cia0_port_b_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia0_port_b_w))
 
-	MCFG_MOS6526_ADD("cia_1", 3500000, 60, WRITELINE(c65_state, c65_cia1_interrupt))
-	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia1_port_a_r), WRITE8(c65_state, c65_cia1_port_a_w))
+	MCFG_DEVICE_ADD("cia_1", MOS6526, 3500000)
+	MCFG_MOS6526_TOD(60)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(NULL)
@@ -616,14 +622,11 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_MOS6526_ADD("cia_0", 3500000, 50, WRITELINE(c65_state, c65_cia0_interrupt))
-	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia0_port_a_r), NULL)
-	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c65_state, c65_cia0_port_b_r), WRITE8(c65_state, c65_cia0_port_b_w), NULL)
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_MOS6526_TOD(50)
 
-	MCFG_MOS6526_ADD("cia_1", 3500000, 50, WRITELINE(c65_state, c65_cia1_interrupt))
-	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c65_state, c65_cia1_port_a_r), WRITE8(c65_state, c65_cia1_port_a_w))
+	MCFG_DEVICE_MODIFY("cia_1")
+	MCFG_MOS6526_TOD(50)
 MACHINE_CONFIG_END
 
 
