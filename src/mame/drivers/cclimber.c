@@ -1274,7 +1274,7 @@ ROM_START( ccbootmr )  /* Model Racing bootleg */
 
 	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
 	ROM_LOAD( "213.r4",       0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
-	ROM_LOAD( "212.n4 ",      0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+	ROM_LOAD( "212.n4",       0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
 
