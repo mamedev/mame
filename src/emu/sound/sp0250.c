@@ -46,7 +46,8 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 		m_RNG(0),
 		m_stream(NULL),
 		m_voiced(0),
-		m_fifo_pos(0)
+		m_fifo_pos(0),
+		m_drq(*this)
 {
 	for (int i = 0; i < 15; i++)
 	{
@@ -63,37 +64,16 @@ sp0250_device::sp0250_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sp0250_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const sp0250_interface *intf = reinterpret_cast<const sp0250_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<sp0250_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void sp0250_device::device_start()
 {
-	const sp0250_interface *intf = reinterpret_cast<const sp0250_interface *>(static_config());
-
 	m_RNG = 1;
-	m_drq = ( intf!= NULL) ? m_drq_callback : NULL;
-	if (m_drq != NULL)
+	m_drq.resolve_safe();
+	if (!m_drq.isnull())
 	{
-		m_drq(this, ASSERT_LINE);
+		m_drq( ASSERT_LINE);
 		machine().scheduler().timer_pulse(attotime::from_hz(clock()) * CLOCK_DIVIDER, timer_expired_delegate(FUNC(sp0250_device::timer_tick), this));
 	}
 
@@ -159,8 +139,7 @@ void sp0250_device::load_values()
 	m_filter[5].B = sp0250_gc(m_fifo[13]);
 	m_filter[5].F = sp0250_gc(m_fifo[14]);
 	m_fifo_pos = 0;
-	if (m_drq != NULL)
-		m_drq(this, ASSERT_LINE);
+	m_drq(ASSERT_LINE);
 
 	m_pcount = 0;
 	m_rcount = 0;
@@ -182,8 +161,8 @@ WRITE8_MEMBER( sp0250_device::write )
 	if (m_fifo_pos != 15)
 	{
 		m_fifo[m_fifo_pos++] = data;
-		if (m_fifo_pos == 15 && m_drq != NULL)
-			m_drq(this, CLEAR_LINE);
+		if (m_fifo_pos == 15)
+			m_drq(CLEAR_LINE);
 	}
 	else
 		logerror("%s: overflow SP0250 FIFO\n", machine().describe_context());

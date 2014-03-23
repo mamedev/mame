@@ -3,26 +3,20 @@
 #ifndef __SP0250_H__
 #define __SP0250_H__
 
-
-struct sp0250_interface {
-	void (*m_drq_callback)(device_t *device, int state);
-};
-
-
 class sp0250_device : public device_t,
-									public device_sound_interface,
-									public sp0250_interface
+									public device_sound_interface
 {
 public:
 	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sp0250_device() {}
+
+	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<sp0250_device &>(device).m_drq.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	UINT8 drq_r();
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
@@ -40,7 +34,7 @@ private:
 	int m_voiced;
 	UINT8 m_fifo[15];
 	int m_fifo_pos;
-	void (*m_drq)(device_t *device, int state);
+	devcb2_write_line m_drq;
 
 	struct
 	{
@@ -53,6 +47,10 @@ private:
 };
 
 extern const device_type SP0250;
+
+#define MCFG_SP0250_DRQ_CALLBACK(_write) \
+	devcb = &sp0250_device::set_drq_callback(*device, DEVCB2_##_write);
+
 
 
 #endif /* __SP0250_H__ */
