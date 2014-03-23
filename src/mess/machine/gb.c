@@ -207,8 +207,9 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	save_gb_base();
 	save_sgb_only();
 
-	if (m_cartslot && m_cartslot->get_sgb_hack())
-		machine().device<sgb_lcd_device>("lcd")->set_sgb_hack(TRUE);
+	if (m_cartslot && m_cartslot->get_sgb_hack()) {
+		dynamic_cast<sgb_lcd_device*>(m_lcd.target())->set_sgb_hack(TRUE);
+	}
 }
 
 MACHINE_RESET_MEMBER(gb_state,gb)
@@ -346,7 +347,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 		//printf("here again?\n");
 	}
 	else
-		machine().device<gb_lcd_device>("lcd")->video_w(space, offset, data);
+		m_lcd->video_w(space, offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -454,7 +455,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									m_sgb_controller_mode = 2;
 								break;
 							default:
-								machine().device<sgb_lcd_device>("lcd")->sgb_io_write_pal(sgb_data[0] >> 3, &sgb_data[0]);
+								dynamic_cast<sgb_lcd_device*>(m_lcd.target())->sgb_io_write_pal(sgb_data[0] >> 3, &sgb_data[0]);
 								break;
 						}
 						m_sgb_start = 0;
@@ -632,7 +633,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 		default:
 			break;
 	}
-	machine().device<cgb_lcd_device>("lcd")->video_w(space, offset, data);
+	m_lcd->video_w(space, offset, data);
 }
 
 READ8_MEMBER(gb_state::gbc_io2_r)
@@ -648,7 +649,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	default:
 		break;
 	}
-	return machine().device<cgb_lcd_device>("lcd")->video_r(space, offset);
+	return m_lcd->video_r(space, offset);
 }
 
 /****************************************************************************
@@ -718,7 +719,7 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	{
 		offset ^= 0x0C;
 	}
-	data = machine().device<gb_lcd_device>("lcd")->video_r(space, offset);
+	data = m_lcd->video_r(space, offset);
 	if ( offset )
 		return data;
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
@@ -734,7 +735,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 	{
 		offset ^= 0x0C;
 	}
-	machine().device<gb_lcd_device>("lcd")->video_w(space, offset, data);
+	m_lcd->video_w(space, offset, data);
 }
 
 /* Map megaduck audio offset to game boy audio offsets */
