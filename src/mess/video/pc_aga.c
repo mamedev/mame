@@ -3,10 +3,10 @@
  * video/pc_aga.c
  *
  ****************************************************************************/
-
+#define CGA_PALETTE_SETS 83 /* one for colour, one for mono, * 81 for colour composite */
+				 
 #include "emu.h"
 #include "video/pc_aga.h"
-#include "video/pc_cga.h"
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
 #include "video/cgapal.h"
@@ -688,13 +688,13 @@ VIDEO_START( pc_aga )
 	switch(buswidth)
 	{
 		case 8:
-			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w) );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w) );
 			spaceio.install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
 			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w) );
 			break;
 
 		case 16:
-			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w), 0xffff );
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w), 0xffff );
 			spaceio.install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
 			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc_aga_cga_r), FUNC(pc_aga_cga_w), 0xffff );
 			break;
@@ -719,14 +719,14 @@ VIDEO_START( pc200 )
 	int buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
-		case 8:
-			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w) );
+		case 8:			
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w) );
 			spaceio.install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w) );
 			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w) );
 			break;
 
-		case 16:
-			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc_aga_videoram_r), FUNC(pc_aga_videoram_w), 0xffff );
+		case 16:			
+			space.install_legacy_readwrite_handler(0xb0000, 0xbffff, FUNC(pc200_videoram_r), FUNC(pc200_videoram_w), 0xffff );
 			spaceio.install_legacy_readwrite_handler(0x3b0, 0x3bf, FUNC(pc_aga_mda_r), FUNC(pc_aga_mda_w), 0xffff );
 			spaceio.install_legacy_readwrite_handler(0x3d0, 0x3df, FUNC(pc200_cga_r),  FUNC(pc200_cga_w), 0xffff );
 			break;
