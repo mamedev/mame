@@ -793,9 +793,6 @@ static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 	MCFG_CPU_IO_MAP(tetriskr_io)
 
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", filetto_isa8_cards, "tetriskr", true)
-	//MCFG_DEVICE_MODIFY("screen")
-	//MCFG_VIDEO_START(pc_cga_superimpose)
-	//MCFG_SCREEN_UPDATE_DRIVER(pcxt_state, screen_update_tetriskr)
 
 	MCFG_DEVICE_REMOVE("voice")
 MACHINE_CONFIG_END

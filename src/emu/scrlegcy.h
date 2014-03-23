@@ -17,8 +17,6 @@
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define SCREEN_UPDATE32_CALL(name)      SCREEN_UPDATE_NAME(name)(NULL, screen, bitmap, cliprect)
-
 #define MCFG_SCREEN_UPDATE_STATIC(_func) \
 	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 
