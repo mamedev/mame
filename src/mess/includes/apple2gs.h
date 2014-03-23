@@ -260,10 +260,9 @@ public:
 	DECLARE_WRITE8_MEMBER( apple2gs_E12xxx_w );
 	DECLARE_WRITE8_MEMBER( apple2gs_slowmem_w );
 	DECLARE_READ8_MEMBER(apple2gs_bank_echo_r);
+	DECLARE_WRITE_LINE_MEMBER( apple2gs_doc_irq);
+	DECLARE_READ8_MEMBER(apple2gs_adc_read);
+
 };
-
-
-/*----------- defined in machine/apple2gs.c -----------*/
-void apple2gs_doc_irq(device_t *device, int state);
 
 #endif /* APPLE2GS_H_ */

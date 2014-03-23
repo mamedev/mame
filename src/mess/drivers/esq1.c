@@ -409,6 +409,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
+	DECLARE_WRITE_LINE_MEMBER(esq1_doc_irq);
+	DECLARE_READ8_MEMBER(esq1_adc_read);
+
 	int m_mapper_state;
 	int m_seq_bank;
 	UINT8 m_seqram[0x10000];
@@ -420,11 +423,11 @@ public:
 };
 
 
-static void esq1_doc_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
 {
 }
 
-static UINT8 esq1_adc_read(device_t *device)
+READ8_MEMBER(esq1_state::esq1_adc_read)
 {
 	return 0x00;
 }
@@ -601,7 +604,11 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ES5503_ADD("es5503", 7000000, 8, esq1_doc_irq, esq1_adc_read)
+	MCFG_ES5503_ADD("es5503", 7000000)
+	MCFG_ES5503_OUTPUT_CHANNELS(8)
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(esq1_state, esq1_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(esq1_state, esq1_adc_read))
+	
 	MCFG_SOUND_ROUTE_EX(0, "filters", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "filters", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "filters", 1.0, 2)

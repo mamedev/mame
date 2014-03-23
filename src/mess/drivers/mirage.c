@@ -77,6 +77,8 @@ public:
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
+	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
+	DECLARE_READ8_MEMBER(mirage_adc_read);
 
 	UINT8 m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
@@ -90,12 +92,12 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-static void mirage_doc_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(mirage_state::mirage_doc_irq)
 {
 //    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-static UINT8 mirage_adc_read(device_t *device)
+READ8_MEMBER(mirage_state::mirage_adc_read)
 {
 	return 0x00;
 }
@@ -209,7 +211,11 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ES5503_ADD("es5503", 7000000, 2, mirage_doc_irq, mirage_adc_read)
+	MCFG_ES5503_ADD("es5503", 7000000)
+	MCFG_ES5503_OUTPUT_CHANNELS(2)
+	MCFG_ES5503_IRQ_FUNC(WRITELINE(mirage_state, mirage_doc_irq))
+	MCFG_ES5503_ADC_FUNC(READ8(mirage_state, mirage_adc_read))
+	
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

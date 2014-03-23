@@ -66,8 +66,8 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("es5503_samples", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(es5503)),
-		m_irq_func(NULL),
-		m_adc_func(NULL)
+		m_irq_func(*this),
+		m_adc_func(*this)
 {
 }
 
@@ -90,18 +90,6 @@ void es5503_device::static_set_channels(device_t &device, int channels)
 {
 	es5503_device &es5503 = downcast<es5503_device &>(device);
 	es5503.output_channels = channels;
-}
-
-void es5503_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
-{
-	es5503_device &es5503 = downcast<es5503_device &>(device);
-	es5503.m_irq_func = irqf;
-}
-
-void es5503_device::static_set_adcf(device_t &device, UINT8 (*adcf)(device_t *device))
-{
-	es5503_device &es5503 = downcast<es5503_device &>(device);
-	es5503.m_adc_func = adcf;
 }
 
 //-------------------------------------------------
@@ -157,10 +145,7 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 	{
 		pOsc->irqpend = 1;
 
-		if (m_irq_func)
-		{
-			m_irq_func(this, 1);
-		}
+		m_irq_func(1);
 	}
 }
 
@@ -248,6 +233,9 @@ void es5503_device::device_start()
 	// find our direct access
 	m_direct = &space().direct();
 
+	m_irq_func.resolve_safe();
+	m_adc_func.resolve_safe(0);
+	
 	rege0 = 0xff;
 
 	for (osc = 0; osc < 32; osc++)
@@ -346,10 +334,7 @@ READ8_MEMBER( es5503_device::read )
 			case 0xe0:  // interrupt status
 				retval = rege0;
 
-				if (m_irq_func)
-				{
-					m_irq_func(this, 0);
-				}
+				m_irq_func(0);
 
 				// scan all oscillators
 				for (i = 0; i < oscsenabled+1; i++)
@@ -372,10 +357,7 @@ READ8_MEMBER( es5503_device::read )
 				{
 					if (oscillators[i].irqpend)
 					{
-						if (m_irq_func)
-						{
-							m_irq_func(this, 1);
-						}
+						m_irq_func(1);
 						break;
 					}
 				}
@@ -386,11 +368,7 @@ READ8_MEMBER( es5503_device::read )
 				return oscsenabled<<1;
 
 			case 0xe2:  // A/D converter
-				if (m_adc_func)
-				{
-					return m_adc_func(this);
-				}
-				break;
+				return m_adc_func();
 		}
 	}
 

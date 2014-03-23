@@ -5,24 +5,18 @@
 
 // channels must be a power of two
 
-#define MCFG_ES5503_ADD(_tag, _clock, _channels, _irqf, _adcf)  \
-	MCFG_DEVICE_ADD(_tag, ES5503, _clock) \
-	MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
-	MCFG_ES5503_IRQ_FUNC(_irqf) \
-	MCFG_ES5503_ADC_FUNC(_adcf)
-
-#define MCFG_ES5503_REPLACE(_tag, _clock, _channels, _irqf, _adcf) \
-	MCFG_DEVICE_REPLACE(_tag, ES5503, _clock) \
-	MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
-	MCFG_ES5503_IRQ_FUNC(_irqf) \
-	MCFG_ES5503_ADC_FUNC(_adcf)
+#define MCFG_ES5503_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, ES5503, _clock)
 
 #define MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
 	es5503_device::static_set_channels(*device, _channels);
-#define MCFG_ES5503_IRQ_FUNC(_irqf) \
-	es5503_device::static_set_irqf(*device, _irqf);
-#define MCFG_ES5503_ADC_FUNC(_adcf) \
-	es5503_device::static_set_adcf(*device, _adcf);
+
+#define MCFG_ES5503_IRQ_FUNC(_write) \
+	devcb = &es5503_device::static_set_irqf(*device, DEVCB2_##_write);
+	
+#define MCFG_ES5503_ADC_FUNC(_read) \
+	devcb = &es5503_device::static_set_adcf(*device, DEVCB2_##_read);
+
 // ======================> es5503_device
 
 class es5503_device : public device_t,
@@ -34,13 +28,14 @@ public:
 	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_channels(device_t &device, int channels);
-	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
-	static void static_set_adcf(device_t &device, UINT8 (*adcf)(device_t *device));
 
+	template<class _Object> static devcb2_base &static_set_irqf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_irq_func.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_adcf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_adc_func.set_callback(object); }
+	
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-		UINT8 get_channel_strobe() { return m_channel_strobe; }
+	UINT8 get_channel_strobe() { return m_channel_strobe; }
 
 	sound_stream *m_stream;
 
@@ -58,8 +53,8 @@ protected:
 
 	const address_space_config  m_space_config;
 
-	void (*m_irq_func)(device_t *device, int state);
-	UINT8 (*m_adc_func)(device_t *device);
+	devcb2_write_line 	m_irq_func;
+	devcb2_read8 		m_adc_func;
 
 	emu_timer *m_sync_timer;
 
