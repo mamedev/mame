@@ -508,7 +508,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
-	void ethernet_interrupt_machine(int state);
+	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	void update_vblank_irq();
 	UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type);
 	void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
@@ -642,7 +642,7 @@ WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
  *
  *************************************/
 
-void seattle_state::ethernet_interrupt_machine(int state)
+WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
 {
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
@@ -654,13 +654,6 @@ void seattle_state::ethernet_interrupt_machine(int state)
 	else if (m_board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq();
 }
-
-static void ethernet_interrupt(device_t *device, int state)
-{
-	seattle_state *drvstate = device->machine().driver_data<seattle_state>();
-	drvstate->ethernet_interrupt_machine(state);
-}
-
 
 
 /*************************************
@@ -739,7 +732,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 
 	/* update the states */
 	update_vblank_irq();
-	ethernet_interrupt_machine(m_ethernet_irq_state);
+	ethernet_interrupt(m_ethernet_irq_state);
 }
 
 
@@ -752,7 +745,7 @@ WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
 		if (m_vblank_latch)
 			update_vblank_irq();
 		if (m_ethernet_irq_state)
-			ethernet_interrupt_machine(m_ethernet_irq_state);
+			ethernet_interrupt(m_ethernet_irq_state);
 	}
 }
 
@@ -2569,13 +2562,10 @@ static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
-static const smc91c9x_interface ethernet_intf =
-{
-	ethernet_interrupt
-};
 
 static MACHINE_CONFIG_DERIVED( seattle150_widget, seattle150 )
-	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
+	MCFG_SMC91C94_ADD("ethernet")
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 
@@ -2589,7 +2579,8 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle200_widget, seattle200 )
-	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
+	MCFG_SMC91C94_ADD("ethernet")
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 static const voodoo_config voodoo_2_intf =
@@ -2610,7 +2601,8 @@ static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
-	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
+	MCFG_SMC91C94_ADD("ethernet")
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 
 	MCFG_DEVICE_REMOVE("voodoo")
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_2_intf)
