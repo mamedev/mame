@@ -32,7 +32,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 
         (*pn)->m_solver = this;
 
-        for (netlist_core_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
+        for (netlist_core_terminal_t *p = (*pn)->m_list.first(); p != NULL; p = (*pn)->m_list.next(p))
         {
             NL_VERBOSE_OUT(("%s %s %d\n", p->name().cstr(), (*pn)->name().cstr(), (int) (*pn)->isRailNet()));
             switch (p->type())
@@ -627,12 +627,12 @@ ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, net
 
 ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
-    if (net->m_head == NULL)
+    if (net->m_list.is_empty())
         return;
     /* add the net */
     SOLVER_VERBOSE_OUT(("add %d - %s\n", cur_group, net->name().cstr()));
     groups[cur_group].add(net);
-    for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
+    for (netlist_core_terminal_t *p = net->m_list.first(); p != NULL; p = net->m_list.next(p))
     {
         SOLVER_VERBOSE_OUT(("terminal %s\n", p->name().cstr()));
         if (p->isType(netlist_terminal_t::TERMINAL))
@@ -855,7 +855,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
         {
             SOLVER_VERBOSE_OUT(("Net %d: %s\n", j, groups[i][j]->name().cstr()));
             netlist_net_t *n = groups[i][j];
-            for (netlist_core_terminal_t *p = n->m_head; p != NULL; p = p->m_update_list_next)
+            for (netlist_core_terminal_t *p = n->m_list.first(); p != NULL; p = n->m_list.next(p))
             {
                 SOLVER_VERBOSE_OUT(("   %s\n", p->name().cstr()));
             }

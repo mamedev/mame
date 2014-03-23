@@ -57,6 +57,13 @@ void free_file_line( void *memory, const char *file, int line )
 	osd_free( memory );
 }
 
+void CLIB_DECL logerror(const char *format, ...)
+{
+    va_list arg;
+    va_start(arg, format);
+    vprintf(format, arg);
+    va_end(arg);
+}
 
 struct options_entry oplist[] =
 {

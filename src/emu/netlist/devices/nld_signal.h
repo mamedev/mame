@@ -104,28 +104,32 @@ public:
         m_active = 1;
     }
 
-	#if (USE_DEACTIVE_DEVICE)
-		ATTR_HOT void inc_active()
-		{
-			if (++m_active == 1)
-			{
-				update();
-			}
-		}
+#if (USE_DEACTIVE_DEVICE)
+    ATTR_HOT void inc_active()
+    {
+        if (++m_active == 1)
+        {
+            update();
+        }
+    }
 
-		ATTR_HOT void dec_active()
-		{
-			if (--m_active == 0)
-			{
-				for (int i = 0; i< _numdev; i++)
-					m_i[i].inactivate();
-			}
-		}
-	#endif
+    ATTR_HOT void dec_active()
+    {
+        if (--m_active == 0)
+        {
+            for (int i = 0; i< _numdev; i++)
+                m_i[i].inactivate();
+        }
+    }
+#endif
 
     virtual void update()
     {
         const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+
+        // FIXME: this check is needed because update is called during startup as well
+        if (UNEXPECTED(USE_DEACTIVE_DEVICE && m_active == 0))
+            return;
 
         for (int i = 0; i< _numdev; i++)
         {
@@ -174,28 +178,32 @@ public:
         m_active = 1;
     }
 
-	#if (USE_DEACTIVE_DEVICE)
-		ATTR_HOT virtual void inc_active()
-		{
-			if (++m_active == 1)
-			{
-				update();
-			}
-		}
+#if (USE_DEACTIVE_DEVICE)
+    ATTR_HOT virtual void inc_active()
+    {
+        if (++m_active == 1)
+        {
+            update();
+        }
+    }
 
-		ATTR_HOT virtual void dec_active()
-		{
-			if (--m_active == 0)
-			{
-				m_i[0].inactivate();
-				m_i[1].inactivate();
-			}
-		}
-	#endif
+    ATTR_HOT virtual void dec_active()
+    {
+        if (--m_active == 0)
+        {
+            m_i[0].inactivate();
+            m_i[1].inactivate();
+        }
+    }
+#endif
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
+
+		// FIXME: this check is needed because update is called during startup as well
+        if (UNEXPECTED(USE_DEACTIVE_DEVICE && m_active == 0))
+            return;
 
 		m_i[0].activate();
 		m_i[1].activate();

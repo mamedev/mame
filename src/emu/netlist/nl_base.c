@@ -465,7 +465,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	: netlist_object_t(atype, afamily)
     , m_solver(NULL)
     , m_railterminal(NULL)
-	, m_head(NULL)
 	, m_num_cons(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
@@ -484,9 +483,15 @@ ATTR_COLD netlist_net_t::~netlist_net_t()
     netlist().remove_save_items(this);
 }
 
-ATTR_HOT void netlist_net_t::inc_active()
+ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 {
     m_active++;
+
+    if (USE_ADD_REMOVE_LIST)
+    {
+        m_list.insert(term);
+        //m_list.add(term);
+    }
 
     if (USE_DEACTIVE_DEVICE)
     {
@@ -516,9 +521,15 @@ ATTR_HOT void netlist_net_t::inc_active()
     }
 }
 
-ATTR_HOT void netlist_net_t::dec_active()
+ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 {
     m_active--;
+
+    if (USE_ADD_REMOVE_LIST)
+    {
+        m_list.remove(term);
+    }
+
     if (USE_DEACTIVE_DEVICE)
     {
         if (m_active == 0)
@@ -539,9 +550,12 @@ ATTR_COLD void netlist_net_t::reset()
     m_active = 0;
     m_in_queue = 2;
 
-    for (netlist_core_terminal_t *t = m_head; t != NULL; t = t->m_update_list_next)
+    for (netlist_core_terminal_t *t = m_list.first(); t != NULL; t = m_list.next(t))
     {
         t->do_reset();
+    }
+    for (netlist_core_terminal_t *t = m_list.first(); t != NULL; t = m_list.next(t))
+    {
         if (t->state() != netlist_input_t::STATE_INP_PASSIVE)
             m_active++;
     }
@@ -589,15 +603,15 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 	}
 	else
 	{
-		netlist_core_terminal_t *p = othernet->m_head;
+		netlist_core_terminal_t *p = othernet->m_list.first();
 		while (p != NULL)
 		{
-			netlist_core_terminal_t *pn = p->m_update_list_next;
+			netlist_core_terminal_t *pn = othernet->m_list.next(p);
 			register_con(*p);
 			p = pn;
 		}
 
-		othernet->m_head = NULL; // FIXME: othernet needs to be free'd from memory
+		othernet->m_list.clear(); // FIXME: othernet needs to be free'd from memory
 	}
 }
 
@@ -605,8 +619,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 {
 	terminal.set_net(*this);
 
-	terminal.m_update_list_next = m_head;
-	m_head = &terminal;
+	m_list.insert(terminal);
 	m_num_cons++;
 
 	if (terminal.state() != netlist_input_t::STATE_INP_PASSIVE)
@@ -632,38 +645,52 @@ ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
     const UINT32 mask = masks[ (m_last_Q  << 1) | m_new_Q ];
-    netlist_core_terminal_t *p = m_head;
+    netlist_core_terminal_t *p = m_list.first();
 
     m_in_queue = 2; /* mark as taken ... */
     m_cur_Q = m_new_Q;
 
     m_cur_Analog = m_new_Analog;
 
-#if 1
-    switch (m_num_cons)
+    if (USE_ADD_REMOVE_LIST)
     {
-    case 2:
-        update_dev(p, mask);
-        p = p->m_update_list_next;
-    case 1:
-        update_dev(p, mask);
-        break;
-    default:
-        do
+        switch (m_active)
         {
+        case 2:
             update_dev(p, mask);
-            p = p->m_update_list_next;
-        } while (p != NULL);
-        break;
+            p = m_list.next(p);
+            if (p == NULL) break;
+        case 1:
+            update_dev(p, mask);
+            break;
+        default:
+            while (p != NULL)
+            {
+                update_dev(p, mask);
+                p = m_list.next(p);
+            }
+            break;
+        }
     }
-
-#else
-    do
+    else
     {
-        update_dev(p, mask);
-        p = p->m_update_list_next;
-    } while (p != NULL);
-#endif
+        switch (m_num_cons)
+        {
+        case 2:
+            update_dev(p, mask);
+            p = m_list.next(p);
+        case 1:
+            update_dev(p, mask);
+            break;
+        default:
+            do
+            {
+                update_dev(p, mask);
+                p = m_list.next(p);
+            } while (p != NULL);
+            break;
+        }
+    }
     m_last_Q = m_cur_Q;
     m_last_Analog = m_cur_Analog;
 }
@@ -680,8 +707,8 @@ ATTR_HOT void netlist_net_t::solve()
 
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
+, plinked_list_element<netlist_core_terminal_t>()
 , m_family_desc(NULL)
-, m_update_list_next(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
 {

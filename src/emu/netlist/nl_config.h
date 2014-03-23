@@ -23,10 +23,14 @@
  */
 #define USE_PMFDELEGATES        (0)
 
-// This used to add 20% performance ... but is not guaranteed to be absolutely timing correct.
-// Update 01.01.2014: Currently, enabling this has no observable impact on performance.
+// This increases performance in circuits with a lot of gates
+// but is not guaranteed to be absolutely timing correct.
 
 #define USE_DEACTIVE_DEVICE     (0)
+
+// The following adds about 10% performance ...
+
+#define USE_ADD_REMOVE_LIST     (1)
 
 #define USE_OPENMP              (0)
 

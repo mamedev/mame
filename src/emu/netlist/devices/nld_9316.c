@@ -7,6 +7,8 @@
 
 NETLIB_START(9316)
 {
+    register_sub(subABCD, "subABCD");
+    sub.m_ABCD = &subABCD;
 	register_sub(sub, "sub");
 
 	register_subalias("CLK", sub.m_CLK);
@@ -16,10 +18,10 @@ NETLIB_START(9316)
 	register_input("CLRQ", m_CLRQ);
 	register_input("LOADQ", m_LOADQ);
 
-	register_subalias("A", sub.m_A);
-	register_subalias("B", sub.m_B);
-	register_subalias("C", sub.m_C);
-	register_subalias("D", sub.m_D);
+	register_subalias("A", subABCD.m_A);
+	register_subalias("B", subABCD.m_B);
+	register_subalias("C", subABCD.m_C);
+	register_subalias("D", subABCD.m_D);
 
 	register_subalias("QA", sub.m_QA);
 	register_subalias("QB", sub.m_QB);
@@ -32,16 +34,44 @@ NETLIB_START(9316)
 NETLIB_RESET(9316)
 {
     sub.do_reset();
+    subABCD.do_reset();
+}
+
+NETLIB_START(9316_subABCD)
+{
+    register_input("A", m_A);
+    register_input("B", m_B);
+    register_input("C", m_C);
+    register_input("D", m_D);
+
+}
+
+NETLIB_RESET(9316_subABCD)
+{
+    if (1 || !USE_ADD_REMOVE_LIST)
+    {
+        m_A.inactivate();
+        m_B.inactivate();
+        m_C.inactivate();
+        m_D.inactivate();
+    }
+}
+
+ATTR_HOT inline UINT8 NETLIB_NAME(9316_subABCD::read_ABCD)()
+{
+    if (1 || !USE_ADD_REMOVE_LIST)
+        return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
+    else
+        return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+}
+
+NETLIB_UPDATE(9316_subABCD)
+{
 }
 
 NETLIB_START(9316_sub)
 {
 	register_input("CLK", m_CLK);
-
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("C", m_C);
-	register_input("D", m_D);
 
 	register_output("QA", m_QA);
 	register_output("QB", m_QB);
@@ -57,11 +87,6 @@ NETLIB_START(9316_sub)
 NETLIB_RESET(9316_sub)
 {
     m_CLK.set_state(netlist_input_t::STATE_INP_LH);
-    m_A.set_state(netlist_input_t::STATE_INP_PASSIVE);
-    m_B.set_state(netlist_input_t::STATE_INP_PASSIVE);
-    m_C.set_state(netlist_input_t::STATE_INP_PASSIVE);
-    m_D.set_state(netlist_input_t::STATE_INP_PASSIVE);
-
     m_cnt = 0;
     m_loadq = 1;
     m_ent = 1;
@@ -84,7 +109,7 @@ NETLIB_UPDATE(9316_sub)
 	}
 	else
 	{
-		cnt = (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
+		cnt = m_ABCD->read_ABCD();
 		update_outputs_all(cnt);
 		OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
 	}
@@ -109,9 +134,9 @@ NETLIB_UPDATE(9316)
 		{
 			cnt = 0;
 			sub.update_outputs(cnt);
-			OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
+			//OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
 			sub.m_cnt = cnt;
-			return;
+			//return;
 		}
 	}
 	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
@@ -177,10 +202,10 @@ NETLIB_START(9316_dip)
 
     register_subalias("1", m_CLRQ);
     register_subalias("2", sub.m_CLK);
-    register_subalias("3", sub.m_A);
-    register_subalias("4", sub.m_B);
-    register_subalias("5", sub.m_C);
-    register_subalias("6", sub.m_D);
+    register_subalias("3", subABCD.m_A);
+    register_subalias("4", subABCD.m_B);
+    register_subalias("5", subABCD.m_C);
+    register_subalias("6", subABCD.m_D);
     register_subalias("7", m_ENP);
     // register_subalias("8", ); --> GND
 
