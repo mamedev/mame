@@ -231,7 +231,7 @@ Language:
 	</software>
 
 	<software name="cinderla">
-		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 0)</description>
+		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 0)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
@@ -242,7 +242,7 @@ Language:
 	</software>
 
 	<software name="cinderla1" cloneof="cinderla">
-		<description>Cinderella - Lernen im Maerchenland (Ger, Rev. 1)</description>
+		<description>Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
