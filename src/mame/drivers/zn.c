@@ -613,7 +613,7 @@ Notes:
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 45570 9420S 40 (C)92 AT&T (PLCC84)
       C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? Z80 northbridge?(address decode, etc)
-      Z80 clock - 4.000MHz(?) but Z80 chip label is rated at 8MHz and some music effects(portamento, vibrato) are wrong at 4MHz 
+      Z80 clock - 8.000MHz
 
       Unpopulated sockets - 1.3B, 2.2E, 3.3E, 8.2K, 9.3K, 10.4K, 11.5K, 12.6K & 13.7K
 */
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // see pcb notes
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
@@ -707,7 +707,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // see pcb notes
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
@@ -830,7 +830,7 @@ Notes:
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 11008 9741T 74 (C)92 LUCENT (PLCC84)
       C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? Z80 northbridge?(address decode, etc)
-      Z80 clock - 4.000MHz(?) but Z80 chip label is rated at 8MHz and some music effects(portamento, vibrato) are wrong at 4MHz 
+      Z80 clock - 8.000MHz
       ROMs      -
                   SFEX2
                        1.3A   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'EX2-01M'
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_DERIVED(coh3002c, zn2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // see pcb notes
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
