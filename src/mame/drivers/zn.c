@@ -89,8 +89,8 @@ public:
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
 	DECLARE_DRIVER_INIT(coh1000tb);
-	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000c);
+	DECLARE_MACHINE_RESET(glpracr);
 	DECLARE_MACHINE_RESET(coh1000ta);
 	DECLARE_MACHINE_RESET(coh1000tb);
 	DECLARE_MACHINE_RESET(coh1002tb);
@@ -423,9 +423,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ16(unknown_r, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
-ADDRESS_MAP_END
-
 void zn_state::driver_start()
 {
 	int n_game;
@@ -661,21 +658,15 @@ static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
-DRIVER_INIT_MEMBER(zn_state,coh1000c)
-{
-	if( strcmp( machine().system().name, "glpracr" ) == 0 ||
-		strcmp( machine().system().name, "glpracr2l" ) == 0 )
-	{
-		/* disable:
-		    the QSound CPU for glpracr as it doesn't have any roms &
-		    the link cpu for glprac2l as the h/w is not emulated yet. */
-		m_audiocpu->suspend(SUSPEND_REASON_DISABLE, 1);
-	}
-}
-
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	membank("bankedroms")->set_base(memregion("maskroms")->base()+ 0x400000 ); /* banked game rom */
+	membank("bankedroms")->set_base(memregion("maskroms")->base() + 0x400000 ); /* banked game rom */
+}
+
+MACHINE_RESET_MEMBER(zn_state,glpracr)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr qsound rom sockets are empty
+	MACHINE_RESET_CALL_MEMBER(coh1000c);
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -701,11 +692,15 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.c)
 
-	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( glpracr, coh1000c )
+	MCFG_MACHINE_RESET_OVERRIDE(zn_state, glpracr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
@@ -2507,6 +2502,15 @@ static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	AM_RANGE(0x91, 0x91) AM_READ(cbaj_sound_z80_status_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( coh1002ml_link_map, AS_PROGRAM, 8, zn_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( coh1002ml_link_port_map, AS_IO, 8, zn_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
 static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 
 	/* basic machine hardware */
@@ -2528,11 +2532,18 @@ static MACHINE_CONFIG_DERIVED( coh1002msnd, coh1002m )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( coh1002ml, coh1002m )
-	MCFG_CPU_ADD("link", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(link_map)
+	MCFG_CPU_ADD("link", Z80, 4000000) // ?
+	MCFG_CPU_PROGRAM_MAP(coh1002ml_link_map)
+	MCFG_CPU_IO_MAP(coh1002ml_link_port_map)
 MACHINE_CONFIG_END
+
+
+/*
+
+Inputs
+
+*/
 
 static INPUT_PORTS_START( zn )
 	PORT_START("P1")
@@ -2706,6 +2717,13 @@ static INPUT_PORTS_START( primrag2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
+/*
+
+ROM Definitions
+
+*/
+
 /* Capcom ZN1 */
 
 #define CPZN1_BIOS \
@@ -2861,8 +2879,7 @@ ROM_START( glpracr )
 	ROM_LOAD( "gra-07m.5h", 0x0800000, 0x400000, CRC(acaefe3a) SHA1(32d596b0f975e1558fa7929c3166d8dad40a1c80) )
 
 	/* Sockets 2.2E, 3.3E are not populated, pcb verified */
-	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_FILL( 0, 0x50000, 0x76 )
+	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASE00 ) /* 64k for the audio CPU (+banks) */
 
 	/* Socket 1.3B is not populated, pcb verified */
 	ROM_REGION( 0x400000, "qsound", ROMREGION_ERASE00 ) /* Q Sound Samples */
@@ -2881,8 +2898,7 @@ ROM_START( glpracrj )
 	ROM_LOAD( "gra-07m.5h", 0x0800000, 0x400000, CRC(acaefe3a) SHA1(32d596b0f975e1558fa7929c3166d8dad40a1c80) )
 
 	/* Sockets 2.2E, 3.3E are not populated, pcb verified */
-	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_FILL( 0, 0x50000, 0x76 )
+	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASE00 ) /* 64k for the audio CPU (+banks) */
 
 	/* Socket 1.3B is not populated, pcb verified */
 	ROM_REGION( 0x400000, "qsound", ROMREGION_ERASE00 ) /* Q Sound Samples */
@@ -3693,7 +3709,7 @@ ROM_START( glpracr2l )
 	ROM_LOAD( "gra2-7.323",          0x2400000, 0x400000, CRC(7dfb6c54) SHA1(6e9a9a4172f957ba354ddd82c30735a56c5934b1) )
 
 	ROM_REGION( 0x040000, "link", 0 )
-	ROM_LOAD( "link3118.bin", 0x0000000, 0x040000, CRC(a4d4761e) SHA1(3fb25dfa5220d25093588d9501e0666214491100) )
+	ROM_LOAD( "link3118.bin",        0x0000000, 0x040000, CRC(a4d4761e) SHA1(3fb25dfa5220d25093588d9501e0666214491100) )
 ROM_END
 
 ROM_START( cbaj )
@@ -4702,23 +4718,23 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, cpzn1,    0,         coh1000c, zn, zn_state,   coh1000c, ROT0, "Capcom", "ZN1", GAME_IS_BIOS_ROOT )
+GAME( 1995, cpzn1,    0,         coh1000c, zn,   driver_device, 0, ROT0, "Capcom", "ZN1", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124) Older", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, starglad,  cpzn1,    coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (USA 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, stargladj, starglad, coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (Japan 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, glpracr,   cpzn1,    coh1000c, zn,   zn_state, coh1000c, ROT0, "Tecmo", "Gallop Racer (English Ver 10.17.K)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, glpracrj,  glpracr,  coh1000c, zn,   zn_state, coh1000c, ROT0, "Tecmo", "Gallop Racer (Japanese Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Euro 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexu,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (USA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Asia 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, sfexj,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Japan 961130)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexp,     cpzn1,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpu1,   sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, sfexpj1,   sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124) Older", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, driver_device, 0, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, starglad,  cpzn1,    coh1000c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (USA 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, stargladj, starglad, coh1000c, zn6b, driver_device, 0, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (Japan 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, glpracr,   cpzn1,    glpracr,  zn,   driver_device, 0, ROT0, "Tecmo", "Gallop Racer (English Ver 10.17.K)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, glpracrj,  glpracr,  glpracr,  zn,   driver_device, 0, ROT0, "Tecmo", "Gallop Racer (Japanese Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX (Euro 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexu,     sfex,     coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX (USA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX (Asia 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sfexj,     sfex,     coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX (Japan 961130)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexp,     cpzn1,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpu1,   sfexp,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX Plus (USA 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970407)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, sfexpj1,   sfexp,    coh1002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX Plus (Japan 970311)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Capcom ZN2 */
 
