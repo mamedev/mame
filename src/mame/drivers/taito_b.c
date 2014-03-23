@@ -1893,25 +1893,18 @@ static const ay8910_interface ay8910_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed( running_machine &machine, int channel, int percent )
+WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-
-	if (channel == 1)
+	if (offset == 1)
 	{
 		device_sound_interface *sound;
-		state->m_ym->interface(sound);
-		sound->set_output_gain(0, percent / 100.0);
-		sound->set_output_gain(1, percent / 100.0);
-		sound->set_output_gain(2, percent / 100.0);
-		//popmessage("MB87078 gain ch#%i percent=%i", channel, percent);
+		m_ym->interface(sound);
+		sound->set_output_gain(0, data / 100.0);
+		sound->set_output_gain(1, data / 100.0);
+		sound->set_output_gain(2, data / 100.0);
+		//popmessage("MB87078 gain ch#%i percent=%i", offset, data);
 	}
 }
-
-static const mb87078_interface taitob_mb87078_intf =
-{
-	mb87078_gain_changed    /*callback function for gain change*/
-};
 
 static const tc0220ioc_interface taitob_io_intf =
 {
@@ -2354,7 +2347,8 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2405,7 +2399,8 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2503,7 +2498,8 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 
 	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
 
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

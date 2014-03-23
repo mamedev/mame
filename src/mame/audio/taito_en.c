@@ -27,16 +27,6 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void taito_en_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -267,13 +257,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static void mb87078_gain_changed( running_machine &machine, int channel, int percent )
+WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
 {
-	if (channel > 1)
+	if (offset > 1)
 	{
-		es5505_device *es5505 = machine.device<es5505_device>("ensoniq");
-
-		es5505->set_output_gain(channel & 1, percent / 100.0);
+		machine().device<es5505_device>("ensoniq")->set_output_gain(offset & 1, data / 100.0);
 	}
 }
 
@@ -317,11 +305,6 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
     IP5: 1MHz
 */
 
-static const mb87078_interface taito_en_mb87078_intf =
-{
-	mb87078_gain_changed
-};
-
 static const es5505_interface es5505_taito_en_config =
 {
 	"ensoniq.0",    /* Bank 0: Unused by F3 games? */
@@ -346,7 +329,8 @@ MACHINE_CONFIG_FRAGMENT( taito_en_sound )
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("taito_en", taito_en_device, duart_irq_handler))
 
-	MCFG_MB87078_ADD("mb87078", taito_en_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(DEVWRITE8("taito_en", taito_en_device, mb87078_gain_changed))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
