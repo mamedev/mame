@@ -1,4 +1,4 @@
-/* Cuantro en Linea */
+/* Cuatro en Linea */
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -199,6 +199,6 @@ ROM_END
 
 
 
-GAME( 1991, 4enlinea,  0,       4enlinea,  4enlinea, driver_device,  0,       ROT0, "System Compumatic",      "Cuantro en Linea", GAME_NOT_WORKING )
+GAME( 1991, 4enlinea,  0,       4enlinea,  4enlinea, driver_device,  0,       ROT0, "System Compumatic",      "Cuatro en Linea", GAME_NOT_WORKING )
         
 
