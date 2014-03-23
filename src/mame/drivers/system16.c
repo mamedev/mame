@@ -2022,20 +2022,11 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 MACHINE_CONFIG_END
 
 
-static void sound_cause_nmi( device_t *device, int chip )
+WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
-	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-
 	/* upd7759 callback */
-	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
-
-const upd775x_interface sys16_upd7759_interface  =
-{
-	sound_cause_nmi
-};
-
 
 static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
@@ -2047,7 +2038,7 @@ static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(sys16_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas1x_bootleg_state,sound_cause_nmi))	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END

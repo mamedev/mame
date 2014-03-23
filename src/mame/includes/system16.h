@@ -214,4 +214,5 @@ public:
 	void datsu_set_pages(  );
 	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
+	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
 };

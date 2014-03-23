@@ -145,6 +145,7 @@ public:
 	UINT16 pico_read_penpos(int pen);
 	DECLARE_READ16_MEMBER(pico_68k_io_read);
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
+	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 };
 
 class pico_state : public pico_base_state
@@ -156,7 +157,6 @@ public:
 
 	optional_device<pico_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(pico);
-
 };
 
 
@@ -268,20 +268,12 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 }
 
 
-static void sound_cause_irq( device_t *device, int chip )
+WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
 {
-	pico_base_state *state = device->machine().driver_data<pico_base_state>();
 //  printf("sound irq\n");
 	/* upd7759 callback */
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
-
-
-const upd775x_interface pico_upd7759_interface  =
-{
-	sound_cause_irq
-};
-
 
 WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 {
@@ -369,7 +361,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -389,7 +381,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -559,7 +551,7 @@ static MACHINE_CONFIG_START( copera, copera_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(copera_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END

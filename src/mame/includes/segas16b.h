@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER( upd7759_status_r );
 
 	// other callbacks
-	static void upd7759_generate_nmi(device_t *device, int state);
+	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 
 	// ROM board-specific driver init

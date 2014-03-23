@@ -1249,11 +1249,10 @@ READ8_MEMBER( segas16b_state::upd7759_status_r )
 //  NMI to the sound CPU
 //-------------------------------------------------
 
-void segas16b_state::upd7759_generate_nmi(device_t *device, int state)
+WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 {
-	segas16b_state *driver = device->machine().driver_data<segas16b_state>();
 	if (state)
-		driver->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3232,17 +3231,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  SOUND CONFIGURATIONS
-//**************************************************************************
-
-static const upd775x_interface upd7759_config =
-{
-	&segas16b_state::upd7759_generate_nmi
-};
-
-
-
-//**************************************************************************
 //  GRAPHICS DECODING
 //**************************************************************************
 
@@ -3291,7 +3279,7 @@ static MACHINE_CONFIG_START( system16b, segas16b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(upd7759_config)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas16b_state,upd7759_generate_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
