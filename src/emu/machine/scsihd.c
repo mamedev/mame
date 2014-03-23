@@ -28,7 +28,7 @@ void scsihd_device::device_start()
 	scsihle_device::device_start();
 }
 
-harddisk_interface scsihd_device::hd_intf = { NULL, NULL, "scsi_hdd", NULL };
+harddisk_interface scsihd_device::hd_intf = { "scsi_hdd", NULL };
 
 static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
 	MCFG_HARDDISK_CONFIG_ADD("image", scsihd_device::hd_intf)

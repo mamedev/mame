@@ -70,7 +70,7 @@
 
 const device_type CORVUS_HDC = &device_creator<corvus_hdc_t>;
 
-harddisk_interface corvus_hdc_t::hd_intf = { NULL, NULL, "corvus_hdd", NULL };
+harddisk_interface corvus_hdc_t::hd_intf = { "corvus_hdd", NULL };
 
 corvus_hdc_t::corvus_hdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, CORVUS_HDC, "Corvus Flat Cable HDC", tag, owner, clock, "corvus_hdc", __FILE__),

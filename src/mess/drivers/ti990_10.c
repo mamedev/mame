@@ -71,7 +71,6 @@ TODO :
 
 #include "cpu/tms9900/ti990_10.h"
 #include "sound/beep.h"
-#include "machine/ti99/ti990.h"
 #include "machine/ti99/990_hd.h"
 #include "machine/ti99/990_tap.h"
 #include "video/911_vdt.h"
@@ -82,46 +81,174 @@ class ti990_10_state : public driver_device
 public:
 	ti990_10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_intlines(0),
+		m_ckon_state(0) { }
 
 	device_t *m_terminal;
 	DECLARE_DRIVER_INIT(ti990_10);
-	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 
 	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( tape_interrupt );
+	void ti990_set_int_line(int line, int state);
+	WRITE_LINE_MEMBER(ti990_set_int13);
+	TIMER_CALLBACK_MEMBER(clear_load);
+	void ti990_hold_load();
+	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
+	READ8_MEMBER( ti990_panel_read );
+	WRITE8_MEMBER( ti990_panel_write );
 
 	required_device<cpu_device> m_maincpu;
+	UINT16 m_intlines;
+	int m_ckon_state;
 };
 
 
-void ti990_10_state::machine_start()
+/*
+    Interrupt priority encoder.  Actually part of the CPU board.
+*/
+
+void ti990_10_state::ti990_set_int_line(int line, int state)
 {
-	MACHINE_START_CALL_LEGACY( ti990_hdc );
+	int level;
+
+
+	if (state)
+		m_intlines |= (1 << line);
+	else
+		m_intlines &= ~ (1 << line);
+
+	if (m_intlines)
+	{
+		for (level = 0; ! (m_intlines & (1 << level)); level++)
+			;
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* interrupt it, baby */
+	}
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void ti990_10_state::machine_reset()
+
+WRITE_LINE_MEMBER(ti990_10_state::ti990_set_int13)
 {
-	ti990_hold_load(machine());
-	ti990_reset_int();
-	ti990_hdc_init(machine(), ti990_set_int13);
+	ti990_set_int_line(13, state);
 }
 
 /*
-static void rset_callback(device_t *device)
+    hold and debounce load line (emulation is inaccurate)
+*/
+
+TIMER_CALLBACK_MEMBER(ti990_10_state::clear_load)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+void ti990_10_state::ti990_hold_load()
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(ti990_10_state::clear_load),this));
+}
+
+/*
+    line interrupt
+*/
+
+/* m_ckon_state: 1 if line clock active (RTCLR flip-flop on TI990/10 schematics -
+SMI sheet 4) */
+WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
+{
+	// set_int10(state);
+	if (m_ckon_state)
+		ti990_set_int_line(5, 1);
+}
+
+WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
+{
+	m_ckon_state = state;
+	if (! m_ckon_state)
+		ti990_set_int_line(5, 0);
+}
+
+
+
+/*
+    Control panel emulation
+
+    three panel types
+    * operator panel
+    * programmer panel
+    * MDU (external unit connected instead of the control panel, as seen in
+      945401-9701 p. 2-5 though 2-15)
+
+    Operator panel:
+    * Power led
+    * Fault led
+    * Off/On/Load switch
+
+    Programmer panel:
+    * 16 status light, 32 switches, IDLE, RUN leds
+    * interface to a low-level debugger in ROMs
+
+    * MDU:
+    * includes a programmer panel, a tape unit, and a few parts
+      (diagnostic tape, diagnostic ROMs, etc.)
+
+    CRU output:
+    0-7: lights 0-7
+    8: increment scan
+    9: clear scan (according to 990 handbook)
+    A: run light (additionally sets all data LEDs to 1s, the scan count to 0b10 and enables the HALT/SIE switch)
+    B: fault light
+    C: Memory Error Interrupt clear
+    D: Start panel timer
+    E: Set SIE function (interrupt after 2 instructions are executed)
+    F: flag (according to 990 handbook)
+
+    input :
+    0-7: switches 0-7 (or data from MDU tape)
+    8: scan count bit 1
+    9: scan count bit 0
+    A: timer active
+    B: programmer panel not present or locked
+    C: char in MDU tape unit buffer?
+    D: unused?
+    E: if 0, MDU unit present
+    F: flag (according to 990 handbook)
+*/
+
+READ8_MEMBER( ti990_10_state::ti990_panel_read )
+{
+	if (offset == 1)
+		return 0x48;
+
+	return 0;
+}
+
+WRITE8_MEMBER( ti990_10_state::ti990_panel_write )
+{
+}
+
+
+void ti990_10_state::machine_reset()
+{
+	ti990_hold_load();
+}
+
+/*
+void ti990_10_state::rset_callback)
 {
     ti990_cpuboard_reset();
 
     // clear controller panel and smi fault LEDs
 }
 
-static void lrex_callback(device_t *device)
+void ti990_10_state::lrex_callback)
 {
     // right???
-    ti990_hold_load(device->machine());
+    ti990_hold_load();
 }
 */
 
@@ -141,12 +268,6 @@ WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
 	// set_int10(state);
 }
 
-WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
-{
-	// set_int10(state);
-	ti990_line_interrupt(machine());
-}
-
 /*
   Memory map - see description above
 */
@@ -155,7 +276,7 @@ static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16, ti990_10_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM     /* let's say we have 1MB of RAM */
 	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP     /* free TILINE space */
-	AM_RANGE(0x1ff800, 0x1ff81f) AM_READWRITE_LEGACY(ti990_hdc_r, ti990_hdc_w)  /* disk controller TPCS */
+	AM_RANGE(0x1ff800, 0x1ff81f) AM_DEVREADWRITE("hdc", ti990_hdc_device, read, write)  /* disk controller TPCS */
 	AM_RANGE(0x1ff820, 0x1ff87f) AM_NOP     /* free TPCS */
 	AM_RANGE(0x1ff880, 0x1ff89f) AM_DEVREADWRITE("tpc", tap_990_device, read, write) /* tape controller TPCS */
 	AM_RANGE(0x1ff8a0, 0x1ffbff) AM_NOP     /* free TPCS */
@@ -171,12 +292,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8, ti990_10_state )
 	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
-	AM_RANGE(0x1fa, 0x1fb) AM_NOP // AM_READ_LEGACY(ti990_10_mapper_cru_r)
-	AM_RANGE(0x1fc, 0x1fd) AM_NOP // AM_READ_LEGACY(ti990_10_eir_cru_r)
-	AM_RANGE(0x1fe, 0x1ff) AM_READ_LEGACY(ti990_panel_read)
-	AM_RANGE(0xfd0, 0xfdf) AM_NOP // AM_WRITE_LEGACY(ti990_10_mapper_cru_w)
-	AM_RANGE(0xfe0, 0xfef) AM_NOP // AM_WRITE_LEGACY(ti990_10_eir_cru_w)
-	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
+	AM_RANGE(0x1fa, 0x1fb) AM_NOP // AM_READ(ti990_10_mapper_cru_r)
+	AM_RANGE(0x1fc, 0x1fd) AM_NOP // AM_READ(ti990_10_eir_cru_r)
+	AM_RANGE(0x1fe, 0x1ff) AM_READ(ti990_panel_read)
+	AM_RANGE(0xfd0, 0xfdf) AM_NOP // AM_WRITE(ti990_10_mapper_cru_w)
+	AM_RANGE(0xfe0, 0xfef) AM_NOP // AM_WRITE(ti990_10_eir_cru_w)
+	AM_RANGE(0xff0, 0xfff) AM_WRITE(ti990_panel_write)
 
 ADDRESS_MAP_END
 
@@ -199,7 +320,8 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_10_state, line_interrupt))
 
 	// Hard disk
-	MCFG_FRAGMENT_ADD( ti990_hdc )
+	MCFG_DEVICE_ADD("hdc", TI990_HDC, 0)
+	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(ti990_10_state, ti990_set_int13))
 
 	// Tape controller
 	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)

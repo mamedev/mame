@@ -1851,7 +1851,6 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_MACHINE)/ti99/990_dk.o    \
 	$(MESS_MACHINE)/ti99/990_hd.o    \
 	$(MESS_MACHINE)/ti99/990_tap.o   \
-	$(MESS_MACHINE)/ti99/ti990.o     \
 	$(MESS_MACHINE)/ti99/datamux.o  \
 	$(MESS_MACHINE)/ti99/videowrp.o \
 	$(MESS_MACHINE)/ti99/grom.o \

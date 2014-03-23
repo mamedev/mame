@@ -23,12 +23,6 @@
 #include "harddisk.h"
 #include "imagedev/harddriv.h"
 
-static void update_interrupt(running_machine &machine);
-
-/* max disk units per controller: 4 is the protocol limit, but it may be
-overriden if more than one controller is used */
-#define MAX_DISK_UNIT 4
-
 /* Max sector length is bytes.  Generally 256, except for a few older disk
 units which use 288-byte-long sectors, and SCSI units which generally use
 standard 512-byte-long sectors. */
@@ -74,34 +68,6 @@ enum
 	header_len = sizeof(disk_image_header)
 };
 
-enum format_t
-{
-	format_mame,
-	format_old
-};
-
-/* disk drive unit descriptor */
-struct hd_unit_t
-{
-	device_image_interface *img;                        /* image descriptor */
-	format_t format;
-	hard_disk_file *hd_handle;      /* mame hard disk descriptor - only if format == format_mame */
-	unsigned int wp : 1;                    /* TRUE if disk is write-protected */
-	unsigned int unsafe : 1;                /* TRUE when a disk has just been connected */
-
-	/* disk geometry */
-	unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
-};
-
-/* disk controller */
-struct hdc_t
-{
-	UINT16 w[8];
-
-	void (*interrupt_callback)(running_machine &machine, int state);
-
-	hd_unit_t d[MAX_DISK_UNIT];
-};
 
 /* masks for individual bits controller registers */
 enum
@@ -164,10 +130,8 @@ static const UINT16 w_mask[8] =
 	0xf7ff      /* Don't overwrite reserved bits */
 };
 
-static hdc_t hdc;
 
-
-static int get_id_from_device( device_t *device )
+int ti990_hdc_device::get_id_from_device( device_t *device )
 {
 	int id = -1;
 
@@ -196,13 +160,13 @@ static int get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-static DEVICE_IMAGE_LOAD_LEGACY( ti990_hd )
+DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device, ti990_hd )
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
 	hard_disk_file  *hd_file;
 
-	d = &hdc.d[id];
+	d = &m_d[id];
 	d->img = &image;
 
 	hd_file = dynamic_cast<harddisk_image_device *>(&image)->get_hard_disk_file();
@@ -265,7 +229,7 @@ static DEVICE_IMAGE_LOAD_LEGACY( ti990_hd )
 
 	d->unsafe = 1;
 	/* set attention line */
-	hdc.w[0] |= (0x80 >> id);
+	m_w[0] |= (0x80 >> id);
 
 	return IMAGE_INIT_PASS;
 }
@@ -273,12 +237,12 @@ static DEVICE_IMAGE_LOAD_LEGACY( ti990_hd )
 /*
     close a hard disk image
 */
-static DEVICE_IMAGE_UNLOAD_LEGACY( ti990_hd )
+DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device, ti990_hd )
 {
 	int id = get_id_from_device( image );
 	hd_unit_t *d;
 
-	d = &hdc.d[id];
+	d = &m_d[id];
 
 	d->format = format_mame;    /* don't care */
 	d->hd_handle = NULL;
@@ -286,24 +250,24 @@ static DEVICE_IMAGE_UNLOAD_LEGACY( ti990_hd )
 	d->unsafe = 1;
 
 	/* clear attention line */
-	hdc.w[0] &= ~ (0x80 >> id);
+	m_w[0] &= ~ (0x80 >> id);
 }
 
 /*
     Return true if a HD image has been loaded
 */
-INLINE int is_unit_loaded(int unit)
+int ti990_hdc_device::is_unit_loaded(int unit)
 {
 	int reply = 0;
 
-	switch (hdc.d[unit].format)
+	switch (m_d[unit].format)
 	{
 	case format_mame:
-		reply = (hdc.d[unit].hd_handle != NULL);
+		reply = (m_d[unit].hd_handle != NULL);
 		break;
 
 	case format_old:
-		reply = (hdc.d[unit].img->exists() ? 1 : 0);
+		reply = (m_d[unit].img->exists() ? 1 : 0);
 		break;
 	}
 
@@ -311,57 +275,21 @@ INLINE int is_unit_loaded(int unit)
 }
 
 /*
-    Init the hdc core
-*/
-MACHINE_START(ti990_hdc)
-{
-	int i;
-
-	/* initialize harddisk information */
-	/* attention lines will be set by DEVICE_IMAGE_LOD */
-	for (i=0; i<MAX_DISK_UNIT; i++)
-	{
-		hdc.d[i].format = format_mame;
-		hdc.d[i].hd_handle = NULL;
-		hdc.d[i].wp = 1;
-		hdc.d[i].unsafe = 1;
-	}
-}
-
-
-void ti990_hdc_init(running_machine &machine, void (*interrupt_callback)(running_machine &machine, int state))
-{
-	memset(hdc.w, 0, sizeof(hdc.w));
-	hdc.w[7] = w7_idle;
-
-	/* get references to harddisk devices */
-	hdc.d[0].img = dynamic_cast<device_image_interface *>(machine.device("harddisk1"));
-	hdc.d[1].img = dynamic_cast<device_image_interface *>(machine.device("harddisk2"));
-	hdc.d[2].img = dynamic_cast<device_image_interface *>(machine.device("harddisk3"));
-	hdc.d[3].img = dynamic_cast<device_image_interface *>(machine.device("harddisk4"));
-
-	hdc.interrupt_callback = interrupt_callback;
-
-	update_interrupt(machine);
-}
-
-
-/*
     Parse the disk select lines, and return the corresponding tape unit.
     (-1 if none)
 */
-static int cur_disk_unit(void)
+int ti990_hdc_device::cur_disk_unit(void)
 {
 	int reply;
 
 
-	if (hdc.w[6] & w6_unit0_sel)
+	if (m_w[6] & w6_unit0_sel)
 		reply = 0;
-	else if (hdc.w[6] & w6_unit1_sel)
+	else if (m_w[6] & w6_unit1_sel)
 		reply = 1;
-	else if (hdc.w[6] & w6_unit2_sel)
+	else if (m_w[6] & w6_unit2_sel)
 		reply = 2;
-	else if (hdc.w[6] & w6_unit3_sel)
+	else if (m_w[6] & w6_unit3_sel)
 		reply = 3;
 	else
 		reply = -1;
@@ -375,12 +303,12 @@ static int cur_disk_unit(void)
 /*
     Update interrupt state
 */
-static void update_interrupt(running_machine &machine)
+void ti990_hdc_device::update_interrupt()
 {
-	if (hdc.interrupt_callback)
-		(*hdc.interrupt_callback)(machine, (hdc.w[7] & w7_idle)
-									&& (((hdc.w[7] & w7_int_enable) && (hdc.w[7] & (w7_complete | w7_error)))
-										|| ((hdc.w[0] & (hdc.w[0] >> 4)) & w0_attn_mask)));
+	if (!m_interrupt_callback.isnull())
+		m_interrupt_callback((m_w[7] & w7_idle)
+									&& (((m_w[7] & w7_int_enable) && (m_w[7] & (w7_complete | w7_error)))
+										|| ((m_w[0] & (m_w[0] >> 4)) & w0_attn_mask)));
 }
 
 /*
@@ -388,23 +316,23 @@ static void update_interrupt(running_machine &machine)
 
     Terminate current command and return non-zero if the address is invalid.
 */
-static int check_sector_address(running_machine &machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
+int ti990_hdc_device::check_sector_address(int unit, unsigned int cylinder, unsigned int head, unsigned int sector)
 {
-	if ((cylinder > hdc.d[unit].cylinders) || (head > hdc.d[unit].heads) || (sector > hdc.d[unit].sectors_per_track))
+	if ((cylinder > m_d[unit].cylinders) || (head > m_d[unit].heads) || (sector > m_d[unit].sectors_per_track))
 	{   /* invalid address */
-		if (cylinder > hdc.d[unit].cylinders)
+		if (cylinder > m_d[unit].cylinders)
 		{
-			hdc.w[0] |= w0_seek_incomplete;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
+			m_w[0] |= w0_seek_incomplete;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
 		}
-		else if (head > hdc.d[unit].heads)
+		else if (head > m_d[unit].heads)
 		{
-			hdc.w[0] |= w0_end_of_cylinder;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
+			m_w[0] |= w0_end_of_cylinder;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
 		}
-		else if (sector > hdc.d[unit].sectors_per_track)
-			hdc.w[7] |= w7_idle | w7_error | w7_command_time_out_err;
-		update_interrupt(machine);
+		else if (sector > m_d[unit].sectors_per_track)
+			m_w[7] |= w7_idle | w7_error | w7_command_time_out_err;
+		update_interrupt();
 		return 1;
 	}
 
@@ -414,12 +342,12 @@ static int check_sector_address(running_machine &machine, int unit, unsigned int
 /*
     Seek to sector whose address is given
 */
-static int sector_to_lba(running_machine &machine, int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba)
+int ti990_hdc_device::sector_to_lba(int unit, unsigned int cylinder, unsigned int head, unsigned int sector, unsigned int *lba)
 {
-	if (check_sector_address(machine, unit, cylinder, head, sector))
+	if (check_sector_address(unit, cylinder, head, sector))
 		return 1;
 
-	* lba = (cylinder*hdc.d[unit].heads + head)*hdc.d[unit].sectors_per_track + sector;
+	* lba = (cylinder*m_d[unit].heads + head)*m_d[unit].sectors_per_track + sector;
 
 	return 0;
 }
@@ -427,23 +355,23 @@ static int sector_to_lba(running_machine &machine, int unit, unsigned int cylind
 /*
     Read one given sector
 */
-static int read_sector(int unit, unsigned int lba, void *buffer, unsigned int bytes_to_read)
+int ti990_hdc_device::read_sector(int unit, unsigned int lba, void *buffer, unsigned int bytes_to_read)
 {
 	unsigned long byte_position;
 	unsigned int bytes_read;
 
-	switch (hdc.d[unit].format)
+	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_read = hdc.d[unit].bytes_per_sector * hard_disk_read(hdc.d[unit].hd_handle, lba, buffer);
+		bytes_read = m_d[unit].bytes_per_sector * hard_disk_read(m_d[unit].hd_handle, lba, buffer);
 		if (bytes_read > bytes_to_read)
 			bytes_read = bytes_to_read;
 		break;
 
 	case format_old:
-		byte_position = lba*hdc.d[unit].bytes_per_sector + header_len;
-		hdc.d[unit].img->fseek(byte_position, SEEK_SET);
-		bytes_read = hdc.d[unit].img->fread(buffer, bytes_to_read);
+		byte_position = lba*m_d[unit].bytes_per_sector + header_len;
+		m_d[unit].img->fseek(byte_position, SEEK_SET);
+		bytes_read = m_d[unit].img->fread(buffer, bytes_to_read);
 		break;
 
 	default:
@@ -457,23 +385,23 @@ static int read_sector(int unit, unsigned int lba, void *buffer, unsigned int by
 /*
     Write one given sector
 */
-static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned int bytes_to_write)
+int ti990_hdc_device::write_sector(int unit, unsigned int lba, const void *buffer, unsigned int bytes_to_write)
 {
 	unsigned long byte_position;
 	unsigned int bytes_written;
 
-	switch (hdc.d[unit].format)
+	switch (m_d[unit].format)
 	{
 	case format_mame:
-		bytes_written = hdc.d[unit].bytes_per_sector * hard_disk_write(hdc.d[unit].hd_handle, lba, buffer);
+		bytes_written = m_d[unit].bytes_per_sector * hard_disk_write(m_d[unit].hd_handle, lba, buffer);
 		if (bytes_written > bytes_to_write)
 			bytes_written = bytes_to_write;
 		break;
 
 	case format_old:
-		byte_position = lba*hdc.d[unit].bytes_per_sector + header_len;
-		hdc.d[unit].img->fseek(byte_position, SEEK_SET);
-		bytes_written = hdc.d[unit].img->fwrite(buffer, bytes_to_write);
+		byte_position = lba*m_d[unit].bytes_per_sector + header_len;
+		m_d[unit].img->fseek(byte_position, SEEK_SET);
+		bytes_written = m_d[unit].img->fwrite(buffer, bytes_to_write);
 		break;
 
 	default:
@@ -487,7 +415,7 @@ static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned
 /*
     Handle the store registers command: read the drive geometry.
 */
-static void store_registers(running_machine &machine)
+void ti990_hdc_device::store_registers()
 {
 	int dma_address;
 	int byte_count;
@@ -501,44 +429,44 @@ static void store_registers(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	hdc.d[dsk_sel].unsafe = 0;      /* I think */
+	m_d[dsk_sel].unsafe = 0;      /* I think */
 
-	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
-	byte_count = hdc.w[4] & 0xfffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
 
 	/* formatted words per track */
-	buffer[0] = (hdc.d[dsk_sel].sectors_per_track*hdc.d[dsk_sel].bytes_per_sector) >> 1;
+	buffer[0] = (m_d[dsk_sel].sectors_per_track*m_d[dsk_sel].bytes_per_sector) >> 1;
 	/* MSByte: sectors per track; LSByte: bytes of overhead per sector */
-	buffer[1] = (hdc.d[dsk_sel].sectors_per_track << 8) | 0;
+	buffer[1] = (m_d[dsk_sel].sectors_per_track << 8) | 0;
 	/* bits 0-4: heads; bits 5-15: cylinders */
-	buffer[2] = (hdc.d[dsk_sel].heads << 11) | hdc.d[dsk_sel].cylinders;
+	buffer[2] = (m_d[dsk_sel].heads << 11) | m_d[dsk_sel].cylinders;
 
 	real_word_count = byte_count >> 1;
 	if (real_word_count > 3)
 		real_word_count = 3;
 
 	/* DMA */
-	if (! (hdc.w[1] & w1_transfer_inhibit))
+	if (! (m_w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
@@ -546,7 +474,7 @@ static void store_registers(running_machine &machine)
 
     The emulation just clears the track data in the disk image.
 */
-static void write_format(running_machine &machine)
+void ti990_hdc_device::write_format()
 {
 	unsigned int cylinder, head, sector;
 	unsigned int lba;
@@ -560,63 +488,63 @@ static void write_format(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].unsafe)
+	else if (m_d[dsk_sel].unsafe)
 	{   /* disk in unsafe condition */
-		hdc.w[0] |= w0_unsafe | w0_pack_change;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_unsafe | w0_pack_change;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].wp)
+	else if (m_d[dsk_sel].wp)
 	{   /* disk write-protected */
-		hdc.w[0] |= w0_write_protect;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_write_protect;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	cylinder = hdc.w[3];
-	head = hdc.w[1] & w1_head_address;
+	cylinder = m_w[3];
+	head = m_w[1] & w1_head_address;
 
-	if (sector_to_lba(machine, dsk_sel, cylinder, head, 0, &lba))
+	if (sector_to_lba(dsk_sel, cylinder, head, 0, &lba))
 		return;
 
-	memset(buffer, 0, hdc.d[dsk_sel].bytes_per_sector);
+	memset(buffer, 0, m_d[dsk_sel].bytes_per_sector);
 
-	for (sector=0; sector<hdc.d[dsk_sel].sectors_per_track; sector++)
+	for (sector=0; sector<m_d[dsk_sel].sectors_per_track; sector++)
 	{
-		bytes_written = write_sector(dsk_sel, lba, buffer, hdc.d[dsk_sel].bytes_per_sector);
+		bytes_written = write_sector(dsk_sel, lba, buffer, m_d[dsk_sel].bytes_per_sector);
 
-		if (bytes_written != hdc.d[dsk_sel].bytes_per_sector)
+		if (bytes_written != m_d[dsk_sel].bytes_per_sector)
 		{
-			hdc.w[0] |= w0_offline | w0_not_ready;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-			update_interrupt(machine);
+			m_w[0] |= w0_offline | w0_not_ready;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
+			update_interrupt();
 			return;
 		}
 
 		lba++;
 	}
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the read data command: read a variable number of sectors from disk.
 */
-static void read_data(running_machine &machine)
+void ti990_hdc_device::read_data()
 {
 	int dma_address;
 	int byte_count;
@@ -635,60 +563,60 @@ static void read_data(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].unsafe)
+	else if (m_d[dsk_sel].unsafe)
 	{   /* disk in unsafe condition */
-		hdc.w[0] |= w0_unsafe | w0_pack_change;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_unsafe | w0_pack_change;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
-	byte_count = hdc.w[4] & 0xfffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
 
-	cylinder = hdc.w[3];
-	head = hdc.w[1] & w1_head_address;
-	sector = hdc.w[2] & 0xff;
+	cylinder = m_w[3];
+	head = m_w[1] & w1_head_address;
+	sector = m_w[2] & 0xff;
 
-	if (sector_to_lba(machine, dsk_sel, cylinder, head, sector, &lba))
+	if (sector_to_lba(dsk_sel, cylinder, head, sector, &lba))
 		return;
 
 	while (byte_count)
 	{   /* read data sector per sector */
-		if (cylinder > hdc.d[dsk_sel].cylinders)
+		if (cylinder > m_d[dsk_sel].cylinders)
 		{
-			hdc.w[0] |= w0_seek_incomplete;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-			update_interrupt(machine);
+			m_w[0] |= w0_seek_incomplete;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
+			update_interrupt();
 			return;
 		}
 
-		bytes_to_read = (byte_count < hdc.d[dsk_sel].bytes_per_sector) ? byte_count : hdc.d[dsk_sel].bytes_per_sector;
+		bytes_to_read = (byte_count < m_d[dsk_sel].bytes_per_sector) ? byte_count : m_d[dsk_sel].bytes_per_sector;
 		bytes_read = read_sector(dsk_sel, lba, buffer, bytes_to_read);
 
 		if (bytes_read != bytes_to_read)
 		{   /* behave as if the controller could not found the sector ID mark */
-			hdc.w[7] |= w7_idle | w7_error | w7_command_time_out_err;
-			update_interrupt(machine);
+			m_w[7] |= w7_idle | w7_error | w7_command_time_out_err;
+			update_interrupt();
 			return;
 		}
 
 		/* DMA */
-		if (! (hdc.w[1] & w1_transfer_inhibit))
+		if (! (m_w[1] & w1_transfer_inhibit))
 			for (i=0; i<bytes_read; i+=2)
 			{
-				machine.device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+				machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 				dma_address = (dma_address + 2) & 0x1ffffe;
 			}
 
@@ -697,11 +625,11 @@ static void read_data(running_machine &machine)
 		/* update sector address to point to next sector */
 		lba++;
 		sector++;
-		if (sector == hdc.d[dsk_sel].sectors_per_track)
+		if (sector == m_d[dsk_sel].sectors_per_track)
 		{
 			sector = 0;
 			head++;
-			if (head == hdc.d[dsk_sel].heads)
+			if (head == m_d[dsk_sel].heads)
 			{
 				head = 0;
 				cylinder++;
@@ -709,14 +637,14 @@ static void read_data(running_machine &machine)
 		}
 	}
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the write data command: write a variable number of sectors from disk.
 */
-static void write_data(running_machine &machine)
+void ti990_hdc_device::write_data()
 {
 	int dma_address;
 	int byte_count;
@@ -735,72 +663,72 @@ static void write_data(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].unsafe)
+	else if (m_d[dsk_sel].unsafe)
 	{   /* disk in unsafe condition */
-		hdc.w[0] |= w0_unsafe | w0_pack_change;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_unsafe | w0_pack_change;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].wp)
+	else if (m_d[dsk_sel].wp)
 	{   /* disk write-protected */
-		hdc.w[0] |= w0_write_protect;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_write_protect;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
-	byte_count = hdc.w[4] & 0xfffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
 
-	cylinder = hdc.w[3];
-	head = hdc.w[1] & w1_head_address;
-	sector = hdc.w[2] & 0xff;
+	cylinder = m_w[3];
+	head = m_w[1] & w1_head_address;
+	sector = m_w[2] & 0xff;
 
-	if (sector_to_lba(machine, dsk_sel, cylinder, head, sector, &lba))
+	if (sector_to_lba(dsk_sel, cylinder, head, sector, &lba))
 		return;
 
 	while (byte_count > 0)
 	{   /* write data sector per sector */
-		if (cylinder > hdc.d[dsk_sel].cylinders)
+		if (cylinder > m_d[dsk_sel].cylinders)
 		{
-			hdc.w[0] |= w0_seek_incomplete;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-			update_interrupt(machine);
+			m_w[0] |= w0_seek_incomplete;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
+			update_interrupt();
 			return;
 		}
 
 		/* DMA */
-		for (i=0; (i<byte_count) && (i<hdc.d[dsk_sel].bytes_per_sector); i+=2)
+		for (i=0; (i<byte_count) && (i<m_d[dsk_sel].bytes_per_sector); i+=2)
 		{
-			word = machine.device("maincpu")->memory().space(AS_PROGRAM).read_word(dma_address);
+			word = machine().device("maincpu")->memory().space(AS_PROGRAM).read_word(dma_address);
 			buffer[i] = word >> 8;
 			buffer[i+1] = word & 0xff;
 
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 		/* fill with 0s if we did not reach sector end */
-		for (; i<hdc.d[dsk_sel].bytes_per_sector; i+=2)
+		for (; i<m_d[dsk_sel].bytes_per_sector; i+=2)
 			buffer[i] = buffer[i+1] = 0;
 
-		bytes_written = write_sector(dsk_sel, lba, buffer, hdc.d[dsk_sel].bytes_per_sector);
+		bytes_written = write_sector(dsk_sel, lba, buffer, m_d[dsk_sel].bytes_per_sector);
 
-		if (bytes_written != hdc.d[dsk_sel].bytes_per_sector)
+		if (bytes_written != m_d[dsk_sel].bytes_per_sector)
 		{
-			hdc.w[0] |= w0_offline | w0_not_ready;
-			hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-			update_interrupt(machine);
+			m_w[0] |= w0_offline | w0_not_ready;
+			m_w[7] |= w7_idle | w7_error | w7_unit_err;
+			update_interrupt();
 			return;
 		}
 
@@ -809,11 +737,11 @@ static void write_data(running_machine &machine)
 		/* update sector address to point to next sector */
 		lba++;
 		sector++;
-		if (sector == hdc.d[dsk_sel].sectors_per_track)
+		if (sector == m_d[dsk_sel].sectors_per_track)
 		{
 			sector = 0;
 			head++;
-			if (head == hdc.d[dsk_sel].heads)
+			if (head == m_d[dsk_sel].heads)
 			{
 				head = 0;
 				cylinder++;
@@ -821,14 +749,14 @@ static void write_data(running_machine &machine)
 		}
 	}
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the unformatted read command: read drive geometry information.
 */
-static void unformatted_read(running_machine &machine)
+void ti990_hdc_device::unformatted_read()
 {
 	int dma_address;
 	int byte_count;
@@ -844,65 +772,65 @@ static void unformatted_read(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
-	else if (hdc.d[dsk_sel].unsafe)
+	else if (m_d[dsk_sel].unsafe)
 	{   /* disk in unsafe condition */
-		hdc.w[0] |= w0_unsafe | w0_pack_change;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_unsafe | w0_pack_change;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
-	byte_count = hdc.w[4] & 0xfffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
 
-	cylinder = hdc.w[3];
-	head = hdc.w[1] & w1_head_address;
-	sector = hdc.w[2] & 0xff;
+	cylinder = m_w[3];
+	head = m_w[1] & w1_head_address;
+	sector = m_w[2] & 0xff;
 
-	if (check_sector_address(machine, dsk_sel, cylinder, head, sector))
+	if (check_sector_address(dsk_sel, cylinder, head, sector))
 		return;
 
-	dma_address = ((((int) hdc.w[6]) << 16) | hdc.w[5]) & 0x1ffffe;
-	byte_count = hdc.w[4] & 0xfffe;
+	dma_address = ((((int) m_w[6]) << 16) | m_w[5]) & 0x1ffffe;
+	byte_count = m_w[4] & 0xfffe;
 
 	/* bits 0-4: head address; bits 5-15: cylinder address */
 	buffer[0] = (head << 11) | cylinder;
 	/* MSByte: sectors per record (1); LSByte: sector address */
 	buffer[1] = (1 << 8) | sector;
 	/* formatted words per record */
-	buffer[2] = hdc.d[dsk_sel].bytes_per_sector >> 1;
+	buffer[2] = m_d[dsk_sel].bytes_per_sector >> 1;
 
 	real_word_count = byte_count >> 1;
 	if (real_word_count > 3)
 		real_word_count = 3;
 
 	/* DMA */
-	if (! (hdc.w[1] & w1_transfer_inhibit))
+	if (! (m_w[1] & w1_transfer_inhibit))
 		for (i=0; i<real_word_count; i++)
 		{
-			machine.device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, buffer[i]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Handle the restore command: return to track 0.
 */
-static void restore(running_machine &machine)
+void ti990_hdc_device::restore()
 {
 	int dsk_sel = cur_disk_unit();
 
@@ -910,83 +838,83 @@ static void restore(running_machine &machine)
 	if (dsk_sel == -1)
 	{
 		/* No idea what to report... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		return;
 	}
 	else if (! is_unit_loaded(dsk_sel))
 	{   /* offline */
-		hdc.w[0] |= w0_offline | w0_not_ready;
-		hdc.w[7] |= w7_idle | w7_error | w7_unit_err;
-		update_interrupt(machine);
+		m_w[0] |= w0_offline | w0_not_ready;
+		m_w[7] |= w7_idle | w7_error | w7_unit_err;
+		update_interrupt();
 		return;
 	}
 
-	hdc.d[dsk_sel].unsafe = 0;      /* I think */
+	m_d[dsk_sel].unsafe = 0;      /* I think */
 
 	/*if (seek_to_sector(dsk_sel, 0, 0, 0))
 	    return;*/
 
-	hdc.w[7] |= w7_idle | w7_complete;
-	update_interrupt(machine);
+	m_w[7] |= w7_idle | w7_complete;
+	update_interrupt();
 }
 
 /*
     Parse command code and execute the command.
 */
-static void execute_command(running_machine &machine)
+void ti990_hdc_device::execute_command()
 {
 	/* hack */
-	hdc.w[0] &= 0xff;
+	m_w[0] &= 0xff;
 
-	if (hdc.w[1] & w1_extended_command)
+	if (m_w[1] & w1_extended_command)
 		logerror("extended commands not supported\n");
 
-	switch (/*((hdc.w[1] & w1_extended_command) >> 11) |*/ ((hdc.w[1] & w1_command) >> 8))
+	switch (/*((m_w[1] & w1_extended_command) >> 11) |*/ ((m_w[1] & w1_command) >> 8))
 	{
 	case 0x00: //0b000:
 		/* store registers */
 		logerror("store registers\n");
-		store_registers(machine);
+		store_registers();
 		break;
 	case 0x01: //0b001:
 		/* write format */
 		logerror("write format\n");
-		write_format(machine);
+		write_format();
 		break;
 	case 0x02: //0b010:
 		/* read data */
 		logerror("read data\n");
-		read_data(machine);
+		read_data();
 		break;
 	case 0x03: //0b011:
 		/* write data */
 		logerror("write data\n");
-		write_data(machine);
+		write_data();
 		break;
 	case 0x04: //0b100:
 		/* unformatted read */
 		logerror("unformatted read\n");
-		unformatted_read(machine);
+		unformatted_read();
 		break;
 	case 0x05: //0b101:
 		/* unformatted write */
 		logerror("unformatted write\n");
 		/* ... */
-		hdc.w[7] |= w7_idle | w7_error | w7_abnormal_completion;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_error | w7_abnormal_completion;
+		update_interrupt();
 		break;
 	case 0x06: //0b110:
 		/* seek */
 		logerror("seek\n");
 		/* This command can (almost) safely be ignored */
-		hdc.w[7] |= w7_idle | w7_complete;
-		update_interrupt(machine);
+		m_w[7] |= w7_idle | w7_complete;
+		update_interrupt();
 		break;
 	case 0x07: //0b111:
 		/* restore */
 		logerror("restore\n");
-		restore(machine);
+		restore();
 		break;
 	}
 }
@@ -994,10 +922,10 @@ static void execute_command(running_machine &machine)
 /*
     Read one register in TPCS space
 */
-READ16_HANDLER(ti990_hdc_r)
+READ16_MEMBER(ti990_hdc_device::read)
 {
 	if (offset < 8)
-		return hdc.w[offset];
+		return m_w[offset];
 	else
 		return 0;
 }
@@ -1005,24 +933,24 @@ READ16_HANDLER(ti990_hdc_r)
 /*
     Write one register in TPCS space.  Execute command if w7_idle is cleared.
 */
-WRITE16_HANDLER(ti990_hdc_w)
+WRITE16_MEMBER(ti990_hdc_device::write)
 {
 	if (offset < 8)
 	{
 		/* write protect if a command is in progress */
-		if (hdc.w[7] & w7_idle)
+		if (m_w[7] & w7_idle)
 		{
-			UINT16 old_data = hdc.w[offset];
+			UINT16 old_data = m_w[offset];
 
 			/* Only write writable bits AND honor byte accesses (ha!) */
-			hdc.w[offset] = (hdc.w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
+			m_w[offset] = (m_w[offset] & ((~w_mask[offset]) | mem_mask)) | (data & w_mask[offset] & ~mem_mask);
 
 			if ((offset == 0) || (offset == 7))
-				update_interrupt(space.machine());
+				update_interrupt();
 
 			if ((offset == 7) && (old_data & w7_idle) && ! (data & w7_idle))
 			{   /* idle has been cleared: start command execution */
-				execute_command(space.machine());
+				execute_command();
 			}
 		}
 	}
@@ -1031,15 +959,71 @@ WRITE16_HANDLER(ti990_hdc_w)
 
 static const struct harddisk_interface ti990_harddisk_config =
 {
-	DEVICE_IMAGE_LOAD_NAME_LEGACY( ti990_hd ),
-	DEVICE_IMAGE_UNLOAD_NAME_LEGACY( ti990_hd ),
 	NULL,
 	NULL
 };
 
-MACHINE_CONFIG_FRAGMENT( ti990_hdc )
+static MACHINE_CONFIG_FRAGMENT( ti990_hdc )
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk1", ti990_harddisk_config )
+	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
+	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk2", ti990_harddisk_config )
+	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
+	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk3", ti990_harddisk_config )
+	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
+	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 	MCFG_HARDDISK_CONFIG_ADD( "harddisk4", ti990_harddisk_config )
+	MCFG_HARDDISK_LOAD(ti990_hdc_device, ti990_hd)
+	MCFG_HARDDISK_UNLOAD(ti990_hdc_device, ti990_hd)
 MACHINE_CONFIG_END
+
+const device_type TI990_HDC = &device_creator<ti990_hdc_device>;
+
+ti990_hdc_device::ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TI990_HDC, "Generic TI-990 Hard Disk Controller", tag, owner, clock, "hdc_990", __FILE__),
+	m_interrupt_callback(*this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ti990_hdc_device::device_start()
+{
+	int i;
+
+	/* initialize harddisk information */
+	/* attention lines will be set by DEVICE_IMAGE_LOD */
+	for (i=0; i<MAX_DISK_UNIT; i++)
+	{
+		m_d[i].format = format_mame;
+		m_d[i].hd_handle = NULL;
+		m_d[i].wp = 1;
+		m_d[i].unsafe = 1;
+	}
+	memset(m_w, 0, sizeof(m_w));
+	m_w[7] = w7_idle;
+
+	/* get references to harddisk devices */
+	m_d[0].img = dynamic_cast<device_image_interface *>(subdevice("harddisk1"));
+	m_d[1].img = dynamic_cast<device_image_interface *>(subdevice("harddisk2"));
+	m_d[2].img = dynamic_cast<device_image_interface *>(subdevice("harddisk3"));
+	m_d[3].img = dynamic_cast<device_image_interface *>(subdevice("harddisk4"));
+
+	m_interrupt_callback.resolve_safe();
+
+	update_interrupt();
+}
+
+
+//-------------------------------------------------
+//  device_mconfig_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor ti990_hdc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti990_hdc  );
+}
