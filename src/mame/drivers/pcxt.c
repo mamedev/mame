@@ -64,9 +64,8 @@ the main program is 9th October 1990.
 #include "machine/pic8259.h"
 #include "sound/hc55516.h"
 #include "sound/speaker.h"
-#include "video/pc_cga.h"
-#include "drivlgcy.h"
-#include "scrlegcy.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/cga.h"
 
 
 class pcxt_state : public driver_device
@@ -78,10 +77,8 @@ public:
 			m_pic8259_1(*this,"pic8259_1"),
 			m_dma8237_1(*this,"dma8237_1") ,
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_palette(*this, "palette") { }
+		m_speaker(*this, "speaker") { }
 
-	UINT8 m_bg_bank;
 	int m_bank;
 	int m_lastvalue;
 	UINT8 m_disk_data[2];
@@ -132,10 +129,89 @@ public:
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<palette_device> m_palette;
 };
 
-UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+
+class isa8_cga_filetto_device : public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual const rom_entry *device_rom_region() const;
+};
+
+const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
+
+//-------------------------------------------------
+//  isa8_cga_filetto_device - constructor
+//-------------------------------------------------
+
+isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_FILETTO, "ISA8_CGA_FILETTO", tag, owner, clock, "filetto_cga", __FILE__)
+{	
+}
+
+ROM_START( filetto_cga )
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
+ROM_END
+
+const rom_entry *isa8_cga_filetto_device::device_rom_region() const
+{
+	return ROM_NAME( filetto_cga );
+}
+
+
+
+class isa8_cga_tetriskr_device : public isa8_cga_superimpose_device
+{
+public:
+	// construction/destruction
+	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void device_start();
+	virtual const rom_entry *device_rom_region() const;
+	
+	DECLARE_READ8_MEMBER(bg_bank_r);
+	DECLARE_WRITE8_MEMBER(bg_bank_w);
+private:
+	UINT8 m_bg_bank;
+};
+
+
+/* for superimposing CGA over a different source video (i.e. tetriskr) */
+const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
+
+//-------------------------------------------------
+//  isa8_cga_tetriskr_device - constructor
+//-------------------------------------------------
+
+isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_superimpose_device( mconfig, ISA8_CGA_TETRISKR, "ISA8_CGA_TETRISKR", tag, owner, clock, "tetriskr_cga", __FILE__)
+{	
+}
+
+
+void isa8_cga_tetriskr_device::device_start()
+{
+	isa8_cga_superimpose_device::device_start();
+	m_isa->install_device(0x3c0, 0x3c0, 0, 0,  read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
+}
+
+WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
+{
+	m_bg_bank = (data & 0x0f) ^ 8;
+}
+
+READ8_MEMBER(isa8_cga_tetriskr_device::bg_bank_r)
+{
+	return 0xff;
+}
+
+
+UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int yi;
@@ -168,10 +244,31 @@ UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
-	SCREEN_UPDATE32_CALL(mc6845_cga);
+	isa8_cga_device::screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
+
+ROM_START( tetriskr_cga )
+	ROM_REGION( 0x2000, "gfx1",ROMREGION_ERASE00 ) /* gfx - 1bpp font*/
+	ROM_LOAD( "b-3.u36", 0x1800, 0x0800, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
+	ROM_IGNORE( 0x1800 )
+
+	ROM_REGION( 0x80000+1, "gfx2",ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
+	ROM_LOAD( "b-2.u58", 0x10000, 0x10000, CRC(599e1154) SHA1(14d99f90b4fedeab0ac24ffa9b1fd9ad0f0ba699))
+	ROM_LOAD( "b-4.u54", 0x20000, 0x10000, CRC(e112c450) SHA1(dfdecfc6bd617ec520b7563b7caf44b79d498bd3))
+	ROM_LOAD( "b-5.u53", 0x30000, 0x10000, CRC(050b7650) SHA1(5981dda4ed43b6e81fbe48bfba90a8775d5ecddf))
+	ROM_LOAD( "b-6.u49", 0x40000, 0x10000, CRC(d596ceb0) SHA1(8c82fb638688971ef11159a6b240253e63f0949d))
+	ROM_LOAD( "b-7.u48", 0x50000, 0x10000, CRC(79336b6c) SHA1(7a95875f3071bdc3ee25c0e6a5a3c00ef02dc977))
+	ROM_LOAD( "b-8.u44", 0x60000, 0x10000, CRC(1f82121a) SHA1(106da0f39f1260d0761217ed0a24c1611bfd7f05))
+	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
+ROM_END
+
+const rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
+{
+	return ROM_NAME( tetriskr_cga );
+}
 
 READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
@@ -532,16 +629,10 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(pcxt_state::tetriskr_bg_bank_w)
-{
-	m_bg_bank = (data & 0x0f) ^ 8;
-}
-
 static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-	AM_RANGE(0x03c0, 0x03c0) AM_WRITE(tetriskr_bg_bank_w)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
@@ -624,41 +715,6 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-
-/* F4 Character Displayer */
-static const gfx_layout pc_16_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8                 /* every char takes 2 x 8 bytes */
-};
-
-static const gfx_layout pc_8_charlayout =
-{
-	8, 8,                   /* 8 x 8 characters */
-	512,                    /* 512 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( pcxt )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout,    3, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout,   3, 1 )
-GFXDECODE_END
-
-
 void pcxt_state::machine_reset()
 {
 	m_bank = -1;
@@ -671,7 +727,29 @@ void pcxt_state::machine_reset()
 	m_speaker->level_w(0);
 }
 
-static MACHINE_CONFIG_START( filetto, pcxt_state )
+SLOT_INTERFACE_START( filetto_isa8_cards )
+	SLOT_INTERFACE_INTERNAL("filetto",  ISA8_CGA_FILETTO)
+	SLOT_INTERFACE_INTERNAL("tetriskr", ISA8_CGA_TETRISKR)
+SLOT_INTERFACE_END
+
+static const isa8bus_interface filetto_isabus_intf =
+{
+	// interrupts
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir7_w),
+
+	// dma request
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq3_w)
+};
+
+
+static MACHINE_CONFIG_FRAGMENT(pcxt)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
@@ -690,8 +768,7 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 
 	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, NULL )
 
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcxt)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", filetto_isabus_intf)
 
 	/*Sound Hardware*/
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -704,13 +781,21 @@ static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tetriskr, filetto )
+static MACHINE_CONFIG_START( filetto, pcxt_state )
+	MCFG_FRAGMENT_ADD( pcxt )
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", filetto_isa8_cards, "filetto", true)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( tetriskr, pcxt_state )
+	MCFG_FRAGMENT_ADD( pcxt )
+	
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tetriskr_io)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_VIDEO_START(pc_cga_superimpose)
-	MCFG_SCREEN_UPDATE_DRIVER(pcxt_state, screen_update_tetriskr)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", filetto_isa8_cards, "tetriskr", true)
+	//MCFG_DEVICE_MODIFY("screen")
+	//MCFG_VIDEO_START(pc_cga_superimpose)
+	//MCFG_SCREEN_UPDATE_DRIVER(pcxt_state, screen_update_tetriskr)
 
 	MCFG_DEVICE_REMOVE("voice")
 MACHINE_CONFIG_END
@@ -732,9 +817,6 @@ ROM_START( filetto )
 	ROM_LOAD( "m2.u3", 0x20000, 0x10000, CRC(abc64869) SHA1(564fc9d90d241a7b7776160b3fd036fb08037355) )
 	ROM_LOAD( "m3.u4", 0x30000, 0x10000, CRC(0c1e8a67) SHA1(f1b9280c65fcfcb5ec481cae48eb6f52d6cdbc9d) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
-
 	ROM_REGION( 0x40000, "samples", 0 ) // UM5100 sample roms?
 	ROM_LOAD16_BYTE("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
 	ROM_LOAD16_BYTE("v2.u14",  0x00001, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
@@ -743,20 +825,6 @@ ROM_END
 ROM_START( tetriskr )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
-
-	ROM_REGION( 0x2000, "gfx1",ROMREGION_ERASE00 ) /* gfx - 1bpp font*/
-	ROM_LOAD( "b-3.u36", 0x1800, 0x0800, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
-	ROM_IGNORE( 0x1800 )
-
-	ROM_REGION( 0x80000+1, "gfx2",ROMREGION_INVERT | ROMREGION_ERASEFF )
-	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
-	ROM_LOAD( "b-2.u58", 0x10000, 0x10000, CRC(599e1154) SHA1(14d99f90b4fedeab0ac24ffa9b1fd9ad0f0ba699))
-	ROM_LOAD( "b-4.u54", 0x20000, 0x10000, CRC(e112c450) SHA1(dfdecfc6bd617ec520b7563b7caf44b79d498bd3))
-	ROM_LOAD( "b-5.u53", 0x30000, 0x10000, CRC(050b7650) SHA1(5981dda4ed43b6e81fbe48bfba90a8775d5ecddf))
-	ROM_LOAD( "b-6.u49", 0x40000, 0x10000, CRC(d596ceb0) SHA1(8c82fb638688971ef11159a6b240253e63f0949d))
-	ROM_LOAD( "b-7.u48", 0x50000, 0x10000, CRC(79336b6c) SHA1(7a95875f3071bdc3ee25c0e6a5a3c00ef02dc977))
-	ROM_LOAD( "b-8.u44", 0x60000, 0x10000, CRC(1f82121a) SHA1(106da0f39f1260d0761217ed0a24c1611bfd7f05))
-	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 ROM_END
 
 DRIVER_INIT_MEMBER(pcxt_state,filetto)

@@ -493,6 +493,7 @@ MACHINES += PCCARD
 # specify available bus cores
 #-------------------------------------------------
 BUSES += CENTRONICS
+BUSES += ISA
 
 #-------------------------------------------------
 # this is the list of driver libraries that

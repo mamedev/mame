@@ -700,6 +700,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
 	m_font_selection_mask = 0x01;
 	m_start_offset = 0;
+	m_superimpose = false;
 }
 
 
@@ -716,8 +717,7 @@ void isa8_cga_device::device_start()
 	m_vram.resize(m_vram_size);
 	m_update_row = NULL;
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
-	m_superimpose = false;
+	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);	
 
 	/* Initialise the cga palette */
 	int i;
@@ -835,6 +835,11 @@ isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &m
 	m_superimpose = true;
 }
 
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		isa8_cga_device( mconfig, type, name, tag, owner, clock, shortname, source)
+{
+	m_superimpose = true;
+}
 
 /***************************************************************************
   Draw text mode with 40x25 characters (default) with high intensity bg.
