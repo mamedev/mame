@@ -204,6 +204,9 @@ TMS5110A chip by Jarek Burczynski using the PROMOUT pin, and can be regarded
 as established fact. However, the chirp table and the interpolation
 coefficients still come from the patents as there doesn't seem to be an easy
 way to read those out from the chip without decapping it.
+The TMS5111NLL was decapped and imaged by digshadow in April, 2013.
+The LPC table is verified to match the values from Jarek's PROMOUT dump of the TMS5110,
+and the die even says "TMS5110AJ" on it. It uses the 'newer' 5200-style chirp table.
 */
 static const struct tms5100_coeffs tms5110a_coeff =
 {
@@ -255,13 +258,13 @@ static const struct tms5100_coeffs tms5110a_coeff =
 		{ -205, -132,  -59,   14,   87,  160,  234,  307 },
 	},
 	/* Chirp table */
-	{   0,  42, -44, 50, -78, 18, 37, 20,
-		2, -31, -59,  2,  95, 90,  5, 15,
-		38, -4,  -91,-91, -42,-35,-36, -4,
-		37, 43,   34, 33,  15, -1, -8,-18,
-		-19,-17,   -9,-10,  -6,  0,  3,  2,
-		1,  0,    0,  0,   0,  0,  0,  0,
-		0,  0,    0,  0 },
+	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
+		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,
+		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,
+		0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0 },
 	/* interpolation coefficients */
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
