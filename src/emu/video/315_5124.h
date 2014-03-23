@@ -118,7 +118,8 @@ protected:
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
 	UINT8            m_pending_status;           /* Pending status flags */
-	UINT8            m_reg9copy;                 /* Internal copy of register 9 */
+	UINT8            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
+	UINT8            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
 	UINT8            m_addrmode;                 /* Type of VDP action */
 	UINT16           m_addr;                     /* Contents of internal VDP address register */
 	UINT8            m_cram_size;                /* CRAM size */
@@ -141,6 +142,7 @@ protected:
 	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 	bool             m_supports_224_240;
+	bool             m_display_disabled;
 	UINT16           m_sprite_base;
 	int              m_selected_sprite[8];
 	int              m_sprite_count;
