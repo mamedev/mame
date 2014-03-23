@@ -433,6 +433,9 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_lo_w );
 	DECLARE_READ16_MEMBER( hdgsp_paletteram_hi_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_paletteram_hi_w );
+
+	/* DSK board */
+	DECLARE_WRITE32_MEMBER(hddsk_update_pif);
 };
 
 
@@ -454,9 +457,6 @@ void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable);
 
 void hdds3xdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
 INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port);
-
-/* DSK board */
-void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
 
 
 /*----------- defined in video/harddriv.c -----------*/

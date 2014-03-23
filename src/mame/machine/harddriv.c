@@ -1516,11 +1516,10 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_program_w )
  *
  *************************************/
 
-void hddsk_update_pif(dsp32c_device &device, UINT32 pins)
+WRITE32_MEMBER(harddriv_state::hddsk_update_pif)
 {
-	atarigen_state *atarigen = device.machine().driver_data<atarigen_state>();
-	atarigen->m_sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);
-	atarigen->update_interrupts();
+	m_sound_int_state = ((data & DSP32_OUTPUT_PIF) != 0);
+	update_interrupts();
 }
 
 
