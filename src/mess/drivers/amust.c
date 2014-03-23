@@ -4,14 +4,23 @@
 
 Amust Compak
 
+A magazine called it the Amust Executive 816. Trying to confirm if in fact
+it's the same computer.
+
 2014-03-21 Skeleton driver. [Robbbert]
 
 An unusual-looking CP/M computer.
 There are no manuals or schematics known to exist.
 The entire driver is guesswork.
-A blurry photo of the board shows 2x 8251, 2x 8255, 8253, uPD765 and a 6845.
+The board has LH0080 (Z80A), 2x 8251, 2x 8255, 8253, uPD765A and a HD46505SP-2.
 The videoram is a 6116 RAM. There is a piezo beeper. There are 3 crystals,
-but the writing is too blurred.
+X1 = 4.9152 (serial chips?), X2 = 16 (CPU), X3 = 14.31818 MHz (Video?).
+Floppy capacity: 790k
+Their are numerous jumpers, all of which perform unknown functions.
+
+The keyboard is a plug-in unit, same idea as Kaypro and Zorba. It has these
+chips: INS8035N-6, F74145, 74LS373N, SN75451BP, 2716 rom with label KBD-3.
+Crystal: 3.579545 MHz
 
 The main rom is identical between the 2 halves, except that the initial
 crtc parameters are slightly different. I've chosen to ignore the first
@@ -26,6 +35,7 @@ B = Boot from floppy
 ToDo:
 - Everything
 - Need software
+- If booting straight to CP/M, the load message should be in the middle of the screen.
 
 ****************************************************************************/
 
@@ -245,7 +255,7 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 
 static MACHINE_CONFIG_START( amust, amust_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4) // guess clock
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(amust_mem)
 	MCFG_CPU_IO_MAP(amust_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
@@ -262,7 +272,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_16MHz / 8, amust_crtc)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8, amust_crtc)
 	MCFG_ASCII_KEYBOARD_ADD("keybd", keyboard_intf)
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -276,6 +286,9 @@ ROM_START( amust )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "cg4.rom", 0x000, 0x800, CRC(52e7b9d8) SHA1(cc6d457634eb688ccef471f72bddf0424e64b045) )
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "kbd_3.rom", 0x000, 0x800, NO_DUMP )
 
 	ROM_REGION( 0x800, "videoram", ROMREGION_ERASE00 )
 ROM_END

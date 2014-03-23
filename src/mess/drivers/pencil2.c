@@ -64,6 +64,8 @@ but is banked out of view of a BASIC program.
 KNOWN CARTS
 SD-BASIC V1.0
 SD-BASIC V2.0
+Zaxxon
+Smurf
 
 
 ToDo:
@@ -87,12 +89,11 @@ class pencil2_state : public driver_device
 {
 public:
 	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_centronics(*this, "centronics"),
-		m_cass(*this, "cassette")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_centronics(*this, "centronics")
+		, m_cass(*this, "cassette")
+	{}
 
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
@@ -103,13 +104,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+private:
 	virtual void machine_reset();
+	int m_centronics_busy;
+	int m_centronics_ack;
 	required_device<cpu_device> m_maincpu;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cass;
-
-	int m_centronics_busy;
-	int m_centronics_ack;
 };
 
 static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
