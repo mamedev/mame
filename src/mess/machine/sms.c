@@ -871,22 +871,26 @@ READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 }
 
 
+// There are two known models of the Store Display Unit:
+//
+// - the one with 16 cart slots and 3 card slots;
+// - the one with 16 cart slots and 16 card slots.
+//
+// On front panel of both models there are only 16 game switches, 
+// that seems to change the active cart/card slot pair or, for the 4th
+// game switch onward of the 16-3 model, the active cart slot only.
+
 WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 {
 	UINT8 slot = data >> 4;
 	UINT8 slottype;
 
-	// There are two known models of the Store Display Unit:
-	//
-	// - the one with 16 cart slots and 3 card slots;
-	// - the one with 16 cart slots and 16 card slots.
-	//
-	// On front panel of both models there are only 16 game switches, 
-	// that seems to change the active cart/card slot pair or, for the 4th
-	// game switch onward of the 16-3 model, the active cart slot only.
-
-	m_cartslot = m_slots[slot];
-	m_cardslot = m_cards[slot];
+	// Currently, this does not work: it goes through all the available slots
+	// but then it does not acknowledge which slots were empty and which not
+	// so that it does not map back the slot with a cart/card inserted but sits
+	// on idle at slot 16
+	//m_cartslot = m_slots[slot];
+	//m_cardslot = m_cards[slot];
 
 	// TODO: check how the selection between the cart and the card slot of
 	// the active pair behaves, and how the slot type bit is set:
