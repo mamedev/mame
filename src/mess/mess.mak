@@ -982,7 +982,6 @@ $(MESSOBJ)/at.a:                \
 	$(MESS_DRIVERS)/ct486.o     \
 
 $(MESSOBJ)/atari.a:             \
-	$(MESS_MACHINE)/ataricrt.o  \
 	$(MESS_MACHINE)/atarifdc.o  \
 	$(MESS_DRIVERS)/atari400.o  \
 	$(MESS_MACHINE)/a7800.o     \
