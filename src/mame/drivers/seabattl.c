@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( seabattl_io_map, AS_IO, 8, seabattl_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-READ8_HANDLER(seabattl_state::seabattl_collision_r)
+READ8_MEMBER(seabattl_state::seabattl_collision_r)
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision;
@@ -287,20 +287,20 @@ WRITE8_MEMBER(seabattl_state::seabattl_control_w)
 	m_waveenable = BIT(data, 5);
 }
 
-READ8_HANDLER(seabattl_state::seabattl_collision_clear_r)
+READ8_MEMBER(seabattl_state::seabattl_collision_clear_r)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 	return 0;
 }
 
-WRITE8_HANDLER(seabattl_state::seabattl_collision_clear_w )
+WRITE8_MEMBER(seabattl_state::seabattl_collision_clear_w )
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision = 0;
 }
 
-WRITE8_HANDLER(seabattl_state::sound_w )
+WRITE8_MEMBER(seabattl_state::sound_w )
 {
 	// sound effects
 	// bits:
@@ -314,7 +314,7 @@ WRITE8_HANDLER(seabattl_state::sound_w )
 	// 7 - unused
 }
 
-WRITE8_HANDLER(seabattl_state::sound2_w )
+WRITE8_MEMBER(seabattl_state::sound2_w )
 {
 	// sound effects
 	// bits:
@@ -328,19 +328,19 @@ WRITE8_HANDLER(seabattl_state::sound2_w )
 	// 7 - unused
 }
 
-WRITE8_HANDLER(seabattl_state::time_display_w )
+WRITE8_MEMBER(seabattl_state::time_display_w )
 {
 	m_digit5->a_w(data & 0x0f);
 	m_digit4->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_HANDLER(seabattl_state::score_display_w )
+WRITE8_MEMBER(seabattl_state::score_display_w )
 {
 	m_digit3->a_w(data & 0x0f);
 	m_digit2->a_w((data >> 4) & 0x0f);
 }
 
-WRITE8_HANDLER(seabattl_state::score2_display_w )
+WRITE8_MEMBER(seabattl_state::score2_display_w )
 {
 	m_digit1->a_w(data & 0x0f);
 	m_digit0->a_w((data >> 4) & 0x0f);

@@ -404,9 +404,9 @@ private:
 	READ8_MEMBER( smsgg_backupram_r );
 	WRITE8_MEMBER( smsgg_backupram_w );
 	WRITE8_MEMBER( mt_sms_standard_rom_bank_w );
-	WRITE8_HANDLER( codemasters_rom_bank_0000_w );
-	WRITE8_HANDLER( codemasters_rom_bank_4000_w );
-	WRITE8_HANDLER( codemasters_rom_bank_8000_w );
+	WRITE8_MEMBER( codemasters_rom_bank_0000_w );
+	WRITE8_MEMBER( codemasters_rom_bank_4000_w );
+	WRITE8_MEMBER( codemasters_rom_bank_8000_w );
 	void megatech_set_genz80_as_sms_standard_ports(const char* tag);
 
 };

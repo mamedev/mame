@@ -286,7 +286,7 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 
 
-WRITE8_HANDLER( thomson_state::to7_5p14_w )
+WRITE8_MEMBER( thomson_state::to7_5p14_w )
 {
 	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	if ( offset < 4 )

@@ -88,9 +88,9 @@ public:
 	int       m_oki_bank;
 	UINT16  m_gfx_control;
 
-	DECLARE_WRITE16_HANDLER(gfx_ctrl_w);
-	DECLARE_WRITE16_HANDLER(tilemap1_scrollx_w);
-	DECLARE_WRITE16_HANDLER(tilemap1_scrolly_w);
+	DECLARE_WRITE16_MEMBER(gfx_ctrl_w);
+	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
+	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
 
 protected:
 	virtual void video_start();
