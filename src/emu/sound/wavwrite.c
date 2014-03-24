@@ -1,4 +1,4 @@
-#include "osdcore.h"
+#include "corealloc.h"
 #include "sound/wavwrite.h"
 
 struct wav_file
@@ -16,7 +16,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	UINT16 align, temp16;
 
 	/* allocate memory for the wav struct */
-	wav = (wav_file *) global_alloc(sizeof(wav_file));
+	wav = (wav_file *) global_alloc(wav_file);
 	if (!wav)
 		return NULL;
 
@@ -128,7 +128,7 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(samples * sizeof(temp[0]));
+	temp = (INT16 *)global_alloc_array(INT16, samples);
 	if (!temp)
 		return;
 
@@ -156,7 +156,7 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)global_alloc_array(INT16, samples * 2);
 	if (!temp)
 		return;
 
@@ -181,7 +181,7 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)global_alloc_array(INT16, samples);
 	if (!temp)
 		return;
 
