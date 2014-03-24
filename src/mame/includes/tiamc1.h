@@ -80,7 +80,7 @@ struct timer8253struct
 };
 
 
-// ======================> qsound_device
+// ======================> tiamc1_sound_device
 
 class tiamc1_sound_device : public device_t,
 							public device_sound_interface
