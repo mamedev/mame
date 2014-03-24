@@ -15,7 +15,7 @@
 #define __DMAC_H__
 
 #include "emu.h"
-#include "bus/zorro/autoconfig.h"
+#include "autoconfig.h"
 
 
 //**************************************************************************
