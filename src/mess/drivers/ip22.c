@@ -105,10 +105,22 @@ public:
 	m_mainram(*this, "mainram"),
 	m_lpt0(*this, "lpt_0"),
 	m_pit(*this, "pit8254"),
+	m_sgi_mc(*this, "sgi_mc"),
 	m_newport(*this, "newport"),
 	m_dac(*this, "dac"),
 	m_kbdc8042(*this, "kbdc")
 	{ }
+	
+	required_device<cpu_device> m_maincpu;
+	required_device<wd33c93_device> m_wd33c93;
+	required_shared_ptr<UINT32> m_unkpbus0;
+	required_shared_ptr<UINT32> m_mainram;
+	required_device<pc_lpt_device> m_lpt0;
+	required_device<pit8254_device> m_pit;
+	required_device<sgi_mc_device> m_sgi_mc;
+	required_device<newport_video_device> m_newport;
+	required_device<dac_device> m_dac;
+	required_device<kbdc8042_device> m_kbdc8042;
 
 	RTC_t m_RTC;
 	UINT32 m_int3_regs[64];
@@ -143,15 +155,6 @@ public:
 	INTERRUPT_GEN_MEMBER(ip22_vbl);
 	TIMER_CALLBACK_MEMBER(ip22_dma);
 	TIMER_CALLBACK_MEMBER(ip22_timer);
-	required_device<cpu_device> m_maincpu;
-	required_device<wd33c93_device> m_wd33c93;
-	required_shared_ptr<UINT32> m_unkpbus0;
-	required_shared_ptr<UINT32> m_mainram;
-	required_device<pc_lpt_device> m_lpt0;
-	required_device<pit8254_device> m_pit;
-	required_device<newport_video_device> m_newport;
-	required_device<dac_device> m_dac;
-	required_device<kbdc8042_device> m_kbdc8042;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	void int3_raise_local0_irq(UINT8 source_mask);
 	void int3_lower_local0_irq(UINT8 source_mask);
@@ -182,11 +185,11 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 }
 
 
-#define RTC_DAY     state->m_RTC.nRAM[0x09]
-#define RTC_HOUR    state->m_RTC.nRAM[0x08]
-#define RTC_MINUTE  state->m_RTC.nRAM[0x07]
-#define RTC_SECOND  state->m_RTC.nRAM[0x06]
-#define RTC_HUNDREDTH   state->m_RTC.nRAM[0x05]
+#define RTC_DAY     m_RTC.nRAM[0x09]
+#define RTC_HOUR    m_RTC.nRAM[0x08]
+#define RTC_MINUTE  m_RTC.nRAM[0x07]
+#define RTC_SECOND  m_RTC.nRAM[0x06]
+#define RTC_HUNDREDTH   m_RTC.nRAM[0x05]
 
 // interrupt sources handled by INT3
 #define INT3_LOCAL0_FIFO    (0x01)
@@ -868,14 +871,14 @@ WRITE32_MEMBER(ip22_state::rtc_w)
 WRITE32_MEMBER(ip22_state::ip22_write_ram)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (sgi_mc_r(space, 0xc8/4, 0xffffffff) & 0x10001000)
+	if (m_sgi_mc->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
 	}
 
 	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (sgi_mc_r(space, 0xc0/4, 0xffffffff) & 0x40004000)
+	if (m_sgi_mc->read(space, 0xc0/4, 0xffffffff) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
 		data ^= 0xffffffff;
@@ -1180,7 +1183,7 @@ static ADDRESS_MAP_START( ip225015_map, AS_PROGRAM, 32, ip22_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_RAMBANK( "bank1" )    /* mirror of first 512k of main RAM */
 	AM_RANGE( 0x08000000, 0x0fffffff ) AM_SHARE("mainram") AM_RAM_WRITE(ip22_write_ram)     /* 128 MB of main RAM */
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_DEVREADWRITE("newport", newport_video_device, rex3_r, rex3_w )
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
+	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE(hpc3_hd_enet_r, hpc3_hd_enet_w )
 	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM   /* unknown, but read a lot and discarded */
 	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE(hpc3_hd0_r, hpc3_hd0_w )
@@ -1480,8 +1483,6 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 
 void ip22_state::machine_start()
 {
-	sgi_mc_init(machine());
-
 	// SCSI init
 	machine().device<nvram_device>("nvram_user")->set_base(m_RTC.nUserRAM, 0x200);
 	machine().device<nvram_device>("nvram")->set_base(m_RTC.nRAM, 0x200);
@@ -1622,6 +1623,8 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_NEWPORT_ADD("newport")
+	
+	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
 
