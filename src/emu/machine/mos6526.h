@@ -128,16 +128,18 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 pa_r();
-	DECLARE_READ8_MEMBER( pa_r );
-	UINT8 pb_r();
-	DECLARE_READ8_MEMBER( pb_r );
+	UINT8 pa_r() { return m_pa; }
+	DECLARE_READ8_MEMBER( pa_r ) { return pa_r(); }
+	UINT8 pb_r() { return m_pb; }
+	DECLARE_READ8_MEMBER( pb_r ) { return pb_r(); }
 
-	DECLARE_READ_LINE_MEMBER( sp_r );
+	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
-	DECLARE_READ_LINE_MEMBER( cnt_r );
+	DECLARE_READ_LINE_MEMBER( cnt_r ) { return m_cnt; }
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( flag_w );
+	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
+	DECLARE_WRITE_LINE_MEMBER( tod_w );
 
 protected:
 	enum
