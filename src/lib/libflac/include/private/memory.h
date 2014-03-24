@@ -32,7 +32,7 @@
 #ifndef FLAC__PRIVATE__MEMORY_H
 #define FLAC__PRIVATE__MEMORY_H
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
