@@ -843,6 +843,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
 	$(MACHINE)/cps2crpt.o \
 	$(MACHINE)/kabuki.o \
+	$(AUDIO)/qsound.o \
 
 $(MAMEOBJ)/cinemat.a: \
 	$(DRIVERS)/ataxx.o \

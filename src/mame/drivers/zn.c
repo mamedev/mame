@@ -24,9 +24,9 @@
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
 #include "sound/ymz280b.h"
-#include "sound/qsound.h"
 #include "sound/spu.h"
 #include "sound/ymf271.h"
+#include "audio/qsound.h"
 #include "audio/taito_zm.h"
 
 #define VERBOSE_LEVEL ( 0 )
