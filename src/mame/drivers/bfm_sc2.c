@@ -237,6 +237,7 @@ public:
 	int m_e2data_to_read;
 	UINT8 m_codec_data[256];
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
+	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(reel12_vid_w);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -2605,16 +2606,10 @@ WRITE8_MEMBER(bfm_sc2_state::sc3_expansion_w)
 }
 #endif
 
-static void bfmdm01_busy(running_machine &machine, int state)
+WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
 {
-	bfm_sc2_state *drvstate = machine.driver_data<bfm_sc2_state>();
-	drvstate->Scorpion2_SetSwitchState(4,4, state?0:1);
+	Scorpion2_SetSwitchState(4,4, state?0:1);
 }
-
-static const bfmdm01_interface dm01_interface =
-{
-	bfmdm01_busy
-};
 
 /* machine init (called only once) */
 MACHINE_RESET_MEMBER(bfm_sc2_state,awp_init)
@@ -3772,7 +3767,8 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sc2_dmd)
-	MCFG_DM01_ADD("dm01", dm01_interface)
+	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
+	MCFG_BF_DM01_BUSY_CB(WRITELINE(bfm_sc2_state, bfmdm01_busy))
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc2_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */

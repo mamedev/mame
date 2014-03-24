@@ -698,17 +698,10 @@ WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
 }
 
 /* default dmd */
-static void bfmdm01_busy(running_machine &machine, int state)
+WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 {
 	// Must tie back to inputs somehow!
 }
-
-static const bfmdm01_interface dm01_interface =
-{
-	bfmdm01_busy
-};
-
-
 
 MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
@@ -765,7 +758,8 @@ MACHINE_CONFIG_DERIVED_CLASS( sc4dmd, sc4, sc4_state )
 	/* video hardware */
 
 	MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
-	MCFG_DM01_ADD("dm01", dm01_interface)
+	MCFG_DEVICE_ADD("dm01", BF_DM01, 0)
+	MCFG_BF_DM01_BUSY_CB(WRITELINE(sc4_state, bfmdm01_busy))
 	MCFG_CPU_ADD("matrix", M6809, 2000000 )             /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sc4_state, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */

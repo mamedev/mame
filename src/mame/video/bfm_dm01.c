@@ -59,7 +59,8 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 	m_control(0),
 	m_xcounter(0),
 	m_busy(0),
-	m_comdata(0)
+	m_comdata(0),
+	m_busy_cb(*this)
 {
 	for (int i = 0; i < 65; i++)
 	m_segbuffer[i] = 0;
@@ -69,30 +70,13 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void bfmdm01_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const bfmdm01_interface *intf = reinterpret_cast<const bfmdm01_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<bfmdm01_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bfmdm01_device::device_start()
 {
+	m_busy_cb.resolve_safe();
+	
 	save_item(NAME(m_data_avail));
 	save_item(NAME(m_control));
 	save_item(NAME(m_xcounter));
@@ -116,8 +100,8 @@ void bfmdm01_device::device_reset()
 	m_control  = 0;
 	m_xcounter = 0;
 	m_data_avail = 0;
-
-	m_busy_func(machine(), m_busy);
+	
+	m_busy_cb(m_busy);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -161,7 +145,7 @@ WRITE8_MEMBER( bfmdm01_device::control_w )
 		if ( data & 8 )   m_busy = 0;
 		else              m_busy = 1;
 
-		m_busy_func(machine(), m_busy);
+		m_busy_cb(m_busy);
 	}
 }
 
