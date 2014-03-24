@@ -16,7 +16,7 @@ const device_type TMS3615 = &device_creator<tms3615_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  qsound_device - constructor
+//  tms3615_device - constructor
 //-------------------------------------------------
 
 tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

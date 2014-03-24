@@ -6,7 +6,7 @@
 const device_type FILTER_VOLUME = &device_creator<filter_volume_device>;
 
 //-------------------------------------------------
-//  qsound_device - constructor
+//  filter_volume_device - constructor
 //-------------------------------------------------
 
 filter_volume_device::filter_volume_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

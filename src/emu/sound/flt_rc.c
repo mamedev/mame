@@ -14,7 +14,7 @@ const device_type FILTER_RC = &device_creator<filter_rc_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  qsound_device - constructor
+//  filter_rc_device - constructor
 //-------------------------------------------------
 
 filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
