@@ -61,18 +61,10 @@ enum int_levels
  *
  *************************************/
 
-static void tms_interrupt(running_machine &machine, int state)
+WRITE_LINE_MEMBER(jpmsys5_state::generate_tms34061_interrupt)
 {
-	jpmsys5_state *drvstate = machine.driver_data<jpmsys5_state>();
-	drvstate->m_maincpu->set_input_line(INT_TMS34061, state);
+	m_maincpu->set_input_line(INT_TMS34061, state);
 }
-
-static const struct tms34061_interface tms34061intf =
-{
-	8,              /* VRAM address is (row << rowshift) | col */
-	0x40000,        /* Size of video RAM - FIXME: Should be 128kB + 32kB */
-	tms_interrupt   /* Interrupt gen callback */
-};
 
 WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 {
@@ -663,7 +655,10 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
 	MCFG_SCREEN_UPDATE_DRIVER(jpmsys5_state, screen_update_jpmsys5v)
 
-	MCFG_TMS34061_ADD("tms34061", tms34061intf)
+	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
+	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
+	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(jpmsys5_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	MCFG_PALETTE_ADD("palette", 16)
 

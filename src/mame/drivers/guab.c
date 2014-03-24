@@ -91,6 +91,7 @@ public:
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;
 	struct wd1770 m_fdc;
+	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
 	DECLARE_READ16_MEMBER(guab_tms34061_r);
 	DECLARE_WRITE16_MEMBER(ef9369_w);
@@ -138,19 +139,10 @@ static const ptm6840_interface ptm_intf =
  * TMS34061 CRTC
  *****************/
 
-static void tms_interrupt(running_machine &machine, int state)
+WRITE_LINE_MEMBER(guab_state::generate_tms34061_interrupt)
 {
-	guab_state *drvstate = machine.driver_data<guab_state>();
-	drvstate->m_maincpu->set_input_line(INT_TMS34061, state);
+	m_maincpu->set_input_line(INT_TMS34061, state);
 }
-
-static const struct tms34061_interface tms34061intf =
-{
-	8,              /* VRAM address is (row << rowshift) | col */
-	0x40000,        /* Size of video RAM */
-	tms_interrupt   /* Interrupt gen callback */
-};
-
 
 WRITE16_MEMBER(guab_state::guab_tms34061_w)
 {
@@ -810,7 +802,10 @@ static MACHINE_CONFIG_START( guab, guab_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_TMS34061_ADD("tms34061", tms34061intf)
+	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
+	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
+	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(guab_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

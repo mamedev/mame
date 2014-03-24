@@ -1608,23 +1608,12 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-void itech8_state::static_generate_interrupt(running_machine &machine, int state_num) { machine.driver_data<itech8_state>()->generate_interrupt(state_num); }
-void itech8_state::generate_interrupt(int state_num)
+WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 {
-	itech8_update_interrupts(-1, state_num, -1);
+	itech8_update_interrupts(-1, state, -1);
 
-	if (FULL_LOGGING && state_num) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
+	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", m_screen->vpos());
 }
-
-
-static const struct tms34061_interface tms34061intf =
-{
-	8,                      /* VRAM address is (row << rowshift) | col */
-	0x40000,                /* size of video RAM */
-	&itech8_state::static_generate_interrupt      /* interrupt gen callback */
-};
-
-
 
 /*************************************
  *
@@ -1653,7 +1642,10 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 263)
 
-	MCFG_TMS34061_ADD("tms34061", tms34061intf)
+	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
+	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
+	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(itech8_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
