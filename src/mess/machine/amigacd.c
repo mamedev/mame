@@ -122,6 +122,7 @@ static TIMER_CALLBACK(dmac_dma_proc)
 	}
 }
 
+#if 0
 static READ16_HANDLER( amiga_dmac_r )
 {
 	offset &= 0xff;
@@ -380,45 +381,8 @@ static WRITE16_HANDLER( amiga_dmac_w )
 		break;
 	}
 }
+#endif
 
-/***************************************************************************
-
-    Autoconfig
-
-***************************************************************************/
-
-static void dmac_install(running_machine &machine, offs_t base)
-{
-	amiga_state *state = machine.driver_data<amiga_state>();
-	address_space &space = *state->m_maincpu_program_space;
-	space.install_legacy_read_handler(base, base + 0xFFFF, FUNC(amiga_dmac_r));
-	space.install_legacy_write_handler(base, base + 0xFFFF, FUNC(amiga_dmac_w));
-}
-
-static void dmac_uninstall(running_machine &machine, offs_t base)
-{
-	amiga_state *state = machine.driver_data<amiga_state>();
-	address_space &space = *state->m_maincpu_program_space;
-	space.unmap_readwrite(base, base + 0xFFFF);
-}
-
-static const amiga_autoconfig_device dmac_device =
-{
-	0,              /* link into free memory list */
-	0,              /* ROM vector offset valid */
-	0,              /* multiple devices on card */
-	1,              /* number of 64k pages */
-	3,              /* product number (DMAC) */
-	0,              /* prefer 8MB address space */
-	0,              /* can be shut up */
-	0x0202,         /* manufacturers number (Commodore) */
-	0,              /* serial number */
-	0,              /* ROM vector offset */
-	NULL,           /* interrupt control read */
-	NULL,           /* interrupt control write */
-	dmac_install,   /* memory installation */
-	dmac_uninstall  /* memory uninstallation */
-};
 
 /***************************************************************************
 
@@ -533,7 +497,7 @@ MACHINE_START( amigacd )
 	tp6525_delayed_timer = machine.scheduler().timer_alloc(FUNC(tp6525_delayed_irq));
 
 	/* set up DMAC with autoconfig */
-	amiga_add_autoconfig( machine, &dmac_device );
+	//amiga_add_autoconfig( machine, &dmac_device );
 
 	matsucd_init( machine.device<cdrom_image_device>("cdrom"), "cdda" );
 }

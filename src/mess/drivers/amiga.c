@@ -47,10 +47,10 @@ very fussy with the state machine.
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
 #include "machine/6526cia.h"
+#include "bus/zorro/zorro.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
 #include "machine/amigacd.h"
-#include "machine/amigacrt.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
@@ -58,7 +58,6 @@ very fussy with the state machine.
 
 /* Devices */
 #include "imagedev/chd_cd.h"
-#include "imagedev/cartslot.h"
 
 class cdtv_state : public amiga_state
 {
@@ -165,7 +164,6 @@ static ADDRESS_MAP_START(amiga_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM /* slow-mem */
 	AM_RANGE(0xc80000, 0xcfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)    /* see Note 1 above */
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")    /* Custom Chips */
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)   /* System ROM - mirror */
 ADDRESS_MAP_END
 
@@ -175,7 +173,6 @@ static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, a1200_state )
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)   /* Kickstart */
 ADDRESS_MAP_END
 
@@ -185,7 +182,6 @@ static ADDRESS_MAP_START( amiga_mem32, AS_PROGRAM, 32, amiga_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)   /* Kickstart */
 ADDRESS_MAP_END
 
@@ -239,7 +235,6 @@ static ADDRESS_MAP_START(cdtv_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")    /* Custom Chips */
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_ROM AM_REGION("user1", 0)   /* CDTV & System ROM */
 ADDRESS_MAP_END
 
@@ -266,7 +261,6 @@ static ADDRESS_MAP_START(a1000_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) /* See Note 1 above */
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")    /* Custom Chips */
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xfbffff) AM_ROM AM_REGION("user1", 0)   /* Bootstrap ROM */
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK("bank2")    /* Writable Control Store RAM */
 ADDRESS_MAP_END
@@ -615,12 +609,6 @@ static SLOT_INTERFACE_START( amiga_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_START( ntsc, amiga_state )
 	/* basic machine hardware */
@@ -694,7 +682,7 @@ static MACHINE_CONFIG_DERIVED( a1000ntsc, ntsc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500ntsc, ntsc )
-	MCFG_FRAGMENT_ADD(amiga_cartslot)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
@@ -773,11 +761,34 @@ static MACHINE_CONFIG_DERIVED( pal, ntsc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500p, pal )
-	MCFG_FRAGMENT_ADD(amiga_cartslot)
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
+MACHINE_CONFIG_END
+
+WRITE_LINE_MEMBER( amiga_state::zorro2_int2_w )
+{
+	amiga_custom_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+}
+
+WRITE_LINE_MEMBER( amiga_state::zorro2_int6_w )
+{
+	amiga_custom_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+}
+
+static MACHINE_CONFIG_DERIVED( a2000p, pal )
+	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, NULL)
+
+	MCFG_ZORRO2_ADD("maincpu")
+	MCFG_ZORRO2_INT2_HANDLER(WRITELINE(amiga_state, zorro2_int2_w))
+	MCFG_ZORRO2_INT6_HANDLER(WRITELINE(amiga_state, zorro2_int6_w))
+	MCFG_ZORRO2_SLOT_ADD("zorro1", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro2", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro3", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro4", zorro2_cards, NULL)
+	MCFG_ZORRO2_SLOT_ADD("zorro5", zorro2_cards, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1000p, pal )
@@ -1067,10 +1078,6 @@ WRITE8_MEMBER( amiga_state::amiga_cia_0_portA_w )
 
 		/* overlay disabled, map RAM on 0x000000 */
 		m_maincpu_program_space->install_write_bank(0x000000, m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
-
-		/* if there is a cart region, check for cart overlay */
-		if (space.machine().root_device().memregion("user2")->base() != NULL)
-			amiga_cart_check_overlay(space.machine());
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
@@ -1133,7 +1140,7 @@ DRIVER_INIT_MEMBER(amiga_state,amiga)
 		NULL,                                    /* serdat_w */
 		NULL,                                    /* scanline0_callback */
 		amiga_reset,                             /* reset_callback */
-		amiga_cart_nmi,                          /* nmi_callback */
+		NULL,                          /* nmi_callback */
 		0                                        /* flags */
 	};
 
@@ -1142,9 +1149,6 @@ DRIVER_INIT_MEMBER(amiga_state,amiga)
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
 	m_bank1->configure_entry(1, memregion("user1")->base());
-
-	/* initialize cartridge (if present) */
-	amiga_cart_init(machine());
 }
 
 
@@ -1247,20 +1251,17 @@ ROM_START( a500 )
 	ROM_SYSTEM_BIOS(1, "kick13",  "Kickstart 1.3 (34.5)")
 	ROMX_LOAD("315093-02.u6", 0x000000, 0x040000, CRC(c4f0f55f) SHA1(891e9a547772fe0c6c19b610baf8bc4ea7fcb785), ROM_GROUPWORD | ROM_BIOS(2))
 	ROM_COPY("user1", 0x000000, 0x040000, 0x040000)
-	/* why would you run kick31 on an a500? */
+	/* todo: add kickstart 2.04 back */
 	ROM_SYSTEM_BIOS(2, "kick31",  "Kickstart 3.1 (40.63)")
-	ROMX_LOAD("kick40063.u6", 0x000000, 0x080000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(4))    /* part number? */
-
-	/* action replay cartridge */
-	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROMX_LOAD("kick40063.u6", 0x000000, 0x080000, CRC(fc24ae0d) SHA1(3b7f1493b27e212830f989f26ca76c02049f09ca), ROM_GROUPWORD | ROM_BIOS(3))    /* part number? */
 
 	/* keyboard controller, mos 6500/1 mcu */
 	ROM_REGION(0x800, "keyboard", 0)
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, NO_DUMP)
 ROM_END
 
-#define rom_a500n    rom_a500
+#define rom_a500n	rom_a500
+#define rom_a2000	rom_a500
 
 ROM_START( a500pl )
 	ROM_REGION16_BE(0x080000, "user1", 0)
@@ -1268,10 +1269,6 @@ ROM_START( a500pl )
 
 	ROM_SYSTEM_BIOS(0, "kick204", "Kickstart 2.04 (37.175)")
 	ROMX_LOAD("390979-01.u6", 0x000000, 0x080000, CRC(c3bdb240) SHA1(c5839f5cb98a7a8947065c3ed2f14f5f42e334a1), ROM_GROUPWORD | ROM_BIOS(0))    /* identical to 363968.01 */
-
-	/* action replay cartridge */
-	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	/* keyboard controller, mos 6500/1 mcu */
 	ROM_REGION(0x800, "keyboard", 0)
@@ -1292,10 +1289,6 @@ ROM_START( a600 )
 	ROMX_LOAD("kickstart v2.05 r37.300 (1991)(commodore)(a600hd).rom",  0x000000, 0x080000, CRC(64466c2a) SHA1(f72d89148dac39c696e30b10859ebc859226637b), ROM_GROUPWORD | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "kick205b", "Kickstart 2.05 (37.300)")
 	ROMX_LOAD("kickstart v2.05 r37.350 (1992)(commodore)(a600hd)[!].rom", 0x000000, 0x080000, CRC(43b0df7b) SHA1(02843c4253bbd29aba535b0aa3bd9a85034ecde4), ROM_GROUPWORD | ROM_BIOS(2))
-
-	/* action replay cartridge */
-	ROM_REGION16_BE(0x080000, "user2", ROMREGION_ERASEFF )
-	ROM_CART_LOAD("cart", 0x0000, 0x080000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 	/* keyboard controller, mos 6500/1 mcu */
 	ROM_REGION(0x800, "keyboard", 0)
@@ -1378,6 +1371,7 @@ ROM_END
 COMP( 1985, a1000,   0,      0,     a1000,  amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (PAL)",      GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 COMP( 1985, a1000n,  a1000,  0,     a1000n, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 1000 (NTSC)",     GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
+COMP( 1987, a2000,   0,      0,     a2000p, amiga, amiga_state,  amiga,  "Commodore Business Machines",  "Amiga 2000 (PAL, OCS)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
 
 /* Low-end market line */

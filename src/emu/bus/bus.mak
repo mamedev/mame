@@ -1046,3 +1046,16 @@ OBJDIRS += $(BUSOBJ)/macpds
 BUSOBJS += $(BUSOBJ)/macpds/macpds.o
 BUSOBJS += $(BUSOBJ)/macpds/pds_tpdfpd.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/zorro/zorro.h,BUSES += ZORRO
+#-------------------------------------------------
+
+ifneq ($(filter ZORRO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/zorro
+BUSOBJS += $(BUSOBJ)/zorro/zorro.o
+BUSOBJS += $(BUSOBJ)/zorro/cards.o
+BUSOBJS += $(BUSOBJ)/zorro/a590.o
+BUSOBJS += $(BUSOBJ)/zorro/action_replay.o
+endif

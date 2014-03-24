@@ -347,31 +347,6 @@ struct amiga_machine_interface
 #define IS_ECS_OR_AGA(intf) ( intf->chip_ram_mask == ECS_CHIP_RAM_MASK)
 #define IS_32BIT(intf) (( intf->flags & FLAGS_IS_32BIT) != 0)
 
-struct amiga_autoconfig_device
-{
-	UINT8       link_memory;        /* link into free memory list */
-	UINT8       rom_vector_valid;   /* ROM vector offset valid */
-	UINT8       multi_device;       /* multiple devices on card */
-	UINT8       size;               /* number of 64k pages */
-	UINT16      product_number;     /* product number */
-	UINT8       prefer_8meg;        /* prefer 8MB address space */
-	UINT8       can_shutup;         /* can be shut up */
-	UINT16      mfr_number;         /* manufacturers number */
-	UINT32      serial_number;      /* serial number */
-	UINT16      rom_vector;         /* ROM vector offset */
-	UINT8       (*int_control_r)(running_machine &machine); /* interrupt control read */
-	void        (*int_control_w)(running_machine &machine, UINT8 data); /* interrupt control write */
-	void        (*install)(running_machine &machine, offs_t base); /* memory installation */
-	void        (*uninstall)(running_machine &machine, offs_t base); /* memory uninstallation */
-};
-
-struct autoconfig_device
-{
-	autoconfig_device *     next;
-	amiga_autoconfig_device device;
-	offs_t                  base;
-};
-
 class amiga_sound_device;
 
 class amiga_state : public driver_device
@@ -436,8 +411,6 @@ public:
 	address_space* m_maincpu_program_space;
 
 	const amiga_machine_interface *m_intf;
-	autoconfig_device *m_autoconfig_list;
-	autoconfig_device *m_cur_autoconfig;
 	emu_timer * m_irq_timer;
 	emu_timer * m_blitter_timer;
 
@@ -513,8 +486,8 @@ public:
 	DECLARE_READ16_MEMBER( amiga_custom_r );
 	DECLARE_WRITE16_MEMBER( amiga_custom_w );
 
-	DECLARE_READ16_MEMBER( amiga_autoconfig_r );
-	DECLARE_WRITE16_MEMBER( amiga_autoconfig_w );
+	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
+	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
 
 	DECLARE_READ16_MEMBER( amiga_cia_r );
 	DECLARE_WRITE16_MEMBER( amiga_cia_w );
@@ -552,8 +525,6 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 
 void amiga_serial_in_w(running_machine &machine, UINT16 data);
 attotime amiga_get_serial_char_period(running_machine &machine);
-
-void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device);
 
 const amiga_machine_interface *amiga_get_interface(running_machine &machine);
 

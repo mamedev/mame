@@ -16,6 +16,16 @@ MACHINEOBJ = $(EMUOBJ)/machine
 
 #-------------------------------------------------
 #
+#@src/emu/machine/autoconfig.h,MACHINES += AUTOCONFIG
+#-------------------------------------------------
+
+ifneq ($(filter DMAC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/autoconfig.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/machine/40105.h,MACHINES += CMOS40105
 #-------------------------------------------------
 
@@ -413,6 +423,15 @@ endif
 
 ifneq ($(filter CS8221,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/cs8221.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/machine/dmac.h,MACHINES += DMAC
+#-------------------------------------------------
+
+ifneq ($(filter DMAC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/dmac.o
 endif
 
 #-------------------------------------------------

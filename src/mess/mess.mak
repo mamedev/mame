@@ -328,6 +328,7 @@ MACHINES += 68561MPCC
 MACHINES += 68681
 MACHINES += 7200FIFO
 MACHINES += 8530SCC
+MACHINES += AUTOCONFIG
 MACHINES += AAKARTDEV
 MACHINES += ACIA6850
 MACHINES += ADC0808
@@ -352,6 +353,7 @@ MACHINES += COM8116
 MACHINES += CR589
 MACHINES += CS4031
 MACHINES += CS8221
+MACHINES += DMAC
 MACHINES += DP8390
 MACHINES += DS1302
 MACHINES += DS1315
@@ -577,6 +579,7 @@ BUSES += VIP
 BUSES += WANGPC
 BUSES += X68K
 BUSES += Z88
+BUSES += ZORRO
 
 
 #-------------------------------------------------
@@ -900,7 +903,6 @@ $(MESSOBJ)/altos.a:             \
 	$(MESS_DRIVERS)/altos5.o    \
 
 $(MESSOBJ)/amiga.a:             \
-	$(MESS_MACHINE)/amigacrt.o  \
 	$(MESS_MACHINE)/amigacd.o   \
 	$(MESS_MACHINE)/amigakbd.o  \
 	$(MESS_DRIVERS)/amiga.o     \

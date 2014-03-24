@@ -513,6 +513,10 @@ WRITE8_MEMBER(wd33c93_device::write)
 				/* if data was written, and we have a count, send to device */
 				int count = get_xfer_count();
 
+				// counter disabled?
+				if (count == 0)
+					count = 1;
+
 				if ( regs[WD_COMMAND] & 0x80 )
 					count = 1;
 
