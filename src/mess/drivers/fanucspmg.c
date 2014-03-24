@@ -424,6 +424,7 @@
 #define FDC_TAG		"fdc"
 #define SCREEN_TAG	"screen"
 #define SHARED_TAG	"shared"
+#define CHARGEN_TAG	"chargen"
 
 class fanucspmg_state : public driver_device
 {
@@ -444,7 +445,7 @@ public:
 		, m_crtc(*this, CRTC_TAG)
 		, m_fdc(*this, FDC_TAG)
 		, m_shared(*this, SHARED_TAG)
-		, m_chargen(*this, "chargen")
+		, m_chargen(*this, CHARGEN_TAG)
 	{ }
 
 	required_device<i8086_cpu_device> m_maincpu;
@@ -662,19 +663,27 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 		{
 			if (offset <= 0x5ff)
 			{
-				UINT8 chr = state->m_vram[offset + 0x600]; 
-				UINT8 data = chargen[ (chr * 16) + ra ];
+				UINT8 chr = state->m_vram[offset + 0x600];
+				UINT8 attr = state->m_vram[offset];
+				UINT8 data = chargen[ chr + (ra * 256) ];
 				UINT32 fg = 0xffffff;
 				UINT32 bg = 0;
 
-				*p++ = ( data & 0x80 ) ? fg : bg;
-				*p++ = ( data & 0x40 ) ? fg : bg;
-				*p++ = ( data & 0x20 ) ? fg : bg;
-				*p++ = ( data & 0x10 ) ? fg : bg;
-				*p++ = ( data & 0x08 ) ? fg : bg;
-				*p++ = ( data & 0x04 ) ? fg : bg;
-				*p++ = ( data & 0x02 ) ? fg : bg;
+				// colors are black, red, green, yellow, blue, purple, light blue, and white
+				// attr & 0x70 = 0x60 is green, need more software running to know the others
+				if (((attr>>4) & 7) == 6)
+				{
+					fg = 0x008800;
+				}
+
 				*p++ = ( data & 0x01 ) ? fg : bg;
+				*p++ = ( data & 0x02 ) ? fg : bg;
+				*p++ = ( data & 0x04 ) ? fg : bg;
+				*p++ = ( data & 0x08 ) ? fg : bg;   						  
+				*p++ = ( data & 0x10 ) ? fg : bg;   						  
+				*p++ = ( data & 0x20 ) ? fg : bg;
+				*p++ = ( data & 0x40 ) ? fg : bg;
+				*p++ = ( data & 0x80 ) ? fg : bg;
 			}
 		}
 		else
@@ -759,13 +768,11 @@ ROM_START( fanucspg )
 	ROM_LOAD16_BYTE( "a40_001a.13a", 0x000000, 0x002000, CRC(1b8ac8ef) SHA1(309c081d25270e082ebf846b4f73cef76b52d991) ) 
 	ROM_LOAD16_BYTE( "a40_002a.15a", 0x000001, 0x002000, CRC(587ae652) SHA1(ebc5a4c3d64ab9d6dd4d5355f85bc894e7294e17) ) 
 
-	ROM_REGION(0xc000, SUBCPU_TAG, 0)
+	ROM_REGION(0x4000, SUBCPU_TAG, 0)
 	ROM_LOAD( "a41_010b.28b", 0x000000, 0x004000, CRC(35a9714f) SHA1(5697b6c4db5adb5702dc1290ecc98758d5fab221) ) 
-	ROM_LOAD( "a42_020a.30b", 0x004000, 0x008000, CRC(33eb5962) SHA1(1157a72089ff77e8db9a9a8fcd0f6c32a1374f56) ) 
 
-	ROM_REGION(0x2000,"chargen", 0)
-	// marked BAD_DUMP because this doesn't belong to this system, we need to find where the chargen data comes from
-	ROM_LOAD( "chs_7859.bin", 0x000000, 0x001000, BAD_DUMP CRC(ebe8f333) SHA1(3517fa9e7a39573f1cb159b3161d6939dec199ba) ) 
+	ROM_REGION(0x8000, CHARGEN_TAG, 0)
+	ROM_LOAD( "a42_020a.30b", 0x000000, 0x008000, CRC(33eb5962) SHA1(1157a72089ff77e8db9a9a8fcd0f6c32a1374f56) ) 
 ROM_END
 
 /* Driver */
