@@ -176,7 +176,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 			}
 			else if (compression == APR_COMPRESSED)
 			{
-				UINT8 *buffer = (UINT8 *)osd_malloc(data_size * sizeof(UINT8));
+				UINT8 *buffer = (UINT8 *)global_alloc(data_size * sizeof(UINT8));
 				UINT16 length;
 				UINT8 value;
 
@@ -185,7 +185,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 				length = pick_integer_le(buffer, 0, 2);
 				value = pick_integer_le(buffer, 2, 1);
 
-				osd_free(buffer);
+				global_free(buffer);
 
 				/* not sure if this is possible */
 				if (length != 512) {
