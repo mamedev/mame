@@ -201,9 +201,9 @@ emu_timer *m_ic21_timer;
 	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
 	void update_triacs();
 	void mpu3_stepper_reset();
-	void ic11_update(mpu3_state *state);
-	void ic21_output(mpu3_state *state,int data);
-	void ic21_setup(mpu3_state *state);
+	void ic11_update();
+	void ic21_output(int data);
+	void ic21_setup();
 	void mpu3_config_common();
 	required_device<cpu_device> m_maincpu;
 };
@@ -308,7 +308,7 @@ IC23 is a 74LS138 1-of-8 Decoder
 
 It is used as a multiplexer for the LEDs, lamp selects and inputs.*/
 
-void mpu3_state::ic11_update(mpu3_state *state)
+void mpu3_state::ic11_update()
 {
 	if (!m_IC11G2A)
 	{
@@ -354,19 +354,19 @@ t/ns = .34 * 47 * 2.2e6 [ 1+ (1/47)]
 
 This seems less stable than the revised version used in MPU4
 */
-void mpu3_state::ic21_output(mpu3_state *state,int data)
+void mpu3_state::ic21_output(int data)
 {
 	m_IC11G1 = data;
-	ic11_update(state);
+	ic11_update();
 }
 
-void mpu3_state::ic21_setup(mpu3_state *state)
+void mpu3_state::ic21_setup()
 {
 	if (m_IC11GA)
 	{
 		{
 			m_ic11_active=1;
-			ic21_output(state,1);
+			ic21_output(1);
 			m_ic21_timer->adjust(attotime::from_nsec( (0.34 * 47 * 2200000) *(1+(1/47))));
 		}
 	}
@@ -375,7 +375,7 @@ void mpu3_state::ic21_setup(mpu3_state *state)
 TIMER_CALLBACK_MEMBER(mpu3_state::ic21_timeout)
 {
 	m_ic11_active=0;
-	ic21_output(this,0);
+	ic21_output(0);
 }
 
 READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
@@ -430,11 +430,10 @@ WRITE8_MEMBER(mpu3_state::pia_ic3_portb_w)
 
 WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
 {
-	mpu3_state *mstate = machine().driver_data<mpu3_state>();
 	LOG(("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state));
 	m_IC11GA = state;
-	ic21_setup(mstate);
-	ic11_update(mstate);
+	ic21_setup();
+	ic11_update();
 }
 
 READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
@@ -508,10 +507,9 @@ WRITE8_MEMBER(mpu3_state::pia_ic4_portb_w)
 
 WRITE_LINE_MEMBER(mpu3_state::pia_ic4_ca2_w)
 {
-	mpu3_state *mstate = machine().driver_data<mpu3_state>();
 	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state));
 	m_IC11GB = state;
-	ic11_update(mstate);
+	ic11_update();
 }
 
 WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
@@ -570,10 +568,9 @@ WRITE8_MEMBER(mpu3_state::pia_ic5_portb_w)
 
 WRITE_LINE_MEMBER(mpu3_state::pia_ic5_ca2_w)
 {
-	mpu3_state *mstate = machine().driver_data<mpu3_state>();
 	LOG(("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state));
 	m_IC11GC = state;
-	ic11_update(mstate);
+	ic11_update();
 }
 
 WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)

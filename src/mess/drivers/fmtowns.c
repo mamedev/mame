@@ -1183,51 +1183,50 @@ WRITE8_MEMBER( towns_state::towns_cmos_w )
 
 void towns_state::towns_update_video_banks(address_space& space)
 {
-	towns_state *state = space.machine().driver_data<towns_state>();
 	UINT8* ROM;
 
 	if(m_towns_mainmem_enable != 0)  // first MB is RAM
 	{
 		ROM = m_user->base();
 
-//      state->membank(1)->set_base(m_messram->pointer()+0xc0000);
-//      state->membank(2)->set_base(m_messram->pointer()+0xc8000);
-//      state->membank(3)->set_base(m_messram->pointer()+0xc9000);
-//      state->membank(4)->set_base(m_messram->pointer()+0xca000);
-//      state->membank(5)->set_base(m_messram->pointer()+0xca000);
-//      state->membank(10)->set_base(m_messram->pointer()+0xca800);
-		state->membank("bank6")->set_base(m_messram->pointer()+0xcb000);
-		state->membank("bank7")->set_base(m_messram->pointer()+0xcb000);
+//      membank(1)->set_base(m_messram->pointer()+0xc0000);
+//      membank(2)->set_base(m_messram->pointer()+0xc8000);
+//      membank(3)->set_base(m_messram->pointer()+0xc9000);
+//      membank(4)->set_base(m_messram->pointer()+0xca000);
+//      membank(5)->set_base(m_messram->pointer()+0xca000);
+//      membank(10)->set_base(m_messram->pointer()+0xca800);
+		membank("bank6")->set_base(m_messram->pointer()+0xcb000);
+		membank("bank7")->set_base(m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			state->membank("bank11")->set_base(m_messram->pointer()+0xf8000);
+			membank("bank11")->set_base(m_messram->pointer()+0xf8000);
 		else
-			state->membank("bank11")->set_base(ROM+0x238000);
-		state->membank("bank12")->set_base(m_messram->pointer()+0xf8000);
+			membank("bank11")->set_base(ROM+0x238000);
+		membank("bank12")->set_base(m_messram->pointer()+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
 	{
 		ROM = m_user->base();
 
-//      state->membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
-//      state->membank(2)->set_base(towns_txtvram);
-//      state->membank(3)->set_base(state->m_messram->pointer()+0xc9000);
+//      membank(1)->set_base(towns_gfxvram+(towns_vram_rplane*0x8000));
+//      membank(2)->set_base(towns_txtvram);
+//      membank(3)->set_base(m_messram->pointer()+0xc9000);
 //      if(towns_ankcg_enable != 0)
-//          state->membank(4)->set_base(ROM+0x180000+0x3d000);  // ANK CG 8x8
+//          membank(4)->set_base(ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
-//          state->membank(4)->set_base(towns_txtvram+0x2000);
-//      state->membank(5)->set_base(towns_txtvram+0x2000);
-//      state->membank(10)->set_base(state->m_messram->pointer()+0xca800);
+//          membank(4)->set_base(towns_txtvram+0x2000);
+//      membank(5)->set_base(towns_txtvram+0x2000);
+//      membank(10)->set_base(m_messram->pointer()+0xca800);
 		if(m_towns_ankcg_enable != 0)
-			state->membank("bank6")->set_base(ROM+0x180000+0x3d800);  // ANK CG 8x16
+			membank("bank6")->set_base(ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			state->membank("bank6")->set_base(m_messram->pointer()+0xcb000);
-		state->membank("bank7")->set_base(m_messram->pointer()+0xcb000);
+			membank("bank6")->set_base(m_messram->pointer()+0xcb000);
+		membank("bank7")->set_base(m_messram->pointer()+0xcb000);
 		if(m_towns_system_port & 0x02)
-			state->membank("bank11")->set_base(m_messram->pointer()+0xf8000);
+			membank("bank11")->set_base(m_messram->pointer()+0xf8000);
 		else
-			state->membank("bank11")->set_base(ROM+0x238000);
-		state->membank("bank12")->set_base(m_messram->pointer()+0xf8000);
+			membank("bank11")->set_base(ROM+0x238000);
+		membank("bank12")->set_base(m_messram->pointer()+0xf8000);
 		return;
 	}
 }

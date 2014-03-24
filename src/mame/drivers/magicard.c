@@ -286,7 +286,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ ....aaaa  VSR:H = video start address (MSB's)
 */
 
-#define SCC_DCR_VREG    (state->m_pcab_vregs[0x02/2] & 0xffff)
+#define SCC_DCR_VREG    (m_pcab_vregs[0x02/2] & 0xffff)
 #define SCC_DE_VREG     ((SCC_DCR_VREG & 0x8000)>>15)
 #define SCC_FG_VREG     ((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
@@ -296,7 +296,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w aaaaaaaa aaaaaaaa  VSR:L = video start address (LSB's)
 */
 
-#define SCC_VSR_VREG_L  (state->m_pcab_vregs[0x04/2] & 0xffff)
+#define SCC_VSR_VREG_L  (m_pcab_vregs[0x04/2] & 0xffff)
 #define SCC_VSR_VREG    ((SCC_VSR_VREG_H)<<16) | (SCC_VSR_VREG_L)
 
 /*
@@ -315,7 +315,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ xxxx....  not used
     w ........ ....aaaa  "data" (dunno the purpose...)
 */
-#define SCC_DCR2_VREG  (state->m_pcab_vregs[0x08/2] & 0xffff)
+#define SCC_DCR2_VREG  (m_pcab_vregs[0x08/2] & 0xffff)
 
 /*
 (Note: not present on the original vreg listing)
@@ -336,14 +336,14 @@ TODO: check this register,doesn't seem to be 100% correct.
 1ffff0  a = source register a
     w nnnnnnnn nnnnnnnn  source
 */
-#define SCC_SRCA_VREG  (state->m_pcab_vregs[0x10/2] & 0xffff)
+#define SCC_SRCA_VREG  (m_pcab_vregs[0x10/2] & 0xffff)
 
 /*
 1ffff2  b = destination register b
    rw nnnnnnnn nnnnnnnn  destination
 */
 
-#define SCC_DSTB_VREG  (state->m_pcab_vregs[0x12/2] & 0xffff)
+#define SCC_DSTB_VREG  (m_pcab_vregs[0x12/2] & 0xffff)
 
 /*
 1ffff4  pcr = pixac command register
@@ -390,7 +390,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ .......0
 */
 
-#define SCC_PCR_VREG  (state->m_pcab_vregs[0x14/2] & 0xffff)
+#define SCC_PCR_VREG  (m_pcab_vregs[0x14/2] & 0xffff)
 
 /*
 1ffff6  mask = mask register
@@ -422,7 +422,6 @@ void magicard_state::video_start()
 
 UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	magicard_state *state = machine().driver_data<magicard_state>();
 	int x,y;
 	UINT32 count;
 

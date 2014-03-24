@@ -1489,8 +1489,7 @@ static const ay8910_interface ay8910_interface_2 =
 WRITE_LINE_MEMBER(nemesis_state::sound_irq)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
-// nemesis_state *driver_state = device->machine().driver_data<nemesis_state>();
-// driver_state->audiocpu->set_input_line(0, HOLD_LINE);
+// m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(nemesis_state::volume_callback)

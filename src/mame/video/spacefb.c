@@ -99,13 +99,13 @@ void spacefb_state::video_start()
 #define NUM_STARFIELD_PENS  (0x40)
 
 
-inline void spacefb_state::shift_star_generator(spacefb_state *state)
+inline void spacefb_state::shift_star_generator()
 {
 	m_star_shift_reg = ((m_star_shift_reg << 1) | (((~m_star_shift_reg >> 16) & 0x01) ^ ((m_star_shift_reg >> 4) & 0x01))) & 0x1ffff;
 }
 
 
-void spacefb_state::get_starfield_pens(spacefb_state *state, pen_t *pens)
+void spacefb_state::get_starfield_pens(pen_t *pens)
 {
 	/* generate the pens based on the various enable bits */
 	int i;
@@ -137,11 +137,10 @@ void spacefb_state::get_starfield_pens(spacefb_state *state, pen_t *pens)
 
 void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	spacefb_state *state = screen.machine().driver_data<spacefb_state>();
 	int y;
 	pen_t pens[NUM_STARFIELD_PENS];
 
-	get_starfield_pens(state, pens);
+	get_starfield_pens(pens);
 
 	/* the shift register is always shifting -- do the portion in the top VBLANK */
 	if (cliprect.min_y == screen.visible_area().min_y)
@@ -152,7 +151,7 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * SPACEFB_VBEND - 1;
 
 		for (i = 0; i < clock_count; i++)
-			shift_star_generator(state);
+			shift_star_generator();
 	}
 
 	/* visible region of the screen */
@@ -174,7 +173,7 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 					bitmap.pix32(y, x) = pens[0];
 			}
 
-			shift_star_generator(state);
+			shift_star_generator();
 		}
 	}
 
@@ -185,7 +184,7 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * (SPACEFB_VTOTAL - SPACEFB_VBSTART);
 
 		for (i = 0; i < clock_count; i++)
-			shift_star_generator(state);
+			shift_star_generator();
 	}
 }
 

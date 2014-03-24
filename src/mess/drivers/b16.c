@@ -83,7 +83,6 @@ void b16_state::video_start()
 
 UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	b16_state *state = machine().driver_data<b16_state>();
 	int x,y;
 	int xi,yi;
 	UINT8 *gfx_rom = memregion("pcg")->base();
@@ -92,8 +91,8 @@ UINT32 b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for(x=0;x<mc6845_h_display;x++)
 		{
-			int tile = state->m_vram[x+y*mc6845_h_display] & 0xff;
-			int color = (state->m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
+			int tile = m_vram[x+y*mc6845_h_display] & 0xff;
+			int color = (m_vram[x+y*mc6845_h_display] & 0x700) >> 8;
 			int pen;
 
 			for(yi=0;yi<mc6845_tile_height;yi++)

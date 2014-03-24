@@ -33,9 +33,9 @@ confirmed for m107 games as well.
 #include "sound/iremga20.h"
 
 
-#define M107_IRQ_0 ((state->m_irq_vectorbase+0)/4)  /* VBL interrupt */
-#define M107_IRQ_1 ((state->m_irq_vectorbase+4)/4)  /* ??? */
-#define M107_IRQ_2 ((state->m_irq_vectorbase+8)/4)  /* Raster interrupt */
+#define M107_IRQ_0 ((m_irq_vectorbase+0)/4)  /* VBL interrupt */
+#define M107_IRQ_1 ((m_irq_vectorbase+4)/4)  /* ??? */
+#define M107_IRQ_2 ((m_irq_vectorbase+8)/4)  /* Raster interrupt */
 #define M107_IRQ_3 ((m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
 
 
@@ -51,20 +51,19 @@ void m107_state::machine_start()
 TIMER_DEVICE_CALLBACK_MEMBER(m107_state::m107_scanline_interrupt)
 {
 	int scanline = param;
-	m107_state *state = machine().driver_data<m107_state>();
 
 	/* raster interrupt */
 	if (scanline == m_raster_irq_position)
 	{
 		m_screen->update_partial(scanline);
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_2);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == m_screen->visible_area().max_y + 1)
 	{
 		m_screen->update_partial(scanline);
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_0);
 	}
 }
 

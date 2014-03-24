@@ -43,10 +43,10 @@
 
 /* current HP48 model */
 
-#define HP48_G_SERIES ((state->m_model==HP48_G) || (state->m_model==HP48_GX) || (state->m_model==HP48_GP))
-#define HP48_S_SERIES ((state->m_model==HP48_S) || (state->m_model==HP48_SX))
-#define HP48_X_SERIES ((state->m_model==HP48_SX) || (state->m_model==HP48_GX))
-#define HP48_GX_MODEL ((state->m_model==HP48_GX) || (state->m_model==HP48_GP))
+#define HP48_G_SERIES ((m_model==HP48_G) || (m_model==HP48_GX) || (m_model==HP48_GP))
+#define HP48_S_SERIES ((m_model==HP48_S) || (m_model==HP48_SX))
+#define HP48_X_SERIES ((m_model==HP48_SX) || (m_model==HP48_GX))
+#define HP48_GX_MODEL ((m_model==HP48_GX) || (m_model==HP48_GP))
 
 /* OUT register from SATURN (actually 12-bit) */
 
@@ -466,7 +466,6 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 
 READ8_MEMBER(hp48_state::hp48_io_r)
 {
-	hp48_state *state = machine().driver_data<hp48_state>();
 	UINT8 data = 0;
 
 	switch( offset )
@@ -692,7 +691,6 @@ void hp48_state::hp48_apply_modules()
 
 	m_io_addr = 0x100000;
 
-	hp48_state *state = machine().driver_data<hp48_state>();
 	if ( HP48_G_SERIES )
 	{
 		/* port 2 bank switch */
@@ -1089,7 +1087,6 @@ void hp48_state::machine_reset()
 
 void hp48_state::hp48_machine_start( hp48_models model )
 {
-	hp48_state *state = machine().driver_data<hp48_state>();
 	UINT8* rom, *ram;
 	int ram_size, rom_size, i;
 
@@ -1171,8 +1168,8 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	save_item(NAME(m_io) );
 	//save_pointer(NAME(machine.generic.nvram.u8), machine.generic.nvram_size );
 
-	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_update_annunciators), state ));
-	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_apply_modules), state ));
+	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_update_annunciators), this ));
+	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_apply_modules), this ));
 
 #ifdef CHARDEV
 	/* direct I/O */

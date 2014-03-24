@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
+	void unlock_shared_ram();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
@@ -222,27 +223,26 @@ ADDRESS_MAP_END
 
 /* sub 6809 */
 
-static void unlock_shared_ram(address_space &space)
+void sothello_state::unlock_shared_ram()
 {
-	sothello_state *state = space.machine().driver_data<sothello_state>();
-	if(!state->m_subcpu->suspended(SUSPEND_REASON_HALT))
+	if(!m_subcpu->suspended(SUSPEND_REASON_HALT))
 	{
-		state->m_subcpu_status|=1;
+		m_subcpu_status|=1;
 	}
 	else
 	{
-		logerror("Sub cpu active! @%x\n",space.device().safe_pc());
+		//logerror("Sub cpu active! @%x\n",device().safe_pc());
 	}
 }
 
 WRITE8_MEMBER(sothello_state::subcpu_status_w)
 {
-	unlock_shared_ram(space);
+	unlock_shared_ram();
 }
 
 READ8_MEMBER(sothello_state::subcpu_status_r)
 {
-	unlock_shared_ram(space);
+	unlock_shared_ram();
 	return 0;
 }
 

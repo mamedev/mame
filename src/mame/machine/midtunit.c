@@ -590,14 +590,13 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 	}
 
 	/* call through based on the sound type */
-	midtunit_state *state = space.machine().driver_data<midtunit_state>();
 	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
 		switch (chip_type)
 		{
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
-				state->m_adpcm_sound->reset_write(~data & 0x100);
-				state->m_adpcm_sound->write(space, offset, data & 0xff);
+				m_adpcm_sound->reset_write(~data & 0x100);
+				m_adpcm_sound->write(space, offset, data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				fake_sound_state = 128;

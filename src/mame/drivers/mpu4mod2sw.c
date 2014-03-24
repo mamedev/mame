@@ -47,9 +47,8 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
 
 DRIVER_INIT_MEMBER (mpu4_state, connect4)
 {
-	mpu4_state *state = machine().driver_data<mpu4_state>();
-	state->m_reels = 0; //reel-free game
-	state->m_led_lamp=1;
+	m_reels = 0; //reel-free game
+	m_led_lamp=1;
 	DRIVER_INIT_CALL( m4default_banks );
 }
 

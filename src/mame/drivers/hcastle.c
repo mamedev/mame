@@ -154,8 +154,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(hcastle_state::irqhandler)
 {
-//  hcastle_state *state = device->machine().driver_data<hcastle_state>();
-//  state->m_audiocpu->set_input_line(linestate);
+//  m_audiocpu->set_input_line(state);
 }
 
 WRITE8_MEMBER(hcastle_state::volume_callback)

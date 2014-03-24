@@ -868,8 +868,8 @@ the zooming.To use it,you should use Player 2 Start button to show the test scre
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-state->m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-state->m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
+m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
 WRITE16_MEMBER(gstriker_state::twrldc94_mcu_w)
@@ -884,7 +884,6 @@ READ16_MEMBER(gstriker_state::twrldc94_mcu_r)
 
 WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 {
-	gstriker_state *state = machine().driver_data<gstriker_state>();
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;
 
@@ -1015,15 +1014,15 @@ READ16_MEMBER(gstriker_state::twrldc94_prot_reg_r)
 
     The tick count is usually set to 0x3c => it's driven off vblank?
 */
-//state->m_work_ram[ (0xffe900 - 0xffc00) ]
-#define COUNTER1_ENABLE state->m_work_ram[0x2900/2] >> 8
-#define COUNTER2_ENABLE (state->m_work_ram[0x2900/2] & 0xff)
-#define TICK_1 state->m_work_ram[0x2908/2]
-#define TICKCOUNT_1 state->m_work_ram[0x290a/2]
-#define TICK_2 state->m_work_ram[0x290c/2]
-#define TICKCOUNT_3 state->m_work_ram[0x290e/2]
-#define COUNTER_1 state->m_work_ram[0x2928/2]
-#define COUNTER_2 state->m_work_ram[0x292a/2]
+//m_work_ram[ (0xffe900 - 0xffc00) ]
+#define COUNTER1_ENABLE m_work_ram[0x2900/2] >> 8
+#define COUNTER2_ENABLE (m_work_ram[0x2900/2] & 0xff)
+#define TICK_1 m_work_ram[0x2908/2]
+#define TICKCOUNT_1 m_work_ram[0x290a/2]
+#define TICK_2 m_work_ram[0x290c/2]
+#define TICKCOUNT_3 m_work_ram[0x290e/2]
+#define COUNTER_1 m_work_ram[0x2928/2]
+#define COUNTER_2 m_work_ram[0x292a/2]
 READ16_MEMBER(gstriker_state::vbl_toggle_r)
 {
 	return 0xff;
@@ -1031,7 +1030,6 @@ READ16_MEMBER(gstriker_state::vbl_toggle_r)
 
 WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 {
-	gstriker_state *state = machine().driver_data<gstriker_state>();
 	if( COUNTER1_ENABLE == 1 )
 	{
 		TICK_1 = (TICK_1 - 1) & 0xff;   // 8bit
