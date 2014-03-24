@@ -125,14 +125,18 @@ Notes:
       PAL4      - MMI PAL16L8 (DIP20, stamped 'BGSA1')
       PAL5      - MMI PAL16L8 (DIP20, stamped 'BGSA2')
       VSync     - 59.6388Hz
-      HSync     - 15,4445kHz
+      HSync     - 15,444.5kHz
 
       Custom IC's -
                    DL-030P - KABUKI Custom encrypted Z80, running at 8.000MHz, manufactured by VLSI
-                             Technology (DIP40), INT frequency ~249.932Hz-250.070Hz
+                             Technology (DIP40), INT frequency ~249.932Hz-250.070Hz.
                              On most PCB's this is a regular Zilog Z80 (Z0840008PSC)
-                   DL-1425 - CAPCOM-Q1 QSound Processor, DSP-16A (C) 92 AT&T, clock input of
-                             60.000MHz (PLCC84)
+                   DL-1425 - CAPCOM-Q1 QSound Processor, DSP-16A (C) 92 AT&T (PLCC84)
+                             * pin 33 - CKO (O): moving very fast, connected to a logic chip on the A board
+                             * pin 58 - ICK (I/O): 60MHz
+                             * pin 59 - OCK (I/O): 60MHz
+                             * pin 67 - CKI (I): 60MHz
+                             * pin 71 - INT (I): erratic, active during qsound writes
                    DL-0921 \
                    DL-0311 / CPS-A/B Graphics Processors (QFP160)
                    DL-1625 - Custom 68000 CPU, running at 16.000MHz (QFP128)
