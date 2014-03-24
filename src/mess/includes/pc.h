@@ -142,7 +142,6 @@ public:
 	UINT8 pc_speaker_get_spk();
 	void pc_speaker_set_spkrdata(UINT8 data);
 	void pcjr_keyb_init();
-	void mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, int));
 	void pc_rtc_init();
 
 	// turbo support
@@ -154,20 +153,21 @@ public:
 	double m_turbo_on_speed;
 
 	// keyboard
-	void init_pc_common(void (*set_keyb_int_func)(running_machine &, int));
+	void init_pc_common(write_line_delegate set_keyb_int_func);
 	TIMER_CALLBACK_MEMBER( pc_keyb_timer );
 	void pc_keyboard();
 	UINT8 pc_keyb_read();
 	void pc_keyb_set_clock(int on);
 	void pc_keyb_clear();
-	void (*m_pc_keyb_int_cb)(running_machine &, int);
+	write_line_delegate m_pc_keyb_int_cb;
 	emu_timer *m_pc_keyb_timer;
 	UINT8 m_pc_keyb_data;
 	int m_pc_keyb_on;
 	int m_pc_keyb_self_test;
+	
+	DECLARE_WRITE_LINE_MEMBER(pcjr_set_keyb_int);
+	DECLARE_WRITE_LINE_MEMBER(pc_set_keyb_int);
 };
-
-void pc_set_keyb_int(running_machine &machine, int state);
 
 /*----------- defined in machine/pc.c -----------*/
 

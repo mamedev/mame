@@ -267,7 +267,7 @@ MACHINE_RESET_MEMBER(tandy_pc_state,tandy1000rl)
 
 DRIVER_INIT_MEMBER(tandy_pc_state,t1000hx)
 {
-	mess_init_pc_common(pc_set_keyb_int);
+	init_pc_common(write_line_delegate(FUNC(tandy_pc_state::pc_set_keyb_int),this));
 	pc_turbo_setup(4.77/12, 1);
 }
 

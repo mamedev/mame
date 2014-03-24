@@ -371,7 +371,7 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(pc_set_keyb_int);
+	init_pc_common(write_line_delegate(FUNC(europc_pc_state::pc_set_keyb_int),this));
 
 	europc_rtc_init();
 //  europc_rtc_set_time();

@@ -424,12 +424,11 @@ TIMER_CALLBACK_MEMBER(pc_state::pcjr_keyb_signal_callback)
 }
 
 
-static void pcjr_set_keyb_int(running_machine &machine, int state)
+WRITE_LINE_MEMBER(pc_state::pcjr_set_keyb_int)
 {
-	pc_state *drvstate = machine.driver_data<pc_state>();
 	if ( state )
 	{
-		UINT8   data = drvstate->pc_keyb_read();
+		UINT8   data = pc_keyb_read();
 		UINT8   parity = 0;
 		int     i;
 
@@ -460,7 +459,7 @@ static void pcjr_set_keyb_int(running_machine &machine, int state)
 
 		pcjr_keyb.latch = 1;
 	}
-	drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
 }
 
 
@@ -808,26 +807,9 @@ WRITE_LINE_MEMBER( pc_state::fdc_interrupt )
 	}
 }
 
-static void pc_set_irq_line(running_machine &machine,int irq, int state)
+WRITE_LINE_MEMBER( pc_state::pc_set_keyb_int)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-
-	switch (irq)
-	{
-	case 0: st->m_pic8259->ir0_w(state); break;
-	case 1: st->m_pic8259->ir1_w(state); break;
-	case 2: st->m_pic8259->ir2_w(state); break;
-	case 3: st->m_pic8259->ir3_w(state); break;
-	case 4: st->m_pic8259->ir4_w(state); break;
-	case 5: st->m_pic8259->ir5_w(state); break;
-	case 6: st->m_pic8259->ir6_w(state); break;
-	case 7: st->m_pic8259->ir7_w(state); break;
-	}
-}
-
-void pc_set_keyb_int(running_machine &machine, int state)
-{
-	pc_set_irq_line( machine, 1, state );
+	m_pic8259->ir1_w(state);
 }
 
 TIMER_CALLBACK_MEMBER(pc_state::pcjr_fdc_watchdog)
@@ -971,8 +953,8 @@ void pc_state::pc_keyb_set_clock(int on)
 void pc_state::pc_keyb_clear(void)
 {
 	m_pc_keyb_data = 0;
-	if ( m_pc_keyb_int_cb ) {
-		m_pc_keyb_int_cb(machine(),0);
+	if (!m_pc_keyb_int_cb.isnull()) {
+		m_pc_keyb_int_cb(0);
 	}
 }
 
@@ -987,25 +969,23 @@ void pc_state::pc_keyboard(void)
 		if ( (data=at_keyboard_read())!=-1) {
 			m_pc_keyb_data = data;
 			//DBG_LOG(1,"KB_scancode",("$%02x\n", m_pc_keyb_data));
-			if ( m_pc_keyb_int_cb ) {
-				m_pc_keyb_int_cb(machine(),1);
+			if ( !m_pc_keyb_int_cb.isnull() ) {
+				m_pc_keyb_int_cb(1);
 			}
 			m_pc_keyb_self_test = 0;
 		}
 	}
 }
-void pc_state::init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
-{
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
-	m_pc_keyb_int_cb = set_keyb_int_func;
-	m_pc_keyb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_keyb_timer),this));
-}
 
-void pc_state::mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
+void pc_state::init_pc_common(write_line_delegate set_keyb_int_func)
 {
-	if ( set_keyb_int_func != NULL )
-		init_pc_common(set_keyb_int_func);
+	m_pc_keyb_int_cb = set_keyb_int_func;
+	if (!set_keyb_int_func.isnull()) {
+		at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
+		at_keyboard_set_scan_code_set(1);
+		m_pc_keyb_int_cb = set_keyb_int_func;
+		m_pc_keyb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_keyb_timer),this));
+	}
 
 	/* MESS managed RAM */
 	if ( m_ram->pointer() )
@@ -1015,32 +995,32 @@ void pc_state::mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, 
 
 DRIVER_INIT_MEMBER(pc_state,ibm5150)
 {
-	mess_init_pc_common(NULL);
+	init_pc_common(write_line_delegate());
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,pccga)
 {
-	mess_init_pc_common(NULL);
+	init_pc_common(write_line_delegate());
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
-	mess_init_pc_common(NULL);
+	init_pc_common(write_line_delegate());
 	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcmda)
 {
-	mess_init_pc_common(pc_set_keyb_int);
+	init_pc_common(write_line_delegate(FUNC(pc_state::pc_set_keyb_int),this));
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
-	mess_init_pc_common(pcjr_set_keyb_int);
+	init_pc_common(write_line_delegate(FUNC(pc_state::pcjr_set_keyb_int),this));
 }
 
 
