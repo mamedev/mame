@@ -2,10 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-Amust Compak
-
-A magazine called it the Amust Executive 816. Trying to confirm if in fact
-it's the same computer.
+Amust Compak - also known as Amust Executive 816.
 
 2014-03-21 Skeleton driver. [Robbbert]
 
@@ -15,8 +12,7 @@ The entire driver is guesswork.
 The board has LH0080 (Z80A), 2x 8251, 2x 8255, 8253, uPD765A and a HD46505SP-2.
 The videoram is a 6116 RAM. There is a piezo beeper. There are 3 crystals,
 X1 = 4.9152 (serial chips?), X2 = 16 (CPU), X3 = 14.31818 MHz (Video?).
-Floppy capacity: 790k
-Their are numerous jumpers, all of which perform unknown functions.
+There are numerous jumpers, all of which perform unknown functions.
 
 The keyboard is a plug-in unit, same idea as Kaypro and Zorba. It has these
 chips: INS8035N-6, F74145, 74LS373N, SN75451BP, 2716 rom with label KBD-3.
@@ -25,6 +21,17 @@ Crystal: 3.579545 MHz
 The main rom is identical between the 2 halves, except that the initial
 crtc parameters are slightly different. I've chosen to ignore the first
 half.
+
+Floppy Parameters:
+Double Density
+Two Side
+80 track
+1024 byte sectors
+5 sectors/track
+800k capacity
+128 directory entries
+2k block size
+Skew 1,3,5,2,4
 
 
 Monitor Commands:
