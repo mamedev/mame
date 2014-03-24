@@ -4411,7 +4411,7 @@ input_seq_type ioport_manager::token_to_seq_type(const char *string)
 {
 	// look up the string in the table of possible sequence types and return the index
 	for (int seqindex = 0; seqindex < ARRAY_LENGTH(seqtypestrings); seqindex++)
-		if (!mame_stricmp(string, seqtypestrings[seqindex]))
+		if (!core_stricmp(string, seqtypestrings[seqindex]))
 			return input_seq_type(seqindex);
 	return SEQ_TYPE_INVALID;
 }

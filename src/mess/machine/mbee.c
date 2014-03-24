@@ -767,7 +767,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 	UINT16 i, j;
 	UINT8 data, sw = ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
 
-	if (!mame_stricmp(image.filetype(), "mwb"))
+	if (!core_stricmp(image.filetype(), "mwb"))
 	{
 		/* mwb files - standard basic files */
 		for (i = 0; i < quickload_size; i++)
@@ -797,7 +797,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else if (!mame_stricmp(image.filetype(), "com"))
+	else if (!core_stricmp(image.filetype(), "com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
 		for (i = 0; i < quickload_size; i++)
@@ -821,7 +821,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 
 		if (sw) m_maincpu->set_pc(0x100);
 	}
-	else if (!mame_stricmp(image.filetype(), "bee"))
+	else if (!core_stricmp(image.filetype(), "bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
 		for (i = 0; i < quickload_size; i++)

@@ -149,7 +149,7 @@ int ui_menu_software_list::compare_entries(const entry_info *e1, const entry_inf
 		e2_basename = (e2->long_name != NULL) ? e2->long_name : "";
 	}
 
-	result = mame_stricmp(e1_basename, e2_basename);
+	result = core_stricmp(e1_basename, e2_basename);
 	if (result == 0)
 	{
 		result = strcmp(e1_basename, e2_basename);
@@ -309,7 +309,7 @@ void ui_menu_software_list::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(compare_name, m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
 								match = i;
 						}
 
@@ -330,7 +330,7 @@ void ui_menu_software_list::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(compare_name, m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
 								match = i;
 						}
 

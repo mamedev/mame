@@ -110,7 +110,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 				{
 					int j;
 					int size = strlen(m_extra_options);
-					char * const s = mame_strdup(m_extra_options);
+					char * const s = core_strdup(m_extra_options);
 					char * const e = s + size;
 					char *p = s;
 					for (j=0;j<size;j++) {

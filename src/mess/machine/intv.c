@@ -410,7 +410,7 @@ int intv_state::intv_load_rom_file(device_image_interface &image)
 	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
-	if (!mame_stricmp (filetype, "rom"))
+	if (!core_stricmp (filetype, "rom"))
 	{
 		image.fread( &temp, 1);         /* header */
 		if (temp != 0xa8)

@@ -164,11 +164,11 @@ int main( int argc, char *argv[] )
 				{
 					usage();
 				}
-				if( mame_stricmp( argv[ i ], "bin" ) == 0 )
+				if( core_stricmp( argv[ i ], "bin" ) == 0 )
 				{
 					format = FORMAT_BIN;
 				}
-				else if( mame_stricmp( argv[ i ], "psx" ) == 0 )
+				else if( core_stricmp( argv[ i ], "psx" ) == 0 )
 				{
 					format = FORMAT_PSX;
 				}
@@ -183,15 +183,15 @@ int main( int argc, char *argv[] )
 				{
 					usage();
 				}
-				if( mame_stricmp( argv[ i ], "psx" ) == 0 )
+				if( core_stricmp( argv[ i ], "psx" ) == 0 )
 				{
 					cpu = CPU_PSX;
 				}
-				else if( mame_stricmp( argv[ i ], "r3000" ) == 0 )
+				else if( core_stricmp( argv[ i ], "r3000" ) == 0 )
 				{
 					cpu = CPU_R3000;
 				}
-				else if( mame_stricmp( argv[ i ], "r4000" ) == 0 )
+				else if( core_stricmp( argv[ i ], "r4000" ) == 0 )
 				{
 					cpu = CPU_R4000;
 				}

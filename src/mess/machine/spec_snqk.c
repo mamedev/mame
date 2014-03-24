@@ -54,7 +54,7 @@ static void log_quickload(running_machine &machine, const char *type, UINT32 sta
 	tempstring.catprintf("Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
 
 	logerror("Quickload loaded.\n");
-	if (!mame_stricmp(exec_format, EXEC_NA))
+	if (!core_stricmp(exec_format, EXEC_NA))
 		tempstring.cat("N/A");
 	else
 	{
@@ -120,7 +120,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 
 	image.fread(snapshot_data, snapshot_size);
 
-	if (!mame_stricmp(file_type, "sna"))
+	if (!core_stricmp(file_type, "sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
 		{
@@ -129,7 +129,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_sna(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "sp"))
+	else if (!core_stricmp(file_type, "sp"))
 	{
 		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
@@ -141,7 +141,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_sp(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "ach"))
+	else if (!core_stricmp(file_type, "ach"))
 	{
 		if (snapshot_size != ACH_SIZE)
 		{
@@ -150,7 +150,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_ach(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "prg"))
+	else if (!core_stricmp(file_type, "prg"))
 	{
 		if (snapshot_size != PRG_SIZE)
 		{
@@ -159,7 +159,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_prg(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "plusd"))
+	else if (!core_stricmp(file_type, "plusd"))
 	{
 		if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
 		{
@@ -168,7 +168,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_plusd(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "sem"))
+	else if (!core_stricmp(file_type, "sem"))
 	{
 		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' && \
@@ -182,7 +182,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_sem(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "sit"))
+	else if (!core_stricmp(file_type, "sit"))
 	{
 		if (snapshot_size != SIT_SIZE)
 		{
@@ -191,7 +191,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_sit(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "zx"))
+	else if (!core_stricmp(file_type, "zx"))
 	{
 		if (snapshot_size != ZX_SIZE)
 		{
@@ -200,7 +200,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_zx(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "snp"))
+	else if (!core_stricmp(file_type, "snp"))
 	{
 		if (snapshot_size != SNP_SIZE)
 		{
@@ -209,7 +209,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_snp(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "snx"))
+	else if (!core_stricmp(file_type, "snx"))
 	{
 		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
@@ -219,7 +219,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_snx(machine(), snapshot_data, snapshot_size);
 	}
-	else if (!mame_stricmp(file_type, "frz"))
+	else if (!core_stricmp(file_type, "frz"))
 	{
 		if (snapshot_size != FRZ_SIZE)
 		{
@@ -2461,7 +2461,7 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 
 	image.fread(quickload_data, quickload_size);
 
-	if (!mame_stricmp(file_type, "scr"))
+	if (!core_stricmp(file_type, "scr"))
 	{
 		if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
 		{
@@ -2470,7 +2470,7 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 		}
 		spectrum_setup_scr(machine(), quickload_data, quickload_size);
 	}
-	else if (!mame_stricmp(file_type, "raw"))
+	else if (!core_stricmp(file_type, "raw"))
 	{
 		if (quickload_size != RAW_SIZE)
 		{

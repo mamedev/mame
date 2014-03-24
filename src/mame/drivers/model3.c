@@ -1262,9 +1262,9 @@ static void model3_init(running_machine &machine, int step)
 	model3_tap_reset(machine);
 
 	if(step < 0x20) {
-		if( mame_stricmp(machine.system().name, "vs215") == 0 ||
-			mame_stricmp(machine.system().name, "vs29815") == 0 ||
-			mame_stricmp(machine.system().name, "bass") == 0 )
+		if( core_stricmp(machine.system().name, "vs215") == 0 ||
+			core_stricmp(machine.system().name, "vs29815") == 0 ||
+			core_stricmp(machine.system().name, "bass") == 0 )
 		{
 			mpc106_init(machine);
 		}
@@ -1278,8 +1278,8 @@ static void model3_init(running_machine &machine, int step)
 		mpc106_init(machine);
 		// some step 2+ games need the older PCI ID (obvious symptom:
 		// vbl is enabled briefly then disabled so the game hangs)
-		if (mame_stricmp(machine.system().name, "magtruck") == 0 ||
-			mame_stricmp(machine.system().name, "von254g") == 0)
+		if (core_stricmp(machine.system().name, "magtruck") == 0 ||
+			core_stricmp(machine.system().name, "von254g") == 0)
 		{
 			state->m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 		}
@@ -1750,13 +1750,13 @@ READ64_MEMBER(model3_state::model3_security_r)
 		case 0x00/8:    return 0;       /* status */
 		case 0x1c/8:                    /* security board data read */
 		{
-			if (mame_stricmp(machine().system().name, "vs299") == 0 ||
-				mame_stricmp(machine().system().name, "vs2v991") == 0)
+			if (core_stricmp(machine().system().name, "vs299") == 0 ||
+				core_stricmp(machine().system().name, "vs2v991") == 0)
 			{
 				return (UINT64)vs299_prot_data[m_prot_data_ptr++] << 48;
 			}
-			else if (mame_stricmp(machine().system().name, "swtrilgy") == 0 ||
-						mame_stricmp(machine().system().name, "swtrilgya") == 0)
+			else if (core_stricmp(machine().system().name, "swtrilgy") == 0 ||
+						core_stricmp(machine().system().name, "swtrilgya") == 0)
 			{
 				UINT64 data = (UINT64)swt_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr > 0x38)
@@ -1765,7 +1765,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine().system().name, "fvipers2") == 0)
+			else if (core_stricmp(machine().system().name, "fvipers2") == 0)
 			{
 				UINT64 data = (UINT64)fvipers2_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr >= 0x41)
@@ -1774,8 +1774,8 @@ READ64_MEMBER(model3_state::model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine().system().name, "spikeout") == 0 ||
-						mame_stricmp(machine().system().name, "spikeofe") == 0)
+			else if (core_stricmp(machine().system().name, "spikeout") == 0 ||
+						core_stricmp(machine().system().name, "spikeofe") == 0)
 			{
 				UINT64 data = (UINT64)spikeout_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr >= 0x55)
@@ -1784,8 +1784,8 @@ READ64_MEMBER(model3_state::model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine().system().name, "eca") == 0 ||
-						mame_stricmp(machine().system().name, "ecax") == 0)
+			else if (core_stricmp(machine().system().name, "eca") == 0 ||
+						core_stricmp(machine().system().name, "ecax") == 0)
 			{
 				UINT64 data = (UINT64)eca_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr >= 0x31)
@@ -1794,7 +1794,7 @@ READ64_MEMBER(model3_state::model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine().system().name, "oceanhun") == 0)
+			else if (core_stricmp(machine().system().name, "oceanhun") == 0)
 			{
 				UINT64 data = (UINT64)oceanhun_prot_data[m_prot_data_ptr++] << 16;
 				if (m_prot_data_ptr >= 58)

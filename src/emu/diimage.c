@@ -118,7 +118,7 @@ iodevice_t device_image_interface::device_typeid(const char *name)
 	int i;
 	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
 	{
-		if (!mame_stricmp(name, m_device_info_array[i].m_name) || !mame_stricmp(name, m_device_info_array[i].m_shortname))
+		if (!core_stricmp(name, m_device_info_array[i].m_name) || !core_stricmp(name, m_device_info_array[i].m_shortname))
 			return m_device_info_array[i].m_type;
 	}
 	return (iodevice_t)-1;
@@ -299,7 +299,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	{
 		while(!done && (entry = osd_readdir(directory)) != NULL)
 		{
-			if (!mame_stricmp(subdir, entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = TRUE;
 				success = entry->type == ENTTYPE_DIR;
@@ -535,7 +535,7 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 	char *ext = strtok((char*)extensions.cstr(),",");
 	while (ext != NULL)
 	{
-		if (!mame_stricmp(ext, file_extension))
+		if (!core_stricmp(ext, file_extension))
 		{
 			result = TRUE;
 			break;

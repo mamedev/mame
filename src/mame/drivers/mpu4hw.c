@@ -945,7 +945,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		awp_draw_reel(2);
 	}
 
-	if (mame_stricmp(machine().system().name, "m4gambal") == 0)
+	if (core_stricmp(machine().system().name, "m4gambal") == 0)
 	{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
 		provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of

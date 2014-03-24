@@ -34,11 +34,11 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 	if (!file_type)
 		goto error;
 
-	if (!mame_stricmp(file_type, "prg"))
+	if (!core_stricmp(file_type, "prg"))
 	{
 		/* prg files */
 	}
-	else if (!mame_stricmp(file_type, "p00"))
+	else if (!core_stricmp(file_type, "p00"))
 	{
 		/* p00 files */
 		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
@@ -48,7 +48,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		image.fseek(26, SEEK_SET);
 		snapshot_size -= 26;
 	}
-	else if (!mame_stricmp(file_type, "t64"))
+	else if (!core_stricmp(file_type, "t64"))
 	{
 		/* t64 files - for GB64 Single T64s loading to x0801 - header is always the same size */
 		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
@@ -65,7 +65,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 
 	image.fread( &address, 2);
 	address = LITTLE_ENDIANIZE_INT16(address);
-	if (!mame_stricmp(file_type, "t64"))
+	if (!core_stricmp(file_type, "t64"))
 		address = 2049;
 	snapshot_size -= 2;
 

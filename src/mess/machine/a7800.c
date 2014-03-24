@@ -238,7 +238,7 @@ UINT16 a7800_state::a7800_get_pcb_id(const char *pcb)
 
 	for (i = 0; i < ARRAY_LENGTH(pcb_list); i++)
 	{
-		if (!mame_stricmp(pcb_list[i].pcb_name, pcb))
+		if (!core_stricmp(pcb_list[i].pcb_name, pcb))
 			return pcb_list[i].type;
 	}
 

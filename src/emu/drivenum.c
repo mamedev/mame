@@ -60,7 +60,7 @@ bool driver_list::matches(const char *wildstring, const char *string)
 		return false;
 
 	// match everything else normally
-	return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0);
+	return (wildstring == NULL || core_strwildcmp(wildstring, string) == 0);
 }
 
 
@@ -73,7 +73,7 @@ int driver_list::driver_sort_callback(const void *elem1, const void *elem2)
 {
 	const game_driver * const *item1 = reinterpret_cast<const game_driver * const *>(elem1);
 	const game_driver * const *item2 = reinterpret_cast<const game_driver * const *>(elem2);
-	return mame_stricmp((*item1)->name, (*item2)->name);
+	return core_stricmp((*item1)->name, (*item2)->name);
 }
 
 

@@ -581,12 +581,12 @@ DEVICE_IMAGE_LOAD_MEMBER( mtech_state, megatech_cart )
 		return IMAGE_INIT_FAIL;
 	else
 	{
-		if (!mame_stricmp("genesis", pcb_name))
+		if (!core_stricmp("genesis", pcb_name))
 		{
 			mame_printf_debug("%s is genesis\n", mt_cart->tag);
 			m_cart_is_genesis[this_cart->slot] = 1;
 		}
-		else if (!mame_stricmp("sms", pcb_name))
+		else if (!core_stricmp("sms", pcb_name))
 		{
 			mame_printf_debug("%s is sms\n", mt_cart->tag);
 			m_cart_is_genesis[this_cart->slot] = 0;

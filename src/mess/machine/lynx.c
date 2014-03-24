@@ -2087,7 +2087,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 
 		filetype = image.filetype();
 
-		if (!mame_stricmp (filetype, "lnx"))
+		if (!core_stricmp (filetype, "lnx"))
 		{
 			if (image.fread( header, 0x40) != 0x40)
 				return IMAGE_INIT_FAIL;
@@ -2106,7 +2106,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 
 			size -= 0x40;
 		}
-		else if (!mame_stricmp (filetype, "lyx"))
+		else if (!core_stricmp (filetype, "lyx"))
 		{
 			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?

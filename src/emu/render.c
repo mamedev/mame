@@ -1053,7 +1053,7 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	{
 		// scan for a matching view name
 		for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
-			if (mame_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
+			if (core_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
 				break;
 	}
 

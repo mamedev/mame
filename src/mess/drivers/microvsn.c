@@ -572,7 +572,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 
 			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++ )
 			{
-				if (!mame_stricmp(pcb, pcb_types[i].pcb_name))
+				if (!core_stricmp(pcb, pcb_types[i].pcb_name))
 				{
 					m_pcb_type = pcb_types[i].pcbtype;
 				}
@@ -593,7 +593,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 
 			for ( int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++ )
 			{
-				if (!mame_stricmp(rc, rc_types[i].rc_name))
+				if (!core_stricmp(rc, rc_types[i].rc_name))
 				{
 					m_rc_type = rc_types[i].rctype;
 				}

@@ -2584,7 +2584,7 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 		return;
 
 	/* open the file */
-	if (mame_stricmp(filename, "off") != 0)
+	if (core_stricmp(filename, "off") != 0)
 	{
 		mode = "w";
 

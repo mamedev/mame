@@ -2019,11 +2019,11 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 		skip = 96;
 
 	else    /* ABS binary */
-	if (!mame_stricmp(image.filetype(), "abs"))
+	if (!core_stricmp(image.filetype(), "abs"))
 		start = 0xc000;
 
 	else    /* JAG binary */
-	if (!mame_stricmp(image.filetype(), "jag"))
+	if (!core_stricmp(image.filetype(), "jag"))
 		start = 0x5000;
 
 
@@ -2069,7 +2069,7 @@ int jaguar_state::cart_load(device_image_interface &image)
 		size = image.length();
 
 		/* .rom files load & run at 802000 */
-		if (!mame_stricmp(image.filetype(), "rom"))
+		if (!core_stricmp(image.filetype(), "rom"))
 		{
 			load_offset = 0x2000;       // fix load address
 			m_cart_base[0x101]=0x802000;    // fix exec address

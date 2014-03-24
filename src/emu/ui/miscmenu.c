@@ -949,7 +949,7 @@ void ui_menu_settings::populate()
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
-							if (mame_stricmp(dip->name, "FAKE") != 0)
+							if (core_stricmp(dip->name, "FAKE") != 0)
 								dipcount++;
 						}
 
@@ -995,7 +995,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	/* iterate over DIP switches */
 	for (dip = diplist; dip != NULL; dip = dip->next)
 	{
-		if (mame_stricmp(dip->name, "FAKE") != 0)
+		if (core_stricmp(dip->name, "FAKE") != 0)
 		{
 			const ioport_diplocation *diploc;
 			UINT32 selectedmask = 0;

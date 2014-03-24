@@ -125,7 +125,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)
 			{
-				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+				if (!core_stricmp(mapper, mapper_types[i].mapper_name))
 					type = mapper_types[i].mapper_type;
 			}
 
