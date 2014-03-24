@@ -842,7 +842,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/cps1.o      \
 	$(MAME_VIDEO)/cps1.o        \
 	$(MAME_DRIVERS)/konamim2.o  \
-	$(MAME_AUDIO)/qsound.o      \
 
 
 #-------------------------------------------------
