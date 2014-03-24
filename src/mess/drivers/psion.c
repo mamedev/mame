@@ -31,7 +31,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-UINT8 psion_state::kb_read(running_machine &machine)
+UINT8 psion_state::kb_read()
 {
 	static const char *const bitnames[] = {"K1", "K2", "K3", "K4", "K5", "K6", "K7"};
 	UINT8 line, data = 0x7c;
@@ -40,26 +40,25 @@ UINT8 psion_state::kb_read(running_machine &machine)
 	{
 		for (line = 0; line < 7; line++)
 			if (m_kb_counter == (0x7f & ~(1 << line)))
-				data = machine.root_device().ioport(bitnames[line])->read();
+				data = machine().root_device().ioport(bitnames[line])->read();
 	}
 	else
 	{
 		//Read all the input lines
 		for (line = 0; line < 7; line++)
-			data &= machine.root_device().ioport(bitnames[line])->read();
+			data &= machine().root_device().ioport(bitnames[line])->read();
 	}
 
 	return data & 0x7c;
 }
 
-void psion_state::update_banks(running_machine &machine)
+void psion_state::update_banks()
 {
-	psion_state *state = machine.driver_data<psion_state>();
 	if (m_ram_bank < m_ram_bank_count && m_ram_bank_count)
-		state->membank("rambank")->set_entry(m_ram_bank);
+		membank("rambank")->set_entry(m_ram_bank);
 
 	if (m_rom_bank < m_rom_bank_count && m_rom_bank_count)
-		state->membank("rombank")->set_entry(m_rom_bank);
+		membank("rombank")->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
@@ -121,7 +120,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
 		---- --x- pulse
 		---- ---x battery status
 		*/
-		return kb_read(machine()) | ioport("BATTERY")->read() | ioport("ON")->read() | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
+		return kb_read() | ioport("BATTERY")->read() | ioport("ON")->read() | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		return (m_pack1->control_r() | (m_pack2->control_r() & 0x8f)) | ((m_pack2->control_r() & 0x10)<<1);
@@ -166,7 +165,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		{
 			m_ram_bank=0;
 			m_rom_bank=0;
-			update_banks(machine());
+			update_banks();
 		}
 		else
 			m_kb_counter++;
@@ -175,7 +174,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2a0 && m_ram_bank_count)
 		{
 			m_ram_bank++;
-			update_banks(machine());
+			update_banks();
 		}
 		else
 			m_enable_nmi = 1;
@@ -184,7 +183,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		if (offset == 0x2e0 && m_rom_bank_count)
 		{
 			m_rom_bank++;
-			update_banks(machine());
+			update_banks();
 		}
 		else
 			m_enable_nmi = 0;
@@ -430,7 +429,7 @@ void psion_state::machine_reset()
 	m_pulse=0;
 
 	if (m_rom_bank_count || m_ram_bank_count)
-		update_banks(machine());
+		update_banks();
 }
 
 

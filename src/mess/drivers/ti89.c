@@ -25,7 +25,7 @@
 #include "machine/intelfsh.h"
 #include "rendlay.h"
 
-UINT8 ti68k_state::keypad_r (running_machine &machine)
+UINT8 ti68k_state::keypad_r()
 {
 	UINT8 bit, data = 0xff;
 
@@ -104,7 +104,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 			data = m_timer_val;
 			break;
 		case 0x0d:
-			data = ((!m_on_key) << 9) | keypad_r(machine());
+			data = ((!m_on_key) << 9) | keypad_r();
 			break;
 		default:
 			data= m_io_hw1[offset & 0x0f];
@@ -189,7 +189,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
 		}
 	}
 
-	if (keypad_r(machine()) != 0xff)
+	if (keypad_r() != 0xff)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 

@@ -155,8 +155,8 @@ public:
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
-//  UINT16 m_fdc_dma_r(running_machine &machine);
-//  void m_fdc_dma_w(running_machine &machine, UINT16 data);
+//  UINT16 m_fdc_dma_r();
+//  void m_fdc_dma_w(UINT16 data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
 	DECLARE_READ16_MEMBER(fdc_dma_r);

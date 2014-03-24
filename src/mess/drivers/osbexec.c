@@ -69,7 +69,7 @@ public:
 	/* Vblank counter ("RTC") */
 	UINT8   m_rtc;
 
-	void set_banks(running_machine &machine)
+	void set_banks()
 	{
 		UINT8 *ram_ptr = m_messram->pointer();
 
@@ -95,7 +95,7 @@ public:
 			m_ram_c000 = m_vram_region->base();
 	}
 
-	void update_irq_state(running_machine &machine)
+	void update_irq_state()
 	{
 		if ( m_pia0_irq_state || m_pia1_irq_state )
 			m_maincpu->set_input_line(0, ASSERT_LINE );
@@ -365,7 +365,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 
 	m_pia0_porta = data;
 
-	set_banks(machine());
+	set_banks();
 }
 
 
@@ -410,14 +410,14 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
 WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_irq)
 {
 	m_pia0_irq_state = state;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 
 WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
 {
 	m_pia1_irq_state = state;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 
@@ -585,7 +585,7 @@ void osbexec_state::machine_reset()
 {
 	m_pia0_porta = 0xC0;        /* Enable ROM and VRAM on reset */
 
-	set_banks( machine() );
+	set_banks();
 
 	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
 

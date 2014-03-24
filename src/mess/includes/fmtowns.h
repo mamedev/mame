@@ -267,8 +267,8 @@ class towns_state : public driver_device
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 
 	void towns_update_video_banks(address_space&);
-	void init_serial_rom(running_machine&);
-	void init_rtc(running_machine&);
+	void init_serial_rom();
+	void init_rtc();
 	void kb_sendcode(UINT8 scancode, int release);
 	UINT8 speaker_get_spk();
 	void speaker_set_spkrdata(UINT8 data);

@@ -212,7 +212,7 @@ inline UINT32 towns_state::msf_to_lbafm(UINT32 val)  // because the CDROM core d
 	return ((m * (60 * 75)) + (s * 75) + f);
 }
 
-void towns_state::init_serial_rom(running_machine &machine)
+void towns_state::init_serial_rom()
 {
 	// TODO: init serial ROM contents
 	int x;
@@ -252,11 +252,11 @@ void towns_state::init_serial_rom(running_machine &machine)
 	m_towns_serial_rom[25] = 0x10;
 }
 
-void towns_state::init_rtc(running_machine &machine)
+void towns_state::init_rtc()
 {
 	system_time systm;
 
-	machine.base_datetime(systm);
+	machine().base_datetime(systm);
 
 	// seconds
 	m_towns_rtc_reg[0] = systm.local_time.second % 10;
@@ -2567,8 +2567,8 @@ void towns_state::driver_start()
 	memset(m_towns_txtvram, 0, sizeof(UINT8)*0x20000);
 	//towns_sprram = auto_alloc_array(machine(),UINT8,0x20000);
 	m_towns_serial_rom = auto_alloc_array(machine(),UINT8,256/8);
-	init_serial_rom(machine());
-	init_rtc(machine());
+	init_serial_rom();
+	init_rtc();
 	m_towns_rtc_timer = timer_alloc(TIMER_RTC);
 	m_towns_kb_timer = timer_alloc(TIMER_KEYBOARD);
 	m_towns_mouse_timer = timer_alloc(TIMER_MOUSE);

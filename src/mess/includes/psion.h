@@ -61,8 +61,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	UINT8 kb_read(running_machine &machine);
-	void update_banks(running_machine &machine);
+	UINT8 kb_read();
+	void update_banks();
 	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
 	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
 	void io_rw(address_space &space, UINT16 offset);
