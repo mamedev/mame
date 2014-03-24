@@ -486,6 +486,17 @@ endif
 
 
 #-------------------------------------------------
+# QSound sample player
+#@src/emu/sound/qsound.h,SOUNDS += QSOUND
+#-------------------------------------------------
+
+ifneq ($(filter QSOUND,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/qsound.o $(CPUOBJ)/dsp16/dsp16.o $(CPUOBJ)/dsp16/dsp16dis.o
+endif
+
+
+
+#-------------------------------------------------
 # Ricoh sample players
 #@src/emu/sound/rf5c68.h,SOUNDS += RF5C68
 #@src/emu/sound/rf5c400.h,SOUNDS += RF5C400

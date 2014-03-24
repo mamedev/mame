@@ -8,10 +8,10 @@
 #define _CPS1_H_
 
 #include "sound/msm5205.h"
+#include "sound/qsound.h"
 #include "sound/okim6295.h"
 #include "machine/timekpr.h"
 #include "cpu/m68000/m68000.h"
-#include "audio/qsound.h"
 
 // Video raw params
 // measured clocks:

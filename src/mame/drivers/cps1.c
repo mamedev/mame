@@ -242,7 +242,7 @@ Stephh's log (2006.09.20) :
 #include "machine/eepromser.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "audio/qsound.h"
+#include "sound/qsound.h"
 #include "machine/kabuki.h"
 #include "includes/cps1.h"
 

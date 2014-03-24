@@ -598,10 +598,10 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/qsound.h"
 #include "sound/okim6295.h"
-#include "audio/qsound.h"
 
 #include "includes/cps1.h" // External CPS1 definitions
 
