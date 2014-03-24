@@ -1526,7 +1526,6 @@ private:
 #define UCHAR_MAMEKEY(code) (UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
 
 // macro for a read callback function (PORT_CUSTOM)
-#define CUSTOM_INPUT(name)  ioport_value name(device_t &device, ioport_field &field, void *param)
 #define CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
 #define DECLARE_CUSTOM_INPUT_MEMBER(name)   ioport_value name(ioport_field &field, void *param)
 

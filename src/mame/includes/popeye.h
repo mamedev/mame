@@ -46,6 +46,7 @@ public:
 	DECLARE_PALETTE_INIT(popeyebl);
 	UINT32 screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(popeye_interrupt);
+	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );
 	void convert_color_prom(const UINT8 *color_prom);
 	void set_background_palette(int bank);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
