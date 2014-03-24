@@ -45,7 +45,7 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 #define strncasecmp !MUST_USE_CORE_STRNICMP_INSTEAD!
 
 
-/* since strdup is not part of the standard, we use this instead */
+/* since strdup is not part of the standard, we use this instead - free with osd_free() */
 char *core_strdup(const char *str);
 
 /* this macro prevents people from using strdup directly */
