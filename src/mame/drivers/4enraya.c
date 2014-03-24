@@ -1,12 +1,13 @@
 /***************************************************************************
 
-Driver by Tomasz Slanina
+    IDSA 4 En Raya
 
-TODO:
-- video and irq timings;
-- there's a waitstate penalty on the VRAM apparently?
+    Driver by Tomasz Slanina
 
-- unknown Pac-Man gambling game (whats the real title?) sound issues
+    TODO:
+    - video and irq timings;
+    - there's a waitstate penalty on the VRAM apparently?
+    - unknown Pac-Man gambling game (whats the real title?) sound issues
 
 ***************************************************************************
 
@@ -77,9 +78,7 @@ WRITE8_MEMBER(_4enraya_state::sound_control_w)
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
 	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
-	UINT8 res;
-
-	res = 0;
+	UINT8 res = 0;
 
 	if(prom_routing & 1) //ROM5
 	{
@@ -131,13 +130,6 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enraya_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r,fenraya_custom_map_w)
-	#if 0
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_NOP
-	#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
@@ -164,6 +156,13 @@ static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(sound_data_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( 4enraya )
 	PORT_START("DSW")
@@ -193,12 +192,12 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Down")            // "drop" ("down")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Down") // "drop" ("down")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Down")            // "drop" ("down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Down") // "drop" ("down")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shot")            // "fire" ("shot")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shot")            // "fire" ("shot")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shot") // "fire" ("shot")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Shot") // "fire" ("shot")
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -267,8 +266,8 @@ static INPUT_PORTS_START( unkpacg )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -282,7 +281,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( 4enraya )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 void _4enraya_state::machine_start()
@@ -292,22 +291,12 @@ void _4enraya_state::machine_start()
 
 	m_prom = memregion("pal_prom")->base();
 	m_rom = memregion("maincpu")->base();
-
 }
 
 void _4enraya_state::machine_reset()
 {
 	m_soundlatch = 0;
 	m_last_snd_ctrl = 0;
-}
-
-PALETTE_INIT_MEMBER(_4enraya_state, _4enraya)
-{
-	int i;
-
-	/* RGB format */
-	for(i=0;i<8;i++)
-		m_palette->set_pen_color(i, rgb_t(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
 }
 
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
@@ -317,7 +306,6 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,6 +328,8 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(unkpacg_main_map)
 	MCFG_CPU_IO_MAP(unkpacg_main_portmap)
@@ -359,7 +349,7 @@ ROM_START( 4enraya )
 	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(87f92552) SHA1(d16afd963c30f2e60951876b843e5c1dcbee1cfc) ) // this dump might be bad, blue line on '8' character, 1 byte different from set below
+	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
@@ -373,7 +363,7 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "(__4enrayaa)1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
+	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
@@ -384,8 +374,8 @@ ROM_END
 
 ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("1.u14", 0x00000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
-	ROM_LOAD("2.u46", 0x08000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
+	ROM_LOAD("1.u14",    0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
+	ROM_LOAD("2.u46",    0x0800, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
@@ -393,20 +383,18 @@ ROM_START(unkpacg)
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
 ROM_END
 
-DRIVER_INIT_MEMBER(_4enraya_state,unkpacg)
-{
-	UINT8 *rom = memregion("maincpu")->base();
 
+DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
+{
 	m_snd_latch_bit = 2;
 
-	{
-		for(int i=0x8000;i<0xa000;++i)
-		{
-			rom[i]=BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
-		}
-	}
+	// descramble rom
+	UINT8 *rom = memregion("maincpu")->base();
+	for (int i = 0x8000; i < 0xa000; i++)
+		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
 }
+
 
 GAME( 1990, 4enraya,  0,       4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
