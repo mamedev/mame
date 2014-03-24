@@ -102,11 +102,13 @@ protected:
 	UINT16  m_o;
 
 	// generic variables
+	void    update_lcd();
 	void    lcd_write(UINT8 control, UINT8 data);
 	void    speaker_write(UINT8 speaker);
 	bool    m_pla;
 
 	UINT8   m_lcd_latch[8];
+	UINT8   m_lcd_holding_latch[8];
 	UINT8   m_lcd_latch_index;
 	UINT8   m_lcd[16][16];
 	UINT8   m_lcd_control_old;
@@ -148,6 +150,7 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 	save_item(NAME(m_lcd));
 	save_item(NAME(m_lcd_control_old));
 	save_item(NAME(m_pla));
+	save_item(NAME(m_lcd_holding_latch));
 }
 
 
@@ -205,6 +208,29 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 }
 
 
+void microvision_state::update_lcd()
+{
+	UINT16 row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
+	UINT16 col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
+
+	if (LOG) logerror("row = %04x, col = %04x\n", row, col );
+	for ( int i = 0; i < 16; i++ )
+	{
+		UINT16 temp = row;
+
+		for ( int j = 0; j < 16; j++ )
+		{
+			if ( ( temp & col ) & 0x8000 )
+			{
+				m_lcd[j][i] = 15;
+			}
+			temp <<= 1;
+		}
+		col <<= 1;
+	}
+}
+
+
 UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for ( UINT8 i = 0; i < 16; i++ )
@@ -233,6 +259,7 @@ void microvision_state::screen_vblank(screen_device &screen, bool state)
 				}
 			}
 		}
+		update_lcd();
 	}
 }
 
@@ -270,24 +297,10 @@ void microvision_state::lcd_write(UINT8 control, UINT8 data)
 	// A parallel transfer of data from the addressed latches to the holding latches occurs
 	// whenever Latch Pulse is high and -Data Clk is high
 	if ( control == 3 ) {
-		UINT16 row = ( m_lcd_latch[0] << 12 ) | ( m_lcd_latch[1] << 8 ) | ( m_lcd_latch[2] << 4 ) | m_lcd_latch[3];
-		UINT16 col = ( m_lcd_latch[4] << 12 ) | ( m_lcd_latch[5] << 8 ) | ( m_lcd_latch[6] << 4 ) | m_lcd_latch[7];
-
-		if (LOG) logerror("row = %04x, col = %04x\n", row, col );
-		for ( int i = 0; i < 16; i++ )
-		{
-			UINT16 temp = row;
-
-			for ( int j = 0; j < 16; j++ )
-			{
-				if ( ( temp & col ) & 0x8000 )
-				{
-					m_lcd[j][i] = 15;
-				}
-				temp <<= 1;
-			}
-			col <<= 1;
+		for ( int i = 0; i < 8; i++ ) {
+			m_lcd_holding_latch[i] = m_lcd_latch[i];
 		}
+		update_lcd();
 	}
 
 	m_lcd_control_old = control;
