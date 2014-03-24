@@ -547,7 +547,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		{
 			/* get the entry type and free the stat entry */
 			current_entry_type = current_entry->type;
-			free(current_entry);
+			osd_free(current_entry);
 			current_entry = NULL;
 		}
 		else

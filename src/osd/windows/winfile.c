@@ -64,7 +64,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// allocate a file object, plus space for the converted filename
-	*file = (osd_file *)malloc(sizeof(**file) + sizeof(TCHAR) * _tcslen(t_path));
+	*file = (osd_file *)osd_malloc_array(sizeof(**file) + sizeof(TCHAR) * _tcslen(t_path));
 	if (*file == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -152,7 +152,7 @@ error:
 	// cleanup
 	if (filerr != FILERR_NONE && *file != NULL)
 	{
-		free(*file);
+		osd_free(*file);
 		*file = NULL;
 	}
 	osd_free(t_path);
@@ -286,7 +286,7 @@ file_error osd_close(osd_file *file)
 		case WINFILE_FILE:
 			// close the file handle and free the file structure
 			CloseHandle(file->handle);
-			free(file);
+			osd_free(file);
 			break;
 		case WINFILE_SOCKET:
 			return win_close_socket(file);
@@ -490,7 +490,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *)malloc(sizeof(*result) + strlen(path) + 1);
+	result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + strlen(path) + 1);
 	if (!result)
 		goto done;
 	strcpy(((char *) result) + sizeof(*result), path);
