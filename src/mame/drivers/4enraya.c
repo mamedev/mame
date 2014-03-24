@@ -62,6 +62,7 @@ Sound :
 
 #define MAIN_CLOCK XTAL_8MHz
 
+
 WRITE8_MEMBER(_4enraya_state::sound_data_w)
 {
 	m_soundlatch = data;
@@ -69,10 +70,26 @@ WRITE8_MEMBER(_4enraya_state::sound_data_w)
 
 WRITE8_MEMBER(_4enraya_state::sound_control_w)
 {
-	if ((m_last_snd_ctrl & m_snd_latch_bit ) == m_snd_latch_bit && (data & m_snd_latch_bit) == 0x00)
-		m_ay->data_address_w(space, m_last_snd_ctrl, m_soundlatch);
+	// BDIR must be high
+	if (~data & 4)
+		return;
 
-	m_last_snd_ctrl = data;
+	switch (data & 3)
+	{
+		case 0: case 3:
+			// latch address
+			m_ay->address_data_w(space, 0, m_soundlatch);
+			break;
+
+		case 2:
+			// write to psg
+			m_ay->address_data_w(space, 1, m_soundlatch);
+			break;
+
+		default:
+			// inactive
+			break;
+	}
 }
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
@@ -80,22 +97,22 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 	UINT8 res = 0;
 
-	if(prom_routing & 1) //ROM5
+	if (prom_routing & 1) // ROM5
 	{
 		res |= m_rom[offset & 0x7fff];
 	}
 
-	if(prom_routing & 2) //ROM4
+	if (prom_routing & 2) // ROM4
 	{
 		res |= m_rom[(offset & 0x7fff) | 0x8000];
 	}
 
-	if(prom_routing & 4) //RAM
+	if (prom_routing & 4) // RAM
 	{
 		res |= m_workram[offset & 0xfff];
 	}
 
-	if(prom_routing & 8) //gfx control / RAM wait
+	if (prom_routing & 8) // gfx control / RAM wait
 	{
 		res |= m_videoram[offset & 0xfff];
 	}
@@ -107,29 +124,29 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
 	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 
-	if(prom_routing & 1) //ROM5
+	if (prom_routing & 1) // ROM5
 	{
 		// ...
 	}
 
-	if(prom_routing & 2) //ROM4
+	if (prom_routing & 2) // ROM4
 	{
 		// ...
 	}
 
-	if(prom_routing & 4) //RAM
+	if (prom_routing & 4) // RAM
 	{
 		m_workram[offset & 0xfff] = data;
 	}
 
-	if(prom_routing & 8) //gfx control / RAM wait
+	if (prom_routing & 8) // gfx control / RAM wait
 	{
-		fenraya_videoram_w(space,offset & 0xfff,data);
+		fenraya_videoram_w(space, offset & 0xfff, data);
 	}
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enraya_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r,fenraya_custom_map_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r, fenraya_custom_map_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
@@ -144,7 +161,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8, _4enraya_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -287,7 +304,6 @@ GFXDECODE_END
 void _4enraya_state::machine_start()
 {
 	save_item(NAME(m_soundlatch));
-	save_item(NAME(m_last_snd_ctrl));
 
 	m_prom = memregion("pal_prom")->base();
 	m_rom = memregion("maincpu")->base();
@@ -296,13 +312,12 @@ void _4enraya_state::machine_start()
 void _4enraya_state::machine_reset()
 {
 	m_soundlatch = 0;
-	m_last_snd_ctrl = 0;
 }
 
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
@@ -375,7 +390,7 @@ ROM_END
 ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1.u14",    0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
-	ROM_LOAD("2.u46",    0x0800, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
+	ROM_LOAD("2.u46",    0x8000, 0x2000, CRC(9e6e0bd3) SHA1(f502132a0460108dad243632cc13d9116c534291))
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
@@ -386,8 +401,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 {
-	m_snd_latch_bit = 2;
-
 	// descramble rom
 	UINT8 *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)

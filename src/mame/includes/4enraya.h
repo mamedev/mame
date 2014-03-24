@@ -14,8 +14,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "aysnd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_snd_latch_bit(4)
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -24,19 +23,17 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	UINT8      m_videoram[0x1000];
-	UINT8      m_workram[0x1000];
+	UINT8 m_videoram[0x1000];
+	UINT8 m_workram[0x1000];
+
+	UINT8* m_prom;
+	UINT8* m_rom;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 
 	/* sound-related */
-	UINT8      m_soundlatch;
-	UINT8      m_last_snd_ctrl;
-	UINT8      m_snd_latch_bit;
-
-	UINT8* m_prom;
-	UINT8* m_rom;
+	UINT8 m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
