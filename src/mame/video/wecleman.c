@@ -72,21 +72,21 @@ struct sprite
 
 ***************************************************************************/
 
-static void get_sprite_info(running_machine &machine)
+void wecleman_state::get_sprite_info()
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
-	const pen_t *base_pal = state->m_palette->pens();
-	UINT8 *base_gfx = state->memregion("gfx1")->base();
-	int gfx_max     = state->memregion("gfx1")->bytes();
 
-	UINT16 *source = state->m_spriteram;
+	const pen_t *base_pal = m_palette->pens();
+	UINT8 *base_gfx = memregion("gfx1")->base();
+	int gfx_max     = memregion("gfx1")->bytes();
 
-	struct sprite *sprite = state->m_sprite_list;
-	struct sprite *finish = state->m_sprite_list + NUM_SPRITES;
+	UINT16 *source = m_spriteram;
+
+	struct sprite *sprite = m_sprite_list;
+	struct sprite *finish = m_sprite_list + NUM_SPRITES;
 
 	int bank, code, gfx, zoom;
 
-	for (state->m_spr_count=0; sprite<finish; source+=0x10/2, sprite++)
+	for (m_spr_count=0; sprite<finish; source+=0x10/2, sprite++)
 	{
 		if (source[0x00/2] == 0xffff) break;
 
@@ -109,7 +109,7 @@ static void get_sprite_info(running_machine &machine)
 		sprite->pal_base = (source[0x0e/2] & 0xff) << 4;
 		sprite->pal_data = base_pal + sprite->pal_base;
 
-		gfx = (state->m_gfx_bank[bank] << 15) + (code & 0x7fff);
+		gfx = (m_gfx_bank[bank] << 15) + (code & 0x7fff);
 
 		sprite->flags = 0;
 		if (code & 0x8000) { sprite->flags |= SPRITE_FLIPX; gfx += 1-sprite->tile_width; }
@@ -125,22 +125,22 @@ static void get_sprite_info(running_machine &machine)
 		sprite->line_offset = sprite->tile_width;
 		sprite->total_width = sprite->tile_width - (sprite->tile_width * (zoom & 0xff)) / 0x80;
 		sprite->total_height += 1;
-		sprite->x += state->m_spr_offsx;
-		sprite->y += state->m_spr_offsy;
+		sprite->x += m_spr_offsx;
+		sprite->y += m_spr_offsy;
 
-		if (state->m_gameid == 0)
+		if (m_gameid == 0)
 		{
-			state->m_spr_idx_list[state->m_spr_count] = state->m_spr_count;
-			state->m_spr_pri_list[state->m_spr_count] = source[0x0e/2] >> 8;
+			m_spr_idx_list[m_spr_count] = m_spr_count;
+			m_spr_pri_list[m_spr_count] = source[0x0e/2] >> 8;
 		}
 
-		state->m_spr_ptr_list[state->m_spr_count] = sprite;
-		state->m_spr_count++;
+		m_spr_ptr_list[m_spr_count] = sprite;
+		m_spr_count++;
 	}
 }
 
 // priority sorting, silly but good for smaller arrays
-static void sortsprite(int *idx_array, int *key_array, int size)
+void wecleman_state::sortsprite(int *idx_array, int *key_array, int size)
 {
 	int i, j, tgt_val, low_val, low_pos, src_idx, tgt_idx, hi_idx;
 
@@ -169,7 +169,7 @@ static void sortsprite(int *idx_array, int *key_array, int size)
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
 template<class _BitmapClass>
-static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite)
+void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -315,7 +315,7 @@ static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const re
 							dst_ptr[sx] = base + pix;
 						else
 						{
-							if (dst_ptr[sx] != state->m_black_pen)
+							if (dst_ptr[sx] != m_black_pen)
 								dst_ptr[sx] |= 0x800;
 						}
 					}
@@ -329,20 +329,19 @@ static void do_blit_zoom32(wecleman_state *state, _BitmapClass &bitmap, const re
 }
 
 template<class _BitmapClass>
-static void sprite_draw(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect)
+void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 	int i;
 
-	if (state->m_gameid == 0)   // Wec Le Mans
+	if (m_gameid == 0)   // Wec Le Mans
 	{
-		sortsprite(state->m_spr_idx_list, state->m_spr_pri_list, state->m_spr_count);
+		sortsprite(m_spr_idx_list, m_spr_pri_list, m_spr_count);
 
-		for (i=0; i<state->m_spr_count; i++) do_blit_zoom32(state, bitmap, cliprect, state->m_spr_ptr_list[state->m_spr_idx_list[i]]);
+		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, m_spr_ptr_list[m_spr_idx_list[i]]);
 	}
 	else    // Hot Chase
 	{
-		for (i=0; i<state->m_spr_count; i++) do_blit_zoom32(state, bitmap, cliprect, state->m_spr_ptr_list[i]);
+		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, m_spr_ptr_list[i]);
 	}
 }
 
@@ -533,9 +532,8 @@ WRITE16_MEMBER(wecleman_state::wecleman_pageram_w)
 
 ------------------------------------------------------------------------*/
 
-static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
+void wecleman_state::wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 // must be powers of 2
 #define XSIZE 512
 #define YSIZE 256
@@ -565,7 +563,7 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int scrollx, sy, sx;
 	int mdy, tdy, i;
 
-	rgb_ptr = state->m_palette->pens();
+	rgb_ptr = m_palette->pens();
 
 	if (priority == 0x02)
 	{
@@ -576,10 +574,10 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 			UINT32 pix;
 			UINT16 road;
 
-			road = state->m_roadram[sy];
+			road = m_roadram[sy];
 			if ((road>>8) != 0x02) continue;
 
-			pix = rgb_ptr[(state->m_roadram[sy+(YSIZE*2)] & 0xf) + 0x7f0];
+			pix = rgb_ptr[(m_roadram[sy+(YSIZE*2)] & 0xf) + 0x7f0];
 
 			for (sx = 0; sx < DST_WIDTH; sx++)
 				dst[sx] = pix;
@@ -602,24 +600,24 @@ static void wecleman_draw_road(running_machine &machine, bitmap_rgb32 &bitmap, c
 			UINT32 pix;
 			UINT16 road;
 
-			road = state->m_roadram[sy];
+			road = m_roadram[sy];
 			if ((road>>8) != 0x04) continue;
 			road &= YMASK;
 
-			src_ptr = state->m_gfxdecode->gfx(1)->get_data((road << 3));
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 1);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 2);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 3);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 4);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 5);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 6);
-			state->m_gfxdecode->gfx(1)->get_data((road << 3) + 7);
+			src_ptr = m_gfxdecode->gfx(1)->get_data((road << 3));
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 1);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 2);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 3);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 4);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 5);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 6);
+			m_gfxdecode->gfx(1)->get_data((road << 3) + 7);
 			mdy = ((road * MIDCURB_DY) >> 8) * bitmap.rowpixels();
 			tdy = ((road * TOPCURB_DY) >> 8) * bitmap.rowpixels();
 
-			scrollx = state->m_roadram[sy+YSIZE] + (0x18 - 0xe00);
+			scrollx = m_roadram[sy+YSIZE] + (0x18 - 0xe00);
 
-			pal_ptr = road_rgb + ((state->m_roadram[sy+(YSIZE*2)]<<3) & 8);
+			pal_ptr = road_rgb + ((m_roadram[sy+(YSIZE*2)]<<3) & 8);
 
 			for (sx = 0; sx < DST_WIDTH; sx++, scrollx++)
 			{
@@ -785,20 +783,19 @@ void wecleman_state::draw_cloud(bitmap_rgb32 &bitmap,
 
 ------------------------------------------------------------------------*/
 
-static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wecleman_state::hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wecleman_state *state = machine.driver_data<wecleman_state>();
 /* Referred to what's in the ROMs */
 #define XSIZE 512
 #define YSIZE 512
 
 	int sx, sy;
-	const rectangle &visarea = machine.first_screen()->visible_area();
+	const rectangle &visarea = machine().first_screen()->visible_area();
 
 	/* Let's draw from the top to the bottom of the visible screen */
 	for (sy = visarea.min_y;sy <= visarea.max_y;sy++)
 	{
-		int code    = state->m_roadram[sy*4/2+2/2] + (state->m_roadram[sy*4/2+0/2] << 16);
+		int code    = m_roadram[sy*4/2+2/2] + (m_roadram[sy*4/2+0/2] << 16);
 		int color   = ((code & 0x00f00000) >> 20) + 0x70;
 		int scrollx = ((code & 0x0007fc00) >> 10) * 2;
 
@@ -809,7 +806,7 @@ static void hotchase_draw_road(running_machine &machine, bitmap_ind16 &bitmap, c
 
 		for (sx=0; sx<2*XSIZE; sx+=64)
 		{
-			state->m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code++,
 					color,
 					0,0,
@@ -1052,12 +1049,12 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	/* palette hacks! */
 	((pen_t *)mrct)[0x27] = mrct[0x24];
 
-	get_sprite_info(machine());
+	get_sprite_info();
 
 	bitmap.fill(m_black_pen, cliprect);
 
 	/* Draw the road (lines which have priority 0x02) */
-	if (video_on) wecleman_draw_road(machine(), bitmap, cliprect, 0x02);
+	if (video_on) wecleman_draw_road(bitmap, cliprect, 0x02);
 
 	/* Draw the background */
 	if (video_on) m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -1090,10 +1087,10 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 	if (video_on) m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
-	if (video_on) wecleman_draw_road(machine(), bitmap,cliprect, 0x04);
+	if (video_on) wecleman_draw_road(bitmap,cliprect, 0x04);
 
 	/* Draw the sprites */
-	if (video_on) sprite_draw(machine(), bitmap,cliprect);
+	if (video_on) sprite_draw(bitmap,cliprect);
 
 	/* Draw the text layer */
 	if (video_on) m_txt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -1112,7 +1109,7 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	set_led_status(machine(), 0, m_selected_ip & 0x04); // Start lamp
 
-	get_sprite_info(machine());
+	get_sprite_info();
 
 	bitmap.fill(m_black_pen, cliprect);
 
@@ -1122,11 +1119,11 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	/* Draw the road */
 	if (video_on)
-		hotchase_draw_road(machine(), bitmap, cliprect);
+		hotchase_draw_road(bitmap, cliprect);
 
 	/* Draw the sprites */
 	if (video_on)
-		sprite_draw(machine(), bitmap,cliprect);
+		sprite_draw(bitmap,cliprect);
 
 	/* Draw the foreground (text) */
 	if (video_on)
