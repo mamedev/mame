@@ -290,8 +290,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tandy2k_hd_io, AS_IO, 16, tandy2k_state )
 	AM_IMPORT_FROM(tandy2k_io)
 //  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
-//  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
-//  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8_LEGACY(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
+//  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, hdc_reset_r, hdc_reset_w, 0x00ff)
+//  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
