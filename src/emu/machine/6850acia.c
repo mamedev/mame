@@ -220,9 +220,6 @@ WRITE8_MEMBER( acia6850_device::control_w )
 
 		m_status &= SR_CTS;
 
-		/// TODO: find out if this should be set as data sheet says status is cleared apart from cts & dcd
-		m_status |= SR_TDRE;
-
 		if (m_dcd)
 		{
 			m_status |= SR_DCD;
@@ -538,6 +535,8 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 			case STATE_STOP:
 				if (m_tx_counter == m_divide)
 				{
+					m_tx_counter = 0;
+					
 					m_tx_bits++;
 
 					if (LOG) logerror("MC6850 '%s': TX STOP BIT %d\n", tag(), m_tx_bits);

@@ -1876,6 +1876,13 @@ prof80
 prof180x
 prof181x
 
+// SWTPC S/09
+swtpc09   // S09, DMF2 Floppy SBUG rom - FLEX
+swtpc09i  // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
+swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX 
+swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
+
+
 //***************Games******************************************************
 // Computer Electronic
 ccmk1      // Chess Champion MK I

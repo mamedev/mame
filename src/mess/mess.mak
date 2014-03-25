@@ -728,6 +728,7 @@ DRVLIBS += \
 	$(MESSOBJ)/sun.a \
 	$(MESSOBJ)/svi.a \
 	$(MESSOBJ)/svision.a \
+	$(MESSOBJ)/swtpc09.a \
 	$(MESSOBJ)/synertec.a \
 	$(MESSOBJ)/ta.a \
 	$(MESSOBJ)/tandberg.a \
@@ -1772,6 +1773,10 @@ $(MESSOBJ)/svi.a:               \
 $(MESSOBJ)/svision.a:           \
 	$(MESS_DRIVERS)/svision.o   \
 	$(MESS_AUDIO)/svision.o     \
+
+$(MESSOBJ)/swtpc09.a:			\
+	$(MESS_DRIVERS)/swtpc09.o	\
+	$(MESS_MACHINE)/swtpc09.o    \
 
 $(MESSOBJ)/synertec.a:          \
 	$(MESS_DRIVERS)/sym1.o      \
