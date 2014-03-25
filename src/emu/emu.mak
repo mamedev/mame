@@ -74,6 +74,7 @@ EMUOBJS = \
 	$(EMUOBJ)/diserial.o \
 	$(EMUOBJ)/dislot.o \
 	$(EMUOBJ)/disound.o \
+	$(EMUOBJ)/dispatch.o \
 	$(EMUOBJ)/distate.o \
 	$(EMUOBJ)/divideo.o \
 	$(EMUOBJ)/drawgfx.o \

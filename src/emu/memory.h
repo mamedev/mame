@@ -246,6 +246,8 @@ public:
 	address_space_config();
 	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
 	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
+	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
 
 	// getters
 	const char *name() const { return m_name; }
@@ -269,6 +271,8 @@ public:
 	UINT8               m_page_shift;
 	address_map_constructor m_internal_map;
 	address_map_constructor m_default_map;
+	address_map_delegate m_internal_map_delegate;
+	address_map_delegate m_default_map_delegate;
 };
 
 

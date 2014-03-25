@@ -53,7 +53,7 @@
 #define SND_CLOCK   XTAL_14_31818MHz
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83337.h"
 #include "sound/upd7759.h"
 
 
@@ -268,7 +268,7 @@ PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 static MACHINE_CONFIG_START( itgambl2, itgambl2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a H8/3337 core ATM */
+	MCFG_CPU_ADD("maincpu", H83337, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(itgambl2_map)
 
 	/* video hardware */

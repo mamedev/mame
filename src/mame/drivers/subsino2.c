@@ -35,7 +35,7 @@ To do:
 ************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83048.h"
 #include "cpu/i86/i186.h"
 #include "cpu/z180/z180.h"
 #include "sound/3812intf.h"
@@ -840,16 +840,6 @@ WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
 {
 	downcast<i80186_cpu_device *>(m_maincpu.target())->int0_w(1);
-}
-
-/***************************************************************************
-                             H8/3044  Functions
-***************************************************************************/
-
-// To be removed when cpu core is updated
-TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::h8_timer_irq)
-{
-	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 
@@ -2138,7 +2128,6 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state,  irq0_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", subsino2_state, h8_timer_irq, attotime::from_hz(60))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)

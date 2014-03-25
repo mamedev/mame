@@ -29,7 +29,8 @@ const device_type RTC4543 = &device_creator<rtc4543_device>;
 
 rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RTC4543, "Epson R4543", tag, owner, clock, "rtc4543", __FILE__),
-		device_rtc_interface(mconfig, *this)
+	  device_rtc_interface(mconfig, *this),
+	  data_cb(*this)
 {
 }
 
@@ -40,6 +41,8 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, d
 
 void rtc4543_device::device_start()
 {
+	data_cb.resolve_safe();
+
 	// allocate timers
 	m_clock_timer = timer_alloc();
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
@@ -148,20 +151,24 @@ WRITE_LINE_MEMBER( rtc4543_device::clk_w )
 
 	if (!m_clk && state) // rising edge - read data becomes valid here
 	{
-		if (m_bit > 7)  // reload data?
+		if (!m_wr)
 		{
-			m_bit = 0;
-			m_data = m_regs[m_curreg++];
-		}
-		else            // no reload, just continue with the current byte
-		{
-			m_data <<= 1;
-		}
+			if (m_bit > 7)  // reload data?
+			{
+				m_bit = 0;
+				m_data = m_regs[m_curreg++];
+				if (VERBOSE)
+					logerror("RTC4543 '%s' sending byte: %02x\n", tag(), m_data);
+			}
+			else            // no reload, just continue with the current byte
+			{
+				m_data >>= 1;
+			}
 
-		m_bit++;
-	}
-	else if (m_clk && !state) // falling edge - write data becomes valid here
-	{
+			m_bit++;
+
+			data_cb(m_data & 0x01);
+		}
 	}
 
 	m_clk = state;

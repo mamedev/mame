@@ -239,32 +239,33 @@ READ16_MEMBER( cybiko_state::cybikoxt_key_r )
 READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 {
 	UINT8 data = 0;
+#if 0
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
 		// keyboard
-		case H8S_IO_PORT1 :
+		case h8_device::PORT_1:
 		{
 			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;
 		// serial dataflash
-		case H8S_IO_PORT3 :
+		case h8_device::PORT_3:
 		{
 			if (m_flash1->so_r())
 				data |= H8S_P3_RXD1;
 		}
 		break;
 		// rs232
-		case H8S_IO_PORT5 :
+		case h8_device::PORT_5:
 		{
 			if (cybiko_rs232_pin_rxd())
 				data |= H8S_P5_RXD2;
 		}
 		break;
 		// real-time clock
-		case H8S_IO_PORTF :
+		case h8_device::PORT_F:
 		{
 			data = H8S_PF_PF2;
 			if (m_rtc->sda_r())
@@ -279,38 +280,40 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 		}
 		break;
 	}
+#endif
 	return data;
 }
 
 READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 {
 	UINT8 data = 0;
+#if 0
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
 		// keyboard
-		case H8S_IO_PORT1 :
+		case h8_device::PORT_1 :
 		{
 			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;
 		// serial dataflash
-		case H8S_IO_PORT3 :
+		case h8_device::PORT_3 :
 		{
 			if (m_flash1->so_r())
 				data |= H8S_P3_RXD1;
 		}
 		break;
 		// rs232
-		case H8S_IO_PORT5 :
+		case h8_device::PORT_5 :
 		{
 			if (cybiko_rs232_pin_rxd())
 				data |= H8S_P5_RXD2;
 		}
 		break;
 		// real-time clock
-		case H8S_IO_PORTF :
+		case h8_device::PORT_F :
 		{
 			data = H8S_PF_PF2;
 			if (m_rtc->sda_r())
@@ -325,31 +328,33 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 		}
 		break;
 	}
+#endif
 	return data;
 }
 
 READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 {
 	UINT8 data = 0;
+#if 0
 	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)
 	{
 		// rs232
-		case H8S_IO_PORT3 :
+		case h8_device::PORT_3 :
 		{
 			if (cybiko_rs232_pin_rxd())
 				data |= H8S_P3_RXD1;
 		}
 		break;
 		// ...
-		case H8S_IO_PORTA :
+		case h8_device::PORT_A :
 		{
 			data |= (1 << 6); // recharge batteries (xtreme)
 			data |= (1 << 7); // on/off key (xtreme)
 		}
 		break;
 		// real-time clock
-		case H8S_IO_PORTF :
+		case h8_device::PORT_F :
 		{
 			if (m_rtc->sda_r())
 				data |= H8S_PF_PF6;
@@ -363,11 +368,13 @@ READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 		}
 		break;
 	}
+#endif
 	return data;
 }
 
 WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 {
+#if 0
 	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
@@ -405,10 +412,12 @@ WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 		}
 		break;
 	}
+#endif
 }
 
 WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 {
+#if 0
 	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
@@ -446,10 +455,12 @@ WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 		}
 		break;
 	}
+#endif
 }
 
 WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 {
+#if 0
 	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));
 	switch (offset)
 	{
@@ -479,6 +490,7 @@ WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 		}
 		break;
 	}
+#endif
 }
 
 // Cybiko Xtreme writes following byte pairs to 0x200003/0x200000

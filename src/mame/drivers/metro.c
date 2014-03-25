@@ -95,8 +95,8 @@ driver modified by Eisuke Watanabe
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
+#include "cpu/h8/h83006.h"
 #include "includes/metro.h"
 #include "machine/eepromser.h"
 #include "sound/2151intf.h"
@@ -247,8 +247,6 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
 	update_irq_state();
-
-	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 WRITE_LINE_MEMBER(metro_state::ymf278b_interrupt)
@@ -1780,15 +1778,14 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(metro_state::puzzlet_portb_w)
+WRITE16_MEMBER(metro_state::puzzlet_portb_w)
 {
 //  popmessage("PORTB %02x", data);
 }
 
-static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(H8_PORT_7,   H8_PORT_7) AM_READ_PORT("IN2")
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ_PORT("IN0")      // coin
-	AM_RANGE(H8_PORT_B,   H8_PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
+static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 16, metro_state )
+	AM_RANGE(h8_device::PORT_7,   h8_device::PORT_7) AM_READ_PORT("IN2")
+	AM_RANGE(h8_device::PORT_B,   h8_device::PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
 ADDRESS_MAP_END
 
 

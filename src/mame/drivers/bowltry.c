@@ -26,7 +26,7 @@
 
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
 
 
 class bowltry_state : public driver_device

@@ -238,7 +238,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
 
 
 class bingoman_state : public driver_device
@@ -370,7 +370,7 @@ PALETTE_INIT_MEMBER(bingoman_state, bingoman)
 static MACHINE_CONFIG_START( bingoman, bingoman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz) /* TODO: correct CPU type */
+	MCFG_CPU_ADD("maincpu", H83002, XTAL_20MHz) /* TODO: correct CPU type */
 	MCFG_CPU_PROGRAM_MAP(bingoman_prg_map)
 	MCFG_CPU_IO_MAP(bingoman_io_map)
 

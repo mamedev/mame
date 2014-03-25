@@ -1227,14 +1227,17 @@ Notes:
 #include <float.h>
 #include "video/polylgcy.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
+#include "cpu/h8/h83337.h"
 #include "cpu/sh2/sh2.h"
 #include "sound/c352.h"
 #include "machine/nvram.h"
 #include "machine/rtc4543.h"
+#include "machine/namco_settings.h"
 
 #define S23_BUSCLOCK    (66664460/2)    /* 33MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal */
-#define S23_H8CLOCK     (14745600)
+#define S23_H8CLOCK     (16737350)
+#define S23_JVSCLOCK    (14745600)
 #define S23_C352CLOCK   (24576000)      /* measured at 25.992MHz from 2061 pin 9 (but that sounds too highpitched) */
 #define S23_VSYNC1      (59.8824)
 #define S23_VSYNC2      (59.915)
@@ -1347,8 +1350,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
+		m_adc(*this, "subcpu:adc"),
+		m_sci0(*this, "subcpu:sci0"),
 		m_iocpu(*this, "iocpu"),
 		m_rtc(*this, "rtc"),
+		m_settings(*this, "namco_settings"),
 		m_mainram(*this, "mainram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_gammaram(*this, "gammaram"),
@@ -1367,9 +1373,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_iocpu;
+	required_device<h83002_device> m_subcpu;
+	required_device<h8_adc_device> m_adc;
+	required_device<h8_sci_device> m_sci0;
+	optional_device<h83334_device> m_iocpu;
 	required_device<rtc4543_device> m_rtc;
+	required_device<namco_settings_device> m_settings;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_shared_ram;
 	required_shared_ptr<UINT32> m_gammaram;
@@ -1429,18 +1438,9 @@ public:
 	INT16 m_spm[3];
 
 	int m_s23_porta;
-	int m_s23_rtcstate;
 	int m_s23_lastpb;
-	int m_s23_setstate;
-	int m_s23_setnum;
-	int m_s23_settings[8];
-	UINT8 m_maintoio[128];
-	UINT8 m_mi_rd;
-	UINT8 m_mi_wr;
-	UINT8 m_iotomain[128];
-	UINT8 m_im_rd;
-	UINT8 m_im_wr;
 	UINT8 m_s23_tssio_port_4;
+	bool jvs_timer_state;
 
 	void update_main_interrupts(UINT32 cause);
 	void update_mixer();
@@ -1475,26 +1475,21 @@ public:
 	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
 	DECLARE_READ16_MEMBER(sharedram_sub_r);
 	DECLARE_WRITE16_MEMBER(sub_interrupt_main_w);
-	DECLARE_READ8_MEMBER(s23_mcu_p8_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_p8_w);
-	DECLARE_READ8_MEMBER(s23_mcu_pa_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_pa_w);
-	DECLARE_READ8_MEMBER(s23_mcu_rtc_r);
-	DECLARE_READ8_MEMBER(s23_mcu_pb_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_pb_w);
-	DECLARE_WRITE8_MEMBER(s23_mcu_settings_w);
-	DECLARE_READ8_MEMBER(s23_mcu_iob_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_iob_w);
-	DECLARE_READ8_MEMBER(s23_mcu_p6_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_p6_w);
-	DECLARE_READ8_MEMBER(s23_iob_mcu_r);
-	DECLARE_WRITE8_MEMBER(s23_iob_mcu_w);
-	DECLARE_READ8_MEMBER(s23_iob_p4_r);
-	DECLARE_WRITE8_MEMBER(s23_iob_p4_w);
-	DECLARE_READ8_MEMBER(s23_iob_p6_r);
-	DECLARE_WRITE8_MEMBER(s23_iob_p6_w);
-	DECLARE_READ8_MEMBER(s23_iob_gun_r);
-	DECLARE_READ8_MEMBER(s23_iob_analog_r);
+	DECLARE_READ16_MEMBER(s23_mcu_p8_r);
+	DECLARE_WRITE16_MEMBER(s23_mcu_p8_w);
+	DECLARE_READ16_MEMBER(s23_mcu_pa_r);
+	DECLARE_WRITE16_MEMBER(s23_mcu_pa_w);
+	DECLARE_READ16_MEMBER(s23_mcu_rtc_r);
+	DECLARE_READ16_MEMBER(s23_mcu_pb_r);
+	DECLARE_WRITE16_MEMBER(s23_mcu_pb_w);
+	DECLARE_READ16_MEMBER(s23_mcu_p6_r);
+	DECLARE_WRITE16_MEMBER(s23_mcu_p6_w);
+	DECLARE_READ16_MEMBER(s23_iob_p4_r);
+	DECLARE_WRITE16_MEMBER(s23_iob_p4_w);
+	DECLARE_READ16_MEMBER(s23_iob_p6_r);
+	DECLARE_WRITE16_MEMBER(s23_iob_p6_w);
+	DECLARE_READ16_MEMBER(s23_iob_gun_r);
+	DECLARE_READ16_MEMBER(s23_iob_analog_r);
 	DECLARE_DRIVER_INIT(s23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
@@ -1504,6 +1499,8 @@ public:
 	UINT32 screen_update_s23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(jvs_timer);
+	void namcos23_sub_irq(screen_device &screen, bool state);
 	UINT8 nthbyte(const UINT32 *pSource, int offs);
 	UINT16 nthword(const UINT32 *pSource, int offs);
 	inline INT32 u32_to_s24(UINT32 v);
@@ -2234,6 +2231,12 @@ INTERRUPT_GEN_MEMBER(namcos23_state::s23_interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
+void namcos23_state::namcos23_sub_irq(screen_device &screen, bool state)
+{
+	m_subcpu->set_input_line(1, state);
+	m_adc->adtrg_w(state);
+	m_s23_lastpb = (m_s23_lastpb & 0x7f) | (state << 7);
+}
 
 
 // C417
@@ -2798,13 +2801,13 @@ WRITE16_MEMBER(namcos23_state::sub_interrupt_main_w)
 
 // Port 6
 
-READ8_MEMBER(namcos23_state::s23_mcu_p6_r)
+READ16_MEMBER(namcos23_state::s23_mcu_p6_r)
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_mcu_p6_w)
+WRITE16_MEMBER(namcos23_state::s23_mcu_p6_w)
 {
 	//printf("%02x to port 6\n", data);
 }
@@ -2813,12 +2816,12 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_p6_w)
 
 // Port 8, looks like serial comms, where to/from?
 
-READ8_MEMBER(namcos23_state::s23_mcu_p8_r)
+READ16_MEMBER(namcos23_state::s23_mcu_p8_r)
 {
 	return 0x02;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_mcu_p8_w)
+WRITE16_MEMBER(namcos23_state::s23_mcu_p8_w)
 {
 	;
 }
@@ -2827,117 +2830,37 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_p8_w)
 
 // Port A
 
-READ8_MEMBER(namcos23_state::s23_mcu_pa_r)
+READ16_MEMBER(namcos23_state::s23_mcu_pa_r)
 {
 	return m_s23_porta;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_mcu_pa_w)
+WRITE16_MEMBER(namcos23_state::s23_mcu_pa_w)
 {
-	// bit 0 = chip enable for the RTC
 	m_rtc->ce_w(data & 1);
 	m_s23_porta = data;
+	m_rtc->ce_w((m_s23_lastpb & 0x20) && (m_s23_porta & 1));
+	m_settings->ce_w((m_s23_lastpb & 0x20) && !(m_s23_porta & 1));
 }
 
 
 
 // Port B
 
-READ8_MEMBER(namcos23_state::s23_mcu_pb_r)
+READ16_MEMBER(namcos23_state::s23_mcu_pb_r)
 {
-	m_s23_lastpb ^= 0x80;
 	return m_s23_lastpb;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_mcu_pb_w)
+WRITE16_MEMBER(namcos23_state::s23_mcu_pb_w)
 {
-	// bit 7 = chip enable for the video settings controller
-	if (data & 0x80)
-	{
-		m_s23_setstate = 0;
-	}
-
 	m_s23_lastpb = data;
+	m_rtc->ce_w((m_s23_lastpb & 0x20) && (m_s23_porta & 1));
+	m_settings->ce_w((m_s23_lastpb & 0x20) && !(m_s23_porta & 1));
 }
-
-
-
-// Serial Port 0
-
-READ8_MEMBER(namcos23_state::s23_mcu_iob_r)
-{
-	UINT8 ret = m_iotomain[m_im_rd];
-
-	m_im_rd++;
-	m_im_rd &= 0x7f;
-
-	if (m_im_rd == m_im_wr)
-	{
-		m_subcpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
-	}
-	else
-	{
-		m_subcpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
-		m_subcpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
-	}
-
-	return ret;
-}
-
-WRITE8_MEMBER(namcos23_state::s23_mcu_iob_w)
-{
-	m_maintoio[m_mi_wr++] = data;
-	m_mi_wr &= 0x7f;
-
-	m_iocpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
-}
-
 
 
 // Serial Port 1
-
-READ8_MEMBER(namcos23_state::s23_mcu_rtc_r)
-{
-	// emulation of the Epson R4543 real time clock
-	// in System 12, bit 0 of H8/3002 port A is connected to it's chip enable
-	// the actual I/O takes place through the H8/3002's serial port 1.
-	UINT8 ret = 0;
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_rtc->clk_w(0);
-		m_rtc->clk_w(1);
-		ret <<= 1;
-		ret |= m_rtc->data_r();
-		}
-
-	return ret;
-}
-
-WRITE8_MEMBER(namcos23_state::s23_mcu_settings_w)
-{
-	if (m_s23_setstate)
-	{
-		// data
-		m_s23_settings[m_s23_setnum] = data;
-
-		if (m_s23_setnum == 7)
-		{
-			logerror("S23 video settings: Contrast: %02x  R: %02x  G: %02x  B: %02x\n",
-				BITSWAP8(m_s23_settings[0], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(m_s23_settings[1], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(m_s23_settings[2], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(m_s23_settings[3], 0, 1, 2, 3, 4, 5, 6, 7));
-		}
-	}
-	else
-	{   // setting number
-		m_s23_setnum = (data >> 4)-1;
-	}
-
-	m_s23_setstate ^= 1;
-}
-
 
 static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -2950,30 +2873,15 @@ static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READWRITE(s23_mcu_p8_r, s23_mcu_p8_w )
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_pb_r, s23_mcu_pb_w )
-	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_mcu_iob_r, s23_mcu_iob_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE(s23_mcu_rtc_r, s23_mcu_settings_w )
-	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
-	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
-	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_NOP
-	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
-ADDRESS_MAP_END
-
-// version without serial hookup to I/O board for games where the PIC isn't dumped
-static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READWRITE(s23_mcu_p8_r, s23_mcu_p8_w )
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_pb_r, s23_mcu_pb_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE(s23_mcu_rtc_r, s23_mcu_settings_w )
-	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
-	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
-	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_NOP
-	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
+static ADDRESS_MAP_START( s23h8iomap, AS_IO, 16, namcos23_state )
+	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
+	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READWRITE(s23_mcu_p8_r, s23_mcu_p8_w )
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
+	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s23_mcu_pb_r, s23_mcu_pb_w )
+	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
+	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
 
@@ -2988,12 +2896,12 @@ ADDRESS_MAP_END
 
 // Port 4
 
-READ8_MEMBER(namcos23_state::s23_iob_p4_r)
+READ16_MEMBER(namcos23_state::s23_iob_p4_r)
 {
 	return m_s23_tssio_port_4;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_iob_p4_w)
+WRITE16_MEMBER(namcos23_state::s23_iob_p4_w)
 {
 	m_s23_tssio_port_4 = data;
 
@@ -3005,7 +2913,7 @@ WRITE8_MEMBER(namcos23_state::s23_iob_p4_w)
 
 // Port 6
 
-READ8_MEMBER(namcos23_state::s23_iob_p6_r)
+READ16_MEMBER(namcos23_state::s23_iob_p6_r)
 {
 	// d4 is service button
 	UINT8 sb = (ioport("SERVICE")->read() & 1) << 4;
@@ -3014,78 +2922,43 @@ READ8_MEMBER(namcos23_state::s23_iob_p6_r)
 	return sb | 0;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_iob_p6_w)
+WRITE16_MEMBER(namcos23_state::s23_iob_p6_w)
 {
 	//printf("iob %02x to port 6\n", data);
 }
 
 
-
-// Serial Port 0
-
-READ8_MEMBER(namcos23_state::s23_iob_mcu_r)
-{
-	UINT8 ret = m_maintoio[m_mi_rd];
-
-	m_mi_rd++;
-	m_mi_rd &= 0x7f;
-
-	if (m_mi_rd == m_mi_wr)
-	{
-		m_iocpu->set_input_line(H8_SCI_0_RX, CLEAR_LINE);
-	}
-
-	return ret;
-}
-
-WRITE8_MEMBER(namcos23_state::s23_iob_mcu_w)
-{
-	m_iotomain[m_im_wr++] = data;
-	m_im_wr &= 0x7f;
-
-	m_subcpu->set_input_line(H8_SCI_0_RX, ASSERT_LINE);
-}
-
-
-
 // Analog Ports
 
-READ8_MEMBER(namcos23_state::s23_iob_analog_r)
+READ16_MEMBER(namcos23_state::s23_iob_analog_r)
 {
 	static const char *const portnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	if (offset & 1)
-		return ioport(portnames[offset >> 1 & 3])->read_safe(0) >> 8 & 0xff;
-	else
-		return ioport(portnames[offset >> 1 & 3])->read_safe(0) & 0xff;
+	return ioport(portnames[offset >> 1 & 3])->read_safe(0);
 }
 
 
-static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
+static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")
-	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")
-	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN3")
+	AM_RANGE(0x6000, 0x6001) AM_READ_PORT("IN01")
+	AM_RANGE(0x6002, 0x6003) AM_READ_PORT("IN23")
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0xc000, 0xf7ff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE(s23_iob_p4_r, s23_iob_p4_w)
-	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP   // bit 2 = status LED to indicate transmitting packet to main
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_iob_p6_r, s23_iob_p6_w)
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP   // unknown - used on ASCA-5 only
-	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_iob_mcu_r, s23_iob_mcu_w)
-	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_READ(s23_iob_analog_r)
+static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 16, namcos23_state )
+	AM_RANGE(h8_device::PORT_4,  h8_device::PORT_4)  AM_READWRITE(s23_iob_p4_r, s23_iob_p4_w)
+	AM_RANGE(h8_device::PORT_5,  h8_device::PORT_5)  AM_NOP   // bit 2 = status LED to indicate transmitting packet to main
+	AM_RANGE(h8_device::PORT_6,  h8_device::PORT_6)  AM_READWRITE(s23_iob_p6_r, s23_iob_p6_w)
+	AM_RANGE(h8_device::PORT_8,  h8_device::PORT_8)  AM_NOP   // unknown - used on ASCA-5 only
+	AM_RANGE(h8_device::PORT_9,  h8_device::PORT_9)  AM_NOP   // unknown - used on ASCA-5 only
+	AM_RANGE(h8_device::ADC_0,   h8_device::ADC_3)   AM_READ(s23_iob_analog_r)
 ADDRESS_MAP_END
-
 
 
 // Time Crisis lightgun
 
-READ8_MEMBER(namcos23_state::s23_iob_gun_r)
+READ16_MEMBER(namcos23_state::s23_iob_gun_r)
 {
 	UINT16 xpos = m_lightx->read();
 	UINT16 ypos = m_lighty->read();
@@ -3093,19 +2966,16 @@ READ8_MEMBER(namcos23_state::s23_iob_gun_r)
 
 	switch(offset)
 	{
-		case 0: return xpos&0xff;
-		case 3: return xpos>>8;
-		case 1: return ypos&0xff;
-		case 4: return ypos>>8;
-		case 2: return ypos&0xff;
-		case 5: return ypos>>8;
+		case 0: return xpos;
+		case 1: return ypos;
+		case 2: return ypos;
 		default: break;
 	}
 
 	return 0;
 }
 
-static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
+static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x7000, 0x700f) AM_READ(s23_iob_gun_r)
 	AM_IMPORT_FROM( s23iobrdmap )
 ADDRESS_MAP_END
@@ -3127,25 +2997,17 @@ static INPUT_PORTS_START( rapidrvr )
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Service Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Service Down")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Service Enter")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN01")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Service Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Service Down")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Service Enter")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN23")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -3196,15 +3058,13 @@ static INPUT_PORTS_START( rapidrvrp )
 	PORT_BIT( 0x400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // I/O Air Dumper FL
 	PORT_BIT( 0x800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Dev Service B") // + I/O Air Dumper RL
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("User Service Enter")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("User Start")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("IN01")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test Button") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("User Service Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("User Service Down")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("User Service Enter")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("User Start")
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x08, 0x08, "Debug Messages" )    PORT_DIPLOCATION("DIP:5")
@@ -3231,9 +3091,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( finfurl )
 	PORT_INCLUDE( rapidrvr )
 
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_MODIFY("IN01")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 
 #if 0 // need to hook these up properly
 	PORT_START("ADC0")
@@ -3263,26 +3123,21 @@ static INPUT_PORTS_START( s23 )
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )   // 0x100 = freeze?
 
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )    // this is the "coin acceptor connected" signal
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_START("IN01")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )    // this is the "coin acceptor connected" signal
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) // gun trigger
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) // foot pedal
+	PORT_BIT(0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // gun trigger
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // foot pedal
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN23")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -3343,7 +3198,14 @@ void namcos23_state::machine_start()
 
 void namcos23_state::machine_reset()
 {
+	jvs_timer_state = false;
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos23_state::jvs_timer)
+{
+	jvs_timer_state = !jvs_timer_state;
+	m_sci0->clk_w(jvs_timer_state);
 }
 
 MACHINE_RESET_MEMBER(namcos23_state,gmen)
@@ -3367,16 +3229,12 @@ DRIVER_INIT_MEMBER(namcos23_state,s23)
 	m_tile_mask = memregion("textile")->bytes()/256 - 1;
 	m_ptrom_limit = memregion("pointrom")->bytes()/4;
 
-	m_mi_rd = m_mi_wr = m_im_rd = m_im_wr = 0;
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
 	m_s23_lastpb = 0x50;
-	m_s23_setstate = 0;
-	m_s23_setnum = 0;
-	memset(m_s23_settings, 0, sizeof(m_s23_settings));
 	m_s23_tssio_port_4 = 0;
-	m_s23_porta = 0, m_s23_rtcstate = 0;
+	m_s23_porta = 0;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;
@@ -3451,15 +3309,33 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
-	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
+// Timer at 115200*16 for the jvs serial clock, extra *2 to have both edges
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
+
+	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+
+	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	
+	MCFG_DEVICE_MODIFY("subcpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -3467,6 +3343,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
+	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, namcos23_sub_irq)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3495,18 +3372,36 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP(s23_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
+	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK*2 )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
 
-	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
+
+	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
 
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+
+	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	
+	MCFG_DEVICE_MODIFY("subcpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -3514,6 +3409,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
+	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, namcos23_sub_irq)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3534,7 +3430,6 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
-
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
@@ -3562,12 +3457,25 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
-	MCFG_CPU_IO_MAP( s23h8noiobmap )
+	MCFG_CPU_IO_MAP( s23h8iomap )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
+	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
+
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
+
+	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	
+	MCFG_DEVICE_MODIFY("subcpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
@@ -3575,6 +3483,7 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos23_state, screen_update_s23)
+	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, namcos23_sub_irq)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
@@ -3595,26 +3504,28 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
-
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_IO_MAP( s23h8iomap )
-
-	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
+
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(S23_BUSCLOCK*6)
 
-	MCFG_CPU_MODIFY("subcpu")
-	MCFG_CPU_IO_MAP( s23h8iomap )
-
-	MCFG_CPU_ADD("iocpu", H83334, S23_H8CLOCK )
+	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
+
+	MCFG_DEVICE_MODIFY("iocpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":subcpu:sci0", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("subcpu:sci0")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
 

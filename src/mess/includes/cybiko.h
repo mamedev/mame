@@ -21,7 +21,8 @@
 #include "sound/speaker.h"
 
 /* Components */
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h8s2320.h"
+#include "cpu/h8/h8s2245.h"
 #include "video/hd66421.h"
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"

@@ -69,7 +69,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/ygv608.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
 #include "includes/namcond1.h"
 #include "sound/c352.h"
 #include "machine/at28c16.h"
@@ -232,17 +232,17 @@ READ16_MEMBER(namcond1_state::sharedram_sub_r)
 }
 
 
-READ8_MEMBER(namcond1_state::mcu_p7_read)
+READ16_MEMBER(namcond1_state::mcu_p7_read)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(namcond1_state::mcu_pa_read)
+READ16_MEMBER(namcond1_state::mcu_pa_read)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(namcond1_state::mcu_pa_write)
+WRITE16_MEMBER(namcond1_state::mcu_pa_write)
 {
 	m_p8 = data;
 }
@@ -259,17 +259,17 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 8, namcond1_state )
-	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ(mcu_p7_read )
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
-	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls
+static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
+	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ(mcu_p7_read )
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(mcu_pa_read, mcu_pa_write )
+	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
 {
 	if( m_h8_irq5_enabled )
 	{
-		generic_pulse_irq_line(device.execute(), H8_IRQ5, 1);
+		generic_pulse_irq_line(device.execute(), 5, 1);
 	}
 }
 
