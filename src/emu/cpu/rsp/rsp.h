@@ -17,7 +17,7 @@
 #define __RSP_H__
 
 #define USE_SIMD        (0)
-#define SIMUL_SIMD		(1)
+#define SIMUL_SIMD		(0)
 
 #if USE_SIMD
 #include <tmmintrin.h>
@@ -169,6 +169,27 @@ struct rsp_state
 	UINT32 r[35];
 	VECTOR_REG v[32];
 	UINT16 vflag[6][8];
+
+#if SIMUL_SIMD
+	UINT32 old_r[35];
+	UINT8 old_dmem[4096];
+
+	UINT32 scalar_r[35];
+	UINT8 scalar_dmem[4096];
+
+	INT32 old_reciprocal_res;
+	UINT32 old_reciprocal_high;
+	INT32 old_dp_allowed;
+
+	INT32 scalar_reciprocal_res;
+	UINT32 scalar_reciprocal_high;
+	INT32 scalar_dp_allowed;
+
+	INT32 simd_reciprocal_res;
+	UINT32 simd_reciprocal_high;
+	INT32 simd_dp_allowed;
+#endif
+
 #if USE_SIMD
 	// Mirror of v[] for now, to be used in parallel as
 	// more vector ops are transitioned over
@@ -183,6 +204,7 @@ struct rsp_state
 	__m128i accum_h;
 	__m128i accum_m;
 	__m128i accum_l;
+	__m128i accum_ll;
 #endif
 	INT32 reciprocal_res;
 	UINT32 reciprocal_high;
