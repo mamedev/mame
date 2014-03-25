@@ -98,6 +98,8 @@ const device_type I8271 = &device_creator<i8271_device>;
 
 i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
+	m_write_irq(*this),
+	m_write_drq(*this),
 	m_flags(0),
 	m_state(0),
 	m_Command(0),
@@ -160,8 +162,6 @@ void i8271_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_interrupt_cb, 0, sizeof(m_interrupt_cb));
-		m_dma_request = NULL;
 		m_floppy_drive_tags[0] = "";
 		m_floppy_drive_tags[1] = "";
 	}
@@ -173,11 +173,13 @@ void i8271_device::device_config_complete()
 
 void i8271_device::device_start()
 {
+	m_write_irq.resolve_safe();
+	m_write_drq.resolve_safe();
+
 	m_data_timer = timer_alloc(TIMER_DATA_CALLBACK);
 	m_command_complete_timer = timer_alloc(TIMER_TIMED_COMMAND_COMPLETE);
 	m_drive = 0;
 	m_pExecutionPhaseData = auto_alloc_array(machine(), char, 0x4000);
-	m_interrupt_func.resolve(m_interrupt_cb, *this);
 
 	// register for state saving
 	/*save_item(NAME(m_flags));
@@ -361,16 +363,12 @@ void i8271_device::set_irq_state(int state)
 		m_StatusRegister |= I8271_STATUS_INT_REQUEST;
 	}
 
-	if (!m_interrupt_func.isnull())
-		m_interrupt_func(m_StatusRegister & I8271_STATUS_INT_REQUEST);
+	m_write_irq((m_StatusRegister & I8271_STATUS_INT_REQUEST) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void i8271_device::set_dma_drq()
 {
-	if (m_dma_request)
-	{
-		m_dma_request(*this, (m_flags & I8271_FLAGS_DATA_REQUEST), (m_flags & I8271_FLAGS_DATA_DIRECTION));
-	}
+	m_write_drq((m_flags & I8271_FLAGS_DATA_REQUEST) ? 1 : 0);
 }
 
 void i8271_device::load_bad_tracks(int surface)

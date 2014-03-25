@@ -7,17 +7,18 @@
 #ifndef I8271_H_
 #define I8271_H_
 
+#define MCFG_I8271_IRQ_CALLBACK(_write) \
+	devcb = &i8271_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_I8271_DRQ_CALLBACK(_write) \
+	devcb = &i8271_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*i8271_dma_request)(device_t &device, int state, int read_);
-#define I8271_DMA_REQUEST(name) void name(device_t &device, int state, int read_)
-
 struct i8271_interface
 {
-	devcb_write_line m_interrupt_cb;
-	i8271_dma_request m_dma_request;
 	const char *m_floppy_drive_tags[2];
 };
 
@@ -31,6 +32,9 @@ class i8271_device : public device_t,
 public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~i8271_device() {}
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).m_write_drq.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -55,6 +59,9 @@ private:
 		TIMER_DATA_CALLBACK,
 		TIMER_TIMED_COMMAND_COMPLETE
 	};
+
+	devcb2_write_line m_write_irq;
+	devcb2_write_line m_write_drq;
 	
 	int m_flags;
 	int m_state;
@@ -118,8 +125,6 @@ private:
 
 	emu_timer *m_data_timer;
 	emu_timer *m_command_complete_timer;
-	
-	devcb_resolved_write_line m_interrupt_func;
 	
 	device_t *current_image();
 	void seek_to_track(int track);
