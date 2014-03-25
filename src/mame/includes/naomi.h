@@ -79,9 +79,3 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
 };
-/*----------- defined in machine/gdcrypt.c -----------*/
-
-extern void naomi_game_decrypt(running_machine& machine, UINT64 key, UINT8* region, int length);
-
-/*----------- defined in machine/naomi.c -----------*/
-void naomi_g1_irq(running_machine &machine);

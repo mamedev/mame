@@ -75,12 +75,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
-/*----------- defined in drivers/triplhnt.c -----------*/
-
-void triplhnt_set_collision(running_machine &machine, int data);
-
 /*----------- defined in audio/triplhnt.c -----------*/
-
 DISCRETE_SOUND_EXTERN( triplhnt );
 extern const samples_interface triplhnt_samples_interface;
