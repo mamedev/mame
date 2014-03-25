@@ -817,19 +817,6 @@ WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
 		case 0x0e:
 			logerror("Attempt to Write to HV counters!!\n");
 			break;
-
-		case 0x10:
-		case 0x12:
-		case 0x14:
-		case 0x16:
-		{
-			// accessed by either segapsg_device or sn76496_device
-			sn76496_base_device *sn = machine().device<sn76496_base_device>(":snsnd");
-			if (ACCESSING_BITS_0_7) sn->write(space, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn->write(space, 0, (data>>8) & 0xff);
-			break;
-		}
-
 		default:
 		mame_printf_debug("write to unmapped vdp port\n");
 	}
@@ -1235,14 +1222,6 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = machine().rand();
 		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),genesis_get_scanline_counter(), get_hposition(),retvalue);
-			break;
-
-		case 0x10:
-		case 0x12:
-		case 0x14:
-		case 0x16:
-			logerror("Attempting to read PSG!\n");
-			retvalue = 0;
 			break;
 	}
 	return retvalue;
