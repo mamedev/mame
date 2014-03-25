@@ -521,7 +521,6 @@ public:
 	DECLARE_WRITE8_MEMBER( megatech_bios_port_ctrl_w );
 	DECLARE_READ8_MEMBER( megatech_bios_joypad_r );
 	DECLARE_WRITE8_MEMBER (megatech_bios_port_7f_w);
-
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -549,5 +548,3 @@ extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
 extern UINT16* megadrive_vdp_palette_lookup;
-extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
-extern timer_device* megadriv_scanline_timer;

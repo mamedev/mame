@@ -9,9 +9,6 @@
 
 #include "sound/sn76496.h"
 
-timer_device* megadriv_scanline_timer;
-
-
 #define MAX_HPOSITION 480
 
 
@@ -1127,7 +1124,7 @@ UINT16 sega_genesis_vdp_device::get_hposition()
 	{
 		attotime time_elapsed_since_megadriv_scanline_timer;
 
-		time_elapsed_since_megadriv_scanline_timer = megadriv_scanline_timer->time_elapsed();
+		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->time_elapsed();
 
 		if (time_elapsed_since_megadriv_scanline_timer.attoseconds<(ATTOSECONDS_PER_SECOND/m_framerate /megadrive_total_scanlines))
 		{
@@ -2736,41 +2733,37 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 
 
 // called at the start of each scanline
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( sega_genesis_vdp_device::megadriv_scanline_timer_callback )
 {
-	sega_genesis_vdp_device *vdp = timer.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-
-	if (!vdp->m_use_alt_timing)
+	if (!m_use_alt_timing)
 	{
-		timer.machine().scheduler().synchronize();
-		vdp->vdp_handle_scanline_callback(param);
+		machine().scheduler().synchronize();
+		vdp_handle_scanline_callback(param);
 
-		megadriv_scanline_timer->adjust(attotime::from_hz(vdp->get_framerate()) / megadrive_total_scanlines);
+		m_megadriv_scanline_timer->adjust(attotime::from_hz(get_framerate()) / megadrive_total_scanlines);
 	}
 	else
 	{
-		vdp->vdp_handle_scanline_callback(param);
+		vdp_handle_scanline_callback(param);
 	}
 }
 
-TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing )
+TIMER_DEVICE_CALLBACK_MEMBER( sega_genesis_vdp_device::megadriv_scanline_timer_callback_alt_timing )
 {
-	sega_genesis_vdp_device *vdp = timer.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-
-	if (vdp->m_use_alt_timing)
+	if (m_use_alt_timing)
 	{
 		if (param==0)
 		{
-			//printf("where are we? %d %d\n", m_screen->vpos(), vdp->screen().hpos());
-			vdp->vdp_handle_eof();
-			//vdp->vdp_clear_bitmap();
+			//printf("where are we? %d %d\n", m_screen->vpos(), screen().hpos());
+			vdp_handle_eof();
+			//vdp_clear_bitmap();
 		}
 
 
-		vdp->vdp_handle_scanline_callback(param);
+		vdp_handle_scanline_callback(param);
 
-		int vpos = vdp->screen().vpos();
+		int vpos = screen().vpos();
 		if (vpos > 0)
-			vdp->screen().update_partial(vpos-1);
+			screen().update_partial(vpos-1);
 	}
 }

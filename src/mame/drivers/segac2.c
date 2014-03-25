@@ -1366,7 +1366,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
 	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)

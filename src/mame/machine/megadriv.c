@@ -28,9 +28,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 MACHINE_CONFIG_EXTERN( megadriv );
 
-extern timer_device* megadriv_scanline_timer;
-
-
 void megadriv_z80_hold(running_machine &machine)
 {
 	md_base_state *state = machine.driver_data<md_base_state>();
@@ -887,8 +884,8 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 
 	if (!m_vdp->m_use_alt_timing)
 	{
-		megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
-		megadriv_scanline_timer->adjust(attotime::zero);
+		m_vdp->m_megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
+		m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
 	if (m_other_hacks)
@@ -908,7 +905,7 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 void md_base_state::megadriv_stop_scanline_timer()
 {
 	if (!m_vdp->m_use_alt_timing)
-		megadriv_scanline_timer->reset();
+		m_vdp->m_megadriv_scanline_timer->reset();
 }
 
 
@@ -964,7 +961,7 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 }
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
-	MCFG_TIMER_ADD("md_scan_timer", megadriv_scanline_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
@@ -1015,7 +1012,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
@@ -1291,7 +1288,7 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 		if (!m_vdp->m_use_alt_timing)
 		{
 			m_vdp->vdp_handle_eof();
-			megadriv_scanline_timer->adjust(attotime::zero);
+			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 		}
 	}
 }

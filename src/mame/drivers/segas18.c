@@ -1241,7 +1241,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(*device, 0x2000);
 	sega_genesis_vdp_device::static_set_palette_tag(*device,":palette");
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
 
 
 	// video hardware
