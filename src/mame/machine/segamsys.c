@@ -320,7 +320,7 @@ void *segamsys_state::start_vdp(int type)
 }
 
 /* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
-void segamsys_state::segae_md_sms_stop_scanline_timer()
+void segamsys_state::megatech_sms_stop_scanline_timer()
 {
 	md_sms_vdp->sms_scanline_timer->adjust(attotime::never);
 	memset(md_sms_vdp->vram,0x00,0x4000);
@@ -974,7 +974,7 @@ void segamsys_state::screen_eof_megatech_bios(screen_device &screen, bool state)
 		end_of_frame(screen, vdp1);
 }
 
-UINT32 segamsys_state::screen_update_megatech_md_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 segamsys_state::screen_update_megatech_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -992,24 +992,6 @@ UINT32 segamsys_state::screen_update_megatech_md_sms(screen_device &screen, bitm
 	return 0;
 }
 
-
-UINT32 segamsys_state::screen_update_megatech_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int x,y;
-
-	for (y=0;y<224;y++)
-	{
-		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &vdp1->r_bitmap->pix32(y);
-
-		for (x=0;x<256;x++)
-		{
-			lineptr[x]=srcptr[x];
-		}
-	}
-
-	return 0;
-}
 
 UINT32 segamsys_state::screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1045,7 +1027,7 @@ void segamsys_state::init_for_megadrive()
 
 
 
-void segamsys_state::init_megatech_bios()
+void segamsys_state::init_megaplay_legacy_overlay()
 {
 	vdp1 = (struct sms_vdp *)start_vdp(SMS2_VDP);
 	vdp1->set_irq = segamsys_state::sms_vdp_cpu2_irq_callback;
@@ -1142,7 +1124,7 @@ void segamsys_state::megatech_set_genz80_as_sms_standard_ports(const char* tag)
 	io.install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(segamsys_state::z80_unmapped_port_r),this), write8_delegate(FUNC(segamsys_state::sms_z80_unmapped_port_w),this));
 
 	io.install_read_handler      (0x7e, 0x7e, read8_delegate(FUNC(segamsys_state::md_sms_vdp_vcounter_r),this));
-	io.install_write_handler            (0x7e, 0x7f, write8_delegate(FUNC(sn76496_device::write),sn));
+	io.install_write_handler     (0x7e, 0x7f, write8_delegate(FUNC(sn76496_device::write),sn));
 	io.install_readwrite_handler (0xbe, 0xbe, read8_delegate(FUNC(segamsys_state::md_sms_vdp_data_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_data_w),this));
 	io.install_readwrite_handler (0xbf, 0xbf, read8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_w),this));
 

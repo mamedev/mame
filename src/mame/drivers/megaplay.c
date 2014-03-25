@@ -57,54 +57,6 @@ Bugs:
 
 #define MASTER_CLOCK        53693100
 
-// Interrupt handler - from drivers/segasyse.c
-#if 0
-static UINT8 segae_vintpending;
-static UINT8 segae_hintpending;
-static UINT8 *segae_vdp_regs[];     /* pointer to vdp's registers */
-
-static UINT8 hintcount;           /* line interrupt counter, decreased each scanline */
-
-static INTERRUPT_GEN (megaplay_bios_irq)
-{
-	int sline;
-	sline = device->m_screen->vpos();
-
-	if (sline ==0) {
-		hintcount = segae_vdp_regs[0][10];
-	}
-
-	if (sline <= 192) {
-//      if (sline != 192) segae_drawscanline(sline,1,1);
-
-		if (sline == 192)
-			segae_vintpending = 1;
-
-		if (hintcount == 0) {
-			hintcount = segae_vdp_regs[0][10];
-			segae_hintpending = 1;
-
-			if  ((segae_vdp_regs[0][0] & 0x10)) {
-				device->execute().set_input_line(0, HOLD_LINE);
-				return;
-			}
-
-		} else {
-			hintcount--;
-		}
-	}
-
-	if (sline > 192) {
-		hintcount = segae_vdp_regs[0][10];
-
-		if ( (sline<0xe0) && (segae_vintpending) ) {
-			device->execute().set_input_line(0, HOLD_LINE);
-		}
-	}
-
-}
-#endif
-
 static INPUT_PORTS_START ( megaplay )
 	PORT_INCLUDE( md_common )
 
@@ -372,12 +324,12 @@ INPUT_PORTS_END
 
 /*MEGAPLAY specific*/
 
-READ8_MEMBER(mplay_state::megaplay_bios_banksel_r )
+READ8_MEMBER(mplay_state::megaplay_bios_banksel_r)
 {
 	return m_bios_bank;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_banksel_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_banksel_w)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -389,12 +341,12 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_banksel_w )
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_gamesel_r )
+READ8_MEMBER(mplay_state::megaplay_bios_gamesel_r)
 {
 	return m_bios_6403;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_gamesel_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_gamesel_w)
 {
 	m_bios_6403 = data;
 
@@ -402,7 +354,7 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_gamesel_w )
 	m_bios_mode = data & 0x10;
 }
 
-WRITE16_MEMBER(mplay_state::megaplay_io_write )
+WRITE16_MEMBER(mplay_state::megaplay_io_write)
 {
 	if (offset == 0x03)
 		m_megadrive_io_data_regs[2] = (data & m_megadrive_io_ctrl_regs[2]) | (m_megadrive_io_data_regs[2] & ~m_megadrive_io_ctrl_regs[2]);
@@ -410,7 +362,7 @@ WRITE16_MEMBER(mplay_state::megaplay_io_write )
 		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
 }
 
-READ16_MEMBER(mplay_state::megaplay_io_read )
+READ16_MEMBER(mplay_state::megaplay_io_read)
 {
 	if (offset == 0x03)
 		return m_megadrive_io_data_regs[2];
@@ -418,7 +370,7 @@ READ16_MEMBER(mplay_state::megaplay_io_read )
 		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
 }
 
-READ8_MEMBER(mplay_state::bank_r )
+READ8_MEMBER(mplay_state::bank_r)
 {
 	UINT8* bank = memregion("mtbios")->base();
 	UINT32 fulladdress = m_mp_bios_bank_addr + offset;
@@ -458,7 +410,7 @@ READ8_MEMBER(mplay_state::bank_r )
 
 }
 
-WRITE8_MEMBER(mplay_state::bank_w )
+WRITE8_MEMBER(mplay_state::bank_w)
 {
 	UINT32 fulladdress = m_mp_bios_bank_addr + offset;
 
@@ -489,38 +441,38 @@ WRITE8_MEMBER(mplay_state::bank_w )
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::megaplay_bios_6402_r )
+READ8_MEMBER(mplay_state::megaplay_bios_6402_r)
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6402_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_6402_w)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6204_r )
+READ8_MEMBER(mplay_state::megaplay_bios_6204_r)
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_width_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_width_w)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6404_r )
+READ8_MEMBER(mplay_state::megaplay_bios_6404_r)
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return (m_bios_6404 & 0xfe) | ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -529,7 +481,7 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w )
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6600_r )
+READ8_MEMBER(mplay_state::megaplay_bios_6600_r)
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -540,13 +492,13 @@ READ8_MEMBER(mplay_state::megaplay_bios_6600_r )
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6600_w )
+WRITE8_MEMBER(mplay_state::megaplay_bios_6600_w)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_game_w )
+WRITE8_MEMBER(mplay_state::megaplay_game_w)
 {
 	if (m_readpos == 1)
 		m_game_banksel = 0;
@@ -600,14 +552,12 @@ VIDEO_START_MEMBER(mplay_state,megplay)
 {
 	//printf("megplay vs\n");
 	VIDEO_START_CALL_MEMBER(megadriv);
-//  VIDEO_START_CALL_MEMBER(megaplay_normal);
 }
 
 UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen,bitmap,cliprect);
-//  screen_update_megaplay_normal(screen,bitmap,cliprect);
 	screen_update_megaplay_bios(screen,bitmap,cliprect);
 	return 0;
 }
@@ -871,8 +821,7 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
 
-	init_megatech_bios();
-
+	init_megaplay_legacy_overlay();
 }
 
 /*

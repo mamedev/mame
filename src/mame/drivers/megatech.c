@@ -273,15 +273,13 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	machine().device("ymsnd")->reset();
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
-	segae_md_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
+	megatech_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
 
 
 	/* if the regions exist we're fine */
 	if (game_region)
 	{
-		{
-			timer_set(attotime::zero, TIMER_Z80_RUN_STATE, param);
-		}
+		timer_set(attotime::zero, TIMER_Z80_RUN_STATE, param);
 	}
 	else
 	{
@@ -324,13 +322,11 @@ WRITE8_MEMBER(mtech_state::bios_ctrl_w )
 {
 	if (offset == 1)
 	{
-		output_set_value("Alarm_sound", data>>7 & 0x01);
+		output_set_value("Alarm_sound", BIT(data, 7));
 		m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
 	else if (offset == 2)
-	{
-		output_set_value("Flash_screen", data>>1 & 0x01);
-	}
+		output_set_value("Flash_screen", BIT(data, 1));
 
 	m_bios_ctrl[offset] = data;
 }
@@ -351,14 +347,9 @@ WRITE8_MEMBER(mtech_state::megatech_z80_write_68k_banked_data )
 	space68k.write_byte(m_mt_bank_addr + offset,data);
 }
 
-void mtech_state::megatech_z80_bank_w(UINT16 data)
-{
-	m_mt_bank_addr = ((m_mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
-}
-
 WRITE8_MEMBER(mtech_state::mt_z80_bank_w )
 {
-	megatech_z80_bank_w(data & 1);
+	m_mt_bank_addr = ((m_mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
 READ8_MEMBER(mtech_state::megatech_banked_ram_r )
@@ -452,7 +443,7 @@ UINT32 mtech_state::screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bit
 	if (!m_current_game_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
-		screen_update_megatech_md_sms(screen, bitmap, cliprect);
+		screen_update_megatech_sms(screen, bitmap, cliprect);
 	return 0;
 }
 

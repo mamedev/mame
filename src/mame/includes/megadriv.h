@@ -335,10 +335,9 @@ public:
 
 	};
 
-	UINT32 screen_update_megatech_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_megatech_md_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void init_megatech_bios();
+	UINT32 screen_update_megatech_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void init_megaplay_legacy_overlay();
 	DECLARE_MACHINE_RESET(megatech_bios);
 	DECLARE_MACHINE_RESET(megatech_md_sms);
 	void screen_eof_megatech_bios(screen_device &screen, bool state);
@@ -351,7 +350,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sms_vdp_ctrl_w );
 
 	void init_for_megadrive();
-	void segae_md_sms_stop_scanline_timer();
+	void megatech_sms_stop_scanline_timer();
 	void megatech_set_genz80_as_sms_standard_map(const char* tag);
 private:
 
@@ -516,7 +515,6 @@ public:
 	DECLARE_WRITE8_MEMBER( bios_ctrl_w );
 	DECLARE_READ8_MEMBER( megatech_z80_read_68k_banked_data );
 	DECLARE_WRITE8_MEMBER( megatech_z80_write_68k_banked_data );
-	void megatech_z80_bank_w(UINT16 data);
 	DECLARE_WRITE8_MEMBER( mt_z80_bank_w );
 	DECLARE_READ8_MEMBER( megatech_banked_ram_r );
 	DECLARE_WRITE8_MEMBER( megatech_banked_ram_w );
