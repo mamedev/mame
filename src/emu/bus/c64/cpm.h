@@ -14,8 +14,6 @@
 #ifndef __CPM__
 #define __CPM__
 
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "exp.h"
