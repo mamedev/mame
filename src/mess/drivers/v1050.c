@@ -666,12 +666,6 @@ WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 	}
 }
 
-static I8214_INTERFACE( pic_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(v1050_state,pic_int_w),
-	DEVCB_NULL
-};
-
 // Display 8255A Interface
 
 WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
@@ -1120,7 +1114,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_FRAGMENT_ADD(v1050_video)
 
 	// devices
-	MCFG_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, pic_intf)
+	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, XTAL_16MHz/4)
+	MCFG_I8214_IRQ_CALLBACK(WRITELINE(v1050_state, pic_int_w))
 
 	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, XTAL_32_768kHz)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_0_w))

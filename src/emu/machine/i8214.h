@@ -37,13 +37,11 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_I8214_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, I8214, _clock)    \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_I8214_IRQ_CALLBACK(_write) \
+	devcb = &i8214_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-
-#define I8214_INTERFACE(name) \
-	const i8214_interface (name) =
+#define MCFG_I8214_ENLG_CALLBACK(_write) \
+	devcb = &i8214_device::set_enlg_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -51,22 +49,16 @@
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> i8214_interface
-
-struct i8214_interface
-{
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_enlg_cb;
-};
-
-
 // ======================> i8214_device
 
-class i8214_device :    public device_t, public i8214_interface
+class i8214_device :    public device_t
 {
 public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_enlg_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );
@@ -78,15 +70,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
 	inline void trigger_interrupt(int level);
 	inline void check_interrupt();
 
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_enlg_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_enlg;
 
 	int m_inte;                 // interrupt enable
 	int m_int_dis;              // interrupt disable flip-flop
