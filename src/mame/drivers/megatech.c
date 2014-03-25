@@ -242,7 +242,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 	{
 		printf("enabling SMS Z80\n");
 		m_current_game_is_sms = 1;
-		megatech_set_genz80_as_sms_standard_map("genesis_snd_z80", MAPPER_STANDARD);
+		megatech_set_genz80_as_sms_standard_map("genesis_snd_z80");
 		//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}

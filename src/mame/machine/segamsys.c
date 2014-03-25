@@ -1056,8 +1056,6 @@ void segamsys_state::init_megatech_bios()
 
 	vdp1_vram_bank0 = vdp1->vram;
 	vdp1_vram_bank1 = auto_alloc_array(machine(), UINT8, 0x4000);
-
-	smsgg_backupram = 0;
 }
 
 /* Functions to set up the Memory Map
@@ -1106,17 +1104,6 @@ READ8_MEMBER (segamsys_state::megatech_sms_ioport_dd_r)
 }
 
 
-READ8_MEMBER( segamsys_state::smsgg_backupram_r )
-{
-	return smsgg_backupram[offset];
-}
-
-WRITE8_MEMBER( segamsys_state::smsgg_backupram_w )
-{
-	smsgg_backupram[offset] = data;
-}
-
-
 WRITE8_MEMBER( segamsys_state::mt_sms_standard_rom_bank_w )
 {
 	int bank = data&0x1f;
@@ -1127,16 +1114,8 @@ WRITE8_MEMBER( segamsys_state::mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			if ((data & 0x08) && smsgg_backupram)
-			{
-				space.install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(segamsys_state::smsgg_backupram_r),this), write8_delegate(FUNC(segamsys_state::smsgg_backupram_w),this));
-			}
-			else
-			{
-				space.install_rom(0x0000, 0xbfff, sms_rom);
-				space.unmap_write(0x0000, 0xbfff);
-			}
-
+			space.install_rom(0x0000, 0xbfff, sms_rom);
+			space.unmap_write(0x0000, 0xbfff);
 			//printf("bank ram??\n");
 			break;
 		case 1:
@@ -1150,24 +1129,6 @@ WRITE8_MEMBER( segamsys_state::mt_sms_standard_rom_bank_w )
 			break;
 
 	}
-}
-
-WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_0000_w )
-{
-	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
-}
-
-WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_4000_w )
-{
-	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
-}
-
-WRITE8_MEMBER( segamsys_state::codemasters_rom_bank_8000_w )
-{
-	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
@@ -1193,7 +1154,7 @@ void segamsys_state::megatech_set_genz80_as_sms_standard_ports(const char* tag)
 	io.install_read_handler      (0xdf, 0xdf, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this)); // adams family
 }
 
-void segamsys_state::megatech_set_genz80_as_sms_standard_map(const char* tag, int mapper)
+void segamsys_state::megatech_set_genz80_as_sms_standard_map(const char* tag)
 {
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
@@ -1211,16 +1172,5 @@ void segamsys_state::megatech_set_genz80_as_sms_standard_map(const char* tag, in
 
 	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
 
-	if (mapper == MAPPER_STANDARD )
-	{
-		machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(segamsys_state::mt_sms_standard_rom_bank_w),this));
-
-	}
-	else if (mapper == MAPPER_CODEMASTERS )
-	{
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0000, 0x0000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_0000_w),this));
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_4000_w),this));
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0x8000, write8_delegate(FUNC(segamsys_state::codemasters_rom_bank_8000_w),this));
-	}
-//  smsgg_backupram = NULL;
+	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(segamsys_state::mt_sms_standard_rom_bank_w),this));
 }

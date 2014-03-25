@@ -289,15 +289,8 @@ class segamsys_state : public md_base_state
 {
 public:
 	segamsys_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-		smsgg_backupram(0)
+	: md_base_state(mconfig, type, tag)
 	{ }
-	
-	enum sms_mapper
-	{
-		MAPPER_STANDARD = 0,
-		MAPPER_CODEMASTERS = 1
-	};
 	
 	struct sms_vdp
 	{
@@ -346,7 +339,6 @@ public:
 	UINT32 screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_megatech_md_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_megatech_bios();
-	void init_hazemd_segasyse();
 	DECLARE_MACHINE_RESET(megatech_bios);
 	DECLARE_MACHINE_RESET(megatech_md_sms);
 	void screen_eof_megatech_bios(screen_device &screen, bool state);
@@ -360,13 +352,12 @@ public:
 
 	void init_for_megadrive();
 	void segae_md_sms_stop_scanline_timer();
-	void megatech_set_genz80_as_sms_standard_map(const char* tag, int mapper);
+	void megatech_set_genz80_as_sms_standard_map(const char* tag);
 private:
 
 	UINT8* vdp1_vram_bank0;
 	UINT8* vdp1_vram_bank1;
 	UINT8* sms_mainram;
-	UINT8* smsgg_backupram;
 	struct sms_vdp *vdp1;
 	struct sms_vdp *md_sms_vdp;
 	UINT8* sms_rom;
@@ -401,12 +392,7 @@ private:
 	WRITE8_MEMBER( sms_z80_unmapped_w );
 	READ8_MEMBER (megatech_sms_ioport_dc_r);
 	READ8_MEMBER (megatech_sms_ioport_dd_r);
-	READ8_MEMBER( smsgg_backupram_r );
-	WRITE8_MEMBER( smsgg_backupram_w );
 	WRITE8_MEMBER( mt_sms_standard_rom_bank_w );
-	WRITE8_MEMBER( codemasters_rom_bank_0000_w );
-	WRITE8_MEMBER( codemasters_rom_bank_4000_w );
-	WRITE8_MEMBER( codemasters_rom_bank_8000_w );
 	void megatech_set_genz80_as_sms_standard_ports(const char* tag);
 
 };
