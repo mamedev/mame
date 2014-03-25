@@ -285,106 +285,11 @@ public:
 };
 
 
-class segamsys_state : public md_base_state
-{
-public:
-	segamsys_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag)
-	{ }
-	
-	struct sms_vdp
-	{
-		UINT8 chip_id;
-
-		UINT8  cmd_pend;
-		UINT8  cmd_part1;
-		UINT8  cmd_part2;
-		UINT16 addr_reg;
-		UINT8  cmd_reg;
-		UINT8  regs[0x10];
-		UINT8  readbuf;
-		UINT8* vram;
-		UINT8* cram;
-		UINT8  writemode;
-		bitmap_rgb32* r_bitmap;
-		UINT8* tile_renderline;
-		UINT8* sprite_renderline;
-
-		UINT8 sprite_collision;
-		UINT8 sprite_overflow;
-
-		UINT8  yscroll;
-		UINT8  hint_counter;
-
-		UINT8 frame_irq_pending;
-		UINT8 line_irq_pending;
-
-		UINT8 vdp_type;
-
-		UINT8 gg_cram_latch; // gamegear specific.
-
-		/* below are MAME specific, to make things easier */
-		UINT8 screen_mode;
-		UINT8 is_pal;
-		int sms_scanline_counter;
-		int sms_total_scanlines;
-		int sms_framerate;
-		emu_timer* sms_scanline_timer;
-		UINT32* cram_mamecolours; // for use on RGB_DIRECT screen
-		int  (*set_irq)(running_machine &machine, int state);
-
-	};
-
-	UINT32 screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_megatech_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void init_megaplay_legacy_overlay();
-	DECLARE_MACHINE_RESET(megaplay_bios);
-	void screen_eof_megaplay_bios(screen_device &screen, bool state);
-
-	DECLARE_READ8_MEMBER( sms_vcounter_r );
-	DECLARE_READ8_MEMBER( sms_vdp_data_r );
-	DECLARE_WRITE8_MEMBER( sms_vdp_data_w );
-	DECLARE_READ8_MEMBER( sms_vdp_ctrl_r );
-	DECLARE_WRITE8_MEMBER( sms_vdp_ctrl_w );
-
-private:
-
-	UINT8* vdp1_vram_bank0;
-	UINT8* vdp1_vram_bank1;
-	struct sms_vdp *vdp1;
-	struct sms_vdp *md_sms_vdp;
-
-	static int sms_vdp_null_irq_callback(running_machine &machine, int status);
-	static int sms_vdp_cpu1_irq_callback(running_machine &machine, int status);
-	static int sms_vdp_cpu2_irq_callback(running_machine &machine, int status);
-	void *start_vdp(int type);
-	UINT8 vcounter_r(struct sms_vdp *chip);
-	UINT8 vdp_data_r(struct sms_vdp *chip);
-	void vdp_data_w(address_space &space, UINT8 data, struct sms_vdp* chip);
-	UINT8 vdp_ctrl_r(address_space &space, struct sms_vdp *chip);
-	void vdp_update_code_addr_regs(struct sms_vdp *chip);
-	void vdp_set_register(struct sms_vdp *chip);
-	void vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp *chip);
-	void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip);
-	void sms_render_spriteline(int scanline, struct sms_vdp* chip);
-	void sms_render_tileline(int scanline, struct sms_vdp* chip);
-	void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip);
-	void sms_draw_scanline(int scanline, struct sms_vdp* chip);
-	TIMER_CALLBACK_MEMBER( sms_scanline_timer_callback );
-	void end_of_frame(screen_device &screen, struct sms_vdp *chip);
-
-	READ8_MEMBER( sms_z80_unmapped_port_r );
-	WRITE8_MEMBER( sms_z80_unmapped_port_w );
-	READ8_MEMBER(sms_z80_unmapped_r );
-	WRITE8_MEMBER( sms_z80_unmapped_w );
-};
-
-
-class mplay_state : public segamsys_state
+class mplay_state : public md_base_state
 {
 public:
 	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
-	: segamsys_state(mconfig, type, tag),
+	: md_base_state(mconfig, type, tag),
 	m_ic3_ram(*this, "ic3_ram"),
 	m_vdp1(*this, "vdp1"),
 	m_bioscpu(*this, "mtbios")
@@ -410,7 +315,8 @@ public:
 	required_device<cpu_device>          m_bioscpu;
 	UINT8* m_ic37_ram;
 	UINT16 *m_ic36_ram;
-	DECLARE_WRITE_LINE_MEMBER( int_callback );
+	DECLARE_WRITE_LINE_MEMBER( bios_int_callback );
+	READ8_MEMBER(vdp_count_r);
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
@@ -440,7 +346,7 @@ public:
 	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_extra_ram );
 };
 
-class mtech_state : public segamsys_state
+class mtech_state : public md_base_state
 {
 public:
 	enum
@@ -450,7 +356,7 @@ public:
 	};
 
 	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
-	: segamsys_state(mconfig, type, tag),
+	: md_base_state(mconfig, type, tag),
 		m_vdp1(*this, "vdp1"),
 		m_bioscpu(*this, "mtbios")
 	{ }

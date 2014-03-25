@@ -537,31 +537,48 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
 ADDRESS_MAP_END
 
-/* basically from src/drivers/segasyse.c */
+
+READ8_MEMBER(mplay_state::vdp_count_r)
+{
+	address_space &prg = m_bioscpu->space(AS_PROGRAM);
+	if (offset & 0x01)
+		return m_vdp->hcount_read(prg, offset);
+	else
+		return m_vdp->vcount_read(prg, offset);
+}
+
 static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)  /* SN76489 */
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)    /* VDP */
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)    /* VDP */
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)
+
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp_count_r)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("gen_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("gen_vdp", sega315_5124_device, register_read, register_write)
 ADDRESS_MAP_END
 
-
-
-
-VIDEO_START_MEMBER(mplay_state,megplay)
-{
-	//printf("megplay vs\n");
-	VIDEO_START_CALL_MEMBER(megadriv);
-}
 
 UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//printf("megplay vu\n");
-	screen_update_megadriv(screen,bitmap,cliprect);
-	screen_update_megaplay_bios(screen,bitmap,cliprect);
+	screen_update_megadriv(screen, bitmap, cliprect);
+//	m_vdp->screen_update(screen, bitmap, cliprect);
+
+	// overlay, only drawn for pixels != 0
+	for (int y = 0; y < 224; y++)
+	{
+		UINT32* lineptr = &bitmap.pix32(y, 0);
+		UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+		
+		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
+		{
+			UINT32 src = srcptr[x] & 0xffffff;
+			
+			if (src)
+				lineptr[x] = src;
+		}
+	}	
 	return 0;
 }
-
 
 MACHINE_RESET_MEMBER(mplay_state,megaplay)
 {
@@ -569,14 +586,19 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	m_mp_bios_bank_addr = 0;
 	m_readpos = 1;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	MACHINE_RESET_CALL_MEMBER(megaplay_bios);
 }
 
-void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
+WRITE_LINE_MEMBER( mplay_state::bios_int_callback )
 {
-	screen_eof_megadriv(screen,state);
-	screen_eof_megaplay_bios(screen,state);
+	m_bioscpu->set_input_line(0, state);
 }
+
+static const sega315_5124_interface bios_vdp_intf =
+{
+	false,
+	DEVCB_DRIVER_LINE_MEMBER(mplay_state, bios_int_callback),
+	DEVCB_NULL,
+};
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* basic machine hardware */
@@ -588,8 +610,6 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
 
-	MCFG_MACHINE_RESET_OVERRIDE(mplay_state, megaplay )
-
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
@@ -597,10 +617,19 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 
 	/* New update functions to handle the extra layer */
-	MCFG_VIDEO_START_OVERRIDE(mplay_state,megplay)
 	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
+		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
-	MCFG_SCREEN_VBLANK_DRIVER(mplay_state, screen_eof_megaplay)
+
+	MCFG_DEVICE_REMOVE("gen_vdp")
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_DEVICE_CONFIG( bios_vdp_intf )
+	MCFG_VIDEO_SET_SCREEN("megadriv")
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 MACHINE_CONFIG_END
 
 
@@ -820,8 +849,6 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
-
-	init_megaplay_legacy_overlay();
 }
 
 /*

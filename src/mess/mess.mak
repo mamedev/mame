@@ -807,8 +807,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/megacdcd.o  \
 	$(MAME_MACHINE)/mega32x.o   \
 	$(MAME_MACHINE)/megavdp.o   \
-	$(MAME_MACHINE)/segamsys.o  \
-	$(MAME_DRIVERS)/megatech.o  \
 	$(MAME_MACHINE)/dc.o        \
 	$(MAME_DRIVERS)/naomi.o     \
 	$(MAME_VIDEO)/powervr2.o    \

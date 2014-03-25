@@ -1567,7 +1567,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/triforce.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
-	$(DRIVERS)/segae.o $(MACHINE)/segamsys.o \
+	$(DRIVERS)/segae.o \
 	$(DRIVERS)/shtzone.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \
 	$(DRIVERS)/segag80v.o $(AUDIO)/segag80v.o $(VIDEO)/segag80v.o \
