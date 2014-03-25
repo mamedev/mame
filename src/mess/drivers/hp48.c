@@ -2,7 +2,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX/G+
+   Hewlett Packard HP48 S/SX & G/GX/G+ and HP49 G
 
 **********************************************************************/
 
@@ -25,6 +25,8 @@
    IO RAM is & CPU state are discarded; save-state saves base & IO RAM,
    CPU state, but not expansion port RAM)
    - more accurate IRQ, NMI, sleep and wake-up handling
+   - HP49 G flash ROM write
+   - HP49 xmodem
 */
 
 
@@ -96,6 +98,17 @@
     + Codename: Plus
     + 128 KB RAM, not expandable
     + no expansion port
+
+
+
+  HP49 G:
+  similar to HP48 G with the following differences:
+  - 2048 KB flash ROM (re-writtable)
+  - 512 KB RAM (not expandable)
+  - Keyboard: 51 keys
+  - no IR I/O port
+  - rewritten optimized OS makes the HP49 G much faster than HP48 despite
+  having the same CPU and clock rate (4 MHz York Saturn)
 
 */
 
@@ -169,7 +182,7 @@
 /*  KEYBOARD
     --------
 
-    keyboard layout (all models)
+    keyboard layout for 48 models
 
    -------------------------------------------------
    |   A   |   B   |   C   |   D   |   E   |   F   |
@@ -749,6 +762,324 @@ INPUT_PORTS_END
 
 
 
+
+/*
+   keyboard layout for 49 G model
+
+   -------------------------------------------------
+   |   F1  |   F2  |   F3  |   F4  |   F5  |  F6   | 
+   |-----------------------------------------------|
+   |   APPS  |  MODE  |  TOOL  |        up         |
+   |---------+--------+--------| left        right |
+   |   VAR   |  STO   |  NXT   |       down        |
+   |---------+--------+--------+-------------------|
+   |   HIST  |  CAT   |  EQW   |  SYMB   |   <=    | 
+   |---------+--------+--------+---------+---------|
+   |   y^x   |  sqrt  |  SIN   |  COS    |   TAN   | 
+   |---------+--------+--------+---------+---------|
+   |   EEX   |  +/-   |   X    |  1/x    |    /    | 
+   |---------+--------+--------+---------+---------|
+   |  alpha  |   7    |   8    |   9     |    *    | 
+   |---------+--------+--------+---------+---------|
+   |   blue  |   4    |   5    |   6     |    -    | 
+   |---------+--------+--------+---------+---------|
+   |   red   |   1    |   2    |   3     |    +    | 
+   |---------+--------+--------+---------+---------|
+   |   ON    |   0    |    .   |  SPC    |  ENTER  | 
+   -------------------------------------------------
+
+   * 51 keys
+   * including 3 modifier keys:
+     - a red shift (upper right)
+     - a blue shift (upper left)
+     - a cyan alpha key (lower right)
+*/
+
+
+static INPUT_PORTS_START( hp49g_kbd )
+
+        PORT_START( "LINE0" ) /* OUT = 0x001 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "ENTER   ANS  NUM")
+	PORT_CODE ( KEYCODE_ENTER )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "+  { }  \xC2\xAB \xC2\xBB")  /* << >> */
+	PORT_CODE ( KEYCODE_EQUALS )
+	PORT_CODE ( KEYCODE_PLUS_PAD )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "-  ( )  _")
+	PORT_CODE ( KEYCODE_MINUS )
+	PORT_CODE ( KEYCODE_MINUS_PAD )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "*  [ ]  \" \"")
+	PORT_CODE ( KEYCODE_ASTERISK )
+	PORT_CODE ( KEYCODE_CLOSEBRACE )
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "/  ABS  ARG  Z")
+	PORT_CODE ( KEYCODE_SLASH )
+	PORT_CODE ( KEYCODE_SLASH_PAD )
+	PORT_CODE ( KEYCODE_Z)
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "TAN  ATAN  \xE2\x88\xAB  U") /* integral */
+	PORT_CODE ( KEYCODE_U )
+
+	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "\xE2\x87\x90  DEL  CLEAR") /* double left arrow */
+	PORT_CODE ( KEYCODE_BACKSPACE )
+	PORT_CODE ( KEYCODE_DEL )
+	PORT_CODE ( KEYCODE_DEL_PAD )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "NXT  PREV  PASTE  L")
+	PORT_CODE ( KEYCODE_L )
+
+        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE1" ) /* OUT = 0x002 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "SPC  \xCF\x80  ,")  /* pi */
+	PORT_CODE ( KEYCODE_SPACE )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "3  #  BASE")
+	PORT_CODE ( KEYCODE_3 )
+	PORT_CODE ( KEYCODE_3_PAD )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "6  CONVERT  UNITS")
+	PORT_CODE ( KEYCODE_6 )
+	PORT_CODE ( KEYCODE_6_PAD )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "9  FINANCE  TIME")
+	PORT_CODE ( KEYCODE_9 )
+	PORT_CODE ( KEYCODE_9_PAD )
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "1/x  \xE2\x89\xA5  >  Y") /* >= */
+	PORT_CODE ( KEYCODE_Y )
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "COS  ACOS  \xE2\x88\x82  T") /* delta */
+	PORT_CODE ( KEYCODE_T )
+
+	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "SYMB  MTH  EVAL  P")
+	PORT_CODE ( KEYCODE_P )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "STO\xE2\x8A\xB3  RCL  CUT  K")
+	PORT_CODE ( KEYCODE_K )
+
+        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE2" ) /* OUT = 0x004 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( ".  : :  \xE2\x86\xb5") /* return arrow */
+	PORT_CODE ( KEYCODE_STOP )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "2  DEF  LIB")
+	PORT_CODE ( KEYCODE_2 )
+	PORT_CODE ( KEYCODE_2_PAD )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "5  MATRICES  STAT")
+	PORT_CODE ( KEYCODE_5 )
+	PORT_CODE ( KEYCODE_5_PAD )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "8  EXP&LN  TRIG")
+	PORT_CODE ( KEYCODE_8 )
+	PORT_CODE ( KEYCODE_8_PAD )
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "X  \xE2\x89\xA4  <  X") /* <= */
+	PORT_CODE ( KEYCODE_X )
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "SIN  ASIN  \xE2\x88\x91  S") /* sum */
+	PORT_CODE ( KEYCODE_S )
+
+	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "EQW  MTRW  '  O")
+	PORT_CODE ( KEYCODE_O )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "VAR  UPDIR  COPY  J")
+	PORT_CODE ( KEYCODE_J )
+
+        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE3" ) /* OUT = 0x008 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "0  \xE2\x88\x9E  \xE2\x86\x92") /* infinity, right arrow */
+	PORT_CODE ( KEYCODE_0 )
+	PORT_CODE ( KEYCODE_0_PAD )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "1  ARITH  CMPLX")
+	PORT_CODE ( KEYCODE_1 )
+	PORT_CODE ( KEYCODE_1_PAD )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "4  CALC  ALG")
+	PORT_CODE ( KEYCODE_4 )
+	PORT_CODE ( KEYCODE_4_PAD )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "7  SSLV  NUMSLV")
+	PORT_CODE ( KEYCODE_7 )
+	PORT_CODE ( KEYCODE_7_PAD )
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "+/-  \xE2\x89\xA0  =  W") /* =/ */
+	PORT_CODE ( KEYCODE_W )
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "\xE2\x88\x9A  x^2  sqrt(x,y)  R") /* square root */
+	PORT_CODE ( KEYCODE_R )
+
+	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "CAT  PRG  CHARS  N")
+	PORT_CODE ( KEYCODE_N )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "TOOL i  |  I")
+	PORT_CODE ( KEYCODE_I )
+
+        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE4" ) /* OUT = 0x010 */
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "EEX  10^x  LOG  V")
+	PORT_CODE ( KEYCODE_V )
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "y^x  e^x  LN  Q")
+	PORT_CODE ( KEYCODE_Q )
+
+	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "HIST  CMD  UNDO  M")
+	PORT_CODE ( KEYCODE_M )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "MODE  CUSTOM  END  H")
+	PORT_CODE ( KEYCODE_H )
+
+        PORT_BIT ( 0x7f0f, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE5" ) /* OUT = 0x020 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F1  Y=  A")
+	PORT_CODE ( KEYCODE_A )
+	PORT_CODE ( KEYCODE_F1 )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F2  WIN  B")
+	PORT_CODE ( KEYCODE_B )
+	PORT_CODE ( KEYCODE_F2 )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F3  GRAPH  C")
+	PORT_CODE ( KEYCODE_C )
+	PORT_CODE ( KEYCODE_F3 )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F4  2D/3D  D")
+	PORT_CODE ( KEYCODE_D )
+	PORT_CODE ( KEYCODE_F4 )
+
+	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F5  TBLSET  E")
+	PORT_CODE ( KEYCODE_E )
+	PORT_CODE ( KEYCODE_F5 )
+
+	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "F6  TABLE  F")
+	PORT_CODE ( KEYCODE_F )
+	PORT_CODE ( KEYCODE_F6 )
+
+	PORT_BIT  ( 128, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "APPS  FILES  BEGIN  G")
+	PORT_CODE ( KEYCODE_G )
+
+        PORT_BIT ( 0x7f40, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE6" ) /* OUT = 0x040 */
+
+	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "\xE2\x86\x92") /* right arrow */
+	PORT_CODE ( KEYCODE_RIGHT )
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "\xE2\x86\x93") /* down arrow */
+	PORT_CODE ( KEYCODE_DOWN )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "\xE2\x86\x90") /* left arrow */ 
+	PORT_CODE ( KEYCODE_LEFT )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "\xE2\x86\x91") /* up arrow */
+	PORT_CODE ( KEYCODE_UP )
+
+        PORT_BIT ( 0x7ff0, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE7" ) /* OUT = 0x080 */
+
+	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "right shift")
+	PORT_CODE ( KEYCODE_RSHIFT )
+
+	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "left shift")
+	PORT_CODE ( KEYCODE_LSHIFT )
+
+	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+        PORT_NAME ( "\xCE\xB1  USER  ENTRY") /* alpha */
+	PORT_CODE ( KEYCODE_LALT )
+
+        PORT_BIT ( 0x7ff1, 0, IPT_UNUSED )
+
+
+        PORT_START( "LINE8" ) /* OUT = 0x100 */
+
+        PORT_BIT ( 0xffff, 0, IPT_UNUSED )
+
+
+        PORT_START( "ON" ) /* ON key, appears on all OUT lines */
+
+	PORT_BIT  ( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_NAME ( "ON  CONT  OFF  CANCEL" )
+	PORT_CODE ( KEYCODE_ESC )
+	PORT_CODE ( KEYCODE_HOME )
+
+        PORT_BIT ( 0x7fff, 0, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+
+
+
 /*  BATTERY
     -------
  */
@@ -777,6 +1108,10 @@ static INPUT_PORTS_START( hp48gx )
 		PORT_INCLUDE( hp48_battery )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hp49g )
+        PORT_INCLUDE( hp49g_kbd )
+        PORT_INCLUDE( hp48_battery )
+INPUT_PORTS_END
 
 
 
@@ -921,6 +1256,7 @@ static const char layout_hp48g [] = "hp48g";
 static const char layout_hp48gp[] = "hp48gp";
 static const char layout_hp48sx[] = "hp48sx";
 static const char layout_hp48s [] = "hp48s";
+static const char layout_hp49g [] = "hp49g";
 
 
 /*************************** driver ********************************/
@@ -1014,13 +1350,22 @@ static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hp49g, hp48_common )
+	MCFG_CPU_MODIFY     ( "maincpu" )
+	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
+	MCFG_DEFAULT_LAYOUT ( layout_hp49g )
+
+	/* serial I/O */
+        //MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+        //MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+MACHINE_CONFIG_END
+
 
 COMP ( 1990, hp48sx, 0     , 0, hp48sx, hp48sx, hp48_state, hp48, "Hewlett Packard", "HP48SX", 0 )
 COMP ( 1991, hp48s , hp48sx, 0, hp48s,  hp48sx, hp48_state, hp48, "Hewlett Packard", "HP48S", 0 )
 COMP ( 1993, hp48gx, 0     , 0, hp48gx, hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48GX", 0 )
 COMP ( 1993, hp48g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48G", 0 )
 COMP ( 1998, hp48gp, hp48gx, 0, hp48gp, hp48gx, hp48_state, hp48, "Hewlett Packard", "HP48G+", 0 )
-
-COMP ( 1995, hp38g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP38G", 0 )
-COMP ( 2000, hp39g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP39G", GAME_NOT_WORKING )
-COMP ( 1999, hp49g , hp48gx, 0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP49G", 0 )
+COMP ( 1999, hp49g , 0,      0, hp49g,  hp49g,  hp48_state, hp48, "Hewlett Packard", "HP49G", 0 )
+COMP ( 1995, hp38g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP38G", 0 )
+COMP ( 2000, hp39g , 0,      0, hp48g,  hp48gx, hp48_state, hp48, "Hewlett Packard", "HP39G", GAME_NOT_WORKING )

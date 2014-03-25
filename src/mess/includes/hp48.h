@@ -2,7 +2,7 @@
 
   Copyright (C) Antoine Mine' 2008
 
-   Hewlett Packard HP48 S/SX & G/GX
+   Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
 
@@ -11,20 +11,22 @@
 #endif
 #include "sound/dac.h"
 /* model */
-enum hp48_models {
+typedef enum {
 	HP48_S,
 	HP48_SX,
 	HP48_G,
 	HP48_GX,
 	HP48_GP,
-};
+	HP49_G,
+} hp48_models;
 
 /* memory module configuration */
-struct hp48_module
+typedef struct
 {
 	/* static part */
 	UINT32 off_mask;             /* offset bit-mask, indicates the real size */
 	read8_delegate read;
+	const char *read_name;
 	write8_delegate write;
 	void* data;                  /* non-NULL for banks */
 	int isnop;
@@ -34,7 +36,7 @@ struct hp48_module
 	UINT32 base;                 /* base address */
 	UINT32 mask;                 /* often improperly called size, it is an address select mask */
 
-};
+} hp48_module;
 
 
 /* screen image averaging */
@@ -52,12 +54,24 @@ public:
 	UINT8 *m_videoram;
 	UINT8 m_io[64];
 	hp48_models m_model;
+
+	/* OUT register from SATURN (actually 12-bit) */
 	UINT16 m_out;
+
+	/* keyboard interrupt */
 	UINT8 m_kdn;
+
+	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
 	hp48_module m_modules[6];
+
+	/* RAM/ROM extensions, GX/SX only (each UINT8 stores one nibble)
+	   port1: SX/GX: 32/128 KB
+	   port2: SX:32/128KB, GX:128/512/4096 KB
+	*/
 	UINT32 m_port_size[2];
 	UINT8 m_port_write[2];
 	UINT8* m_port_data[2];
+
 	UINT32 m_bank_switch;
 	UINT32 m_io_addr;
 	UINT16 m_crc;
@@ -68,9 +82,12 @@ public:
 #endif
 	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
+	UINT8* m_rom;
+
 	DECLARE_DRIVER_INIT(hp48);
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(hp48);
+	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
 	DECLARE_MACHINE_START(hp48g);
 	DECLARE_MACHINE_START(hp48gp);
@@ -81,6 +98,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hp48_io_w);
 	DECLARE_READ8_MEMBER(hp48_io_r);
 	DECLARE_READ8_MEMBER(hp48_bank_r);
+	DECLARE_WRITE8_MEMBER(hp49_bank_w);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_recv_cb);
 	TIMER_CALLBACK_MEMBER(hp48_rs232_byte_sent_cb);
 	TIMER_CALLBACK_MEMBER(hp48_chardev_byte_recv_cb);
