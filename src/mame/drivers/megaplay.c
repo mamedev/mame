@@ -569,13 +569,13 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	m_mp_bios_bank_addr = 0;
 	m_readpos = 1;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	MACHINE_RESET_CALL_MEMBER(megatech_bios);
+	MACHINE_RESET_CALL_MEMBER(megaplay_bios);
 }
 
 void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 {
 	screen_eof_megadriv(screen,state);
-	screen_eof_megatech_bios(screen,state);
+	screen_eof_megaplay_bios(screen,state);
 }
 
 static MACHINE_CONFIG_START( megaplay, mplay_state )

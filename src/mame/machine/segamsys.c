@@ -319,13 +319,6 @@ void *segamsys_state::start_vdp(int type)
 	return chip;
 }
 
-/* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
-void segamsys_state::megatech_sms_stop_scanline_timer()
-{
-	md_sms_vdp->sms_scanline_timer->adjust(attotime::never);
-	memset(md_sms_vdp->vram,0x00,0x4000);
-}
-
 UINT8 segamsys_state::vcounter_r(struct sms_vdp *chip)
 {
 //  return vc_pal_224[sms_scanline_counter%(sizeof vc_pal_224)];
@@ -481,34 +474,6 @@ void segamsys_state::vdp_ctrl_w(address_space &space, UINT8 data, struct sms_vdp
 		vdp_update_code_addr_regs(chip);
 	}
 }
-
-/* for the Genesis */
-
-READ8_MEMBER(segamsys_state::md_sms_vdp_vcounter_r )
-{
-	return vcounter_r(md_sms_vdp);
-}
-
-READ8_MEMBER(segamsys_state::md_sms_vdp_data_r )
-{
-	return vdp_data_r(md_sms_vdp);
-}
-
-WRITE8_MEMBER(segamsys_state::md_sms_vdp_data_w )
-{
-	vdp_data_w(space, data, md_sms_vdp);
-}
-
-READ8_MEMBER(segamsys_state::md_sms_vdp_ctrl_r )
-{
-	return vdp_ctrl_r(space, md_sms_vdp);
-}
-
-WRITE8_MEMBER(segamsys_state::md_sms_vdp_ctrl_w )
-{
-	vdp_ctrl_w(space, data, md_sms_vdp);
-}
-
 
 /* Read / Write Handlers - call other functions */
 
@@ -949,49 +914,18 @@ void segamsys_state::end_of_frame(screen_device &screen, struct sms_vdp *chip)
 }
 
 
-MACHINE_RESET_MEMBER(segamsys_state,megatech_md_sms)
-{
-	md_sms_vdp->sms_scanline_timer->adjust(attotime::zero);
-}
-
-MACHINE_RESET_MEMBER(segamsys_state,megatech_bios)
+MACHINE_RESET_MEMBER(segamsys_state, megaplay_bios)
 {
 	vdp1->sms_scanline_timer->adjust(attotime::zero);
 }
 
 
-void segamsys_state::screen_eof_megatech_md_sms(screen_device &screen, bool state)
-{
-	// rising edge
-	if (state)
-		end_of_frame(screen, md_sms_vdp);
-}
-
-void segamsys_state::screen_eof_megatech_bios(screen_device &screen, bool state)
+void segamsys_state::screen_eof_megaplay_bios(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
 		end_of_frame(screen, vdp1);
 }
-
-UINT32 segamsys_state::screen_update_megatech_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int x,y;
-
-	for (y=0;y<224;y++)
-	{
-		UINT32* lineptr = &bitmap.pix32(y);
-		UINT32* srcptr =  &md_sms_vdp->r_bitmap->pix32(y);
-
-		for (x=0;x<256;x++)
-		{
-			lineptr[x]=srcptr[x];
-		}
-	}
-
-	return 0;
-}
-
 
 UINT32 segamsys_state::screen_update_megaplay_bios(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1014,19 +948,6 @@ UINT32 segamsys_state::screen_update_megaplay_bios(screen_device &screen, bitmap
 	return 0;
 }
 
-
-void segamsys_state::init_for_megadrive()
-{
-	md_sms_vdp = (struct sms_vdp *)start_vdp(GEN_VDP);
-	md_sms_vdp->set_irq = segamsys_state::sms_vdp_cpu1_irq_callback;
-	md_sms_vdp->is_pal = 0;
-	md_sms_vdp->sms_total_scanlines = 262;
-	md_sms_vdp->sms_framerate = 60;
-	md_sms_vdp->chip_id = 3;
-}
-
-
-
 void segamsys_state::init_megaplay_legacy_overlay()
 {
 	vdp1 = (struct sms_vdp *)start_vdp(SMS2_VDP);
@@ -1040,119 +961,3 @@ void segamsys_state::init_megaplay_legacy_overlay()
 	vdp1_vram_bank1 = auto_alloc_array(machine(), UINT8, 0x4000);
 }
 
-/* Functions to set up the Memory Map
-
- -- these are needed because on a Genesis the Sound Z80 becomes the SMS Z80 in comptibility mode
-    so we need to be able to dynamically change the mapping
-
-*/
-
-READ8_MEMBER( segamsys_state::sms_z80_unmapped_port_r )
-{
-//  printf("unmapped z80 port read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER( segamsys_state::sms_z80_unmapped_port_w )
-{
-//  printf("unmapped z80 port write %04x\n",offset);
-}
-
-READ8_MEMBER( segamsys_state::sms_z80_unmapped_r )
-{
-	printf("unmapped z80 read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER( segamsys_state::sms_z80_unmapped_w )
-{
-	printf("unmapped z80 write %04x\n",offset);
-}
-
-
-/* the SMS inputs should be more complex, like the megadrive ones */
-READ8_MEMBER (segamsys_state::megatech_sms_ioport_dc_r)
-{
-	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
-	/* bit 4: TL-A; bit 5: TR-A */
-	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
-}
-
-READ8_MEMBER (segamsys_state::megatech_sms_ioport_dd_r)
-{
-	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
-	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
-}
-
-
-WRITE8_MEMBER( segamsys_state::mt_sms_standard_rom_bank_w )
-{
-	int bank = data&0x1f;
-	//logerror("bank w %02x %02x\n", offset, data);
-
-	sms_mainram[0x1ffc+offset] = data;
-	switch (offset)
-	{
-		case 0:
-			logerror("bank w %02x %02x\n", offset, data);
-			space.install_rom(0x0000, 0xbfff, sms_rom);
-			space.unmap_write(0x0000, 0xbfff);
-			//printf("bank ram??\n");
-			break;
-		case 1:
-			memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
-			break;
-		case 2:
-			memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
-			break;
-		case 3:
-			memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
-			break;
-
-	}
-}
-
-
-void segamsys_state::megatech_set_genz80_as_sms_standard_ports(const char* tag)
-{
-	/* INIT THE PORTS *********************************************************************************************/
-
-	address_space &io = machine().device(tag)->memory().space(AS_IO);
-	sn76496_base_device *sn = machine().device<sn76496_base_device>("snsnd");
-
-	io.install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(segamsys_state::z80_unmapped_port_r),this), write8_delegate(FUNC(segamsys_state::sms_z80_unmapped_port_w),this));
-
-	io.install_read_handler      (0x7e, 0x7e, read8_delegate(FUNC(segamsys_state::md_sms_vdp_vcounter_r),this));
-	io.install_write_handler     (0x7e, 0x7f, write8_delegate(FUNC(sn76496_device::write),sn));
-	io.install_readwrite_handler (0xbe, 0xbe, read8_delegate(FUNC(segamsys_state::md_sms_vdp_data_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_data_w),this));
-	io.install_readwrite_handler (0xbf, 0xbf, read8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_r),this), write8_delegate(FUNC(segamsys_state::md_sms_vdp_ctrl_w),this));
-
-	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this)); // super tetris
-
-	io.install_read_handler      (0xdc, 0xdc, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dc_r),this));
-	io.install_read_handler      (0xdd, 0xdd, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this));
-	io.install_read_handler      (0xde, 0xde, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this));
-	io.install_read_handler      (0xdf, 0xdf, read8_delegate(FUNC(segamsys_state::megatech_sms_ioport_dd_r),this)); // adams family
-}
-
-void segamsys_state::megatech_set_genz80_as_sms_standard_map(const char* tag)
-{
-	/* INIT THE MEMMAP / BANKING *********************************************************************************/
-
-	/* catch any addresses that don't get mapped */	
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(segamsys_state::z80_unmapped_r),this), write8_delegate(FUNC(segamsys_state::z80_unmapped_w),this));
-
-	/* main ram area */
-	sms_mainram = (UINT8 *)machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, 0, 0x2000);
-	memset(sms_mainram,0x00,0x2000);
-
-	megatech_set_genz80_as_sms_standard_ports(tag);
-
-	/* fixed rom bank area */
-	sms_rom = (UINT8 *)machine().device(tag)->memory().space(AS_PROGRAM).install_rom(0x0000, 0xbfff, NULL);
-
-	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(segamsys_state::mt_sms_standard_rom_bank_w),this));
-}

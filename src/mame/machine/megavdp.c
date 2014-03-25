@@ -27,7 +27,7 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
-}	
+}
 
 //-------------------------------------------------
 //  static_set_palette_tag: Set the tag of the
@@ -42,6 +42,7 @@ void sega_genesis_vdp_device::static_set_palette_tag(device_t &device, const cha
 
 static MACHINE_CONFIG_FRAGMENT( sega_genesis_vdp )
 	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(sega315_5124_device, sega315_5124)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -188,6 +189,8 @@ void sega_genesis_vdp_device::device_start()
 
 	m_space68k = &machine().device<m68000_base_device>(":maincpu")->space();
 	m_cpu68k = machine().device<m68000_base_device>(":maincpu");
+
+	sega315_5124_device::device_start();
 }
 
 void sega_genesis_vdp_device::device_reset()
@@ -206,6 +209,8 @@ void sega_genesis_vdp_device::device_reset()
 	megadrive_irq6_pending = 0;
 	megadrive_irq4_pending = 0;
 	m_scanline_counter = 0;
+
+	sega315_5124_device::device_reset();
 }
 
 void sega_genesis_vdp_device::device_reset_old()
@@ -217,8 +222,6 @@ void sega_genesis_vdp_device::device_reset_old()
 	m_irq6_scanline = 224;
 	m_z80irq_scanline = 226;
 }
-
-
 
 
 

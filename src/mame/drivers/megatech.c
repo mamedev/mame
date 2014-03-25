@@ -202,7 +202,6 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 /* MEGATECH specific */
@@ -210,7 +209,6 @@ READ8_MEMBER(mtech_state::megatech_cart_select_r )
 {
 	return m_mt_cart_select_reg;
 }
-
 
 void mtech_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -227,6 +225,118 @@ void mtech_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
+READ8_MEMBER(mtech_state::sms_count_r)
+{
+	address_space &prg = machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM);
+	if (offset & 0x01)
+		return m_vdp->hcount_read(prg, offset);
+	else
+		return m_vdp->vcount_read(prg, offset);
+}
+
+
+/* the SMS inputs should be more complex, like the megadrive ones */
+READ8_MEMBER (mtech_state::sms_ioport_dc_r)
+{
+	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
+	/* bit 4: TL-A; bit 5: TR-A */
+	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
+}
+
+READ8_MEMBER (mtech_state::sms_ioport_dd_r)
+{
+	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
+	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
+	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+}
+
+
+WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
+{
+	int bank = data&0x1f;
+	//logerror("bank w %02x %02x\n", offset, data);
+	
+	sms_mainram[0x1ffc+offset] = data;
+	switch (offset)
+	{
+		case 0:
+			logerror("bank w %02x %02x\n", offset, data);
+			space.install_rom(0x0000, 0xbfff, sms_rom);
+			space.unmap_write(0x0000, 0xbfff);
+			//printf("bank ram??\n");
+			break;
+		case 1:
+			memcpy(sms_rom+0x0000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			break;
+		case 2:
+			memcpy(sms_rom+0x4000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			break;
+		case 3:
+			memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
+			break;
+			
+	}
+}
+
+void mtech_state::megatech_set_genz80_as_sms(const char* tag)
+{
+	address_space &prg = machine().device(tag)->memory().space(AS_PROGRAM);
+	address_space &io = machine().device(tag)->memory().space(AS_IO);
+	sn76496_base_device *sn = machine().device<sn76496_base_device>("snsnd");
+	
+	// main ram area
+	sms_mainram = (UINT8 *)prg.install_ram(0xc000, 0xdfff, 0, 0x2000);
+	memset(sms_mainram,0x00,0x2000);
+	
+	// fixed rom bank area
+	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, NULL);
+	
+	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
+	
+	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
+	
+	// ports
+	io.install_read_handler      (0x40, 0x41, 0xff, 0x3e, read8_delegate(FUNC(mtech_state::sms_count_r),this));
+	io.install_write_handler     (0x40, 0x41, 0xff, 0x3e, write8_delegate(FUNC(sn76496_device::write),sn));
+	io.install_readwrite_handler (0x80, 0x80, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x81, 0x81, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
+	
+	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
+	
+	io.install_read_handler      (0xdc, 0xdc, read8_delegate(FUNC(mtech_state::sms_ioport_dc_r),this));
+	io.install_read_handler      (0xdd, 0xdd, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
+	io.install_read_handler      (0xde, 0xde, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
+	io.install_read_handler      (0xdf, 0xdf, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // adams family
+}
+
+
+/* sets the megadrive z80 to it's normal ports / map */
+void mtech_state::megatech_set_genz80_as_md(const char* tag)
+{
+	address_space &prg = machine().device(tag)->memory().space(AS_PROGRAM);
+	address_space &io = machine().device(tag)->memory().space(AS_IO);
+	ym2612_device *ym2612 = machine().device<ym2612_device>("ymsnd");
+	
+	io.install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_port_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_port_w),this));
+	
+	/* catch any addresses that don't get mapped */
+	prg.install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_w),this));
+	
+	
+	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
+	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
+	
+	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
+
+	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
+	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
+	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
+	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
+	prg.install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(FUNC(mtech_state::megadriv_z80_vdp_read),this), write8_delegate(FUNC(mtech_state::megadriv_z80_vdp_write),this));
+	prg.install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(mtech_state::z80_read_68k_banked_data),this), write8_delegate(FUNC(mtech_state::z80_write_68k_banked_data),this));
+}
+
+
 
 TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 {
@@ -242,7 +352,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 	{
 		printf("enabling SMS Z80\n");
 		m_current_game_is_sms = 1;
-		megatech_set_genz80_as_sms_standard_map("genesis_snd_z80");
+		megatech_set_genz80_as_sms("genesis_snd_z80");
 		//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
@@ -250,7 +360,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 	{
 		printf("disabling SMS Z80\n");
 		m_current_game_is_sms = 0;
-		megatech_set_megadrive_z80_as_megadrive_z80("genesis_snd_z80");
+		megatech_set_genz80_as_md("genesis_snd_z80");
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
@@ -273,8 +383,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	machine().device("ymsnd")->reset();
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed
-	megatech_sms_stop_scanline_timer();// stop the scanline timer for the sms vdp
-
+	m_vdp->reset();
 
 	/* if the regions exist we're fine */
 	if (game_region)
@@ -430,20 +539,14 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
-VIDEO_START_MEMBER(mtech_state,mtnew)
-{
-	init_for_megadrive(); // create an sms vdp too, for compatibility mode
-	VIDEO_START_CALL_MEMBER(megadriv);
-}
 
-//attotime::never
 UINT32 mtech_state::screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 	if (!m_current_game_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
-		screen_update_megatech_sms(screen, bitmap, cliprect);
+		m_vdp->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -451,16 +554,12 @@ void mtech_state::screen_eof_mtnew(screen_device &screen, bool state)
 {
 	if (!m_current_game_is_sms)
 		screen_eof_megadriv(screen, state);
-	else
-		screen_eof_megatech_md_sms(screen, state);
 }
 
 MACHINE_RESET_MEMBER(mtech_state,mtnew)
 {
 	m_mt_bank_addr = 0;
-
 	MACHINE_RESET_CALL_MEMBER(megadriv);
-	MACHINE_RESET_CALL_MEMBER(megatech_md_sms);
 	megatech_select_game(0);
 }
 
@@ -472,16 +571,28 @@ UINT32 mtech_state::screen_update_megatech_menu(screen_device &screen, bitmap_rg
 
 
 
-WRITE_LINE_MEMBER( mtech_state::int_callback )
+WRITE_LINE_MEMBER( mtech_state::bios_int_callback )
 {
 	m_bioscpu->set_input_line(0, state);
 }
 
-
-static const sega315_5124_interface _vdp_intf =
+static const sega315_5124_interface bios_vdp_intf =
 {
 	false,
-	DEVCB_DRIVER_LINE_MEMBER(mtech_state, int_callback),
+	DEVCB_DRIVER_LINE_MEMBER(mtech_state, bios_int_callback),
+	DEVCB_NULL,
+};
+
+
+WRITE_LINE_MEMBER( mtech_state::snd_int_callback )
+{
+	m_z80snd->set_input_line(0, state);
+}
+
+static const sega315_5124_interface main_vdp_intf =
+{
+	false,
+	DEVCB_DRIVER_LINE_MEMBER(mtech_state, snd_int_callback),
 	DEVCB_NULL,
 };
 
@@ -497,9 +608,22 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state,mtnew)
 
-	MCFG_VIDEO_START_OVERRIDE(mtech_state,mtnew)
-
 	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
+
+	MCFG_SCREEN_MODIFY("megadriv")
+	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+		SEGA315_5124_WIDTH , SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH + 256, \
+		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
+	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_mtnew)
+	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_mtnew)
+
+	MCFG_DEVICE_REMOVE("gen_vdp")
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_DEVICE_CONFIG( main_vdp_intf )
+	MCFG_VIDEO_SET_SCREEN("megadriv")
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("menu", RASTER)
 	// check frq
@@ -508,13 +632,8 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_megatech_menu)
 
-	MCFG_SEGA315_5246_ADD("vdp1", _vdp_intf)
+	MCFG_SEGA315_5246_ADD("vdp1", bios_vdp_intf)
 	MCFG_SEGA315_5246_SET_SCREEN("menu")
-
-
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_mtnew)
-	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_mtnew)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)

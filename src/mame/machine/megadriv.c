@@ -1059,8 +1059,6 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-
 	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
 	/* sound hardware */
@@ -1244,34 +1242,6 @@ WRITE8_MEMBER(md_base_state::z80_unmapped_w )
 {
 	printf("unmapped z80 write %04x\n",offset);
 }
-
-
-/* sets the megadrive z80 to it's normal ports / map */
-void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
-{
-	ym2612_device *ym2612 = machine().device<ym2612_device>("ymsnd");
-
-	/* INIT THE PORTS *********************************************************************************************/
-	machine().device(tag)->memory().space(AS_IO).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_port_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_port_w),this));
-
-	/* catch any addresses that don't get mapped */
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_w),this));
-
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
-
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(FUNC(mtech_state::megadriv_z80_vdp_read),this), write8_delegate(FUNC(mtech_state::megadriv_z80_vdp_write),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(mtech_state::z80_read_68k_banked_data),this), write8_delegate(FUNC(mtech_state::z80_write_68k_banked_data),this));
-}
-
 
 
 

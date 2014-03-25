@@ -171,7 +171,6 @@ public:
 
 	int genesis_get_scanline_counter();
 
-
 	void genesis_render_scanline();
 	void vdp_handle_scanline_callback(int scanline);
 	void vdp_handle_irq6_on_timer_callback(int param);
