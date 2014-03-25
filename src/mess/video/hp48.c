@@ -118,7 +118,7 @@ PALETTE_INIT_MEMBER(hp48_state, hp48)
 
 
 #define draw_pixel                          \
-	state->m_screens[ state->m_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
+	m_screens[ m_cur_screen ][ y ][ xp + 8 ] = (data & 1) ? fg : 0; \
 	xp++;                               \
 	data >>= 1
 
@@ -129,7 +129,6 @@ PALETTE_INIT_MEMBER(hp48_state, hp48)
 
 UINT32 hp48_state::screen_update_hp48(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	hp48_state *state = machine().driver_data<hp48_state>();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int x, y, xp, i, addr;
 	int display       = HP48_IO_4(0) >> 3;           /* 1=on, 0=off */

@@ -35,8 +35,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/pic8259.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_vga.h"
-#include "video/pc_cga.h"
 #include "video/pc_aga.h"
 
 #include "machine/pc_fdc.h"
