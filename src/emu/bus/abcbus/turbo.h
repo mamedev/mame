@@ -18,8 +18,6 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 
 
 
@@ -50,8 +48,6 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<legacy_floppy_image_device> m_image0;
-	required_device<legacy_floppy_image_device> m_image1;
 };
 
 

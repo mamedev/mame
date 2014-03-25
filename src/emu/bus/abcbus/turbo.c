@@ -81,24 +81,6 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  floppy_interface unidisk_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface unidisk_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( turbo_kontroller )
 //-------------------------------------------------
 
@@ -107,8 +89,6 @@ static MACHINE_CONFIG_FRAGMENT( turbo_kontroller )
 	MCFG_CPU_PROGRAM_MAP(turbo_kontroller_mem)
 	MCFG_CPU_IO_MAP(turbo_kontroller_io)
 	MCFG_CPU_CONFIG(daisy_chain)
-
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(unidisk_floppy_interface)
 MACHINE_CONFIG_END
 
 
@@ -135,9 +115,7 @@ machine_config_constructor turbo_kontroller_device::device_mconfig_additions() c
 turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock, "unidisk", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
-		m_maincpu(*this, Z80_TAG),
-		m_image0(*this, FLOPPY_0),
-		m_image1(*this, FLOPPY_1)
+		m_maincpu(*this, Z80_TAG)
 {
 }
 
