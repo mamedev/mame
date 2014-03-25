@@ -318,7 +318,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	 * this value auto-latches on a key press and remains through multiple reads
 	 * this is done by a 74C923 integrated circuit
 	*/
-	UINT8 kbd = m_kb->data_out_r();
+	UINT8 kbd = m_kb->read();
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
 #endif
@@ -577,17 +577,6 @@ WRITE_LINE_MEMBER( digel804_state::da_w )
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	m_key_intq = state ? 0 : 1;
 }
-static MM74C923_INTERFACE( digel804_keypad_intf )
-{
-	0,  // FIXME
-	0,  // FIXME
-	DEVCB_DRIVER_LINE_MEMBER(digel804_state, da_w),
-	DEVCB_INPUT_PORT("LINE0"),
-	DEVCB_INPUT_PORT("LINE1"),
-	DEVCB_INPUT_PORT("LINE2"),
-	DEVCB_INPUT_PORT("LINE3"),
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* basic machine hardware */
@@ -603,7 +592,12 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
 
-	MCFG_MM74C923_ADD("74c923", digel804_keypad_intf)
+	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
+	MCFG_MM74C922_DA_CALLBACK(WRITELINE(digel804_state, da_w))
+	MCFG_MM74C922_X1_CALLBACK(IOPORT("LINE0"))
+	MCFG_MM74C922_X2_CALLBACK(IOPORT("LINE1"))
+	MCFG_MM74C922_X3_CALLBACK(IOPORT("LINE2"))
+	MCFG_MM74C922_X4_CALLBACK(IOPORT("LINE3"))
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)

@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 	{
 		/* shift keyboard data to latch */
 		m_data <<= 4;
-		m_data |= m_kb->data_out_r() & 0x0f;
+		m_data |= m_kb->read() & 0x0f;
 
 		if (LOAD)
 		{
@@ -192,18 +192,6 @@ WRITE_LINE_MEMBER( elf2_state::da_w )
 		}
 	}
 }
-
-static MM74C923_INTERFACE( keyboard_intf )
-{
-	CAP_U(0.15),
-	CAP_U(1),
-	DEVCB_DRIVER_LINE_MEMBER(elf2_state, da_w),
-	DEVCB_INPUT_PORT("X1"),
-	DEVCB_INPUT_PORT("X2"),
-	DEVCB_INPUT_PORT("X3"),
-	DEVCB_INPUT_PORT("X4"),
-	DEVCB_NULL
-};
 
 /* Machine Initialization */
 
@@ -273,7 +261,15 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_579545MHz/2)
 
 	/* devices */
-	MCFG_MM74C923_ADD(MM74C923_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)
+	MCFG_MM74C922_OSC(CAP_U(0.15))
+	MCFG_MM74C922_DEBOUNCE(CAP_U(1))
+	MCFG_MM74C922_DA_CALLBACK(WRITELINE(elf2_state, da_w))
+	MCFG_MM74C922_X1_CALLBACK(IOPORT("X1"))
+	MCFG_MM74C922_X2_CALLBACK(IOPORT("X2"))
+	MCFG_MM74C922_X3_CALLBACK(IOPORT("X3"))
+	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
+
 	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
 	MCFG_OUTPUT_NAME("digit0")
 	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
