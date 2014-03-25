@@ -353,30 +353,6 @@ MACHINE_RESET_MEMBER(mquake_state,mquake)
  *
  *************************************/
 
-static const legacy_mos6526_interface cia_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_0_irq),                                    /* irq_func */
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("CIA0PORTA"),
-	DEVCB_DRIVER_MEMBER(mquake_state,mquake_cia_0_porta_w),    /* port A */
-	DEVCB_DRIVER_MEMBER(mquake_state,mquake_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(mquake_state,mquake_cia_0_portb_w) /* port B */
-};
-
-static const legacy_mos6526_interface cia_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_1_irq),                                    /* irq_func */
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( mquake, mquake_state )
 
 	/* basic machine hardware */
@@ -418,11 +394,18 @@ static MACHINE_CONFIG_START( mquake, mquake_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 
 	/* cia */
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_0_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(mquake_state,mquake_cia_0_porta_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(mquake_state,mquake_cia_0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(mquake_state,mquake_cia_0_portb_w))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
 
 	/* fdc */
-	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 MACHINE_CONFIG_END
 
 

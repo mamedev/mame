@@ -4,12 +4,14 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
-#define MCFG_AMIGA_FDC_ADD(_tag, _clock)    \
-	MCFG_DEVICE_ADD(_tag, AMIGA_FDC, _clock)
+#define MCFG_AMIGA_FDC_INDEX_CALLBACK(_write) \
+	devcb = &amiga_fdc::set_index_wr_callback(*device, DEVCB2_##_write);
 
 class amiga_fdc : public device_t {
 public:
 	amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_index_wr_callback(device_t &device, _Object object) { return downcast<amiga_fdc &>(device).m_write_index.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER(ciaaprb_w);
 
@@ -72,6 +74,8 @@ private:
 		int bit_counter;
 		pll_t pll;
 	};
+
+	devcb2_write_line m_write_index;
 
 	floppy_image_device *floppy;
 	floppy_image_device *floppy_devices[4];

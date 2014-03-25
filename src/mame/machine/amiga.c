@@ -340,7 +340,8 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 		amiga_custom_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
-		mos6526_tod_w(m_cia_0, 1);
+		m_cia_0->tod_w(1);
+		m_cia_0->tod_w(0);
 
 		/* call the system-specific callback */
 		if (m_intf->scanline0_callback != NULL)
@@ -348,7 +349,8 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 	}
 
 	/* on every scanline, clock the second CIA TOD */
-	mos6526_tod_w(m_cia_1, 1);
+	m_cia_1->tod_w(1);
+	m_cia_1->tod_w(0);
 
 	/* render up to this scanline */
 	if (!m_screen->update_partial(scanline))
@@ -1044,7 +1046,7 @@ READ16_MEMBER( amiga_state::amiga_cia_r )
 	amiga_state *state = space.machine().driver_data<amiga_state>();
 	UINT8 data;
 	int shift;
-	device_t *cia;
+	legacy_mos6526_device *cia;
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1061,7 +1063,7 @@ READ16_MEMBER( amiga_state::amiga_cia_r )
 	}
 
 	/* handle the reads */
-	data = mos6526_r(cia, space, offset >> 7);
+	data = cia->read(space, offset >> 7);
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", space.device().safe_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
@@ -1080,7 +1082,7 @@ READ16_MEMBER( amiga_state::amiga_cia_r )
 WRITE16_MEMBER( amiga_state::amiga_cia_w )
 {
 	amiga_state *state = space.machine().driver_data<amiga_state>();
-	device_t *cia;
+	legacy_mos6526_device *cia;
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", space.device().safe_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
@@ -1104,7 +1106,7 @@ WRITE16_MEMBER( amiga_state::amiga_cia_w )
 	}
 
 	/* handle the writes */
-	mos6526_w(cia, space, offset >> 7, (UINT8) data);
+	cia->write(space, offset >> 7, (UINT8) data);
 }
 
 
@@ -1458,8 +1460,8 @@ WRITE16_MEMBER( amiga_state::amiga_custom_w )
 				CUSTOM_REG(REG_SERDATR) &= ~0x8000;
 
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			if ( mos6526_irq_r( state->m_cia_0 ) ) data |= INTENA_PORTS;
-			if ( mos6526_irq_r( state->m_cia_1 ) ) data |= INTENA_EXTER;
+			if ( state->m_cia_0->irq_r() ) data |= INTENA_PORTS;
+			if ( state->m_cia_1->irq_r() ) data |= INTENA_EXTER;
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */

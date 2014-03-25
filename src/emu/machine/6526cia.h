@@ -1,4 +1,8 @@
 /**********************************************************************
+	
+	WARNING: DO NOT USE! WILL BE REMOVED IN FAVOR OF machine/mos6526.h
+
+**********************************************************************
 
     MOS 6526/8520 Complex Interface Adapter emulation
 
@@ -43,32 +47,32 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_LEGACY_MOS6526R1_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, LEGACY_MOS6526R1, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
+#define MCFG_MOS6526_TOD(_clock) \
+	legacy_mos6526_device::static_set_tod_clock(*device, _clock);
 
-#define MCFG_LEGACY_MOS6526R2_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, LEGACY_MOS6526R2, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
+#define MCFG_MOS6526_IRQ_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_LEGACY_MOS8520_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, LEGACY_MOS8520, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
+#define MCFG_MOS6526_CNT_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_LEGACY_MOS5710_ADD(_tag, _clock, _tod_clock, _config) \
-	MCFG_DEVICE_ADD(_tag, LEGACY_MOS5710, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	legacy_mos6526_device::static_set_tod_clock(*device, _tod_clock);
+#define MCFG_MOS6526_SP_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_sp_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_MOS6526_PA_INPUT_CALLBACK(_read) \
+	devcb = &legacy_mos6526_device::set_pa_rd_callback(*device, DEVCB2_##_read);
 
-#define LEGACY_MOS6526_INTERFACE(name) \
-	const legacy_mos6526_interface (name)=
+#define MCFG_MOS6526_PA_OUTPUT_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_pa_wr_callback(*device, DEVCB2_##_write);
 
-#define LEGACY_MOS8520_INTERFACE(name) \
-	const legacy_mos6526_interface (name)=
+#define MCFG_MOS6526_PB_INPUT_CALLBACK(_read) \
+	devcb = &legacy_mos6526_device::set_pb_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MOS6526_PB_OUTPUT_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_pb_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MOS6526_PC_CALLBACK(_write) \
+	devcb = &legacy_mos6526_device::set_pc_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -76,37 +80,24 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-
-// ======================> legacy_mos6526_interface
-
-struct legacy_mos6526_interface
-{
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_pc_cb;
-	devcb_write_line    m_out_cnt_cb;
-	devcb_write_line    m_out_sp_cb;
-
-	devcb_read8         m_in_pa_cb;
-	devcb_write8        m_out_pa_cb;
-
-	devcb_read8         m_in_pb_cb;
-	devcb_write8        m_out_pb_cb;
-};
-
-
-
 // ======================> legacy_mos6526_device
 
-class legacy_mos6526_device :  public device_t,
-						public legacy_mos6526_interface
+class legacy_mos6526_device :  public device_t
 {
-protected:
+public:
 	// construction/destruction
 	legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-public:
-	// inline configuration
-	static void static_set_tod_clock(device_t &device, int tod_clock);
+	static void static_set_tod_clock(device_t &device, int clock) { downcast<legacy_mos6526_device &>(device).m_tod_clock = clock; }
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_sp.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_read_pa.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pa_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_pa.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pb_rd_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_read_pb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_pb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<legacy_mos6526_device &>(device).m_write_pc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -119,30 +110,29 @@ public:
 	UINT8 pb_r(UINT8 offset) { return (m_port[1].m_latch | ~m_port[1].m_ddr); }
 
 	/* interrupt request */
-	UINT8 irq_r() { return m_irq; }
+	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
 
 	/* time of day clock */
-	void tod_w(UINT8 state) { if(state) clock_tod(); }
+	DECLARE_WRITE_LINE_MEMBER( tod_w ) { if(state) clock_tod(); }
 
 	/* serial counter */
-	UINT8 cnt_r() { return m_cnt; }
+	DECLARE_READ_LINE_MEMBER( cnt_r ) { return m_cnt; }
 	void cnt_w(UINT8 state);
 	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { cnt_w(state); }
 
 	/* serial port */
-	UINT8 sp_r() { return m_sp; }
-	void sp_w(UINT8 state) { m_sp = state; }
-	DECLARE_WRITE_LINE_MEMBER( sp_w ) { sp_w(state); }
+	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
+	DECLARE_WRITE_LINE_MEMBER( sp_w ) { m_sp = state; }
 
 	/* flag */
 	void flag_w(UINT8 state);
+	DECLARE_WRITE_LINE_MEMBER( flag_w ) { flag_w(state); }
 
 	/* port mask */
 	void set_port_mask_value(int port, int data);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load() { }
@@ -186,19 +176,22 @@ private:
 
 	struct cia_port
 	{
+	public:
 		UINT8       m_ddr;
 		UINT8       m_latch;
 		UINT8       m_in;
 		UINT8       m_out;
-		devcb_resolved_read8    m_read;
-		devcb_resolved_write8   m_write;
 		UINT8       m_mask_value; /* in READ operation the value can be forced by a extern electric circuit */
 	};
 
-	devcb_resolved_write_line m_out_irq_func;
-	devcb_resolved_write_line m_out_pc_func;
-	devcb_resolved_write_line m_out_cnt_func;
-	devcb_resolved_write_line m_out_sp_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_pc;
+	devcb2_write_line   m_write_cnt;
+	devcb2_write_line   m_write_sp;
+	devcb2_read8        m_read_pa;
+	devcb2_write8       m_write_pa;
+	devcb2_read8        m_read_pb;
+	devcb2_write8       m_write_pb;
 
 	cia_port        m_port[2];
 	cia_timer       m_timer[2];
@@ -255,38 +248,16 @@ public:
 
 
 // device type definition
-extern const device_type LEGACY_MOS6526R1;
-extern const device_type LEGACY_MOS6526R2;
-extern const device_type LEGACY_MOS8520;
-extern const device_type LEGACY_MOS5710;
+extern const ATTR_DEPRECATED device_type LEGACY_MOS6526R1;
+extern const ATTR_DEPRECATED device_type LEGACY_MOS6526R2;
+extern const ATTR_DEPRECATED device_type LEGACY_MOS8520;
+extern const ATTR_DEPRECATED device_type LEGACY_MOS5710;
 
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* register access */
-DECLARE_READ8_DEVICE_HANDLER( mos6526_r );
-DECLARE_WRITE8_DEVICE_HANDLER( mos6526_w );
-
-/* port access */
-DECLARE_READ8_DEVICE_HANDLER( mos6526_pa_r );
-DECLARE_READ8_DEVICE_HANDLER( mos6526_pb_r );
-
-/* interrupt request */
-READ_LINE_DEVICE_HANDLER( mos6526_irq_r );
-
-/* time of day clock */
-WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w );
-
-/* serial counter */
-READ_LINE_DEVICE_HANDLER( mos6526_cnt_r );
-WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w );
-
-/* serial port */
-READ_LINE_DEVICE_HANDLER( mos6526_sp_r );
-WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
 
 /* port mask */
 void cia_set_port_mask_value(device_t *device, int port, int data);

@@ -77,29 +77,30 @@ inline attotime legacy_mos6526_device::cycles_to_time(int c)
 //-------------------------------------------------
 
 legacy_mos6526_device::legacy_mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_write_irq(*this),
+		m_write_pc(*this),
+		m_write_cnt(*this),
+		m_write_sp(*this),
+		m_read_pa(*this),
+		m_write_pa(*this),
+		m_read_pb(*this),
+		m_write_pb(*this),
+		m_tod_clock(0)
 {
 }
 
 legacy_mos6526r1_device::legacy_mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "MOS6526r1", tag, owner, clock, "legacy_mos6526r1", __FILE__) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R1, "LEGACY_MOS6526R1", tag, owner, clock, "legacy_mos6526r1", __FILE__) { }
 
 legacy_mos6526r2_device::legacy_mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "MOS6526r2", tag, owner, clock, "legacy_mos6526r2", __FILE__) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "LEGACY_MOS6526R2", tag, owner, clock, "legacy_mos6526r2", __FILE__) { }
 
 legacy_mos8520_device::legacy_mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock, "legacy_mos8520", __FILE__) { }
 
 legacy_mos5710_device::legacy_mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock, "legacy_mos5710", __FILE__) { }
-
-
-void legacy_mos6526_device::static_set_tod_clock(device_t &device, int tod_clock)
-{
-	legacy_mos6526_device &cia = dynamic_cast<legacy_mos6526_device &>(device);
-
-	cia.m_tod_clock = tod_clock;
-}
 
 
 //-------------------------------------------------
@@ -149,52 +150,25 @@ void legacy_mos6526_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void legacy_mos6526_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const legacy_mos6526_interface *intf = reinterpret_cast<const legacy_mos6526_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<legacy_mos6526_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-		memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
-		memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void legacy_mos6526_device::device_start()
 {
+	// resolve callbacks
+	m_write_irq.resolve_safe();
+	m_write_pc.resolve_safe();
+	m_write_cnt.resolve_safe();
+	m_write_sp.resolve_safe();
+	m_read_pa.resolve_safe(0xff);
+	m_write_pa.resolve_safe();
+	m_read_pb.resolve_safe(0xff);
+	m_write_pb.resolve_safe();
+
 	/* clear out CIA structure, and copy the interface */
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_pc_func.resolve(m_out_pc_cb, *this);
-	m_out_cnt_func.resolve(m_out_cnt_cb, *this);
-	m_out_sp_func.resolve(m_out_sp_cb, *this);
 	m_flag = 1;
 
 	/* setup ports */
-	m_port[0].m_read.resolve(m_in_pa_cb, *this);
-	m_port[0].m_write.resolve(m_out_pa_cb, *this);
-	m_port[1].m_read.resolve(m_in_pb_cb, *this);
-	m_port[1].m_write.resolve(m_out_pb_cb, *this);
-
 	for (int p = 0; p < (sizeof(m_port) / sizeof(m_port[0])); p++)
 	{
 		m_port[p].m_mask_value = 0xff;
@@ -263,7 +237,7 @@ void legacy_mos6526_device::device_timer(emu_timer &timer, device_timer_id id, i
 	switch (id)
 	{
 	case TIMER_PC:
-		m_out_pc_func(1);
+		m_write_pc(1);
 		break;
 
 	case TIMER_TOD:
@@ -288,7 +262,7 @@ void legacy_mos6526_device::set_port_mask_value(int port, int data)
 
 void legacy_mos6526_device::update_pc()
 {
-	m_out_pc_func(0);
+	m_write_pc(0);
 
 	m_pc_timer->adjust(cycles_to_time(1));
 }
@@ -316,7 +290,7 @@ void legacy_mos6526_device::update_interrupts()
 	if (m_irq != new_irq)
 	{
 		m_irq = new_irq;
-		m_out_irq_func(m_irq);
+		m_write_irq(m_irq);
 	}
 }
 
@@ -389,11 +363,11 @@ void legacy_mos6526_device::timer_underflow(int timer)
 
 					/* transmit MSB */
 					m_sp = BIT(m_serial, 7);
-					m_out_sp_func(m_sp);
+					m_write_sp(m_sp);
 
 					/* toggle CNT */
 					m_cnt = !m_cnt;
-					m_out_cnt_func(m_cnt);
+					m_write_cnt(m_cnt);
 
 					/* shift data */
 					m_serial <<= 1;
@@ -410,7 +384,7 @@ void legacy_mos6526_device::timer_underflow(int timer)
 				{
 					/* toggle CNT */
 					m_cnt = !m_cnt;
-					m_out_cnt_func(m_cnt);
+					m_write_cnt(m_cnt);
 
 					if (m_shift == 8)
 					{
@@ -609,7 +583,7 @@ UINT8 legacy_mos6526_device::reg_r(UINT8 offset)
 		case CIA_PRA:
 		case CIA_PRB:
 			port = &m_port[offset & 1];
-			data = port->m_read(0);
+			data = (offset & 1) ? m_read_pb(0) : m_read_pa(0);
 			data = ((data & ~port->m_ddr) | (port->m_latch & port->m_ddr)) & port->m_mask_value;
 
 			port->m_in = data;
@@ -749,7 +723,10 @@ void legacy_mos6526_device::reg_w(UINT8 offset, UINT8 data)
 			port = &m_port[offset & 1];
 			port->m_latch = data;
 			port->m_out = (data & port->m_ddr) | (port->m_in & ~port->m_ddr);
-			port->m_write(0, port->m_out);
+			if (offset & 1)
+				m_write_pb((offs_t)0, port->m_out);
+			else
+				m_write_pa((offs_t)0, port->m_out);
 
 			/* pulse /PC following the write */
 			if (offset == CIA_PRB)

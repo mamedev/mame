@@ -390,12 +390,10 @@ WRITE32_MEMBER(a1200_state::aga_overlay_w)
 
 WRITE8_MEMBER(a1200_state::ami1200_cia_0_porta_w)
 {
-	device_t *device = machine().device("cia_0");
-
 	/* bit 2 = Power Led on Amiga */
 	output_set_value("audio_led", !BIT(data, 1));
 
-	handle_cd32_joystick_cia(this, data, mos6526_r(device, space, 2));
+	handle_cd32_joystick_cia(this, data, m_cia_0->read(space, 2));
 }
 
 /*************************************
@@ -503,66 +501,6 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 	/* initialize the cdrom controller */
 	MACHINE_RESET_CALL_LEGACY( amigacd );
 }
-
-static const legacy_mos6526_interface cia_0_ntsc_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
-};
-
-static const legacy_mos6526_interface cia_0_pal_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
-};
-
-static const legacy_mos6526_interface cia_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_1_irq),                            /* irq_func */
-	DEVCB_NULL,                                             /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_1_porta_r),
-	DEVCB_NULL,                                             /* port A */
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("fdc", amiga_fdc, ciaaprb_w)        /* port B */
-};
-
-static const legacy_mos6526_interface cia_0_cdtv_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_cdtv_portA_r),
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
-};
-
-static const legacy_mos6526_interface cia_1_cdtv_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_1_irq),                            /* irq_func */
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_1_porta_r),
-	DEVCB_NULL,                                             /* port A */
-	DEVCB_NULL,
-	DEVCB_NULL                                              /* port B */
-};
 
 static const tpi6525_interface cdtv_tpi_intf =
 {
@@ -673,11 +611,21 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 60, cia_0_ntsc_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_TOD(60)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_0_portA_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, amiga_cia_0_portA_w))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_1_porta_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc, ciaaprb_w))
 
 	/* fdc */
-	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
@@ -694,6 +642,9 @@ static MACHINE_CONFIG_DERIVED( a1000ntsc, ntsc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500ntsc, ntsc )
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_MOS6526_TOD(0)
+
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
@@ -735,15 +686,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( cdtv, ntsc, cdtv_state)
 
 	MCFG_TPI6525_ADD("tpi6525", cdtv_tpi_intf)
 
-	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_LEGACY_MOS8520_ADD("cia_0", CDTV_CLOCK_X1 / 4 / 40, 0, cia_0_cdtv_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", CDTV_CLOCK_X1 / 4 / 40, 0, cia_1_cdtv_intf)
-
-	/* fdc */
-	MCFG_DEVICE_MODIFY("fdc")
-	MCFG_DEVICE_CLOCK(CDTV_CLOCK_X1 / 4)
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_MOS6526_TOD(0) // connected to vsync
 MACHINE_CONFIG_END
 
 
@@ -762,10 +706,11 @@ static MACHINE_CONFIG_DERIVED( pal, ntsc )
 //  MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
 
 	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, 50, cia_0_pal_intf)
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_PAL_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_DEVICE_CLOCK(AMIGA_68000_PAL_CLOCK / 10)
+	MCFG_MOS6526_TOD(50)
+	MCFG_DEVICE_MODIFY("cia_1")
+	MCFG_DEVICE_CLOCK(AMIGA_68000_PAL_CLOCK / 10)
 
 	/* fdc */
 	MCFG_DEVICE_MODIFY("fdc")
@@ -773,6 +718,9 @@ static MACHINE_CONFIG_DERIVED( pal, ntsc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500p, pal )
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_MOS6526_TOD(0) // connected to vsync
+
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
@@ -882,11 +830,20 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK /2 / 10, 60, cia_0_ntsc_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK /2 / 10, 0, cia_1_intf)
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68EC020_NTSC_CLOCK /2 / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_0_portA_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, amiga_cia_0_portA_w))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68EC020_NTSC_CLOCK /2 / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_1_porta_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc, ciaaprb_w))
 
 	/* fdc */
-	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68EC020_NTSC_CLOCK / 2)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68EC020_NTSC_CLOCK / 2)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
@@ -992,11 +949,21 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
 	/* cia */
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 60, cia_0_ntsc_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_TOD(60) // jumper selectable TICK or VSYNC
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_MOS6526_PC_CALLBACK(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_0_portA_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(amiga_state, amiga_cia_0_portA_w))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(amiga_state, amiga_cia_1_porta_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(DEVWRITE8("fdc", amiga_fdc, ciaaprb_w))
 
 	/* fdc */
-	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amiga_floppies, "35dd", amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amiga_floppies, 0,      amiga_fdc::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", amiga_floppies, 0,      amiga_fdc::floppy_formats)
@@ -1021,10 +988,11 @@ static MACHINE_CONFIG_DERIVED( a3000, a3000n )
 //  MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 312-1)
 
 	/* cia */
-	MCFG_DEVICE_REMOVE("cia_0")
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_PAL_CLOCK / 10, 50, cia_0_pal_intf)
-	MCFG_DEVICE_REMOVE("cia_1")
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_PAL_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_MODIFY("cia_0")
+	MCFG_DEVICE_CLOCK(AMIGA_68000_PAL_CLOCK / 10)
+	MCFG_MOS6526_TOD(50) // jumper selectable TICK or VSYNC
+	MCFG_DEVICE_MODIFY("cia_1")
+	MCFG_DEVICE_CLOCK(AMIGA_68000_PAL_CLOCK / 10)
 
 	/* fdc */
 	MCFG_DEVICE_MODIFY("fdc")
@@ -1045,11 +1013,6 @@ READ8_MEMBER( amiga_state::amiga_cia_0_portA_r )
 	return ret;
 }
 
-
-READ8_MEMBER( amiga_state::amiga_cia_0_cdtv_portA_r )
-{
-	return space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;    /* Gameport 1 and 0 buttons */
-}
 
 
 WRITE8_MEMBER( amiga_state::amiga_cia_0_portA_w )
