@@ -33,34 +33,14 @@ const device_type I8212 = &device_creator<i8212_device>;
 //  i8212_device - constructor
 //-------------------------------------------------
 
-i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8212, "Intel 8212", tag, owner, clock, "i8212", __FILE__),
-		m_md(I8212_MODE_INPUT),
-		m_stb(0)
+i8212_device::i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, I8212, "I8212", tag, owner, clock, "i8212", __FILE__),
+	m_write_irq(*this),
+	m_read_di(*this),
+	m_write_do(*this),
+	m_md(I8212_MODE_INPUT),
+	m_stb(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8212_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8212_interface *intf = reinterpret_cast<const i8212_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8212_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_in_di_cb, 0, sizeof(m_in_di_cb));
-		memset(&m_out_do_cb, 0, sizeof(m_out_do_cb));
-	}
 }
 
 
@@ -71,9 +51,9 @@ void i8212_device::device_config_complete()
 void i8212_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_in_di_func.resolve(m_in_di_cb, *this);
-	m_out_do_func.resolve(m_out_do_cb, *this);
+	m_write_irq.resolve_safe();
+	m_read_di.resolve_safe(0);
+	m_write_do.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_md));
@@ -93,19 +73,19 @@ void i8212_device::device_reset()
 	if (m_md == I8212_MODE_OUTPUT)
 	{
 		// output data
-		m_out_do_func(0, m_data);
+		m_write_do((offs_t)0, m_data);
 	}
 }
 
 
 //-------------------------------------------------
-//  data_r - data latch read
+//  read - data latch read
 //-------------------------------------------------
 
-READ8_MEMBER( i8212_device::data_r )
+READ8_MEMBER( i8212_device::read )
 {
 	// clear interrupt line
-	m_out_int_func(CLEAR_LINE);
+	m_write_irq(CLEAR_LINE);
 
 	if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), CLEAR_LINE);
 
@@ -114,16 +94,16 @@ READ8_MEMBER( i8212_device::data_r )
 
 
 //-------------------------------------------------
-//  data_w - data latch write
+//  write - data latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8212_device::data_w )
+WRITE8_MEMBER( i8212_device::write )
 {
 	// latch data
 	m_data = data;
 
 	// output data
-	m_out_do_func(0, m_data);
+	m_write_do((offs_t)0, m_data);
 }
 
 
@@ -152,10 +132,10 @@ WRITE_LINE_MEMBER( i8212_device::stb_w )
 		if (m_stb && !state)
 		{
 			// input data
-			m_data = m_in_di_func(0);
+			m_data = m_read_di(0);
 
 			// assert interrupt line
-			m_out_int_func(ASSERT_LINE);
+			m_write_irq(ASSERT_LINE);
 
 			if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), ASSERT_LINE);
 		}

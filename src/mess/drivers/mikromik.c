@@ -105,7 +105,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 4:
-			data = m_iop->data_r(space, 0);
+			data = m_iop->read(space, 0);
 			break;
 
 		case 5:
@@ -174,7 +174,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 4:
-			m_iop->data_w(space, 0, data);
+			m_iop->write(space, 0, data);
 			break;
 
 		case 5:
@@ -485,13 +485,6 @@ READ8_MEMBER( mm1_state::kb_r )
 	return m_keydata;
 }
 
-static I8212_INTERFACE( iop_intf )
-{
-	DEVCB_CPU_INPUT_LINE(I8085A_TAG, I8085_RST65_LINE),
-	DEVCB_DRIVER_MEMBER(mm1_state, kb_r),
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  I8237_INTERFACE( dmac_intf )
@@ -709,7 +702,10 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// peripheral hardware
-	MCFG_I8212_ADD(I8212_TAG, iop_intf)
+	MCFG_DEVICE_ADD(I8212_TAG, I8212, 0)
+	MCFG_I8212_IRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
+	MCFG_I8212_DI_CALLBACK(READ8(mm1_state, kb_r))
+
 	MCFG_I8237_ADD(I8237_TAG, XTAL_6_144MHz/2, dmac_intf)
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
