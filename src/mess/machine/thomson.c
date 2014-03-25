@@ -18,7 +18,7 @@
 #define VERBOSE_KBD   0  /* TO8 / TO9 / TO9+ keyboard */
 #define VERBOSE_BANK  0
 #define VERBOSE_VIDEO 0  /* video & lightpen */
-#define VERBOSE_IO    1  /* serial & parallel I/O */
+#define VERBOSE_IO    0  /* serial & parallel I/O */
 #define VERBOSE_MIDI  0
 
 #define PRINT(x) mame_printf_info x
@@ -4119,8 +4119,8 @@ MACHINE_START_MEMBER( thomson_state, to9p )
 	membank( THOM_CART_BANK )->configure_entries( 0,  8, mem + 0x10000, 0x4000 );
 	membank( THOM_CART_BANK )->configure_entries( 8, 32, ram, 0x4000 );
 	membank( THOM_VRAM_BANK )->configure_entries( 0,  2, ram, 0x2000 );
-	membank( TO8_SYS_LO )->configure_entry( 0,  ram + 0x6000);
-	membank( TO8_SYS_HI )->configure_entry( 0,  ram + 0x4000);
+	membank( TO8_SYS_LO )->configure_entry( 0,  ram + 0x6000 );
+	membank( TO8_SYS_HI )->configure_entry( 0,  ram + 0x4000 );
 	membank( TO8_DATA_LO )->configure_entries( 0, 32, ram + 0x2000, 0x4000 );
 	membank( TO8_DATA_HI )->configure_entries( 0, 32, ram + 0x0000, 0x4000 );
 	membank( TO8_BIOS_BANK )->configure_entries( 0,  2, mem + 0x30800, 0x2000 );
@@ -4196,8 +4196,6 @@ void thomson_state::mo6_update_cart_bank()
 	int bank = 0;
 	int bank_is_read_only = 0;
 
-	// space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
-
 	if ( ( ( m_to8_reg_sys1 & 0x40 ) && ( m_to8_reg_cart & 0x20 ) ) || ( ! ( m_to8_reg_sys1 & 0x40 ) && ( m_mo5_reg_cart & 4 ) ) )
 	{
 		/* RAM space */
@@ -4213,14 +4211,16 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if (m_old_cart_bank < 8 || m_old_cart_bank > 11)
 					{
-						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+						space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+						space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 						if ( bank_is_read_only )
 						{
 							space.nop_write( 0xb000, 0xefff);
 						}
 						else
 						{
-							space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::to8_vcart_w),this));
+							space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
+							space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
 						}
 					}
 				}
@@ -4230,12 +4230,14 @@ void thomson_state::mo6_update_cart_bank()
 					{
 						if ( bank_is_read_only )
 						{
-							space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
-							space.nop_write( 0xb000, 0xefff);
+                                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+                                                        space.nop_write( 0xb000, 0xefff);
 						}
 						else
 						{
-							space.install_readwrite_bank( 0xb000, 0xefff,THOM_CART_BANK);
+							space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                        space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 						}
 					}
 				}
@@ -4253,11 +4255,14 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if (m_to8_cart_vpage < 4)
 					{
-						space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::to8_vcart_w),this));
+                                                space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
+                                                space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
+
 					}
 					else
 					{
-						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK );
+                                                space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 					}
 				}
 				LOG_BANK(( "mo6_update_cart_bank: update CART bank %i write status to %s\n",
@@ -4274,7 +4279,8 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 				{
-					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.nop_write( 0xb000, 0xefff);
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
@@ -4292,12 +4298,14 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if ( bank_is_read_only )
 					{
-						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                                space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 						space.nop_write( 0xb000, 0xefff);
 					}
 					else
 					{
-						space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                                space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 					}
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n",
@@ -4308,12 +4316,14 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( bank_is_read_only )
 				{
-					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.nop_write( 0xb000, 0xefff);
 				}
 				else
 				{
-					space.install_readwrite_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                        space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                        space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 				}
 				LOG_BANK(( "mo5_update_cart_bank: update CART bank %i write status to %s\n",
 											m_to8_cart_vpage,
@@ -4340,7 +4350,8 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( m_old_cart_bank < 4 || m_old_cart_bank > 7 )
 				{
-					space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK);
+                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
@@ -4354,9 +4365,10 @@ void thomson_state::mo6_update_cart_bank()
 				bank = m_thom_cart_bank % m_thom_cart_nb_banks;
 				if ( bank != m_old_cart_bank )
 				{
-					if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
+                                  if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 					{
-						space.install_read_bank( 0xb000, 0xefff, THOM_CART_BANK );
+                                                space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+                                                space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 						space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
 						space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(FUNC(thomson_state::mo6_cartridge_r),this) );
 					}
@@ -4375,7 +4387,8 @@ void thomson_state::mo6_update_cart_bank()
 	}
 	if ( bank != m_old_cart_bank )
 		{
-		membank( THOM_CART_BANK )->set_entry( bank );
+		membank( MO6_CART_LO )->set_entry( bank );
+		membank( MO6_CART_HI )->set_entry( bank );
 		membank( TO8_BIOS_BANK )->set_entry( b );
 		m_old_cart_bank = bank;
 	}
@@ -4802,17 +4815,22 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 	m_thom_cart_bank = 0;
 	m_mo5_reg_cart = 0;
 	m_thom_vram = ram;
-	membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 8, 8, ram, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 8, 8, ram + 0x3000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 0, 4, mem + 0x10000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 4, 2, mem + 0x1f000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 6, 2, mem + 0x28000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 8, 8, ram, 0x4000 );
 	membank( THOM_VRAM_BANK )->configure_entries( 0, 2, ram, 0x2000 );
 	membank( TO8_SYS_LO )->configure_entry( 0, ram + 0x6000);
 	membank( TO8_SYS_HI )->configure_entry( 0, ram + 0x4000);
 	membank( TO8_DATA_LO )->configure_entries( 0, 8, ram + 0x2000, 0x4000 );
 	membank( TO8_DATA_HI )->configure_entries( 0, 8, ram + 0x0000, 0x4000 );
 	membank( TO8_BIOS_BANK )->configure_entries( 0, 2, mem + 0x23000, 0x4000 );
-	membank( THOM_CART_BANK )->set_entry( 0 );
+	membank( MO6_CART_LO )->set_entry( 0 );
+	membank( MO6_CART_HI )->set_entry( 0 );
 	membank( THOM_VRAM_BANK )->set_entry( 0 );
 	membank( TO8_SYS_LO )->set_entry( 0 );
 	membank( TO8_SYS_HI )->set_entry( 0 );
@@ -5025,17 +5043,23 @@ MACHINE_START_MEMBER( thomson_state, mo5nr )
 	m_thom_cart_bank = 0;
 	m_mo5_reg_cart = 0;
 	m_thom_vram = ram;
-	membank( THOM_CART_BANK )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
-	membank( THOM_CART_BANK )->configure_entries( 8, 8, ram, 0x4000 );
+
+	membank( MO6_CART_LO )->configure_entries( 0, 4, mem + 0x10000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 4, 2, mem + 0x1f000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 6, 2, mem + 0x28000, 0x4000 );
+	membank( MO6_CART_LO )->configure_entries( 8, 8, ram + 0x3000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 0, 4, mem + 0x10000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 4, 2, mem + 0x1f000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 6, 2, mem + 0x28000 + 0x1000, 0x4000 );
+	membank( MO6_CART_HI )->configure_entries( 8, 8, ram, 0x4000 );
 	membank( THOM_VRAM_BANK )->configure_entries( 0, 2, ram, 0x2000 );
 	membank( TO8_SYS_LO )->configure_entry( 0, ram + 0x6000);
 	membank( TO8_SYS_HI )->configure_entry( 0, ram + 0x4000);
 	membank( TO8_DATA_LO )->configure_entries( 0, 8, ram + 0x2000, 0x4000 );
 	membank( TO8_DATA_HI )->configure_entries( 0, 8, ram + 0x0000, 0x4000 );
 	membank( TO8_BIOS_BANK )->configure_entries( 0, 2, mem + 0x23000, 0x4000 );
-	membank( THOM_CART_BANK )->set_entry( 0 );
+	membank( MO6_CART_LO )->set_entry( 0 );
+	membank( MO6_CART_HI )->set_entry( 0 );
 	membank( THOM_VRAM_BANK )->set_entry( 0 );
 	membank( TO8_SYS_LO )->set_entry( 0 );
 	membank( TO8_SYS_HI )->set_entry( 0 );

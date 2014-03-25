@@ -53,6 +53,8 @@
 #define TO8_DATA_LO     "bank7" /* data RAM low 2 Kb */
 #define TO8_DATA_HI     "bank8" /* data RAM hi 2 Kb */
 #define TO8_BIOS_BANK   "bank9" /* BIOS ROM */
+#define MO6_CART_LO     "bank10"
+#define MO6_CART_HI     "bank11"
 
 
 /* original screen dimension (may be different from emulated screen!) */
@@ -249,6 +251,8 @@ public:
 	DECLARE_WRITE8_MEMBER( to8_data_lo_w );
 	DECLARE_WRITE8_MEMBER( to8_data_hi_w );
 	DECLARE_WRITE8_MEMBER( to8_vcart_w );
+	DECLARE_WRITE8_MEMBER( mo6_vcart_lo_w );
+	DECLARE_WRITE8_MEMBER( mo6_vcart_hi_w );
 	TIMER_CALLBACK_MEMBER( thom_set_init );
 	void to770_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
 	void mo5_scandraw_16( UINT8* vram, UINT16* dst, UINT16* pal, int org, int len );
