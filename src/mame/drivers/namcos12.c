@@ -1562,10 +1562,10 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 
 	MCFG_CPU_ADD("sub", H83002, 16737350 )
-	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)
-	MCFG_CPU_IO_MAP( s12h8iomap)
+	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
+	MCFG_CPU_IO_MAP(s12h8iomap)
 
-	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
@@ -1579,8 +1579,9 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_DEVICE_MODIFY("sub:sci1")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
-
 	
+	MCFG_AT28C16_ADD("at28c16", NULL)
+
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
 	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos12_state::namcos12_sub_irq ), (namcos12_state *) owner ) )
@@ -1593,8 +1594,6 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
-
-	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )

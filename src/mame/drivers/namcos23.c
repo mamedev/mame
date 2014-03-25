@@ -1235,10 +1235,10 @@ Notes:
 #include "machine/rtc4543.h"
 #include "machine/namco_settings.h"
 
-#define S23_BUSCLOCK    (66664460/2)    /* 33MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal */
-#define S23_H8CLOCK     (16737350)
-#define S23_JVSCLOCK    (14745600)
-#define S23_C352CLOCK   (24576000)      /* measured at 25.992MHz from 2061 pin 9 (but that sounds too highpitched) */
+#define S23_JVSCLOCK    (XTAL_14_7456MHz)
+#define S23_H8CLOCK     (16737350)      /* from 2061 */
+#define S23_BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
+#define S23_C352CLOCK   (16737350*1.5)  /* measured at 25.992MHz from 2061 pin 9 (but that sounds too highpitched) */
 #define S23_VSYNC1      (59.8824)
 #define S23_VSYNC2      (59.915)
 #define S23_HSYNC       (16666150)
@@ -3304,13 +3304,13 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(gorgon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, s23_interrupt)
 
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-// Timer at 115200*16 for the jvs serial clock, extra *2 to have both edges
+	// Timer at 115200*16 for the jvs serial clock, extra *2 to have both edges
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
 	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
@@ -3337,6 +3337,9 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3346,8 +3349,6 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_SCREEN_VBLANK_DRIVER(namcos23_state, namcos23_sub_irq)
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
 
@@ -3370,12 +3371,12 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, s23_interrupt)
 
-	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK*2 )
+	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, irq1_line_pulse)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
@@ -3403,6 +3404,9 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3414,8 +3418,6 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3430,17 +3432,20 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gmen, s23 )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(S23_BUSCLOCK*5)
 	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen_sh2", SH2, 28700000)
+	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL_28_7MHz)
 	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
@@ -3453,12 +3458,12 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MCFG_CPU_CONFIG(r4650_config)
 	MCFG_CPU_PROGRAM_MAP(s23_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  s23_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, s23_interrupt)
 
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state,  irq1_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, irq1_line_pulse)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
@@ -3477,6 +3482,9 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
@@ -3488,8 +3496,6 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos23)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(namcos23_state,s23)
 
@@ -3504,6 +3510,8 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
+
+	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 	MCFG_CPU_IO_MAP( s23iobrdiomap )
@@ -3515,6 +3523,8 @@ static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
+
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(S23_BUSCLOCK*6)
 
