@@ -767,18 +767,14 @@ MACHINE_START_MEMBER(sms_state,sms)
 	{
 		m_mainram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 		save_pointer(NAME(m_mainram), 0x2000);
-	}
 
-	// alibaba and blockhol are ports of games for the MSX system. The
-	// MSX bios usually initializes callback "vectors" at the top of RAM.
-	// The code in alibaba does not do this so the IRQ vector only contains
-	// the "call $4010" without a following RET statement. That is basically
-	// a bug in the program code. The only way this cartridge could have run
-	// successfully on a real unit is if the RAM would be initialized with
-	// a F0 pattern on power up; F0 = RET P. Do that only for consoles of
-	// Japan region (including Korea), until confirmed on other consoles.
-	if (m_is_region_japan)
-	{
+		// alibaba and blockhol are ports of games for the MSX system. The
+		// MSX bios usually initializes callback "vectors" at the top of RAM.
+		// The code in alibaba does not do this so the IRQ vector only contains
+		// the "call $4010" without a following RET statement. That is basically
+		// a bug in the program code. The only way this cartridge could have run
+		// successfully on a real unit is if the RAM would be initialized with
+		// a F0 pattern on power up; F0 = RET P.
 		memset(m_mainram, 0xf0, 0x2000);
 	}
 
@@ -900,7 +896,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 	// each slot of the pair, to enable the first where a ROM was found?
 
 	slottype = data & 0x08;
-	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot );
+	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
 

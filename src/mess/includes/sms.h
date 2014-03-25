@@ -198,11 +198,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 	DECLARE_DRIVER_INIT(smssdisp);
 
-	DECLARE_READ8_MEMBER(store_read_0000);
-	DECLARE_READ8_MEMBER(store_read_4000);
-	DECLARE_READ8_MEMBER(store_read_8000);
 	DECLARE_READ8_MEMBER(store_cart_peek);
-	DECLARE_WRITE8_MEMBER(store_write_cart);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };
