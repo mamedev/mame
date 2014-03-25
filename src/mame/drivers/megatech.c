@@ -507,14 +507,23 @@ WRITE8_MEMBER(mtech_state::megatech_bios_port_7f_w)
 }
 
 
+READ8_MEMBER(mtech_state::vdp1_count_r)
+{
+	address_space &prg = m_bioscpu->space(AS_PROGRAM);
+	if (offset & 0x01)
+		return m_vdp1->hcount_read(prg, offset);
+	else
+		return m_vdp1->vcount_read(prg, offset);
+}
 
 static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(megatech_bios_port_7f_w)
 
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(sms_vcounter_r, megatech_bios_port_7f_w)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp1_count_r)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
 
 	AM_RANGE(0xdc, 0xdd) AM_READ(megatech_bios_joypad_r)  // player inputs
 ADDRESS_MAP_END
@@ -546,7 +555,17 @@ UINT32 mtech_state::screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bit
 	if (!m_current_game_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
-		m_vdp->screen_update(screen, bitmap, cliprect);
+	{
+//		m_vdp->screen_update(screen, bitmap, cliprect);
+		for (int y = 0; y < 224; y++)
+		{
+			UINT32* lineptr = &bitmap.pix32(y, 0);
+			UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+			
+			for (int x = 0; x < SEGA315_5124_WIDTH; x++)
+				lineptr[x] = srcptr[x];
+		}	
+	}
 	return 0;
 }
 

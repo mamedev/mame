@@ -504,6 +504,7 @@ public:
 	DECLARE_WRITE8_MEMBER( megatech_bios_port_ctrl_w );
 	DECLARE_READ8_MEMBER( megatech_bios_joypad_r );
 	DECLARE_WRITE8_MEMBER (megatech_bios_port_7f_w);
+	READ8_MEMBER(vdp1_count_r);
 	READ8_MEMBER(sms_count_r);
 	READ8_MEMBER(sms_ioport_dc_r);
 	READ8_MEMBER(sms_ioport_dd_r);
