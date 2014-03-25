@@ -510,10 +510,8 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 //  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
 //  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
 
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xc00010, 0xc0001f) AM_DEVWRITE8("snsnd", sn76496_base_device, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
-	AM_RANGE(0xd00010, 0xd0001f) AM_DEVWRITE8("snsnd", sn76496_base_device, write, 0x00ff)
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
