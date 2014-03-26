@@ -1508,10 +1508,27 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG( cbm3000 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( cbm3000, pet2001n )
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( cbm3008 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3008, pet2001n )
+static MACHINE_CONFIG_DERIVED( cbm3008, cbm3000 )
 	MCFG_FRAGMENT_ADD(8k)
 MACHINE_CONFIG_END
 
@@ -1520,7 +1537,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3016, pet2001n )
+static MACHINE_CONFIG_DERIVED( cbm3016, cbm3000 )
 	MCFG_FRAGMENT_ADD(16k)
 MACHINE_CONFIG_END
 
@@ -1529,7 +1546,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3032, pet2001n )
+static MACHINE_CONFIG_DERIVED( cbm3032, cbm3000 )
 	MCFG_FRAGMENT_ADD(32k)
 MACHINE_CONFIG_END
 
@@ -1576,6 +1593,16 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( cbm3032b, pet2001b )
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
+
 	MCFG_FRAGMENT_ADD(32k)
 MACHINE_CONFIG_END
 
@@ -1614,6 +1641,16 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( cbm4000, pet2001n )
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
+
 	MCFG_DEVICE_REMOVE("b000")
 MACHINE_CONFIG_END
 
@@ -1661,6 +1698,16 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( cbm4000b, pet2001b )
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
+
 	MCFG_DEVICE_REMOVE("b000")
 MACHINE_CONFIG_END
 
