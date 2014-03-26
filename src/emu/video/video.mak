@@ -363,17 +363,12 @@ ifneq ($(filter MOS6566,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/mos6566.o
 endif
 
-#-------------------------------------------------
-#
-#@src/emu/video/pc_cga.h,VIDEOS += PC_CGA
-#-------------------------------------------------
 
-ifneq ($(filter PC_CGA,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/cgapal.o
-endif
 
 #-------------------------------------------------
 #
+
 #@src/emu/video/pc_vga.h,VIDEOS += PC_VGA
 #-------------------------------------------------
 

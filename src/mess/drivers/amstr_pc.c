@@ -35,7 +35,8 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/pic8259.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_aga.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 
 #include "machine/pc_fdc.h"
 #include "bus/pc_joy/pc_joy.h"
@@ -125,11 +126,6 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pc200 )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, "Name/Language")
 	PORT_DIPSETTING(    0x00, "English/less checks" )
@@ -222,29 +218,45 @@ static SLOT_INTERFACE_START(amstr_com)
 	SLOT_INTERFACE("mousesys_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
+static const isa8bus_interface pc_isabus_intf =
+{
+	// interrupts
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
+
+	// dma request
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq3_w)
+};
+
 #define MCFG_CPU_PC(mem, port, type, clock, vblankfunc) \
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
 	MCFG_CPU_IO_MAP(port##_io)  \
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, vblankfunc, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", amstrad_pc_state, vblankfunc, attotime::from_hz(60))
 
 
-static const gfx_layout pc200_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	2048,                   /* 2048 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
-};
+// static const gfx_layout pc200_charlayout =
+// {
+	// 8, 16,                  /* 8 x 16 characters */
+	// 2048,                   /* 2048 characters */
+	// 1,                  /* 1 bits per pixel */
+	// { 0 },                  /* no bitplanes */
+	// /* x offsets */
+	// { 0, 1, 2, 3, 4, 5, 6, 7 },
+	// /* y offsets */
+	// { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	// 8*16                    /* every char takes 16 bytes */
+// };
 
-static GFXDECODE_START( pc200 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
-GFXDECODE_END
+// static GFXDECODE_START( pc200 )
+	// GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
+// GFXDECODE_END
 
 static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	/* basic machine hardware */
@@ -301,8 +313,8 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc200)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "aga", pc_isa8_cards, "aga_pc200", true)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -332,33 +344,12 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 MACHINE_CONFIG_END
 
 
-
-
-#if 0
-static const gfx_layout pc1512_charlayout =
-{
-	8, 8,                   /* 8 x 8 characters */
-	1024,                   /* 1024 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( pc1512 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1512_charlayout, 3, 1 )
-GFXDECODE_END
-#endif
-
 static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc512_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, pc_frame_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", amstrad_pc_state, pc_frame_interrupt, attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_pc_state,pc)
@@ -411,8 +402,8 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc200)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "aga", pc_isa8_cards, "aga_pc200", true)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -482,9 +473,6 @@ ROM_START( pc200 )
 	ROMX_LOAD("40185.ic129", 0xfc001, 0x2000, CRC(c2b4eeac) SHA1(f11015fadf0c16d86ce2c5047be3e6a4782044f7), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("40184.ic132", 0xfc000, 0x2000, CRC(b22704a6) SHA1(dadd573db6cd34f339f2f0ae55b07537924c024a), ROM_SKIP(1) | ROM_BIOS(3))
 	// also mapped to f0000, f4000, f8000
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("40109.ic159",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
-
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )
 ROM_END
@@ -501,8 +489,6 @@ ROM_START( pc20 )
 	ROM_LOAD16_BYTE("pc20v2.0", 0xfc001, 0x2000, CRC(41302eb8) SHA1(8b4b2afea543b96b45d6a30365281decc15f2932)) // v2
 	ROM_LOAD16_BYTE("pc20v2.1", 0xfc000, 0x2000, CRC(71b84616) SHA1(4135102a491b25fc659d70b957e07649f3eacf24)) // v2
 	// also mapped to f0000, f4000, f8000
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
 ROM_END
 
 
@@ -513,9 +499,6 @@ ROM_START( ppc512 )
 	ROM_LOAD16_BYTE("40107.v1", 0xfc000, 0x2000, CRC(4e37e769) SHA1(88be3d3375ec3b0a7041dbcea225b197e50d4bfe)) // v1.9
 	ROM_LOAD16_BYTE("40108.v1", 0xfc001, 0x2000, CRC(4f0302d9) SHA1(e4d69ca98c3b98f3705a2902b16746360043f039)) // v1.9
 	// also mapped to f0000, f4000, f8000
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
-
 	ROM_REGION( 0x800, "keyboard", 0 ) // PPC512 / PPC640 / PC200 102-key keyboard
 	ROM_LOAD( "40112.ic801", 0x000, 0x800, CRC(842a954c) SHA1(93ca6badf20e0215025fe109959eddead8c52f38) )
 ROM_END
@@ -528,9 +511,6 @@ ROM_START( ppc640 )
 	ROM_LOAD16_BYTE("40107.v2", 0xfc000, 0x2000, CRC(0785b63e) SHA1(4dbde6b9e9500298bb6241a8daefd85927f1ad28)) // v2.1
 	ROM_LOAD16_BYTE("40108.v2", 0xfc001, 0x2000, CRC(5351cf8c) SHA1(b4dbf11b39378ab4afd2107d3fe54a99fffdedeb)) // v2.1
 	// also mapped to f0000, f4000, f8000
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("40109.bin",     0x00000, 0x08000, CRC(a8b67639) SHA1(99663bfb61798526e092205575370c2ad34249a1))
-
 	ROM_REGION(0x2000,"subcpu", 0)
 	ROM_LOAD("40135.ic192", 0x00000, 0x2000, CRC(75d99199) SHA1(a76d39fda3d5140e1fb9ce70fcddbdfb8f891dc6))
 
@@ -545,8 +525,6 @@ ROM_START( pc2086 )
 	ROM_LOAD16_BYTE( "40179.ic129", 0xfc000, 0x2000, CRC(003605e4) SHA1(b882e97ee81b9ba0e7d969c63da3f2052f23b4b9) )
 	ROM_LOAD16_BYTE( "40180.ic132", 0xfc001, 0x2000, CRC(28ee5e58) SHA1(93e045609466fcec74e2bb72578bb7405281cf7b) )
 
-	ROM_REGION(0x08100,"gfx1", ROMREGION_ERASE00)
-
 	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
 ROM_END
@@ -557,8 +535,6 @@ ROM_START( pc3086 )
 	ROM_LOAD( "c000.bin", 0xc0000, 0x8000, CRC(5a6c38e9) SHA1(382d2028e0dc5515a68843829563ce29018edb08) )
 	ROM_LOAD( "c800.bin", 0xc8000, 0x2000, CRC(3329c6d5) SHA1(982e852278185d69acde47a4f3942bc09ed76777) )
 	ROM_LOAD( "fc00.bin", 0xfc000, 0x4000, CRC(b5630753) SHA1(98c344831cc4dc59ebb39bbb1961964a8d39fe20) )
-
-	ROM_REGION(0x08100,"gfx1", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x800, "keyboard", 0 ) // PC2086 / PC3086 102-key keyboard
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )

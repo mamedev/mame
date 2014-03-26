@@ -203,7 +203,7 @@ public:
 // device type definition
 extern const device_type ISA8_EC1841_0002;
 
-// ======================> isa8_poisk2_device
+// ======================> isa8_cga_mc1502_device
 
 class isa8_cga_mc1502_device :
 		public isa8_cga_device

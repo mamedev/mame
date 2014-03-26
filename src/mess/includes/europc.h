@@ -8,8 +8,8 @@
 #define EUROPC_H_
 
 #include "includes/pc.h"
-#include "video/pc_aga.h"
-
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 class europc_pc_state : public pc_state
 {
 public:

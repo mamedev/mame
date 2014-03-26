@@ -106,15 +106,15 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 		}
 //      mode= data&0x10?AGA_COLOR:AGA_MONO;
 //      mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(space.machine(), m_jim_mode);
+		(machine().device<isa8_aga_device>("aga:aga"))->pc_aga_set_mode(m_jim_mode);		
 		if (data & 0x80) m_jim_state = 0;
 		break;
 	case 4:
 		switch(data & 0xc0)
 		{
-		case 0x00: space.machine().device("maincpu")->set_clock_scale(1.0 / 2); break;
-		case 0x40: space.machine().device("maincpu")->set_clock_scale(3.0 / 4); break;
-		default: space.machine().device("maincpu")->set_clock_scale(1); break;
+		case 0x00: machine().device("maincpu")->set_clock_scale(1.0 / 2); break;
+		case 0x40: machine().device("maincpu")->set_clock_scale(3.0 / 4); break;
+		default: machine().device("maincpu")->set_clock_scale(1); break;
 		}
 		break;
 	case 0xa:
@@ -352,14 +352,9 @@ NVRAM_HANDLER( europc_rtc )
 
 DRIVER_INIT_MEMBER(europc_pc_state,europc)
 {
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	UINT8 *rom = &memregion("maincpu")->base()[0];
+
 	int i;
-
-	/* just a plain bit pattern for graphics data generation */
-	for (i = 0; i < 256; i++)
-		gfx[i] = i;
-
 	/*
 	  fix century rom bios bug !
 	  if year <79 month (and not CENTURY) is loaded with 0x20

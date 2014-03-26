@@ -291,7 +291,6 @@ VIDEOS += MC6847
 VIDEOS += MSM6222B
 VIDEOS += MSM6255
 VIDEOS += MOS6566
-VIDEOS += PC_CGA
 VIDEOS += PC_VGA
 #VIDEOS += POLY
 VIDEOS += PSX
@@ -1553,7 +1552,6 @@ $(MESSOBJ)/pitronic.a:          \
 	$(MESS_DRIVERS)/beta.o      \
 
 $(MESSOBJ)/pc.a:                \
-	$(MESS_VIDEO)/pc_aga.o      \
 	$(MESS_MACHINE)/tandy1t.o   \
 	$(MESS_MACHINE)/europc.o    \
 	$(MESS_MACHINE)/pc.o        \

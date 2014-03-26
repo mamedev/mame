@@ -73,7 +73,6 @@ video HW too.
 #include "machine/pit8253.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "video/pc_aga.h"
 #include "video/pc_t1t.h"
 
 #include "machine/pc_fdc.h"
@@ -530,11 +529,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( europc )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_START("DSW0") /* IN1 */
 
 	PORT_START("DSW1") /* IN2 */
@@ -577,11 +571,6 @@ static INPUT_PORTS_START( europc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bondwell )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -885,37 +874,37 @@ static MACHINE_CONFIG_DERIVED( pc10iii, pccga )
 	//MCFG_GFXDECODE_MODIFY("gfxdecode", pc10iii)
 MACHINE_CONFIG_END
 
-static const gfx_layout europc_8_charlayout =
-{
-	8, 8,                   /* 8 x 8 characters */
-	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*16                    /* every char takes 16 bytes */
-};
+// static const gfx_layout europc_8_charlayout =
+// {
+	// 8, 8,                   /* 8 x 8 characters */
+	// 256,                    /* 256 characters */
+	// 1,                  /* 1 bits per pixel */
+	// { 0 },                  /* no bitplanes */
+	// /* x offsets */
+	// { 0, 1, 2, 3, 4, 5, 6, 7 },
+	// /* y offsets */
+	// { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	// 8*16                    /* every char takes 16 bytes */
+// };
 
-static const gfx_layout europc_16_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
-};
+// static const gfx_layout europc_16_charlayout =
+// {
+	// 8, 16,                  /* 8 x 16 characters */
+	// 256,                    /* 256 characters */
+	// 1,                  /* 1 bits per pixel */
+	// { 0 },                  /* no bitplanes */
+	// /* x offsets */
+	// { 0, 1, 2, 3, 4, 5, 6, 7 },
+	// /* y offsets */
+	// { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	// 8*16                    /* every char takes 16 bytes */
+// };
 
 
-static GFXDECODE_START( europc )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, europc_8_charlayout, 3, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
-GFXDECODE_END
+// static GFXDECODE_START( europc )
+	// GFXDECODE_ENTRY( "gfx1", 0x0000, europc_8_charlayout, 3, 1 )
+	// GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
+// GFXDECODE_END
 
 static MACHINE_CONFIG_START( europc, europc_pc_state )
 	/* basic machine hardware */
@@ -958,9 +947,8 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_aga )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", europc)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "aga", pc_isa8_cards, "aga", true)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1863,8 +1851,6 @@ ROM_START( europc )
 	ROM_REGION(0x100000,"maincpu", 0)
 	// hdd bios integrated!
 	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3)) // V2.07
-	ROM_REGION(0x08100,"gfx1", 0)
-	ROM_LOAD("50146 char d1.0 euro.u16", 0x00000, 0x02000, CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //D1.0
 ROM_END
 
 
