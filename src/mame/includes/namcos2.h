@@ -8,6 +8,7 @@
 
 #include "namcoic.h"
 #include "cpu/m6502/m3745x.h"
+#include "video/c45.h"
 
 /* CPU reference numbers */
 
