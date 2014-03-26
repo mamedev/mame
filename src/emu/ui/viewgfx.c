@@ -38,49 +38,57 @@ const int MAX_GFX_DECODERS = 8;
     TYPE DEFINITIONS
 ***************************************************************************/
 
+// information about a single gfx device
+struct ui_gfx_info
+{
+	gfxdecode_device *device;			// pointer to device
+	UINT8 setcount;						// how many gfx sets device has
+	UINT8 rotate[MAX_GFX_ELEMENTS];		// current rotation (orientation) value
+	UINT8 columns[MAX_GFX_ELEMENTS];	// number of items per row
+	int   offset[MAX_GFX_ELEMENTS];		// current offset of top,left item
+	int   color[MAX_GFX_ELEMENTS];		// current color selected
+};
+
 struct ui_gfx_state
 {
-	bool            started;            // have we called ui_gfx_count_devices() yet?
-	UINT8           mode;               // which mode are we in?
+	bool            started;		// have we called ui_gfx_count_devices() yet?
+	UINT8           mode;			// which mode are we in?
 
 	// intermediate bitmaps
-	bool            bitmap_dirty;       // is the bitmap dirty?
-	bitmap_rgb32 *  bitmap;             // bitmap for drawing gfx and tilemaps
-	render_texture *texture;            // texture for rendering the above bitmap
+	bool            bitmap_dirty;	// is the bitmap dirty?
+	bitmap_rgb32 *  bitmap;			// bitmap for drawing gfx and tilemaps
+	render_texture *texture;		// texture for rendering the above bitmap
 
 	// palette-specific data
 	struct
 	{
-		palette_device *device;         // pointer to current device
-		int     devcount;               // how many palette devices exist
-		int     devindex;               // which palette device is visible
-		UINT8   which;                  // which subset (pens or indirect colors)?
-		UINT8   columns;                // number of items per row
-		int     offset;                 // current offset of top left item
+		palette_device *device;		// pointer to current device
+		int   devcount;				// how many palette devices exist
+		int   devindex;				// which palette device is visible
+		UINT8 which;				// which subset (pens or indirect colors)?
+		UINT8 columns;				// number of items per row
+		int   offset;				// current offset of top left item
 	} palette;
 
-	// graphics-viewer-specific data
+	// graphics-specific data
 	struct
 	{
-		gfxdecode_device *device;                            // pointer to current device
-		UINT8   devcount;                                    // how many decoder devices exist
-		UINT8   devindex;                                    // which decoder device is visible
-		UINT8   set;                                         // which set is visible
-		UINT8   setcount[MAX_GFX_DECODERS];                  // how many sets each decoder has
-		UINT8   rotate[MAX_GFX_DECODERS][MAX_GFX_ELEMENTS];  // current rotation (orientation) value
-		UINT8   columns[MAX_GFX_DECODERS][MAX_GFX_ELEMENTS]; // number of items per row
-		int     offset[MAX_GFX_DECODERS][MAX_GFX_ELEMENTS];  // current offset of top,left item
-		int     color[MAX_GFX_DECODERS][MAX_GFX_ELEMENTS];   // current color selected
+		UINT8   devcount;	// how many gfx devices exist
+		UINT8   devindex;	// which device is visible
+		UINT8   set;		// which set is visible
 	} gfxset;
+	
+	// information about each gfx device
+	ui_gfx_info gfxdev[MAX_GFX_DECODERS];
 
-	// tilemap-viewer-specific data
+	// tilemap-specific data
 	struct
 	{
-		int     which;                  // which tilemap are we viewing?
-		int     xoffs;                  // current X offset
-		int     yoffs;                  // current Y offset
-		int     zoom;                   // zoom factor
-		UINT8   rotate;                 // current rotation (orientation) value
+		int   which;				// which tilemap are we viewing?
+		int   xoffs;				// current X offset
+		int   yoffs;				// current Y offset
+		int   zoom;					// zoom factor
+		UINT8 rotate;				// current rotation (orientation) value
 	} tilemap;
 };
 
@@ -98,25 +106,24 @@ static ui_gfx_state ui_gfx;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state *state);
+static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state);
 static void ui_gfx_exit(running_machine &machine);
 
 // palette handling
-static void palette_set_device(running_machine &machine, ui_gfx_state *state);
-static void palette_handle_keys(running_machine &machine, ui_gfx_state *state);
-static void palette_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
+static void palette_set_device(running_machine &machine, ui_gfx_state &state);
+static void palette_handle_keys(running_machine &machine, ui_gfx_state &state);
+static void palette_handler(running_machine &machine, render_container *container, ui_gfx_state &state);
 
 // graphics set handling
-static void gfxset_set_device(running_machine &machine, ui_gfx_state *state);
-static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells);
-static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
-static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
-static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
+static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, int xcells, int ycells);
+static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, int xcells, int ycells, gfx_element &gfx);
+static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state &state);
 
 // tilemap handling
-static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, int viswidth, int visheight);
-static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state, int width, int height);
-static void tilemap_handler(running_machine &machine, render_container *container, ui_gfx_state *state);
+static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, int viswidth, int visheight);
+static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state, int width, int height);
+static void tilemap_handler(running_machine &machine, render_container *container, ui_gfx_state &state);
 
 
 
@@ -146,8 +153,8 @@ void ui_gfx_init(running_machine &machine)
 	for (int i = 0; i < MAX_GFX_DECODERS; i++)
 		for (int j = 0; j < MAX_GFX_ELEMENTS; j++)
 		{
-			state->gfxset.rotate[i][j] = rotate;
-			state->gfxset.columns[i][j] = 16;
+			state->gfxdev[i].rotate[j] = rotate;
+			state->gfxdev[i].columns[j] = 16;
 		}
 
 	// set up the tilemap state
@@ -160,40 +167,45 @@ void ui_gfx_init(running_machine &machine)
 //  gfx decoders and gfx sets in the machine
 //-------------------------------------------------
 
-static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state *state)
+static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
 	palette_device_iterator pal_deviter(machine.root_device());
 	gfxdecode_device_iterator gfx_deviter(machine.root_device());
 
 	// count the palette devices
-	state->palette.devcount = pal_deviter.count();
+	state.palette.devcount = pal_deviter.count();
 
 	// set the pointer to the first palette
-	if (state->palette.devcount > 0)
+	if (state.palette.devcount > 0)
 		palette_set_device(machine, state);
 
 	// count the gfx decoders
-	state->gfxset.devcount = MIN(gfx_deviter.count(), MAX_GFX_DECODERS);
+	state.gfxset.devcount = 0;
+	int tempcount = gfx_deviter.count();
 
 	// count the gfx sets in each decoder
-	if (state->gfxset.devcount > 0)
+	if (tempcount > 0)
 	{
 		gfxdecode_device *m_gfxdecode;
 		int i, count;
+
 		for (i = 0, m_gfxdecode = gfx_deviter.first();
-				i < state->gfxset.devcount;
+				i < tempcount && state.gfxset.devcount < MAX_GFX_DECODERS;
 				i++, m_gfxdecode = gfx_deviter.next())
 		{
 			for (count = 0; count < MAX_GFX_ELEMENTS && m_gfxdecode->gfx(count) != NULL; count++);
 
 			// count = index of first NULL
-			state->gfxset.setcount[i] = count;
+			if (count > 0)
+			{
+				state.gfxdev[state.gfxset.devcount].device = m_gfxdecode;
+				state.gfxdev[state.gfxset.devcount].setcount = count;
+				state.gfxset.devcount++;
+			}
 		}
-		// set the pointer to the first decoder
-		gfxset_set_device(machine, state);
 	}
 
-	state->started = true;
+	state.started = true;
 }
 
 
@@ -224,13 +236,13 @@ static void ui_gfx_exit(running_machine &machine)
 
 bool ui_gfx_is_relevant(running_machine &machine)
 {
-	ui_gfx_state *state = &ui_gfx;
+	ui_gfx_state &state = ui_gfx;
 
-	if (!state->started)
+	if (!state.started)
 		ui_gfx_count_devices(machine, state);
 
-	return state->palette.devcount > 0
-		|| state->gfxset.devcount > 0
+	return state.palette.devcount > 0
+		|| state.gfxset.devcount > 0
 		|| machine.tilemap().count() > 0;
 }
 
@@ -241,7 +253,7 @@ bool ui_gfx_is_relevant(running_machine &machine)
 
 UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 uistate)
 {
-	ui_gfx_state *state = &ui_gfx;
+	ui_gfx_state &state = ui_gfx;
 	
 	// if we have nothing, implicitly cancel
 	if (!ui_gfx_is_relevant(machine))
@@ -249,33 +261,33 @@ UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, 
 
 	// if we're not paused, mark the bitmap dirty
 	if (!machine.paused())
-		state->bitmap_dirty = true;
+		state.bitmap_dirty = true;
 
 	// switch off the state to display something
 again:
-	switch (state->mode)
+	switch (state.mode)
 	{
 		case UI_GFX_PALETTE:
 			// if we have a palette, display it
-			if (state->palette.devcount > 0)
+			if (state.palette.devcount > 0)
 			{
 				palette_handler(machine, container, state);
 				break;
 			}
 
 			// fall through...
-			state->mode++;
+			state.mode++;
 
 		case UI_GFX_GFXSET:
 			// if we have graphics sets, display them
-			if (state->gfxset.devcount > 0)
+			if (state.gfxset.devcount > 0)
 			{
 				gfxset_handler(machine, container, state);
 				break;
 			}
 
 			// fall through...
-			state->mode++;
+			state.mode++;
 
 		case UI_GFX_TILEMAP:
 			// if we have tilemaps, display them
@@ -285,15 +297,15 @@ again:
 				break;
 			}
 
-			state->mode = UI_GFX_PALETTE;
+			state.mode = UI_GFX_PALETTE;
 			goto again;
 	}
 
 	// handle keys
 	if (ui_input_pressed(machine, IPT_UI_SELECT))
 	{
-		state->mode = (state->mode + 1) % 3;
-		state->bitmap_dirty = true;
+		state.mode = (state.mode + 1) % 3;
+		state.bitmap_dirty = true;
 	}
 
 	if (ui_input_pressed(machine, IPT_UI_PAUSE))
@@ -312,7 +324,7 @@ again:
 cancel:
 	if (!uistate)
 		machine.resume();
-	state->bitmap_dirty = true;
+	state.bitmap_dirty = true;
 	return UI_HANDLER_CANCEL;
 }
 
@@ -327,10 +339,10 @@ cancel:
 //  current palette device
 //-------------------------------------------------
 
-static void palette_set_device(running_machine &machine, ui_gfx_state *state)
+static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 {
 	palette_device_iterator pal_deviter(machine.root_device());
-	state->palette.device = pal_deviter.byindex(state->palette.devindex);
+	state.palette.device = pal_deviter.byindex(state.palette.devindex);
 }
 
 
@@ -339,11 +351,11 @@ static void palette_set_device(running_machine &machine, ui_gfx_state *state)
 //  viewer
 //-------------------------------------------------
 
-static void palette_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
+static void palette_handler(running_machine &machine, render_container *container, ui_gfx_state &state)
 {
-	palette_device *palette = state->palette.device;
+	palette_device *palette = state.palette.device;
 
-	int total = state->palette.which ? palette->indirect_entries() : palette->entries();
+	int total = state.palette.which ? palette->indirect_entries() : palette->entries();
 	const rgb_t *raw_color = palette->palette()->entry_list_raw();
 	render_font *ui_font = machine.ui().get_font();
 	float cellwidth, cellheight;
@@ -377,7 +389,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 	cellboxbounds.y0 += 3.0f * chheight;
 
 	// figure out the title and expand the outer box to fit
-	const char *suffix = palette->indirect_entries() == 0 ? "" : state->palette.which ? " (colors)" : " (pens)";
+	const char *suffix = palette->indirect_entries() == 0 ? "" : state.palette.which ? " COLORS" : " PENS";
 	sprintf(title, "'%s'%s", palette->tag(), suffix);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;
@@ -397,12 +409,12 @@ static void palette_handler(running_machine &machine, render_container *containe
 	}
 
 	// compute the cell size
-	cellwidth = (cellboxbounds.x1 - cellboxbounds.x0) / (float)state->palette.columns;
-	cellheight = (cellboxbounds.y1 - cellboxbounds.y0) / (float)state->palette.columns;
+	cellwidth = (cellboxbounds.x1 - cellboxbounds.x0) / (float)state.palette.columns;
+	cellheight = (cellboxbounds.y1 - cellboxbounds.y0) / (float)state.palette.columns;
 
 	// draw the top column headers
 	skip = (int)(chwidth / cellwidth);
-	for (x = 0; x < state->palette.columns; x += 1 + skip)
+	for (x = 0; x < state.palette.columns; x += 1 + skip)
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
@@ -416,10 +428,10 @@ static void palette_handler(running_machine &machine, render_container *containe
 
 	// draw the side column headers
 	skip = (int)(chheight / cellheight);
-	for (y = 0; y < state->palette.columns; y += 1 + skip)
+	for (y = 0; y < state.palette.columns; y += 1 + skip)
 
 		// only display if there is data to show
-		if (state->palette.offset + y * state->palette.columns < total)
+		if (state.palette.offset + y * state.palette.columns < total)
 		{
 			char buffer[10];
 
@@ -431,7 +443,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 				container->add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			sprintf(buffer, "%5X", state->palette.offset + y * state->palette.columns);
+			sprintf(buffer, "%5X", state.palette.offset + y * state.palette.columns);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, machine.render().ui_aspect(), buffer[x]);
@@ -440,13 +452,13 @@ static void palette_handler(running_machine &machine, render_container *containe
 		}
 
 	// now add the rectangles for the colors
-	for (y = 0; y < state->palette.columns; y++)
-		for (x = 0; x < state->palette.columns; x++)
+	for (y = 0; y < state.palette.columns; y++)
+		for (x = 0; x < state.palette.columns; x++)
 		{
-			int index = state->palette.offset + y * state->palette.columns + x;
+			int index = state.palette.offset + y * state.palette.columns + x;
 			if (index < total)
 			{
-				pen_t pen = state->palette.which ? palette->indirect_color(index) : raw_color[index];
+				pen_t pen = state.palette.which ? palette->indirect_color(index) : raw_color[index];
 				container->add_rect(cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 									cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 									0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -463,76 +475,76 @@ static void palette_handler(running_machine &machine, render_container *containe
 //  the palette viewer
 //-------------------------------------------------
 
-static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
+static void palette_handle_keys(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device *palette = state->palette.device;
+	palette_device *palette = state.palette.device;
 	int rowcount, screencount;
 	int total;
 
 	// handle zoom (minus,plus)
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))
-		state->palette.columns /= 2;
+		state.palette.columns /= 2;
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN))
-		state->palette.columns *= 2;
+		state.palette.columns *= 2;
 
 	// clamp within range
-	if (state->palette.columns <= 4)
-		state->palette.columns = 4;
-	if (state->palette.columns > 64)
-		state->palette.columns = 64;
+	if (state.palette.columns <= 4)
+		state.palette.columns = 4;
+	if (state.palette.columns > 64)
+		state.palette.columns = 64;
 
 	// handle colormap selection (open bracket,close bracket)
 	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
 	{
-		if (state->palette.which)
-			state->palette.which = 0;
-		else if (state->palette.devindex > 0)
+		if (state.palette.which)
+			state.palette.which = 0;
+		else if (state.palette.devindex > 0)
 		{
-			state->palette.devindex--;
+			state.palette.devindex--;
 			palette_set_device(machine, state);
-			palette = state->palette.device;
-			state->palette.which = (palette->indirect_entries() > 0);
+			palette = state.palette.device;
+			state.palette.which = (palette->indirect_entries() > 0);
 		}
 	}
 	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
 	{
-		if (!state->palette.which && palette->indirect_entries() > 0)
-			state->palette.which = 1;
-		else if (state->palette.devindex < state->palette.devcount - 1)
+		if (!state.palette.which && palette->indirect_entries() > 0)
+			state.palette.which = 1;
+		else if (state.palette.devindex < state.palette.devcount - 1)
 		{
-			state->palette.devindex++;
+			state.palette.devindex++;
 			palette_set_device(machine, state);
-			palette = state->palette.device;
-			state->palette.which = 0;
+			palette = state.palette.device;
+			state.palette.which = 0;
 		}
 	}
 
 	// cache some info in locals
-	total = state->palette.which ? palette->indirect_entries() : palette->entries();
+	total = state.palette.which ? palette->indirect_entries() : palette->entries();
 
 	// determine number of entries per row and total
-	rowcount = state->palette.columns;
+	rowcount = state.palette.columns;
 	screencount = rowcount * rowcount;
 
 	// handle keyboard navigation
 	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
-		state->palette.offset -= rowcount;
+		state.palette.offset -= rowcount;
 	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
-		state->palette.offset += rowcount;
+		state.palette.offset += rowcount;
 	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
-		state->palette.offset -= screencount;
+		state.palette.offset -= screencount;
 	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
-		state->palette.offset += screencount;
+		state.palette.offset += screencount;
 	if (ui_input_pressed_repeat(machine, IPT_UI_HOME, 4))
-		state->palette.offset = 0;
+		state.palette.offset = 0;
 	if (ui_input_pressed_repeat(machine, IPT_UI_END, 4))
-		state->palette.offset = total;
+		state.palette.offset = total;
 
 	// clamp within range
-	if (state->palette.offset + screencount > ((total + rowcount - 1) / rowcount) * rowcount)
-		state->palette.offset = ((total + rowcount - 1) / rowcount) * rowcount - screencount;
-	if (state->palette.offset < 0)
-		state->palette.offset = 0;
+	if (state.palette.offset + screencount > ((total + rowcount - 1) / rowcount) * rowcount)
+		state.palette.offset = ((total + rowcount - 1) / rowcount) * rowcount - screencount;
+	if (state.palette.offset < 0)
+		state.palette.offset = 0;
 }
 
 
@@ -542,29 +554,18 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 ***************************************************************************/
 
 //-------------------------------------------------
-//  gfxset_set_device - set the pointer to the
-//  current gfx decoder device
-//-------------------------------------------------
-
-static void gfxset_set_device(running_machine &machine, ui_gfx_state *state)
-{
-	gfxdecode_device_iterator gfx_deviter(machine.root_device());
-	state->gfxset.device = gfx_deviter.byindex(state->gfxset.devindex);
-}
-
-
-//-------------------------------------------------
 //  gfxset_handler - handler for the graphics
 //  viewer
 //-------------------------------------------------
 
-static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
+static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state &state)
 {
-	gfxdecode_device *m_gfxdecode = state->gfxset.device;
 	render_font *ui_font = machine.ui().get_font();
-	int dev = state->gfxset.devindex;
-	int set = state->gfxset.set;
-	gfx_element *gfx = m_gfxdecode->gfx(set);
+	int dev = state.gfxset.devindex;
+	int set = state.gfxset.set;
+	ui_gfx_info &info = state.gfxdev[dev];
+	gfxdecode_device &m_gfxdecode = *info.device;
+	gfx_element &gfx = *m_gfxdecode.gfx(set);
 	float fullwidth, fullheight;
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -608,11 +609,11 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	cellboxheight = (cellboxbounds.y1 - cellboxbounds.y0) * (float)targheight;
 
 	// compute the number of source pixels in a cell
-	cellxpix = 1 + ((state->gfxset.rotate[dev][set] & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width());
-	cellypix = 1 + ((state->gfxset.rotate[dev][set] & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height());
+	cellxpix = 1 + ((info.rotate[set] & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width());
+	cellypix = 1 + ((info.rotate[set] & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height());
 
 	// compute the largest pixel scale factor that still fits
-	xcells = state->gfxset.columns[dev][set];
+	xcells = info.columns[set];
 	while (xcells > 1)
 	{
 		pixelscale = (cellboxwidth / xcells) / cellxpix;
@@ -648,10 +649,10 @@ static void gfxset_handler(running_machine &machine, render_container *container
 
 	// figure out the title and expand the outer box to fit
 	sprintf(title, "'%s' %d/%d %dx%d COLOR %X",
-					m_gfxdecode->tag(),
-					set, state->gfxset.setcount[dev] - 1,
-					gfx->width(), gfx->height(),
-					state->gfxset.color[dev][set]);
+					m_gfxdecode.tag(),
+					set, info.setcount - 1,
+					gfx.width(), gfx.height(),
+					info.color[set]);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
@@ -688,7 +689,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	for (y = 0; y < ycells; y += 1 + skip)
 
 		// only display if there is data to show
-		if (state->gfxset.offset[dev][set] + y * xcells < gfx->elements())
+		if (info.offset[set] + y * xcells < gfx.elements())
 		{
 			char buffer[10];
 
@@ -700,7 +701,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 				container->add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			sprintf(buffer, "%5X", state->gfxset.offset[dev][set] + y * xcells);
+			sprintf(buffer, "%5X", info.offset[set] + y * xcells);
 			for (x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, machine.render().ui_aspect(), buffer[x]);
@@ -715,7 +716,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	container->add_quad(boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
 						boxbounds.x0 + 6.0f * chwidth + (float)cellboxwidth / (float)targwidth,
 						boxbounds.y0 + 3.5f * chheight + (float)cellboxheight / (float)targheight,
-						ARGB_WHITE, state->texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+						ARGB_WHITE, state.texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// handle keyboard navigation before drawing
 	gfxset_handle_keys(machine, state, xcells, ycells);
@@ -727,94 +728,92 @@ static void gfxset_handler(running_machine &machine, render_container *container
 //  graphics viewer
 //-------------------------------------------------
 
-static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, int xcells, int ycells)
+static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, int xcells, int ycells)
 {
 	// handle gfxset selection (open bracket,close bracket)
 	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
 	{
-		if (state->gfxset.set > 0)
-			state->gfxset.set--;
-		else if (state->gfxset.devindex > 0)
+		if (state.gfxset.set > 0)
+			state.gfxset.set--;
+		else if (state.gfxset.devindex > 0)
 		{
-			state->gfxset.devindex--;
-			gfxset_set_device(machine, state);
-			state->gfxset.set = state->gfxset.setcount[state->gfxset.devindex] - 1;
+			state.gfxset.devindex--;
+			state.gfxset.set = state.gfxdev[state.gfxset.devindex].setcount - 1;
 		}
-		state->bitmap_dirty = true;
+		state.bitmap_dirty = true;
 	}
 	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
 	{
-		if (state->gfxset.set < state->gfxset.setcount[state->gfxset.devindex] - 1)
-			state->gfxset.set++;
-		else if (state->gfxset.devindex < state->gfxset.devcount - 1)
+		if (state.gfxset.set < state.gfxdev[state.gfxset.devindex].setcount - 1)
+			state.gfxset.set++;
+		else if (state.gfxset.devindex < state.gfxset.devcount - 1)
 		{
-			state->gfxset.devindex++;
-			gfxset_set_device(machine, state);
-			state->gfxset.set = 0;
+			state.gfxset.devindex++;
+			state.gfxset.set = 0;
 		}
-		state->bitmap_dirty = true;
+		state.bitmap_dirty = true;
 	}
 
 	// cache some info in locals
-	gfxdecode_device *m_gfxdecode = state->gfxset.device;
-	int dev = state->gfxset.devindex;
-	int set = state->gfxset.set;
-	gfx_element *gfx = m_gfxdecode->gfx(set);
+	int dev = state.gfxset.devindex;
+	int set = state.gfxset.set;
+	ui_gfx_info &info = state.gfxdev[dev];
+	gfx_element &gfx = *info.device->gfx(set);
 
 	// handle cells per line (minus,plus)
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))
-	{ state->gfxset.columns[dev][set] = xcells - 1; state->bitmap_dirty = true; }
+	{ info.columns[set] = xcells - 1; state.bitmap_dirty = true; }
 
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN))
-	{ state->gfxset.columns[dev][set] = xcells + 1; state->bitmap_dirty = true; }
+	{ info.columns[set] = xcells + 1; state.bitmap_dirty = true; }
 
 	// clamp within range
-	if (state->gfxset.columns[dev][set] < 2)
-	{ state->gfxset.columns[dev][set] = 2; state->bitmap_dirty = true; }
-	if (state->gfxset.columns[dev][set] > 32)
-	{ state->gfxset.columns[dev][set] = 32; state->bitmap_dirty = true; }
+	if (info.columns[set] < 2)
+	{ info.columns[set] = 2; state.bitmap_dirty = true; }
+	if (info.columns[set] > 32)
+	{ info.columns[set] = 32; state.bitmap_dirty = true; }
 
 	// handle rotation (R)
 	if (ui_input_pressed(machine, IPT_UI_ROTATE))
 	{
-		state->gfxset.rotate[dev][set] = orientation_add(ROT90, state->gfxset.rotate[dev][set]);
-		state->bitmap_dirty = true;
+		info.rotate[set] = orientation_add(ROT90, info.rotate[set]);
+		state.bitmap_dirty = true;
 	}
 
 	// handle navigation within the cells (up,down,pgup,pgdown)
 	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
-	{ state->gfxset.offset[dev][set] -= xcells; state->bitmap_dirty = true; }
+	{ info.offset[set] -= xcells; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
-	{ state->gfxset.offset[dev][set] += xcells; state->bitmap_dirty = true; }
+	{ info.offset[set] += xcells; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
-	{ state->gfxset.offset[dev][set] -= xcells * ycells; state->bitmap_dirty = true; }
+	{ info.offset[set] -= xcells * ycells; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
-	{ state->gfxset.offset[dev][set] += xcells * ycells; state->bitmap_dirty = true; }
+	{ info.offset[set] += xcells * ycells; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_HOME, 4))
-	{ state->gfxset.offset[dev][set] = 0; state->bitmap_dirty = true; }
+	{ info.offset[set] = 0; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_END, 4))
-	{ state->gfxset.offset[dev][set] = gfx->elements(); state->bitmap_dirty = true; }
+	{ info.offset[set] = gfx.elements(); state.bitmap_dirty = true; }
 
 	// clamp within range
-	if (state->gfxset.offset[dev][set] + xcells * ycells > ((gfx->elements() + xcells - 1) / xcells) * xcells)
+	if (info.offset[set] + xcells * ycells > ((gfx.elements() + xcells - 1) / xcells) * xcells)
 	{
-		state->gfxset.offset[dev][set] = ((gfx->elements() + xcells - 1) / xcells) * xcells - xcells * ycells;
-		state->bitmap_dirty = true;
+		info.offset[set] = ((gfx.elements() + xcells - 1) / xcells) * xcells - xcells * ycells;
+		state.bitmap_dirty = true;
 	}
-	if (state->gfxset.offset[dev][set] < 0)
-	{ state->gfxset.offset[dev][set] = 0; state->bitmap_dirty = true; }
+	if (info.offset[set] < 0)
+	{ info.offset[set] = 0; state.bitmap_dirty = true; }
 
 	// handle color selection (left,right)
 	if (ui_input_pressed_repeat(machine, IPT_UI_LEFT, 4))
-	{ state->gfxset.color[dev][set] -= 1; state->bitmap_dirty = true; }
+	{ info.color[set] -= 1; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_RIGHT, 4))
-	{ state->gfxset.color[dev][set] += 1; state->bitmap_dirty = true; }
+	{ info.color[set] += 1; state.bitmap_dirty = true; }
 
 	// clamp within range
-	if (state->gfxset.color[dev][set] >= (int)gfx->colors())
-	{ state->gfxset.color[dev][set] = gfx->colors() - 1; state->bitmap_dirty = true; }
-	if (state->gfxset.color[dev][set] < 0)
-	{ state->gfxset.color[dev][set] = 0; state->bitmap_dirty = true; }
+	if (info.color[set] >= (int)gfx.colors())
+	{ info.color[set] = gfx.colors() - 1; state.bitmap_dirty = true; }
+	if (info.color[set] < 0)
+	{ info.color[set] = 0; state.bitmap_dirty = true; }
 }
 
 
@@ -823,35 +822,36 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state *state, in
 //  graphics view bitmap
 //-------------------------------------------------
 
-static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx)
+static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state &state, int xcells, int ycells, gfx_element &gfx)
 {
-	int dev = state->gfxset.devindex;
-	int set = state->gfxset.set;
+	int dev = state.gfxset.devindex;
+	int set = state.gfxset.set;
+	ui_gfx_info &info = state.gfxdev[dev];
 	int cellxpix, cellypix;
 	int x, y;
 
 	// compute the number of source pixels in a cell
-	cellxpix = 1 + ((state->gfxset.rotate[dev][set] & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width());
-	cellypix = 1 + ((state->gfxset.rotate[dev][set] & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height());
+	cellxpix = 1 + ((info.rotate[set] & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width());
+	cellypix = 1 + ((info.rotate[set] & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height());
 
 	// realloc the bitmap if it is too small
-	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->bpp() != 32 || state->bitmap->width() != cellxpix * xcells || state->bitmap->height() != cellypix * ycells)
+	if (state.bitmap == NULL || state.texture == NULL || state.bitmap->bpp() != 32 || state.bitmap->width() != cellxpix * xcells || state.bitmap->height() != cellypix * ycells)
 	{
 		// free the old stuff
-		machine.render().texture_free(state->texture);
-		global_free(state->bitmap);
+		machine.render().texture_free(state.texture);
+		global_free(state.bitmap);
 
 		// allocate new stuff
-		state->bitmap = global_alloc(bitmap_rgb32(cellxpix * xcells, cellypix * ycells));
-		state->texture = machine.render().texture_alloc();
-		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_ARGB32);
+		state.bitmap = global_alloc(bitmap_rgb32(cellxpix * xcells, cellypix * ycells));
+		state.texture = machine.render().texture_alloc();
+		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_ARGB32);
 
 		// force a redraw
-		state->bitmap_dirty = true;
+		state.bitmap_dirty = true;
 	}
 
 	// handle the redraw
-	if (state->bitmap_dirty)
+	if (state.bitmap_dirty)
 	{
 		// loop over rows
 		for (y = 0; y < ycells; y++)
@@ -859,38 +859,38 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 			rectangle cellbounds;
 
 			// make a rect that covers this row
-			cellbounds.set(0, state->bitmap->width() - 1, y * cellypix, (y + 1) * cellypix - 1);
+			cellbounds.set(0, state.bitmap->width() - 1, y * cellypix, (y + 1) * cellypix - 1);
 
 			// only display if there is data to show
-			if (state->gfxset.offset[dev][set] + y * xcells < gfx->elements())
+			if (info.offset[set] + y * xcells < gfx.elements())
 			{
 				// draw the individual cells
 				for (x = 0; x < xcells; x++)
 				{
-					int index = state->gfxset.offset[dev][set] + y * xcells + x;
+					int index = info.offset[set] + y * xcells + x;
 
 					// update the bounds for this cell
 					cellbounds.min_x = x * cellxpix;
 					cellbounds.max_x = (x + 1) * cellxpix - 1;
 
 					// only render if there is data
-					if (index < gfx->elements())
-						gfxset_draw_item(machine, gfx, index, *state->bitmap, cellbounds.min_x, cellbounds.min_y, state->gfxset.color[dev][set], state->gfxset.rotate[dev][set]);
+					if (index < gfx.elements())
+						gfxset_draw_item(machine, gfx, index, *state.bitmap, cellbounds.min_x, cellbounds.min_y, info.color[set], info.rotate[set]);
 
 					// otherwise, fill with transparency
 					else
-						state->bitmap->fill(0, cellbounds);
+						state.bitmap->fill(0, cellbounds);
 				}
 			}
 
 			// otherwise, fill with transparency
 			else
-				state->bitmap->fill(0, cellbounds);
+				state.bitmap->fill(0, cellbounds);
 		}
 
 		// reset the texture to force an update
-		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_ARGB32);
-		state->bitmap_dirty = false;
+		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_ARGB32);
+		state.bitmap_dirty = false;
 	}
 }
 
@@ -900,18 +900,18 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 //  the view
 //-------------------------------------------------
 
-static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(running_machine &machine, gfx_element &gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
-	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
-	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
-	const rgb_t *palette = gfx->palette()->palette()->entry_list_raw() + gfx->colorbase() + color * gfx->granularity();
+	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx.height() : gfx.width();
+	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx.width() : gfx.height();
+	const rgb_t *palette = gfx.palette()->palette()->entry_list_raw() + gfx.colorbase() + color * gfx.granularity();
 	int x, y;
 
 	// loop over rows in the cell
 	for (y = 0; y < height; y++)
 	{
 		UINT32 *dest = &bitmap.pix32(dsty + y, dstx);
-		const UINT8 *src = gfx->get_data(index);
+		const UINT8 *src = gfx.get_data(index);
 
 		// loop over columns in the cell
 		for (x = 0; x < width; x++)
@@ -923,22 +923,22 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 			if (!(rotate & ORIENTATION_SWAP_XY))
 			{
 				if (rotate & ORIENTATION_FLIP_X)
-					effx = gfx->width() - 1 - effx;
+					effx = gfx.width() - 1 - effx;
 				if (rotate & ORIENTATION_FLIP_Y)
-					effy = gfx->height() - 1 - effy;
+					effy = gfx.height() - 1 - effy;
 			}
 			else
 			{
 				int temp;
 				if (rotate & ORIENTATION_FLIP_X)
-					effx = gfx->height() - 1 - effx;
+					effx = gfx.height() - 1 - effx;
 				if (rotate & ORIENTATION_FLIP_Y)
-					effy = gfx->width() - 1 - effy;
+					effy = gfx.width() - 1 - effy;
 				temp = effx; effx = effy; effy = temp;
 			}
 
 			// get a pointer to the start of this source row
-			s = src + effy * gfx->rowbytes();
+			s = src + effy * gfx.rowbytes();
 
 			// extract the pixel
 			*dest++ = 0xff000000 | palette[s[effx]];
@@ -957,7 +957,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 //  viewer
 //-------------------------------------------------
 
-static void tilemap_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
+static void tilemap_handler(running_machine &machine, render_container *container, ui_gfx_state &state)
 {
 	render_font *ui_font = machine.ui().get_font();
 	float chwidth, chheight;
@@ -974,10 +974,10 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	char title[100];
 
 	// get the size of the tilemap itself
-	tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
+	tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
 	mapwidth = tilemap->width();
 	mapheight = tilemap->height();
-	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
+	if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
 
 	// add a half character padding for the box
@@ -1003,7 +1003,7 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	mapboxheight = (mapboxbounds.y1 - mapboxbounds.y0) * (float)targheight;
 
 	// determine the maximum integral scaling factor
-	pixelscale = state->tilemap.zoom;
+	pixelscale = state.tilemap.zoom;
 	if (pixelscale == 0)
 	{
 		for (maxxscale = 1; mapwidth * (maxxscale + 1) < mapboxwidth; maxxscale++) ;
@@ -1028,7 +1028,7 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	boxbounds.y1 = mapboxbounds.y1 + 0.5f * chheight;
 
 	// figure out the title and expand the outer box to fit
-	sprintf(title, "TILEMAP %d/%d %dx%d OFFS %d,%d", state->tilemap.which, machine.tilemap().count() - 1, mapwidth, mapheight, state->tilemap.xoffs, state->tilemap.yoffs);
+	sprintf(title, "TILEMAP %d/%d %dx%d OFFS %d,%d", state.tilemap.which, machine.tilemap().count() - 1, mapwidth, mapheight, state.tilemap.xoffs, state.tilemap.yoffs);
 	titlewidth = ui_font->string_width(chheight, machine.render().ui_aspect(), title);
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
@@ -1054,8 +1054,8 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	// add the final quad
 	container->add_quad(mapboxbounds.x0, mapboxbounds.y0,
 						mapboxbounds.x1, mapboxbounds.y1,
-						ARGB_WHITE, state->texture,
-						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state->tilemap.rotate));
+						ARGB_WHITE, state.texture,
+						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state.tilemap.rotate));
 
 	// handle keyboard input
 	tilemap_handle_keys(machine, state, mapboxwidth, mapboxheight);
@@ -1067,44 +1067,44 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 //  tilemap view
 //-------------------------------------------------
 
-static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, int viswidth, int visheight)
+static void tilemap_handle_keys(running_machine &machine, ui_gfx_state &state, int viswidth, int visheight)
 {
 	UINT32 mapwidth, mapheight;
 	int step;
 
 	// handle tilemap selection (open bracket,close bracket)
-	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP) && state->tilemap.which > 0)
-	{ state->tilemap.which--; state->bitmap_dirty = true; }
-	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP) && state->tilemap.which < machine.tilemap().count() - 1)
-	{ state->tilemap.which++; state->bitmap_dirty = true; }
+	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP) && state.tilemap.which > 0)
+	{ state.tilemap.which--; state.bitmap_dirty = true; }
+	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP) && state.tilemap.which < machine.tilemap().count() - 1)
+	{ state.tilemap.which++; state.bitmap_dirty = true; }
 
 	// cache some info in locals
-	tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
+	tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
 	mapwidth = tilemap->width();
 	mapheight = tilemap->height();
 
 	// handle zoom (minus,plus)
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT) && state->tilemap.zoom > 0)
+	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT) && state.tilemap.zoom > 0)
 	{
-		state->tilemap.zoom--;
-		state->bitmap_dirty = true;
-		if (state->tilemap.zoom != 0)
-			popmessage("Zoom = %d", state->tilemap.zoom);
+		state.tilemap.zoom--;
+		state.bitmap_dirty = true;
+		if (state.tilemap.zoom != 0)
+			popmessage("Zoom = %d", state.tilemap.zoom);
 		else
 			popmessage("Zoom Auto");
 	}
-	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN) && state->tilemap.zoom < 8)
+	if (ui_input_pressed(machine, IPT_UI_ZOOM_IN) && state.tilemap.zoom < 8)
 	{
-		state->tilemap.zoom++;
-		state->bitmap_dirty = true;
-		popmessage("Zoom = %d", state->tilemap.zoom);
+		state.tilemap.zoom++;
+		state.bitmap_dirty = true;
+		popmessage("Zoom = %d", state.tilemap.zoom);
 	}
 
 	// handle rotation (R)
 	if (ui_input_pressed(machine, IPT_UI_ROTATE))
 	{
-		state->tilemap.rotate = orientation_add(ROT90, state->tilemap.rotate);
-		state->bitmap_dirty = true;
+		state.tilemap.rotate = orientation_add(ROT90, state.tilemap.rotate);
+		state.bitmap_dirty = true;
 	}
 
 	// handle navigation (up,down,left,right)
@@ -1112,23 +1112,23 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, i
 	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
 	if (machine.input().code_pressed(KEYCODE_LCONTROL)) step = 64;
 	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
-	{ state->tilemap.yoffs -= step; state->bitmap_dirty = true; }
+	{ state.tilemap.yoffs -= step; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))
-	{ state->tilemap.yoffs += step; state->bitmap_dirty = true; }
+	{ state.tilemap.yoffs += step; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_LEFT, 6))
-	{ state->tilemap.xoffs -= step; state->bitmap_dirty = true; }
+	{ state.tilemap.xoffs -= step; state.bitmap_dirty = true; }
 	if (ui_input_pressed_repeat(machine, IPT_UI_RIGHT, 6))
-	{ state->tilemap.xoffs += step; state->bitmap_dirty = true; }
+	{ state.tilemap.xoffs += step; state.bitmap_dirty = true; }
 
 	// clamp within range
-	while (state->tilemap.xoffs < 0)
-		state->tilemap.xoffs += mapwidth;
-	while (state->tilemap.xoffs >= mapwidth)
-		state->tilemap.xoffs -= mapwidth;
-	while (state->tilemap.yoffs < 0)
-		state->tilemap.yoffs += mapheight;
-	while (state->tilemap.yoffs >= mapheight)
-		state->tilemap.yoffs -= mapheight;
+	while (state.tilemap.xoffs < 0)
+		state.tilemap.xoffs += mapwidth;
+	while (state.tilemap.xoffs >= mapwidth)
+		state.tilemap.xoffs -= mapwidth;
+	while (state.tilemap.yoffs < 0)
+		state.tilemap.yoffs += mapheight;
+	while (state.tilemap.yoffs >= mapheight)
+		state.tilemap.yoffs -= mapheight;
 }
 
 
@@ -1137,36 +1137,36 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, i
 //  for the tilemap view
 //-------------------------------------------------
 
-static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state, int width, int height)
+static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state &state, int width, int height)
 {
 	// swap the coordinates back if they were talking about a rotated surface
-	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
+	if (state.tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = width; width = height; height = temp; }
 
 	// realloc the bitmap if it is too small
-	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->width() != width || state->bitmap->height() != height)
+	if (state.bitmap == NULL || state.texture == NULL || state.bitmap->width() != width || state.bitmap->height() != height)
 	{
 		// free the old stuff
-		machine.render().texture_free(state->texture);
-		global_free(state->bitmap);
+		machine.render().texture_free(state.texture);
+		global_free(state.bitmap);
 
 		// allocate new stuff
-		state->bitmap = global_alloc(bitmap_rgb32(width, height));
-		state->texture = machine.render().texture_alloc();
-		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
+		state.bitmap = global_alloc(bitmap_rgb32(width, height));
+		state.texture = machine.render().texture_alloc();
+		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_RGB32);
 
 		// force a redraw
-		state->bitmap_dirty = true;
+		state.bitmap_dirty = true;
 	}
 
 	// handle the redraw
-	if (state->bitmap_dirty)
+	if (state.bitmap_dirty)
 	{
-		tilemap_t *tilemap = machine.tilemap().find(state->tilemap.which);
-		tilemap->draw_debug(*machine.first_screen(), *state->bitmap, state->tilemap.xoffs, state->tilemap.yoffs);
+		tilemap_t *tilemap = machine.tilemap().find(state.tilemap.which);
+		tilemap->draw_debug(*machine.first_screen(), *state.bitmap, state.tilemap.xoffs, state.tilemap.yoffs);
 
 		// reset the texture to force an update
-		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
-		state->bitmap_dirty = false;
+		state.texture->set_bitmap(*state.bitmap, state.bitmap->cliprect(), TEXFORMAT_RGB32);
+		state.bitmap_dirty = false;
 	}
 }
