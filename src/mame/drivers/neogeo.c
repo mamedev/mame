@@ -473,7 +473,7 @@
 
 void neogeo_state::adjust_display_position_interrupt_timer()
 {
-	attotime period = attotime::from_hz(NEOGEO_PIXEL_CLOCK) * (m_display_counter + 1);
+	attotime period = attotime::from_ticks(m_display_counter + 1, NEOGEO_PIXEL_CLOCK);
 	if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", m_screen->vpos(), m_screen->hpos(), (m_display_counter + 1) / NEOGEO_HTOTAL, (m_display_counter + 1) % NEOGEO_HTOTAL);
 
 	m_display_position_interrupt_timer->adjust(period);
