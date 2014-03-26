@@ -136,10 +136,10 @@ enum
 class psxcpu_state
 {
 public:
-	virtual UINT32 pc();
-	virtual UINT32 delayr();
-	virtual UINT32 delayv();
-	virtual UINT32 r(int i);
+	virtual UINT32 pc() = 0;
+	virtual UINT32 delayr() = 0;
+	virtual UINT32 delayv() = 0;
+	virtual UINT32 r(int i) = 0;
 };
 
 // ======================> psxcpu_device
