@@ -3,7 +3,6 @@
 #include "machine/pit8253.h"
 #include "includes/amstr_pc.h"
 #include "includes/pc.h"
-#include "video/pc_vga.h"
 
 
 /* pc20 (v2)

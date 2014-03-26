@@ -20,8 +20,6 @@
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 
-#include "video/pc_vga.h"
-#include "video/pc_cga.h"
 #include "video/pc_t1t.h"
 
 #include "machine/pit8253.h"
@@ -1194,17 +1192,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pc_frame_interrupt)
 
 	if((scanline % 64) == 0)
 		pc_keyboard();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pc_vga_frame_interrupt)
-{
-	int scanline = param;
-
-	if((scanline % 64) == 0)
-	{
-		//vga_timer();
-		pc_keyboard();
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pcjr_frame_interrupt)

@@ -2212,3 +2212,29 @@ READ8_MEMBER( isa8_ec1841_0002_device::io_read )
 	}
 	return data;
 }
+
+const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
+
+//-------------------------------------------------
+//  isa8_cga_mc1502_device - constructor
+//-------------------------------------------------
+
+isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "MC1502 CGA", tag, owner, clock, "cga_mc1502", __FILE__)
+{
+	m_vram_size = 0x8000;
+	m_chr_gen_offset[0] = 0x0000;
+	m_chr_gen_offset[1] = 0x0800;
+
+}
+
+ROM_START( mc1502 )
+	ROM_REGION(0x2000,"gfx1", 0)
+	// taken from mc1502
+	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))	
+ROM_END
+
+const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
+{
+	return ROM_NAME( mc1502 );
+}

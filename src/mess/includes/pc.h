@@ -99,7 +99,6 @@ public:
 	TIMER_CALLBACK_MEMBER(pcjr_fdc_watchdog);
 	TIMER_CALLBACK_MEMBER(pc_rtc_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc_vga_frame_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcjr_frame_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma8237_fdc_dack_r);

@@ -369,8 +369,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter PC_CGA,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/pc_cga.o        \
-			$(VIDEOOBJ)/cgapal.o
+VIDEOOBJS+= $(VIDEOOBJ)/cgapal.o
 endif
 
 #-------------------------------------------------

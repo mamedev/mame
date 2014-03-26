@@ -71,8 +71,8 @@ video HW too.
 #include "machine/pic8259.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_vga.h"
-#include "video/pc_cga.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"
 
@@ -407,11 +407,6 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pccga )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -470,16 +465,9 @@ static INPUT_PORTS_START( pccga )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
-
-	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pcega )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_START("DSW0") /* IN1 */
 	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -538,8 +526,6 @@ static INPUT_PORTS_START( pcega )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
-
-	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 
@@ -588,8 +574,6 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 	EUROPC_KEYBOARD
-
-	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bondwell )
@@ -660,7 +644,6 @@ static INPUT_PORTS_START( bondwell )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 //  PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
-	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tandy1t )
@@ -740,22 +723,8 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
 	MCFG_CPU_IO_MAP(port##_io)  \
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", pc_state, vblankfunc, attotime::from_hz(60))
 
-
-/* F4 Character Displayer */
-static const gfx_layout pc_16_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	256,                    /* 256 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8                 /* every char takes 2 x 8 bytes */
-};
 
 static const gfx_layout pc_8_charlayout =
 {
@@ -783,16 +752,44 @@ static const gfx_layout kanji_layout =
 	16*16                   /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ibm5150 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_16_charlayout, 3, 1 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, pc_8_charlayout, 3, 1 )
-GFXDECODE_END
-
 
 static const pc_kbdc_interface pc_kbdc_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_state, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_state, keyboard_data_w)
+};
+
+
+static const isa8bus_interface pc_isabus_intf =
+{
+	// interrupts
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
+
+	// dma request
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq3_w)
+};
+
+static const isa8bus_interface asst128_isabus_intf =
+{
+	// interrupts
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
+
+	// dma request
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -836,9 +833,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -866,27 +862,27 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
-static const gfx_layout pc10iii_16_charlayout =
-{
-	8, 16,                  /* 8 x 16 characters */
-	2048,                    /* 2048 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16                    /* every char takes 16 bytes */
-};
+// static const gfx_layout pc10iii_16_charlayout =
+// {
+	// 8, 16,                  /* 8 x 16 characters */
+	// 2048,                    /* 2048 characters */
+	// 1,                  /* 1 bits per pixel */
+	// { 0 },                  /* no bitplanes */
+	// /* x offsets */
+	// { 7, 6, 5, 4, 3, 2, 1, 0 },
+	// /* y offsets */
+	// { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	// 8*16                    /* every char takes 16 bytes */
+// };
 
-// 8-byte chars: 080-0FF, 180-27F, 300-37F, 480-4FF, 580-67F, 700-77F
-// 16-byte chars: 000-07F, 100-17F, 280-2FF, 380-47F, 500-57F, 680-6FF, 780-7FF
-static GFXDECODE_START( pc10iii )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, pc10iii_16_charlayout, 3, 1 )
-GFXDECODE_END
+// // 8-byte chars: 080-0FF, 180-27F, 300-37F, 480-4FF, 580-67F, 700-77F
+// // 16-byte chars: 000-07F, 100-17F, 280-2FF, 380-47F, 500-57F, 680-6FF, 780-7FF
+// static GFXDECODE_START( pc10iii )
+	// GFXDECODE_ENTRY( "gfx1", 0x0000, pc10iii_16_charlayout, 3, 1 )
+// GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED( pc10iii, pccga )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", pc10iii)
+	//MCFG_GFXDECODE_MODIFY("gfxdecode", pc10iii)
 MACHINE_CONFIG_END
 
 static const gfx_layout europc_8_charlayout =
@@ -1384,9 +1380,9 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", asst128_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga_mc1502", false)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1472,8 +1468,9 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-//  MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "ega", false)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -1542,9 +1539,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga_poisk2", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1613,9 +1609,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1645,7 +1640,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( olivetti, pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(pc16, pc16, I8086, 8000000, pc_vga_frame_interrupt)
+	MCFG_CPU_PC(pc16, pc16, I8086, 8000000, pc_frame_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1684,9 +1679,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1716,7 +1710,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ibm5550, pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(ibm5550, ibm5550, I8086, 8000000, pc_vga_frame_interrupt)
+	MCFG_CPU_PC(ibm5550, ibm5550, I8086, 8000000, pc_frame_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1755,9 +1749,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
-	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", pc_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", pc_isa8_cards, "cga", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1856,10 +1849,6 @@ MACHINE_CONFIG_END
 ROM_START( bw230 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405) SHA1(a57c705d1144c7b61940b6f5c05d785c272fc9bb))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( zdsupers )
@@ -1868,9 +1857,6 @@ ROM_START( zdsupers )
 	ROMX_LOAD( "z184m v3.1d.10d", 0xf8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9e" )
 	ROMX_LOAD( "z184m v2.9e.10d", 0xf8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(2))
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( europc )
@@ -2079,19 +2065,11 @@ ROM_END
 ROM_START( dgone )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "dgone.bin",  0xf8000, 0x08000, CRC(2c38c86e) SHA1(c0f85a000d1d13cd354965689e925d677822549e))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( ssam88s )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "samsung_samtron_88s_vers_2.0a.bin",  0xf8000, 0x08000, CRC(d1252a91) SHA1(469d15b6ecd7b70234975dc12c6bda4212a66652))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( asst128 )
@@ -2157,8 +2135,6 @@ ROM_START( poisk2 )
 	ROM_SYSTEM_BIOS(5, "v23d", "v2.3d")
 	ROMX_LOAD( "opp2_3h.rf4", 0xfc001, 0x2000, CRC(ac7d4f06) SHA1(858d6e084a38814280b3e29fb54971f4f532e484), ROM_SKIP(1) | ROM_BIOS(6))
 	ROMX_LOAD( "opp2_3l.rf4", 0xfc000, 0x2000, CRC(3c877ea1) SHA1(0753168659653538311c0ad1df851cbbdba426f4), ROM_SKIP(1) | ROM_BIOS(6))
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "p2_ecga.rf4", 0x0000, 0x2000, CRC(d537f665) SHA1(d70f085b9b0cbd53df7c3122fbe7592998ba8fed))
 ROM_END
 
 ROM_START( mc1702 )
@@ -2166,10 +2142,6 @@ ROM_START( mc1702 )
 	ROM_LOAD16_BYTE( "2764_2_(573rf4).rom", 0xfc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
 	ROM_LOAD16_BYTE( "2764_3_(573rf4).rom", 0xfc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
 	ROM_LOAD( "ba1m_(573rf5).rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 
@@ -2177,39 +2149,23 @@ ROM_START( m24 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROMX_LOAD("olivetti_m24_version_1.43_high.bin",0xfc001, 0x2000, CRC(04e697ba) SHA1(1066dcc849e6289b5ac6372c84a590e456d497a6), ROM_SKIP(1))
 	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0xfc000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( m240 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROMX_LOAD("olivetti_m240_pch5_2.04_high.bin", 0xf8001, 0x4000, CRC(ceb97b59) SHA1(84fabbeab355e0a4c9445910f2b7d1ec98886642), ROM_SKIP(1))
 	ROMX_LOAD("olivetti_m240_pch6_2.04_low.bin",  0xf8000, 0x4000, CRC(c463aa94) SHA1(a30c763c1ace9f3ff79e7136b252d624108a50ae), ROM_SKIP(1))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( ibm5550 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD( "ipl5550.rom", 0xfc000, 0x4000, CRC(40cf34c9) SHA1(d41f77fdfa787b0e97ed311e1c084b8699a5b197))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( pc7000 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROMX_LOAD( "mitsubishi-m5l27128k-1.bin", 0xf8000, 0x4000, CRC(9683957f) SHA1(4569eab6d88eb1bba0d553d1358e593c326978aa), ROM_SKIP(1))
 	ROMX_LOAD( "mitsubishi-m5l27128k-2.bin", 0xf8001, 0x4000, CRC(99b229a4) SHA1(5800c8bafed26873d8cfcc79a05f93a780a31c91), ROM_SKIP(1))
-
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( olivm15 )
@@ -2222,26 +2178,17 @@ ROM_START( pcd )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD16_BYTE( "sni_pcd1.bin", 0xfc001, 0x2000, CRC(e20244dd) SHA1(0ebc5ddb93baacd9106f1917380de58aac64fe73))
 	ROM_LOAD16_BYTE( "sni_pcd2.bin", 0xfc000, 0x2000, CRC(e03db2ec) SHA1(fcae8b0c9e7543706817b0a53872826633361fda))
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( olypeopl )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD16_BYTE( "uo1271c0.bin", 0xfe000, 0x1000, CRC(c9187bce) SHA1(464e1f96046657b49afa4223ede1040650643d58))
 	ROM_LOAD16_BYTE( "uo1271d0.bin", 0xfe001, 0x1000, CRC(10e6437b) SHA1(0b77bb7a62f0a8240602f4cdcc3d6765e62894f4))
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0) /* original font rom is undumped */
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( sx16 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "tmm27128ad.bin",0xfc000, 0x4000, CRC(f8543362) SHA1(fef625e260ca89ba02174584bdc12db609f0780e))
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( compc1 )
@@ -2280,8 +2227,6 @@ ROM_START( mbc16 )
 	ROM_REGION(0x2000,"gfx1", 0)
 	//ATI Graphics Solution SR (graphics card, need to make it ISA card)
 	ROM_LOAD( "atigssr.bin", 0x0000, 0x2000, CRC(aca81498) SHA1(0d84c89487ee7a6ac4c9e73fdb30c5fd8aa595f8))
-	// override for now with IBM CGA card
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
 ROM_START( ataripc3 )
