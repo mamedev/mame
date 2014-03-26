@@ -63,12 +63,12 @@ public:
 	DECLARE_READ16_MEMBER(cybikov2_key_r);
 	DECLARE_READ16_MEMBER(cybikoxt_key_r);
 	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
-	DECLARE_READ8_MEMBER(cybikov1_io_reg_r);
-	DECLARE_READ8_MEMBER(cybikov2_io_reg_r);
-	DECLARE_READ8_MEMBER(cybikoxt_io_reg_r);
-	DECLARE_WRITE8_MEMBER(cybikov1_io_reg_w);
-	DECLARE_WRITE8_MEMBER(cybikov2_io_reg_w);
-	DECLARE_WRITE8_MEMBER(cybikoxt_io_reg_w);
+	DECLARE_READ16_MEMBER(cybikov1_io_reg_r);
+	DECLARE_READ16_MEMBER(cybikov2_io_reg_r);
+	DECLARE_READ16_MEMBER(cybikoxt_io_reg_r);
+	DECLARE_WRITE16_MEMBER(cybikov1_io_reg_w);
+	DECLARE_WRITE16_MEMBER(cybikov2_io_reg_w);
+	DECLARE_WRITE16_MEMBER(cybikoxt_io_reg_w);
 	int cybiko_key_r( offs_t offset, int mem_mask);
 	void cybiko_rs232_write_byte(int data);
 	void cybiko_rs232_pin_sck(int data);

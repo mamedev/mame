@@ -236,9 +236,9 @@ READ16_MEMBER( cybiko_state::cybikoxt_key_r )
 	return cybiko_key_r(offset, mem_mask);
 }
 
-READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
+READ16_MEMBER( cybiko_state::cybikov1_io_reg_r )
 {
-	UINT8 data = 0;
+	UINT16 data = 0;
 #if 0
 	_logerror( 2, ("cybikov1_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -284,9 +284,9 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 	return data;
 }
 
-READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
+READ16_MEMBER( cybiko_state::cybikov2_io_reg_r )
 {
-	UINT8 data = 0;
+	UINT16 data = 0;
 #if 0
 	_logerror( 2, ("cybikov2_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -332,9 +332,9 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 	return data;
 }
 
-READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
+READ16_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 {
-	UINT8 data = 0;
+	UINT16 data = 0;
 #if 0
 	_logerror( 2, ("cybikoxt_io_reg_r (%08X)\n", offset));
 	switch (offset)
@@ -372,7 +372,7 @@ READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 	return data;
 }
 
-WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
+WRITE16_MEMBER( cybiko_state::cybikov1_io_reg_w )
 {
 #if 0
 	_logerror( 2, ("cybikov1_io_reg_w (%08X/%02X)\n", offset, data));
@@ -415,7 +415,7 @@ WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 #endif
 }
 
-WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
+WRITE16_MEMBER( cybiko_state::cybikov2_io_reg_w )
 {
 #if 0
 	_logerror( 2, ("cybikov2_io_reg_w (%08X/%02X)\n", offset, data));
@@ -458,7 +458,7 @@ WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 #endif
 }
 
-WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
+WRITE16_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 {
 #if 0
 	_logerror( 2, ("cybikoxt_io_reg_w (%08X/%02X)\n", offset, data));

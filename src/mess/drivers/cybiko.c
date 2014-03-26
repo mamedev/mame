@@ -99,15 +99,15 @@ ADDRESS_MAP_END
 // ADDRESS MAP - IO //
 //////////////////////
 
-static ADDRESS_MAP_START( cybikov1_io, AS_IO, 8, cybiko_state )
+static ADDRESS_MAP_START( cybikov1_io, AS_IO, 16, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov1_io_reg_r, cybikov1_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikov2_io, AS_IO, 8, cybiko_state )
+static ADDRESS_MAP_START( cybikov2_io, AS_IO, 16, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikov2_io_reg_r, cybikov2_io_reg_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 8, cybiko_state )
+static ADDRESS_MAP_START( cybikoxt_io, AS_IO, 16, cybiko_state )
 	AM_RANGE( 0xfffe40, 0xffffff ) AM_READWRITE( cybikoxt_io_reg_r, cybikoxt_io_reg_w )
 ADDRESS_MAP_END
 
