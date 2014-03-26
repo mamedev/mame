@@ -71,12 +71,12 @@ public:
 
 	void set_info(const char *intc_tag, int vect);
 
-	DECLARE_READ8_HANDLER(addr8_r);
-	DECLARE_READ16_HANDLER(addr16_r);
-	DECLARE_READ8_HANDLER(adcsr_r);
-	DECLARE_READ8_HANDLER(adcr_r);
-	DECLARE_WRITE8_HANDLER(adcsr_w);
-	DECLARE_WRITE8_HANDLER(adcr_w);
+	DECLARE_READ8_MEMBER(addr8_r);
+	DECLARE_READ16_MEMBER(addr16_r);
+	DECLARE_READ8_MEMBER(adcsr_r);
+	DECLARE_READ8_MEMBER(adcr_r);
+	DECLARE_WRITE8_MEMBER(adcsr_w);
+	DECLARE_WRITE8_MEMBER(adcr_w);
 	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
 
 	void set_suspend(bool suspend);

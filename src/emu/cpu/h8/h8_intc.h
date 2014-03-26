@@ -62,10 +62,10 @@ public:
 	void set_input(int inputnum, int state);
 	void set_filter(int icr_filter, int ipr_filter);
 
-	DECLARE_READ8_HANDLER(ier_r);
-	DECLARE_WRITE8_HANDLER(ier_w);
-	DECLARE_READ8_HANDLER(iscr_r);
-	DECLARE_WRITE8_HANDLER(iscr_w);
+	DECLARE_READ8_MEMBER(ier_r);
+	DECLARE_WRITE8_MEMBER(ier_w);
+	DECLARE_READ8_MEMBER(iscr_r);
+	DECLARE_WRITE8_MEMBER(iscr_w);
 
 protected:
 	enum { IRQ_LEVEL, IRQ_EDGE, IRQ_DUAL_EDGE };
@@ -99,16 +99,16 @@ public:
 	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	DECLARE_READ8_HANDLER(isr_r);
-	DECLARE_WRITE8_HANDLER(isr_w);	
-	DECLARE_READ8_HANDLER(icr_r);
-	DECLARE_WRITE8_HANDLER(icr_w);
-	DECLARE_READ8_HANDLER(icrc_r);
-	DECLARE_WRITE8_HANDLER(icrc_w);
-	DECLARE_READ8_HANDLER(iscrh_r);
-	DECLARE_WRITE8_HANDLER(iscrh_w);
-	DECLARE_READ8_HANDLER(iscrl_r);
-	DECLARE_WRITE8_HANDLER(iscrl_w);
+	DECLARE_READ8_MEMBER(isr_r);
+	DECLARE_WRITE8_MEMBER(isr_w);	
+	DECLARE_READ8_MEMBER(icr_r);
+	DECLARE_WRITE8_MEMBER(icr_w);
+	DECLARE_READ8_MEMBER(icrc_r);
+	DECLARE_WRITE8_MEMBER(icrc_w);
+	DECLARE_READ8_MEMBER(iscrh_r);
+	DECLARE_WRITE8_MEMBER(iscrh_w);
+	DECLARE_READ8_MEMBER(iscrl_r);
+	DECLARE_WRITE8_MEMBER(iscrl_w);
 
 protected:
 	static const int vector_to_slot[];
@@ -126,10 +126,10 @@ class h8s_intc_device : public h8h_intc_device {
 public:
 	h8s_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_HANDLER(ipr_r);
-	DECLARE_WRITE8_HANDLER(ipr_w);
-	DECLARE_READ8_HANDLER(iprk_r);
-	DECLARE_WRITE8_HANDLER(iprk_w);
+	DECLARE_READ8_MEMBER(ipr_r);
+	DECLARE_WRITE8_MEMBER(ipr_w);
+	DECLARE_READ8_MEMBER(iprk_r);
+	DECLARE_WRITE8_MEMBER(iprk_w);
 
 	void set_mode_8(bool mode_8);
 

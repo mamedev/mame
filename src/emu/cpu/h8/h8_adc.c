@@ -22,31 +22,31 @@ void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
 	intc_vector = _intc_vector;
 }
 
-READ8_HANDLER(h8_adc_device::addr8_r)
+READ8_MEMBER(h8_adc_device::addr8_r)
 {
 	logerror("%s: addr8_r %d %03x\n", tag(), offset, addr[offset >> 1]);
 	return offset & 1 ? addr[offset >> 1] >> 2 : addr[offset >> 1] << 6;
 }
 
-READ16_HANDLER(h8_adc_device::addr16_r)
+READ16_MEMBER(h8_adc_device::addr16_r)
 {
 	logerror("%s: addr16_r %d %03x\n", tag(), offset, addr[offset]);
 	return addr[offset];
 }
 
-READ8_HANDLER(h8_adc_device::adcsr_r)
+READ8_MEMBER(h8_adc_device::adcsr_r)
 {
 	logerror("%s: adcsr_r %02x\n", tag(), adcsr);
 	return adcsr;
 }
 
-READ8_HANDLER(h8_adc_device::adcr_r)
+READ8_MEMBER(h8_adc_device::adcr_r)
 {
 	logerror("%s: adcr_r %02x\n", tag(), adcr);
 	return adcr;
 }
 
-WRITE8_HANDLER(h8_adc_device::adcsr_w)
+WRITE8_MEMBER(h8_adc_device::adcsr_w)
 {
 	logerror("%s: adcsr_w %02x\n", tag(), data);
 	UINT8 prev = adcsr;
@@ -67,7 +67,7 @@ WRITE8_HANDLER(h8_adc_device::adcsr_w)
 		start_conversion();
 }
 
-WRITE8_HANDLER(h8_adc_device::adcr_w)
+WRITE8_MEMBER(h8_adc_device::adcr_w)
 {
 	logerror("%s: adcr_w %02x\n", tag(), data);
 	adcr = data;

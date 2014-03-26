@@ -205,12 +205,12 @@ void h83002_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_HANDLER(h83002_device::syscr_r)
+READ8_MEMBER(h83002_device::syscr_r)
 {
 	return syscr;
 }
 
-WRITE8_HANDLER(h83002_device::syscr_w)
+WRITE8_MEMBER(h83002_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();

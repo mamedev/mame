@@ -424,12 +424,12 @@ void h8s2320_device::device_reset()
 	syscr = 0x01;
 }
 
-READ8_HANDLER(h8s2320_device::syscr_r)
+READ8_MEMBER(h8s2320_device::syscr_r)
 {
 	return syscr;
 }
 
-WRITE8_HANDLER(h8s2320_device::syscr_w)
+WRITE8_MEMBER(h8s2320_device::syscr_w)
 {
 	syscr = data;
 	mac_saturating = syscr & 0x80;

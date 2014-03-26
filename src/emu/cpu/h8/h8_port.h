@@ -52,14 +52,14 @@ public:
 
 	void set_info(int address, UINT8 default_ddr, UINT8 mask);
 
-	DECLARE_WRITE8_HANDLER(ddr_w);
-	DECLARE_WRITE8_HANDLER(dr_w);
-	DECLARE_READ8_HANDLER(dr_r);
-	DECLARE_READ8_HANDLER(port_r);
-	DECLARE_WRITE8_HANDLER(pcr_w);
-	DECLARE_READ8_HANDLER(pcr_r);
-	DECLARE_WRITE8_HANDLER(odr_w);
-	DECLARE_READ8_HANDLER(odr_r);
+	DECLARE_WRITE8_MEMBER(ddr_w);
+	DECLARE_WRITE8_MEMBER(dr_w);
+	DECLARE_READ8_MEMBER(dr_r);
+	DECLARE_READ8_MEMBER(port_r);
+	DECLARE_WRITE8_MEMBER(pcr_w);
+	DECLARE_READ8_MEMBER(pcr_r);
+	DECLARE_WRITE8_MEMBER(odr_w);
+	DECLARE_READ8_MEMBER(odr_r);
 
 protected:
 	required_device<h8_device> cpu;

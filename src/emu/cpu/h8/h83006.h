@@ -54,8 +54,8 @@ public:
 	h83006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_HANDLER(syscr_r);
-	DECLARE_WRITE8_HANDLER(syscr_w);	
+	DECLARE_READ8_MEMBER(syscr_r);
+	DECLARE_WRITE8_MEMBER(syscr_w);	
 
 protected:
 	required_device<h8h_intc_device> intc;

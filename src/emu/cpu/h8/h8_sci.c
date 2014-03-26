@@ -20,7 +20,7 @@ void h8_sci_device::set_info(const char *_intc_tag,int eri, int rxi, int txi, in
 	tei_int = tei;
 }
 
-WRITE8_HANDLER(h8_sci_device::smr_w)
+WRITE8_MEMBER(h8_sci_device::smr_w)
 {
 	smr = data;
 	logerror("%s: smr_w %02x %s %c%c%c%s /%d (%06x)\n", tag(), data,
@@ -34,26 +34,26 @@ WRITE8_HANDLER(h8_sci_device::smr_w)
 	clock_update();
 }
 
-READ8_HANDLER(h8_sci_device::smr_r)
+READ8_MEMBER(h8_sci_device::smr_r)
 {
 	logerror("%s: smr_r %02x (%06x)\n", tag(), smr, cpu->pc());
 	return smr;
 }
 
-WRITE8_HANDLER(h8_sci_device::brr_w)
+WRITE8_MEMBER(h8_sci_device::brr_w)
 {
 	brr = data;
 	logerror("%s: brr_w %02x (%06x)\n", tag(), data, cpu->pc());
 	clock_update();
 }
 
-READ8_HANDLER(h8_sci_device::brr_r)
+READ8_MEMBER(h8_sci_device::brr_r)
 {
 	logerror("%s: brr_r %02x (%06x)\n", tag(), brr, cpu->pc());
 	return brr;
 }
 
-WRITE8_HANDLER(h8_sci_device::scr_w)
+WRITE8_MEMBER(h8_sci_device::scr_w)
 {
 	logerror("%s: scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", tag(), data,
 			 data & SCR_TIE  ? " txi" : "",
@@ -86,25 +86,25 @@ WRITE8_HANDLER(h8_sci_device::scr_w)
 		intc->internal_interrupt(eri_int);
 }
 
-READ8_HANDLER(h8_sci_device::scr_r)
+READ8_MEMBER(h8_sci_device::scr_r)
 {
 	logerror("%s: scr_r %02x (%06x)\n", tag(), scr, cpu->pc());
 	return scr;
 }
 
-WRITE8_HANDLER(h8_sci_device::tdr_w)
+WRITE8_MEMBER(h8_sci_device::tdr_w)
 {
 	logerror("%s: tdr_w %02x (%06x)\n", tag(), data, cpu->pc());
 	tdr = data;
 }
 
-READ8_HANDLER(h8_sci_device::tdr_r)
+READ8_MEMBER(h8_sci_device::tdr_r)
 {
 	logerror("%s: tdr_r %02x (%06x)\n", tag(), tdr, cpu->pc());
 	return tdr;
 }
 
-WRITE8_HANDLER(h8_sci_device::ssr_w)
+WRITE8_MEMBER(h8_sci_device::ssr_w)
 {
 	if(!(scr & SCR_TE)) {
 		data |= SSR_TDRE;
@@ -119,24 +119,24 @@ WRITE8_HANDLER(h8_sci_device::ssr_w)
 		tx_start();
 }
 
-READ8_HANDLER(h8_sci_device::ssr_r)
+READ8_MEMBER(h8_sci_device::ssr_r)
 {
 	logerror("%s: ssr_r %02x (%06x)\n", tag(), ssr, cpu->pc());
 	return ssr;
 }
 
-READ8_HANDLER(h8_sci_device::rdr_r)
+READ8_MEMBER(h8_sci_device::rdr_r)
 {
 	logerror("%s: rdr_r %02x (%06x)\n", tag(), rdr, cpu->pc());
 	return rdr;
 }
 
-WRITE8_HANDLER(h8_sci_device::scmr_w)
+WRITE8_MEMBER(h8_sci_device::scmr_w)
 {
 	logerror("%s: scmr_w %02x (%06x)\n", tag(), data, cpu->pc());
 }
 
-READ8_HANDLER(h8_sci_device::scmr_r)
+READ8_MEMBER(h8_sci_device::scmr_r)
 {
 	logerror("%s: scmr_r (%06x)\n", tag(), cpu->pc());
 	return 0x00;

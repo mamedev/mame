@@ -185,12 +185,12 @@ void h83337_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_HANDLER(h83337_device::syscr_r)
+READ8_MEMBER(h83337_device::syscr_r)
 {
 	return syscr;
 }
 
-WRITE8_HANDLER(h83337_device::syscr_w)
+WRITE8_MEMBER(h83337_device::syscr_w)
 {
 	syscr = data;
 	logerror("%s: syscr = %02x\n", tag(), data);

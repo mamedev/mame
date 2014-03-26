@@ -396,12 +396,12 @@ void h8s2357_device::device_reset()
 	syscr = 0x01;
 }
 
-READ8_HANDLER(h8s2357_device::syscr_r)
+READ8_MEMBER(h8s2357_device::syscr_r)
 {
 	return syscr;
 }
 
-WRITE8_HANDLER(h8s2357_device::syscr_w)
+WRITE8_MEMBER(h8s2357_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();

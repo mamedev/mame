@@ -92,12 +92,12 @@ void h8_intc_device::set_filter(int _icr_filter, int _ipr_filter)
 	update_irq_state();
 }
 
-READ8_HANDLER(h8_intc_device::ier_r)
+READ8_MEMBER(h8_intc_device::ier_r)
 {
 	return ier;
 }
 
-WRITE8_HANDLER(h8_intc_device::ier_w)
+WRITE8_MEMBER(h8_intc_device::ier_w)
 {
 	ier = data;
 	logerror("%s: ier = %02x\n", tag(), data);
@@ -120,12 +120,12 @@ void h8_intc_device::check_level_irqs(bool force_update)
 }
 
 
-READ8_HANDLER(h8_intc_device::iscr_r)
+READ8_MEMBER(h8_intc_device::iscr_r)
 {
 	return iscr;
 }
 
-WRITE8_HANDLER(h8_intc_device::iscr_w)
+WRITE8_MEMBER(h8_intc_device::iscr_w)
 {
 	iscr = data;
 	logerror("%s: iscr = %02x\n", tag(), iscr);
@@ -206,57 +206,57 @@ void h8h_intc_device::device_reset()
 	icr = 0x000000;
 }
 
-READ8_HANDLER(h8h_intc_device::isr_r)
+READ8_MEMBER(h8h_intc_device::isr_r)
 {
 	return isr;
 }
 
-WRITE8_HANDLER(h8h_intc_device::isr_w)
+WRITE8_MEMBER(h8h_intc_device::isr_w)
 {
 	isr &= data; // edge/level
 	logerror("%s: isr = %02x / %02x\n", tag(), data, isr);
 	check_level_irqs(true);
 }
 
-READ8_HANDLER(h8h_intc_device::icr_r)
+READ8_MEMBER(h8h_intc_device::icr_r)
 {
 	return icr >> (8*offset);
 }
 
-WRITE8_HANDLER(h8h_intc_device::icr_w)
+WRITE8_MEMBER(h8h_intc_device::icr_w)
 {
 	icr = (icr & (0xff << (8*offset))) | (data << (8*offset));
 	logerror("%s: icr %d = %02x\n", tag(), offset, data);
 }
 
-READ8_HANDLER(h8h_intc_device::icrc_r)
+READ8_MEMBER(h8h_intc_device::icrc_r)
 {
 	return icr_r(space, 2, mem_mask);
 }
 
-WRITE8_HANDLER(h8h_intc_device::icrc_w)
+WRITE8_MEMBER(h8h_intc_device::icrc_w)
 {
 	icr_w(space, 2, data, mem_mask);
 }
 
-READ8_HANDLER(h8h_intc_device::iscrh_r)
+READ8_MEMBER(h8h_intc_device::iscrh_r)
 {
 	return iscr >> 8;
 }
 
-WRITE8_HANDLER(h8h_intc_device::iscrh_w)
+WRITE8_MEMBER(h8h_intc_device::iscrh_w)
 {
 	iscr = (iscr & 0x00ff) | (data << 8);
 	logerror("%s: iscr = %04x\n", tag(), iscr);
 	update_irq_types();
 }
 
-READ8_HANDLER(h8h_intc_device::iscrl_r)
+READ8_MEMBER(h8h_intc_device::iscrl_r)
 {
 	return iscr;
 }
 
-WRITE8_HANDLER(h8h_intc_device::iscrl_w)
+WRITE8_MEMBER(h8h_intc_device::iscrl_w)
 {
 	iscr = (iscr & 0xff00) | data;
 	logerror("%s: iscr = %04x\n", tag(), iscr);
@@ -321,23 +321,23 @@ void h8s_intc_device::device_reset()
 	memset(ipr, 0x77, sizeof(ipr));
 }
 
-READ8_HANDLER(h8s_intc_device::ipr_r)
+READ8_MEMBER(h8s_intc_device::ipr_r)
 {
 	return ipr[offset];
 }
 
-WRITE8_HANDLER(h8s_intc_device::ipr_w)
+WRITE8_MEMBER(h8s_intc_device::ipr_w)
 {
 	ipr[offset] = data;
 	logerror("%s: ipr %d = %02x\n", tag(), offset, data);
 }
 
-READ8_HANDLER(h8s_intc_device::iprk_r)
+READ8_MEMBER(h8s_intc_device::iprk_r)
 {
 	return ipr_r(space, 10, mem_mask);
 }
 
-WRITE8_HANDLER(h8s_intc_device::iprk_w)
+WRITE8_MEMBER(h8s_intc_device::iprk_w)
 {
 	ipr_w(space, 10, data, mem_mask);
 }
