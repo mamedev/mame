@@ -728,7 +728,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
@@ -736,16 +736,16 @@ INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)         /* 4MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) /* 4MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(slapfght_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8)            /* 2MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8) /* 2MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 4*60)   /* music speed, verified */
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 240) /* music speed, verified */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))       /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -784,16 +784,16 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tigerh_map)
 	MCFG_CPU_IO_MAP(tigerh_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 6*60)    /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 360) // music speed, verfied with pcb recording
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -828,16 +828,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)
+	MCFG_CPU_ADD("maincpu", Z80, 6000000) // ?
 	MCFG_CPU_PROGRAM_MAP(tigerh_map)
 	MCFG_CPU_IO_MAP(tigerhb_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 6000000)
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000) // ?
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 6*60)    /* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 360) // ?
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
@@ -876,16 +876,16 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfght_map)
 	MCFG_CPU_IO_MAP(slapfght_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt,  3*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 180)
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
 
