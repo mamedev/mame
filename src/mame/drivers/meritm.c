@@ -112,9 +112,9 @@ PROGRAM#    Program Version      Program Differences
   Megatouch III Tournament Edition (c)1996
   Megatouch IV (c)1996
   Megatouch IV Tournament Edition (c)1996
-  Super Megatouch IV (c) 1996  (rom labels 9255-41-0x, see below)
-  Super Megatouch IV Tournament Edition (c) 1996
-  *The Real Broadway (c) 1996 (single rom at U38 + DS1204 security key (likely 9131-20-00 U38-R0A))
+  Super Megatouch IV (c)1996  (rom labels 9255-41-0x, see below)
+  Super Megatouch IV Tournament Edition (c)1996
+  The Real Broadway (c)1995
   Megatouch 5 (c)1997
   Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
@@ -696,6 +696,26 @@ static INPUT_PORTS_START(dodgecty)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(realbrod)
+	PORT_INCLUDE(meritm_crt250)
+
+	PORT_MODIFY("PIO1_PORTA")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME( "Stand / Clear Hi-Score" )
+
+	PORT_MODIFY("PIO1_PORTB")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Setup")
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Play" )       PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x0c, "20" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x00, "50 Raise Yes / 99 Raise No" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(pitbossm)
@@ -1391,11 +1411,43 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 ROM_END
 
 /*
-The Real Broadway - Standard 5 card draw poker.
+
+The Real Broadway - Standard 5 card draw Joker Poker.
 
  Single rom at U38 on a Merit CTR-260 PCB with a Dallas DS1204U-3 security key.
  Uses standard draw poker keys - NOT a touchscreen based game.
  Dipswitches are used for in game functions.
+
+Pressing Service Mode "F2" brings up a Coins in for Coin1 & Coin2 plus total coins.
+  At this screen pressing in order Hold1 through Hold5 results in a simple system test.
+  The program responds with "STATUS OK."
+
+Entering the Setup menu "S":
+ Hold3 switches selection choice.
+ Hold5 advances through the list.
+ Stand will clear the High Scores
+  Pressing Stand a second time clears All Time High Scores
+
+In the rom there is text for:
+  Hi Lo Double Up mini game
+  DIP 5 use (unknown at this time)
+  PUSH STAND FOR BONUS SET UP
+  ENTER NEW PASSWORD
+  TEN STRAIGHT NO-WINS RETURNS FIRST NINE BETS
+
+ Additional Setup menu items:
+  Double Up            Yes / No
+  Unlimited Double Up  Yes / No
+  Take 1/2, DBL 1/2    Yes / No
+  Bonus Feature        Yes / No
+  Bonus Type           10Loss / Twin
+  Re-Bet               Yes / No
+  Hi-Score             Yes / No
+
+It's unknown if the above is used for regional versions of the game or left over from previous
+ versions of the game such as Dodge City which also contains many of the same text strings.
+It's currently unknown how to access / enable those features or if it's possible to do so.
+
 */
 
 ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0A */
@@ -1407,7 +1459,7 @@ ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0A
 	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9131-20-00-u5-r0a", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) /* WRONG!! Taken from megat2 */
+	ROM_LOAD( "9131-20-00-u5-r0a", 0x000000, 0x000022, BAD_DUMP CRC(89e45123) SHA1(6eddd33e1b465112e9442be46aee69d95130d780) )
 ROM_END
 
 
@@ -2205,7 +2257,7 @@ GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, driver_devic
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, driver_device, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 NON-touchscreen based */
-GAME( 1995, realbrod,  0,      meritm_crt260, meritm_crt250, driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1995, realbrod,  0,      meritm_crt260, realbrod,      driver_device, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, driver_device, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", GAME_IMPERFECT_GRAPHICS )
