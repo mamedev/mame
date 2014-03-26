@@ -508,19 +508,6 @@ WRITE8_MEMBER( thomson_state::to7_timer_tco_out )
 }
 
 
-
-const mc6846_interface to7_timer =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_port_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_cp2_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_port_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_tco_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_dev_irq_0)
-};
-
-
-
 /* ------------ lightpen automaton ------------ */
 
 
@@ -1461,19 +1448,6 @@ WRITE8_MEMBER( thomson_state::to770_timer_port_out )
 							((data & 0x40) ? 4 : 0) |
 							((data & 0x04) ? 0 : 8) );
 }
-
-
-
-const mc6846_interface to770_timer =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to770_timer_port_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_cp2_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_port_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_tco_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_dev_irq_0)
-};
-
 
 
 /* ------------ gate-array ------------ */
@@ -2845,19 +2819,6 @@ WRITE8_MEMBER( thomson_state::to9_timer_port_out )
 }
 
 
-
-const mc6846_interface to9_timer =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_timer_port_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_cp2_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_port_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_tco_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_dev_irq_0)
-};
-
-
-
 /* ------------ init / reset ------------ */
 
 
@@ -3847,20 +3808,6 @@ WRITE8_MEMBER( thomson_state::to8_timer_cp2_out )
 	to7_game_sound_update();
 }
 
-
-
-const mc6846_interface to8_timer =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_timer_port_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_timer_cp2_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_timer_port_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_tco_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_dev_irq_0)
-};
-
-
-
 /* ------------ lightpen ------------ */
 
 
@@ -4032,23 +3979,7 @@ WRITE8_MEMBER( thomson_state::to9p_timer_port_out )
 	to8_update_cart_bank();
 }
 
-
-
-const mc6846_interface to9p_timer =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to9p_timer_port_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_timer_cp2_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to9p_timer_port_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_timer_tco_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_dev_irq_0)
-};
-
-
-
 /* ------------ init / reset ------------ */
-
-
 
 MACHINE_RESET_MEMBER( thomson_state, to9p )
 {

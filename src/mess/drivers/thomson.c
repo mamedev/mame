@@ -693,11 +693,16 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_CASSETTE_ADD( "cassette", to7_cassette_interface )
 
 /* timer */
-	MCFG_MC6846_ADD( "mc6846", to7_timer )
+	MCFG_DEVICE_ADD("mc6846", MC6846, 0)
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to7_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to7_timer_cp2_out))
+	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to7_timer_port_in))
+	MCFG_MC6846_OUT_CTO_CB(WRITE8(thomson_state, to7_timer_tco_out))
+	MCFG_MC6846_IRQ_CB(WRITELINE(thomson_state, thom_dev_irq_0))
 
 /* speech synthesis */
-  MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
-  MCFG_MEA8000_DAC("speech")
+	MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
+	MCFG_MEA8000_DAC("speech")
 
 /* floppy */
 	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
@@ -949,8 +954,9 @@ static MACHINE_CONFIG_DERIVED( to770, to7 )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to770_sys_portb_out))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to770_sys_cb2_out))
 
-	MCFG_MC6846_MODIFY( "mc6846", to770_timer )
-
+	MCFG_DEVICE_MODIFY("mc6846")
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to770_timer_port_out))
+	
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_INTERFACE("to770_cart")
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -1487,7 +1493,8 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_PIA_CB2_HANDLER(NULL)
 	MCFG_PIA_IRQA_HANDLER(NULL)
 
-	MCFG_MC6846_MODIFY( "mc6846", to9_timer )
+	MCFG_DEVICE_MODIFY("mc6846")
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9_timer_port_out))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
@@ -1711,7 +1718,10 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
-	MCFG_MC6846_MODIFY( "mc6846", to8_timer )
+	MCFG_DEVICE_MODIFY("mc6846")
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to8_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to8_timer_port_in))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1864,8 +1874,11 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(thomson_state, write_centronics_busy))
 
-	MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
-
+	MCFG_DEVICE_MODIFY("mc6846")
+	MCFG_MC6846_OUT_PORT_CB(WRITE8(thomson_state, to9p_timer_port_out))
+	MCFG_MC6846_OUT_CP2_CB(WRITE8(thomson_state, to8_timer_cp2_out))
+	MCFG_MC6846_IN_PORT_CB(READ8(thomson_state, to9p_timer_port_in))
+	
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")

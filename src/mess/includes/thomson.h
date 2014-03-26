@@ -558,18 +558,6 @@ protected:
 	void to7_midi_ready_to_send_cb(  );
 };
 
-/*----------- defined in machine/thomson.c -----------*/
-
-extern const mc6846_interface to7_timer;
-extern const mc6846_interface to770_timer;
-extern const mc6846_interface to9_timer;
-
-/***************************** TO8 ******************************/
-
-extern const mc6846_interface to8_timer;
-extern const mc6846_interface to9p_timer;
-
-
 /*----------- defined in video/thomson.c -----------*/
 
 /*

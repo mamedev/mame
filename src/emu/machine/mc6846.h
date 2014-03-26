@@ -10,33 +10,38 @@
 #define MC6846_H
 
 
-/* ---------- configuration ------------ */
+#define MCFG_MC6846_OUT_PORT_CB(_devcb) \
+	devcb = &mc6846_device::set_out_port_callback(*device, DEVCB2_##_devcb);
 
-struct mc6846_interface
-{
-	/* CPU write to the outside through chip */
-	devcb_write8 m_out_port_cb;  /* 8-bit output */
-	devcb_write8 m_out_cp1_cb;   /* 1-bit output */
-	devcb_write8 m_out_cp2_cb;   /* 1-bit output */
+#define MCFG_MC6846_OUT_CP1_CB(_devcb) \
+	devcb = &mc6846_device::set_out_cp1_callback(*device, DEVCB2_##_devcb);
 
-	/* CPU read from the outside through chip */
-	devcb_read8 m_in_port_cb; /* 8-bit input */
+#define MCFG_MC6846_OUT_CP2_CB(_devcb) \
+	devcb = &mc6846_device::set_out_cp2_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_MC6846_IN_PORT_CB(_devcb) \
+	devcb = &mc6846_device::set_in_port_callback(*device, DEVCB2_##_devcb);
 
-	/* asynchronous timer output to outside world */
-	devcb_write8 m_out_cto_cb; /* 1-bit output */
+#define MCFG_MC6846_OUT_CTO_CB(_devcb) \
+	devcb = &mc6846_device::set_out_cto_callback(*device, DEVCB2_##_devcb);
 
-	/* timer interrupt */
-	devcb_write_line m_irq_cb;
-};
+#define MCFG_MC6846_IRQ_CB(_devcb) \
+	devcb = &mc6846_device::set_irq_callback(*device, DEVCB2_##_devcb);
 
 
-class mc6846_device : public device_t,
-									public mc6846_interface
+class mc6846_device : public device_t
 {
 public:
 	mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6846_device() {}
 
+	template<class _Object> static devcb2_base &set_out_port_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_port_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_cp1_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_cp1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_cp2_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_cp2_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_port_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_in_port_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_cto_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_cto_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_irq_cb.set_callback(object); }
+	
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -55,7 +60,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -89,18 +93,18 @@ private:
 	emu_timer *m_one_shot; /* 1-us x factor one-shot timer */
 
 	/* CPU write to the outside through chip */
-	devcb_resolved_write8 m_out_port_func;  /* 8-bit output */
-	devcb_resolved_write8 m_out_cp1_func;   /* 1-bit output */
-	devcb_resolved_write8 m_out_cp2_func;   /* 1-bit output */
+	devcb2_write8 m_out_port_cb;  /* 8-bit output */
+	devcb2_write8 m_out_cp1_cb;   /* 1-bit output */
+	devcb2_write8 m_out_cp2_cb;   /* 1-bit output */
 
 	/* CPU read from the outside through chip */
-	devcb_resolved_read8 m_in_port_func; /* 8-bit input */
+	devcb2_read8 m_in_port_cb; /* 8-bit input */
 
 	/* asynchronous timer output to outside world */
-	devcb_resolved_write8 m_out_cto_func; /* 1-bit output */
+	devcb2_write8 m_out_cto_cb; /* 1-bit output */
 
 	/* timer interrupt */
-	devcb_resolved_write_line m_irq_func;
+	devcb2_write_line m_irq_cb;
 
 	int m_old_cif;
 	int m_old_cto;
@@ -115,16 +119,5 @@ private:
 };
 
 extern const device_type MC6846;
-
-#define MCFG_MC6846_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MC6846, 0)          \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MC6846_MODIFY(_tag, _intrf) \
-	MCFG_DEVICE_MODIFY(_tag)          \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MC6846_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
 
 #endif
