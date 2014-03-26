@@ -33,6 +33,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/null_modem.h"
 #include "machine/nvram.h"
+#include "machine/bankdev.h"
 
 class hunter2_state : public driver_device
 {
@@ -45,6 +46,9 @@ public:
 		, m_rom(*this, "roms")
 		, m_ram(*this, "rams")
 		, m_nvram(*this, "nvram")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
 	{ }
 
 	DECLARE_READ8_MEMBER(port00_r);
@@ -76,13 +80,22 @@ private:
 	required_memory_region m_rom;
 	required_memory_region m_ram;
 	required_device<nvram_device> m_nvram;
+	required_device<address_map_bank_device> m_bank1;
+	required_device<address_map_bank_device> m_bank2;
+	required_device<address_map_bank_device> m_bank3;
 };
+
+static ADDRESS_MAP_START(hunter2_banked_mem, AS_PROGRAM, 8, hunter2_state)
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("roms", 0x0000)
+	AM_RANGE(0x30000, 0x3ffff) AM_NOP
+	AM_RANGE(0x40000, 0xfffff) AM_RAM AM_REGION("rams", 0x0000)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bankr1") AM_WRITE_BANK("bankw1")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bankr2") AM_WRITE_BANK("bankw2")
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -294,23 +307,17 @@ WRITE8_MEMBER( hunter2_state::porte0_w )
 {
 	if (data < 0x0a)
 	{
-		membank("bankr0")->set_entry(0);
-		membank("bankr1")->set_entry(0);
-		membank("bankr2")->set_entry(data);
-		membank("bankw0")->set_entry(0);
-		membank("bankw1")->set_entry(0);
-		membank("bankw2")->set_entry(0);
+		m_bank1->set_bank(0);
+		m_bank2->set_bank(1);
+		m_bank3->set_bank(2 + data);
 	}
 	else
 	if ((data >= 0x80) && (data <= 0x8f))
 	{
-		data -= 0x70;
-		membank("bankr0")->set_entry(data);
-		membank("bankr1")->set_entry(data);
-		membank("bankr2")->set_entry(data);
-		membank("bankw0")->set_entry(data);
-		membank("bankw1")->set_entry(data);
-		membank("bankw2")->set_entry(data);
+		UINT8 bank = data & 0x0f;
+		m_bank1->set_bank(16 + (bank*3));
+		m_bank2->set_bank(17 + (bank*3));
+		m_bank3->set_bank(18 + (bank*3));
 	}
 }
 
@@ -318,31 +325,15 @@ void hunter2_state::machine_reset()
 {
 	m_keydata = 0xff;
 	m_irq_mask = 0;
-	membank("bankr0")->set_entry(0);
-	membank("bankr1")->set_entry(0);
-	membank("bankr2")->set_entry(0);
-	membank("bankw0")->set_entry(0);
-	membank("bankw1")->set_entry(0);
-	membank("bankw2")->set_entry(0);
+	m_bank1->set_bank(0);
+	m_bank2->set_bank(1);
+	m_bank3->set_bank(2);
 }
 
 // it is presumed that writing to rom will go nowhere
 DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 {
-	UINT8 *rom = m_rom->base();
 	UINT8 *ram = m_ram->base();
-	membank("bankr0")->configure_entries( 0, 10, &rom[0x00000], 0x0000);
-	membank("bankr0")->configure_entries(16, 16, &ram[0x00000], 0xc000);
-	membank("bankr1")->configure_entries( 0, 10, &rom[0x04000], 0x0000);
-	membank("bankr1")->configure_entries(16, 16, &ram[0x04000], 0xc000);
-	membank("bankr2")->configure_entries( 0, 10, &rom[0x08000], 0x4000);
-	membank("bankr2")->configure_entries(16, 16, &ram[0x08000], 0xc000);
-	membank("bankw0")->configure_entries( 0, 10, &ram[0xc0000], 0x0000);
-	membank("bankw0")->configure_entries(16, 16, &ram[0x00000], 0xc000);
-	membank("bankw1")->configure_entries( 0, 10, &ram[0xc0000], 0x0000);
-	membank("bankw1")->configure_entries(16, 16, &ram[0x04000], 0xc000);
-	membank("bankw2")->configure_entries( 0, 10, &ram[0xc0000], 0x0000);
-	membank("bankw2")->configure_entries(16, 16, &ram[0x08000], 0xc000);
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }
@@ -436,6 +427,25 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
