@@ -2050,14 +2050,7 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, astrin
 
 offs_t psxcpu_device::disasm_disassemble( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options )
 {
-	DasmPSXCPU_state state;
-
-	state.pc = m_pc;
-	state.delayr = m_delayr;
-	state.delayv = m_delayv;
-	memcpy( state.r, m_r, sizeof( state.r ) );
-
-	return DasmPSXCPU( &state, buffer, pc, opram );
+	return DasmPSXCPU( this, buffer, pc, opram );
 }
 
 

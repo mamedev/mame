@@ -133,9 +133,19 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class psxcpu_state
+{
+public:
+	virtual UINT32 pc();
+	virtual UINT32 delayr();
+	virtual UINT32 delayv();
+	virtual UINT32 r(int i);
+};
+
 // ======================> psxcpu_device
 
-class psxcpu_device : public cpu_device
+class psxcpu_device : public cpu_device,
+	psxcpu_state
 {
 public:
 	// construction/destruction
@@ -333,6 +343,13 @@ protected:
 	devcb2_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
 	memory_region *m_rom;
+
+private:
+	// disassembler interface
+	virtual UINT32 pc() { return m_pc; }
+	virtual UINT32 delayr() { return m_delayr; }
+	virtual UINT32 delayv() { return m_delayv; }
+	virtual UINT32 r(int i) { return m_r[ i ]; }
 };
 
 class cxd8530aq_device : public psxcpu_device
@@ -504,16 +521,6 @@ extern const device_type CXD8606CQ;
 #define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
-
-
-struct DasmPSXCPU_state
-{
-	UINT32 pc;
-	int delayr;
-	UINT32 delayv;
-	UINT32 r[ 32 ];
-};
-
-extern unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UINT8 *opram );
+extern unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, UINT32 pc, const UINT8 *opram );
 
 #endif /* __PSXCPU_H__ */

@@ -122,37 +122,37 @@ static const char *const s_gtelm[] =
 	" lm=s16", " lm=u15"
 };
 
-static char *effective_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
+static char *effective_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	static char s_address[ 20 ];
 
-	if( state != NULL && state->pc == pc )
+	if( state != NULL && state->pc() == pc )
 	{
 		sprintf( s_address, "%s(%s) ; 0x%08x", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ],
-			(UINT32)( state->r[ INS_RS( op ) ] + (INT16)INS_IMMEDIATE( op ) ) );
+			(UINT32)( state->r( INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
 		return s_address;
 	}
 	sprintf( s_address, "%s(%s)", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ] );
 	return s_address;
 }
 
-static UINT32 relative_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
+static UINT32 relative_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-	if( state != NULL && state->pc == pc && state->delayr == PSXCPU_DELAYR_PC )
+	if( state != NULL && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
-		nextpc = state->delayv;
+		nextpc = state->delayv();
 	}
 
 	return nextpc + ( PSXCPU_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
 }
 
-static UINT32 jump_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
+static UINT32 jump_address( psxcpu_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-	if( state != NULL && state->pc == pc && state->delayr == PSXCPU_DELAYR_PC )
+	if( state != NULL && state->pc() == pc && state->delayr() == PSXCPU_DELAYR_PC )
 	{
-		nextpc = state->delayv;
+		nextpc = state->delayv();
 	}
 	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );
 }
@@ -183,7 +183,7 @@ static char *upper_address( UINT32 op, const UINT8 *opram )
 	return s_address;
 }
 
-unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UINT8 *opram )
+unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, UINT32 pc, const UINT8 *opram )
 {
 	UINT32 op;
 	const UINT8 *oldopram;
@@ -676,7 +676,5 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 
 CPU_DISASSEMBLE( psxcpu_generic )
 {
-	DasmPSXCPU_state state = {0};
-	state.pc = pc;
-	return DasmPSXCPU( &state, buffer, pc, opram );
+	return DasmPSXCPU( NULL, buffer, pc, opram );
 }
