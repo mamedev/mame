@@ -982,8 +982,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-
 	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
 	/* sound hardware */

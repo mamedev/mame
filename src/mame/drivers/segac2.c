@@ -1355,8 +1355,6 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-//  MCFG_FRAGMENT_ADD(megadriv_timers)
-
 	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
