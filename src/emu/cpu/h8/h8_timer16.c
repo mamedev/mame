@@ -158,13 +158,13 @@ WRITE16_HANDLER(h8_timer16_channel_device::tbr_w)
 
 void h8_timer16_channel_device::device_start()
 {
-	io = &cpu->space(AS_IO);
 	intc = owner()->siblingdevice<h8_intc_device>(intc_tag);
+	channel_active = false;
 }
 
 void h8_timer16_channel_device::device_reset()
 {
-	channel_active = false;
+	// Don't touch channel_active here, top level device handles it
 	tcr = 0;
 	tcnt = 0;
 	memset(tgr, 0xff, sizeof(tgr));

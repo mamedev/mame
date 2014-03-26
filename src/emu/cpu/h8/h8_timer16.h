@@ -133,7 +133,6 @@ public:
 
 protected:
 	required_device<h8_device> cpu;
-	address_space *io;
 	h8_timer16_channel_device *chained_timer;
 	h8_intc_device *intc;
 	const char *chain_tag, *intc_tag;
