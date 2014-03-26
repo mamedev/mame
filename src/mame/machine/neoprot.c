@@ -107,8 +107,8 @@ void neogeo_state::fatfury2_install_protection()
 /************************ King of Fighters 98*******************
   The encrypted set has a rom overlay feature, checked at
   various points in the game.
-  Special board is used: NEO-MVS PROGSF1 (1998.6.17)
-  The board has a ALTERA (EPM7128SQC100-15) chip which is tied to 242-P1
+  Boards used: NEO-MVS PROGSF1 (1998.6.17) / NEO-MVS PROGSF1E (1998.6.18)
+  The boards have an ALTERA chip (EPM7128SQC100-15) which is tied to 242-P1
 ***************************************************************/
 
 WRITE16_MEMBER( neogeo_state::kof98_prot_w )
@@ -146,9 +146,9 @@ void neogeo_state::install_kof98_protection()
 
 
 /************************ Metal Slug X *************************
-  Special board is used: NEO-MVS PROGEOP (1999.2.2)
-  The board has a ALTERA (EPM7128SQC100-15) chip which is tied to 250-P1
-  Also found on this special board is a QFP144 labeled with 0103
+  Board used: NEO-MVS PROGEOP (1999.2.2)
+  The board has an ALTERA chip (EPM7128SQC100-15) which is tied to 250-P1
+  Also found is a QFP144 chip labeled with 0103 - function unknown
 ***************************************************************/
 
 WRITE16_MEMBER( neogeo_state::mslugx_protection_16_w )

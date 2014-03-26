@@ -7414,6 +7414,7 @@ doubledr        // 0082 (c) 1995 Technos
 pbobblen        // 0083 (c) 1994 Taito
 pbobblenb       // bootleg
 kof95           // 0084 (c) 1995 SNK
+kof95a          // 0084 (c) 1995 SNK, alternate board
 kof95h          // 0084 (c) 1995 SNK
 				// 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only)
 tws96           // 0086 (c) 1996 Tecmo
@@ -7493,6 +7494,7 @@ rbff2h          // 0240 (c) 1998 SNK
 rbff2k          // 0140 Censored Korean release of rbff2
 mslug2          // 0241 (c) 1998 SNK
 kof98           // 0242 (c) 1998 SNK
+kof98a          // 0242 (c) 1998 SNK, alternate board
 kof98k          // 0242 (c) 1998 SNK
 kof98ka         // 0242 (c) 1998 SNK
 kof98h          // 0242 (c) 1998 SNK
