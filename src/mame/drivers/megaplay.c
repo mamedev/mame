@@ -324,12 +324,12 @@ INPUT_PORTS_END
 
 /*MEGAPLAY specific*/
 
-READ8_MEMBER(mplay_state::megaplay_bios_banksel_r)
+READ8_MEMBER(mplay_state::bios_banksel_r)
 {
 	return m_bios_bank;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_banksel_w)
+WRITE8_MEMBER(mplay_state::bios_banksel_w)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -341,12 +341,12 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_banksel_w)
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_gamesel_r)
+READ8_MEMBER(mplay_state::bios_gamesel_r)
 {
 	return m_bios_6403;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_gamesel_w)
+WRITE8_MEMBER(mplay_state::bios_gamesel_w)
 {
 	m_bios_6403 = data;
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_gamesel_w)
 	m_bios_mode = data & 0x10;
 }
 
-WRITE16_MEMBER(mplay_state::megaplay_io_write)
+WRITE16_MEMBER(mplay_state::mp_io_write)
 {
 	if (offset == 0x03)
 		m_megadrive_io_data_regs[2] = (data & m_megadrive_io_ctrl_regs[2]) | (m_megadrive_io_data_regs[2] & ~m_megadrive_io_ctrl_regs[2]);
@@ -362,7 +362,7 @@ WRITE16_MEMBER(mplay_state::megaplay_io_write)
 		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
 }
 
-READ16_MEMBER(mplay_state::megaplay_io_read)
+READ16_MEMBER(mplay_state::mp_io_read)
 {
 	if (offset == 0x03)
 		return m_megadrive_io_data_regs[2];
@@ -373,7 +373,7 @@ READ16_MEMBER(mplay_state::megaplay_io_read)
 READ8_MEMBER(mplay_state::bank_r)
 {
 	UINT8* bank = memregion("mtbios")->base();
-	UINT32 fulladdress = m_mp_bios_bank_addr + offset;
+	UINT32 fulladdress = m_bios_bank_addr + offset;
 
 	if (fulladdress <= 0x3fffff) // ROM Addresses
 	{
@@ -400,7 +400,7 @@ READ8_MEMBER(mplay_state::bank_r)
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
 	{
-		return megaplay_io_read(space, (offset & 0x1f) / 2, 0xffff);
+		return mp_io_read(space, (offset & 0x1f) / 2, 0xffff);
 	}
 	else
 	{
@@ -412,7 +412,7 @@ READ8_MEMBER(mplay_state::bank_r)
 
 WRITE8_MEMBER(mplay_state::bank_w)
 {
-	UINT32 fulladdress = m_mp_bios_bank_addr + offset;
+	UINT32 fulladdress = m_bios_bank_addr + offset;
 
 	if (fulladdress <= 0x3fffff) // ROM / Megaplay Custom Addresses
 	{
@@ -429,7 +429,7 @@ WRITE8_MEMBER(mplay_state::bank_w)
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <=0xa1001f) // IO Access
 	{
-		megaplay_io_write(space, (offset & 0x1f) / 2, data, 0xffff);
+		mp_io_write(space, (offset & 0x1f) / 2, data, 0xffff);
 	}
 	else
 	{
@@ -441,38 +441,38 @@ WRITE8_MEMBER(mplay_state::bank_w)
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::megaplay_bios_6402_r)
+READ8_MEMBER(mplay_state::bios_6402_r)
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6402_w)
+WRITE8_MEMBER(mplay_state::bios_6402_w)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6204_r)
+READ8_MEMBER(mplay_state::bios_6204_r)
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_width_w)
+WRITE8_MEMBER(mplay_state::bios_width_w)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6404_r)
+READ8_MEMBER(mplay_state::bios_6404_r)
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return (m_bios_6404 & 0xfe) | ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w)
+WRITE8_MEMBER(mplay_state::bios_6404_w)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -481,7 +481,7 @@ WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w)
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::megaplay_bios_6600_r)
+READ8_MEMBER(mplay_state::bios_6600_r)
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -492,13 +492,13 @@ READ8_MEMBER(mplay_state::megaplay_bios_6600_r)
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_bios_6600_w)
+WRITE8_MEMBER(mplay_state::bios_6600_w)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
-WRITE8_MEMBER(mplay_state::megaplay_game_w)
+WRITE8_MEMBER(mplay_state::game_w)
 {
 	if (m_readpos == 1)
 		m_game_banksel = 0;
@@ -514,24 +514,24 @@ WRITE8_MEMBER(mplay_state::megaplay_game_w)
 		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", space.device().safe_pcbase(), m_game_banksel);
 	}
 
-	m_mp_bios_bank_addr = ((m_mp_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
+	m_bios_bank_addr = ((m_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
 static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(megaplay_game_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(game_w)
 	AM_RANGE(0x6200, 0x6200) AM_READ_PORT("DSW0")
 	AM_RANGE(0x6201, 0x6201) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6203, 0x6203) AM_READWRITE(megaplay_bios_banksel_r, megaplay_bios_banksel_w)
-	AM_RANGE(0x6204, 0x6204) AM_READWRITE(megaplay_bios_6204_r, megaplay_bios_width_w)
+	AM_RANGE(0x6203, 0x6203) AM_READWRITE(bios_banksel_r, bios_banksel_w)
+	AM_RANGE(0x6204, 0x6204) AM_READWRITE(bios_6204_r, bios_width_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("TEST")
 	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("COIN")
-	AM_RANGE(0x6402, 0x6402) AM_READWRITE(megaplay_bios_6402_r, megaplay_bios_6402_w)
-	AM_RANGE(0x6403, 0x6403) AM_READWRITE(megaplay_bios_gamesel_r, megaplay_bios_gamesel_w)
-	AM_RANGE(0x6404, 0x6404) AM_READWRITE(megaplay_bios_6404_r, megaplay_bios_6404_w)
-	AM_RANGE(0x6600, 0x6600) AM_READWRITE(megaplay_bios_6600_r, megaplay_bios_6600_w)
+	AM_RANGE(0x6402, 0x6402) AM_READWRITE(bios_6402_r, bios_6402_w)
+	AM_RANGE(0x6403, 0x6403) AM_READWRITE(bios_gamesel_r, bios_gamesel_w)
+	AM_RANGE(0x6404, 0x6404) AM_READWRITE(bios_6404_r, bios_6404_w)
+	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
 	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
 	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
@@ -583,7 +583,7 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 MACHINE_RESET_MEMBER(mplay_state,megaplay)
 {
 	m_bios_mode = MP_ROM;
-	m_mp_bios_bank_addr = 0;
+	m_bios_bank_addr = 0;
 	m_readpos = 1;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
@@ -808,12 +808,12 @@ void mplay_state::mplay_start()
 	}
 }
 
-READ16_MEMBER(mplay_state::megadriv_68k_read_z80_extra_ram )
+READ16_MEMBER(mplay_state::extra_ram_r )
 {
 	return m_ic36_ram[(offset << 1) ^ 1] | (m_ic36_ram[(offset << 1)] << 8);
 }
 
-WRITE16_MEMBER(mplay_state::megadriv_68k_write_z80_extra_ram )
+WRITE16_MEMBER(mplay_state::extra_ram_w )
 {
 	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{
@@ -835,20 +835,21 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	/* to support the old code.. */
 	m_ic36_ram = auto_alloc_array(machine(), UINT16, 0x10000 / 2);
 	m_ic37_ram = auto_alloc_array(machine(), UINT8, 0x10000);
-	m_genesis_io_ram = auto_alloc_array(machine(), UINT16, 0x20 / 2);
 
-	DRIVER_INIT_CALL(mpnew);
-
+	DRIVER_INIT_CALL(megadrij);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
+	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	
 	mplay_start();
 
 	/* for now ... */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::megaplay_io_read),this), write16_delegate(FUNC(mplay_state::megaplay_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
 
 	/* megaplay has ram shared with the bios cpu here */
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
 }
 
 /*

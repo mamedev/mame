@@ -25,7 +25,6 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "includes/megadriv.h"
 
 
-
 MACHINE_CONFIG_EXTERN( megadriv );
 
 void megadriv_z80_hold(running_machine &machine)
@@ -269,33 +268,6 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 					((((m_io_pad_3b[portnum]->read_safe(0) & 0xc0) >> 2) |
 						(m_io_pad_3b[portnum]->read_safe(0) & 0x03) | 0x40) & ~helper);
-	}
-
-	return retdata;
-}
-
-/* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
-UINT8 md_base_state::megatech_bios_port_cc_dc_r(int offset, int ctrl)
-{
-	UINT8 retdata;
-
-	if (ctrl == 0x55)
-	{
-			/* A keys */
-			retdata = ((m_io_pad_3b[0]->read() & 0x40) >> 2) |
-				((m_io_pad_3b[1]->read() & 0x40) >> 4) | 0xeb;
-	}
-	else
-	{
-		if (offset == 0)
-		{
-			retdata = (m_io_pad_3b[0]->read() & 0x3f) | ((m_io_pad_3b[1]->read() & 0x03) << 6);
-		}
-		else
-		{
-			retdata = ((m_io_pad_3b[1]->read() & 0x3c) >> 2) | 0xf0;
-		}
-
 	}
 
 	return retdata;
@@ -1212,38 +1184,6 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	m_export = 1;
 	m_pal = 1;
 }
-
-DRIVER_INIT_MEMBER(md_base_state,mpnew)
-{
-	DRIVER_INIT_CALL(megadrij);
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
-}
-
-/* used by megatech */
-READ8_MEMBER(md_base_state::z80_unmapped_port_r )
-{
-//  printf("unmapped z80 port read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER(md_base_state::z80_unmapped_port_w )
-{
-//  printf("unmapped z80 port write %04x\n",offset);
-}
-
-READ8_MEMBER(md_base_state::z80_unmapped_r )
-{
-	printf("unmapped z80 read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER(md_base_state::z80_unmapped_w )
-{
-	printf("unmapped z80 write %04x\n",offset);
-}
-
-
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {

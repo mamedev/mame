@@ -113,10 +113,6 @@ public:
 	DECLARE_WRITE8_MEMBER( megadriv_z80_vdp_write );
 	DECLARE_READ8_MEMBER( megadriv_z80_vdp_read );
 	DECLARE_READ8_MEMBER( megadriv_z80_unmapped_read );
-	DECLARE_READ8_MEMBER( z80_unmapped_port_r );
-	DECLARE_WRITE8_MEMBER( z80_unmapped_port_w );
-	DECLARE_READ8_MEMBER( z80_unmapped_r );
-	DECLARE_WRITE8_MEMBER( z80_unmapped_w );
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
 	/* Megadrive / Genesis has 3 I/O ports */
@@ -136,7 +132,6 @@ public:
 	void megadrive_reset_io();
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
-	UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl);
 	UINT8 megadrive_io_read_ctrl_port(int portnum);
 	UINT8 megadrive_io_read_tx_port(int portnum);
 	UINT8 megadrive_io_read_rx_port(int portnum);
@@ -156,7 +151,6 @@ public:
 	DECLARE_VIDEO_START( megadriv );
 	UINT32 screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megadriv(screen_device &screen, bool state);
-
 };
 
 class md_boot_state : public md_base_state
@@ -295,55 +289,55 @@ public:
 	m_bioscpu(*this, "mtbios")
 	{ }
 
-	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
-	// is to read from 0x8000-0xffff
-
+	DECLARE_READ16_MEMBER(extra_ram_r);
+	DECLARE_WRITE16_MEMBER(extra_ram_w);
+	DECLARE_READ8_MEMBER(bios_banksel_r);
+	DECLARE_WRITE8_MEMBER(bios_banksel_w);
+	DECLARE_READ8_MEMBER(bios_gamesel_r);
+	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
+	DECLARE_WRITE16_MEMBER(mp_io_write);
+	DECLARE_READ16_MEMBER(mp_io_read);
+	DECLARE_READ8_MEMBER(bank_r);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(bios_6402_r);
+	DECLARE_WRITE8_MEMBER(bios_6402_w);
+	DECLARE_READ8_MEMBER(bios_6204_r);
+	DECLARE_WRITE8_MEMBER(bios_width_w);
+	DECLARE_READ8_MEMBER(bios_6404_r);
+	DECLARE_WRITE8_MEMBER(bios_6404_w);
+	DECLARE_READ8_MEMBER(bios_6600_r);
+	DECLARE_WRITE8_MEMBER(bios_6600_w);
+	DECLARE_WRITE8_MEMBER(game_w);
+	DECLARE_READ8_MEMBER(vdp_count_r);
+	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
+	void mplay_start();
+	
+	DECLARE_DRIVER_INIT(megaplay);
+	DECLARE_VIDEO_START(megplay);
+	DECLARE_MACHINE_RESET(megaplay);
+	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+private:
+	
+	UINT32 m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
+	
 	UINT32 m_bios_bank; // ROM bank selection
 	UINT16 m_game_banksel;  // Game bank selection
 	UINT32 m_readpos;  // serial bank selection position (9-bit)
-	UINT32 m_mp_bios_bank_addr;
-
+	UINT32 m_bios_bank_addr;
+	
 	UINT32 m_bios_width;  // determines the way the game info ROM is read
 	UINT8 m_bios_ctrl[6];
 	UINT8 m_bios_6600;
 	UINT8 m_bios_6403;
 	UINT8 m_bios_6404;
+	
+	UINT16 *m_ic36_ram;
+	UINT8* m_ic37_ram;
 
-	UINT16 *m_genesis_io_ram;
-	required_shared_ptr<UINT8> m_ic3_ram;
+	required_shared_ptr<UINT8>           m_ic3_ram;
 	optional_device<sega315_5124_device> m_vdp1;
 	required_device<cpu_device>          m_bioscpu;
-	UINT8* m_ic37_ram;
-	UINT16 *m_ic36_ram;
-	DECLARE_WRITE_LINE_MEMBER( bios_int_callback );
-	READ8_MEMBER(vdp_count_r);
-	DECLARE_DRIVER_INIT(megaplay);
-	DECLARE_VIDEO_START(megplay);
-	DECLARE_MACHINE_RESET(megaplay);
-
-	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_megaplay(screen_device &screen, bool state);
-
-	DECLARE_READ8_MEMBER( megaplay_bios_banksel_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_banksel_w );
-	DECLARE_READ8_MEMBER( megaplay_bios_gamesel_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_gamesel_w );
-	DECLARE_WRITE16_MEMBER( megaplay_io_write );
-	DECLARE_READ16_MEMBER( megaplay_io_read );
-	DECLARE_READ8_MEMBER( bank_r );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_READ8_MEMBER( megaplay_bios_6402_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_6402_w );
-	DECLARE_READ8_MEMBER( megaplay_bios_6204_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_width_w );
-	DECLARE_READ8_MEMBER( megaplay_bios_6404_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_6404_w );
-	DECLARE_READ8_MEMBER( megaplay_bios_6600_r );
-	DECLARE_WRITE8_MEMBER( megaplay_bios_6600_w );
-	DECLARE_WRITE8_MEMBER( megaplay_game_w );
-	void mplay_start();
-	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_extra_ram );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_extra_ram );
 };
 
 class mtech_state : public md_base_state
@@ -361,66 +355,59 @@ public:
 		m_bioscpu(*this, "mtbios")
 	{ }
 
-
-	required_device<sega315_5124_device> m_vdp1;
-	required_device<cpu_device>          m_bioscpu;
-
-
 	DECLARE_WRITE_LINE_MEMBER( snd_int_callback );
 	DECLARE_WRITE_LINE_MEMBER( bios_int_callback );
-
+	DECLARE_READ8_MEMBER(cart_select_r);
+	DECLARE_WRITE8_MEMBER(cart_select_w);
+	DECLARE_READ8_MEMBER(bios_ctrl_r);
+	DECLARE_WRITE8_MEMBER(bios_ctrl_w);
+	DECLARE_READ8_MEMBER(read_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
+	DECLARE_READ8_MEMBER(banked_ram_r);
+	DECLARE_WRITE8_MEMBER(banked_ram_w);
+	DECLARE_WRITE8_MEMBER(bios_port_ctrl_w);
+	DECLARE_READ8_MEMBER(bios_joypad_r);
+	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
+	DECLARE_READ8_MEMBER(vdp1_count_r);
+	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
+	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
+	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);	
+	
+	DECLARE_DRIVER_INIT(mt_crt);
+	DECLARE_DRIVER_INIT(mt_slot);
+	DECLARE_MACHINE_RESET(megatech);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(megatech_cart);
+	UINT32 screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_main(screen_device &screen, bool state);
+	
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
+private:	
 	UINT8 m_mt_cart_select_reg;
 	UINT32 m_bios_port_ctrl;
 	int m_current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	UINT32 m_bios_ctrl_inputs;
 	UINT8 m_bios_ctrl[6];
-
 	int m_mt_bank_addr;
 
 	int m_cart_is_genesis[8];
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( megatech_cart );
+	void set_genz80_as_md();
+	void set_genz80_as_sms();
 
-	/* Megatech BIOS specific */
-	UINT8* m_megatech_banked_ram;
-	DECLARE_DRIVER_INIT(mt_crt);
-	DECLARE_DRIVER_INIT(mt_slot);
-	DECLARE_VIDEO_START(mtnew);
-	DECLARE_MACHINE_RESET(mtnew);
-	UINT32 screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_mtnew(screen_device &screen, bool state);
-	UINT32 screen_update_megatech_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(z80_run_state);
+	TIMER_CALLBACK_MEMBER(z80_stop_state);
 
-	void megatech_set_genz80_as_md(const char* tag);
-	void megatech_set_genz80_as_sms(const char* tag);
-	UINT32 screen_update_megatech_sms2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_READ8_MEMBER( megatech_cart_select_r );
-	TIMER_CALLBACK_MEMBER( megatech_z80_run_state );
-	TIMER_CALLBACK_MEMBER( megatech_z80_stop_state );
-	void megatech_select_game(int gameno);
-	DECLARE_WRITE8_MEMBER( megatech_cart_select_w );
-	DECLARE_READ8_MEMBER( bios_ctrl_r );
-	DECLARE_WRITE8_MEMBER( bios_ctrl_w );
-	DECLARE_READ8_MEMBER( megatech_z80_read_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( megatech_z80_write_68k_banked_data );
-	DECLARE_WRITE8_MEMBER( mt_z80_bank_w );
-	DECLARE_READ8_MEMBER( megatech_banked_ram_r );
-	DECLARE_WRITE8_MEMBER( megatech_banked_ram_w );
-	DECLARE_WRITE8_MEMBER( megatech_bios_port_ctrl_w );
-	DECLARE_READ8_MEMBER( megatech_bios_joypad_r );
-	DECLARE_WRITE8_MEMBER (megatech_bios_port_7f_w);
-	READ8_MEMBER(vdp1_count_r);
-	READ8_MEMBER(sms_count_r);
-	READ8_MEMBER(sms_ioport_dc_r);
-	READ8_MEMBER(sms_ioport_dd_r);
-	WRITE8_MEMBER(mt_sms_standard_rom_bank_w);	
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
+	UINT8* m_banked_ram;
 	UINT8* sms_mainram;
 	UINT8* sms_rom;
+
+	required_device<sega315_5124_device> m_vdp1;
+	required_device<cpu_device>          m_bioscpu;	
 };
 
 class _32x_state : public md_base_state
