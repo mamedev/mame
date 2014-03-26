@@ -1,13 +1,20 @@
 /***************************************************************************
 
-Driver by K.Wilkins Jan 1998
+  Toaplan Slap Fight hardware
 
-Games supported:
-  Alcon / Slap Fight
-  Guardian / Get Star
-  Performan
-  Tiger Heli
+  Driver by K.Wilkins Jan 1998
 
+  Games supported:
+    Alcon / Slap Fight
+    Guardian / Get Star
+    Performan
+    Tiger Heli
+  
+  TODO:
+  - proper MCU emulation (mame/machine/slapfght.c)
+
+
+****************************************************************************
 
 Main CPU Memory Map
 -------------------
@@ -729,12 +736,12 @@ INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,16000000/4)         /* 4MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)         /* 4MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(slapfght_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/8)            /* 2MHz ???, 16MHz Oscillator */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8)            /* 2MHz ???, 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 4*60)   /* music speed, verified */
 
@@ -761,15 +768,62 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 16000000/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_16MHz/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 16000000/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_16MHz/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( tigerh, slapfght_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tigerh_map)
+	MCFG_CPU_IO_MAP(tigerh_io_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 6*60)    /* ??? */
+
+	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
+
+	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
+	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
@@ -811,53 +865,6 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( tigerh, slapfght_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tigerh_map)
-	MCFG_CPU_IO_MAP(tigerh_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state,  vblank_irq)
-
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 6*60)    /* ??? */
-
-	MCFG_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
-
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
-
-	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -913,7 +920,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 
 	/* basic machine hardware */
-
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
@@ -921,7 +927,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( slapfighb2, slapfigh )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 
@@ -1782,7 +1787,7 @@ READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 	return 0;
 }
 
-void slapfght_state::getstar_init(  )
+void slapfght_state::getstar_init()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),this), write8_delegate(FUNC(slapfght_state::getstar_e803_w),this));
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),this));
@@ -1833,24 +1838,24 @@ DRIVER_INIT_MEMBER(slapfght_state,perfrman)
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
 }
 
-/*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */
+/*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR, COMPANY, FULLNAME, FLAGS ) */
 GAME( 1985, perfrman,   0,        perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East USA",         "Performan (US)", 0 )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East USA", "Performan (US)", 0 )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh, slapfght_state,   tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh, slapfght_state,   tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh, slapfght_state,   tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh, driver_device,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh, driver_device,   0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,   slapfght_state, tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,   slapfght_state, tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh,   slapfght_state, tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
 
 GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)",  GAME_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
-GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
-GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, driver_device, 0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, getstar,    0,        slapfigh,   getstar, slapfght_state,  getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
+GAME( 1986, getstar,    0,        slapfigh,   getstar,  slapfght_state, getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
 GAME( 1986, getstarj,   getstar,  slapfigh,   getstarj, slapfght_state, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb1,   getstar,  slapfighb1, getstarj, slapfght_state, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb2,   getstar,  slapfighb1, gtstarb2, slapfght_state, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )

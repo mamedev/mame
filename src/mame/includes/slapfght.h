@@ -1,3 +1,9 @@
+/***************************************************************************
+
+  Toaplan Slap Fight hardware
+
+***************************************************************************/
+
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 
@@ -17,21 +23,31 @@ class slapfght_state : public driver_device
 public:
 	slapfght_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_slapfight_videoram(*this, "videoram"),
-			m_slapfight_colorram(*this, "colorram"),
-			m_slapfight_fixvideoram(*this, "fixvideoram"),
-			m_slapfight_fixcolorram(*this, "fixcolorram"),
-			m_slapfight_scrollx_lo(*this, "scrollx_lo"),
-			m_slapfight_scrollx_hi(*this, "scrollx_hi"),
-			m_slapfight_scrolly(*this, "scrolly"),
-			m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
+		m_slapfight_videoram(*this, "videoram"),
+		m_slapfight_colorram(*this, "colorram"),
+		m_slapfight_fixvideoram(*this, "fixvideoram"),
+		m_slapfight_fixcolorram(*this, "fixcolorram"),
+		m_slapfight_scrollx_lo(*this, "scrollx_lo"),
+		m_slapfight_scrollx_hi(*this, "scrollx_hi"),
+		m_slapfight_scrolly(*this, "scrolly")
+	{ }
 
 	int m_getstar_id;
+	
+	// devices, memory pointers
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram8_device> m_spriteram;
+
 	required_shared_ptr<UINT8> m_slapfight_videoram;
 	required_shared_ptr<UINT8> m_slapfight_colorram;
 	optional_shared_ptr<UINT8> m_slapfight_fixvideoram;
@@ -39,6 +55,7 @@ public:
 	optional_shared_ptr<UINT8> m_slapfight_scrollx_lo;
 	optional_shared_ptr<UINT8> m_slapfight_scrollx_hi;
 	optional_shared_ptr<UINT8> m_slapfight_scrolly;
+
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
 	int m_getstar_sh_intenabled;
@@ -67,7 +84,7 @@ public:
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_irq_mask;
-	required_device<buffered_spriteram8_device> m_spriteram;
+
 	DECLARE_READ8_MEMBER(tigerh_status_r);
 	DECLARE_READ8_MEMBER(gtstarb1_port_0_read);
 	DECLARE_WRITE8_MEMBER(slapfight_port_00_w);
@@ -134,24 +151,5 @@ public:
 	INTERRUPT_GEN_MEMBER(getstar_interrupt);
 	void slapfght_log_vram();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display );
-	void getstar_init(  );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	void getstar_init();
 };
-
-
-/*----------- defines -----------*/
-
-/* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ),
-   register C is a unaltered copy of register A */
-
-#define GS_SAVE_REGS  m_gs_a = space.device().state().state_int(Z80_BC) >> 0; \
-						m_gs_d = space.device().state().state_int(Z80_DE) >> 8; \
-						m_gs_e = space.device().state().state_int(Z80_DE) >> 0;
-
-#define GS_RESET_REGS m_gs_a = 0; \
-						m_gs_d = 0; \
-						m_gs_e = 0;
