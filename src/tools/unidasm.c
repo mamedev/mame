@@ -87,9 +87,6 @@ CPU_DISASSEMBLE( esrip );
 CPU_DISASSEMBLE( f8 );
 CPU_DISASSEMBLE( g65816_generic );
 CPU_DISASSEMBLE( h6280 );
-CPU_DISASSEMBLE( h8 );
-CPU_DISASSEMBLE( h8_24 );
-CPU_DISASSEMBLE( h8_32 );
 CPU_DISASSEMBLE( hc11 );
 CPU_DISASSEMBLE( hcd62121 );
 CPU_DISASSEMBLE( hd61700 );
@@ -234,9 +231,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "f8",         _8bit,  0, CPU_DISASSEMBLE_NAME(f8) },
 	{ "g65816",     _8bit,  0, CPU_DISASSEMBLE_NAME(g65816_generic) },
 	{ "h6280",      _8bit,  0, CPU_DISASSEMBLE_NAME(h6280) },
-	{ "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
-	{ "h8_24",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
-	{ "h8_32",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
+	//	{ "h8",         _16be,  0, CPU_DISASSEMBLE_NAME(h8) },
+	//	{ "h8_24",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_24) },
+	//	{ "h8_32",      _16be,  0, CPU_DISASSEMBLE_NAME(h8_32) },
 	{ "hc11",       _8bit,  0, CPU_DISASSEMBLE_NAME(mb88) },
 	{ "hcd62121",   _16be,  0, CPU_DISASSEMBLE_NAME(hcd62121) },
 	{ "hd61700",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd61700) },
