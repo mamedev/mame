@@ -2512,16 +2512,9 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int sca
 	else
 		lineptr = m_render_line;
 
-	if (_32xdev) _32xdev->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
-
 	for (int x = 0; x < 320; x++)
 	{
 		UINT32 dat = m_video_renderline[x];
-		int drawn = 0;
-
-		// low priority 32x - if it's the bg pen, we have a 32x, and its display is enabled...
-		if (_32xdev && dat & 0x20000)
-			drawn = _32xdev->_32x_render_videobuffer_to_screenbuffer_lopri(x, lineptr[x]);
 
 		if (!(dat & 0x20000))
 			m_render_line_raw[x] = 0x100;
@@ -2529,70 +2522,70 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int sca
 			m_render_line_raw[x] = 0x000;
 
 
-		if (!drawn)
+		if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 		{
-			if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
+			if (dat & 0x10000)
 			{
-				if (dat & 0x10000)
-				{
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
-				}
-				else
-				{
-					lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
-					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
-				}
-
+				lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
+				m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 			}
 			else
 			{
-				/* Verify my handling.. I'm not sure all cases are correct */
-				switch (dat & 0x1e000)
-				{
-					case 0x00000: // low priority, no shadow sprite, no highlight = shadow
-					case 0x02000: // low priority, shadow sprite, no highlight = shadow
-					case 0x06000: // normal pri,   shadow sprite, no highlight = shadow?
-					case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
-					case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
-					case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat & 0x3f)];
-						m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
-						break;
-
-					case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
-					case 0x8000: // low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
-						m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
-						break;
-
-					case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
-					case 0x18000: // (sprite) low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
-						m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
-						break;
-
-
-					case 0x0c000: // normal pri, highlight set = highlight?
-					case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat & 0x3f)];
-						m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
-						break;
-
-					case 0x0a000: // shadow set, highlight set - not possible
-					case 0x0e000: // shadow set, highlight set, normal set, not possible
-					case 0x1a000: // (sprite)shadow set, highlight set - not possible
-					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
-					default:
-						lineptr[x] = m_render_line_raw[x] |= (machine().rand() & 0x3f);
-						break;
-				}
+				lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
+				m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
+			}
+			
+		}
+		else
+		{
+			/* Verify my handling.. I'm not sure all cases are correct */
+			switch (dat & 0x1e000)
+			{
+				case 0x00000: // low priority, no shadow sprite, no highlight = shadow
+				case 0x02000: // low priority, shadow sprite, no highlight = shadow
+				case 0x06000: // normal pri,   shadow sprite, no highlight = shadow?
+				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
+				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
+				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
+					lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat & 0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
+					break;
+					
+				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
+				case 0x8000: // low pri, highlight sprite = normal;
+					lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
+					break;
+					
+				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
+				case 0x18000: // (sprite) low pri, highlight sprite = normal;
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
+					break;
+					
+					
+				case 0x0c000: // normal pri, highlight set = highlight?
+				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
+					lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat & 0x3f)];
+					m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
+					break;
+					
+				case 0x0a000: // shadow set, highlight set - not possible
+				case 0x0e000: // shadow set, highlight set, normal set, not possible
+				case 0x1a000: // (sprite)shadow set, highlight set - not possible
+				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
+				default:
+					lineptr[x] = m_render_line_raw[x] |= (machine().rand() & 0x3f);
+					break;
 			}
 		}
-
-		// high priority 32x
-		if (_32xdev)
-			_32xdev->_32x_render_videobuffer_to_screenbuffer_hipri(x, lineptr[x]);
+	}
+	
+	if (_32xdev)
+	{
+		_32xdev->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
+		for (int x = 0; x < 320; x++)
+			_32xdev->_32x_render_videobuffer_to_screenbuffer(x, m_video_renderline[x] & 0x20000, lineptr[x]);
 	}
 }
 

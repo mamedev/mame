@@ -109,6 +109,7 @@ public:
 	void _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
 	int _32x_render_videobuffer_to_screenbuffer_lopri(int x, UINT16 &lineptr);
 	void _32x_render_videobuffer_to_screenbuffer_hipri(int x, UINT16 &lineptr);
+	void _32x_render_videobuffer_to_screenbuffer(int x, UINT32 priority, UINT16 &lineptr);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 	void _32x_check_framebuffer_swap(bool enabled);

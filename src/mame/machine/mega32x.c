@@ -1764,6 +1764,27 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_hipri(int x, UINT1
 	}
 }
 
+void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, UINT32 priority, UINT16 &lineptr)
+{
+	if (m_32x_displaymode != 0)
+	{
+		if (!m_32x_videopriority)
+		{
+			if (priority && !(m_32x_linerender[x] & 0x8000))
+				lineptr = m_32x_linerender[x] & 0x7fff;
+			if (!priority && m_32x_linerender[x] & 0x8000)
+				lineptr = m_32x_linerender[x] & 0x7fff;
+		}
+		else
+		{
+			if (priority && m_32x_linerender[x] & 0x8000)
+				lineptr = m_32x_linerender[x] & 0x7fff;
+			if (!priority && !(m_32x_linerender[x] & 0x8000))
+				lineptr = m_32x_linerender[x] & 0x7fff;
+		}
+	}
+}
+
 static const sh2_cpu_core sh2_conf_master = { 0, NULL, _32x_fifo_available_callback };
 static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callback };
 
