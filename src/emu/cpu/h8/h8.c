@@ -61,27 +61,49 @@ void h8_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	if(has_exr)
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  CCR).formatstr("%11s").noshow();
+	else
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  CCR).formatstr("%8s").noshow();
 	state_add(H8_PC,           "PC",        NPC);
 	state_add(H8_CCR,          "CCR",       CCR);
+
 	if(has_exr)
 		state_add(H8_EXR,          "EXR",       EXR);
-	state_add(H8_R0,           "R0",        R[0]);
-	state_add(H8_R1,           "R1",        R[1]);
-	state_add(H8_R2,           "R2",        R[2]);
-	state_add(H8_R3,           "R3",        R[3]);
-	state_add(H8_R4,           "R4",        R[4]);
-	state_add(H8_R5,           "R5",        R[5]);
-	state_add(H8_R6,           "R6",        R[6]);
-	state_add(H8_R7,           "R7",        R[7]);
-	if(supports_advanced) {
-		state_add(H8_E0,           "E0",        R[8]);
-		state_add(H8_E1,           "E1",        R[9]);
-		state_add(H8_E2,           "E2",        R[10]);
-		state_add(H8_E3,           "E3",        R[11]);
-		state_add(H8_E4,           "E4",        R[12]);
-		state_add(H8_E5,           "E5",        R[13]);
-		state_add(H8_E6,           "E6",        R[14]);
-		state_add(H8_E7,           "E7",        R[15]);
+	if(!supports_advanced) {
+		state_add(H8_R0,           "R0",        R[0]);
+		state_add(H8_R1,           "R1",        R[1]);
+		state_add(H8_R2,           "R2",        R[2]);
+		state_add(H8_R3,           "R3",        R[3]);
+		state_add(H8_R4,           "R4",        R[4]);
+		state_add(H8_R5,           "R5",        R[5]);
+		state_add(H8_R6,           "R6",        R[6]);
+		state_add(H8_R7,           "R7",        R[7]);
+	} else {
+		state_add(H8_R0,           "R0",        R[0]).noshow();
+		state_add(H8_R1,           "R1",        R[1]).noshow();
+		state_add(H8_R2,           "R2",        R[2]).noshow();
+		state_add(H8_R3,           "R3",        R[3]).noshow();
+		state_add(H8_R4,           "R4",        R[4]).noshow();
+		state_add(H8_R5,           "R5",        R[5]).noshow();
+		state_add(H8_R6,           "R6",        R[6]).noshow();
+		state_add(H8_R7,           "R7",        R[7]).noshow();
+		state_add(H8_E0,           "E0",        R[8]).noshow();
+		state_add(H8_E1,           "E1",        R[9]).noshow();
+		state_add(H8_E2,           "E2",        R[10]).noshow();
+		state_add(H8_E3,           "E3",        R[11]).noshow();
+		state_add(H8_E4,           "E4",        R[12]).noshow();
+		state_add(H8_E5,           "E5",        R[13]).noshow();
+		state_add(H8_E6,           "E6",        R[14]).noshow();
+		state_add(H8_E7,           "E7",        R[15]).noshow();
+		state_add(H8_R0,           "ER0",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R1,           "ER1",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R2,           "ER2",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R3,           "ER3",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R4,           "ER4",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R5,           "ER5",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R6,           "ER6",       TMPR).callimport().formatstr("%9s");
+		state_add(H8_R7,           "ER7",       TMPR).callimport().formatstr("%9s");
 	}
 
 	save_item(NAME(PPC));
@@ -210,6 +232,21 @@ const address_space_config *h8_device::memory_space_config(address_spacenum spac
 
 void h8_device::state_import(const device_state_entry &entry)
 {
+	switch(entry.index()) {
+	case H8_R0:
+	case H8_R1:
+	case H8_R2:
+	case H8_R3:
+	case H8_R4:
+	case H8_R5:
+	case H8_R6:
+	case H8_R7: {
+		int r = entry.index() - H8_R0;
+		R[r + 8] = TMPR >> 16;
+		R[r] = TMPR;
+		break;
+	}
+	}
 }
 
 void h8_device::state_export(const device_state_entry &entry)
@@ -218,6 +255,44 @@ void h8_device::state_export(const device_state_entry &entry)
 
 void h8_device::state_string_export(const device_state_entry &entry, astring &string)
 {
+	switch(entry.index()) {
+	case STATE_GENFLAGS:
+		if(has_exr)
+			string.printf("%c%c %c%c%c%c%c%c%c%c",
+						  (EXR & EXR_T) ? 'T' : '-',
+						  '0' + (EXR & EXR_I),
+						  (CCR & F_I)  ? 'I' : '-',
+						  (CCR & F_UI) ? 'u' : '-',
+						  (CCR & F_H)  ? 'H' : '-',
+						  (CCR & F_U)  ? 'U' : '-',
+						  (CCR & F_N)  ? 'N' : '-',
+						  (CCR & F_Z)  ? 'Z' : '-',
+						  (CCR & F_V)  ? 'V' : '-',
+						  (CCR & F_C)  ? 'C' : '-');
+		else
+			string.printf("%c%c%c%c%c%c%c%c", 
+						  (CCR & F_I)  ? 'I' : '-',
+						  (CCR & F_UI) ? 'u' : '-',
+						  (CCR & F_H)  ? 'H' : '-',
+						  (CCR & F_U)  ? 'U' : '-',
+						  (CCR & F_N)  ? 'N' : '-',
+						  (CCR & F_Z)  ? 'Z' : '-',
+						  (CCR & F_V)  ? 'V' : '-',
+						  (CCR & F_C)  ? 'C' : '-');
+		break;
+	case H8_R0:
+	case H8_R1:
+	case H8_R2:
+	case H8_R3:
+	case H8_R4:
+	case H8_R5:
+	case H8_R6:
+	case H8_R7: {
+		int r = entry.index() - H8_R0;
+		string.printf("%04x %04x", R[r+8], R[r]);
+		break;
+	}
+	}
 }
 
 

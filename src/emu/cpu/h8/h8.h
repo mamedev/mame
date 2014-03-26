@@ -208,6 +208,7 @@ protected:
 	INT64   MAC;                    /* Multiply accumulator (h8s/2600+) */
 	UINT8   MACF;                   /* MAC flags (h8s/2600+) */
 	UINT32  TMP1, TMP2;
+	UINT32  TMPR;                   /* For debugger ER register import */
 
 	bool has_exr, has_trace, supports_advanced, mode_advanced, mac_saturating;
 
