@@ -14,7 +14,6 @@
 #include "machine/kb_7007_3.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "video/pc_cga.h"
 
 #define VERBOSE_DBG 0
 
@@ -280,13 +279,7 @@ static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, mc1502_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mc1502 )
-	PORT_START("IN0") /* IN0 */
-	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
-
 	PORT_INCLUDE( mc7007_3_keyboard )
-	PORT_INCLUDE( pcvideo_mc1502 )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mc1502, mc1502_state )
@@ -327,9 +320,8 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_ISA8_BUS_ADD("isa", ":maincpu", mc1502_isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", mc1502_isa8_cards, "fdc", false)
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", mc1502_isa8_cards, "rom", false)
-
 	/* video hardware (only 1 chargen in ROM; CGA_FONT dip always 1 */
-	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
+	MCFG_ISA8_SLOT_ADD("isa", "isa3", mc1502_isa8_cards, "cga_mc1502", false)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -378,9 +370,6 @@ ROM_START( mc1502 )
 	ROM_SYSTEM_BIOS(3, "v533", "v5.33")
 	ROMX_LOAD( "0_(cbc0).bin", 0xfc000, 0x2000, CRC(9a55bc4f) SHA1(81da44eec2e52cf04b1fc7053502270f51270590),ROM_BIOS(4))
 	ROMX_LOAD( "1_(dfe2).bin", 0xfe000, 0x2000, CRC(8dec077a) SHA1(d6f6d7cc2183abc77fbd9cd59132de5766f7c458),ROM_BIOS(4))
-
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
 ROM_START( pk88 )
@@ -392,10 +381,6 @@ ROM_START( pk88 )
 	ROM_LOAD( "b3.064", 0xf6000, 0x2000, CRC(3062b3fc) SHA1(5134dd64721cbf093d059ee5d3fd09c7f86604c7))
 	ROM_LOAD( "pk88-0.064", 0xfc000, 0x2000, CRC(1e4666cf) SHA1(6364c5241f2792909ff318194161eb2c29737546))
 	ROM_LOAD( "pk88-1.064", 0xfe000, 0x2000, CRC(6fa7e7ef) SHA1(d68bc273baa46ba733ac6ad4df7569dd70cf60dd))
-
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	// taken from mc1502
-	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
 /***************************************************************************

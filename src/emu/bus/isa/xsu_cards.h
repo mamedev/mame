@@ -14,6 +14,7 @@
 
 #include "emu.h"
 
+#include "cga.h"
 // storage
 #include "mc1502_fdc.h"
 #include "p1_fdc.h"
