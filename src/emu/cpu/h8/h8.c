@@ -617,7 +617,7 @@ UINT16 h8_device::do_inc16(UINT16 v1, UINT16 v2)
 	CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		CCR |= F_Z;
-	else if(INT32(res) < 0)
+	else if(INT16(res) < 0)
 		CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x8000)
 		CCR |= F_V;
@@ -709,7 +709,7 @@ UINT16 h8_device::do_dec16(UINT16 v1, UINT16 v2)
 	CCR &= ~(F_N|F_V|F_Z);
 	if(!res)
 		CCR |= F_Z;
-	else if(INT32(res) < 0)
+	else if(INT16(res) < 0)
 		CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x8000)
 		CCR |= F_V;
