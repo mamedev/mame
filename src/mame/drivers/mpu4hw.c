@@ -2512,7 +2512,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 	int size = memregion( "maincpu" )->bytes();
 	if (size<=0x10000)
 	{
-		printf("extended banking selected on set <=0x10000 in size, ignoring");
+		printf("Error: Extended banking selected on set <=0x10000 in size, ignoring\n");
 		DRIVER_INIT_CALL(m4default_reels);
 		DRIVER_INIT_CALL(m4default_banks);
 	}
