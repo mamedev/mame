@@ -80,6 +80,8 @@
 	
 	2014/02/15 Robert Tuccitto  Added more details and clarification
 	                            regarding the potentiometer.
+
+	2014/03/25 Mike Saarna  Fixed Riot Timer
 ***************************************************************************/
 
 #include "emu.h"
@@ -1047,7 +1049,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_RIOT6532_ADD("riot", A7800_NTSC_Y1/12, a7800_r6532_interface)
+	MCFG_RIOT6532_ADD("riot", A7800_NTSC_Y1/8, a7800_r6532_interface)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,a78")
