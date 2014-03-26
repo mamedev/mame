@@ -41,22 +41,24 @@ UINT8 amspdwy_state::amspdwy_wheel_r( int index )
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
 		if (wheel > m_wheel_old[index])
-		m_wheel_return[index] = ((+wheel) & 0xf) | 0x00;
+			m_wheel_return[index] = ((+wheel) & 0xf) | 0x00;
 		else
-		m_wheel_return[index] = ((-wheel) & 0xf) | 0x10;
+			m_wheel_return[index] = ((-wheel) & 0xf) | 0x10;
 
-	m_wheel_old[index] = wheel;
+		m_wheel_old[index] = wheel;
 	}
 	return m_wheel_return[index] | ioport(portnames[index])->read();
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
 {
+	// player 1
 	return amspdwy_wheel_r(0);
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 {
+	// player 2
 	return amspdwy_wheel_r(1);
 }
 
@@ -72,31 +74,24 @@ WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
 }
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             // ROM
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_SHARE("palette")// Palette
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")    // Layer, mirrored?
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")  // Layer
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM                                             // Unused?
-//  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_SHARE("palette")
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
+//  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)    // DSW 2 + Toggle Flip Screen?
-	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)                         // Player 1
-	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)                         // Player 2
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP                                        // ? Exiting IRQ
-	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)     // YM2151 status, To Sound CPU
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")// Sprites
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM                                             // Work RAM
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)
+	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)
+	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // irq ack?
+	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-
-READ8_MEMBER(amspdwy_state::amspdwy_port_r)
-{
-	UINT8 *tracks = memregion("maincpu")->base() + 0x10000;
-	return tracks[offset];
-}
-
 static ADDRESS_MAP_START( amspdwy_portmap, AS_IO, 8, amspdwy_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(amspdwy_port_r)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("tracks", 0)
 ADDRESS_MAP_END
 
 
@@ -110,12 +105,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8, amspdwy_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                 // ROM
-//  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
-	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_byte_r)                 // From Main CPU
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           //
-	AM_RANGE(0xc000, 0xdfff) AM_RAM                                 // Work RAM
-	AM_RANGE(0xffff, 0xffff) AM_READNOP                             // ??? IY = FFFF at the start ?
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+//  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
+	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xffff, 0xffff) AM_READNOP // ??? IY = FFFF at the start ?
 ADDRESS_MAP_END
 
 
@@ -190,7 +185,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( amspdwya )
-
 	PORT_INCLUDE(amspdwy)
 
 	PORT_MODIFY("DSW2")
@@ -222,7 +216,7 @@ static const gfx_layout layout_8x8x2 =
 };
 
 static GFXDECODE_START( amspdwy )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2,   0, 8 ) // [0] Layer & Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2, 0, 8 )
 GFXDECODE_END
 
 
@@ -255,12 +249,12 @@ void amspdwy_state::machine_reset()
 static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,3000000)
+	MCFG_CPU_ADD("maincpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
 	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state,  irq0_line_hold)    /* IRQ: 60Hz, NMI: retn */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80,3000000)   /* Can't be disabled: the YM2151 timers must work */
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
 	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -347,33 +341,37 @@ HILO.5A     5A    2732   9B3C
 ***************************************************************************/
 
 ROM_START( amspdwy )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "game5807.u33", 0x00000, 0x8000, CRC(88233b59) SHA1(bfdf10dde1731cde5c579a9a5173cafe9295a80c) )
-	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Main Z80 Code */
+	ROM_LOAD( "game5807.u33", 0x0000, 0x8000, CRC(88233b59) SHA1(bfdf10dde1731cde5c579a9a5173cafe9295a80c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
-	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound Z80 Code */
+	ROM_LOAD( "audi9463.u2",  0x0000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
+
+	ROM_REGION( 0x8000, "tracks", 0 )
+	ROM_LOAD( "trks6092.u34", 0x0000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* Layer + Sprites */
-	ROM_LOAD( "hilo9b3c.5a", 0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
-	ROM_LOAD( "hihie12a.4a", 0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
-	ROM_LOAD( "lolo1d51.1a", 0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )
-	ROM_LOAD( "lohi4644.2a", 0x3000, 0x1000, CRC(a1d802b1) SHA1(1249ce406b1aa518885a02ab063fa14906ccec2e) )
+	ROM_LOAD( "hilo9b3c.5a",  0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
+	ROM_LOAD( "hihie12a.4a",  0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
+	ROM_LOAD( "lolo1d51.1a",  0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )
+	ROM_LOAD( "lohi4644.2a",  0x3000, 0x1000, CRC(a1d802b1) SHA1(1249ce406b1aa518885a02ab063fa14906ccec2e) )
 ROM_END
 
 ROM_START( amspdwya )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "game.u33",     0x00000, 0x8000, CRC(facab102) SHA1(e232969eaaad8b89ac8e28ee0a7996107a7de9a2) )
-	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Main Z80 Code */
+	ROM_LOAD( "game.u33",     0x0000, 0x8000, CRC(facab102) SHA1(e232969eaaad8b89ac8e28ee0a7996107a7de9a2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
-	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound Z80 Code */
+	ROM_LOAD( "audi9463.u2",  0x0000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
+
+	ROM_REGION( 0x8000, "tracks", 0 )
+	ROM_LOAD( "trks6092.u34", 0x0000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* Layer + Sprites */
-	ROM_LOAD( "hilo9b3c.5a", 0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
-	ROM_LOAD( "hihie12a.4a", 0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
-	ROM_LOAD( "lolo1d51.1a", 0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )
-	ROM_LOAD( "lohi4644.2a", 0x3000, 0x1000, CRC(a1d802b1) SHA1(1249ce406b1aa518885a02ab063fa14906ccec2e) )
+	ROM_LOAD( "hilo9b3c.5a",  0x0000, 0x1000, CRC(f50f864c) SHA1(5b2412c1558b30a04523fcdf1d5cf6fdae1ba88d) )
+	ROM_LOAD( "hihie12a.4a",  0x1000, 0x1000, CRC(3d7497f3) SHA1(34820ba42d9c9dab1d6fdda15795450ce08392c1) )
+	ROM_LOAD( "lolo1d51.1a",  0x2000, 0x1000, CRC(58701c1c) SHA1(67b476e697652a6b684bd76ae6c0078ed4b3e3a2) )
+	ROM_LOAD( "lohi4644.2a",  0x3000, 0x1000, CRC(a1d802b1) SHA1(1249ce406b1aa518885a02ab063fa14906ccec2e) )
 ROM_END
 
 
