@@ -73,14 +73,12 @@ static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, tmc600_state )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_SHARE("page_ram") AM_WRITE(page_ram_w)
 ADDRESS_MAP_END
 
-static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
+CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
 {
-	tmc600_state *state = device->machine().driver_data<tmc600_state>();
-
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = state->get_color(pageaddr);
+	UINT8 color = get_color(pageaddr);
 	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
-	UINT8 cdb = state->m_char_rom->base()[charaddr] & 0x3f;
+	UINT8 cdb = m_char_rom->base()[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
@@ -88,23 +86,13 @@ static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
 	return (ccb1 << 7) | (ccb0 << 6) | cdb;
 }
 
-static CDP1869_PCB_READ( tmc600_pcb_r )
+CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
 {
-	tmc600_state *state = device->machine().driver_data<tmc600_state>();
-
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
-	UINT8 color = state->get_color(pageaddr);
+	UINT8 color = get_color(pageaddr);
 
 	return BIT(color, 0);
 }
-
-static CDP1869_INTERFACE( vis_intf )
-{
-	CDP1869_COLOR_CLK_PAL,
-	tmc600_pcb_r,
-	tmc600_char_ram_r,
-	NULL
-};
 
 void tmc600_state::video_start()
 {
@@ -144,7 +132,10 @@ MACHINE_CONFIG_FRAGMENT( tmc600_video )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, vis_intf, cdp1869_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_CHAR_PCB_READ_OWNER(tmc600_state, tmc600_pcb_r)
+	MCFG_CDP1869_CHAR_RAM_READ_OWNER(tmc600_state, tmc600_char_ram_r)	
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

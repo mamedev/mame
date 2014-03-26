@@ -139,9 +139,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CDP1869_ADD(_tag, _pixclock, _config, _map) \
+#define MCFG_CDP1869_ADD(_tag, _pixclock, _map) \
 	MCFG_DEVICE_ADD(_tag, CDP1869, _pixclock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
 #define MCFG_CDP1869_SCREEN_PAL_ADD(_cdptag, _tag, _clock) \
@@ -154,14 +153,11 @@
 	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
 	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1869_SCREEN_WIDTH, CDP1869_HBLANK_END, CDP1869_HBLANK_START, CDP1869_TOTAL_SCANLINES_NTSC, CDP1869_SCANLINE_VBLANK_END_NTSC, CDP1869_SCANLINE_VBLANK_START_NTSC)
 
-#define CDP1869_INTERFACE(_name) \
-	const cdp1869_interface (_name) =
-
 #define MCFG_CDP1869_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#define CDP1869_CHAR_RAM_READ(name) UINT8 name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
-#define CDP1869_CHAR_RAM_WRITE(name) void name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
-#define CDP1869_PCB_READ(name) int name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_READ_MEMBER(name) UINT8 name(UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_WRITE_MEMBER(name) void name(UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
+#define CDP1869_PCB_READ_MEMBER(name) int name(UINT16 pma, UINT8 cma, UINT8 pmd)
 
 #define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
 	devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB2_##_read);
@@ -169,43 +165,32 @@
 #define MCFG_CDP1869_PRD_CALLBACK(_write) \
 	devcb = &cdp1869_device::set_prd_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_CDP1869_COLOR_CLOCK(_clk) \
+	cdp1869_device::static_set_color_clock(*device, _clk);
 
+#define MCFG_CDP1869_CHAR_RAM_READ_OWNER(_class, _method) \
+	cdp1869_device::static_set_char_ram_read(*device, cdp1869_char_ram_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(_class, _method) \
+	cdp1869_device::static_set_char_ram_write(*device, cdp1869_char_ram_write_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_CDP1869_CHAR_PCB_READ_OWNER(_class, _method) \
+	cdp1869_device::static_set_pcb_read(*device, cdp1869_pcb_read_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef UINT8 (*cdp1869_char_ram_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
-typedef void (*cdp1869_char_ram_write_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data);
-typedef int (*cdp1869_pcb_read_func)(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd);
-
-
-// ======================> cdp1869_interface
-
-struct cdp1869_interface
-{
-	// pixel clock of the chip is the device clock
-	int color_clock;            // the chroma clock of the chip
-
-	// page memory color bit read function
-	cdp1869_pcb_read_func           in_pcb_cb;
-
-	// character memory read function
-	cdp1869_char_ram_read_func      in_char_ram_cb;
-
-	// character memory write function
-	cdp1869_char_ram_write_func     out_char_ram_cb;
-};
-
-
+typedef device_delegate<UINT8 (UINT16 pma, UINT8 cma, UINT8 pmd)> cdp1869_char_ram_read_delegate;
+typedef device_delegate<void (UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)> cdp1869_char_ram_write_delegate;
+typedef device_delegate<int (UINT16 pma, UINT8 cma, UINT8 pmd)> cdp1869_pcb_read_delegate;
 
 // ======================> cdp1869_device
 
 class cdp1869_device :  public device_t,
 						public device_sound_interface,
 						public device_video_interface,
-						public device_memory_interface,
-						public cdp1869_interface
+						public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -213,7 +198,11 @@ public:
 
 	template<class _Object> static devcb2_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
 	template<class _Object> static devcb2_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }
-
+	static void static_set_char_ram_read(device_t &device, cdp1869_char_ram_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_char_ram_func = callback; }
+	static void static_set_char_ram_write(device_t &device, cdp1869_char_ram_write_delegate callback) { downcast<cdp1869_device &>(device).m_out_char_ram_func = callback; }
+	static void static_set_pcb_read(device_t &device, cdp1869_pcb_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_pcb_func = callback; }
+	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
+	
 	DECLARE_PALETTE_INIT(cdp1869);
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
@@ -239,8 +228,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual void device_config_complete();
+	virtual machine_config_constructor device_mconfig_additions() const;	
 	virtual void device_start();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -270,9 +258,10 @@ protected:
 private:
 	devcb2_read_line        m_read_pal_ntsc;
 	devcb2_write_line       m_write_prd;
-	cdp1869_pcb_read_func           m_in_pcb_func;
-	cdp1869_char_ram_read_func      m_in_char_ram_func;
-	cdp1869_char_ram_write_func     m_out_char_ram_func;
+	cdp1869_pcb_read_delegate           m_in_pcb_func;
+	cdp1869_char_ram_read_delegate      m_in_char_ram_func;
+	cdp1869_char_ram_write_delegate     m_out_char_ram_func;
+	int m_color_clock;
 
 	//address_space *m_page_ram;
 	emu_timer *m_prd_timer;

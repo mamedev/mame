@@ -44,27 +44,23 @@ static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, driver_device )
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
 ADDRESS_MAP_END
 
-static CDP1869_CHAR_RAM_READ( pecom_char_ram_r )
+CDP1869_CHAR_RAM_READ_MEMBER(pecom_state::pecom_char_ram_r )
 {
-	pecom_state *state = device->machine().driver_data<pecom_state>();
-
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	return state->m_charram[charaddr];
+	return m_charram[charaddr];
 }
 
-static CDP1869_CHAR_RAM_WRITE( pecom_char_ram_w )
+CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_state::pecom_char_ram_w )
 {
-	pecom_state *state = device->machine().driver_data<pecom_state>();
-
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	state->m_charram[charaddr] = data;
+	m_charram[charaddr] = data;
 }
 
-static CDP1869_PCB_READ( pecom_pcb_r )
+CDP1869_PCB_READ_MEMBER(pecom_state::pecom_pcb_r )
 {
 	return BIT(pmd, 7);
 }
@@ -79,14 +75,6 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 
 	m_dma = !m_dma;
 }
-
-static CDP1869_INTERFACE( pecom_cdp1869_intf )
-{
-	CDP1869_COLOR_CLK_PAL,
-	pecom_pcb_r,
-	pecom_char_ram_r,
-	pecom_char_ram_w
-};
 
 VIDEO_START_MEMBER(pecom_state,pecom)
 {
@@ -106,7 +94,11 @@ MACHINE_CONFIG_FRAGMENT( pecom_video )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pecom_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_CHAR_PCB_READ_OWNER(pecom_state, pecom_pcb_r)
+	MCFG_CDP1869_CHAR_RAM_READ_OWNER(pecom_state, pecom_char_ram_r)
+	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(pecom_state, pecom_char_ram_w)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
 	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(pecom_state, pecom_prd_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
