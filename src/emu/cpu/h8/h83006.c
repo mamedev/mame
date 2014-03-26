@@ -159,34 +159,34 @@ void h83006_device::execute_set_input(int inputnum, int state)
 int h83006_device::trapa_setup()
 {
 	if(syscr & 0x08)
-		CCR |= F_I|F_UI;
-	else
 		CCR |= F_I;
+	else
+		CCR |= F_I|F_UI;
 	return 8;
 }
 
 void h83006_device::irq_setup()
 {
 	if(syscr & 0x08)
-		CCR |= F_I|F_UI;
-	else
 		CCR |= F_I;
+	else
+		CCR |= F_I|F_UI;
 }
 
 void h83006_device::update_irq_filter()
 {
 	switch(syscr & 0x08) {
 	case 0x00:
-		if(CCR & F_I)
-			intc->set_filter(2, -1);
-		else
-			intc->set_filter(0, -1);
-		break;
-	case 0x08:
 		if((CCR & (F_I|F_UI)) == (F_I|F_UI))
 			intc->set_filter(2, -1);
 		else if(CCR & F_I)
 			intc->set_filter(1, -1);
+		else
+			intc->set_filter(0, -1);
+		break;
+	case 0x08:
+		if(CCR & F_I)
+			intc->set_filter(2, -1);
 		else
 			intc->set_filter(0, -1);
 		break;

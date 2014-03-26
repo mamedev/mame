@@ -3376,7 +3376,6 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, irq1_line_pulse)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
@@ -3463,7 +3462,6 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_ADD("subcpu", H83002, S23_H8CLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos23_state, irq1_line_pulse)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
 
