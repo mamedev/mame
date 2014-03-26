@@ -191,15 +191,10 @@ void h8_device::execute_run()
 			int picount = inst_state >= 0x10000 && inst_state < 0x20000 ? -100 : icount;
 			if(inst_state < 0x10000) {
 				PPC = NPC;
-				//				fprintf(stderr, "%06x %04x\n", NPC, IR[0]);
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 					debugger_instruction_hook(this, NPC);
 			}
 			do_exec_full();
-			if(icount == picount) {
-				fprintf(stderr, "Unhandled %x (%04x)\n", inst_state, PPC);
-				exit(0);
-			}
 		}
 		while(bcount && icount <= bcount)
 			internal_update(end_cycles - bcount);
@@ -623,8 +618,7 @@ void h8_device::internal(int cycles)
 
 void h8_device::illegal()
 {
-	logerror("Illegal at %x\n", PPC);
-	exit(0);
+	throw emu_fatalerror("%s: Illegal instruction at address %x\n", tag(), PPC);
 }
 
 int h8_device::trace_setup()
