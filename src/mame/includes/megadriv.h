@@ -39,12 +39,6 @@ MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
-/* Megaplay - Megatech specific */
-/* It might be possible to move the following structs in the drivers */
-
-#define MP_ROM  0x10
-#define MP_GAME 0
-
 
 struct genesis_z80_vars
 {
@@ -310,7 +304,6 @@ public:
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp_count_r);
 	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
-	void mplay_start();
 	
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
