@@ -95,6 +95,18 @@
 #define LOG_DISK_WRITE  0
 #define LOG_DISK_READ   0
 
+void ql_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_MOUSE_TICK:
+			mouse_tick();
+			break;
+		default:
+			assert_always(FALSE, "Unknown id in ql_state::device_timer");
+	}
+}
+
 //**************************************************************************
 //  INTELLIGENT PERIPHERAL CONTROLLER
 //**************************************************************************
@@ -276,6 +288,10 @@ READ8_MEMBER( ql_state::disk_io_r )
 		case 0x0001 : result=m_fdc->read(space, offset); break;
 		case 0x0002 : result=m_fdc->read(space, offset); break;
 		case 0x0003 : result=m_fdc->read(space, offset); break;
+		case 0x000C : if(IS_SANDY_DISK(m_disk_type))
+					    result = (m_mouse_int ^ MOUSE_DIRX) | m_mouseb->read() | 0x01; break;
+		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
+		                m_mouse_int &= ~MOUSE_INT_MASK; break;
 		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
@@ -293,10 +309,12 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 		case 0x0001 : m_fdc->write(space, offset, data); break;
 		case 0x0002 : m_fdc->write(space, offset, data); break;
 		case 0x0003 : m_fdc->write(space, offset, data); break;
-		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
+		case 0x0004 : if(IS_SANDY_DISK(m_disk_type))
 						sandy_set_control(data);break;
-		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)
-						m_printer_char=data;
+		case 0x0008 : if(IS_SANDY_DISK(m_disk_type))
+						sandy_print_char(data); break;
+		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
+		                m_mouse_int &= ~MOUSE_INT_MASK; break;
 		case 0x2000 : if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
 		default     : logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
@@ -344,8 +362,6 @@ void ql_state::sandy_set_control(UINT8 data)
 {
 	//logerror("sandy_set_control:%02X\n",data);
 
-	m_disk_io_byte=data;
-
 	if(data & SANDY_DRIVE0_MASK)
 		m_fdc->set_drive(0);
 
@@ -366,11 +382,30 @@ void ql_state::sandy_set_control(UINT8 data)
 		if(data & SANDY_PRINTER_INTMASK)
 			m_zx8302->extint_w(ASSERT_LINE);
 	}
+ 
+	m_disk_io_byte=data;
+}
+
+void ql_state::sandy_print_char(UINT8 data)
+{
+	// latch the data until it's  strobed out
+	m_printer_char=data;
+	
+//	m_centronics->write(data);
+}
+
+WRITE_LINE_MEMBER( ql_state::sandy_printer_busy )
+{
+	if ((state == ASSERT_LINE) && (m_disk_io_byte & SANDY_PRINTER_INTMASK))
+	{
+		logerror("sandy_print_char : triggering extint\n");
+		m_zx8302->extint_w(ASSERT_LINE);
+	}
 }
 
 READ_LINE_MEMBER(ql_state::disk_io_dden_r)
 {
-	if(m_disk_type==DISK_TYPE_SANDY)
+	if(IS_SANDY_DISK(m_disk_type))
 		return ((m_disk_io_byte & SANDY_DDEN_MASK) >> SANDY_DDEN_SHIFT);
 	else
 		return 0;
@@ -386,6 +421,92 @@ WRITE_LINE_MEMBER(ql_state::disk_io_drq_w)
 	//logerror("DiskIO:drq = %d\n",state);
 }
 
+void ql_state::mouse_tick()
+{
+	UINT8 x 		= m_mousex->read();
+	UINT8 y 		= m_mousey->read();
+	UINT8 do_int	= 0;
+
+	//m_mouse_int = 0;
+
+	// Set X interupt flag and direction if x has changed
+	if (x > m_ql_mouse_x) 
+	{
+		m_mouse_int |= MOUSE_INTX;
+		m_mouse_int |= MOUSE_DIRX;
+	}
+	else if (x < m_ql_mouse_x)
+	{
+		m_mouse_int |= MOUSE_INTX;
+		m_mouse_int &= ~MOUSE_DIRX;
+	}
+
+	// Set Y interupt flag and direction if y has changed
+	if (y > m_ql_mouse_y) 
+	{
+		m_mouse_int |= MOUSE_INTY;
+		m_mouse_int &= ~MOUSE_DIRY;
+	}
+	else if (y < m_ql_mouse_y)
+	{
+		m_mouse_int |= MOUSE_INTY;
+		m_mouse_int |= MOUSE_DIRY;
+	}
+
+	// Update saved location
+	m_ql_mouse_x = x;
+	m_ql_mouse_y = y;
+
+	// if it is a QIMI, then always do int if triggered.
+	// if this is a Sandy mouse, only trigger an int if it is enabled in the mask register
+	if (m_config->read() & QIMI_MOUSE)
+		do_int = 1;
+	else
+		do_int = IS_SANDY_DISK(m_disk_type) && (m_disk_io_byte & SANDY_MOUSE_INTMASK);
+	
+	//logerror("m_mouse_int=%02X, MOUSE_INT_MASK=%02X, m_disk_io_byte=%02X, (m_disk_io_byte & SANDY_MOUSE_INTMASK)=%02x\n",m_mouse_int,MOUSE_INT_MASK,m_disk_io_byte,(m_disk_io_byte & SANDY_MOUSE_INTMASK));
+	
+	// if mouse moved trigger external int
+	if((m_mouse_int & MOUSE_INT_MASK) && do_int)
+	{
+		m_zx8302->extint_w(ASSERT_LINE);
+	}
+}
+
+READ8_MEMBER( ql_state::qimi_io_r )
+{
+	UINT8 result = 0;
+	UINT8 buttons;
+	
+	switch (offset)
+	{
+		// 0x1bf9c, button status
+		case 0x00	: 
+			buttons = m_mouseb->read();
+			result = ((buttons & MOUSE_RIGHT) << 2) | ((buttons & MOUSE_LEFT) << 2);
+			break;
+		
+		// 0x1bfbc, direction status
+		case 0x20	:
+			result = ((m_mouse_int & MOUSE_INTX) >> 5) | ((m_mouse_int & MOUSE_INTY) >> 1) |
+				     ((m_mouse_int & MOUSE_DIRX) >> 1) | ((m_mouse_int & MOUSE_DIRY) >> 4);
+			break;
+		case 0x22 	:
+			m_mouse_int &= ~MOUSE_INT_MASK;
+			break;
+	}
+	
+	return result;
+}
+
+WRITE8_MEMBER( ql_state::qimi_io_w )
+{
+	// write to 0x1bfbe resets int status
+	if (offset == 0x22)
+	{
+		m_mouse_int = 0;
+	}
+}
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -540,10 +661,27 @@ static INPUT_PORTS_START( ql )
 
 
 	PORT_START(QL_CONFIG_PORT)
-	PORT_DIPNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select")
-	PORT_DIPSETTING(DISK_TYPE_NONE,     DEF_STR( None ))
-	PORT_DIPSETTING(DISK_TYPE_TRUMP,    "Miracle Trump card")
-	PORT_DIPSETTING(DISK_TYPE_SANDY,    "Sandy Superdisk")
+	PORT_CONFNAME( QIMI_PORT_MASK, QIMI_NONE, "QIMI enabled")
+	PORT_CONFSETTING( QIMI_NONE, "No" )
+	PORT_CONFSETTING( QIMI_MOUSE, "Yes" )
+	
+	PORT_CONFNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select" )
+	PORT_CONFSETTING(DISK_TYPE_NONE,     DEF_STR( None ))
+	PORT_CONFSETTING(DISK_TYPE_TRUMP,    "Miracle Trump card")
+	PORT_CONFSETTING(DISK_TYPE_SANDY_SD, "Sandy Superdisk")
+	PORT_CONFSETTING(DISK_TYPE_SANDY_SQB,"Sandy SuperQBoard")
+
+	
+	PORT_START(MOUSEX_TAG)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) 
+
+	PORT_START(MOUSEY_TAG)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) 
+
+	PORT_START(MOUSEB_TAG)  /* Mouse buttons */
+	PORT_BIT( MOUSE_RIGHT, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1) 
+	PORT_BIT( MOUSE_LEFT,  IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2) 
+	PORT_BIT( MOUSE_MIDDLE, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3) 
 
 INPUT_PORTS_END
 
@@ -826,7 +964,6 @@ wd17xx_interface ql_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-
 //-------------------------------------------------
 //  MICRODRIVE_CONFIG( mdv1_config )
 //-------------------------------------------------
@@ -875,19 +1012,28 @@ void ql_state::machine_start()
 	save_item(NAME(m_baudx4));
 	save_item(NAME(m_printer_char));
 	save_item(NAME(m_disk_io_byte));
+
+	// QIMI QL Internal Mouse Interface
+	if (m_mousex)
+	{
+		m_mouse_timer = timer_alloc(TIMER_MOUSE_TICK);
+		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
+	}
 }
 
 void ql_state::machine_reset()
 {
 	address_space   &program    = m_maincpu->space(AS_PROGRAM);
 
-	m_disk_type=ioport(QL_CONFIG_PORT)->read() & DISK_TYPE_MASK;
+	m_disk_type=m_config->read() & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);
 
 	m_printer_char=0;
 	m_disk_io_byte=0;
-
-	logerror("Configuring RAM\n");
+	m_mouse_int = 0;
+	
+	logerror("Configuring RAM %d\n",m_ram->size() / 1024);
+	
 	// configure RAM
 	switch (m_ram->size())
 	{
@@ -914,21 +1060,39 @@ void ql_state::machine_reset()
 
 	switch (m_disk_type)
 	{
-		case DISK_TYPE_SANDY :
-			logerror("Configuring SandySuperDisk\n");
-			program.install_rom(0x0c0000, 0x0c3fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE]);
+		case DISK_TYPE_SANDY_SD :
+			logerror("Configuring Sandy SuperDisk\n");
+			program.install_rom(0x0c0000, 0x0c3fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE_SD]);
 			program.install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
 			program.install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=SANDY_IO_BASE;
 			break;
+
+		case DISK_TYPE_SANDY_SQB :
+			logerror("Configuring Sandy SuperQBoard\n");
+			program.install_rom(0x0c0000, 0x0c7fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE_SQB]);
+			program.install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
+			program.install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
+			m_disk_io_base=SANDY_IO_BASE;
+			break;
+
 		case DISK_TYPE_TRUMP :
 			logerror("Configuring TrumpCard\n");
 			program.install_read_handler(CART_ROM_BASE, CART_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::cart_rom_r), this));
-			program.install_read_handler(TRUMP_ROM_BASE, TRUMP_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::trump_card_rom_r), this));
+			program.install_read_handler(TRUMP_ROM_MBASE, TRUMP_ROM_END, 0, 0, read8_delegate(FUNC(ql_state::trump_card_rom_r), this));
 			program.install_read_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
 			program.install_write_handler(TRUMP_IO_BASE, TRUMP_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=TRUMP_IO_BASE;
 			break;
+	}
+
+	
+	// QIMI QL Internal Mouse Interface
+	if (m_config->read() & QIMI_MOUSE)
+	{	
+		logerror("QIMI enabled\n");
+		program.install_read_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, read8_delegate(FUNC(ql_state::qimi_io_r), this));
+		program.install_write_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, write8_delegate(FUNC(ql_state::qimi_io_w), this));	
 	}
 }
 
@@ -1062,7 +1226,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( ql )
-	ROM_REGION( 0x20000, M68008_TAG, 0 )
+	ROM_REGION( 0x28000, M68008_TAG, 0 )
 	ROM_DEFAULT_BIOS("js")
 	ROM_SYSTEM_BIOS( 0, "fb", "v1.00 (FB)" )
 	ROMX_LOAD( "fb.ic33", 0x0000, 0x8000, NO_DUMP, ROM_BIOS(1) )
@@ -1090,7 +1254,8 @@ ROM_START( ql )
 	ROM_CART_LOAD("cart", 0xc000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 
 	ROM_LOAD( "trumpcard-125.rom", TRUMP_ROM_BASE, 0x08000, CRC(938eaa46) SHA1(9b3458cf3a279ed86ba395dc45c8f26939d6c44d))
-	ROM_LOAD( "sandysuperdisk.rom", SANDY_ROM_BASE, 0x04000, CRC(b52077da) SHA1(bf531758145ffd083e01c1cf9c45d0e9264a3b53))
+	ROM_LOAD( "sandysuperdisk.rom", SANDY_ROM_BASE_SD, 0x04000, CRC(b52077da) SHA1(bf531758145ffd083e01c1cf9c45d0e9264a3b53))
+	ROM_LOAD( "sandy_disk_controller_v1.18y_1984.rom", SANDY_ROM_BASE_SQB, 0x08000, CRC(d02425be) SHA1(e730576e3e0c6a1acad042c09e15fc62a32d8fbd))
 
 	ROM_REGION( 0x800, I8749_TAG, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x000, 0x800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
