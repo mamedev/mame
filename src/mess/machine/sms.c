@@ -87,7 +87,7 @@ void sms_state::sms_get_inputs( address_space &space )
 
 	// Sega Mark III does not have TH line connected.
 	// Also, the japanese Master System does not set port $dd with TH input.
-	if (!m_is_region_japan)
+	if (!m_is_mark_iii && !m_is_smsj)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -276,7 +276,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
-	if (m_is_region_japan)
+	if (m_is_smsj)
 	{
 		// For japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
@@ -963,15 +963,31 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 DRIVER_INIT_MEMBER(sms_state,smsj)
 {
 	m_is_region_japan = 1;
+	m_is_smsj = 1;
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms2kr)
+DRIVER_INIT_MEMBER(sms_state,sms1krfm)
 {
 	m_is_region_japan = 1;
+	m_has_bios_2000 = 1;
+	m_has_fm = 1;
+}
+
+
+DRIVER_INIT_MEMBER(sms_state,sms1kr)
+{
+	m_is_region_japan = 1;
+	m_has_bios_2000 = 1;
+}
+
+
+DRIVER_INIT_MEMBER(sms_state,smskr)
+{
 	m_has_bios_full = 1;
+	// Despite Korean sms1 version is detected as Japanese region, the sms2 version is not.
 }
 
 

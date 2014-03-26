@@ -45,6 +45,7 @@ public:
 		m_mainram(NULL),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
+		m_is_smsj(0),
 		m_is_mark_iii(0),
 		m_is_sdisp(0),
 		m_has_bios_0400(0),
@@ -97,6 +98,7 @@ public:
 	// model identifiers
 	UINT8 m_is_gamegear;
 	UINT8 m_is_region_japan;
+	UINT8 m_is_smsj;
 	UINT8 m_is_mark_iii;
 	UINT8 m_is_sdisp;
 	UINT8 m_has_bios_0400;
@@ -153,7 +155,9 @@ public:
 	DECLARE_DRIVER_INIT(sg1000m3);
 	DECLARE_DRIVER_INIT(gamegear);
 	DECLARE_DRIVER_INIT(gamegeaj);
-	DECLARE_DRIVER_INIT(sms2kr);
+	DECLARE_DRIVER_INIT(sms1krfm);
+	DECLARE_DRIVER_INIT(sms1kr);
+	DECLARE_DRIVER_INIT(smskr);
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
 	DECLARE_MACHINE_START(sms);

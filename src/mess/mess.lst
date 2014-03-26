@@ -94,7 +94,9 @@ sms1pal   // Sega Master System I (PAL)
 smspal  // Sega Master System II (PAL)
 smsj      // Sega Master System (Japan) with FM Chip
 sg1000m3  // Sega SG-1000 Mark III (Japan)
-sms2kr  // Samsung Gam*Boy II (Korea)
+sms1krfm  // Samsung Gam*Boy I (Korea) with FM Chip
+sms1kr  // Samsung Gam*Boy I (Korea)
+smskr  // Samsung Gam*Boy II (Korea)
 smssdisp  // Sega Master System Store Display Unit
 
 megadrij  // 1988 Sega Mega Drive (Japan)
