@@ -1327,7 +1327,7 @@ void device_image_interface::software_get_default_slot(astring &result, const ch
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return global_alloc_clear(ui_menu_control_device_image(machine, container, this));
+	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
 }
 
 ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu(machine, container)
@@ -1453,20 +1453,20 @@ void ui_menu_control_device_image::handle()
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear(ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}
 
 	case START_SOFTLIST:
 		sld = 0;
-		ui_menu::stack_push(global_alloc_clear(ui_menu_software(machine(), container, image->image_interface(), &sld)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &sld)));
 		state = SELECT_SOFTLIST;
 		break;
 
 	case START_OTHER_PART: {
 		submenu_result = -1;
-		ui_menu::stack_push(global_alloc_clear(ui_menu_software_parts(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
 		state = SELECT_OTHER_PART;
 		break;
 	}
@@ -1477,7 +1477,7 @@ void ui_menu_control_device_image::handle()
 			break;
 		}
 		software_info_name = "";
-		ui_menu::stack_push(global_alloc_clear(ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
 		state = SELECT_PARTLIST;
 		break;
 
@@ -1486,7 +1486,7 @@ void ui_menu_control_device_image::handle()
 		if(swi->has_multiple_parts(image->image_interface())) {
 			submenu_result = -1;
 			swp = 0;
-			ui_menu::stack_push(global_alloc_clear(ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
 			state = SELECT_ONE_PART;
 		} else {
 			swp = swi->first_part();
@@ -1541,7 +1541,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(global_alloc_clear(ui_menu_file_create(machine(), container, image, current_directory, current_file)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
 			state = CREATE_FILE;
 			break;
 
@@ -1561,7 +1561,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(global_alloc_clear(ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;
