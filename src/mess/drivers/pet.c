@@ -199,7 +199,9 @@ void pet_state::update_speaker()
 {
 	if (m_speaker)
 	{
-		m_speaker->level_w(!(m_via_cb2 || m_pia1_pa7));
+		int level = m_via_cb2 && m_pia1_pa7;
+
+		m_speaker->level_w(level);
 	}
 }
 
