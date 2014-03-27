@@ -304,7 +304,6 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
-//  AM_RANGE(0xe803, 0xe803) AM_READWRITE(slapfight_mcu_r, slapfight_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
@@ -330,47 +329,34 @@ ADDRESS_MAP_END
 
 INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (m_main_irq_enabled)
+		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-/* Reset and hold sound CPU */
-WRITE8_MEMBER(slapfght_state::slapfight_port_00_w)
+WRITE8_MEMBER(slapfght_state::irq_enable_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_getstar_sh_intenabled = 0;
+	m_main_irq_enabled = offset ? true : false;
+	
+	if (!m_main_irq_enabled)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-/* Release reset on sound CPU */
-WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
+WRITE8_MEMBER(slapfght_state::sound_reset_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	
+	if (offset == 0)
+		m_sound_nmi_enabled = false;
 }
 
-/* Disable and clear hardware interrupt */
-WRITE8_MEMBER(slapfght_state::slapfight_port_06_w)
-{
-	m_irq_mask = 0;
-}
-
-/* Enable hardware interrupt */
-WRITE8_MEMBER(slapfght_state::slapfight_port_07_w)
-{
-	m_irq_mask = 1;
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_port_08_w)
+WRITE8_MEMBER(slapfght_state::prg_bank_w)
 {
 	UINT8 *RAM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&RAM[0x10000]);
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_port_09_w)
-{
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&RAM[0x14000]);
+	
+	if (offset)
+		membank("bank1")->set_base(&RAM[0x14000]);
+	else
+		membank("bank1")->set_base(&RAM[0x10000]);
 }
 
 READ8_MEMBER(slapfght_state::perfrman_port_00_r)
@@ -381,32 +367,27 @@ READ8_MEMBER(slapfght_state::perfrman_port_00_r)
 
 static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)  /* select bank 0 */
-	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)  /* select bank 1 */
-	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x08, 0x09) AM_WRITE(prg_bank_w)
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(palette_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r) AM_WRITE(slapfight_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
+	AM_RANGE(0x00, 0x00) AM_READ(getstar_mcusim_status_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
 ADDRESS_MAP_END
 
 
@@ -417,18 +398,15 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-/* Generate interrups only if they have been enabled */
-INTERRUPT_GEN_MEMBER(slapfght_state::getstar_interrupt)
+INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 {
-	if (m_getstar_sh_intenabled)
+	if (m_sound_nmi_enabled)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-/* Enable hardware interrupt of sound cpu */
-WRITE8_MEMBER(slapfght_state::getstar_sh_intenable_w)
+WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
 {
-	m_getstar_sh_intenabled = 1;
-	logerror("cpu #1 PC=%d: %d written to a0e0\n",space.device().safe_pc(),data);
+	m_sound_nmi_enabled = offset ? false : true;
 }
 
 static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
@@ -441,8 +419,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
-//  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
+	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
@@ -453,8 +430,7 @@ static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
-//  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
+	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xffff) AM_RAM
@@ -748,7 +724,7 @@ void slapfght_state::machine_reset()
 	m_slapfight_status = 0xc7;
 
 	m_getstar_sequence_index = 0;
-	m_getstar_sh_intenabled = 0;    /* disable sound cpu interrupts */
+	m_sound_nmi_enabled = false;
 
 	/* SOUND CPU */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -766,7 +742,7 @@ DRIVER_INIT_MEMBER(slapfght_state,tigerh)
 
 DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_prot_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_prot_w),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,perfrman)
@@ -782,8 +758,8 @@ DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 
 void slapfght_state::getstar_init()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),this), write8_delegate(FUNC(slapfght_state::getstar_e803_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_mcusim_r),this), write8_delegate(FUNC(slapfght_state::getstar_mcusim_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::getstar_mcusim_status_r),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstar)
@@ -806,7 +782,7 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 	getstar_init();
 
 	/* specific handlers for this bootleg */
-	m_maincpu->space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::gtstarb1_prot_r),this));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -939,7 +915,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 240) // music speed, verified
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -982,7 +958,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 360) // music speed, verified with pcb recording
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
@@ -1027,7 +1003,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) // 3MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, nmi_line_pulse, 360)
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1070,7 +1046,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, getstar_interrupt, 180)
+	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)

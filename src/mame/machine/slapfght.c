@@ -16,6 +16,12 @@
 
 ***************************************************************************/
 
+READ8_MEMBER(slapfght_state::tigerh_mcu_r)
+{
+	m_mcu_sent = 0;
+	return m_from_mcu;
+}
+
 WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 {
 	m_from_main = data;
@@ -24,22 +30,19 @@ WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(slapfght_state::tigerh_mcu_r)
-{
-	m_mcu_sent = 0;
-	return m_from_mcu;
-}
-
 
 /**************************************************************************/
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 {
 	int res = 0;
-	if (!m_main_sent) res |= 0x02;
-	if (!m_mcu_sent) res |= 0x04;
+
+	if (!m_main_sent)
+		res |= 0x02;
+	if (!m_mcu_sent)
+		res |= 0x04;
 	
-	return res | (slapfight_port_00_r(space, 0) & 0xf9);
+	return res | (getstar_mcusim_status_r(space, 0) & 0xf9);
 }
 
 
@@ -71,8 +74,10 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
 {
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
+		if (m_main_sent)
+			m_mcu->set_input_line(0, CLEAR_LINE);
+
 		m_portA_in = m_from_main;
-		if (m_main_sent) m_mcu->set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 	}
 	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
@@ -93,8 +98,12 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrB_w)
 READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
 {
 	m_portC_in = 0;
-	if (!m_main_sent) m_portC_in |= 0x01;
-	if (m_mcu_sent) m_portC_in |= 0x02;
+
+	if (!m_main_sent)
+		m_portC_in |= 0x01;
+	if (m_mcu_sent)
+		m_portC_in |= 0x02;
+
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
@@ -110,57 +119,42 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
 
 
 
-
-READ8_MEMBER(slapfght_state::tigerhb_e803_r)
-{
-	UINT8 tigerhb_val = 0;
-	switch (m_tigerhb_cmd)
-	{
-		case 0x73:  /* avoid "BAD HW" message */
-			tigerhb_val = 0x83;
-			break;
-		default:
-			logerror("%04x: tigerhb_e803_r - cmd = %02x\n", space.device().safe_pc(), m_getstar_cmd);
-			break;
-	}
-	return tigerhb_val;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerhb_e803_w)
-{
-	switch (data)
-	{
-		/* hardware test */
-		case 0x73:
-			m_tigerhb_cmd = 0x73;
-			break;
-		default:
-			logerror("%04x: tigerhb_e803_w - data = %02x\n",space.device().safe_pc(),data);
-			m_tigerhb_cmd = 0x00;
-			break;
-	}
-}
-
-
-
 /***************************************************************************
 
     Slap Fight MCU
 
 ***************************************************************************/
 
-/* Status register */
-READ8_MEMBER(slapfght_state::slapfight_port_00_r)
+READ8_MEMBER(slapfght_state::slapfight_mcu_r)
 {
-	static const int states[3]={ 0xc7, 0x55, 0x00 };
-
-	m_slapfight_status = states[m_slapfight_status_state];
-
-	m_slapfight_status_state++;
-	if (m_slapfight_status_state > 2) m_slapfight_status_state = 0;
-
-	return m_slapfight_status;
+	m_mcu_sent = 0;
+	return m_from_mcu;
 }
+
+WRITE8_MEMBER(slapfght_state::slapfight_mcu_w)
+{
+	m_from_main = data;
+	m_main_sent = 1;
+	m_mcu->set_input_line(0, ASSERT_LINE);
+}
+
+
+/**************************************************************************/
+
+READ8_MEMBER(slapfght_state::slapfight_mcu_status_r)
+{
+	int res = 0;
+
+	if (!m_main_sent)
+		res |= 0x02;
+	if (!m_mcu_sent)
+		res |= 0x04;
+
+	return res;
+}
+
+
+/**************************************************************************/
 
 READ8_MEMBER(slapfght_state::slapfight_68705_portA_r)
 {
@@ -186,11 +180,10 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
 {
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
-		m_portA_in = m_from_main;
-
 		if (m_main_sent)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
+		m_portA_in = m_from_main;
 		m_main_sent = 0;
 	}
 	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
@@ -237,40 +230,27 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrC_w)
 	m_ddrC = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_mcu_w)
-{
-	m_from_main = data;
-	m_main_sent = 1;
-	m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(slapfght_state::slapfight_mcu_r)
-{
-	m_mcu_sent = 0;
-	return m_from_mcu;
-}
-
-READ8_MEMBER(slapfght_state::slapfight_mcu_status_r)
-{
-	int res = 0;
-
-	if (!m_main_sent)
-		res |= 0x02;
-	if (!m_mcu_sent)
-		res |= 0x04;
-
-	return res;
-}
-
 
 
 /***************************************************************************
 
-    Get Star MCU simulation
+    Get Star MCU simulation :(
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::getstar_e803_r)
+READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
+{
+	static const int states[3]={ 0xc7, 0x55, 0x00 };
+
+	m_slapfight_status = states[m_slapfight_status_state];
+
+	m_slapfight_status_state++;
+	if (m_slapfight_status_state > 2) m_slapfight_status_state = 0;
+
+	return m_slapfight_status;
+}
+
+READ8_MEMBER(slapfght_state::getstar_mcusim_r)
 {
 	UINT16 tmp = 0;  /* needed for values computed on 16 bits */
 	UINT8 getstar_val = 0;
@@ -339,7 +319,7 @@ READ8_MEMBER(slapfght_state::getstar_e803_r)
 					getstar_val = 0x76;
 					break;
 				default:
-					logerror("%04x: getstar_e803_r - cmd = %02x\n",space.device().safe_pc(),m_getstar_cmd);
+					logerror("%04x: getstar_mcusim_r - cmd = %02x\n",space.device().safe_pc(),m_getstar_cmd);
 					break;
 			}
 			break;
@@ -365,13 +345,13 @@ READ8_MEMBER(slapfght_state::getstar_e803_r)
 			if (space.device().safe_pc() == 0x6b04) return (lgsb2_lookup_table[m_gs_a]);
 			break;
 		default:
-			logerror("%04x: getstar_e803_r - cmd = %02x - unknown set !\n",space.device().safe_pc(),m_getstar_cmd);
+			logerror("%04x: getstar_mcusim_r - cmd = %02x - unknown set !\n",space.device().safe_pc(),m_getstar_cmd);
 			break;
 	}
 	return getstar_val;
 }
 
-WRITE8_MEMBER(slapfght_state::getstar_e803_w)
+WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 {
 	/* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ), register C is a unaltered copy of register A */
 	#define GS_SAVE_REGS  m_gs_a = space.device().state().state_int(Z80_BC) >> 0; \
@@ -776,7 +756,7 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 			    6AFF: 00            nop
 			    6B00: 00            nop
 			    6B01: 3A 03 E8      ld   a,($E803)
-			   We save the regs though to hack it in 'getstar_e803_r' read handler.
+			   We save the regs though to hack it in 'getstar_mcusim_r' read handler.
 			*/
 			if (space.device().safe_pc() == 0x6ae2)
 			{
@@ -815,7 +795,7 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 			    6AFF: 00            nop
 			    6B00: 00            nop
 			    6B01: 3A 03 E8      ld   a,($E803)
-			   We save the regs though to hack it in 'getstar_e803_r' read handler.
+			   We save the regs though to hack it in 'getstar_mcusim_r' read handler.
 			*/
 			if (space.device().safe_pc() == 0x6ae2)
 			{
@@ -829,13 +809,53 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 			}
 			break;
 		default:
-			logerror("%04x: getstar_e803_w - data = %02x - unknown set !\n",space.device().safe_pc(),data);
+			logerror("%04x: getstar_mcusim_w - data = %02x - unknown set !\n",space.device().safe_pc(),data);
 			break;
 	}
 }
 
 
-READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
+
+/***************************************************************************
+
+    Protection kludges for some bootleg sets
+
+***************************************************************************/
+
+READ8_MEMBER(slapfght_state::tigerhb_prot_r)
+{
+	UINT8 tigerhb_val = 0;
+	switch (m_tigerhb_cmd)
+	{
+		case 0x73:  /* avoid "BAD HW" message */
+			tigerhb_val = 0x83;
+			break;
+		default:
+			logerror("%04x: tigerhb_prot_r - cmd = %02x\n", space.device().safe_pc(), m_getstar_cmd);
+			break;
+	}
+	return tigerhb_val;
+}
+
+WRITE8_MEMBER(slapfght_state::tigerhb_prot_w)
+{
+	switch (data)
+	{
+		/* hardware test */
+		case 0x73:
+			m_tigerhb_cmd = 0x73;
+			break;
+		default:
+			logerror("%04x: tigerhb_prot_w - data = %02x\n",space.device().safe_pc(),data);
+			m_tigerhb_cmd = 0x00;
+			break;
+	}
+}
+
+
+/**************************************************************************/
+
+READ8_MEMBER(slapfght_state::gtstarb1_prot_r)
 {
 	/* The bootleg has it's own 'protection' on startup ?
 	    6D1A: 06 04         ld   b,$04

@@ -56,7 +56,7 @@ public:
 
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
-	int m_getstar_sh_intenabled;
+	bool m_sound_nmi_enabled;
 	int m_slapfight_status_state;
 	UINT8 m_mcu_val;
 	UINT8 m_getstar_cmd;
@@ -77,20 +77,17 @@ public:
 	UINT8 m_portC_in;
 	UINT8 m_portC_out;
 	UINT8 m_ddrC;
-	int m_flipscreen;
+	bool m_flipscreen;
 	int m_palette_bank;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
-	UINT8 m_irq_mask;
+	bool m_main_irq_enabled;
 
-	DECLARE_READ8_MEMBER(gtstarb1_port_0_read);
-	DECLARE_WRITE8_MEMBER(slapfight_port_00_w);
-	DECLARE_WRITE8_MEMBER(slapfight_port_01_w);
-	DECLARE_WRITE8_MEMBER(slapfight_port_06_w);
-	DECLARE_WRITE8_MEMBER(slapfight_port_07_w);
-	DECLARE_WRITE8_MEMBER(slapfight_port_08_w);
-	DECLARE_WRITE8_MEMBER(slapfight_port_09_w);
-	DECLARE_READ8_MEMBER(slapfight_port_00_r);
+	DECLARE_READ8_MEMBER(gtstarb1_prot_r);
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(prg_bank_w);
+	DECLARE_READ8_MEMBER(getstar_mcusim_status_r);
 	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
 	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
@@ -103,9 +100,9 @@ public:
 	DECLARE_WRITE8_MEMBER(slapfight_mcu_w);
 	DECLARE_READ8_MEMBER(slapfight_mcu_r);
 	DECLARE_READ8_MEMBER(slapfight_mcu_status_r);
-	DECLARE_READ8_MEMBER(getstar_e803_r);
-	DECLARE_WRITE8_MEMBER(getstar_e803_w);
-	DECLARE_WRITE8_MEMBER(getstar_sh_intenable_w);
+	DECLARE_READ8_MEMBER(getstar_mcusim_r);
+	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
@@ -118,15 +115,15 @@ public:
 	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
 	DECLARE_READ8_MEMBER(tigerh_mcu_r);
 	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_READ8_MEMBER(tigerhb_e803_r);
-	DECLARE_WRITE8_MEMBER(tigerhb_e803_w);
+	DECLARE_READ8_MEMBER(tigerhb_prot_r);
+	DECLARE_WRITE8_MEMBER(tigerhb_prot_w);
 	DECLARE_READ8_MEMBER(perfrman_port_00_r);
 	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
 	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
 	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);
 	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
-	DECLARE_WRITE8_MEMBER(slapfight_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(slapfight_palette_bank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_DRIVER_INIT(getstarj);
 	DECLARE_DRIVER_INIT(getstar);
 	DECLARE_DRIVER_INIT(gtstarb1);
@@ -147,7 +144,7 @@ public:
 	UINT32 screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(getstar_interrupt);
+	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void getstar_init();
 	
 	virtual void machine_start();

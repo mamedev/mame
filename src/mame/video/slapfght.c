@@ -96,13 +96,12 @@ WRITE8_MEMBER(slapfght_state::slapfight_fixcol_w)
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_flipscreen_w)
+WRITE8_MEMBER(slapfght_state::flipscreen_w)
 {
-	// port 2 is flipscreen, port 3 is normal
-	m_flipscreen = (offset == 0);
+	m_flipscreen = offset ? false : true;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_palette_bank_w)
+WRITE8_MEMBER(slapfght_state::palette_bank_w)
 {
 	m_palette_bank = offset;
 }
