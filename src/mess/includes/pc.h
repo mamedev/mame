@@ -53,12 +53,6 @@ public:
 	int m_cur_eop;
 	UINT8 m_pc_spkrdata;
 	UINT8 m_pit_out2;
-	UINT8 m_pcjr_dor;
-	emu_timer *m_pcjr_watchdog;
-	UINT8 m_pcjx_1ff_count;
-	UINT8 m_pcjx_1ff_val;
-	UINT8 m_pcjx_1ff_bankval;
-	UINT8 m_pcjx_1ff_bank[20][2];
 
 	int                     m_ppi_portc_switch_high;
 	int                     m_ppi_speaker;
@@ -86,20 +80,13 @@ public:
 	DECLARE_READ8_MEMBER(pc_EXP_r);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_DRIVER_INIT(bondwell);
-	DECLARE_DRIVER_INIT(pcjr);
 	DECLARE_DRIVER_INIT(pccga);
 	DECLARE_DRIVER_INIT(ibm5150);
 	DECLARE_DRIVER_INIT(pcmda);
 	DECLARE_MACHINE_START(pc);
 	DECLARE_MACHINE_RESET(pc);
-	DECLARE_MACHINE_START(pcjr);
-	DECLARE_MACHINE_RESET(pcjr);
-	TIMER_CALLBACK_MEMBER(pcjr_delayed_pic8259_irq);
-	TIMER_CALLBACK_MEMBER(pcjr_keyb_signal_callback);
-	TIMER_CALLBACK_MEMBER(pcjr_fdc_watchdog);
 	TIMER_CALLBACK_MEMBER(pc_rtc_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(pcjr_frame_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma8237_fdc_dack_r);
 	DECLARE_READ8_MEMBER(pc_dma8237_hdc_dack_r);
@@ -121,14 +108,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ibm5160_ppi_portb_w);
 	DECLARE_READ8_MEMBER(pc_ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(pc_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
-	DECLARE_READ8_MEMBER(pcjr_ppi_porta_r);
-	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
-	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
-	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
-	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt);
 	void pc_select_dma_channel(int channel, bool state);
@@ -140,7 +120,6 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
 	UINT8 pc_speaker_get_spk();
 	void pc_speaker_set_spkrdata(UINT8 data);
-	void pcjr_keyb_init();
 	void pc_rtc_init();
 
 	// turbo support
@@ -164,7 +143,6 @@ public:
 	int m_pc_keyb_on;
 	int m_pc_keyb_self_test;
 	
-	DECLARE_WRITE_LINE_MEMBER(pcjr_set_keyb_int);
 	DECLARE_WRITE_LINE_MEMBER(pc_set_keyb_int);
 };
 

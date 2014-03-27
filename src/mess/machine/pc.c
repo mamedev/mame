@@ -208,40 +208,7 @@ I8237_INTERFACE( ibm5150_dma8237_config )
 };
 
 
-/*************************************************************
- *
- * PCJR pic8259 configuration
- *
- * Part of the PCJR CRT POST test at address F0452/F0454 writes
- * to the PIC enabling an IRQ which is then immediately fired,
- * however it is expected that the actual IRQ is taken one
- * instruction later (the irq bit is reset by the instruction
- * at F0454). Delaying taking of an IRQ by one instruction for
- * all cases breaks floppy emulation. This seems to be a really
- * tight corner case. For now we delay the IRQ by one instruction
- * only for the PCJR and only when it's inside the POST checks.
- *
- *************************************************************/
 
-static emu_timer    *pc_int_delay_timer;
-
-TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
-{
-	m_maincpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(pc_state::pcjr_pic8259_set_int_line)
-{
-	UINT32 pc = m_maincpu->pc();
-	if ( (pc == 0xF0453) || (pc == 0xFF196) )
-	{
-		pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	}
-}
 
 /*************************************************************************
  *
@@ -353,123 +320,6 @@ WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
 
 	nmi_enabled = data & 0x80;
 }
-
-/*************************************************************
- *
- * PCJR NMI and raw keybaord handling
- *
- * raw signals on the keyboard cable:
- * ---_-b0b1b2b3b4b5b6b7pa----------------------
- *    | | | | | | | | | | |
- *    | | | | | | | | | | *--- 11 stop bits ( -- = 1 stop bit )
- *    | | | | | | | | | *----- parity bit ( 0 = _-, 1 = -_ )
- *    | | | | | | | | *------- bit 7 ( 0 = _-, 1 = -_ )
- *    | | | | | | | *--------- bit 6 ( 0 = _-, 1 = -_ )
- *    | | | | | | *----------- bit 5 ( 0 = _-, 1 = -_ )
- *    | | | | | *------------- bit 4 ( 0 = _-, 1 = -_ )
- *    | | | | *--------------- bit 3 ( 0 = _-, 1 = -_ )
- *    | | | *----------------- bit 2 ( 0 = _-, 1 = -_ )
- *    | | *------------------- bit 1 ( 0 = _-, 1 = -_ )
- *    | *--------------------- bit 0 ( 0 = _-, 1 = -_ )
- *    *----------------------- start bit (always _- )
- *
- * An entire bit lasts for 440 uSec, half bit time is 220 uSec.
- * Transferring an entire byte takes 21 x 440uSec. The extra
- * time of the stop bits is to allow the CPU to do other things
- * besides decoding keyboard signals.
- *
- * These signals get inverted before going to the PCJR
- * handling hardware. The sequence for the start then
- * becomes:
- *
- * __-_b0b1.....
- *   |
- *   *---- on the 0->1 transition of the start bit a keyboard
- *         latch signal is set to 1 and an NMI is generated
- *         when enabled.
- *         The keyboard latch is reset by reading from the
- *         NMI enable port (A0h).
- *
- *************************************************************/
-
-static struct {
-	UINT8       transferring;
-	UINT8       latch;
-	UINT32      raw_keyb_data;
-	int         signal_count;
-	emu_timer   *keyb_signal_timer;
-} pcjr_keyb;
-
-
-READ8_MEMBER(pc_state::pcjr_nmi_enable_r)
-{
-	pcjr_keyb.latch = 0;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return nmi_enabled;
-}
-
-
-TIMER_CALLBACK_MEMBER(pc_state::pcjr_keyb_signal_callback)
-{
-	pcjr_keyb.raw_keyb_data = pcjr_keyb.raw_keyb_data >> 1;
-	pcjr_keyb.signal_count--;
-
-	if ( pcjr_keyb.signal_count <= 0 )
-	{
-		pcjr_keyb.keyb_signal_timer->adjust( attotime::never, 0, attotime::never );
-		pcjr_keyb.transferring = 0;
-	}
-}
-
-
-WRITE_LINE_MEMBER(pc_state::pcjr_set_keyb_int)
-{
-	if ( state )
-	{
-		UINT8   data = pc_keyb_read();
-		UINT8   parity = 0;
-		int     i;
-
-		/* Calculate the raw data */
-		for( i = 0; i < 8; i++ )
-		{
-			if ( ( 1 << i ) & data )
-			{
-				parity ^= 1;
-			}
-		}
-		pcjr_keyb.raw_keyb_data = 0;
-		pcjr_keyb.raw_keyb_data = ( pcjr_keyb.raw_keyb_data << 2 ) | ( parity ? 1 : 2 );
-		for( i = 0; i < 8; i++ )
-		{
-			pcjr_keyb.raw_keyb_data = ( pcjr_keyb.raw_keyb_data << 2 ) | ( ( data & 0x80 ) ? 1 : 2 );
-			data <<= 1;
-		}
-		/* Insert start bit */
-		pcjr_keyb.raw_keyb_data = ( pcjr_keyb.raw_keyb_data << 2 ) | 1;
-		pcjr_keyb.signal_count = 20 + 22;
-
-		/* we are now transferring a byte of keyboard data */
-		pcjr_keyb.transferring = 1;
-
-		/* Set timer */
-		pcjr_keyb.keyb_signal_timer->adjust( attotime::from_usec(220), 0, attotime::from_usec(220) );
-
-		pcjr_keyb.latch = 1;
-	}
-	m_maincpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
-}
-
-
-void pc_state::pcjr_keyb_init()
-{
-	pcjr_keyb.transferring = 0;
-	pcjr_keyb.latch = 0;
-	pcjr_keyb.raw_keyb_data = 0;
-	pc_keyb_set_clock( 1 );
-}
-
-
 
 /**********************************************************
  *
@@ -708,87 +558,6 @@ I8255_INTERFACE( pc_ppi8255_interface )
 };
 
 
-WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
-{
-	/* KB controller port B */
-	m_ppi_portb = data;
-	m_ppi_portc_switch_high = data & 0x08;
-	m_pit8253->write_gate2(BIT(data, 0));
-	pc_speaker_set_spkrdata( data & 0x02 );
-
-	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-}
-
-
-/*
- * On a PCJR none of the port A bits are connected.
- */
-READ8_MEMBER(pc_state::pcjr_ppi_porta_r)
-{
-	int data;
-
-	data = 0xff;
-	PIO_LOG(1,"PIO_A_r",("$%02x\n", data));
-	return data;
-}
-
-
-/*
- * Port C connections on a PCJR (notes from schematics):
- * PC0 - KYBD LATCH
- * PC1 - MODEM CD INSTALLED
- * PC2 - DISKETTE CD INSTALLED
- * PC3 - ATR CD IN
- * PC4 - cassette audio
- * PC5 - OUT2 from 8253
- * PC6 - KYBD IN
- * PC7 - (keyboard) CABLE CONNECTED
- */
-READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
-{
-	int data=0xff;
-
-	data&=~0x80;
-	data &= ~0x04;      /* floppy drive installed */
-	if ( m_ram->size() > 64 * 1024 )    /* more than 64KB ram installed */
-		data &= ~0x08;
-	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
-	if ( ! ( m_ppi_portb & 0x08 ) )
-	{
-		double tap_val = m_cassette->input();
-
-		if ( tap_val < 0 )
-		{
-			data &= ~0x10;
-		}
-		else
-		{
-			data |= 0x10;
-		}
-	}
-	else
-	{
-		if ( m_ppi_portb & 0x01 )
-		{
-			data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
-		}
-	}
-	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
-	data = ( data & ~0x40 ) | ( ( pcjr_keyb.raw_keyb_data & 0x01 ) ? 0x40 : 0x00 );
-
-	return data;
-}
-
-
-I8255_INTERFACE( pcjr_ppi8255_interface )
-{
-	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portc_r),
-	DEVCB_NULL
-};
 
 
 /**********************************************************
@@ -808,86 +577,6 @@ WRITE_LINE_MEMBER( pc_state::fdc_interrupt )
 WRITE_LINE_MEMBER( pc_state::pc_set_keyb_int)
 {
 	m_pic8259->ir1_w(state);
-}
-
-TIMER_CALLBACK_MEMBER(pc_state::pcjr_fdc_watchdog)
-{
-	if(m_pcjr_dor & 0x20)
-		fdc_interrupt(1);
-	else
-		fdc_interrupt(0);
-}
-
-WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
-{
-	logerror("fdc: dor = %02x\n", data);
-	UINT8 pdor = m_pcjr_dor;
-	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	floppy_image_device *floppy0 = fdc->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = NULL;
-
-	if(fdc->subdevice("1"))
-		floppy1 = fdc->subdevice<floppy_connector>("1")->get_device();
-	m_pcjr_dor = data;
-
-	if(floppy0)
-		floppy0->mon_w(!(m_pcjr_dor & 1));
-	if(floppy1)
-		floppy1->mon_w(!(m_pcjr_dor & 2));
-
-	if(m_pcjr_dor & 1)
-		fdc->set_floppy(floppy0);
-	else if(m_pcjr_dor & 2)
-		fdc->set_floppy(floppy1);
-	else
-		fdc->set_floppy(NULL);
-
-	if((pdor^m_pcjr_dor) & 0x80)
-		fdc->reset();
-
-	if(m_pcjr_dor & 0x20) {
-		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
-			m_pcjr_watchdog->adjust(attotime::from_seconds(3));
-	} else {
-		m_pcjr_watchdog->adjust(attotime::never);
-		fdc_interrupt(0);
-	}
-}
-
-// pcjx port 0x1ff, some info from Toshiya Takeda
-
-void pc_state::pcjx_set_bank(int unk1, int unk2, int unk3)
-{
-	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
-}
-
-WRITE8_MEMBER(pc_state::pcjx_port_1ff_w)
-{
-	switch(m_pcjx_1ff_count) {
-	case 0:
-		m_pcjx_1ff_bankval = data;
-		m_pcjx_1ff_count++;
-		break;
-	case 1:
-		m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0] = data;
-		m_pcjx_1ff_count++;
-		break;
-	case 2:
-		m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1] = data;
-		m_pcjx_1ff_count = 0;
-		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], data);
-		break;
-	}
-}
-
-
-READ8_MEMBER(pc_state::pcjx_port_1ff_r)
-{
-	if(m_pcjx_1ff_count == 2)
-		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);
-
-	m_pcjx_1ff_count = 0;
-	return 0x60; // expansion?
 }
 
 WRITE8_MEMBER(pc_state::asst128_fdc_dor_w)
@@ -1016,12 +705,6 @@ DRIVER_INIT_MEMBER(pc_state,pcmda)
 	init_pc_common(write_line_delegate(FUNC(pc_state::pc_set_keyb_int),this));
 }
 
-DRIVER_INIT_MEMBER(pc_state,pcjr)
-{
-	init_pc_common(write_line_delegate(FUNC(pc_state::pcjr_set_keyb_int),this));
-}
-
-
 IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 {
 	return m_pic8259->acknowledge();
@@ -1057,129 +740,6 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 }
 
 
-MACHINE_START_MEMBER(pc_state,pcjr)
-{
-	pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_delayed_pic8259_irq),this));
-	m_pcjr_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_fdc_watchdog),this));
-	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
-
-	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
-}
-
-MACHINE_RESET_MEMBER(pc_state,pcjr)
-{
-	m_u73_q2 = 0;
-	m_out1 = 0;
-	m_pc_spkrdata = 0;
-	m_pit_out2 = 1;
-	m_dma_channel = -1;
-	memset(m_dma_offset,0,sizeof(m_dma_offset));
-	m_ppi_portc_switch_high = 0;
-	m_ppi_speaker = 0;
-	m_ppi_keyboard_clear = 0;
-	m_ppi_keyb_clock = 0;
-	m_ppi_portb = 0;
-	m_ppi_clock_signal = 0;
-	m_ppi_data_signal = 0;
-	m_ppi_shift_register = 0;
-	m_ppi_shift_enable = 0;
-	m_pcjr_dor = 0;
-	m_speaker->level_w(0);
-
-	m_pcjx_1ff_count = 0;
-	m_pcjx_1ff_val = 0;
-	m_pcjx_1ff_bankval = 0;
-	memset(m_pcjx_1ff_bank, 0, sizeof(m_pcjx_1ff_bank));
-
-	pcjr_keyb_init();
-}
-
-
-DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
-{
-	UINT32  address;
-	UINT32  size;
-
-	address = (!strcmp(":cart2", image.device().tag())) ? 0xd0000 : 0xe0000;
-
-	if ( image.software_entry() )
-	{
-		UINT8 *cart = image.get_software_region( "rom" );
-
-		size = image.get_software_region_length("rom" );
-
-		memcpy( memregion("maincpu")->base() + address, cart, size );
-	}
-	else
-	{
-		UINT8   header[0x200];
-
-		unsigned header_size = 0;
-		unsigned image_size = image.length();
-		bool imagic_hack = false;
-
-		/* Check for supported header sizes */
-		switch( image_size & 0x3ff )
-		{
-		case 0x80:
-			header_size = 0x80;
-			break;
-		case 0x200:
-			header_size = 0x200;
-			break;
-		default:
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Check for supported image sizes */
-		switch( image_size - header_size )
-		{
-		case 0xa000:
-			imagic_hack = true;
-		case 0x2000:
-		case 0x4000:
-		case 0x8000:
-		case 0x10000:
-			break;
-		default:
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Read and verify the header */
-		if ( header_size != image.fread( header, header_size ) )
-		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		/* Read the cartridge contents */
-		if ( ( image_size - header_size ) != image.fread(memregion("maincpu")->base() + address, image_size - header_size ) )
-		{
-			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
-			return IMAGE_INIT_FAIL;
-		}
-
-		if (imagic_hack)
-		{
-			UINT8 *cart_area = memregion("maincpu")->base() + address;
-
-			memcpy( cart_area + 0xe000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0xc000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0xa000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0x8000, cart_area + 0x2000, 0x2000 );
-			memcpy( cart_area + 0x6000, cart_area, 0x2000 );
-			memcpy( cart_area + 0x4000, cart_area, 0x2000 );
-			memcpy( cart_area + 0x2000, cart_area, 0x2000 );
-		}
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-
 /**************************************************************************
  *
  *      Interrupt handlers.
@@ -1191,14 +751,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pc_frame_interrupt)
 	int scanline = param;
 
 	if((scanline % 64) == 0)
-		pc_keyboard();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(pc_state::pcjr_frame_interrupt)
-{
-	int scanline = param;
-
-	if((scanline % 64) == 0 &&  pcjr_keyb.transferring == 0 )
 		pc_keyboard();
 }
 

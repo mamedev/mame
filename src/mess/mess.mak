@@ -1552,7 +1552,8 @@ $(MESSOBJ)/pitronic.a:          \
 	$(MESS_DRIVERS)/beta.o      \
 
 $(MESSOBJ)/pc.a:                \
-	$(MESS_MACHINE)/tandy1t.o   \
+	$(MESS_DRIVERS)/tandy1t.o   \
+	$(MESS_DRIVERS)/ibmpcjr.o   \
 	$(MESS_MACHINE)/europc.o    \
 	$(MESS_MACHINE)/pc.o        \
 	$(MESS_DRIVERS)/pc.o        \
