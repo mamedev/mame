@@ -188,8 +188,6 @@ void h8_device::execute_run()
 
 	while(icount > 0) {
 		while(icount > bcount) {
-// TODO: picount is unused since SVN r28981
-//			int picount = inst_state >= 0x10000 && inst_state < 0x20000 ? -100 : icount;
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
