@@ -105,6 +105,8 @@ public:
 	DECLARE_MACHINE_START( pet );
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
+	DECLARE_MACHINE_START( pet40 );
+	DECLARE_MACHINE_RESET( pet40 );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -54,7 +54,7 @@ const device_type WANGPC_LVC = &device_creator<wangpc_lvc_device>;
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	offs_t scroll_y = (((m_scroll >> 8) + 0x15) & 0xff) * 0x80;
 
@@ -72,7 +72,7 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(y, x) = m_palette[color];
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
 
 				data <<= 1;
 			}
@@ -94,7 +94,7 @@ void wangpc_lvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(y, x) = m_palette[color];
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
 
 				data <<= 1;
 			}
@@ -108,7 +108,7 @@ static MC6845_UPDATE_ROW( wangpc_lvc_update_row )
 {
 	wangpc_lvc_device *lvc = downcast<wangpc_lvc_device *>(device->owner());
 
-	lvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+	lvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }
 
 WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
@@ -121,7 +121,7 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

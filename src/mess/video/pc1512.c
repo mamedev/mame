@@ -57,8 +57,6 @@ enum
 #define COLOR_PALETTE_1     0x20
 
 
-#define VFP_HIRES           22
-#define HFP_HIRES           112
 #define VFP_LORES           22
 #define HFP_LORES           16
 
@@ -167,6 +165,7 @@ READ8_MEMBER( pc1512_state::vdu_r )
 		data |= 0x04;
 
 		// vertical sync
+		//data |= m_vdu->vsync_r();
 		int flyback = 0;
 
 		if (machine().first_screen()->vpos() < VFP_LORES - 16) flyback = 1;
@@ -395,13 +394,13 @@ offs_t pc1512_state::get_char_rom_offset()
 	return ((m_lk->read() >> 5) & 0x03) << 11;
 }
 
-void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
+	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
-		p = &bitmap.pix32(y + VFP_LORES, HFP_LORES);
+		p = &bitmap.pix32(y + vbp, hbp);
 
 	if (y > 199) return;
 
@@ -434,7 +433,7 @@ void pc1512_state::draw_alpha(bitmap_rgb32 &bitmap, const rectangle &cliprect, U
 		{
 			int color = BIT(data, 7) ? fg : bg;
 
-			*p = PALETTE_1512[color]; p++;
+			*p = PALETTE_1512[de ? color : 0]; p++;
 
 			data <<= 1;
 		}
@@ -464,11 +463,11 @@ int pc1512_state::get_color(UINT8 data)
 	return color;
 };
 
-void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	if (y > 199) return;
 
-	UINT32 *p = &bitmap.pix32(y + VFP_LORES, HFP_LORES);
+	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -478,17 +477,17 @@ void pc1512_state::draw_graphics_1(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int x = 0; x < 8; x++)
 		{
-			*p = PALETTE_1512[get_color((BIT(b, 15) << 1) | BIT(b, 14))]; p++;
+			*p = PALETTE_1512[de ? get_color((BIT(b, 15) << 1) | BIT(b, 14)) : 0]; p++;
 			b <<= 2;
 		}
 	}
 }
 
-void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	if (y > 199) return;
 
-	UINT32 *p = &bitmap.pix32(y + VFP_HIRES, HFP_HIRES);
+	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -501,7 +500,7 @@ void pc1512_state::draw_graphics_2(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int x = 0; x < 16; x++)
 		{
-			*p = PALETTE_1512[(BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15)]; p++;
+			*p = PALETTE_1512[de ? (BIT(i, 15) << 3) | (BIT(r, 15) << 2) | (BIT(g, 15) << 1) | BIT(b, 15) : 0]; p++;
 			i <<= 1; r <<= 1; g <<= 1; b <<= 1;
 		}
 	}
@@ -515,22 +514,22 @@ static MC6845_UPDATE_ROW( pc1512_update_row )
 	{
 	case ALPHA_40:
 	case ALPHA_80:
-		state->draw_alpha(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_alpha(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 		break;
 
 	case GRAPHICS_1:
-		state->draw_graphics_1(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_graphics_1(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 		break;
 
 	case GRAPHICS_2:
-		state->draw_graphics_2(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+		state->draw_graphics_2(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 		break;
 	}
 }
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

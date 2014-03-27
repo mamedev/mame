@@ -249,10 +249,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	int e6 = state->m_40;
 	int th = 0;
 
-	// prevent wraparound
-	if (y >= 240) return;
-
-	y += state->m_sync + VERTICAL_PORCH_HACK;
+	y += state->m_sync + vbp;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -323,11 +320,12 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 
 		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
 		UINT8 chargen_data = state->m_char_rom->base()[chargen_addr & 0xfff] << 2;
-		int x = HORIZONTAL_PORCH_HACK + (column + 4) * ABC800_CHAR_WIDTH;
+		int x = hbp + (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
+			if (!de) color = rgb_t::black;
 
 			bitmap.pix32(y, x++) = PALETTE_ABC[color];
 
@@ -413,7 +411,7 @@ WRITE_LINE_MEMBER( abc806_state::vs_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	ABC800_CHAR_WIDTH,
 	NULL,

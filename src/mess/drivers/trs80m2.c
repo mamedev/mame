@@ -399,9 +399,9 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int dout = BIT(data, 7);
-			int color = dcursor ^ drevid ^ dout;
+			int color = (dcursor ^ drevid ^ dout) && de;
 
-			bitmap.pix32(y, x++) = pen[color];
+			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
 
 			data <<= 1;
 		}
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 
 static MC6845_INTERFACE( mc6845_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

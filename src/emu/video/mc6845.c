@@ -43,7 +43,7 @@
 #include "mc6845.h"
 
 
-#define LOG     (0)
+#define LOG     (1)
 
 
 const device_type MC6845 = &device_creator<mc6845_device>;
@@ -493,8 +493,8 @@ void mc6845_device::recompute_parameters(bool postload)
 	vsync_on_pos = m_vert_sync_pos * video_char_height;
 	vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
-	/* the Commodore PET computers program a horizontal synch pulse that extends
-	   past the scanline width.  I assume that the real device will clamp it */
+	// the Commodore PET computers have a non-standard 20kHz monitor which
+	// requires a wider HSYNC pulse that extends past the scanline width
 	if (hsync_off_pos > horiz_pix_total)
 		hsync_off_pos = horiz_pix_total;
 
@@ -942,6 +942,11 @@ UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle 
 
 	/* compute the cursor X position, or -1 if not visible */
 	INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
+	int de = (y < m_max_visible_y) ? 1 : 0;
+	int vbp = m_vert_pix_total - m_vsync_off_pos;
+	if (vbp < 0) vbp = 0;
+	int hbp = m_horiz_pix_total - m_hsync_off_pos;
+	if (hbp < 0) hbp = 0;
 
 	/* call the external system to draw it */
 	if (MODE_ROW_COLUMN_ADDRESSING)
@@ -950,11 +955,11 @@ UINT8 mc6845_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle 
 		UINT8 cr = y / (m_max_ras_addr + 1);
 		UINT16 ma = (cr << 8) | cc;
 
-		m_update_row(this, bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, param);
+		m_update_row(this, bitmap, cliprect, ma, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp, param);
 	}
 	else
 	{
-		m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, param);
+		m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp, param);
 	}
 
 	/* update MA if the last raster address */
@@ -1524,7 +1529,7 @@ UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle
 }
 
 
-void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	const pen_t *pen = m_palette->pens();
 
@@ -1565,7 +1570,7 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(y, x) = pen[color];
+				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
 			}
 		}
 		else
@@ -1601,7 +1606,7 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(y, x) = pen[color];
+				bitmap.pix32(vbp + y, hbp + x) = pen[de ? color : 0];
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}
@@ -1613,5 +1618,5 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
 	mos8563_device *mos8563 = static_cast<mos8563_device *>(device);
 
-	mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+	mos8563->update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }

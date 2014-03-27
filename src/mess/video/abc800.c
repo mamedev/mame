@@ -234,10 +234,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	int column;
 	rgb_t fgpen = state->m_palette->pen(1);
 
-	// prevent wraparound
-	if (y >= 240) return;
-
-	y += VERTICAL_PORCH_HACK;
+	y += vbp;
 
 	for (column = 0; column < x_count; column++)
 	{
@@ -255,9 +252,9 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 		for (bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
-			int x = HORIZONTAL_PORCH_HACK + (column * ABC800_CHAR_WIDTH) + bit;
+			int x = hbp + (column * ABC800_CHAR_WIDTH) + bit;
 
-			if (BIT(data, 7))
+			if (BIT(data, 7) && de)
 			{
 				bitmap.pix32(y, x) = fgpen;
 			}

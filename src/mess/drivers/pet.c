@@ -1073,6 +1073,7 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 	int x = 0;
 	int char_rom_mask = state->m_char_rom->bytes() - 1;
 	const pen_t *pen = state->m_palette->pens();
+	hbp = 80;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -1091,8 +1092,8 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-			bitmap.pix32(y, x++) = pen[video];
+			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1104,19 +1105,73 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-			bitmap.pix32(y, x++) = pen[video];
+			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	2*8,
 	NULL,
 	pet80_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, cb1_w),
+	NULL
+};
+
+
+//-------------------------------------------------
+//  MC6845_INTERFACE( pet40_crtc_intf )
+//-------------------------------------------------
+static MC6845_BEGIN_UPDATE( pet_begin_update )
+{
+	bitmap.fill(rgb_t::black);
+	return 0;
+}
+
+static MC6845_UPDATE_ROW( pet40_update_row )
+{
+	pet_state *state = device->machine().driver_data<pet_state>();
+	int x = 0;
+	int char_rom_mask = state->m_char_rom->bytes() - 1;
+	const pen_t *pen = state->m_palette->pens();
+	hbp = 41;
+
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT8 lsd = 0, data = 0;
+		UINT8 rra = ra & 0x07;
+		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
+		int invert = BIT(ma, 12);
+		int chr_option = BIT(ma, 13);
+
+		lsd = state->m_video_ram[(ma + column) & 0x3ff];
+
+		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+
+		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		{
+			int video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
+			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
+		}
+	}
+}
+
+static MC6845_INTERFACE( pet40_crtc_intf )
+{
+	true,
+	0,0,0,0,
+	8,
+	pet_begin_update,
+	pet40_update_row,
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1156,8 +1211,8 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
-			bitmap.pix32(y, x++) = pen[video];
+			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
 		}
 
 		// odd character
@@ -1169,15 +1224,15 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
-			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
-			bitmap.pix32(y, x++) = pen[video];
+			int video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
+			bitmap.pix32(vbp + y, hbp + x++) = pen[video];
 		}
 	}
 }
 
 static MC6845_INTERFACE( cbm8296_crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	2*8,
 	NULL,
@@ -1268,6 +1323,26 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 	m_exp->reset();
 
 	m_ieee->ren_w(0);
+}
+
+
+//-------------------------------------------------
+//  MACHINE_START( pet40 )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( pet_state, pet40 )
+{
+	m_video_ram_size = 0x400;
+
+	MACHINE_START_CALL_MEMBER(pet);
+}
+
+
+MACHINE_RESET_MEMBER( pet_state, pet40 )
+{
+	MACHINE_RESET_CALL_MEMBER(pet);
+
+	m_crtc->reset();
 }
 
 
@@ -1637,6 +1712,33 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG( pet4032f )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
+
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 250 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, pet40_crtc_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( cbm4000 )
 //-------------------------------------------------
 
@@ -1671,6 +1773,33 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( cbm4032, cbm4000 )
+	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( cbm4032f )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
+
+	// video hardware
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(320, 250)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320 - 1, 0, 250 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	MCFG_DEVICE_REMOVE("sync_timer")
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_16MHz/16, pet40_crtc_intf)
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	MCFG_FRAGMENT_ADD(32k)
 MACHINE_CONFIG_END
 
@@ -1982,7 +2111,6 @@ ROM_START( pet4016 )
 	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "901499-01.ud7", 0x5000, 0x0800, CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
 	ROM_LOAD( "901447-29.ud8", 0x5000, 0x0800, CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
@@ -1991,6 +2119,29 @@ ROM_START( pet4016 )
 ROM_END
 
 #define rom_pet4032 rom_pet4016
+
+
+//-------------------------------------------------
+//  ROM( pet4032f )
+//-------------------------------------------------
+
+ROM_START( pet4032f )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_DEFAULT_BIOS( "basic4r" )
+	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901499-01.ud7", 0x5000, 0x0800, CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
+	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
+
+	ROM_REGION( 0x800, "charom", 0 )
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+ROM_END
 
 
 //-------------------------------------------------
@@ -2008,7 +2159,6 @@ ROM_START( cbm4016 )
 	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "901498-01.ud7", 0x5000, 0x0800, CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
 	ROM_LOAD( "901447-29.ud8", 0x5000, 0x0800, CRC(e5714d4c) SHA1(e88f56e5c54b0e8d8d4e8cb39a4647c803c1f51c) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
@@ -2017,6 +2167,29 @@ ROM_START( cbm4016 )
 ROM_END
 
 #define rom_cbm4032 rom_cbm4016
+
+
+//-------------------------------------------------
+//  ROM( cbm4032f )
+//-------------------------------------------------
+
+ROM_START( cbm4032f )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_DEFAULT_BIOS( "basic4r" )
+	ROM_SYSTEM_BIOS( 0, "basic4", "Original" )
+	ROMX_LOAD( "901465-19.ud5", 0x2000, 0x1000, CRC(3a5f5721) SHA1(bc2b7c99495fea3eda950ee9e3d6cabe448a452b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "basic4r", "Revised" )
+	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(2) ) // BASIC 4
+	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "901498-01.ud7", 0x5000, 0x0800, CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
+	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
+
+	ROM_REGION( 0x800, "charom", 0 )
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+ROM_END
 
 
 //-------------------------------------------------
@@ -2357,8 +2530,10 @@ COMP( 1979, pet2001b32, pet2001b,   0,      pet2001b32, petb,       driver_devic
 COMP( 1979, cbm3032b,   pet2001b,   0,      cbm3032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 3032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1980, pet4016,    0,          0,      pet4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4016",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1980, pet4032,    pet4016,    0,      pet4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1980, pet4032f,   pet4016,    0,      pet4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     GAME_SUPPORTS_SAVE )
 COMP( 1980, cbm4016,    pet4016,    0,      cbm4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4016",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1980, cbm4032,    pet4016,    0,      cbm4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032",     GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1980, cbm4032f,   pet4016,    0,      cbm4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     GAME_SUPPORTS_SAVE )
 COMP( 1980, pet4032b,   0,          0,      pet4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "PET 4032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 4032B",    GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     GAME_SUPPORTS_SAVE )

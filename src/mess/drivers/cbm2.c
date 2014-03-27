@@ -1122,8 +1122,9 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 		{
 			int color = BIT(data, 7) ^ BIT(code, 7) ^ BIT(ma, 13);
 			if (cursor_x == column) color ^= 1;
+			color &= de;
 
-			bitmap.pix32(y, x++) = pen[color];
+			bitmap.pix32(vbp + y, hbp + x++) = pen[color];
 
 			if (bit < 8 || !state->m_graphics) data <<= 1;
 		}
@@ -1132,7 +1133,7 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	9,
 	NULL,

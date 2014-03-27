@@ -231,7 +231,7 @@ static MC6845_UPDATE_ROW( aga_update_row )
 	isa8_aga_device *aga  = downcast<isa8_aga_device *>(device->owner());
 	if ( aga->m_update_row )
 	{
-		aga->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
+		aga->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param );
 	}
 }
 

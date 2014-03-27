@@ -69,7 +69,7 @@ const device_type WANGPC_MVC = &device_creator<wangpc_mvc_device>;
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	for (int sx = 0; sx < 50; sx++)
 	{
@@ -79,9 +79,9 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 		for (int bit = 0; bit < 16; bit++)
 		{
 			int x = (sx * 16) + bit;
-			int color = BIT(data, 15);
+			int color = BIT(data, 15) && de;
 
-			bitmap.pix32(y, x) = PALETTE_MVC[color];
+			bitmap.pix32(vbp + y, hbp + x) = PALETTE_MVC[color];
 
 			data <<= 1;
 		}
@@ -116,8 +116,8 @@ void wangpc_mvc_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bit
 			int x = (column * 10) + bit;
 			int color = ((BIT(data, 9) & !ATTR_BLANK) ^ ATTR_REVERSE);
 
-			if ((color | bitmap.pix32(y, x)) & ATTR_BOLD) color = 2;
-			if (color) bitmap.pix32(y, x) = PALETTE_MVC[color];
+			if ((color | bitmap.pix32(vbp + y, hbp + x)) & ATTR_BOLD) color = 2;
+			if (color) bitmap.pix32(vbp + y, hbp + x) = de ? PALETTE_MVC[color] : rgb_t::black;
 
 			data <<= 1;
 		}
@@ -128,7 +128,7 @@ static MC6845_UPDATE_ROW( wangpc_mvc_update_row )
 {
 	wangpc_mvc_device *mvc = downcast<wangpc_mvc_device *>(device->owner());
 
-	mvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+	mvc->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }
 
 WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
@@ -141,7 +141,7 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	10,
 	NULL,

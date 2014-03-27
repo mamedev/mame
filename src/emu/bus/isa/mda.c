@@ -369,7 +369,7 @@ static MC6845_UPDATE_ROW( mda_update_row )
 	isa8_mda_device *mda  = downcast<isa8_mda_device *>(device->owner());
 	if ( mda->m_update_row )
 	{
-		mda->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
+		mda->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param );
 	}
 }
 

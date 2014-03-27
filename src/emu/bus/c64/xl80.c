@@ -81,7 +81,7 @@ const rom_entry *c64_xl80_device::device_rom_region() const
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	const pen_t *pen = m_palette->pens();
 
@@ -99,9 +99,9 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7);
+			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(y, x) = pen[color];
+			bitmap.pix32(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}
@@ -111,12 +111,12 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 static MC6845_UPDATE_ROW( c64_xl80_update_row )
 {
 	c64_xl80_device *xl80 = downcast<c64_xl80_device *>(device->owner());
-	xl80->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
+	xl80->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
 }
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

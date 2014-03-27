@@ -290,7 +290,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 				if (sx == cursor_x) color = 1;
 
-				bitmap.pix32(y, x + sx*10) = palette[color];
+				bitmap.pix32(vbp + y, hbp + x + sx*10) = palette[color && de];
 			}
 
 			video_ram_addr += 2;
@@ -307,7 +307,7 @@ WRITE_LINE_MEMBER(victor9k_state::vert_w)
 
 static MC6845_INTERFACE( hd46505s_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	10,
 	NULL,

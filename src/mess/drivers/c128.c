@@ -872,7 +872,7 @@ GFXDECODE_END
 
 static MC6845_INTERFACE( vdc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

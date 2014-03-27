@@ -10,13 +10,6 @@
 
 
 
-// these are needed because the MC6845 emulation does
-// not position the active display area correctly
-#define HORIZONTAL_PORCH_HACK   121
-#define VERTICAL_PORCH_HACK     29
-
-
-
 //-------------------------------------------------
 //  MC6845_UPDATE_ROW( abc802_update_row )
 //-------------------------------------------------
@@ -67,10 +60,7 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 
 	int rf = 0, rc = 0, rg = 0;
 
-	// prevent wraparound
-	if (y >= 240) return;
-
-	y += VERTICAL_PORCH_HACK;
+	y += vbp;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -133,8 +123,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			{
 				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
-					int color = BIT(data, 7) ^ ri;
+					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + bit;
+					int color = (BIT(data, 7) ^ ri) && de;
 
 					bitmap.pix32(y, x) = pen[color];
 
@@ -145,8 +135,8 @@ static MC6845_UPDATE_ROW( abc802_update_row )
 			{
 				for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 				{
-					int x = HORIZONTAL_PORCH_HACK + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
-					int color = BIT(data, 7) ^ ri;
+					int x = hbp + ((column + 3) * ABC800_CHAR_WIDTH) + (bit << 1);
+					int color = (BIT(data, 7) ^ ri) && de;
 
 					bitmap.pix32(y, x) = pen[color];
 					bitmap.pix32(y, x + 1) = pen[color];
