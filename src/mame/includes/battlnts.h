@@ -41,7 +41,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	K007342_CALLBACK_MEMBER(battlnts_tile_callback);
+	K007420_CALLBACK_MEMBER(battlnts_sprite_callback);
 };
-
-/*----------- defined in video/battlnts.c -----------*/
-void battlnts_sprite_callback(running_machine &machine, int *code, int *color);

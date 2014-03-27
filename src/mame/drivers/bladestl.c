@@ -280,12 +280,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const k007420_interface bladestl_k007420_intf =
-{
-	0x3ff,  bladestl_sprite_callback    /* banklimit, callback */
-};
-
-
 void bladestl_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -341,8 +335,11 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
-	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)
+	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_BANK_LIMIT(0x3ff)
+	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)	
 	MCFG_K007420_PALETTE("palette")
+	
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

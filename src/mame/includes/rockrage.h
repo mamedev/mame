@@ -50,6 +50,7 @@ public:
 	INTERRUPT_GEN_MEMBER(rockrage_interrupt);
 	void set_pens();
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
+	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
+
 };
 
-void rockrage_sprite_callback(running_machine &machine, int *code, int *color);

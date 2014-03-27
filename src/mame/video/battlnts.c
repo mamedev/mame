@@ -19,11 +19,9 @@ K007342_CALLBACK_MEMBER(battlnts_state::battlnts_tile_callback)
 
 ***************************************************************************/
 
-void battlnts_sprite_callback(running_machine &machine, int *code,int *color)
+K007420_CALLBACK_MEMBER(battlnts_state::battlnts_sprite_callback)
 {
-	battlnts_state *state = machine.driver_data<battlnts_state>();
-
-	*code |= ((*color & 0xc0) << 2) | state->m_spritebank;
+	*code |= ((*color & 0xc0) << 2) | m_spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
 	*color = 0;
 }

@@ -20,30 +20,10 @@ k007420_device::k007420_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K007420, "Konami 007420", tag, owner, clock, "k007420", __FILE__),
 	m_ram(NULL),
 	m_flipscreen(0),
-	m_palette(*this)
+	m_palette(*this),
+	m_banklimit(0)
 	//m_regs[8],
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k007420_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k007420_interface *intf = reinterpret_cast<const k007420_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k007420_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_banklimit = 0;
-		m_callback = NULL;
-	}
 }
 
 //-------------------------------------------------
@@ -52,6 +32,9 @@ void k007420_device::device_config_complete()
 
 void k007420_device::device_start()
 {
+	// bind the init function
+    m_callback.bind_relative_to(*owner());
+	
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x200);
 
 	save_pointer(NAME(m_ram), 0x200);
@@ -125,7 +108,7 @@ void k007420_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		flipx = m_ram[offs + 4] & 0x04;
 		flipy = m_ram[offs + 4] & 0x08;
 
-		m_callback(machine(), &code, &color);
+		m_callback(&code, &color);
 
 		bank = code & bankmask;
 		code &= codemask;
