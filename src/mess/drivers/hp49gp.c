@@ -24,11 +24,12 @@ class hp49gp_state : public driver_device
 public:
 	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_s3c2410(*this, "s3c2410"),
 		m_steppingstone(*this, "steppingstone"),
 		m_maincpu(*this, "maincpu") { }
 
 	UINT32 m_port[9];
-	device_t *m_s3c2410;
+	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
 	DECLARE_DRIVER_INIT(hp49gp);
@@ -238,14 +239,13 @@ WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
 
 INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
 {
-	s3c2410_request_eint( m_s3c2410, (FPTR)param + 8);
+	m_s3c2410->s3c2410_request_eint( (FPTR)param + 8);
 }
 
 // ...
 
 void hp49gp_state::machine_start()
 {
-	m_s3c2410 = machine().device( "s3c2410");
 }
 
 void hp49gp_state::machine_reset()

@@ -27,7 +27,7 @@ public:
 		m_peny(*this, "PENY") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_s3c2440;
+	required_device<s3c2440_device> m_s3c2440;
 	required_device<nand_device> m_nand;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
@@ -175,7 +175,7 @@ READ32_MEMBER(mini2440_state::s3c2440_adc_data_r )
 
 INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 {
-	s3c2440_touch_screen( m_s3c2440, (newval & 0x01) ? 1 : 0);
+	m_s3c2440->s3c2440_touch_screen( (newval & 0x01) ? 1 : 0);
 }
 
 // ...

@@ -76,12 +76,13 @@ class palmz22_state : public driver_device
 public:
 	palmz22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_s3c2410(*this, "s3c2410")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 
-	device_t *m_s3c2410;
+	required_device<s3c2410_device> m_s3c2410;
 	nand_device *m_nand;
 
 	UINT32 m_port[8];
@@ -236,11 +237,11 @@ INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
 {
 	if (param == 0)
 	{
-		s3c2410_touch_screen( m_s3c2410, (newval & 0x01) ? 1 : 0);
+		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
 	}
 	else
 	{
-		s3c2410_request_eint( m_s3c2410, (FPTR)param - 1);
+		m_s3c2410->s3c2410_request_eint( (FPTR)param - 1);
 	}
 }
 
@@ -248,7 +249,6 @@ INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
 
 void palmz22_state::machine_start()
 {
-	m_s3c2410 = machine().device( "s3c2410");
 	m_nand = machine().device<nand_device>("nand");
 	m_nand->set_data_ptr( memregion("nand")->base());
 }
