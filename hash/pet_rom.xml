@@ -44,6 +44,18 @@
 		</part>
 	</software>
 
+	<software name="clusterone">
+		<description>Cluster/One (CLO-1002-2, for 2001-16/-32)</description>
+		<year>1979</year>
+		<publisher>Nestar Systems, Inc.</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="clo-1002-2-9000.bin" size="0x800" crc="d4a9178b" sha1="a026a0db734265b7731a442b5162ff9e314fa723" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commando">
 		<description>Command-O (for 4016/4032, except "Fat-40")</description>
 		<year>1980</year>
