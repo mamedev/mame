@@ -146,11 +146,11 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 {
 	int offset = 0;
 		
-	for (int y = 0; y < 256; y++)
+	for (int y = 0; y < 200; y++)
 	{
 		UINT16* dstptr_bitmap = &bitmap.pix16(y);
 
-		for (int x = 0; x < 256; x+=4)
+		for (int x = 0; x < 320; x+=4)
 		{
 			UINT8 pix = m_videoram[offset++];
 
@@ -369,10 +369,8 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(320, 200)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(320, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_4enlinea_state, screen_update_4enlinea)
 	MCFG_SCREEN_PALETTE("palette")
 
