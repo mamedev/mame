@@ -115,7 +115,6 @@ $84fc0 and neighbouring routines poke col scroll area.
 
 #define TC0100SCN_RAM_SIZE        0x14000   /* enough for double-width tilemaps */
 #define TC0100SCN_TOTAL_CHARS     256
-#define XOR(a) WORD_XOR_BE(a)
 
 const device_type TC0100SCN = &device_creator<tc0100scn_device>;
 
@@ -197,7 +196,7 @@ void tc0100scn_device::device_start()
 	8,8,    /* 8*8 characters */
 	256,    /* 256 characters */
 	2,  /* 2 bits per pixel */
-	{ XOR(0)*4, XOR(2)*4 },
+	{ 0, 8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8    /* every sprite takes 16 consecutive bytes */
@@ -286,7 +285,7 @@ void tc0100scn_device::device_start()
 									/* we call this here, so that they can be modified at video_start*/
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0100scn_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));

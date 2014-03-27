@@ -144,6 +144,7 @@ void gfxdecode_device::device_start()
 		UINT32 width = gl->width;
 		UINT32 height = gl->height;
 		UINT32 total = gl->total;
+		UINT32 xormask = 0;
 		UINT32 charincrement = gl->charincrement;
 		gfx_layout glcopy;
 		int j;
@@ -246,7 +247,7 @@ void gfxdecode_device::device_start()
 		glcopy.total = total;
 
 		// allocate the graphics
-		m_gfx[curgfx].reset(global_alloc(gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start)));
+		m_gfx[curgfx].reset(global_alloc(gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, xormask, gfxdecode->total_color_codes, gfxdecode->color_codes_start)));
 	}
 }
 
@@ -359,6 +360,7 @@ gfx_element::gfx_element()
 		m_gfxdata(NULL),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
+		m_layout_xormask(0),
 		m_layout_charincrement(0)
 {
 }
@@ -383,11 +385,12 @@ gfx_element::gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UIN
 		m_gfxdata(base),
 		m_layout_is_raw(true),
 		m_layout_planes(0),
+		m_layout_xormask(0),
 		m_layout_charincrement(0)
 {
 }
 
-gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base)
+gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base)
 	: m_palette(palette),
 		m_width(0),
 		m_height(0),
@@ -407,6 +410,7 @@ gfx_element::gfx_element(palette_device *palette, const gfx_layout &gl, const UI
 		m_gfxdata(NULL),
 		m_layout_is_raw(false),
 		m_layout_planes(0),
+		m_layout_xormask(xormask),
 		m_layout_charincrement(0)
 {
 	// set the layout
@@ -533,20 +537,22 @@ void gfx_element::decode(UINT32 code)
 		memset(decode_base, 0, m_char_modulo);
 
 		// iterate over planes
-		for (int plane = 0; plane < m_layout_planes; plane++)
+		int plane, planebit;
+		for (plane = 0, planebit = 1 << (m_layout_planes - 1);
+				plane < m_layout_planes;
+				plane++, planebit >>= 1)
 		{
-			int planebit = 1 << (m_layout_planes - 1 - plane);
 			int planeoffs = code * m_layout_charincrement + m_layout_planeoffset[plane];
 
 			// iterate over rows
 			for (int y = 0; y < m_origheight; y++)
 			{
 				int yoffs = planeoffs + m_layout_yoffset[y];
-				UINT8 *dp = decode_base + y * rowbytes();
+				UINT8 *dp = decode_base + y * m_line_modulo;
 
 				// iterate over columns
 				for (int x = 0; x < m_origwidth; x++)
-					if (readbit(m_srcdata, yoffs + m_layout_xoffset[x]))
+					if (readbit(m_srcdata, (yoffs + m_layout_xoffset[x]) ^ m_layout_xormask))
 						dp[x] |= planebit;
 			}
 		}

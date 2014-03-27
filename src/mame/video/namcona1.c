@@ -188,16 +188,14 @@ WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
 
 /*************************************************************************/
 
-#define XOR(a) BYTE_XOR_BE(a)
-
 static const gfx_layout shape_layout =
 {
 	8,8,
 	0x1000,
 	1,
 	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 }; /* shape_layout */
 
@@ -207,9 +205,9 @@ static const gfx_layout cg_layout_8bpp =
 	0x1000,
 	8, /* 8BPP */
 	{ 0,1,2,3,4,5,6,7 },
-	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
-	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7 },
-	64*8
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
 }; /* cg_layout_8bpp */
 
 static const gfx_layout cg_layout_4bpp =
@@ -218,9 +216,9 @@ static const gfx_layout cg_layout_4bpp =
 	0x1000,
 	4, /* 4BPP */
 	{ 4,5,6,7 },
-	{ 8*XOR(0),8*XOR(1),8*XOR(2),8*XOR(3),8*XOR(4),8*XOR(5),8*XOR(6),8*XOR(7) },
-	{ 64*0,64*1,64*2,64*3,64*4,64*5,64*6,64*7 },
-	64*8
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
 }; /* cg_layout_4bpp */
 
 READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
@@ -289,9 +287,9 @@ void namcona1_state::video_start()
 	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
 	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
 
-	m_gfxdecode->set_gfx(0, global_alloc( gfx_element(m_palette, cg_layout_8bpp, (UINT8 *)m_cgram, m_palette->entries()/256, 0 )));
-	m_gfxdecode->set_gfx(1, global_alloc( gfx_element(m_palette, cg_layout_4bpp, (UINT8 *)m_cgram, m_palette->entries()/16, 0 )));
-	m_gfxdecode->set_gfx(2, global_alloc( gfx_element(m_palette, shape_layout, (UINT8 *)m_shaperam, m_palette->entries()/2, 0 )));
+	m_gfxdecode->set_gfx(0, global_alloc( gfx_element(m_palette, cg_layout_8bpp, (UINT8 *)m_cgram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/256, 0 )));
+	m_gfxdecode->set_gfx(1, global_alloc( gfx_element(m_palette, cg_layout_4bpp, (UINT8 *)m_cgram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/16, 0 )));
+	m_gfxdecode->set_gfx(2, global_alloc( gfx_element(m_palette, shape_layout, (UINT8 *)m_shaperam, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/2, 0 )));
 
 } /* namcona1_vh_start */
 

@@ -431,9 +431,8 @@ INPUT_PORTS_END
 /*** GFX Decodes *************************************************************/
 
 /* We can't decode the sprite data like this because it isn't tile based.
-   The 32x32 tile data is 5bpp chunky LSB first (bits 01234 are pixel 0,
-   bits 567+01 of the next byte are pixel 1, etc.) which MAME can't decode
-   as-is, so we must invert the bit order of the ROM data */
+   Note that the bit indexes in these layouts are inverted compared to usual
+   MAME gfx layouts (0 = LSB, 7 = MSB) */
 
 static const gfx_layout pgm8_charlayout =
 {
@@ -465,7 +464,6 @@ static const gfx_layout pgm32_charlayout =
 
 GFXDECODE_START( pgm )
 	GFXDECODE_ENTRY( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
-
 	GFXDECODE_ENTRY( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
 
@@ -3984,16 +3982,6 @@ ROM_END
 
 /*** Init Stuff **************************************************************/
 
-/* Invert the bit order so that we can decode the 32x32x5bpp tiles */
-
-void pgm_state::invert_tiledata()
-{
-	UINT8 *src = memregion( "tiles" )->base();
-	size_t srcsize = memregion( "tiles" )->bytes();
-	for (int i = 0; i < srcsize; i++)
-		src[i] = BITSWAP8(src[i], 0, 1, 2, 3, 4, 5, 6, 7);
-}
-
 /* This function expands the sprite colour data (in the A Roms) from 3 pixels
    in each word to a byte per pixel making it easier to use */
 
@@ -4028,7 +4016,6 @@ void pgm_state::pgm_basic_init( bool set_bank)
 	UINT8 *ROM = memregion("maincpu")->base();
 	if (set_bank) membank("bank1")->set_base(&ROM[0x100000]);
 
-	invert_tiledata();
 	expand_colourdata();
 
 	m_bg_videoram = &m_videoram[0];

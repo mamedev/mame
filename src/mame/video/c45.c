@@ -51,7 +51,7 @@ const gfx_layout namco_c45_road_device::s_tile_layout =
 	ROAD_TILE_SIZE, ROAD_TILE_SIZE,
 	ROAD_TILE_COUNT_MAX,
 	2,
-	{ NATIVE_ENDIAN_VALUE_LE_BE(8,0), NATIVE_ENDIAN_VALUE_LE_BE(0,8) },
+	{ 0, 8 },
 	{// x offset
 		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
 		0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17
@@ -206,7 +206,7 @@ void namco_c45_road_device::device_start()
 		throw device_missing_dependencies();
 
 	// create a gfx_element describing the road graphics
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], 0x3f, 0xf00)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 0x3f, 0xf00)));
 
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),

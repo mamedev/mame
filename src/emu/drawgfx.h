@@ -138,7 +138,7 @@ class gfx_element
 public:
 	// construction/destruction
 	gfx_element();
-	gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
+	gfx_element(palette_device *palette, const gfx_layout &gl, const UINT8 *srcdata, UINT32 xormask, UINT32 total_colors, UINT32 color_base);
 	gfx_element(palette_device *palette, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 total_colors, UINT32 color_base, UINT32 color_granularity);
 
 	// getters
@@ -160,6 +160,7 @@ public:
 	void set_layout(const gfx_layout &gl, const UINT8 *srcdata);
 	void set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 height, UINT32 total, UINT32 linemod, UINT32 charmod);
 	void set_source(const UINT8 *source) { m_srcdata = source; if (m_layout_is_raw) m_gfxdata = const_cast<UINT8 *>(source); memset(m_dirty, 1, elements()); }
+	void set_xormask(UINT32 xormask) { m_layout_xormask = xormask; }
 	void set_palette(palette_device *palette) { m_palette = palette; }
 	void set_colors(UINT32 colors) { m_total_colors = colors; }
 	void set_colorbase(UINT16 colorbase) { m_color_base = colorbase; }
@@ -282,6 +283,7 @@ private:
 
 	bool            m_layout_is_raw;        // raw layout?
 	UINT8           m_layout_planes;        // bit planes in the layout
+	UINT32          m_layout_xormask;       // xor mask applied to each bit offset
 	UINT32          m_layout_charincrement; // per-character increment in source data
 	dynamic_array<UINT32> m_layout_planeoffset;// plane offsets
 	dynamic_array<UINT32> m_layout_xoffset; // X offsets

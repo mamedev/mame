@@ -133,7 +133,6 @@ Control registers
 
 #define TC0480SCP_RAM_SIZE 0x10000
 #define TC0480SCP_TOTAL_CHARS 256
-#define XOR(a) WORD_XOR_BE(a)
 
 
 const device_type TC0480SCP = &device_creator<tc0480scp_device>;
@@ -217,7 +216,7 @@ void tc0480scp_device::device_start()
 		256,    /* 256 characters */
 		4,  /* 4 bits per pixel */
 		{ 0, 1, 2, 3 },
-		{ XOR(3)*4, XOR(2)*4, XOR(1)*4, XOR(0)*4, XOR(7)*4, XOR(6)*4, XOR(5)*4, XOR(4)*4 },
+		{ 3*4, 2*4, 1*4, 0*4, 7*4, 6*4, 5*4, 4*4 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 		32*8    /* every sprite takes 32 consecutive bytes */
 	};
@@ -295,7 +294,7 @@ void tc0480scp_device::device_start()
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, tc0480scp_charlayout, (UINT8 *)m_char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0480SCP_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
