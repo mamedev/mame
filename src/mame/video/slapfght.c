@@ -1,8 +1,8 @@
 /***************************************************************************
 
-  video.c
+  Toaplan Slap Fight hardware
 
-  Functions to emulate the video hardware of early Toaplan hardware.
+  Functions to emulate the video hardware of the machine
 
 ***************************************************************************/
 
@@ -42,26 +42,28 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 }
 
 
+
 /***************************************************************************
 
   Start the video hardware emulation.
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(slapfght_state,perfrman)
+VIDEO_START_MEMBER(slapfght_state, perfrman)
 {
 	m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 
-VIDEO_START_MEMBER(slapfght_state,slapfight)
+VIDEO_START_MEMBER(slapfght_state, slapfight)
 {
 	m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_pf1_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_fix_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
+
 
 
 /***************************************************************************
@@ -96,33 +98,20 @@ WRITE8_MEMBER(slapfght_state::slapfight_fixcol_w)
 
 WRITE8_MEMBER(slapfght_state::slapfight_flipscreen_w)
 {
-	logerror("Writing %02x to flipscreen\n", offset);
-	
 	// port 2 is flipscreen, port 3 is normal
 	m_flipscreen = (offset == 0);
 }
 
 WRITE8_MEMBER(slapfght_state::slapfight_palette_bank_w)
 {
-	m_slapfight_palette_bank = offset;
+	m_palette_bank = offset;
 }
 
-void slapfght_state::slapfght_log_vram()
-{
-#ifdef MAME_DEBUG
-	if ( machine().input().code_pressed_once(KEYCODE_B) )
-	{
-		for (int i = 0; i < 0x800; i++)
-		{
-			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n", i, m_slapfight_videoram[i], m_slapfight_colorram[i], m_spriteram->live()[i]);
-		}
-	}
-#endif
-}
+
 
 /***************************************************************************
 
-  Render the Sprites
+  Render the Screen
 
 ***************************************************************************/
 
@@ -150,7 +139,7 @@ void slapfght_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			
 			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 				src[offs],
-				((src[offs + 2] >> 1) & 3) | ((src[offs + 2] << 2) & 4) | (m_slapfight_palette_bank << 3),
+				((src[offs + 2] >> 1) & 3) | ((src[offs + 2] << 2) & 4) | (m_palette_bank << 3),
 				m_flipscreen, m_flipscreen,
 				sx, sy, 0
 			);
@@ -173,7 +162,6 @@ UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind1
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap,cliprect, 0x80);
 
-	slapfght_log_vram();
 	return 0;
 }
 
@@ -221,6 +209,5 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	slapfght_log_vram();
 	return 0;
 }

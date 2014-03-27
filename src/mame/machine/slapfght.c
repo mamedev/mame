@@ -1,9 +1,8 @@
 /***************************************************************************
 
-  machine.c
+  Toaplan Slap Fight hardware
 
-  Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
-  I/O ports)
+  Functions to emulate (and simulate) the MCU
 
 ***************************************************************************/
 
@@ -11,68 +10,144 @@
 #include "includes/slapfght.h"
 
 
-/* Perform basic machine initialisation */
-MACHINE_RESET_MEMBER(slapfght_state,slapfight)
+/***************************************************************************
+
+    Tiger Heli MCU
+
+***************************************************************************/
+
+WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 {
-	/* MAIN CPU */
-	m_slapfight_status_state=0;
-	m_slapfight_status = 0xc7;
-
-	m_getstar_sequence_index = 0;
-	m_getstar_sh_intenabled = 0;    /* disable sound cpu interrupts */
-
-	/* SOUND CPU */
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	/* MCU */
-	m_mcu_val = 0;
+	m_from_main = data;
+	m_main_sent = 1;
+	m_mcu_sent = 0;
+	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-/* Slapfight CPU input/output ports
-
-  These ports seem to control memory access
-
-*/
-
-/* Reset and hold sound CPU */
-WRITE8_MEMBER(slapfght_state::slapfight_port_00_w)
+READ8_MEMBER(slapfght_state::tigerh_mcu_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_getstar_sh_intenabled = 0;
+	m_mcu_sent = 0;
+	return m_from_mcu;
 }
 
-/* Release reset on sound CPU */
-WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
+
+/**************************************************************************/
+
+READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	int res = 0;
+	if (!m_main_sent) res |= 0x02;
+	if (!m_mcu_sent) res |= 0x04;
+	
+	return res | (slapfight_port_00_r(space, 0) & 0xf9);
 }
 
-/* Disable and clear hardware interrupt */
-WRITE8_MEMBER(slapfght_state::slapfight_port_06_w)
+
+/**************************************************************************/
+
+READ8_MEMBER(slapfght_state::tigerh_68705_portA_r)
 {
-	m_irq_mask = 0;
+	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-/* Enable hardware interrupt */
-WRITE8_MEMBER(slapfght_state::slapfight_port_07_w)
+WRITE8_MEMBER(slapfght_state::tigerh_68705_portA_w)
 {
-	m_irq_mask = 1;
+	m_portA_out = data; // ?
+	m_from_mcu = m_portA_out;
+	m_mcu_sent = 1;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_port_08_w)
+WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrA_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&RAM[0x10000]);
+	m_ddrA = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_port_09_w)
+READ8_MEMBER(slapfght_state::tigerh_68705_portB_r)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&RAM[0x14000]);
+	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
+WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
+{
+	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
+	{
+		m_portA_in = m_from_main;
+		if (m_main_sent) m_mcu->set_input_line(0, CLEAR_LINE);
+		m_main_sent = 0;
+	}
+	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
+	{
+		m_from_mcu = m_portA_out;
+		m_mcu_sent = 1;
+	}
+
+	m_portB_out = data;
+}
+
+WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrB_w)
+{
+	m_ddrB = data;
+}
+
+
+READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
+{
+	m_portC_in = 0;
+	if (!m_main_sent) m_portC_in |= 0x01;
+	if (m_mcu_sent) m_portC_in |= 0x02;
+	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+}
+
+WRITE8_MEMBER(slapfght_state::tigerh_68705_portC_w)
+{
+	m_portC_out = data;
+}
+
+WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
+{
+	m_ddrC = data;
+}
+
+
+
+
+READ8_MEMBER(slapfght_state::tigerhb_e803_r)
+{
+	UINT8 tigerhb_val = 0;
+	switch (m_tigerhb_cmd)
+	{
+		case 0x73:  /* avoid "BAD HW" message */
+			tigerhb_val = 0x83;
+			break;
+		default:
+			logerror("%04x: tigerhb_e803_r - cmd = %02x\n", space.device().safe_pc(), m_getstar_cmd);
+			break;
+	}
+	return tigerhb_val;
+}
+
+WRITE8_MEMBER(slapfght_state::tigerhb_e803_w)
+{
+	switch (data)
+	{
+		/* hardware test */
+		case 0x73:
+			m_tigerhb_cmd = 0x73;
+			break;
+		default:
+			logerror("%04x: tigerhb_e803_w - data = %02x\n",space.device().safe_pc(),data);
+			m_tigerhb_cmd = 0x00;
+			break;
+	}
+}
+
+
+
+/***************************************************************************
+
+    Slap Fight MCU
+
+***************************************************************************/
 
 /* Status register */
 READ8_MEMBER(slapfght_state::slapfight_port_00_r)
@@ -186,6 +261,8 @@ READ8_MEMBER(slapfght_state::slapfight_mcu_status_r)
 
 	return res;
 }
+
+
 
 /***************************************************************************
 
@@ -757,161 +834,57 @@ WRITE8_MEMBER(slapfght_state::getstar_e803_w)
 	}
 }
 
-/* Enable hardware interrupt of sound cpu */
-WRITE8_MEMBER(slapfght_state::getstar_sh_intenable_w)
+
+READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 {
-	m_getstar_sh_intenabled = 1;
-	logerror("cpu #1 PC=%d: %d written to a0e0\n",space.device().safe_pc(),data);
-}
+	/* The bootleg has it's own 'protection' on startup ?
+	    6D1A: 06 04         ld   b,$04
+	    6D1C: DB 00         in   a,($00)
+	    6D1E: E6 06         and  $06
+	    6D20: 20 FA         jr   nz,$6D1C
+	    6D22: DB 00         in   a,($00)
+	    6D24: E6 06         and  $06
+	    6D26: FE 06         cp   $06
+	    6D28: 20 F8         jr   nz,$6D22
+	    6D2A: DB 00         in   a,($00)
+	    6D2C: E6 06         and  $06
+	    6D2E: FE 02         cp   $02
+	    6D30: 20 F8         jr   nz,$6D2A
+	    6D32: DB 00         in   a,($00)
+	    6D34: E6 06         and  $06
+	    6D36: FE 04         cp   $04
+	    6D38: 20 F8         jr   nz,$6D32
+	    6D3A: 10 E0         djnz $6D1C
+	*/
+	if (space.device().safe_pc() == 0x6d1e) return 0;
+	if (space.device().safe_pc() == 0x6d24) return 6;
+	if (space.device().safe_pc() == 0x6d2c) return 2;
+	if (space.device().safe_pc() == 0x6d34) return 4;
 
+	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
+	    6AD4: DB 00         in   a,($00)
+	    6AD6: CB 4F         bit  1,a
+	    6AD8: 28 FA         jr   z,$6AD4
+	    6ADA: 3E 23         ld   a,$23
+	    6ADC: CD 52 11      call $1152
+	    6ADF: 32 03 E8      ld   ($E803),a
+	    6AE2: DB 00         in   a,($00)
+	    6AE4: CB 4F         bit  1,a
+	    6AE6: 28 FA         jr   z,$6AE2
+	    6AE8: 3A 0A C8      ld   a,($C80A)
+	    6AEB: E6 03         and  $03
+	    6AED: CD 52 11      call $1152
+	    6AF0: 32 03 E8      ld   ($E803),a
+	    6AF3: DB 00         in   a,($00)
+	    6AF5: CB 57         bit  2,a
+	    6AF7: 20 FA         jr   nz,$6AF3
+	   This seems to be what used to be the MCU status.
+	*/
+	if (space.device().safe_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (space.device().safe_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (space.device().safe_pc() == 0x6af5) return 0; /* bit 2 must be OFF */
 
+	logerror("Port Read PC=%04x\n",space.device().safe_pc());
 
-/* Generate interrups only if they have been enabled */
-INTERRUPT_GEN_MEMBER(slapfght_state::getstar_interrupt)
-{
-	if (m_getstar_sh_intenabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(slapfght_state::getstar_port_04_w)
-{
-//  cpu_halt(0,0);
-}
-#endif
-
-
-/***************************************************************************
-
-    Tiger Heli MCU
-
-***************************************************************************/
-
-READ8_MEMBER(slapfght_state::tigerh_68705_portA_r)
-{
-	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portA_w)
-{
-	m_portA_out = data;//?
-	m_from_mcu = m_portA_out;
-	m_mcu_sent = 1;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrA_w)
-{
-	m_ddrA = data;
-}
-
-READ8_MEMBER(slapfght_state::tigerh_68705_portB_r)
-{
-	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
-{
-	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
-	{
-		m_portA_in = m_from_main;
-		if (m_main_sent) m_mcu->set_input_line(0, CLEAR_LINE);
-		m_main_sent = 0;
-	}
-	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
-	{
-		m_from_mcu = m_portA_out;
-		m_mcu_sent = 1;
-	}
-
-	m_portB_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrB_w)
-{
-	m_ddrB = data;
-}
-
-
-READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
-{
-	m_portC_in = 0;
-	if (!m_main_sent) m_portC_in |= 0x01;
-	if (m_mcu_sent) m_portC_in |= 0x02;
-	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portC_w)
-{
-	m_portC_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
-{
-	m_ddrC = data;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
-{
-	m_from_main = data;
-	m_main_sent = 1;
-	m_mcu_sent = 0;
-	m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(slapfght_state::tigerh_mcu_r)
-{
-	m_mcu_sent = 0;
-	return m_from_mcu;
-}
-
-READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
-{
-	int res = 0;
-	if (!m_main_sent) res |= 0x02;
-	if (!m_mcu_sent) res |= 0x04;
-	return res;
-}
-
-
-READ8_MEMBER(slapfght_state::tigerhb_e803_r)
-{
-	UINT8 tigerhb_val = 0;
-	switch (m_tigerhb_cmd)
-	{
-		case 0x73:  /* avoid "BAD HW" message */
-			tigerhb_val = 0x83;
-			break;
-		default:
-			logerror("%04x: tigerhb_e803_r - cmd = %02x\n",space.device().safe_pc(),m_getstar_cmd);
-			break;
-	}
-	return tigerhb_val;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerhb_e803_w)
-{
-	switch (data)
-	{
-		/* hardware test */
-		case 0x73:
-			m_tigerhb_cmd = 0x73;
-			break;
-		default:
-			logerror("%04x: tigerhb_e803_w - data = %02x\n",space.device().safe_pc(),data);
-			m_tigerhb_cmd = 0x00;
-			break;
-	}
-}
-
-
-/***************************************************************************
-
-    Performan
-
-***************************************************************************/
-
-READ8_MEMBER(slapfght_state::perfrman_port_00_r)
-{
-	/* TODO */
-	return machine().rand() & 1;
+	return 0;
 }

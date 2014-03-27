@@ -8,16 +8,6 @@
 #include "video/bufsprite.h"
 
 
-/* This it the best way to allow game specific kludges until the system is fully understood */
-enum {
-	GETSTUNK=0,  /* unknown for inclusion of possible new sets */
-	GETSTAR,
-	GETSTARJ,
-	GTSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
-	GTSTARB2,    /* "lame" bootleg with lots of ingame bugs */
-};
-
-
 class slapfght_state : public driver_device
 {
 public:
@@ -37,8 +27,6 @@ public:
 		m_slapfight_scrollx_hi(*this, "scrollx_hi"),
 		m_slapfight_scrolly(*this, "scrolly")
 	{ }
-
-	int m_getstar_id;
 	
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
@@ -55,6 +43,16 @@ public:
 	optional_shared_ptr<UINT8> m_slapfight_scrollx_lo;
 	optional_shared_ptr<UINT8> m_slapfight_scrollx_hi;
 	optional_shared_ptr<UINT8> m_slapfight_scrolly;
+
+	/* This it the best way to allow game specific kludges until the system is fully understood */
+	enum getstar_id
+	{
+		GETSTUNK = 0, /* unknown for inclusion of possible new sets */
+		GETSTAR,
+		GETSTARJ,
+		GTSTARB1,     /* "good" bootleg with same behaviour as 'getstarj' */
+		GTSTARB2      /* "lame" bootleg with lots of ingame bugs */
+	} m_getstar_id;
 
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
@@ -80,12 +78,11 @@ public:
 	UINT8 m_portC_out;
 	UINT8 m_ddrC;
 	int m_flipscreen;
-	int m_slapfight_palette_bank;
+	int m_palette_bank;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_irq_mask;
 
-	DECLARE_READ8_MEMBER(tigerh_status_r);
 	DECLARE_READ8_MEMBER(gtstarb1_port_0_read);
 	DECLARE_WRITE8_MEMBER(slapfight_port_00_w);
 	DECLARE_WRITE8_MEMBER(slapfight_port_01_w);
@@ -109,7 +106,6 @@ public:
 	DECLARE_READ8_MEMBER(getstar_e803_r);
 	DECLARE_WRITE8_MEMBER(getstar_e803_w);
 	DECLARE_WRITE8_MEMBER(getstar_sh_intenable_w);
-	DECLARE_WRITE8_MEMBER(getstar_port_04_w);
 	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
@@ -139,17 +135,21 @@ public:
 	DECLARE_DRIVER_INIT(perfrman);
 	DECLARE_DRIVER_INIT(gtstarb2);
 	DECLARE_DRIVER_INIT(tigerh);
+
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
-	DECLARE_MACHINE_RESET(slapfight);
 	DECLARE_VIDEO_START(perfrman);
 	DECLARE_VIDEO_START(slapfight);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display);
 	UINT32 screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(getstar_interrupt);
-	void slapfght_log_vram();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display);
 	void getstar_init();
+	
+	virtual void machine_start();
+	virtual void machine_reset();
 };

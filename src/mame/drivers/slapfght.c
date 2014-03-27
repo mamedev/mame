@@ -261,6 +261,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/slapfght.h"
 
 
+/***************************************************************************
+
+  Main Z80 I/O and Memory Maps
+
+***************************************************************************/
+
 static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -320,12 +326,64 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
+/**************************************************************************/
+
+INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
+{
+	if (m_irq_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
+/* Reset and hold sound CPU */
+WRITE8_MEMBER(slapfght_state::slapfight_port_00_w)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_getstar_sh_intenabled = 0;
+}
+
+/* Release reset on sound CPU */
+WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+/* Disable and clear hardware interrupt */
+WRITE8_MEMBER(slapfght_state::slapfight_port_06_w)
+{
+	m_irq_mask = 0;
+}
+
+/* Enable hardware interrupt */
+WRITE8_MEMBER(slapfght_state::slapfight_port_07_w)
+{
+	m_irq_mask = 1;
+}
+
+WRITE8_MEMBER(slapfght_state::slapfight_port_08_w)
+{
+	UINT8 *RAM = memregion("maincpu")->base();
+
+	membank("bank1")->set_base(&RAM[0x10000]);
+}
+
+WRITE8_MEMBER(slapfght_state::slapfight_port_09_w)
+{
+	UINT8 *RAM = memregion("maincpu")->base();
+
+	membank("bank1")->set_base(&RAM[0x14000]);
+}
+
+READ8_MEMBER(slapfght_state::perfrman_port_00_r)
+{
+	/* TODO */
+	return machine().rand() & 1;
+}
+
 static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)  /* select bank 0 */
@@ -333,26 +391,9 @@ static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-READ8_MEMBER(slapfght_state::tigerh_status_r)
-{
-	return (slapfight_port_00_r(space, 0) & 0xf9)| ((tigerh_mcu_status_r(space, 0)));
-}
-
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r) AM_WRITE(slapfight_port_00_w) /* status register */
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r) AM_WRITE(slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
@@ -361,24 +402,34 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w) /* status register */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r,tigerh_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r,tigerh_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tigerh_68705_portC_r,tigerh_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(tigerh_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(tigerh_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(tigerh_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+
+
+/***************************************************************************
+
+  Sound Z80 I/O Memory Maps
+
+***************************************************************************/
+
+/* Generate interrups only if they have been enabled */
+INTERRUPT_GEN_MEMBER(slapfght_state::getstar_interrupt)
+{
+	if (m_getstar_sh_intenabled)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+/* Enable hardware interrupt of sound cpu */
+WRITE8_MEMBER(slapfght_state::getstar_sh_intenable_w)
+{
+	m_getstar_sh_intenabled = 1;
+	logerror("cpu #1 PC=%d: %d written to a0e0\n",space.device().safe_pc(),data);
+}
 
 static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -410,6 +461,46 @@ static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 ADDRESS_MAP_END
 
 
+
+/***************************************************************************
+
+  MCU Memory Maps
+  
+  NOTE: handlers and simulation are in the src/mame/machine folder
+
+***************************************************************************/
+
+static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r, tigerh_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r, tigerh_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tigerh_68705_portC_r, tigerh_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(tigerh_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(tigerh_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(tigerh_68705_ddrC_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( slapfght_generic )
 	PORT_START("IN0")
@@ -639,6 +730,104 @@ static INPUT_PORTS_START( gtstarb2 )
 INPUT_PORTS_END
 
 
+
+/***************************************************************************
+
+  Driver/Machine Inits
+
+***************************************************************************/
+
+void slapfght_state::machine_start()
+{
+}
+
+void slapfght_state::machine_reset()
+{
+	/* MAIN CPU */
+	m_slapfight_status_state = 0;
+	m_slapfight_status = 0xc7;
+
+	m_getstar_sequence_index = 0;
+	m_getstar_sh_intenabled = 0;    /* disable sound cpu interrupts */
+
+	/* SOUND CPU */
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	/* MCU */
+	m_mcu_val = 0;
+}
+
+/**************************************************************************/
+
+DRIVER_INIT_MEMBER(slapfght_state,tigerh)
+{
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
+{
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,perfrman)
+{
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
+{
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
+}
+
+void slapfght_state::getstar_init()
+{
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),this), write8_delegate(FUNC(slapfght_state::getstar_e803_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),this));
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,getstar)
+{
+	m_getstar_id = GETSTAR;
+	getstar_init();
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,getstarj)
+{
+	m_getstar_id = GETSTARJ;
+	getstar_init();
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
+{
+	UINT8 *ROM = memregion("maincpu")->base();
+
+	m_getstar_id = GTSTARB1;
+	getstar_init();
+
+	/* specific handlers for this bootleg */
+	m_maincpu->space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
+	/* requires this or it gets stuck with 'rom test' on screen */
+	/* it is possible the program roms are slighly corrupt like the gfx roms, or
+	   that the bootleg simply shouldn't execute the code due to the modified roms */
+	/* TODO: find & fix the cause of the following happening. */
+	ROM[0x6d56] = 0xc3; //jp instead of jp z
+}
+
+DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
+{
+	m_getstar_id = GTSTARB2;
+	getstar_init();
+}
+
+
+
+/***************************************************************************
+
+  GFX Decode, Chip Interfaces
+
+***************************************************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,            /* 8*8 characters */
@@ -710,7 +899,7 @@ static GFXDECODE_START( slapfght )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0,  16 )
 GFXDECODE_END
 
-
+/**************************************************************************/
 
 static const ay8910_interface ay8910_interface_1 =
 {
@@ -732,12 +921,13 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
-{
-	if (m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
-}
 
+
+/***************************************************************************
+
+  Machine Drivers
+
+***************************************************************************/
 
 static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
@@ -753,8 +943,6 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
-
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -769,7 +957,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state,perfrman)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -801,8 +989,6 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
-
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -817,7 +1003,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -845,8 +1031,6 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
-
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -861,7 +1045,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -893,8 +1077,6 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state,slapfight)
-
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -909,7 +1091,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state,slapfight)
+	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -939,6 +1121,13 @@ static MACHINE_CONFIG_DERIVED( slapfighb2, slapfigh )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
+
+
+/***************************************************************************
+
+  Game Drivers
+
+***************************************************************************/
 
 ROM_START( perfrman )
 	ROM_REGION( 0x10000, "maincpu", 0 )              /* Main CPU code */
@@ -1302,7 +1491,7 @@ Slap Fight -   M6100179A
 |-----|----------|--------------|----------|-------|
       |----------|              |----------|
 Notes:
-      AY3-8910 clock - 1.500MHz (36/24)
+      AY-3-8910 clock - 1.500MHz (36/24)
       Z80A clock - 3.000MHz (36/12)
       VSync - 57Hz
       HSync - 14.97kHz
@@ -1602,7 +1791,7 @@ ROM_START( getstar )
 	ROM_LOAD( "a68-03",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a68_14",    0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "a68_14",       0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
 	ROM_LOAD( "a68_05-1",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
@@ -1727,122 +1916,6 @@ ROM_START( gtstarb2 )
 	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
 ROM_END
 
-
-DRIVER_INIT_MEMBER(slapfght_state,tigerh)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),this));
-}
-
-
-READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
-{
-	/* The bootleg has it's own 'protection' on startup ?
-	    6D1A: 06 04         ld   b,$04
-	    6D1C: DB 00         in   a,($00)
-	    6D1E: E6 06         and  $06
-	    6D20: 20 FA         jr   nz,$6D1C
-	    6D22: DB 00         in   a,($00)
-	    6D24: E6 06         and  $06
-	    6D26: FE 06         cp   $06
-	    6D28: 20 F8         jr   nz,$6D22
-	    6D2A: DB 00         in   a,($00)
-	    6D2C: E6 06         and  $06
-	    6D2E: FE 02         cp   $02
-	    6D30: 20 F8         jr   nz,$6D2A
-	    6D32: DB 00         in   a,($00)
-	    6D34: E6 06         and  $06
-	    6D36: FE 04         cp   $04
-	    6D38: 20 F8         jr   nz,$6D32
-	    6D3A: 10 E0         djnz $6D1C
-	*/
-	if (space.device().safe_pc() == 0x6d1e) return 0;
-	if (space.device().safe_pc() == 0x6d24) return 6;
-	if (space.device().safe_pc() == 0x6d2c) return 2;
-	if (space.device().safe_pc() == 0x6d34) return 4;
-
-	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
-	    6AD4: DB 00         in   a,($00)
-	    6AD6: CB 4F         bit  1,a
-	    6AD8: 28 FA         jr   z,$6AD4
-	    6ADA: 3E 23         ld   a,$23
-	    6ADC: CD 52 11      call $1152
-	    6ADF: 32 03 E8      ld   ($E803),a
-	    6AE2: DB 00         in   a,($00)
-	    6AE4: CB 4F         bit  1,a
-	    6AE6: 28 FA         jr   z,$6AE2
-	    6AE8: 3A 0A C8      ld   a,($C80A)
-	    6AEB: E6 03         and  $03
-	    6AED: CD 52 11      call $1152
-	    6AF0: 32 03 E8      ld   ($E803),a
-	    6AF3: DB 00         in   a,($00)
-	    6AF5: CB 57         bit  2,a
-	    6AF7: 20 FA         jr   nz,$6AF3
-	   This seems to be what used to be the MCU status.
-	*/
-	if (space.device().safe_pc() == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (space.device().safe_pc() == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (space.device().safe_pc() == 0x6af5) return 0; /* bit 2 must be OFF */
-
-	logerror("Port Read PC=%04x\n",space.device().safe_pc());
-
-	return 0;
-}
-
-void slapfght_state::getstar_init()
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),this), write8_delegate(FUNC(slapfght_state::getstar_e803_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),this));
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,getstar)
-{
-	m_getstar_id = GETSTAR;
-	getstar_init();
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,getstarj)
-{
-	m_getstar_id = GETSTARJ;
-	getstar_init();
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
-{
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	m_getstar_id = GTSTARB1;
-	getstar_init();
-
-	/* specific handlers for this bootleg */
-	m_maincpu->space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
-	/* requires this or it gets stuck with 'rom test' on screen */
-	/* it is possible the program roms are slighly corrupt like the gfx roms, or
-	   that the bootleg simply shouldn't execute the code due to the modified roms */
-	/* TODO: find & fix the cause of the following happening. */
-	ROM[0x6d56] = 0xc3; //jp instead of jp z
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
-{
-	m_getstar_id = GTSTARB2;
-	getstar_init();
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,perfrman)
-{
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
-}
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR, COMPANY, FULLNAME, FLAGS ) */
 GAME( 1985, perfrman,   0,        perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
