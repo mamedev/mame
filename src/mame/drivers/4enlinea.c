@@ -22,9 +22,9 @@
   1x ES2 9046 (unknown PLCC-84 IC)
   1x 8952 CM 32 (unknown DIP-40 IC)
 
-  1x 14.31818 MHz crystal (for HMCGA video controller)
-  1x 8.0000 MHz crystal. (for Z84C00HB6)
-  1x 16.000 MHz crystal. (divided by 2 for Z84C00AB6)
+  1x 16.0000 MHz crystal. ; Divided by 2 (through CM3080) for main CPU Z84C00HB6.
+  1x 8.000 MHz crystal.   ; Divided by 2 for audio CPU Z84C00AB6.
+  1x 14.31818 MHz crystal ; For HMCGA video controller.
 
 **************************************************************************
 
@@ -78,6 +78,12 @@
   Screen Total:   0x38+1 * 0x7F+1 = (57 * 128) chars.
   Screen Visible: 0x28 * 0x64 = (40 * 100) chars.
 
+**************************************************************************
+
+  Custom IC's...
+
+  (soon...)
+
 *************************************************************************/
 
 #define MAIN_CLOCK           XTAL_16MHz
@@ -86,7 +92,7 @@
 
 #define PRG_CPU_CLOCK        MAIN_CLOCK /2		/* 8 MHz. */
 #define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. */
-#define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz.? (guess) */
+#define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. */
 #define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. */
 
 
