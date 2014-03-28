@@ -111,6 +111,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
 		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
@@ -118,6 +119,7 @@ public:
 
 	required_device<ay8910_device> m_ay;
 	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram2;
 
 	DECLARE_WRITE8_MEMBER(crtc_config_w);
 	DECLARE_WRITE8_MEMBER(crtc_mode_ctrl_w);
@@ -136,6 +138,8 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(vram2_w);
+
 };
 
 
@@ -153,6 +157,7 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 /* note: chars are 16*12 pixels */
 
 	int offset = 0;
+	int offset2 = 0;
 		
 	for (int y = 0; y < 200; y++)
 	{
@@ -160,7 +165,10 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 
 		for (int x = 0; x < 320; x += 4)
 		{
-			UINT8 pix = m_videoram[offset++];
+			UINT8 pix;
+
+			if (y&1) pix = m_videoram2[offset2++];
+			else pix = m_videoram[offset++];
 
 			dstptr_bitmap[x + 3] = (pix >> 0) & 0x3;
 			dstptr_bitmap[x + 2] = (pix >> 2) & 0x3;
@@ -176,9 +184,14 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 WRITE8_MEMBER(_4enlinea_state::vram_w)
 {
 	m_videoram[offset] = data;
-	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
+//	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
+WRITE8_MEMBER(_4enlinea_state::vram2_w)
+{
+	m_videoram2[offset] = data;
+//	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
+}
 
 WRITE8_MEMBER(_4enlinea_state::crtc_config_w)
 {
@@ -246,7 +259,8 @@ READ8_MEMBER(_4enlinea_state::unk_e001_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram") // even lines
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(vram2_w) AM_SHARE("videoram2") // odd lines
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe000) AM_READ(unk_e000_r)
