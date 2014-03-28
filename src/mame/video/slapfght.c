@@ -98,7 +98,7 @@ WRITE8_MEMBER(slapfght_state::slapfight_fixcol_w)
 
 WRITE8_MEMBER(slapfght_state::flipscreen_w)
 {
-	m_flipscreen = offset ? false : true;
+	m_flipscreen = offset ? 0 : 1;
 }
 
 WRITE8_MEMBER(slapfght_state::palette_bank_w)
@@ -202,7 +202,7 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 				src[offs] + ((src[offs + 2] & 0xc0) << 2),
 				(src[offs + 2] & 0x1e) >> 1,
 				0, 0,
-				(src[offs + 1] + ((src[offs + 2] & 0x01) << 8)) - 13, src[offs + 3],0
+				(src[offs + 1] + ((src[offs + 2] & 0x01) << 8)) - 13, src[offs + 3], 0
 			);
 	}
 

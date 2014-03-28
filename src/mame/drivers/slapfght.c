@@ -757,7 +757,7 @@ void slapfght_state::machine_start()
 {
 	// zerofill
 	m_palette_bank = 0;
-	m_flipscreen = false;
+	m_flipscreen = 0;
 	m_main_irq_enabled = false;
 	m_sound_nmi_enabled = false;
 

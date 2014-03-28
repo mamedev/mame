@@ -59,7 +59,7 @@ public:
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_palette_bank;
-	bool m_flipscreen;
+	UINT8 m_flipscreen;
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
 
