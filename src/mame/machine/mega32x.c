@@ -1772,14 +1772,14 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, UINT32 prio
 		{
 			if (priority && !(m_32x_linerender[x] & 0x8000))
 				lineptr = m_32x_linerender[x] & 0x7fff;
-			if (!priority && m_32x_linerender[x] & 0x8000)
+			if (m_32x_linerender[x] & 0x8000)
 				lineptr = m_32x_linerender[x] & 0x7fff;
 		}
 		else
 		{
 			if (priority && m_32x_linerender[x] & 0x8000)
 				lineptr = m_32x_linerender[x] & 0x7fff;
-			if (!priority && !(m_32x_linerender[x] & 0x8000))
+			if (!(m_32x_linerender[x] & 0x8000))
 				lineptr = m_32x_linerender[x] & 0x7fff;
 		}
 	}
