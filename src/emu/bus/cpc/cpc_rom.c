@@ -111,7 +111,7 @@ bool rom_image_device::call_load()
 	device_image_interface* image = this;
 	UINT64 size = image->length();
 
-	m_base = (UINT8*)malloc(16384);
+	m_base = global_alloc_array(UINT8, 16384);
 	if(size <= 16384)
 	{
 		image->fread(m_base,size);
@@ -131,6 +131,6 @@ bool rom_image_device::call_load()
 -------------------------------------------------*/
 void rom_image_device::call_unload()
 {
-	free(m_base);
+	global_free_array(m_base);
 	m_base = NULL;
 }

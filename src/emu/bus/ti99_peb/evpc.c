@@ -308,7 +308,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(DSRROM)->base();
-	m_novram = (UINT8*)malloc(NOVRAM_SIZE);
+	m_novram = global_alloc_array(UINT8, NOVRAM_SIZE);
 }
 
 void snug_enhanced_video_device::device_reset()
@@ -323,7 +323,7 @@ void snug_enhanced_video_device::device_reset()
 
 void snug_enhanced_video_device::device_stop()
 {
-	free(m_novram);
+	global_free_array(m_novram);
 }
 
 ROM_START( ti99_evpc )

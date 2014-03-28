@@ -2140,7 +2140,7 @@ void saturn_state::make_dir_current(UINT32 fad)
 	UINT8 *sect;
 	direntryT *curentry;
 
-	sect = (UINT8 *)malloc(MAX_DIR_SIZE);
+	sect = global_alloc_array(UINT8, MAX_DIR_SIZE);
 	memset(sect, 0, MAX_DIR_SIZE);
 	if(sectlenin != 2048)
 		popmessage("Sector Length %d, contact MAMEdev (1)",sectlenin);
@@ -2231,7 +2231,7 @@ void saturn_state::make_dir_current(UINT32 fad)
 		}
 	}
 
-	free(sect);
+	global_free_array(sect);
 }
 
 void saturn_state::stvcd_exit( void )

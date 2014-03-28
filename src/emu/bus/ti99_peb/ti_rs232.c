@@ -1039,14 +1039,14 @@ void ti_rs232_pio_device::device_start()
 	m_serdev[1] = subdevice<ti_rs232_attached_device>("serdev1");
 	m_piodev = subdevice<ti_pio_attached_device>("piodev");
 	// Prepare the receive buffers
-	m_recvbuf[0] = (UINT8*)malloc(512);
-	m_recvbuf[1] = (UINT8*)malloc(512);
+	m_recvbuf[0] = global_alloc_array(UINT8, 512);
+	m_recvbuf[1] = global_alloc_array(UINT8, 512);
 }
 
 void ti_rs232_pio_device::device_stop()
 {
-	if (m_recvbuf[0] != NULL) free(m_recvbuf[0]);
-	if (m_recvbuf[1] != NULL) free(m_recvbuf[1]);
+	if (m_recvbuf[0] != NULL) global_free_array(m_recvbuf[0]);
+	if (m_recvbuf[1] != NULL) global_free_array(m_recvbuf[1]);
 }
 
 void ti_rs232_pio_device::device_reset()

@@ -776,7 +776,7 @@ void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 
 	sector_len = 1 << (id.N+7);
 	sector_data_id = id.data_id;
-	buf = (UINT8 *)malloc(sector_len);
+	buf = global_alloc_array(UINT8, sector_len);
 
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
@@ -802,7 +802,7 @@ void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 		}
 		m_out_dip(CLEAR_LINE);
 	}
-	free(buf);
+	global_free_array(buf);
 
 	/* Check CRC. We assume everything is OK, no retry required. */
 	m_register_r[CHIP_STATUS] &= ~CS_RETREQ;
@@ -857,7 +857,7 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 	sector_len = 1 << (id.N+7);
 	sector_data_id = id.data_id;
 
-	buf = (UINT8 *)malloc(sector_len);
+	buf = global_alloc_array(UINT8, sector_len);
 
 	/* Copy via DMA from controller RAM. */
 	set_dma_address(DMA23_16, DMA15_8, DMA7_0);
@@ -884,7 +884,7 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
 		harddisk->write_sector(id.C, id.H, id.R, buf);
 	}
-	free(buf);
+	global_free_array(buf);
 	sync_status_in();
 
 	m_register_r[CHIP_STATUS] &= ~CS_RETREQ;
@@ -1360,7 +1360,7 @@ void smc92x4_device::format_floppy_track(int flags)
 	}
 
 	/* Build buffer */
-	buffer = (UINT8*)malloc(data_count);
+	buffer = global_alloc_array(UINT8, data_count);
 
 	fm = in_single_density_mode();
 
@@ -1489,7 +1489,7 @@ void smc92x4_device::format_floppy_track(int flags)
 	index += gap4;
 
 	floppy_drive_write_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
-	free(buffer);
+	global_free_array(buffer);
 	sync_status_in();
 }
 
@@ -1528,7 +1528,7 @@ void smc92x4_device::format_harddisk_track(int flags)
 
 	data_count = gap1 + count*(sync+12+gap2+sync+size*128+gap3)+gap4;
 
-	buffer = (UINT8*)malloc(data_count);
+	buffer = global_alloc_array(UINT8, data_count);
 
 	index = 0;
 	gap_byte = 0x4e;
@@ -1590,7 +1590,7 @@ void smc92x4_device::format_harddisk_track(int flags)
 	// Now write the whole track
 	harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
 
-	free(buffer);
+	global_free_array(buffer);
 	sync_status_in();
 }
 
@@ -1636,7 +1636,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 			data_count = TRKSIZE_DD;
 	}
 
-	buffer = (UINT8*)malloc(data_count);
+	buffer = global_alloc_array(UINT8, data_count);
 
 	floppy_drive_read_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
 	sync_status_in();
@@ -1657,7 +1657,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 	}
 	m_out_dip(CLEAR_LINE);
 
-	free(buffer);
+	global_free_array(buffer);
 }
 
 void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
@@ -1671,7 +1671,7 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 	sync_latches_out();
 
 	data_count = harddisk->get_track_length();
-	buffer = (UINT8*)malloc(data_count);
+	buffer = global_alloc_array(UINT8, data_count);
 
 	/* buffer and data_count are allocated and set by the function. */
 	harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
@@ -1698,7 +1698,7 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 	}
 	m_out_dip(CLEAR_LINE);
 
-	free(buffer);
+	global_free_array(buffer);
 }
 
 
