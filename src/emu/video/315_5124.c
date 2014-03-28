@@ -1698,6 +1698,21 @@ UINT32 sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &
 }
 
 
+// MegaDrive/Genesis VDP (315-5313) is currently coded as superset of the 315-5124
+// To support properly SMS VDP in MegaTech and MegaPlay, we start the 315-5124
+// in all systems using MegaDrive/Genesis VDP, but this affects the performance
+// of the emulator hence we stop it in systems that don't need it
+// Proper way to handle this would be implement the 315-5124 modes in the 315-5313
+// device instead of running the two chips separately...
+void sega315_5124_device::stop_timers()
+{
+	m_display_timer->adjust(attotime::never);
+	m_check_hint_timer->adjust(attotime::never);
+	m_check_vint_timer->adjust(attotime::never);
+	m_draw_timer->adjust(attotime::never);
+}
+
+
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/

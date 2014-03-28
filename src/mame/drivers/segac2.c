@@ -102,6 +102,8 @@ MACHINE_START_MEMBER(segac2_state,segac2)
 	save_item(NAME(m_misc_io_data));
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
+	
+	m_vdp->stop_timers();
 }
 
 

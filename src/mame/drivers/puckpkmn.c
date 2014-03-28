@@ -280,6 +280,8 @@ static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmn_map)
 
+	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
+
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)

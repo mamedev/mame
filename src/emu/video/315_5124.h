@@ -81,6 +81,7 @@ public:
 
 	void hcount_latch() { hcount_latch_at_hpos( m_screen->hpos() ); };
 	void hcount_latch_at_hpos( int hpos );
+	void stop_timers();
 
 	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
 	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
