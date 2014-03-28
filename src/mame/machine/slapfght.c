@@ -209,12 +209,12 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
 {
 	static const int states[3]={ 0xc7, 0x55, 0x00 };
 
-	m_slapfight_status = states[m_slapfight_status_state];
+	m_getstar_status = states[m_getstar_status_state];
 
-	m_slapfight_status_state++;
-	if (m_slapfight_status_state > 2) m_slapfight_status_state = 0;
+	m_getstar_status_state++;
+	if (m_getstar_status_state > 2) m_getstar_status_state = 0;
 
-	return m_slapfight_status;
+	return m_getstar_status;
 }
 
 READ8_MEMBER(slapfght_state::getstar_mcusim_r)

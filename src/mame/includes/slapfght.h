@@ -60,22 +60,13 @@ public:
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_palette_bank;
 	bool m_flipscreen;
-	bool m_sound_nmi_enabled;
 	bool m_main_irq_enabled;
+	bool m_sound_nmi_enabled;
 
-	int m_slapfight_status;
-	int m_getstar_sequence_index;
-	int m_slapfight_status_state;
-	UINT8 m_mcu_val;
-	UINT8 m_getstar_cmd;
-	UINT8 m_gs_a;
-	UINT8 m_gs_d;
-	UINT8 m_gs_e;
-	UINT8 m_tigerhb_cmd;
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
 	bool m_mcu_sent;
 	bool m_main_sent;
+	UINT8 m_from_main;
+	UINT8 m_from_mcu;
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
 	UINT8 m_ddrA;
@@ -85,6 +76,15 @@ public:
 	UINT8 m_portC_in;
 	UINT8 m_portC_out;
 	UINT8 m_ddrC;
+
+	int m_getstar_status;
+	int m_getstar_sequence_index;
+	int m_getstar_status_state;
+	UINT8 m_getstar_cmd;
+	UINT8 m_gs_a;
+	UINT8 m_gs_d;
+	UINT8 m_gs_e;
+	UINT8 m_tigerhb_cmd;
 
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);

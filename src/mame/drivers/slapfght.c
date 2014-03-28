@@ -755,28 +755,82 @@ INPUT_PORTS_END
 
 void slapfght_state::machine_start()
 {
+	// zerofill
+	m_palette_bank = 0;
+	m_flipscreen = false;
+	m_main_irq_enabled = false;
+	m_sound_nmi_enabled = false;
+
+	bool m_mcu_sent = false;
+	bool m_main_sent = false;
+	UINT8 m_from_main = 0;
+	UINT8 m_from_mcu = 0;
+	UINT8 m_portA_in = 0;
+	UINT8 m_portA_out = 0;
+	UINT8 m_ddrA = 0;
+	UINT8 m_portB_in = 0;
+	UINT8 m_portB_out = 0;
+	UINT8 m_ddrB = 0;
+	UINT8 m_portC_in = 0;
+	UINT8 m_portC_out = 0;
+	UINT8 m_ddrC = 0;
+
+	int m_getstar_status = 0;
+	int m_getstar_sequence_index = 0;
+	int m_getstar_status_state = 0;
+	UINT8 m_getstar_cmd = 0;
+	UINT8 m_gs_a = 0;
+	UINT8 m_gs_d = 0;
+	UINT8 m_gs_e = 0;
+	UINT8 m_tigerhb_cmd = 0;
+
+	// savestates
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_main_irq_enabled));
+	save_item(NAME(m_sound_nmi_enabled));
+
+	save_item(NAME(m_mcu_sent));
+	save_item(NAME(m_main_sent));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_portB_in));
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_portC_in));
+	save_item(NAME(m_portC_out));
+	save_item(NAME(m_ddrC));
+
+	save_item(NAME(m_getstar_status));
+	save_item(NAME(m_getstar_sequence_index));
+	save_item(NAME(m_getstar_status_state));
+	save_item(NAME(m_getstar_cmd));
+	save_item(NAME(m_gs_a));
+	save_item(NAME(m_gs_d));
+	save_item(NAME(m_gs_e));
+	save_item(NAME(m_tigerhb_cmd));
 }
 
 void slapfght_state::machine_reset()
 {
-	/* MAIN CPU */
-	m_slapfight_status_state = 0;
-	m_slapfight_status = 0xc7;
-
+	m_getstar_status = 0xc7;
+	m_getstar_status_state = 0;
 	m_getstar_sequence_index = 0;
+
+	// reset sound
 	m_sound_nmi_enabled = false;
-
-	/* SOUND CPU */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	/* MCU */
-	m_mcu_val = 0;
 }
 
 MACHINE_RESET_MEMBER(slapfght_state,getstar)
 {
 	// don't boot the mcu since we don't have a dump yet
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	
+	machine_reset();
 }
 
 /**************************************************************************/
@@ -1924,23 +1978,23 @@ ROM_END
 
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT      INIT                       MONITOR, COMPANY, FULLNAME, FLAGS ) */
-GAME( 1985, perfrman,   0,        perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East USA", "Performan (US)", 0 )
+GAME( 1985, perfrman,   0,        perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East USA", "Performan (US)", GAME_SUPPORTS_SAVE )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 
-GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
-GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
-GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL ) /* MCU code not dumped */
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, grdian,     0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarj,   grdian,   getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1986, grdian,     0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, getstarj,   grdian,   getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
