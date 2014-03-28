@@ -200,9 +200,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
     (see Mantis bug ID 00652 with Z80 explanations).
 
 
-2) 'getstar' and clones
+2) 'grdian' and clones
 
-2a) 'getstar'
+2a) 'grdian'
 
   - US version, licensed to Kitkorp - name "Guardian".
   - MCU missing and simulated.
@@ -222,18 +222,18 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - I don't know what default difficulty shall be, so I set it to "Easy".
   - You can get multiple extra lives.
 
-2c) 'gtstarb1'
+2c) 'getstarb1'
 
   - Bootleg based on 'getstarj'
   - MCU reads/writes are patched, but this hasn't been done in the "test mode".
   - The game seems to have its own protection on startup (check code at 0x6d1a).
 
-2d) 'gtstarb2'
+2d) 'getstarb2'
 
   - Bootleg based on 'getstarj'
   - MCU reads/writes are patched, but this hasn't been done in the "test mode".
   - The game seems to have its own protection (check code at 0x0569 and 0x0ac6).
-  - Patches are coded diffrently than in 'gtstarb1' and code isn't always perfect
+  - Patches are coded diffrently than in 'getstarb1' and code isn't always perfect
     (lazy coding ?) which causes LOTS of ingames bugs or strange behaviours :
       * patched command 0x20 : NO continue play
       * patched command 0x21 : as soon as a player loses all his lives,
@@ -1787,7 +1787,7 @@ ROM_START( slapfighb3 )
 	ROM_LOAD( "sf_col19.bin", 0x0200,  0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) )
 ROM_END
 
-ROM_START( getstar )
+ROM_START( grdian )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "a68_00-1",     0x00000, 0x4000, CRC(6a8bdc6c) SHA1(c923bca539bd2eb9a34cb9c7a67a199e28bc081a) )
 	ROM_LOAD( "a68_01-1",     0x04000, 0x4000, CRC(ebe8db3c) SHA1(9046d6e63c33fc9cbd48b90dcbcc0badf1d3b9ba) )
@@ -1855,7 +1855,7 @@ ROM_START( getstarj )
 	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
 ROM_END
 
-ROM_START( gtstarb1 )
+ROM_START( getstarb1 )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "gs_rb_1.bin",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) )
 	ROM_LOAD( "gs_rb_2.bin",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) )
@@ -1891,7 +1891,7 @@ ROM_START( gtstarb1 )
 	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
 ROM_END
 
-ROM_START( gtstarb2 )
+ROM_START( getstarb2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
 	ROM_LOAD( "gs_14.rom",    0x00000, 0x4000, CRC(1a57a920) SHA1(b1e9d5b29c0e3632eec3ad1ee51bf3392e4b816d) )
 	ROM_LOAD( "gs_13.rom",    0x04000, 0x4000, CRC(805f8e77) SHA1(c3ad6eae842d2d10f716998d5a803038fa7b338f) )
@@ -1940,7 +1940,7 @@ GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfig
 GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
 GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, getstar,    0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarj,   getstar,  getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb1,   getstar,  getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb2,   getstar,  getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1986, grdian,     0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
+GAME( 1986, getstarj,   grdian,   getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, getstarb1,  grdian,   getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, getstarb2,  grdian,   getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )

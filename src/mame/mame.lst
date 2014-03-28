@@ -2563,10 +2563,10 @@ slapfigha       // A76 / TP-???
 slapfighb1      // bootleg but (c) 1986 Taito Corporation
 slapfighb2      // bootleg but (c) 1986 Taito Corporation
 slapfighb3      // bootleg but (c) 1986 Taito Corporation
-getstar         // A68 (c) 1986 Taito Corporation
+grdian          // A68 (c) 1986 Taito Corporation
 getstarj        // A68 (c) 1986 Taito Corporation
-gtstarb1        // GX-006 bootleg but (c) 1986 Taito Corporation
-gtstarb2        // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarb1       // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarb2       // GX-006 bootleg but (c) 1986 Taito Corporation
 mjsister        // (c) 1986 Toaplan
 fshark          // B02 / TP-007 (c) 1987 Taito Corporation (World)
 skyshark        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
