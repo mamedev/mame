@@ -18,14 +18,14 @@
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_r)
 {
-	m_mcu_sent = 0;
+	m_mcu_sent = false;
 	return m_from_mcu;
 }
 
 WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 {
 	m_from_main = data;
-	m_main_sent = 1;
+	m_main_sent = true;
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -76,12 +76,12 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
 		m_portA_in = m_from_main;
-		m_main_sent = 0;
+		m_main_sent = false;
 	}
 	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
 	{
 		m_from_mcu = m_portA_out;
-		m_mcu_sent = 1;
+		m_mcu_sent = true;
 	}
 
 	m_portB_out = data;
@@ -151,12 +151,12 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
 		m_portA_in = m_from_main;
-		m_main_sent = 0;
+		m_main_sent = false;
 	}
 	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
 	{
 		m_from_mcu = m_portA_out;
-		m_mcu_sent = 1;
+		m_mcu_sent = true;
 	}
 	if ((m_ddrB & 0x08) && (~data & 0x08) && (m_portB_out & 0x08))
 	{
@@ -290,11 +290,11 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_r)
 					break;
 			}
 			break;
-		case GTSTARB1:
+		case GETSTARB1:
 			/* value isn't computed by the bootleg but we want to please the "test mode" */
 			if (space.device().safe_pc() == 0x6b04) return (lives_lookup_table[m_gs_a]);
 			break;
-		case GTSTARB2:
+		case GETSTARB2:
 			/*
 			056B: 21 03 E8      ld   hl,$E803
 			056E: 7E            ld   a,(hl)
@@ -699,7 +699,7 @@ WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 				GS_SAVE_REGS
 			}
 			break;
-		case GTSTARB1:
+		case GETSTARB1:
 			/* "Test mode" doesn't compute the lives value :
 			    6ADA: 3E 23         ld   a,$23
 			    6ADC: CD 52 11      call $1152
@@ -736,7 +736,7 @@ WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 				GS_SAVE_REGS
 			}
 			break;
-		case GTSTARB2:
+		case GETSTARB2:
 			/* "Test mode" doesn't compute the lives value :
 			    6ADA: 3E 23         ld   a,$23
 			    6ADC: CD 52 11      call $1152
@@ -789,7 +789,7 @@ WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerhb_prot_r)
+READ8_MEMBER(slapfght_state::tigerhb1_prot_r)
 {
 	UINT8 tigerhb_val = 0;
 	switch (m_tigerhb_cmd)
@@ -798,13 +798,13 @@ READ8_MEMBER(slapfght_state::tigerhb_prot_r)
 			tigerhb_val = 0x83;
 			break;
 		default:
-			logerror("%04x: tigerhb_prot_r - cmd = %02x\n", space.device().safe_pc(), m_getstar_cmd);
+			logerror("%04x: tigerhb1_prot_r - cmd = %02x\n", space.device().safe_pc(), m_getstar_cmd);
 			break;
 	}
 	return tigerhb_val;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerhb_prot_w)
+WRITE8_MEMBER(slapfght_state::tigerhb1_prot_w)
 {
 	switch (data)
 	{
@@ -813,7 +813,7 @@ WRITE8_MEMBER(slapfght_state::tigerhb_prot_w)
 			m_tigerhb_cmd = 0x73;
 			break;
 		default:
-			logerror("%04x: tigerhb_prot_w - data = %02x\n",space.device().safe_pc(),data);
+			logerror("%04x: tigerhb1_prot_w - data = %02x\n",space.device().safe_pc(),data);
 			m_tigerhb_cmd = 0x00;
 			break;
 	}
@@ -822,7 +822,7 @@ WRITE8_MEMBER(slapfght_state::tigerhb_prot_w)
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::gtstarb1_prot_r)
+READ8_MEMBER(slapfght_state::getstarb1_prot_r)
 {
 	/* The bootleg has it's own 'protection' on startup ?
 	    6D1A: 06 04         ld   b,$04

@@ -276,6 +276,7 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -286,11 +287,23 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
+static ADDRESS_MAP_START( tigerhb1_map, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerhb1_prot_r, tigerhb1_prot_w)
+	AM_IMPORT_FROM( tigerh_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tigerhb2_map, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
+	AM_IMPORT_FROM( tigerh_map )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -301,8 +314,19 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
 	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slapfighb1_map, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
+	AM_IMPORT_FROM( slapfigh_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( getstar_map, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(getstar_mcusim_r, getstar_mcusim_w)
+	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
@@ -320,6 +344,7 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
+
 
 /**************************************************************************/
 
@@ -364,13 +389,6 @@ static ADDRESS_MAP_START( perfrman_io_map, AS_IO, 8, slapfght_state )
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(palette_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE(prg_bank_w)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -382,10 +400,36 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(vblank_r)
+	AM_RANGE(0x00, 0x00) AM_READ(vblank_r) // no MCU
+	AM_IMPORT_FROM( tigerh_io_map )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( slapfigh_io_map, AS_IO, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x08, 0x09) AM_WRITE(prg_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slapfighb1_io_map, AS_IO, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(vblank_r) // no MCU
+	AM_IMPORT_FROM( slapfigh_io_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( getstar_io_map, AS_IO, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(getstar_mcusim_status_r)
+	AM_IMPORT_FROM( slapfigh_io_map )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( getstarb1_io_map, AS_IO, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(getstarb1_prot_r)
+	AM_IMPORT_FROM( getstar_io_map )
 ADDRESS_MAP_END
 
 
@@ -419,7 +463,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
+static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -680,7 +724,7 @@ static INPUT_PORTS_START( getstarj )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:3" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gtstarb2 )
+static INPUT_PORTS_START( getstarb2 )
 	PORT_INCLUDE(getstarj)
 
 	/* RIGHT and DOWN are swapped due to code at 0x0551 */
@@ -729,73 +773,56 @@ void slapfght_state::machine_reset()
 	m_mcu_val = 0;
 }
 
+MACHINE_RESET_MEMBER(slapfght_state,getstar)
+{
+	// don't boot the mcu since we don't have a dump yet
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 /**************************************************************************/
 
-DRIVER_INIT_MEMBER(slapfght_state,tigerh)
+void slapfght_state::init_banks()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_prot_r),this), write8_delegate(FUNC(slapfght_state::tigerhb_prot_w),this));
-}
-
-DRIVER_INIT_MEMBER(slapfght_state,perfrman)
-{
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::vblank_r),this));
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	
+	membank("bank1")->set_entry(0);
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::tigerh_mcu_status_r),this));
-
-	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
-}
-
-void slapfght_state::getstar_init()
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_mcusim_r),this), write8_delegate(FUNC(slapfght_state::getstar_mcusim_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::getstar_mcusim_status_r),this));
-
-	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	init_banks();
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstar)
 {
 	m_getstar_id = GETSTAR;
-	getstar_init();
+	init_banks();
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstarj)
 {
 	m_getstar_id = GETSTARJ;
-	getstar_init();
+	init_banks();
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
+DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	m_getstar_id = GETSTARB1;
+	init_banks();
 
-	m_getstar_id = GTSTARB1;
-	getstar_init();
-
-	/* specific handlers for this bootleg */
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::gtstarb1_prot_r),this));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
-	ROM[0x6d56] = 0xc3; //jp instead of jp z
+	UINT8 *ROM = memregion("maincpu")->base();
+	ROM[0x6d56] = 0xc3; // jp instead of jp z
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
+DRIVER_INIT_MEMBER(slapfght_state,getstarb2)
 {
-	m_getstar_id = GTSTARB2;
-	getstar_init();
+	m_getstar_id = GETSTARB2;
+	init_banks();
 }
 
 
@@ -959,7 +986,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
@@ -995,46 +1022,21 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tigerhb, slapfght_state )
+static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000) // 6MHz?
-	MCFG_CPU_PROGRAM_MAP(tigerh_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tigerhb1_map)
 	MCFG_CPU_IO_MAP(tigerhb_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
+	
+	MCFG_DEVICE_REMOVE("mcu")
+MACHINE_CONFIG_END
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000) // 3MHz?
-	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360)
+static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
-	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tigerhb2_map)
 MACHINE_CONFIG_END
 
 
@@ -1042,12 +1044,12 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(slapfght_map)
-	MCFG_CPU_IO_MAP(slapfght_io_map)
+	MCFG_CPU_PROGRAM_MAP(slapfigh_map)
+	MCFG_CPU_IO_MAP(slapfigh_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
 	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
@@ -1086,17 +1088,43 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 
 	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(slapfighb1_map)
+	MCFG_CPU_IO_MAP(slapfighb1_io_map)
+
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-/* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
-static MACHINE_CONFIG_DERIVED( slapfighb2, slapfigh )
+static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
+MACHINE_CONFIG_END
 
-	MCFG_DEVICE_REMOVE("mcu")
+static MACHINE_CONFIG_DERIVED( getstar, slapfigh )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(getstar_map)
+	MCFG_CPU_IO_MAP(getstar_io_map)
+	
+	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state, getstar)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( getstarb1, slapfighb1 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(getstarb1_io_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( getstarb2, slapfighb1 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(getstar_map)
+	MCFG_CPU_IO_MAP(getstar_io_map)
 MACHINE_CONFIG_END
 
 
@@ -1108,12 +1136,12 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( perfrman )
-	ROM_REGION( 0x10000, "maincpu", 0 )              /* Main CPU code */
-	ROM_LOAD( "ci07.0",    0x00000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
-	ROM_LOAD( "ci08.1",    0x04000, 0x4000, CRC(90a02d5f) SHA1(9f2d2ce70a5bc96fc9d268e2b24533f73361225c) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Main CPU code */
+	ROM_LOAD( "ci07.0",     0x0000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
+	ROM_LOAD( "ci08.1",     0x4000, 0x4000, CRC(90a02d5f) SHA1(9f2d2ce70a5bc96fc9d268e2b24533f73361225c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )                 /* Sound CPU code */
-	ROM_LOAD( "ci06.4",    0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU code */
+	ROM_LOAD( "ci06.4",     0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "ci02.7",     0x0000, 0x2000, CRC(8efa960a) SHA1(d547ea23f2dd622500bf3f38cd9aca4e80aa27ca) )
@@ -1125,7 +1153,7 @@ ROM_START( perfrman )
 	ROM_LOAD( "ci04.9",     0x2000, 0x2000, CRC(026f27b3) SHA1(a222d31368fa5117824f5a14a1e52f01326e1f63) )
 	ROM_LOAD( "ci03.8",     0x4000, 0x2000, CRC(6410d9eb) SHA1(7e57de9255cbcacb4610cabb1364e2a4933ec12b) )
 
-	ROM_REGION( 0x300, "proms", 0 )              /* Color BPROMs */
+	ROM_REGION( 0x300, "proms", 0 ) /* Color BPROMs */
 	ROM_LOAD( "ci14.16",    0x000, 0x0100, CRC(515f8a3b) SHA1(a99d4c119f6c4c6cd1b3fd208eadfb69ef7e8e2d) )
 	ROM_LOAD( "ci13.15",    0x100, 0x0100, CRC(a9a397eb) SHA1(a84cf23efa0cf3e97b8dd1fff868c85d7eda1253) )
 	ROM_LOAD( "ci12.14",    0x200, 0x0100, CRC(67f86e3d) SHA1(b1240212ea91cf451dbd7c6e2bfccbac76568cf6) )
@@ -1137,12 +1165,12 @@ ROM_START( perfrman )
 ROM_END
 
 ROM_START( perfrmanu )
-	ROM_REGION( 0x10000, "maincpu", 0 )              /* Main CPU code */
-	ROM_LOAD( "ci07.0",    0x00000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
-	ROM_LOAD( "ci108r5.1", 0x04000, 0x4000, CRC(9d373efa) SHA1(b1d87e033ee3c50cfc56db05891b00b7bc236733) )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Main CPU code */
+	ROM_LOAD( "ci07.0",     0x0000, 0x4000, CRC(7ad32eea) SHA1(e5b29793e9c8c5c9322ca2af468a9810a598c0ae) )
+	ROM_LOAD( "ci108r5.1",  0x4000, 0x4000, CRC(9d373efa) SHA1(b1d87e033ee3c50cfc56db05891b00b7bc236733) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )                 /* Sound CPU code */
-	ROM_LOAD( "ci06.4",    0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU code */
+	ROM_LOAD( "ci06.4",     0x0000, 0x2000, CRC(df891ad0) SHA1(0d33e7d0562831382f48d1588ef20a1bc73be71a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* Tiles */
 	ROM_LOAD( "ci02.7",     0x0000, 0x2000, CRC(8efa960a) SHA1(d547ea23f2dd622500bf3f38cd9aca4e80aa27ca) )
@@ -1154,15 +1182,15 @@ ROM_START( perfrmanu )
 	ROM_LOAD( "ci04.9",     0x2000, 0x2000, CRC(026f27b3) SHA1(a222d31368fa5117824f5a14a1e52f01326e1f63) )
 	ROM_LOAD( "ci03.8",     0x4000, 0x2000, CRC(6410d9eb) SHA1(7e57de9255cbcacb4610cabb1364e2a4933ec12b) )
 
-	ROM_REGION( 0x300, "proms", 0 )              /* Color BPROMs */
-	ROM_LOAD( "ci14.16",    0x000, 0x0100, CRC(515f8a3b) SHA1(a99d4c119f6c4c6cd1b3fd208eadfb69ef7e8e2d) )
-	ROM_LOAD( "ci13.15",    0x100, 0x0100, CRC(a9a397eb) SHA1(a84cf23efa0cf3e97b8dd1fff868c85d7eda1253) )
-	ROM_LOAD( "ci12.14",    0x200, 0x0100, CRC(67f86e3d) SHA1(b1240212ea91cf451dbd7c6e2bfccbac76568cf6) )
+	ROM_REGION( 0x300, "proms", 0 ) /* Color BPROMs */
+	ROM_LOAD( "ci14.16",    0x0000, 0x0100, CRC(515f8a3b) SHA1(a99d4c119f6c4c6cd1b3fd208eadfb69ef7e8e2d) )
+	ROM_LOAD( "ci13.15",    0x0100, 0x0100, CRC(a9a397eb) SHA1(a84cf23efa0cf3e97b8dd1fff868c85d7eda1253) )
+	ROM_LOAD( "ci12.14",    0x0200, 0x0100, CRC(67f86e3d) SHA1(b1240212ea91cf451dbd7c6e2bfccbac76568cf6) )
 
 	ROM_REGION( 0x220, "user1", 0 )
-	ROM_LOAD( "ci11.11",    0x000, 0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) )
-	ROM_LOAD( "ci10.12",    0x100, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) )
-	ROM_LOAD( "ci09r1.13",  0x200, 0x0020, CRC(d9e92f6f) SHA1(7dc2939267b7d2b1eeeca906cc6151fab2cf1cc4) )
+	ROM_LOAD( "ci11.11",    0x0000, 0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) )
+	ROM_LOAD( "ci10.12",    0x0100, 0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) )
+	ROM_LOAD( "ci09r1.13",  0x0200, 0x0020, CRC(d9e92f6f) SHA1(7dc2939267b7d2b1eeeca906cc6151fab2cf1cc4) )
 ROM_END
 
 
@@ -1258,36 +1286,36 @@ Notes:
 
 ROM_START( tigerh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0.4",          0x00000, 0x4000, CRC(4be73246) SHA1(a6f6a36fa7e3d269b87b777c0975b210d8b53483) )
-	ROM_LOAD( "1.4",          0x04000, 0x4000, CRC(aad04867) SHA1(5e9ff3c982afe104428e936ef417de2d238dc033) )
-	ROM_LOAD( "2.4",          0x08000, 0x4000, CRC(4843f15c) SHA1(c0c145c9df9d6273171ac64fb7396e65a786f67c) )
+	ROM_LOAD( "0.4",         0x0000, 0x4000, CRC(4be73246) SHA1(a6f6a36fa7e3d269b87b777c0975b210d8b53483) )
+	ROM_LOAD( "1.4",         0x4000, 0x4000, CRC(aad04867) SHA1(5e9ff3c982afe104428e936ef417de2d238dc033) )
+	ROM_LOAD( "2.4",         0x8000, 0x4000, CRC(4843f15c) SHA1(c0c145c9df9d6273171ac64fb7396e65a786f67c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "a47_03.12d",   0x0000,  0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
+	ROM_LOAD( "a47_03.12d",  0x0000, 0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "a47_05.6f",   0x00000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) )  /* Chars */
-	ROM_LOAD( "a47_04.6g",   0x02000, 0x2000, CRC(cd59628e) SHA1(7be6479f20eb51b79b93e6fd65ab219096d54984) )
+	ROM_LOAD( "a47_05.6f",   0x0000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) )  /* Chars */
+	ROM_LOAD( "a47_04.6g",   0x2000, 0x2000, CRC(cd59628e) SHA1(7be6479f20eb51b79b93e6fd65ab219096d54984) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "a47_09.4m",   0x00000, 0x4000, CRC(31fae8a8) SHA1(ef8c23776431f00a74b25c5800755b6fa8d585ec) )  /* Tiles */
-	ROM_LOAD( "a47_08.6m",   0x04000, 0x4000, CRC(e539af2b) SHA1(0c8369a0fac1cbe40c07b51e16e8f8a9b8ed03b8) )
-	ROM_LOAD( "a47_07.6n",   0x08000, 0x4000, CRC(02fdd429) SHA1(fa392f2e57cfb6af4c124e0c151a4652f83e5577) )
-	ROM_LOAD( "a47_06.6p",   0x0c000, 0x4000, CRC(11fbcc8c) SHA1(b4fdb9ee00b749e1a54cfc0cdf55cc5e9bee3662) )
+	ROM_LOAD( "a47_09.4m",   0x0000, 0x4000, CRC(31fae8a8) SHA1(ef8c23776431f00a74b25c5800755b6fa8d585ec) )  /* Tiles */
+	ROM_LOAD( "a47_08.6m",   0x4000, 0x4000, CRC(e539af2b) SHA1(0c8369a0fac1cbe40c07b51e16e8f8a9b8ed03b8) )
+	ROM_LOAD( "a47_07.6n",   0x8000, 0x4000, CRC(02fdd429) SHA1(fa392f2e57cfb6af4c124e0c151a4652f83e5577) )
+	ROM_LOAD( "a47_06.6p",   0xc000, 0x4000, CRC(11fbcc8c) SHA1(b4fdb9ee00b749e1a54cfc0cdf55cc5e9bee3662) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "a47_13.8j",   0x00000, 0x4000, CRC(739a7e7e) SHA1(5fee71d9e1540903a6cf7bcaab30acaa088d35ed) )  /* Sprites */
-	ROM_LOAD( "a47_12.6j",   0x04000, 0x4000, CRC(c064ecdb) SHA1(fa8d712e2b2bda78b9375d96c93a4d7549c94075) )
-	ROM_LOAD( "a47_11.8h",   0x08000, 0x4000, CRC(744fae9b) SHA1(b324350469c51043e1d90ce58808d966467435b9) )
-	ROM_LOAD( "a47_10.6h",   0x0c000, 0x4000, CRC(e1cf844e) SHA1(eeb8eff09f96c693e147d155a8c0a87416d64603) )
+	ROM_LOAD( "a47_13.8j",   0x0000, 0x4000, CRC(739a7e7e) SHA1(5fee71d9e1540903a6cf7bcaab30acaa088d35ed) )  /* Sprites */
+	ROM_LOAD( "a47_12.6j",   0x4000, 0x4000, CRC(c064ecdb) SHA1(fa8d712e2b2bda78b9375d96c93a4d7549c94075) )
+	ROM_LOAD( "a47_11.8h",   0x8000, 0x4000, CRC(744fae9b) SHA1(b324350469c51043e1d90ce58808d966467435b9) )
+	ROM_LOAD( "a47_10.6h",   0xc000, 0x4000, CRC(e1cf844e) SHA1(eeb8eff09f96c693e147d155a8c0a87416d64603) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "82s129.12q",   0x0000,  0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
-	ROM_LOAD( "82s129.12m",   0x0100,  0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
-	ROM_LOAD( "82s129.12n",   0x0200,  0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
+	ROM_LOAD( "82s129.12q",  0x0000, 0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
+	ROM_LOAD( "82s129.12m",  0x0100, 0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
+	ROM_LOAD( "82s129.12n",  0x0200, 0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r4a.2e", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1295,36 +1323,36 @@ ROM_END
 
 ROM_START( tigerhj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a47_00.8p",   0x00000, 0x4000, CRC(cbdbe3cc) SHA1(5badf76cdf4a7f0ae9e85ee602420ba5c128efef) )
-	ROM_LOAD( "a47_01.8n",   0x04000, 0x4000, CRC(65df2152) SHA1(8e1516905a4af379cb0d0b9d42ff1cc3179c3589) )
-	ROM_LOAD( "a47_02.8k",   0x08000, 0x4000, CRC(633d324b) SHA1(70a17d17ebe003bfb2246e92e925a343a92553e5) )
+	ROM_LOAD( "a47_00.8p",   0x0000, 0x4000, CRC(cbdbe3cc) SHA1(5badf76cdf4a7f0ae9e85ee602420ba5c128efef) )
+	ROM_LOAD( "a47_01.8n",   0x4000, 0x4000, CRC(65df2152) SHA1(8e1516905a4af379cb0d0b9d42ff1cc3179c3589) )
+	ROM_LOAD( "a47_02.8k",   0x8000, 0x4000, CRC(633d324b) SHA1(70a17d17ebe003bfb2246e92e925a343a92553e5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "a47_03.12d",   0x0000,  0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
+	ROM_LOAD( "a47_03.12d",  0x0000,  0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "a47_05.6f",   0x00000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) )  /* Chars */
-	ROM_LOAD( "a47_04.6g",   0x02000, 0x2000, CRC(cd59628e) SHA1(7be6479f20eb51b79b93e6fd65ab219096d54984) )
+	ROM_LOAD( "a47_05.6f",   0x0000, 0x2000, CRC(c5325b49) SHA1(6df9051e7545dcac4995340f80957510457aaf64) )  /* Chars */
+	ROM_LOAD( "a47_04.6g",   0x2000, 0x2000, CRC(cd59628e) SHA1(7be6479f20eb51b79b93e6fd65ab219096d54984) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "a47_09.4m",   0x00000, 0x4000, CRC(31fae8a8) SHA1(ef8c23776431f00a74b25c5800755b6fa8d585ec) )  /* Tiles */
-	ROM_LOAD( "a47_08.6m",   0x04000, 0x4000, CRC(e539af2b) SHA1(0c8369a0fac1cbe40c07b51e16e8f8a9b8ed03b8) )
-	ROM_LOAD( "a47_07.6n",   0x08000, 0x4000, CRC(02fdd429) SHA1(fa392f2e57cfb6af4c124e0c151a4652f83e5577) )
-	ROM_LOAD( "a47_06.6p",   0x0c000, 0x4000, CRC(11fbcc8c) SHA1(b4fdb9ee00b749e1a54cfc0cdf55cc5e9bee3662) )
+	ROM_LOAD( "a47_09.4m",   0x0000, 0x4000, CRC(31fae8a8) SHA1(ef8c23776431f00a74b25c5800755b6fa8d585ec) )  /* Tiles */
+	ROM_LOAD( "a47_08.6m",   0x4000, 0x4000, CRC(e539af2b) SHA1(0c8369a0fac1cbe40c07b51e16e8f8a9b8ed03b8) )
+	ROM_LOAD( "a47_07.6n",   0x8000, 0x4000, CRC(02fdd429) SHA1(fa392f2e57cfb6af4c124e0c151a4652f83e5577) )
+	ROM_LOAD( "a47_06.6p",   0xc000, 0x4000, CRC(11fbcc8c) SHA1(b4fdb9ee00b749e1a54cfc0cdf55cc5e9bee3662) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "a47_13.8j",   0x00000, 0x4000, CRC(739a7e7e) SHA1(5fee71d9e1540903a6cf7bcaab30acaa088d35ed) )  /* Sprites */
-	ROM_LOAD( "a47_12.6j",   0x04000, 0x4000, CRC(c064ecdb) SHA1(fa8d712e2b2bda78b9375d96c93a4d7549c94075) )
-	ROM_LOAD( "a47_11.8h",   0x08000, 0x4000, CRC(744fae9b) SHA1(b324350469c51043e1d90ce58808d966467435b9) )
-	ROM_LOAD( "a47_10.6h",   0x0c000, 0x4000, CRC(e1cf844e) SHA1(eeb8eff09f96c693e147d155a8c0a87416d64603) )
+	ROM_LOAD( "a47_13.8j",   0x0000, 0x4000, CRC(739a7e7e) SHA1(5fee71d9e1540903a6cf7bcaab30acaa088d35ed) )  /* Sprites */
+	ROM_LOAD( "a47_12.6j",   0x4000, 0x4000, CRC(c064ecdb) SHA1(fa8d712e2b2bda78b9375d96c93a4d7549c94075) )
+	ROM_LOAD( "a47_11.8h",   0x8000, 0x4000, CRC(744fae9b) SHA1(b324350469c51043e1d90ce58808d966467435b9) )
+	ROM_LOAD( "a47_10.6h",   0xc000, 0x4000, CRC(e1cf844e) SHA1(eeb8eff09f96c693e147d155a8c0a87416d64603) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "82s129.12q",   0x0000,  0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
-	ROM_LOAD( "82s129.12m",   0x0100,  0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
-	ROM_LOAD( "82s129.12n",   0x0200,  0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
+	ROM_LOAD( "82s129.12q",  0x0000, 0x0100, CRC(2c69350d) SHA1(658bf63c6d1e718f99494cd1c9346c3622913beb) )
+	ROM_LOAD( "82s129.12m",  0x0100, 0x0100, CRC(7142e972) SHA1(4a854c2fdd006077aecb695832110ae6bf5819c1) )
+	ROM_LOAD( "82s129.12n",  0x0200, 0x0100, CRC(25f273f2) SHA1(2c696745f42fa09b64295a39536aeba08ab58d67) )
 ROM_END
 
 ROM_START( tigerhb1 )
@@ -1895,24 +1923,24 @@ ROM_START( gtstarb2 )
 ROM_END
 
 
-/*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR, COMPANY, FULLNAME, FLAGS ) */
-GAME( 1985, perfrman,   0,        perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
-GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman, slapfght_state, perfrman, ROT270, "Toaplan / Data East USA", "Performan (US)", 0 )
+/*  ( YEAR  NAME        PARENT    MACHINE     INPUT      INIT                       MONITOR, COMPANY, FULLNAME, FLAGS ) */
+GAME( 1985, perfrman,   0,        perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East Corporation", "Performan (Japan)", 0 )
+GAME( 1985, perfrmanu,  perfrman, perfrman,   perfrman,  driver_device,  0,         ROT270, "Toaplan / Data East USA", "Performan (US)", 0 )
 
-GAME( 1985, tigerh,     0,        tigerh,     tigerh,   slapfght_state, tigerh,   ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,   slapfght_state, tigerh,   ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh,   slapfght_state, tigerhb,  ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
-GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerh,     0,        tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito America Corp.", "Tiger Heli (US)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhj,    tigerh,   tigerh,     tigerh,    driver_device,  0,         ROT270, "Toaplan / Taito", "Tiger Heli (Japan)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb1,   tigerh,   tigerhb1,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb2,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, tigerhb3,   tigerh,   tigerhb2,   tigerh,    driver_device,  0,         ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
 
-GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
-GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
-GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh,  slapfght_state, slapfigh,  ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
+GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, slapfighb2, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 2)", GAME_NO_COCKTAIL ) // England?
+GAME( 1986, slapfighb3, alcon,    slapfighb2, slapfigh,  slapfght_state, slapfigh,  ROT270, "bootleg", "Slap Fight (bootleg set 3)", GAME_NO_COCKTAIL ) // PCB labeled 'slap fighter'
 
-GAME( 1986, getstar,    0,        slapfigh,   getstar,  slapfght_state, getstar,  ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
-GAME( 1986, getstarj,   getstar,  slapfigh,   getstarj, slapfght_state, getstarj, ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb1,   getstar,  slapfighb1, getstarj, slapfght_state, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
-GAME( 1986, gtstarb2,   getstar,  slapfighb1, gtstarb2, slapfght_state, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1986, getstar,    0,        getstar,    getstar,   slapfght_state, getstar,   ROT0,   "Toaplan / Taito America Corporation (Kitkorp license)", "Guardian (US)", GAME_NO_COCKTAIL )
+GAME( 1986, getstarj,   getstar,  getstar,    getstarj,  slapfght_state, getstarj,  ROT0,   "Toaplan / Taito", "Get Star (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb1,   getstar,  getstarb1,  getstarj,  slapfght_state, getstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1986, gtstarb2,   getstar,  getstarb2,  getstarb2, slapfght_state, getstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )

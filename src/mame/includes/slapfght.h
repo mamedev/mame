@@ -52,13 +52,19 @@ public:
 		GETSTUNK = 0, /* unknown for inclusion of possible new sets */
 		GETSTAR,
 		GETSTARJ,
-		GTSTARB1,     /* "good" bootleg with same behaviour as 'getstarj' */
-		GTSTARB2      /* "lame" bootleg with lots of ingame bugs */
+		GETSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
+		GETSTARB2     /* "lame" bootleg with lots of ingame bugs */
 	} m_getstar_id;
+
+	tilemap_t *m_pf1_tilemap;
+	tilemap_t *m_fix_tilemap;
+	UINT8 m_palette_bank;
+	bool m_flipscreen;
+	bool m_sound_nmi_enabled;
+	bool m_main_irq_enabled;
 
 	int m_slapfight_status;
 	int m_getstar_sequence_index;
-	bool m_sound_nmi_enabled;
 	int m_slapfight_status_state;
 	UINT8 m_mcu_val;
 	UINT8 m_getstar_cmd;
@@ -68,8 +74,8 @@ public:
 	UINT8 m_tigerhb_cmd;
 	UINT8 m_from_main;
 	UINT8 m_from_mcu;
-	int m_mcu_sent;
-	int m_main_sent;
+	bool m_mcu_sent;
+	bool m_main_sent;
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
 	UINT8 m_ddrA;
@@ -79,29 +85,22 @@ public:
 	UINT8 m_portC_in;
 	UINT8 m_portC_out;
 	UINT8 m_ddrC;
-	bool m_flipscreen;
-	int m_palette_bank;
-	tilemap_t *m_pf1_tilemap;
-	tilemap_t *m_fix_tilemap;
-	bool m_main_irq_enabled;
 
-	DECLARE_READ8_MEMBER(gtstarb1_prot_r);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(prg_bank_w);
-	DECLARE_READ8_MEMBER(getstar_mcusim_status_r);
-	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrB_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
-	DECLARE_READ8_MEMBER(getstar_mcusim_r);
-	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
+	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);
+	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+
+	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
+	DECLARE_READ8_MEMBER(tigerh_mcu_r);
+	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
 	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
@@ -111,27 +110,35 @@ public:
 	DECLARE_READ8_MEMBER(tigerh_68705_portC_r);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_portC_w);
 	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrC_w);
-	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
-	DECLARE_READ8_MEMBER(tigerh_mcu_r);
-	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_READ8_MEMBER(tigerhb_prot_r);
-	DECLARE_WRITE8_MEMBER(tigerhb_prot_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+
+	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
+	DECLARE_READ8_MEMBER(slapfight_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portB_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrB_w);
+	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
+	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
+
+	DECLARE_READ8_MEMBER(getstar_mcusim_r);
+	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
+	DECLARE_READ8_MEMBER(getstar_mcusim_status_r);
+	DECLARE_READ8_MEMBER(getstarb1_prot_r);
+	DECLARE_READ8_MEMBER(tigerhb1_prot_r);
+	DECLARE_WRITE8_MEMBER(tigerhb1_prot_w);
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	DECLARE_MACHINE_RESET(getstar);
+
+	void init_banks();
 	DECLARE_DRIVER_INIT(getstarj);
 	DECLARE_DRIVER_INIT(getstar);
-	DECLARE_DRIVER_INIT(gtstarb1);
-	DECLARE_DRIVER_INIT(tigerhb);
+	DECLARE_DRIVER_INIT(getstarb1);
 	DECLARE_DRIVER_INIT(slapfigh);
-	DECLARE_DRIVER_INIT(perfrman);
-	DECLARE_DRIVER_INIT(gtstarb2);
-	DECLARE_DRIVER_INIT(tigerh);
-
+	DECLARE_DRIVER_INIT(getstarb2);
+	
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
@@ -144,8 +151,4 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
-	void getstar_init();
-	
-	virtual void machine_start();
-	virtual void machine_reset();
 };
