@@ -270,8 +270,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
@@ -280,8 +279,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc810, 0xcfff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
@@ -296,8 +294,7 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc810, 0xcfff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
@@ -312,8 +309,7 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc810, 0xcfff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
@@ -351,12 +347,7 @@ WRITE8_MEMBER(slapfght_state::sound_reset_w)
 
 WRITE8_MEMBER(slapfght_state::prg_bank_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	
-	if (offset)
-		membank("bank1")->set_base(&RAM[0x14000]);
-	else
-		membank("bank1")->set_base(&RAM[0x10000]);
+	membank("bank1")->set_entry(offset);
 }
 
 READ8_MEMBER(slapfght_state::vblank_r)
@@ -364,13 +355,21 @@ READ8_MEMBER(slapfght_state::vblank_r)
 	return m_screen->vblank() ? 1 : 0;
 }
 
+static ADDRESS_MAP_START( perfrman_io_map, AS_IO, 8, slapfght_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(vblank_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(palette_bank_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x08, 0x09) AM_WRITE(prg_bank_w)
-	AM_RANGE(0x0c, 0x0d) AM_WRITE(palette_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
@@ -383,7 +382,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(getstar_mcusim_status_r)
+	AM_RANGE(0x00, 0x00) AM_READ(vblank_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(irq_enable_w)
@@ -410,8 +409,7 @@ WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
 
 static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -430,8 +428,7 @@ static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc810, 0xcfff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -753,12 +750,18 @@ DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::tigerh_mcu_status_r),this));
+
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 }
 
 void slapfght_state::getstar_init()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_mcusim_r),this), write8_delegate(FUNC(slapfght_state::getstar_mcusim_w),this));
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::getstar_mcusim_status_r),this));
+
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstar)
@@ -909,7 +912,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) // 4MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
-	MCFG_CPU_IO_MAP(slapfght_io_map)
+	MCFG_CPU_IO_MAP(perfrman_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8) // 2MHz? XTAL is known, divider is guessed
@@ -995,12 +998,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) // 6MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("maincpu", Z80, 6000000) // 6MHz?
 	MCFG_CPU_PROGRAM_MAP(tigerh_map)
 	MCFG_CPU_IO_MAP(tigerhb_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) // 3MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000) // 3MHz?
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360)
 
@@ -1025,11 +1028,11 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1205,7 +1208,7 @@ GX-511-A MADE IN JAPAN
 |-----|----------|--------------|----------|-------|
       |----------|              |----------|
 Notes:
-      AY3-8910 clock - 3.000MHz (36/12)
+      AY3-8910 clock - 1.500MHz (36/24)
       Z80A clock - 3.000MHz (36/12)
       VSync - 57Hz
       HSync - 15.02kHz
@@ -1427,7 +1430,7 @@ Slap Fight/Alcon
 1986 Taito Corporation
 
 Slap Fight and Alcon are the same PCBs exactly, with just 4 ROMs changed. The same MCU is
-common to Slap Fight and Alcon. There is an alternate "A76" version of Slap Fight with it's
+common to Slap Fight and Alcon. There is an alternate "A76" version of Slap Fight with its
 own unique MCU code.
 
 PCB Layouts - Top Board
@@ -1902,7 +1905,7 @@ GAME( 1985, tigerhb1,   tigerh,   tigerhb,    tigerh,   slapfght_state, tigerhb,
 GAME( 1985, tigerhb2,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 2)", GAME_NO_COCKTAIL )
 GAME( 1985, tigerhb3,   tigerh,   tigerhb,    tigerh,   driver_device,  0,        ROT270, "bootleg", "Tiger Heli (bootleg set 3)", GAME_NO_COCKTAIL )
 
-GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)",  GAME_NO_COCKTAIL )
+GAME( 1986, alcon,      0,        slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito America Corp.", "Alcon (US)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfigh,   alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, slapfigha,  alcon,    slapfigh,   slapfigh, slapfght_state, slapfigh, ROT270, "Toaplan / Taito", "Slap Fight (Japan set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL ) /* MCU code not dumped */
 GAME( 1986, slapfighb1, alcon,    slapfighb1, slapfigh, driver_device,  0,        ROT270, "bootleg", "Slap Fight (bootleg set 1)", GAME_NO_COCKTAIL )
