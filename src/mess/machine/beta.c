@@ -7,6 +7,12 @@
     04/05/2008 Created by Miodrag Milanovic
 
 *********************************************************************/
+/*
+BUGS:
+- random commands can be sent to FDC, so better keep .trd images write protected for now
+goto TR-DOS, CAT -> files will be shown, CAT again -> NO DISK mesage as result of trash commands
+
+*/
 #include "emu.h"
 #include "imagedev/flopdrv.h"
 #include "formats/trd_dsk.h"
@@ -145,12 +151,16 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 	if (m_betadisk_active==1) {
 		m_wd179x->set_drive(data & 3);
 		m_wd179x->set_side ((data & 0x10) ? 0 : 1 );
-		m_wd179x->dden_w(!BIT(data, 5));
+		m_wd179x->dden_w(!BIT(data, 6));
 		if ((data & 0x04) == 0) // reset
 		{
 			m_wd179x->reset();
 		}
-		m_betadisk_status = (data & 0x3f) | m_betadisk_status;
+		// bit 3 connected to pin 23 "HRDY" of FDC
+		// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
+		device_t *flop = subdevice(beta_wd17xx_interface.floppy_drive_tags[data & 3]);
+		floppy_mon_w(flop, CLEAR_LINE);
+		floppy_drive_set_ready_state(flop, 1, 0);
 	}
 }
 
@@ -189,14 +199,14 @@ static const floppy_interface beta_floppy_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD,
 	LEGACY_FLOPPY_OPTIONS_NAME(trd),
 	NULL,
 	NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
-	MCFG_WD2793_ADD("wd179x", beta_wd17xx_interface ) // KR1818VG93
+	MCFG_WD2793_ADD("wd179x", beta_wd17xx_interface ) // KR1818VG93 clone of WD1793
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(beta_floppy_interface)
 MACHINE_CONFIG_END
 

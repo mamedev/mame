@@ -319,10 +319,10 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x4021, 0x4021) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3fdc)
+	AM_RANGE(0x8021, 0x8021) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3fdc)
+	AM_RANGE(0xc021, 0xc021) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3fdc)
+	AM_RANGE(0x0021, 0x0021) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x3fdc)
 ADDRESS_MAP_END
 
 
@@ -519,7 +519,7 @@ ROM_START( kay1024 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT   CLASS         INIT      COMPANY     FULLNAME */
-COMP( 1994, scorpio,  spec128,   0, scorpion,   spec_plus, driver_device,   0,      "Zonov and Co.",        "Scorpion ZS-256", GAME_NOT_WORKING )
+COMP( 1994, scorpio,  spec128,   0, scorpion,   spec_plus, driver_device,   0,      "Zonov and Co.",        "Scorpion ZS-256", 0 )
 COMP( 1991, profi,    spec128,   0, profi,      spec_plus, driver_device,   0,      "Kondor and Kramis",        "Profi", GAME_NOT_WORKING )
 COMP( 1998, kay1024,  spec128,   0, scorpion,   spec_plus, driver_device,   0,      "NEMO",     "Kay 1024", GAME_NOT_WORKING )
 COMP( 19??, quorum,   spec128,   0, quorum,     spec_plus, driver_device,   0,      "<unknown>",        "Quorum", GAME_NOT_WORKING )

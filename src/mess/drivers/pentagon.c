@@ -12,6 +12,11 @@
 class pentagon_state : public spectrum_state
 {
 public:
+	enum
+	{
+		TIMER_IRQ_ON,
+		TIMER_IRQ_OFF
+	};
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
@@ -24,13 +29,16 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_MACHINE_RESET(pentagon);
-
+	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
+	TIMER_CALLBACK_MEMBER(irq_on);
+	TIMER_CALLBACK_MEMBER(irq_off);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
 	UINT8 *m_p_ram;
 	void pentagon_update_memory();
@@ -81,7 +89,15 @@ void pentagon_state::pentagon_update_memory()
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
+	if (strcmp(machine().system().name, "pent1024") != 0)
+	{
+		m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
+	}
+	else
+	{
+		// currently 512Kb ram expansion supported
+		m_bank4->set_base(messram + (((m_port_7ffd_data & 0x07) | ((m_port_7ffd_data & 0xc0) >> 3)) * 0x4000));
+	}
 
 	if (m_beta->started() && m_beta->is_active() && !( m_port_7ffd_data & 0x10 ) )
 	{
@@ -112,15 +128,45 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	pentagon_update_memory();
 }
 
+void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_IRQ_ON:
+		irq_on(ptr, param);
+		break;
+	case TIMER_IRQ_OFF:
+		irq_off(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
+{
+	m_maincpu->set_input_line(0, HOLD_LINE);
+	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, NULL);
+}
+
+TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
+{
+	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, NULL);
+}
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)	// (A15 | A1) == 0
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
@@ -136,7 +182,8 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 
 	if (m_beta->started())
 	{
-		m_beta->enable();
+		if (strcmp(machine().system().name, "pent1024")==0)
+			m_beta->enable();
 		m_beta->clear_status();
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
@@ -176,8 +223,14 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pentagon, spectrum_128, pentagon_state )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
 	MCFG_CPU_IO_MAP(pentagon_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
+
+	MCFG_SCREEN_MODIFY("screen")
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 304)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 287)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
@@ -268,5 +321,5 @@ ROM_START(pent1024)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon", GAME_NOT_WORKING)
-COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon 1024", GAME_NOT_WORKING)
+COMP( 1989, pentagon, spec128,  0,      pentagon,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon", 0)
+COMP( 19??, pent1024, spec128,  0,      pent1024,   spec_plus, driver_device,   0,      "<unknown>",        "Pentagon 1024", 0)
