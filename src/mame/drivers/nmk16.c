@@ -7584,7 +7584,7 @@ GAME( 2000, mangchi,  0,        popspops, mangchi, nmk16_state,    bubl2000, ROT
 
 // these two are very similar games, but the exact parent/clone relationship is unknown
 GAME( 2000, spec2k,   0,        firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (Euro)", 0 )
-GAME( 2000, spec2kv,  spec2k,   firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", 0 )
+GAME( 2000, spec2kv,  spec2k,   firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_NOT_WORKING ) // incomplete dump, only gfx roms are dumped
 GAME( 2001, firehawk, 0,        firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
