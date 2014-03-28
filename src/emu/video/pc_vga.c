@@ -2758,6 +2758,22 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x35:
 				res = s3.crt_reg_lock;
 				break;
+			case 0x36:  // Configuration register 1
+				res = 0x1e;  // PCI (not really), Fast Page Mode DRAM
+				if(vga.svga_intf.vram_size == 0x80000)
+					res |= 0xe0;
+				else if(vga.svga_intf.vram_size == 0x100000)
+					res |= 0xd0;
+				else if(vga.svga_intf.vram_size == 0x200000)
+					res |= 0x80;
+				else if(vga.svga_intf.vram_size == 0x400000)
+					res |= 0x00;
+				else
+					res |= 0xe0;  // shouldn't get here...
+				break;
+			case 0x37:  // Configuration register 2
+				res = 0x09;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
+				break;
 			case 0x38:
 				res = s3.reg_lock1;
 				break;
@@ -2823,11 +2839,17 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x67:
 				res = s3.ext_misc_ctrl_2;
 				break;
+			case 0x68:  // Configuration register 3
+				res = 0x03;  // no /CAS,/OE stretch time, 32-bit data bus size
+				break;
 			case 0x69:
 				res = vga.crtc.start_addr_latch >> 16;
 				break;
 			case 0x6a:
 				res = svga.bank_r & 0x7f;
+				break;
+			case 0x6f: // Configuration register 4
+				res = 0x18;  // LPB(?) mode, Serial port I/O at port 0xe8, Serial port I/O disabled (MMIO only), no WE delay
 				break;
 			default:
 				res = vga.crtc.data[index];
