@@ -3,20 +3,6 @@
 
 const device_type H8_SCI = &device_creator<h8_sci_device>;
 
-static astring tts(attotime t)
-{
-	char buf[256];
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds), nsec/1000000, (nsec/1000)%1000,
-			nsec % 1000);
-	return buf;
-}
-
-static astring ttsn(running_machine &m)
-{
-	return tts(m.time());
-}
-
 const char *const h8_sci_device::state_names[] = { "idle", "start", "bit", "parity", "stop", "last-tick" };
 
 h8_sci_device::h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -367,7 +353,6 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 				bool new_clock = delta >= divider*8;
 				if(new_clock != clock_value) {
 					cpu->synchronize();
-					logerror("%s: internal clock edge %s\n", tag(), ttsn(machine()).cstr());
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 					
@@ -380,7 +365,6 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 				}
 			}
 			
-			logerror("%s: %lld -> %lld (%lld, %lld, %d, %d)\n", tag(), current_time, clock_base + (clock_value ? fp : divider*8), clock_base, divider*8, clock_value, clock_state);
 			event = clock_base + (clock_value ? fp : divider*8);
 		}
 		break;
@@ -419,7 +403,6 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 				bool new_clock = delta >= 8;
 				if(new_clock != clock_value) {
 					cpu->synchronize();
-					logerror("%s: external clock edge %s / %lld\n", tag(), ttsn(machine()).cstr(), current_time);
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
 					
@@ -442,7 +425,6 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 		attotime ctime = machine().time();
 		attotime sync_time = attotime::from_ticks(event-10, cpu->clock());
 		if(cur_sync_time != sync_time && sync_time > ctime) {
-			logerror("%s: adjust to %s (%lld) from %s\n", tag(), tts(sync_time).cstr(), event-10, tts(ctime).cstr());
 			sync_timer->adjust(sync_time - ctime);
 			cur_sync_time = sync_time;
 		}

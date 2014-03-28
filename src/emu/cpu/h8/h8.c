@@ -41,22 +41,6 @@
 #include "debugger.h"
 #include "h8.h"
 
-
-static astring tts(attotime t)
-{
-	char buf[256];
-	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
-	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds), nsec/1000000, (nsec/1000)%1000,
-			nsec % 1000);
-	return buf;
-}
-
-static astring ttsn(running_machine &m)
-{
-	return tts(m.time());
-}
-
-
 h8_device::h8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, bool mode_a16, address_map_delegate map_delegate) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
@@ -211,7 +195,6 @@ void h8_device::execute_run()
 			}
 			do_exec_full();
 		}
-		int pic = icount;
 		while(bcount && icount && icount <= bcount)
 			internal_update(end_cycles - bcount);
 		do_exec_partial();
