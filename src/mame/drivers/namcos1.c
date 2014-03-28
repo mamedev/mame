@@ -380,19 +380,17 @@ WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 	coin_counter_w(machine(), 1,data & 4);
 }
 
-static void namcos1_update_DACs(running_machine &machine)
+void namcos1_state::namcos1_update_DACs()
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	state->m_dac->write_signed16(0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
+	m_dac->write_signed16(0x8000 + (m_dac0_value * m_dac0_gain) + (m_dac1_value * m_dac1_gain));
 }
 
-void namcos1_init_DACs(running_machine &machine)
+void namcos1_state::namcos1_init_DACs()
 {
-	namcos1_state *state = machine.driver_data<namcos1_state>();
-	state->m_dac0_value = 0;
-	state->m_dac1_value = 0;
-	state->m_dac0_gain=0x80;
-	state->m_dac1_gain=0x80;
+	m_dac0_value = 0;
+	m_dac1_value = 0;
+	m_dac0_gain=0x80;
+	m_dac1_gain=0x80;
 }
 
 WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
@@ -407,19 +405,19 @@ WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
 	m_dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs(machine());
+	namcos1_update_DACs();
 }
 
 WRITE8_MEMBER(namcos1_state::namcos1_dac0_w)
 {
 	m_dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(machine());
+	namcos1_update_DACs();
 }
 
 WRITE8_MEMBER(namcos1_state::namcos1_dac1_w)
 {
 	m_dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(machine());
+	namcos1_update_DACs();
 }
 
 

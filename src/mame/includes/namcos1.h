@@ -6,8 +6,8 @@
 /* Bank handler definitions */
 struct bankhandler
 {
-	read8_space_func bank_handler_r;
-	write8_space_func bank_handler_w;
+	read8_delegate bank_handler_r;
+	write8_delegate bank_handler_w;
 	int           bank_offset;
 	UINT8 *bank_pointer;
 };
@@ -116,23 +116,84 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_info5);
 	virtual void machine_reset();
 	virtual void video_start();
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_namcos1(screen_device &screen, bool state);
+	void namcos1_update_DACs();
+	void namcos1_init_DACs();
+	DECLARE_READ8_MEMBER( namcos1_videoram_r );
+	DECLARE_WRITE8_MEMBER( namcos1_videoram_w );
+	DECLARE_WRITE8_MEMBER( namcos1_paletteram_w );
+	DECLARE_READ8_MEMBER( namcos1_spriteram_r );
+	DECLARE_WRITE8_MEMBER( namcos1_spriteram_w );
+	inline UINT8 bank_r(address_space &space, offs_t offset, int bank);
+	READ8_MEMBER( bank1_r );
+	READ8_MEMBER( bank2_r );
+	READ8_MEMBER( bank3_r );
+	READ8_MEMBER( bank4_r );
+	READ8_MEMBER( bank5_r );
+	READ8_MEMBER( bank6_r );
+	READ8_MEMBER( bank7_r );
+	READ8_MEMBER( bank8_r );
+	READ8_MEMBER( bank9_r );
+	READ8_MEMBER( bank10_r );
+	READ8_MEMBER( bank11_r );
+	READ8_MEMBER( bank12_r );
+	READ8_MEMBER( bank13_r );
+	READ8_MEMBER( bank14_r );
+	READ8_MEMBER( bank15_r );
+	READ8_MEMBER( bank16_r );
+	inline void bank_w(address_space &space, offs_t offset, UINT8 data, int bank);
+	WRITE8_MEMBER( bank1_w );
+	WRITE8_MEMBER( bank2_w );
+	WRITE8_MEMBER( bank3_w );
+	WRITE8_MEMBER( bank4_w );
+	WRITE8_MEMBER( bank5_w );
+	WRITE8_MEMBER( bank6_w );
+	WRITE8_MEMBER( bank7_w );
+	WRITE8_MEMBER( bank8_w );
+	WRITE8_MEMBER( bank9_w );
+	WRITE8_MEMBER( bank10_w );
+	WRITE8_MEMBER( bank11_w );
+	WRITE8_MEMBER( bank12_w );
+	WRITE8_MEMBER( bank13_w );
+	WRITE8_MEMBER( bank14_w );
+	WRITE8_MEMBER( bank15_w );
+	WRITE8_MEMBER( bank16_w );
+	WRITE8_MEMBER( namcos1_3dcs_w );
+	READ8_MEMBER( no_key_r );
+	WRITE8_MEMBER( no_key_w );
+	READ8_MEMBER( key_type1_r );
+	WRITE8_MEMBER( key_type1_w );
+	READ8_MEMBER( key_type2_r );
+	WRITE8_MEMBER( key_type2_w );
+	READ8_MEMBER( key_type3_r );
+	WRITE8_MEMBER( key_type3_w );
+	READ8_MEMBER( soundram_r );
+	WRITE8_MEMBER( soundram_w );
+	WRITE8_MEMBER( rom_w );
+	READ8_MEMBER( unknown_r );
+	WRITE8_MEMBER( unknown_w );
+	void set_bank(int banknum, const bankhandler *handler);
+	void namcos1_bankswitch(int cpu, offs_t offset, UINT8 data);
+	void namcos1_install_bank(int start,int end,read8_delegate hr,write8_delegate hw,int offset,UINT8 *pointer);
+	void namcos1_build_banks(read8_delegate key_r,write8_delegate key_w);
+	struct namcos1_specific
+	{
+		/* keychip */
+		read8_delegate key_r;
+		write8_delegate key_w;
+		int key_id;
+		int key_reg1;
+		int key_reg2;
+		int key_reg3;
+		int key_reg4;
+		int key_reg5;
+		int key_reg6;
+	};
 
-
+	void namcos1_driver_init(const struct namcos1_specific *specific );
 private:
 	inline void bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
 	inline void fg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);
 };
-
-/*----------- defined in drivers/namcos1.c -----------*/
-
-void namcos1_init_DACs(running_machine &machine);
-
-/*----------- defined in video/namcos1.c -----------*/
-
-DECLARE_READ8_HANDLER( namcos1_videoram_r );
-DECLARE_WRITE8_HANDLER( namcos1_videoram_w );
-DECLARE_WRITE8_HANDLER( namcos1_paletteram_w );
-DECLARE_READ8_HANDLER( namcos1_spriteram_r );
-DECLARE_WRITE8_HANDLER( namcos1_spriteram_w );
