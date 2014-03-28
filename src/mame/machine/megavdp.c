@@ -2626,15 +2626,7 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 
-			// 32x interrupt!
-			if (_32xdev) _32xdev->_32x_scanline_cb0();
-
 		}
-
-
-
-		if (_32xdev) _32xdev->_32x_check_framebuffer_swap(m_scanline_counter >= m_irq6_scanline);
-
 
 	//  if (genesis_get_scanline_counter()==0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
@@ -2666,9 +2658,6 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 		//if (genesis_get_scanline_counter()==0) irq4_on_timer->adjust(attotime::from_usec(2));
 
 
-		if (_32xdev) _32xdev->_32x_scanline_cb1(m_scanline_counter);
-
-
 		if (genesis_get_scanline_counter() == m_z80irq_scanline)
 		{
 			m_genesis_vdp_sndirqline_callback(true);
@@ -2683,15 +2672,14 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 		if (!m_use_alt_timing) m_scanline_counter = megadrive_total_scanlines - 1;
 	}
 
+	// 32x interrupts!
+	if (_32xdev) 
+		_32xdev->_32x_interrupt_cb(genesis_get_scanline_counter(), m_irq6_scanline);
 }
-
-
 
 
 void sega_genesis_vdp_device::vdp_handle_eof()
 {
-	sega_32x_device *_32xdev = machine().device<sega_32x_device>("sega32x"); // take this out of the VDP eventually
-
 	rectangle visarea;
 	int scr_width = 320;
 
@@ -2743,9 +2731,6 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
 	m_screen->configure(480, megadrive_total_scanlines, visarea, m_screen->frame_period().attoseconds);
-
-
-	if(_32xdev) _32xdev->m_32x_hcount_compare_val = -1;
 }
 
 

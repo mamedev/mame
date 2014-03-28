@@ -1193,6 +1193,9 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 		{
 			m_vdp->vdp_handle_eof();
 			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
+			
+			if (m_32x) 
+				m_32x->m_32x_hcount_compare_val = -1;
 		}
 	}
 }

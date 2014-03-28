@@ -116,6 +116,7 @@ public:
 	void _32x_check_irqs();
 	void _32x_scanline_cb0();
 	void _32x_scanline_cb1(int scanline);
+	void _32x_interrupt_cb(int scanline, int irq6);
 
 	/* our main vblank handler resets this */
 	int m_32x_hcount_compare_val;
