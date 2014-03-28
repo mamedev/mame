@@ -17,6 +17,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_slapfight_videoram(*this, "videoram"),
@@ -33,6 +34,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
@@ -97,9 +99,6 @@ public:
 	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
 	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
 	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
-	DECLARE_WRITE8_MEMBER(slapfight_mcu_w);
-	DECLARE_READ8_MEMBER(slapfight_mcu_r);
-	DECLARE_READ8_MEMBER(slapfight_mcu_status_r);
 	DECLARE_READ8_MEMBER(getstar_mcusim_r);
 	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
@@ -117,7 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
 	DECLARE_READ8_MEMBER(tigerhb_prot_r);
 	DECLARE_WRITE8_MEMBER(tigerhb_prot_w);
-	DECLARE_READ8_MEMBER(perfrman_port_00_r);
+	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
 	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
 	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);

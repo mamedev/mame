@@ -359,10 +359,9 @@ WRITE8_MEMBER(slapfght_state::prg_bank_w)
 		membank("bank1")->set_base(&RAM[0x10000]);
 }
 
-READ8_MEMBER(slapfght_state::perfrman_port_00_r)
+READ8_MEMBER(slapfght_state::vblank_r)
 {
-	/* TODO */
-	return machine().rand() & 1;
+	return m_screen->vblank() ? 1 : 0;
 }
 
 static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
@@ -747,13 +746,13 @@ DRIVER_INIT_MEMBER(slapfght_state,tigerhb)
 
 DRIVER_INIT_MEMBER(slapfght_state,perfrman)
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::vblank_r),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),this), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),this), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::tigerh_mcu_status_r),this));
 }
 
 void slapfght_state::getstar_init()

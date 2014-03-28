@@ -26,7 +26,6 @@ WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 {
 	m_from_main = data;
 	m_main_sent = 1;
-	m_mcu_sent = 0;
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -35,14 +34,15 @@ WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 {
-	int res = 0;
+	// d0 is vblank
+	UINT8 res = m_screen->vblank() ? 1 : 0;
 
 	if (!m_main_sent)
 		res |= 0x02;
 	if (!m_mcu_sent)
 		res |= 0x04;
 	
-	return res | (getstar_mcusim_status_r(space, 0) & 0xf9);
+	return res;
 }
 
 
@@ -55,9 +55,7 @@ READ8_MEMBER(slapfght_state::tigerh_68705_portA_r)
 
 WRITE8_MEMBER(slapfght_state::tigerh_68705_portA_w)
 {
-	m_portA_out = data; // ?
-	m_from_mcu = m_portA_out;
-	m_mcu_sent = 1;
+	m_portA_out = data;
 }
 
 WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrA_w)
@@ -124,37 +122,6 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
     Slap Fight MCU
 
 ***************************************************************************/
-
-READ8_MEMBER(slapfght_state::slapfight_mcu_r)
-{
-	m_mcu_sent = 0;
-	return m_from_mcu;
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_mcu_w)
-{
-	m_from_main = data;
-	m_main_sent = 1;
-	m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
-
-/**************************************************************************/
-
-READ8_MEMBER(slapfght_state::slapfight_mcu_status_r)
-{
-	int res = 0;
-
-	if (!m_main_sent)
-		res |= 0x02;
-	if (!m_mcu_sent)
-		res |= 0x04;
-
-	return res;
-}
-
-
-/**************************************************************************/
 
 READ8_MEMBER(slapfght_state::slapfight_68705_portA_r)
 {
