@@ -462,12 +462,12 @@ static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 
 int base_md_cart_slot_device::load_nonlist()
 {
-	unsigned char *ROM, *tmpROM;
+	unsigned char *ROM;
 	bool is_smd, is_md;
 	UINT32 tmplen = length(), offset, len;
-
+	dynamic_buffer tmpROM(tmplen);
+	
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
-	tmpROM = global_alloc_array(unsigned char, tmplen);
 	fread(tmpROM, tmplen);
 	is_smd = genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);
 	is_md = (tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G');
@@ -515,8 +515,6 @@ int base_md_cart_slot_device::load_nonlist()
 		fseek(0, SEEK_SET);
 		fread(ROM, len);
 	}
-
-	global_free_array(tmpROM);
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
 	if (len > (tmplen - offset))

@@ -69,7 +69,7 @@ void dp8390_device::check_dma_complete() {
 }
 
 void dp8390_device::do_tx() {
-	UINT8 *buf;
+	dynamic_buffer buf;
 	int i;
 	UINT32 high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
 	if(m_reset) return;
@@ -82,7 +82,7 @@ void dp8390_device::do_tx() {
 		return;
 	}
 
-	buf = global_alloc_array(UINT8, m_regs.tbcr);
+	buf.resize(m_regs.tbcr);
 	for(i = 0; i < m_regs.tbcr; i++) buf[i] = mem_read(high16 + (m_regs.tpsr << 8) + i);
 
 	if(send(buf, m_regs.tbcr)) {
@@ -94,7 +94,6 @@ void dp8390_device::do_tx() {
 	}
 	m_regs.cr &= ~4;
 	check_irq();
-	global_free_array(buf);
 }
 
 void dp8390_device::set_cr(UINT8 newcr) {

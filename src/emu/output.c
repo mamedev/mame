@@ -78,20 +78,6 @@ static void output_exit(running_machine &machine);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-#if 0
-/*-------------------------------------------------
-    copy_string - make a copy of a string
--------------------------------------------------*/
-
-INLINE const char *copy_string(const char *string)
-{
-	char *newstring = global_alloc_array(char, strlen(string) + 1);
-	strcpy(newstring, string);
-	return newstring;
-}
-#endif
-
-
 /*-------------------------------------------------
     get_hash - return the hash of an output value
 -------------------------------------------------*/

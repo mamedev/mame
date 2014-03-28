@@ -630,11 +630,10 @@ bool base_sns_cart_slot_device::call_load()
 		if (software_entry() == NULL)
 		{
 			UINT32 tmplen = length();
-			UINT8 *tmpROM = global_alloc_array(UINT8, tmplen);
+			dynamic_buffer tmpROM(tmplen);
 			fread(tmpROM, tmplen);
 			offset = snes_skip_header(tmpROM, tmplen);
 			fseek(offset, SEEK_SET);
-			global_free_array(tmpROM);
 		}
 
 		len = (software_entry() == NULL) ? (length() - offset) : get_software_region_length("rom");

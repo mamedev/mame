@@ -2137,10 +2137,9 @@ void saturn_state::make_dir_current(UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
-	UINT8 *sect;
+	dynamic_buffer sect(MAX_DIR_SIZE);
 	direntryT *curentry;
 
-	sect = global_alloc_array(UINT8, MAX_DIR_SIZE);
 	memset(sect, 0, MAX_DIR_SIZE);
 	if(sectlenin != 2048)
 		popmessage("Sector Length %d, contact MAMEdev (1)",sectlenin);
@@ -2230,8 +2229,6 @@ void saturn_state::make_dir_current(UINT32 fad)
 			i = numfiles;
 		}
 	}
-
-	global_free_array(sect);
 }
 
 void saturn_state::stvcd_exit( void )

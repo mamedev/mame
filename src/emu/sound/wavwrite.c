@@ -1,4 +1,4 @@
-#include "corealloc.h"
+#include "coretmpl.h"
 #include "sound/wavwrite.h"
 
 struct wav_file
@@ -122,13 +122,13 @@ void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
 
 void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(INT16, samples);
+	/* resize dynamic array */
+	temp.resize(samples);
 	if (!temp)
 		return;
 
@@ -142,21 +142,18 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	/* write and flush */
 	fwrite(temp, 2, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	global_free_array(temp);
 }
 
 
 void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(INT16, samples * 2);
+	/* resize dynamic array */
+	temp.resize(samples * 2);
 	if (!temp)
 		return;
 
@@ -167,21 +164,18 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	/* write and flush */
 	fwrite(temp, 4, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	global_free_array(temp);
 }
 
 
 void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, int shift)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)global_alloc_array(INT16, samples);
+	/* resize dynamic array */
+	temp.resize(samples);
 	if (!temp)
 		return;
 
@@ -196,7 +190,4 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	/* write and flush */
 	fwrite(temp, 4, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	global_free_array(temp);
 }
