@@ -2337,7 +2337,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		if (header == NULL) throw rpk_exception(RPK_MISSING_LAYOUT);
 
 		/* reserve space for the layout file contents (+1 for the termination) */
-		layout_text = (char*)malloc(header->uncompressed_length + 1);
+		layout_text = global_alloc_array(char, header->uncompressed_length + 1);
 		if (layout_text == NULL) throw rpk_exception(RPK_OUT_OF_MEMORY);
 
 		/* uncompress the layout text */
@@ -2429,14 +2429,14 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	{
 		newrpk->close();
 		if (zipfile != NULL)        zip_file_close(zipfile);
-		if (layout_text != NULL)    free(layout_text);
+		if (layout_text != NULL)    global_free_array(layout_text);
 
 		// rethrow the exception
 		throw exp;
 	}
 
 	if (zipfile != NULL)        zip_file_close(zipfile);
-	if (layout_text != NULL)    free(layout_text);
+	if (layout_text != NULL)    global_free_array(layout_text);
 
 	return newrpk;
 }

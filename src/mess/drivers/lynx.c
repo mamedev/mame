@@ -167,18 +167,18 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 	length = header[5] | (header[4]<<8);
 	length -= 10;
 
-	data = (UINT8*)malloc(length);
+	data = global_alloc_array(UINT8, length);
 
 	if (image.fread( data, length) != length)
 	{
-		free(data);
+		global_free_array(data);
 		return IMAGE_INIT_FAIL;
 	}
 
 	for (i = 0; i < length; i++)
 		space.write_byte(start + i, data[i]);
 
-	free(data);
+	global_free_array(data);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;

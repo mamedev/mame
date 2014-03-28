@@ -351,7 +351,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	quick_data = (UINT8*)malloc(quick_length);
+	quick_data = global_alloc_array(UINT8, quick_length);
 	if (!quick_data)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
@@ -383,7 +383,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 			result = IMAGE_INIT_PASS;
 		}
 
-		free( quick_data );
+		global_free_array(quick_data);
 	}
 
 	return result;

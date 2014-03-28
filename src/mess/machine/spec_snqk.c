@@ -114,7 +114,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 {
 	UINT8 *snapshot_data = NULL;
 
-	snapshot_data = (UINT8*)malloc(snapshot_size);
+	snapshot_data = global_alloc_array(UINT8, snapshot_size);
 	if (!snapshot_data)
 		goto error;
 
@@ -233,13 +233,13 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_z80(machine(), snapshot_data, snapshot_size);
 	}
 
-	free(snapshot_data);
+	global_free_array(snapshot_data);
 
 	return IMAGE_INIT_PASS;
 
 error:
 	if (snapshot_data)
-		free(snapshot_data);
+		global_free_array(snapshot_data);
 	return IMAGE_INIT_FAIL;
 }
 
@@ -2455,7 +2455,7 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 {
 	UINT8 *quickload_data = NULL;
 
-	quickload_data = (UINT8*)malloc(quickload_size);
+	quickload_data = global_alloc_array(UINT8, quickload_size);
 	if (!quickload_data)
 		goto error;
 
@@ -2480,13 +2480,13 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_raw(machine(), quickload_data, quickload_size);
 	}
 
-	free(quickload_data);
+	global_free_array(quickload_data);
 
 	return IMAGE_INIT_PASS;
 
 error:
 	if (quickload_data)
-		free(quickload_data);
+		global_free_array(quickload_data);
 	return IMAGE_INIT_FAIL;
 }
 

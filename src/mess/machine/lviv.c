@@ -323,7 +323,7 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
 	UINT8 *lviv_snapshot_data;
 
-	lviv_snapshot_data = (UINT8*)malloc(LVIV_SNAPSHOT_SIZE);
+	lviv_snapshot_data = global_alloc_array(UINT8, LVIV_SNAPSHOT_SIZE);
 	if (!lviv_snapshot_data)
 	{
 		logerror ("Unable to load snapshot file\n");
@@ -334,7 +334,7 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 
 	if(lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
-		free(lviv_snapshot_data);
+		global_free_array(lviv_snapshot_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -342,7 +342,7 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 
 	dump_registers();
 
-	free(lviv_snapshot_data);
+	global_free_array(lviv_snapshot_data);
 
 	logerror("Snapshot file loaded\n");
 	return IMAGE_INIT_PASS;

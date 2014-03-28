@@ -637,7 +637,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	file_data = (UINT8 *)malloc(file_size);
+	file_data = global_alloc_array(UINT8, file_size);
 	if (file_data == NULL)
 	{
 		logerror ("Memory allocating error\n");
@@ -651,7 +651,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 
 	if (chunks_in_file*0x2000+0x09 != file_size)
 	{
-		free (file_data);
+		global_free_array(file_data);
 		logerror ("File corrupted\n");
 		return IMAGE_INIT_FAIL;
 	}
@@ -660,10 +660,10 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 	{
 		case 0x00:  logerror ("DOCK cart\n");
 				timex_cart.type = TIMEX_CART_DOCK;
-				timex_cart.data = (UINT8*) malloc (0x10000);
+				timex_cart.data = global_alloc_array(UINT8, 0x10000);
 				if (!timex_cart.data)
 				{
-					free (file_data);
+					global_free_array(file_data);
 					logerror ("Memory allocate error\n");
 					return IMAGE_INIT_FAIL;
 				}
@@ -684,11 +684,11 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 							memset (timex_cart.data+i*0x2000, 0xff, 0x2000);
 					}
 				}
-				free (file_data);
+				global_free_array(file_data);
 				break;
 
 		default:    logerror ("Cart type not supported\n");
-				free (file_data);
+				global_free_array(file_data);
 				timex_cart.type = TIMEX_CART_NONE;
 				return IMAGE_INIT_FAIL;
 	}
@@ -703,7 +703,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( spectrum_state, timex_cart )
 {
 	if (timex_cart.data)
 	{
-		free (timex_cart.data);
+		global_free_array(timex_cart.data);
 		timex_cart.data = NULL;
 	}
 	timex_cart.type = TIMEX_CART_NONE;

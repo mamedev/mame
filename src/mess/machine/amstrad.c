@@ -3155,7 +3155,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 	if (snapshot_size < 8)
 		return IMAGE_INIT_FAIL;
 
-	snapshot = (UINT8 *)malloc(snapshot_size);
+	snapshot = global_alloc_array(UINT8, snapshot_size);
 	if (!snapshot)
 		return IMAGE_INIT_FAIL;
 
@@ -3164,12 +3164,12 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 
 	if (memcmp(snapshot, "MV - SNA", 8))
 	{
-		free(snapshot);
+		global_free_array(snapshot);
 		return IMAGE_INIT_FAIL;
 	}
 
 	amstrad_handle_snapshot(snapshot);
-	free(snapshot);
+	global_free_array(snapshot);
 	return IMAGE_INIT_PASS;
 }
 

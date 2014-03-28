@@ -694,7 +694,7 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (!(ti8x_snapshot_data = (UINT8*)malloc(snapshot_size)))
+	if (!(ti8x_snapshot_data = global_alloc_array(UINT8, snapshot_size)))
 		return IMAGE_INIT_FAIL;
 
 	image.fread( ti8x_snapshot_data, snapshot_size);
@@ -704,6 +704,6 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	else if (!strncmp(machine().system().name, "ti86", 4))
 		ti86_setup_snapshot(ti8x_snapshot_data);
 
-	free(ti8x_snapshot_data);
+	global_free_array(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;
 }

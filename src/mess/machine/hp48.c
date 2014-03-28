@@ -992,7 +992,7 @@ void hp48_port_image_device::hp48_fill_port()
 	struct hp48_port_interface* conf = (struct hp48_port_interface*) static_config();
 	int size = state->m_port_size[conf->port];
 	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", tag(), conf->module, size, state->m_port_write[conf->port] ));
-	state->m_port_data[conf->port] = (UINT8*)malloc( 2 * size );
+	state->m_port_data[conf->port] = global_alloc_array(UINT8, 2 * size);
 	memset( state->m_port_data[conf->port], 0, 2 * size );
 	state->m_modules[conf->module].off_mask = 2 * (( size > 128 * 1024 ) ? 128 * 1024 : size) - 1;
 	state->m_modules[conf->module].read     = read8_delegate();
@@ -1072,7 +1072,7 @@ void hp48_port_image_device::call_unload()
 		fseek( 0, SEEK_SET );
 		fwrite( state->m_port_data[conf->port], state->m_port_size[conf->port] );
 	}
-	free( state->m_port_data[conf->port] );
+	global_free_array( state->m_port_data[conf->port] );
 	hp48_unfill_port();
 	state->hp48_apply_modules();
 }

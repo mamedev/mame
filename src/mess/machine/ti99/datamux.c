@@ -392,7 +392,7 @@ void ti99_datamux_device::device_start(void)
 
 void ti99_datamux_device::device_stop(void)
 {
-	if (m_ram16b) free(m_ram16b);
+	if (m_ram16b) global_free_array(m_ram16b);
 }
 
 void ti99_datamux_device::device_reset(void)
@@ -410,7 +410,7 @@ void ti99_datamux_device::device_reset(void)
 	// better use a region?
 	if (m_ram16b==NULL)
 	{
-		m_ram16b = (UINT16*)malloc(32768);
+		m_ram16b = global_alloc_array(UINT16, 32768/2);
 		memset(m_ram16b, 0, 32768);
 	}
 

@@ -69,7 +69,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		address = 2049;
 	snapshot_size -= 2;
 
-	data = (UINT8*)malloc(snapshot_size);
+	data = global_alloc_array(UINT8, snapshot_size);
 	if (!data)
 		goto error;
 
@@ -81,12 +81,12 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		space.write_byte(address + i + offset, data[i]);
 
 	cbm_sethiaddress(space, address + snapshot_size);
-	free(data);
+	global_free_array(data);
 	return IMAGE_INIT_PASS;
 
 error:
 	if (data)
-		free(data);
+		global_free_array(data);
 	return IMAGE_INIT_FAIL;
 }
 

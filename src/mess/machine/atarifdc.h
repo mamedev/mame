@@ -32,7 +32,7 @@ private:
 
 	struct atari_drive
 	{
-		UINT8 *image;       /* malloc'd image */
+		UINT8 *image;       /* alloc'd image */
 		int type;           /* type of image (XFD, ATR, DSK) */
 		int mode;           /* 0 read only, != 0 read/write */
 		int density;        /* 0 SD, 1 MD, 2 DD */

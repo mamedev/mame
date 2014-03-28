@@ -265,11 +265,11 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 						lba |= m_command[2] << 8;
 						lba |= (m_command[1] & 0x1f) << 16;
 						fseek(lba * 256,SEEK_SET);
-						blk = (char*)malloc(256*33);
+						blk = global_alloc_array(char, 256*33);
 						memset(blk,0,256*33);
 						// formats 33 256-byte blocks
 						fwrite(blk,256*33);
-						free(blk);
+						global_free_array(blk);
 						logerror("SASI: FORMAT UNIT (LBA 0x%06x)\n",lba);
 					break;
 				default:

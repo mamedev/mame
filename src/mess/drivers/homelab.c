@@ -657,12 +657,11 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	int read_;
 
 	quick_length = image.length();
-	quick_data = (UINT8*)malloc(quick_length);
+	quick_data = global_alloc_array(UINT8, quick_length);
 	if (!quick_data)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
 		image.message(" Cannot open file");
-		free(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -671,7 +670,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
-		free(quick_data);
+		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -681,7 +680,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
 		image.message(" Invalid header");
-		free(quick_data);
+		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -691,7 +690,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 			image.message(" File name too long");
-			free(quick_data);
+			global_free_array(quick_data);
 			return IMAGE_INIT_FAIL;
 		}
 
@@ -705,7 +704,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
 		image.message(" Unexpected EOF while getting file size");
-		free(quick_data);
+		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -717,7 +716,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too large");
 		image.message(" File too large");
-		free(quick_data);
+		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -733,13 +732,13 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			free(quick_data);
+			global_free_array(quick_data);
 			return IMAGE_INIT_FAIL;
 		}
 		space.write_byte(j, ch);
 	}
 
-	free(quick_data);
+	global_free_array(quick_data);
 	return IMAGE_INIT_PASS;
 }
 
