@@ -316,8 +316,6 @@ static const mc6847_interface spc1000_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(spc1000_state,spc1000_mc6847_videoram_r),   // data fetch
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(spc1000_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                 /* AG */
 	DEVCB_LINE_VCC,             /* GM2 */
@@ -340,7 +338,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, spc1000_mc6847_intf)
-
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)

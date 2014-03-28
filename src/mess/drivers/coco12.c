@@ -299,7 +299,9 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 	// video hardware
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, VDG_TAG)
 	MCFG_MC6847_ADD(VDG_TAG, MC6847_NTSC, XTAL_3_579545MHz, coco12_state::mc6847_config)
-
+	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(coco12_state, horizontal_sync))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(coco12_state, field_sync))
+	
 	// sound hardware
 	MCFG_FRAGMENT_ADD( coco_sound )
 

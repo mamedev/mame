@@ -400,8 +400,6 @@ static const mc6847_interface sv8000_mc6847_interface =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(sv8000_state,mc6847_videoram_r),   // data fetch
-	DEVCB_NULL,
-	DEVCB_NULL,
 
 	DEVCB_NULL,                 /* AG */
 	DEVCB_NULL,                 /* GM2 */

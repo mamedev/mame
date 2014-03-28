@@ -444,8 +444,6 @@ static const mc6847_interface z80net_mc6847_intf =
 {
 	"lx388",
 	DEVCB_DRIVER_MEMBER(z80ne_state, lx388_mc6847_videoram_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 
 	DEVCB_LINE_GND,             /* AG */
 	DEVCB_LINE_GND,             /* GM2 */

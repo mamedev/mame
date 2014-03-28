@@ -37,6 +37,14 @@
 	MCFG_SCREEN_SIZE(320, 243)                                  \
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
 	MCFG_SCREEN_VBLANK_TIME(0)
+
+#define MCFG_MC6847_HSYNC_CALLBACK(_write) \
+	devcb = &mc6847_friend_device::set_hsync_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC6847_FSYNC_CALLBACK(_write) \
+	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB2_##_write);
+
+	
 /* interface */
 struct mc6847_interface
 {
@@ -45,12 +53,6 @@ struct mc6847_interface
 
 	/* if specified, this gets called whenever reading a byte (offs_t ~0 specifies DA* entering the tristate mode) */
 	devcb_read8                 m_input_func;
-
-	/* if specified, this gets called for every change of the HS pin (pin 38) */
-	devcb_write_line            m_out_hsync_func;
-
-	/* if specified, this gets called for every change of the FS pin (pin 37) */
-	devcb_write_line            m_out_fsync_func;
 
 	/* mode control lines input */
 	devcb_read_line             m_in_ag_func;
@@ -85,6 +87,9 @@ public:
 	// inlines
 	bool hs_r(void)                 { return m_horizontal_sync; }
 	bool fs_r(void)                 { return m_field_sync; }
+
+	template<class _Object> static devcb2_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_hsync.set_callback(object); }
+	template<class _Object> static devcb2_base &set_fsync_wr_callback(device_t &device, _Object object) { return downcast<mc6847_friend_device &>(device).m_write_fsync.set_callback(object); }
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
@@ -266,8 +271,8 @@ protected:
 	};
 
 	// callbacks
-	devcb_resolved_write_line m_res_out_hsync_func;
-	devcb_resolved_write_line m_res_out_fsync_func;
+	devcb2_write_line   m_write_hsync;
+	devcb2_write_line   m_write_fsync;
 
 	// incidentals
 	character_map m_character_map;

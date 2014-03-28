@@ -126,9 +126,7 @@ void coco12_state::update_cart_base(UINT8 *cart_base)
 const mc6847_interface coco12_state::mc6847_config =
 {
 	SCREEN_TAG,
-	DEVCB_DEVICE_MEMBER(SAM_TAG, sam6883_device, display_read),
-	DEVCB_DRIVER_LINE_MEMBER(coco12_state, horizontal_sync),
-	DEVCB_DRIVER_LINE_MEMBER(coco12_state, field_sync)
+	DEVCB_DEVICE_MEMBER(SAM_TAG, sam6883_device, display_read)
 };
 
 

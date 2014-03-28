@@ -906,8 +906,6 @@ static const mc6847_interface vtech1_mc6847_bw_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,                                 /* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
 
 	DEVCB_NULL,                                 /* AG */
 	DEVCB_LINE_GND,                             /* GM2 */
@@ -925,9 +923,7 @@ static const mc6847_interface vtech1_mc6847_bw_intf =
 static const mc6847_interface vtech1_mc6847_intf =
 {
 	"screen",
-	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,                                 /* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
+	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),	
 
 	DEVCB_NULL,                                 /* AG */
 	DEVCB_LINE_GND,                             /* GM2 */
@@ -946,8 +942,6 @@ static const mc6847_interface vtech1_shrg_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(vtech1_state,vtech1_mc6847_videoram_r),
-	DEVCB_NULL,                                 /* horz sync */
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),         /* field sync */
 
 	DEVCB_NULL,                                 /* AG */
 	DEVCB_NULL,                                 /* GM2 */
@@ -969,6 +963,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_bw_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))	
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1004,6 +999,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	MCFG_DEVICE_REMOVE("mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_mc6847_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))	
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( laser210, laser200 )
@@ -1032,6 +1028,7 @@ static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
 	MCFG_CPU_IO_MAP(vtech1_shrg_io)
 	MCFG_DEVICE_REMOVE("mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz, vtech1_shrg_mc6847_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0))	
 MACHINE_CONFIG_END
 
 
