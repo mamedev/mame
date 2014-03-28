@@ -80,10 +80,13 @@
 
 **************************************************************************
 
-  Custom IC's...
-
-  (soon...)
-
+  TODO:
+  
+  - Proper UM487F device emulation.
+  - Interlaced video mode.
+  - Sound.
+  - More work...
+  
 *************************************************************************/
 
 #define MAIN_CLOCK           XTAL_16MHz
@@ -119,6 +122,10 @@ public:
 	DECLARE_WRITE8_MEMBER(crtc_config_w);
 	DECLARE_WRITE8_MEMBER(crtc_mode_ctrl_w);
 	DECLARE_WRITE8_MEMBER(crtc_colormode_w);
+	DECLARE_READ8_MEMBER(crtc_status_r);
+	DECLARE_READ8_MEMBER(unk_e000_r);
+	DECLARE_READ8_MEMBER(unk_e001_r);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -138,27 +145,27 @@ public:
 
 void _4enlinea_state::video_start()
 {
-
 	m_gfxdecode->gfx(0)->set_source(m_videoram);
 }
 
 UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+/* note: chars are 16*12 pixels */
+
 	int offset = 0;
 		
 	for (int y = 0; y < 200; y++)
 	{
 		UINT16* dstptr_bitmap = &bitmap.pix16(y);
 
-		for (int x = 0; x < 320; x+=4)
+		for (int x = 0; x < 320; x += 4)
 		{
 			UINT8 pix = m_videoram[offset++];
 
-			dstptr_bitmap[x+3] = (pix>>0)&0x3;
-			dstptr_bitmap[x+2] = (pix>>2)&0x3;
-			dstptr_bitmap[x+1] = (pix>>4)&0x3;
-			dstptr_bitmap[x+0] = (pix>>6)&0x3;
-
+			dstptr_bitmap[x + 3] = (pix >> 0) & 0x3;
+			dstptr_bitmap[x + 2] = (pix >> 2) & 0x3;
+			dstptr_bitmap[x + 1] = (pix >> 4) & 0x3;
+			dstptr_bitmap[x + 0] = (pix >> 6) & 0x3;
 		}
 	}
 
@@ -195,6 +202,43 @@ WRITE8_MEMBER(_4enlinea_state::crtc_colormode_w)
 	logerror("CRTC color mode (3D9h): %02x\n", data);
 }
 
+READ8_MEMBER(_4enlinea_state::crtc_status_r)
+{
+/*----- bits -----
+  7 6 5 4  3 2 1 0   For CGA Mode.
+  x x x x  - - - -  (bits 4-5-6-7 are unused)
+           | | | |
+           | | | '-- 0: Display active period.
+           | | |     1: Non-display period.
+           | | |
+           | | '---- 0: Light pen reset.
+           | |       1: Light pen set.
+           | |
+           | '------ 0: Light pen switch off.
+           |         1: Light pen switch on.
+           |
+           '-------- 0: Non-vertical sync period.
+                     1: Vertical sync period.
+
+*/
+	logerror("CRTC status read\n");
+	return (machine().rand() & 0x80);	/* bit 7 ??? (is suppossed to be unused inCGA mode) */
+}
+
+READ8_MEMBER(_4enlinea_state::unk_e000_r)
+{
+	logerror("read e000\n");
+//	return (machine().rand() & 0xff);
+	return 0xff;
+}
+
+READ8_MEMBER(_4enlinea_state::unk_e001_r)
+{
+	logerror("read e001\n");
+//	return (machine().rand() & 0xff);	// after 30 seconds, random strings and gfx appear on the screen.
+	return (machine().rand() & 0x0f);	// after 30 seconds, random gfx appear on the screen.
+}
+
 
 /***********************************
 *      Memory Map Information      *
@@ -202,12 +246,11 @@ WRITE8_MEMBER(_4enlinea_state::crtc_colormode_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(unk_e000_r)
+	AM_RANGE(0xe001, 0xe001) AM_READ(unk_e001_r)
 
 ADDRESS_MAP_END
 
@@ -219,6 +262,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
 	AM_RANGE(0xd5, 0xd5) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(crtc_mode_ctrl_w)
 	AM_RANGE(0xd9, 0xd9) AM_WRITE(crtc_colormode_w)
+	AM_RANGE(0xda, 0xda) AM_READ(crtc_status_r)
 	AM_RANGE(0xbf, 0xbf) AM_WRITE(crtc_config_w)
 
 ADDRESS_MAP_END
@@ -227,7 +271,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
