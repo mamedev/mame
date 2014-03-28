@@ -2763,7 +2763,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				if(vga.svga_intf.vram_size == 0x80000)
 					res |= 0xe0;
 				else if(vga.svga_intf.vram_size == 0x100000)
-					res |= 0xd0;
+					res |= 0xc0;
 				else if(vga.svga_intf.vram_size == 0x200000)
 					res |= 0x80;
 				else if(vga.svga_intf.vram_size == 0x400000)
