@@ -1351,7 +1351,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_adc(*this, "subcpu:adc"),
-		m_sci0(*this, "subcpu:sci0"),
 		m_iocpu(*this, "iocpu"),
 		m_rtc(*this, "rtc"),
 		m_settings(*this, "namco_settings"),
@@ -1375,7 +1374,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<h83002_device> m_subcpu;
 	required_device<h8_adc_device> m_adc;
-	required_device<h8_sci_device> m_sci0;
 	optional_device<h83334_device> m_iocpu;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
@@ -1440,7 +1438,6 @@ public:
 	int m_s23_porta;
 	int m_s23_lastpb;
 	UINT8 m_s23_tssio_port_4;
-	bool jvs_timer_state;
 
 	void update_main_interrupts(UINT32 cause);
 	void update_mixer();
@@ -1499,7 +1496,6 @@ public:
 	UINT32 screen_update_s23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(jvs_timer);
 	void namcos23_sub_irq(screen_device &screen, bool state);
 	UINT8 nthbyte(const UINT32 *pSource, int offs);
 	UINT16 nthword(const UINT32 *pSource, int offs);
@@ -3198,14 +3194,7 @@ void namcos23_state::machine_start()
 
 void namcos23_state::machine_reset()
 {
-	jvs_timer_state = false;
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(namcos23_state::jvs_timer)
-{
-	jvs_timer_state = !jvs_timer_state;
-	m_sci0->clk_w(jvs_timer_state);
 }
 
 MACHINE_RESET_MEMBER(namcos23_state,gmen)
@@ -3310,8 +3299,9 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	// Timer at 115200*16 for the jvs serial clock, extra *2 to have both edges
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
+	// Timer at 115200*16 for the jvs serial clock
+	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(S23_JVSCLOCK/8))
 
 	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
@@ -3322,7 +3312,7 @@ static MACHINE_CONFIG_START( gorgon, namcos23_state )
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
@@ -3377,7 +3367,9 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
+	// Timer at 115200*16 for the jvs serial clock
+	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(S23_JVSCLOCK/8))
 
 	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( s23iobrdmap )
@@ -3388,7 +3380,7 @@ static MACHINE_CONFIG_START( s23, namcos23_state )
 	MCFG_DEVICE_MODIFY("subcpu:sci0")
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
@@ -3463,9 +3455,11 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 	MCFG_CPU_PROGRAM_MAP( s23h8rwmap )
 	MCFG_CPU_IO_MAP( s23h8iomap )
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("jvs_timer", namcos23_state, jvs_timer, attotime::from_hz(S23_JVSCLOCK/8*2))
+	// Timer at 115200*16 for the jvs serial clock
+	MCFG_DEVICE_MODIFY(":subcpu:sci0")
+	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(S23_JVSCLOCK/8))
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
@@ -3508,7 +3502,6 @@ static MACHINE_CONFIG_START( ss23, namcos23_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, S23_JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )

@@ -214,7 +214,7 @@ protected:
 
 	int inst_state, inst_substate;
 	int icount, bcount;
-	UINT64 end_cycles;
+	UINT64 start_cycles, end_cycles;
 	int irq_vector, taken_irq_vector;
 	int irq_level, taken_irq_level;
 	bool irq_required, irq_nmi;

@@ -47,6 +47,9 @@
 	MCFG_DEVICE_ADD( _tag, H8_SCI, 0 ) \
 	downcast<h8_sci_device *>(device)->set_info(intc, eri, rxi, txi, tei);
 
+#define MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(_period) \
+	downcast<h8_sci_device *>(device)->set_external_clock_period(_period);
+
 #define MCFG_H8_SCI_TX_CALLBACK(_devcb) \
 	devcb = &h8_sci_device::set_tx_cb(*device, DEVCB2_##_devcb);
 
@@ -58,6 +61,7 @@ public:
 	h8_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
+	void set_external_clock_period(attotime _period);
 
 	DECLARE_WRITE8_MEMBER(smr_w);
 	DECLARE_READ8_MEMBER(smr_r);
@@ -86,6 +90,8 @@ protected:
 		ST_IDLE, ST_START, ST_BIT, ST_PARITY, ST_STOP, ST_LAST_TICK,
 	};
 
+	static const char *const state_names[];
+
 	enum {
 		CLK_TX = 1,
 		CLK_RX = 2
@@ -95,8 +101,10 @@ protected:
 		CLKM_INTERNAL_ASYNC,
 		CLKM_INTERNAL_ASYNC_OUT,
 		CLKM_EXTERNAL_ASYNC,
+		CLKM_EXTERNAL_RATE_ASYNC,
 		CLKM_INTERNAL_SYNC_OUT,
-		CLKM_EXTERNAL_SYNC
+		CLKM_EXTERNAL_SYNC,
+		CLKM_EXTERNAL_RATE_SYNC
 	};
 
 	enum {
@@ -129,8 +137,12 @@ protected:
 	};
 
 	required_device<h8_device> cpu;
+	devcb2_write_line tx_cb, clk_cb;
 	h8_intc_device *intc;
 	const char *intc_tag;
+	attotime external_clock_period, cur_sync_time;
+	double external_to_internal_ratio, internal_to_external_ratio;
+	emu_timer *sync_timer;
 
 	int eri_int, rxi_int, txi_int, tei_int;
 
@@ -140,10 +152,10 @@ protected:
 	UINT8 rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
 	UINT64 clock_base, divider;
 
-	devcb2_write_line tx_cb, clk_cb;
 
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void clock_start(int mode);
 	void clock_stop(int mode);
