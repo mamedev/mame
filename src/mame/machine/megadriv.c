@@ -967,12 +967,11 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
+	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf )
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1014,12 +1013,11 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( sms_vdp_pal_intf )
+	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_pal_intf )
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

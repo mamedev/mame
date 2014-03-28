@@ -1357,13 +1357,12 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf)
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_sndirqline_callback_segac2));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_lv6irqline_callback_segac2));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
+	MCFG_SEGAGEN_VDP_ALT_TIMING(1);
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_sndirqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv6irqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
 
 	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 

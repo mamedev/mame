@@ -145,7 +145,27 @@
 #define MEGADRIVE_REG17_DMATYPE         ((m_vdp_regs[0x17]&0xc0)>>6)
 #define MEGADRIVE_REG17_UNUSED          ((m_vdp_regs[0x17]&0x3f)>>0)
 
+#define MCFG_SEGAGEN_VDP_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, SEGA_GEN_VDP, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
+#define MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(_write) \
+	devcb = &sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_##_write);
+ 
+#define MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(_write) \
+	devcb = &sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_##_write);
+ 
+#define MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(_write) \
+	devcb = &sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_##_write);
+ 
+#define MCFG_SEGAGEN_VDP_ALT_TIMING(_data) \
+	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, _data);
+ 
+#define MCFG_SEGAGEN_VDP_PAL_WRITE_BASE(_data) \
+	sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(*device, _data);
+ 
+#define MCFG_SEGAGEN_VDP_PALETTE(_palette_tag) \
+	sega_genesis_vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
 

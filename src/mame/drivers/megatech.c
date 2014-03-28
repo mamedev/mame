@@ -637,12 +637,11 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_main)
 
 	MCFG_DEVICE_REMOVE("gen_vdp")
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( main_vdp_intf )
+	MCFG_SEGAGEN_VDP_ADD("gen_vdp", main_vdp_intf )
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("menu", RASTER)
 	// check frq
