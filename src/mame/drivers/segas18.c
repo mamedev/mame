@@ -1192,15 +1192,15 @@ GFXDECODE_END
 
 
 // are any of the VDP interrupt lines hooked up to anything?
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_sndirqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_sndirqline_callback_s18)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv6irqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_lv6irqline_callback_s18)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv4irqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
 {
 }
 
@@ -1234,9 +1234,9 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 
 	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf )
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segas18_state, genesis_vdp_sndirqline_callback_segas18));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, genesis_vdp_lv6irqline_callback_segas18));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, genesis_vdp_lv4irqline_callback_segas18));
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));
 	MCFG_SEGAGEN_VDP_ALT_TIMING(1);
 	MCFG_SEGAGEN_VDP_PAL_WRITE_BASE(0x2000);
 	MCFG_SEGAGEN_VDP_PALETTE("palette")

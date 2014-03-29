@@ -118,9 +118,9 @@ public:
 	read8_delegate m_megadrive_io_read_data_port_ptr;
 	write16_delegate m_megadrive_io_write_data_port_ptr;
 
-	WRITE_LINE_MEMBER(genesis_vdp_sndirqline_callback_genesis_z80);
-	WRITE_LINE_MEMBER(genesis_vdp_lv6irqline_callback_genesis_68k);
-	WRITE_LINE_MEMBER(genesis_vdp_lv4irqline_callback_genesis_68k);
+	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
+	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
+	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
 
 	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
 	void megadrive_reset_io();
@@ -250,9 +250,9 @@ public:
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
 
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_sndirqline_callback_segac2);
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv6irqline_callback_segac2);
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv4irqline_callback_segac2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
 
 	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
 	DECLARE_READ16_MEMBER( palette_r );

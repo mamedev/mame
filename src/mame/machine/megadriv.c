@@ -881,7 +881,7 @@ void md_base_state::megadriv_stop_scanline_timer()
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_sndirqline_callback_genesis_z80)
+WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 {
 	if (m_z80snd)
 	{
@@ -897,7 +897,7 @@ WRITE_LINE_MEMBER(md_base_state::genesis_vdp_sndirqline_callback_genesis_z80)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv6irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -906,7 +906,7 @@ WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv6irqline_callback_genesis_68k)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv4irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -968,9 +968,9 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf )
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
@@ -1014,9 +1014,9 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
 	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_pal_intf )
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)

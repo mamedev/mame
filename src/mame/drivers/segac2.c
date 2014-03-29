@@ -1319,22 +1319,22 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_sndirqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
 {
-	if (state==ASSERT_LINE)
+	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv6irqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv4irqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 {
-	if (state==ASSERT_LINE)
+	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	else
 		m_maincpu->set_input_line(4, CLEAR_LINE);
@@ -1358,9 +1358,9 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_sndirqline_callback_segac2));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_lv6irqline_callback_segac2));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_sndirqline_callback_c2));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv6irqline_callback_c2));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv4irqline_callback_c2));
 	MCFG_SEGAGEN_VDP_ALT_TIMING(1);
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 

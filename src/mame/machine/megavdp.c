@@ -19,9 +19,9 @@ const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
 
 sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega315_5124_device( mconfig, SEGA315_5246, "Sega Genesis VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega_genesis_vdp", __FILE__),
-	m_genesis_vdp_sndirqline_callback(*this),
-	m_genesis_vdp_lv6irqline_callback(*this),
-	m_genesis_vdp_lv4irqline_callback(*this)
+	m_sndirqline_callback(*this),
+	m_lv6irqline_callback(*this),
+	m_lv4irqline_callback(*this)
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
@@ -56,14 +56,14 @@ machine_config_constructor sega_genesis_vdp_device::device_mconfig_additions() c
 static TIMER_CALLBACK( megadriv_render_timer_callback )
 {
 	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
-	vdp->genesis_render_scanline();
+	vdp->render_scanline();
 }
 
 void sega_genesis_vdp_device::vdp_handle_irq6_on_timer_callback(int param)
 {
 // megadrive_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
-		m_genesis_vdp_lv6irqline_callback(true);
+		m_lv6irqline_callback(true);
 }
 
 static TIMER_CALLBACK( irq6_on_timer_callback )
@@ -74,7 +74,7 @@ static TIMER_CALLBACK( irq6_on_timer_callback )
 
 void sega_genesis_vdp_device::vdp_handle_irq4_on_timer_callback(int param)
 {
-	m_genesis_vdp_lv4irqline_callback(true);
+	m_lv4irqline_callback(true);
 }
 
 static TIMER_CALLBACK( irq4_on_timer_callback )
@@ -86,13 +86,13 @@ static TIMER_CALLBACK( irq4_on_timer_callback )
 
 
 
-void sega_genesis_vdp_device::set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing)
+void sega_genesis_vdp_device::set_alt_timing(device_t &device, int use_alt_timing)
 {
 	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
 	dev.m_use_alt_timing = use_alt_timing;
 }
 
-void sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base)
+void sega_genesis_vdp_device::set_palwrite_base(device_t &device, int palwrite_base)
 {
 	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
 	dev.m_palwrite_base = palwrite_base;
@@ -103,9 +103,9 @@ void sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(device_t &device, in
 
 void sega_genesis_vdp_device::device_start()
 {
-	m_genesis_vdp_sndirqline_callback.resolve_safe();
-	m_genesis_vdp_lv6irqline_callback.resolve_safe();
-	m_genesis_vdp_lv4irqline_callback.resolve_safe();
+	m_sndirqline_callback.resolve_safe();
+	m_lv6irqline_callback.resolve_safe();
+	m_lv4irqline_callback.resolve_safe();
 
 	m_32x_scanline_func.bind_relative_to(*owner());
 	m_32x_interrupt_func.bind_relative_to(*owner());
@@ -412,9 +412,9 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				m_genesis_vdp_lv4irqline_callback(true);
+				m_lv4irqline_callback(true);
 			else
-				m_genesis_vdp_lv4irqline_callback(false);
+				m_lv4irqline_callback(false);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -429,9 +429,9 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE )
-				m_genesis_vdp_lv6irqline_callback(true);
+				m_lv6irqline_callback(true);
 			else
-				m_genesis_vdp_lv6irqline_callback(false);
+				m_lv6irqline_callback(false);
 
 		}
 
@@ -505,7 +505,7 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
    as the 68k address bus isn't accessed */
 
 /* Wani Wani World, James Pond 3, Pirates Gold! */
-void sega_genesis_vdp_device::megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
+void sega_genesis_vdp_device::insta_vram_copy(UINT32 source, UINT16 length)
 {
 	int x;
 
@@ -533,7 +533,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_vram_copy(UINT32 source, UINT16
 }
 
 /* Instant, but we pause the 68k a bit */
-void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
+void sega_genesis_vdp_device::insta_68k_to_vram_dma(UINT32 source,int length)
 {
 	int count;
 
@@ -560,7 +560,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vram_dma(UINT32 source,i
 }
 
 
-void sega_genesis_vdp_device::megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
+void sega_genesis_vdp_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -588,7 +588,7 @@ void sega_genesis_vdp_device::megadrive_do_insta_68k_to_cram_dma(UINT32 source,U
 
 }
 
-void sega_genesis_vdp_device::megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
+void sega_genesis_vdp_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -643,7 +643,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 
 			/* The 68k is frozen during this transfer, it should be safe to throw a few cycles away and do 'instant' DMA because the 68k can't detect it being in progress (can the z80?) */
 			//mame_printf_debug("68k->VRAM DMA transfer source %06x length %04x dest %04x enabled %01x\n", source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE);
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_68k_to_vram_dma(source,length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) insta_68k_to_vram_dma(source,length);
 
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x2)
@@ -663,7 +663,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8)); // length in bytes
 			//mame_printf_debug("setting vram copy mode length registers are %02x %02x other regs! %02x %02x %02x(Mode Bits %02x) Enable %02x\n", MEGADRIVE_REG13_DMALENGTH1, MEGADRIVE_REG14_DMALENGTH2, MEGADRIVE_REG15_DMASOURCE1, MEGADRIVE_REG16_DMASOURCE2, MEGADRIVE_REG17_DMASOURCE3, MEGADRIVE_REG17_DMATYPE, MEGADRIVE_REG01_DMA_ENABLE);
 
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_vram_copy(source, length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) insta_vram_copy(source, length);
 		}
 	}
 	else if (m_vdp_code==0x23)
@@ -677,7 +677,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 
 			/* The 68k is frozen during this transfer, it should be safe to throw a few cycles away and do 'instant' DMA because the 68k can't detect it being in progress (can the z80?) */
 			//mame_printf_debug("68k->CRAM DMA transfer source %06x length %04x dest %04x enabled %01x\n", source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE);
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_68k_to_cram_dma(source,length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) insta_68k_to_cram_dma(source,length);
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x2)
 		{
@@ -704,7 +704,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 
 			/* The 68k is frozen during this transfer, it should be safe to throw a few cycles away and do 'instant' DMA because the 68k can't detect it being in progress (can the z80?) */
 			//mame_printf_debug("68k->VSRAM DMA transfer source %06x length %04x dest %04x enabled %01x\n", source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE);
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_68k_to_vsram_dma(source,length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) insta_68k_to_vsram_dma(source,length);
 		}
 		else if (MEGADRIVE_REG17_DMATYPE==0x2)
 		{
@@ -742,7 +742,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 			length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8)); // length in bytes
 			//mame_printf_debug("setting vram copy mode length registers are %02x %02x other regs! %02x %02x %02x(Mode Bits %02x) Enable %02x\n", MEGADRIVE_REG13_DMALENGTH1, MEGADRIVE_REG14_DMALENGTH2, MEGADRIVE_REG15_DMASOURCE1, MEGADRIVE_REG16_DMASOURCE2, MEGADRIVE_REG17_DMASOURCE3, MEGADRIVE_REG17_DMATYPE, MEGADRIVE_REG01_DMA_ENABLE);
 
-			if (MEGADRIVE_REG01_DMA_ENABLE) megadrive_do_insta_vram_copy(source, length);
+			if (MEGADRIVE_REG01_DMA_ENABLE) insta_vram_copy(source, length);
 		}
 	}
 }
@@ -1290,7 +1290,7 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 
 */
 
-void sega_genesis_vdp_device::genesis_render_spriteline_to_spritebuffer(int scanline)
+void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 {
 	int screenwidth;
 	int maxsprites=0;
@@ -1480,7 +1480,7 @@ void sega_genesis_vdp_device::genesis_render_spriteline_to_spritebuffer(int scan
 }
 
 /* Clean up this function (!) */
-void sega_genesis_vdp_device::genesis_render_videoline_to_videobuffer(int scanline)
+void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 {
 	UINT16 base_a;
 	UINT16 base_w=0;
@@ -2504,7 +2504,7 @@ void sega_genesis_vdp_device::genesis_render_videoline_to_videobuffer(int scanli
 
 
 /* This converts our render buffer to real screen colours */
-void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int scanline)
+void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
 {
 	UINT16 *lineptr;
 
@@ -2591,16 +2591,16 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int sca
 	}
 }
 
-void sega_genesis_vdp_device::genesis_render_scanline()
+void sega_genesis_vdp_device::render_scanline()
 {
 	int scanline = genesis_get_scanline_counter();
 
 	if (scanline >= 0 && scanline < m_visible_scanlines)
 	{
 		//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
-		genesis_render_spriteline_to_spritebuffer(genesis_get_scanline_counter());
-		genesis_render_videoline_to_videobuffer(scanline);
-		genesis_render_videobuffer_to_screenbuffer(scanline);
+		render_spriteline_to_spritebuffer(genesis_get_scanline_counter());
+		render_videoline_to_videobuffer(scanline);
+		render_videobuffer_to_screenbuffer(scanline);
 	}
 }
 
@@ -2660,11 +2660,11 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 
 		if (genesis_get_scanline_counter() == m_z80irq_scanline)
 		{
-			m_genesis_vdp_sndirqline_callback(true);
+			m_sndirqline_callback(true);
 		}
 		if (genesis_get_scanline_counter() == m_z80irq_scanline + 1)
 		{
-			m_genesis_vdp_sndirqline_callback(false);
+			m_sndirqline_callback(false);
 		}
 	}
 	else /* pretend we're still on the same scanline to compensate for rounding errors */

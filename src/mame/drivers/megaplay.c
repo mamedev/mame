@@ -618,9 +618,9 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 
 	MCFG_DEVICE_REMOVE("gen_vdp")
 	MCFG_SEGAGEN_VDP_ADD("gen_vdp", bios_vdp_intf)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 MACHINE_CONFIG_END
 
