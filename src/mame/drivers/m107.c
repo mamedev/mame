@@ -2,7 +2,7 @@
 
     Irem M107 games:
 
-    Fire Barrel                             (c) 1993 Irem Corporation
+    Air Assault / Fire Barrel               (c) 1993 Irem Corporation
     Dream Soccer '94                        (c) 1994 Data East Corporation
     Kick for the Goal                       (c) 1994 Jaleco
     World PK Soccer                         (c) 1995 Jaleco
@@ -821,8 +821,7 @@ static MACHINE_CONFIG_DERIVED( airass, firebarr )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table) // need the right table
-
+	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
