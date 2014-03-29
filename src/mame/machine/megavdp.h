@@ -143,9 +143,15 @@
 #define MEGADRIVE_REG17_DMATYPE         ((m_vdp_regs[0x17]&0xc0)>>6)
 #define MEGADRIVE_REG17_UNUSED          ((m_vdp_regs[0x17]&0x3f)>>0)
 
-#define MCFG_SEGAGEN_VDP_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, SEGA_GEN_VDP, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+
+#define MCFG_SEGAGEN_VDP_IS_PAL(_bool) \
+	sega_genesis_vdp_device::set_signal_type(*device, _bool);
+
+#define MCFG_SEGAGEN_VDP_INT_CB(_devcb) \
+	devcb = &sega_genesis_vdp_device::set_int_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_SEGAGEN_VDP_PAUSE_CB(_devcb) \
+	devcb = &sega_genesis_vdp_device::set_pause_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(_write) \
 	devcb = &sega_genesis_vdp_device::set_sndirqline_callback(*device, DEVCB2_##_write);

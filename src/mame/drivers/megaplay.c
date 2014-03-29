@@ -586,13 +586,6 @@ WRITE_LINE_MEMBER( mplay_state::bios_int_callback )
 	m_bioscpu->set_input_line(0, state);
 }
 
-static const sega315_5124_interface bios_vdp_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(mplay_state, bios_int_callback),
-	DEVCB_NULL,
-};
-
 static MACHINE_CONFIG_START( megaplay, mplay_state )
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
@@ -616,12 +609,8 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
-	MCFG_DEVICE_REMOVE("gen_vdp")
-	MCFG_SEGAGEN_VDP_ADD("gen_vdp", bios_vdp_intf)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_VIDEO_SET_SCREEN("megadriv")
+	MCFG_DEVICE_MODIFY("gen_vdp")
+	MCFG_SEGAGEN_VDP_INT_CB(WRITELINE(mplay_state, bios_int_callback))
 MACHINE_CONFIG_END
 
 

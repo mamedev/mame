@@ -410,28 +410,6 @@ WRITE_LINE_MEMBER(sms_state::sms_int_callback)
 	m_maincpu->set_input_line(0, state);
 }
 
-static const sega315_5124_interface _315_5124_ntsc_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
-static const sega315_5124_interface _315_5124_pal_intf =
-{
-	true,
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
-static const sega315_5124_interface sms_store_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(smssdisp_state,sms_store_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
-
 static SLOT_INTERFACE_START(sms_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
 	SLOT_INTERFACE_INTERNAL("codemasters",  SEGA8_ROM_CODEMASTERS)
@@ -530,9 +508,13 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
@@ -566,8 +548,11 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(false)
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
@@ -598,8 +583,11 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	MCFG_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
@@ -690,8 +678,11 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 		SEGA315_5124_HEIGHT_PAL, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(true)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
@@ -726,8 +717,11 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(true)
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
@@ -793,8 +787,11 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 
-	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")
+	MCFG_SEGA315_5378_IS_PAL(false)
+	MCFG_SEGA315_5378_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")

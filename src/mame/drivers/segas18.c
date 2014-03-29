@@ -1210,13 +1210,6 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *
  *************************************/
 
-static const sega315_5124_interface sms_vdp_ntsc_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
 static MACHINE_CONFIG_START( system18, segas18_state )
 
 	// basic machine hardware
@@ -1233,7 +1226,8 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 
-	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf )
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_SEGAGEN_VDP_IS_PAL(false)
 	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
 	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
 	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));

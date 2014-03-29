@@ -158,6 +158,9 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
+	, m_is_pal(false)
+	, m_int_cb(*this)
+	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
@@ -171,6 +174,9 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
+	, m_is_pal(false)
+	, m_int_cb(*this)
+	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
@@ -328,8 +334,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			{
 				m_irq_state = 1;
 
-				if ( !m_cb_int.isnull() )
-					m_cb_int(ASSERT_LINE);
+				if ( !m_int_cb.isnull() )
+					m_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -341,8 +347,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			{
 				m_irq_state = 1;
 
-				if ( !m_cb_int.isnull() )
-					m_cb_int(ASSERT_LINE);
+				if ( !m_int_cb.isnull() )
+					m_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -369,8 +375,8 @@ void sega315_5124_device::process_line_timer()
 	if (vpos == vpos_limit - 1)
 	{
 		m_line_counter = m_reg[0x0a];
-		if ( !m_cb_pause.isnull() )
-			m_cb_pause(0);
+		if ( !m_pause_cb.isnull() )
+			m_pause_cb(0);
 
 		return;
 	}
@@ -584,8 +590,8 @@ READ8_MEMBER( sega315_5124_device::register_read )
 		{
 			m_irq_state = 0;
 
-			if ( !m_cb_int.isnull() )
-				m_cb_int(CLEAR_LINE);
+			if ( !m_int_cb.isnull() )
+				m_int_cb(CLEAR_LINE);
 		}
 	}
 
@@ -690,9 +696,9 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 					{
 						m_irq_state = 0;
 
-						if ( !m_cb_int.isnull() )
+						if ( !m_int_cb.isnull() )
 						{
-							m_cb_int(CLEAR_LINE);
+							m_int_cb(CLEAR_LINE);
 						}
 					}
 				}
@@ -706,8 +712,8 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 					//
 					m_irq_state = 1;
 
-					if ( !m_cb_int.isnull() )
-						m_cb_int(ASSERT_LINE);
+					if ( !m_int_cb.isnull() )
+						m_int_cb(ASSERT_LINE);
 				}
 			}
 			m_addrmode = 0;
@@ -1717,20 +1723,6 @@ void sega315_5124_device::stop_timers()
     DEVICE INTERFACE
 *****************************************************************************/
 
-void sega315_5124_device::device_config_complete()
-{
-	const sega315_5124_interface *intf = reinterpret_cast<const sega315_5124_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<sega315_5124_interface *>(this) = *intf;
-	}
-	else
-	{
-		fatalerror("No sega315_5124_interface supplied\n");
-	}
-}
-
 void sega315_5124_device::vdp_postload()
 {
 	switch (m_y_pixels)
@@ -1752,8 +1744,8 @@ void sega315_5124_device::vdp_postload()
 void sega315_5124_device::device_start()
 {
 	/* Resolve callbacks */
-	m_cb_int.resolve( m_int_callback, *this );
-	m_cb_pause.resolve( m_pause_callback, *this );
+	m_int_cb.resolve();
+	m_pause_cb.resolve();
 
 	/* Allocate video RAM */
 	astring tempstring;

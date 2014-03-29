@@ -1337,12 +1337,6 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-static const sega315_5124_interface sms_vdp_ntsc_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
 
 static MACHINE_CONFIG_START( segac, segac2_state )
 
@@ -1354,7 +1348,8 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_SEGAGEN_VDP_ADD("gen_vdp", sms_vdp_ntsc_intf)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_SEGAGEN_VDP_IS_PAL(false)
 	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_sndirqline_callback_c2));
 	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv6irqline_callback_c2));
 	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv4irqline_callback_c2));
