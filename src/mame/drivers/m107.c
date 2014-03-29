@@ -821,7 +821,7 @@ static MACHINE_CONFIG_DERIVED( airass, firebarr )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(rtypeleo_decryption_table) // need the right table
+	MCFG_V25_CONFIG(gunforce_decryption_table) // need the right table
 
 MACHINE_CONFIG_END
 
