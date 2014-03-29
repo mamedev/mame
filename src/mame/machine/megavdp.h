@@ -26,8 +26,6 @@
 
 
 
-
-
 /*
 
  $00 - Mode Set Register No. 1
@@ -225,6 +223,7 @@ public:
 	void set_use_cram(int cram) { m_vdp_use_cram = cram; }
 	void set_dma_delay(int delay) { m_dma_delay = delay; }
 	int get_framerate() { return m_framerate; }
+	int get_imode() { return megadrive_imode; }
 
 
 	void vdp_clear_bitmap(void)
@@ -279,8 +278,7 @@ private:
 	int m_visible_scanlines;
 	int m_irq6_scanline;
 	int m_z80irq_scanline;
-	// this is updated at runtime (atm we still need a global one, to handle 32x and SCD timers)
-	// int m_total_scanlines;
+	int m_total_scanlines;
 	// this is only set at init: 262 for PAL, 313 for NTSC
 	int m_base_total_scanlines;
 

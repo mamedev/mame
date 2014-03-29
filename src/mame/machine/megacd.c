@@ -1819,7 +1819,7 @@ void sega_segacd_device::device_reset()
 
 	stopwatch_timer = machine().device<timer_device>(":segacd:sw_timer");
 
-
+	m_total_scanlines = 262;
 
 	// HACK!!!! timegal, anettfut, roadaven end up with the SubCPU waiting in a loop for *something*
 	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
@@ -1870,7 +1870,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
 
-	scd_dma_timer->adjust(attotime::from_hz(m_framerate) / megadrive_total_scanlines);
+	scd_dma_timer->adjust(attotime::from_hz(m_framerate) / m_total_scanlines);
 
 }
 

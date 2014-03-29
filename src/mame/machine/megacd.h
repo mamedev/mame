@@ -101,12 +101,16 @@ public:
 	UINT16 m_a12000_halt_reset_reg;
 
 	int m_framerate;
+	int m_base_total_scanlines;
+	int m_total_scanlines;
 
 	void segacd_mark_tiles_dirty(running_machine& machine, int offset);
 	int segacd_get_active_stampmap_tilemap(void);
 
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
+	void set_total_scanlines(int total) { m_base_total_scanlines = total; }		// this gets set at start only
+	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }	// this gets set at each EOF
 
 	void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index );

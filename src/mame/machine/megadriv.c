@@ -1096,11 +1096,15 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 	m_vdp->set_total_scanlines(262);
 	if (m_32x)
 	{
-		m_32x->set_framerate(60);
 		m_32x->set_32x_pal(FALSE);
+		m_32x->set_framerate(60);
+		m_32x->set_total_scanlines(262);
 	}
 	if (m_segacd)
+	{
 		m_segacd->set_framerate(60);
+		m_segacd->set_total_scanlines(262);
+	}
 
 	m_export = 1;
 	m_pal = 0;
@@ -1119,12 +1123,16 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 	m_vdp->set_total_scanlines(262);
 	if (m_32x)
 	{
-		m_32x->set_framerate(60);
 		m_32x->set_32x_pal(FALSE);
+		m_32x->set_framerate(60);
+		m_32x->set_total_scanlines(262);
 	}
 	if (m_segacd)
+	{
 		m_segacd->set_framerate(60);
-
+		m_segacd->set_total_scanlines(262);
+	}
+	
 	m_export = 0;
 	m_pal = 0;
 }
@@ -1142,11 +1150,15 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	m_vdp->set_total_scanlines(313);
 	if (m_32x)
 	{
-		m_32x->set_framerate(50);
 		m_32x->set_32x_pal(TRUE);
+		m_32x->set_framerate(50);
+		m_32x->set_total_scanlines(313);
 	}
 	if (m_segacd)
+	{
 		m_segacd->set_framerate(50);
+		m_segacd->set_total_scanlines(313);
+	}
 
 	m_export = 1;
 	m_pal = 1;
@@ -1162,6 +1174,7 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 	{
 		if (!m_vdp->m_use_alt_timing)
 		{
+			bool mode3 = (m_vdp->get_imode() == 3);
 			m_vdp->vdp_handle_eof();
 			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 
@@ -1169,7 +1182,10 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 			{
 				m_32x->m_32x_vblank_flag = 0;
 				m_32x->m_32x_hcount_compare_val = -1;
+				m_32x->update_total_scanlines(mode3);
 			}
+			if (m_segacd)
+				m_segacd->update_total_scanlines(mode3);
 		}
 	}
 }

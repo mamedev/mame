@@ -37,6 +37,8 @@ public:
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
+	void set_total_scanlines(int total) { m_base_total_scanlines = total; }		// this get set at start only
+	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }	// this gets set at each EOF
 	
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
@@ -178,8 +180,10 @@ private:
 	UINT16 m_a15100_reg;
 	int m_32x_68k_a15102_reg;
 
-	int m_framerate;
 	int m_32x_pal;
+	int m_framerate;
+	int m_base_total_scanlines;
+	int m_total_scanlines;
 
 	UINT16 m_commsram[8];
 

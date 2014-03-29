@@ -404,6 +404,3 @@ private:
 	required_device<cpu_device>          m_bioscpu;	
 };
 
-
-/* machine/megavdp.c */
-extern int megadrive_total_scanlines;
