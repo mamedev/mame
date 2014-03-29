@@ -651,26 +651,19 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	UINT16 quick_addr;
 	UINT16 quick_length;
 	UINT16 quick_end;
-	UINT8 *quick_data;
+	dynamic_buffer quick_data;
 	char pgmname[256];
 	UINT16 args[2];
 	int read_;
 
 	quick_length = image.length();
-	quick_data = global_alloc_array(UINT8, quick_length);
-	if (!quick_data)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
-	}
+	quick_data.resize(quick_length);
 
 	read_ = image.fread( quick_data, quick_length);
 	if (read_ != quick_length)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
 		image.message(" Cannot read the file");
-		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -680,7 +673,6 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
 		image.message(" Invalid header");
-		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -690,7 +682,6 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 			image.message(" File name too long");
-			global_free_array(quick_data);
 			return IMAGE_INIT_FAIL;
 		}
 
@@ -704,7 +695,6 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
 		image.message(" Unexpected EOF while getting file size");
-		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -716,7 +706,6 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too large");
 		image.message(" File too large");
-		global_free_array(quick_data);
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -732,13 +721,11 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			global_free_array(quick_data);
 			return IMAGE_INIT_FAIL;
 		}
 		space.write_byte(j, ch);
 	}
 
-	global_free_array(quick_data);
 	return IMAGE_INIT_PASS;
 }
 

@@ -558,127 +558,118 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	int i;
 	int exec_addr;
 	int quick_length;
-	UINT8 *quick_data;
+	dynamic_buffer quick_data;
 	int read_;
 	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	quick_data = global_alloc_array(UINT8, quick_length);
-	if (!quick_data)
+	quick_data.resize(quick_length);
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-		image.message(" Cannot open file");
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
 	}
 	else
 	{
-		read_ = image.fread( quick_data, quick_length);
-		if (read_ != quick_length)
+		if (core_stricmp(image.filetype(), "tvc")==0)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-			image.message(" Cannot read the file");
-		}
-		else
-		{
-			if (core_stricmp(image.filetype(), "tvc")==0)
+			if (quick_data[0] != 2)
 			{
-				if (quick_data[0] != 2)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-					image.message(" Invalid header");
-				}
-				else
-				{
-					int quick_addr = quick_data[1] * 256 + quick_data[2];
-					exec_addr = quick_data[3] * 256 + quick_data[4];
-
-					if (quick_length < 0x5)
-					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-						image.message(" File too short");
-					}
-					else
-					if ((quick_length + quick_addr - 5) > 0x1600)
-					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-						image.message(" File too long");
-					}
-					else
-					{
-						space.write_byte(0x08be, quick_data[3]);
-						space.write_byte(0x08bf, quick_data[4]);
-
-						for (i = 5; i < quick_length; i++)
-							space.write_byte(i - 5 + quick_addr, quick_data[i]);
-
-						/* display a message about the loaded quickload */
-						image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
-
-						// Start the quickload
-						m_maincpu->set_state_int(S2650_PC, exec_addr);
-						result = IMAGE_INIT_PASS;
-					}
-				}
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
 			}
 			else
-			if (core_stricmp(image.filetype(), "pgm")==0)
 			{
-				if (quick_data[0] != 0)
+				int quick_addr = quick_data[1] * 256 + quick_data[2];
+				exec_addr = quick_data[3] * 256 + quick_data[4];
+
+				if (quick_length < 0x5)
 				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-					image.message(" Invalid header");
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+					image.message(" File too short");
+				}
+				else
+				if ((quick_length + quick_addr - 5) > 0x1600)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+					image.message(" File too long");
 				}
 				else
 				{
-					exec_addr = quick_data[1] * 256 + quick_data[2];
+					space.write_byte(0x08be, quick_data[3]);
+					space.write_byte(0x08bf, quick_data[4]);
 
-					if (exec_addr >= quick_length)
-					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-						image.message(" Exec address beyond end of file");
-					}
-					else
-					if (quick_length < 0x904)
-					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-						image.message(" File too short");
-					}
-					else
-					if (quick_length > 0x2000)
-					{
-						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-						image.message(" File too long");
-					}
-					else
-					{
-						space.write_byte(0x08be, quick_data[1]);
-						space.write_byte(0x08bf, quick_data[2]);
+					for (i = 5; i < quick_length; i++)
+						space.write_byte(i - 5 + quick_addr, quick_data[i]);
 
-						// load to 08C0-15FF (standard ram + extra)
-						int read_ = 0x1600;
-						if (quick_length < 0x1600)
-							read_ = quick_length;
-						for (i = 0x8c0; i < read_; i++)
-							space.write_byte(i, quick_data[i]);
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
 
-						// load to 1F50-1FAF (PVI regs)
-						read_ = 0x1FB0;
-						if (quick_length < 0x1FB0)
-							read_ = quick_length;
-						if (quick_length > 0x1FC0)
-							for (i = 0x1F50; i < read_; i++)
-								vc4000_video_w(space, i-0x1f00, quick_data[i]);
-
-						/* display a message about the loaded quickload */
-						image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-						// Start the quickload
-						m_maincpu->set_state_int(S2650_PC, exec_addr);
-						result = IMAGE_INIT_PASS;
-					}
+					// Start the quickload
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
+					result = IMAGE_INIT_PASS;
 				}
 			}
 		}
-		global_free_array(quick_data);
+		else
+		if (core_stricmp(image.filetype(), "pgm")==0)
+		{
+			if (quick_data[0] != 0)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
+			}
+			else
+			{
+				exec_addr = quick_data[1] * 256 + quick_data[2];
+
+				if (exec_addr >= quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+					image.message(" Exec address beyond end of file");
+				}
+				else
+				if (quick_length < 0x904)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+					image.message(" File too short");
+				}
+				else
+				if (quick_length > 0x2000)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+					image.message(" File too long");
+				}
+				else
+				{
+					space.write_byte(0x08be, quick_data[1]);
+					space.write_byte(0x08bf, quick_data[2]);
+
+					// load to 08C0-15FF (standard ram + extra)
+					int read_ = 0x1600;
+					if (quick_length < 0x1600)
+						read_ = quick_length;
+					for (i = 0x8c0; i < read_; i++)
+						space.write_byte(i, quick_data[i]);
+
+					// load to 1F50-1FAF (PVI regs)
+					read_ = 0x1FB0;
+					if (quick_length < 0x1FB0)
+						read_ = quick_length;
+					if (quick_length > 0x1FC0)
+						for (i = 0x1F50; i < read_; i++)
+							vc4000_video_w(space, i-0x1f00, quick_data[i]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+					// Start the quickload
+					m_maincpu->set_state_int(S2650_PC, exec_addr);
+					result = IMAGE_INIT_PASS;
+				}
+			}
+		}
 	}
 	return result;
 }

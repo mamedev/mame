@@ -6,7 +6,7 @@
 
 #include "apridisk.h"
 #include "imageutl.h"
-#include "corealloc.h"
+#include "coretmpl.h"
 
 /***************************************************************************
     CONSTANTS
@@ -177,7 +177,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 			}
 			else if (compression == APR_COMPRESSED)
 			{
-				UINT8 *buffer = (UINT8 *)global_alloc_array(UINT8, data_size);
+				dynamic_buffer buffer(data_size);
 				UINT16 length;
 				UINT8 value;
 
@@ -186,12 +186,10 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 				length = pick_integer_le(buffer, 0, 2);
 				value = pick_integer_le(buffer, 2, 1);
 
-				global_free_array(buffer);
-
 				/* not sure if this is possible */
 				if (length != 512) {
 					printf("Compression unsupported");
-					exit(-1);
+					exit(-1); // TODO: NO!
 				}
 
 				memset(&tag->sectors[cur_sector].data, value, length);

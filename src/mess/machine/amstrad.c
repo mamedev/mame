@@ -3149,27 +3149,23 @@ MACHINE_RESET_MEMBER(amstrad_state,aleste)
 /* load snapshot */
 SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 {
-	UINT8 *snapshot;
+	dynamic_buffer snapshot;
 
 	/* get file size */
 	if (snapshot_size < 8)
 		return IMAGE_INIT_FAIL;
 
-	snapshot = global_alloc_array(UINT8, snapshot_size);
-	if (!snapshot)
-		return IMAGE_INIT_FAIL;
+	snapshot.resize(snapshot_size);
 
 	/* read whole file */
 	image.fread(snapshot, snapshot_size);
 
 	if (memcmp(snapshot, "MV - SNA", 8))
 	{
-		global_free_array(snapshot);
 		return IMAGE_INIT_FAIL;
 	}
 
 	amstrad_handle_snapshot(snapshot);
-	global_free_array(snapshot);
 	return IMAGE_INIT_PASS;
 }
 

@@ -217,61 +217,51 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	}
 	else
 	{
-		UINT8 *quick_data = global_alloc_array(UINT8, quick_length);
-		if (!quick_data)
+		dynamic_buffer quick_data(quick_length);
+		int read_ = image.fread( quick_data, quick_length);
+		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-			image.message(" Cannot open file");
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.message(" Cannot read the file");
+		}
+		else
+		if (quick_data[0] != 0x40)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.message(" Invalid header");
 		}
 		else
 		{
-			int read_ = image.fread( quick_data, quick_length);
-			if (read_ != quick_length)
+			int exec_addr = quick_data[1] * 256 + quick_data[2];
+
+			if (exec_addr >= quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-				image.message(" Cannot read the file");
-			}
-			else
-			if (quick_data[0] != 0x40)
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-				image.message(" Invalid header");
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.message(" Exec address beyond end of file");
 			}
 			else
 			{
-				int exec_addr = quick_data[1] * 256 + quick_data[2];
+				// do not overwite system area (17E0-17FF) otherwise chess3 has problems
+				read_ = 0x17e0;
+				if (quick_length < 0x17e0)
+					read_ = quick_length;
 
-				if (exec_addr >= quick_length)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-					image.message(" Exec address beyond end of file");
-				}
-				else
-				{
-					// do not overwite system area (17E0-17FF) otherwise chess3 has problems
-					read_ = 0x17e0;
-					if (quick_length < 0x17e0)
-						read_ = quick_length;
+				for (i = 0x1500; i < read_; i++)
+					m_p_videoram[i-0x1000] = quick_data[i];
 
-					for (i = 0x1500; i < read_; i++)
+				if (quick_length > 0x17ff)
+					for (i = 0x1800; i < quick_length; i++)
 						m_p_videoram[i-0x1000] = quick_data[i];
 
-					if (quick_length > 0x17ff)
-						for (i = 0x1800; i < quick_length; i++)
-							m_p_videoram[i-0x1000] = quick_data[i];
+				/* display a message about the loaded quickload */
+				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+				// Start the quickload
+				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
-
-					result = IMAGE_INIT_PASS;
-				}
+				result = IMAGE_INIT_PASS;
 			}
 		}
-
-		global_free_array(quick_data);
 	}
 
 	return result;

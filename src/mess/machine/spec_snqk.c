@@ -112,11 +112,7 @@ static void spectrum_page_basicrom(running_machine &machine)
 
 SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	UINT8 *snapshot_data = NULL;
-
-	snapshot_data = global_alloc_array(UINT8, snapshot_size);
-	if (!snapshot_data)
-		goto error;
+	dynamic_buffer snapshot_data(snapshot_size);
 
 	image.fread(snapshot_data, snapshot_size);
 
@@ -233,13 +229,9 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_z80(machine(), snapshot_data, snapshot_size);
 	}
 
-	global_free_array(snapshot_data);
-
 	return IMAGE_INIT_PASS;
 
 error:
-	if (snapshot_data)
-		global_free_array(snapshot_data);
 	return IMAGE_INIT_FAIL;
 }
 
@@ -2453,11 +2445,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
 QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 {
-	UINT8 *quickload_data = NULL;
-
-	quickload_data = global_alloc_array(UINT8, quickload_size);
-	if (!quickload_data)
-		goto error;
+	dynamic_buffer quickload_data(quickload_size);
 
 	image.fread(quickload_data, quickload_size);
 
@@ -2480,13 +2468,9 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 		spectrum_setup_raw(machine(), quickload_data, quickload_size);
 	}
 
-	global_free_array(quickload_data);
-
 	return IMAGE_INIT_PASS;
 
 error:
-	if (quickload_data)
-		global_free_array(quickload_data);
 	return IMAGE_INIT_FAIL;
 }
 

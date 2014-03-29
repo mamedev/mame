@@ -2090,7 +2090,7 @@ ROM_END
 
 void astra_addresslines( UINT16* src, size_t srcsize, int small )
 {
-	UINT16 *dst = global_alloc_array(UINT16, srcsize/2);
+	dynamic_array<UINT16> dst(srcsize/2);
 
 	int blocksize;
 
@@ -2107,7 +2107,6 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 	}
 
 	memcpy(src,dst, srcsize);
-	global_free_array(dst);
 }
 
 

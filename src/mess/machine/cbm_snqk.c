@@ -26,7 +26,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, UINT16 hiaddress) )
 {
 	char buffer[7];
-	UINT8 *data = NULL;
+	dynamic_buffer data;
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
@@ -69,9 +69,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		address = 2049;
 	snapshot_size -= 2;
 
-	data = global_alloc_array(UINT8, snapshot_size);
-	if (!data)
-		goto error;
+	data.resize(snapshot_size);
 
 	bytesread = image.fread( data, snapshot_size);
 	if (bytesread != snapshot_size)
@@ -81,12 +79,9 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 		space.write_byte(address + i + offset, data[i]);
 
 	cbm_sethiaddress(space, address + snapshot_size);
-	global_free_array(data);
 	return IMAGE_INIT_PASS;
 
 error:
-	if (data)
-		global_free_array(data);
 	return IMAGE_INIT_FAIL;
 }
 

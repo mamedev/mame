@@ -150,7 +150,7 @@ ROM_END
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *data = NULL;
+	dynamic_buffer data;
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	UINT16 start, length;
@@ -167,18 +167,15 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 	length = header[5] | (header[4]<<8);
 	length -= 10;
 
-	data = global_alloc_array(UINT8, length);
+	data.resize(length);
 
 	if (image.fread( data, length) != length)
 	{
-		global_free_array(data);
 		return IMAGE_INIT_FAIL;
 	}
 
 	for (i = 0; i < length; i++)
 		space.write_byte(start + i, data[i]);
-
-	global_free_array(data);
 
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;

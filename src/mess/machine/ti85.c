@@ -679,7 +679,7 @@ void ti85_state::ti86_setup_snapshot (UINT8 * data)
 SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 {
 	int expected_snapshot_size = 0;
-	UINT8 *ti8x_snapshot_data;
+	dynamic_buffer ti8x_snapshot_data;
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;
@@ -694,8 +694,7 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (!(ti8x_snapshot_data = global_alloc_array(UINT8, snapshot_size)))
-		return IMAGE_INIT_FAIL;
+	ti8x_snapshot_data.resize(snapshot_size);
 
 	image.fread( ti8x_snapshot_data, snapshot_size);
 
@@ -704,6 +703,5 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 	else if (!strncmp(machine().system().name, "ti86", 4))
 		ti86_setup_snapshot(ti8x_snapshot_data);
 
-	global_free_array(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;
 }

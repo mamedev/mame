@@ -229,7 +229,7 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 	int quick_addr = 0x440;
 	int exec_addr;
 	int quick_length;
-	UINT8 *quick_data;
+	dynamic_buffer quick_data;
 	int read_;
 	int result = IMAGE_INIT_FAIL;
 
@@ -246,51 +246,41 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 	}
 	else
 	{
-		quick_data = global_alloc_array(UINT8, quick_length);
-		if (!quick_data)
+		quick_data.resize(quick_length);
+		read_ = image.fread( quick_data, quick_length);
+		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-			image.message(" Cannot open file");
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.message(" Cannot read the file");
+		}
+		else if (quick_data[0] != 0xc4)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.message(" Invalid header");
 		}
 		else
 		{
-			read_ = image.fread( quick_data, quick_length);
-			if (read_ != quick_length)
+			exec_addr = quick_data[1] * 256 + quick_data[2];
+
+			if (exec_addr >= quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-				image.message(" Cannot read the file");
-			}
-			else if (quick_data[0] != 0xc4)
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-				image.message(" Invalid header");
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.message(" Exec address beyond end of file");
 			}
 			else
 			{
-				exec_addr = quick_data[1] * 256 + quick_data[2];
+				for (i = quick_addr; i < read_; i++)
+					space.write_byte(i, quick_data[i]);
 
-				if (exec_addr >= quick_length)
-				{
-					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-					image.message(" Exec address beyond end of file");
-				}
-				else
-				{
-					for (i = quick_addr; i < read_; i++)
-						space.write_byte(i, quick_data[i]);
+				/* display a message about the loaded quickload */
+				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
-					/* display a message about the loaded quickload */
-					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+				// Start the quickload
+				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-					// Start the quickload
-					m_maincpu->set_state_int(S2650_PC, exec_addr);
-
-					result = IMAGE_INIT_PASS;
-				}
+				result = IMAGE_INIT_PASS;
 			}
 		}
-
-		global_free_array(quick_data);
 	}
 
 	return result;

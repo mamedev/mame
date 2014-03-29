@@ -286,7 +286,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 i;
 	UINT16 quick_addr = 0x1800;
-	UINT8 *quick_data;
+	dynamic_buffer quick_data;
 	int result = IMAGE_INIT_FAIL;
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
@@ -296,35 +296,25 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	}
 	else
 	{
-		quick_data = global_alloc_array(UINT8, quick_length);
-		if (!quick_data)
-		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-			image.message(" Cannot open file");
-		}
-		else
-		{
-			membank("bankru")->set_entry(0); // point at ram
+		quick_data.resize(quick_length);
+		membank("bankru")->set_entry(0); // point at ram
 
-			UINT16 exec_addr = quick_addr + 2;
+		UINT16 exec_addr = quick_addr + 2;
 
-			for (i = 0; i < quick_length; i++)
-				space.write_byte(i+quick_addr, quick_data[i]);
+		for (i = 0; i < quick_length; i++)
+			space.write_byte(i+quick_addr, quick_data[i]);
 
-			/* display a message about the loaded quickload */
-			image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+		/* display a message about the loaded quickload */
+		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
-			// Start the quickload
-			m_maincpu->set_state_int(S2650_R0, exec_addr>>8);
-			m_maincpu->set_state_int(S2650_R1, 0x08);
-			m_maincpu->set_state_int(S2650_R2, 0xe0);
-			m_maincpu->set_state_int(S2650_R3, 0x83);
-			m_maincpu->set_state_int(S2650_PC, exec_addr);
+		// Start the quickload
+		m_maincpu->set_state_int(S2650_R0, exec_addr>>8);
+		m_maincpu->set_state_int(S2650_R1, 0x08);
+		m_maincpu->set_state_int(S2650_R2, 0xe0);
+		m_maincpu->set_state_int(S2650_R3, 0x83);
+		m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-			result = IMAGE_INIT_PASS;
-		}
-
-		global_free_array(quick_data);
+		result = IMAGE_INIT_PASS;
 	}
 
 	return result;
