@@ -44,7 +44,9 @@ enum
 {
 	MDA_TEXT_INTEN = 0,
 	MDA_TEXT_BLINK,
-	HERCULES_GFX_BLINK
+	HERCULES_GFX_BLINK,
+	MDA_LOWRES_TEXT_INTEN,
+	MDA_LOWRES_TEXT_BLINK
 };
 
 /* F4 Character Displayer */
@@ -749,4 +751,231 @@ READ8_MEMBER( isa8_hercules_device::io_read )
 		break;
 	}
 	return data;
+}
+
+// XXX
+MACHINE_CONFIG_FRAGMENT( pcvideo_ec1840_0002 )
+	MCFG_SCREEN_ADD( MDA_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 792, 0, 640, 370, 0, 350 )
+	MCFG_SCREEN_UPDATE_DEVICE( MDA_MC6845_NAME, mc6845_device, screen_update )
+
+	MCFG_PALETTE_ADD( "palette", 4 )
+
+	MCFG_MC6845_ADD( MDA_MC6845_NAME, MC6845, MDA_SCREEN_NAME, MDA_CLOCK/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(isa8_mda_device, crtc_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+MACHINE_CONFIG_END
+
+const device_type ISA8_EC1840_0002 = &device_creator<isa8_ec1840_0002_device>;
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa8_ec1840_0002_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( pcvideo_ec1840_0002 );
+}
+
+//-------------------------------------------------
+//  isa8_ec1840_0002_device - constructor
+//-------------------------------------------------
+
+isa8_ec1840_0002_device::isa8_ec1840_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_mda_device( mconfig, ISA8_EC1840_0002, "EC 1840.0002 (MDA)", tag, owner, clock, "ec1840_0002", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa8_ec1840_0002_device::device_start()
+{
+	isa8_mda_device::device_start();
+
+	m_soft_chr_gen = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_isa->install_bank(0xdc000, 0xddfff, 0, 0x2000, "bank_chargen", m_soft_chr_gen);
+}
+
+void isa8_ec1840_0002_device::device_reset()
+{
+	isa8_mda_device::device_reset();
+
+	m_chr_gen = m_soft_chr_gen;
+}
+
+
+/***************************************************************************
+  Draw text mode with 80x25 characters (default) and intense background.
+  The character cell size is 8x14.
+***************************************************************************/
+
+MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_inten_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT32  *p = &bitmap.pix32(y);
+	UINT16  chr_base = ra;
+	int i;
+
+	if ( y == 0 ) MDA_LOG(1,"mda_lowres_text_inten_update_row",("\n"));
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		UINT8 chr = m_videoram[ offset ];
+		UINT8 attr = m_videoram[ offset + 1 ];
+		UINT8 data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
+		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
+		UINT8 bg = 0;
+
+		if ( ( attr & ~0x88 ) == 0 )
+		{
+			data = 0x00;
+		}
+
+		switch( attr )
+		{
+		case 0x70:
+			bg = 2;
+			fg = 0;
+			break;
+		case 0x78:
+			bg = 2;
+			fg = 1;
+			break;
+		case 0xF0:
+			bg = 3;
+			fg = 0;
+			break;
+		case 0xF8:
+			bg = 3;
+			fg = 1;
+			break;
+		}
+
+		if ( ( i == cursor_x && ( m_framecnt & 0x08 ) ) || ( attr & 0x07 ) == 0x01 )
+		{
+			data = 0xFF;
+		}
+
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
+}
+
+
+/***************************************************************************
+  Draw text mode with 80x25 characters (default) and blinking characters.
+  The character cell size is 8x14.
+***************************************************************************/
+
+MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_blink_update_row )
+{
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT32  *p = &bitmap.pix32(y);
+	UINT16  chr_base = ra;
+	int i;
+
+	if ( y == 0 ) MDA_LOG(1,"mda_lowres_text_blink_update_row",("\n"));
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ( ma + i ) << 1 ) & 0x0FFF;
+		UINT8 chr = m_videoram[ offset ];
+		UINT8 attr = m_videoram[ offset + 1 ];
+		UINT8 data = m_chr_gen[ (chr_base + chr * 16) << 1 ];
+		UINT8 fg = ( attr & 0x08 ) ? 3 : 2;
+		UINT8 bg = 0;
+
+		if ( ( attr & ~0x88 ) == 0 )
+		{
+			data = 0x00;
+		}
+
+		switch( attr )
+		{
+		case 0x70:
+		case 0xF0:
+			bg = 2;
+			fg = 0;
+			break;
+		case 0x78:
+		case 0xF8:
+			bg = 2;
+			fg = 1;
+			break;
+		}
+
+		if ( ( attr & 0x07 ) == 0x01 )
+		{
+			data = 0xFF;
+		}
+
+		if ( i == cursor_x )
+		{
+			if ( m_framecnt & 0x08 )
+			{
+				data = 0xFF;
+			}
+		}
+		else
+		{
+			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+			{
+				data = 0x00;
+			}
+		}
+
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
+}
+
+WRITE8_MEMBER( isa8_ec1840_0002_device::mode_control_w )
+{
+	m_mode_control = data;
+
+	switch( m_mode_control & 0x2a )
+	{
+	case 0x08:
+		m_update_row_type = MDA_LOWRES_TEXT_INTEN;
+		break;
+	case 0x28:
+		m_update_row_type = MDA_LOWRES_TEXT_BLINK;
+		break;
+	default:
+		m_update_row_type = -1;
+	}
+}
+
+MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
+{
+	if (m_update_row_type == -1)
+		return;
+	
+	switch (m_update_row_type)
+	{
+		case MDA_LOWRES_TEXT_INTEN:
+			mda_lowres_text_inten_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case MDA_LOWRES_TEXT_BLINK:
+			mda_lowres_text_blink_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
 }

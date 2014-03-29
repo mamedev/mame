@@ -8,7 +8,6 @@
     - memory bank size is smaller (128K)
 
     TODO (ec1841)
-    - add chargen upload support for MDA
     - hard disk is connected but requires changes to isa_hdc.c
 
 ***************************************************************************/
@@ -178,7 +177,6 @@ static ADDRESS_MAP_START( ec1841_map, AS_PROGRAM, 16, ec184x_state )
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
 	AM_RANGE(0xc8000, 0xcffff) AM_ROM
-	AM_RANGE(0xdc000, 0xdffff) AM_RAM       // monochrome chargen
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
