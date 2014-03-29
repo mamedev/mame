@@ -432,11 +432,34 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 }
 
 
+void md_cons_state::_32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr)
+{
+	if (m_32x)
+		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
+}
+
+void md_cons_state::_32x_interrupt_callback(int scanline, int irq6)
+{
+	if (m_32x)
+		m_32x->_32x_interrupt_cb(scanline, irq6);
+}
+
+void md_cons_state::_32x_scanline_helper_callback(int scanline)
+{
+	if (m_32x)
+		m_32x->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
+}
+
 static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
+	MCFG_DEVICE_MODIFY("gen_vdp")
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
+	MCFG_SEGAGEN_VDP_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
@@ -472,6 +495,11 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
+	MCFG_DEVICE_MODIFY("gen_vdp")
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
+	MCFG_SEGAGEN_VDP_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
@@ -505,6 +533,11 @@ static MACHINE_CONFIG_START( md_32x, md_cons_state )
 
 	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
 	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
+	MCFG_DEVICE_MODIFY("gen_vdp")
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
+	MCFG_SEGAGEN_VDP_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
+	MCFG_SEGAGEN_VDP_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")

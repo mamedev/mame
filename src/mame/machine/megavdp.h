@@ -167,7 +167,23 @@
 #define MCFG_SEGAGEN_VDP_PALETTE(_palette_tag) \
 	sega_genesis_vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
 
+
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
+
+
+// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
+typedef device_delegate<void (int x, UINT32 priority, UINT16 &lineptr)> md_32x_scanline_delegate;
+typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
+typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
+
+#define MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(_class, _method) \
+	sega_genesis_vdp_device::static_set_md_32x_scanline(*device, md_32x_scanline_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_SEGAGEN_VDP_32X_INTERRUPT_CB(_class, _method) \
+	sega_genesis_vdp_device::static_set_md_32x_interrupt(*device, md_32x_interrupt_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_SEGAGEN_VDP_32X_SCANLINE_HELPER_CB(_class, _method) \
+	sega_genesis_vdp_device::static_set_md_32x_scanline_helper(*device, md_32x_scanline_helper_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
 class sega_genesis_vdp_device : public sega315_5124_device
@@ -181,7 +197,11 @@ public:
 	static void set_genesis_vdp_alt_timing(device_t &device, int use_alt_timing);
 	static void set_genesis_vdp_palwrite_base(device_t &device, int palwrite_base);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
+	static void static_set_md_32x_scanline(device_t &device, md_32x_scanline_delegate callback) { downcast<sega_genesis_vdp_device &>(device).m_32x_scanline_func = callback; }
+	static void static_set_md_32x_interrupt(device_t &device, md_32x_interrupt_delegate callback) { downcast<sega_genesis_vdp_device &>(device).m_32x_interrupt_func = callback; }
+	static void static_set_md_32x_scanline_helper(device_t &device, md_32x_scanline_helper_delegate callback) { downcast<sega_genesis_vdp_device &>(device).m_32x_scanline_helper_func = callback; }
+
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
 	int m_palwrite_base; // if we want to write to the actual MAME palette..
@@ -232,7 +252,11 @@ protected:
 	devcb2_write_line m_genesis_vdp_sndirqline_callback;
 	devcb2_write_line m_genesis_vdp_lv6irqline_callback;
 	devcb2_write_line m_genesis_vdp_lv4irqline_callback;
-
+	
+	md_32x_scanline_delegate m_32x_scanline_func;
+	md_32x_interrupt_delegate m_32x_interrupt_func;
+	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
+	
 private:
 
 	int m_vdp_command_pending; // 2nd half of command pending..

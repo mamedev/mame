@@ -2,8 +2,6 @@
 
 #include "emu.h"
 #include "megavdp.h"
-#include "mega32x.h"
-#include "video/315_5124.h"
 
 /* still have dependencies on the following external gunk */
 
@@ -108,6 +106,10 @@ void sega_genesis_vdp_device::device_start()
 	m_genesis_vdp_sndirqline_callback.resolve_safe();
 	m_genesis_vdp_lv6irqline_callback.resolve_safe();
 	m_genesis_vdp_lv4irqline_callback.resolve_safe();
+
+	m_32x_scanline_func.bind_relative_to(*owner());
+	m_32x_interrupt_func.bind_relative_to(*owner());
+	m_32x_scanline_helper_func.bind_relative_to(*owner());
 
 	m_vram  = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_cram  = auto_alloc_array(machine(), UINT16, 0x80/2);
@@ -2504,7 +2506,6 @@ void sega_genesis_vdp_device::genesis_render_videoline_to_videobuffer(int scanli
 /* This converts our render buffer to real screen colours */
 void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int scanline)
 {
-	sega_32x_device *_32xdev = machine().device<sega_32x_device>("sega32x"); // take this out of the VDP eventually
 	UINT16 *lineptr;
 
 	if (!m_use_alt_timing)
@@ -2580,12 +2581,13 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(int sca
 			}
 		}
 	}
-	
-	if (_32xdev)
+
+	if (!m_32x_scanline_helper_func.isnull())
+		m_32x_scanline_helper_func(scanline);
+	if (!m_32x_scanline_func.isnull())
 	{
-		_32xdev->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
 		for (int x = 0; x < 320; x++)
-			_32xdev->_32x_render_videobuffer_to_screenbuffer(x, m_video_renderline[x] & 0x20000, lineptr[x]);
+			m_32x_scanline_func(x, m_video_renderline[x] & 0x20000, lineptr[x]);
 	}
 }
 
@@ -2610,8 +2612,6 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
        to rounding errors in the timer calculation we're not quite there.  Let's assume we are
        still in the previous scanline for now.
     */
-	sega_32x_device *_32xdev = machine().device<sega_32x_device>("sega32x"); // take this out of the VDP eventually
-
 
 	if (genesis_get_scanline_counter() != (megadrive_total_scanlines - 1))
 	{
@@ -2673,8 +2673,8 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 	}
 
 	// 32x interrupts!
-	if (_32xdev) 
-		_32xdev->_32x_interrupt_cb(genesis_get_scanline_counter(), m_irq6_scanline);
+	if (!m_32x_interrupt_func.isnull())
+		m_32x_interrupt_func(genesis_get_scanline_counter(), m_irq6_scanline);
 }
 
 

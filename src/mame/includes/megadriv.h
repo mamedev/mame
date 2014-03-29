@@ -404,22 +404,6 @@ private:
 	required_device<cpu_device>          m_bioscpu;	
 };
 
-class _32x_state : public md_base_state
-{
-public:
-	_32x_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
-
-};
-
-class segacd_state : public _32x_state  // use _32x_state as base to make easier the combo 32X + SCD
-{
-public:
-	segacd_state(const machine_config &mconfig, device_type type, const char *tag)
-	: _32x_state(mconfig, type, tag)
-		{ }
-};
-
 
 /* machine/megavdp.c */
 extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space);
