@@ -1017,16 +1017,16 @@ READ16_MEMBER( sega_32x_device::_32x_common_vdp_regs_r )
 			UINT16 hpos = get_hposition();
 			int megadrive_hblank_flag = 0;
 
-			if (megadrive_vblank_flag) retdata |= 0x8000;
+			if (m_32x_vblank_flag) retdata |= 0x8000;
 
 			if (hpos>400) megadrive_hblank_flag = 1;
 			if (hpos>460) megadrive_hblank_flag = 0;
 
 			if (megadrive_hblank_flag) retdata |= 0x4000;
 
-			if (megadrive_vblank_flag) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
+			if (m_32x_vblank_flag) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
 
-			if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
+			if (megadrive_hblank_flag && m_32x_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
 
 			return retdata;
 	}
@@ -1597,6 +1597,7 @@ void sega_32x_device::_32x_interrupt_cb(int scanline, int irq6)
 {
 	if (scanline == irq6)
 	{
+		m_32x_vblank_flag = 1;
 		m_sh2_master_vint_pending = 1;
 		m_sh2_slave_vint_pending = 1;
 		_32x_check_irqs();

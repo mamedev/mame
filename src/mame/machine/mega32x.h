@@ -120,6 +120,7 @@ public:
 
 	/* our main vblank handler resets this */
 	int m_32x_hcount_compare_val;
+	int m_32x_vblank_flag;
 	int m_sh2_are_running;
 	int m_32x_240mode;
 	UINT16 m_32x_a1518a_reg;

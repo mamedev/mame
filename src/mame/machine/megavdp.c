@@ -12,7 +12,6 @@
 
 /* external gunk still has dependencies on these */
 int megadrive_total_scanlines;
-int megadrive_vblank_flag = 0;
 
 
 const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
@@ -148,6 +147,7 @@ void sega_genesis_vdp_device::device_start()
 	save_item(NAME(m_irq6_scanline));
 	save_item(NAME(m_z80irq_scanline));
 	save_item(NAME(m_scanline_counter));
+	save_item(NAME(m_vblank_flag));
 
 	m_sprite_renderline = auto_alloc_array(machine(), UINT8, 1024);
 	m_highpri_renderline = auto_alloc_array(machine(), UINT8, 320);
@@ -212,6 +212,7 @@ void sega_genesis_vdp_device::device_reset()
 	megadrive_irq6_pending = 0;
 	megadrive_irq4_pending = 0;
 	m_scanline_counter = 0;
+	m_vblank_flag = 0;
 
 	sega315_5124_device::device_reset();
 }
@@ -986,7 +987,7 @@ UINT16 sega_genesis_vdp_device::megadriv_vdp_ctrl_port_r()
 	int megadrive_odd_frame = m_imode_odd_frame^1;
 	int megadrive_hblank_flag = 0;
 	int megadrive_dma_active = 0;
-	int vblank;
+	int vblank = m_vblank_flag;
 	int fifo_empty = 1;
 	int fifo_full = 0;
 
@@ -994,8 +995,6 @@ UINT16 sega_genesis_vdp_device::megadriv_vdp_ctrl_port_r()
 
 	if (hpos>400) megadrive_hblank_flag = 1;
 	if (hpos>460) megadrive_hblank_flag = 0;
-
-	vblank = megadrive_vblank_flag;
 
 	/* extra case */
 	if (MEGADRIVE_REG01_DISP_ENABLE==0) vblank = 1;
@@ -2623,7 +2622,7 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 		//  mame_printf_debug("x %d",genesis_get_scanline_counter());
 			irq6_on_timer->adjust(attotime::from_usec(6));
 			megadrive_irq6_pending = 1;
-			megadrive_vblank_flag = 1;
+			m_vblank_flag = 1;
 
 		}
 
@@ -2682,7 +2681,7 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 	rectangle visarea;
 	int scr_width = 320;
 
-	megadrive_vblank_flag = 0;
+	m_vblank_flag = 0;
 	//megadrive_irq6_pending = 0; /* NO! (breaks warlock) */
 
 	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */

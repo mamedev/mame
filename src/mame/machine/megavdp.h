@@ -272,6 +272,7 @@ private:
 	int megadrive_irq6_pending;
 	int megadrive_irq4_pending;
 	int m_scanline_counter;
+	int m_vblank_flag;
 
 	int megadrive_imode;
 

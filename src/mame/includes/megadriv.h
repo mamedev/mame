@@ -407,4 +407,3 @@ private:
 
 /* machine/megavdp.c */
 extern int megadrive_total_scanlines;
-extern int megadrive_vblank_flag;
