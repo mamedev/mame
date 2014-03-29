@@ -1750,16 +1750,6 @@ void isa8_ec1841_0002_device::device_reset()
 	m_p3df = 0;
 }
 
-ROM_START( iskr1031 )
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
-ROM_END
-
-const rom_entry *isa8_ec1841_0002_device::device_rom_region() const
-{
-	return ROM_NAME( iskr1031 );
-}
-
 WRITE8_MEMBER( isa8_ec1841_0002_device::char_ram_write )
 {
 	offset ^= BIT(offset, 12);
@@ -1826,6 +1816,58 @@ isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, co
 	m_chr_gen_offset[1] = 0x0800;
 
 }
+
+ROM_START( cga_iskr1031 )
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+ROM_END
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *isa8_cga_iskr1031_device::device_rom_region() const
+{
+	return ROM_NAME( cga_iskr1031 );
+}
+
+const device_type ISA8_CGA_ISKR1031 = &device_creator<isa8_cga_iskr1031_device>;
+
+//-------------------------------------------------
+//  isa8_cga_iskr1031_device - constructor
+//-------------------------------------------------
+
+isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_ISKR1031, "Iskra-1031 CGA", tag, owner, clock, "cga_iskr1031", __FILE__)
+{
+}
+
+ROM_START( cga_iskr1030m )
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD( "iskra-1030m.chr", 0x0000, 0x2000, CRC(50b162eb) SHA1(5bd7cb1705a69bd16115a4c9ed1c2748a5c8ad51))
+ROM_END
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *isa8_cga_iskr1030m_device::device_rom_region() const
+{
+	return ROM_NAME( cga_iskr1030m );
+}
+
+const device_type ISA8_CGA_ISKR1030M = &device_creator<isa8_cga_iskr1030m_device>;
+
+//-------------------------------------------------
+//  isa8_cga_iskr1030m_device - constructor
+//-------------------------------------------------
+
+isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_ISKR1030M, "Iskra-1030M CGA", tag, owner, clock, "cga_iskr1030m", __FILE__)
+{
+}
+
+// XXX
 
 ROM_START( mc1502 )
 	ROM_REGION(0x2000,"gfx1", 0)
