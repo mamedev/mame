@@ -31,6 +31,8 @@ public:
 		virtual const rom_entry *device_rom_region() const;
 		DECLARE_READ8_MEMBER(pc_hdc_r);
 		DECLARE_WRITE8_MEMBER(pc_hdc_w);
+		virtual ioport_constructor device_input_ports() const;
+
 protected:
 		// device-level overrides
 		virtual void device_start();
