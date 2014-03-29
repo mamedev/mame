@@ -684,15 +684,12 @@ bool base_sns_cart_slot_device::call_load()
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
-			UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+			dynamic_buffer temp_nvram(tot_size);
 			battery_load(temp_nvram, tot_size, 0xff);
 			if (m_cart->get_nvram_size())
 				memcpy(m_cart->get_nvram_base(), temp_nvram, m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
 				memcpy(m_cart->get_rtc_ram_base(), temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_size());
-
-			if (temp_nvram)
-				auto_free(machine(), temp_nvram);
 		}
 
 		//printf("Type %d\n", m_type);
@@ -717,15 +714,13 @@ void base_sns_cart_slot_device::call_unload()
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
-			UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+			dynamic_buffer temp_nvram(tot_size);
 			if (m_cart->get_nvram_size())
 				memcpy(temp_nvram, m_cart->get_nvram_base(), m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
 				memcpy(temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
 
 			battery_save(temp_nvram, tot_size);
-			if (temp_nvram)
-				auto_free(machine(), temp_nvram);
 		}
 	}
 }
