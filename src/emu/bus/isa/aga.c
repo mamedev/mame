@@ -171,8 +171,8 @@ void isa8_aga_pc200_device::device_start()
 		throw device_missing_dependencies();
 
 	m_mode = AGA_COLOR;
-	m_mda_chr_gen = memregion("gfx1")->base() + 0x1000;
-	m_cga_chr_gen = memregion("gfx1")->base();
+	m_mda_chr_gen = memregion("gfx1")->base();
+	m_cga_chr_gen = memregion("gfx1")->base() + 0x1000;
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	set_isa_device();

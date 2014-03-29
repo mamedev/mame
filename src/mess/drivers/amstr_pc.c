@@ -551,19 +551,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
-
-	PORT_START("VIDEO") /* IN20 */
-	PORT_CONFNAME( 0x03, 0x03, "IDA character set")
-	PORT_CONFSETTING(0x00, "Greek")
-	PORT_CONFSETTING(0x01, "Norwegian (Codepage 860)")
-	PORT_CONFSETTING(0x02, "Portugese (Codepage 865)")
-	PORT_CONFSETTING(0x03, "Default (Codepage 437)")
-	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
-	PORT_CONFSETTING(0x00, "Colour RGB")
-	PORT_CONFSETTING(0x04, "Mono RGB")
-	PORT_CONFSETTING(0x0C, "Television")
-	PORT_BIT ( 0xE0, 0x40, IPT_UNUSED ) /* Chipset is always PPC512 */
-
 INPUT_PORTS_END
 
 // static const gfx_layout pc200_charlayout =
@@ -583,10 +570,6 @@ INPUT_PORTS_END
 	// GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
 // GFXDECODE_END
 
-static DEVICE_INPUT_DEFAULTS_START( pc200 )
-	DEVICE_INPUT_DEFAULTS("cga_config", 0xE0, 0x20)
-DEVICE_INPUT_DEFAULTS_END
-
 // has it's own mouse
 static MACHINE_CONFIG_FRAGMENT( cfg_com )
 	MCFG_DEVICE_MODIFY("serport0")
@@ -603,8 +586,6 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "aga", pc_isa8_cards, "aga_pc200", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("aga_pc200", pc200)
-
 	MCFG_ISA8_SLOT_ADD("mb:isa", "fdc", pc_isa8_cards, "fdc_xt", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "com", pc_isa8_cards, "com", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("com", cfg_com)
