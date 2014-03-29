@@ -36,7 +36,7 @@ struct h63484_interface
 	h63484_display_pixels_func  m_display_cb;
 };
 
-// ======================> upd7220_device
+// ======================> h63484_device
 
 class h63484_device :   public device_t,
 						public device_memory_interface,

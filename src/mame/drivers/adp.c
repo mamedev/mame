@@ -183,7 +183,6 @@ public:
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE16_MEMBER(wh2_w);
 	DECLARE_WRITE8_MEMBER(ramdac_io_w);
-	DECLARE_READ8_MEMBER(h63484_rom_r);
 	DECLARE_READ8_MEMBER(t2_r);
 	DECLARE_MACHINE_START(skattv);
 	DECLARE_MACHINE_RESET(skattv);
@@ -425,6 +424,7 @@ static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 //  AM_RANGE(0x400000, 0x40001f) ?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE("h63484", h63484_device, status_r, address_w) // bad
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE("h63484", h63484_device, data_r, data_w) // bad
+	AM_RANGE(0x800100, 0x800101) AM_READ_PORT("IN0")
 	AM_RANGE(0x800140, 0x800143) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, address_data_w, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -497,13 +497,36 @@ static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 ADDRESS_MAP_END
 
 
-#if 0
-static INPUT_PORTS_START( adp )
+static INPUT_PORTS_START( quickjac )
+	PORT_START("PA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Collect")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hand 1")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hand 2")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hand 3")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hand 4")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hand 5")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Joker")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Low Battery" )
+	PORT_DIPSETTING(     0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x00, DEF_STR( On ) )
+	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
-#endif
 
 static INPUT_PORTS_START( skattv )
+	PORT_START("PA")
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_HBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
 	PORT_START("DSW1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
@@ -594,18 +617,11 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_DRIVER_MEMBER(adp_state,t2_r),
+	DEVCB_INPUT_PORT("PA"),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
-
-READ8_MEMBER(adp_state::h63484_rom_r)
-{
-	UINT8 *rom = memregion("gfx1")->base();
-
-	return rom[offset];
-}
 
 static ADDRESS_MAP_START( adp_h63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
@@ -615,6 +631,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fashiong_h63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x60000) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("gfx1", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fstation_h63484_map, AS_0, 16, adp_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
+	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
 static H63484_INTERFACE( adp_h63484_intf )
@@ -659,77 +680,18 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( skattv, adp_state )
-
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+static MACHINE_CONFIG_DERIVED( skattv, quickjac )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(skattv_mem)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", adp_state,  adp_int)
-
-	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
-	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
-
-	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
-
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x10)
-
-	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
-
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
-	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( backgamn, adp_state )
-
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+static MACHINE_CONFIG_DERIVED( backgamn, skattv )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 
-	MCFG_MC68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
-
-	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", mc68681_device, rx_a_w) )
-
-	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
-	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(adp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x10)
-
-//  MCFG_PALETTE_INIT_OWNER(adp_state,adp)
-
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
-	MCFG_SOUND_CONFIG(ay8910_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fashiong, skattv )
@@ -737,15 +699,18 @@ static MACHINE_CONFIG_DERIVED( fashiong, skattv )
 	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, fashiong_h63484_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( funland, fashiong )
+static MACHINE_CONFIG_DERIVED( funland, quickjac )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(funland_mem)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
+
+	MCFG_DEVICE_REMOVE("h63484")
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, fstation_h63484_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fstation, fashiong )
+static MACHINE_CONFIG_DERIVED( fstation, funland )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fstation_mem)
 MACHINE_CONFIG_END
@@ -843,7 +808,7 @@ ROM_END
 
 
 GAME( 1990, backgamn,  0,        backgamn,    skattv, driver_device,    0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,  0,        quickjac,    skattv, driver_device,    0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
+GAME( 1993, quickjac,  0,        quickjac,    quickjac, driver_device,  0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,    0,        skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,   skattv,   skattv,      skattv, driver_device,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,  0,        fashiong,    skattv, driver_device,    0, ROT0,  "ADP",     "Fashion Gambler (set 1)", GAME_NOT_WORKING )
