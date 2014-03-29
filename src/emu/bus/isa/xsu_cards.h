@@ -32,5 +32,7 @@
 // supported devices
 SLOT_INTERFACE_EXTERN( p1_isa8_cards );
 SLOT_INTERFACE_EXTERN( mc1502_isa8_cards );
+SLOT_INTERFACE_EXTERN( ec184x_isa8_cards );
+SLOT_INTERFACE_EXTERN( iskr103x_isa8_cards );
 
 #endif // __XSU_CARDS_H__
