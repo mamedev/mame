@@ -49,7 +49,7 @@ machine_config_constructor sega_genesis_vdp_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
-static TIMER_CALLBACK( megadriv_render_timer_callback )
+static TIMER_CALLBACK( render_timer_callback )
 {
 	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
 	vdp->render_scanline();
@@ -57,7 +57,7 @@ static TIMER_CALLBACK( megadriv_render_timer_callback )
 
 void sega_genesis_vdp_device::vdp_handle_irq6_on_timer_callback(int param)
 {
-// megadrive_irq6_pending = 1;
+// m_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
 		m_lv6irqline_callback(true);
 }
@@ -110,25 +110,25 @@ void sega_genesis_vdp_device::device_start()
 	m_vram  = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_cram  = auto_alloc_array(machine(), UINT16, 0x80/2);
 	m_vsram = auto_alloc_array(machine(), UINT16, 0x80/2);
-	m_vdp_regs = auto_alloc_array(machine(), UINT16, 0x40/2);
+	m_regs = auto_alloc_array(machine(), UINT16, 0x40/2);
 	m_internal_sprite_attribute_table = auto_alloc_array(machine(), UINT16, 0x400/2);
 
 	memset(m_vram, 0x00, 0x10000);
 	memset(m_cram, 0x00, 0x80);
 	memset(m_vsram, 0x00, 0x80);
-	memset(m_vdp_regs, 0x00, 0x40);
+	memset(m_regs, 0x00, 0x40);
 	memset(m_internal_sprite_attribute_table, 0x00, 0x400);
 
 
 	save_pointer(NAME(m_vram), 0x10000/2);
 	save_pointer(NAME(m_cram), 0x80/2);
 	save_pointer(NAME(m_vsram), 0x80/2);
-	save_pointer(NAME(m_vdp_regs), 0x40/2);
+	save_pointer(NAME(m_regs), 0x40/2);
 	save_pointer(NAME(m_internal_sprite_attribute_table), 0x400/2);
 
-	save_item(NAME(m_vdp_command_pending));
-	save_item(NAME(m_vdp_command_part1));
-	save_item(NAME(m_vdp_command_part2));
+	save_item(NAME(m_command_pending));
+	save_item(NAME(m_command_part1));
+	save_item(NAME(m_command_part2));
 	save_item(NAME(m_vdp_code));
 	save_item(NAME(m_vdp_address));
 	save_item(NAME(m_vram_fill_pending));
@@ -136,9 +136,9 @@ void sega_genesis_vdp_device::device_start()
 	save_item(NAME(m_irq4counter));
 	save_item(NAME(m_imode_odd_frame));
 	save_item(NAME(m_sprite_collision));
-	save_item(NAME(megadrive_imode));
-	save_item(NAME(megadrive_irq6_pending));
-	save_item(NAME(megadrive_irq4_pending));
+	save_item(NAME(m_imode));
+	save_item(NAME(m_irq6_pending));
+	save_item(NAME(m_irq4_pending));
 	save_item(NAME(m_visible_scanlines));
 	save_item(NAME(m_irq6_scanline));
 	save_item(NAME(m_z80irq_scanline));
@@ -150,17 +150,17 @@ void sega_genesis_vdp_device::device_start()
 	m_highpri_renderline = auto_alloc_array(machine(), UINT8, 320);
 	m_video_renderline = auto_alloc_array(machine(), UINT32, 320);
 
-	megadrive_vdp_palette_lookup = auto_alloc_array(machine(), UINT16, 0x40);
-	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup_sprite = auto_alloc_array(machine(), UINT16, 0x40);
 
-	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine(), UINT16, 0x40);
-	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup_shadow = auto_alloc_array(machine(), UINT16, 0x40);
+	m_palette_lookup_highlight = auto_alloc_array(machine(), UINT16, 0x40);
 
-	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
-	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
+	memset(m_palette_lookup,0x00,0x40*2);
+	memset(m_palette_lookup_sprite,0x00,0x40*2);
 
-	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
-	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
+	memset(m_palette_lookup_shadow,0x00,0x40*2);
+	memset(m_palette_lookup_highlight,0x00,0x40*2);
 
 
 	if (!m_use_alt_timing)
@@ -175,17 +175,17 @@ void sega_genesis_vdp_device::device_start()
 	save_pointer(NAME(m_sprite_renderline), 1024);
 	save_pointer(NAME(m_highpri_renderline), 320);
 	save_pointer(NAME(m_video_renderline), 320/4);
-	save_pointer(NAME(megadrive_vdp_palette_lookup), 0x40/2);
-	save_pointer(NAME(megadrive_vdp_palette_lookup_sprite), 0x40/2);
-	save_pointer(NAME(megadrive_vdp_palette_lookup_shadow), 0x40/2);
-	save_pointer(NAME(megadrive_vdp_palette_lookup_highlight), 0x40/2);
+	save_pointer(NAME(m_palette_lookup), 0x40/2);
+	save_pointer(NAME(m_palette_lookup_sprite), 0x40/2);
+	save_pointer(NAME(m_palette_lookup_shadow), 0x40/2);
+	save_pointer(NAME(m_palette_lookup_highlight), 0x40/2);
 	save_pointer(NAME(m_render_line_raw), m_screen->width()/2);
 	if (m_use_alt_timing)
 		save_pointer(NAME(m_render_line), m_screen->width()/2);
 
-	irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
-	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
-	megadriv_render_timer = machine().scheduler().timer_alloc(FUNC(megadriv_render_timer_callback), (void*)this);
+	m_irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
+	m_irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);
+	m_render_timer = machine().scheduler().timer_alloc(FUNC(render_timer_callback), (void*)this);
 
 	m_space68k = &machine().device<m68000_base_device>(":maincpu")->space();
 	m_cpu68k = machine().device<m68000_base_device>(":maincpu");
@@ -195,9 +195,9 @@ void sega_genesis_vdp_device::device_start()
 
 void sega_genesis_vdp_device::device_reset()
 {
-	m_vdp_command_pending = 0;
-	m_vdp_command_part1 = 0;
-	m_vdp_command_part2 = 0;
+	m_command_pending = 0;
+	m_command_part1 = 0;
+	m_command_part2 = 0;
 	m_vdp_code = 0;
 	m_vdp_address = 0;
 	m_vram_fill_pending = 0;
@@ -205,9 +205,9 @@ void sega_genesis_vdp_device::device_reset()
 	m_irq4counter = -1;
 	m_imode_odd_frame = 0;
 	m_sprite_collision = 0;
-	megadrive_imode = 0;
-	megadrive_irq6_pending = 0;
-	megadrive_irq4_pending = 0;
+	m_imode = 0;
+	m_irq6_pending = 0;
+	m_irq4_pending = 0;
 	m_scanline_counter = 0;
 	m_vblank_flag = 0;
 	m_total_scanlines = 262;
@@ -270,7 +270,7 @@ void sega_genesis_vdp_device::write_cram_value(int offset, int data)
 	m_cram[offset] = data;
 
 	//logerror("Wrote to CRAM addr %04x data %04x\n",m_vdp_address&0xfffe,m_cram[m_vdp_address>>1]);
-	if (m_vdp_use_cram)
+	if (m_use_cram)
 	{
 		int r,g,b;
 		r = ((data >> 1)&0x07);
@@ -282,10 +282,10 @@ void sega_genesis_vdp_device::write_cram_value(int offset, int data)
 			m_palette->set_pen_color(offset + m_palwrite_base + 0x40 ,pal3bit(r>>1),pal3bit(g>>1),pal3bit(b>>1));
 			m_palette->set_pen_color(offset + m_palwrite_base + 0x80 ,pal3bit((r>>1)|0x4),pal3bit((g>>1)|0x4),pal3bit((b>>1)|0x4));
 		}
-		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
-		megadrive_vdp_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);
-		megadrive_vdp_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
-		megadrive_vdp_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
+		m_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
+		m_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);
+		m_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
+		m_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
 	}
 }
 
@@ -302,9 +302,9 @@ void sega_genesis_vdp_device::vdp_cram_write(UINT16 data)
 }
 
 
-void sega_genesis_vdp_device::megadriv_vdp_data_port_w(int data)
+void sega_genesis_vdp_device::data_port_w(int data)
 {
-	m_vdp_command_pending = 0;
+	m_command_pending = 0;
 
 	/*
 	0000b : VRAM read
@@ -348,12 +348,12 @@ void sega_genesis_vdp_device::megadriv_vdp_data_port_w(int data)
 
 		}
 
-		m_vdp_regs[0x13] = 0;
-		m_vdp_regs[0x14] = 0;
+		m_regs[0x13] = 0;
+		m_regs[0x14] = 0;
 
-	//  m_vdp_regs[0x15] = (source>>1) & 0xff;
-	//  m_vdp_regs[0x16] = (source>>9) & 0xff;
-	//  m_vdp_regs[0x17] = (source>>17) & 0xff;
+	//  m_regs[0x15] = (source>>1) & 0xff;
+	//  m_regs[0x16] = (source>>9) & 0xff;
+	//  m_regs[0x17] = (source>>17) & 0xff;
 
 
 	}
@@ -397,9 +397,9 @@ void sega_genesis_vdp_device::megadriv_vdp_data_port_w(int data)
 
 
 
-void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value)
+void sega_genesis_vdp_device::vdp_set_register(int regnum, UINT8 value)
 {
-	m_vdp_regs[regnum] = value;
+	m_regs[regnum] = value;
 
 	/* We need special handling for the IRQ enable registers, some games turn
 	   off the irqs before they are taken, delaying them until the IRQ is turned
@@ -409,7 +409,7 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value
 	{
 	//mame_printf_debug("setting reg 0, irq enable is now %d\n",MEGADRIVE_REG0_IRQ4_ENABLE);
 
-		if (megadrive_irq4_pending)
+		if (m_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				m_lv4irqline_callback(true);
@@ -419,14 +419,14 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
 		   it causes flickering in roadrash */
-	//  megadrive_irq6_pending = 0;
-	//  megadrive_irq4_pending = 0;
+	//  m_irq6_pending = 0;
+	//  m_irq4_pending = 0;
 
 	}
 
 	if (regnum == 0x01)
 	{
-		if (megadrive_irq6_pending)
+		if (m_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE )
 				m_lv6irqline_callback(true);
@@ -436,25 +436,25 @@ void sega_genesis_vdp_device::megadrive_vdp_set_register(int regnum, UINT8 value
 		}
 
 		/* ??? */
-	//  megadrive_irq6_pending = 0;
-	//  megadrive_irq4_pending = 0;
+	//  m_irq6_pending = 0;
+	//  m_irq4_pending = 0;
 
 	}
 
 
 //  if (regnum == 0x0a)
-//      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, genesis_get_scanline_counter());
+//      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, get_scanline_counter());
 
 //  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine().describe_context(), regnum,value);
 }
 
-void sega_genesis_vdp_device::update_m_vdp_code_and_address(void)
+void sega_genesis_vdp_device::update_code_and_address(void)
 {
-	m_vdp_code = ((m_vdp_command_part1 & 0xc000) >> 14) |
-							((m_vdp_command_part2 & 0x00f0) >> 2);
+	m_vdp_code = ((m_command_part1 & 0xc000) >> 14) |
+							((m_command_part2 & 0x00f0) >> 2);
 
-	m_vdp_address = ((m_vdp_command_part1 & 0x3fff) >> 0) |
-							((m_vdp_command_part2 & 0x0003) << 14);
+	m_vdp_address = ((m_command_part1 & 0x3fff) >> 0) |
+							((m_command_part2 & 0x0003) << 14);
 }
 
 // if either SVP CPU or segaCD is present, there is a 'lag' we have to compensate for
@@ -549,12 +549,12 @@ void sega_genesis_vdp_device::insta_68k_to_vram_dma(UINT32 source,int length)
 
 	m_vdp_address&=0xffff;
 
-	m_vdp_regs[0x13] = 0;
-	m_vdp_regs[0x14] = 0;
+	m_regs[0x13] = 0;
+	m_regs[0x14] = 0;
 
-	m_vdp_regs[0x15] = (source>>1) & 0xff;
-	m_vdp_regs[0x16] = (source>>9) & 0xff;
-	m_vdp_regs[0x17] = (source>>17) & 0xff;
+	m_regs[0x15] = (source>>1) & 0xff;
+	m_regs[0x16] = (source>>9) & 0xff;
+	m_regs[0x17] = (source>>17) & 0xff;
 }
 
 
@@ -577,12 +577,12 @@ void sega_genesis_vdp_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 		m_vdp_address&=0xffff;
 	}
 
-	m_vdp_regs[0x13] = 0;
-	m_vdp_regs[0x14] = 0;
+	m_regs[0x13] = 0;
+	m_regs[0x14] = 0;
 
-	m_vdp_regs[0x15] = (source>>1) & 0xff;
-	m_vdp_regs[0x16] = (source>>9) & 0xff;
-	m_vdp_regs[0x17] = (source>>17) & 0xff;
+	m_regs[0x15] = (source>>1) & 0xff;
+	m_regs[0x16] = (source>>9) & 0xff;
+	m_regs[0x17] = (source>>17) & 0xff;
 
 }
 
@@ -605,12 +605,12 @@ void sega_genesis_vdp_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length
 		m_vdp_address&=0xffff;
 	}
 
-	m_vdp_regs[0x13] = 0;
-	m_vdp_regs[0x14] = 0;
+	m_regs[0x13] = 0;
+	m_regs[0x14] = 0;
 
-	m_vdp_regs[0x15] = (source>>1) & 0xff;
-	m_vdp_regs[0x16] = (source>>9) & 0xff;
-	m_vdp_regs[0x17] = (source>>17) & 0xff;
+	m_regs[0x15] = (source>>1) & 0xff;
+	m_regs[0x16] = (source>>9) & 0xff;
+	m_regs[0x17] = (source>>17) & 0xff;
 }
 
 /* This can be simplified quite a lot.. */
@@ -745,18 +745,18 @@ void sega_genesis_vdp_device::handle_dma_bits()
 	}
 }
 
-void sega_genesis_vdp_device::megadriv_vdp_ctrl_port_w(int data)
+void sega_genesis_vdp_device::ctrl_port_w(int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
 	m_vram_fill_pending = 0; // ??
 
-	if (m_vdp_command_pending)
+	if (m_command_pending)
 	{
 		/* 2nd part of 32-bit command */
-		m_vdp_command_pending = 0;
-		m_vdp_command_part2 = data;
+		m_command_pending = 0;
+		m_command_part2 = data;
 
-		update_m_vdp_code_and_address();
+		update_code_and_address();
 		handle_dma_bits();
 
 		//logerror("VDP Write Part 2 setting Code %02x Address %04x\n",m_vdp_code, m_vdp_address);
@@ -771,15 +771,15 @@ void sega_genesis_vdp_device::megadriv_vdp_ctrl_port_w(int data)
 
 			if (regnum &0x20) mame_printf_debug("reg error\n");
 
-			megadrive_vdp_set_register(regnum&0x1f,value);
+			vdp_set_register(regnum & 0x1f, value);
 			m_vdp_code = 0;
 			m_vdp_address = 0;
 		}
 		else
 		{
-			m_vdp_command_pending = 1;
-			m_vdp_command_part1 = data;
-			update_m_vdp_code_and_address();
+			m_command_pending = 1;
+			m_command_part1 = data;
+			update_code_and_address();
 			//logerror("VDP Write Part 1 setting Code %02x Address %04x\n",m_vdp_code, m_vdp_address);
 		}
 
@@ -802,13 +802,13 @@ WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			megadriv_vdp_data_port_w(data);
+			data_port_w(data);
 			break;
 
 		case 0x04:
 		case 0x06:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
-			megadriv_vdp_ctrl_port_w(data);
+			ctrl_port_w(data);
 			break;
 
 		case 0x08:
@@ -850,13 +850,13 @@ UINT16 sega_genesis_vdp_device::vdp_cram_r(void)
 	return m_cram[(m_vdp_address&0x7e)>>1];
 }
 
-UINT16 sega_genesis_vdp_device::megadriv_vdp_data_port_r()
+UINT16 sega_genesis_vdp_device::data_port_r()
 {
 	UINT16 retdata=0;
 
 	//return machine().rand();
 
-	m_vdp_command_pending = 0;
+	m_command_pending = 0;
 
 	switch (m_vdp_code & 0x000f)
 	{
@@ -967,7 +967,7 @@ PAL, 256x224
 
 
 
-UINT16 sega_genesis_vdp_device::megadriv_vdp_ctrl_port_r()
+UINT16 sega_genesis_vdp_device::ctrl_port_r()
 {
 	/* Battletoads is very fussy about the vblank flag
 	   it wants it to be 1. in scanline 224 */
@@ -981,18 +981,18 @@ UINT16 sega_genesis_vdp_device::megadriv_vdp_ctrl_port_r()
 
 	/* Megalo Mania also fussy - cares about pending flag*/
 
-	int megadrive_sprite_overflow = 0;
-	int megadrive_odd_frame = m_imode_odd_frame^1;
-	int megadrive_hblank_flag = 0;
-	int megadrive_dma_active = 0;
+	int sprite_overflow = 0;
+	int odd_frame = m_imode_odd_frame^1;
+	int hblank_flag = 0;
+	int dma_active = 0;
 	int vblank = m_vblank_flag;
 	int fifo_empty = 1;
 	int fifo_full = 0;
 
 	UINT16 hpos = get_hposition();
 
-	if (hpos>400) megadrive_hblank_flag = 1;
-	if (hpos>460) megadrive_hblank_flag = 0;
+	if (hpos>400) hblank_flag = 1;
+	if (hpos>460) hblank_flag = 0;
 
 	/* extra case */
 	if (MEGADRIVE_REG01_DISP_ENABLE==0) vblank = 1;
@@ -1029,13 +1029,13 @@ UINT16 sega_genesis_vdp_device::megadriv_vdp_ctrl_port_r()
 			(1<<10) | // ALWAYS 1
 			(fifo_empty<<9 ) | // FIFO EMPTY
 			(fifo_full<<8 ) | // FIFO FULL
-			(megadrive_irq6_pending << 7) | // exmutants has a tight loop checking this ..
-			(megadrive_sprite_overflow << 6) |
+			(m_irq6_pending << 7) | // exmutants has a tight loop checking this ..
+			(sprite_overflow << 6) |
 			(m_sprite_collision << 5) |
-			(megadrive_odd_frame << 4) |
+			(odd_frame << 4) |
 			(vblank << 3) |
-			(megadrive_hblank_flag << 2) |
-			(megadrive_dma_active << 1 ) |
+			(hblank_flag << 2) |
+			(dma_active << 1 ) |
 			(m_vdp_pal << 0); // PAL MODE FLAG checked by striker for region prot..
 }
 
@@ -1158,7 +1158,7 @@ UINT16 sega_genesis_vdp_device::get_hposition()
 	return value4;
 }
 
-int sega_genesis_vdp_device::genesis_get_scanline_counter()
+int sega_genesis_vdp_device::get_scanline_counter()
 {
 	if (!m_use_alt_timing)
 		return m_scanline_counter;
@@ -1173,7 +1173,7 @@ UINT16 sega_genesis_vdp_device::megadriv_read_hv_counters()
 	/* Dracula is very sensitive to this */
 	/* Marvel Land is sensitive to this */
 
-	int vpos = genesis_get_scanline_counter();
+	int vpos = get_scanline_counter();
 	UINT16 hpos = get_hposition();
 
 //  if (hpos>424) vpos++; // fixes dracula, breaks road rash
@@ -1214,15 +1214,15 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_data_port_r();
+			retvalue = data_port_r();
 			break;
 
 		case 0x04:
 		case 0x06:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_ctrl_port_r();
+			retvalue = ctrl_port_r();
 		//  retvalue = machine().rand();
-		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),genesis_get_scanline_counter(), get_hposition(),retvalue);
+		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),get_scanline_counter(), get_hposition(),retvalue);
 			break;
 
 		case 0x08:
@@ -1232,7 +1232,7 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = machine().rand();
-		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),genesis_get_scanline_counter(), get_hposition(),retvalue);
+		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",space.device().safe_pc(),get_scanline_counter(), get_hposition(),retvalue);
 			break;
 
 		case 0x10:
@@ -1338,7 +1338,7 @@ void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 			link  = (m_internal_sprite_attribute_table[(spritenum*4)+0x1] & 0x007f)>>0;
 			xpos  = (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x3) & 0x01ff)>>0; /* 0x03ff? */ // pirates gold has a sprite with co-ord 0x200...
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				ypos  = (m_internal_sprite_attribute_table[(spritenum*4)+0x0] & 0x03ff)>>0; /* 0x3ff requried in interlace mode (sonic 2 2 player) */
 				drawypos = ypos - 256;
@@ -1363,7 +1363,7 @@ void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 				colour= (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x2) & 0x6000)>>13;
 				pri   = (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x2) & 0x8000)>>15;
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					addr<<=1;
 					addr &=0x7ff;
@@ -1405,7 +1405,7 @@ void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 							UINT32 gfxdata;
 							int loopcount;
 
-							if(megadrive_imode==3)
+							if(m_imode == 3)
 							{
 								if (!yflip) base_addr = (addr<<4)+(xtile*((height+1)*(2*16)))+(yline*2);
 								else base_addr = (addr<<4)+(xtile*((height+1)*(2*16)))+((((height+1)*16)-yline-1)*2);
@@ -1437,7 +1437,7 @@ void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 
 							int loopcount;
 
-							if(megadrive_imode==3)
+							if(m_imode == 3)
 							{
 								if (!yflip) base_addr = (addr<<4)+(((width-xtile))*((height+1)*(2*16)))+(yline*2);
 								else base_addr =      (addr<<4)+(((width-xtile))*((height+1)*(2*16)))+((((height+1)*16)-yline-1)*2);
@@ -1633,7 +1633,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			break;
 
 		case 0x01: // 'Broken' Line Scroll
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				hscroll_a = MEGADRIV_VDP_VRAM((hscroll_base>>1)+0+((scanline>>1)&7)*2);
 				hscroll_b = MEGADRIV_VDP_VRAM((hscroll_base>>1)+1+((scanline>>1)&7)*2);
@@ -1646,7 +1646,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			break;
 
 		case 0x02: // Cell Scroll
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				hscroll_a = MEGADRIV_VDP_VRAM((hscroll_base>>1)+0+((scanline>>1)&~7)*2);
 				hscroll_b = MEGADRIV_VDP_VRAM((hscroll_base>>1)+1+((scanline>>1)&~7)*2);
@@ -1659,7 +1659,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			break;
 
 		case 0x03: // Full Line Scroll
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				hscroll_a = MEGADRIV_VDP_VRAM((hscroll_base>>1)+0+(scanline>>1)*2);
 				hscroll_b = MEGADRIV_VDP_VRAM((hscroll_base>>1)+1+(scanline>>1)*2);
@@ -1711,7 +1711,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 
 				hcolumn = ((column*2-1)-(hscroll_b>>3))&(hsize-1);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 					tile_base = (base_b>>1)+((vcolumn>>4)*hsize)+hcolumn;
@@ -1732,7 +1732,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_pri = (tile_dat&0x8000)>>15;
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
@@ -1780,7 +1780,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 
 				hcolumn = ((column*2)-(hscroll_b>>3))&(hsize-1);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 					tile_base = (base_b>>1)+((vcolumn>>4)*hsize)+hcolumn;
@@ -1799,7 +1799,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_pri = (tile_dat&0x8000)>>15;
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
@@ -1847,7 +1847,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 
 				hcolumn = ((column*2+1)-(hscroll_b>>3))&(hsize-1);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 					tile_base = (base_b>>1)+((vcolumn>>4)*hsize)+hcolumn;
@@ -1866,7 +1866,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_pri = (tile_dat&0x8000)>>15;
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
@@ -1931,7 +1931,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			dpos = column*16;
 			hcolumn = (column*2)&(window_hsize-1);
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				tile_base = (base_w>>1)+((vcolumn>>4)*window_hsize)+hcolumn;
 			}
@@ -1948,13 +1948,13 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			tile_pri = (tile_dat&0x8000)>>15;
 			tile_addr = ((tile_dat&0x07ff)<<4);
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				tile_addr <<=1;
 				tile_addr &=0x7fff;
 			}
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				if (!tile_yflip) tile_addr+=(vcolumn&0xf)*2;
 				else tile_addr+=((0xf-vcolumn)&0xf)*2;
@@ -2009,7 +2009,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 
 
 			hcolumn = (column*2+1)&(window_hsize-1);
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				tile_base = (base_w>>1)+((vcolumn>>4)*window_hsize)+hcolumn;
 			}
@@ -2025,13 +2025,13 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 			tile_pri = (tile_dat&0x8000)>>15;
 			tile_addr = ((tile_dat&0x07ff)<<4);
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				tile_addr <<=1;
 				tile_addr &=0x7fff;
 			}
 
-			if(megadrive_imode==3)
+			if(m_imode == 3)
 			{
 				if (!tile_yflip) tile_addr+=(vcolumn&0xf)*2;
 				else tile_addr+=((0xf-vcolumn)&0xf)*2;
@@ -2120,7 +2120,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				if ((!window_is_bugged) || ((hscroll_a&0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column*2-1)-(hscroll_a>>3))&(hsize-1);
 				else hcolumn = ((column*2+1)-(hscroll_a>>3))&(hsize-1);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 				}
@@ -2129,7 +2129,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 					vcolumn = (vscroll + scanline)&((vsize*8)-1);
 				}
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_base = (base_a>>1)+((vcolumn>>4)*hsize)+hcolumn;
 				}
@@ -2147,7 +2147,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_pri = (tile_dat&0x8000)>>15;
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
@@ -2219,7 +2219,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				}
 
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 					tile_base = (base_a>>1)+((vcolumn>>4)*hsize)+hcolumn;
@@ -2239,7 +2239,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
@@ -2305,7 +2305,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				if ((!window_is_bugged) || ((hscroll_a&0xf)==0) || (column>non_window_firstcol/16)) hcolumn = ((column*2+1)-(hscroll_a>>3))&(hsize-1);
 				else hcolumn = ((column*2+1)-(hscroll_a>>3))&(hsize-1);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					vcolumn = (vscroll + scanline)&((vsize*16)-1);
 					tile_base = (base_a>>1)+((vcolumn>>4)*hsize)+hcolumn;
@@ -2323,13 +2323,13 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 				tile_pri = (tile_dat&0x8000)>>15;
 				tile_addr = ((tile_dat&0x07ff)<<4);
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					tile_addr <<=1;
 					tile_addr &=0x7fff;
 				}
 
-				if(megadrive_imode==3)
+				if(m_imode == 3)
 				{
 					if (!tile_yflip) tile_addr+=(vcolumn&0xf)*2;
 					else tile_addr+=((0xf-vcolumn)&0xf)*2;
@@ -2523,12 +2523,12 @@ void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
 		{
 			if (dat & 0x10000)
 			{
-				lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
+				lineptr[x] = m_palette_lookup_sprite[(dat & 0x3f)];
 				m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 			}
 			else
 			{
-				lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
+				lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 				m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 			}
 			
@@ -2544,26 +2544,26 @@ void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
 				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-					lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat & 0x3f)];
+					lineptr[x] = m_palette_lookup_shadow[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
 					break;
 					
 				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 				case 0x8000: // low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
+					lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 					break;
 					
 				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 				case 0x18000: // (sprite) low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
+					lineptr[x] = m_palette_lookup_sprite[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 					break;
 					
 					
 				case 0x0c000: // normal pri, highlight set = highlight?
 				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-					lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat & 0x3f)];
+					lineptr[x] = m_palette_lookup_highlight[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
 					break;
 					
@@ -2589,12 +2589,12 @@ void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
 
 void sega_genesis_vdp_device::render_scanline()
 {
-	int scanline = genesis_get_scanline_counter();
+	int scanline = get_scanline_counter();
 
 	if (scanline >= 0 && scanline < m_visible_scanlines)
 	{
 		//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
-		render_spriteline_to_spritebuffer(genesis_get_scanline_counter());
+		render_spriteline_to_spritebuffer(get_scanline_counter());
 		render_videoline_to_videobuffer(scanline);
 		render_videobuffer_to_screenbuffer(scanline);
 	}
@@ -2609,56 +2609,56 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
        still in the previous scanline for now.
     */
 
-	if (genesis_get_scanline_counter() != (m_total_scanlines - 1))
+	if (get_scanline_counter() != (m_total_scanlines - 1))
 	{
 		if (!m_use_alt_timing) m_scanline_counter++;
-//      mame_printf_debug("scanline %d\n",genesis_get_scanline_counter());
-		megadriv_render_timer->adjust(attotime::from_usec(1));
+//      mame_printf_debug("scanline %d\n",get_scanline_counter());
+		m_render_timer->adjust(attotime::from_usec(1));
 
-		if (genesis_get_scanline_counter() == m_irq6_scanline)
+		if (get_scanline_counter() == m_irq6_scanline)
 		{
-		//  mame_printf_debug("x %d",genesis_get_scanline_counter());
-			irq6_on_timer->adjust(attotime::from_usec(6));
-			megadrive_irq6_pending = 1;
+		//  mame_printf_debug("x %d",get_scanline_counter());
+			m_irq6_on_timer->adjust(attotime::from_usec(6));
+			m_irq6_pending = 1;
 			m_vblank_flag = 1;
 
 		}
 
-	//  if (genesis_get_scanline_counter()==0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
+	//  if (get_scanline_counter()==0) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 
-		if (genesis_get_scanline_counter()<=224)
+		if (get_scanline_counter()<=224)
 		{
 			m_irq4counter--;
 
 			if (m_irq4counter==-1)
 			{
-				if (megadrive_imode==3) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE*2;
+				if (m_imode == 3) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE*2;
 				else m_irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 
-				megadrive_irq4_pending = 1;
+				m_irq4_pending = 1;
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					irq4_on_timer->adjust(attotime::from_usec(1));
-					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_get_scanline_counter(),MEGADRIVE_REG0A_HINT_VALUE);
+					m_irq4_on_timer->adjust(attotime::from_usec(1));
+					//mame_printf_debug("irq4 on scanline %d reload %d\n",get_scanline_counter(),MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
 		}
 		else
 		{
-			if (megadrive_imode==3) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE*2;
+			if (m_imode == 3) m_irq4counter = MEGADRIVE_REG0A_HINT_VALUE*2;
 			else m_irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_get_scanline_counter()==0) irq4_on_timer->adjust(attotime::from_usec(2));
+		//if (get_scanline_counter()==0) irq4_on_timer->adjust(attotime::from_usec(2));
 
 
-		if (genesis_get_scanline_counter() == m_z80irq_scanline)
+		if (get_scanline_counter() == m_z80irq_scanline)
 		{
 			m_sndirqline_callback(true);
 		}
-		if (genesis_get_scanline_counter() == m_z80irq_scanline + 1)
+		if (get_scanline_counter() == m_z80irq_scanline + 1)
 		{
 			m_sndirqline_callback(false);
 		}
@@ -2670,7 +2670,7 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 
 	// 32x interrupts!
 	if (!m_32x_interrupt_func.isnull())
-		m_32x_interrupt_func(genesis_get_scanline_counter(), m_irq6_scanline);
+		m_32x_interrupt_func(get_scanline_counter(), m_irq6_scanline);
 }
 
 
@@ -2680,12 +2680,12 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 	int scr_width = 320;
 
 	m_vblank_flag = 0;
-	//megadrive_irq6_pending = 0; /* NO! (breaks warlock) */
+	//m_irq6_pending = 0; /* NO! (breaks warlock) */
 
 	/* Set it to -1 here, so it becomes 0 when the first timer kicks in */
 	if (!m_use_alt_timing) m_scanline_counter = -1;
 	m_sprite_collision=0;//? when to reset this ..
-	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
+	m_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	m_imode_odd_frame^=1;
 //      m_genesis_snd_z80->set_input_line(0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
@@ -2705,7 +2705,7 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 		m_z80irq_scanline = 224;
 	}
 
-	if (megadrive_imode == 3)
+	if (m_imode == 3)
 	{
 		m_total_scanlines <<= 1;
 		m_visible_scanlines <<= 1;
@@ -2722,7 +2722,7 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 		case 2:scr_width = 320;break;
 		case 3:scr_width = 320;break;
 	}
-//      mame_printf_debug("my mode %02x", m_vdp_regs[0x0c]);
+//      mame_printf_debug("my mode %02x", m_regs[0x0c]);
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 

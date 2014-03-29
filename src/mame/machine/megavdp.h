@@ -42,13 +42,13 @@
 
  */
 
-#define MEGADRIVE_REG0_UNUSED          ((m_vdp_regs[0x00]&0xc0)>>6)
-#define MEGADRIVE_REG0_BLANK_LEFT      ((m_vdp_regs[0x00]&0x20)>>5) // like SMS, not used by any commercial games?
-#define MEGADRIVE_REG0_IRQ4_ENABLE     ((m_vdp_regs[0x00]&0x10)>>4)
-#define MEGADRIVE_REG0_INVALID_MODE    ((m_vdp_regs[0x00]&0x08)>>3) // invalid display mode, unhandled
-#define MEGADRIVE_REG0_SPECIAL_PAL     ((m_vdp_regs[0x00]&0x04)>>2) // strange palette mode, unhandled
-#define MEGADRIVE_REG0_HVLATCH_ENABLE  ((m_vdp_regs[0x00]&0x02)>>1) // HV Latch, used by lightgun games
-#define MEGADRIVE_REG0_DISPLAY_DISABLE ((m_vdp_regs[0x00]&0x01)>>0)
+#define MEGADRIVE_REG0_UNUSED          ((m_regs[0x00]&0xc0)>>6)
+#define MEGADRIVE_REG0_BLANK_LEFT      ((m_regs[0x00]&0x20)>>5) // like SMS, not used by any commercial games?
+#define MEGADRIVE_REG0_IRQ4_ENABLE     ((m_regs[0x00]&0x10)>>4)
+#define MEGADRIVE_REG0_INVALID_MODE    ((m_regs[0x00]&0x08)>>3) // invalid display mode, unhandled
+#define MEGADRIVE_REG0_SPECIAL_PAL     ((m_regs[0x00]&0x04)>>2) // strange palette mode, unhandled
+#define MEGADRIVE_REG0_HVLATCH_ENABLE  ((m_regs[0x00]&0x02)>>1) // HV Latch, used by lightgun games
+#define MEGADRIVE_REG0_DISPLAY_DISABLE ((m_regs[0x00]&0x01)>>0)
 
 /*
 
@@ -66,82 +66,82 @@
 
 */
 
-#define MEGADRIVE_REG01_TMS9918_SELECT  ((m_vdp_regs[0x01]&0x80)>>7)
-#define MEGADRIVE_REG01_DISP_ENABLE     ((m_vdp_regs[0x01]&0x40)>>6)
-#define MEGADRIVE_REG01_IRQ6_ENABLE     ((m_vdp_regs[0x01]&0x20)>>5)
-#define MEGADRIVE_REG01_DMA_ENABLE      ((m_vdp_regs[0x01]&0x10)>>4)
-#define MEGADRIVE_REG01_240_LINE        ((m_vdp_regs[0x01]&0x08)>>3)
-#define MEGADRIVE_REG01_SMS_SELECT      ((m_vdp_regs[0x01]&0x04)>>2)
-#define MEGADRIVE_REG01_UNUSED          ((m_vdp_regs[0x01]&0x02)>>1)
-#define MEGADRIVE_REG01_STRANGE_VIDEO   ((m_vdp_regs[0x01]&0x01)>>0) // unhandled, does strange things to the display
+#define MEGADRIVE_REG01_TMS9918_SELECT  ((m_regs[0x01]&0x80)>>7)
+#define MEGADRIVE_REG01_DISP_ENABLE     ((m_regs[0x01]&0x40)>>6)
+#define MEGADRIVE_REG01_IRQ6_ENABLE     ((m_regs[0x01]&0x20)>>5)
+#define MEGADRIVE_REG01_DMA_ENABLE      ((m_regs[0x01]&0x10)>>4)
+#define MEGADRIVE_REG01_240_LINE        ((m_regs[0x01]&0x08)>>3)
+#define MEGADRIVE_REG01_SMS_SELECT      ((m_regs[0x01]&0x04)>>2)
+#define MEGADRIVE_REG01_UNUSED          ((m_regs[0x01]&0x02)>>1)
+#define MEGADRIVE_REG01_STRANGE_VIDEO   ((m_regs[0x01]&0x01)>>0) // unhandled, does strange things to the display
 
-#define MEGADRIVE_REG02_UNUSED1         ((m_vdp_regs[0x02]&0xc0)>>6)
-#define MEGADRIVE_REG02_PATTERN_ADDR_A  ((m_vdp_regs[0x02]&0x38)>>3)
-#define MEGADRIVE_REG02_UNUSED2         ((m_vdp_regs[0x02]&0x07)>>0)
+#define MEGADRIVE_REG02_UNUSED1         ((m_regs[0x02]&0xc0)>>6)
+#define MEGADRIVE_REG02_PATTERN_ADDR_A  ((m_regs[0x02]&0x38)>>3)
+#define MEGADRIVE_REG02_UNUSED2         ((m_regs[0x02]&0x07)>>0)
 
-#define MEGADRIVE_REG03_UNUSED1         ((m_vdp_regs[0x03]&0xc0)>>6)
-#define MEGADRIVE_REG03_PATTERN_ADDR_W  ((m_vdp_regs[0x03]&0x3e)>>1)
-#define MEGADRIVE_REG03_UNUSED2         ((m_vdp_regs[0x03]&0x01)>>0)
+#define MEGADRIVE_REG03_UNUSED1         ((m_regs[0x03]&0xc0)>>6)
+#define MEGADRIVE_REG03_PATTERN_ADDR_W  ((m_regs[0x03]&0x3e)>>1)
+#define MEGADRIVE_REG03_UNUSED2         ((m_regs[0x03]&0x01)>>0)
 
-#define MEGADRIVE_REG04_UNUSED          ((m_vdp_regs[0x04]&0xf8)>>3)
-#define MEGADRIVE_REG04_PATTERN_ADDR_B  ((m_vdp_regs[0x04]&0x07)>>0)
+#define MEGADRIVE_REG04_UNUSED          ((m_regs[0x04]&0xf8)>>3)
+#define MEGADRIVE_REG04_PATTERN_ADDR_B  ((m_regs[0x04]&0x07)>>0)
 
-#define MEGADRIVE_REG05_UNUSED          ((m_vdp_regs[0x05]&0x80)>>7)
-#define MEGADRIVE_REG05_SPRITE_ADDR     ((m_vdp_regs[0x05]&0x7f)>>0)
+#define MEGADRIVE_REG05_UNUSED          ((m_regs[0x05]&0x80)>>7)
+#define MEGADRIVE_REG05_SPRITE_ADDR     ((m_regs[0x05]&0x7f)>>0)
 
 /* 6? */
 
-#define MEGADRIVE_REG07_UNUSED          ((m_vdp_regs[0x07]&0xc0)>>6)
-#define MEGADRIVE_REG07_BGCOLOUR        ((m_vdp_regs[0x07]&0x3f)>>0)
+#define MEGADRIVE_REG07_UNUSED          ((m_regs[0x07]&0xc0)>>6)
+#define MEGADRIVE_REG07_BGCOLOUR        ((m_regs[0x07]&0x3f)>>0)
 
 /* 8? */
 /* 9? */
 
-#define MEGADRIVE_REG0A_HINT_VALUE      ((m_vdp_regs[0x0a]&0xff)>>0)
+#define MEGADRIVE_REG0A_HINT_VALUE      ((m_regs[0x0a]&0xff)>>0)
 
-#define MEGADRIVE_REG0B_UNUSED          ((m_vdp_regs[0x0b]&0xf0)>>4)
-#define MEGADRIVE_REG0B_IRQ2_ENABLE     ((m_vdp_regs[0x0b]&0x08)>>3)
-#define MEGADRIVE_REG0B_VSCROLL_MODE    ((m_vdp_regs[0x0b]&0x04)>>2)
-#define MEGADRIVE_REG0B_HSCROLL_MODE    ((m_vdp_regs[0x0b]&0x03)>>0)
+#define MEGADRIVE_REG0B_UNUSED          ((m_regs[0x0b]&0xf0)>>4)
+#define MEGADRIVE_REG0B_IRQ2_ENABLE     ((m_regs[0x0b]&0x08)>>3)
+#define MEGADRIVE_REG0B_VSCROLL_MODE    ((m_regs[0x0b]&0x04)>>2)
+#define MEGADRIVE_REG0B_HSCROLL_MODE    ((m_regs[0x0b]&0x03)>>0)
 
-#define MEGADRIVE_REG0C_RS0             ((m_vdp_regs[0x0c]&0x80)>>7)
-#define MEGADRIVE_REG0C_UNUSED1         ((m_vdp_regs[0x0c]&0x40)>>6)
-#define MEGADRIVE_REG0C_SPECIAL         ((m_vdp_regs[0x0c]&0x20)>>5)
-#define MEGADRIVE_REG0C_UNUSED2         ((m_vdp_regs[0x0c]&0x10)>>4)
-#define MEGADRIVE_REG0C_SHADOW_HIGLIGHT ((m_vdp_regs[0x0c]&0x08)>>3)
-#define MEGADRIVE_REG0C_INTERLEAVE      ((m_vdp_regs[0x0c]&0x06)>>1)
-#define MEGADRIVE_REG0C_RS1             ((m_vdp_regs[0x0c]&0x01)>>0)
+#define MEGADRIVE_REG0C_RS0             ((m_regs[0x0c]&0x80)>>7)
+#define MEGADRIVE_REG0C_UNUSED1         ((m_regs[0x0c]&0x40)>>6)
+#define MEGADRIVE_REG0C_SPECIAL         ((m_regs[0x0c]&0x20)>>5)
+#define MEGADRIVE_REG0C_UNUSED2         ((m_regs[0x0c]&0x10)>>4)
+#define MEGADRIVE_REG0C_SHADOW_HIGLIGHT ((m_regs[0x0c]&0x08)>>3)
+#define MEGADRIVE_REG0C_INTERLEAVE      ((m_regs[0x0c]&0x06)>>1)
+#define MEGADRIVE_REG0C_RS1             ((m_regs[0x0c]&0x01)>>0)
 
-#define MEGADRIVE_REG0D_UNUSED          ((m_vdp_regs[0x0d]&0xc0)>>6)
-#define MEGADRIVE_REG0D_HSCROLL_ADDR    ((m_vdp_regs[0x0d]&0x3f)>>0)
+#define MEGADRIVE_REG0D_UNUSED          ((m_regs[0x0d]&0xc0)>>6)
+#define MEGADRIVE_REG0D_HSCROLL_ADDR    ((m_regs[0x0d]&0x3f)>>0)
 
 /* e? */
 
-#define MEGADRIVE_REG0F_AUTO_INC        ((m_vdp_regs[0x0f]&0xff)>>0)
+#define MEGADRIVE_REG0F_AUTO_INC        ((m_regs[0x0f]&0xff)>>0)
 
-#define MEGADRIVE_REG10_UNUSED1        ((m_vdp_regs[0x10]&0xc0)>>6)
-#define MEGADRIVE_REG10_VSCROLL_SIZE   ((m_vdp_regs[0x10]&0x30)>>4)
-#define MEGADRIVE_REG10_UNUSED2        ((m_vdp_regs[0x10]&0x0c)>>2)
-#define MEGADRIVE_REG10_HSCROLL_SIZE   ((m_vdp_regs[0x10]&0x03)>>0)
+#define MEGADRIVE_REG10_UNUSED1        ((m_regs[0x10]&0xc0)>>6)
+#define MEGADRIVE_REG10_VSCROLL_SIZE   ((m_regs[0x10]&0x30)>>4)
+#define MEGADRIVE_REG10_UNUSED2        ((m_regs[0x10]&0x0c)>>2)
+#define MEGADRIVE_REG10_HSCROLL_SIZE   ((m_regs[0x10]&0x03)>>0)
 
-#define MEGADRIVE_REG11_WINDOW_RIGHT   ((m_vdp_regs[0x11]&0x80)>>7)
-#define MEGADRIVE_REG11_UNUSED         ((m_vdp_regs[0x11]&0x60)>>5)
-#define MEGADRIVE_REG11_WINDOW_HPOS      ((m_vdp_regs[0x11]&0x1f)>>0)
+#define MEGADRIVE_REG11_WINDOW_RIGHT   ((m_regs[0x11]&0x80)>>7)
+#define MEGADRIVE_REG11_UNUSED         ((m_regs[0x11]&0x60)>>5)
+#define MEGADRIVE_REG11_WINDOW_HPOS      ((m_regs[0x11]&0x1f)>>0)
 
-#define MEGADRIVE_REG12_WINDOW_DOWN    ((m_vdp_regs[0x12]&0x80)>>7)
-#define MEGADRIVE_REG12_UNUSED         ((m_vdp_regs[0x12]&0x60)>>5)
-#define MEGADRIVE_REG12_WINDOW_VPOS      ((m_vdp_regs[0x12]&0x1f)>>0)
+#define MEGADRIVE_REG12_WINDOW_DOWN    ((m_regs[0x12]&0x80)>>7)
+#define MEGADRIVE_REG12_UNUSED         ((m_regs[0x12]&0x60)>>5)
+#define MEGADRIVE_REG12_WINDOW_VPOS      ((m_regs[0x12]&0x1f)>>0)
 
-#define MEGADRIVE_REG13_DMALENGTH1     ((m_vdp_regs[0x13]&0xff)>>0)
+#define MEGADRIVE_REG13_DMALENGTH1     ((m_regs[0x13]&0xff)>>0)
 
-#define MEGADRIVE_REG14_DMALENGTH2      ((m_vdp_regs[0x14]&0xff)>>0)
+#define MEGADRIVE_REG14_DMALENGTH2      ((m_regs[0x14]&0xff)>>0)
 
-#define MEGADRIVE_REG15_DMASOURCE1      ((m_vdp_regs[0x15]&0xff)>>0)
-#define MEGADRIVE_REG16_DMASOURCE2      ((m_vdp_regs[0x16]&0xff)>>0)
+#define MEGADRIVE_REG15_DMASOURCE1      ((m_regs[0x15]&0xff)>>0)
+#define MEGADRIVE_REG16_DMASOURCE2      ((m_regs[0x16]&0xff)>>0)
 
-#define MEGADRIVE_REG17_DMASOURCE3      ((m_vdp_regs[0x17]&0xff)>>0)
-#define MEGADRIVE_REG17_DMATYPE         ((m_vdp_regs[0x17]&0xc0)>>6)
-#define MEGADRIVE_REG17_UNUSED          ((m_vdp_regs[0x17]&0x3f)>>0)
+#define MEGADRIVE_REG17_DMASOURCE3      ((m_regs[0x17]&0xff)>>0)
+#define MEGADRIVE_REG17_DMATYPE         ((m_regs[0x17]&0xc0)>>6)
+#define MEGADRIVE_REG17_UNUSED          ((m_regs[0x17]&0x3f)>>0)
 
 
 #define MCFG_SEGAGEN_VDP_IS_PAL(_bool) \
@@ -210,7 +210,7 @@ public:
 	DECLARE_READ16_MEMBER( megadriv_vdp_r );
 	DECLARE_WRITE16_MEMBER( megadriv_vdp_w );
 
-	int genesis_get_scanline_counter();
+	int get_scanline_counter();
 
 	void render_scanline();
 	void vdp_handle_scanline_callback(int scanline);
@@ -218,18 +218,18 @@ public:
 	void vdp_handle_irq4_on_timer_callback(int param);
 	void vdp_handle_eof();
 	void device_reset_old();
-	void vdp_clear_irq6_pending(void) { megadrive_irq6_pending = 0; };
-	void vdp_clear_irq4_pending(void) { megadrive_irq4_pending = 0; };
+	void vdp_clear_irq6_pending(void) { m_irq6_pending = 0; };
+	void vdp_clear_irq4_pending(void) { m_irq4_pending = 0; };
 
 	// set some VDP variables at start (shall be moved to a device interface?)
 	void set_scanline_counter(int scanline) { m_scanline_counter = scanline; }
 	void set_total_scanlines(int total) { m_base_total_scanlines = total; }
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_vdp_pal(bool pal) { m_vdp_pal = pal ? 1 : 0; }
-	void set_use_cram(int cram) { m_vdp_use_cram = cram; }
+	void set_use_cram(int cram) { m_use_cram = cram; }
 	void set_dma_delay(int delay) { m_dma_delay = delay; }
 	int get_framerate() { return m_framerate; }
-	int get_imode() { return megadrive_imode; }
+	int get_imode() { return m_imode; }
 
 
 	void vdp_clear_bitmap(void)
@@ -264,9 +264,9 @@ protected:
 	
 private:
 
-	int m_vdp_command_pending; // 2nd half of command pending..
-	UINT16 m_vdp_command_part1;
-	UINT16 m_vdp_command_part2;
+	int m_command_pending; // 2nd half of command pending..
+	UINT16 m_command_part1;
+	UINT16 m_command_part2;
 	UINT8  m_vdp_code;
 	UINT16 m_vdp_address;
 	UINT8 m_vram_fill_pending;
@@ -274,12 +274,12 @@ private:
 	int m_irq4counter;
 	int m_imode_odd_frame;
 	int m_sprite_collision;
-	int megadrive_irq6_pending;
-	int megadrive_irq4_pending;
+	int m_irq6_pending;
+	int m_irq4_pending;
 	int m_scanline_counter;
 	int m_vblank_flag;
 
-	int megadrive_imode;
+	int m_imode;
 
 	int m_visible_scanlines;
 	int m_irq6_scanline;
@@ -290,10 +290,10 @@ private:
 
 	int m_framerate;
 	int m_vdp_pal;
-	int m_vdp_use_cram; // c2 uses it's own palette ram, so it sets this to 0
+	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;	// SVP and SegaCD have some 'lag' in DMA transfers
 
-	UINT16* m_vdp_regs;
+	UINT16* m_regs;
 	UINT16* m_vram;
 	UINT16* m_cram;
 	UINT16* m_vsram;
@@ -303,9 +303,9 @@ private:
 
 	// these are used internally by the VDP to schedule when after the start of a scanline
 	// to trigger the various interrupts / rendering to our bitmap, bit of a hack really
-	emu_timer* irq6_on_timer;
-	emu_timer* irq4_on_timer;
-	emu_timer* megadriv_render_timer;
+	emu_timer* m_irq6_on_timer;
+	emu_timer* m_irq4_on_timer;
+	emu_timer* m_render_timer;
 
 	UINT16 vdp_vram_r(void);
 	UINT16 vdp_vsram_r(void);
@@ -321,18 +321,18 @@ private:
 	void write_cram_value(int offset, int data);
 	void vdp_vsram_write(UINT16 data);
 
-	void megadrive_vdp_set_register(int regnum, UINT8 value);
+	void vdp_set_register(int regnum, UINT8 value);
 
 	void handle_dma_bits();
 
 	UINT16 get_hposition();
 	UINT16 megadriv_read_hv_counters();
 
-	UINT16 megadriv_vdp_ctrl_port_r();
-	UINT16 megadriv_vdp_data_port_r();
-	void megadriv_vdp_data_port_w(int data);
-	void megadriv_vdp_ctrl_port_w(int data);
-	void update_m_vdp_code_and_address(void);
+	UINT16 ctrl_port_r();
+	UINT16 data_port_r();
+	void data_port_w(int data);
+	void ctrl_port_w(int data);
+	void update_code_and_address(void);
 
 
 	void render_spriteline_to_spritebuffer(int scanline);
@@ -343,10 +343,10 @@ private:
 	UINT8* m_sprite_renderline;
 	UINT8* m_highpri_renderline;
 	UINT32* m_video_renderline;
-	UINT16* megadrive_vdp_palette_lookup;
-	UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
-	UINT16* megadrive_vdp_palette_lookup_shadow;
-	UINT16* megadrive_vdp_palette_lookup_highlight;
+	UINT16* m_palette_lookup;
+	UINT16* m_palette_lookup_sprite; // for C2
+	UINT16* m_palette_lookup_shadow;
+	UINT16* m_palette_lookup_highlight;
 
 	address_space *m_space68k;
 	m68000_base_device* m_cpu68k;
