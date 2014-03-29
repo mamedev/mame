@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(zenith, pc8, I8088, XTAL_14_31818MHz/3) /* 4,77 MHz */
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
 	
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)

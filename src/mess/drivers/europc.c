@@ -377,8 +377,6 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 	{
 	case 1:
 		m_port61=data;
-//      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
-//      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
 		m_mb->m_pit8253->write_gate2(BIT(data, 0));
 		m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
