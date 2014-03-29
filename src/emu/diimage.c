@@ -430,8 +430,7 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 	hashes.reset();
 	size = (UINT32) length();
 
-	buf.resize(size);
-	memset(buf,0,size);
+	buf.resize_and_clear(size);
 
 	/* read the file */
 	fseek(0, SEEK_SET);

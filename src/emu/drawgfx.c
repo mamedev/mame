@@ -473,8 +473,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	}
 
 	// mark everything dirty
-	m_dirty.resize(m_total_elements);
-	memset(m_dirty, 1, m_total_elements);
+	m_dirty.resize_and_clear(m_total_elements, 1);
 
 	// allocate a pen usage array for entries with 32 pens or less
 	if (m_color_depth <= 32)

@@ -75,12 +75,11 @@ const UINT32 *palette_client::dirty_state::dirty_list(UINT32 &mindirty, UINT32 &
 
 void palette_client::dirty_state::resize(UINT32 colors)
 {
-	// resize to the correct number of dwords
+	// resize to the correct number of dwords and mark all entries dirty
 	UINT32 dirty_dwords = (colors + 31) / 32;
-	m_dirty.resize(dirty_dwords);
+	m_dirty.resize_and_clear(dirty_dwords, 0xff);
 
 	// mark all entries dirty
-	memset(&m_dirty[0], 0xff, dirty_dwords * sizeof(UINT32));
 	m_dirty[dirty_dwords - 1] &= (1 << (colors % 32)) - 1;
 
 	// set min/max	

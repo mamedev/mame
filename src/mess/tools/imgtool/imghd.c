@@ -101,8 +101,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	cache.resize(hunksize);
-	cache.clear();
+	cache.resize_and_clear(hunksize);
 
 	/* zero out every hunk */
 	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
