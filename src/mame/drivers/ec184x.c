@@ -6,12 +6,6 @@
 
     Driver file for EC-184x series
 
-    TODO (ec1840)
-    - memory bank size is smaller (128K)
-
-    TODO (ec1841)
-    - hard disk is connected but requires changes to isa_hdc.c
-
 ***************************************************************************/
 
 
@@ -23,6 +17,8 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
+
+#define EC1841_MEMBOARD_SIZE	512*1024
 
 #define VERBOSE_DBG 1       /* general debug messages */
 
@@ -48,12 +44,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_MACHINE_RESET(ec184x);
-	DECLARE_DRIVER_INIT(ec184x);
+	DECLARE_DRIVER_INIT(ec1841);
 
 	struct {
 		UINT8 enable[4];
 		int boards;
-		int board_size;
 	} m_memory;
 
 	DECLARE_READ8_MEMBER(memboard_r);
@@ -109,13 +104,13 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 
 	if (BIT(current, 2) && !BIT(data, 2)) {
 		// disable read access
-		program.unmap_read(0, m_memory.board_size-1);
+		program.unmap_read(0, EC1841_MEMBOARD_SIZE-1);
 		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
 	}
 
 	if (BIT(current, 3) && !BIT(data, 3)) {
 		// disable write access
-		program.unmap_write(0, 0x7ffff);
+		program.unmap_write(0, EC1841_MEMBOARD_SIZE-1);
 		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
 	}
 
@@ -123,8 +118,8 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 		for(int i=0; i<4; i++)
 			m_memory.enable[i] &= 0xfb;
 		// enable read access
-		membank("bank10")->set_base(m_ram->pointer() + offset*0x80000);
-		program.install_read_bank(0, m_memory.board_size-1, "bank10");
+		membank("bank10")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
+		program.install_read_bank(0, EC1841_MEMBOARD_SIZE-1, "bank10");
 		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
 	}
 
@@ -132,26 +127,32 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 		for(int i=0; i<4; i++)
 			m_memory.enable[i] &= 0xf7;
 		// enable write access
-		membank("bank20")->set_base(m_ram->pointer() + offset*0x80000);
-		program.install_write_bank(0, m_memory.board_size-1, "bank20");
+		membank("bank20")->set_base(m_ram->pointer() + offset*EC1841_MEMBOARD_SIZE);
+		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
 		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
 	}
 
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER( ec184x_state, ec184x )
+DRIVER_INIT_MEMBER( ec184x_state, ec1841 )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
-	m_memory.board_size = 512 * 1024; // XXX
-	m_memory.boards = m_ram->size()/m_memory.board_size - 1;
+	m_memory.boards = m_ram->size()/EC1841_MEMBOARD_SIZE - 1;
 	if (m_memory.boards > 3)
 		m_memory.boards = 3;
 
-	program.install_read_bank(0, m_memory.board_size-1, "bank10");
-	program.install_write_bank(0, m_memory.board_size-1, "bank20");
+	// 640K configuration is special -- 512K board mapped at 0 + 128K board mapped at 512K
+	// XXX verify this was actually the case
+	if (m_ram->size() == 640*1024) {
+		program.install_read_bank(0,  m_ram->size()-1, "bank10");
+		program.install_write_bank(0, m_ram->size()-1, "bank20");
+	} else {
+		program.install_read_bank(0,  EC1841_MEMBOARD_SIZE-1, "bank10");
+		program.install_write_bank(0, EC1841_MEMBOARD_SIZE-1, "bank20");
+	}
 	membank( "bank10" )->set_base( m_ram->pointer() );
 	membank( "bank20" )->set_base( m_ram->pointer() );
 }
@@ -271,8 +272,8 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1024K,1576K,2048K") // 640K variant not emulated
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("512K,1024K,1576K,2048K")
 MACHINE_CONFIG_END
 
 // XXX verify everything
@@ -374,14 +375,8 @@ ROM_START( ec1847 )
 	ROM_LOAD( "317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
 ROM_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
 /*     YEAR     ROM NAME    PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1987,    ec1840,     ibm5150,    0,      ec1840,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1840", MACHINE_NOT_WORKING)
-COMP ( 1987,    ec1841,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1841", 0)
-COMP ( 1989,    ec1845,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec184x,     "<unknown>",  "EC-1845", MACHINE_NOT_WORKING)
+COMP ( 1987,    ec1840,     ibm5150,    0,      ec1840,     ec1841,   driver_device,    0,          "<unknown>",  "EC-1840", MACHINE_NOT_WORKING)
+COMP ( 1987,    ec1841,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec1841,     "<unknown>",  "EC-1841", 0)
+COMP ( 1989,    ec1845,     ibm5150,    0,      ec1841,     ec1841,   ec184x_state,     ec1841,     "<unknown>",  "EC-1845", MACHINE_NOT_WORKING)
 COMP ( 1990,    ec1847,     ibm5150,    0,      ec1847,     ec1841,   driver_device,    0,          "<unknown>",  "EC-1847", MACHINE_NOT_WORKING)
