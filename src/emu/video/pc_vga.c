@@ -635,7 +635,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				addr %= vga.svga_intf.vram_size;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 				{
-					if(pos + 0x08 > 0x100000)
+					if(pos + 0x08 >= vga.svga_intf.vram_size)
 						return;
 
 					for(xi=0;xi<8;xi++)
@@ -673,7 +673,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
-			if(pos + 0x10 > 0x100000)
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
@@ -717,7 +717,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
-			if(pos + 0x10 > 0x100000)
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
@@ -761,7 +761,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
 		{
-			if(pos + 24 > 0x100000)
+			if(pos + 24 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=3)
 			{
@@ -802,7 +802,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
 		{
-			if(pos + 0x20 > 0x100000)
+			if(pos + 0x20 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=4)
 			{
@@ -2883,10 +2883,11 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
+			case 0x01: svga.rgb8_en = 1; break;
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
-			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
-			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
+			case 0x0d: svga.rgb32_en = 1; divisor = 1; break;
+			default: fatalerror("TODO: S3 colour mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
 	}
 	else
@@ -4811,7 +4812,7 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			return 0;
 		data = 0;
 		if(vga.sequencer.data[4] & 0x8)
-			data = vga.memory[offset + (svga.bank_r*0x10000)];
+			data = vga.memory[(offset + (svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
 		else
 		{
 			int i;
@@ -4819,7 +4820,7 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					data |= vga.memory[offset*4+i+(svga.bank_r*0x10000)];
+					data |= vga.memory[(offset*4+i+(svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
 			}
 		}
 		return data;
