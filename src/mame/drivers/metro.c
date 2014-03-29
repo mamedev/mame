@@ -246,6 +246,8 @@ WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
 INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
+	m_requested_int[5] = 1;
+
 	update_irq_state();
 }
 
@@ -6400,7 +6402,7 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 	metro_common();
 	m_irq_line = 0;
 	m_vblank_bit = 1;
-	m_blitter_bit = 0;
+	m_blitter_bit = 3;
 }
 
 /***************************************************************************
