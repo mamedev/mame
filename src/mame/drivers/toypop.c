@@ -509,33 +509,6 @@ WRITE8_MEMBER(toypop_state::flip)
 	flip_screen_set(data & 1);
 }
 
-/* chip #0: player inputs, buttons, coins */
-static const namcoio_interface intf0_coin =
-{
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1_RIGHT"), DEVCB_INPUT_PORT("P2_RIGHT"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(toypop_state,out_coin0), DEVCB_DRIVER_MEMBER(toypop_state,out_coin1) },       /* port write handlers */
-};
-static const namcoio_interface intf0 =
-{
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1_RIGHT"), DEVCB_INPUT_PORT("P2_RIGHT"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
-	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
-};
-
-/* chip #1: dip switches */
-static const namcoio_interface intf1 =
-{
-	{ DEVCB_DRIVER_MEMBER(toypop_state,dipA_h), DEVCB_DRIVER_MEMBER(toypop_state,dipB_l), DEVCB_DRIVER_MEMBER(toypop_state,dipB_h), DEVCB_DRIVER_MEMBER(toypop_state,dipA_l) }, /* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(toypop_state,flip), DEVCB_NULL },                     /* port write handlers */
-};
-
-/* chip #2: test/cocktail, optional buttons */
-static const namcoio_interface intf2 =
-{
-	{ DEVCB_NULL, DEVCB_INPUT_PORT("P1_LEFT"), DEVCB_INPUT_PORT("P2_LEFT"), DEVCB_INPUT_PORT("SERVICE") },  /* port read handlers */
-	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
-};
-
-
 static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
 	/* basic machine hardware */
@@ -554,10 +527,24 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MCFG_NAMCO58XX_ADD("58xx", intf0)
-	MCFG_NAMCO56XX_ADD("56xx_1", intf1)
-	MCFG_NAMCO56XX_ADD("56xx_2", intf2)
-
+	MCFG_DEVICE_ADD("58xx", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1_RIGHT"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2_RIGHT"))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+		
+	MCFG_DEVICE_ADD("56xx_1", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(toypop_state, dipA_h))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(toypop_state, dipB_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(toypop_state, dipB_h))
+	MCFG_NAMCO56XX_IN_3_CB(READ8(toypop_state, dipA_l))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(toypop_state, flip))
+	
+	MCFG_DEVICE_ADD("56xx_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2_LEFT"))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("SERVICE"))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.606060)
@@ -586,8 +573,9 @@ static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(toypop_map)
 
-	MCFG_DEVICE_REMOVE("58xx")
-	MCFG_NAMCO58XX_ADD("58xx", intf0_coin)
+	MCFG_DEVICE_MODIFY("58xx")
+	MCFG_NAMCO58XX_OUT_0_CB(WRITE8(toypop_state, out_coin0))
+	MCFG_NAMCO58XX_OUT_1_CB(WRITE8(toypop_state, out_coin1))
 MACHINE_CONFIG_END
 
 

@@ -121,7 +121,13 @@ const device_type NAMCO58XX = &device_creator<namco58xx_device>;
 const device_type NAMCO59XX = &device_creator<namco59xx_device>;
 
 namcoio_device::namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
+		m_in_0_cb(*this),
+		m_in_1_cb(*this),
+		m_in_2_cb(*this),
+		m_in_3_cb(*this),
+		m_out_0_cb(*this),
+		m_out_1_cb(*this)
 {
 }
 
@@ -144,42 +150,17 @@ namco59xx_device::namco59xx_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void namcoio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const namcoio_interface *intf = reinterpret_cast<const namcoio_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<namcoio_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in[0], 0, sizeof(m_in[0]));
-		memset(&m_in[1], 0, sizeof(m_in[1]));
-		memset(&m_in[2], 0, sizeof(m_in[2]));
-		memset(&m_in[3], 0, sizeof(m_in[3]));
-		memset(&m_out[0], 0, sizeof(m_out[0]));
-		memset(&m_out[1], 0, sizeof(m_out[1]));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void namcoio_device::device_start()
 {
-	m_in_func[0].resolve(m_in[0], *this);
-	m_in_func[1].resolve(m_in[1], *this);
-	m_in_func[2].resolve(m_in[2], *this);
-	m_in_func[3].resolve(m_in[3], *this);
-	m_out_func[0].resolve(m_out[0], *this);
-	m_out_func[1].resolve(m_out[1], *this);
+	m_in_0_cb.resolve_safe(0);
+	m_in_1_cb.resolve_safe(0);
+	m_in_2_cb.resolve_safe(0);
+	m_in_3_cb.resolve_safe(0);
+	m_out_0_cb.resolve_safe();
+	m_out_1_cb.resolve_safe();
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_reset));
@@ -208,9 +189,6 @@ void namcoio_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-#define READ_PORT(n)    (m_in_func[n](0) & 0x0f)
-#define WRITE_PORT(n,d) (m_out_func[n](0, (d) & 0x0f))
-
 #define IORAM_READ(offset) (m_ram[offset] & 0x0f)
 #define IORAM_WRITE(offset,data) {m_ram[offset] = (data) & 0x0f;}
 
@@ -223,7 +201,7 @@ void namcoio_device::handle_coins( int swap )
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-	val = ~READ_PORT(0);    // pins 38-41
+	val = ~m_in_0_cb(0 & 0x0f);    // pins 38-41
 	toggled = val ^ m_lastcoins;
 	m_lastcoins = val;
 
@@ -255,7 +233,7 @@ void namcoio_device::handle_coins( int swap )
 		credit_add = 1;
 	}
 
-	val = ~READ_PORT(3);    // pins 30-33
+	val = ~m_in_3_cb(0 & 0x0f);    // pins 30-33
 	toggled = val ^ m_lastbuttons;
 	m_lastbuttons = val;
 
@@ -279,10 +257,10 @@ void namcoio_device::handle_coins( int swap )
 	IORAM_WRITE(1 ^ swap, m_credits % 10);   // BCD credits
 	IORAM_WRITE(2 ^ swap, credit_add);  // credit increment (coin inputs)
 	IORAM_WRITE(3 ^ swap, credit_sub);  // credit decrement (start buttons)
-	IORAM_WRITE(4, ~READ_PORT(1));  // pins 22-25
+	IORAM_WRITE(4, ~m_in_1_cb(0 & 0x0f));  // pins 22-25
 	button = ((val & 0x05) << 1) | (val & toggled & 0x05);
 	IORAM_WRITE(5, button); // pins 30 & 32 normal and impulse
-	IORAM_WRITE(6, ~READ_PORT(2));  // pins 26-29
+	IORAM_WRITE(6, ~m_in_2_cb(0 & 0x0f));  // pins 26-29
 	button = (val & 0x0a) | ((val & toggled & 0x0a) >> 1);
 	IORAM_WRITE(7, button); // pins 31 & 33 normal and impulse
 }
@@ -298,15 +276,15 @@ void namco56xx_device::customio_run()
 			break;
 
 		case 1: // read switch inputs
-			IORAM_WRITE(0, ~READ_PORT(0));  // pins 38-41
-			IORAM_WRITE(1, ~READ_PORT(1));  // pins 22-25
-			IORAM_WRITE(2, ~READ_PORT(2));  // pins 26-29
-			IORAM_WRITE(3, ~READ_PORT(3));  // pins 30-33
+			IORAM_WRITE(0, ~m_in_0_cb(0 & 0x0f));  // pins 38-41
+			IORAM_WRITE(1, ~m_in_1_cb(0 & 0x0f));  // pins 22-25
+			IORAM_WRITE(2, ~m_in_2_cb(0 & 0x0f));  // pins 26-29
+			IORAM_WRITE(3, ~m_in_3_cb(0 & 0x0f));  // pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(0, IORAM_READ(9));   // output to pins 13-16 (motos, pacnpal, gaplus)
-			WRITE_PORT(1, IORAM_READ(10));  // output to pins 17-20 (gaplus)
+			m_out_0_cb((offs_t)0, IORAM_READ(9) & 0x0f);   // output to pins 13-16 (motos, pacnpal, gaplus)
+			m_out_1_cb((offs_t)0, IORAM_READ(10) & 0x0f);  // output to pins 17-20 (gaplus)
 			break;
 
 		case 2: // initialize coinage settings
@@ -349,16 +327,16 @@ void namco56xx_device::customio_run()
 			break;
 
 		case 9: // read dip switches and inputs
-			WRITE_PORT(0, 0);   // set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(0));  // pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(1));  // pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(2));  // pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(3));  // pins 30-33, pin 13 = 0
-			WRITE_PORT(0, 1);   // set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(0));  // pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(1));  // pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(2));  // pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(3));  // pins 30-33, pin 13 = 1
+			m_out_0_cb((offs_t)0, 0 & 0x0f);   // set pin 13 = 0
+			IORAM_WRITE(0, ~m_in_0_cb(0 & 0x0f));  // pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~m_in_1_cb(0 & 0x0f));  // pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~m_in_2_cb(0 & 0x0f));  // pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~m_in_3_cb(0 & 0x0f));  // pins 30-33, pin 13 = 0
+			m_out_0_cb((offs_t)0, 1 & 0x0f);   // set pin 13 = 1
+			IORAM_WRITE(1, ~m_in_0_cb(0 & 0x0f));  // pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~m_in_1_cb(0 & 0x0f));  // pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~m_in_2_cb(0 & 0x0f));  // pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~m_in_3_cb(0 & 0x0f));  // pins 30-33, pin 13 = 1
 			break;
 
 		default:
@@ -378,10 +356,10 @@ void namco59xx_device::customio_run()
 			break;
 
 		case 3: // pacnpal chip #1: read dip switches and inputs
-			IORAM_WRITE(4, ~READ_PORT(0));  // pins 38-41, pin 13 = 0 ?
-			IORAM_WRITE(5, ~READ_PORT(2));  // pins 26-29 ?
-			IORAM_WRITE(6, ~READ_PORT(1));  // pins 22-25 ?
-			IORAM_WRITE(7, ~READ_PORT(3));  // pins 30-33
+			IORAM_WRITE(4, ~m_in_0_cb(0 & 0x0f));  // pins 38-41, pin 13 = 0 ?
+			IORAM_WRITE(5, ~m_in_2_cb(0 & 0x0f));  // pins 26-29 ?
+			IORAM_WRITE(6, ~m_in_1_cb(0 & 0x0f));  // pins 22-25 ?
+			IORAM_WRITE(7, ~m_in_3_cb(0 & 0x0f));  // pins 30-33
 			break;
 
 		default:
@@ -401,15 +379,15 @@ void namco58xx_device::customio_run()
 			break;
 
 		case 1: // read switch inputs
-			IORAM_WRITE(4, ~READ_PORT(0));  // pins 38-41
-			IORAM_WRITE(5, ~READ_PORT(1));  // pins 22-25
-			IORAM_WRITE(6, ~READ_PORT(2));  // pins 26-29
-			IORAM_WRITE(7, ~READ_PORT(3));  // pins 30-33
+			IORAM_WRITE(4, ~m_in_0_cb(0 & 0x0f));  // pins 38-41
+			IORAM_WRITE(5, ~m_in_1_cb(0 & 0x0f));  // pins 22-25
+			IORAM_WRITE(6, ~m_in_2_cb(0 & 0x0f));  // pins 26-29
+			IORAM_WRITE(7, ~m_in_3_cb(0 & 0x0f));  // pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(0, IORAM_READ(9));   // output to pins 13-16 (toypop)
-			WRITE_PORT(1, IORAM_READ(10));  // output to pins 17-20 (toypop)
+			m_out_0_cb((offs_t)0, IORAM_READ(9) & 0x0f);   // output to pins 13-16 (toypop)
+			m_out_1_cb((offs_t)0, IORAM_READ(10) & 0x0f);  // output to pins 17-20 (toypop)
 			break;
 
 		case 2: // initialize coinage settings
@@ -427,16 +405,16 @@ void namco58xx_device::customio_run()
 			break;
 
 		case 4: // read dip switches and inputs
-			WRITE_PORT(0, 0);   // set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(0));  // pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(1));  // pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(2));  // pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(3));  // pins 30-33, pin 13 = 0
-			WRITE_PORT(0, 1);   // set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(0));  // pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(1));  // pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(2));  // pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(3));  // pins 30-33, pin 13 = 1
+			m_out_0_cb((offs_t)0, 0 & 0x0f);   // set pin 13 = 0
+			IORAM_WRITE(0, ~m_in_0_cb(0 & 0x0f));  // pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~m_in_1_cb(0 & 0x0f));  // pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~m_in_2_cb(0 & 0x0f));  // pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~m_in_3_cb(0 & 0x0f));  // pins 30-33, pin 13 = 0
+			m_out_0_cb((offs_t)0, 1 & 0x0f);   // set pin 13 = 1
+			IORAM_WRITE(1, ~m_in_0_cb(0 & 0x0f));  // pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~m_in_1_cb(0 & 0x0f));  // pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~m_in_2_cb(0 & 0x0f));  // pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~m_in_3_cb(0 & 0x0f));  // pins 30-33, pin 13 = 1
 			break;
 
 		case 5: // bootup check

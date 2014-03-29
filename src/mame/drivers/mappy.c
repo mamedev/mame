@@ -1642,32 +1642,6 @@ WRITE8_MEMBER(mappy_state::out_lamps)
 	coin_counter_w(machine(), 0, ~data & 8);
 }
 
-/* chip #0: player inputs, buttons, coins */
-static const namcoio_interface intf0 =
-{
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
-	{ DEVCB_NULL, DEVCB_NULL },                 /* port write handlers */
-};
-
-static const namcoio_interface intf0_lamps =
-{
-	{ DEVCB_INPUT_PORT("COINS"), DEVCB_INPUT_PORT("P1"), DEVCB_INPUT_PORT("P2"), DEVCB_INPUT_PORT("BUTTONS") }, /* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_lamps), DEVCB_NULL },                 /* port write handlers */
-};
-
-/* chip #1: dip switches, test/cocktail, optional buttons */
-static const namcoio_interface intf1 =
-{
-	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_mux), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") },  /* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },                   /* port write handlers */
-};
-
-static const namcoio_interface intf1_interleave =
-{
-	{ DEVCB_DRIVER_MEMBER(mappy_state,dipB_muxi), DEVCB_DRIVER_MEMBER(mappy_state,dipA_l), DEVCB_DRIVER_MEMBER(mappy_state,dipA_h), DEVCB_INPUT_PORT("DSW0") }, /* port read handlers */
-	{ DEVCB_DRIVER_MEMBER(mappy_state,out_mux), DEVCB_NULL },                   /* port write handlers */
-};
-
 MACHINE_START_MEMBER(mappy_state,mappy)
 {
 	switch (m_type)
@@ -1744,8 +1718,18 @@ static MACHINE_CONFIG_START( superpac, mappy_state )
 
 	MCFG_FRAGMENT_ADD(superpac_common)
 
-	MCFG_NAMCO56XX_ADD("namcoio_1", intf0)
-	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pacnpal, mappy_state )
@@ -1755,8 +1739,19 @@ static MACHINE_CONFIG_START( pacnpal, mappy_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  pacnpal_main_vblank_irq) // also update the custom I/O chips
 
-	MCFG_NAMCO56XX_ADD("namcoio_1", intf0_lamps)
-	MCFG_NAMCO59XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO59XX, 0)
+	MCFG_NAMCO59XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO59XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO59XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO59XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO59XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
 
@@ -1767,8 +1762,18 @@ static MACHINE_CONFIG_START( grobda, mappy_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  grobda_main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
-	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 
 	/* sound hardware */
 	MCFG_DAC_ADD("dac")
@@ -1797,9 +1802,19 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,phozon)
 
-	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
-	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
-
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_muxi))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
+	
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
@@ -1864,8 +1879,18 @@ static MACHINE_CONFIG_START( mappy, mappy_state )
 
 	MCFG_FRAGMENT_ADD(mappy_common)
 
-	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
-	MCFG_NAMCO58XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO58XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO58XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO58XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( digdug2, mappy_state )
@@ -1877,8 +1902,18 @@ static MACHINE_CONFIG_START( digdug2, mappy_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(0)
 
-	MCFG_NAMCO58XX_ADD("namcoio_1", intf0)
-	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
+	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( todruaga, digdug2 )
@@ -1896,8 +1931,19 @@ static MACHINE_CONFIG_START( motos, mappy_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  motos_main_vblank_irq)    // also update the custom I/O chips
 
-	MCFG_NAMCO56XX_ADD("namcoio_1", intf0_lamps)
-	MCFG_NAMCO56XX_ADD("namcoio_2", intf1)
+	MCFG_DEVICE_ADD("namcoio_1", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))
+	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1"))
+	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2"))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("BUTTONS"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_lamps))
+	
+	MCFG_DEVICE_ADD("namcoio_2", NAMCO56XX, 0)
+	MCFG_NAMCO56XX_IN_0_CB(READ8(mappy_state, dipB_mux))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(mappy_state, dipA_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(mappy_state, dipA_h))
+	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSW0"))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 MACHINE_CONFIG_END
 
 
