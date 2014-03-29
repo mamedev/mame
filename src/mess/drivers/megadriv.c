@@ -246,28 +246,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-
-UINT16 vdp_get_word_from_68k_mem_console(running_machine &machine, UINT32 source, address_space & space68k)
-{
-	md_cons_state *state = machine.driver_data<md_cons_state>();
-
-	if (source <= 0x3fffff)
-	{
-		if (state->m_slotcart->get_type() == SEGA_SVP)
-		{
-			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-		}
-		return space68k.read_word(source);
-	}
-	else if ((source >= 0xe00000) && (source <= 0xffffff))
-		return space68k.read_word(source);
-	else
-	{
-		printf("DMA Read unmapped %06x\n",source);
-		return machine.rand();
-	}
-}
-
 MACHINE_START_MEMBER(md_cons_state, md_common)
 {
 	static const char *const pad6names[2][4] = {
@@ -296,7 +274,9 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 {
 	MACHINE_START_CALL_MEMBER( md_common );
 
-	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_console;
+	// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
+	if (m_slotcart->get_type() == SEGA_SVP)
+		m_vdp->set_dma_delay(2);
 
 	// for now m_cartslot is only in MD and not 32x and SegaCD
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_slotcart));
@@ -305,7 +285,16 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_slotcart));
 }
 
-MACHINE_RESET_MEMBER(md_cons_state,ms_megadriv )
+MACHINE_START_MEMBER(md_cons_state, ms_megacd)
+{
+	MACHINE_START_CALL_MEMBER( md_common );
+
+	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for, 
+	// at least when reading wordram? we might need to check what mode we're in the DMA...
+	m_vdp->set_dma_delay(2);
+}
+
+MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 {
 	m_maincpu->reset();
 	MACHINE_RESET_CALL_MEMBER( megadriv );
@@ -314,8 +303,8 @@ MACHINE_RESET_MEMBER(md_cons_state,ms_megadriv )
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -324,8 +313,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, ms_megadriv )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -453,8 +442,8 @@ void md_cons_state::_32x_scanline_helper_callback(int scanline)
 static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -492,8 +481,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -531,8 +520,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( md_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
 	MCFG_SEGAGEN_VDP_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
@@ -609,8 +598,8 @@ struct cdrom_interface scd_cdrom =
 static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 
@@ -622,8 +611,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( md_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
 
@@ -635,8 +624,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
-	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
-	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
+	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
 	
@@ -649,6 +638,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+
+	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END

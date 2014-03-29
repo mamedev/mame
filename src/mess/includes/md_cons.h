@@ -24,6 +24,7 @@ public:
 
 	DECLARE_MACHINE_START( md_common );     // setup ioport_port
 	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
+	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
 	DECLARE_MACHINE_RESET( ms_megadriv );
 
 	void _32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr);

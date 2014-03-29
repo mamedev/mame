@@ -406,8 +406,6 @@ private:
 
 
 /* machine/megavdp.c */
-extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space);
-extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space& space);
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
 extern UINT16* megadrive_vdp_palette_lookup;

@@ -1048,24 +1048,6 @@ static int megadriv_tas_callback(device_t *device)
 	return 0; // writeback not allowed
 }
 
-// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-// likewise segaCD, at least when reading wordram? we might need to check what mode we're in here..
-UINT16 vdp_get_word_from_68k_mem_delayed(running_machine &machine, UINT32 source, address_space & space68k)
-{
-	if (source <= 0x3fffff)
-	{
-		source -= 2;    // compensate DMA lag
-		return space68k.read_word(source);
-	}
-	else if ((source >= 0xe00000) && (source <= 0xffffff))
-		return space68k.read_word(source);
-	else
-	{
-		printf("DMA Read unmapped %06x\n",source);
-		return machine.rand();
-	}
-}
-
 void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
@@ -1077,17 +1059,6 @@ void md_base_state::megadriv_init_common()
 	}
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
-
-	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
-
-	if (machine().device("sega32x"))
-		printf("32X found 'sega32x'\n");
-
-	if (machine().device("segacd"))
-	{
-		printf("SegaCD found 'segacd'\n");
-		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
-	}
 
 	m68k_set_tas_callback(m_maincpu, megadriv_tas_callback);
 

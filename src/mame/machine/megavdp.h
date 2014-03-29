@@ -168,9 +168,6 @@
 	sega_genesis_vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 
-UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
-
-
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 typedef device_delegate<void (int x, UINT32 priority, UINT16 &lineptr)> md_32x_scanline_delegate;
 typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
@@ -226,6 +223,7 @@ public:
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_vdp_pal(bool pal) { m_vdp_pal = pal ? 1 : 0; }
 	void set_use_cram(int cram) { m_vdp_use_cram = cram; }
+	void set_dma_delay(int delay) { m_dma_delay = delay; }
 	int get_framerate() { return m_framerate; }
 
 
@@ -242,6 +240,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
 	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback );
 	timer_device* m_megadriv_scanline_timer;
+
+	inline UINT16 vdp_get_word_from_68k_mem(UINT32 source);
 
 protected:
 	virtual void device_start();
@@ -286,6 +286,7 @@ private:
 	int m_framerate;
 	int m_vdp_pal;
 	int m_vdp_use_cram; // c2 uses it's own palette ram, so it sets this to 0
+	int m_dma_delay;	// SVP and SegaCD have some 'lag' in DMA transfers
 
 	UINT16* m_vdp_regs;
 	UINT16* m_vram;

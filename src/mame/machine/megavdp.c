@@ -21,7 +21,8 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 	: sega315_5124_device( mconfig, SEGA315_5246, "Sega Genesis VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega_genesis_vdp", __FILE__),
 	m_sndirqline_callback(*this),
 	m_lv6irqline_callback(*this),
-	m_lv4irqline_callback(*this)
+	m_lv4irqline_callback(*this),
+	m_dma_delay(0)
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
@@ -457,11 +458,9 @@ void sega_genesis_vdp_device::update_m_vdp_code_and_address(void)
 							((m_vdp_command_part2 & 0x0003) << 14);
 }
 
-UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space68k);
-
-// if either SVP CPU or segaCD is present, there is a lag we have to compensate for
-// hence, variants of this call will be defined in megadriv_init_common for segacd and svp
-UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k)
+// if either SVP CPU or segaCD is present, there is a 'lag' we have to compensate for
+// hence, for segacd and svp we set m_dma_delay to the appropriate value at start
+inline UINT16 sega_genesis_vdp_device::vdp_get_word_from_68k_mem(UINT32 source)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
@@ -470,13 +469,13 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
 	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
 
 	if (source <= 0x3fffff)
-		return space68k.read_word(source);
+		return m_space68k->read_word(source - m_dma_delay);    // compensate DMA lag
 	else if ((source >= 0xe00000) && (source <= 0xffffff))
-		return space68k.read_word(source);
+		return m_space68k->read_word(source);
 	else
 	{
 		printf("DMA Read unmapped %06x\n",source);
-		return machine.rand();
+		return machine().rand();
 	}
 }
 
@@ -544,7 +543,7 @@ void sega_genesis_vdp_device::insta_68k_to_vram_dma(UINT32 source,int length)
 
 	for (count = 0;count<(length>>1);count++)
 	{
-		vdp_vram_write(vdp_get_word_from_68k_mem(machine(), source, *m_space68k));
+		vdp_vram_write(vdp_get_word_from_68k_mem(source));
 		source+=2;
 		if (source>0xffffff) source = 0xe00000;
 	}
@@ -570,7 +569,7 @@ void sega_genesis_vdp_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 	{
 		//if (m_vdp_address>=0x80) return; // abandon
 
-		write_cram_value((m_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(machine(), source, *m_space68k));
+		write_cram_value((m_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(source));
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -598,7 +597,7 @@ void sega_genesis_vdp_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length
 	{
 		if (m_vdp_address>=0x80) return; // abandon
 
-		m_vsram[(m_vdp_address&0x7e)>>1] = vdp_get_word_from_68k_mem(machine(), source, *m_space68k);
+		m_vsram[(m_vdp_address&0x7e)>>1] = vdp_get_word_from_68k_mem(source);
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
