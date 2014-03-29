@@ -480,7 +480,12 @@ MACHINE_CONFIG_END
 
 ROM_START( ega )
 	ROM_REGION(0x4000, "user1", 0)
-	ROM_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b))
+	ROM_DEFAULT_BIOS("ega")
+	ROM_SYSTEM_BIOS(0, "ega", "IBM EGA BIOS")
+	ROMX_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "iskr3104", "Iskra-3104 EGA BIOS")
+	ROMX_LOAD( "143-03.bin", 0x0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede),ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "143-02.bin", 0x0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1)|ROM_BIOS(2))
 	ROM_REGION(0x4000, "user2", ROMREGION_ERASE00)
 ROM_END
 
@@ -603,15 +608,21 @@ void isa8_ega_device::device_start()
 		m_palette->set_pen_color( i, r, g, b );
 	}
 
-	UINT8   *dst = memregion(subtag(tempstring, "user2" ))->base() + 0x0000;
-	UINT8   *src = memregion(subtag(tempstring, "user1" ))->base() + 0x3fff;
-	int     i;
-
-	/* Perform the EGA bios address line swaps */
-	for( i = 0; i < 0x4000; i++ )
+	if(m_default_bios_tag != "iskr3104")
 	{
-		*dst++ = *src--;
+		UINT8   *dst = memregion(subtag(tempstring, "user2" ))->base() + 0x0000;
+		UINT8   *src = memregion(subtag(tempstring, "user1" ))->base() + 0x3fff;
+		int     i;
+
+		/* Perform the EGA bios address line swaps */
+		for( i = 0; i < 0x4000; i++ )
+		{
+			*dst++ = *src--;
+		}
 	}
+	else
+		memcpy(memregion(subtag(tempstring, "user2" ))->base(), memregion(subtag(tempstring, "user1" ))->base(), 0x4000);
+
 	/* Install 256KB Video ram on our EGA card */
 	m_vram = machine().memory().region_alloc(subtag(tempstring,"vram"), 256*1024, 1, ENDIANNESS_LITTLE);
 

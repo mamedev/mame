@@ -45,10 +45,10 @@ public:
 	required_device<pic8259_device>  m_pic8259;
 	required_device<am9517a_device>  m_dma8237;
 	required_device<pit8253_device>  m_pit8253;
-	required_device<i8255_device>  m_ppi8255;
+	optional_device<i8255_device>  m_ppi8255;
 	required_device<speaker_sound_device>  m_speaker;
 	required_device<isa8_device>  m_isabus;
-	required_device<pc_kbdc_device>  m_pc_kbdc;
+	optional_device<pc_kbdc_device>  m_pc_kbdc;
 	required_device<ram_device> m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
@@ -182,5 +182,24 @@ public:
 
 // device type definition
 extern const device_type EC1841_MOTHERBOARD;
+
+#define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
+	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
+	pc_noppi_mb_device::static_set_cputag(*device, _cputag);
+
+class pc_noppi_mb_device : public ibm5160_mb_device
+{
+public:
+	// construction/destruction
+	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+protected:
+	// device-level overrides
+	void device_start();
+};
+
+extern const device_type PCNOPPI_MOTHERBOARD;
 
 #endif /* GENPC_H_ */

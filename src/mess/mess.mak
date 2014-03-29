@@ -906,7 +906,6 @@ $(MESSOBJ)/amstrad.a:           \
 	$(MESS_DRIVERS)/amstrad.o   \
 	$(MESS_MACHINE)/amstrad.o   \
 	$(MESS_DRIVERS)/amstr_pc.o  \
-	$(MESS_MACHINE)/amstr_pc.o  \
 	$(MESS_DRIVERS)/pc1512.o    \
 	$(MESS_MACHINE)/pc1512kb.o  \
 	$(MESS_VIDEO)/pc1512.o      \
@@ -1554,8 +1553,8 @@ $(MESSOBJ)/pitronic.a:          \
 $(MESSOBJ)/pc.a:                \
 	$(MESS_DRIVERS)/tandy1t.o   \
 	$(MESS_DRIVERS)/ibmpcjr.o   \
-	$(MESS_MACHINE)/europc.o    \
-	$(MESS_MACHINE)/pc.o        \
+	$(MESS_DRIVERS)/asst128.o   \
+	$(MESS_DRIVERS)/europc.o    \
 	$(MESS_DRIVERS)/pc.o        \
 	$(MESS_DRIVERS)/genpc.o     \
 	$(MESS_MACHINE)/genpc.o     \
