@@ -177,14 +177,12 @@ void esrip_device::make_ops()
 
 void esrip_device::device_start()
 {
-	esrip_config* _config = (esrip_config*)static_config();
-
 	/* Register configuration structure callbacks */
-	m_fdt_r = _config->fdt_r;
-	m_fdt_w = _config->fdt_w;
-	m_lbrm = (UINT8*)machine().root_device().memregion(_config->lbrm_prom)->base();
-	m_status_in = _config->status_in;
-	m_draw = _config->draw;
+	m_fdt_r.resolve_safe(0);
+	m_fdt_w.resolve_safe();
+	m_lbrm = (UINT8*)machine().root_device().memregion(m_lbrm_prom)->base();
+	m_status_in.resolve_safe(0);
+	m_draw.bind_relative_to(*owner());
 
 	/* Allocate image pointer table RAM */
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
@@ -1693,24 +1691,15 @@ const device_type ESRIP = &device_creator<esrip_device>;
 
 esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock, "esrip", __FILE__),
-		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
+		m_program_config("program", ENDIANNESS_BIG, 64, 9, -3),
+		m_fdt_r(*this),
+		m_fdt_w(*this),
+		m_status_in(*this),
+		m_lbrm_prom(NULL)
 {
 	// build the opcode table
 	for (int op = 0; op < 24; op++)
 		m_opcode[op] = s_opcodetable[op];
-}
-
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void esrip_device::static_set_config(device_t &device, const esrip_config &config)
-{
-	esrip_device &esrip = downcast<esrip_device &>(device);
-	static_cast<esrip_config &>(esrip) = config;
-	static_set_static_config(device, &config);
 }
 
 
@@ -1799,7 +1788,7 @@ void esrip_device::execute_run()
 	UINT8 status;
 
 	/* I think we can get away with placing this outside of the loop */
-	status = m_status_in(machine());
+	status = m_status_in(*m_program, 0);
 
 	/* Core execution loop */
 	do
@@ -1832,7 +1821,7 @@ void esrip_device::execute_run()
 
 			/* FDT RAM: /Enable, Direction and /RAM OE */
 			else if (!bl44 && !_BIT(m_l2, 3) && bl46)
-				y_bus = m_fdt_r(this, *m_program, m_fdt_cnt, 0);
+				y_bus = m_fdt_r(*m_program, m_fdt_cnt, 0xffff);
 
 			/* IPT RAM: /Enable and /READ */
 			else if (!_BIT(m_l2, 6) && !_BIT(m_l4, 5))
@@ -1859,7 +1848,7 @@ void esrip_device::execute_run()
 
 		/* FDT RAM */
 		if (!bl44)
-			x_bus = m_fdt_r(this, *m_program, m_fdt_cnt, 0);
+			x_bus = m_fdt_r(*m_program, m_fdt_cnt, 0xffff);
 
 		/* Buffer is enabled - write direction */
 		else if (!BIT(m_l2, 3) && !bl46)
@@ -1884,7 +1873,7 @@ void esrip_device::execute_run()
 
 		/* Write FDT RAM: /Enable, Direction and WRITE */
 		if (!BIT(m_l2, 3) && !bl46 && !BIT(m_l4, 3))
-			m_fdt_w(this, *m_program, m_fdt_cnt, x_bus, 0);
+			m_fdt_w(*m_program, m_fdt_cnt, x_bus, 0xffff);
 
 		/* Write IPT RAM: /Enable and /WR */
 		if (!BIT(m_l2, 7) && !BIT(m_l4, 5))
@@ -1942,7 +1931,7 @@ void esrip_device::execute_run()
 			m_attr_latch = x_bus;
 
 			m_fig = 1;
-			m_fig_cycles = m_draw(machine(), m_adl_latch, m_adr_latch, m_fig_latch, m_attr_latch, m_iaddr_latch, m_c_latch, m_x_scale, m_img_bank);
+			m_fig_cycles = m_draw(m_adl_latch, m_adr_latch, m_fig_latch, m_attr_latch, m_iaddr_latch, m_c_latch, m_x_scale, m_img_bank);
 		}
 
 		/* X-scale */
