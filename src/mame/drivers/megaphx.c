@@ -22,9 +22,6 @@
  I/O:
   - port_c_r / port_c_w should go through the 8255 but I don't see how to hook them up that way? various bits of the writes are lost?
 
-  Misc:
-  - some of the large phoenix graphics during stages 3/4 are corrupt for a frame when they re-enter at the top of the screen, possible original game bug?
-  
   
   --
 
