@@ -223,9 +223,6 @@ WRITE16_MEMBER(segac2_state::palette_w )
 	/* set the color */
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
-//  megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
-//  megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
-
 	tmpr = r >> 1;
 	tmpg = g >> 1;
 	tmpb = b >> 1;

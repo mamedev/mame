@@ -408,4 +408,3 @@ private:
 /* machine/megavdp.c */
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
-extern UINT16* megadrive_vdp_palette_lookup;
