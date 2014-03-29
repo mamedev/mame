@@ -501,12 +501,6 @@ static const tc0480scp_interface slapshot_tc0480scp_intf =
 	256     /* col_base */
 };
 
-static const tc0640fio_interface slapshot_io_intf =
-{
-	DEVCB_NULL, DEVCB_INPUT_PORT("COINS"),
-	DEVCB_INPUT_PORT("BUTTONS"), DEVCB_INPUT_PORT("SYSTEM"), DEVCB_INPUT_PORT("JOY")    /* port read handlers */
-};
-
 static const tc0140syt_interface slapshot_tc0140syt_intf =
 {
 	"maincpu", "audiocpu"
@@ -534,9 +528,12 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
-
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -583,8 +580,11 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

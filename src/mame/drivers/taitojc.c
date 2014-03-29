@@ -1242,12 +1242,6 @@ INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
 }
 
-static const tc0640fio_interface taitojc_io_intf =
-{
-	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COINS"),
-	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("UNUSED"), DEVCB_INPUT_PORT("BUTTONS")
-};
-
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
@@ -1269,8 +1263,13 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TC0640FIO_ADD("tc0640fio", taitojc_io_intf)
-
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
+	
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	/* video hardware */

@@ -55,32 +55,13 @@ Newer version of the I/O chip ?
 const device_type TC0220IOC = &device_creator<tc0220ioc_device>;
 
 tc0220ioc_device::tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock, "tc0220ioc", __FILE__)
+	: device_t(mconfig, TC0220IOC, "Taito TC0220IOC", tag, owner, clock, "tc0220ioc", __FILE__),
+	m_read_0_cb(*this),
+	m_read_1_cb(*this),
+	m_read_2_cb(*this),
+	m_read_3_cb(*this),
+	m_read_7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0220ioc_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0220ioc_interface *intf = reinterpret_cast<const tc0220ioc_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0220ioc_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_read_0, 0, sizeof(m_read_0));
-	memset(&m_read_1, 0, sizeof(m_read_1));
-	memset(&m_read_2, 0, sizeof(m_read_2));
-	memset(&m_read_3, 0, sizeof(m_read_3));
-	memset(&m_read_7, 0, sizeof(m_read_7));
-	}
 }
 
 //-------------------------------------------------
@@ -89,11 +70,11 @@ void tc0220ioc_device::device_config_complete()
 
 void tc0220ioc_device::device_start()
 {
-	m_read_0_func.resolve(m_read_0, *this);
-	m_read_1_func.resolve(m_read_1, *this);
-	m_read_2_func.resolve(m_read_2, *this);
-	m_read_3_func.resolve(m_read_3, *this);
-	m_read_7_func.resolve(m_read_7, *this);
+	m_read_0_cb.resolve_safe(0);
+	m_read_1_cb.resolve_safe(0);
+	m_read_2_cb.resolve_safe(0);
+	m_read_3_cb.resolve_safe(0);
+	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_port));
@@ -120,22 +101,22 @@ READ8_MEMBER( tc0220ioc_device::read )
 	switch (offset)
 	{
 		case 0x00:
-			return m_read_0_func(0);
+			return m_read_0_cb(0);
 
 		case 0x01:
-			return m_read_1_func(0);
+			return m_read_1_cb(0);
 
 		case 0x02:
-			return m_read_2_func(0);
+			return m_read_2_cb(0);
 
 		case 0x03:
-			return m_read_3_func(0);
+			return m_read_3_cb(0);
 
 		case 0x04:  /* coin counters and lockout */
 			return m_regs[4];
 
 		case 0x07:
-			return m_read_7_func(0);
+			return m_read_7_cb(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0220IOC address %02x\n",space.device().safe_pc(),offset);
@@ -200,32 +181,13 @@ WRITE8_MEMBER( tc0220ioc_device::portreg_w )
 const device_type TC0510NIO = &device_creator<tc0510nio_device>;
 
 tc0510nio_device::tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock, "tc0510nio", __FILE__)
+	: device_t(mconfig, TC0510NIO, "Taito TC0510NIO", tag, owner, clock, "tc0510nio", __FILE__),
+	m_read_0_cb(*this),
+	m_read_1_cb(*this),
+	m_read_2_cb(*this),
+	m_read_3_cb(*this),
+	m_read_7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0510nio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0510nio_interface *intf = reinterpret_cast<const tc0510nio_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0510nio_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_read_0, 0, sizeof(m_read_0));
-	memset(&m_read_1, 0, sizeof(m_read_1));
-	memset(&m_read_2, 0, sizeof(m_read_2));
-	memset(&m_read_3, 0, sizeof(m_read_3));
-	memset(&m_read_7, 0, sizeof(m_read_7));
-	}
 }
 
 //-------------------------------------------------
@@ -234,11 +196,11 @@ void tc0510nio_device::device_config_complete()
 
 void tc0510nio_device::device_start()
 {
-	m_read_0_func.resolve(m_read_0, *this);
-	m_read_1_func.resolve(m_read_1, *this);
-	m_read_2_func.resolve(m_read_2, *this);
-	m_read_3_func.resolve(m_read_3, *this);
-	m_read_7_func.resolve(m_read_7, *this);
+	m_read_0_cb.resolve_safe(0);
+	m_read_1_cb.resolve_safe(0);
+	m_read_2_cb.resolve_safe(0);
+	m_read_3_cb.resolve_safe(0);
+	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
 }
@@ -262,22 +224,22 @@ READ8_MEMBER( tc0510nio_device::read )
 	switch (offset)
 	{
 		case 0x00:
-			return m_read_0_func(0);
+			return m_read_0_cb(0);
 
 		case 0x01:
-			return m_read_1_func(0);
+			return m_read_1_cb(0);
 
 		case 0x02:
-			return m_read_2_func(0);
+			return m_read_2_cb(0);
 
 		case 0x03:
-			return m_read_3_func(0);
+			return m_read_3_cb(0);
 
 		case 0x04:  /* coin counters and lockout */
 			return m_regs[4];
 
 		case 0x07:
-			return m_read_7_func(0);
+			return m_read_7_cb(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0510NIO address %02x\n",space.device().safe_pc(),offset);
@@ -346,32 +308,13 @@ WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
 const device_type TC0640FIO = &device_creator<tc0640fio_device>;
 
 tc0640fio_device::tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock, "tc0640fio", __FILE__)
+	: device_t(mconfig, TC0640FIO, "Taito TC0640FIO", tag, owner, clock, "tc0640fio", __FILE__),
+	m_read_0_cb(*this),
+	m_read_1_cb(*this),
+	m_read_2_cb(*this),
+	m_read_3_cb(*this),
+	m_read_7_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0640fio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0640fio_interface *intf = reinterpret_cast<const tc0640fio_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0640fio_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_read_0, 0, sizeof(m_read_0));
-	memset(&m_read_1, 0, sizeof(m_read_1));
-	memset(&m_read_2, 0, sizeof(m_read_2));
-	memset(&m_read_3, 0, sizeof(m_read_3));
-	memset(&m_read_7, 0, sizeof(m_read_7));
-	}
 }
 
 //-------------------------------------------------
@@ -380,11 +323,11 @@ void tc0640fio_device::device_config_complete()
 
 void tc0640fio_device::device_start()
 {
-	m_read_0_func.resolve(m_read_0, *this);
-	m_read_1_func.resolve(m_read_1, *this);
-	m_read_2_func.resolve(m_read_2, *this);
-	m_read_3_func.resolve(m_read_3, *this);
-	m_read_7_func.resolve(m_read_7, *this);
+	m_read_0_cb.resolve_safe(0);
+	m_read_1_cb.resolve_safe(0);
+	m_read_2_cb.resolve_safe(0);
+	m_read_3_cb.resolve_safe(0);
+	m_read_7_cb.resolve_safe(0);
 
 	save_item(NAME(m_regs));
 }
@@ -409,22 +352,22 @@ READ8_MEMBER( tc0640fio_device::read )
 	switch (offset)
 	{
 		case 0x00:
-			return m_read_0_func(0);
+			return m_read_0_cb(0);
 
 		case 0x01:
-			return m_read_1_func(0);
+			return m_read_1_cb(0);
 
 		case 0x02:
-			return m_read_2_func(0);
+			return m_read_2_cb(0);
 
 		case 0x03:
-			return m_read_3_func(0);
+			return m_read_3_cb(0);
 
 		case 0x04:  /* coin counters and lockout */
 			return m_regs[4];
 
 		case 0x07:
-			return m_read_7_func(0);
+			return m_read_7_cb(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0640FIO address %02x\n",space.device().safe_pc(),offset);
