@@ -30,6 +30,8 @@ public:
 
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
 
 	DECLARE_DRIVER_INIT(europc);
 
@@ -371,6 +373,12 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(europc_pc_state::pc_frame_interrupt)
+{
+	if(!(param % 64))
+		pc_keyboard();
+}
+
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 {
 	switch (offset)
@@ -539,6 +547,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2) 
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", europc_pc_state, pc_frame_interrupt, attotime::from_hz(60))
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 	
