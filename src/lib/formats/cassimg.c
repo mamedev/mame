@@ -855,9 +855,9 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	casserr_t err;
 	int length;
 	int sample_count;
-	void *bytes = NULL;
-	void *chunk = NULL;
-	INT16 *samples = NULL;
+	dynamic_buffer bytes;
+	dynamic_buffer chunk;
+	dynamic_array<INT16> samples;
 	int pos = 0;
 	UINT64 offset = 0;
 	UINT64 size;
@@ -880,12 +880,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		args.sample_frequency = 11025;
 
 	/* allocate a buffer for the binary data */
-	chunk = malloc(args.chunk_size);
-	if (!chunk)
-	{
-		err = CASSETTE_ERROR_OUTOFMEMORY;
-		goto done;
-	}
+	chunk.resize(args.chunk_size);
 
 	/* determine number of samples */
 	if (args.chunk_sample_calc)
@@ -896,14 +891,9 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 			goto done;
 		}
 
-		bytes = malloc(size);
-		if (!bytes)
-		{
-			err = CASSETTE_ERROR_OUTOFMEMORY;
-			goto done;
-		}
+		bytes.resize(size);
 		cassette_image_read(cassette, bytes, 0, size);
-		sample_count = args.chunk_sample_calc((const UINT8*)bytes, (int) size);
+		sample_count = args.chunk_sample_calc(bytes, (int)size);
 
 		if (args.header_samples < 0)
 			args.header_samples = sample_count;
@@ -916,12 +906,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	sample_count += args.header_samples + args.trailer_samples;
 
 	/* allocate a buffer for the completed samples */
-	samples = (INT16*)malloc(sample_count * sizeof(*samples));
-	if (!samples)
-	{
-		err = CASSETTE_ERROR_OUTOFMEMORY;
-		goto done;
-	}
+	samples.resize(sample_count);
 
 	/* if there has to be a header */
 	if (args.header_samples > 0)
@@ -941,7 +926,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		cassette_image_read(cassette, chunk, offset, args.chunk_size);
 		offset += args.chunk_size;
 
-		length = args.fill_wave(samples + pos, sample_count - pos, (UINT8*)chunk);
+		length = args.fill_wave(samples + pos, sample_count - pos, chunk);
 		if (length < 0)
 		{
 			err = CASSETTE_ERROR_INVALIDIMAGE;
@@ -978,12 +963,6 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 #endif
 
 done:
-	if (samples)
-		free(samples);
-	if (chunk)
-		free(chunk);
-	if (bytes)
-		free(bytes);
 	return err;
 }
 

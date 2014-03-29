@@ -1647,9 +1647,8 @@ static floperr_t ti99_sdf_write_track(floppy_image_legacy *floppy, int head, int
 */
 /* static floperr_t ti99_sdf_format_track(floppy_image_legacy *floppy, int head, int track, option_resolution *params)
 {
-    UINT8 *sector0 = (UINT8*)malloc(SECTOR_SIZE);
+    dynamic_buffer sector0(SECTOR_SIZE);
     create_vib(sector0, params);
-    free(sector0);
     if (true)
     {
         printf("not implemented\n");
@@ -2297,11 +2296,9 @@ static floperr_t ti99_tdf_read_sector(floppy_image_legacy *floppy, int head, int
 {
 	floperr_t err;
 	UINT8 *sector_data;
-	UINT8 *track_data;
 	int imgtrack = track;
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
-
-	track_data = (UINT8*)malloc(tag->track_size);
+	dynamic_buffer track_data(tag->track_size);
 
 	if (use_80_track_drives && tag->tracks<=40)
 	{
@@ -2318,7 +2315,6 @@ static floperr_t ti99_tdf_read_sector(floppy_image_legacy *floppy, int head, int
 	/* verify CRC? */
 
 	memcpy(buffer, sector_data, SECTOR_SIZE);
-	free(track_data);
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -2376,7 +2372,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	/* Read track, head */
 	int byte;
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
-	UINT8 *track_data;
+	dynamic_buffer track_data(tag->track_size);
 	UINT8 *sector_data;
 	UINT64 track_offset;
 	UINT64 offset;
@@ -2388,8 +2384,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	int i;
 	floperr_t err;
 
-	track_data = (UINT8*)malloc(tag->track_size);
-
 	if (use_80_track_drives && tag->tracks<=40)
 	{
 		imgtrack = track / 2;
@@ -2398,7 +2392,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, track_data, tag->track_size);
 	if (err)
 	{
-		free(track_data);
 		return err;
 	}
 
@@ -2407,7 +2400,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	{
 		if (determine_offset(tag->format, track_data, &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
-			free(track_data);
 			return FLOPPY_ERROR_SEEKERROR;
 		}
 	}
@@ -2428,7 +2420,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	/* Not that many sectors in this track? */
 	if (sector_index>0)
 	{
-		free(track_data);
 		return FLOPPY_ERROR_SEEKERROR;
 	}
 
@@ -2445,7 +2436,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	/* There was no DAM. Image seems to be broken. */
 	if (i == tag->track_size)
 	{
-		free(track_data);
 		return FLOPPY_ERROR_SEEKERROR;
 	}
 
@@ -2469,9 +2459,6 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	crc_field[1] = (crc & 0xff);
 	floppy_image_write(floppy, crc_field, offset+SECTOR_SIZE, 2);
 
-	/* Free the temporary buffer */
-	free(track_data);
-
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -2481,12 +2468,11 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 	/* Read track, head */
 	int byte = 0;
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
-	UINT8 *track_data;
+	dynamic_buffer track_data(tag->track_size);
 	int imgtrack = track;
 	int i;
 	floperr_t err;
 	floperr_t retval;
-	track_data = (UINT8*)malloc(tag->track_size);
 
 	if (use_80_track_drives && tag->tracks<=40)
 	{
@@ -2496,7 +2482,6 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, track_data, tag->track_size);
 	if (err)
 	{
-		free(track_data);
 		return err;
 	}
 
@@ -2506,7 +2491,6 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 	{
 		if (determine_offset(tag->format, track_data, &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
-			free(track_data);
 			return FLOPPY_ERROR_SEEKERROR;
 		}
 	}
@@ -2572,7 +2556,6 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 			}
 		}
 	}
-	free(track_data);
 	return retval;
 }
 
@@ -2626,7 +2609,8 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 {
 	int idamcnt, state, track, head, i, totalseclen = 0, format = 0, byte, tracklength, trackadd = 0;
 	int first_idam = 0;
-	UINT8 *track_data;
+	/* Allocate enough bytes to hold the longest supported track. */
+	dynamic_buffer track_data(13000);
 	/*int offset;*/
 
 	struct ti99dsk_geometry dummy_geometry;
@@ -2636,8 +2620,6 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	else
 		geometry = &dummy_geometry;
 
-	/* Allocate enough bytes to hold the longest supported track. */
-	track_data = (UINT8*)malloc(13000);
 	floppy_image_read(floppy, track_data, 0, 13000);
 
 	if (determine_offset(TI99_MFM, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
@@ -2652,7 +2634,6 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 			// We only give a moderate vote in this case, so SDF
 			// make take it.
 
-			free(track_data);
 			if (size < 130120 || size > 2078720)
 			{
 				LOG_FORMATS("Unknown format size: %d\n", (int)size);
@@ -2794,7 +2775,6 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	{
 		/* error ... what now? */
 		LOG_FORMATS("Error when reading last track. Image broken.\n");
-		free(track_data);
 		return 50;
 	}
 	else
@@ -2824,11 +2804,9 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	if (geometry->tracksperside < 35 || geometry->tracksperside > 80)
 	{
 		LOG_FORMATS("Unsupported track count: %d\n", geometry->tracksperside);
-		free(track_data);
 		return 0;
 	}
 
-	free(track_data);
 	return 100;
 }
 

@@ -310,16 +310,11 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 {
 	floperr_t err;
 	floppy_image_legacy *floppy;
-	void *buffer = NULL;
+	dynamic_buffer buffer;
 
 	floppy = imgtool_floppy(img);
 
-	buffer = malloc(length);
-	if (!buffer)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
+	buffer.resize(length);
 
 	if (direction)
 	{
@@ -339,8 +334,6 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 	err = FLOPPY_ERROR_SUCCESS;
 
 done:
-	if (buffer)
-		free(buffer);
 	return imgtool_floppy_error(err);
 }
 

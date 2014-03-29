@@ -49,7 +49,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	UINT8  CompressionType;
 	UINT8  Flags;
 	UINT8  HeaderExtensionLength;
-	UINT8  *gz_ptr = NULL;
+	dynamic_buffer gz_ptr;
 
 	int         total_size;
 	z_stream    d_stream;
@@ -97,8 +97,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) casdata+0x34+HeaderExtensionLength;
 
-	gz_ptr = (UINT8*)malloc( 8 );
-
+	gz_ptr.resize( 8 );
 
 	d_stream.next_in = (unsigned char *)in_ptr;
 	d_stream.avail_in = caslen - ( in_ptr - casdata );
@@ -155,20 +154,9 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 		goto cleanup;
 	}
 
-	if ( gz_ptr )
-	{
-		free( gz_ptr );
-		gz_ptr = NULL;
-	}
-
 	return total_size;
 
 cleanup:
-	if ( gz_ptr )
-	{
-		free( gz_ptr );
-		gz_ptr = NULL;
-	}
 	return -1;
 }
 
@@ -181,7 +169,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 	UINT8  HeaderExtensionLength;
 	INT8   Bit;
 
-	UINT8 *gz_ptr = NULL;
+	dynamic_buffer gz_ptr;
 	int         total_size;
 	z_stream    d_stream;
 	int         err;
@@ -217,7 +205,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 	//from here on down for now I am assuming it is compressed csw file.
 	in_ptr = (UINT8*) bytes+0x34+HeaderExtensionLength;
 
-	gz_ptr = (UINT8*)malloc( 8 );
+	gz_ptr.resize( 8 );
 
 	d_stream.next_in = (unsigned char *)in_ptr;
 	d_stream.avail_in = mycaslen - ( in_ptr - bytes );
@@ -278,20 +266,9 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 		goto cleanup;
 	}
 
-	if ( gz_ptr )
-	{
-		free( gz_ptr );
-		gz_ptr = NULL;
-	}
-
 	return length;
 
 cleanup:
-	if ( gz_ptr )
-	{
-		free( gz_ptr );
-		gz_ptr = NULL;
-	}
 	return -1;
 }
 

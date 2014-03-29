@@ -47,7 +47,7 @@ static imgtoolerr_t map_chd_error(chd_error chderr)
 imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylinders, UINT32 heads, UINT32 sectors, UINT32 seclen)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	UINT8 *cache = NULL;
+	dynamic_buffer cache;
 	chd_file chd;
 	chd_error rc;
 	UINT64 logicalbytes;
@@ -101,13 +101,8 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	cache = (UINT8*)malloc(hunksize);
-	if (!cache)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(cache, '\0', hunksize);
+	cache.resize(hunksize);
+	cache.clear();
 
 	/* zero out every hunk */
 	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
@@ -121,10 +116,7 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 		}
 	}
 
-
 done:
-	if (cache)
-		free(cache);
 	return err;
 }
 

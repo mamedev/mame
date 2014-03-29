@@ -10,6 +10,7 @@
 #include "z80ne_dsk.h"
 #include "basicdsk.h"
 #include "imageutl.h"
+#include "coretmpl.h"
 
 /* -----------------------------------------------------------------------
  * DMK file format
@@ -175,8 +176,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	UINT8 *track_data;
 	void *track_data_v;
 	UINT32 max_track_size;
-	int *sector_map = NULL;
-	UINT8 *local_sector = NULL;
+	dynamic_array<int> sector_map;
+	dynamic_buffer local_sector;
 	int local_sector_size;
 	int sector_position;
 	int i;
@@ -206,13 +207,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map = (int*)malloc(sectors * sizeof(*sector_map));
-	if (!sector_map)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(sector_map, 0xFF, sectors * sizeof(*sector_map));
+	sector_map.resize(sectors);
+	sector_map.clear(0xFF);
 
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)
@@ -235,13 +231,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 							sector_length +
 							DMK_DATA_CRC_LEN +
 							DMK_DATA_GAP_LEN);
-	local_sector = (UINT8*)malloc(local_sector_size);
-	if (!local_sector)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(local_sector, 0x00, local_sector_size);
+	local_sector.resize(local_sector_size);
+	local_sector.clear();
 
 	/* set up track table of contents */
 	physical_sector = 0;
@@ -326,11 +317,6 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	memset(&track_data[track_position], 0xFF, max_track_size - track_position);
 
 done:
-	if (sector_map)
-		free(sector_map);
-	if (local_sector)
-		free(local_sector);
-
 	return err;
 }
 
@@ -392,7 +378,7 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 	void *track_data_v;
 	size_t track_length;
 	size_t sec_len;
-	UINT8 *local_idam = NULL;
+	dynamic_buffer local_idam;
 	int local_idam_size;
 	UINT8 *sec_data;
 
@@ -406,13 +392,8 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 							DMK_ID_GAP_LEN +
 							DMK_DAM_LEN +
 							DMK_DATA_GAP_LEN);
-	local_idam = (UINT8*)malloc(local_idam_size);
-	if (!local_idam)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(local_idam, 0x00, local_idam_size);
+	local_idam.resize(local_idam_size);
+	local_idam.clear();
 
 	/* search for matching IDAM */
 	for (i = 0; i < DMK_TOC_LEN / 2; i++)
@@ -509,8 +490,6 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 	if (sector_length)
 		*sector_length = sec_len;
 done:
-	if (local_idam)
-		free(local_idam);
 	return err;
 }
 
@@ -582,7 +561,7 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 	UINT16 crc_on_disk;
 	UINT16 calculated_crc;
 	UINT8 *sector_data = NULL;
-	UINT8 *local_sector = NULL;
+	dynamic_buffer local_sector;
 	int local_sector_size;
 	int i;
 
@@ -593,13 +572,8 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 
 	/* set up a local physical sector space (DAM + data + crc + GAP) */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector = (UINT8*)malloc(local_sector_size);
-	if (!local_sector)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(local_sector, 0x00, local_sector_size);
+	local_sector.resize(local_sector_size);
+	local_sector.clear();
 
 	/* get sector data */
 	/* create a local copy of sector data including DAM (for crc calculation) */
@@ -622,8 +596,6 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 	memcpy(buffer, local_sector+1, MIN(sector_length, buflen));
 
 	done:
-	if (local_sector)
-		free(local_sector);
 	return err;
 }
 
@@ -635,7 +607,7 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 	UINT32 sector_length;
 	UINT8 *sector_data;
 	UINT16 crc;
-	UINT8 *local_sector = NULL;
+	dynamic_buffer local_sector;
 	int local_sector_size;
 	int i;
 
@@ -646,13 +618,8 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 
 	/* set up a local physical sector space */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector = (UINT8*)malloc(local_sector_size);
-	if (!local_sector)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(local_sector, 0x00, local_sector_size);
+	local_sector.resize(local_sector_size);
+	local_sector.clear();
 	if(!ddam)
 		local_sector[0] = 0xFB;
 	else
@@ -677,8 +644,6 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 		sector_data[i*2] = sector_data[(i*2)+1] = local_sector[i];
 
 	done:
-	if (local_sector)
-		free(local_sector);
 	return err;
 }
 

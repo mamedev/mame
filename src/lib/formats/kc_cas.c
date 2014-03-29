@@ -210,7 +210,7 @@ static int kc_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 static int kc_handle_sss(INT16 *buffer, const UINT8 *casdata)
 {
-	UINT8 *sss = (UINT8*)malloc(kc_image_size + 11);
+	dynamic_buffer sss(kc_image_size + 11);
 
 	// tries to generate the missing head
 	memset(sss + 0, 0xd3, 3);
@@ -221,8 +221,6 @@ static int kc_handle_sss(INT16 *buffer, const UINT8 *casdata)
 	sss[3] = 'A';
 
 	int retval = kc_handle_cass(buffer, sss, KC_IMAGE_KCC);
-
-	free(sss);
 
 	return retval;
 }
