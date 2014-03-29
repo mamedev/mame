@@ -44,14 +44,15 @@ public:
 		m_port_persist(*this, "PERSISTENCE"),
 		m_mainram(NULL),
 		m_is_gamegear(0),
-		m_is_region_japan(0),
+		m_is_gg_region_japan(0),
 		m_is_smsj(0),
 		m_is_mark_iii(0),
 		m_is_sdisp(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
-		m_has_fm(0) { }
+		m_has_fm(0),
+		m_has_jpn_sms_cart_slot(0) { }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -97,7 +98,7 @@ public:
 
 	// model identifiers
 	UINT8 m_is_gamegear;
-	UINT8 m_is_region_japan;
+	UINT8 m_is_gg_region_japan;
 	UINT8 m_is_smsj;
 	UINT8 m_is_mark_iii;
 	UINT8 m_is_sdisp;
@@ -105,6 +106,7 @@ public:
 	UINT8 m_has_bios_2000;
 	UINT8 m_has_bios_full;
 	UINT8 m_has_fm;
+	UINT8 m_has_jpn_sms_cart_slot;
 
 	// Data needed for Light Phaser
 	UINT8 m_ctrl1_th_state;

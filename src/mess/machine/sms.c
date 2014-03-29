@@ -281,6 +281,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 		// For japanese Master System, set upper 4 bits with TH/TR
 		// direction bits of IO control register, according to Enri's
 		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
+		// This makes the console incapable of using the Light Phaser.
 		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
 		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
 		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);
@@ -347,8 +348,8 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 
 READ8_MEMBER(sms_state::gg_input_port_2_r)
 {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", (m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80), activecpu_get_pc());
-	return (m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80), activecpu_get_pc());
+	return (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
 }
 
 
@@ -694,7 +695,7 @@ void sms_state::setup_media_slots()
 	{
 		m_mem_device_enabled |= ENABLE_EXT_RAM;
 	}
-	else if (!m_is_gamegear && m_is_region_japan && (m_mem_device_enabled & ENABLE_CART))
+	else if (m_has_jpn_sms_cart_slot && (m_mem_device_enabled & ENABLE_CART))
 	{
 		// a bunch of SG1000 carts (compatible with SG1000 Mark III) use their own RAM...
 		// TODO: are BASIC and Music actually compatible with Mark III??
@@ -774,8 +775,15 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// the "call $4010" without a following RET statement. That is basically
 		// a bug in the program code. The only way this cartridge could have run
 		// successfully on a real unit is if the RAM would be initialized with
-		// a F0 pattern on power up; F0 = RET P.
-		memset(m_mainram, 0xf0, 0x2000);
+		// a F0 pattern on power up; F0 = RET P. 
+		// This initialization breaks the some Game Gear games though (e.g. 
+		// tempojr), suggesting that not all systems had the same initialization.
+		// For the moment we apply this to systems that have the Japanese SMS 
+		// cartridge slot.
+		if (m_has_jpn_sms_cart_slot)
+		{
+			memset(m_mainram, 0xf0, 0x2000);
+		}
 	}
 
 	save_item(NAME(m_paused));
@@ -948,9 +956,9 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 
 DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 {
-	m_is_region_japan = 1;
 	m_is_mark_iii = 1;
 	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
@@ -962,32 +970,33 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 
 DRIVER_INIT_MEMBER(sms_state,smsj)
 {
-	m_is_region_japan = 1;
 	m_is_smsj = 1;
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
 DRIVER_INIT_MEMBER(sms_state,sms1krfm)
 {
-	m_is_region_japan = 1;
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
 DRIVER_INIT_MEMBER(sms_state,sms1kr)
 {
-	m_is_region_japan = 1;
 	m_has_bios_2000 = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
 DRIVER_INIT_MEMBER(sms_state,smskr)
 {
 	m_has_bios_full = 1;
-	// Despite Korean sms1 version is detected as Japanese region, the sms2 version is not.
+	// Despite having a Japanese cartridge slot, this version is detected as Export region.
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
@@ -1006,9 +1015,9 @@ DRIVER_INIT_MEMBER(sms_state,gamegear)
 
 DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 {
-	m_is_region_japan = 1;
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
+	m_is_gg_region_japan = 1;
 }
 
 
