@@ -817,6 +817,14 @@ static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
 	MCFG_V25_CONFIG(leagueman_decryption_table)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( airass, firebarr )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_V25_CONFIG(rtypeleo_decryption_table) // need the right table
+
+MACHINE_CONFIG_END
+
 /***************************************************************************/
 
 ROM_START( firebarr )
@@ -852,6 +860,36 @@ ROM_START( firebarr )
 
 	ROM_REGION( 0x80000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "f4-b-da0", 0x000000, 0x80000, CRC(7a493e2e) SHA1(f6a8bacbe25760c86bdd8e8bb6d052ff15718eef) )
+ROM_END
+
+
+ROM_START( airass )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "f4-a-h0-etc.h0", 0x000001, 0x40000, CRC(038f2cbd) SHA1(79db9f4cc96d32ae9b9526111078bdb87f5711ce) )
+	ROM_LOAD16_BYTE( "f4-a-l0-etc.l0", 0x000000, 0x40000, CRC(d3eb7842) SHA1(4f8c48f6d42ff222d28397e747fafddb025f21b1) )
+	ROM_LOAD16_BYTE( "f4-a-h1-ss.h1", 0x080001, 0x20000, CRC(4cb1c9ae) SHA1(9e372f9a6e21a80fce1ce94290ba638f0659f056) )
+	ROM_LOAD16_BYTE( "f4-a-l1-ss.l1", 0x080000, 0x20000, CRC(1ddd192d) SHA1(5805d33bd73d2c2c1529420d29582df1c43b62c2) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD16_BYTE( "f4-b-sh0-c.sh0", 0x00001, 0x10000, CRC(31c05c0d) SHA1(9e4d4cd35cf4d725c26836610f0bf36a40fb1617) )
+	ROM_LOAD16_BYTE( "f4-b-sl0-c.sl0", 0x00000, 0x10000, CRC(60a0d33a) SHA1(11668b44ff4d85b6f23278c5eb6a142e129dec38) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* chars */
+	ROM_LOAD16_BYTE( "w45.c00", 0x000000, 0x100000, CRC(2aab419e) SHA1(bc55d3d52ae9d89b9f2b38493d3fce2710a95837) )
+	ROM_LOAD16_BYTE( "w46.c01", 0x000001, 0x100000, CRC(d6e5c910) SHA1(40bcf895a7379aa3c65cc58c0b5dbec5e391ab6c) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
+	ROM_LOAD( "w47.000", 0x000000, 0x100000, CRC(72e1a253) SHA1(ac7e28eadb365dbb6e2246ae4a9b9ae9bcb6ccee) )
+	ROM_LOAD( "w48.010", 0x100000, 0x100000, CRC(1746b7f6) SHA1(b0faa60516e656dfce19bc1f2d72281342adc8a4) )
+	ROM_LOAD( "w49.020", 0x200000, 0x100000, CRC(17b5caf2) SHA1(df38f9a625226c96ac921182ef975e598d9bc245) )
+	ROM_LOAD( "w50.030", 0x300000, 0x100000, CRC(63e4bec3) SHA1(252b4493e1bc368021389e65295036523c401ad4) )
+
+	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
+	ROM_LOAD16_BYTE( "f4-b-drh-.drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) )
+	ROM_LOAD16_BYTE( "f4-b-drl-.drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) )
+
+	ROM_REGION( 0x80000, "irem", 0 )    /* ADPCM samples */
+	ROM_LOAD( "w96.da0", 0x000000, 0x80000, CRC(7a493e2e) SHA1(f6a8bacbe25760c86bdd8e8bb6d052ff15718eef) )
 ROM_END
 
 ROM_START( dsoccr94 )
@@ -973,8 +1011,10 @@ DRIVER_INIT_MEMBER(m107_state,wpksoc)
 
 /***************************************************************************/
 
-GAME( 1993, firebarr,      0, firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
-// Air Assault : World version of Fire Barrel, seen on location at the London Trocadero
-GAME( 1994, dsoccr94,      0, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL )
-GAME( 1995, wpksoc,        0, wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
-GAME( 1994, kftgoal,  wpksoc, wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
+GAME( 1993, firebarr,      0,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
+GAME( 1993, airass,        firebarr, airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", GAME_NO_COCKTAIL | GAME_NOT_WORKING ) // possible location test, but sound code is newer than Japan version
+
+GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL )
+
+GAME( 1995, wpksoc,        0,        wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
+GAME( 1994, kftgoal,       wpksoc,   wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
