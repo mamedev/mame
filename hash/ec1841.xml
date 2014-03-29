@@ -125,4 +125,15 @@
 		</part>
 	</software>
 
+	<software name="voice41">
+		<description>Speech syntesis software v.?.?</description>
+		<year>19??</year>
+		<publisher>??</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="205475">
+				<rom name="ec1841-voice41.td0" size="205475" sha1="5561649fde90bccc743ce61a5d4a50e07cd5a674" crc="1f85afad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
