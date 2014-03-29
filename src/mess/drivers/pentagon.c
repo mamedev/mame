@@ -146,7 +146,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, NULL);
+	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, 0);
 }
 
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
@@ -156,7 +156,7 @@ TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, NULL);
+	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
 }
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	ADDRESS_MAP_UNMAP_HIGH
