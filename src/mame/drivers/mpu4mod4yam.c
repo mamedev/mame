@@ -185,7 +185,12 @@ INPUT_PORTS_START( m4gambal )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+ROM_START( m4tst )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
+ROM_END
 
+GAME(198?, m4tst,        0, mod4yam ,mpu4 , mpu4_state,m4default,     ROT0,"Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
 
 ROM_START( m4stc )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -23,11 +23,6 @@ INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 INPUT_PORTS_EXTERN( mpu4jackpot8per );
 INPUT_PORTS_EXTERN( grtecp );
 
-ROM_START( m4tst )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
-ROM_END
-
 ROM_START( m4tst2 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "ut2.p1",  0xE000, 0x2000,  CRC(f7fb6575) SHA1(f7961cbd0801b9561d8cd2d23081043d733e1902))
@@ -2374,7 +2369,6 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
 GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
 GAME( 198?, m4clr,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
 GAME( 198?, m4rltst,      0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Reel Test (3.0)",GAME_MECHANICAL )

@@ -90,7 +90,7 @@
 
 IMPACT Games
 
-IMPACT apparently stands for Interactive Moving Picture Amusment Control
+IMPACT apparently stands for Interactive Moving Picture Amusement Control
 Technology, and is intended as a replacement for the JPM System 5 board.
 Large sections of the processing were moved to two identical custom ASICs
 (U1 and U2), only half of each is used.

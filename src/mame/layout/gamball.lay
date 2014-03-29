@@ -5,6 +5,12 @@
 			<color red="1.0" green="0.0" blue="0.0" />
 	</led7seg>
 	</element>
+	<element name ="bezelblock">
+		<rect state ="0">
+		<bounds x="0" y="0" width="1" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>		
 	<element name="reellamp">
 		<rect state ="0">
 			<bounds x="0" y="0" width="7" height="3" />
@@ -254,29 +260,34 @@
 		</text>
 	</element>
 
+	<!-- Barcrest reels have the opto flag set central to their first symbol, which we say is around step 1 (halfsteps = 2)
+	We base our reel generation from the top, so we need an offset to drag the right symbol down.
+	Each half step is 65536/96 =  682.6 recurring, with a symbol taking 8 half steps when on 12 per reel (5461 per symbol), or 6 when on 16 (4096 per symbol).
+	We also need to allow for that 2 half step deflection (1365).
+	-->
 	<element name="SteppersReel1" defstate="0">
-	<reel stateoffset="-1364" symbollist="3.00 RPT:300p.png,2.40:240.png,2.20:220.png,2.00:200.png,1.60:160.png,1.20:120.png,1.00:100p.png,80p:80p.png,60p:60p.png,LOSE:lose.png,JACK:jack.png,POT:pot.png"  numsymbolsvisible="2">
+	<reel stateoffset="-6826" symbollist="3.00 RPT:300p.png,2.40:240.png,2.20:220.png,2.00:200.png,1.60:160.png,1.20:120.png,1.00:100p.png,80p:80p.png,60p:60p.png,LOSE:lose.png,JACK:jack.png,POT:pot.png"  numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel2" defstate="0">
-	<reel stateoffset="2732" symbollist="7:7.png,Cherry:cherry.png,Bar:bar.png,Melon:melon.png,7:7.png,Bar:bar.png,Bell:bell.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,7:7.png,Bar:bar.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png"  numsymbolsvisible="3">
+	<reel stateoffset="-5461" symbollist="7:7.png,Cherry:cherry.png,Bar:bar.png,Melon:melon.png,7:7.png,Bar:bar.png,Bell:bell.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,7:7.png,Bar:bar.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png"  numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel3" defstate="0">
-	<reel stateoffset="2732" symbollist="7:7.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,Bell:bell.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,7:7.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png" numsymbolsvisible="3">
+	<reel stateoffset="-5461" symbollist="7:7.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,Bell:bell.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,7:7.png,Melon:melon.png,Bar:bar.png,Cherry:cherry.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png" numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
 	</element>
 
 	<element name="SteppersReel4" defstate="0">
-	<reel stateoffset="2732" symbollist="Bell:bell.png,7:7.png,Bell:bell.png,Bar:bar.png,7:7.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,7:7.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png" numsymbolsvisible="3">
+	<reel stateoffset="-5461" symbollist="Bell:bell.png,7:7.png,Bell:bell.png,Bar:bar.png,7:7.png,Cherry:cherry.png,Melon:melon.png,Bell:bell.png,Cherry:cherry.png,Bar:bar.png,7:7.png,Melon:melon.png,Cherry:cherry.png,Bell:bell.png,Bar:bar.png,Melon:melon.png" numsymbolsvisible="3">
 	<color red="1.0" green="1.0" blue="1.0" />
 	<bounds x="0" y="0" width="1" height="1" />
 	</reel>
@@ -296,7 +307,11 @@
 		</backdrop>
 
 		<backdrop name="sreel1" element="SteppersReel1" state="0">
-			<bounds x="85" y="491.3333" width="50" height="58.6666"/>
+			<bounds x="85" y="463" width="49" height="87.9999"/>
+		</backdrop>
+		
+		<backdrop name="blk" element="bezelblock" state="0">
+			<bounds x="85" y="463" width="49" height="29.3333"/>
 		</backdrop>
 
 		<backdrop name="lamp26" element="cancol" state="0" inputtag="BLACK2" inputmask="0x04">
