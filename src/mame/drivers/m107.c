@@ -1011,8 +1011,8 @@ DRIVER_INIT_MEMBER(m107_state,wpksoc)
 
 /***************************************************************************/
 
-GAME( 1993, firebarr,      0,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, airass,        firebarr, airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", GAME_NO_COCKTAIL | GAME_NOT_WORKING ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, airass,        0,             airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", GAME_NO_COCKTAIL ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,      airass,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
 
 GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL )
 
