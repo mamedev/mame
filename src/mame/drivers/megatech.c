@@ -551,12 +551,14 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 
 UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
+	// if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip
 	if (!m_current_game_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
 	{
-//		m_vdp->screen_update(screen, bitmap, cliprect);
+		m_vdp->screen_update(screen, bitmap, cliprect);
+#if 0
+		// when launching megatech + both sms and megadrive games, the following would be needed...
 		for (int y = 0; y < 224; y++)
 		{
 			UINT32* lineptr = &bitmap.pix32(y, 0);
@@ -565,6 +567,7 @@ UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitm
 			for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 				lineptr[x] = srcptr[x];
 		}	
+#endif
 	}
 	return 0;
 }
