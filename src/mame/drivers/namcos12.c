@@ -2584,7 +2584,7 @@ ROM_START( tektagtjc1 )
 	ROM_LOAD32_BYTE( "flou.ic7",        0x3000003, 0x200000, CRC(75894a07) SHA1(ee36dded4c78b0bddd4904eceabc0f0f2ca5cf07) ) //
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
-	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, BAD_DUMP CRC(0a6e5d6c) SHA1(fd37c190ac99dc9ab2373a43dc39ccf6eca6c178) ) // There is a single bit difference @ 0x1805
+	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "teg1_wave0.ic1",      0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
