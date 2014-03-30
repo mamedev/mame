@@ -86,6 +86,28 @@
         return
 
 
+c8000000:
+  8011e384:
+   if((a2000000.w & 0xfff0 != 0x0080) (c417_r, 808e or 008e)
+     +10.w = 2
+     +16.w = 42
+     +16.w = 23c0
+     +10.w = 3
+     801deaf0.w *0x28 -> +12.w (fixed)
+
+
+
+
+':maincpu' (801142FC): unmapped program memory write to 0C800010 = 00020000 & FFFF0000
+':maincpu' (801143A8): unmapped program memory write to 0C800010 = 00020000 & FFFF0000
+':maincpu' (801143B4): unmapped program memory write to 0C800014 = 00000042 & 0000FFFF
+':maincpu' (801143C0): unmapped program memory write to 0C800014 = 000023C0 & 0000FFFF
+':maincpu' (801143CC): unmapped program memory write to 0C800010 = 00030000 & FFFF0000
+':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
+':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
+':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
+':maincpu' (801143E0): unmapped program memory write to 0C800010 = 00000000 & 0000FFFF
+
 ****************************************************************************
 
 Namco System 23 and Super System 23 Hardware Overview (last updated 7th April 2013 at 12.49am)
@@ -1523,6 +1545,8 @@ public:
 	DECLARE_WRITE16_MEMBER(iob_p6_w);
 	DECLARE_READ8_MEMBER(iob_gun_r);
 	DECLARE_READ16_MEMBER(iob_analog_r);
+	DECLARE_WRITE16_MEMBER(c435_state_pio_w);
+	DECLARE_WRITE16_MEMBER(c435_state_reset_w);
 	DECLARE_DRIVER_INIT(s23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	DECLARE_VIDEO_START(s23);
@@ -1537,17 +1561,23 @@ public:
 	UINT16 nthword(const UINT32 *pSource, int offs);
 	inline INT32 u32_to_s24(UINT32 v);
 	inline INT32 u32_to_s10(UINT32 v);
+	float f24_to_f32(UINT32 v);
+
 	INT32 *c435_getv(UINT16 id);
 	INT16 *c435_getm(UINT16 id);
+
+	void c435_state_set_interrupt(const UINT16 *param);
+	void c435_state_set_projection_matrix_line(const UINT16 *param);
+	void c435_state_set(UINT16 type, const UINT16 *param);
+	int c435_get_state_entry_size(UINT16 type);
 
 	void c435_matrix_matrix_mul();
 	void c435_matrix_set();
 	void c435_vector_set();
 	void c435_matrix_vector_mul();
 	void c435_vector_matrix_mul();
-	void c435_scaling_set();
-	void c435_state_set_interrupt();
 	void c435_state_set();
+	void c435_scaling_set();
 	void c435_render();
 	void c435_flush();
 
@@ -1602,6 +1632,28 @@ inline INT32 namcos23_state::u32_to_s10(UINT32 v)
 	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
 }
 
+float namcos23_state::f24_to_f32(UINT32 v)
+{
+	// 8 bits exponent, 16 mantissa
+	// mantissa is 16-bits signed, 2-complement
+	// value is m * 2**(e-46)
+	// 1 is e=32, m=0x4000, -1 is e=31, m=0x8000
+
+	// This code turns it into a standard float
+	if(!v)
+		return 0;
+
+	UINT32 r = v & 0x8000 ? 0x80000000 : 0;
+	UINT16 m = r ? -v : v;
+	UINT8 e = (v >> 16) + 0x60;
+	while(!(m & 0x8000)) {
+		m <<= 1;
+		e--;
+	}
+
+	r = r | (e << 23) | ((m & 0x7fff) << 8);
+	return *(float *)&r;
+}
 
 INLINE UINT8 light(UINT8 c, float l)
 {
@@ -1632,12 +1684,88 @@ INT16 *namcos23_state::c435_getm(UINT16 id)
 	return m_matrices[id];
 }
 
+void namcos23_state::c435_state_set_interrupt(const UINT16 *param)
+{
+	if(param[0] & 1)
+		update_main_interrupts(m_main_irqcause | MAIN_C435_IRQ);
+	else
+		update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
+}
+
+void namcos23_state::c435_state_set_projection_matrix_line(const UINT16 *param)
+{
+	// timecrs2:
+	//   sx = 640/2, sy = 480/2, t = tan(fov/2) (fov=45 degrees)
+	//   line 1: 1 0 -(sx-a)/(sx/t) 0 -1  0 -(sx+a)/(sx/t) 0
+	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
+	//   line 3: 0 0 -1             c  0  0              0 sx/t
+
+	char buf[4096];
+	char *p = buf;
+	p += sprintf(p, "projection matrix line:");
+	for(int i=0; i<8; i++)
+		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
+	p += sprintf(p, "\n");
+	logerror(buf);
+}
+
+void namcos23_state::c435_state_set(UINT16 type, const UINT16 *param)
+{
+	switch(type) {
+	case 0x0001: c435_state_set_interrupt(param); break;
+	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
+	default: {
+		char buf[4096];
+		char *p = buf;
+		p += sprintf(buf, "WARNING: Unhandled state type %04x :", type);
+		for(int i=0; i<c435_get_state_entry_size(type); i++)
+			p += sprintf(p, " %04x", param[i]);
+		p += sprintf(p, "\n");
+		logerror(buf);
+		break;
+	}
+	}
+}
+
+WRITE16_MEMBER(namcos23_state::c435_state_reset_w)
+{
+	m_c435_buffer_pos = 0;
+}
+
+WRITE16_MEMBER(namcos23_state::c435_state_pio_w)
+{
+	m_c435_buffer[m_c435_buffer_pos++] = data;
+	int psize = c435_get_state_entry_size(m_c435_buffer[0]);
+	if(m_c435_buffer_pos < psize+1)
+		return;
+	c435_state_set(m_c435_buffer[0], m_c435_buffer+1);
+	m_c435_buffer_pos = 0;
+}
+
+int namcos23_state::c435_get_state_entry_size(UINT16 type)
+{
+	switch(type) {
+	case 0x0001: return 1;
+	case 0x0009: return 19;
+	case 0x0042: return 41;
+	case 0x0046: return 13;
+	case 0x00c0: return 33;
+	case 0x00c6: return 13;
+	case 0x00c8: return 17;
+	default:
+		logerror("WARNING: Unknown size for state type %04x\n", type);
+		return -1;
+	}
+}
+
 void namcos23_state::c435_matrix_matrix_mul() // 0.0
 {
 	if((m_c435_buffer[0] & 0xf) != 4) {
 		logerror("WARNING: c435_matrix_matrix_mul with size %d\n", m_c435_buffer[0] & 0xf);
 		return;
 	}
+	if(m_c435_buffer[0] != 0x0004)
+		logerror("WARNING: c435_matrix_matrix_mul header %04x\n", m_c435_buffer[0]);
 	if(m_c435_buffer[3] != 0xffff)
 		logerror("WARNING: c435_matrix_matrix_mul with +2=%04x\n", m_c435_buffer[3]);
 
@@ -1662,6 +1790,10 @@ void namcos23_state::c435_matrix_vector_mul() // 0.1
 		logerror("WARNING: c435_matrix_vector_mul with size %d\n", m_c435_buffer[0] & 0xf);
 		return;
 	}
+
+	if(m_c435_buffer[0] != 0x0814 && m_c435_buffer[0] != 0x1014)
+		logerror("WARNING: c435_matrix_vector_mul header %04x\n", m_c435_buffer[0]);
+
 
 	if(m_c435_buffer[3] != 0xffff) {
 		INT32 *t        = c435_getv(m_c435_buffer[1]);
@@ -1690,6 +1822,10 @@ void namcos23_state::c435_matrix_set() // 0.4
 		logerror("WARNING: c435_matrix_set with size %d\n", m_c435_buffer[0] & 0xf);
 		return;
 	}
+
+	if(m_c435_buffer[0] != 0x004a)
+		logerror("WARNING: c435_matrix_set header %04x\n", m_c435_buffer[0]);
+
 	INT16 *t = c435_getm(m_c435_buffer[1]);
 	for(int i=0; i<9; i++)
 		t[i] = m_c435_buffer[i+2];
@@ -1701,6 +1837,9 @@ void namcos23_state::c435_vector_set() // 0.5
 		logerror("WARNING: c435_vector_set with size %d\n", m_c435_buffer[0] & 0xf);
 		return;
 	}
+	if(m_c435_buffer[0] != 0x057)
+		logerror("WARNING: c435_vector_set header %04x\n", m_c435_buffer[0]);
+
 	INT32 *t = c435_getv(m_c435_buffer[1]);
 	for(int i=0; i<3; i++)
 		t[i] = u32_to_s24((m_c435_buffer[2*i+2] << 16) | m_c435_buffer[2*i+3]);
@@ -1715,36 +1854,26 @@ void namcos23_state::c435_scaling_set() // 4.4
 	m_scaling = m_c435_buffer[1];
 }
 
-void namcos23_state::c435_state_set_interrupt() // 4.f.0001
-{
-	if(m_c435_buffer[0] != 0x4f02) {
-		logerror("WARNING: c435_state_set_interrupt with size %d\n", m_c435_buffer[0] & 0xff);
-		return;
-	}
-	if(m_c435_buffer[2] & 1)
-		update_main_interrupts(m_main_irqcause | MAIN_C435_IRQ);
-	else
-		update_main_interrupts(m_main_irqcause & ~MAIN_C435_IRQ);
-}
-
 void namcos23_state::c435_state_set() // 4.f
 {
 	if((m_c435_buffer[0] & 0xff) == 0) {
-		logerror("WARNING: c435_state_set with size %d\n", m_c435_buffer[0] & 0xff);
+		logerror("WARNING: c435_state_set with zero size\n");
 		return;
 	}
-	switch(m_c435_buffer[1]) {
-	case 0x0001: c435_state_set_interrupt(); break;
-	default:
-		logerror("WARNING: c435_state_set(%04x, ...)\n", m_c435_buffer[1]);
-		break;
+	int size = c435_get_state_entry_size(m_c435_buffer[1]);
+	if(size != (m_c435_buffer[0] & 0xff)-1)
+	{
+		logerror("WARNING: c435_state_set size disagreement (type=%04x, got %d, expected %d)\n", m_c435_buffer[1], (m_c435_buffer[0] & 0xff)-1, size);
+		return;
 	}
+
+	c435_state_set(m_c435_buffer[1], m_c435_buffer+2);
 }
 
 void namcos23_state::c435_render() // 8
 {
 	if((m_c435_buffer[0] & 0xf) != 3) {
-		logerror("WARNING: c435_render with size %d, header %04x", m_c435_buffer[0] & 0xf, m_c435_buffer[0]);
+		logerror("WARNING: c435_render with size %d, header %04x\n", m_c435_buffer[0] & 0xf, m_c435_buffer[0]);
 		return;
 	}
 
@@ -1768,13 +1897,16 @@ void namcos23_state::c435_render() // 8
 	re->model.scaling = use_scaling ? m_scaling / 16384.0 : 1.0;
 	memcpy(re->model.m, m, sizeof(re->model.m));
 	memcpy(re->model.v, v, sizeof(re->model.v));
+	//	re->model.v[2] *= 768/420.0;
+
 	if(0)
-		fprintf(stderr, "Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f)\n",
+		logerror("Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f) %f\n",
 				re->model.model,
 				re->model.m[0]/16384.0, re->model.m[1]/16384.0, re->model.m[2]/16384.0,
 				re->model.m[3]/16384.0, re->model.m[4]/16384.0, re->model.m[5]/16384.0,
 				re->model.m[6]/16384.0, re->model.m[7]/16384.0, re->model.m[8]/16384.0,
-				re->model.v[0]/16384.0, re->model.v[1]/16384.0, re->model.v[2]/16384.0);
+				re->model.v[0]/16384.0, re->model.v[1]/16384.0, re->model.v[2]/16384.0,
+				re->model.scaling);
 
 	render.count[render.cur]++;
 }
@@ -1830,10 +1962,13 @@ void namcos23_state::c435_pio_w(UINT16 data)
 	}
 
 	if(!known) {
-		logerror("c435 -");
+		char buf[4096];
+		char *p = buf;
+		p += sprintf(p, "c435 -");
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			logerror(" %04x", m_c435_buffer[i]);
-		logerror("\n");
+			p += sprintf(p, " %04x", m_c435_buffer[i]);
+		p += sprintf(p, "\n");
+		logerror(buf);
 	}
 
 	m_c435_buffer_pos = 0;
@@ -1930,8 +2065,14 @@ void namcos23_state::render_project(poly_vertex &pv)
 	// 640/(3.125/3.75) = 768
 	// 480/(2.34375/3.75) = 768
 
-	pv.x = 320 + 768 * pv.x;
-	pv.y = 240 - 768 * pv.y;
+#if 1
+	pv.x = 320 + 768*pv.x;
+	pv.y = 240 - 768*pv.y;
+#else
+	pv.x = 320 + 410*pv.x;
+	pv.y = 240 - 410*pv.y;
+#endif
+
 	pv.p[0] = 1.0f / pv.p[0];
 }
 
@@ -1957,6 +2098,14 @@ static UINT32 render_texture_lookup_nocache_point(running_machine &machine, cons
 void namcos23_state::render_one_model(const namcos23_render_entry *re)
 {
 	render_t &render = m_render;
+	if(re->model.model < 0x80) {
+		logerror("WARNING: model %02x requested\n", re->model.model);
+		return;
+	}
+
+	if(re->model.model == 3486)
+		return;
+
 	UINT32 adr = m_ptrom[re->model.model];
 	if(adr >= m_ptrom_limit) {
 		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
@@ -2761,6 +2910,8 @@ static ADDRESS_MAP_START( s23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(c412_r, c412_w, 0xffffffff)
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(c421_r, c421_w, 0xffffffff)
+	AM_RANGE(0x0c800010, 0x0c800013) AM_WRITE16(c435_state_reset_w, 0xffff0000)
+	AM_RANGE(0x0c800014, 0x0c800017) AM_WRITE16(c435_state_pio_w, 0x0000ffff)
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(ctl_r, ctl_w, 0xffffffff)
 	AM_RANGE(0x0e800000, 0x0e800003) AM_READWRITE16(sub_comm_r, sub_comm_w, 0xffffffff) // not sure
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
