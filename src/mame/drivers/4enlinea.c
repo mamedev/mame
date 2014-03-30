@@ -4,6 +4,9 @@
   System I.
   1991, Compumatic
 
+  Driver by David Haywood & Roberto Fresca.
+
+**************************************************************************
 
   1x Z84C00HB6 CPU @ 8 MHz for program.
   1x Z84C00AB6 CPU @ 4 MHz for sound.
@@ -24,11 +27,11 @@
 
   1x 16.0000 MHz crystal. ; Divided by 2 (through CM3080) for main CPU Z84C00HB6.
   1x 8.000 MHz crystal.   ; Divided by 2 for audio CPU Z84C00AB6.
-  1x 14.31818 MHz crystal ; For HMCGA video controller.
+  1x 14.31818 MHz crystal ; For HCGA controller.
 
 **************************************************************************
 
-  UM487F Notes...
+  UM487F HCGA Controller notes...
   
   The fact that there is a 14.318 MHz crystal tied to pin 65, just point
   that the video controller is working in CGA mode. MGA mode needs a
@@ -78,25 +81,85 @@
   Screen Total:   0x38+1 * 0x7F+1 = (57 * 128) chars.
   Screen Visible: 0x28 * 0x64 = (40 * 100) chars.
 
+  NOTE: All (registers and offsets) match the CGA ISA card.
+  Maybe we can find a workaround to hook the controller
+  without the ISA bus.
+
+**************************************************************************
+
+  Custom IC's...
+
+  8952 CM 32 pinouts and periferical circuitry:
+
+                               8952 CM 32
+                            .------v------.
+    74HC244 (IC9), PIN 08 --|01         40|-- 74HC244 (IC9), PIN 17
+    74HC244 (IC9), PIN 06 --|02         39|-- 74HC244 (IC9), PIN 15
+    74HC244 (IC9), PIN 04 --|03         38|-- 74HC244 (IC9), PIN 13
+    74HC244 (IC9), PIN 02 --|04         37|-- 74HC244 (IC9), PIN 11
+   74HC244 (IC10), PIN 08 --|05         36|-- 74HC244 (IC10), PIN 17
+   74HC244 (IC10), PIN 06 --|06         35|-- 74HC244 (IC10), PIN 15
+   74HC244 (IC10), PIN 04 --|07    8    34|-- 74HC244 (IC10), PIN 13
+   74HC244 (IC10), PIN 02 --|08    9    33|-- 74HC244 (IC10), PIN 11
+                            |      5      |
+                         /--|09    2    32|--\
+  To CN1 (through IC15) | --|10         31|-- | To CN1 (through IC15)
+                        | --|11         30|-- |
+                         \--|12    C    29|--/
+                            |      M     |
+                         /--|13         28|--\
+  To CN2 (through IC14) | --|14    3    27|-- | To CN2 (through IC14)
+                        | --|15    2    26|-- |
+                         \--|16         25|--/
+                            |             |
+      To CN3 and ES2 9046 --|17         24|--\
+      To CN3 and ES2 9046 --|18         23|-- > bridge to GND
+                   To CN3 --|19         22|--/
+                            |             |
+                      GND --|20         21|-- VCC
+                            '-------------'
+
+                 74HC244 (IC9)                                 74HC244 (IC10)
+                  .-------.                                     .-------.
+   GAL (PIN 17) --|01   20|-- VCC                GAL (PIN 16) --|01   20|-- VCC
+  8952 (PIN 04) --|02   19|-- GAL (PIN 17)      8952 (PIN 08) --|02   19|-- GAL (PIN 16)
+       Z80 (D7) --|03   18|-- Z80 (D0)               Z80 (D7) --|03   18|-- Z80 (D0)
+  8952 (PIN 03) --|04   17|-- 8952 (PIN 40)     8952 (PIN 07) --|04   17|-- 8952 (PIN 36)
+       Z80 (D6) --|05   16|-- Z80 (D1)               Z80 (D6) --|05   16|-- Z80 (D1) 
+  8952 (PIN 02) --|06   15|-- 8952 (PIN 39)     8952 (PIN 06) --|06   15|-- 8952 (PIN 35)
+       Z80 (D5) --|07   14|-- Z80 (D2)               Z80 (D5) --|07   14|-- Z80 (D2)
+  8952 (PIN 01) --|08   13|-- 8952 (PIN 38)     8952 (PIN 05) --|08   13|-- 8952 (PIN 34)
+       Z80 (D4) --|09   12|-- Z80 (D3)               Z80 (D4) --|09   12|-- Z80 (D3) 
+            GND --|10   11|-- 8952 (PIN 37)               GND --|10   11|-- 8952 (PIN 33)
+                  '-------'                                     '-------'
+
+  Notes:
+
+  - Looks like the GAL is switching the different '8952 CM 32' outputs
+     through the 74HC244 drivers to the Z80 data bus.
+  - CN1, CN2 & CN3 are blind connectors.
+  - 8952 pinouts to CN1 & CN2, are also passing through locations
+    IC14 & IC15 (both are unpopulated from factory).
+
 **************************************************************************
 
   TODO:
-  
+
   - Proper UM487F device emulation.
   - Interlaced video mode.
   - Sound.
   - More work...
-  
+
 *************************************************************************/
 
 #define MAIN_CLOCK           XTAL_16MHz
 #define SEC_CLOCK            XTAL_8MHz
 #define HCGA_CLOCK           XTAL_14_31818MHz
 
-#define PRG_CPU_CLOCK        MAIN_CLOCK /2		/* 8 MHz. */
-#define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. */
-#define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. */
-#define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. */
+#define PRG_CPU_CLOCK        MAIN_CLOCK /2		/* 8 MHz. (measured) */
+#define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. (measured) */
+#define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. (measured) */
+#define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. (measured) */
 
 
 #include "emu.h"
@@ -158,7 +221,7 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 
 	int offset = 0;
 	int offset2 = 0;
-		
+
 	for (int y = 0; y < 200; y++)
 	{
 		UINT16* dstptr_bitmap = &bitmap.pix16(y);
@@ -167,7 +230,7 @@ UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind
 		{
 			UINT8 pix;
 
-			if (y&1) pix = m_videoram2[offset2++];
+			if (y & 1) pix = m_videoram2[offset2++];
 			else pix = m_videoram[offset++];
 
 			dstptr_bitmap[x + 3] = (pix >> 0) & 0x3;
@@ -195,6 +258,7 @@ WRITE8_MEMBER(_4enlinea_state::vram2_w)
 
 WRITE8_MEMBER(_4enlinea_state::crtc_config_w)
 {
+/* Bit 6 enables the CGA mode, otherwise is MGA */
 	if(data & 0x40)
 	{
 		logerror("CRTC config mode (3BFh): CGA\n");
@@ -207,6 +271,7 @@ WRITE8_MEMBER(_4enlinea_state::crtc_config_w)
 
 WRITE8_MEMBER(_4enlinea_state::crtc_mode_ctrl_w)
 {
+/* Bit 3 enables/disables the video (see the notes above) */
 	logerror("CRTC mode control (3D8h): %02x\n", data);
 }
 
@@ -235,7 +300,7 @@ READ8_MEMBER(_4enlinea_state::crtc_status_r)
 
 */
 	logerror("CRTC status read\n");
-	return (machine().rand() & 0x80);	/* bit 7 ??? (is suppossed to be unused inCGA mode) */
+	return (machine().rand() & 0x80);	/* bit 7 ??? (it's suppossed to be unused in CGA mode) */
 }
 
 READ8_MEMBER(_4enlinea_state::unk_e000_r)
@@ -248,8 +313,8 @@ READ8_MEMBER(_4enlinea_state::unk_e000_r)
 READ8_MEMBER(_4enlinea_state::unk_e001_r)
 {
 	logerror("read e001\n");
-//	return (machine().rand() & 0xff);	// after 30 seconds, random strings and gfx appear on the screen.
-	return (machine().rand() & 0x0f);	// after 30 seconds, random gfx appear on the screen.
+	return (machine().rand() & 0xff);	// after 30 seconds, random strings and gfx appear on the screen.
+//	return (machine().rand() & 0x0f);	// after 30 seconds, random gfx appear on the screen.
 }
 
 
@@ -259,12 +324,14 @@ READ8_MEMBER(_4enlinea_state::unk_e001_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram") // even lines
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(vram2_w) AM_SHARE("videoram2") // odd lines
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")		// even lines
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(vram2_w) AM_SHARE("videoram2")	// odd lines
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe000) AM_READ(unk_e000_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(unk_e001_r)
+
+	AM_RANGE(0xe002, 0xe3ff) AM_RAM	// bad... just temporary to allow writes for debug purposes.
 
 ADDRESS_MAP_END
 
