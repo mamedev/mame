@@ -171,8 +171,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 {
 	// derive the full path of the file in an allocated string
 	// for now just fake it since we don't presume any underlying file system
-	*dst = (char*)osd_malloc_array(strlen(path) + 1);
-	strcpy(*dst, path);
+	*dst = core_strdup(path);
 	return FILERR_NONE;
 }
 
