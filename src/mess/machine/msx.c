@@ -308,7 +308,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 	memset (st, 0, sizeof (slot_state));
 
 	st->m_type = type;
-	sramfile = auto_alloc_array(machine(), char, strlen (image.filename () + 1));
+	sramfile = auto_alloc_array(machine(), char, strlen (image.filename ()) + 1);
 
 	if (sramfile)
 	{
