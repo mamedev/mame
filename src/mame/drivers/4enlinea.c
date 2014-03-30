@@ -89,7 +89,7 @@
 
   Custom IC's...
 
-  8952 CM 32 pinouts and periferical circuitry:
+  8952 CM 32 pinouts and peripheral circuitry:
 
                                8952 CM 32
                             .------v------.
