@@ -81,6 +81,8 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-march=athlon",            "/G7" },
 	{ 0,        "-march=pentium4",          "/G7" },
 	{ 0,        "-march=athlon64",          "/G7" },
+	{ VS71,     "-msse",                   "/arch:SSE" },
+	{ 0,        "-msse",                   "" },
 	{ VS71,     "-msse2",                   "/arch:SSE2" },
 	{ 0,        "-msse2",                   "" },
 	{ 0,        "-msse3",                   "" },
@@ -222,6 +224,7 @@ static DWORD get_exe_version(const char *executable)
 //  build_command_line
 //============================================================
 
+// TODO: VS2012 and up enable SSE2 instructions by default - we should make older versions consistent with this
 static void build_command_line(int argc, char *argv[])
 {
 	const translation_info *transtable;
