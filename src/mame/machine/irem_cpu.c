@@ -7,17 +7,18 @@
     to be able to run code in emulation (non-encrypted) mode for some subroutines..
 
     Hasamu                             Nanao   08J27261A1 011 9102KK700
-    Gunforce                           Nanao   08J27261A1 011 9106KK701
     Ken-Go                             Nanao   08J27261A1 011 9102KK701
+    Air Assault                        Nanao   08J27261A1 011 9106KK440
+    Gunforce                           Nanao   08J27261A1 011 9106KK701
     Bomberman                          Nanao   08J27261A1 012 9123KK200
     Atomic Punk                        Nanao   08J27291A1 012 9128KK440
     Blade Master / Cross Blades!       Nanao   08J27291A1 012 9123KK740
     Quiz F-1 1,2 Finish                Nanao   08J27291A4 014 9147KK700
-    Gunforce 2                         Nanao   08J27291A4 014 9247KK700
     Lethal Thunder                     Nanao   08J27291A4 014 9147KK700
+    Gun Force II / Geo Storm           Nanao   08J27291A4 014 9247KK700
     Bomberman World / New Atomic Punk  Nanao   08J27291A5 015 9219KK700
     Undercover Cops                    Nanao   08J27291A5 015 9219KK700
-    Gun Hohki                          Nanao   08J27291A6 016 9217NK700
+    Mystic Riders / Gun Hohki          Nanao   08J27291A6 016 9217NK700
     Skins Game                         Nanao   08J27291A7 017
     Hook                               Nanao   08J27291A8 018 9237NK700
 
@@ -26,9 +27,9 @@
     In The Hunt                        Irem    D8000011A1 020
     Risky Challenge/Gussun Oyoyo       Irem    D8000019A1 022 9331NK700
     Match It II/Shisensho II           Irem    D8000020A1 023 9320NK700
-    World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
     Ninja Baseball Batman              Irem    D8000021A1 024 9335NK700
-    Perfect Soldiers                   Irem    D8000022A1
+    World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
+    Superior Soldiers/Perfect Soldiers Irem    D8000022A1
     Dream Soccer '94                   Irem    D8000023A1 026 9433NK700
 
     Please let me know if you can fill in any of the blanks.
