@@ -34,7 +34,7 @@ void h8_intc_device::device_reset()
 
 int h8_intc_device::interrupt_taken(int vector)
 {
-	if(1)
+	if(0)
 		logerror("%s: taking internal interrupt %d\n", tag(), vector);
 	pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
 	if(vector >= irq_vector_base && vector < irq_vector_base + 8) {
@@ -52,7 +52,7 @@ int h8_intc_device::interrupt_taken(int vector)
 
 void h8_intc_device::internal_interrupt(int vector)
 {
-	if(1)
+	if(0)
 		logerror("%s: internal interrupt %d\n", tag(), vector);
 	pending_irqs[vector >> 5] |= 1 << (vector & 31);
 	update_irq_state();
@@ -60,7 +60,6 @@ void h8_intc_device::internal_interrupt(int vector)
 
 void h8_intc_device::set_input(int inputnum, int state)
 {
-	logerror("%s: input %d = %d\n", tag(), inputnum, state);
 	if(inputnum == INPUT_LINE_NMI) {
 		if(state == ASSERT_LINE && !nmi_input)
 			pending_irqs[0] |= 1 << irq_vector_nmi;
@@ -151,8 +150,6 @@ void h8_intc_device::update_irq_state()
 	pending_irqs[0] &= ~(255 << irq_vector_base);
 	pending_irqs[0] |= (isr & ier) << irq_vector_base;
 
-	logerror("%s: pe[0]=%04x isr=%02x ier=%02x\n",
-			 tag(), pending_irqs[0], isr, ier);
 	int cur_vector = 0;
 	int cur_level = -1;
 
