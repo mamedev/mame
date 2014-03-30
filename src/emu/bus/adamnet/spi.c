@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Coleco Adam serial port interface emulation
+    Coleco Adam Serial/Parallel Interface emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -18,6 +18,9 @@
 //**************************************************************************
 
 #define M6801_TAG       "m6801"
+#define MC2661_TAG		"mc2661"
+#define RS232_TAG		"rs232"
+#define CENTRONICS_TAG	"centronics"
 
 
 
@@ -69,6 +72,25 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
+//  MC2661_INTERFACE( uart_intf )
+//-------------------------------------------------
+
+static MC2661_INTERFACE( uart_intf )
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_DRIVER( adam_spi )
 //-------------------------------------------------
 
@@ -76,8 +98,15 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(adam_spi_mem)
 	MCFG_CPU_IO_MAP(adam_spi_io)
-
 	MCFG_DEVICE_DISABLE()
+
+	MCFG_MC2661_ADD(MC2661_TAG, XTAL_4_9152MHz, uart_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
+	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
+	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 MACHINE_CONFIG_END
 
 
