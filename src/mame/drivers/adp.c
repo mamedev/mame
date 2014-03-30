@@ -143,6 +143,13 @@ Video board has additional chips:
   - SG-615PH (32.0000M oscillator)
   - Bt481 (RAMDAC)
 
+
+
+Quick Jack administration/service mode:
+- hold down Start and Joker buttons at start
+- enter the default CODENUMBER 54321 using the hand buttons
+- confirm the CODENUMBER with start
+
 */
 
 #include "emu.h"
