@@ -1014,9 +1014,7 @@ void adam_state::machine_start()
 
 void adam_state::machine_reset()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
-
-	if (image->exists())
+	if (m_cart->exists())
 	{
 		// game reset
 		m_game = 1;
