@@ -336,6 +336,8 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ninjaryu",         NES_NROM)    // mapper 111 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_dance",        NES_NROM)    // UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("onebus",           NES_NROM)    // UNSUPPORTED
+	SLOT_INTERFACE_INTERNAL("dance2k",          NES_NROM)    // UNSUPPORTED
+	SLOT_INTERFACE_INTERNAL("pec586",           NES_NROM)    // UNSUPPORTED
 // are there dumps of games with these boards?
 	SLOT_INTERFACE_INTERNAL("bmc_hik_kof",      NES_NROM) // mapper 251 - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("bmc_13in1jy110",   NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
@@ -343,7 +345,6 @@ SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("konami_qtai",      NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_3d_block",     NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_c_n22m",       NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
-	SLOT_INTERFACE_INTERNAL("unl_pec_586",      NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("a9746",            NES_NROM) // mapper 219 - UNSUPPORTED (no dump available)
 // legacy boards for FFE copier mappers (are there images available to fix/improve emulation?)
 	SLOT_INTERFACE_INTERNAL("ffe3",             NES_FFE3)
