@@ -160,6 +160,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, const opcode_desc *prevdes
 {
 	// initialize the description
 	opcode_desc *desc = m_desc_allocator.alloc();
+	// TODO: this kills the opcode_desc.delay vptr
 	memset(desc, 0, sizeof(*desc));
 	desc->pc = curpc;
 	desc->physpc = curpc;
