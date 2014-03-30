@@ -292,7 +292,7 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_w)
 	}
 	if ( chip->write_display )
 	{  // Data
-		assert(chip->disp_address >= 0 && chip->disp_address < ARRAY_LENGTH(chip->ram));
+		assert(chip->disp_address < ARRAY_LENGTH(chip->ram));
 		if ( chip->ram[chip->disp_address] != data )
 		{
 			m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 0);
