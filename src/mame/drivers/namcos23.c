@@ -1822,7 +1822,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 
 void namcos23_state::c435_dma(address_space &space, UINT32 adr, UINT32 size)
 {
-	UINT16 buffer[256];
+	//UINT16 buffer[256];
 	adr &= 0x1fffffff;
 
 	for(int pos=0; pos < size; pos += 2)
