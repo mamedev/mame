@@ -561,9 +561,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 		UINT8 data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, 0x4000 + (offset & 0x1fff));
-		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_cart(space, 0x4000 + (offset & 0x1fff));
+			data &= m_cartslot->read_cart(space, 0x6000 + (offset & 0x1fff));
 
 		return data;
 	}
@@ -816,7 +814,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	if (m_is_sdisp)
 	{
 		save_item(NAME(m_store_control));
-		save_item(NAME(m_current_cartridge));
+		save_item(NAME(m_store_cart_selection_data));
 
 		m_slots[0] = m_cartslot;
 		for (int i = 1; i < 16; i++)
@@ -829,6 +827,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 			sprintf(str,"slot%i",i + 16 + 1);
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
+		store_select_cart(m_store_cart_selection_data);
 	}
 }
 
@@ -862,7 +861,8 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	if (m_is_sdisp)
 	{
 		m_store_control = 0;
-		m_current_cartridge = 0;
+		m_store_cart_selection_data = 0;
+		store_select_cart(m_store_cart_selection_data);
 	}
 
 	setup_bios();
@@ -875,6 +875,14 @@ READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 }
 
 
+WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
+{
+	store_select_cart(data);
+	m_store_cart_selection_data = data;
+	setup_media_slots();
+}
+
+
 // There are two known models of the Store Display Unit:
 //
 // - the one with 16 cart slots and 3 card slots;
@@ -884,26 +892,18 @@ READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 // that seems to change the active cart/card slot pair or, for the 4th
 // game switch onward of the 16-3 model, the active cart slot only.
 
-WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
+void sms_state::store_select_cart(UINT8 data)
 {
 	UINT8 slot = data >> 4;
-	UINT8 slottype;
+	UINT8 slottype = data & 0x08;
 
-	// Currently, this does not work: it goes through all the available slots
-	// but then it does not acknowledge which slots were empty and which not
-	// so that it does not map back the slot with a cart/card inserted but sits
-	// on idle at slot 16
-	//m_cartslot = m_slots[slot];
-	//m_cardslot = m_cards[slot];
+	// The SMS Store Display only uses the logical cartridge slot to map
+	// the active cartridge or card slot, of its multiple ones.
+	if (slottype == 0)
+		m_cartslot = m_slots[slot];
+	else
+		m_cartslot = m_cards[slot];
 
-	// TODO: check how the selection between the cart and the card slot of
-	// the active pair behaves, and how the slot type bit is set:
-	//
-	// - is there a priority set by hardware, as on Mark III?
-	// - does the BIOS a detection routine to check the presence of ROM on
-	// each slot of the pair, to enable the first where a ROM was found?
-
-	slottype = data & 0x08;
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 

@@ -52,7 +52,8 @@ public:
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
 		m_has_fm(0),
-		m_has_jpn_sms_cart_slot(0) { }
+		m_has_jpn_sms_cart_slot(0),
+		m_store_cart_selection_data(0) { }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -125,9 +126,10 @@ public:
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
 	UINT8 m_store_control;
-	int m_current_cartridge;
+	UINT8 m_store_cart_selection_data;
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
+	void store_select_cart(UINT8 data);
 
 	/* Cartridge slot info */
 	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
