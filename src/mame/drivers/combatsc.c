@@ -754,12 +754,6 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 MACHINE_CONFIG_END
 
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_NULL,              /* interrupt function */
-	MSM5205_SEX_4B  /* 8KHz playback ?    */
-};
-
 /* combat school (bootleg on different hardware) */
 static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
@@ -798,7 +792,7 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 8KHz playback ?    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

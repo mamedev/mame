@@ -721,18 +721,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_NULL,              /* interrupt function */
-	MSM5205_SEX_4B  /* slave mode */
-};
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -837,7 +825,7 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)    /* verified on PCB */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

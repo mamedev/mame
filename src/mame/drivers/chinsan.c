@@ -564,11 +564,6 @@ WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 	}
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(chinsan_state,chin_adpcm_int), /* interrupt function */
-	MSM5205_S64_4B  /* 8kHz */
-};
 
 /*************************************
  *
@@ -630,7 +625,8 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, chin_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

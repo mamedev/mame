@@ -366,13 +366,6 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface tturfbl_msm5205_interface  =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,tturfbl_msm5205_callback),
-	MSM5205_S48_4B
-};
-
-
 READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 {
 	if (m_soundbank_ptr)
@@ -1166,12 +1159,6 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 	if (m_sample_select == 0)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
-static const msm5205_interface shdancbl_msm5205_interface  =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,shdancbl_msm5205_callback),
-	MSM5205_S48_4B
-};
 
 READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 {
@@ -2061,7 +2048,8 @@ static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
 	MCFG_SOUND_ADD("5205", MSM5205, 220000)
-	MCFG_SOUND_CONFIG(tturfbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, tturfbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2198,7 +2186,8 @@ static MACHINE_CONFIG_DERIVED( tturfbl, system16_7759 )
 
 	MCFG_DEVICE_REMOVE("7759")
 	MCFG_SOUND_ADD("5205", MSM5205, 220000)
-	MCFG_SOUND_CONFIG(tturfbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, tturfbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
@@ -2338,7 +2327,8 @@ static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 	MCFG_DEVICE_REMOVE("5c68")
 
 	MCFG_SOUND_ADD("5205", MSM5205, 200000)
-	MCFG_SOUND_CONFIG(shdancbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, shdancbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

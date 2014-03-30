@@ -227,13 +227,6 @@ struct cdrom_interface pce_cdrom =
 	NULL
 };
 
-static const msm5205_interface pce_cd_msm5205_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pce_cd_device, msm5205_int), /* interrupt function */
-	MSM5205_S48_4B      /* 1/48 prescaler, 4bit data */
-};
-
-
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
 static MACHINE_CONFIG_FRAGMENT( pce_cd )
 	MCFG_NVRAM_ADD_0FILL("bram")
@@ -241,7 +234,8 @@ static MACHINE_CONFIG_FRAGMENT( pce_cd )
 	MCFG_CDROM_ADD("cdrom", pce_cdrom)
 
 	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE(DEVICE_SELF_OWNER, pce_cd_device, msm5205_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 1/48 prescaler, 4bit data */
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.00 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.00 )
 

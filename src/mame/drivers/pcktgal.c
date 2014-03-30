@@ -204,13 +204,6 @@ static GFXDECODE_START( bootleg )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, bootleg_spritelayout,   0,  8 ) /* sprites */
 GFXDECODE_END
 
-/***************************************************************************/
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pcktgal_state,pcktgal_adpcm_int),  /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz            */
-};
 
 /***************************************************************************/
 
@@ -260,7 +253,8 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(pcktgal_state, pcktgal_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

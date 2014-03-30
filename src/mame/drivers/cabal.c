@@ -458,18 +458,6 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static const msm5205_interface msm5205_interface_1 =
-{
-	DEVCB_NULL,
-	MSM5205_SEX_4B
-};
-
-static const msm5205_interface msm5205_interface_2 =
-{
-	DEVCB_NULL,
-	MSM5205_SEX_4B
-};
-
 static MACHINE_CONFIG_START( cabal, cabal_state )
 
 	/* basic machine hardware */
@@ -559,11 +547,11 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
-	MCFG_SOUND_CONFIG(msm5205_interface_1)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
-	MCFG_SOUND_CONFIG(msm5205_interface_2)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

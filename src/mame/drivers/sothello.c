@@ -340,13 +340,6 @@ WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 	m_soundcpu->set_input_line(0, ASSERT_LINE );
 }
 
-
-static const msm5205_interface msm_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sothello_state,adpcm_int),      /* interrupt function */
-	MSM5205_S48_4B  /* changed on the fly */
-};
-
 void sothello_state::machine_reset()
 {
 }
@@ -403,7 +396,8 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm",MSM5205, MSM_CLOCK)
-	MCFG_SOUND_CONFIG(msm_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -920,28 +920,6 @@ static MACHINE_CONFIG_START( galaxygn, fantland_state )
 MACHINE_CONFIG_END
 
 
-// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-static const msm5205_interface msm5205_config_0 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_0),   /* IRQ handler */
-	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
-};
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_1),   /* IRQ handler */
-	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
-};
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_2),   /* IRQ handler */
-	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
-};
-static const msm5205_interface msm5205_config_3 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_3),   /* IRQ handler */
-	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
-};
-
 MACHINE_START_MEMBER(fantland_state,borntofi)
 {
 	MACHINE_START_CALL_MEMBER(fantland);
@@ -1013,10 +991,26 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("msm1", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("msm2", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_1) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("msm3", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_2) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("msm4", MSM5205, 384000) MCFG_SOUND_CONFIG(msm5205_config_3) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("msm3", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("msm4", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

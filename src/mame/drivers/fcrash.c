@@ -1402,19 +1402,6 @@ static INPUT_PORTS_START( sgyxz )
 INPUT_PORTS_END
 
 
-static const msm5205_interface msm5205_interface1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(cps_state,m5205_int1), /* interrupt function */
-	MSM5205_S96_4B      /* 4KHz 4-bit */
-};
-
-static const msm5205_interface msm5205_interface2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(cps_state,m5205_int2), /* interrupt function */
-	MSM5205_S96_4B      /* 4KHz 4-bit */
-};
-
-
 MACHINE_START_MEMBER(cps_state,fcrash)
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
@@ -1592,11 +1579,13 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int1)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int2)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1685,11 +1674,13 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 
 	/* has 2x MSM5205 instead of OKI6295 */
 	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int1)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int2)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1730,11 +1721,13 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 
 	/* has 2x MSM5205 instead of OKI6295 */
 	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int1)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)    /* ? */
-	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(cps_state, m5205_int2)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

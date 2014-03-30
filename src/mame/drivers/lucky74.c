@@ -1516,11 +1516,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(lucky74_state,ym2149_portb_w)
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(lucky74_state,lucky74_adpcm_int),  /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz */
-};
 
 /*************************
 *    Machine Drivers     *
@@ -1573,7 +1568,8 @@ static MACHINE_CONFIG_START( lucky74, lucky74_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)         /* not routed to audio hardware */
 
 	MCFG_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(lucky74_state, lucky74_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 MACHINE_CONFIG_END

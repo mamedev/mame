@@ -22,7 +22,6 @@
 #include "machine/6522via.h"
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
-#include "sound/msm5205.h"
 
 const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3] =
 {
@@ -71,12 +70,6 @@ static const ay8910_interface nimbus_ay8910_interface =
 	DEVCB_NULL,                     /* portB read */
 	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_porta_w),   /* portA write */
 	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_portb_w)    /* portB write */
-};
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_msm5205_vck), /* VCK function */
-	MSM5205_S48_4B      /* 8 kHz */
 };
 
 static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
@@ -343,7 +336,8 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,MONO_TAG, 0.75)
 
 	MCFG_SOUND_ADD(MSM5205_TAG, MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(rmnimbus_state, nimbus_msm5205_vck)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, MONO_TAG, 0.75)
 
 	/* Software list */

@@ -579,14 +579,6 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 	}
 }
 
-static const msm5205_interface msm_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dacholer_state,adpcm_int),          /* interrupt function */
-	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
-};
-
-
-
 void dacholer_state::machine_start()
 {
 	save_item(NAME(m_bg_bank));
@@ -691,7 +683,8 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(msm_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

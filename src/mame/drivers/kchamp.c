@@ -360,12 +360,6 @@ WRITE_LINE_MEMBER(kchamp_state::msmint)
 	}
 }
 
-static const msm5205_interface msm_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kchamp_state,msmint),         /* interrupt function */
-	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback */
-};
-
 /********************
 * 1 Player Version  *
 ********************/
@@ -437,7 +431,8 @@ static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_SOUND_CONFIG(msm_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kchamp_state, msmint))         /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 = 3906.25Hz playback */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

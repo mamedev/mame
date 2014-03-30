@@ -246,17 +246,6 @@ static const ay8910_interface irem_ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static const msm5205_interface irem_msm5205_interface_1 =
-{
-	DEVCB_DEVICE_LINE_MEMBER("irem_audio", irem_audio_device, adpcm_int),          /* interrupt function */
-	MSM5205_S96_4B      /* default to 4KHz, but can be changed at run time */
-};
-
-static const msm5205_interface irem_msm5205_interface_2 =
-{
-	DEVCB_NULL,              /* interrupt function */
-	MSM5205_SEX_4B      /* default to 4KHz, but can be changed at run time, slave */
-};
 
 /*
  * http://newsgroups.derkeiler.com/Archive/Rec/rec.games.video.arcade.collecting/2006-06/msg03108.html
@@ -412,11 +401,12 @@ static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_msm5205_interface_1)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("irem_audio", irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_msm5205_interface_2)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -441,7 +431,8 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(irem_msm5205_interface_1)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("irem_audio", irem_audio_device, adpcm_int))          /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* default to 4KHz, but can be changed at run time */
 	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
 	MCFG_SOUND_ADD("filtermix", DISCRETE, 0)

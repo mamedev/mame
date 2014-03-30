@@ -488,12 +488,6 @@ WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(darius_state,darius_adpcm_int),   /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz   */
-};
-
 READ8_MEMBER(darius_state::adpcm_command_read)
 {
 	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, space.device().safe_pc() ); */
@@ -934,7 +928,8 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SOUND_ROUTE(3, "filter1.3r", 0.60)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(darius_state, darius_adpcm_int))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz   */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 

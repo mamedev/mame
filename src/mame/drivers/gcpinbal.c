@@ -379,16 +379,6 @@ static GFXDECODE_START( gcpinbal )
 GFXDECODE_END
 
 
-/**************************************************************
-                            (SOUND)
-**************************************************************/
-
-static const msm5205_interface msm6585_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(gcpinbal_state,gcp_adpcm_int),      /* VCK function */
-	MSM6585_S40         /* 16 kHz */
-};
-
 /***********************************************************
                         MACHINE DRIVERS
 ***********************************************************/
@@ -459,7 +449,8 @@ static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
-	MCFG_SOUND_CONFIG(msm6585_config)
+	MCFG_MSM6585_VCLK_CB(WRITELINE(gcpinbal_state, gcp_adpcm_int))      /* VCK function */
+	MCFG_MSM6585_PRESCALER_SELECTOR(MSM6585_S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

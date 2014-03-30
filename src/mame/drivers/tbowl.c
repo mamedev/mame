@@ -432,17 +432,6 @@ WRITE_LINE_MEMBER(tbowl_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tbowl_state,tbowl_adpcm_int_1),    /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz               */
-};
-
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tbowl_state,tbowl_adpcm_int_2),    /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz               */
-};
 
 /*** Machine Driver
 
@@ -517,11 +506,13 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 
 	/* something for the samples? */
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, tbowl_adpcm_int_1))    /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, tbowl_adpcm_int_2))    /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

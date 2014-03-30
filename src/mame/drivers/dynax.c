@@ -4066,13 +4066,6 @@ static const ay8910_interface hanamai_ay8910_config =
 	DEVCB_NULL,                         /* Port B Write */
 };
 
-static const msm5205_interface hanamai_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,adpcm_int),          /* IRQ handler */
-	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
-};
-
-
 
 static MACHINE_CONFIG_START( hanamai, dynax_state )
 
@@ -4116,7 +4109,8 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4170,7 +4164,8 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4216,7 +4211,8 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
-	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4401,12 +4397,6 @@ static const ay8910_interface jantouki_ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-static const msm5205_interface jantouki_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,adpcm_int_cpu1),         /* IRQ handler */
-	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
-};
-
 MACHINE_START_MEMBER(dynax_state,jantouki)
 {
 	UINT8 *MAIN = memregion("maincpu")->base();
@@ -4478,7 +4468,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(jantouki_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dynax_state, adpcm_int_cpu1))         /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */

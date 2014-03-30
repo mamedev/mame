@@ -484,12 +484,6 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_toggle ^= 1;
 }
 
-static const msm5205_interface yunsung8_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(discoboy_state,yunsung8_adpcm_int), /* interrupt function */
-	MSM5205_S96_4B      /* 4KHz, 4 Bits */
-};
-
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
@@ -524,7 +518,8 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
-	MCFG_SOUND_CONFIG(yunsung8_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

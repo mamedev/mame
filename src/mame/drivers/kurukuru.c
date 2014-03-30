@@ -549,12 +549,6 @@ static const ay8910_interface ym2149_intf =
 	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_bout_w)
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kurukuru_state,kurukuru_msm5205_vck),
-	MSM5205_S48_4B      /* changed on the fly */
-};
-
 
 /*************************************************
 *                 Machine Driver                 *
@@ -596,7 +590,8 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

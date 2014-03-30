@@ -291,18 +291,6 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 };
 
 
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kungfur_state,kfr_adpcm1_int),
-	MSM5205_S48_4B
-};
-
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kungfur_state,kfr_adpcm2_int),
-	MSM5205_S48_4B
-};
-
 void kungfur_state::machine_start()
 {
 	save_item(NAME(m_control));
@@ -333,11 +321,13 @@ static MACHINE_CONFIG_START( kungfur, kungfur_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL_384kHz)  // clock verified with recording
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm1_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL_384kHz)  // "
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm2_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

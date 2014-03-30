@@ -348,11 +348,6 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 		m_msm->data_w((m_msm5205next & 0x0f) >> 0);
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(wc90b_state,adpcm_int),      /* interrupt function */
-	MSM5205_S96_4B  /* 4KHz 4-bit */
-};
 
 static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
@@ -392,7 +387,8 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

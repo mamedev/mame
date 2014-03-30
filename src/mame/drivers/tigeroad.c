@@ -503,12 +503,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_NULL,              /* interrupt function */
-	MSM5205_SEX_4B  /* 4KHz playback ?  */
-};
-
 
 static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 
@@ -565,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* 4KHz playback ?  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

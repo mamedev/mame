@@ -515,13 +515,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_NULL,                  /* IRQ handler */
-	MSM5205_SEX_4B
-};
-
-
 
 void hnayayoi_state::machine_start()
 {
@@ -580,7 +573,7 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

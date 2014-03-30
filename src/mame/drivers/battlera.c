@@ -212,14 +212,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(battlera_state,battlera_adpcm_int),/* interrupt function */
-	MSM5205_S48_4B      /* 8KHz            */
-};
-
-/******************************************************************************/
-
 static const c6280_interface c6280_config =
 {
 	"audiocpu"
@@ -257,7 +249,8 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, battlera_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 

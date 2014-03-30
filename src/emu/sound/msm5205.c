@@ -59,13 +59,16 @@ const device_type MSM6585 = &device_creator<msm6585_device>;
 
 msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, MSM5205, "MSM5205", tag, owner, clock, "msm5205", __FILE__),
-						device_sound_interface(mconfig, *this)
+						device_sound_interface(mconfig, *this),
+						m_vclk_cb(*this)
 {
 }
 
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_sound_interface(mconfig, *this)
+						device_sound_interface(mconfig, *this),
+						m_select(0),
+						m_vclk_cb(*this)
 {
 }
 
@@ -76,35 +79,13 @@ msm6585_device::msm6585_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm5205_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const msm5205_interface *intf = reinterpret_cast<const msm5205_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<msm5205_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_vclk_cb, 0, sizeof(m_vclk_cb));
-		m_select = 0;
-	}
-
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void msm5205_device::device_start()
 {
 	m_mod_clock = clock();
-	m_vclk_callback.resolve(m_vclk_cb, *this);
+	m_vclk_cb.resolve();
 
 	/* compute the difference tables */
 	compute_tables();
@@ -191,8 +172,8 @@ TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
 	int new_signal;
 
 	/* callback user handler and latch next data */
-	if (!m_vclk_callback.isnull())
-		m_vclk_callback(1);
+	if (!m_vclk_cb.isnull())
+		m_vclk_cb(1);
 
 	/* reset check at last hiedge of VCLK */
 	if (m_reset)

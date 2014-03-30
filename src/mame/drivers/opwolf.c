@@ -676,23 +676,6 @@ static GFXDECODE_START( opwolfb )
 GFXDECODE_END
 
 
-/**************************************************************
-                 YM2151 (SOUND)
-**************************************************************/
-
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(opwolf_state,opwolf_msm5205_vck_1), /* VCK function */
-	MSM5205_S48_4B      /* 8 kHz */
-};
-
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(opwolf_state,opwolf_msm5205_vck_2), /* VCK function */
-	MSM5205_S48_4B      /* 8 kHz */
-};
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -757,12 +740,14 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
@@ -817,12 +802,14 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_1)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(opwolf_state, opwolf_msm5205_vck_2)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
