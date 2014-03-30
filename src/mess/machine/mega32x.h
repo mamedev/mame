@@ -19,7 +19,11 @@
 #define SH2_CINT_IRQ_LEVEL 8
 #define SH2_PINT_IRQ_LEVEL 6
 
+#define MASTER_CLOCK_NTSC 53693175
+#define MASTER_CLOCK_PAL  53203424
 
+#include "cpu/sh2/sh2.h"
+#include "cpu/sh2/sh2comn.h"
 #include "sound/dac.h"
 
 class sega_32x_device : public device_t

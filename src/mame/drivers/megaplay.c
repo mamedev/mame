@@ -60,6 +60,68 @@ Bugs:
 #define MP_ROM  1
 #define MP_GAME 0
 
+
+class mplay_state : public md_base_state
+{
+public:
+	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_ic3_ram(*this, "ic3_ram"),
+	m_vdp1(*this, "vdp1"),
+	m_bioscpu(*this, "mtbios")
+	{ }
+	
+	DECLARE_READ16_MEMBER(extra_ram_r);
+	DECLARE_WRITE16_MEMBER(extra_ram_w);
+	DECLARE_READ8_MEMBER(bios_banksel_r);
+	DECLARE_WRITE8_MEMBER(bios_banksel_w);
+	DECLARE_READ8_MEMBER(bios_gamesel_r);
+	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
+	DECLARE_WRITE16_MEMBER(mp_io_write);
+	DECLARE_READ16_MEMBER(mp_io_read);
+	DECLARE_READ8_MEMBER(bank_r);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(bios_6402_r);
+	DECLARE_WRITE8_MEMBER(bios_6402_w);
+	DECLARE_READ8_MEMBER(bios_6204_r);
+	DECLARE_WRITE8_MEMBER(bios_width_w);
+	DECLARE_READ8_MEMBER(bios_6404_r);
+	DECLARE_WRITE8_MEMBER(bios_6404_w);
+	DECLARE_READ8_MEMBER(bios_6600_r);
+	DECLARE_WRITE8_MEMBER(bios_6600_w);
+	DECLARE_WRITE8_MEMBER(game_w);
+	DECLARE_READ8_MEMBER(vdp_count_r);
+	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
+	
+	DECLARE_DRIVER_INIT(megaplay);
+	DECLARE_VIDEO_START(megplay);
+	DECLARE_MACHINE_RESET(megaplay);
+	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+private:
+	
+	UINT32 m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
+	
+	UINT32 m_bios_bank; // ROM bank selection
+	UINT16 m_game_banksel;  // Game bank selection
+	UINT32 m_readpos;  // serial bank selection position (9-bit)
+	UINT32 m_bios_bank_addr;
+	
+	UINT32 m_bios_width;  // determines the way the game info ROM is read
+	UINT8 m_bios_ctrl[6];
+	UINT8 m_bios_6600;
+	UINT8 m_bios_6403;
+	UINT8 m_bios_6404;
+	
+	UINT16 *m_ic36_ram;
+	UINT8* m_ic37_ram;
+	
+	required_shared_ptr<UINT8>           m_ic3_ram;
+	optional_device<sega315_5124_device> m_vdp1;
+	required_device<cpu_device>          m_bioscpu;
+};
+
+
 static INPUT_PORTS_START ( megaplay )
 	PORT_INCLUDE( md_common )
 
@@ -559,7 +621,7 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
 	{
-		UINT32* lineptr = &bitmap.pix32(y, 0);
+		UINT32* lineptr = &bitmap.pix32(y);
 		UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 		
 		for (int x = 0; x < SEGA315_5124_WIDTH; x++)

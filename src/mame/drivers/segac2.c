@@ -78,7 +78,6 @@
 
 #include "includes/megadriv.h"
 
-#include "machine/megavdp.h"
 
 #define XL1_CLOCK           XTAL_640kHz
 #define XL2_CLOCK           XTAL_53_693175MHz
@@ -87,6 +86,100 @@
 #define LOG_PROTECTION      1
 #define LOG_PALETTE         0
 #define LOG_IOCHIP          0
+
+
+class segac2_state : public md_base_state
+{
+public:
+	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_paletteram(*this, "paletteram"),
+	m_upd7759(*this, "upd"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette") { }
+	
+	// for Print Club only
+	int m_cam_data;
+	
+	int m_segac2_enable_display;
+	
+	required_shared_ptr<UINT16> m_paletteram;
+	
+	/* internal states */
+	UINT8       m_misc_io_data[0x10];   /* holds values written to the I/O chip */
+	
+	/* protection-related tracking */
+	int (*m_prot_func)(int in);     /* emulation of protection chip */
+	UINT8       m_prot_write_buf;       /* remembers what was written */
+	UINT8       m_prot_read_buf;        /* remembers what was returned */
+	
+	/* palette-related variables */
+	UINT8       m_segac2_alt_palette_mode;
+	UINT8       m_palbank;
+	UINT8       m_bg_palbase;
+	UINT8       m_sp_palbase;
+	
+	/* sound-related variables */
+	UINT8       m_sound_banks;      /* number of sound banks */
+	
+	DECLARE_DRIVER_INIT(c2boot);
+	DECLARE_DRIVER_INIT(bloxeedc);
+	DECLARE_DRIVER_INIT(columns);
+	DECLARE_DRIVER_INIT(columns2);
+	DECLARE_DRIVER_INIT(tfrceac);
+	DECLARE_DRIVER_INIT(tfrceacb);
+	DECLARE_DRIVER_INIT(borench);
+	DECLARE_DRIVER_INIT(twinsqua);
+	DECLARE_DRIVER_INIT(ribbit);
+	DECLARE_DRIVER_INIT(puyo);
+	DECLARE_DRIVER_INIT(tantr);
+	DECLARE_DRIVER_INIT(tantrkor);
+	DECLARE_DRIVER_INIT(potopoto);
+	DECLARE_DRIVER_INIT(stkclmns);
+	DECLARE_DRIVER_INIT(stkclmnj);
+	DECLARE_DRIVER_INIT(ichir);
+	DECLARE_DRIVER_INIT(ichirk);
+	DECLARE_DRIVER_INIT(ichirj);
+	DECLARE_DRIVER_INIT(ichirjbl);
+	DECLARE_DRIVER_INIT(puyopuy2);
+	DECLARE_DRIVER_INIT(zunkyou);
+	DECLARE_DRIVER_INIT(pclub);
+	DECLARE_DRIVER_INIT(pclubjv2);
+	DECLARE_DRIVER_INIT(pclubjv4);
+	DECLARE_DRIVER_INIT(pclubjv5);
+	void segac2_common_init(int (*func)(int in));
+	DECLARE_VIDEO_START(segac2_new);
+	DECLARE_MACHINE_START(segac2);
+	DECLARE_MACHINE_RESET(segac2);
+	
+	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int m_segac2_bg_pal_lookup[4];
+	int m_segac2_sp_pal_lookup[4];
+	void recompute_palette_tables();
+	
+	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	
+	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
+	DECLARE_READ16_MEMBER( palette_r );
+	DECLARE_WRITE16_MEMBER( palette_w );
+	DECLARE_READ16_MEMBER( io_chip_r );
+	DECLARE_WRITE16_MEMBER( io_chip_w );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_READ16_MEMBER( prot_r );
+	DECLARE_WRITE16_MEMBER( prot_w );
+	DECLARE_WRITE16_MEMBER( counter_timer_w );
+	DECLARE_READ16_MEMBER( printer_r );
+	DECLARE_WRITE16_MEMBER( print_club_camera_w );
+	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
+	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	optional_device<upd7759_device> m_upd7759;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
+};
+
 
 /******************************************************************************
     Machine init

@@ -1,8 +1,9 @@
 #include "emu.h"
-#include "includes/megadriv.h"
+#include "mcfglgcy.h"
+#include "machine/megacd.h"
+#include "machine/nvram.h"
 #include "megacd.lh"
 #include "sound/rf5c68.h"
-#include "mcfglgcy.h"
 
 
 /* Callback when the genesis enters interrupt code */

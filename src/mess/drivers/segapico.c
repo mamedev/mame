@@ -116,9 +116,6 @@ C = MB3514 / 9325 M36
 */
 
 #include "emu.h"
-#include "includes/megadriv.h"
-#include "bus/megadrive/md_slot.h"
-#include "bus/megadrive/rom.h"
 #include "includes/md_cons.h"
 #include "sound/upd7759.h"
 
@@ -146,6 +143,10 @@ public:
 	DECLARE_READ16_MEMBER(pico_68k_io_read);
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
+
+	DECLARE_DRIVER_INIT(pico);
+	DECLARE_DRIVER_INIT(picou);
+	DECLARE_DRIVER_INIT(picoj);
 };
 
 class pico_state : public pico_base_state
@@ -191,7 +192,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 	switch (offset)
 	{
 		case 0: /* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
-			retdata = (m_export << 6) | (m_pal << 5);
+			retdata = m_version_hi_nibble;
 			break;
 		case 1:
 			retdata = m_io_pad->read_safe(0);
@@ -342,7 +343,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
-	
+
 	m_vdp->stop_timers();
 }
 
@@ -361,7 +362,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))	
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -381,7 +382,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))	
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -404,9 +405,34 @@ ROM_START( picoj )
 ROM_END
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, md_cons_state,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,      pico,      0,      pico,            pico, md_cons_state,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, md_cons_state,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)
+DRIVER_INIT_MEMBER(pico_base_state, pico)
+{
+	DRIVER_INIT_CALL(megadrie);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x60; // Export PAL
+}
+
+DRIVER_INIT_MEMBER(pico_base_state, picou)
+{
+	DRIVER_INIT_CALL(megadriv);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x40; // Export NTSC
+}
+
+DRIVER_INIT_MEMBER(pico_base_state, picoj)
+{
+	DRIVER_INIT_CALL(megadrij);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x00; // JPN NTSC
+}
+
+
+CONS( 1994, pico,       0,         0,      picopal,         pico, pico_base_state,   pico,    "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico, pico_base_state,   picou,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_base_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", 0)
 
 /*
 
@@ -495,7 +521,6 @@ public:
 
 	optional_device<copera_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(copera);
-
 };
 
 
@@ -564,4 +589,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, md_cons_state,   md_jpn,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", GAME_NOT_WORKING)
+CONS( 1993, copera,       0,         0,      copera,         pico, pico_base_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", GAME_NOT_WORKING)

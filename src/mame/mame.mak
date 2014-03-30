@@ -1545,9 +1545,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/lindbergh.o \
 	$(MACHINE)/megadriv.o \
-	$(MACHINE)/megacd.o \
-	$(MACHINE)/megacdcd.o \
-	$(MACHINE)/mega32x.o \
 	$(MACHINE)/megavdp.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
@@ -2729,8 +2726,6 @@ $(DRIVERS)/zac_2.o: $(LAYOUT)/zac_2.lh
 $(DRIVERS)/zac_proto.o: $(LAYOUT)/zac_proto.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
-
-$(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 #-------------------------------------------------
 # misc dependencies

@@ -321,10 +321,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 	{
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
-			retdata = m_export << 7 | // Export
-						m_pal << 6 | // NTSC or PAL?
-						(m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
-						0x00 | // Unused (Always 0)
+			retdata = m_version_hi_nibble |
 						0x00 | // Bit 3 of Version Number
 						0x00 | // Bit 2 of Version Number
 						0x00 | // Bit 1 of Version Number
@@ -858,18 +855,10 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 		m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
-	if (m_other_hacks)
-	{
-	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-		if (m_megadrive_ram)
-			memset(m_megadrive_ram,0x00,0x10000);
-	}
+	if (m_megadrive_ram)
+		memset(m_megadrive_ram, 0x00, 0x10000);
 
 	m_vdp->device_reset_old();
-
-	// if the system has a 32x, pause the extra CPUs until they are actually turned on
-	if (m_32x)
-		m_32x->pause_cpu();
 }
 
 void md_base_state::megadriv_stop_scanline_timer()
@@ -962,10 +951,10 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1009,10 +998,10 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1049,83 +1038,50 @@ void md_base_state::megadriv_init_common()
 
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
-
-	m_export = 0;
-	m_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
-	m_other_hacks = 0;
-
 	megadriv_init_common();
 
 	m_vdp->set_use_cram(0); // C2 uses its own palette ram
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-}
-
-
-
-DRIVER_INIT_MEMBER(md_base_state,megadriv)
-{
-	m_other_hacks = 1;
-
-	megadriv_init_common();
-
-	// todo: move this to the device interface?
-	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
-	if (m_32x)
-	{
-		m_32x->set_32x_pal(FALSE);
-		m_32x->set_framerate(60);
-		m_32x->set_total_scanlines(262);
-	}
-	if (m_segacd)
-	{
-		m_segacd->set_framerate(60);
-		m_segacd->set_total_scanlines(262);
-	}
-
-	m_export = 1;
-	m_pal = 0;
-}
-
-DRIVER_INIT_MEMBER(md_base_state,megadrij)
-{
-	m_other_hacks = 1;
-
-	megadriv_init_common();
-
-	// todo: move this to the device interface?
-	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
-	if (m_32x)
-	{
-		m_32x->set_32x_pal(FALSE);
-		m_32x->set_framerate(60);
-		m_32x->set_total_scanlines(262);
-	}
-	if (m_segacd)
-	{
-		m_segacd->set_framerate(60);
-		m_segacd->set_total_scanlines(262);
-	}
 	
-	m_export = 0;
-	m_pal = 0;
+	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state,megadrie)
-{
-	m_other_hacks = 1;
 
+
+DRIVER_INIT_MEMBER(md_base_state, megadriv)
+{
+	megadriv_init_common();
+
+	// todo: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
+
+	m_version_hi_nibble = 0xa0;	// Export NTSC no-SCD
+}
+
+DRIVER_INIT_MEMBER(md_base_state, megadrij)
+{
+	megadriv_init_common();
+
+	// todo: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
+	
+	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
+}
+
+DRIVER_INIT_MEMBER(md_base_state, megadrie)
+{
 	megadriv_init_common();
 
 	// todo: move this to the device interface?
@@ -1133,20 +1089,8 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	m_vdp->set_vdp_pal(TRUE);
 	m_vdp->set_framerate(50);
 	m_vdp->set_total_scanlines(313);
-	if (m_32x)
-	{
-		m_32x->set_32x_pal(TRUE);
-		m_32x->set_framerate(50);
-		m_32x->set_total_scanlines(313);
-	}
-	if (m_segacd)
-	{
-		m_segacd->set_framerate(50);
-		m_segacd->set_total_scanlines(313);
-	}
 
-	m_export = 1;
-	m_pal = 1;
+	m_version_hi_nibble = 0xe0;	// Export PAL no-SCD
 }
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
@@ -1159,18 +1103,8 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 	{
 		if (!m_vdp->m_use_alt_timing)
 		{
-			bool mode3 = (m_vdp->get_imode() == 3);
 			m_vdp->vdp_handle_eof();
 			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
-
-			if (m_32x)
-			{
-				m_32x->m_32x_vblank_flag = 0;
-				m_32x->m_32x_hcount_compare_val = -1;
-				m_32x->update_total_scanlines(mode3);
-			}
-			if (m_segacd)
-				m_segacd->update_total_scanlines(mode3);
 		}
 	}
 }

@@ -801,9 +801,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/rdptpipe.o    \
 	$(MAME_VIDEO)/rdpspn16.o    \
 	$(MAME_MACHINE)/megadriv.o  \
-	$(MAME_MACHINE)/megacd.o    \
-	$(MAME_MACHINE)/megacdcd.o  \
-	$(MAME_MACHINE)/mega32x.o   \
 	$(MAME_MACHINE)/megavdp.o   \
 	$(MAME_MACHINE)/dc.o        \
 	$(MAME_DRIVERS)/naomi.o     \
@@ -1657,6 +1654,9 @@ $(MESSOBJ)/sanyo.a:             \
 $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/sg1000.o    \
 	$(MESS_DRIVERS)/megadriv.o  \
+	$(MESS_MACHINE)/megacd.o    \
+	$(MESS_MACHINE)/megacdcd.o  \
+	$(MESS_MACHINE)/mega32x.o   \
 	$(MESS_DRIVERS)/segapico.o  \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \
@@ -2241,9 +2241,7 @@ $(MESS_DRIVERS)/llc.o:      $(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:     $(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/lx800.o:    $(MESS_LAYOUT)/lx800.lh
 $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
-$(MAME_MACHINE)/megacd.o:   $(MAME_LAYOUT)/megacd.lh
-$(MAME_MACHINE)/megadriv.o: $(MAME_LAYOUT)/megacd.lh
-$(MESS_DRIVERS)/megadriv.o: $(MAME_LAYOUT)/megacd.lh
+$(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/merlin.o:   $(MESS_LAYOUT)/merlin.lh

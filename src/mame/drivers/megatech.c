@@ -78,6 +78,80 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 
 #define MASTER_CLOCK        53693100
 
+
+
+class mtech_state : public md_base_state
+{
+public:
+	enum
+	{
+		TIMER_Z80_RUN_STATE,
+		TIMER_Z80_STOP_STATE
+	};
+	
+	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_vdp1(*this, "vdp1"),
+	m_bioscpu(*this, "mtbios")
+	{ }
+	
+	DECLARE_WRITE_LINE_MEMBER( snd_int_callback );
+	DECLARE_WRITE_LINE_MEMBER( bios_int_callback );
+	DECLARE_READ8_MEMBER(cart_select_r);
+	DECLARE_WRITE8_MEMBER(cart_select_w);
+	DECLARE_READ8_MEMBER(bios_ctrl_r);
+	DECLARE_WRITE8_MEMBER(bios_ctrl_w);
+	DECLARE_READ8_MEMBER(read_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
+	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
+	DECLARE_READ8_MEMBER(banked_ram_r);
+	DECLARE_WRITE8_MEMBER(banked_ram_w);
+	DECLARE_WRITE8_MEMBER(bios_port_ctrl_w);
+	DECLARE_READ8_MEMBER(bios_joypad_r);
+	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
+	DECLARE_READ8_MEMBER(vdp1_count_r);
+	DECLARE_READ8_MEMBER(sms_count_r);
+	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
+	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
+	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);	
+	
+	DECLARE_DRIVER_INIT(mt_crt);
+	DECLARE_DRIVER_INIT(mt_slot);
+	DECLARE_MACHINE_RESET(megatech);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(megatech_cart);
+	UINT32 screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_main(screen_device &screen, bool state);
+	
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
+private:	
+	UINT8 m_mt_cart_select_reg;
+	UINT32 m_bios_port_ctrl;
+	int m_current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	UINT32 m_bios_ctrl_inputs;
+	UINT8 m_bios_ctrl[6];
+	int m_mt_bank_addr;
+	
+	int m_cart_is_genesis[8];
+	
+	void set_genz80_as_md();
+	void set_genz80_as_sms();
+	
+	TIMER_CALLBACK_MEMBER(z80_run_state);
+	TIMER_CALLBACK_MEMBER(z80_stop_state);
+	
+	UINT8* m_banked_ram;
+	UINT8* sms_mainram;
+	UINT8* sms_rom;
+	
+	required_device<sega315_5124_device> m_vdp1;
+	required_device<cpu_device>          m_bioscpu;	
+};
+
+
+
 /* not currently used */
 static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_INCLUDE(megadriv)
@@ -561,7 +635,7 @@ UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitm
 		// when launching megatech + both sms and megadrive games, the following would be needed...
 		for (int y = 0; y < 224; y++)
 		{
-			UINT32* lineptr = &bitmap.pix32(y, 0);
+			UINT32* lineptr = &bitmap.pix32(y);
 			UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 			
 			for (int x = 0; x < SEGA315_5124_WIDTH; x++)
@@ -587,7 +661,7 @@ MACHINE_RESET_MEMBER(mtech_state, megatech)
 
 UINT32 mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_vdp1->screen_update(screen,bitmap,cliprect);
+	m_vdp1->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 

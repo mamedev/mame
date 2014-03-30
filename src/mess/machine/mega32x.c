@@ -196,7 +196,7 @@ GFX check (these don't explicitly fails):
 
 */
 #include "emu.h"
-#include "includes/megadriv.h"
+#include "machine/mega32x.h"
 
 
 /* need to make fifo callback part of device */

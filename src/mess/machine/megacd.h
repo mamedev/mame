@@ -1,8 +1,10 @@
 /* Sega CD / Mega CD */
 
+#include "cpu/m68000/m68000.h"
 #include "machine/lc89510.h"
 #include "machine/megacdcd.h"
 
+#define SEGACD_CLOCK      12500000
 
 #define RAM_MODE_2MEG (0)
 #define RAM_MODE_1MEG (2)
