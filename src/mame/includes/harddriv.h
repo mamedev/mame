@@ -296,6 +296,8 @@ public:
 	/*----------- defined in audio/harddriv.c -----------*/
 
 	void hdsnd_init();
+	void update_68k_interrupts();
+	TIMER_CALLBACK_MEMBER( delayed_68k_w );
 
 	/*----------- defined in machine/harddriv.c -----------*/
 
@@ -377,6 +379,9 @@ public:
 	DECLARE_WRITE16_MEMBER( hdds3_sdsp_control_w );
 	DECLARE_READ16_MEMBER( hdds3_xdsp_control_r );
 	DECLARE_WRITE16_MEMBER( hdds3_xdsp_control_w );
+	
+	void hdds3sdsp_reset_timer();
+	void hdds3xdsp_reset_timer();
 
 	/* DSK board */
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );

@@ -25,16 +25,6 @@
 #define LOG_COMMANDS        0
 
 
-
-/*************************************
- *
- *  Static globals
- *
- *************************************/
-
-static void hdds3sdsp_reset_timer(running_machine &machine);
-static void hdds3xdsp_reset_timer(running_machine &machine);
-
 #if 0
 #pragma mark * DRIVER/MULTISYNC BOARD
 #endif
@@ -1169,7 +1159,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			if (m_ds3sdsp_regs[0x1b] != data)
 			{
 				m_ds3sdsp_regs[0x1b] = data;
-				hdds3sdsp_reset_timer(space.machine());
+				hdds3sdsp_reset_timer();
 			}
 			break;
 
@@ -1178,7 +1168,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			if (m_ds3sdsp_regs[0x1c] != data)
 			{
 				m_ds3sdsp_regs[0x1c] = data;
-				hdds3sdsp_reset_timer(space.machine());
+				hdds3sdsp_reset_timer();
 			}
 			break;
 
@@ -1248,17 +1238,15 @@ TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback )
 }
 
 
-static void hdds3sdsp_reset_timer(running_machine &machine)
+void harddriv_state::hdds3sdsp_reset_timer()
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-
-	if (!state->m_ds3sdsp_timer_en)
+	if (!m_ds3sdsp_timer_en)
 		return;
 
-	UINT16 count = state->m_ds3sdsp_regs[0x1c];
-	UINT16 scale = state->m_ds3sdsp_regs[0x1b] + 1;
+	UINT16 count = m_ds3sdsp_regs[0x1c];
+	UINT16 scale = m_ds3sdsp_regs[0x1b] + 1;
 
-	state->m_ds3sdsp_internal_timer->adjust(state->m_ds3sdsp->cycles_to_attotime(count * scale));
+	m_ds3sdsp_internal_timer->adjust(m_ds3sdsp->cycles_to_attotime(count * scale));
 }
 
 void hdds3sdsp_timer_enable_callback(adsp21xx_device &device, int enable)
@@ -1268,7 +1256,7 @@ void hdds3sdsp_timer_enable_callback(adsp21xx_device &device, int enable)
 	state->m_ds3sdsp_timer_en = enable;
 
 	if (enable)
-		hdds3sdsp_reset_timer(device.machine());
+		state->hdds3sdsp_reset_timer();
 	else
 		state->m_ds3sdsp_internal_timer->adjust(attotime::never);
 }
@@ -1289,17 +1277,15 @@ TIMER_DEVICE_CALLBACK( ds3xdsp_internal_timer_callback )
 }
 
 
-static void hdds3xdsp_reset_timer(running_machine &machine)
+void harddriv_state::hdds3xdsp_reset_timer()
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-
-	if (!state->m_ds3xdsp_timer_en)
+	if (!m_ds3xdsp_timer_en)
 		return;
 
-	UINT16 count = state->m_ds3xdsp_regs[0x1c];
-	UINT16 scale = state->m_ds3xdsp_regs[0x1b] + 1;
+	UINT16 count = m_ds3xdsp_regs[0x1c];
+	UINT16 scale = m_ds3xdsp_regs[0x1b] + 1;
 
-	state->m_ds3xdsp_internal_timer->adjust(state->m_ds3xdsp->cycles_to_attotime(count * scale));
+	m_ds3xdsp_internal_timer->adjust(m_ds3xdsp->cycles_to_attotime(count * scale));
 }
 
 
@@ -1310,7 +1296,7 @@ void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable)
 	state->m_ds3xdsp_timer_en = enable;
 
 	if (enable)
-		hdds3xdsp_reset_timer(device.machine());
+		state->hdds3xdsp_reset_timer();
 	else
 		state->m_ds3xdsp_internal_timer->adjust(attotime::never);
 }
