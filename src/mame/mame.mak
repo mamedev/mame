@@ -271,6 +271,7 @@ SOUNDS += MOS7360
 #-------------------------------------------------
 
 VIDEOS += SEGA315_5124
+VIDEOS += SEGA315_5313
 VIDEOS += BUFSPRITE
 #VIDEOS += CDP1861
 #VIDEOS += CDP1862
@@ -1545,7 +1546,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/lindbergh.o \
 	$(MACHINE)/megadriv.o \
-	$(MACHINE)/megavdp.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \

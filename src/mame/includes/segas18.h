@@ -9,9 +9,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/megavdp.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "video/315_5313.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 
@@ -124,7 +124,7 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
-	required_device<sega_genesis_vdp_device> m_vdp;
+	required_device<sega315_5313_device> m_vdp;
 	required_device<nvram_device> m_nvram;
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;

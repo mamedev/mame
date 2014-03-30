@@ -551,12 +551,12 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
 
 READ16_MEMBER( segas18_state::genesis_vdp_r )
 {
-	return m_vdp->megadriv_vdp_r(space,offset,mem_mask);
+	return m_vdp->vdp_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER( segas18_state::genesis_vdp_w )
 {
-	m_vdp->megadriv_vdp_w(space,offset,data,mem_mask);
+	m_vdp->vdp_w(space, offset, data, mem_mask);
 }
 
 
@@ -1226,16 +1226,16 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_SEGAGEN_VDP_IS_PAL(false)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));
-	MCFG_SEGAGEN_VDP_ALT_TIMING(1);
-	MCFG_SEGAGEN_VDP_PAL_WRITE_BASE(0x2000);
-	MCFG_SEGAGEN_VDP_PALETTE("palette")
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(false)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));
+	MCFG_SEGA315_5313_ALT_TIMING(1);
+	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
+	MCFG_SEGA315_5313_PALETTE("palette")
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
 
 
 	// video hardware

@@ -1038,7 +1038,7 @@ READ16_MEMBER( sega_32x_device::_32x_common_vdp_regs_r )
 void sega_32x_device::_32x_check_framebuffer_swap(bool enabled)
 {
 	// this logic should be correct, but makes things worse?
-	// enabled = (genesis_scanline_counter >= megadrive_irq6_scanline) from megavdp.c
+	// enabled = (genesis_scanline_counter >= megadrive_irq6_scanline) from video/315_5313.c
 	//if (enabled)
 	{
 		m_32x_a1518a_reg = m_32x_fb_swap & 1;

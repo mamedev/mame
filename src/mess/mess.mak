@@ -258,6 +258,7 @@ SOUNDS += VRC6
 #-------------------------------------------------
 
 VIDEOS += SEGA315_5124
+VIDEOS += SEGA315_5313
 #VIDEOS += BUFSPRITE
 VIDEOS += CDP1861
 VIDEOS += CDP1862
@@ -801,7 +802,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/rdptpipe.o    \
 	$(MAME_VIDEO)/rdpspn16.o    \
 	$(MAME_MACHINE)/megadriv.o  \
-	$(MAME_MACHINE)/megavdp.o   \
 	$(MAME_MACHINE)/dc.o        \
 	$(MAME_DRIVERS)/naomi.o     \
 	$(MAME_VIDEO)/powervr2.o    \

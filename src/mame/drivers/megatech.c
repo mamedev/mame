@@ -698,7 +698,7 @@ static MACHINE_CONFIG_START( megatech, mtech_state )
 	MCFG_SCREEN_VBLANK_DRIVER(mtech_state, screen_eof_main)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGAGEN_VDP_INT_CB(WRITELINE(mtech_state, snd_int_callback))
+	MCFG_SEGA315_5313_INT_CB(WRITELINE(mtech_state, snd_int_callback))
 
 	MCFG_SCREEN_ADD("menu", RASTER)
 	// check frq

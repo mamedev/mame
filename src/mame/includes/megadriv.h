@@ -4,7 +4,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2612intf.h"
 #include "sound/sn76496.h"
-#include "machine/megavdp.h"
+#include "video/315_5313.h"
 
 #define MASTER_CLOCK_NTSC 53693175
 #define MASTER_CLOCK_PAL  53203424
@@ -49,7 +49,7 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
-	required_device<sega_genesis_vdp_device> m_vdp;
+	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
 	ioport_port *m_io_reset;

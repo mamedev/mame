@@ -1,7 +1,7 @@
-/* Megadrive VDP */
+/* Sega 315-5313 - Megadrive VDP */
 
 #include "emu.h"
-#include "megavdp.h"
+#include "video/315_5313.h"
 
 /* still have dependencies on the following external gunk */
 
@@ -10,10 +10,10 @@
 #define MAX_HPOSITION 480
 
 
-const device_type SEGA_GEN_VDP = &device_creator<sega_genesis_vdp_device>;
+const device_type SEGA315_5313 = &device_creator<sega315_5313_device>;
 
-sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega Genesis VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega_genesis_vdp", __FILE__),
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5313 (Genesis VDP)", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5313", __FILE__),
 	m_sndirqline_callback(*this),
 	m_lv6irqline_callback(*this),
 	m_lv4irqline_callback(*this),
@@ -28,9 +28,9 @@ sega_genesis_vdp_device::sega_genesis_vdp_device(const machine_config &mconfig, 
 //  palette device
 //-------------------------------------------------
 
-void sega_genesis_vdp_device::static_set_palette_tag(device_t &device, const char *tag)
+void sega315_5313_device::static_set_palette_tag(device_t &device, const char *tag)
 {
-	downcast<sega_genesis_vdp_device &>(device).m_palette.set_tag(tag);
+	downcast<sega315_5313_device &>(device).m_palette.set_tag(tag);
 }
 
 
@@ -44,18 +44,18 @@ MACHINE_CONFIG_END
 //  the device's machine fragment
 //-------------------------------------------------
 
-machine_config_constructor sega_genesis_vdp_device::device_mconfig_additions() const
+machine_config_constructor sega315_5313_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
 static TIMER_CALLBACK( render_timer_callback )
 {
-	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
 	vdp->render_scanline();
 }
 
-void sega_genesis_vdp_device::vdp_handle_irq6_on_timer_callback(int param)
+void sega315_5313_device::vdp_handle_irq6_on_timer_callback(int param)
 {
 // m_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
@@ -64,40 +64,39 @@ void sega_genesis_vdp_device::vdp_handle_irq6_on_timer_callback(int param)
 
 static TIMER_CALLBACK( irq6_on_timer_callback )
 {
-	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
 	vdp->vdp_handle_irq6_on_timer_callback(param);
 }
 
-void sega_genesis_vdp_device::vdp_handle_irq4_on_timer_callback(int param)
+void sega315_5313_device::vdp_handle_irq4_on_timer_callback(int param)
 {
 	m_lv4irqline_callback(true);
 }
 
 static TIMER_CALLBACK( irq4_on_timer_callback )
 {
-	sega_genesis_vdp_device* vdp = (sega_genesis_vdp_device*)ptr;
+	sega315_5313_device* vdp = (sega315_5313_device*)ptr;
 	vdp->vdp_handle_irq4_on_timer_callback(param);
 }
 
 
 
-
-void sega_genesis_vdp_device::set_alt_timing(device_t &device, int use_alt_timing)
+void sega315_5313_device::set_alt_timing(device_t &device, int use_alt_timing)
 {
-	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	sega315_5313_device &dev = downcast<sega315_5313_device &>(device);
 	dev.m_use_alt_timing = use_alt_timing;
 }
 
-void sega_genesis_vdp_device::set_palwrite_base(device_t &device, int palwrite_base)
+void sega315_5313_device::set_palwrite_base(device_t &device, int palwrite_base)
 {
-	sega_genesis_vdp_device &dev = downcast<sega_genesis_vdp_device &>(device);
+	sega315_5313_device &dev = downcast<sega315_5313_device &>(device);
 	dev.m_palwrite_base = palwrite_base;
 }
 
 
 
 
-void sega_genesis_vdp_device::device_start()
+void sega315_5313_device::device_start()
 {
 	m_sndirqline_callback.resolve_safe();
 	m_lv6irqline_callback.resolve_safe();
@@ -193,7 +192,7 @@ void sega_genesis_vdp_device::device_start()
 	sega315_5124_device::device_start();
 }
 
-void sega_genesis_vdp_device::device_reset()
+void sega315_5313_device::device_reset()
 {
 	m_command_pending = 0;
 	m_command_part1 = 0;
@@ -215,7 +214,7 @@ void sega_genesis_vdp_device::device_reset()
 	sega315_5124_device::device_reset();
 }
 
-void sega_genesis_vdp_device::device_reset_old()
+void sega315_5313_device::device_reset_old()
 {
 	// other stuff, are we sure we want to set some of these every reset?
 	// it's called from machine_reset
@@ -227,7 +226,7 @@ void sega_genesis_vdp_device::device_reset_old()
 
 
 
-void sega_genesis_vdp_device::vdp_vram_write(UINT16 data)
+void sega315_5313_device::vdp_vram_write(UINT16 data)
 {
 	UINT16 sprite_base_address = MEGADRIVE_REG0C_RS1?((MEGADRIVE_REG05_SPRITE_ADDR&0x7e)<<9):((MEGADRIVE_REG05_SPRITE_ADDR&0x7f)<<9);
 	int spritetable_size = MEGADRIVE_REG0C_RS1?0x400:0x200;
@@ -254,7 +253,7 @@ void sega_genesis_vdp_device::vdp_vram_write(UINT16 data)
 	m_vdp_address &= 0xffff;
 }
 
-void sega_genesis_vdp_device::vdp_vsram_write(UINT16 data)
+void sega315_5313_device::vdp_vsram_write(UINT16 data)
 {
 	m_vsram[(m_vdp_address&0x7e)>>1] = data;
 
@@ -265,7 +264,7 @@ void sega_genesis_vdp_device::vdp_vsram_write(UINT16 data)
 	m_vdp_address &=0xffff;
 }
 
-void sega_genesis_vdp_device::write_cram_value(int offset, int data)
+void sega315_5313_device::write_cram_value(int offset, int data)
 {
 	m_cram[offset] = data;
 
@@ -289,7 +288,7 @@ void sega_genesis_vdp_device::write_cram_value(int offset, int data)
 	}
 }
 
-void sega_genesis_vdp_device::vdp_cram_write(UINT16 data)
+void sega315_5313_device::vdp_cram_write(UINT16 data)
 {
 	int offset;
 	offset = (m_vdp_address&0x7e)>>1;
@@ -302,7 +301,7 @@ void sega_genesis_vdp_device::vdp_cram_write(UINT16 data)
 }
 
 
-void sega_genesis_vdp_device::data_port_w(int data)
+void sega315_5313_device::data_port_w(int data)
 {
 	m_command_pending = 0;
 
@@ -397,7 +396,7 @@ void sega_genesis_vdp_device::data_port_w(int data)
 
 
 
-void sega_genesis_vdp_device::vdp_set_register(int regnum, UINT8 value)
+void sega315_5313_device::vdp_set_register(int regnum, UINT8 value)
 {
 	m_regs[regnum] = value;
 
@@ -448,7 +447,7 @@ void sega_genesis_vdp_device::vdp_set_register(int regnum, UINT8 value)
 //  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine().describe_context(), regnum,value);
 }
 
-void sega_genesis_vdp_device::update_code_and_address(void)
+void sega315_5313_device::update_code_and_address(void)
 {
 	m_vdp_code = ((m_command_part1 & 0xc000) >> 14) |
 							((m_command_part2 & 0x00f0) >> 2);
@@ -459,7 +458,7 @@ void sega_genesis_vdp_device::update_code_and_address(void)
 
 // if either SVP CPU or segaCD is present, there is a 'lag' we have to compensate for
 // hence, for segacd and svp we set m_dma_delay to the appropriate value at start
-inline UINT16 sega_genesis_vdp_device::vdp_get_word_from_68k_mem(UINT32 source)
+inline UINT16 sega315_5313_device::vdp_get_word_from_68k_mem(UINT32 source)
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
@@ -503,7 +502,7 @@ inline UINT16 sega_genesis_vdp_device::vdp_get_word_from_68k_mem(UINT32 source)
    as the 68k address bus isn't accessed */
 
 /* Wani Wani World, James Pond 3, Pirates Gold! */
-void sega_genesis_vdp_device::insta_vram_copy(UINT32 source, UINT16 length)
+void sega315_5313_device::insta_vram_copy(UINT32 source, UINT16 length)
 {
 	int x;
 
@@ -531,7 +530,7 @@ void sega_genesis_vdp_device::insta_vram_copy(UINT32 source, UINT16 length)
 }
 
 /* Instant, but we pause the 68k a bit */
-void sega_genesis_vdp_device::insta_68k_to_vram_dma(UINT32 source,int length)
+void sega315_5313_device::insta_68k_to_vram_dma(UINT32 source,int length)
 {
 	int count;
 
@@ -558,7 +557,7 @@ void sega_genesis_vdp_device::insta_68k_to_vram_dma(UINT32 source,int length)
 }
 
 
-void sega_genesis_vdp_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
+void sega315_5313_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -586,7 +585,7 @@ void sega_genesis_vdp_device::insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 
 }
 
-void sega_genesis_vdp_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
+void sega315_5313_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 {
 	int count;
 
@@ -614,7 +613,7 @@ void sega_genesis_vdp_device::insta_68k_to_vsram_dma(UINT32 source,UINT16 length
 }
 
 /* This can be simplified quite a lot.. */
-void sega_genesis_vdp_device::handle_dma_bits()
+void sega315_5313_device::handle_dma_bits()
 {
 #if 0
 	if (m_vdp_code&0x20)
@@ -745,7 +744,7 @@ void sega_genesis_vdp_device::handle_dma_bits()
 	}
 }
 
-void sega_genesis_vdp_device::ctrl_port_w(int data)
+void sega315_5313_device::ctrl_port_w(int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
 	m_vram_fill_pending = 0; // ??
@@ -786,7 +785,7 @@ void sega_genesis_vdp_device::ctrl_port_w(int data)
 	}
 }
 
-WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
+WRITE16_MEMBER( sega315_5313_device::vdp_w )
 {
 	switch (offset<<1)
 	{
@@ -835,22 +834,22 @@ WRITE16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_w )
 	}
 }
 
-UINT16 sega_genesis_vdp_device::vdp_vram_r(void)
+UINT16 sega315_5313_device::vdp_vram_r(void)
 {
 	return MEGADRIV_VDP_VRAM((m_vdp_address&0xfffe)>>1);
 }
 
-UINT16 sega_genesis_vdp_device::vdp_vsram_r(void)
+UINT16 sega315_5313_device::vdp_vsram_r(void)
 {
 	return m_vsram[(m_vdp_address&0x7e)>>1];
 }
 
-UINT16 sega_genesis_vdp_device::vdp_cram_r(void)
+UINT16 sega315_5313_device::vdp_cram_r(void)
 {
 	return m_cram[(m_vdp_address&0x7e)>>1];
 }
 
-UINT16 sega_genesis_vdp_device::data_port_r()
+UINT16 sega315_5313_device::data_port_r()
 {
 	UINT16 retdata=0;
 
@@ -967,7 +966,7 @@ PAL, 256x224
 
 
 
-UINT16 sega_genesis_vdp_device::ctrl_port_r()
+UINT16 sega315_5313_device::ctrl_port_r()
 {
 	/* Battletoads is very fussy about the vblank flag
 	   it wants it to be 1. in scanline 224 */
@@ -1130,7 +1129,7 @@ static const UINT8 vc_pal_240[] =
 };
 
 
-UINT16 sega_genesis_vdp_device::get_hposition()
+UINT16 sega315_5313_device::get_hposition()
 {
 	UINT16 value4;
 
@@ -1158,7 +1157,7 @@ UINT16 sega_genesis_vdp_device::get_hposition()
 	return value4;
 }
 
-int sega_genesis_vdp_device::get_scanline_counter()
+int sega315_5313_device::get_scanline_counter()
 {
 	if (!m_use_alt_timing)
 		return m_scanline_counter;
@@ -1167,7 +1166,7 @@ int sega_genesis_vdp_device::get_scanline_counter()
 }
 
 
-UINT16 sega_genesis_vdp_device::megadriv_read_hv_counters()
+UINT16 sega315_5313_device::megadriv_read_hv_counters()
 {
 	/* Bubble and Squeek wants vcount=0xe0 */
 	/* Dracula is very sensitive to this */
@@ -1203,7 +1202,7 @@ UINT16 sega_genesis_vdp_device::megadriv_read_hv_counters()
 
 }
 
-READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
+READ16_MEMBER( sega315_5313_device::vdp_r )
 {
 	UINT16 retvalue = 0;
 
@@ -1286,7 +1285,7 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 
 */
 
-void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
+void sega315_5313_device::render_spriteline_to_spritebuffer(int scanline)
 {
 	int screenwidth;
 	int maxsprites=0;
@@ -1476,7 +1475,7 @@ void sega_genesis_vdp_device::render_spriteline_to_spritebuffer(int scanline)
 }
 
 /* Clean up this function (!) */
-void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
+void sega315_5313_device::render_videoline_to_videobuffer(int scanline)
 {
 	UINT16 base_a;
 	UINT16 base_w=0;
@@ -2500,7 +2499,7 @@ void sega_genesis_vdp_device::render_videoline_to_videobuffer(int scanline)
 
 
 /* This converts our render buffer to real screen colours */
-void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
+void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 {
 	UINT16 *lineptr;
 
@@ -2587,7 +2586,7 @@ void sega_genesis_vdp_device::render_videobuffer_to_screenbuffer(int scanline)
 	}
 }
 
-void sega_genesis_vdp_device::render_scanline()
+void sega315_5313_device::render_scanline()
 {
 	int scanline = get_scanline_counter();
 
@@ -2600,7 +2599,7 @@ void sega_genesis_vdp_device::render_scanline()
 	}
 }
 
-void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
+void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 {
 /* Compensate for some rounding errors
 
@@ -2674,7 +2673,7 @@ void sega_genesis_vdp_device::vdp_handle_scanline_callback(int scanline)
 }
 
 
-void sega_genesis_vdp_device::vdp_handle_eof()
+void sega315_5313_device::vdp_handle_eof()
 {
 	rectangle visarea;
 	int scr_width = 320;
@@ -2731,7 +2730,7 @@ void sega_genesis_vdp_device::vdp_handle_eof()
 
 
 // called at the start of each scanline
-TIMER_DEVICE_CALLBACK_MEMBER( sega_genesis_vdp_device::megadriv_scanline_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callback )
 {
 	if (!m_use_alt_timing)
 	{
@@ -2746,7 +2745,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_genesis_vdp_device::megadriv_scanline_timer_c
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( sega_genesis_vdp_device::megadriv_scanline_timer_callback_alt_timing )
+TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callback_alt_timing )
 {
 	if (m_use_alt_timing)
 	{

@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 //  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
 //  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
@@ -773,8 +773,8 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
@@ -920,7 +920,7 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 }
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
-	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega_genesis_vdp_device, megadriv_scanline_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
@@ -939,11 +939,11 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_SEGAGEN_VDP_IS_PAL(false)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(false)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
@@ -986,11 +986,11 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_SEGAGEN_VDP_IS_PAL(true)
-	MCFG_SEGAGEN_VDP_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGAGEN_VDP_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGAGEN_VDP_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(true)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)

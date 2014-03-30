@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
 
 	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGAGEN_VDP_INT_CB(WRITELINE(mplay_state, bios_int_callback))
+	MCFG_SEGA315_5313_INT_CB(WRITELINE(mplay_state, bios_int_callback))
 MACHINE_CONFIG_END
 
 
