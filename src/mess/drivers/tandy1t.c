@@ -50,6 +50,7 @@ public:
 		, m_romcs0(*this, "romcs0")
 		, m_romcs1(*this, "romcs1")
 		, m_biosbank(*this, "biosbank")
+		, m_keyboard(*this, "pc_keyboard")
 		, m_mb(*this, "mb") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +60,8 @@ public:
 	optional_memory_region m_romcs1;
 	optional_memory_bank m_biosbank;
 
-	required_device<pc_noppi_mb_device>  m_mb;
+	required_device<pc_keyboard_device> m_keyboard;
+	required_device<pc_noppi_mb_device> m_mb;
 
 	DECLARE_WRITE8_MEMBER ( pc_t1t_p37x_w );
 	DECLARE_READ8_MEMBER ( pc_t1t_p37x_r );
@@ -77,7 +79,6 @@ public:
 	DECLARE_DRIVER_INIT(t1000sl);
 
 	DECLARE_MACHINE_RESET(tandy1000rl);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
 
 	struct
 	{
@@ -93,38 +94,7 @@ public:
 
 	UINT8 m_tandy_bios_bank;    /* I/O port FFEAh */
 	UINT8 m_tandy_ppi_portb, m_tandy_ppi_portc;
-	
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	emu_timer* m_keyboard_timer;
-	
-	enum
-	{
-		TIMER_KEYBOARD
-	};
-
-	void pc_keyboard();
-	void pc_keyb_set_clock(bool on);
-	
-	bool m_pc_keyb_self_test;
-	bool m_pc_keyb_on;
-	UINT8 m_pc_keyb_data;
 };
-
-void tandy1000_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case TIMER_KEYBOARD:
-			if ( m_pc_keyb_on ) {
-				pc_keyboard();
-			} else {
-				/* Clock has been low for more than 5 msec, start diagnostic test */
-				at_keyboard_reset(machine());
-				m_pc_keyb_self_test = 1;
-			}
-			break;
-	}
-}
 
 /* tandy 1000 eeprom
   hx and later
@@ -286,12 +256,9 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 		m_mb->m_pit8253->write_gate2(BIT(data, 0));
 		m_mb->pc_speaker_set_spkrdata( data & 0x02 );
 		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
-		pc_keyb_set_clock((data&0x48) ? true : false);
+		m_keyboard->enable(data&0x48);
 		if ( data & 0x80 )
-		{
-			m_pc_keyb_data = 0;
 			m_mb->m_pic8259->ir1_w(0);
-		}
 		break;
 	case 2:
 		m_tandy_ppi_portc = data;
@@ -309,7 +276,7 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	switch (offset)
 	{
 	case 0:
-		data = m_pc_keyb_data;
+		data = m_keyboard->read(space, 0);
 		break;
 	case 1:
 		data=m_tandy_ppi_portb;
@@ -367,9 +334,6 @@ MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 
 DRIVER_INIT_MEMBER(tandy1000_state,t1000hx)
 {
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
-	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
@@ -430,49 +394,6 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_bank_w )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(tandy1000_state::pc_frame_interrupt)
-{
-	if(!(param % 64))
-		pc_keyboard();
-}
-
-void tandy1000_state::pc_keyb_set_clock(bool on)
-{
-	if (m_pc_keyb_on != on)
-	{
-		if (!on)
-			m_keyboard_timer->adjust(attotime::from_msec(5));
-		else {
-			if ( m_pc_keyb_self_test ) {
-				/* The self test of the keyboard takes some time. 2 msec seems to work. */
-				/* This still needs to verified against a real keyboard. */
-				m_keyboard_timer->adjust(attotime::from_msec( 2 ));
-			} else {
-				m_keyboard_timer->reset();
-				m_pc_keyb_self_test = 0;
-			}
-		}
-
-		m_pc_keyb_on = on;
-	}
-}
-
-void tandy1000_state::pc_keyboard(void)
-{
-	int data;
-
-	at_keyboard_polling();
-
-	if (m_pc_keyb_on)
-	{
-		if ( (data=at_keyboard_read())!=-1) {
-			m_pc_keyb_data = data;
-			m_mb->m_pic8259->ir1_w(1);
-			m_pc_keyb_self_test = 0;
-		}
-	}
-}
-
 static INPUT_PORTS_START( tandy1t )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
@@ -515,14 +436,23 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
 	
 	PORT_MODIFY("pc_keyboard_3")
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE /* Caps Lock                   3A  BA */
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
 
 	PORT_MODIFY("pc_keyboard_4")
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE /* Num Lock                    45  C5 */
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 \\") PORT_CODE(KEYCODE_7_PAD) /* Keypad 7                    47  C7 */
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 ~") PORT_CODE(KEYCODE_8_PAD) /* Keypad 8                    48  C8 */
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD) /* Keypad 9  (PgUp)            49  C9 */
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) /*                             4A  CA */
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 |") PORT_CODE(KEYCODE_4_PAD) /* Keypad 4                    4B  CB */
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6") PORT_CODE(KEYCODE_6_PAD) /* Keypad 6                    4D  CD */
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) /*                             4E  CE */
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD) /* Keypad 1  (End)             4F  CF */
 
 	PORT_MODIFY("pc_keyboard_5")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 `") PORT_CODE(KEYCODE_2_PAD) /* Keypad 2                    50  D0 */
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD) /* Keypad 3  (PgDn)            51  D1 */
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0") PORT_CODE(KEYCODE_0_PAD) /* Keypad 0                    52  D2 */
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP - (Del)") PORT_CODE(KEYCODE_MINUS_PAD) /* - Delete                    53  D3 */
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) /* Break                       54  D4 */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Insert") PORT_CODE(KEYCODE_PLUS_PAD) /* + Insert                    55  D5 */
@@ -641,6 +571,7 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_com", pc_isa8_cards, "com", true)
 	
 	MCFG_PC_JOY_ADD("pc_joy")
+	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -651,7 +582,6 @@ static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I8088, 8000000) 
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tandy1000_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 	
@@ -673,7 +603,6 @@ static MACHINE_CONFIG_START( t1000_16, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_16_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_bank_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tandy1000_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 
@@ -695,7 +624,6 @@ static MACHINE_CONFIG_START( t1000_286, tandy1000_state )
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tandy1000_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
 

@@ -54,7 +54,7 @@ to the scancode set I have here. - KT 22/Jun/2000 */
 
 
 /* key set 3 */
-static const int at_keyboard_scancode_set_2_3[]=
+const int at_keyboard_device::m_scancode_set_2_3[]=
 {
 	0,
 	0x076,
@@ -165,37 +165,7 @@ static const int at_keyboard_scancode_set_2_3[]=
 };
 
 
-#define AT_KEYBOARD_QUEUE_MAXSIZE   256
-
-struct at_keyboard
-{
-	AT_KEYBOARD_TYPE type;
-	int on;
-	UINT8 delay;   /* 240/60 -> 0,25s */
-	UINT8 repeat;   /* 240/ 8 -> 30/s */
-	int numlock;
-	UINT8 queue[AT_KEYBOARD_QUEUE_MAXSIZE];
-	UINT8 head;
-	UINT8 tail;
-	UINT8 make[128];
-
-	int input_state;
-	int scan_code_set;
-	int last_code;
-
-	ioport_port *ports[8];
-};
-
-static at_keyboard keyboard;
-
-struct extended_keyboard_code
-{
-	const char *pressed;
-	const char *released;
-};
-
-
-static const extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/]={
+const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_mf2_code[0x10][2/*numlock off, on*/]={
 	{   { "\xe0\x1c", "\xe0\x9c" } }, // keypad enter
 	{   { "\xe0\x1d", "\xe0\x9d" } }, // right control
 	{   { "\xe0\x35", "\xe0\xb5" } },
@@ -216,7 +186,7 @@ static const extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/
 
 /* I don't think these keys change if num-lock is active! */
 /* pc-at extended keyboard make/break codes for code set 3 */
-static const extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
+const at_keyboard_device::extended_keyboard_code at_keyboard_device::m_extended_codes_set_2_3[]=
 {
 	/*keypad enter */
 	{
@@ -302,112 +272,159 @@ static const extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
 
 };
 
-static void at_keyboard_queue_insert(UINT8 data);
+const device_type PC_KEYB = &device_creator<pc_keyboard_device>;
+const device_type AT_KEYB = &device_creator<at_keyboard_device>;
 
-static int at_keyboard_queue_size(void);
-static int at_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len);
-static bool at_keyboard_accept_char(running_machine &machine, unicode_char ch);
-static bool at_keyboard_charqueue_empty(running_machine &machine);
-
-
-
-void at_keyboard_init(running_machine &machine, AT_KEYBOARD_TYPE type)
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, PC_KEYB, "PC Keyboard", tag, owner, clock, "pc_keyb", __FILE__),
+	m_type(KEYBOARD_TYPE_PC),
+	m_ioport_0(*this, ":pc_keyboard_0"),
+	m_ioport_1(*this, ":pc_keyboard_1"),
+	m_ioport_2(*this, ":pc_keyboard_2"),
+	m_ioport_3(*this, ":pc_keyboard_3"),
+	m_ioport_4(*this, ":pc_keyboard_4"),
+	m_ioport_5(*this, ":pc_keyboard_5"),
+	m_ioport_6(*this, ":pc_keyboard_6"),
+	m_ioport_7(*this, ":pc_keyboard_7"),
+	m_out_keypress_func(*this)
 {
-	int i;
+}
 
-	memset(&keyboard, 0, sizeof(keyboard));
-	keyboard.type = type;
-	keyboard.on = 1;
-	keyboard.delay = 60;
-	keyboard.repeat = 8;
-	keyboard.numlock = 0;
-	keyboard.head = keyboard.tail = 0;
-	keyboard.input_state = 0;
-	memset(&keyboard.make[0], 0, sizeof(UINT8)*128);
+pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_ioport_0(*this, ":pc_keyboard_0"),
+	m_ioport_1(*this, ":pc_keyboard_1"),
+	m_ioport_2(*this, ":pc_keyboard_2"),
+	m_ioport_3(*this, ":pc_keyboard_3"),
+	m_ioport_4(*this, ":pc_keyboard_4"),
+	m_ioport_5(*this, ":pc_keyboard_5"),
+	m_ioport_6(*this, ":pc_keyboard_6"),
+	m_ioport_7(*this, ":pc_keyboard_7"),
+	m_out_keypress_func(*this)
+{
+}
+
+at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	pc_keyboard_device(mconfig, AT_KEYB, "AT Keyboard", tag, owner, clock, "at_keyb", __FILE__),
+	m_scan_code_set(1)
+{
+	m_type = KEYBOARD_TYPE_AT;
+}
+
+
+void pc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	polling();
+	if(!charqueue_empty())
+		m_out_keypress_func(1);
+}
+
+void pc_keyboard_device::device_start()
+{
+	save_item(NAME(m_delay));
+	save_item(NAME(m_repeat));
+	save_item(NAME(m_numlock));
+	save_item(NAME(m_on));
+	save_item(NAME(m_head));
+	save_item(NAME(m_tail));
+	save_pointer(NAME(m_queue), ARRAY_LENGTH(m_queue));
+	save_pointer(NAME(m_make), ARRAY_LENGTH(m_make));
+
+	memset(m_make, 0, sizeof(m_make));
+
+	machine().ioport().natkeyboard().configure(
+		ioport_queue_chars_delegate(FUNC(pc_keyboard_device::queue_chars), this),
+		ioport_accept_char_delegate(FUNC(pc_keyboard_device::accept_char), this),
+		ioport_charqueue_empty_delegate(FUNC(pc_keyboard_device::charqueue_empty), this));
+		
+	m_out_keypress_func.resolve_safe();
+	m_keyboard_timer = timer_alloc();
+}
+
+void at_keyboard_device::device_start()
+{
+	save_item(NAME(m_scan_code_set));
+	save_item(NAME(m_input_state));
+	pc_keyboard_device::device_start();
+}
+
+void pc_keyboard_device::device_reset()
+{
+	m_delay = 60;
+	m_repeat = 8;
+	m_numlock = 0;
+	m_on = true;
 	/* set default led state */
-	set_led_status(machine, 2, 0);
-	set_led_status(machine, 0, 0);
-	set_led_status(machine, 1, 0);
+	set_led_status(machine(), 2, 0);
+	set_led_status(machine(), 0, 0);
+	set_led_status(machine(), 1, 0);
 
-	keyboard.scan_code_set = 3;
+	m_head = m_tail = 0;
+	queue_insert(0xaa);
+	m_keyboard_timer->adjust(attotime::from_msec(5), 0, attotime::from_hz(60));
+}
 
-	/* locate the keyboard ports */
-	for (i = 0; i < sizeof(keyboard.ports) / sizeof(keyboard.ports[0]); i++)
+void at_keyboard_device::device_reset()
+{
+	m_input_state = 0;
+	pc_keyboard_device::device_reset();
+}
+
+WRITE_LINE_MEMBER(pc_keyboard_device::enable)
+{
+	if(state && !m_on)
 	{
-		astring buf;
-		buf.printf("pc_keyboard_%d", i);
-		keyboard.ports[i] = machine.root_device().ioport(buf);
+		if(m_type == KEYBOARD_TYPE_PC)
+			reset();
+		else
+			m_keyboard_timer->adjust(attotime::from_msec(5), 0, attotime::from_hz(60));
 	}
+	else if(!state)
+		m_keyboard_timer->adjust(attotime::never);
 
-	machine.ioport().natkeyboard().configure(
-		ioport_queue_chars_delegate(FUNC(at_keyboard_queue_chars), &machine),
-		ioport_accept_char_delegate(FUNC(at_keyboard_accept_char), &machine),
-		ioport_charqueue_empty_delegate(FUNC(at_keyboard_charqueue_empty), &machine));
+	m_on = state ? true : false;
 }
-
-
-
-void at_keyboard_reset(running_machine &machine)
-{
-	keyboard.head = keyboard.tail = 0;
-	keyboard.input_state = 0;
-	memset(&keyboard.make[0], 0, sizeof(UINT8)*128);
-	/* set default led state */
-	set_led_status(machine, 2, 0);
-	set_led_status(machine, 0, 0);
-	set_led_status(machine, 1, 0);
-
-	keyboard.scan_code_set=1;
-	at_keyboard_queue_insert(0xaa);
-}
-
-/* set initial scan set */
-void at_keyboard_set_scan_code_set(int set)
-{
-	keyboard.scan_code_set = set;
-}
-
-
 
 /* insert a code into the buffer */
-static void at_keyboard_queue_insert(UINT8 data)
+void pc_keyboard_device::queue_insert(UINT8 data)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard queueing %.2x\n",data);
 
-	keyboard.queue[keyboard.head] = data;
-	keyboard.head++;
-	keyboard.head %= (sizeof(keyboard.queue) / sizeof(keyboard.queue[0]));
+	m_queue[m_head] = data;
+	m_head++;
+	m_head %= (sizeof(m_queue) / sizeof(m_queue[0]));
 }
 
 
-static int at_keyboard_queue_size(void)
+int pc_keyboard_device::queue_size(void)
 {
 	int queue_size;
-	queue_size = keyboard.head - keyboard.tail;
+	queue_size = m_head - m_tail;
 	if (queue_size < 0)
-		queue_size += sizeof(keyboard.queue) / sizeof(keyboard.queue[0]);
+		queue_size += sizeof(m_queue) / sizeof(m_queue[0]);
 	return queue_size;
 }
 
-
-/* add a list of codes to the keyboard buffer */
-static void at_keyboard_helper(const char *codes)
+void pc_keyboard_device::standard_scancode_insert(int our_code, int pressed)
 {
-	int i;
-	for (i = 0; codes[i]; i++)
-		at_keyboard_queue_insert(codes[i]);
+	if (!pressed)
+	{
+		/* adjust code for break code */
+		our_code|=0x080;
+	}
+	queue_insert(our_code);
 }
 
-
 /* add codes for standard keys */
-static void at_keyboard_standard_scancode_insert(int our_code, int pressed)
+void at_keyboard_device::standard_scancode_insert(int our_code, int pressed)
 {
 	int scancode = our_code;
 
-	switch (keyboard.scan_code_set)
+	switch (m_scan_code_set)
 	{
 		case 1:
+		default:
 		{
 			/* the original code was designed for this set, and there is
 			a 1:1 correspondance for the scancodes */
@@ -425,42 +442,43 @@ static void at_keyboard_standard_scancode_insert(int our_code, int pressed)
 		case 3:
 		{
 			/* lookup scancode */
-			scancode = at_keyboard_scancode_set_2_3[our_code];
+			scancode = m_scancode_set_2_3[our_code];
 
 			if (!pressed)
 			{
 				/* break code */
-				at_keyboard_queue_insert(0x0f0);
+				queue_insert(0x0f0);
 			}
 
 		}
 		break;
 	}
 
-	at_keyboard_queue_insert(scancode);
+	queue_insert(scancode);
 }
 
-static void at_keyboard_extended_scancode_insert(int code, int pressed)
+void at_keyboard_device::extended_scancode_insert(int code, int pressed)
 {
 	code = code - 0x060;
 
-	switch (keyboard.scan_code_set)
+	switch (m_scan_code_set)
 	{
 		case 1:
+		default:
 		{
 			if (pressed)
 			{
-				if (keyboard_mf2_code[code][keyboard.numlock].pressed)
-					at_keyboard_helper(keyboard_mf2_code[code][keyboard.numlock].pressed);
+				if (m_mf2_code[code][m_numlock].pressed)
+					helper(m_mf2_code[code][m_numlock].pressed);
 				else
-					at_keyboard_helper(keyboard_mf2_code[code][0].pressed);
+					helper(m_mf2_code[code][0].pressed);
 			}
 			else
 			{
-				if (keyboard_mf2_code[code][keyboard.numlock].released)
-					at_keyboard_helper(keyboard_mf2_code[code][keyboard.numlock].released);
-				else if (keyboard_mf2_code[code][0].released)
-					at_keyboard_helper(keyboard_mf2_code[code][0].released);
+				if (m_mf2_code[code][m_numlock].released)
+					helper(m_mf2_code[code][m_numlock].released);
+				else if (m_mf2_code[code][0].released)
+					helper(m_mf2_code[code][0].released);
 			}
 		}
 		break;
@@ -468,20 +486,20 @@ static void at_keyboard_extended_scancode_insert(int code, int pressed)
 		case 2:
 		case 3:
 		{
-			const extended_keyboard_code *key = &at_keyboard_extended_codes_set_2_3[code];
+			const extended_keyboard_code *key = &m_extended_codes_set_2_3[code];
 
 			if (pressed)
 			{
 				if (key->pressed)
 				{
-					at_keyboard_helper(key->pressed);
+					helper(key->pressed);
 				}
 			}
 			else
 			{
 				if (key->released)
 				{
-					at_keyboard_helper(key->released);
+					helper(key->released);
 				}
 			}
 		}
@@ -490,133 +508,180 @@ static void at_keyboard_extended_scancode_insert(int code, int pressed)
 
 }
 
+/* add a list of codes to the keyboard buffer */
+void at_keyboard_device::helper(const char *codes)
+{
+	int i;
+	for (i = 0; codes[i]; i++)
+		queue_insert(codes[i]);
+}
 
 /**************************************************************************
  *  scan keys and stuff make/break codes
  **************************************************************************/
 
-static UINT32 at_keyboard_readport(int port)
+UINT32 pc_keyboard_device::readport(int port)
 {
 	UINT32 result = 0;
-	if (keyboard.ports[port] != NULL)
-		result = keyboard.ports[port]->read();
+	switch(port)
+	{
+		case 0:
+			if(m_ioport_0)
+				result = m_ioport_0->read();
+			break;
+		case 1:
+			if(m_ioport_1)
+				result = m_ioport_1->read();
+			break;
+		case 2:
+			if(m_ioport_2)
+				result = m_ioport_2->read();
+			break;
+		case 3:
+			if(m_ioport_3)
+				result = m_ioport_3->read();
+			break;
+		case 4:
+			if(m_ioport_4)
+				result = m_ioport_4->read();
+			break;
+		case 5:
+			if(m_ioport_5)
+				result = m_ioport_5->read();
+			break;
+		case 6:
+			if(m_ioport_6)
+				result = m_ioport_6->read();
+			break;
+		case 7:
+			if(m_ioport_7)
+				result = m_ioport_7->read();
+			break;
+	}
 	return result;
 }
 
-void at_keyboard_polling(void)
+void pc_keyboard_device::polling(void)
 {
 	int i;
 
-	if (keyboard.on)
+	if (m_on)
 	{
 		/* add codes for keys that are set */
 		for( i = 0x01; i < 0x80; i++  )
 		{
 			if (i==0x60) i+=0x10; // keys 0x60..0x6f need special handling
 
-			if( at_keyboard_readport(i/16) & (1 << (i & 15)) )
+			if( readport(i/16) & (1 << (i & 15)) )
 			{
-				if( keyboard.make[i] == 0 )
+				if( m_make[i] == 0 )
 				{
-					keyboard.make[i] = 1;
+					m_make[i] = 1;
 
-					if (i==0x45) keyboard.numlock^=1;
+					if (i==0x45) m_numlock^=1;
 
-					at_keyboard_standard_scancode_insert(i,1);
+					standard_scancode_insert(i,1);
 				}
-				else
+				else if((i != 0x45) && (i != 0x3a)) // don't send repeats for caps or num lock
 				{
-					keyboard.make[i] += 1;
+					m_make[i] += 1;
 
-					if( keyboard.make[i] == keyboard.delay )
+					if( m_make[i] == m_delay )
 					{
-						at_keyboard_standard_scancode_insert(i, 1);
+						standard_scancode_insert(i, 1);
 					}
 					else
 					{
-						if( keyboard.make[i] == keyboard.delay + keyboard.repeat )
+						if( m_make[i] == m_delay + m_repeat )
 						{
-							keyboard.make[i] = keyboard.delay;
-							at_keyboard_standard_scancode_insert(i, 1);
+							m_make[i] = m_delay;
+							standard_scancode_insert(i, 1);
 						}
 					}
 				}
 			}
 			else
 			{
-				if( keyboard.make[i] )
+				if( m_make[i] )
 				{
-					keyboard.make[i] = 0;
+					m_make[i] = 0;
 
-					at_keyboard_standard_scancode_insert(i, 0);
+					standard_scancode_insert(i, 0);
 				}
 			}
 		}
 
+		if(m_type != KEYBOARD_TYPE_PC)
+		{
 			/* extended scan-codes */
 			for( i = 0x60; i < 0x70; i++  )
 			{
-				if( at_keyboard_readport(i/16) & (1 << (i & 15)) )
+				if( readport(i/16) & (1 << (i & 15)) )
 				{
-					if( keyboard.make[i] == 0 )
+					if( m_make[i] == 0 )
 					{
-						keyboard.make[i] = 1;
+						m_make[i] = 1;
 
-						at_keyboard_extended_scancode_insert(i,1);
+						extended_scancode_insert(i,1);
 
 					}
 					else
 					{
-						keyboard.make[i] += 1;
-						if( keyboard.make[i] == keyboard.delay )
+						m_make[i] += 1;
+						if( m_make[i] == m_delay )
 						{
-							at_keyboard_extended_scancode_insert(i, 1);
+							extended_scancode_insert(i, 1);
 						}
 						else
 						{
-							if( keyboard.make[i] == keyboard.delay + keyboard.repeat )
+							if( m_make[i] == m_delay + m_repeat )
 							{
-								keyboard.make[i]=keyboard.delay;
+								m_make[i]=m_delay;
 
-								at_keyboard_extended_scancode_insert(i, 1);
+								extended_scancode_insert(i, 1);
 							}
 						}
 					}
 				}
 				else
 				{
-					if( keyboard.make[i] )
+					if( m_make[i] )
 					{
-						keyboard.make[i] = 0;
+						m_make[i] = 0;
 
-						at_keyboard_extended_scancode_insert(i,0);
+						extended_scancode_insert(i,0);
 					}
 				}
 			}
+		}
 	}
 }
 
-int at_keyboard_read(void)
+READ8_MEMBER(pc_keyboard_device::read)
 {
 	int data;
-	if (keyboard.tail == keyboard.head)
-		return -1;
+	if (m_tail == m_head)
+		return 0;
 
-	data = keyboard.queue[keyboard.tail];
+	data = m_queue[m_tail];
 
 	if (LOG_KEYBOARD)
-		logerror("at_keyboard_read(): Keyboard Read 0x%02x\n",data);
+		logerror("read(): Keyboard Read 0x%02x\n",data);
 
-	keyboard.tail++;
-	keyboard.tail %= sizeof(keyboard.queue) / sizeof(keyboard.queue[0]);
+	m_tail++;
+	m_tail %= sizeof(m_queue) / sizeof(m_queue[0]);
 	return data;
 }
 
-static void at_clear_buffer_and_acknowledge(void)
+void pc_keyboard_device::clear_buffer(void)
 {
-	/* clear output buffer and respond with acknowledge */
-	keyboard.head = keyboard.tail = 0;
-	at_keyboard_queue_insert(0x0fa);
+	m_head = m_tail = 0;
+}
+
+void at_keyboard_device::clear_buffer_and_acknowledge(void)
+{
+	clear_buffer();
+	queue_insert(0x0fa);
 }
 
 /* From Ralf Browns Interrupt list:
@@ -666,122 +731,117 @@ Note:   each command is acknowledged by FAh (ACK), if not mentioned otherwise.
 SeeAlso: #P046
 */
 
-void at_keyboard_write(running_machine &machine, UINT8 data)
+WRITE8_MEMBER(at_keyboard_device::write)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard write %.2x\n",data);
 
-	switch (keyboard.input_state)
+	switch (m_input_state)
 	{
 		case 0:
 			switch (data) {
 			case 0xed: // leds schalten
 				/* acknowledge */
-				at_keyboard_queue_insert(0x0fa);
+				queue_insert(0x0fa);
 				/* now waiting for  code... */
-				keyboard.input_state=1;
+				m_input_state=1;
 				break;
 			case 0xee: // echo
 				/* echo code with no acknowledge */
-				at_keyboard_queue_insert(0xee);
+				queue_insert(0xee);
 				break;
 			case 0xf0: // scancodes adjust
 				/* acknowledge */
-				at_clear_buffer_and_acknowledge();
+				clear_buffer_and_acknowledge();
 				/* waiting for data */
-				keyboard.input_state=2;
+				m_input_state=2;
 				break;
 			case 0xf2: // identify keyboard
 				/* ack and two byte keyboard id */
-				at_keyboard_queue_insert(0xfa);
+				queue_insert(0xfa);
 
 				/* send keyboard code */
-				if (keyboard.type == AT_KEYBOARD_TYPE_MF2) {
-					at_keyboard_queue_insert(0xab);
-					at_keyboard_queue_insert(0x41);
+				if (m_type == KEYBOARD_TYPE_MF2) {
+					queue_insert(0xab);
+					queue_insert(0x41);
 				}
 				else
 				{
 					/* from help-pc docs */
-					at_keyboard_queue_insert(0x0ab);
-					at_keyboard_queue_insert(0x083);
+					queue_insert(0x0ab);
+					queue_insert(0x083);
 				}
 
 				break;
 			case 0xf3: // adjust rates
 				/* acknowledge */
-				at_keyboard_queue_insert(0x0fa);
+				queue_insert(0x0fa);
 
-				keyboard.input_state=3;
+				m_input_state=3;
 				break;
 			case 0xf4: // activate
-				at_clear_buffer_and_acknowledge();
+				clear_buffer_and_acknowledge();
 
-				keyboard.on=1;
+				enable(1);
 				break;
 			case 0xf5:
 				/* acknowledge */
-				at_clear_buffer_and_acknowledge();
+				clear_buffer_and_acknowledge();
 				// standardvalues
-				keyboard.on=0;
+				enable(0);
 				break;
 			case 0xf6:
-				at_clear_buffer_and_acknowledge();
+				clear_buffer_and_acknowledge();
 				// standardvalues
-				keyboard.on=1;
+				enable(1);
 				break;
 			case 0xfe: // resend
 				// should not happen, for now send 0
-				at_keyboard_queue_insert(0);    //keyboard.last_code);
+				queue_insert(0);    //m_last_code);
 				break;
 			case 0xff: // reset
 				/* it doesn't state this in the docs I have read, but I assume
 				that the keyboard input buffer is cleared. The PCW16 sends &ff,
 				and requires that 0x0fa is the first byte to be read */
 
-				at_clear_buffer_and_acknowledge();
-
-	//          /* acknowledge */
-	//          at_keyboard_queue_insert(0xfa);
-				/* BAT completion code */
-				at_keyboard_queue_insert(0xaa);
+				reset();
 				break;
 			}
 			break;
 		case 1:
 			/* code received */
-			keyboard.input_state=0;
+			m_input_state=0;
 
 			/* command? */
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(machine, data);
+				write(space, offset, data);
 			}
 			else
 			{
 				/* send acknowledge */
-				at_keyboard_queue_insert(0x0fa);
+				queue_insert(0x0fa);
 
 				/* led  bits */
 				/* bits: 0 scroll lock, 1 num lock, 2 capslock */
 
 				/* led's in same order as my keyboard leds. */
 				/* num lock, caps lock, scroll lock */
-				set_led_status(machine, 2, (data & 0x01));
-				set_led_status(machine, 0, ((data & 0x02)>>1));
-				set_led_status(machine, 1, ((data & 0x04)>>2));
+				set_led_status(machine(), 2, (data & 0x01));
+				set_led_status(machine(), 0, ((data & 0x02)>>1));
+				set_led_status(machine(), 1, ((data & 0x04)>>2));
 
 			}
 			break;
 		case 2:
-			keyboard.input_state=0;
+			m_input_state=0;
 
 			/* command? */
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(machine, data);
+				write(space, offset, data);
 			}
 			else
 			{
@@ -793,11 +853,12 @@ void at_keyboard_write(running_machine &machine, UINT8 data)
 
 				if (data == 0x00)
 				{
-						at_keyboard_queue_insert(keyboard.scan_code_set);
+						queue_insert(m_scan_code_set);
 				}
 				else
 				{
-					keyboard.scan_code_set = data;
+					if(data && (data <= 3))
+						m_scan_code_set = data;
 				}
 			}
 
@@ -807,11 +868,11 @@ void at_keyboard_write(running_machine &machine, UINT8 data)
 			/* 4..0: 30 26.7 .... 2 chars/s*/
 
 			/* command? */
-			keyboard.input_state=0;
+			m_input_state=0;
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(machine, data);
+				write(space, offset, data);
 			}
 			else
 			{
@@ -827,7 +888,7 @@ void at_keyboard_write(running_machine &machine, UINT8 data)
   unicode_char_to_at_keycode
 ***************************************************************************/
 
-static UINT8 unicode_char_to_at_keycode(unicode_char ch)
+UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
 {
 	UINT8 b;
 	switch(ch)
@@ -965,27 +1026,27 @@ static UINT8 unicode_char_to_at_keycode(unicode_char ch)
 }
 
 /***************************************************************************
-  at_keyboard_queue_chars
+  queue_chars
 ***************************************************************************/
 
-static int at_keyboard_queue_chars(running_machine &machine, const unicode_char *text, size_t text_len)
+int pc_keyboard_device::queue_chars(const unicode_char *text, size_t text_len)
 {
 	int i;
 	UINT8 b;
 
-	for (i = 0; (i < text_len) && ((at_keyboard_queue_size()) + 4 < AT_KEYBOARD_QUEUE_MAXSIZE); i++)
+	for (i = 0; (i < text_len) && ((queue_size()) + 4 < sizeof(m_queue)); i++)
 	{
 		b = unicode_char_to_at_keycode(text[i]);
 		if (b)
 		{
 			if (b & 0x80)
-				at_keyboard_standard_scancode_insert(0x36, 1);
+				standard_scancode_insert(0x36, 1);
 
-			at_keyboard_standard_scancode_insert(b & 0x7f, 1);
-			at_keyboard_standard_scancode_insert(b & 0x7f, 0);
+			standard_scancode_insert(b & 0x7f, 1);
+			standard_scancode_insert(b & 0x7f, 0);
 
 			if (b & 0x80)
-				at_keyboard_standard_scancode_insert(0x36, 0);
+				standard_scancode_insert(0x36, 0);
 		}
 	}
 	return i;
@@ -1063,7 +1124,7 @@ INPUT_PORTS_START( pc_keyboard )
 	PORT_BIT( 0x0080, 0x0000, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK)      /* Keypad *  (PrtSc)           37  B7 */
 	PORT_BIT( 0x0100, 0x0000, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT)                    /* Left Alt                    38  B8 */
 	PORT_BIT( 0x0200, 0x0000, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')  /* Space                       39  B9 */
-	PORT_BIT( 0x0400, 0x0000, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
+	PORT_BIT( 0x0400, 0x0000, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)               /* Caps Lock                   3A  BA */
 	PORT_BIT( 0x0800, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))          /* F1                          3B  BB */
 	PORT_BIT( 0x1000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))          /* F2                          3C  BC */
 	PORT_BIT( 0x2000, 0x0000, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))          /* F3                          3D  BD */
@@ -1096,15 +1157,7 @@ INPUT_PORTS_START( pc_keyboard )
 	PORT_BIT ( 0x0030, 0x0000, IPT_UNUSED )
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(84/102)\\") PORT_CODE(KEYCODE_BACKSLASH2)      /* Backslash 2                 56  D6 */
 	PORT_BIT ( 0xff80, 0x0000, IPT_UNUSED )
-
-	PORT_START("pc_keyboard_6")
-	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-
-	PORT_START("pc_keyboard_7")
-	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END
-
-
 
 INPUT_PORTS_START( at_keyboard )
 	PORT_START("pc_keyboard_0")
@@ -1231,20 +1284,18 @@ INPUT_PORTS_START( at_keyboard )
 	PORT_BIT ( 0xfffe, 0x0000, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-
 /***************************************************************************
   Inputx stuff
 ***************************************************************************/
 
-static bool at_keyboard_accept_char(running_machine &machine, unicode_char ch)
+bool pc_keyboard_device::accept_char(unicode_char ch)
 {
 	return unicode_char_to_at_keycode(ch) != 0;
 }
 
 
 
-static bool at_keyboard_charqueue_empty(running_machine &machine)
+bool pc_keyboard_device::charqueue_empty()
 {
-	return at_keyboard_queue_size() == 0;
+	return queue_size() == 0;
 }

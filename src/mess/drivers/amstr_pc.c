@@ -43,12 +43,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
+		m_keyboard(*this, "pc_keyboard"),
 		m_lpt1(*this, "lpt_1"),
 		m_lpt2(*this, "lpt_2")
 			{ m_mouse.x =0; m_mouse.y=0;}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
+	required_device<pc_keyboard_device> m_keyboard;
 	required_device<pc_lpt_device> m_lpt1;
 	required_device<pc_lpt_device> m_lpt2;
 
@@ -67,10 +69,7 @@ public:
 	DECLARE_READ8_MEMBER( pc1640_port4278_r );
 	DECLARE_READ8_MEMBER( pc1640_port278_r );
 
-	DECLARE_DRIVER_INIT(pc200);
 	DECLARE_DRIVER_INIT(pc1640);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
 
 	struct {
 		UINT8 x,y; //byte clipping needed
@@ -83,37 +82,7 @@ public:
 	UINT8 m_port65;
 
 	int m_dipstate;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	emu_timer* m_keyboard_timer;
-	
-	enum
-	{
-		TIMER_KEYBOARD
-	};
-
-	void pc_keyboard();
-	void pc_keyb_set_clock(bool on);
-	
-	bool m_pc_keyb_self_test;
-	bool m_pc_keyb_on;
-	UINT8 m_pc_keyb_data;
 };
-
-void amstrad_pc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case TIMER_KEYBOARD:
-			if ( m_pc_keyb_on ) {
-				pc_keyboard();
-			} else {
-				/* Clock has been low for more than 5 msec, start diagnostic test */
-				at_keyboard_reset(machine());
-				m_pc_keyb_self_test = 1;
-			}
-			break;
-	}
-}
 
 static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, amstrad_pc_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
@@ -281,21 +250,10 @@ port 03de write/read
 
 DRIVER_INIT_MEMBER(amstrad_pc_state,pc1640)
 {
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
-	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
-
 	address_space &io_space = m_maincpu->space( AS_IO );
 
 	io_space.install_read_handler(0x278, 0x27b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port278_r),this), 0xffff);
 	io_space.install_read_handler(0x4278, 0x427b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port4278_r),this), 0xffff);
-}
-
-DRIVER_INIT_MEMBER(amstrad_pc_state,pc200)
-{
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
-	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
 }
 
 WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
@@ -307,12 +265,10 @@ WRITE8_MEMBER( amstrad_pc_state::pc1640_port60_w )
 		else if (data==0x34) m_port62=m_port65&0xf;
 		m_mb->m_pit8253->write_gate2(BIT(data, 0));
 		m_mb->pc_speaker_set_spkrdata( data & 0x02 );
-		pc_keyb_set_clock(data&0x40);
+		m_keyboard->enable(data&0x40);
 		if(data & 0x80)
-		{
-			m_pc_keyb_data = 0;
 			m_mb->m_pic8259->ir1_w(0);
-		}
+
 		break;
 	case 4:
 		if (data&0x80) {
@@ -339,7 +295,7 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 		if (m_port61&0x80)
 			data=m_port60;
 		else
-			data = m_pc_keyb_data;
+			data = m_keyboard->read(space, 0);
 		break;
 
 	case 1:
@@ -353,49 +309,6 @@ READ8_MEMBER( amstrad_pc_state::pc1640_port60_r )
 		break;
 	}
 	return data;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(amstrad_pc_state::pc_frame_interrupt)
-{
-	if(!(param % 64))
-		pc_keyboard();
-}
-
-void amstrad_pc_state::pc_keyb_set_clock(bool on)
-{
-	if (m_pc_keyb_on != on)
-	{
-		if (!on)
-			m_keyboard_timer->adjust(attotime::from_msec(5));
-		else {
-			if ( m_pc_keyb_self_test ) {
-				/* The self test of the keyboard takes some time. 2 msec seems to work. */
-				/* This still needs to verified against a real keyboard. */
-				m_keyboard_timer->adjust(attotime::from_msec( 2 ));
-			} else {
-				m_keyboard_timer->reset();
-				m_pc_keyb_self_test = 0;
-			}
-		}
-
-		m_pc_keyb_on = on;
-	}
-}
-
-void amstrad_pc_state::pc_keyboard(void)
-{
-	int data;
-
-	at_keyboard_polling();
-
-	if (m_pc_keyb_on)
-	{
-		if ( (data=at_keyboard_read())!=-1) {
-			m_pc_keyb_data = data;
-			m_mb->m_pic8259->ir1_w(1);
-			m_pc_keyb_self_test = 0;
-		}
-	}
 }
 
 READ8_MEMBER( amstrad_pc_state::pc200_port378_r )
@@ -581,7 +494,6 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 	MCFG_CPU_IO_MAP(pc200_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", amstrad_pc_state, pc_frame_interrupt, attotime::from_hz(60))
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
@@ -604,6 +516,8 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("mb:pic8259", pic8259_device, ir5_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
+
+	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -733,9 +647,9 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, amstrad_pc_state,    pc200, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, amstrad_pc_state,    pc200, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
-COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )
+COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
+COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )

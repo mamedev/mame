@@ -488,7 +488,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 				/* busy */
 				m_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;
 				/* keyboard takes data */
-				at_keyboard_write(machine(),m_keyboard_data_shift);
+				m_keyboard->write(space, 0, m_keyboard_data_shift);
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */
@@ -514,16 +514,18 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_keyboard_timer_callback)
+WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 {
-	at_keyboard_polling();
+	if(!state)
+		return;
+
 	if (pcw16_keyboard_can_transmit())
 	{
 		int data;
 
-		data = at_keyboard_read();
+		data = m_keyboard->read(machine().driver_data()->generic_space(), 0);
 
-		if (data!=-1)
+		if (data)
 		{
 //          if (data==4)
 //          {
@@ -1008,10 +1010,6 @@ void pcw16_state::machine_start()
 	m_system_status = 0;
 	m_interrupt_counter = 0;
 
-	/* initialise keyboard */
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
-	at_keyboard_set_scan_code_set(3);
-
 	m_beeper->set_state(0);
 	m_beeper->set_frequency(3750);
 }
@@ -1074,13 +1072,13 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
+	
+	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
 	/* rtc timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
-	/* keyboard timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pcw16_state, pcw16_keyboard_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /***************************************************************************

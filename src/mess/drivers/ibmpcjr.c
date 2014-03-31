@@ -29,7 +29,8 @@ public:
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_fdc(*this, "fdc")
+		m_fdc(*this, "fdc"),
+		m_keyboard(*this, "pc_keyboard")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,9 +40,10 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<upd765a_device> m_fdc;
+	required_device<pc_keyboard_device> m_keyboard;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(frame_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
 
 	DECLARE_WRITE8_MEMBER(pc_nmi_enable_w);
 	DECLARE_READ8_MEMBER(pcjr_nmi_enable_r);
@@ -96,24 +98,6 @@ public:
 static INPUT_PORTS_START( ibmpcjr )
 	PORT_INCLUDE(pc_keyboard)
 
-	PORT_MODIFY("pc_keyboard_2")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) /*                             29  A9 */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
-	
-	PORT_MODIFY("pc_keyboard_4")
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN) /*                             4A  CA */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) /*                             4E  CE */
-
-	PORT_MODIFY("pc_keyboard_5")
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP - (Del)") PORT_CODE(KEYCODE_MINUS_PAD) /* - Delete                    53  D3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_STOP) /* Break                       54  D4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Insert") PORT_CODE(KEYCODE_PLUS_PAD) /* + Insert                    55  D5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_DEL_PAD) /* .                           56  D6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* Enter                       57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Home") PORT_CODE(KEYCODE_HOME) /* HOME                        58  D8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11) /* F11                         59  D9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12) /* F12                         5a  Da */
-
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
 	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
@@ -126,8 +110,6 @@ DRIVER_INIT_MEMBER(pcjr_state, pcjr)
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
 	m_keyb_signal_timer = timer_alloc(TIMER_KB_SIGNAL);
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcjr_state::pc_irq_callback),this));
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
 }
 
 void pcjr_state::machine_reset()
@@ -261,19 +243,19 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
  *
  *************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcjr_state::frame_interrupt)
+WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
-
-	if((param % 64) || m_transferring)
-		return;
-
-	at_keyboard_polling();
-
-	if ( (data=at_keyboard_read())!=-1)
+	
+	if(state && (data = m_keyboard->read(machine().driver_data()->generic_space(), 0)))
 	{
 		UINT8   parity = 0;
 		int     i;
+
+		m_latch = 1;
+
+		if(m_transferring)
+			return;
 
 		m_pc_keyb_data = data;
 
@@ -301,10 +283,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcjr_state::frame_interrupt)
 
 		/* Set timer */
 		m_keyb_signal_timer->adjust( attotime::from_usec(220), 0, attotime::from_usec(220) );
-
-		m_latch = 1;
+		m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 	}
-	m_maincpu->set_input_line(INPUT_LINE_NMI, m_latch && m_nmi_enabled);
 }
 
 READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
@@ -317,6 +297,7 @@ READ8_MEMBER(pcjr_state::pcjr_nmi_enable_r)
 WRITE8_MEMBER(pcjr_state::pc_nmi_enable_w)
 {
 	m_nmi_enabled = data & 0x80;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_enabled && m_latch);
 }
 
 WRITE8_MEMBER(pcjr_state::pcjr_ppi_portb_w)
@@ -638,10 +619,9 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 4900000)   \
-	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map) \
-	MCFG_CPU_IO_MAP(ibmpcjr_io)  \
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pcjr_state, frame_interrupt, "pcvideo_pcjr:screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", I8088, 4900000)
+	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
+	MCFG_CPU_IO_MAP(ibmpcjr_io)
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
@@ -693,6 +673,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
+
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(pcjr_state, keyb_interrupt))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")

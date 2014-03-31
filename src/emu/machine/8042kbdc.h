@@ -10,6 +10,9 @@
 #ifndef KBDC8042_H
 #define KBDC8042_H
 
+#include "emu.h"
+#include "machine/pckeybrd.h"
+
 enum kbdc8042_type_t
 {
 	KBDC8042_STANDARD,
@@ -53,13 +56,15 @@ public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_out2 );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 
 	void at_8042_set_outport(UINT8 data, int initial);
-	TIMER_CALLBACK_MEMBER( kbdc8042_time );
 	TIMER_CALLBACK_MEMBER( kbdc8042_clr_int );
 	void at_8042_receive(UINT8 data);
 	void at_8042_check_keyboard();
@@ -96,6 +101,8 @@ protected:
 	int m_offset1;
 
 	int m_poll_delay;
+	
+	required_device<at_keyboard_device> m_keyboard_dev;
 
 	devcb_resolved_write_line   m_system_reset_func;
 	devcb_resolved_write_line   m_gate_a20_func;

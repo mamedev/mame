@@ -13,12 +13,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
+		m_keyboard(*this, "pc_keyboard"),
 		m_jim_state(0),
 		m_port61(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
+	required_device<pc_keyboard_device> m_keyboard;
 	isa8_aga_device *m_aga;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
@@ -31,8 +33,6 @@ public:
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
 	
-	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
-
 	DECLARE_DRIVER_INIT(europc);
 
 	void europc_rtc_set_time();
@@ -47,20 +47,11 @@ public:
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	emu_timer* m_rtc_timer;
-	emu_timer* m_keyboard_timer;
 	
 	enum
 	{
-		TIMER_KEYBOARD,
 		TIMER_RTC
 	};
-
-	void pc_keyboard();
-	void pc_keyb_set_clock(bool on);
-	
-	bool m_pc_keyb_self_test;
-	bool m_pc_keyb_on;
-	UINT8 m_pc_keyb_data;
 };
 
 /*
@@ -289,16 +280,6 @@ void europc_pc_state::device_timer(emu_timer &timer, device_timer_id id, int par
 				}
 			}
 			break;
-
-		case TIMER_KEYBOARD:
-			if ( m_pc_keyb_on ) {
-				pc_keyboard();
-			} else {
-				/* Clock has been low for more than 5 msec, start diagnostic test */
-				at_keyboard_reset(machine());
-				m_pc_keyb_self_test = 1;
-			}
-			break;
 	}
 }
 
@@ -367,16 +348,7 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 	
 	machine().device<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 	m_aga = machine().device<isa8_aga_device>("aga:aga");		
-	
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
-	at_keyboard_set_scan_code_set(1);
-	m_keyboard_timer = timer_alloc(TIMER_KEYBOARD);
-}
 
-TIMER_DEVICE_CALLBACK_MEMBER(europc_pc_state::pc_frame_interrupt)
-{
-	if(!(param % 64))
-		pc_keyboard();
 }
 
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )
@@ -387,12 +359,9 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 		m_port61=data;
 		m_mb->m_pit8253->write_gate2(BIT(data, 0));
 		m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
-		pc_keyb_set_clock(BIT(data, 6));
+		m_keyboard->enable(BIT(data, 6));
 		if(data & 0x80)
-		{
-			m_pc_keyb_data = 0;
 			m_mb->m_pic8259->ir1_w(0);
-		}
 		break;
 	}
 
@@ -406,8 +375,7 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 	switch (offset)
 	{
 	case 0:
-		if (!(m_port61&0x80))
-			data = m_pc_keyb_data;
+		data = m_keyboard->read(space, 0);
 		break;
 	case 1:
 		data = m_port61;
@@ -418,43 +386,6 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
 		break;
 	}
 	return data;
-}
-
-void europc_pc_state::pc_keyb_set_clock(bool on)
-{
-	if (m_pc_keyb_on != on)
-	{
-		if (!on)
-			m_keyboard_timer->adjust(attotime::from_msec(5));
-		else {
-			if ( m_pc_keyb_self_test ) {
-				/* The self test of the keyboard takes some time. 2 msec seems to work. */
-				/* This still needs to verified against a real keyboard. */
-				m_keyboard_timer->adjust(attotime::from_msec( 2 ));
-			} else {
-				m_keyboard_timer->reset();
-				m_pc_keyb_self_test = 0;
-			}
-		}
-
-		m_pc_keyb_on = on;
-	}
-}
-
-void europc_pc_state::pc_keyboard(void)
-{
-	int data;
-
-	at_keyboard_polling();
-
-	if (m_pc_keyb_on)
-	{
-		if ( (data=at_keyboard_read())!=-1) {
-			m_pc_keyb_data = data;
-			m_mb->m_pic8259->ir1_w(1);
-			m_pc_keyb_self_test = 0;
-		}
-	}
 }
 
 /*
@@ -522,8 +453,9 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F11") PORT_CODE(KEYCODE_F11)      /* F11                         57  D7 */
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F12") PORT_CODE(KEYCODE_F12)      /* F12                         58  D8 */
 
-	PORT_MODIFY("pc_keyboard_6") /* IN10 */\
+	PORT_START("pc_keyboard_6") /* IN10 */\
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP Enter") PORT_CODE(KEYCODE_ENTER_PAD)       /* PAD Enter                   60  e0 */
+	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, europc_pc_state )
@@ -547,7 +479,6 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2) 
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", europc_pc_state, pc_frame_interrupt, attotime::from_hz(60))
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 	
@@ -555,6 +486,8 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
+	
+	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
 	
