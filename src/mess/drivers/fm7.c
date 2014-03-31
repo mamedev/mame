@@ -46,7 +46,6 @@
 
 #include "imagedev/cassette.h"
 #include "formats/fm7_cas.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "bus/centronics/dsjoy.h"
 
@@ -432,19 +431,18 @@ WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 
 READ8_MEMBER(fm7_state::fm7_fdc_r)
 {
-	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
 	{
 		case 0:
-			return fdc->status_r(space, offset);
+			return m_fdc->status_r(space, offset);
 		case 1:
-			return fdc->track_r(space, offset);
+			return m_fdc->track_r(space, offset);
 		case 2:
-			return fdc->sector_r(space, offset);
+			return m_fdc->sector_r(space, offset);
 		case 3:
-			return fdc->data_r(space, offset);
+			return m_fdc->data_r(space, offset);
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -466,24 +464,23 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 
 WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 {
-	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	switch(offset)
 	{
 		case 0:
-			fdc->command_w(space, offset,data);
+			m_fdc->command_w(space, offset,data);
 			break;
 		case 1:
-			fdc->track_w(space, offset,data);
+			m_fdc->track_w(space, offset,data);
 			break;
 		case 2:
-			fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(space, offset,data);
 			break;
 		case 3:
-			fdc->data_w(space, offset,data);
+			m_fdc->data_w(space, offset,data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
-			fdc->set_side(data & 0x01);
+			m_fdc->set_side(data & 0x01);
 			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
 			break;
 		case 5:
@@ -494,7 +491,7 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 			}
 			else
 			{
-				fdc->set_drive(data & 0x03);
+				m_fdc->set_drive(data & 0x03);
 				floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
 				floppy_drive_set_ready_state(floppy_get_device(machine(), data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
