@@ -43,6 +43,7 @@ ToDo:
 - Everything
 - Need software
 - If booting straight to CP/M, the load message should be in the middle of the screen.
+- Beeper is a low pulse on bit 0 of port 0b - enable a pit event?
 
 ****************************************************************************/
 
@@ -51,6 +52,9 @@ ToDo:
 #include "video/mc6845.h"
 #include "machine/upd765.h"
 #include "machine/keyboard.h"
+//#include "machine/pit8253.h"
+//#include "machine/i8255.h"
+//#include "machine/i8251.h"
 
 
 class amust_state : public driver_device
@@ -116,6 +120,13 @@ static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
 	AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x10, 0x11) AM_DEVICE("fdc", upd765a_device, map)
+	//AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	//AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	//AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	//AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
+	//AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("pit", pit8253_device, read, write)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( amust_floppies )
@@ -165,6 +176,26 @@ INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
 {
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
+
+//static I8255_INTERFACE( ppi1_intf )
+//{
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_r),   // Port A read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_w),   // Port A write
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_r),   // Port B read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_w),   // Port B write
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_r),   // Port C read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_w),   // Port C write
+//};
+
+//static I8255_INTERFACE( ppi2_intf )
+//{
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_r),   // Port A read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_w),   // Port A write
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_r),   // Port B read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_w),   // Port B write
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_r),   // Port C read
+//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_w),   // Port C write
+//};
 
 WRITE8_MEMBER( amust_state::kbd_put )
 {
@@ -284,6 +315,26 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
+	//MCFG_DEVICE_ADD("uart1", I8251, 0)
+	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	//MCFG_DEVICE_ADD("uart2", I8251, 0)
+	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
+	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
+
+	//MCFG_DEVICE_ADD("pit", PIT8253, 0)
+
+	//MCFG_I8255A_ADD("ppi1", ppi1_intf)
+	//MCFG_I8255A_ADD("ppi2", ppi2_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
