@@ -20,7 +20,7 @@
   1x X24C16P Serial EEPROM.
 
   1x GAL16V8AS
-  
+
   1x ES2 CM3080 (unknown DIP-18 IC)
   1x ES2 9046 (unknown PLCC-84 IC)
   1x 8952 CM 32 (unknown DIP-40 IC)
@@ -32,7 +32,7 @@
 **************************************************************************
 
   UM487F HCGA Controller notes...
-  
+
   The fact that there is a 14.318 MHz crystal tied to pin 65, just point
   that the video controller is working in CGA mode. MGA mode needs a
   16.257 MHz crystal instead, and tied to pin 64 (currently tied to GND).
@@ -125,11 +125,11 @@
   8952 (PIN 04) --|02   19|-- GAL (PIN 17)      8952 (PIN 08) --|02   19|-- GAL (PIN 16)
        Z80 (D7) --|03   18|-- Z80 (D0)               Z80 (D7) --|03   18|-- Z80 (D0)
   8952 (PIN 03) --|04   17|-- 8952 (PIN 40)     8952 (PIN 07) --|04   17|-- 8952 (PIN 36)
-       Z80 (D6) --|05   16|-- Z80 (D1)               Z80 (D6) --|05   16|-- Z80 (D1) 
+       Z80 (D6) --|05   16|-- Z80 (D1)               Z80 (D6) --|05   16|-- Z80 (D1)
   8952 (PIN 02) --|06   15|-- 8952 (PIN 39)     8952 (PIN 06) --|06   15|-- 8952 (PIN 35)
        Z80 (D5) --|07   14|-- Z80 (D2)               Z80 (D5) --|07   14|-- Z80 (D2)
   8952 (PIN 01) --|08   13|-- 8952 (PIN 38)     8952 (PIN 05) --|08   13|-- 8952 (PIN 34)
-       Z80 (D4) --|09   12|-- Z80 (D3)               Z80 (D4) --|09   12|-- Z80 (D3) 
+       Z80 (D4) --|09   12|-- Z80 (D3)               Z80 (D4) --|09   12|-- Z80 (D3)
             GND --|10   11|-- 8952 (PIN 37)               GND --|10   11|-- 8952 (PIN 33)
                   '-------'                                     '-------'
 
@@ -177,6 +177,7 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
 
@@ -198,6 +199,7 @@ public:
 	UINT32 screen_update_4enlinea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -299,8 +301,10 @@ READ8_MEMBER(_4enlinea_state::crtc_status_r)
                      1: Vertical sync period.
 
 */
-	logerror("CRTC status read\n");
-	return (machine().rand() & 0x80);	/* bit 7 ??? (it's suppossed to be unused in CGA mode) */
+	//logerror("CRTC status read\n");
+	return (m_screen->vpos() >= 200) ? 0x80 : 0x00;
+
+//	return (machine().rand() & 0x80);	/* bit 7 ??? (it's suppossed to be unused in CGA mode) */
 }
 
 READ8_MEMBER(_4enlinea_state::unk_e000_r)
@@ -337,14 +341,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
-	AM_RANGE(0xd4, 0xd4) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xd5, 0xd5) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(crtc_mode_ctrl_w)
-	AM_RANGE(0xd9, 0xd9) AM_WRITE(crtc_colormode_w)
-	AM_RANGE(0xda, 0xda) AM_READ(crtc_status_r)
-	AM_RANGE(0xbf, 0xbf) AM_WRITE(crtc_config_w)
+	AM_RANGE(0x3d4, 0x3d4) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x3d5, 0x3d5) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x3d8, 0x3d8) AM_WRITE(crtc_mode_ctrl_w)
+	AM_RANGE(0x3d9, 0x3d9) AM_WRITE(crtc_colormode_w)
+	AM_RANGE(0x3da, 0x3da) AM_READ(crtc_status_r)
+	AM_RANGE(0x3bf, 0x3bf) AM_WRITE(crtc_config_w)
 
 ADDRESS_MAP_END
 
@@ -367,6 +371,32 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 4enlinea )
 	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "0-0")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "0-1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "0-2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "0-3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "0-4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "0-5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "0-6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "0-7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "0-0")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -485,7 +515,7 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4enlinea_state, nmi_line_pulse)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*60)
-	
+
 	MCFG_CPU_ADD("audiocpu", Z80, SND_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_portmap)
@@ -546,4 +576,3 @@ ROM_END
 
 /*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT    COMPANY       FULLNAME          FLAGS  */
 GAME( 1991, 4enlinea,  0,       4enlinea, 4enlinea, driver_device, 0,     ROT0, "Compumatic", "Cuatro en Linea", GAME_NOT_WORKING )
-        
