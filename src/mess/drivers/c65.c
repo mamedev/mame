@@ -52,9 +52,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
-#include "sound/mos6581.h"
 #include "machine/mos6526.h"
-#include "video/vic4567.h"
 #include "machine/cbm_snqk.h"
 #include "includes/c65.h"
 #include "bus/cbmiec/cbmiec.h"
@@ -466,16 +464,12 @@ int c65_state::c64_paddle_read( device_t *device, address_space &space, int whic
 
 READ8_MEMBER( c65_state::sid_potx_r )
 {
-	device_t *sid = machine().device("sid_r");
-
-	return c64_paddle_read(sid, space, 0);
+	return c64_paddle_read(m_sid_r, space, 0);
 }
 
 READ8_MEMBER( c65_state::sid_poty_r )
 {
-	device_t *sid = machine().device("sid_r");
-
-	return c64_paddle_read(sid, space, 1);
+	return c64_paddle_read(m_sid_r, space, 1);
 }
 
 
@@ -487,7 +481,7 @@ READ8_MEMBER( c65_state::sid_poty_r )
 
 UINT32 c65_state::screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().device<vic3_device>("vic3")->video_update(bitmap, cliprect);
+	m_vic->video_update(bitmap, cliprect);
 	return 0;
 }
 
@@ -539,7 +533,7 @@ static const vic3_interface c65_vic3_pal_intf = {
 
 INTERRUPT_GEN_MEMBER(c65_state::vic3_raster_irq)
 {
-	machine().device<vic3_device>("vic3")->raster_interrupt_gen();
+	m_vic->raster_interrupt_gen();
 }
 
 /*************************************

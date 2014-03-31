@@ -12,6 +12,8 @@
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
+#include "sound/mos6581.h"
+#include "video/vic4567.h"
 
 #define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
 
@@ -61,6 +63,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_cia0(*this, "cia_0"),
 			m_cia1(*this, "cia_1"),
+			m_sid_r(*this, "sid_r"),
+			m_vic(*this, "vic3"),
 			m_iec(*this, CBM_IEC_TAG),
 			m_colorram(*this, "colorram"),
 			m_basic(*this, "basic"),
@@ -74,6 +78,8 @@ public:
 
 	required_device<mos6526_device> m_cia0;
 	required_device<mos6526_device> m_cia1;
+	required_device<mos6581_device> m_sid_r;
+	required_device<vic3_device> m_vic;
 	optional_device<cbm_iec_device> m_iec;
 
 	required_shared_ptr<UINT8> m_colorram;
