@@ -99,8 +99,9 @@ public:
 	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
 	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
 	UINT8 sound_data_shift();
-	
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_scanline_sound);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_scanline_unk);
+	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
 };
 
@@ -229,31 +230,29 @@ static INPUT_PORTS_START( littlerb )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_scanline_sound)
+TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_scanline_unk)
 {
 	int scanline = param;
-
-	if((scanline % 2) == 0)
-	{
-		UINT8 res;
-		UINT8 *sample_rom = memregion("samples")->base();
-
-		res = sample_rom[m_sound_pointer_l|(m_sound_index_l<<10)|0x40000];
-		m_dacl->write_signed8(res);
-		res = sample_rom[m_sound_pointer_r|(m_sound_index_r<<10)|0x00000];
-		m_dacr->write_signed8(res);
-		m_sound_pointer_l++;
-		m_sound_pointer_l&=0x3ff;
-		m_sound_pointer_r++;
-		m_sound_pointer_r&=0x3ff;
-	}
 
 	if (scanline == 0) m_soundframe++;
 
 //	printf("scanline %d\n", scanline);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
+{
+	UINT8 res;
+	UINT8 *sample_rom = memregion("samples")->base();
 
+	res = sample_rom[m_sound_pointer_l|(m_sound_index_l<<10)|0x40000];
+	m_dacl->write_signed8(res);
+	res = sample_rom[m_sound_pointer_r|(m_sound_index_r<<10)|0x00000];
+	m_dacr->write_signed8(res);
+	m_sound_pointer_l++;
+	m_sound_pointer_l&=0x3ff;
+	m_sound_pointer_r++;
+	m_sound_pointer_r&=0x3ff;
+}
 
 static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -262,7 +261,8 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_INDER_VIDEO_ADD("inder_vid")
 
 	// should probably be done with a timer rather than relying on screen(!)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", littlerb_state, littlerb_scanline_sound, "inder_vid:inder_screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", littlerb_state, littlerb_scanline_unk, "inder_vid:inder_screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500)) // TODO: not accurate
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
