@@ -20,8 +20,6 @@
 
 
 
-// these are needed because the MC6845 emulation does
-// not position the active display area correctly
 #define HORIZONTAL_PORCH_HACK   109
 #define VERTICAL_PORCH_HACK     27
 
@@ -82,7 +80,7 @@ WRITE8_MEMBER( abc806_state::hrc_w )
 
 READ8_MEMBER( abc806_state::charram_r )
 {
-	m_attr_data = m_color_ram[offset];
+	m_attr_data = m_attr_ram[offset];
 
 	return m_char_ram[offset];
 }
@@ -94,7 +92,7 @@ READ8_MEMBER( abc806_state::charram_r )
 
 WRITE8_MEMBER( abc806_state::charram_w )
 {
-	m_color_ram[offset] = m_attr_data;
+	m_attr_ram[offset] = m_attr_data;
 
 	m_char_ram[offset] = data;
 }
@@ -254,7 +252,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 data = state->m_char_ram[(ma + column) & 0x7ff];
-		UINT8 attr = state->m_color_ram[(ma + column) & 0x7ff];
+		UINT8 attr = state->m_attr_ram[(ma + column) & 0x7ff];
 		UINT16 rad_addr;
 		UINT8 rad_data;
 
@@ -283,7 +281,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 				e6 = BIT(attr, 1);
 
 				// read attributes from next byte
-				attr = state->m_color_ram[(ma + column + 1) & 0x7ff];
+				attr = state->m_attr_ram[(ma + column + 1) & 0x7ff];
 
 				if (attr != 0x00)
 				{
@@ -471,12 +469,9 @@ void abc806_state::video_start()
 
 	// allocate memory
 	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
-	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
+	m_attr_ram.allocate(ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving
-	save_pointer(NAME(m_char_ram.target()), ABC806_CHAR_RAM_SIZE);
-	save_pointer(NAME(m_color_ram), ABC806_ATTR_RAM_SIZE);
-	save_pointer(NAME(m_video_ram.target()), ABC806_VIDEO_RAM_SIZE);
 	save_item(NAME(m_txoff));
 	save_item(NAME(m_40));
 	save_item(NAME(m_flshclk_ctr));
@@ -499,9 +494,6 @@ void abc806_state::video_start()
 
 UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// HACK expand visible area to workaround MC6845
-	screen.set_visible_area(0, 767, 0, 311);
-
 	// clear screen
 	bitmap.fill(rgb_t::black, cliprect);
 

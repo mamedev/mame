@@ -260,7 +260,8 @@ public:
 			m_rtc(*this, E0516_TAG),
 			m_rad_prom(*this, "rad"),
 			m_hru2_prom(*this, "hru"),
-			m_char_rom(*this, MC6845_TAG)
+			m_char_rom(*this, MC6845_TAG),
+			m_attr_ram(*this, "attr_ram")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -268,6 +269,7 @@ public:
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
 	required_memory_region m_char_rom;
+	optional_shared_ptr<UINT8> m_attr_ram;
 
 	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();
@@ -303,8 +305,6 @@ public:
 	UINT8 m_map[16];            // memory page register
 
 	// video state
-	UINT8 *m_color_ram;         // attribute RAM
-
 	int m_txoff;                // text display enable
 	int m_40;                   // 40/80 column mode
 	int m_flshclk_ctr;          // flash clock counter
