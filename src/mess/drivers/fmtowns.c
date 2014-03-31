@@ -586,7 +586,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 			m_fdc->dden_w(BIT(~data, 1));
 
 			m_towns_fdc_irq6mask = data & 0x01;
-			logerror("FDC: Config drive%i %02x\n",m_towns_selected_drive-1,data);
+			//logerror("FDC: Config drive%i %02x\n",m_towns_selected_drive-1,data);
 
 			break;
 		case 0x0c:  // drive select
@@ -616,7 +616,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 						m_fdc->set_floppy(sel[3]);
 					break;
 			}
-			logerror("FDC: drive select %02x\n",data);
+			//logerror("FDC: drive select %02x\n",data);
 			break;
 		default:
 			logerror("FDC: write %02x to invalid or unimplemented register %02x\n",data,offset);
@@ -684,7 +684,7 @@ void towns_state::kb_sendcode(UINT8 scancode, int release)
 		m_pic_master->ir1_w(1);
 		if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set high\n");
 	}
-	logerror("KB: sending scancode 0x%02x\n",scancode);
+	//logerror("KB: sending scancode 0x%02x\n",scancode);
 }
 
 void towns_state::poll_keyboard()
@@ -732,7 +732,7 @@ READ8_MEMBER(towns_state::towns_keyboard_r)
 				m_towns_kb_status &= ~0x01;
 			return ret;
 		case 1:  // status
-			logerror("KB: read status port, returning %02x\n",m_towns_kb_status);
+			//logerror("KB: read status port, returning %02x\n",m_towns_kb_status);
 			return m_towns_kb_status;
 		default:
 			logerror("KB: read offset %02x\n",offset);
