@@ -805,7 +805,9 @@ WRITE8_MEMBER(at_keyboard_device::write)
 				and requires that 0x0fa is the first byte to be read */
 
 				reset();
-				break;
+				clear_buffer_and_acknowledge();
+				queue_insert(0xaa);
+			break;
 			}
 			break;
 		case 1:

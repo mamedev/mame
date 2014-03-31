@@ -88,6 +88,8 @@ TODO:
    so ui disabled */
 
 #include "includes/pcw16.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
 
 // interrupt counter
 /* controls which bank of 2mb address space is paged into memory */
@@ -919,29 +921,21 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_0){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_0){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_0){ }
-
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_1){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_1){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_1){ }
-
 static const ins8250_interface pcw16_com_interface[2]=
 {
 	{
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_1),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_2),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}
@@ -1026,6 +1020,9 @@ static INPUT_PORTS_START(pcw16)
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(pcw16_com)
+	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* basic machine hardware */
@@ -1036,8 +1033,20 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 
 	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_RS232_PORT_ADD( "serport1", pcw16_com, "msystems_mouse" )
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
 	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_RS232_PORT_ADD( "serport2", pcw16_com, NULL )
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
