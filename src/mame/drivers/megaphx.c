@@ -57,12 +57,12 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
+
+
 #include "video/ramdac.h"
 #include "machine/i8255.h"
-#include "machine/z80ctc.h"
-#include "cpu/z80/z80daisy.h"
-#include "sound/dac.h"
+#include "machine/inder_sb.h"
+
 
 
 class megaphx_state : public driver_device
@@ -71,69 +71,33 @@ public:
 	megaphx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_ctc(*this, "ctc"),
-		m_dac0(*this, "dac0" ),
-		m_dac1(*this, "dac1" ),
-		m_dac2(*this, "dac2" ),
-		m_dac3(*this, "dac3" ),
 		port_c_value(0),
 		m_palette(*this, "palette"),
-		m_tms(*this, "tms")
+		m_tms(*this, "tms"),
+		m_indersb(*this, "inder_sb")
+
 	{ 
 		m_shiftfull = 0;
-		m_soundirq = 0;
+
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT16> m_mainram;
 	required_shared_ptr<UINT16> m_vram;
-	required_device<z80ctc_device> m_ctc;
 
-	required_device<dac_device> m_dac0;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_device<dac_device> m_dac3;
+
 
 
 
 	DECLARE_DRIVER_INIT(megaphx);
 	DECLARE_MACHINE_RESET(megaphx);
 
-	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
-	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
-	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
-	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
 
 
-	DECLARE_WRITE8_MEMBER(dac0_value_write);
-	DECLARE_WRITE8_MEMBER(dac0_gain_write);
-	DECLARE_WRITE8_MEMBER(dac1_value_write);
-	DECLARE_WRITE8_MEMBER(dac1_gain_write);
-	DECLARE_WRITE8_MEMBER(dac2_value_write);
-	DECLARE_WRITE8_MEMBER(dac2_gain_write);
-	DECLARE_WRITE8_MEMBER(dac3_value_write);
-	DECLARE_WRITE8_MEMBER(dac3_gain_write);
-
-	DECLARE_WRITE8_MEMBER(dac0_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac1_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
-
-	UINT8 dac_gain[4];
-	UINT8 m_soundbank[4];
 
 
-	
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
-	
 
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
@@ -150,33 +114,12 @@ public:
 	UINT8 port_c_value;
 	required_device<palette_device> m_palette;
 	required_device<tms34010_device> m_tms;
-	int m_soundsent;
-	UINT8 m_sounddata;
-	UINT8 m_soundback;
+	required_device<inder_sb_device> m_indersb;
+
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
 
-	// hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
-	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r)  { logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; };
-	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r)  { logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; };
-	DECLARE_READ8_MEMBER(megaphx_0309_hack_r)  { logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; };
-	DECLARE_READ8_MEMBER(megaphx_0323_hack_r)  { logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; };
 
-	void install_sound_hacks(void)
-	{
-		address_space &space = m_audiocpu->space(AS_PROGRAM);
-		space.install_read_handler(0x02cc, 0x02cc, read8_delegate(FUNC(megaphx_state::megaphx_02cc_hack_r), this));
-		space.install_read_handler(0x02e6, 0x02e6, read8_delegate(FUNC(megaphx_state::megaphx_02e6_hack_r), this));
-		space.install_read_handler(0x0309, 0x0309, read8_delegate(FUNC(megaphx_state::megaphx_0309_hack_r), this));
-		space.install_read_handler(0x0323, 0x0323, read8_delegate(FUNC(megaphx_state::megaphx_0323_hack_r), this));
-	}
-
-	int m_soundirq;
-	void update_sound_irqs(void)
-	{
-		if (m_soundirq) m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
 
 
 };
@@ -184,27 +127,6 @@ public:
 
 
 
-
-READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
-{
-	space.machine().scheduler().synchronize();
-//	int pc = machine().device("maincpu")->safe_pc();
-	int ret = m_soundback;
-	m_soundback = 0;
-	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
-	return ret; 
-}
-
-WRITE16_MEMBER(megaphx_state::megaphx_0x050000_w)
-{
-//	int pc = machine().device("maincpu")->safe_pc();
-	space.machine().scheduler().synchronize();
-
-	//logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
-	m_soundsent = 0xff;
-	m_sounddata = data;
-
-}
 
 
 static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
@@ -214,14 +136,12 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 
-	AM_RANGE(0x050000, 0x050001) AM_WRITE(megaphx_0x050000_w) // z80 comms?
-	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_0x050002_r) // z80 comms?
+	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE("inder_sb", inder_sb_device, megaphx_0x050000_w)
+	AM_RANGE(0x050002, 0x050003) AM_DEVREAD("inder_sb", inder_sb_device, megaphx_0x050002_r)
 
 
 	AM_RANGE(0x060004, 0x060005) AM_READ8( port_c_r, 0x00ff )
-	
 	AM_RANGE(0x060006, 0x060007) AM_WRITE8( port_c_w, 0x00ff )
-
 	AM_RANGE(0x060000, 0x060003) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
 	
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000) // code + bg gfx are in here
@@ -245,137 +165,6 @@ static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, megaphx_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
-ADDRESS_MAP_END
-
-READ8_MEMBER(megaphx_state::megaphx_sound_cmd_r)
-{
-	space.machine().scheduler().synchronize();
-	return m_sounddata;
-}
-
-READ8_MEMBER(megaphx_state::megaphx_sound_sent_r)
-{
-	space.machine().scheduler().synchronize();
-	int ret = m_soundsent;
-	m_soundsent = 0;
-	return ret;
-}
-
-WRITE8_MEMBER(megaphx_state::megaphx_sound_to_68k_w)
-{
-//	int pc = machine().device("audiocpu")->safe_pc();
-	space.machine().scheduler().synchronize();
-	//logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
-
-	m_soundback = data;
-}
-
-WRITE8_MEMBER(megaphx_state::dac0_value_write)
-{
-//	printf("dac0_data_write %02x\n", data);
-	m_dac0->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac0_gain_write)
-{
-//	printf("dac0_gain_write %02x\n", data);
-	dac_gain[0] = data;
-}
-
-WRITE8_MEMBER(megaphx_state::dac1_value_write)
-{
-//	printf("dac1_data_write %02x\n", data);
-	m_dac1->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac1_gain_write)
-{
-//	printf("dac1_gain_write %02x\n", data);
-	dac_gain[1] = data;
-}
-
-WRITE8_MEMBER(megaphx_state::dac2_value_write)
-{
-//	printf("dac2_data_write %02x\n", data);
-	m_dac2->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac2_gain_write)
-{
-//	printf("dac2_gain_write %02x\n", data);
-	dac_gain[2] = data;
-}
-
-WRITE8_MEMBER(megaphx_state::dac3_value_write)
-{
-//	printf("dac3_data_write %02x\n", data);
-	m_dac3->write_unsigned8(data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac3_gain_write)
-{
-//	printf("dac3_gain_write %02x\n", data);
-	dac_gain[3] = data;
-}
-
-WRITE8_MEMBER(megaphx_state::dac0_rombank_write)
-{
-	m_soundbank[0] = data;
-
-//	printf("dac0_rombank_write %02x", data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac1_rombank_write)
-{
-	m_soundbank[1] = data;
-//	printf("dac1_rombank_write %02x", data);
-
-}
-
-WRITE8_MEMBER(megaphx_state::dac2_rombank_write)
-{
-	m_soundbank[2] = data;
-//	printf("dac2_rombank_write %02x", data);
-}
-
-WRITE8_MEMBER(megaphx_state::dac3_rombank_write)
-{
-	m_soundbank[3] = data;
-//	printf("dac3_rombank_write %02x", data);
-
-}
-
-
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, megaphx_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(dac0_value_write)
-	AM_RANGE(0x01, 0x01) AM_WRITE(dac0_gain_write)
-	AM_RANGE(0x02, 0x02) AM_WRITE(dac1_value_write)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dac1_gain_write)
-	AM_RANGE(0x04, 0x04) AM_WRITE(dac2_value_write)
-	AM_RANGE(0x05, 0x05) AM_WRITE(dac2_gain_write)
-	AM_RANGE(0x06, 0x06) AM_WRITE(dac3_value_write)
-	AM_RANGE(0x07, 0x07) AM_WRITE(dac3_gain_write)
-
-	// not 100% sure how rom banking works.. but each channel can specify a different bank for the 0x8000 range.  Maybe the bank happens when the interrupt triggers so each channel reads the correct data? (so we'd need to put the actual functions in the CTC callbacks)
-	AM_RANGE(0x10, 0x10) AM_WRITE(dac0_rombank_write)
-	AM_RANGE(0x11, 0x11) AM_WRITE(dac1_rombank_write)
-	AM_RANGE(0x12, 0x12) AM_WRITE(dac2_rombank_write)
-	AM_RANGE(0x13, 0x13) AM_WRITE(dac3_rombank_write)
-
-
-	
-
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	
-	AM_RANGE(0x30, 0x30) AM_READWRITE(megaphx_sound_cmd_r, megaphx_sound_to_68k_w)
-	AM_RANGE(0x31, 0x31) AM_READ(megaphx_sound_sent_r)
 ADDRESS_MAP_END
 
 
@@ -687,105 +476,21 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 
 
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch0)
-{
-//	int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank);
-//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x1;
-	else m_soundirq &= ~0x1;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch1)
-{
-//	int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank);
-//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x2;
-	else m_soundirq &= ~0x2;
-
-	update_sound_irqs();
-}
-
-
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch2)
-{
-//	int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank);
-//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x4;
-	else m_soundirq &= ~0x4;
-
-	update_sound_irqs();
-}
-
-
-
-
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch3)
-{
-//	int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank);
-//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-	if (state) m_soundirq |= 0x8;
-	else m_soundirq &= ~0x8;
-
-	update_sound_irqs();
-}
-
-	
-
-
-static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-{
-	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch0),    // for channel 0
-	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch1),    // for channel 1
-	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch2),    // for channel 2
-	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch3),    // for channel 3
-};
-
-static const z80_daisy_config daisy_chain[] =
-{
-	{ "ctc" },
-	{ NULL }
-};
-
-
-// just for debug.. so we can see what is in each of the roms
-static GFXLAYOUT_RAW( megaphxlay, 336, 1, 336*8, 336*8 )
-
-static GFXDECODE_START( megaphx )
-	GFXDECODE_ENTRY( "roms01", 0, megaphxlay,     0x0000, 1 )
-	GFXDECODE_ENTRY( "roms23", 0, megaphxlay,     0x0000, 1 )
-	GFXDECODE_ENTRY( "roms45", 0, megaphxlay,     0x0000, 1 )
-	GFXDECODE_ENTRY( "roms67", 0, megaphxlay,     0x0000, 1 )
-GFXDECODE_END
-
 
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", megaphx_state,  irq6_line_hold)
-
 
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_CONFIG(tms_config_megaphx)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // unk freq
-	MCFG_CPU_CONFIG(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
+	MCFG_INDER_AUDIO_ADD("inder_sb")
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_Z80CTC_ADD( "ctc", 4000000, z80ctc_intf ) // unk freq
 
 	MCFG_MACHINE_RESET_OVERRIDE(megaphx_state,megaphx)
-
-//	MCFG_QUANTUM_PERFECT_CPU("tms")
-
-
-//	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
@@ -793,21 +498,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_PALETTE_ADD("palette", 256)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaphx)
-
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")	
-	MCFG_DAC_ADD("dac0")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DAC_ADD("dac3")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)
@@ -816,10 +507,7 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 	// copy vector table? - it must be writable because the game write the irq vector..
 	memcpy(m_mainram, src, 0x80);
 
-	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
-	membank("snddata")->set_entry(0);
 
-	install_sound_hacks();
 }
 
 
@@ -840,11 +528,11 @@ ROM_START( megaphx )
 	ROM_LOAD16_BYTE( "mph4.u36", 0x000001, 0x20000, CRC(c8e0725e) SHA1(b3af315b9a94a692e81e0dbfd4035036c2af4f50) )
 	ROM_LOAD16_BYTE( "mph5.u25", 0x000000, 0x20000, CRC(c95ccb69) SHA1(9d14cbfafd943f6ff461a7f373170a35e36eb695) )
 
-	ROM_REGION( 0x200000, "user2", 0 )
+	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
 	ROM_LOAD( "sonido_mph1.u39", 0x00000, 0x20000, CRC(f5e65557) SHA1(5ae759c2bcef96fbda42f088c02b6dec208030f3) )
 	ROM_LOAD( "sonido_mph2.u38", 0x20000, 0x20000, CRC(7444d0f9) SHA1(9739b48993bccea5530533b67808d13d6155ffe3) )
 
-	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
 	ROM_LOAD( "sonido_mph0.u35", 0x000000, 0x2000,  CRC(abc1b140) SHA1(8384a162d85cf9ea870d22f44b1ca64001c6a083) )
 
 	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
