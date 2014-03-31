@@ -397,6 +397,10 @@ class mos8564_device :  public mos6567_device
 public:
 	// construction/destruction
 	mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 8); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 8); }
 };
 
 
@@ -431,6 +435,10 @@ class mos8566_device :  public mos6569_device
 public:
 	// construction/destruction
 	mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks / 8); }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 8); }
 };
 
 
