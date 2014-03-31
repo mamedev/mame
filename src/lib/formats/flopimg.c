@@ -114,7 +114,7 @@ static floperr_t floppy_open_internal(void *fp, const struct io_procs *procs, co
 	}
 
 	/* vote on the best format */
-	for (i = 0; (i < max_options) && floppy_options[i].construct; i++)
+	for (i = 0; (i < (size_t)max_options) && floppy_options[i].construct; i++)
 	{
 		if (!extension || !floppy_options[i].extensions || image_find_extension(floppy_options[i].extensions, extension))
 		{

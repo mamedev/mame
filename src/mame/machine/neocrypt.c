@@ -685,7 +685,7 @@ void neogeo_state::svcpcb_gfx_decrypt()
 /* and a further swap on the s1 data */
 void neogeo_state::svcpcb_s1data_decrypt()
 {
-	int i;
+	size_t i;
 	UINT8 *s1 = memregion( "fixed" )->base();
 	size_t s1_size = memregion( "fixed" )->bytes();
 

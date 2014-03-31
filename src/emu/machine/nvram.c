@@ -105,7 +105,7 @@ void nvram_device::nvram_default()
 		case DEFAULT_RANDOM:
 		{
 			UINT8 *nvram = reinterpret_cast<UINT8 *>(m_base);
-			for (int index = 0; index < m_length; index++)
+			for (size_t index = 0; index < m_length; index++)
 				nvram[index] = machine().rand();
 			break;
 		}

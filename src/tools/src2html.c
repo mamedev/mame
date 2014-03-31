@@ -598,7 +598,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 			{
 				const token_entry *curtoken;
 				char *temp = srcptr;
-				int toklength;
+				size_t toklength;
 
 				// find the end of the token
 				while (*temp != 0 && is_token[(UINT8)*temp])

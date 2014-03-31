@@ -1465,7 +1465,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 {
 	UINT8 *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	int address = m_ddenlovr_blit_address;
+	size_t address = m_ddenlovr_blit_address;
 
 	if (address >= size)
 	{
@@ -2655,7 +2655,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 {
 	UINT8 *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
+	size_t address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{
@@ -2879,7 +2879,7 @@ void ddenlovr_state::mjchuuka_get_romdata()
 {
 	UINT8 *rom = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
+	size_t address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{

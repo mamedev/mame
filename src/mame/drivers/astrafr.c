@@ -2097,7 +2097,7 @@ void astra_addresslines( UINT16* src, size_t srcsize, int small )
 	if (small) blocksize= 0x100000/2;
 	else blocksize= 0x100000;
 
-	for (int block = 0; block < srcsize; block += blocksize)
+	for (size_t block = 0; block < srcsize; block += blocksize)
 	{
 		for (int x = 0; x<blocksize/2;x+=2)
 		{

@@ -894,7 +894,7 @@ static imgtoolerr_t fat_readwrite_file(imgtool_partition *partition, fat_file *f
 			return fat_corrupt_file_error(file);
 
 		offset = file->index % FAT_SECLEN;
-		len = MIN(buffer_len, FAT_SECLEN - offset);
+		len = MIN(buffer_len, (size_t(FAT_SECLEN - offset)));
 
 		/* read or write the data from the disk */
 		if (read_or_write)
@@ -1196,7 +1196,7 @@ static UINT8 fat_calc_filename_checksum(const UINT8 *short_filename)
 static void fat_calc_dirent_lfnchecksum(UINT8 *entry, size_t entry_len)
 {
 	UINT8 checksum;
-	int i;
+	size_t i;
 
 	checksum = fat_calc_filename_checksum(entry + entry_len - FAT_DIRENT_SIZE);
 

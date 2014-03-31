@@ -600,7 +600,8 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int pos, line, column, c, addr, curr_addr;
+	size_t pos;
+	int line, column, c, addr, curr_addr;
 	UINT32 *bitmapline;
 	UINT16 mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
@@ -658,7 +659,8 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xi;
 	int yi;
 	int xm;
-	int pos, line, column, c, addr, curr_addr;
+	size_t pos;
+	int	line, column, c, addr, curr_addr;
 
 	UINT32 *bitmapline;
 //  UINT16 mask_comp;
@@ -702,7 +704,8 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xi;
 	int yi;
 	int xm;
-	int pos, line, column, c, addr, curr_addr;
+	size_t pos;
+	int	line, column, c, addr, curr_addr;
 
 	UINT32 *bitmapline;
 //  UINT16 mask_comp;
@@ -746,7 +749,8 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xi;
 	int yi;
 	int xm;
-	int pos, line, column, c, addr, curr_addr;
+	size_t pos;
+	int	line, column, c, addr, curr_addr;
 	UINT32 *bitmapline;
 
 //  UINT16 mask_comp;
@@ -787,7 +791,8 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xi;
 	int yi;
 	int xm;
-	int pos, line, column, c, addr, curr_addr;
+	size_t pos;
+	int line, column, c, addr, curr_addr;
 	UINT32 *bitmapline;
 
 //  UINT16 mask_comp;

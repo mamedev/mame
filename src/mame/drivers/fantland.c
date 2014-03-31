@@ -360,7 +360,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 {
 	UINT8 *rom;
 	size_t len;
-	int start, stop;
+	size_t start, stop;
 
 	if (!m_adpcm_playing[voice])
 		return;

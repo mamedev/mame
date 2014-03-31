@@ -1508,7 +1508,7 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 
 void gaiden_state::descramble_drgnbowl_gfx()
 {
-	int i;
+	size_t i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 	

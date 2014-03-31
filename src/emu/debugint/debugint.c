@@ -445,7 +445,7 @@ static void dview_set_title(DView *dv, astring title)
 
 static void dview_draw_title(DView *dv)
 {
-	int i;
+	size_t i;
 	rgb_t col = rgb_t(0xff,0x00,0x00,0xff);
 	rectangle r;
 

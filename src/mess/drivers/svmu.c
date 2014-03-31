@@ -271,7 +271,7 @@ QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 		vmufat_write_word(flash, 253, 0x02, 0x0000);        // location of first file block
 
 		const char *vms_filename = image.basename_noext();
-		for (int i=0; i<12; i++)
+		for (size_t i=0; i<12; i++)
 		{
 			if (i < strlen(vms_filename))
 				vmufat_write_byte(flash, 253, i + 4, vms_filename[i]);  // 12 bytes filename

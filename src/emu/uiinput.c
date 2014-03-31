@@ -153,7 +153,7 @@ bool ui_input_push_event(running_machine &machine, ui_event evt)
 	}
 
 	/* is the queue filled up? */
-	if ((uidata->events_end + 1) % ARRAY_LENGTH(uidata->events) == uidata->events_start)
+	if ((uidata->events_end + 1) % ARRAY_LENGTH(uidata->events) == (size_t)uidata->events_start)
 		return false;
 
 	uidata->events[uidata->events_end++] = evt;

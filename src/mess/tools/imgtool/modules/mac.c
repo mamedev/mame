@@ -337,7 +337,7 @@ enum
 */
 static void mac_to_c_strncpy(char *dst, int n, UINT8 *src)
 {
-	size_t len = src[0];
+	int len = src[0];
 	int i, j;
 
 	i = j = 0;
@@ -554,12 +554,11 @@ static int mac_stricmp(const UINT8 *s1, const UINT8 *s2)
 	};
 
 	size_t common_len;
-	int i;
 	int c1, c2;
 
 	common_len = (s1[0] <= s2[0]) ? s1[0] : s2[0];
 
-	for (i=0; i<common_len; i++)
+	for (size_t i=0; i<common_len; i++)
 	{
 		c1 = mac_char_sort_table[s1[i+1]];
 		c2 = mac_char_sort_table[s2[i+1]];
@@ -1922,7 +1921,7 @@ static imgtoolerr_t mfs_dir_insert(struct mac_l2_imgref *l2_img, mfs_dirref *dir
 			dirref->index++;
 		}
 
-		if (new_dir_entry_len <= (/*512*/510 - dirref->cur_offset))
+		if (new_dir_entry_len <= (size_t)(/*512*/510 - dirref->cur_offset))
 		{
 			/*memcpy(cur_dir_entry, new_dir_entry, new_dir_entry_len);*/
 			cur_dir_entry->flags = 0x80;
@@ -3177,7 +3176,7 @@ static imgtoolerr_t hfs_get_cat_record_data(struct mac_l2_imgref *l2_img, void *
 
 	lrec_key = (hfs_catKey*)rec_raw;
 	/* check that key is long enough to hold it all */
-	if ((lrec_key->keyLen+1) < (offsetof(hfs_catKey, cName) + lrec_key->cName[0] + 1))
+	if ((size_t)(lrec_key->keyLen+1) < (offsetof(hfs_catKey, cName) + lrec_key->cName[0] + 1))
 		return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* get pointer to record data */

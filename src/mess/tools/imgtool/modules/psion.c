@@ -197,13 +197,13 @@ UINT8 get_free_file_id(psion_pack *pack)
 void put_name_record(imgtool_stream *stream, const char* filename, UINT8 record_type, UINT8 record_id)
 {
 	char data[0x10];
-	int i = 0;
+	size_t i = 0;
 
 	data[i++] = 0x09;
 	data[i++] = record_type;
 
 	// filename is 8 char long space filled
-	for (int j=0; j<8; j++)
+	for (size_t j=0; j<8; j++)
 		if (j < strlen(filename))
 			data[i++] = filename[j];
 		else
@@ -314,7 +314,7 @@ UINT16 put_opl(imgtool_stream *instream, imgtool_stream *outstream)
 	while ((line = stream_getline(instream, 256)))
 	{
 		// replace tab with space
-		for (int i=0; i<strlen(line); i++)
+		for (size_t i=0; i<strlen(line); i++)
 			if (line[i] == '\t') line[i] = ' ';
 
 		stream_write(outstream, line, strlen(line));

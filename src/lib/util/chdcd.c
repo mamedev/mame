@@ -995,7 +995,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo)
 {
 	FILE *infile;
-	int i, trknum;
+	size_t i, trknum;
 	static char token[512];
 	char tocftemp[512];
 

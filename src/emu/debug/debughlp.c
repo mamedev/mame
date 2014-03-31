@@ -1472,8 +1472,9 @@ const char *debug_get_help(const char *tag)
 {
 	static char ambig_message[1024];
 	const help_item *found = NULL;
-	int i, msglen, foundcount = 0;
-	int taglen = (int)strlen(tag);
+	size_t i;
+	int msglen, foundcount = 0;
+	size_t taglen = strlen(tag);
 	char tagcopy[256];
 
 	/* make a lowercase copy of the tag */

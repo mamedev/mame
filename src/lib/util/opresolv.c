@@ -249,7 +249,7 @@ outofmemory:
 
 optreserr_t option_resolution_add_param(option_resolution *resolution, const char *param, const char *value)
 {
-	int i;
+	size_t i;
 	int must_resolve;
 	optreserr_t err;
 	const char *option_specification;
@@ -344,7 +344,7 @@ void option_resolution_close(option_resolution *resolution)
 
 optreserr_t option_resolution_finish(option_resolution *resolution)
 {
-	int i;
+	size_t i;
 	optreserr_t err;
 	struct option_resolution_entry *entry;
 	const char *option_specification;
@@ -445,7 +445,7 @@ const option_guide *option_resolution_find_option(option_resolution *resolution,
 
 const option_guide *option_resolution_index_option(option_resolution *resolution, int indx)
 {
-	if ((indx < 0) || (indx >= resolution->option_count))
+	if ((indx < 0) || ((size_t)indx >= resolution->option_count))
 		return NULL;
 	return resolution->entries[indx].guide_entry;
 }

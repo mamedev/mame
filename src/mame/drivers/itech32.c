@@ -852,7 +852,7 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == m_main_ram) ? 0x80 : 0x00;
-	for (int i = start; i < length; i++)
+	for (size_t i = start; i < length; i++)
 		((UINT8 *)base)[i] = machine().rand();
 
 	// due to accessing uninitialized RAM, we need this hack

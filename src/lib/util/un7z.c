@@ -220,7 +220,7 @@ int _7z_search_crc_match(_7z_file *new_7z, UINT32 search_crc, const char* search
 		/* Check for a name match */
 		SzArEx_GetFileNameUtf16(&new_7z->db, i, temp);
 
-		if (len == search_filename_length+1)
+		if (len == (size_t)search_filename_length+1)
 		{
 			int j;
 			for (j=0;j<search_filename_length;j++)

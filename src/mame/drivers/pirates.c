@@ -331,7 +331,7 @@ void pirates_state::pirates_decrypt_68k()
 
 	memcpy (buf, rom, rom_size);
 
-	for (int i=0; i<rom_size/2; i++)
+	for (size_t i=0; i<rom_size/2; i++)
 	{
 		int adrl, adrr;
 		UINT8 vl, vr;

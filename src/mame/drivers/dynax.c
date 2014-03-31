@@ -5898,7 +5898,7 @@ ROM_END
 // Decrypted by yong
 DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 {
-	int i;
+	size_t i;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	dynamic_buffer rom1(size);
@@ -5910,7 +5910,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 
 DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 {
-	int i, j;
+	size_t i, j;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
 	dynamic_buffer rom1(size);

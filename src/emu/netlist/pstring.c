@@ -207,7 +207,7 @@ void *pblockpool::alloc(const std::size_t n)
 	else
 	{
 		int memsize = ((n + m_align - 1) / m_align) * m_align;
-		int min_alloc = MAX(m_blocksize, memsize+sizeof(memblock)-MINDATASIZE);
+		int min_alloc = MAX((size_t)m_blocksize, (memsize+sizeof(memblock)-MINDATASIZE));
 		char *ret = NULL;
 		//std::printf("m_first %p\n", m_first);
 		for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
