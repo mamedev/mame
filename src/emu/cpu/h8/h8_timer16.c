@@ -289,7 +289,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 					event_delay = new_delay;
 			}
 		if(event_delay != 0xffffffff)
-			event_time = ((((cur_time + (1 << clock_divider) - phase) >> clock_divider) + event_delay - 1) << clock_divider) + phase;
+			event_time = ((((cur_time + (1ULL << clock_divider) - phase) >> clock_divider) + event_delay - 1) << clock_divider) + phase;
 		else
 			event_time = 0;
 		

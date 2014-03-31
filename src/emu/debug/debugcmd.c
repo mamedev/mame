@@ -2149,7 +2149,7 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 	cheat.undo++;
 
 	/* execute the search */
-	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+	for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
 			UINT64 cheat_value = cheat_read_extended(&cheat, *space, cheat.cheatmap[cheatindex].offset);
@@ -2294,7 +2294,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	}
 
 	/* write the cheat list */
-	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+	for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
@@ -2330,7 +2330,7 @@ static void execute_cheatundo(running_machine &machine, int ref, int params, con
 
 	if (cheat.undo > 0)
 	{
-		for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+		for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 		{
 			if (cheat.cheatmap[cheatindex].undo == cheat.undo)
 			{

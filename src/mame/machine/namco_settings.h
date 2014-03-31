@@ -22,7 +22,7 @@ protected:
 	virtual void device_reset();
 
 private:
-	bool ce, clk, data;
+	int ce, clk, data;
 	int cur_bit;
 	UINT8 adr, value;
 };

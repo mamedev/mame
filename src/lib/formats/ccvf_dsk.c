@@ -115,7 +115,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		start = end + 1;
 	} while (start > 0 && end != -1);
 
-	int pos = 0;
+	UINT64 pos = 0;
 	int total_size = 200000000/f.cell_size;
 	
 	for(int track=0; track < f.track_count; track++) {

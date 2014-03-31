@@ -2147,6 +2147,16 @@ layout_view::item::~item()
 
 
 //-------------------------------------------------
+//  screen_container - retrieve screen container
+//-------------------------------------------------
+
+
+render_container *layout_view::item::screen_container(running_machine &machine) const 
+{ 
+	return (m_screen != NULL) ? &m_screen->container() : NULL; 
+}
+
+//-------------------------------------------------
 //  state - fetch state based on configured source
 //-------------------------------------------------
 

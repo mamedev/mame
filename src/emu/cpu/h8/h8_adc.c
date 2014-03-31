@@ -76,7 +76,7 @@ WRITE8_MEMBER(h8_adc_device::adcr_w)
 
 WRITE_LINE_MEMBER(h8_adc_device::adtrg_w)
 {
-	if(state != adtrg) {
+	if((bool)state != adtrg) {
 		adtrg = state;
 		if(!adtrg && (trigger & T_EXT) && !(adcsr & F_ADST)) {
 			adcsr |= F_ADST;

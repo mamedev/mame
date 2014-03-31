@@ -224,7 +224,7 @@ float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
 	int adr = (slot >> 3);
 	if(render[adr] & (1 << bit))
 		return 1-(1-(255-l)/255.0)*contrast;
-	return 0.95;
+	return 0.95f;
 }
 
 UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -249,7 +249,7 @@ UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int x = 830 + 40*(i & 1);
 			int y = 55 + 65*(i >> 1);
 			for(int yy=-9; yy <= 9; yy++) {
-				int dx = int(sqrt(99-yy*yy));
+				int dx = int(sqrt((float)(99-yy*yy)));
 				UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
 				for(int xx=0; xx<2*dx+1; xx++)
 					*pix++ = 0x00ff00;
