@@ -499,7 +499,7 @@ Notes:
 Game                                   on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
 ------------------------------------------------------------------------------------------------------------------------------
 /Akatsuki Denkou Senki Blitz Kampf
-\Ausf. Achse                           841-0058C  23605C       4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
+\Ausf. Achse                           841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
 Dynamite Deka EX / Asian Dynamite      840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
 Illmatic Envelope                      841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
 Mamoru-kun wa Norowarete Shimatta      841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"

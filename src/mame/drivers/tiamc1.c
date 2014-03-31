@@ -7,13 +7,14 @@
 
   Games supported:
       * Billiard
-      * Konek-Gorbunok
-      * Snezhnaja Koroleva
+      * Konek-Gorbunok (Little Humpbacked Horse)
+      * Snezhnaja Koroleva (Snow Queen)
       * S.O.S.
 
   Other games known to exist on this hardware (interchangeable by the ROM swap):
       * Avtogonki
       * Istrebitel'
+      * Gorodki
       * Kot-Rybolov
       * Kotigoroshko
       * Ostrov Drakona
@@ -109,7 +110,7 @@
    TODO:
      - Use machine/pit8253.c in sound
      - Check sprites priorities on the real hardware
-     - Check background scrolling on the real hardware
+     - Check vertical background scrolling on the real hardware
      - What charset control is used for?
 
 */
@@ -144,8 +145,8 @@ static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0x60, 0x6f) AM_WRITE(tiamc1_sprite_n_w) /* sprites # */
 	AM_RANGE(0x70, 0x7f) AM_WRITE(tiamc1_sprite_a_w) /* sprites attributes */
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(tiamc1_palette_w)  /* color ram */
-	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
-	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
+	AM_RANGE(0xbc, 0xbc) AM_WRITE(tiamc1_bg_vshift_w)/* background V scroll */
+	AM_RANGE(0xbd, 0xbd) AM_WRITE(tiamc1_bg_hshift_w)/* background H scroll */
 	AM_RANGE(0xbe, 0xbe) AM_WRITE(tiamc1_bankswitch_w) /* VRAM selector */
 	AM_RANGE(0xbf, 0xbf) AM_WRITENOP                 /* charset control */
 	AM_RANGE(0xc0, 0xc3) AM_DEVWRITE("2x8253", tiamc1_sound_device, tiamc1_timer0_w)   /* timer 0 */
@@ -302,7 +303,7 @@ ROM_START( koroleva )
 	ROM_LOAD( "10.7g", 0x0c000, 0x2000, CRC(397F41F8) SHA1(2D07462AFAD39DDA067114CE8D47E64D6A854283) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "00.2a", 0x00000, 0x2000, CRC(125C72F0) SHA1(A4991F20E6992C272BC7322922E7BEBE7170F7E7) )
+	ROM_LOAD( "00.2a", 0x00000, 0x2000, CRC(6F39F8BE) SHA1(2B20CDAB7064851C552D92D5BC9084DF854EAFD1) )
 	ROM_LOAD( "01.3a", 0x02000, 0x2000, CRC(7BDFDD19) SHA1(8B971689050F9D608225226EB5CADBB4050C7D1F) )
 	ROM_LOAD( "02.5a", 0x04000, 0x2000, CRC(97770B0F) SHA1(CF4605E31F8C57A76BFDA6A7EA329058DA8B8C9C) )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(9B0A686A) SHA1(F02910DB9F862EC017BB3834C58E96E780FB6322) )
@@ -326,7 +327,7 @@ ROM_START( bilyard )
 	ROM_LOAD( "03.6a", 0x06000, 0x2000, CRC(8bfc0b15) SHA1(221efdce516274d3b1d9009d11dc9ed6cd67ef12) )
 ROM_END
 
-GAME( 1988, konek, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, sosterm, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, bilyard, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Billiard", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, konek, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_SUPPORTS_SAVE )
+GAME( 1988, sosterm, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "S.O.S.", GAME_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_SUPPORTS_SAVE )
+GAME( 1988, bilyard, 0, tiamc1, tiamc1, driver_device, 0, ROT0, "Terminal", "Billiard", GAME_SUPPORTS_SAVE )
