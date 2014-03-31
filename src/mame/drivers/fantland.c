@@ -374,7 +374,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	if (start >= len)
 	{
 		borntofi_adpcm_stop(device, voice);
-		logerror("adpcm address out of range: %06x\n", start);
+		logerror("adpcm address out of range: %" I64FMT "x\n", start);
 		return;
 	}
 
