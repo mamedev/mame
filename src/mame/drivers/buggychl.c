@@ -346,12 +346,6 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_DRIVER_MEMBER(buggychl_state,port_b_1_w)
 };
 
-static const msm5232_interface msm5232_config =
-{
-	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 }, /* default 0.39 uF capacitors (not verified) */
-	DEVCB_NULL
-};
-
 
 void buggychl_state::machine_start()
 {
@@ -427,7 +421,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
-	MCFG_SOUND_CONFIG(msm5232_config)
+	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
