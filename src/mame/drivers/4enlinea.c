@@ -44,14 +44,14 @@
 
   Offsets are for sure the CGA mode. MGA mode has different ones.
 
-  3D4h:  W  CRTC index register.
+  3D4h: -W  CRTC index register.
   3D5h: RW  CRTC data register.
-  3D8h:  W  Mode control register.
-  3D9h:  W  Color select register.
-  3DAh: R   Status register.
-  3BFh:  W  Config register.
+  3D8h: -W  Mode control register.
+  3D9h: -W  Color select register.
+  3DAh: R-  Status register.
+  3BFh: -W  Config register.
 
-  Mode CTRL (3D8h) 6Ah:
+  Mode CTRL (3D8h): 0x6A / 0x62
   ----- bits -----
   7 6 5 4  3 2 1 0   For CGA Mode.
   - x x -  x - x -
@@ -120,18 +120,35 @@
                             '-------------'
 
                  74HC244 (IC9)                                 74HC244 (IC10)
-                  .-------.                                     .-------.
+                  .---v---.                                     .---v---.
    GAL (PIN 17) --|01   20|-- VCC                GAL (PIN 16) --|01   20|-- VCC
   8952 (PIN 04) --|02   19|-- GAL (PIN 17)      8952 (PIN 08) --|02   19|-- GAL (PIN 16)
-       Z80 (D7) --|03   18|-- Z80 (D0)               Z80 (D7) --|03   18|-- Z80 (D0)
+  MAIN Z80 (D7) --|03   18|-- MAIN Z80 (D0)     MAIN Z80 (D7) --|03   18|-- MAIN Z80 (D0)
   8952 (PIN 03) --|04   17|-- 8952 (PIN 40)     8952 (PIN 07) --|04   17|-- 8952 (PIN 36)
-       Z80 (D6) --|05   16|-- Z80 (D1)               Z80 (D6) --|05   16|-- Z80 (D1)
+  MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1)     MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1) 
   8952 (PIN 02) --|06   15|-- 8952 (PIN 39)     8952 (PIN 06) --|06   15|-- 8952 (PIN 35)
-       Z80 (D5) --|07   14|-- Z80 (D2)               Z80 (D5) --|07   14|-- Z80 (D2)
+  MAIN Z80 (D5) --|07   14|-- MAIN Z80 (D2)     MAIN Z80 (D5) --|07   14|-- MAIN Z80 (D2)
   8952 (PIN 01) --|08   13|-- 8952 (PIN 38)     8952 (PIN 05) --|08   13|-- 8952 (PIN 34)
-       Z80 (D4) --|09   12|-- Z80 (D3)               Z80 (D4) --|09   12|-- Z80 (D3)
+  MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3)     MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3) 
             GND --|10   11|-- 8952 (PIN 37)               GND --|10   11|-- 8952 (PIN 33)
                   '-------'                                     '-------'
+
+
+  ES2 CM3080 pinouts and peripheral circuitry:
+
+                    CM3080
+                   .---v---.
+             VCC --|01   18|-- VCC          .--------.
+             N/C --|02   17|----------------+ 16 MHz |
+             N/C --|03   16|----------------+  Xtal  |
+             N/C --|04   15|-- CLK OUT --.  '--------'
+             GND --|05   14|-- N/C       |
+             GND --|06   13|-- N/C       '--+-- (8MHz) UM487F (PIN 01, CLK)
+  MAIN Z80 (/M1) --|07   12|-- GND          +-- (8MHz) MAIN Z80 (PIN 06, CLK)
+    GAL (PIN 11) --|08   11|-- VCC
+             GND --|09   10|-- MAIN Z80 (/INT)
+                   '-------'
+
 
   Notes:
 
@@ -139,7 +156,10 @@
      through the 74HC244 drivers to the Z80 data bus.
   - CN1, CN2 & CN3 are blind connectors.
   - 8952 pinouts to CN1 & CN2, are also passing through locations
-    IC14 & IC15 (both are unpopulated from factory).
+     IC14 & IC15 (both are unpopulated from factory).
+  - GAL is GAL16V8 at location IC4.
+  - CM3080 pins 16 & 17 have a 1 Megohm resistor in parallel before connect the
+     16 MHz. crystal.
 
 **************************************************************************
 
