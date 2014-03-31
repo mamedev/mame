@@ -58,7 +58,12 @@ const device_type BARCODE_READER = &device_creator<barcode_reader_device>;
 //-------------------------------------------------
 
 barcode_reader_device::barcode_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, BARCODE_READER, "Barcode Reader", tag, owner, clock, "bcreader", __FILE__)
+	: device_t(mconfig, BARCODE_READER, "Barcode Reader", tag, owner, clock, "bcreader", __FILE__)
+	, m_byte_length(0)
+	, m_pixel_length(0)
+	, m_byte_count(0)
+	, m_pixel_count(0)
+	, m_new_code(0)
 {
 }
 
