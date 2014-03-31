@@ -11,9 +11,9 @@
 #include "imagedev/chd_cd.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "formats/basicdsk.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
+#include "formats/fmtowns_dsk.h"
 #include "machine/upd71071.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
@@ -87,6 +87,9 @@ class towns_state : public driver_device
 			m_dma_2(*this, "dma_2"),
 			m_palette(*this, "palette"),
 			m_ram(*this, RAM_TAG),
+			m_fdc(*this, "fdc"),
+			m_flop0(*this, "fdc:0"),
+			m_flop1(*this, "fdc:1"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -119,7 +122,9 @@ class towns_state : public driver_device
 	required_device<upd71071_device> m_dma_2;
 	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
-	mb8877_device* m_fdc;
+	required_device<mb8877_t> m_fdc;
+	required_device<floppy_connector> m_flop0;
+	required_device<floppy_connector> m_flop1;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;
@@ -194,6 +199,7 @@ class towns_state : public driver_device
 	optional_shared_ptr<UINT16> m_nvram16;
 
 	virtual void driver_start();
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -328,6 +334,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	IRQ_CALLBACK_MEMBER(towns_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();

@@ -499,19 +499,18 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
 
 READ8_MEMBER(towns_state::towns_floppy_r)
 {
-	device_image_interface* image;
 	UINT8 ret;
 
 	switch(offset)
 	{
 		case 0x00:
-			return m_fdc->status_r(space, offset/2);
+			return m_fdc->status_r(space, 0);
 		case 0x02:
-			return m_fdc->track_r(space, offset/2);
+			return m_fdc->track_r(space, 0);
 		case 0x04:
-			return m_fdc->sector_r(space, offset/2);
+			return m_fdc->sector_r(space, 0);
 		case 0x06:
-			return m_fdc->data_r(space, offset/2);
+			return m_fdc->data_r(space, 0);
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
 			ret = 0x80;  // always set
@@ -519,14 +518,12 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			{
 			case 1:
 				ret |= 0x0c;
-				image = dynamic_cast<device_image_interface*>(space.machine().device("floppy0"));
-				if(image->exists())
+				if(m_flop0->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 2:
 				ret |= 0x0c;
-				image = dynamic_cast<device_image_interface*>(space.machine().device("floppy1"));
-				if(image->exists())
+				if(m_flop1->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 3:
@@ -538,6 +535,10 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			return ret;
 		case 0x0e: // DRVCHG
 			logerror("FDC: read from offset 0x0e\n");
+			if(m_towns_selected_drive == 1)
+				return m_flop0->get_device()->dskchg_r();
+			if(m_towns_selected_drive == 2)
+				return m_flop1->get_device()->dskchg_r();
 			return 0x00;
 		default:
 			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
@@ -547,6 +548,8 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 
 WRITE8_MEMBER(towns_state::towns_floppy_w)
 {
+	floppy_image_device* sel[4] = { m_flop0->get_device(), m_flop1->get_device(), NULL, NULL };
+
 	switch(offset)
 	{
 		case 0x00:
@@ -555,29 +558,36 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 				return;
 			if(data == 0xfe)
 				return;
-			m_fdc->command_w(space, offset/2,data);
+			m_fdc->cmd_w(space, 0,data);
+			logerror("FDC: Command %02x\n",data);
 			break;
 		case 0x02:
-			m_fdc->track_w(space, offset/2,data);
+			m_fdc->track_w(space, 0,data);
+			logerror("FDC: Track %02x\n",data);
 			break;
 		case 0x04:
-			m_fdc->sector_w(space, offset/2,data);
+			m_fdc->sector_w(space, 0,data);
+			logerror("FDC: Sector %02x\n",data);
 			break;
 		case 0x06:
-			m_fdc->data_w(space, offset/2,data);
+			m_fdc->data_w(space, 0,data);
+			logerror("FDC: Data %02x\n",data);
 			break;
 		case 0x08:
 			// bit 5 - CLKSEL
-			if(m_towns_selected_drive != 0 && m_towns_selected_drive < 2)
+			if(m_towns_selected_drive != 0)
 			{
-				floppy_mon_w(floppy_get_device(space.machine(), m_towns_selected_drive-1), !BIT(data, 4));
-				floppy_drive_set_ready_state(floppy_get_device(space.machine(), m_towns_selected_drive-1), data & 0x10,0);
+				if(sel[m_towns_selected_drive-1] != NULL)
+				{
+					sel[m_towns_selected_drive-1]->mon_w((~data & 0x10)>>4);
+					sel[m_towns_selected_drive-1]->ss_w((data & 0x04)>>2);
+				}
 			}
-			m_fdc->set_side((data & 0x04)>>2);
 			m_fdc->dden_w(BIT(~data, 1));
 
 			m_towns_fdc_irq6mask = data & 0x01;
-			logerror("FDC: write %02x to offset 0x08\n",data);
+			logerror("FDC: Config drive%i %02x\n",m_towns_selected_drive-1,data);
+
 			break;
 		case 0x0c:  // drive select
 			switch(data & 0x0f)
@@ -587,19 +597,23 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 					break;
 				case 0x01:
 					m_towns_selected_drive = 1;
-					m_fdc->set_drive(0);
+					if(sel[0] != NULL)
+						m_fdc->set_floppy(sel[0]);
 					break;
 				case 0x02:
 					m_towns_selected_drive = 2;
-					m_fdc->set_drive(1);
+					if(sel[1] != NULL)
+						m_fdc->set_floppy(sel[1]);
 					break;
 				case 0x04:
 					m_towns_selected_drive = 3;
-					m_fdc->set_drive(2);
+					if(sel[2] != NULL)
+						m_fdc->set_floppy(sel[2]);
 					break;
 				case 0x08:
 					m_towns_selected_drive = 4;
-					m_fdc->set_drive(3);
+					if(sel[3] != NULL)
+						m_fdc->set_floppy(sel[3]);
 					break;
 			}
 			logerror("FDC: drive select %02x\n",data);
@@ -610,8 +624,8 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{	
-	return m_fdc->data_r(generic_space(), 0);
+{	UINT16 data = m_fdc->data_r(generic_space(), 0);
+	return data;
 }
 
 WRITE16_MEMBER(towns_state::towns_fdc_dma_w)
@@ -2582,7 +2596,6 @@ void towns_state::driver_start()
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(towns_state::towns_irq_callback),this));
 	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,NULL);
-
 }
 
 void marty_state::driver_start()
@@ -2592,10 +2605,15 @@ void marty_state::driver_start()
 		m_towns_machine_id = 0x034a;
 }
 
+void towns_state::machine_start()
+{
+	m_flop0->get_device()->set_rpm(360);
+	m_flop1->get_device()->set_rpm(360);
+}
+
 void towns_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	m_fdc = machine().device<mb8877_device>("fdc");
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device<cdda_device>("cdda");
@@ -2633,35 +2651,13 @@ READ8_MEMBER(towns_state::get_slave_ack)
 	return 0x00;
 }
 
-static const wd17xx_interface towns_mb8877a_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER( towns_state, mb8877a_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER( towns_state, mb8877a_drq_w),
-	{FLOPPY_0,FLOPPY_1,0,0}
-};
+FLOPPY_FORMATS_MEMBER( towns_state::floppy_formats )
+	FLOPPY_FMTOWNS_FORMAT
+FLOPPY_FORMATS_END
 
-static LEGACY_FLOPPY_OPTIONS_START( towns )
-	LEGACY_FLOPPY_OPTION( fmt_bin, "bin", "BIN disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([8])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface towns_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(towns),
-	NULL,
-	NULL
-};
+static SLOT_INTERFACE_START( towns_floppies )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+SLOT_INTERFACE_END
 
 static const upd71071_intf towns_dma_config =
 {
@@ -2762,8 +2758,11 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 
-	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(towns_floppy_interface)
+	MCFG_MB8877x_ADD("fdc",XTAL_8MHz/4)  // clock unknown
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(towns_state,mb8877a_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(towns_state,mb8877a_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", towns_floppies, "35hd", towns_state::floppy_formats)
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 

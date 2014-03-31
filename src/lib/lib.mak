@@ -144,6 +144,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/fdi_dsk.o     \
 	$(LIBOBJ)/formats/fm7_cas.o     \
 	$(LIBOBJ)/formats/fmsx_cas.o    \
+	$(LIBOBJ)/formats/fmtowns_dsk.o \
 	$(LIBOBJ)/formats/g64_dsk.o     \
 	$(LIBOBJ)/formats/gtp_cas.o     \
 	$(LIBOBJ)/formats/hect_dsk.o    \
