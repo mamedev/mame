@@ -29,7 +29,7 @@
 // ======================> adam_fdc_device
 
 class adam_fdc_device :  public device_t,
-							public device_adamnet_card_interface
+						 public device_adamnet_card_interface
 {
 public:
 	// construction/destruction
@@ -58,7 +58,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd2793_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_image_device> m_floppy0;
 	floppy_image_device *m_floppy;
 	required_shared_ptr<UINT8> m_ram;
 	required_ioport m_sw3;
