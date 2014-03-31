@@ -55,13 +55,14 @@
 */
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
 #include "cpu/m68000/m68000.h"
 
 
-#include "video/ramdac.h"
+
+
 #include "machine/i8255.h"
 #include "machine/inder_sb.h"
+#include "machine/inder_vid.h"
 
 
 
@@ -72,32 +73,22 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
-		m_vram(*this, "vram"),
 		port_c_value(0),
-		m_palette(*this, "palette"),
-		m_tms(*this, "tms"),
-		m_indersb(*this, "inder_sb")
+		m_indersb(*this, "inder_sb"),
+		m_indervid(*this, "inder_vid")
 
 	{ 
-		m_shiftfull = 0;
 
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_mainram;
-	required_shared_ptr<UINT16> m_vram;
 
 
 
 
 
 	DECLARE_DRIVER_INIT(megaphx);
-	DECLARE_MACHINE_RESET(megaphx);
-
-
-
-
-
 
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
@@ -112,21 +103,13 @@ public:
 	UINT16 m_pic_result;
 
 	UINT8 port_c_value;
-	required_device<palette_device> m_palette;
-	required_device<tms34010_device> m_tms;
+
 	required_device<inder_sb_device> m_indersb;
-
-
-	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
-
+	required_device<inder_vid_device> m_indervid;
 
 
 
 };
-
-
-
-
 
 
 static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
@@ -134,7 +117,7 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
 
-	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
+	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)
 
 	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE("inder_sb", inder_sb_device, megaphx_0x050000_w)
 	AM_RANGE(0x050002, 0x050003) AM_DEVREAD("inder_sb", inder_sb_device, megaphx_0x050002_r)
@@ -150,94 +133,6 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, megaphx_state )
-
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram") // vram?
-//	AM_RANGE(0x00100000, 0x002fffff) AM_RAM  // vram?
-//	AM_RANGE(0x00300000, 0x003fffff) AM_RAM
-//	AM_RANGE(0x04000000, 0x040000ff) AM_WRITENOP
-
-	AM_RANGE(0x04000000, 0x0400000f) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
-	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-	AM_RANGE(0x04000030, 0x0400003f) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
-	AM_RANGE(0x04000090, 0x0400009f) AM_WRITENOP
-
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
-
-
-static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
-{
-	megaphx_state *state = screen.machine().driver_data<megaphx_state>();
-
-	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
-	UINT32 *dest = &bitmap.pix32(scanline);
-
-	const pen_t *paldata = state->m_palette->pens();
-
-	int coladdr = params->coladdr;
-	int x;
-
-	for (x = params->heblnk; x < params->hsblnk; x += 2)
-	{
-		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = paldata[pixels & 0xff];
-		dest[x + 1] = paldata[pixels >> 8];
-	}
-
-}
-
-
-static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
-{
-	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-
-	if (state->m_shiftfull == 0)
-	{
-		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
-
-		memcpy(shiftreg, &state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
-		state->m_shiftfull = 1;
-	}
-}
-
-static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
-{
-//	printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
-
-	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-	memcpy(&state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
-
-	state->m_shiftfull = 0;
-}
-
-MACHINE_RESET_MEMBER(megaphx_state,megaphx)
-{
-}
-
-static void m68k_gen_int(device_t *device, int state)
-{
-	megaphx_state *drvstate = device->machine().driver_data<megaphx_state>();
-	if (state) drvstate->m_maincpu->set_input_line(4, ASSERT_LINE);
-	else drvstate->m_maincpu->set_input_line(4, CLEAR_LINE);
-
-}
-
-
-static const tms34010_config tms_config_megaphx =
-{
-	TRUE,                          /* halt on reset */
-	"screen",                       /* the screen operated on */
-	XTAL_40MHz/12,                   /* pixel clock */
-	2,                              /* pixels per clock */
-	NULL,                           /* scanline callback (indexed16) */
-	megaphx_scanline,              /* scanline callback (rgb32) */
-	m68k_gen_int,                   /* generate interrupt */
-	megaphx_to_shiftreg,           /* write to shiftreg function */
-	megaphx_from_shiftreg          /* read from shiftreg function */
-};
 
 
 
@@ -336,14 +231,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, megaphx_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
-ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	1
-};
 
 /* why don't the port_c read/writes work properly when hooked through the 8255? */
 
@@ -482,23 +370,14 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
-	MCFG_CPU_CONFIG(tms_config_megaphx)
-	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
 	MCFG_INDER_AUDIO_ADD("inder_sb")
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 
-	MCFG_MACHINE_RESET_OVERRIDE(megaphx_state,megaphx)
+	MCFG_INDER_VIDEO_ADD("inder_vid")
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
-	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(megaphx_state,megaphx)

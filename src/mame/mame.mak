@@ -2084,6 +2084,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/megaphx.o \
 	$(MACHINE)/inder_sb.o \
+	$(MACHINE)/inder_vid.o \
 	$(DRIVERS)/corona.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
