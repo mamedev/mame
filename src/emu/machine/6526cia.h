@@ -117,16 +117,14 @@ public:
 
 	/* serial counter */
 	DECLARE_READ_LINE_MEMBER( cnt_r ) { return m_cnt; }
-	void cnt_w(UINT8 state);
-	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { cnt_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 
 	/* serial port */
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w ) { m_sp = state; }
 
 	/* flag */
-	void flag_w(UINT8 state);
-	DECLARE_WRITE_LINE_MEMBER( flag_w ) { flag_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( flag_w );
 
 	/* port mask */
 	void set_port_mask_value(int port, int data);

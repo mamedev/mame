@@ -498,7 +498,7 @@ void legacy_mos6526_device::clock_tod()
     cnt_w
 -------------------------------------------------*/
 
-void legacy_mos6526_device::cnt_w(UINT8 state)
+WRITE_LINE_MEMBER(legacy_mos6526_device::cnt_w)
 {
 	/* is this a rising edge? */
 	if (!m_cnt && state)
@@ -543,7 +543,7 @@ void legacy_mos6526_device::cnt_w(UINT8 state)
 	m_cnt = state;
 }
 
-void legacy_mos6526_device::flag_w(UINT8 state)
+WRITE_LINE_MEMBER(legacy_mos6526_device::flag_w)
 {
 	/* falling edge */
 	if (m_flag && !state)
