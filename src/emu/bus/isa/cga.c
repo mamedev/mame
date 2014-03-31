@@ -254,6 +254,7 @@ isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag,
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
 	m_font_selection_mask = 0x01;
 	m_start_offset = 0;
+	m_superimpose = false;
 }
 
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
