@@ -377,7 +377,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	size_t sample_index = sample % SAMPLES_PER_BLOCK;
 
 	/* is this block beyond the edge of our waveform? */
-	if (sample_blocknum >= (size_t)cassette->blocks.count())
+	if (sample_blocknum >= cassette->blocks.count())
 		cassette->blocks.resize_keep_and_clear_new(sample_blocknum + 1);
 	
 	if (cassette->blocks[sample_blocknum] == NULL)
@@ -386,7 +386,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	sample_block &block = *cassette->blocks[sample_blocknum];
 
 	/* is this sample access off the current block? */
-	if (sample_index >= (size_t)block.count())
+	if (sample_index >= block.count())
 		block.resize_keep_and_clear_new(SAMPLES_PER_BLOCK);
 
 	*ptr = &block[sample_index];

@@ -202,7 +202,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	cassette_image_read( cass, block, 0, 64 );
 	for ( i = 3; ; i++ )
 	{
-		if ( ( (size_t)i >= size ) || ( i >= 64 ) )
+		if ( ( i >= size ) || ( i >= 64 ) )
 		{
 			/* ? */
 			PRINT (( "to7_k7_load: WARNING: this does not look like a MO or TO cassette.\n" ));
@@ -534,7 +534,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	cassette_image_read( cass, block, 0, 64 );
 	for ( i = 3; ; i++ )
 	{
-		if ( ( (size_t)i >= size ) || ( i >= 64 ) )
+		if ( ( i >= size ) || ( i >= 64 ) )
 		{
 			/* ? */
 			PRINT (( "to5_k5_load: WARNING: this does not look like a MO or TO cassette.\n" ));

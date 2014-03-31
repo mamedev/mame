@@ -512,7 +512,7 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 {
 	UINT16 *RAM  = (UINT16 *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;
-	size_t i;
+	int i;
 
 	for (i = 0; i < size; i++)
 	{

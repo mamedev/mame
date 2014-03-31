@@ -30,7 +30,7 @@ int uchar_isvalid(unicode_char uchar)
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 {
 	unicode_char c, minchar;
-	size_t auxlen, i;
+	int auxlen, i;
 	char auxchar;
 
 	/* validate parameters */

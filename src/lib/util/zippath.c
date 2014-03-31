@@ -697,7 +697,7 @@ void zippath_closedir(zippath_directory *directory)
 static const char *get_relative_path(zippath_directory *directory, const zip_file_header *header)
 {
 	const char *result = NULL;
-	size_t len = directory->zipprefix.len();
+	int len = directory->zipprefix.len();
 
 	if ((len <= strlen(header->filename))
 		&& !strncmp(directory->zipprefix, header->filename, len))

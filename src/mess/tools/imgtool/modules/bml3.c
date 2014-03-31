@@ -766,7 +766,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 			read_sz -= i;
 			sz -= i;
 		}
-		if (i < (size_t)(info->granule_sectors * info->sector_size) && sz > 0) {
+		if (i < info->granule_sectors * info->sector_size && sz > 0) {
 			// write EOF and trailing NULs in the final sector
 			ferr = write_granule(img, g, i, (info->granule_sectors * info->sector_size - i - 1) % info->sector_size + 1, eof_buf);
 			if (ferr)

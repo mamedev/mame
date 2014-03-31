@@ -3483,7 +3483,7 @@ void coolridr_state::machine_start()
 
 	UINT16* compressed = (UINT16*)memregion( "compressedgfx" )->base();
 	int count = 0;
-	for (size_t i=0;i<size/2/10;i++)
+	for (int i=0;i<size/2/10;i++)
 	{
 		m_rearranged_16bit_gfx[count+0] = ((compressed[i+((0x0400000/2)*0)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*0)]&0xff00) >> 8);
 		m_rearranged_16bit_gfx[count+1] = ((compressed[i+((0x0400000/2)*1)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*1)]&0xff00) >> 8);

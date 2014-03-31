@@ -324,7 +324,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					const_cast<device_state_entry *>(this)->m_flags |= DSF_CUSTOM_STRING;
 					return dest;
 				}
-				if (strlen(string) <= (size_t)width)
+				if (strlen(string) <= width)
 				{
 					dest.cat(string);
 					width -= strlen(string);

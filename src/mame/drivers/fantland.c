@@ -360,7 +360,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 {
 	UINT8 *rom;
 	size_t len;
-	size_t start, stop;
+	int start, stop;
 
 	if (!m_adpcm_playing[voice])
 		return;
@@ -374,7 +374,7 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	if (start >= len)
 	{
 		borntofi_adpcm_stop(device, voice);
-		logerror("adpcm address out of range: %lx\n", start);
+		logerror("adpcm address out of range: %06x\n", start);
 		return;
 	}
 

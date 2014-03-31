@@ -946,7 +946,7 @@ UINT32 pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb3
 
 DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 {
-	int length;
+	int i, length;
 	UINT8 *cart = memregion("flash")->base();
 	static const char *gme_id = "123-456-STD";
 
@@ -957,7 +957,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 		return IMAGE_INIT_FAIL;
 	}
 
-	for(size_t i = 0; i < strlen(gme_id); i++)
+	for(i = 0; i < strlen(gme_id); i++)
 	{
 		if(cart[i] != gme_id[i])
 		{

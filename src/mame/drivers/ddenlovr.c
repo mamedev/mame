@@ -1465,11 +1465,11 @@ READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 {
 	UINT8 *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	size_t address = m_ddenlovr_blit_address;
+	int address = m_ddenlovr_blit_address;
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %lX out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -2655,11 +2655,11 @@ READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 {
 	UINT8 *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	size_t address = (m_ddenlovr_blit_address & 0xffffff) * 2;
+	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %lX out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -2879,11 +2879,11 @@ void ddenlovr_state::mjchuuka_get_romdata()
 {
 	UINT8 *rom = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
-	size_t address = (m_ddenlovr_blit_address & 0xffffff) * 2;
+	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{
-		logerror("%s: Error, Blitter address %lX out of range\n", machine().describe_context(), address);
+		logerror("%s: Error, Blitter address %06X out of range\n", machine().describe_context(), address);
 		address %= size;
 	}
 

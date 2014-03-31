@@ -1320,7 +1320,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	{
 		size_t len = memregion("eeprom")->bytes();
 		dynamic_buffer temp(len);
-		size_t i;
+		int i;
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
 

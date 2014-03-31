@@ -673,7 +673,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	UINT8 *opcodes  =   m_harem_decrypted_opcodes   = auto_alloc_array(machine(), UINT8, size * 3);
 
 	// decryption 03
-	for (size_t i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
 		opcodes[size * 0 + i]   =   BITSWAP8(x, 7,0,5,2,3,4,1,6);
@@ -681,7 +681,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	}
 
 	// decryption 09
-	for (size_t i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
 		opcodes[size * 1 + i]   =   BITSWAP8(x, 7,0,5,6,3,2,1,4);
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(scramble_state,harem)
 	}
 
 	// decryption 0a
-	for (size_t i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		UINT8 x = ROM[i];
 		opcodes[size * 2 + i]   =   BITSWAP8(x, 7,2,5,6,3,0,1,4);

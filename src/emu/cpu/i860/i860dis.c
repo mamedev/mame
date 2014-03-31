@@ -618,7 +618,7 @@ static const decode_tbl_t fp_decode_tbl[128] =
 /* Replaces tabs with spaces.  */
 static void i860_dasm_tab_replacer(char* buf, int tab_size)
 {
-	size_t i = 0;
+	int i = 0;
 	int tab_count = 0;
 	char tab_buf[1024];
 	memset(tab_buf, 0, 1024);

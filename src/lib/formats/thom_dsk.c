@@ -105,7 +105,7 @@ static floperr_t internal_sap_read_sector(floppy_image_legacy *floppy, int head,
 {
 	UINT64 offset;
 	floperr_t err;
-	size_t i;
+	int i;
 	UINT8 *buf;
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
@@ -127,7 +127,7 @@ static floperr_t internal_sap_write_sector(floppy_image_legacy *floppy, int head
 	floperr_t err;
 	UINT8 buf[256+6];
 		UINT16 crc;
-	size_t i;
+	int i;
 	err = get_offset(floppy, head, track, sector, sector_is_index, &offset);
 	if (err)
 		return err;

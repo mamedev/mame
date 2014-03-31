@@ -1505,7 +1505,7 @@ static floperr_t ti99_sdf_read_track(floppy_image_legacy *floppy, int head, int 
 */
 static floperr_t ti99_sdf_write_track(floppy_image_legacy *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
 {
-	size_t current_pos = 0;
+	int current_pos = 0;
 	UINT8 *track_image;
 	int leadin, gap1, gap2;
 	int is_fm, found;
@@ -2128,8 +2128,7 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image_legacy *floppy, int h
 	UINT64 track_offset;
 	int first_idam = 0;
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy);
-	size_t i;
-	int byte, crc;
+	int i, byte, crc;
 
 	UINT8 *track_data = (UINT8*)buffer;
 

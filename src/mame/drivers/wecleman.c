@@ -1302,7 +1302,7 @@ void wecleman_state::wecleman_unpack_sprites()
 void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
 	dynamic_buffer buffer(len);
-	size_t i;
+	int i;
 
 	memcpy(buffer,src,len);
 	for (i = 0;i < len;i++)

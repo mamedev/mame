@@ -3989,7 +3989,7 @@ void pgm_state::expand_colourdata()
 {
 	UINT8 *src = memregion( "sprcol" )->base();
 	size_t srcsize = memregion( "sprcol" )->bytes();
-	size_t cnt;
+	int cnt;
 	size_t needed = srcsize / 2 * 3;
 
 	/* work out how much ram we need to allocate to expand the sprites into

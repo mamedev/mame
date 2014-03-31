@@ -802,7 +802,7 @@ void vic3_device::draw_sprite_multi( int nr, int yoff, int ybegin, int yend, int
 #ifndef memset16
 static void *memset16(void *dest, int value, size_t size)
 {
-	size_t i;
+	register int i;
 
 	for (i = 0; i < size; i++)
 		((short *) dest)[i] = value;

@@ -1033,7 +1033,7 @@ UINT8 pc_keyboard_device::unicode_char_to_at_keycode(unicode_char ch)
 
 int pc_keyboard_device::queue_chars(const unicode_char *text, size_t text_len)
 {
-	size_t i;
+	int i;
 	UINT8 b;
 
 	for (i = 0; (i < text_len) && ((queue_size()) + 4 < sizeof(m_queue)); i++)

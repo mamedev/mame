@@ -232,8 +232,7 @@ static imgtoolerr_t vzdos_clear_dirent(imgtool_image *img, int index)
 
 /* search the index for a directory entry */
 static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, int *entry) {
-	int i, ret;
-	size_t len;
+	int i, len, ret;
 	vzdos_dirent ent;
 	char filename[9];
 

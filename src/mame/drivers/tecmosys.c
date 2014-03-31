@@ -624,7 +624,7 @@ void tecmosys_state::tecmosys_descramble()
 {
 	UINT8 *gfxsrc  = memregion( "gfx1" )->base();
 	size_t srcsize = memregion( "gfx1" )->bytes();
-	size_t i;
+	int i;
 
 	for (i=0; i < srcsize; i+=4)
 	{

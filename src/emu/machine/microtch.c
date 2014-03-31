@@ -35,7 +35,7 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 
 int microtouch_device::check_command( const char* commandtocheck, int command_len, UINT8* command_data )
 {
-	if ( ((size_t)command_len == (strlen(commandtocheck) + 2)) &&
+	if ( (command_len == (strlen(commandtocheck) + 2)) &&
 			(command_data[0] == 0x01) &&
 			(strncmp(commandtocheck, (const char*)command_data + 1, strlen(commandtocheck)) == 0) &&
 			(command_data[command_len-1] == 0x0d) )

@@ -210,8 +210,7 @@ static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 int a2600_state::detect_modeDC()
 {
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
 	static const unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
 	if (m_cart_size == 0x10000)
@@ -231,8 +230,7 @@ int a2600_state::detect_modeDC()
 
 int a2600_state::detect_modef6()
 {
-	size_t i;
-	int numfound = 0;
+	int i, numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
 	if (m_cart_size == 0x4000)
 	{
@@ -255,8 +253,7 @@ int a2600_state::detect_mode3E()
 	// 'not boulderdash', but is the only example i have (cow)
 	// Would have used STA $3e, but 'Alien' and 'Star Raiders' do that for unknown reasons
 
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
 	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
 	{
@@ -275,8 +272,7 @@ int a2600_state::detect_mode3E()
 
 int a2600_state::detect_modeSS()
 {
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
 	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
 	{
@@ -295,8 +291,7 @@ int a2600_state::detect_modeSS()
 
 int a2600_state::detect_modeFE()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][5] =  {
 									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
 									{ 0x20, 0xc3, 0xf8, 0xa5, 0x82 },
@@ -323,8 +318,7 @@ int a2600_state::detect_modeFE()
 
 int a2600_state::detect_modeE0()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] =  {
 									{ 0x8d, 0xe0, 0x1f },
 									{ 0x8d, 0xe0, 0x5f },
@@ -353,8 +347,7 @@ int a2600_state::detect_modeE0()
 
 int a2600_state::detect_modeCV()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0x9d, 0xff, 0xf3 },
 									{ 0x99, 0x00, 0xf4 }
@@ -379,8 +372,7 @@ int a2600_state::detect_modeCV()
 
 int a2600_state::detect_modeFV()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0x2c, 0xd0, 0xff }
 	};
@@ -405,8 +397,7 @@ int a2600_state::detect_modeFV()
 
 int a2600_state::detect_modeJVP()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][4] = {
 									{ 0x2c, 0xc0, 0xef, 0x60 },
 									{ 0x8d, 0xa0, 0x0f, 0xf0 }
@@ -431,8 +422,7 @@ int a2600_state::detect_modeJVP()
 
 int a2600_state::detect_modeE7()
 {
-	size_t i,j;
-	int numfound = 0;
+	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0xad, 0xe5, 0xff },
 									{ 0x8d, 0xe7, 0xff }
@@ -457,8 +447,7 @@ int a2600_state::detect_modeE7()
 
 int a2600_state::detect_modeUA()
 {
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
 	if (m_cart_size == 0x2000)
 	{
@@ -477,8 +466,7 @@ int a2600_state::detect_modeUA()
 
 int a2600_state::detect_8K_mode3F()
 {
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
 	static const unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
 	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
@@ -503,8 +491,7 @@ int a2600_state::detect_8K_mode3F()
 
 int a2600_state::detect_32K_mode3F()
 {
-	size_t i;
-	int numfound = 0;
+	int i,numfound = 0;
 	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
 	if (m_cart_size >= 0x8000)
 	{
@@ -523,7 +510,7 @@ int a2600_state::detect_32K_mode3F()
 
 int a2600_state::detect_super_chip()
 {
-	size_t i,j;	
+	int i,j;
 	UINT8 *cart = CART;
 	static const unsigned char signatures[][5] = {
 									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug

@@ -2083,7 +2083,7 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 static void execute_cheatnext(running_machine &machine, int ref, int params, const char *param[])
 {
 	address_space *space;
-	int cheatindex;
+	UINT64 cheatindex;
 	UINT32 active_cheat = 0;
 	UINT8 condition;
 	UINT64 comp_value = 0;
@@ -2149,7 +2149,7 @@ static void execute_cheatnext(running_machine &machine, int ref, int params, con
 	cheat.undo++;
 
 	/* execute the search */
-	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+	for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
 			UINT64 cheat_value = cheat_read_extended(&cheat, *space, cheat.cheatmap[cheatindex].offset);
@@ -2263,7 +2263,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	address_space *space;
 	device_t *cpu;
 	UINT32 active_cheat = 0;
-	int cheatindex;
+	UINT64 cheatindex;
 	UINT64 sizemask;
 	FILE *f = NULL;
 
@@ -2294,7 +2294,7 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 	}
 
 	/* write the cheat list */
-	for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+	for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 	{
 		if (cheat.cheatmap[cheatindex].state == 1)
 		{
@@ -2325,12 +2325,12 @@ static void execute_cheatlist(running_machine &machine, int ref, int params, con
 
 static void execute_cheatundo(running_machine &machine, int ref, int params, const char *param[])
 {
-	int cheatindex;
+	UINT64 cheatindex;
 	UINT32 undo_count = 0;
 
 	if (cheat.undo > 0)
 	{
-		for (cheatindex = 0; cheatindex < cheat.cheatmap.count(); cheatindex += 1)
+		for (cheatindex = 0; cheatindex < (UINT64)cheat.cheatmap.count(); cheatindex += 1)
 		{
 			if (cheat.cheatmap[cheatindex].undo == cheat.undo)
 			{
@@ -2359,9 +2359,9 @@ static void execute_find(running_machine &machine, int ref, int params, const ch
 	UINT64 data_to_find[256];
 	UINT8 data_size[256];
 	int cur_data_size;
-	size_t data_count = 0;
+	int data_count = 0;
 	int found = 0;
-	size_t j;
+	int j;
 
 	/* validate parameters */
 	if (!debug_command_parameter_number(machine, param[0], &offset))

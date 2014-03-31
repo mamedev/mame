@@ -405,7 +405,7 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char 
 {
 	va_list arg_list;
 	char buf[32768];
-	size_t index = 0;
+	INT32 index = 0;
 	const rectangle &visarea = m_screen->visible_area();
 
 	va_start( arg_list, msg );
@@ -502,8 +502,9 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 void ssem_state::strlower(char *buf)
 {
 	if(buf)
-	{		
-		for(size_t i = 0; i < strlen(buf); i++)
+	{
+		int i = 0;
+		for(i = 0; i < strlen(buf); i++)
 		{
 			if(buf[i] >= 'A' && buf[i] <= 'Z')
 			{

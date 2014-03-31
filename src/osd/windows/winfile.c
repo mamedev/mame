@@ -383,7 +383,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 {
 	WCHAR wch;
 
-	count = MIN(count, (size_t)(IsDBCSLeadByte(*osdchar) ? 2 : 1));
+	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
 	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
 		*uchar = wch;
 	else

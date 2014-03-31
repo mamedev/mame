@@ -170,7 +170,7 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	pitch = (width + 3) & ~3;
 
 	// make sure our temporary bitmap is big enough
-	if ((size_t)(pitch * height * 4) > gdi->bmsize)
+	if (pitch * height * 4 > gdi->bmsize)
 	{
 		gdi->bmsize = pitch * height * 4 * 2;
 		global_free_array(gdi->bmdata);

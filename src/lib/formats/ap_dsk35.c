@@ -664,8 +664,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 {
 	floperr_t err;
 	size_t pos = 0;
-	int sector_count, sector, i;
-	size_t j;
+	int sector_count, sector, i, j;
 	struct apple35_tag *tag;
 	UINT8 sum, format_byte, val, side;
 	UINT32 found_sectors = 0;

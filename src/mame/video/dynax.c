@@ -451,7 +451,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 
 	for ( ;; )
 	{
-		if ((size_t)src >= ROM_size)
+		if (src >= ROM_size)
 		{
 			popmessage("GFXROM %s OVER %08x",gfx,src);
 			LOG(("\nGFXROM %s OVER %08x",gfx,src));
@@ -479,7 +479,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 			popmessage("Blitter unknown command %06X: %02X\n", src - 1, cmd);
 
 		case 0xd:   // Skip X pixels
-			if ((size_t)src >= ROM_size)
+			if (src >= ROM_size)
 			{
 				popmessage("GFXROM %s OVER %08x",gfx,src);
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
@@ -490,7 +490,7 @@ int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src,
 			/* fall through into next case */
 
 		case 0xc:   // Draw N pixels
-			if ((size_t)src >= ROM_size)
+			if (src >= ROM_size)
 			{
 				popmessage("GFXROM %s OVER %08x",gfx,src);
 				LOG(("\nGFXROM %s OVER %08x",gfx,src));
