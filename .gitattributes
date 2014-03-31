@@ -5888,7 +5888,7 @@ src/mame/layout/beaminv.lay svneol=native#text/xml
 src/mame/layout/bfm_sc4.lay svneol=native#text/xml
 src/mame/layout/bfm_sc5.lay svneol=native#text/xml
 src/mame/layout/bfmsys85.lay svneol=native#text/xml
-src/mame/layout/bingo.lay svneol=native#text/plain
+src/mame/layout/bingo.lay svneol=native#text/xml
 src/mame/layout/bingowng.lay svneol=native#text/xml
 src/mame/layout/blckjack.lay svneol=native#text/xml
 src/mame/layout/blockade.lay svneol=native#text/xml
@@ -9026,41 +9026,22 @@ src/regtests/chdman/input/copy_cd_nrg_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_cd_toc_empty_v4/in.chd -text
 src/regtests/chdman/input/copy_hd_1/in.chd -text
 src/regtests/chdman/input/createcd_cue_audio_silence/in.bin -text
-src/regtests/chdman/input/createcd_cue_audio_silence/in.cue svneol=native#text/plain
-src/regtests/chdman/input/createcd_cue_audio_silence_wav/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/silence.wav -text
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/silence.wav -text
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdfl/in.cue svneol=native#text/plain
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdfl/in.params svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdfl/silence.wav -text
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdlz/in.cue svneol=native#text/plain
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdlz/in.params svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdlz/silence.wav -text
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/in.cue svneol=native#text/plain
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/in.params svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_cdzl/silence.wav -text
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/in.cue svneol=native#text/plain
-src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/in.params svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks_none/silence.wav -text
 src/regtests/chdman/input/createcd_cue_empty/in.bin -text
-src/regtests/chdman/input/createcd_cue_empty/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_iso_empty/in.iso -text
 src/regtests/chdman/input/createcd_nrg_audio_silence/in.nrg -text
 src/regtests/chdman/input/createcd_nrg_empty/in.nrg -text
 src/regtests/chdman/input/createcd_toc_empty/data.bin -text
-src/regtests/chdman/input/createcd_toc_empty/in.toc svneol=native#text/plain
-src/regtests/chdman/input/createhd_1/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty/in.raw -text
-src/regtests/chdman/input/createhd_raw_empty_flac/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_flac/in.raw -text
-src/regtests/chdman/input/createhd_raw_empty_huff/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_huff/in.raw -text
-src/regtests/chdman/input/createhd_raw_empty_lzma/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_lzma/in.raw -text
-src/regtests/chdman/input/createhd_raw_empty_none/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_none/in.raw -text
-src/regtests/chdman/input/createhd_raw_empty_zlib/in.params svneol=native#text/plain
 src/regtests/chdman/input/createhd_raw_empty_zlib/in.raw -text
 src/regtests/chdman/input/createld_avi_uyvy_3_frames_no_audio/in.avi -text
 src/regtests/chdman/input/createld_avi_yuv2_3_frames_no_audio/in.avi -text
@@ -9186,178 +9167,11 @@ src/regtests/jedutil/baseline/palce16v8/pal16r4-as-palce16v8.txt svneol=native#t
 src/regtests/jedutil/baseline/palce16v8/pal16r6-as-palce16v8.txt svneol=native#text/plain
 src/regtests/jedutil/baseline/palce16v8/pal16r8-as-palce16v8.txt svneol=native#text/plain
 src/regtests/jedutil/baseline/pls153/pls153.txt svneol=native#text/plain
-src/regtests/jedutil/eqns/ICT_Place/PEEL18CV8/18cv8_bi-directional_io.psf svneol=native#text/plain
-src/regtests/jedutil/eqns/ICT_Place/PEEL18CV8/18cv8_combinatorial_feedback.psf svneol=native#text/plain
-src/regtests/jedutil/eqns/ICT_Place/PEEL18CV8/18cv8_register_feedback.psf svneol=native#text/plain
 src/regtests/jedutil/eqns/ICT_Place/readme.txt svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal10h8/pal10h8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal10l8/pal10l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal10p8/pal10p8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal12h10/pal12h10.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal12h6/pal12h6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal12l10/pal12l10.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal12l6/pal12l6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal12p6/pal12p6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal14h4/pal14h4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal14h8/pal14h8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal14l4/pal14l4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal14p4/pal14p4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16c1/pal16c1.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16h2/pal16h2.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16h6/pal16h6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16l2/pal16l2.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16l6/pal16l6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16l8/pal16l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16p8/pal16p8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16r4/pal16r4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16r6/pal16r6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16r8/pal16r8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16rp4/pal16rp4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16rp6/pal16rp6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal16rp8/pal16rp8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal18h4/pal18h4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal18l4/pal18l4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20c1/pal20c1.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20l10/pal20l10.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20l2/pal20l2.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20l8/pal20l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20r4/pal20r4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20r6/pal20r6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20r8/pal20r8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20x10/pal20x10.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20x4/pal20x4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/Opal_Jr/pal20x8/pal20x8.eqn svneol=native#text/plain
 src/regtests/jedutil/eqns/Opal_Jr/readme.txt svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/pal6l16/pal6l16.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/pal8l14/pal8l14.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal10h8-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal10l8-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal12h6-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal12l6-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal14h4-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal14l4-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16h2-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16l2-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16l8-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16r4-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16r6-as-palce16v8.pds svneol=native#text/plain
-src/regtests/jedutil/eqns/PALASM/palce16v8/pal16r8-as-palce16v8.pds svneol=native#text/plain
 src/regtests/jedutil/eqns/PALASM/readme.txt svneol=native#text/plain
-src/regtests/jedutil/eqns/ispLEVER_Classic/gal18v10/test1/gal18v10-test1.abl svneol=native#text/plain
-src/regtests/jedutil/eqns/ispLEVER_Classic/gal18v10/test1/gal18v10-test1.syn svneol=native#text/plain
 src/regtests/jedutil/eqns/ispLEVER_Classic/readme.txt svneol=native#text/plain
-src/regtests/jedutil/eqns/pal10l8/pal10l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal12h6/pal12h6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal12l6/pal12l6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal14h4/pal14h4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal14l4/pal14l4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16c1/pal16c1.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16h2/pal16h2.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16l2/pal16l2.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16l8/pal16l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16r4/pal16r4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16r6/pal16r6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal16r8/pal16r8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal20l10/pal20l10.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal20l8/pal20l8.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal20r4/pal20r4.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal20r6/pal20r6.eqn svneol=native#text/plain
-src/regtests/jedutil/eqns/pal20r8/pal20r8.eqn svneol=native#text/plain
 src/regtests/jedutil/eqns/readme.txt svneol=native#text/plain
-src/regtests/jedutil/jeds/18cv8/18cv8_bi-directional_io.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/18cv8_combinatorial_feedback.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/18cv8_register_feedback.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal10h8-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal10l8-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal12h6-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal12l6-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal14h4-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal14l4-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16h2-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16l2-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16l8-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16r4-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16r6-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/18cv8/pal16r8-to-peel18cv8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/ck2605/ck2605-test1.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/ck2605/ck2605-test2.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal10h8-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal10l8-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal12h6-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal12l6-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal14h4-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal14l4-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16h2-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16l2-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16l8-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16r4-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16r6-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal16v8/pal16r8-to-gal16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/gal18v10-test1.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal10h8-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal10l8-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal12h6-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal12l6-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal14h4-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal14l4-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16h2-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16l2-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16l8-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16r4-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16r6-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/gal18v10/pal16r8-to-gal18v10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal10h8/pal10h8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal10l8/pal10l8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal10p8/pal10p8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal12h10/pal12h10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal12h6/pal12h6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal12l10/pal12l10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal12l6/pal12l6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal12p6/pal12p6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal14h4/pal14h4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal14h8/pal14h8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal14l4/pal14l4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal14l8/pal14l8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal14p4/pal14p4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16c1/pal16c1.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16h2/pal16h2.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16h6/pal16h6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16l2/pal16l2.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16l6/pal16l6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16l8/pal16l8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16p8/pal16p8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16r4/pal16r4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16r6/pal16r6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16r8/pal16r8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16rp4/pal16rp4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal16rp6/pal16rp6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal18h4/pal18h4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal18l4/pal18l4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20c1/pal20c1.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20l10/pal20l10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20l2/pal20l2.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20l8/pal20l8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20r4/pal20r4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20r6/pal20r6.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20r8/pal20r8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20x10/pal20x10.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20x4/pal20x4.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal20x8/pal20x8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal6l16/pal6l16.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pal8l14/pal8l14.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal10h8-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal10l8-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal12h6-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal12l6-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal14h4-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal14l4-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16h2-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16l2-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16l8-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16r4-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16r6-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/palce16v8/pal16r8-as-palce16v8.jed -text svneol=unset#application/octet-stream
-src/regtests/jedutil/jeds/pls153/pls153.jed -text svneol=unset#application/octet-stream
 src/regtests/jedutil/jedtest.py svneol=native#text/plain
 src/regtests/regtests.mak svneol=native#text/plain
 src/targets/mame.lst svneol=native#text/plain
