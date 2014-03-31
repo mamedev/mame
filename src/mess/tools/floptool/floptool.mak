@@ -33,6 +33,7 @@ FLOPTOOL_OBJS = \
 # rules to build the floptool executable
 #-------------------------------------------------
 
-$(FLOPTOOL): $(FLOPTOOL_OBJS) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+# TODO: Visual Studio wants $(FLAC_LIB) and $(7Z_LIB) during linking...
+$(FLOPTOOL): $(FLOPTOOL_OBJS) $(FORMATS_LIB) $(LIBEMU) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
