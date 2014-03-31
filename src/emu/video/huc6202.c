@@ -39,7 +39,7 @@ void huc6202_device::device_config_complete()
 
 
 huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6202, "HuC6202", tag, owner, clock, "huc6202", __FILE__)
+	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__)
 {
 }
 

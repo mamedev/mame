@@ -62,7 +62,7 @@ void huc6260_device::device_config_complete()
 
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:   device_t(mconfig, HUC6260, "HuC6260", tag, owner, clock, "huc6260", __FILE__),
+	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
 		device_video_interface(mconfig, *this)
 {
 }

@@ -25,7 +25,7 @@ const device_type CDROM = &device_creator<cdrom_image_device>;
 //-------------------------------------------------
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CDROM, "Cdrom", tag, owner, clock, "cdrom_image", __FILE__),
+	: device_t(mconfig, CDROM, "CD-ROM Image", tag, owner, clock, "cdrom_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
 }
