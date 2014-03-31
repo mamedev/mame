@@ -1,3 +1,11 @@
+/*************************************************************************
+
+  Sega KO Punch
+
+  Functions to emulate the video hardware of the machine.
+
+*************************************************************************/
+
 #include "emu.h"
 #include "includes/kopunch.h"
 
@@ -5,10 +13,10 @@
 PALETTE_INIT_MEMBER(kopunch_state, kopunch)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
 
-	color_prom += 24;   /* first 24 colors are black */
-	for (i = 0; i < palette.entries(); i++)
+	color_prom += 24; // first 24 colors are black
+
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -33,20 +41,21 @@ PALETTE_INIT_MEMBER(kopunch_state, kopunch)
 	}
 }
 
-WRITE8_MEMBER(kopunch_state::kopunch_videoram_w)
+WRITE8_MEMBER(kopunch_state::kopunch_fg_w)
 {
-	m_videoram[offset] = data;
+	m_vram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::kopunch_videoram2_w)
+WRITE8_MEMBER(kopunch_state::kopunch_bg_w)
 {
-	m_videoram2[offset] = data;
+	m_vram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(kopunch_state::kopunch_scroll_x_w)
 {
+	m_scrollx = data;
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
@@ -57,25 +66,28 @@ WRITE8_MEMBER(kopunch_state::kopunch_scroll_y_w)
 
 WRITE8_MEMBER(kopunch_state::kopunch_gfxbank_w)
 {
+	// d0-d2: bg gfx bank
 	if (m_gfxbank != (data & 0x07))
 	{
 		m_gfxbank = data & 0x07;
 		m_bg_tilemap->mark_all_dirty();
 	}
 
+	// d3: flip y, other bits: unused
 	m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
 TILE_GET_INFO_MEMBER(kopunch_state::get_fg_tile_info)
 {
-	int code = m_videoram[tile_index];
+	int code = m_vram_fg[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
 {
-	int code = (m_videoram2[tile_index] & 0x7f) + 128 * m_gfxbank;
+	// note: highest bit is unused
+	int code = (m_vram_bg[tile_index] & 0x7f) | m_gfxbank << 7;
 
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
 }
@@ -86,13 +98,17 @@ void kopunch_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(kopunch_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_bg_tilemap->set_scrolldx(16, 16);
 }
 
 UINT32 kopunch_state::screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	bitmap.fill(0, cliprect);
+	
+	// background does not wrap around horizontally
+	rectangle bg_clip = cliprect;
+	bg_clip.max_x = m_scrollx ^ 0xff;
+
+	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
