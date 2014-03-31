@@ -82,7 +82,7 @@ private:
 	bool set_dot(INT16 x, INT16 y, INT16 px, INT16 py);
 	bool set_dot(INT16 x, INT16 y, UINT16 color);
 	void draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey);
-	void draw_circle(INT16 cx, INT16 cy, double r, double s_angol, double e_angol, bool c);
+	void draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c);
 	void paint(INT16 sx, INT16 sy);
 
 	void command_wpr_exec();
@@ -96,6 +96,7 @@ private:
 	void command_plg_exec();
 	void command_frct_exec();
 	void command_arc_exec();
+	void command_earc_exec();
 
 	void process_fifo();
 	void exec_abort_sequence();
