@@ -25,11 +25,31 @@ public:
 	bcs3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "videoram"){ }
+	m_p_chargen(*this, "chargen"),
+	m_p_videoram(*this, "videoram"),
+	m_io_line0(*this, "LINE0"),
+	m_io_line1(*this, "LINE1"),
+	m_io_line2(*this, "LINE2"),
+	m_io_line3(*this, "LINE3"),
+	m_io_line4(*this, "LINE4"),
+	m_io_line5(*this, "LINE5"),
+	m_io_line6(*this, "LINE6"),
+	m_io_line7(*this, "LINE7"),
+	m_io_line8(*this, "LINE8")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
-	const UINT8 *m_p_chargen;
+	required_memory_region m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
+	required_ioport m_io_line0;
+	required_ioport m_io_line1;
+	required_ioport m_io_line2;
+	required_ioport m_io_line3;
+	required_ioport m_io_line4;
+	required_ioport m_io_line5;
+	required_ioport m_io_line6;
+	required_ioport m_io_line7;
+	required_ioport m_io_line8;
 	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -44,23 +64,23 @@ READ8_MEMBER( bcs3_state::bcs3_keyboard_r )
 	UINT8 data = 0;
 
 	if (~offset & 0x01)
-		data |= ioport("LINE0")->read();
+		data |= m_io_line0->read();
 	if (~offset & 0x02)
-		data |= ioport("LINE1")->read();
+		data |= m_io_line1->read();
 	if (~offset & 0x04)
-		data |= ioport("LINE2")->read();
+		data |= m_io_line2->read();
 	if (~offset & 0x08)
-		data |= ioport("LINE3")->read();
+		data |= m_io_line3->read();
 	if (~offset & 0x10)
-		data |= ioport("LINE4")->read();
+		data |= m_io_line4->read();
 	if (~offset & 0x20)
-		data |= ioport("LINE5")->read();
+		data |= m_io_line5->read();
 	if (~offset & 0x40)
-		data |= ioport("LINE6")->read();
+		data |= m_io_line6->read();
 	if (~offset & 0x80)
-		data |= ioport("LINE7")->read();
+		data |= m_io_line7->read();
 	if (~offset & 0x100)
-		data |= ioport("LINE8")->read();
+		data |= m_io_line8->read();
 
 	return data;
 }
@@ -219,7 +239,6 @@ void bcs3_state::machine_reset()
 
 void bcs3_state::video_start()
 {
-	m_p_chargen = memregion("chargen")->base();
 }
 
 UINT32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -241,7 +260,7 @@ UINT32 bcs3_state::screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitma
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -286,7 +305,7 @@ UINT32 bcs3_state::screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitm
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -329,7 +348,7 @@ UINT32 bcs3_state::screen_update_bcs3b(screen_device &screen, bitmap_ind16 &bitm
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
@@ -372,7 +391,7 @@ UINT32 bcs3_state::screen_update_bcs3c(screen_device &screen, bitmap_ind16 &bitm
 					chr = m_p_videoram[x] & 0x7f;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_p_chargen[(chr<<3) | rat ] ^ 0xff;
+					gfx = m_p_chargen->base()[(chr<<3) | rat ] ^ 0xff;
 				}
 				else
 					gfx = 0xff;
