@@ -1469,7 +1469,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %" I64FMT "X out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %lX out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -2659,7 +2659,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %" I64FMT "X out of range\n", space.device().safe_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %lX out of range\n", space.device().safe_pc(), address);
 		address %= size;
 	}
 
@@ -2883,7 +2883,7 @@ void ddenlovr_state::mjchuuka_get_romdata()
 
 	if (address >= size)
 	{
-		logerror("%s: Error, Blitter address %" I64FMT "X out of range\n", machine().describe_context(), address);
+		logerror("%s: Error, Blitter address %lX out of range\n", machine().describe_context(), address);
 		address %= size;
 	}
 
