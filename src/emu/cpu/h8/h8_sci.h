@@ -146,8 +146,8 @@ protected:
 
 	int eri_int, rxi_int, txi_int, tei_int;
 
-	int tx_state, rx_state, tx_bit, rx_bit, clock_state, clock_mode, tx_parity, ext_clock_counter;
-	bool clock_value, ext_clock_value, rx_value, rx_parity;
+	int tx_state, rx_state, tx_bit, rx_bit, clock_state, clock_mode, tx_parity, rx_parity, ext_clock_counter;
+	bool clock_value, ext_clock_value, rx_value;
 
 	UINT8 rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
 	UINT64 clock_base, divider;

@@ -279,8 +279,8 @@ WRITE_LINE_MEMBER(h8_sci_device::rx_w)
 
 WRITE_LINE_MEMBER(h8_sci_device::clk_w)
 {
-	if(ext_clock_value != (bool)state) {
-		ext_clock_value = (bool)state;
+	if(ext_clock_value != state) {
+		ext_clock_value = state;
 		if(clock_state) {
 			switch(clock_mode) {
 			case CLKM_EXTERNAL_ASYNC:
