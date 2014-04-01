@@ -706,7 +706,6 @@ BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
 BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
 BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o
-BUSOBJS += $(BUSOBJ)/rs232/teleprinter.o
 BUSOBJS += $(BUSOBJ)/rs232/terminal.o
 endif
 

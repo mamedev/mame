@@ -850,6 +850,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/microdrv.o  \
 	$(MESS_MACHINE)/smartmed.o  \
 	$(MESS_MACHINE)/sonydriv.o  \
+	$(MESS_MACHINE)/teleprinter.o  \
 	$(MESS_MACHINE)/z80bin.o    \
 
 #-------------------------------------------------
