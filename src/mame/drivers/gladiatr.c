@@ -200,60 +200,51 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 }
 
 
-static READ8_HANDLER( gladiator_dsw1_r )
+READ8_MEMBER(gladiatr_state::gladiator_dsw1_r )
 {
-	int orig = space.machine().root_device().ioport("DSW1")->read()^0xff;
+	int orig = ioport("DSW1")->read()^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
-static READ8_HANDLER( gladiator_dsw2_r )
+READ8_MEMBER(gladiatr_state::gladiator_dsw2_r )
 {
-	int orig = space.machine().root_device().ioport("DSW2")->read()^0xff;
+	int orig = ioport("DSW2")->read()^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
 
-static READ8_HANDLER( gladiator_controls_r )
+READ8_MEMBER(gladiatr_state::gladiator_controls_r )
 {
 	int coins = 0;
 
-	if( space.machine().root_device().ioport("COINS")->read() & 0xc0 ) coins = 0x80;
+	if(ioport("COINS")->read() & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return space.machine().root_device().ioport("IN0")->read() | coins;
+		return ioport("IN0")->read() | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return space.machine().root_device().ioport("IN1")->read() | coins;
+		return ioport("IN1")->read() | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return space.machine().root_device().ioport("IN2")->read() | coins;
+		return ioport("IN2")->read() | coins;
 	}
 	/* unknown */
 	return 0;
 }
 
-static READ8_HANDLER( gladiator_button3_r )
+READ8_MEMBER(gladiatr_state::gladiator_button3_r )
 {
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return space.machine().root_device().ioport("IN3")->read();
+		return ioport("IN3")->read();
 	}
 	/* unknown */
 	return 0;
 }
 
-static const struct TAITO8741interface gladiator_8741interface=
-{
-	4,         /* 4 chips */
-	{TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT},/* program mode */
-	{1,0,0,0},  /* serial port connection */
-	{gladiator_dsw1_r,gladiator_dsw2_r,gladiator_button3_r,gladiator_controls_r}    /* port handler */
-};
-
 MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
-	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
 		UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
@@ -437,17 +428,17 @@ static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(TAITO8741_0_r, TAITO8741_0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_1_r, TAITO8741_1_w)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_1, write_1)
 	AM_RANGE(0x40, 0x40) AM_NOP // WRITE(sub_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_READWRITE_LEGACY(TAITO8741_2_r, TAITO8741_2_w)
-	AM_RANGE(0x80, 0x81) AM_READWRITE_LEGACY(TAITO8741_3_r, TAITO8741_3_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
 	AM_RANGE(0xa0, 0xa7) AM_NOP // filters on sound output
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(glad_cpu_sound_command_w)
 ADDRESS_MAP_END
@@ -716,6 +707,11 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_TAITO8741_ADD("taito8741")
+	MCFG_TAITO8741_MODES(TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT)
+	MCFG_TAITO8741_CONNECT(1,0,0,0)
+	MCFG_TAITO8741_PORT_HANDLERS(READ8(gladiatr_state,gladiator_dsw1_r),READ8(gladiatr_state,gladiator_dsw2_r),READ8(gladiatr_state,gladiator_button3_r),READ8(gladiatr_state,gladiator_controls_r))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

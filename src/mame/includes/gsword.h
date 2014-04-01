@@ -44,9 +44,11 @@ public:
 	DECLARE_WRITE8_MEMBER(gsword_AY8910_control_port_1_w);
 	DECLARE_READ8_MEMBER(gsword_fake_0_r);
 	DECLARE_READ8_MEMBER(gsword_fake_1_r);
+	DECLARE_READ8_MEMBER( gsword_8741_2_r );
+	DECLARE_READ8_MEMBER( gsword_8741_3_r );
 	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
 	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);
+	DECLARE_DRIVER_INIT(gsword2);	
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(gsword);

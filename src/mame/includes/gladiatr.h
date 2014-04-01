@@ -39,6 +39,11 @@ public:
 	int m_fg_tile_bank;
 	int m_bg_tile_bank;
 
+	
+	DECLARE_READ8_MEMBER( gladiator_dsw1_r );
+	DECLARE_READ8_MEMBER( gladiator_dsw2_r );
+	DECLARE_READ8_MEMBER( gladiator_controls_r );
+	DECLARE_READ8_MEMBER( gladiator_button3_r );
 	DECLARE_WRITE8_MEMBER(gladiatr_videoram_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_colorram_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_textram_w);
@@ -65,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(glad_adpcm_w);
 	DECLARE_READ8_MEMBER(f1_r);
 	DECLARE_DRIVER_INIT(gladiatr);
-	DECLARE_DRIVER_INIT(ppking);
+	DECLARE_DRIVER_INIT(ppking);	
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	DECLARE_MACHINE_RESET(ppking);
