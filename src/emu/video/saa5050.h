@@ -39,17 +39,12 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SAA5050_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, SAA5050, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MCFG_SAA5052_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, SAA5052, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_SAA5050_D_CALLBACK(_read) \
+	devcb = &saa5050_device::set_d_rd_callback(*device, DEVCB2_##_read);
 
 
-#define SAA5050_INTERFACE(name) \
-	const saa5050_interface (name) =
+#define MCFG_SAA5050_SCREEN_SIZE(_cols, _rows, _size) \
+	saa5050_device::static_set_screen_size(*device, _cols, _rows, _size);
 
 
 
@@ -57,27 +52,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> saa5050_interface
-
-struct saa5050_interface
-{
-	devcb_read8 m_in_d_cb;
-
-	int m_cols;
-	int m_rows;
-	int m_size;
-};
-
-
 // ======================> saa5050_device
 
-class saa5050_device :  public device_t,
-						public saa5050_interface
+class saa5050_device :  public device_t
 {
 public:
 	// construction/destruction
-	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_screen_size(device_t &device, int cols, int rows, int size) { downcast<saa5050_device &>(device).m_cols = cols; downcast<saa5050_device &>(device).m_rows = rows; downcast<saa5050_device &>(device).m_size = size; }
+
+	template<class _Object> static devcb2_base &set_d_rd_callback(device_t &device, _Object object) { return downcast<saa5050_device &>(device).m_read_d.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -95,24 +81,54 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	enum
-	{
-		TYPE_5050,
-		TYPE_5052
-	};
-
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
+	enum
+	{
+		NUL = 0,
+		ALPHA_RED,
+		ALPHA_GREEN,
+		ALPHA_YELLOW,
+		ALPHA_BLUE,
+		ALPHA_MAGENTA,
+		ALPHA_CYAN,
+		ALPHA_WHITE,
+		FLASH,
+		STEADY,
+		END_BOX,
+		START_BOX,
+		NORMAL_HEIGHT,
+		DOUBLE_HEIGHT,
+		S0,
+		S1,
+		DLE,
+		GRAPHICS_RED,
+		GRAPHICS_GREEN,
+		GRAPHICS_YELLOW,
+		GRAPHICS_BLUE,
+		GRAPHICS_MAGENTA,
+		GRAPHICS_CYAN,
+		GRAPHICS_WHITE,
+		CONCEAL_DISPLAY,
+		CONTIGUOUS_GFX,
+		SEPARATED_GFX,
+		ESC,
+		BLACK_BACKGROUND,
+		NEW_BACKGROUND,
+		HOLD_GRAPHICS,
+		RELEASE_GRAPHICS
+	};
+
 	void process_control_character(UINT8 data);
 	void get_character_data(UINT8 data);
 
-	devcb_resolved_read8    m_in_d_func;
+	required_memory_region m_char_rom;
 
-	const UINT8 *m_char_rom;
+	devcb2_read8    m_read_d;
+
 	UINT8 m_code;
 	UINT8 m_last_code;
 	UINT8 m_char_data;
@@ -132,7 +148,22 @@ private:
 	bool m_hold;
 	int m_frame_count;
 
-	int m_variant;
+	int m_cols;
+	int m_rows;
+	int m_size;
+};
+
+
+// ======================> saa5051_device
+
+class saa5051_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 };
 
 
@@ -143,12 +174,86 @@ class saa5052_device :  public saa5050_device
 public:
 	// construction/destruction
 	saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> saa5053_device
+
+class saa5053_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> saa5054_device
+
+class saa5054_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> saa5055_device
+
+class saa5055_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> saa5056_device
+
+class saa5056_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
+// ======================> saa5057_device
+
+class saa5057_device :  public saa5050_device
+{
+public:
+	// construction/destruction
+	saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 };
 
 
 // device type definition
-extern const device_type SAA5050;
-extern const device_type SAA5052;
+extern const device_type SAA5050; // English
+extern const device_type SAA5051; // German
+extern const device_type SAA5052; // Swedish/Finnish
+extern const device_type SAA5053; // Italian
+extern const device_type SAA5054; // Belgian
+extern const device_type SAA5055; // U.S. ASCII
+extern const device_type SAA5056; // Hebrew
+extern const device_type SAA5057; // Cyrillic
 
 
 

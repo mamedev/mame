@@ -29,7 +29,13 @@
 //**************************************************************************
 
 const device_type SAA5050 = &device_creator<saa5050_device>;
+const device_type SAA5051 = &device_creator<saa5051_device>;
 const device_type SAA5052 = &device_creator<saa5052_device>;
+const device_type SAA5053 = &device_creator<saa5053_device>;
+const device_type SAA5054 = &device_creator<saa5054_device>;
+const device_type SAA5055 = &device_creator<saa5055_device>;
+const device_type SAA5056 = &device_creator<saa5056_device>;
+const device_type SAA5057 = &device_creator<saa5057_device>;
 
 
 //-------------------------------------------------
@@ -37,8 +43,18 @@ const device_type SAA5052 = &device_creator<saa5052_device>;
 //-------------------------------------------------
 
 ROM_START( saa5050 )
-	ROM_REGION( 0x10000, "chargen", 0 )
+	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "saa5050", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5051 )
+//-------------------------------------------------
+
+ROM_START( saa5051 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5051", 0x0140, 0x08c0, NO_DUMP )
 ROM_END
 
 
@@ -47,8 +63,58 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( saa5052 )
-	ROM_REGION( 0x10000, "chargen", 0 )
+	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "saa5052", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5053 )
+//-------------------------------------------------
+
+ROM_START( saa5053 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5053", 0x0140, 0x08c0, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5054 )
+//-------------------------------------------------
+
+ROM_START( saa5054 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5054", 0x0140, 0x08c0, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5055 )
+//-------------------------------------------------
+
+ROM_START( saa5055 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5055", 0x0140, 0x08c0, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5056 )
+//-------------------------------------------------
+
+ROM_START( saa5056 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5056", 0x0140, 0x08c0, NO_DUMP )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( saa5057 )
+//-------------------------------------------------
+
+ROM_START( saa5057 )
+	ROM_REGION( 0xa00, "chargen", 0 )
+	ROM_LOAD( "saa5057", 0x0140, 0x08c0, NO_DUMP )
 ROM_END
 
 
@@ -58,67 +124,43 @@ ROM_END
 
 const rom_entry *saa5050_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-		default:        return ROM_NAME( saa5050 );
-		case TYPE_5052: return ROM_NAME( saa5052 );
-	}
+	return ROM_NAME( saa5050 );
 }
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-enum
+const rom_entry *saa5051_device::device_rom_region() const
 {
-	NUL = 0,
-	ALPHA_RED,
-	ALPHA_GREEN,
-	ALPHA_YELLOW,
-	ALPHA_BLUE,
-	ALPHA_MAGENTA,
-	ALPHA_CYAN,
-	ALPHA_WHITE,
-	FLASH,
-	STEADY,
-	END_BOX,
-	START_BOX,
-	NORMAL_HEIGHT,
-	DOUBLE_HEIGHT,
-	S0,
-	S1,
-	DLE,
-	GRAPHICS_RED,
-	GRAPHICS_GREEN,
-	GRAPHICS_YELLOW,
-	GRAPHICS_BLUE,
-	GRAPHICS_MAGENTA,
-	GRAPHICS_CYAN,
-	GRAPHICS_WHITE,
-	CONCEAL_DISPLAY,
-	CONTIGUOUS_GFX,
-	SEPARATED_GFX,
-	ESC,
-	BLACK_BACKGROUND,
-	NEW_BACKGROUND,
-	HOLD_GRAPHICS,
-	RELEASE_GRAPHICS
-};
+	return ROM_NAME( saa5051 );
+}
 
-
-static const rgb_t PALETTE_SAA5050[] =
+const rom_entry *saa5052_device::device_rom_region() const
 {
-	rgb_t::black,
-	rgb_t(0xff, 0x00, 0x00),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0xff, 0xff, 0x00),
-	rgb_t(0x00, 0x00, 0xff),
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0xff),
-	rgb_t::white
-};
+	return ROM_NAME( saa5052 );
+}
+
+const rom_entry *saa5053_device::device_rom_region() const
+{
+	return ROM_NAME( saa5053 );
+}
+
+const rom_entry *saa5054_device::device_rom_region() const
+{
+	return ROM_NAME( saa5054 );
+}
+
+const rom_entry *saa5055_device::device_rom_region() const
+{
+	return ROM_NAME( saa5055 );
+}
+
+const rom_entry *saa5056_device::device_rom_region() const
+{
+	return ROM_NAME( saa5056 );
+}
+
+const rom_entry *saa5057_device::device_rom_region() const
+{
+	return ROM_NAME( saa5057 );
+}
 
 
 
@@ -130,45 +172,49 @@ static const rgb_t PALETTE_SAA5050[] =
 //  saa5050_device - constructor
 //-------------------------------------------------
 
-saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_frame_count(0),
-		m_variant(variant)
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_char_rom(*this, "chargen"),
+	m_read_d(*this),
+	m_frame_count(0),
+	m_cols(0),
+	m_rows(0),
+	m_size(0)
 {
 }
 
-saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock, "saa5050", __FILE__),
-		m_frame_count(0),
-		m_variant(TYPE_5050)
+saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock, "saa5050", __FILE__),
+	m_char_rom(*this, "chargen"),
+	m_read_d(*this),
+	m_frame_count(0),
+	m_cols(0),
+	m_rows(0),
+	m_size(0)
 {
 }
+
+saa5051_device::saa5051_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5051, "SAA5051", tag, owner, clock, "saa5051", __FILE__) { }
 
 saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052, "saa5052", __FILE__)
-{
-}
+	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, "saa5052", __FILE__) { }
 
+saa5053_device::saa5053_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5053, "SAA5053", tag, owner, clock, "saa5053", __FILE__) { }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
+saa5054_device::saa5054_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5054, "SAA5054", tag, owner, clock, "saa5054", __FILE__) { }
 
-void saa5050_device::device_config_complete()
-{
-	// inherit a copy of the static code
-	const saa5050_interface *intf = reinterpret_cast<const saa5050_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<saa5050_interface *>(this) = *intf;
+saa5055_device::saa5055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5055, "SAA5055", tag, owner, clock, "saa5055", __FILE__) { }
 
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_d_cb, 0, sizeof(m_in_d_cb));
-	}
-}
+saa5056_device::saa5056_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5056, "SAA5056", tag, owner, clock, "saa5056", __FILE__) { }
+
+saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: saa5050_device(mconfig, SAA5057, "SAA5057", tag, owner, clock, "saa5057", __FILE__) { }
+
 
 
 //-------------------------------------------------
@@ -178,10 +224,7 @@ void saa5050_device::device_config_complete()
 void saa5050_device::device_start()
 {
 	// resolve callbacks
-	m_in_d_func.resolve(m_in_d_cb, *this);
-
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
+	m_read_d.resolve_safe(0);
 
 	// register for state saving
 	save_item(NAME(m_code));
@@ -202,7 +245,6 @@ void saa5050_device::device_start()
 	save_item(NAME(m_double_height_bottom_row));
 	save_item(NAME(m_hold));
 	save_item(NAME(m_frame_count));
-	save_item(NAME(m_variant));
 }
 
 
@@ -330,7 +372,7 @@ void saa5050_device::get_character_data(UINT8 data)
 	if (m_double_height && m_double_height_bottom_row) ra += 5;
 
 	offs_t char_rom_addr = (data * 10) + ra;
-	m_char_data = m_char_rom[char_rom_addr];
+	m_char_data = m_char_rom->base()[char_rom_addr];
 }
 
 
@@ -455,7 +497,7 @@ UINT32 saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		for (int sx = 0; sx < m_cols; sx++)
 		{
-			UINT8 code = m_in_d_func(video_ram_addr++);
+			UINT8 code = m_read_d(video_ram_addr++);
 
 			write(code & 0x7f);
 

@@ -623,13 +623,6 @@ static const floppy_interface bbc_floppy_interface =
 	NULL
 };
 
-static SAA5050_INTERFACE( trom_intf )
-{
-	DEVCB_NULL,
-	40, 24, 40  // x, y, size
-};
-
-
 static const mc6854_interface adlc_intf =
 {
 	DEVCB_NULL,
@@ -695,7 +688,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
-	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
+
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz/2)
+	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
@@ -909,7 +904,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
-	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz/2)
+	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)

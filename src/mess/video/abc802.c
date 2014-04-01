@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -211,9 +211,6 @@ void abc802_state::video_start()
 
 UINT32 abc802_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// HACK expand visible area to workaround MC6845
-	screen.set_visible_area(0, 767, 0, 311);
-
 	// draw text
 	m_crtc->screen_update(screen, bitmap, cliprect);
 

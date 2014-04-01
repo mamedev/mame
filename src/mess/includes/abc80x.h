@@ -133,15 +133,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
 
-	// cpu state
-	int m_fetch_charram;            // opcode fetched from character RAM region (0x7800-0x7fff)
-
-	// video state
-	UINT8 m_hrs;                    // HR picture start scanline
-	UINT8 m_fgctl;                  // HR foreground control
+	// memory state
+	int m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
 
 	// sound state
-	int m_pling;                    // pling
+	int m_pling;
 
 	// serial state
 	UINT8 m_sb;
@@ -153,20 +149,27 @@ public:
 	int m_dfd_in;
 	int m_tape_ctr;
 
+	// video state
+	UINT8 m_hrs;                    // HR picture start scanline
+	UINT8 m_fgctl;                  // HR foreground control
+
 	// timers
 	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
 };
 
+
+// ======================> abc800m_state
+
 class abc800m_state : public abc800_state
 {
 public:
-	abc800m_state(const machine_config &mconfig, device_type type, const char *tag)
-		: abc800_state(mconfig, type, tag),
-			m_crtc(*this, MC6845_TAG),
-			m_palette(*this, "palette"),
-			m_fgctl_prom(*this, "hru2"),
-			m_char_rom(*this, MC6845_TAG)
+	abc800m_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc800_state(mconfig, type, tag),
+		m_crtc(*this, MC6845_TAG),
+		m_palette(*this, "palette"),
+		m_fgctl_prom(*this, "hru2"),
+		m_char_rom(*this, MC6845_TAG)
 	{ }
 
 	required_device<mc6845_device> m_crtc;
@@ -183,16 +186,21 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 };
 
+
+// ======================> abc800c_state
+
 class abc800c_state : public abc800_state
 {
 public:
-	abc800c_state(const machine_config &mconfig, device_type type, const char *tag)
-		: abc800_state(mconfig, type, tag),
-			m_trom(*this, SAA5052_TAG),
-			m_fgctl_prom(*this, "hru2")
+	abc800c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc800_state(mconfig, type, tag),
+		m_trom(*this, SAA5052_TAG),
+		m_palette(*this, "palette"),
+		m_fgctl_prom(*this, "hru2")
 	{ }
 
 	required_device<saa5052_device> m_trom;
+	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
 
 	DECLARE_DRIVER_INIT(driver_init);
@@ -204,7 +212,9 @@ public:
 
 	DECLARE_READ8_MEMBER( char_ram_r );
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	DECLARE_PALETTE_INIT( abc800c );
 };
+
 
 // ======================> abc802_state
 
@@ -257,6 +267,7 @@ public:
 	abc806_state(const machine_config &mconfig, device_type type, const char *tag)
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
+			m_palette(*this, "palette"),
 			m_rtc(*this, E0516_TAG),
 			m_rad_prom(*this, "rad"),
 			m_hru2_prom(*this, "hru"),
@@ -265,6 +276,7 @@ public:
 	{ }
 
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_device<e0516_device> m_rtc;
 	required_memory_region m_rad_prom;
 	required_memory_region m_hru2_prom;
@@ -297,11 +309,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
 	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	DECLARE_PALETTE_INIT( abc806 );
 
 	// memory state
 	int m_keydtr;               // keyboard DTR
 	int m_eme;                  // extended memory enable
-	int m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
 	UINT8 m_map[16];            // memory page register
 
 	// video state
@@ -310,7 +322,6 @@ public:
 	int m_flshclk_ctr;          // flash clock counter
 	int m_flshclk;              // flash clock
 	UINT8 m_attr_data;          // attribute data latch
-	UINT8 m_hrs;                // HR memory mapping
 	UINT8 m_hrc[16];            // HR palette
 	UINT8 m_sync;               // line synchronization delay
 	UINT8 m_v50_addr;           // vertical sync PROM address

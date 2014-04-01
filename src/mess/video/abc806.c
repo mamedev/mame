@@ -24,18 +24,6 @@
 #define VERTICAL_PORCH_HACK     27
 
 
-static const rgb_t PALETTE_ABC[] =
-{
-	rgb_t::black, // black
-	rgb_t(0xff, 0x00, 0x00), // red
-	rgb_t(0x00, 0xff, 0x00), // green
-	rgb_t(0xff, 0xff, 0x00), // yellow
-	rgb_t(0x00, 0x00, 0xff), // blue
-	rgb_t(0xff, 0x00, 0xff), // magenta
-	rgb_t(0x00, 0xff, 0xff), // cyan
-	rgb_t::white // white
-};
-
 
 //-------------------------------------------------
 //  hrs_w - high resolution memory banking
@@ -237,6 +225,7 @@ WRITE8_MEMBER( abc806_state::sso_w )
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine().driver_data<abc806_state>();
+	const pen_t *pen = state->m_palette->pens();
 
 //  UINT8 old_data = 0xff;
 	int fg_color = 7;
@@ -325,11 +314,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 			if (!de) color = 0;
 
-			bitmap.pix32(y, x++) = PALETTE_ABC[color];
+			bitmap.pix32(y, x++) = pen[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = PALETTE_ABC[color];
+				bitmap.pix32(y, x++) = pen[color];
 			}
 
 			chargen_data <<= 1;
@@ -429,6 +418,8 @@ static MC6845_INTERFACE( crtc_intf )
 
 void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	UINT32 addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
@@ -444,7 +435,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
 				{
-					bitmap.pix32(y, x) = PALETTE_ABC[(dot >> 12) & 0x07];
+					bitmap.pix32(y, x) = pen[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;
@@ -511,6 +502,23 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 //-------------------------------------------------
+//  PALETTE_INIT( abc806 )
+//-------------------------------------------------
+
+PALETTE_INIT_MEMBER( abc806_state, abc806 )
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
+	palette.set_pen_color(6, rgb_t(0x00, 0xff, 0xff)); // cyan
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff)); // white
+}
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( abc806_video )
 //-------------------------------------------------
 
@@ -519,9 +527,11 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
+
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(abc806_state, abc806)
 MACHINE_CONFIG_END

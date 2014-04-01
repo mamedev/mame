@@ -949,6 +949,7 @@ void abc800_state::machine_start()
 	save_item(NAME(m_pling));
 	save_item(NAME(m_sb));
 	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
@@ -991,15 +992,16 @@ void abc802_state::machine_start()
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 
 	// register for state saving
-	save_item(NAME(m_lrs));
 	save_item(NAME(m_pling));
 	save_item(NAME(m_sb));
 	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
+	save_item(NAME(m_lrs));
 }
 
 
@@ -1059,16 +1061,19 @@ void abc806_state::machine_start()
 	}
 
 	// register for state saving
-	save_item(NAME(m_keydtr));
-	save_item(NAME(m_eme));
 	save_item(NAME(m_fetch_charram));
-	save_item(NAME(m_map));
+	save_item(NAME(m_pling));
+	save_item(NAME(m_sb));
 	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
 	save_item(NAME(m_dfd_in));
 	save_item(NAME(m_tape_ctr));
+	save_item(NAME(m_keydtr));
+	save_item(NAME(m_eme));
+	save_item(NAME(m_map));
 }
 
 

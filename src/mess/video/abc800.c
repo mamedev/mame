@@ -16,19 +16,6 @@
 #define VERTICAL_PORCH_HACK     29
 
 
-static const rgb_t PALETTE_ABC[] =
-{
-	rgb_t::black,
-	rgb_t(0xff, 0x00, 0x00), // red
-	rgb_t(0x00, 0xff, 0x00), // green
-	rgb_t(0xff, 0xff, 0x00), // yellow
-	rgb_t(0x00, 0x00, 0xff), // blue
-	rgb_t(0xff, 0x00, 0xff), // magenta
-	rgb_t(0x00, 0xff, 0xff), // cyan
-	rgb_t::white
-};
-
-
 
 //**************************************************************************
 //  HIGH RESOLUTION GRAPHICS
@@ -83,6 +70,8 @@ offs_t abc800c_state::translate_trom_offset(offs_t offset)
 
 void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+	
 	UINT16 addr = 0;
 
 	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 480); y += 2)
@@ -106,11 +95,11 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					if (black || opaque)
 					{
-						bitmap.pix32(y, x) = PALETTE_ABC[color];
-						bitmap.pix32(y, x + 1) = PALETTE_ABC[color];
+						bitmap.pix32(y, x) = pen[color];
+						bitmap.pix32(y, x + 1) = pen[color];
 
-						bitmap.pix32(y + 1, x) = PALETTE_ABC[color];
-						bitmap.pix32(y + 1, x + 1) = PALETTE_ABC[color];
+						bitmap.pix32(y + 1, x) = pen[color];
+						bitmap.pix32(y + 1, x + 1) = pen[color];
 					}
 				}
 
@@ -161,11 +150,22 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 	return m_char_ram[translate_trom_offset(offset)];
 }
 
-static SAA5050_INTERFACE( trom_intf )
+
+//-------------------------------------------------
+//  PALETTE_INIT( abc800c )
+//-------------------------------------------------
+
+PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 {
-	DEVCB_DRIVER_MEMBER(abc800c_state, char_ram_r),
-	40, 24, 40  // x, y, size
-};
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
+	palette.set_pen_color(6, rgb_t(0x00, 0xff, 0xff)); // cyan
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff)); // white
+}
 
 
 //-------------------------------------------------
@@ -175,13 +175,17 @@ static SAA5050_INTERFACE( trom_intf )
 MACHINE_CONFIG_FRAGMENT( abc800c_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
-
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(480, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	MCFG_SAA5052_ADD(SAA5052_TAG, XTAL_12MHz/2, trom_intf)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(abc800c_state, abc800c)
+
+	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL_12MHz/2)
+	MCFG_SAA5050_D_CALLBACK(READ8(abc800c_state, char_ram_r))
+	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 MACHINE_CONFIG_END
 
 
@@ -271,7 +275,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	ABC800_CHAR_WIDTH,
 	NULL,
@@ -291,9 +295,6 @@ static MC6845_INTERFACE( crtc_intf )
 
 UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// HACK expand visible area to workaround MC6845
-	screen.set_visible_area(0, 767, 0, 311);
-
 	// clear screen
 	bitmap.fill(rgb_t::black, cliprect);
 
