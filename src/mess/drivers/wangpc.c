@@ -926,20 +926,6 @@ WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
 	check_level1_interrupts();
 }
 
-static MC2661_INTERFACE( epci_intf )
-{
-	0,
-	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd),
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_rts),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_dtr),
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  upd765_interface fdc_intf
@@ -1147,7 +1133,14 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
-	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
+	
+	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
+	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(wangpc_state, epci_irq_w))
+	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_MC2661_TXEMT_DSCHG_HANDLER(WRITELINE(wangpc_state, epci_irq_w))
+
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(wangpc_state, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(wangpc_state, fdc_drq))
@@ -1218,4 +1211,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", GAME_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, driver_device, 0, "Wang Laboratories", "Wang Professional Computer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

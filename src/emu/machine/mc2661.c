@@ -97,38 +97,20 @@ enum
 //  mc2661_device - constructor
 //-------------------------------------------------
 
-mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC2661, "MC2661", tag, owner, clock, "mc2661", __FILE__),
-		device_serial_interface(mconfig, *this)
+mc2661_device::mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MC2661, "MC2661", tag, owner, clock, "mc2661", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_write_txd(*this),
+	m_write_rxrdy(*this),
+	m_write_txrdy(*this),
+	m_write_rts(*this),
+	m_write_dtr(*this),
+	m_write_txemt_dschg(*this),
+	m_write_bkdet(*this),
+	m_write_xsync(*this),
+	m_rxc(0),
+	m_txc(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc2661_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc2661_interface *intf = reinterpret_cast<const mc2661_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc2661_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
-		memset(&m_out_rxrdy_cb, 0, sizeof(m_out_rxrdy_cb));
-		memset(&m_out_txrdy_cb, 0, sizeof(m_out_txrdy_cb));
-		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
-		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
-		memset(&m_out_txemt_dschg_cb, 0, sizeof(m_out_txemt_dschg_cb));
-		memset(&m_out_bkdet_cb, 0, sizeof(m_out_bkdet_cb));
-		memset(&m_out_xsync_cb, 0, sizeof(m_out_xsync_cb));
-	}
 }
 
 
@@ -139,14 +121,14 @@ void mc2661_device::device_config_complete()
 void mc2661_device::device_start()
 {
 	// resolve callbacks
-	m_out_txd_func.resolve(m_out_txd_cb, *this);
-	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
-	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
-	m_out_rts_func.resolve(m_out_rts_cb, *this);
-	m_out_dtr_func.resolve(m_out_dtr_cb, *this);
-	m_out_txemt_dschg_func.resolve(m_out_txemt_dschg_cb, *this);
-	m_out_bkdet_func.resolve(m_out_bkdet_cb, *this);
-	m_out_xsync_func.resolve(m_out_xsync_cb, *this);
+	m_write_txd.resolve_safe();
+	m_write_rxrdy.resolve_safe();
+	m_write_txrdy.resolve_safe();
+	m_write_rts.resolve_safe();
+	m_write_dtr.resolve_safe();
+	m_write_txemt_dschg.resolve_safe();
+	m_write_bkdet.resolve_safe();
+	m_write_xsync.resolve_safe();
 
 	// create the timers
 	if (m_rxc > 0)
@@ -188,14 +170,14 @@ void mc2661_device::device_reset()
 	m_mode_index = 0;
 	m_sync_index = 0;
 
-	m_out_txd_func(1);
-	m_out_rxrdy_func(CLEAR_LINE);
-	m_out_txrdy_func(CLEAR_LINE);
-	m_out_rts_func(1);
-	m_out_dtr_func(1);
-	m_out_txemt_dschg_func(CLEAR_LINE);
-	m_out_bkdet_func(0);
-	m_out_xsync_func(0);
+	m_write_txd(1);
+	m_write_rxrdy(CLEAR_LINE);
+	m_write_txrdy(CLEAR_LINE);
+	m_write_rts(1);
+	m_write_dtr(1);
+	m_write_txemt_dschg(CLEAR_LINE);
+	m_write_bkdet(0);
+	m_write_xsync(0);
 }
 
 
@@ -205,7 +187,7 @@ void mc2661_device::device_reset()
 
 void mc2661_device::tra_callback()
 {
-	m_out_txd_func(transmit_register_get_data_bit());
+	m_write_txd(transmit_register_get_data_bit());
 }
 
 
@@ -217,7 +199,7 @@ void mc2661_device::tra_complete()
 {
 	// TODO
 	m_sr |= STATUS_TXRDY;
-	m_out_txrdy_func(ASSERT_LINE);
+	m_write_txrdy(ASSERT_LINE);
 }
 
 
@@ -231,7 +213,7 @@ void mc2661_device::rcv_complete()
 	receive_register_extract();
 	m_rhr = get_received_char();
 	m_sr |= STATUS_RXRDY;
-	m_out_rxrdy_func(ASSERT_LINE);
+	m_write_rxrdy(ASSERT_LINE);
 }
 
 
@@ -248,7 +230,7 @@ READ8_MEMBER( mc2661_device::read )
 	case REGISTER_HOLDING:
 		data = m_rhr;
 		m_sr &= ~STATUS_RXRDY;
-		m_out_rxrdy_func(CLEAR_LINE);
+		m_write_rxrdy(CLEAR_LINE);
 		break;
 
 	case REGISTER_STATUS:
@@ -292,7 +274,7 @@ WRITE8_MEMBER( mc2661_device::write )
 			if(COMMAND_MODE != 0x02)
 				transmit_register_setup(m_thr);
 			m_sr &= ~STATUS_TXRDY;
-			m_out_txrdy_func(CLEAR_LINE);
+			m_write_txrdy(CLEAR_LINE);
 		}
 		if(COMMAND_MODE == 0x02)  // loopback - the Wicat will set this after enabling the transmitter
 			m_rhr = data;
@@ -403,8 +385,8 @@ WRITE8_MEMBER( mc2661_device::write )
 
 		m_cr = data & 0xef;
 
-		m_out_dtr_func(!COMMAND_DTR);
-		m_out_rts_func(!COMMAND_RTS);
+		m_write_dtr(!COMMAND_DTR);
+		m_write_rts(!COMMAND_RTS);
 
 		if (COMMAND_MODE == 0x02)  // local loopback
 		{
@@ -413,7 +395,7 @@ WRITE8_MEMBER( mc2661_device::write )
 				// probably much more to it that this, but this is enough for the Wicat to be happy
 				m_rhr = m_thr;
 				m_sr |= STATUS_RXRDY;
-				m_out_rxrdy_func(ASSERT_LINE);
+				m_write_rxrdy(ASSERT_LINE);
 				return;
 			}
 		}
@@ -421,17 +403,17 @@ WRITE8_MEMBER( mc2661_device::write )
 		if (COMMAND_TXEN)
 		{
 			m_sr |= STATUS_TXRDY;
-			m_out_txrdy_func(ASSERT_LINE);
+			m_write_txrdy(ASSERT_LINE);
 		}
 		else
 		{
 			m_sr &= ~STATUS_TXRDY;
-			m_out_txrdy_func(CLEAR_LINE);
+			m_write_txrdy(CLEAR_LINE);
 		}
 		if (!COMMAND_RXEN)
 		{
 			m_sr &= ~STATUS_RXRDY;
-			m_out_rxrdy_func(CLEAR_LINE);
+			m_write_rxrdy(CLEAR_LINE);
 		}
 		if (COMMAND_RESET)
 		{

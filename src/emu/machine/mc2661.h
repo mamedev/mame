@@ -39,13 +39,35 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_MC2661_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, MC2661, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_MC2661_RXC(_clock) \
+	mc2661_device::static_set_rxc(*device, _clock);
 
+#define MCFG_MC2661_TXC(_clock) \
+	mc2661_device::static_set_txc(*device, _clock);
 
-#define MC2661_INTERFACE(_name) \
-	const mc2661_interface (_name) =
+#define MCFG_MC2661_TXD_HANDLER(_write) \
+	devcb = &mc2661_device::set_txd_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_RXRDY_HANDLER(_write) \
+	devcb = &mc2661_device::set_rxrdy_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_TXRDY_HANDLER(_write) \
+	devcb = &mc2661_device::set_txrdy_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_RTS_HANDLER(_write) \
+	devcb = &mc2661_device::set_rts_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_DTR_HANDLER(_write) \
+	devcb = &mc2661_device::set_dtr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_TXEMT_DSCHG_HANDLER(_write) \
+	devcb = &mc2661_device::set_txemt_dschg_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_BKDET_HANDLER(_write) \
+	devcb = &mc2661_device::set_bkdet_callback(*device, DEVCB2_##_write);
+
+#define MCFG_MC2661_XSYNC_HANDLER(_write) \
+	devcb = &mc2661_device::set_xsync_callback(*device, DEVCB2_##_write);
 
 
 
@@ -53,34 +75,26 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> mc2661_interface
-
-struct mc2661_interface
-{
-	int m_rxc;
-	int m_txc;
-
-	devcb_write_line    m_out_txd_cb;
-
-	devcb_write_line    m_out_rxrdy_cb;
-	devcb_write_line    m_out_txrdy_cb;
-	devcb_write_line    m_out_rts_cb;
-	devcb_write_line    m_out_dtr_cb;
-	devcb_write_line    m_out_txemt_dschg_cb;
-	devcb_write_line    m_out_bkdet_cb;
-	devcb_write_line    m_out_xsync_cb;
-};
-
-
 // ======================> mc2661_device
 
 class mc2661_device :  public device_t,
-						public device_serial_interface,
-						public mc2661_interface
+					   public device_serial_interface
 {
 public:
 	// construction/destruction
 	mc2661_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_rxc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_rxc = clock; }
+	static void static_set_txc(device_t &device, int clock) { downcast<mc2661_device &>(device).m_txc = clock; }
+
+	template<class _Object> static devcb2_base &set_txd_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txd.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rxrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rxrdy.set_callback(object); }
+	template<class _Object> static devcb2_base &set_txrdy_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txrdy.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rts_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_rts.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dtr_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_dtr.set_callback(object); }
+	template<class _Object> static devcb2_base &set_txemt_dschg_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_txemt_dschg.set_callback(object); }
+	template<class _Object> static devcb2_base &set_bkdet_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_bkdet.set_callback(object); }
+	template<class _Object> static devcb2_base &set_xsync_callback(device_t &device, _Object object) { return downcast<mc2661_device &>(device).m_write_xsync.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -96,7 +110,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -107,16 +120,17 @@ protected:
 	virtual void rcv_complete();
 
 private:
-	devcb_resolved_read_line    m_in_rxd_func;
-	devcb_resolved_write_line   m_out_txd_func;
+	devcb2_write_line   m_write_txd;
+	devcb2_write_line   m_write_rxrdy;
+	devcb2_write_line   m_write_txrdy;
+	devcb2_write_line   m_write_rts;
+	devcb2_write_line   m_write_dtr;
+	devcb2_write_line   m_write_txemt_dschg;
+	devcb2_write_line   m_write_bkdet;
+	devcb2_write_line   m_write_xsync;
 
-	devcb_resolved_write_line   m_out_rxrdy_func;
-	devcb_resolved_write_line   m_out_txrdy_func;
-	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_write_line   m_out_dtr_func;
-	devcb_resolved_write_line   m_out_txemt_dschg_func;
-	devcb_resolved_write_line   m_out_bkdet_func;
-	devcb_resolved_write_line   m_out_xsync_func;
+	int m_rxc;
+	int m_txc;
 
 	UINT8 m_rhr;
 	UINT8 m_thr;

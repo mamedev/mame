@@ -72,25 +72,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MC2661_INTERFACE( uart_intf )
-//-------------------------------------------------
-
-static MC2661_INTERFACE( uart_intf )
-{
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( adam_spi )
 //-------------------------------------------------
 
@@ -100,7 +81,8 @@ static MACHINE_CONFIG_FRAGMENT( adam_spi )
 	MCFG_CPU_IO_MAP(adam_spi_io)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_MC2661_ADD(MC2661_TAG, XTAL_4_9152MHz, uart_intf)
+	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL_4_9152MHz)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
