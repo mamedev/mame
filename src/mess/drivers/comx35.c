@@ -4,7 +4,6 @@
 
     TODO:
 
-    - unreliable DOS commands?
     - tape input/output
     - PL-80 plotter
     - serial printer

@@ -61,11 +61,19 @@
 
 #define MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD(_tag) \
 	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, NULL) \
-	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w), DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w), DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
+	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w)) \
+	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w)) \
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
 
 
-#define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _nmi, _res) \
-	downcast<vic20_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB2_##_irq, DEVCB2_##_nmi, DEVCB2_##_res);
+#define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
+	devcb = &vic20_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(_write) \
+	devcb = &vic20_expansion_slot_device::set_nmi_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(_write) \
+	devcb = &vic20_expansion_slot_device::set_res_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -85,11 +93,9 @@ public:
 	// construction/destruction
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq, class _nmi, class _res> void set_irq_callbacks(_irq irq, _nmi nmi, _res res) {
-		m_write_irq.set_callback(irq);
-		m_write_nmi.set_callback(nmi);
-		m_write_res.set_callback(res);
-	}
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb2_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_res.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);

@@ -58,18 +58,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _irq) \
+#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
-	downcast<plus4_expansion_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL, DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
-	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r), DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w), DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL) \
+	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
+	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
 
 
-#define MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(_read, _write, _aec) \
-	downcast<plus4_expansion_slot_device *>(device)->set_dma_callbacks(DEVCB2_##_read, DEVCB2_##_write, DEVCB2_##_aec);
+#define MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
+	devcb = &plus4_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
+	devcb = &plus4_expansion_slot_device::set_cd_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
+	devcb = &plus4_expansion_slot_device::set_cd_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(_write) \
+	devcb = &plus4_expansion_slot_device::set_aec_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -89,13 +100,10 @@ public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-
-	template<class _read, class _write, class _aec> void set_dma_callbacks(_read read, _write write, _aec aec) {
-		m_read_dma_cd.set_callback(read);
-		m_write_dma_cd.set_callback(write);
-		m_write_aec.set_callback(aec);
-	}
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cd_rd_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cd_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_dma_cd.set_callback(object); }
+	template<class _Object> static devcb2_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
