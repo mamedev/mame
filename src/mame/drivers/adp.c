@@ -196,13 +196,15 @@ public:
 	DECLARE_PALETTE_INIT(adp);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	UINT32 screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	H63484_DISPLAY_PIXELS_MEMBER( acrtc_display_pixels );
 	//INTERRUPT_GEN_MEMBER(adp_int);
 };
 
 
-static H63484_DISPLAY_PIXELS( acrtc_display_pixels )
+H63484_DISPLAY_PIXELS_MEMBER( adp_state::acrtc_display_pixels )
 {
-	bitmap.pix16(y, x) = data & 0xf;
+	if (cliprect.contains(x, y))
+		bitmap.pix16(y, x) = data;
 }
 
 UINT32 adp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -645,11 +647,6 @@ static ADDRESS_MAP_START( fstation_h63484_map, AS_0, 16, adp_state )
 	AM_RANGE(0x80000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static H63484_INTERFACE( adp_h63484_intf )
-{
-	acrtc_display_pixels
-};
-
 static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -678,7 +675,8 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
 
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, adp_h63484_map)
+	MCFG_H63484_ADD("h63484", 0, adp_h63484_map)
+	MCFG_H63484_DISPLAY_CALLBACK_OWNER(adp_state, acrtc_display_pixels)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 3686400/2)
@@ -702,8 +700,8 @@ static MACHINE_CONFIG_DERIVED( backgamn, skattv )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fashiong, skattv )
-	MCFG_DEVICE_REMOVE("h63484")
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, fashiong_h63484_map)
+	MCFG_DEVICE_MODIFY("h63484")
+	MCFG_H63484_ADDRESS_MAP(fashiong_h63484_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( funland, quickjac )
@@ -713,8 +711,8 @@ static MACHINE_CONFIG_DERIVED( funland, quickjac )
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
 
-	MCFG_DEVICE_REMOVE("h63484")
-	MCFG_H63484_ADD("h63484", 0, adp_h63484_intf, fstation_h63484_map)
+	MCFG_DEVICE_MODIFY("h63484")
+	MCFG_H63484_ADDRESS_MAP(fstation_h63484_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fstation, funland )
