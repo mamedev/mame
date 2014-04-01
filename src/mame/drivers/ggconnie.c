@@ -180,20 +180,6 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static const huc6270_interface sgx_huc6270_0_config =
-{
-	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(pce_common_state,pce_irq_changed)
-};
-
-
-static const huc6270_interface sgx_huc6270_1_config =
-{
-	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(pce_common_state,pce_irq_changed)
-};
-
-
 static const huc6202_interface sgx_huc6202_config =
 {
 	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, next_pixel ),
@@ -232,8 +218,12 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
 	MCFG_HUC6260_ADD( "huc6260", PCE_MAIN_CLOCK/3, sgx_huc6260_config )
-	MCFG_HUC6270_ADD( "huc6270_0", sgx_huc6270_0_config )
-	MCFG_HUC6270_ADD( "huc6270_1", sgx_huc6270_1_config )
+	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x10000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
+	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x10000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
 	MCFG_HUC6202_ADD( "huc6202", sgx_huc6202_config )
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)

@@ -464,20 +464,6 @@ static const huc6261_interface pcfx_huc6261_config =
 };
 
 
-static const huc6270_interface pcfx_huc6270_a_config =
-{
-	0x20000,
-	DEVCB_DRIVER_LINE_MEMBER(pcfx_state, irq12_w)
-};
-
-
-static const huc6270_interface pcfx_huc6270_b_config =
-{
-	0x20000,
-	DEVCB_DRIVER_LINE_MEMBER(pcfx_state, irq14_w)
-};
-
-
 void pcfx_state::machine_reset()
 {
 	membank( "bank1" )->set_base( memregion("user1")->base() );
@@ -503,8 +489,12 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, HUC6261_WPF, 64, 64 + 1024 + 64, HUC6261_LPF, 18, 18 + 242)
 
-	MCFG_HUC6270_ADD( "huc6270_a", pcfx_huc6270_a_config )
-	MCFG_HUC6270_ADD( "huc6270_b", pcfx_huc6270_b_config )
+	MCFG_DEVICE_ADD( "huc6270_a", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x20000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq12_w))
+	MCFG_DEVICE_ADD( "huc6270_b", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x20000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq14_w))
 	MCFG_HUC6261_ADD( "huc6261", XTAL_21_4772MHz, pcfx_huc6261_config )
 	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
 
