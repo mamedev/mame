@@ -1569,30 +1569,6 @@ void sega_32x_device::_32x_check_irqs()
 	else m_slave_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 }
 
-void sega_32x_device::_32x_scanline_cb0()
-{
-	m_sh2_master_vint_pending = 1;
-	m_sh2_slave_vint_pending = 1;
-	_32x_check_irqs();
-}
-
-
-void sega_32x_device::_32x_scanline_cb1(int scanline)
-{
-	m_32x_hcount_compare_val++;
-
-	if (m_32x_hcount_compare_val >= m_32x_hcount_reg)
-	{
-		m_32x_hcount_compare_val = -1;
-
-		if (scanline < 224 || m_sh2_hint_in_vbl)
-		{
-			if (m_sh2_master_hint_enable) { m_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
-			if (m_sh2_slave_hint_enable) { m_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
-		}
-	}
-}
-
 void sega_32x_device::_32x_interrupt_cb(int scanline, int irq6)
 {
 	if (scanline == irq6)
@@ -1744,50 +1720,6 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 				x++;
 				lineoffs++;
 			}
-		}
-	}
-}
-
-int sega_32x_device::_32x_render_videobuffer_to_screenbuffer_lopri(int x, UINT16 &lineptr)
-{
-	int drawn = 0;
-
-	if (m_32x_displaymode != 0)
-	{
-		if (!m_32x_videopriority)
-		{
-			if (!(m_32x_linerender[x] & 0x8000))
-			{
-				lineptr = m_32x_linerender[x] & 0x7fff;
-				drawn = 1;
-			}
-		}
-		else
-		{
-			if (m_32x_linerender[x] & 0x8000)
-			{
-				lineptr = m_32x_linerender[x] & 0x7fff;
-				drawn = 1;
-			}
-		}
-	}
-
-	return drawn;
-}
-
-void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_hipri(int x, UINT16 &lineptr)
-{
-	if (m_32x_displaymode != 0)
-	{
-		if (!m_32x_videopriority)
-		{
-			if (m_32x_linerender[x] & 0x8000)
-				lineptr = m_32x_linerender[x] & 0x7fff;
-		}
-		else
-		{
-			if (!(m_32x_linerender[x] & 0x8000))
-				lineptr = m_32x_linerender[x] & 0x7fff;
 		}
 	}
 }
