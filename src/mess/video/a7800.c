@@ -126,7 +126,6 @@ void a7800_state::maria_draw_scanline()
 	int x, d, c, i, pixel_cell, cells;
 	int maria_cycles;
 
-	//maria_cycles = 0;
      if ( m_maria_offset == 0 )
              maria_cycles = 5+19; // DMA startup + last line shutdown
 	 else
@@ -173,10 +172,10 @@ void a7800_state::maria_draw_scanline()
 			if (ind)
 			{
 				c = READ_MEM(graph_adr + x) & 0xFF;
-				maria_cycles += 3;
 				data_addr = (m_maria_charbase | c) + (m_maria_offset << 8);
 				if (is_holey(data_addr))
 					continue;
+				maria_cycles += 3;
 				if( m_maria_cwidth ) // two data bytes per map byte
 				{
 					cells = write_line_ram(data_addr, hpos, pal);
@@ -262,7 +261,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 	if (frame_scanline == 16)
 		m_maria_vblank = 0x00;
 
-	if ( frame_scanline == ( m_lines - 4 ) )
+	if ( frame_scanline == ( m_lines - 5 ) )
 	{
 		m_maria_vblank = 0x80;
 	}
@@ -286,12 +285,11 @@ TIMER_CALLBACK_MEMBER(a7800_state::a7800_maria_startdma)
 		m_maria_offset = READ_MEM(m_maria_dll) & 0x0f;
 		m_maria_holey = (READ_MEM(m_maria_dll) & 0x60) >> 5;
 		m_maria_nmi = READ_MEM(m_maria_dll) & 0x80;
-		m_maincpu->eat_cycles(6); // 24 Maria cycles minimum (DMA startup + shutdown list-list fetch)
 		/*  logerror("DLL=%x\n",m_maria_dll); */
 	}
 
 
-	if( ( frame_scanline > 15 ) && (frame_scanline < (m_lines - 4)) && m_maria_dmaon )
+	if( ( frame_scanline > 15 ) && (frame_scanline < (m_lines - 5)) && m_maria_dmaon )
 	{
 		maria_draw_scanline();
 
@@ -301,7 +299,6 @@ TIMER_CALLBACK_MEMBER(a7800_state::a7800_maria_startdma)
 			m_maria_dl = (READ_MEM(m_maria_dll+1) << 8) | READ_MEM(m_maria_dll+2);
 			m_maria_offset = READ_MEM(m_maria_dll) & 0x0f;
 			m_maria_holey = (READ_MEM(m_maria_dll) & 0x60) >> 5;
-			m_maincpu->eat_cycles(5); // 20 Maria cycles (DMA startup + shutdown)
 			if ( READ_MEM(m_maria_dll & 0x10) )
 				logerror("dll bit 5 set!\n");
 			m_maria_nmi = READ_MEM(m_maria_dll) & 0x80;
