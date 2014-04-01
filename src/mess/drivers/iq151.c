@@ -331,7 +331,7 @@ INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
 
 IRQ_CALLBACK_MEMBER(iq151_state::iq151_irq_callback)
 {
-	return m_pic->inta_r();
+	return m_pic->acknowledge();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
