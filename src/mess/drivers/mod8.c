@@ -54,7 +54,7 @@ While in 'space' mode, press a letter to increment CLP, or shift-delete
 
 #include "emu.h"
 #include "cpu/i8008/i8008.h"
-#include "bus/rs232/teleprinter.h"
+#include "machine/teleprinter.h"
 
 class mod8_state : public driver_device
 {
