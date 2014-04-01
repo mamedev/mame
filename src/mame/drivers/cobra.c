@@ -3121,16 +3121,12 @@ INPUT_PORTS_END
 
 static powerpc_config main_ppc_cfg =
 {
-	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	NULL,
-	NULL
+	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
 static powerpc_config gfx_ppc_cfg =
 {
-	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	NULL,
-	NULL
+	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
 

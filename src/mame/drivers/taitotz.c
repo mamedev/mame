@@ -2660,9 +2660,7 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 
 static const powerpc_config ppc603e_config =
 {
-	XTAL_66_6667MHz,        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	NULL,
-	NULL
+	XTAL_66_6667MHz        /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
 

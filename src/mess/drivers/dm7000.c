@@ -256,6 +256,9 @@ void dm7000_state::machine_reset()
 	dcr[DCRSTB045_DISP_MODE] = 0x00880000;
 	dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
 	m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
+	
+	ppc4xx_set_dcr_read_handler(m_maincpu, read32_delegate(FUNC(dm7000_state::dcr_r),this));
+	ppc4xx_set_dcr_write_handler(m_maincpu, write32_delegate(FUNC(dm7000_state::dcr_w),this));
 }
 
 void dm7000_state::video_start()
@@ -267,26 +270,24 @@ UINT32 dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-static READ32_DEVICE_HANDLER( dcr_r )
+READ32_MEMBER( dm7000_state::dcr_r )
 {
-	dm7000_state *state = space.machine().driver_data<dm7000_state>();
 	mame_printf_debug("DCR %03X read\n", offset);
 	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
 			return 0; // assume that video dev is always ready
 		default:
-			return state->dcr[offset];
+			return dcr[offset];
 	}
 
 }
 
-static WRITE32_DEVICE_HANDLER( dcr_w )
+WRITE32_MEMBER( dm7000_state::dcr_w )
 {
 	mame_printf_debug("DCR %03X write = %08X\n", offset, data);
-	dm7000_state *state = space.machine().driver_data<dm7000_state>();
 	if(offset>=1024) {printf("get %04X\n", offset); } else
-	state->dcr[offset] = data;
+	dcr[offset] = data;
 }
 
 WRITE8_MEMBER( dm7000_state::kbd_put )
@@ -303,9 +304,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static const powerpc_config ppc405_config =
 {
-	252000000,
-	dcr_r,
-	dcr_w
+	252000000
 };
 
 static MACHINE_CONFIG_START( dm7000, dm7000_state )
