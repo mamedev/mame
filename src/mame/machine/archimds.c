@@ -796,7 +796,7 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.min_x = 0;
 			visarea.min_y = 0;
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
-			visarea.max_y = m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR];
+			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
 
 			logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
 				m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
@@ -806,7 +806,7 @@ void archimedes_state::vidc_dynamic_res_change()
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
 
-			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR], visarea, refresh);
+			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
 		}
 	}
 }

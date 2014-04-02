@@ -24,9 +24,9 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	/* now calculate display clip rectangle start/end areas */
 	xstart = (calc_dxs)-m_vidc_regs[VIDC_HBSR];
-	ystart = (m_vidc_regs[VIDC_VDSR])-m_vidc_regs[VIDC_VBSR];
+	ystart = (m_vidc_regs[VIDC_VDSR]-m_vidc_regs[VIDC_VBSR]);
 	xend = (calc_dxe)+xstart;
-	yend = m_vidc_regs[VIDC_VDER]+ystart;
+	yend = (m_vidc_regs[VIDC_VDER] * (m_vidc_interlace+1))+ystart;
 
 	/* disable the screen if display params are invalid */
 	if(xstart > xend || ystart > yend)
