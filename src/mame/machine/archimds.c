@@ -930,17 +930,17 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		{
 			case 0: /* video init */
 				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
-				//logerror("MEMC: VIDINIT %08x\n",vidc_vidinit);
+				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
 
 			case 1: /* video start */
 				m_vidc_vidstart = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//logerror("MEMC: VIDSTART %08x\n",vidc_vidstart);
+				//printf("MEMC: VIDSTART %08x\n",m_vidc_vidstart);
 				break;
 
 			case 2: /* video end */
 				m_vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//logerror("MEMC: VIDEND %08x\n",vidc_vidend);
+				//printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
 				break;
 
 			case 4: /* sound start */

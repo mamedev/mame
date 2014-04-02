@@ -77,6 +77,41 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				}
 			}
 			break;
+			case 2: //4 bpp
+			{
+				for(y=0;y<ysize;y++)
+				{
+					for(x=0;x<xsize;x+=2)
+					{
+						pen = vram[count];
+
+						res_x = x+xstart;
+						res_y = (y+ystart)*(m_vidc_interlace+1);
+
+						for(xi=0;xi<2;xi++)
+						{
+							res_x = x+xi+xstart;
+							res_y = (y+ystart)*(m_vidc_interlace+1);
+
+							if(m_vidc_interlace)
+							{
+								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
+									bitmap.pix32(res_y, res_x) = m_palette->pen((pen>>(xi*4))&0xf);
+								if (cliprect.contains(res_x, res_y+1) && (res_x) <= xend && (res_y+1) <= yend)
+									bitmap.pix32(res_y+1, res_x) = m_palette->pen((pen>>(xi*4))&0xf);
+							}
+							else
+							{
+								if (cliprect.contains(res_x, res_y) && (res_x) <= xend && (res_y) <= yend)
+									bitmap.pix32(res_y, res_x) = m_palette->pen((pen>>(xi*4))&0xf);
+							}
+						}
+
+						count++;
+					}
+				}
+			}
+			break;
 			case 3: //8 bpp
 			{
 				for(y=0;y<ysize;y++)
@@ -106,6 +141,9 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				}
 			}
 			break;
+			default:
+				popmessage("Unemulated bpp mode %02x, contact MAME/MESSdev",m_vidc_bpp_mode);
+				break;
 		}
 	}
 
