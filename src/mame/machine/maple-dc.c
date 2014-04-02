@@ -118,7 +118,7 @@ void maple_dc_device::dma_step()
 			ddtdata.size      = 4;       // bytes per word
 			ddtdata.buffer    = header;  // destination buffer
 			ddtdata.direction = 0;       // 0 source to buffer, 1 buffer to source
-			ddtdata.channel   = -1;      // not used
+			ddtdata.channel   = 0;
 			ddtdata.mode      = -1;      // copy from/to buffer
 			sh4_dma_ddt(cpu, &ddtdata);
 			dma_adr += 8;
@@ -134,7 +134,7 @@ void maple_dc_device::dma_step()
 			ddtdata.size      = 4;       // bytes per word
 			ddtdata.buffer    = data;    // destination buffer
 			ddtdata.direction = 0;       // 0 source to buffer, 1 buffer to source
-			ddtdata.channel   = -1;      // not used
+			ddtdata.channel   = 0;
 			ddtdata.mode      = -1;      // copy from/to buffer
 			sh4_dma_ddt(cpu, &ddtdata);
 			dma_adr += length*4;
@@ -189,7 +189,7 @@ void maple_dc_device::dma_step()
 			ddtdata.size        = 4;        // bytes per word
 			ddtdata.buffer      = &data;    // destination buffer
 			ddtdata.direction   = 1;        // 0 source to buffer, 1 buffer to source
-			ddtdata.channel     = -1;       // not used
+			ddtdata.channel     = 0;
 			ddtdata.mode        = -1;       // copy from/to buffer
 			sh4_dma_ddt(cpu, &ddtdata);
 			dma_state = dma_endflag ? DMA_DONE : DMA_SEND;
@@ -214,7 +214,7 @@ void maple_dc_device::dma_step()
 				ddtdata.size        = 4;        // bytes per word
 				ddtdata.buffer      = data;     // destination buffer
 				ddtdata.direction   = 1;        // 0 source to buffer, 1 buffer to source
-				ddtdata.channel     = -1;       // not used
+				ddtdata.channel     = 0;
 				ddtdata.mode        = -1;       // copy from/to buffer
 				sh4_dma_ddt(cpu, &ddtdata);
 				dma_dest += length*4;

@@ -86,7 +86,7 @@ void dc_state::generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32
 	ddt.length = length;
 	ddt.size =size;
 	ddt.direction = to_mainram;
-	ddt.channel = -1;
+	ddt.channel = 0;
 	ddt.mode = -1;
 	sh4_dma_ddt(m_maincpu, &ddt);
 }
