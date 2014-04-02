@@ -840,27 +840,27 @@ WRITE8_MEMBER(pk8020_state::pk8020_portc_w)
 WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
 {
 	// Turn all motors off
-	floppy_mon_w(floppy_get_device(machine(), 0), 1);
-	floppy_mon_w(floppy_get_device(machine(), 1), 1);
-	floppy_mon_w(floppy_get_device(machine(), 2), 1);
-	floppy_mon_w(floppy_get_device(machine(), 3), 1);
+	floppy_get_device(machine(), 0)->floppy_mon_w(1);
+	floppy_get_device(machine(), 1)->floppy_mon_w(1);
+	floppy_get_device(machine(), 2)->floppy_mon_w(1);
+	floppy_get_device(machine(), 3)->floppy_mon_w(1);
 	m_wd1793->set_side(BIT(data,4));
 	if (BIT(data,0)) {
 		m_wd1793->set_drive(0);
-		floppy_mon_w(floppy_get_device(machine(), 0), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
+		floppy_get_device(machine(), 0)->floppy_mon_w(0);
+		floppy_get_device(machine(), 0)->floppy_drive_set_ready_state(1, 1);
 	} else if (BIT(data,1)) {
 		m_wd1793->set_drive(1);
-		floppy_mon_w(floppy_get_device(machine(), 1), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
+		floppy_get_device(machine(), 1)->floppy_mon_w(0);
+		floppy_get_device(machine(), 1)->floppy_drive_set_ready_state(1, 1);
 	} else if (BIT(data,2)) {
 		m_wd1793->set_drive(2);
-		floppy_mon_w(floppy_get_device(machine(), 2), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 2), 1, 1);
+		floppy_get_device(machine(), 2)->floppy_mon_w(0);
+		floppy_get_device(machine(), 2)->floppy_drive_set_ready_state(1, 1);
 	} else if (BIT(data,3)) {
 		m_wd1793->set_drive(3);
-		floppy_mon_w(floppy_get_device(machine(), 3), 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 3), 1, 1);
+		floppy_get_device(machine(), 3)->floppy_mon_w(0);
+		floppy_get_device(machine(), 3)->floppy_drive_set_ready_state(1, 1);
 	}
 }
 

@@ -127,10 +127,10 @@ INPUT_PORTS_END
 
 void mbc200_state::machine_start()
 {
-	floppy_mon_w(m_floppy0, CLEAR_LINE);
-	floppy_mon_w(m_floppy1, CLEAR_LINE);
-	floppy_drive_set_ready_state(m_floppy0, 1, 1);
-	floppy_drive_set_ready_state(m_floppy1, 1, 1);
+	m_floppy0->floppy_mon_w(CLEAR_LINE);
+	m_floppy1->floppy_mon_w(CLEAR_LINE);
+	m_floppy0->floppy_drive_set_ready_state(1, 1);
+	m_floppy1->floppy_drive_set_ready_state(1, 1);
 }
 
 MC6845_UPDATE_ROW( mbc200_update_row )

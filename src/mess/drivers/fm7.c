@@ -492,8 +492,8 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 			else
 			{
 				m_fdc->set_drive(data & 0x03);
-				floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
-				floppy_drive_set_ready_state(floppy_get_device(machine(), data & 0x03), data & 0x80,0);
+				floppy_get_device(machine(), data & 0x03)->floppy_mon_w(!BIT(data, 7));
+				floppy_get_device(machine(), data & 0x03)->floppy_drive_set_ready_state(data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
 			}
 			break;

@@ -299,16 +299,16 @@ void coco_fdc_device::dskreg_w(UINT8 data)
 	else if (data & 0x40)
 		drive = 3;
 
-	device_t *floppy[4];
+	legacy_floppy_image_device *floppy[4];
 
-	floppy[0] = subdevice(FLOPPY_0);
-	floppy[1] = subdevice(FLOPPY_1);
-	floppy[2] = subdevice(FLOPPY_2);
-	floppy[3] = subdevice(FLOPPY_3);
+	floppy[0] = subdevice<legacy_floppy_image_device>(FLOPPY_0);
+	floppy[1] = subdevice<legacy_floppy_image_device>(FLOPPY_1);
+	floppy[2] = subdevice<legacy_floppy_image_device>(FLOPPY_2);
+	floppy[3] = subdevice<legacy_floppy_image_device>(FLOPPY_3);
 
 	for (int i = 0; i < 4; i++)
 	{
-		floppy_mon_w(floppy[i], i == drive ? CLEAR_LINE : ASSERT_LINE);
+		floppy[i]->floppy_mon_w(i == drive ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	head = ((data & 0x40) && (drive != 3)) ? 1 : 0;

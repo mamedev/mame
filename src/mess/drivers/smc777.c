@@ -389,9 +389,9 @@ void smc777_state::check_floppy_inserted()
 	/* FIXME: floppy drive 1 doesn't work? */
 	for(f_num=0;f_num<2;f_num++)
 	{
-		floppy = flopimg_get_image(floppy_get_device(machine(), f_num));
-		floppy_mon_w(floppy_get_device(machine(), f_num), (floppy != NULL) ? 0 : 1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), f_num), (floppy != NULL) ? 1 : 0,0);
+		floppy = floppy_get_device(machine(), f_num)->flopimg_get_image();
+		floppy_get_device(machine(), f_num)->floppy_mon_w((floppy != NULL) ? 0 : 1);
+		floppy_get_device(machine(), f_num)->floppy_drive_set_ready_state((floppy != NULL) ? 1 : 0,0);
 	}
 }
 

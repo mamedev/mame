@@ -10,6 +10,8 @@
 #ifndef __WD17XX_H__
 #define __WD17XX_H__
 
+#include "imagedev/flopdrv.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -165,7 +167,7 @@ protected:
 	emu_timer *m_timer_cmd, *m_timer_data, *m_timer_rs, *m_timer_ws;
 
 	/* this is the drive currently selected */
-	device_t *m_drive;
+	legacy_floppy_image_device *m_drive;
 
 	/* this is the head currently selected */
 	UINT8 m_hd;

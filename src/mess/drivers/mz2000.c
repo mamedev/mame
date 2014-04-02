@@ -360,8 +360,8 @@ WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 	{
 		case 0xdc:
 			m_mb8877a->set_drive(data & 3);
-			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
+			floppy_get_device(machine(), data & 3)->floppy_mon_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(1,0);
 			break;
 		case 0xdd:
 			m_mb8877a->set_side((data & 1));

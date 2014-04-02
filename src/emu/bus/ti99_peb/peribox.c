@@ -394,10 +394,10 @@ void peribox_device::device_start(void)
 {
 	if (TRACE_EMU) logerror("Peribox started\n");
 
-	floppy_drive_set_rpm(subdevice(FLOPPY_0), 300.);
-	floppy_drive_set_rpm(subdevice(FLOPPY_1), 300.);
-	floppy_drive_set_rpm(subdevice(FLOPPY_2), 300.);
-	floppy_drive_set_rpm(subdevice(FLOPPY_3), 300.);
+	subdevice<legacy_floppy_image_device>(FLOPPY_0)->floppy_drive_set_rpm(300.);
+	subdevice<legacy_floppy_image_device>(FLOPPY_1)->floppy_drive_set_rpm(300.);
+	subdevice<legacy_floppy_image_device>(FLOPPY_2)->floppy_drive_set_rpm(300.);
+	subdevice<legacy_floppy_image_device>(FLOPPY_3)->floppy_drive_set_rpm(300.);
 
 	// Resolve the callback lines to the console
 	m_console_inta.resolve();

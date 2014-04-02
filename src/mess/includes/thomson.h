@@ -304,7 +304,7 @@ public:
 	WRITE_LINE_MEMBER( fdc_index_1_w );
 	WRITE_LINE_MEMBER( fdc_index_2_w );
 	WRITE_LINE_MEMBER( fdc_index_3_w );
-	void thomson_index_callback(device_t *device, int state);
+	void thomson_index_callback(legacy_floppy_image_device *device, int state);
 	DECLARE_PALETTE_INIT(thom);
 	
 	optional_device<mc6854_device> m_mc6854;
@@ -519,26 +519,26 @@ protected:
 	unsigned to7_lightpen_gpl( int decx, int decy );
 
 	int thom_floppy_make_addr( chrn_id id, UINT8* dst, int sector_size );
-	int thom_floppy_make_sector( device_t* img, chrn_id id, UINT8* dst, int sector_size );
-	int thom_floppy_make_track( device_t* img, UINT8* dst, int sector_size, int side );
+	int thom_floppy_make_sector( legacy_floppy_image_device* img, chrn_id id, UINT8* dst, int sector_size );
+	int thom_floppy_make_track( legacy_floppy_image_device* img, UINT8* dst, int sector_size, int side );
 	int thom_qdd_make_addr( int sector, UINT8* dst );
-	int thom_qdd_make_sector( device_t* img, int sector, UINT8* dst );
-	int thom_qdd_make_disk ( device_t* img, UINT8* dst );
+	int thom_qdd_make_sector( legacy_floppy_image_device* img, int sector, UINT8* dst );
+	int thom_qdd_make_disk ( legacy_floppy_image_device* img, UINT8* dst );
 	void to7_5p14_reset();
 	void to7_5p14_init();
-	void to7_5p14_index_pulse_callback( device_t *controller,device_t *image, int state );
+	void to7_5p14_index_pulse_callback( device_t *controller,legacy_floppy_image_device *image, int state );
 	void to7_5p14sd_reset();
 	void to7_5p14sd_init();
-	void to7_qdd_index_pulse_cb( device_t *controller,device_t *image, int state );
-	device_t * to7_qdd_image();
+	void to7_qdd_index_pulse_cb( device_t *controller,legacy_floppy_image_device *image, int state );
+	legacy_floppy_image_device * to7_qdd_image();
 	void to7_qdd_stat_update();
 	UINT8 to7_qdd_read_byte();
 	void to7_qdd_write_byte( UINT8 data );
 	void to7_qdd_reset();
 	void to7_qdd_init();
-	device_t * thmfc_floppy_image();
-	int thmfc_floppy_is_qdd( device_image_interface *image );
-	void thmfc_floppy_index_pulse_cb( device_t *controller,device_t *image, int state );
+	legacy_floppy_image_device * thmfc_floppy_image();
+	int thmfc_floppy_is_qdd( legacy_floppy_image_device *image );
+	void thmfc_floppy_index_pulse_cb( device_t *controller,legacy_floppy_image_device *image, int state );
 	int thmfc_floppy_find_sector( chrn_id* dst );
 	void thmfc_floppy_cmd_complete();
 	UINT8 thmfc_floppy_read_byte();

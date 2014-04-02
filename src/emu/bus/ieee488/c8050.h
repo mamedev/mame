@@ -125,7 +125,7 @@ protected:
 		int m_bit_pos;                          // bit position within track buffer byte
 
 		// devices
-		device_t *m_image;
+		legacy_floppy_image_device *m_image;
 	} m_unit[2];
 
 	int m_drive;                        // selected drive

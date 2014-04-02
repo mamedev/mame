@@ -158,9 +158,9 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 		}
 		// bit 3 connected to pin 23 "HRDY" of FDC
 		// TEMP HACK, FDD motor and RDY FDC pin controlled by HLD pin of FDC
-		device_t *flop = subdevice(beta_wd17xx_interface.floppy_drive_tags[data & 3]);
-		floppy_mon_w(flop, CLEAR_LINE);
-		floppy_drive_set_ready_state(flop, 1, 0);
+		legacy_floppy_image_device *flop = subdevice<legacy_floppy_image_device>(beta_wd17xx_interface.floppy_drive_tags[data & 3]);
+		flop->floppy_mon_w(CLEAR_LINE);
+		flop->floppy_drive_set_ready_state(1, 0);
 	}
 }
 

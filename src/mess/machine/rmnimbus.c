@@ -2274,7 +2274,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 	wd2793_device *fdc = machine().device<wd2793_device>(FDC_TAG);
 
 	int pc=space.device().safe_pc();
-	device_t *drive = machine().device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
+	legacy_floppy_image_device *drive = machine().device<legacy_floppy_image_device>(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
 
 	switch(offset*2)
 	{
@@ -2294,8 +2294,8 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 		case 0x10 :
 			m_nimbus_drives.reg410_in &= ~FDC_BITS_410;
 			m_nimbus_drives.reg410_in |= (FDC_MOTOR() ? FDC_MOTOR_MASKI : 0x00);
-			m_nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_INDEX) ? 0x00 : FDC_INDEX_MASK);
-			m_nimbus_drives.reg410_in |= (floppy_drive_get_flag_state(drive, FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);
+			m_nimbus_drives.reg410_in |= (drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX) ? 0x00 : FDC_INDEX_MASK);
+			m_nimbus_drives.reg410_in |= (drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) ? FDC_READY_MASK : 0x00);
 
 			// Flip inverted bits
 			result=m_nimbus_drives.reg410_in ^ INV_BITS_410;

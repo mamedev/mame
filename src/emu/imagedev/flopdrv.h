@@ -90,92 +90,6 @@ struct chrn_id
 /* set if index has just occurred */
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
-/* a callback which will be executed if the ready state of the drive changes e.g. not ready->ready, ready->not ready */
-void floppy_drive_set_ready_state_change_callback(device_t *img, void (*callback)(device_t *controller,device_t *img, int state));
-
-void floppy_drive_set_index_pulse_callback(device_t *img, void (*callback)(device_t *controller,device_t *image, int state));
-
-/* set flag state */
-int floppy_drive_get_flag_state(device_t *img, int flag);
-/* get flag state */
-void floppy_drive_set_flag_state(device_t *img, int flag, int state);
-/* get current physical track drive is on */
-int floppy_drive_get_current_track(device_t *img);
-/* get current physical track size */
-UINT64 floppy_drive_get_current_track_size(device_t *img, int head);
-
-/* get next id from track, 1 if got a id, 0 if no id was got */
-int floppy_drive_get_next_id(device_t *img, int side, chrn_id *);
-/* set ready state of drive. If flag == 1, set ready state only if drive present,
-disk is in drive, and motor is on. Otherwise set ready state to the state passed */
-void floppy_drive_set_ready_state(device_t *img, int state, int flag);
-
-/* seek up or down */
-void floppy_drive_seek(device_t *img, signed int signed_tracks);
-
-void floppy_drive_read_track_data_info_buffer(device_t *img, int side, void *ptr, int *length );
-void floppy_drive_write_track_data_info_buffer(device_t *img, int side, const void *ptr, int *length );
-void floppy_drive_format_sector(device_t *img, int side, int sector_index, int c, int h, int r, int n, int filler);
-void floppy_drive_read_sector_data(device_t *img, int side, int index1, void *pBuffer, int length);
-void floppy_drive_write_sector_data(device_t *img, int side, int index1, const void *pBuffer, int length, int ddam);
-
-/* set motor speed to get correct index pulses
-   standard RPM are 300 RPM (common) and 360 RPM
-   Note: this actually only works for soft sectored disks: one index pulse per
-   track.
-*/
-void floppy_drive_set_rpm(device_t *image, float rpm);
-
-void floppy_drive_set_controller(device_t *img, device_t *controller);
-
-floppy_image_legacy *flopimg_get_image(device_t *image);
-
-/* hack for apple II; replace this when we think of something better */
-void floppy_install_unload_proc(device_t *image, void (*proc)(device_image_interface &image));
-
-void floppy_install_load_proc(device_t *image, void (*proc)(device_image_interface &image));
-
-device_t *floppy_get_device(running_machine &machine,int drive);
-device_t *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
-int floppy_get_drive_type(device_t *image);
-void floppy_set_type(device_t *image,int ftype);
-int floppy_get_count(running_machine &machine);
-
-int floppy_get_drive(device_t *image);
-int floppy_get_drive_by_type(device_t *image,int ftype);
-
-void floppy_drive_set_geometry(device_t *img, floppy_type_t type);
-
-/* drive select lines */
-WRITE_LINE_DEVICE_HANDLER( floppy_ds0_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_ds1_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_ds2_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_ds3_w );
-DECLARE_WRITE8_DEVICE_HANDLER( floppy_ds_w );
-
-WRITE_LINE_DEVICE_HANDLER( floppy_mon_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_stp_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w );
-WRITE_LINE_DEVICE_HANDLER( floppy_wtg_w );
-
-/* write-protect */
-READ_LINE_DEVICE_HANDLER( floppy_wpt_r );
-
-/* track 0 detect */
-READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
-
-/* disk changed */
-READ_LINE_DEVICE_HANDLER( floppy_dskchg_r );
-
-/* 2-sided disk */
-READ_LINE_DEVICE_HANDLER( floppy_twosid_r );
-
-// index pulse
-READ_LINE_DEVICE_HANDLER( floppy_index_r );
-
-// drive ready
-READ_LINE_DEVICE_HANDLER( floppy_ready_r );
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
@@ -203,19 +117,133 @@ public:
 	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const { return floppy_option_guide; }
 
-	// access to legacy token
-	struct floppy_drive *token() const { assert(m_token != NULL); return m_token; }
+	floppy_image_legacy *flopimg_get_image();
+	void floppy_drive_set_geometry(floppy_type_t type);
+	void floppy_drive_set_flag_state(int flag, int state);
+	void floppy_drive_set_ready_state(int state, int flag);
+	int floppy_drive_get_flag_state(int flag);
+	void floppy_drive_seek(signed int signed_tracks);
+	int floppy_drive_get_next_id(int side, chrn_id *id);
+	void floppy_drive_read_track_data_info_buffer(int side, void *ptr, int *length );
+	void floppy_drive_write_track_data_info_buffer(int side, const void *ptr, int *length );
+	void floppy_drive_format_sector(int side, int sector_index,int c,int h, int r, int n, int filler);
+	void floppy_drive_read_sector_data(int side, int index1, void *ptr, int length);
+	void floppy_drive_write_sector_data(int side, int index1, const void *ptr,int length, int ddam);
+	void floppy_install_load_proc(void (*proc)(device_image_interface &image));
+	void floppy_install_unload_proc(void (*proc)(device_image_interface &image));
+	void floppy_drive_set_index_pulse_callback(void (*callback)(device_t *controller,device_t *image, int state));
+	void floppy_drive_set_ready_state_change_callback(void (*callback)(device_t *controller,device_t *img, int state));
+	int floppy_drive_get_current_track();
+	UINT64 floppy_drive_get_current_track_size(int head);
+	void floppy_drive_set_rpm(float rpm);
+	void floppy_drive_set_controller(device_t *controller);
+	int floppy_get_drive_type();
+	void floppy_set_type(int ftype);
+	WRITE_LINE_MEMBER( floppy_ds0_w );
+	WRITE_LINE_MEMBER( floppy_ds1_w );
+	WRITE_LINE_MEMBER( floppy_ds2_w );
+	WRITE_LINE_MEMBER( floppy_ds3_w );
+	WRITE8_MEMBER( floppy_ds_w );
+	WRITE_LINE_MEMBER( floppy_mon_w );
+	WRITE_LINE_MEMBER( floppy_drtn_w );
+	WRITE_LINE_MEMBER( floppy_wtd_w );
+	WRITE_LINE_MEMBER( floppy_stp_w );
+	WRITE_LINE_MEMBER( floppy_wtg_w );
+	READ_LINE_MEMBER( floppy_wpt_r );
+	READ_LINE_MEMBER( floppy_tk00_r );
+	READ_LINE_MEMBER( floppy_dskchg_r );
+	READ_LINE_MEMBER( floppy_twosid_r );
+	READ_LINE_MEMBER( floppy_index_r );
+	READ_LINE_MEMBER( floppy_ready_r );
+
+
+private:
+	int flopimg_get_sectors_per_track(int side);
+	void flopimg_get_id_callback(chrn_id *id, int id_index, int side);
+	void log_readwrite(const char *name, int head, int track, int sector, const char *buf, int length);
+	void floppy_drive_set_geometry_absolute(int tracks, int sides);
+	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
+	void floppy_drive_init();
+	void floppy_drive_index_func();
+	TIMER_CALLBACK(floppy_drive_index_callback);
+	int internal_floppy_device_load(int create_format, option_resolution *create_args);
+	TIMER_CALLBACK_MEMBER( set_wpt );
+
 protected:
 	// device overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 
-	struct floppy_drive *m_token;
+	/* callbacks */
+	devcb_resolved_write_line m_out_idx_func;
+	devcb_resolved_read_line m_in_mon_func;
+	devcb_resolved_write_line m_out_tk00_func;
+	devcb_resolved_write_line m_out_wpt_func;
+	devcb_resolved_write_line m_out_rdy_func;
+	devcb_resolved_write_line m_out_dskchg_func;
+
+	/* state of input lines */
+	int m_drtn; /* direction */
+	int m_stp;  /* step */
+	int m_wtg;  /* write gate */
+	int m_mon;  /* motor on */
+
+	/* state of output lines */
+	int m_idx;  /* index pulse */
+	int m_tk00; /* track 00 */
+	int m_wpt;  /* write protect */
+	int m_rdy;  /* ready */
+	int m_dskchg;     /* disk changed */
+
+	/* drive select logic */
+	int m_drive_id;
+	int m_active;
+
+	const floppy_interface  *m_config;
+
+	/* flags */
+	int m_flags;
+	/* maximum track allowed */
+	int m_max_track;
+	/* num sides */
+	int m_num_sides;
+	/* current track - this may or may not relate to the present cylinder number
+	stored by the fdc */
+	int m_current_track;
+
+	/* index pulse timer */
+	emu_timer   *m_index_timer;
+	/* index pulse callback */
+	void    (*m_index_pulse_callback)(device_t *controller,device_t *image, int state);
+	/* rotation per minute => gives index pulse frequency */
+	float m_rpm;
+
+	void    (*m_ready_state_change_callback)(device_t *controller,device_t *img, int state);
+
+	int m_id_index;
+
+	device_t *m_controller;
+
+	floppy_image_legacy *m_floppy;
+	int m_track;
+	void (*m_load_proc)(device_image_interface &image);
+	void (*m_unload_proc)(device_image_interface &image);
+	int m_floppy_drive_type;
+
 	char            m_extension_list[256];
 };
 
 // device type definition
 extern const device_type LEGACY_FLOPPY;
+
+
+
+legacy_floppy_image_device *floppy_get_device(running_machine &machine,int drive);
+legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,int ftype,int drive);
+int floppy_get_drive(device_t *image);
+int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype);
+int floppy_get_count(running_machine &machine);
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

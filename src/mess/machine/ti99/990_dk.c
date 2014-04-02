@@ -16,7 +16,6 @@
 #include "emu.h"
 
 #include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "990_dk.h"
 
 /* status bits */
@@ -110,7 +109,7 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
 
 	/*while (revolution_count < 2)*/
 	/*{*/
-		if (floppy_drive_get_next_id(&m_drv[unit].img->device(), head, &id))
+		if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
 		{
 			if (cylinder_id)
 				*cylinder_id = id.C;
@@ -142,7 +141,7 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
 
 	while (revolution_count < 2)
 	{
-		if (floppy_drive_get_next_id(&m_drv[unit].img->device(), head, &id))
+		if (m_drv[unit].img->floppy_drive_get_next_id(head, &id))
 		{
 			/* compare id */
 			if ((id.R == sector) && (id.N == 0))
@@ -199,7 +198,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 	}
 	for (retries=0; retries<10; retries++)
 	{   /* seek to requested track */
-		floppy_drive_seek(&m_drv[unit].img->device(), cylinder-m_drv[unit].log_cylinder[head]);
+		m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].log_cylinder[head]);
 		/* update physical track position */
 		if (m_drv[unit].phys_cylinder != -1)
 			m_drv[unit].phys_cylinder += cylinder-m_drv[unit].log_cylinder[head];
@@ -241,9 +240,9 @@ int fd800_legacy_device::do_restore(int unit)
 	}
 
 	/* limit iterations to 76 to prevent an endless loop if the disc is locked */
-	while (!(seek_complete = !floppy_tk00_r(&m_drv[unit].img->device())) && (seek_count < 76))
+	while (!(seek_complete = !m_drv[unit].img->floppy_tk00_r()) && (seek_count < 76))
 	{
-		floppy_drive_seek(&m_drv[unit].img->device(), -1);
+		m_drv[unit].img->floppy_drive_seek(-1);
 		seek_count++;
 	}
 	if (! seek_complete)
@@ -279,7 +278,7 @@ void fd800_legacy_device::do_read(void)
 		return;
 	}
 
-	floppy_drive_read_sector_data(&m_drv[m_unit].img->device(), m_head, data_id, m_buf, 128);
+	m_drv[m_unit].img->floppy_drive_read_sector_data(m_head, data_id, m_buf, 128);
 	m_buf_pos = 0;
 	m_buf_mode = bm_read;
 	m_recv_buf = (m_buf[m_buf_pos<<1] << 8) | m_buf[(m_buf_pos<<1)+1];
@@ -305,7 +304,7 @@ void fd800_legacy_device::do_write(void)
 		return;
 	}
 
-	floppy_drive_write_sector_data(&m_drv[m_unit].img->device(), m_head, data_id, m_buf, 128, m_ddam);
+	m_drv[m_unit].img->floppy_drive_write_sector_data(m_head, data_id, m_buf, 128, m_ddam);
 	m_buf_pos = 0;
 	m_buf_mode = bm_write;
 
@@ -587,7 +586,7 @@ void fd800_legacy_device::do_cmd(void)
 		}
 		else if ((m_drv[unit].phys_cylinder != -1) || (!do_restore(unit)))
 		{
-			floppy_drive_seek(&m_drv[unit].img->device(), cylinder-m_drv[unit].phys_cylinder);
+			m_drv[unit].img->floppy_drive_seek(cylinder-m_drv[unit].phys_cylinder);
 			m_stat_reg |= status_OP_complete;
 		}
 
@@ -871,7 +870,7 @@ void fd800_legacy_device::device_start(void)
 
 	for (int i=0; i<MAX_FLOPPIES; i++)
 	{
-		m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine(), i));
+		m_drv[i].img = floppy_get_device(machine(), i);
 		m_drv[i].phys_cylinder = -1;
 		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
 		m_drv[i].seclen = 64;

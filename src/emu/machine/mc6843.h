@@ -67,8 +67,8 @@ private:
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* m_timer_cont;
 	
-	device_t* floppy_image(UINT8 drive);
-	device_t* floppy_image();
+	legacy_floppy_image_device* floppy_image(UINT8 drive);
+	legacy_floppy_image_device* floppy_image();
 	void status_update();
 	void cmd_end();
 	void finish_STZ();

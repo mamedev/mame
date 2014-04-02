@@ -326,7 +326,7 @@ private:
 	virtual void machine_reset();
 
 	int m_unit;
-	device_t *m_image[4];
+	legacy_floppy_image_device *m_image[4];
 
 	int m_irq_high;
 	UINT32 m_irq_mask;
@@ -335,10 +335,10 @@ private:
 
 void rainbow_state::machine_start()
 {
-	m_image[0] = subdevice(FLOPPY_0);
-	m_image[1] = subdevice(FLOPPY_1);
-	m_image[2] = subdevice(FLOPPY_2);
-	m_image[3] = subdevice(FLOPPY_3);
+	m_image[0] = subdevice<legacy_floppy_image_device>(FLOPPY_0);
+	m_image[1] = subdevice<legacy_floppy_image_device>(FLOPPY_1);
+	m_image[2] = subdevice<legacy_floppy_image_device>(FLOPPY_2);
+	m_image[3] = subdevice<legacy_floppy_image_device>(FLOPPY_3);
 
 	COLD_BOOT = 1;
 
@@ -863,9 +863,9 @@ D0 : ZFLIP L: (read from the diagnostic control register of Z80A)
 NOTES: ALL LOW ACTIVE - EXCEPT TR00
 */
 	// * TRACK 00 *  signal for current drive
-	int tk00 = ( floppy_tk00_r( m_image[m_unit] ) == CLEAR_LINE ) ? 0x20 : 0x00;
+	int tk00 = ( m_image[m_unit]->floppy_tk00_r()  == CLEAR_LINE ) ? 0x20 : 0x00;
 
-	int fdc_ready = floppy_drive_get_flag_state( m_image[m_unit] , FLOPPY_DRIVE_READY);
+	int fdc_ready = m_image[m_unit]->floppy_drive_get_flag_state( FLOPPY_DRIVE_READY);
 
 	int data=(   0x80                    |   // (STEP L)
 //           (  (fdc_write_gate) )       |
@@ -958,7 +958,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	int selected_drive = 255;
 
-	if (flopimg_get_image( floppy_get_device( machine(), drive ) ) != NULL)
+	if (floppy_get_device( machine(), drive )->flopimg_get_image() != NULL)
 	{   selected_drive = drive;
 		m_fdc->set_drive(selected_drive);
 	}
@@ -987,10 +987,10 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 			{
 				// Although 1773 does not feature 'motor on' this statement is required:
 				// CLEAR_LINE = turn motor on -
-				floppy_mon_w(m_image[f_num], (f_num == selected_drive) ? CLEAR_LINE : ASSERT_LINE);
+				m_image[f_num]->floppy_mon_w((f_num == selected_drive) ? CLEAR_LINE : ASSERT_LINE);
 
 				// Parameters: DRIVE, STATE, FLAG
-				floppy_drive_set_ready_state( m_image[f_num],
+				m_image[f_num]->floppy_drive_set_ready_state(
 												(f_num == selected_drive) ? 1 : 0,
 												(f_num == selected_drive) ? force_ready : 0
 											);

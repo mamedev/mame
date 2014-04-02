@@ -128,10 +128,10 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 		floppy_name = FLOPPY_3;
 		break;
 	}
-	device_t *floppy = subdevice(floppy_name);
+	legacy_floppy_image_device *floppy = subdevice<legacy_floppy_image_device>(floppy_name);
 	m_mc6843->set_drive(drive);
-	floppy_mon_w(floppy, motor);
-	floppy_drive_set_ready_state(floppy, ASSERT_LINE, 0);
+	floppy->floppy_mon_w(motor);
+	floppy->floppy_drive_set_ready_state(ASSERT_LINE, 0);
 	m_mc6843->set_side(side);
 }
 

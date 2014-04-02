@@ -27,13 +27,13 @@ INLINE apple525_floppy_image_device *get_device(device_t *device)
 
 static int apple525_enable_mask = 1;
 
-device_t *apple525_get_subdevice(device_t *device, int drive)
+legacy_floppy_image_device *apple525_get_subdevice(device_t *device, int drive)
 {
 	switch(drive) {
-		case 0 : return device->subdevice(PARENT_FLOPPY_0);
-		case 1 : return device->subdevice(PARENT_FLOPPY_1);
-		case 2 : return device->subdevice(PARENT_FLOPPY_2);
-		case 3 : return device->subdevice(PARENT_FLOPPY_3);
+		case 0 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_0);
+		case 1 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_1);
+		case 2 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_2);
+		case 3 : return device->subdevice<legacy_floppy_image_device>(PARENT_FLOPPY_3);
 	}
 	return NULL;
 }
@@ -43,8 +43,8 @@ device_t *apple525_get_device_by_type(device_t *device, int ftype, int drive)
 	int i;
 	int cnt = 0;
 	for (i=0;i<4;i++) {
-		device_t *disk = apple525_get_subdevice(device, i);
-		if (floppy_get_drive_type(disk)==ftype) {
+		legacy_floppy_image_device *disk = apple525_get_subdevice(device, i);
+		if (disk->floppy_get_drive_type()==ftype) {
 			if (cnt==drive) {
 				return disk;
 			}
@@ -69,7 +69,7 @@ static void apple525_load_current_track(device_t *image)
 	disk = get_device(image);
 	len = sizeof(disk->track_data);
 
-	floppy_drive_read_track_data_info_buffer(image, 0, disk->track_data, &len);
+	disk->floppy_drive_read_track_data_info_buffer(0, disk->track_data, &len);
 	disk->track_loaded = 1;
 	disk->track_dirty = 0;
 }
@@ -84,14 +84,14 @@ static void apple525_save_current_track(device_t *image, int unload)
 	if (disk->track_dirty)
 	{
 		len = sizeof(disk->track_data);
-		floppy_drive_write_track_data_info_buffer(image, 0, disk->track_data, &len);
+		disk->floppy_drive_write_track_data_info_buffer(0, disk->track_data, &len);
 		disk->track_dirty = 0;
 	}
 	if (unload)
 		disk->track_loaded = 0;
 }
 
-static void apple525_seek_disk(device_t *img, signed int step)
+static void apple525_seek_disk(apple525_floppy_image_device *img, signed int step)
 {
 	int track;
 	int pseudo_track;
@@ -101,7 +101,7 @@ static void apple525_seek_disk(device_t *img, signed int step)
 
 	apple525_save_current_track(img, FALSE);
 
-	track = floppy_drive_get_current_track(img);
+	track = img->floppy_drive_get_current_track();
 	pseudo_track = (track * 2) + disk->tween_tracks;
 
 	pseudo_track += step;
@@ -112,7 +112,7 @@ static void apple525_seek_disk(device_t *img, signed int step)
 
 	if (pseudo_track/2 != track)
 	{
-		floppy_drive_seek(img, pseudo_track/2 - floppy_drive_get_current_track(img));
+		img->floppy_drive_seek(pseudo_track/2 - img->floppy_drive_get_current_track());
 		disk->track_loaded = 0;
 	}
 
@@ -144,7 +144,7 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 			case 8: phase = 3; break;
 		}
 
-		phase -= floppy_drive_get_current_track(image) * 2;
+		phase -= cur_disk->floppy_drive_get_current_track() * 2;
 		if (cur_disk->tween_tracks)
 			phase--;
 		phase %= 4;
@@ -152,10 +152,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 		switch(phase)
 		{
 			case 1:
-				apple525_seek_disk(image, +1);
+				apple525_seek_disk(cur_disk, +1);
 				break;
 			case 3:
-				apple525_seek_disk(image, -1);
+				apple525_seek_disk(cur_disk, -1);
 				break;
 		}
 	}
@@ -164,10 +164,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 int apple525_get_count(device_t *device)
 {
 	int cnt = 0;
-	if ((device->subdevice("^"FLOPPY_0)!=NULL) && (floppy_get_drive_type(device->subdevice("^"FLOPPY_0)) == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_1)!=NULL) && (floppy_get_drive_type(device->subdevice("^"FLOPPY_1)) == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_2)!=NULL) && (floppy_get_drive_type(device->subdevice("^"FLOPPY_2)) == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL)) cnt++;
-	if ((device->subdevice("^"FLOPPY_3)!=NULL) && (floppy_get_drive_type(device->subdevice("^"FLOPPY_3)) == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL)) cnt++;
+	if ((device->subdevice("^"FLOPPY_0)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_0)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL)) cnt++;
+	if ((device->subdevice("^"FLOPPY_1)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_1)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL)) cnt++;
+	if ((device->subdevice("^"FLOPPY_2)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_2)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL)) cnt++;
+	if ((device->subdevice("^"FLOPPY_3)!=NULL) && (device->subdevice<legacy_floppy_image_device>("^"FLOPPY_3)->floppy_get_drive_type() == FLOPPY_TYPE_APPLE) && (get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL)) cnt++;
 
 	return cnt;
 }
@@ -307,7 +307,7 @@ apple525_floppy_image_device::apple525_floppy_image_device(const machine_config 
 void apple525_floppy_image_device::device_start()
 {
 	legacy_floppy_image_device::device_start();
-	floppy_set_type(this,FLOPPY_TYPE_APPLE);
+	floppy_set_type(FLOPPY_TYPE_APPLE);
 
 	state = 0;
 	tween_tracks = 0;
@@ -321,8 +321,8 @@ void apple525_floppy_image_device::device_start()
 bool apple525_floppy_image_device::call_load()
 {
 	int result = legacy_floppy_image_device::call_load();
-	floppy_drive_seek(*this, -999);
-	floppy_drive_seek(*this, +35/2);
+	floppy_drive_seek(-999);
+	floppy_drive_seek(+35/2);
 	return result;
 }
 

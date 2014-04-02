@@ -7,6 +7,8 @@
 #ifndef I8271_H_
 #define I8271_H_
 
+#include "imagedev/flopdrv.h"
+
 #define MCFG_I8271_IRQ_CALLBACK(_write) \
 	devcb = &i8271_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
@@ -126,7 +128,7 @@ private:
 	emu_timer *m_data_timer;
 	emu_timer *m_command_complete_timer;
 	
-	device_t *current_image();
+	legacy_floppy_image_device *current_image();
 	void seek_to_track(int track);
 	void load_bad_tracks(int surface);
 	void write_bad_track(int surface, int track, int data);
