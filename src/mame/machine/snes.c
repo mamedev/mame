@@ -34,7 +34,7 @@
 
 void snes_state::video_start()
 {
-	m_ppu.ppu_start(m_screen);
+	m_ppu.ppu_start(m_screen,this);
 }
 
 UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -269,7 +269,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 *************************************/
 
-READ8_HANDLER( snes_open_bus_r )
+READ8_MEMBER( snes_state::snes_open_bus_r )
 {
 	static UINT8 recurse = 0;
 	UINT16 result;

@@ -1612,11 +1612,11 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 	g_profiler.stop();
 }
 
-void snes_ppu_class::ppu_start(screen_device &screen)
+void snes_ppu_class::ppu_start(screen_device &screen,snes_state *state)
 {
 	m_screen = &screen;
 	running_machine &machine = screen.machine();
-
+	m_state = state;
 #if SNES_LAYER_DEBUG
 	memset(&m_debug_options, 0, sizeof(m_debug_options));
 #endif
@@ -1907,7 +1907,7 @@ WRITE8_MEMBER( snes_ppu_class::vram_write )
 			if (h <= 4)
 				m_vram[offset] = data;
 			else if (h == 6)
-				m_vram[offset] = snes_open_bus_r(space, 0);
+				m_vram[offset] = m_state->snes_open_bus_r(space, 0);
 			else
 			{
 				//printf("%d %d VRAM write, CHECK!\n",h,v);
@@ -2118,7 +2118,7 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 wrio_bit7)
 			}
 		case SLHV:      /* Software latch for H/V counter */
 			latch_counters(space.machine());
-			return snes_open_bus_r(space, 0);       /* Return value is meaningless */
+			return m_state->snes_open_bus_r(space, 0);       /* Return value is meaningless */
 		case ROAMDATA:  /* Read data from OAM (DR) */
 			m_ppu1_open_bus = oam_read(space, m_oam.address);
 			PPU_REG(OAMDATA) = (PPU_REG(OAMDATA) + 1) % 2;
@@ -2213,7 +2213,7 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 wrio_bit7)
 	}
 
 	/* note: remaining registers (Namely TM in Super Kick Boxing) returns MDR open bus, not PPU Open Bus! */
-	return snes_open_bus_r(space, 0);
+	return m_state->snes_open_bus_r(space, 0);
 }
 
 

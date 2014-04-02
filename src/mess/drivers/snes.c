@@ -1904,7 +1904,7 @@ void snes_console_state::machine_start()
 		case SNES_SOULBLAD:
 			// reads from xxx0-xxx3in range [80-bf] return a fixed sequence of 4bits; reads in range [c0-ff] return open bus
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x808000, 0x808003, 0, 0x3f7ff0, read8_delegate(FUNC(base_sns_cart_slot_device::chip_read),(base_sns_cart_slot_device*)m_cartslot));
-			m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0xc00000, 0xffffff, FUNC(snes_open_bus_r));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xffffff, read8_delegate(FUNC(snes_console_state::snes_open_bus_r),this));
 			break;
 		case SNES_BUGS:
 		case SNES_BANANA:
