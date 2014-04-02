@@ -2312,7 +2312,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	zip_file* zipfile;
 
 	char *layout_text = NULL;
-	xml_data_node *layout_xml;
+	xml_data_node *layout_xml = NULL;
 	xml_data_node *romset_node;
 	xml_data_node *configuration_node;
 	xml_data_node *resources_node;
@@ -2428,6 +2428,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	catch (rpk_exception &exp)
 	{
 		newrpk->close();
+		if (layout_xml != NULL)		xml_file_free(layout_xml);
 		if (zipfile != NULL)        zip_file_close(zipfile);
 		if (layout_text != NULL)    global_free_array(layout_text);
 
@@ -2435,6 +2436,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		throw exp;
 	}
 
+	if (layout_xml != NULL)		xml_file_free(layout_xml);
 	if (zipfile != NULL)        zip_file_close(zipfile);
 	if (layout_text != NULL)    global_free_array(layout_text);
 
