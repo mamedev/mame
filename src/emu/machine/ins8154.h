@@ -44,38 +44,39 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_INS8154_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, INS8154, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_INS8154_IN_A_CB(_devcb) \
+	devcb = &ins8154_device::set_in_a_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_INS8154_OUT_A_CB(_devcb) \
+	devcb = &ins8154_device::set_out_a_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_INS8154_IN_B_CB(_devcb) \
+	devcb = &ins8154_device::set_in_b_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_INS8154_OUT_B_CB(_devcb) \
+	devcb = &ins8154_device::set_out_b_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_INS8154_OUT_IRQ_CB(_devcb) \
+	devcb = &ins8154_device::set_out_irq_callback(*device, DEVCB2_##_devcb); //currently unused
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-
-// ======================> ins8154_interface
-
-struct ins8154_interface
-{
-	devcb_read8         m_in_a_cb;
-	devcb_write8        m_out_a_cb;
-	devcb_read8         m_in_b_cb;
-	devcb_write8        m_out_b_cb;
-	devcb_write_line    m_out_irq_cb;
-};
-
-
-
 // ======================> ins8154_device
 
-class ins8154_device :  public device_t,
-						public ins8154_interface
+class ins8154_device :  public device_t
 {
 public:
 	// construction/destruction
 	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_in_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_in_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_b_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(object); }
+	
 	DECLARE_READ8_MEMBER( ins8154_r );
 	DECLARE_WRITE8_MEMBER( ins8154_w );
 
@@ -84,7 +85,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load() { }
@@ -93,11 +93,11 @@ protected:
 private:
 
 	/* i/o lines */
-	devcb_resolved_read8 m_in_a_func;
-	devcb_resolved_write8 m_out_a_func;
-	devcb_resolved_read8 m_in_b_func;
-	devcb_resolved_write8 m_out_b_func;
-	devcb_resolved_write_line m_out_irq_func;
+	devcb2_read8         m_in_a_cb;
+	devcb2_write8        m_out_a_cb;
+	devcb2_read8         m_in_b_cb;
+	devcb2_write8        m_out_b_cb;
+	devcb2_write_line    m_out_irq_cb;
 
 	/* registers */
 	UINT8 m_in_a;  /* Input Latch Port A */

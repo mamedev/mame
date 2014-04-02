@@ -134,15 +134,6 @@ void mk14_state::machine_reset()
 {
 }
 
-static const ins8154_interface mk14_ins8154 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( mk14, mk14_state )
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
@@ -154,7 +145,7 @@ static MACHINE_CONFIG_START( mk14, mk14_state )
 	MCFG_DEFAULT_LAYOUT(layout_mk14)
 
 	/* devices */
-	MCFG_INS8154_ADD("ic8", mk14_ins8154)
+	MCFG_DEVICE_ADD("ic8", INS8154, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

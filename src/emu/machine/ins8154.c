@@ -44,37 +44,14 @@ const device_type INS8154 = &device_creator<ins8154_device>;
 //-------------------------------------------------
 
 ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, INS8154, "INS8154", tag, owner, clock, "ins8154", __FILE__)
+	: device_t(mconfig, INS8154, "INS8154", tag, owner, clock, "ins8154", __FILE__),
+	m_in_a_cb(*this),
+	m_out_a_cb(*this),
+	m_in_b_cb(*this),
+	m_out_b_cb(*this),
+	m_out_irq_cb(*this)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ins8154_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ins8154_interface *intf = reinterpret_cast<const ins8154_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<ins8154_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
-		memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
-		memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
-		memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -83,11 +60,11 @@ void ins8154_device::device_config_complete()
 void ins8154_device::device_start()
 {
 	/* resolve callbacks */
-	m_in_a_func.resolve(m_in_a_cb, *this);
-	m_out_a_func.resolve(m_out_a_cb, *this);
-	m_in_b_func.resolve(m_in_b_cb, *this);
-	m_out_b_func.resolve(m_out_b_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_in_a_cb.resolve();
+	m_out_a_cb.resolve_safe();
+	m_in_b_cb.resolve();
+	m_out_b_cb.resolve_safe();
+	m_out_irq_cb.resolve_safe();
 
 	/* register for state saving */
 	save_item(NAME(m_in_a));
@@ -132,17 +109,17 @@ READ8_MEMBER(ins8154_device::ins8154_r)
 	switch (offset)
 	{
 	case 0x20:
-		if(!m_in_a_func.isnull())
+		if(!m_in_a_cb.isnull())
 		{
-			val = m_in_a_func(0);
+			val = m_in_a_cb(0);
 		}
 		m_in_a = val;
 		break;
 
 	case 0x21:
-		if(!m_in_b_func.isnull())
+		if(!m_in_b_cb.isnull())
 		{
-			val = m_in_b_func(0);
+			val = m_in_b_cb(0);
 		}
 		m_in_b = val;
 		break;
@@ -150,17 +127,17 @@ READ8_MEMBER(ins8154_device::ins8154_r)
 	default:
 		if (offset < 0x08)
 		{
-			if(!m_in_a_func.isnull())
+			if(!m_in_a_cb.isnull())
 			{
-				val = (m_in_a_func(0) << (8 - offset)) & 0x80;
+				val = (m_in_a_cb(0) << (8 - offset)) & 0x80;
 			}
 			m_in_a = val;
 		}
 		else
 		{
-			if(!m_in_b_func.isnull())
+			if(!m_in_b_cb.isnull())
 			{
-				val = (m_in_b_func(0) << (8 - (offset >> 4))) & 0x80;
+				val = (m_in_b_cb(0) << (8 - (offset >> 4))) & 0x80;
 			}
 			m_in_b = val;
 		}
@@ -177,7 +154,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_porta_w)
 	/* Test if any pins are set as outputs */
 	if (m_odra)
 	{
-		m_out_a_func(0, (data & m_odra) | (m_odra ^ 0xff));
+		m_out_a_cb((offs_t)0, (data & m_odra) | (m_odra ^ 0xff));
 	}
 }
 
@@ -188,7 +165,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_portb_w)
 	/* Test if any pins are set as outputs */
 	if (m_odrb)
 	{
-		m_out_b_func(0, (data & m_odrb) | (m_odrb ^ 0xff));
+		m_out_b_cb((offs_t)0, (data & m_odrb) | (m_odrb ^ 0xff));
 	}
 }
 

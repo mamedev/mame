@@ -807,16 +807,6 @@ static I8255A_INTERFACE( ppi8255_intf )
 };
 
 
-static const ins8154_interface ins8154_intf =
-{
-	DEVCB_DRIVER_MEMBER(vega_state, ins8154_pa_r),
-	DEVCB_DRIVER_MEMBER(vega_state, ins8154_pa_w),
-	DEVCB_DRIVER_MEMBER(vega_state, ins8154_pb_r),
-	DEVCB_DRIVER_MEMBER(vega_state, ins8154_pb_w),
-	DEVCB_NULL
-};
-
-
 static const ay8910_interface ay8910_inf =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -843,7 +833,11 @@ static MACHINE_CONFIG_START( vega, vega_state )
 
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
-	MCFG_INS8154_ADD( "ins8154", ins8154_intf)
+	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
+	MCFG_INS8154_IN_A_CB(READ8(vega_state, ins8154_pa_r))
+	MCFG_INS8154_OUT_A_CB(WRITE8(vega_state, ins8154_pa_w))
+	MCFG_INS8154_IN_B_CB(READ8(vega_state, ins8154_pb_r))
+	MCFG_INS8154_OUT_B_CB(WRITE8(vega_state, ins8154_pb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
