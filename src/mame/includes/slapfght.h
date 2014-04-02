@@ -53,7 +53,6 @@ public:
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_palette_bank;
-	UINT8 m_flipscreen;
 	UINT8 m_scrollx_lo;
 	UINT8 m_scrollx_hi;
 	UINT8 m_scrolly;
