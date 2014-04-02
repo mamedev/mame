@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "mcfglgcy.h"
 #include "machine/megacd.h"
 #include "machine/nvram.h"
 #include "megacd.lh"
@@ -317,13 +316,10 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
-
 	MCFG_RF5C68_ADD("rfsnd", SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 
-
-	MCFG_NVRAM_HANDLER_CLEAR()
 	MCFG_NVRAM_ADD_0FILL("backupram")
 
 	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
