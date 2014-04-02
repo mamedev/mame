@@ -81,6 +81,7 @@ public:
 	UINT8 m_i2c_clk;
 	INT16 m_memc_pages[0x2000]; // the logical RAM area is 32 megs, and the smallest page size is 4k
 	UINT32 m_vidc_regs[256];
+	UINT8 m_cursor_vram[0x200];
 	UINT8 m_ioc_regs[0x80/4];
 	UINT8 m_vidc_bpp_mode;
 	UINT8 m_vidc_interlace;
@@ -120,7 +121,7 @@ private:
 	UINT32 m_memc_pagesize;
 	int m_memc_latchrom;
 	UINT32 m_ioc_timercnt[4], m_ioc_timerout[4];
-	UINT32 m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur;
+	UINT32 m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur,m_vidc_cinit;
 	UINT32 m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur;
 	UINT8 m_video_dma_on,m_audio_dma_on;
 	UINT8 m_vidc_pixel_clk;

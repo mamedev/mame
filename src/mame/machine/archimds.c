@@ -116,11 +116,17 @@ void archimedes_state::vidc_video_tick()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static UINT8 *vram = m_region_vram->base();
 	UINT32 size;
+	UINT32 m_vidc_ccur;
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
 	for(m_vidc_vidcur = 0;m_vidc_vidcur < size;m_vidc_vidcur++)
 		vram[m_vidc_vidcur] = (space.read_byte(m_vidc_vidstart+m_vidc_vidcur));
+
+	size = m_vidc_vidend-m_vidc_vidstart+0x10;
+
+	for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
+		m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
 
 	if(m_video_dma_on)
 		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
@@ -941,6 +947,11 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 			case 2: /* video end */
 				m_vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
 				//printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
+				break;
+
+			case 3: /* cursor init */
+				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
+				//printf("MEMC: CURSOR %08x\n",((data>>2)&0x7fff)*16);
 				break;
 
 			case 4: /* sound start */
