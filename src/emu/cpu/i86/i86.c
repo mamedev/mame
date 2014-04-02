@@ -1354,8 +1354,8 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 
 		case 0x8c: // i_mov_wsreg
 			m_modrm = fetch();
-			assert(((m_modrm & 0x38) >> 3) >= 0 && ((m_modrm & 0x38) >> 3) < ARRAY_LENGTH(m_sregs));
-			PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
+			PutRMWord(m_sregs[(m_modrm & 0x18) >> 3]); // guess: ignore bit 5
+			if(m_modrm & 0x20) logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
 			CLKM(MOV_RS,MOV_MS);
 			break;
 
