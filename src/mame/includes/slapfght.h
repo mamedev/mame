@@ -20,13 +20,10 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
-		m_slapfight_videoram(*this, "videoram"),
-		m_slapfight_colorram(*this, "colorram"),
-		m_slapfight_fixvideoram(*this, "fixvideoram"),
-		m_slapfight_fixcolorram(*this, "fixcolorram"),
-		m_slapfight_scrollx_lo(*this, "scrollx_lo"),
-		m_slapfight_scrollx_hi(*this, "scrollx_hi"),
-		m_slapfight_scrolly(*this, "scrolly")
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_fixvideoram(*this, "fixvideoram"),
+		m_fixcolorram(*this, "fixcolorram")
 	{ }
 	
 	// devices, memory pointers
@@ -38,13 +35,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
-	required_shared_ptr<UINT8> m_slapfight_videoram;
-	required_shared_ptr<UINT8> m_slapfight_colorram;
-	optional_shared_ptr<UINT8> m_slapfight_fixvideoram;
-	optional_shared_ptr<UINT8> m_slapfight_fixcolorram;
-	optional_shared_ptr<UINT8> m_slapfight_scrollx_lo;
-	optional_shared_ptr<UINT8> m_slapfight_scrollx_hi;
-	optional_shared_ptr<UINT8> m_slapfight_scrolly;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_fixvideoram;
+	optional_shared_ptr<UINT8> m_fixcolorram;
 
 	/* This it the best way to allow game specific kludges until the system is fully understood */
 	enum getstar_id
@@ -60,6 +54,9 @@ public:
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_palette_bank;
 	UINT8 m_flipscreen;
+	UINT8 m_scrollx_lo;
+	UINT8 m_scrollx_hi;
+	UINT8 m_scrolly;
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
 
@@ -91,10 +88,13 @@ public:
 	DECLARE_WRITE8_MEMBER(prg_bank_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(slapfight_videoram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_colorram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_fixram_w);
-	DECLARE_WRITE8_MEMBER(slapfight_fixcol_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(fixram_w);
+	DECLARE_WRITE8_MEMBER(fixcol_w);
+	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
+	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
+	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 
@@ -145,7 +145,8 @@ public:
 	DECLARE_VIDEO_START(perfrman);
 	DECLARE_VIDEO_START(slapfight);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display);
+	void draw_perfrman_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
+	void draw_slapfight_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

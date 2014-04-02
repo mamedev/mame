@@ -271,8 +271,8 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -281,15 +281,15 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
 	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb1_map, AS_PROGRAM, 8, slapfght_state )
@@ -308,15 +308,15 @@ static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
 	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfighb1_map, AS_PROGRAM, 8, slapfght_state )
@@ -334,15 +334,15 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_hi")
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
-	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_SHARE("scrollx_lo")
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_hi_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
+	AM_RANGE(0xe803, 0xe803) AM_WRITE(scrollx_lo_w)
 	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
 
@@ -758,6 +758,9 @@ void slapfght_state::machine_start()
 	// zerofill
 	m_palette_bank = 0;
 	m_flipscreen = 0;
+	m_scrollx_lo = 0;
+	m_scrollx_hi = 0;
+	m_scrolly = 0;
 	m_main_irq_enabled = false;
 	m_sound_nmi_enabled = false;
 
@@ -787,6 +790,9 @@ void slapfght_state::machine_start()
 	// savestates
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_scrollx_lo));
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly));
 	save_item(NAME(m_main_irq_enabled));
 	save_item(NAME(m_sound_nmi_enabled));
 
@@ -1009,7 +1015,7 @@ static MACHINE_CONFIG_START( perfrman, slapfght_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1055,7 +1061,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1118,7 +1124,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")

@@ -160,11 +160,11 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
 	}
 	if ((m_ddrB & 0x08) && (~data & 0x08) && (m_portB_out & 0x08))
 	{
-		*m_slapfight_scrollx_lo = m_portA_out;
+		m_scrollx_lo = m_portA_out;
 	}
 	if ((m_ddrB & 0x10) && (~data & 0x10) && (m_portB_out & 0x10))
 	{
-		*m_slapfight_scrollx_hi = m_portA_out;
+		m_scrollx_hi = m_portA_out;
 	}
 
 	m_portB_out = data;
