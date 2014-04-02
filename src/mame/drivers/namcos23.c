@@ -1427,6 +1427,8 @@ public:
 	UINT32 m_tile_mask;
 	UINT32 m_ptrom_limit;
 
+	int m_vblank_count;
+
 // It may only be 128
 // At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
 // That fits pretty much anywhere, including inside a IC
@@ -1614,18 +1616,18 @@ void namcos23_state::c435_matrix_matrix_mul() // 000.
 		logerror("WARNING: c435_matrix_matrix_mul with +2=%04x\n", m_c435_buffer[3]);
 
 	INT16 *t        = c435_getm(m_c435_buffer[1]);
-	const INT16 *m1 = c435_getm(m_c435_buffer[2]);
-	const INT16 *m2 = c435_getm(m_c435_buffer[4]);
+	const INT16 *m2 = c435_getm(m_c435_buffer[2]);
+	const INT16 *m1 = c435_getm(m_c435_buffer[4]);
 
-	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]) >> 14);
-	t[1] = INT16((m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]) >> 14);
-	t[2] = INT16((m1[0]*m2[2] + m1[1]*m2[5] + m1[2]*m2[8]) >> 14);
-	t[3] = INT16((m1[3]*m2[0] + m1[4]*m2[3] + m1[5]*m2[6]) >> 14);
-	t[4] = INT16((m1[3]*m2[1] + m1[4]*m2[4] + m1[5]*m2[7]) >> 14);
-	t[5] = INT16((m1[3]*m2[2] + m1[4]*m2[5] + m1[5]*m2[8]) >> 14);
-	t[6] = INT16((m1[6]*m2[0] + m1[7]*m2[3] + m1[8]*m2[6]) >> 14);
-	t[7] = INT16((m1[6]*m2[1] + m1[7]*m2[4] + m1[8]*m2[7]) >> 14);
-	t[8] = INT16((m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]) >> 14);
+	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[1] + m1[2]*m2[2]) >> 14);
+	t[1] = INT16((m1[0]*m2[3] + m1[1]*m2[4] + m1[2]*m2[5]) >> 14);
+	t[2] = INT16((m1[0]*m2[6] + m1[1]*m2[7] + m1[2]*m2[8]) >> 14);
+	t[3] = INT16((m1[3]*m2[0] + m1[4]*m2[1] + m1[5]*m2[2]) >> 14);
+	t[4] = INT16((m1[3]*m2[3] + m1[4]*m2[4] + m1[5]*m2[5]) >> 14);
+	t[5] = INT16((m1[3]*m2[6] + m1[4]*m2[7] + m1[5]*m2[8]) >> 14);
+	t[6] = INT16((m1[6]*m2[0] + m1[7]*m2[1] + m1[8]*m2[2]) >> 14);
+	t[7] = INT16((m1[6]*m2[3] + m1[7]*m2[4] + m1[8]*m2[5]) >> 14);
+	t[8] = INT16((m1[6]*m2[6] + m1[7]*m2[7] + m1[8]*m2[8]) >> 14);
 }
 
 void namcos23_state::c435_matrix_set() // 004.
@@ -1667,7 +1669,7 @@ void namcos23_state::c435_matrix_vector_mul() // 081.
 	const INT32 *v = c435_getv(m_c435_buffer[4]);
 
 	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
-	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
+	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
 	t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
 }
 
@@ -1685,9 +1687,9 @@ void namcos23_state::c435_vector_matrix_mul() // 101.
 	const INT16 *m = c435_getm(m_c435_buffer[2]);
 	const INT32 *v = c435_getv(m_c435_buffer[4]);
 
-	t[0] = INT32((m[0]*INT64(v[0]) + m[3]*INT64(v[1]) + m[6]*INT64(v[2])) >> 14);
-	t[1] = INT32((m[1]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
-	t[2] = INT32((m[2]*INT64(v[0]) + m[5]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
+	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
+	t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
 }
 
 void namcos23_state::c435_scaling_set() // 44..
@@ -1730,7 +1732,7 @@ void namcos23_state::c435_state_set() // 4f..
 
 void namcos23_state::c435_render() // 800. 808.
 {
-	if(m_c435_buffer[0] != 0x8003 && m_c435_buffer[0] != 0x8083)
+	if(m_c435_buffer[0] != 0x8003 && m_c435_buffer[0] != 0x8043 && m_c435_buffer[0] != 0x8083)
 	{
 		logerror("WARNING: c435_render with header %04x\n", m_c435_buffer[0]);
 		return;
@@ -1812,6 +1814,7 @@ void namcos23_state::c435_pio_w(UINT16 data)
 	case 0x4400: c435_scaling_set(); break;
 	case 0x4f00: c435_state_set(); break;
 	case 0x8000: c435_render(); break;
+	case 0x8040: c435_render(); break;
 	case 0x8080: c435_render(); break;
 	case 0xc000: c435_flush(); break;
 	default:
@@ -1902,9 +1905,9 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 
 void namcos23_state::render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
-	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[3]*INT64(yi) + re->model.m[6]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
-	pv.y =    (INT32((re->model.m[1]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[7]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
-	pv.p[0] = (INT32((re->model.m[2]*INT64(xi) + re->model.m[5]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
+	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[1]*INT64(yi) + re->model.m[2]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
+	pv.y =    (INT32((re->model.m[3]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[5]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
+	pv.p[0] = (INT32((re->model.m[6]*INT64(xi) + re->model.m[7]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
 }
 
 void namcos23_state::render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
@@ -1963,7 +1966,6 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		UINT32 type = m_ptrom[adr++];
 		UINT32 h    = m_ptrom[adr++];
 
-
 		float tbase = (type >> 24) << 12;
 		UINT8 color = (h >> 24) & 0x7f;
 		int lmode = (type >> 19) & 3;
@@ -2004,7 +2006,10 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 
 			switch(lmode)
 			{
-			case 0: case 1:
+			case 0:
+				pv[i].p[3] = ((light >> (8*(3-i))) & 0xff) / 64.0;
+				break;
+			case 1:
 				pv[i].p[3] = ((light >> (8*(3-i))) & 0xff) / 64.0;
 				break;
 			case 2:
@@ -2018,13 +2023,12 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 				INT32 nz = u32_to_s10(norm);
 				INT32 nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
-
 				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0;
 				if(lsi < 0)
 					lsi = 0;
 
 				// Mapping taken out of a hat
-				pv[i].p[3] = 0.5+lsi;
+				pv[i].p[3] = 0.25+1.5*lsi;
 				break;
 			}
 			}
@@ -2201,6 +2205,8 @@ UINT32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	if (m_c404.layer & 4)
 		m_bgtilemap->draw(screen, bitmap, cliprect, 0, 0);
 
+	m_vblank_count++;
+
 	return 0;
 }
 
@@ -2323,7 +2329,7 @@ WRITE16_MEMBER(namcos23_state::c417_w)
 			m_c417.pointrom_adr = 0;
 			break;
 		case 4:
-			//logerror("c417_w %04x = %04x (%08x, %08x)\n", c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
+			//logerror("c417_w %04x = %04x (%08x, %08x)\n", m_c417.adr, data, space.device().safe_pc(), (unsigned int)space.device().state().state_int(MIPS3_R31));
 			COMBINE_DATA(m_c417.ram + m_c417.adr);
 			break;
 		case 7:
@@ -3164,7 +3170,7 @@ static INPUT_PORTS_START( s23 )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )
 
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -3222,6 +3228,7 @@ void namcos23_state::machine_start()
 
 void namcos23_state::machine_reset()
 {
+	m_vblank_count = 0;
 	m_c435_buffer_pos = 0;
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
