@@ -347,20 +347,19 @@ MSX_SLOT_RESET(konami_scc)
 	state->m_cart.scc.active = 0;
 }
 
-static READ8_HANDLER (konami_scc_bank5)
+READ8_MEMBER(msx_state::konami_scc_bank5)
 {
-	msx_state *drvstate = space.machine().driver_data<msx_state>();
 	if (offset & 0x80)
 	{
 		if ((offset & 0xff) >= 0xe0)
 		{
-			return drvstate->m_k051649->k051649_test_r(space, offset & 0xff);
+			return m_k051649->k051649_test_r(space, offset & 0xff);
 		}
 		return 0xff;
 	}
 	else
 	{
-		return drvstate->m_k051649->k051649_waveform_r(space, offset & 0x7f);
+		return m_k051649->k051649_waveform_r(space, offset & 0x7f);
 	}
 }
 
@@ -381,7 +380,7 @@ MSX_SLOT_MAP(konami_scc)
 		msx_cpu_setbank (machine, 6, state->m_mem + state->m_banks[3] * 0x2000);
 		if (state->m_cart.scc.active ) {
 			msx_state *drvstate = machine.driver_data<msx_state>();
-			drvstate->m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x9800, 0x9fff, FUNC(konami_scc_bank5));
+			drvstate->m_maincpu->space(AS_PROGRAM).install_read_handler(0x9800, 0x9fff, read8_delegate(FUNC(msx_state::konami_scc_bank5),drvstate));
 		} else {
 			msx_state *drvstate = machine.driver_data<msx_state>();
 			drvstate->m_maincpu->space(AS_PROGRAM).install_read_bank(0x9800, 0x9fff,"bank7");
@@ -1234,40 +1233,38 @@ MSX_SLOT_RESET(diskrom)
 	drvstate->m_wd179x->reset();
 }
 
-static READ8_HANDLER (msx_diskrom_page1_r)
+READ8_MEMBER(msx_state::msx_diskrom_page1_r)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	switch (offset)
 	{
-	case 0: return state->m_wd179x->status_r (space, 0);
-	case 1: return state->m_wd179x->track_r (space, 0);
-	case 2: return state->m_wd179x->sector_r (space, 0);
-	case 3: return state->m_wd179x->data_r (space, 0);
-	case 7: return state->m_dsk_stat;
+	case 0: return m_wd179x->status_r (space, 0);
+	case 1: return m_wd179x->track_r (space, 0);
+	case 2: return m_wd179x->sector_r (space, 0);
+	case 3: return m_wd179x->data_r (space, 0);
+	case 7: return m_dsk_stat;
 	default:
-		return state->m_state[1]->m_mem[offset + 0x3ff8];
+		return m_state[1]->m_mem[offset + 0x3ff8];
 	}
 }
 
-static READ8_HANDLER (msx_diskrom_page2_r)
+READ8_MEMBER(msx_state::msx_diskrom_page2_r)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	if (offset >= 0x7f8)
 	{
 		switch (offset)
 		{
 		case 0x7f8:
-			return state->m_wd179x->status_r (space, 0);
+			return m_wd179x->status_r (space, 0);
 		case 0x7f9:
-			return state->m_wd179x->track_r (space, 0);
+			return m_wd179x->track_r (space, 0);
 		case 0x7fa:
-			return state->m_wd179x->sector_r (space, 0);
+			return m_wd179x->sector_r (space, 0);
 		case 0x7fb:
-			return state->m_wd179x->data_r (space, 0);
+			return m_wd179x->data_r (space, 0);
 		case 0x7ff:
-			return state->m_dsk_stat;
+			return m_dsk_stat;
 		default:
-			return state->m_state[2]->m_mem[offset + 0x3800];
+			return m_state[2]->m_mem[offset + 0x3800];
 		}
 	}
 	else
@@ -1289,12 +1286,12 @@ MSX_SLOT_MAP(diskrom)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->m_mem);
 		msx_cpu_setbank (machine, 4, state->m_mem + 0x2000);
-		space.install_legacy_read_handler(0x7ff8, 0x7fff, FUNC(msx_diskrom_page1_r));
+		space.install_read_handler(0x7ff8, 0x7fff, read8_delegate(FUNC(msx_state::msx_diskrom_page1_r),drvstate));
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, drvstate->m_empty);
 		msx_cpu_setbank (machine, 6, drvstate->m_empty);
-		space.install_legacy_read_handler(0xb800, 0xbfff, FUNC(msx_diskrom_page2_r));
+		space.install_read_handler(0xb800, 0xbfff, read8_delegate(FUNC(msx_state::msx_diskrom_page2_r),drvstate));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, drvstate->m_empty);
@@ -1361,40 +1358,38 @@ MSX_SLOT_RESET(diskrom2)
 	drvstate->m_wd179x->reset();
 }
 
-static READ8_HANDLER (msx_diskrom2_page1_r)
+READ8_MEMBER(msx_state::msx_diskrom2_page1_r)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	switch (offset)
 	{
-	case 0: return state->m_wd179x->status_r(space, 0);
-	case 1: return state->m_wd179x->track_r(space, 0);
-	case 2: return state->m_wd179x->sector_r(space, 0);
-	case 3: return state->m_wd179x->data_r(space, 0);
-	case 4: return state->m_dsk_stat;
+	case 0: return m_wd179x->status_r(space, 0);
+	case 1: return m_wd179x->track_r(space, 0);
+	case 2: return m_wd179x->sector_r(space, 0);
+	case 3: return m_wd179x->data_r(space, 0);
+	case 4: return m_dsk_stat;
 	default:
-		return state->m_state[1]->m_mem[offset + 0x3ff8];
+		return m_state[1]->m_mem[offset + 0x3ff8];
 	}
 }
 
-static  READ8_HANDLER (msx_diskrom2_page2_r)
+READ8_MEMBER(msx_state::msx_diskrom2_page2_r)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	if (offset >= 0x7b8)
 	{
 		switch (offset)
 		{
 		case 0x7b8:
-			return state->m_wd179x->status_r (space, 0);
+			return m_wd179x->status_r (space, 0);
 		case 0x7b9:
-			return state->m_wd179x->track_r (space, 0);
+			return m_wd179x->track_r (space, 0);
 		case 0x7ba:
-			return state->m_wd179x->sector_r (space, 0);
+			return m_wd179x->sector_r (space, 0);
 		case 0x7bb:
-			return state->m_wd179x->data_r (space, 0);
+			return m_wd179x->data_r (space, 0);
 		case 0x7bc:
-			return state->m_dsk_stat;
+			return m_dsk_stat;
 		default:
-			return state->m_state[2]->m_mem[offset + 0x3800];
+			return m_state[2]->m_mem[offset + 0x3800];
 		}
 	}
 	else
@@ -1416,12 +1411,12 @@ MSX_SLOT_MAP(diskrom2)
 	case 1:
 		msx_cpu_setbank (machine, 3, state->m_mem);
 		msx_cpu_setbank (machine, 4, state->m_mem + 0x2000);
-		space.install_legacy_read_handler(0x7fb8, 0x7fbc, FUNC(msx_diskrom2_page1_r));
+		space.install_read_handler(0x7fb8, 0x7fbc, read8_delegate(FUNC(msx_state::msx_diskrom2_page1_r),drvstate));
 		break;
 	case 2:
 		msx_cpu_setbank (machine, 5, drvstate->m_empty);
 		msx_cpu_setbank (machine, 6, drvstate->m_empty);
-		space.install_legacy_read_handler(0xb800, 0xbfbc, FUNC(msx_diskrom2_page2_r));
+		space.install_read_handler(0xb800, 0xbfbc, read8_delegate(FUNC(msx_state::msx_diskrom2_page2_r),drvstate));
 		break;
 	case 3:
 		msx_cpu_setbank (machine, 7, drvstate->m_empty);
@@ -2181,23 +2176,22 @@ MSX_SLOT_RESET(soundcartridge)
 	state->m_cart.sccp.sccp_active = 0;
 }
 
-static  READ8_HANDLER (soundcartridge_scc)
+READ8_MEMBER(msx_state::soundcartridge_scc)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	int reg;
 
 
 	if (offset >= 0x7e0)
 	{
-		return state->m_state[2]->m_mem[
-				state->m_state[2]->m_banks[2] * 0x2000 + 0x1800 + offset];
+		return m_state[2]->m_mem[
+				m_state[2]->m_banks[2] * 0x2000 + 0x1800 + offset];
 	}
 
 	reg = offset & 0xff;
 
 	if (reg < 0x80)
 	{
-		return state->m_k051649->k051649_waveform_r (space, reg);
+		return m_k051649->k051649_waveform_r (space, reg);
 	}
 	else if (reg < 0xa0)
 	{
@@ -2206,36 +2200,35 @@ static  READ8_HANDLER (soundcartridge_scc)
 	else if (reg < 0xc0)
 	{
 		/* read wave 5 */
-		return state->m_k051649->k051649_waveform_r (space, 0x80 + (reg & 0x1f));
+		return m_k051649->k051649_waveform_r (space, 0x80 + (reg & 0x1f));
 	}
 	else if (reg < 0xe0)
 	{
-		return state->m_k051649->k051649_test_r (space, reg);
+		return m_k051649->k051649_test_r (space, reg);
 	}
 
 	return 0xff;
 }
 
-static  READ8_HANDLER (soundcartridge_sccp)
+READ8_MEMBER(msx_state::soundcartridge_sccp)
 {
-	msx_state *state = space.machine().driver_data<msx_state>();
 	int reg;
 
 	if (offset >= 0x7e0)
 	{
-		return state->m_state[2]->m_mem[
-				state->m_state[2]->m_banks[3] * 0x2000 + 0x1800 + offset];
+		return m_state[2]->m_mem[
+				m_state[2]->m_banks[3] * 0x2000 + 0x1800 + offset];
 	}
 
 	reg = offset & 0xff;
 
 	if (reg < 0xa0)
 	{
-		return state->m_k051649->k051649_waveform_r (space, reg);
+		return m_k051649->k051649_waveform_r (space, reg);
 	}
 	else if (reg >= 0xc0 && reg < 0xe0)
 	{
-		return state->m_k051649->k051649_test_r (space, reg);
+		return m_k051649->k051649_test_r (space, reg);
 	}
 
 	return 0xff;
@@ -2259,12 +2252,12 @@ MSX_SLOT_MAP(soundcartridge)
 		msx_cpu_setbank (machine, 5, state->m_mem + state->m_banks[2] * 0x2000);
 		msx_cpu_setbank (machine, 6, state->m_mem + state->m_banks[3] * 0x2000);
 		if (state->m_cart.sccp.scc_active) {
-			space.install_legacy_read_handler(0x9800, 0x9fff, FUNC(soundcartridge_scc));
+			space.install_read_handler(0x9800, 0x9fff, read8_delegate(FUNC(msx_state::soundcartridge_scc),drvstate));
 		} else {
 			space.install_read_bank(0x9800, 0x9fff, "bank7");
 		}
 		if (state->m_cart.sccp.scc_active) {
-			space.install_legacy_read_handler(0xb800, 0xbfff, FUNC(soundcartridge_sccp));
+			space.install_read_handler(0xb800, 0xbfff, read8_delegate(FUNC(msx_state::soundcartridge_sccp),drvstate));
 		} else {
 			space.install_read_bank(0xb800, 0xbfff, "bank9");
 		}
