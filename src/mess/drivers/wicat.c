@@ -887,7 +887,9 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_I8275_ADD("video",XTAL_19_6608MHz/8,9,wicat_display_pixels)
+	MCFG_DEVICE_ADD("video", I8275x, XTAL_19_6608MHz/8)
+	MCFG_I8275_CHARACTER_WIDTH(9)
+	MCFG_I8275_DISPLAY_CALLBACK(wicat_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))
 	MCFG_VIDEO_SET_SCREEN("screen")
