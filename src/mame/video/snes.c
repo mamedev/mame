@@ -81,18 +81,6 @@
 #define SNES_CLIP_ALWAYS   3
 
 #if SNES_LAYER_DEBUG
-struct DEBUGOPTS
-{
-	UINT8 bg_disabled[5];
-	UINT8 mode_disabled[8];
-	UINT8 draw_subscreen;
-	UINT8 windows_disabled;
-	UINT8 mosaic_disabled;
-	UINT8 colormath_disabled;
-	UINT8 sprite_reversed;
-	UINT8 select_pri[5];
-};
-static struct DEBUGOPTS debug_options;
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
 static const UINT16 dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
 #endif /* SNES_LAYER_DEBUG */
@@ -197,7 +185,7 @@ inline void snes_ppu_class::draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colo
 				UINT8 clipmask = m_clipmasks[layer][ii];
 
 #if SNES_LAYER_DEBUG
-				if (debug_options.windows_disabled)
+				if (m_debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -232,7 +220,7 @@ inline void snes_ppu_class::draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colo
 				UINT8 clipmask = m_clipmasks[layer][ii >> 1];
 
 #if SNES_LAYER_DEBUG
-				if (debug_options.windows_disabled)
+				if (m_debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -266,7 +254,7 @@ inline void snes_ppu_class::draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UI
 			UINT8 clipmask = m_clipmasks[SNES_OAM][pos];
 
 #if SNES_LAYER_DEBUG
-			if (debug_options.windows_disabled)
+			if (m_debug_options.windows_disabled)
 				clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -312,7 +300,7 @@ inline void snes_ppu_class::draw_tile( UINT8 planes, UINT8 layer, UINT32 tileadd
 		UINT8 mosaic = m_layer[layer].mosaic_enabled;
 
 #if SNES_LAYER_DEBUG
-		if (debug_options.mosaic_disabled)
+		if (m_debug_options.mosaic_disabled)
 			mosaic = 0;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -415,7 +403,7 @@ inline void snes_ppu_class::update_line( UINT16 curline, UINT8 layer, UINT8 prio
 	UINT8 color_shift = 2 << color_depth;
 
 #if SNES_LAYER_DEBUG
-	if (debug_options.bg_disabled[layer])
+	if (m_debug_options.bg_disabled[layer])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -517,8 +505,8 @@ inline void snes_ppu_class::update_line( UINT16 curline, UINT8 layer, UINT8 prio
 
 #if SNES_LAYER_DEBUG
 		/* if we want to draw only one of the priorities of this layer */
-		if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
-			((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
+		if (((m_debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
+			((m_debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
 		{
 			if (!hires && tile_size)
 				ii += 16;
@@ -597,7 +585,7 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 	int screen;
 
 #if SNES_LAYER_DEBUG
-	if (debug_options.bg_disabled[layer])
+	if (m_debug_options.bg_disabled[layer])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -659,7 +647,7 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 	}
 
 #if SNES_LAYER_DEBUG
-	if (debug_options.mosaic_disabled)
+	if (m_debug_options.mosaic_disabled)
 	{
 		mosaic_x =  m_mosaic_table[0];
 		mosaic_y =  m_mosaic_table[0];
@@ -712,8 +700,8 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 
 #if SNES_LAYER_DEBUG
 		/* if we want to draw only one of the priorities of this layer */
-		if (((debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
-			((debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
+		if (((m_debug_options.select_pri[layer] & 0x01) && (priority == priority_a)) ||
+			((m_debug_options.select_pri[layer] & 0x02) && (priority == priority_b)))
 			continue;
 #endif /* SNES_LAYER_DEBUG */
 		}
@@ -726,7 +714,7 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 				UINT8 clipmask = m_clipmasks[layer][xpos];
 
 #if SNES_LAYER_DEBUG
-				if (debug_options.windows_disabled)
+				if (m_debug_options.windows_disabled)
 					clipmask = 0xff;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -784,25 +772,6 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
  * test their priority with the one of the correct sprite - see update_objects.
  *************************************************************************************************/
 
-struct OAM
-{
-	UINT16 tile;
-	INT16 x, y;
-	UINT8 size, vflip, hflip, priority_bits, pal;
-	int height, width;
-};
-
-static struct OAM oam_spritelist[SNES_SCR_WIDTH / 2];
-
-static UINT8 oam_itemlist[32];
-
-struct TILELIST {
-	INT16 x;
-	UINT16 priority, pal, tileaddr;
-	int hflip;
-};
-
-static struct TILELIST oam_tilelist[34];
 
 /*********************************************
  * update_obsel()
@@ -843,62 +812,62 @@ void snes_ppu_class::oam_list_build( void )
 		if (((ii + 1) % 4) == 0)
 			extra = oamram[oam_extra--];
 
-		oam_spritelist[ii].vflip = (oamram[oam] & 0x80) >> 7;
-		oam_spritelist[ii].hflip = (oamram[oam] & 0x40) >> 6;
-		oam_spritelist[ii].priority_bits = (oamram[oam] & 0x30) >> 4;
-		oam_spritelist[ii].pal = 128 + ((oamram[oam] & 0x0e) << 3);
-		oam_spritelist[ii].tile = (oamram[oam--] & 0x1) << 8;
-		oam_spritelist[ii].tile |= oamram[oam--];
-		oam_spritelist[ii].y = oamram[oam--] + 1;
-		oam_spritelist[ii].x = oamram[oam--];
-		oam_spritelist[ii].size = (extra & 0x80) >> 7;
+		m_oam_spritelist[ii].vflip = (oamram[oam] & 0x80) >> 7;
+		m_oam_spritelist[ii].hflip = (oamram[oam] & 0x40) >> 6;
+		m_oam_spritelist[ii].priority_bits = (oamram[oam] & 0x30) >> 4;
+		m_oam_spritelist[ii].pal = 128 + ((oamram[oam] & 0x0e) << 3);
+		m_oam_spritelist[ii].tile = (oamram[oam--] & 0x1) << 8;
+		m_oam_spritelist[ii].tile |= oamram[oam--];
+		m_oam_spritelist[ii].y = oamram[oam--] + 1;
+		m_oam_spritelist[ii].x = oamram[oam--];
+		m_oam_spritelist[ii].size = (extra & 0x80) >> 7;
 		extra <<= 1;
-		oam_spritelist[ii].x |= ((extra & 0x80) << 1);
+		m_oam_spritelist[ii].x |= ((extra & 0x80) << 1);
 		extra <<= 1;
 
-		oam_spritelist[ii].y *= m_obj_interlace;
-		oam_spritelist[ii].y &= 0x1ff;
+		m_oam_spritelist[ii].y *= m_obj_interlace;
+		m_oam_spritelist[ii].y &= 0x1ff;
 
-		oam_spritelist[ii].x &= 0x1ff;
+		m_oam_spritelist[ii].x &= 0x1ff;
 
 		/* Determine object size */
 		switch (m_oam.size)
 		{
 		case 0:         /* 8x8 or 16x16 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 2 : 1;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 2 : 1;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 2 : 1;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 2 : 1;
 			break;
 		case 1:         /* 8x8 or 32x32 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 1;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 1;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 4 : 1;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 4 : 1;
 			break;
 		case 2:         /* 8x8 or 64x64 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 1;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 1;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 8 : 1;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 8 : 1;
 			break;
 		case 3:         /* 16x16 or 32x32 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 2;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 4 : 2;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 4 : 2;
 			break;
 		case 4:         /* 16x16 or 64x64 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 2;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 2;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 8 : 2;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 8 : 2;
 			break;
 		case 5:         /* 32x32 or 64x64 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 8 : 4;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 4;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 8 : 4;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 8 : 4;
 			break;
 		case 6:         /* undocumented: 16x32 or 32x64 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 8 : 4;
-			if (m_obj_interlace && !oam_spritelist[ii].size)
-				oam_spritelist[ii].height = 2;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 4 : 2;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 8 : 4;
+			if (m_obj_interlace && !m_oam_spritelist[ii].size)
+				m_oam_spritelist[ii].height = 2;
 			break;
 		case 7:         /* undocumented: 16x32 or 32x32 */
-			oam_spritelist[ii].width  = oam_spritelist[ii].size ? 4 : 2;
-			oam_spritelist[ii].height = oam_spritelist[ii].size ? 4 : 4;
-			if (m_obj_interlace && !oam_spritelist[ii].size)
-				oam_spritelist[ii].height = 2;
+			m_oam_spritelist[ii].width  = m_oam_spritelist[ii].size ? 4 : 2;
+			m_oam_spritelist[ii].height = m_oam_spritelist[ii].size ? 4 : 4;
+			if (m_obj_interlace && !m_oam_spritelist[ii].size)
+				m_oam_spritelist[ii].height = 2;
 			break;
 		default:
 			/* we should never enter here... */
@@ -919,15 +888,15 @@ int snes_ppu_class::is_sprite_on_scanline( UINT16 curline, UINT8 sprite )
 {
 	//if sprite is entirely offscreen and doesn't wrap around to the left side of the screen,
 	//then it is not counted. this *should* be 256, and not 255, even though dot 256 is offscreen.
-	int spr_height = (oam_spritelist[sprite].height << 3);
+	int spr_height = (m_oam_spritelist[sprite].height << 3);
 
-	if (oam_spritelist[sprite].x > 256 && (oam_spritelist[sprite].x + (oam_spritelist[sprite].width << 3) - 1) < 512)
+	if (m_oam_spritelist[sprite].x > 256 && (m_oam_spritelist[sprite].x + (m_oam_spritelist[sprite].width << 3) - 1) < 512)
 		return 0;
 
-	if (curline >= oam_spritelist[sprite].y && curline < (oam_spritelist[sprite].y + spr_height))
+	if (curline >= m_oam_spritelist[sprite].y && curline < (m_oam_spritelist[sprite].y + spr_height))
 		return 1;
 
-	if ((oam_spritelist[sprite].y + spr_height) >= 256 && curline < ((oam_spritelist[sprite].y + spr_height) & 255))
+	if ((m_oam_spritelist[sprite].y + spr_height) >= 256 && curline < ((m_oam_spritelist[sprite].y + spr_height) & 255))
 		return 1;
 
 	return 0;
@@ -962,7 +931,7 @@ void snes_ppu_class::update_objects_rto( UINT16 curline )
 	curline *= m_obj_interlace;
 
 	/* reset the list of first 32 objects which intersect current scanline */
-	memset(oam_itemlist, 0xff, 32);
+	memset(m_oam_itemlist, 0xff, 32);
 
 	/* populate the list of 32 objects */
 	for (ii = 0; ii < 128; ii++)
@@ -975,30 +944,30 @@ void snes_ppu_class::update_objects_rto( UINT16 curline )
 		if (range_over++ >= 32)
 			break;
 
-		oam_itemlist[range_over - 1] = active_sprite;
+		m_oam_itemlist[range_over - 1] = active_sprite;
 	}
 
 	/* reset the list of first 34 tiles to be drawn */
 	for (ii = 0; ii < 34; ii++)
-		oam_tilelist[ii].tileaddr = 0xffff;
+		m_oam_tilelist[ii].tileaddr = 0xffff;
 
 	/* populate the list of 34 tiles */
 	for (ii = 31; ii >= 0; ii--)
 	{
-		if (oam_itemlist[ii] == 0xff)
+		if (m_oam_itemlist[ii] == 0xff)
 			continue;
 
-		active_sprite = oam_itemlist[ii];
+		active_sprite = m_oam_itemlist[ii];
 
-		tile = oam_spritelist[active_sprite].tile;
-		x = oam_spritelist[active_sprite].x;
-		y = oam_spritelist[active_sprite].y;
-		height = oam_spritelist[active_sprite].height;
-		width = oam_spritelist[active_sprite].width;
-		vflip = oam_spritelist[active_sprite].vflip;
-		hflip = oam_spritelist[active_sprite].hflip;
-		priority = oam_spritelist[active_sprite].priority_bits;
-		pal = oam_spritelist[active_sprite].pal;
+		tile = m_oam_spritelist[active_sprite].tile;
+		x = m_oam_spritelist[active_sprite].x;
+		y = m_oam_spritelist[active_sprite].y;
+		height = m_oam_spritelist[active_sprite].height;
+		width = m_oam_spritelist[active_sprite].width;
+		vflip = m_oam_spritelist[active_sprite].vflip;
+		hflip = m_oam_spritelist[active_sprite].hflip;
+		priority = m_oam_spritelist[active_sprite].priority_bits;
+		pal = m_oam_spritelist[active_sprite].pal;
 
 		/* Adjust y, if past maximum position (for sprites which overlap between top & bottom) */
 		if (y >= (0x100 - 16) * m_interlace)
@@ -1030,11 +999,11 @@ void snes_ppu_class::update_objects_rto( UINT16 curline )
 					break;
 
 				xs = (hflip) ? (width - 1 - jj) : jj;
-				oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
-				oam_tilelist[time_over - 1].hflip = hflip;
-				oam_tilelist[time_over - 1].x = xx;
-				oam_tilelist[time_over - 1].pal = pal;
-				oam_tilelist[time_over - 1].priority = priority;
+				m_oam_tilelist[time_over - 1].tileaddr = name_sel + tile + table_obj_offset[ys][xs] + line;
+				m_oam_tilelist[time_over - 1].hflip = hflip;
+				m_oam_tilelist[time_over - 1].x = xx;
+				m_oam_tilelist[time_over - 1].pal = pal;
+				m_oam_tilelist[time_over - 1].priority = priority;
 			}
 		}
 	}
@@ -1061,7 +1030,7 @@ void snes_ppu_class::update_objects( UINT8 priority_oam0, UINT8 priority_oam1, U
 	int ii;
 
 #if SNES_LAYER_DEBUG
-	if (debug_options.bg_disabled[SNES_OAM])
+	if (m_debug_options.bg_disabled[SNES_OAM])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1085,26 +1054,26 @@ void snes_ppu_class::update_objects( UINT8 priority_oam0, UINT8 priority_oam1, U
 	{
 		int tile = ii;
 #if SNES_LAYER_DEBUG
-		if (debug_options.sprite_reversed)
+		if (m_debug_options.sprite_reversed)
 			tile = 33 - ii;
 #endif /* SNES_LAYER_DEBUG */
 
-		if (oam_tilelist[tile].tileaddr == 0xffff)
+		if (m_oam_tilelist[tile].tileaddr == 0xffff)
 			continue;
 
-		pri = priority[oam_tilelist[tile].priority];
+		pri = priority[m_oam_tilelist[tile].priority];
 
 #if SNES_LAYER_DEBUG
-		if (debug_options.select_pri[SNES_OAM])
+		if (m_debug_options.select_pri[SNES_OAM])
 		{
-			int oam_draw = debug_options.select_pri[SNES_OAM] - 1;
-			if (oam_draw != oam_tilelist[tile].priority)
+			int oam_draw = m_debug_options.select_pri[SNES_OAM] - 1;
+			if (oam_draw != m_oam_tilelist[tile].priority)
 				continue;
 		}
 #endif /* SNES_LAYER_DEBUG */
 
 		/* OAM tiles have fixed planes (4), no direct color and no hires, but otherwise work the same as BG ones */
-		draw_tile(4, SNES_OAM, charaddr + oam_tilelist[tile].tileaddr, oam_tilelist[tile].x, pri, oam_tilelist[tile].hflip, 0, oam_tilelist[tile].pal, 0);
+		draw_tile(4, SNES_OAM, charaddr + m_oam_tilelist[tile].tileaddr, m_oam_tilelist[tile].x, pri, m_oam_tilelist[tile].hflip, 0, m_oam_tilelist[tile].pal, 0);
 	}
 }
 
@@ -1118,7 +1087,7 @@ void snes_ppu_class::update_objects( UINT8 priority_oam0, UINT8 priority_oam1, U
 void snes_ppu_class::update_mode_0( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[0])
+	if (m_debug_options.mode_disabled[0])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1132,7 +1101,7 @@ void snes_ppu_class::update_mode_0( UINT16 curline )
 void snes_ppu_class::update_mode_1( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[1])
+	if (m_debug_options.mode_disabled[1])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1155,7 +1124,7 @@ void snes_ppu_class::update_mode_1( UINT16 curline )
 void snes_ppu_class::update_mode_2( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[2])
+	if (m_debug_options.mode_disabled[2])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1167,7 +1136,7 @@ void snes_ppu_class::update_mode_2( UINT16 curline )
 void snes_ppu_class::update_mode_3( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[3])
+	if (m_debug_options.mode_disabled[3])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1179,7 +1148,7 @@ void snes_ppu_class::update_mode_3( UINT16 curline )
 void snes_ppu_class::update_mode_4( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[4])
+	if (m_debug_options.mode_disabled[4])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1191,7 +1160,7 @@ void snes_ppu_class::update_mode_4( UINT16 curline )
 void snes_ppu_class::update_mode_5( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[5])
+	if (m_debug_options.mode_disabled[5])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1203,7 +1172,7 @@ void snes_ppu_class::update_mode_5( UINT16 curline )
 void snes_ppu_class::update_mode_6( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[6])
+	if (m_debug_options.mode_disabled[6])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1214,7 +1183,7 @@ void snes_ppu_class::update_mode_6( UINT16 curline )
 void snes_ppu_class::update_mode_7( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.mode_disabled[7])
+	if (m_debug_options.mode_disabled[7])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1359,7 +1328,7 @@ void snes_ppu_class::update_offsets( void )
 inline void snes_ppu_class::draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
 {
 #if SNES_LAYER_DEBUG
-	if (debug_options.colormath_disabled)
+	if (m_debug_options.colormath_disabled)
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
@@ -1386,7 +1355,7 @@ inline void snes_ppu_class::draw_blend( UINT16 offset, UINT16 *colour, UINT8 pre
 
 #if SNES_LAYER_DEBUG
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
-		if (debug_options.draw_subscreen)
+		if (m_debug_options.draw_subscreen)
 		{
 			subscreen = switch_screens ? &m_scanlines[SNES_SUBSCREEN] : &m_scanlines[SNES_MAINSCREEN];
 		}
@@ -1547,7 +1516,7 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 		}
 
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
-		if (debug_options.draw_subscreen)
+		if (m_debug_options.draw_subscreen)
 		{
 			scanline1 = &m_scanlines[SNES_SUBSCREEN];
 			scanline2 = &m_scanlines[SNES_MAINSCREEN];
@@ -1649,7 +1618,7 @@ void snes_ppu_class::ppu_start(screen_device &screen)
 	running_machine &machine = screen.machine();
 
 #if SNES_LAYER_DEBUG
-	memset(&debug_options, 0, sizeof(debug_options));
+	memset(&m_debug_options, 0, sizeof(m_debug_options));
 #endif
 
 	m_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
@@ -2670,27 +2639,27 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 {
 	int i;
 	UINT8 toggles = machine.root_device().ioport("DEBUG1")->read_safe(0);
-	debug_options.select_pri[SNES_BG1] = (toggles & 0x03);
-	debug_options.select_pri[SNES_BG2] = (toggles & 0x0c) >> 2;
-	debug_options.select_pri[SNES_BG3] = (toggles & 0x30) >> 4;
-	debug_options.select_pri[SNES_BG4] = (toggles & 0xc0) >> 6;
+	m_debug_options.select_pri[SNES_BG1] = (toggles & 0x03);
+	m_debug_options.select_pri[SNES_BG2] = (toggles & 0x0c) >> 2;
+	m_debug_options.select_pri[SNES_BG3] = (toggles & 0x30) >> 4;
+	m_debug_options.select_pri[SNES_BG4] = (toggles & 0xc0) >> 6;
 
 	toggles = machine.root_device().ioport("DEBUG2")->read_safe(0);
 	for (i = 0; i < 4; i++)
-		DEBUG_TOGGLE(i, debug_options.bg_disabled[i], ("Debug: Disabled BG%d.\n", i + 1), ("Debug: Enabled BG%d.\n", i + 1))
-	DEBUG_TOGGLE(4, debug_options.bg_disabled[SNES_OAM], ("Debug: Disabled OAM.\n"), ("Debug: Enabled OAM.\n"))
-	DEBUG_TOGGLE(5, debug_options.draw_subscreen, ("Debug: Switched screens.\n"), ("Debug: Switched screens.\n"))
-	DEBUG_TOGGLE(6, debug_options.colormath_disabled, ("Debug: Disabled Color Math.\n"), ("Debug: Enabled Color Math.\n"))
-	DEBUG_TOGGLE(7, debug_options.windows_disabled, ("Debug: Disabled Window Masks.\n"), ("Debug: Enabled Window Masks.\n"))
+		DEBUG_TOGGLE(i, m_debug_options.bg_disabled[i], ("Debug: Disabled BG%d.\n", i + 1), ("Debug: Enabled BG%d.\n", i + 1))
+	DEBUG_TOGGLE(4, m_debug_options.bg_disabled[SNES_OAM], ("Debug: Disabled OAM.\n"), ("Debug: Enabled OAM.\n"))
+	DEBUG_TOGGLE(5, m_debug_options.draw_subscreen, ("Debug: Switched screens.\n"), ("Debug: Switched screens.\n"))
+	DEBUG_TOGGLE(6, m_debug_options.colormath_disabled, ("Debug: Disabled Color Math.\n"), ("Debug: Enabled Color Math.\n"))
+	DEBUG_TOGGLE(7, m_debug_options.windows_disabled, ("Debug: Disabled Window Masks.\n"), ("Debug: Enabled Window Masks.\n"))
 
 	toggles = machine.root_device().ioport("DEBUG4")->read_safe(0);
 	for (i = 0; i < 8; i++)
-		DEBUG_TOGGLE(i, debug_options.mode_disabled[i], ("Debug: Disabled Mode %d drawing.\n", i), ("Debug: Enabled Mode %d drawing.\n", i))
+		DEBUG_TOGGLE(i, m_debug_options.mode_disabled[i], ("Debug: Disabled Mode %d drawing.\n", i), ("Debug: Enabled Mode %d drawing.\n", i))
 
 	toggles = machine.root_device().ioport("DEBUG3")->read_safe(0);
-	DEBUG_TOGGLE(2, debug_options.mosaic_disabled, ("Debug: Disabled Mosaic.\n"), ("Debug: Enabled Mosaic.\n"))
-	debug_options.sprite_reversed = BIT(toggles, 7);
-	debug_options.select_pri[SNES_OAM] = (toggles & 0x70) >> 4;
+	DEBUG_TOGGLE(2, m_debug_options.mosaic_disabled, ("Debug: Disabled Mosaic.\n"), ("Debug: Enabled Mosaic.\n"))
+	m_debug_options.sprite_reversed = BIT(toggles, 7);
+	m_debug_options.select_pri[SNES_OAM] = (toggles & 0x70) >> 4;
 
 #ifdef MAME_DEBUG
 	/* Once per frame, log video properties */
@@ -2698,9 +2667,9 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 	{
 		static const char WINLOGIC[4] = { '|', '&', '^', '!' };
 
-		logerror("%s", debug_options.windows_disabled?" ":"W");
+		logerror("%s", m_debug_options.windows_disabled?" ":"W");
 		logerror("%s1 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
-				debug_options.bg_disabled[0]?" ":"*",
+				m_debug_options.bg_disabled[0]?" ":"*",
 				(PPU_REG(TM) & 0x1)?"M":" ",
 				(PPU_REG(TS) & 0x1)?"S":" ",
 				(PPU_REG(CGADSUB) & 0x1)?"B":" ",
@@ -2715,7 +2684,7 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 				(PPU_REG(BG1SC) & 0xfc) << 9,
 				m_layer[SNES_BG1].charmap << 13);
 		logerror("%s2 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
-				debug_options.bg_disabled[1]?" ":"*",
+				m_debug_options.bg_disabled[1]?" ":"*",
 				(PPU_REG(TM) & 0x2)?"M":" ",
 				(PPU_REG(TS) & 0x2)?"S":" ",
 				(PPU_REG(CGADSUB) & 0x2)?"B":" ",
@@ -2730,7 +2699,7 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 				(PPU_REG(BG2SC) & 0xfc) << 9,
 				m_layer[SNES_BG2].charmap << 13);
 		logerror("%s3 %s%s%s%s%s%c%s%s%d%s%s%d %4X %4X",
-				debug_options.bg_disabled[2]?" ":"*",
+				m_debug_options.bg_disabled[2]?" ":"*",
 				(PPU_REG(TM) & 0x4)?"M":" ",
 				(PPU_REG(TS) & 0x4)?"S":" ",
 				(PPU_REG(CGADSUB) & 0x4)?"B":" ",
@@ -2746,7 +2715,7 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 				(PPU_REG(BG3SC) & 0xfc) << 9,
 				m_layer[SNES_BG3].charmap << 13);
 		logerror("%s4 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
-				debug_options.bg_disabled[3]?" ":"*",
+				m_debug_options.bg_disabled[3]?" ":"*",
 				(PPU_REG(TM) & 0x8)?"M":" ",
 				(PPU_REG(TS) & 0x8)?"S":" ",
 				(PPU_REG(CGADSUB) & 0x8)?"B":" ",
@@ -2761,7 +2730,7 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 				(PPU_REG(BG4SC) & 0xfc) << 9,
 				m_layer[SNES_BG4].charmap << 13 );
 		logerror("%sO %s%s%s%s%s%c%s%s       %4X",
-				debug_options.bg_disabled[4]?" ":"*",
+				m_debug_options.bg_disabled[4]?" ":"*",
 				(PPU_REG(TM) & 0x10)?"M":" ",
 				(PPU_REG(TS) & 0x10)?"S":" ",
 				(PPU_REG(CGADSUB) & 0x10)?"B":" ",
@@ -2772,7 +2741,7 @@ UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 				(PPU_REG(WOBJSEL) & 0x8)?((PPU_REG(WOBJSEL) & 0x4)?"o":"i"):" ",
 				m_layer[SNES_OAM].charmap << 13 );
 		logerror("%sB   %s  %c%s%s",
-				debug_options.colormath_disabled?" ":"*",
+				m_debug_options.colormath_disabled?" ":"*",
 				(PPU_REG(CGADSUB) & 0x20)?"B":" ",
 				WINLOGIC[(PPU_REG(WOBJLOG) & 0xc)>>2],
 				(PPU_REG(WOBJSEL) & 0x20)?((PPU_REG(WOBJSEL) & 0x10)?"o":"i"):" ",

@@ -450,6 +450,41 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
+	
+	struct OAM
+	{
+		UINT16 tile;
+		INT16 x, y;
+		UINT8 size, vflip, hflip, priority_bits, pal;
+		int height, width;
+	};
+
+	struct OAM m_oam_spritelist[SNES_SCR_WIDTH / 2];
+
+	UINT8 m_oam_itemlist[32];
+
+	struct TILELIST {
+		INT16 x;
+		UINT16 priority, pal, tileaddr;
+		int hflip;
+	};
+
+	struct TILELIST m_oam_tilelist[34];
+
+	#if SNES_LAYER_DEBUG
+	struct DEBUGOPTS
+	{
+		UINT8 bg_disabled[5];
+		UINT8 mode_disabled[8];
+		UINT8 draw_subscreen;
+		UINT8 windows_disabled;
+		UINT8 mosaic_disabled;
+		UINT8 colormath_disabled;
+		UINT8 sprite_reversed;
+		UINT8 select_pri[5];
+	};
+	struct DEBUGOPTS m_debug_options;
+	#endif
 
 	screen_device *m_screen;
 
