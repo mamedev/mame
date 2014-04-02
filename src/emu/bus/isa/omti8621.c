@@ -28,10 +28,6 @@ static int verbose = VERBOSE;
 #define LOG2(x) { if (verbose > 1) LOG(x)}
 #define LOG3(x) { if (verbose > 2) LOG(x)}
 
-#define DLOG(x) { logerror ("%s: ", cpu_context(disk->device)); logerror x; logerror ("\n"); }
-#define DLOG1(x)    { if (verbose > 0) DLOG(x)}
-#define DLOG2(x)    { if (verbose > 1) DLOG(x)} 							  
-
 #define OMTI_DISK_SECTOR_SIZE 1056
 
 #define OMTI_DISK_TYPE_155_MB 0x607 // Micropolis 1355 (170 MB Dtype = 607)
@@ -50,37 +46,6 @@ static int verbose = VERBOSE;
 
 // forward declaration of image class
 extern const device_type OMTI_DISK;
-
-class omti_disk_image_device :  public device_t,
-								public device_image_interface
-{
-public:
-	// construction/destruction
-	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const { return IO_HARDDISK; }
-
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
-	virtual const char *file_extensions() const { return "awd"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-
-	virtual bool call_create(int format_type, option_resolution *format_options);
-
-	disk_data *token() { return &m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-	disk_data m_token;
-};
 
 /*
  * I/O register offsets
@@ -279,12 +244,9 @@ void omti8621_device::device_start()
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
 	m_timer = timer_alloc(0, NULL);
-
-	device_t *device0 = subdevice(OMTI_DISK0_TAG);
-	our_disks[0] = (disk_data *) downcast<omti_disk_image_device *>(device0)->token();
-
-	device_t *device1 = subdevice(OMTI_DISK1_TAG);
-	our_disks[1] = (disk_data *) downcast<omti_disk_image_device *>(device1)->token();
+	
+	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
+	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
 }
 
 /*-------------------------------------------------
@@ -320,7 +282,7 @@ void omti8621_device::device_reset()
 		m_installed = true;
 	}
 
-	set_jumper(our_disks[0]->type);
+	set_jumper(our_disks[0]->m_type);
 
 	// should go from reset to idle after 100 us
 	// state->omti_state = OMTI_STATE_RESET;
@@ -422,18 +384,18 @@ void omti8621_device::set_configuration_data(UINT8 lun) {
 	LOG2(("set_configuration_data lun=%x", lun));
 
 	// initialize the configuration data
-	disk_data *disk = our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 
-	disk->config_data[0] = (disk->cylinders - 1) >> 8; // Number of Cylinders (MSB)
-	disk->config_data[1] = (disk->cylinders - 1) & 0xff; // Number of Cylinders (LSB) (-1)
-	disk->config_data[2] = disk->heads - 1; // Number of Heads (-1)
-	disk->config_data[3] = disk->sectors - 1; // Number of Sectors (-1)
-	disk->config_data[4] = 0x02; // Drive Configuration Word (MSB)
-	disk->config_data[5] = 0x44; // Drive Configuration Word (LSB)
-	disk->config_data[6] = 0x00; // ISG AFTER INDEX
-	disk->config_data[7] = 0x00; // PLO SYN Field (ID)
-	disk->config_data[8] = 0x00; // PLO SYN Field (DATA)
-	disk->config_data[9] = 0x00; // ISG AFTER SECTOR
+	disk->m_config_data[0] = (disk->m_cylinders - 1) >> 8; // Number of Cylinders (MSB)
+	disk->m_config_data[1] = (disk->m_cylinders - 1) & 0xff; // Number of Cylinders (LSB) (-1)
+	disk->m_config_data[2] = disk->m_heads - 1; // Number of Heads (-1)
+	disk->m_config_data[3] = disk->m_sectors - 1; // Number of Sectors (-1)
+	disk->m_config_data[4] = 0x02; // Drive Configuration Word (MSB)
+	disk->m_config_data[5] = 0x44; // Drive Configuration Word (LSB)
+	disk->m_config_data[6] = 0x00; // ISG AFTER INDEX
+	disk->m_config_data[7] = 0x00; // PLO SYN Field (ID)
+	disk->m_config_data[8] = 0x00; // PLO SYN Field (DATA)
+	disk->m_config_data[9] = 0x00; // ISG AFTER SECTOR
 }
 
 /***************************************************************************
@@ -457,10 +419,10 @@ UINT8 omti8621_device::check_disk_address(const UINT8 *cdb)
 	UINT16 sector = cdb[2] & 0x3f;
 	UINT32 cylinder = cdb[3] + ((cdb[2] & 0xc0) << 2) + ((cdb[1] & 0x80) << 3);
 	UINT8 block_count = cdb[4];
-	disk_data *disk = our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 
-	UINT32 disk_track = cylinder * disk->heads + head;
-	UINT32 disk_addr = (disk_track * disk->sectors) + sector;
+	UINT32 disk_track = cylinder * disk->m_heads + head;
+	UINT32 disk_addr = (disk_track * disk->m_sectors) + sector;
 
 	if (block_count > OMTI_MAX_BLOCK_COUNT) {
 		LOG(("########### check_disk_address: unexpected block count %x", block_count));
@@ -469,13 +431,13 @@ UINT8 omti8621_device::check_disk_address(const UINT8 *cdb)
 
 	if (lun > OMTI_MAX_LUN) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
-	} else  if (!disk->image->exists()) {
+	} else  if (!disk->m_image->exists()) {
 		sense_code = OMTI_SENSE_CODE_DRIVE_NOT_READY;
 	} else  if (sector >= OMTI_MAX_BLOCK_COUNT) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
-	} else if (head >= disk->heads) {
+	} else if (head >= disk->m_heads) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
-	} else if (cylinder >= disk->cylinders) {
+	} else if (cylinder >= disk->m_cylinders) {
 		sense_code = OMTI_SENSE_CODE_ILLEGAL_ADDRESS | OMTI_SENSE_CODE_ADDRESS_VALID;
 	} else if ( disk_track == diskaddr_format_bad_track && disk_track != 0) {
 		sense_code = OMTI_SENSE_CODE_BAD_TRACK;
@@ -502,7 +464,7 @@ UINT32 omti8621_device::get_disk_track(const UINT8 * cdb) {
 	UINT8 lun = get_lun(cdb);
 	UINT16 head = cdb[1] & 0x1f;
 	UINT32 cylinder = cdb[3] + ((cdb[2] & 0xc0) << 2) + ((cdb[1] & 0x80) << 3);
-	return cylinder * our_disks[lun]->heads + head;
+	return cylinder * our_disks[lun]->m_heads + head;
 }
 
 /***************************************************************************
@@ -512,7 +474,7 @@ UINT32 omti8621_device::get_disk_track(const UINT8 * cdb) {
 UINT32 omti8621_device::get_disk_address(const UINT8 * cdb) {
 	UINT8 lun = get_lun(cdb);
 	UINT16 sector = cdb[2] & 0x3f;
-	return get_disk_track(cdb) * our_disks[lun]->sectors + sector;
+	return get_disk_track(cdb) * our_disks[lun]->m_sectors + sector;
 }
 
 /***************************************************************************
@@ -538,7 +500,7 @@ void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length)
 void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
 {
 	UINT8 *data_buffer = sector_buffer;
-	device_image_interface *image = our_disks[lun]->image;
+	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
 		LOG2(("read_sectors_from_disk lun=%d diskaddr=%x", lun, diskaddr));
@@ -558,7 +520,7 @@ void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 
 void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
 {
 	UINT8 *data_buffer = sector_buffer;
-	device_image_interface *image = our_disks[lun]->image;
+	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
 		LOG2(("write_sectors_to_disk lun=%d diskaddr=%x", lun, diskaddr));
@@ -582,7 +544,7 @@ void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 l
 
 void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun) 
 {
-	device_image_interface *image = our_disks[lun]->image;
+	device_image_interface *image = our_disks[lun]->m_image;
 
 	LOG2(("copy_sectors lun=%d src_addr=%x dst_addr=%x count=%x", lun, src_addr, dst_addr, count));
 
@@ -635,9 +597,9 @@ void omti8621_device::format_track(const UINT8 * cdb)
 
 	if (check_disk_address(cdb) ) {
 		if ((cdb[5] & 0x40) == 0) {
-			memset(sector_buffer, 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->sectors);
+			memset(sector_buffer, 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->m_sectors);
 		}
-		write_sectors_to_disk(disk_addr, our_disks[lun]->sectors, lun);
+		write_sectors_to_disk(disk_addr, our_disks[lun]->m_sectors, lun);
 	}
 
 }
@@ -648,14 +610,14 @@ void omti8621_device::format_track(const UINT8 * cdb)
 
 void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)
 {
-	disk_data *disk = our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 
-	memset(disk->esdi_defect_list, 0, sizeof(disk->esdi_defect_list));
-	disk->esdi_defect_list[0] = 1; // month
-	disk->esdi_defect_list[1] = 1; // day
-	disk->esdi_defect_list[2] = 90; // year
-	disk->esdi_defect_list[3] = head;
-	memset(disk->esdi_defect_list+6, 0xff, 5); // end of defect list
+	memset(disk->m_esdi_defect_list, 0, sizeof(disk->m_esdi_defect_list));
+	disk->m_esdi_defect_list[0] = 1; // month
+	disk->m_esdi_defect_list[1] = 1; // day
+	disk->m_esdi_defect_list[2] = 90; // year
+	disk->m_esdi_defect_list[3] = head;
+	memset(disk->m_esdi_defect_list+6, 0xff, 5); // end of defect list
 }
 
 /***************************************************************************
@@ -785,7 +747,7 @@ void omti8621_device::log_data()
 void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length) 
 {
 	UINT8 lun = get_lun(cdb);
-	disk_data *disk = our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 	int command_duration = 0; // ms
 
 	log_command( cdb, cdb_length);
@@ -799,13 +761,13 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		set_interrupt(CLEAR_LINE);
 	}
 
-	if (!disk->image->exists()) {
+	if (!disk->m_image->exists()) {
 		command_status |= OMTI_COMMAND_STATUS_ERROR; // no such drive
 	}
 
 	switch (cdb[0]) {
 	case OMTI_CMD_TEST_DRIVE_READY: // 0x00
-		if (!disk->image->exists())
+		if (!disk->m_image->exists())
 		{
 			set_sense_data(OMTI_SENSE_CODE_DRIVE_NOT_READY, cdb);
 		}
@@ -866,7 +828,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 
 	case OMTI_CMD_READ_ESDI_DEFECT_LIST: // 0x37
 		set_esdi_defect_list(get_lun(cdb), cdb[1] & 0x1f);
-		set_data_transfer(disk->esdi_defect_list, sizeof(disk->esdi_defect_list));
+		set_data_transfer(disk->m_esdi_defect_list, sizeof(disk->m_esdi_defect_list));
 		break;
 
 	case OMTI_CMD_ASSIGN_ALTERNATE_TRACK: // 0x11
@@ -917,7 +879,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 
 	case OMTI_CMD_READ_CONFIGURATION: // 0xEC
 		set_configuration_data(get_lun(cdb));
-		set_data_transfer(disk->config_data, sizeof(disk->config_data));
+		set_data_transfer(disk->m_config_data, sizeof(disk->m_config_data));
 		break;
 
 	case OMTI_CMD_INVALID_COMMAND: // 0xFF
@@ -1196,9 +1158,9 @@ void omti8621_device::set_verbose(int on_off)
 
 UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 length, UINT8 lun)
 {
-	disk_data *disk = our_disks[lun];
+	omti_disk_image_device *disk = our_disks[lun];
 
-	if (disk->image == NULL || !disk->image->exists())
+	if (disk->m_image == NULL || !disk->m_image->exists())
 	{
 		return 0;
 	}
@@ -1209,8 +1171,8 @@ UINT32 omti8621_device::get_sector(INT32 diskaddr, UINT8 *data_buffer, UINT32 le
 		// restrict length to size of 1 sector (i.e. 1024 Byte)
 		length = length < OMTI_DISK_SECTOR_SIZE ? length  : OMTI_DISK_SECTOR_SIZE;
 
-		disk->image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		disk->image->fread(data_buffer, length);
+		disk->m_image->fseek(diskaddr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
+		disk->m_image->fread(data_buffer, length);
 
 		return length;
 	}
@@ -1282,42 +1244,32 @@ void omti_disk_image_device::device_config_complete()
 
 
 /***************************************************************************
- get_safe_disk_token - makes sure that the passed in device is a OMTI disk
- ***************************************************************************/
-
-INLINE disk_data *get_safe_disk_token(device_t *device) {
-	assert(device != NULL);
-	assert(device->type() == OMTI_DISK);
-	return (disk_data *) downcast<omti_disk_image_device *>(device)->token();
-}
-
-/***************************************************************************
  omti_disk_config - configure disk parameters
  ***************************************************************************/
 
-static void omti_disk_config(disk_data *disk, UINT16 disk_type)
+void omti_disk_image_device::omti_disk_config(UINT16 disk_type)
 {
-	DLOG1(("omti_disk_config: configuring disk with type %x", disk_type));
+	LOG1(("omti_disk_config: configuring disk with type %x", disk_type));
 
 	switch (disk_type)
 	{
 	case OMTI_DISK_TYPE_348_MB: // Maxtor 380 MB (348-MB FA formatted)
-		disk->cylinders = 1223;
-		disk->heads = 15;
-		disk->sectors = 18;
+		m_cylinders = 1223;
+		m_heads = 15;
+		m_sectors = 18;
 		break;
 
 	case OMTI_DISK_TYPE_155_MB: // Micropolis 170 MB (155-MB formatted)
 	default:
-		disk->cylinders = 1023;
-		disk->heads = 8;
-		disk->sectors = 18;
+		m_cylinders = 1023;
+		m_heads = 8;
+		m_sectors = 18;
 		break;
 	}
 
-	disk->type = disk_type;
-	disk->sectorbytes = OMTI_DISK_SECTOR_SIZE;
-	disk->sector_count = disk->cylinders * disk->heads * disk->sectors;
+	m_type = disk_type;
+	m_sectorbytes = OMTI_DISK_SECTOR_SIZE;
+	m_sector_count = m_cylinders * m_heads * m_sectors;
 }
 
 /*-------------------------------------------------
@@ -1326,24 +1278,19 @@ static void omti_disk_config(disk_data *disk, UINT16 disk_type)
 
 void omti_disk_image_device::device_start()
 {
-	disk_data *disk = get_safe_disk_token(this);
+	m_image = this;
 
-	disk->device = this;
-	// note: we must have disk->device before we can log
-
-	disk->image = this;
-
-	if (disk->image->image_core_file() == NULL)
+	if (m_image->image_core_file() == NULL)
 	{
-		DLOG1(("device_start_omti_disk: no disk"));
+		LOG1(("device_start_omti_disk: no disk"));
 	}
 	else
 	{
-		DLOG1(("device_start_omti_disk: with disk image %s",disk->image->basename() ));
+		LOG1(("device_start_omti_disk: with disk image %s",m_image->basename() ));
 	}
 
 	// default disk type
-	omti_disk_config(disk, OMTI_DISK_TYPE_DEFAULT);
+	omti_disk_config(OMTI_DISK_TYPE_DEFAULT);
 }
 
 /*-------------------------------------------------
@@ -1351,17 +1298,16 @@ void omti_disk_image_device::device_start()
 -------------------------------------------------*/
 
 void omti_disk_image_device::device_reset()
-{
-	disk_data *disk = get_safe_disk_token(this);
-	DLOG1(("device_reset_omti_disk"));
+{	
+	LOG1(("device_reset_omti_disk"));
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
 		UINT32 disk_size = (UINT32)(ftell() / OMTI_DISK_SECTOR_SIZE);
 		UINT16 disk_type = disk_size >= 300000 ? OMTI_DISK_TYPE_348_MB : OMTI_DISK_TYPE_155_MB;
-		if (disk_type != disk->type) {
-			DLOG1(("device_reset_omti_disk: disk size=%d blocks, disk type=%x", disk_size, disk_type ));
-			omti_disk_config(disk, disk_type);
+		if (disk_type != m_type) {
+			LOG1(("device_reset_omti_disk: disk size=%d blocks, disk type=%x", disk_size, disk_type ));
+			omti_disk_config(disk_type);
 		}
 	}
 }
@@ -1372,15 +1318,14 @@ void omti_disk_image_device::device_reset()
 
 bool omti_disk_image_device::call_create(int format_type, option_resolution *format_options)
 {
-	disk_data *disk = get_safe_disk_token(this);
-	DLOG(("device_create_omti_disk: creating OMTI Disk with %d blocks", disk->sector_count));
+	LOG(("device_create_omti_disk: creating OMTI Disk with %d blocks", m_sector_count));
 
 	int x;
 	unsigned char sectordata[OMTI_DISK_SECTOR_SIZE]; // empty block data
 
 
 	memset(sectordata, 0x55, sizeof(sectordata));
-	for (x = 0; x < disk->sector_count; x++)
+	for (x = 0; x < m_sector_count; x++)
 	{
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)

@@ -27,23 +27,48 @@
  FUNCTION PROTOTYPES
  ***************************************************************************/
 
-struct disk_data
+class omti_disk_image_device :  public device_t,
+								public device_image_interface
 {
-	device_t *device;
-	UINT16 type;
-	UINT16 cylinders;
-	UINT16 heads;
-	UINT16 sectors;
-	UINT32 sectorbytes;
-	UINT32 sector_count;
+public:
+	// construction/destruction
+	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	device_image_interface *image;
+	// image-level overrides
+	virtual iodevice_t image_type() const { return IO_HARDDISK; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *image_interface() const { return NULL; }
+	virtual const char *file_extensions() const { return "awd"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	virtual bool call_create(int format_type, option_resolution *format_options);
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
+	
+	void omti_disk_config(UINT16 disk_type);
+public:
+	UINT16 m_type;
+	UINT16 m_cylinders;
+	UINT16 m_heads;
+	UINT16 m_sectors;
+	UINT32 m_sectorbytes;
+	UINT32 m_sector_count;
+
+	device_image_interface *m_image;
 
 	// configuration data
-	UINT8 config_data[10];
+	UINT8 m_config_data[10];
 
 	// ESDI defect list data
-	UINT8 esdi_defect_list[256];
+	UINT8 m_esdi_defect_list[256];
 };
 
 /* ----- device interface ----- */
@@ -87,7 +112,7 @@ protected:
 	void set_interrupt(enum line_state line_state);
 
 private:
-	disk_data *our_disks[OMTI_MAX_LUN+1];
+	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
 	UINT16 jumper;
 
