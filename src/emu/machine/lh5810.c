@@ -19,33 +19,6 @@
 
 const device_type LH5810 = &device_creator<lh5810_device>;
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void lh5810_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const lh5810_interface *intf = reinterpret_cast<const lh5810_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<lh5810_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_porta_r_cb, 0, sizeof(m_porta_r_cb));
-		memset(&m_porta_w_cb, 0, sizeof(m_porta_w_cb));
-		memset(&m_portb_r_cb, 0, sizeof(m_portb_r_cb));
-		memset(&m_portb_w_cb, 0, sizeof(m_portb_w_cb));
-		memset(&m_portc_w_cb, 0, sizeof(m_portc_w_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-	}
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -55,7 +28,13 @@ void lh5810_device::device_config_complete()
 //-------------------------------------------------
 
 lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LH5810, "LH5810", tag, owner, clock, "lh5810", __FILE__)
+	: device_t(mconfig, LH5810, "LH5810", tag, owner, clock, "lh5810", __FILE__),
+	m_porta_r_cb(*this),
+	m_porta_w_cb(*this),
+	m_portb_r_cb(*this),
+	m_portb_w_cb(*this),
+	m_portc_w_cb(*this),
+	m_out_int_cb(*this)
 {
 }
 
@@ -67,12 +46,12 @@ lh5810_device::lh5810_device(const machine_config &mconfig, const char *tag, dev
 void lh5810_device::device_start()
 {
 	// resolve callbacks
-	m_porta_r_func.resolve(m_porta_r_cb, *this);
-	m_porta_w_func.resolve(m_porta_w_cb, *this);
-	m_portb_r_func.resolve(m_portb_r_cb, *this);
-	m_portb_w_func.resolve(m_portb_w_cb, *this);
-	m_portc_w_func.resolve(m_portc_w_cb, *this);
-	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_porta_r_cb.resolve_safe(0);
+	m_porta_w_cb.resolve_safe();
+	m_portb_r_cb.resolve_safe(0);
+	m_portb_w_cb.resolve_safe();
+	m_portc_w_cb.resolve_safe();
+	m_out_int_cb.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_irq));
@@ -109,7 +88,7 @@ READ8_MEMBER( lh5810_device::data_r )
 			return m_reg[offset];
 
 		case LH5810_IF:
-			if (BIT(m_portb_r_func(0) & ~m_reg[LH5810_DDB], 7))
+			if (BIT(m_portb_r_cb(0) & ~m_reg[LH5810_DDB], 7))
 				m_reg[offset] |= 2;
 			else
 				m_reg[offset] &= 0xfd;
@@ -120,12 +99,12 @@ READ8_MEMBER( lh5810_device::data_r )
 			return (m_reg[offset]&0x0f) | (m_irq<<4) | (BIT(m_reg[LH5810_OPB],7)<<5);
 
 		case LH5810_OPA:
-			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDA]) | (m_porta_r_func(0) & ~m_reg[LH5810_DDA]);
+			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDA]) | (m_porta_r_cb(0) & ~m_reg[LH5810_DDA]);
 			return m_reg[offset];
 
 		case LH5810_OPB:
-			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDB]) | (m_portb_r_func(0) & ~m_reg[LH5810_DDB]);
-			m_out_int_func((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_reg[offset] = (m_reg[offset] & m_reg[LH5810_DDB]) | (m_portb_r_cb(0) & ~m_reg[LH5810_DDB]);
+			m_out_int_cb((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			return m_reg[offset];
 
 		default:
@@ -175,18 +154,18 @@ WRITE8_MEMBER( lh5810_device::data_w )
 
 		case LH5810_OPA:
 			m_reg[offset] = (data & m_reg[LH5810_DDA]) | (m_reg[offset] & ~m_reg[LH5810_DDA]);
-			m_porta_w_func(0, m_reg[offset]);
+			m_porta_w_cb((offs_t)0, m_reg[offset]);
 			break;
 
 		case LH5810_OPB:
 			m_reg[offset] = (data & m_reg[LH5810_DDB]) | (m_reg[offset] & ~m_reg[LH5810_DDB]);
-			m_portb_w_func(0, m_reg[offset]);
-			m_out_int_func((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_portb_w_cb((offs_t)0, m_reg[offset]);
+			m_out_int_cb((m_reg[offset] & 0x80 && m_reg[LH5810_MSK] & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case LH5810_OPC:
 			m_reg[offset] = data;
-			m_portc_w_func(0, m_reg[offset]);
+			m_portc_w_cb((offs_t)0, m_reg[offset]);
 			break;
 	}
 }

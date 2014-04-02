@@ -264,16 +264,6 @@ PALETTE_INIT_MEMBER(pc1500_state, pc1500)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static const lh5810_interface lh5810_pc1500_config =
-{
-	DEVCB_DRIVER_MEMBER(pc1500_state, port_a_r),        //port A read
-	DEVCB_DRIVER_MEMBER(pc1500_state, kb_matrix_w),     //port A write
-	DEVCB_DRIVER_MEMBER(pc1500_state, port_b_r),        //port B read
-	DEVCB_NULL,                                         //port B write
-	DEVCB_DRIVER_MEMBER(pc1500_state, port_c_w),        //port C write
-	DEVCB_CPU_INPUT_LINE("maincpu", LH5801_LINE_MI)     //IRQ callback
-};
-
 static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
 	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
@@ -292,7 +282,12 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
 
-	MCFG_LH5810_ADD("lh5810", lh5810_pc1500_config)
+	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
+	MCFG_LH5810_PORTA_R_CB(READ8(pc1500_state, port_a_r))
+	MCFG_LH5810_PORTA_W_CB(WRITE8(pc1500_state, kb_matrix_w))
+	MCFG_LH5810_PORTB_R_CB(READ8(pc1500_state, port_b_r))
+	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
+	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
 
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 MACHINE_CONFIG_END
