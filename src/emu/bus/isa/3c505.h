@@ -175,6 +175,7 @@ private:
 	{
 	public:
 		data_buffer_fifo();
+		~data_buffer_fifo();
 		void start(threecom3c505_device *device, INT32 size, INT32 db_size);
 		void reset();
 		int put(const UINT8 data[], const int length);

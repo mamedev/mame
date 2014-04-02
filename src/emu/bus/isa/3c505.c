@@ -473,7 +473,7 @@ void threecom3c505_device::data_buffer_fifo::start(
 	m_size = RX_FIFO_SIZE; // size;
 	for (i = 0; i < m_size; i++)
 	{
-		m_db[i] = new data_buffer();
+		m_db[i] = global_alloc(data_buffer());
 		m_db[i]->start(device, db_size);
 	}
 }
@@ -483,6 +483,14 @@ void threecom3c505_device::data_buffer_fifo::reset()
 	LOG2(("reset threecom3c505_device::data_buffer_fifo"));
 	m_get_index = m_put_index = 0;
 	m_count = 0;
+}
+
+threecom3c505_device::data_buffer_fifo::~data_buffer_fifo()
+{
+	for (int i = 0; i < m_size; i++)
+	{
+		global_free(m_db[i]);
+	}
 }
 
 int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int length)
