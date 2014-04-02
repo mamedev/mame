@@ -464,9 +464,6 @@ public:
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	// access to legacy token
-	struct s3c24xx_t *token() const { assert(m_token != NULL); return m_token; }
-
 	DECLARE_WRITE_LINE_MEMBER( frnb_w );
 	
 	// device-level overrides
@@ -475,7 +472,6 @@ public:
 	virtual void device_reset();
 private:
 	// internal state
-	struct s3c24xx_t *m_token;
 	required_device<palette_device> m_palette;
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
