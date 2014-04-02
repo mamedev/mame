@@ -913,6 +913,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		m_vidc_bpp_mode = ((val & 0x0c) >> 2);
 		m_vidc_interlace = ((val & 0x40) >> 6);
 		m_vidc_pixel_clk = (val & 0x03);
+		//todo: vga/svga modes sets 0x1000
 		vidc_dynamic_res_change();
 	}
 	else
