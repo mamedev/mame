@@ -125,6 +125,7 @@ public:
 	int m_fdc_tc;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 };
 
 

@@ -182,30 +182,6 @@ const rom_entry *upd7220_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd7220_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd7220_interface *intf = reinterpret_cast<const upd7220_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd7220_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
-		memset(&m_out_hsync_cb, 0, sizeof(m_out_hsync_cb));
-		memset(&m_out_vsync_cb, 0, sizeof(m_out_vsync_cb));
-		memset(&m_out_blank_cb, 0, sizeof(m_out_blank_cb));
-	}
-}
-
-
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -681,43 +657,47 @@ inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT1
 //  upd7220_device - constructor
 //-------------------------------------------------
 
-upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock, "upd7220", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_mask(0),
-		m_pitch(0),
-		m_ead(0),
-		m_dad(0),
-		m_lad(0),
-		m_ra_addr(0),
-		m_sr(UPD7220_SR_FIFO_EMPTY),
-		m_cr(0),
-		m_param_ptr(0),
-		m_fifo_ptr(-1),
-		m_fifo_dir(0),
-		m_mode(0),
-		m_draw_mode(0),
-		m_de(0),
-		m_m(0),
-		m_aw(0),
-		m_al(0),
-		m_vs(0),
-		m_vfp(0),
-		m_vbp(0),
-		m_hs(0),
-		m_hfp(0),
-		m_hbp(0),
-		m_dc(0),
-		m_sc(0),
-		m_br(0),
-		m_ctop(0),
-		m_cbot(0),
-		m_lr(0),
-		m_disp(0),
-		m_gchr(0),
-		m_bitmap_mod(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
+upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock, "upd7220", __FILE__),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_write_drq(*this),
+	m_write_hsync(*this),
+	m_write_vsync(*this),
+	m_write_blank(*this),
+	m_mask(0),
+	m_pitch(0),
+	m_ead(0),
+	m_dad(0),
+	m_lad(0),
+	m_ra_addr(0),
+	m_sr(UPD7220_SR_FIFO_EMPTY),
+	m_cr(0),
+	m_param_ptr(0),
+	m_fifo_ptr(-1),
+	m_fifo_dir(0),
+	m_mode(0),
+	m_draw_mode(0),
+	m_de(0),
+	m_m(0),
+	m_aw(0),
+	m_al(0),
+	m_vs(0),
+	m_vfp(0),
+	m_vbp(0),
+	m_hs(0),
+	m_hfp(0),
+	m_hbp(0),
+	m_dc(0),
+	m_sc(0),
+	m_br(0),
+	m_ctop(0),
+	m_cbot(0),
+	m_lr(0),
+	m_disp(0),
+	m_gchr(0),
+	m_bitmap_mod(0),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -748,16 +728,19 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 
 void upd7220_device::device_start()
 {
+	// resolve callbacks
+	m_display_cb.bind_relative_to(*owner());
+	m_draw_text_cb.bind_relative_to(*owner());
+
+	m_write_drq.resolve_safe();
+	m_write_hsync.resolve_safe();
+	m_write_vsync.resolve_safe();
+	m_write_blank.resolve_safe();
+
 	// allocate timers
 	m_vsync_timer = timer_alloc(TIMER_VSYNC);
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
 	m_blank_timer = timer_alloc(TIMER_BLANK);
-
-	// resolve callbacks
-	m_out_drq_func.resolve(m_out_drq_cb, *this);
-	m_out_hsync_func.resolve(m_out_hsync_cb, *this);
-	m_out_vsync_func.resolve(m_out_vsync_cb, *this);
-	m_out_blank_func.resolve(m_out_blank_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_ra));
@@ -795,7 +778,7 @@ void upd7220_device::device_start()
 
 void upd7220_device::device_reset()
 {
-	m_out_drq_func(CLEAR_LINE);
+	m_write_drq(CLEAR_LINE);
 }
 
 
@@ -817,7 +800,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_HBLANK_ACTIVE;
 		}
 
-		m_out_hsync_func(param);
+		m_write_hsync(param);
 
 		update_hsync_timer(param);
 		break;
@@ -832,7 +815,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
 		}
 
-		m_out_vsync_func(param);
+		m_write_vsync(param);
 
 		update_vsync_timer(param);
 		break;
@@ -847,7 +830,7 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_sr &= ~UPD7220_SR_HBLANK_ACTIVE;
 		}
 
-		m_out_blank_func(param);
+		m_write_blank(param);
 
 		update_blank_timer(param);
 		break;
@@ -1556,8 +1539,8 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		{
 			addr = sad + (y * m_pitch);
 
-			if (m_draw_text_cb)
-				m_draw_text_cb(this, bitmap, addr, y, wd, m_pitch, m_lr, m_dc, m_ead);
+			if (!m_draw_text_cb.isnull())
+				m_draw_text_cb(bitmap, addr, y, wd, m_pitch, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1576,7 +1559,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y
 	for (sx = 0; sx < 80; sx++)
 	{
 		if((sx << 3) < m_aw * 16 && y < m_al)
-			m_display_cb(this, bitmap, y, sx << 3, addr);
+			m_display_cb(bitmap, y, sx << 3, addr);
 
 		addr+= wd + 1;
 	}
@@ -1613,7 +1596,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
 				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
 
-				if (m_display_cb)
+				if (!m_display_cb.isnull())
 					draw_graphics_line(bitmap, addr, y + bsy/((m_pitch == 40)+1), wd);
 			}
 		}
@@ -1627,8 +1610,8 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				{
 					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 
-					if (m_draw_text_cb)
-						m_draw_text_cb(this, bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, m_lr, m_dc, m_ead);
+					if (!m_draw_text_cb.isnull())
+						m_draw_text_cb(bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}

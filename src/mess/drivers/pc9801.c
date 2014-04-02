@@ -683,6 +683,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_ext2_video_ff_w);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+    UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+    UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
@@ -781,38 +783,37 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 {
-	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
 	UINT8 interlace_on;
 	UINT8 colors16_mode;
 
-	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
+	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().first_screen()->visible_area().max_y + 1);
-//  interlace_on = ((device->machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
-	interlace_on = state->m_video_ff[INTERLACE_REG];
-	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
+//  popmessage("%02x %d",m_video_ff[INTERLACE_REG],machine().first_screen()->visible_area().max_y + 1);
+//  interlace_on = ((machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
+	interlace_on = m_video_ff[INTERLACE_REG];
+	colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
-	if(state->m_ex_video_ff[ANALOG_256_MODE])
+	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		for(xi=0;xi<8;xi++)
 		{
 			res_x = x + xi;
 			res_y = y;
 
-			if(!device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
+			if(!machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 				return;
 
-			pen = state->m_ext_gvram[(address*8+xi)+(state->m_vram_disp*0x40000)];
+			pen = m_ext_gvram[(address*8+xi)+(m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
+			if(machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
 		}
 	}
@@ -823,18 +824,18 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			pen = ((state->m_video_ram_2[(address & 0x7fff) + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
-			pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
-			pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
-			if(state->m_ex_video_ff[ANALOG_16_MODE])
-				pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 8 : 0;
+			pen = ((m_video_ram_2[(address & 0x7fff) + (0x08000) + (m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+			pen|= ((m_video_ram_2[(address & 0x7fff) + (0x10000) + (m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+			pen|= ((m_video_ram_2[(address & 0x7fff) + (0x18000) + (m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
+			if(m_ex_video_ff[ANALOG_16_MODE])
+				pen|= ((m_video_ram_2[(address & 0x7fff) + (0) + (m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 8 : 0;
 
 			if(interlace_on)
 			{
-				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
+				if(machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
 				/* TODO: it looks like that PC-98xx can only display even lines ... */
-				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
+				if(machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 			}
 			else
@@ -843,10 +844,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	}
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
-	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,yi;
 	int x;
 	UINT8 char_size;
@@ -856,11 +856,11 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 kanji_sel;
 	UINT8 x_step;
 
-	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
+	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  interlace_on = state->m_video_ff[INTERLACE_REG];
-	char_size = state->m_video_ff[FONTSEL_REG] ? 16 : 8;
+//  interlace_on = m_video_ff[INTERLACE_REG];
+	char_size = m_video_ff[FONTSEL_REG] ? 16 : 8;
 	tile = 0;
 
 	for(x=0;x<pitch;x+=x_step)
@@ -873,13 +873,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT8 knj_tile;
 		UINT8 gfx_mode;
 
-		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
+		tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 
 		kanji_sel = 0;
 		kanji_lr = 0;
 
-		tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0xff;
-		knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
+		tile = m_video_ram_1[(tile_addr*2) & 0x1fff] & 0xff;
+		knj_tile = m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
 		if(knj_tile)
 		{
 			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
@@ -900,14 +900,14 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		else
 			x_step = 1;
 
-		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
+		attr = (m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
 
 		secret = (attr & 1) ^ 1;
 		blink = attr & 2;
 		reverse = attr & 4;
 		u_line = attr & 8;
-		v_line = (state->m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
-		gfx_mode = (state->m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
+		v_line = (m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
+		gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 		color = (attr & 0xe0) >> 5;
 
 		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
@@ -918,10 +918,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				{
 					int res_x,res_y;
 
-					res_x = ((x+kanji_lr)*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
-					res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
+					res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
+					res_y = y*lr+yi - (m_txt_scroll_reg[3] & 0xf);
 
-					if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
+					if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 						continue;
 
 					tile_data = 0;
@@ -952,9 +952,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
 						else if(kanji_sel)
-							tile_data = (state->m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
+							tile_data = (m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
 						else
-							tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
+							tile_data = (m_char_rom[tile*char_size+m_video_ff[FONTSEL_REG]*0x800+yi]);
 					}
 
 					if(reverse) { tile_data^=0xff; }
@@ -962,10 +962,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
-					if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
+					if(cursor_on && cursor_addr == tile_addr && machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
-					if(blink && device->machine().first_screen()->frame_number() & 0x10)
+					if(blink && machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
 					if(yi >= char_size)
@@ -976,9 +976,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(pen != -1)
 						bitmap.pix32(res_y, res_x) = palette[pen];
 
-					if(state->m_video_ff[WIDTH40_REG])
+					if(m_video_ff[WIDTH40_REG])
 					{
-						if(!device->machine().first_screen()->visible_area().contains(res_x+1, res_y))
+						if(!machine().first_screen()->visible_area().contains(res_x+1, res_y))
 							continue;
 
 						if(pen != -1)
@@ -989,24 +989,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		}
 	}
 }
-
-static UPD7220_INTERFACE( hgdc_1_intf )
-{
-	NULL,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("upd7220_btm", upd7220_device, ext_sync_w),
-	DEVCB_NULL
-};
-
-static UPD7220_INTERFACE( hgdc_2_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 #if 0
@@ -3672,8 +3654,14 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
-	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
+    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+
+    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
@@ -3744,8 +3732,14 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
-	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
+    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+
+    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
@@ -3830,8 +3824,14 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
-	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
+    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+
+    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16+256)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)

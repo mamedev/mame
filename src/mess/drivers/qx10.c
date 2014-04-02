@@ -148,24 +148,25 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 {
-	qx10_state *state = device->machine().driver_data<qx10_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,gfx[3];
 	UINT8 pen;
 
-	if(state->m_color_mode)
+	if(m_color_mode)
 	{
-		gfx[0] = state->m_video_ram[(address) + 0x00000];
-		gfx[1] = state->m_video_ram[(address) + 0x20000];
-		gfx[2] = state->m_video_ram[(address) + 0x40000];
+		gfx[0] = m_video_ram[(address) + 0x00000];
+		gfx[1] = m_video_ram[(address) + 0x20000];
+		gfx[2] = m_video_ram[(address) + 0x40000];
 	}
 	else
 	{
-		gfx[0] = state->m_video_ram[address];
+		gfx[0] = m_video_ram[address];
 		gfx[1] = 0;
 		gfx[2] = 0;
 	}
@@ -180,10 +181,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	}
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 {
-	qx10_state *state = device->machine().driver_data<qx10_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile;
@@ -194,14 +194,14 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = state->m_video_ram[(addr+x)*2];
-		attr = state->m_video_ram[(addr+x)*2+1];
+		tile = m_video_ram[(addr+x)*2];
+		attr = m_video_ram[(addr+x)*2+1];
 
-		color = (state->m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
+		color = (m_color_mode) ? 1 : (attr & 4) ? 2 : 1; /* TODO: color mode */
 
 		for( yi = 0; yi < lr; yi++)
 		{
-			tile_data = (state->m_char_rom[tile*16+yi]);
+			tile_data = (m_char_rom[tile*16+yi]);
 
 			if(attr & 8)
 				tile_data^=0xff;
@@ -209,7 +209,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
-			if(attr & 0x80 && device->machine().first_screen()->frame_number() & 0x10) //TODO: check for blinking interval
+			if(attr & 0x80 && machine().first_screen()->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
@@ -219,7 +219,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16)
@@ -766,15 +766,6 @@ void qx10_state::video_start()
 	m_char_rom = memregion("chargen")->base();
 }
 
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 PALETTE_INIT_MEMBER(qx10_state, qx10)
 {
 	// ...
@@ -858,8 +849,13 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
-	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
+	
+	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(qx10_state, hgdc_display_pixels)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(qx10_state, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN("screen")
+
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)

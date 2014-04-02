@@ -50,26 +50,15 @@ ADDRESS_MAP_END
 //  UPD7220_INTERFACE( hgdc_intf )
 //-------------------------------------------------
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( mm1_state::hgdc_display_pixels )
 {
-	mm1_state *state = device->machine().driver_data<mm1_state>();
-
-	UINT8 data = state->m_video_ram[address];
+	UINT8 data = m_video_ram[address];
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(data, 7-i)) bitmap.pix32(y, x + i) = state->m_palette->pen(1);
+		if (BIT(data, 7 - i)) bitmap.pix32(y, x + i) = m_palette->pen(1);
 	}
 }
-
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -127,6 +116,9 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 
 	MCFG_I8275_ADD(I8275_TAG, XTAL_18_720MHz/8, 8, crtc_display_pixels, DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)
+
+	MCFG_DEVICE_ADD(UPD7220_TAG, UPD7220, XTAL_18_720MHz/8)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, mm1_upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mm1_state, hgdc_display_pixels)	
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

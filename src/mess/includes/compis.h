@@ -125,6 +125,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 
 	int m_tmr0;
+
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 };
 
 

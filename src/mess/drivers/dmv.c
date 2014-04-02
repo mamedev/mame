@@ -56,6 +56,9 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_device<palette_device> m_palette;
+
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };
 
 
@@ -131,20 +134,19 @@ WRITE8_MEMBER(dmv_state::kb_ctrl_mcu_w)
 	machine().device<upi41_cpu_device>("kb_ctrl_mcu")->upi41_master_w(space, offset, data);
 }
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 {
 	//TODO
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 {
-	dmv_state *state = device->machine().driver_data<dmv_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 * chargen = state->memregion("maincpu")->base() + 0x1000;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 * chargen = memregion("maincpu")->base() + 0x1000;
 
 	for( int x = 0; x < pitch; x++ )
 	{
-		UINT8 tile = state->m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff;
+		UINT8 tile = m_video_ram[((addr+x)*2) & 0x1ffff] & 0xff;
 
 		for( int yi = 0; yi < lr; yi++)
 		{
@@ -161,7 +163,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }
@@ -250,16 +252,6 @@ static GFXDECODE_START( dmv )
 GFXDECODE_END
 
 
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //------------------------------------------------------------------------------------
 //   I8237_INTERFACE
 //------------------------------------------------------------------------------------
@@ -322,7 +314,11 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
-	MCFG_UPD7220_ADD( "upd7220", XTAL_5MHz/2, hgdc_intf, upd7220_map ) // unk clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_5MHz/2) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
+
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
 	MCFG_UPD765A_ADD( "upd765", true, true )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))

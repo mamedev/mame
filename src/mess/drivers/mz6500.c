@@ -33,18 +33,18 @@ public:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 };
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
-	mz6500_state *state = device->machine().driver_data<mz6500_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int gfx[3];
 	UINT8 i,pen;
 
-	gfx[0] = state->m_video_ram[address + 0x00000];
-	gfx[1] = state->m_video_ram[address + 0x10000];
-	gfx[2] = state->m_video_ram[address + 0x20000];
+	gfx[0] = m_video_ram[address + 0x00000];
+	gfx[1] = m_video_ram[address + 0x10000];
+	gfx[2] = m_video_ram[address + 0x20000];
 
 	for(i=0; i<8; i++)
 	{
@@ -126,15 +126,6 @@ static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, mz6500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
@@ -157,7 +148,10 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_UPD7220_ADD("upd7220", 8000000/6, hgdc_intf, upd7220_map) // unk clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
+
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
