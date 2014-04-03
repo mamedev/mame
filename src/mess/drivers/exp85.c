@@ -131,14 +131,6 @@ WRITE8_MEMBER( exp85_state::i8355_a_w )
 	m_speaker->level_w(!BIT(data, 7));
 }
 
-static I8355_INTERFACE( i8355_intf )
-{
-	DEVCB_DRIVER_MEMBER(exp85_state, i8355_a_r),
-	DEVCB_DRIVER_MEMBER(exp85_state, i8355_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* I8085A Interface */
 
 READ_LINE_MEMBER( exp85_state::sid_r )
@@ -220,7 +212,9 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
-	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
+	MCFG_DEVICE_ADD(I8355_TAG, I8355, XTAL_6_144MHz/2)
+	MCFG_I8355_IN_PA_CB(READ8(exp85_state, i8355_a_r))
+	MCFG_I8355_OUT_PA_CB(WRITE8(exp85_state, i8355_a_w))
 	MCFG_CASSETTE_ADD("cassette", exp85_cassette_interface)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
