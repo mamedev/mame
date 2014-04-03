@@ -149,7 +149,7 @@ READ8_MEMBER( mkit09_state::pa_r )
 // read cassette
 READ8_MEMBER( mkit09_state::pb_r )
 {
-	return m_keydata | (m_cass->input() > +0.03) ? 0x80 : 0;
+	return m_keydata | ((m_cass->input() > +0.03) ? 0x80 : 0);
 }
 
 // write display segments
