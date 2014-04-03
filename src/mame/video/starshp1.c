@@ -37,7 +37,7 @@ PALETTE_INIT_MEMBER(starshp1_state, starshp1)
 		5, 7        /* 0x11        - circle */
 	};
 
-	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 		palette.set_pen_indirect(i, colortable_source[i]);
 }
 

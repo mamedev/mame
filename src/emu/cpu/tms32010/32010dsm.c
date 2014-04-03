@@ -154,7 +154,7 @@ static const char *const TMS32010Formats[] = {
 	NULL
 };
 
-#define MAX_OPS (((sizeof(TMS32010Formats) / sizeof(TMS32010Formats[0])) - 1) / PTRS_PER_FORMAT)
+#define MAX_OPS ((ARRAY_LENGTH(TMS32010Formats) - 1) / PTRS_PER_FORMAT)
 
 struct TMS32010Opcode  {
 	word mask;          /* instruction mask */

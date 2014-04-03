@@ -242,7 +242,7 @@ PALETTE_INIT_MEMBER(spcforce_state, spcforce)
 {
 	int i;
 
-	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		int data = colortable_source[i];
 		rgb_t color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spcforce)
-	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(spcforce_state, spcforce)
 
 	/* sound hardware */

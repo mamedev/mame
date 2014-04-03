@@ -49,8 +49,7 @@ imgtoolerr_t imgtool_create_cannonical_library(int omit_untested, imgtool_librar
 		imgtool_library_add(lib, modules[i]);
 
 	/* remove irrelevant modules */
-	for (i = 0; i < sizeof(irrelevant_modules)
-			/ sizeof(irrelevant_modules[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(irrelevant_modules); i++)
 	{
 		imgtool_library_unlink(lib, irrelevant_modules[i]);
 	}

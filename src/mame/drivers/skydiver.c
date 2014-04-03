@@ -116,7 +116,7 @@ PALETTE_INIT_MEMBER(skydiver_state, skydiver)
 {
 	int i;
 
-	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		rgb_t color;
 
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( skydiver, skydiver_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skydiver)
-	MCFG_PALETTE_ADD("palette", sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(colortable_source))
 	MCFG_PALETTE_INIT_OWNER(skydiver_state, skydiver)
 
 

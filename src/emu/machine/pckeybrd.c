@@ -393,7 +393,7 @@ void pc_keyboard_device::queue_insert(UINT8 data)
 
 	m_queue[m_head] = data;
 	m_head++;
-	m_head %= (sizeof(m_queue) / sizeof(m_queue[0]));
+	m_head %= ARRAY_LENGTH(m_queue);
 }
 
 
@@ -402,7 +402,7 @@ int pc_keyboard_device::queue_size(void)
 	int queue_size;
 	queue_size = m_head - m_tail;
 	if (queue_size < 0)
-		queue_size += sizeof(m_queue) / sizeof(m_queue[0]);
+		queue_size += ARRAY_LENGTH(m_queue);
 	return queue_size;
 }
 
@@ -669,7 +669,7 @@ READ8_MEMBER(pc_keyboard_device::read)
 		logerror("read(): Keyboard Read 0x%02x\n",data);
 
 	m_tail++;
-	m_tail %= sizeof(m_queue) / sizeof(m_queue[0]);
+	m_tail %= ARRAY_LENGTH(m_queue);
 	return data;
 }
 

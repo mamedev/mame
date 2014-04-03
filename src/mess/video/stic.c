@@ -952,7 +952,7 @@ WRITE16_MEMBER( stic_device::write )
 			break;
 	}
 
-	if (offset < sizeof(m_stic_registers) / sizeof(m_stic_registers[0]))
+	if (offset < ARRAY_LENGTH(m_stic_registers))
 		m_stic_registers[offset] = data;
 }
 

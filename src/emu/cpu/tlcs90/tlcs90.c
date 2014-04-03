@@ -975,7 +975,7 @@ static const char *const ir_names[] =   {
 const char *tlcs90_device::internal_registers_names(UINT16 x)
 {
 	int ir = x - T90_IOBASE;
-	if ( ir >= 0 && ir < sizeof(ir_names)/sizeof(ir_names[0]) )
+	if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
 		return ir_names[ir];
 	return NULL;
 }

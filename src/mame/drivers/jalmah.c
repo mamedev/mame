@@ -1762,7 +1762,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
+	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
 
 //  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
@@ -1980,7 +1980,7 @@ READ16_MEMBER(jalmah_state::daireika_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
+	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
 
 //  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
@@ -2259,7 +2259,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
+	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
 
 //  logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),res);
 
@@ -2396,7 +2396,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
+	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
 
 //  popmessage("%04x: mcu_r %02x",space.device().safe_pc(),res);
 
@@ -2417,7 +2417,7 @@ READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 	int res;
 
 	res = resp[m_respcount++];
-	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
+	if (m_respcount >= ARRAY_LENGTH(resp)) m_respcount = 0;
 
 //  popmessage("%04x: mcu_r %02x",space.device().safe_pc(),res);
 

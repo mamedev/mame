@@ -464,12 +464,12 @@ P1KEY11  29|30  P2KEY11
 
 		// HACK: read IPT_START1 from "INPUTS" to avoid listing it twice or having two independent STARTs listed
 		int start_depressed = ~value & 0x01000000;
-		keys |= start_depressed ? 1 << (sizeof(key_codes)/sizeof(key_codes[0]) - 1) : 0; // and bung it in at the end
+		keys |= start_depressed ? 1 << (ARRAY_LENGTH(key_codes) - 1) : 0; // and bung it in at the end
 
 		value |= 0xFFFF0000; // set top word
 		do {
 			// since we can't handle multiple keys, just return the first one depressed
-			if((keys & which_key) && (count < sizeof(key_codes)/sizeof(key_codes[0]))) {
+			if((keys & which_key) && (count < ARRAY_LENGTH(key_codes))) {
 				value &= ~((UINT32)(key_codes[count]) << 16); // mask in selected word as IP_ACTIVE_LOW
 				break;
 			}

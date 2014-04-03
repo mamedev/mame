@@ -120,10 +120,10 @@ void coco_state::device_start()
 	driver_device::device_start();
 
 	/* look up keyboard ports */
-	for (int i = 0; i < sizeof(m_keyboard) / sizeof(m_keyboard[0]); i++)
+	for (int i = 0; i < ARRAY_LENGTH(m_keyboard); i++)
 	{
 		char name[32];
-		snprintf(name, sizeof(name) / sizeof(name[0]), "row%d", i);
+		snprintf(name, ARRAY_LENGTH(name), "row%d", i);
 		m_keyboard[i] =  ioport(name);
 	}
 
@@ -850,7 +850,7 @@ void coco_state::poll_keyboard(void)
 	UINT8 pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
-	for (int i = 0; i < sizeof(m_keyboard) / sizeof(m_keyboard[0]); i++)
+	for (int i = 0; i < ARRAY_LENGTH(m_keyboard); i++)
 	{
 		int value = m_keyboard[i]->read();
 		if ((value | pia0_pb) != 0xFF)

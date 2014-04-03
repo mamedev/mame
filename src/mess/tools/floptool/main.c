@@ -70,7 +70,7 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 	va_end(arg);
 }
 
-enum { FORMAT_COUNT = sizeof(floppy_formats)/sizeof(floppy_formats[0]) };
+enum { FORMAT_COUNT = ARRAY_LENGTH(floppy_formats) };
 
 static floppy_image_format_t *formats[FORMAT_COUNT];
 

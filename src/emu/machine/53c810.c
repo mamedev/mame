@@ -759,7 +759,7 @@ unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)
 		buf += sprintf(buf, "%s ", op_mnemonic);
 		need_cojunction = FALSE;
 
-		for (i = 0; i < sizeof(flags) / sizeof(flags[0]); i++)
+		for (i = 0; i < ARRAY_LENGTH(flags); i++)
 		{
 			if (op & flags[i].flag)
 			{

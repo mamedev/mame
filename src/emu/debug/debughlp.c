@@ -1481,7 +1481,7 @@ const char *debug_get_help(const char *tag)
 		tagcopy[i] = tolower((UINT8)tag[i]);
 
 	/* find a match */
-	for (i = 0; i < sizeof(static_help_list) / sizeof(static_help_list[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
 		if (!strncmp(static_help_list[i].tag, tagcopy, taglen))
 		{
 			foundcount++;
@@ -1503,7 +1503,7 @@ const char *debug_get_help(const char *tag)
 
 	/* otherwise, indicate ambiguous help */
 	msglen = sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
-	for (i = 0; i < sizeof(static_help_list) / sizeof(static_help_list[0]); i++)
+	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
 		if (!strncmp(static_help_list[i].tag, tagcopy, taglen))
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;

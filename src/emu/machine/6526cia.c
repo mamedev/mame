@@ -169,7 +169,7 @@ void legacy_mos6526_device::device_start()
 	m_flag = 1;
 
 	/* setup ports */
-	for (int p = 0; p < (sizeof(m_port) / sizeof(m_port[0])); p++)
+	for (int p = 0; p < ARRAY_LENGTH(m_port); p++)
 	{
 		m_port[p].m_mask_value = 0xff;
 	}
@@ -177,7 +177,7 @@ void legacy_mos6526_device::device_start()
 	/* setup timers */
 	m_pc_timer = timer_alloc(TIMER_PC);
 
-	for (int t = 0; t < (sizeof(m_timer) / sizeof(m_timer[0])); t++)
+	for (int t = 0; t < ARRAY_LENGTH(m_timer); t++)
 	{
 		cia_timer *timer = &m_timer[t];
 		timer->m_timer = machine().scheduler().timer_alloc(FUNC(timer_proc), (void*)this);

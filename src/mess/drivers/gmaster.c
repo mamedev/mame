@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gmaster_palette))
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

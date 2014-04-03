@@ -142,7 +142,7 @@ void sam6883_device::configure_bank(int bank, read8_delegate rhandler, write8_de
 
 void sam6883_device::configure_bank(int bank, UINT8 *memory, UINT32 memory_size, bool is_read_only, read8_delegate rhandler, write8_delegate whandler)
 {
-	assert((bank >= 0) && (bank < sizeof(m_banks) / sizeof(m_banks[0])));
+	assert((bank >= 0) && (bank < ARRAY_LENGTH(m_banks)));
 	m_banks[bank].m_memory = memory;
 	m_banks[bank].m_memory_size = memory_size;
 	m_banks[bank].m_memory_read_only = is_read_only;
