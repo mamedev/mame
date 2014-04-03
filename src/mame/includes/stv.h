@@ -645,6 +645,34 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 	DECLARE_READ16_MEMBER(scudsp_dma_r);
 	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
+	
+	// FROM smpc.c
+	TIMER_CALLBACK_MEMBER( stv_bankswitch_state );
+	void stv_select_game(int gameno);
+	void smpc_master_on();
+	TIMER_CALLBACK_MEMBER( smpc_slave_enable );
+	TIMER_CALLBACK_MEMBER( smpc_sound_enable );
+	TIMER_CALLBACK_MEMBER( smpc_cd_enable );
+	void smpc_system_reset();
+	TIMER_CALLBACK_MEMBER( smpc_change_clock );
+	TIMER_CALLBACK_MEMBER( stv_intback_peripheral );
+	TIMER_CALLBACK_MEMBER( stv_smpc_intback );
+	void smpc_digital_pad(UINT8 pad_num, UINT8 offset);
+	void smpc_analog_pad(UINT8 pad_num, UINT8 offset, UINT8 id);
+	void smpc_keyboard(UINT8 pad_num, UINT8 offset);
+	void smpc_mouse(UINT8 pad_num, UINT8 offset, UINT8 id);
+	void smpc_md_pad(UINT8 pad_num, UINT8 offset, UINT8 id);
+	void smpc_unconnected(UINT8 pad_num, UINT8 offset);
+	TIMER_CALLBACK_MEMBER( intback_peripheral );
+	TIMER_CALLBACK_MEMBER( saturn_smpc_intback );
+	void smpc_rtc_write();
+	void smpc_memory_setting();
+	void smpc_nmi_req();
+	TIMER_CALLBACK_MEMBER( smpc_nmi_set );
+	void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv);
+	DECLARE_READ8_MEMBER( stv_SMPC_r );
+	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
+	
 };
 
 class stv_state : public saturn_state

@@ -429,12 +429,12 @@ READ32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_r )
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER ( saturn_vdp1_framebuffer1_w )
+WRITE32_MEMBER ( saturn_state::saturn_vdp1_framebuffer1_w )
 {
 	//popmessage ("STV VDP1 Framebuffer 1 WRITE offset %08x data %08x",offset, data);
 }
 
-READ32_HANDLER ( saturn_vdp1_framebuffer1_r )
+READ32_MEMBER ( saturn_state::saturn_vdp1_framebuffer1_r )
 {
 	//popmessage ("STV VDP1 Framebuffer 1 READ offset %08x",offset);
 	return 0xffff;
