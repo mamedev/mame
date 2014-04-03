@@ -1101,7 +1101,7 @@ WRITE8_MEMBER(nes_smb2jb_device::write_l)
 	LOG_MMC(("smb2jb write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
-	switch (offset & 0x160)
+	switch (offset & 0x1e0)
 	{
 		case 0x020:
 		case 0x0a0:

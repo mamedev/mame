@@ -1324,7 +1324,7 @@ WRITE8_MEMBER(nes_cityfight_device::write_h)
 		case 0x4000:
 		case 0x4004:
 		case 0x4008:
-		case 0x4003c:
+		case 0x400c:
 			m_prg_mode = data & 1;
 
 		case 0x7000:

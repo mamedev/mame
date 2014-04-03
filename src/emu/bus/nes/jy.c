@@ -167,7 +167,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 		return;
 
 	// no counter changes if both Up/Down are set or clear
-	if ((m_irq_down && m_irq_up) || (!m_irq_down && !m_irq_down))
+	if ((m_irq_down && m_irq_up) || (!m_irq_down && !m_irq_up))
 		return;
 
 	// update prescaler
