@@ -170,7 +170,6 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	DECLARE_MACHINE_START(_3do);
 	DECLARE_VIDEO_START(_3do);
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
