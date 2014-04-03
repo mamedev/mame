@@ -18,9 +18,9 @@
 #include "machine/mos6551.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/speaker.h"
 #include "rendlay.h"
-#include "mcfglgcy.h"
 
 class clcd_state : public driver_device
 {
@@ -33,6 +33,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_centronics(*this, "centronics"),
 		m_ram(*this,"ram"),
+		m_nvram(*this, "nvram"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
@@ -89,6 +90,7 @@ public:
 
 		m_rtc->cs1_w(1);
 		m_acia->write_cts(0);
+		m_nvram->set_base(ram()->pointer(), ram()->size());
 	}
 
 	DECLARE_PALETTE_INIT(clcd)
@@ -521,6 +523,8 @@ public:
 		m_key_force_format = 10;
 	}
 
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
@@ -528,6 +532,7 @@ private:
 	required_device<msm58321_device> m_rtc;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
 	required_device<address_map_bank_device> m_bank3;
@@ -560,23 +565,12 @@ private:
 	required_ioport m_special;
 };
 
-static NVRAM_HANDLER(clcd)
+void clcd_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	clcd_state *state = machine.driver_data<clcd_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->ram()->pointer(), state->ram()->size());
-	}
-	else if (file)
-	{
-		file->read(state->ram()->pointer(), state->ram()->size());
-	}
-	else
-	{
-		state->force_format();
-	}
+	memset(data, 0x00, size);
+	force_format();
 }
+
 
 static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
 	/* KERN/APPL/RAM */
@@ -799,7 +793,8 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_RAM_DEFAULT_VALUE(0)
 	MCFG_RAM_EXTRA_OPTIONS("32k,64k")
 	MCFG_RAM_DEFAULT_SIZE("128k")
-	MCFG_NVRAM_HANDLER(clcd)
+
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", clcd_state, nvram_init)
 MACHINE_CONFIG_END
 
 

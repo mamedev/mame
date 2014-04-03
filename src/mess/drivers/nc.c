@@ -404,25 +404,6 @@ void nc_state::nc_refresh_memory_config()
 }
 
 
-static NVRAM_HANDLER( nc )
-{
-	nc_state *state = machine.driver_data<nc_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->m_ram->pointer(), state->m_ram->size());
-	}
-	else if (file)
-	{
-		file->read(state->m_ram->pointer(), state->m_ram->size());
-	}
-	else
-	{
-		// leave whatever ram device defaulted to
-	}
-}
-
-
 TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
 {
 	int inputport_10_state;
@@ -836,6 +817,8 @@ void nc_state::machine_start()
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
+
+	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
 
@@ -1471,7 +1454,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_NVRAM_HANDLER(nc)
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	/* dummy timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))

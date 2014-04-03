@@ -842,60 +842,49 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 /* should save PRAM to file */
 /* TODO : save time difference with host clock, set default date, etc */
-NVRAM_HANDLER(lisa)
+void lisa_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
+	memset(data, 0x00, size);
 
-	if (read_or_write)
 	{
-		file->write(state->m_fdc_ram, 1024);
+		/* Now we copy the host clock into the Lisa clock */
+		system_time systime;
+		machine().base_datetime(systime);
+
+		m_clock_regs.alarm = 0xfffffL;
+		/* The clock count starts on 1st January 1980 */
+		m_clock_regs.years = (systime.local_time.year - 1980) & 0xf;
+		m_clock_regs.days1 = (systime.local_time.day + 1) / 100;
+		m_clock_regs.days2 = ((systime.local_time.day + 1) / 10) % 10;
+		m_clock_regs.days3 = (systime.local_time.day + 1) % 10;
+		m_clock_regs.hours1 = systime.local_time.hour / 10;
+		m_clock_regs.hours2 = systime.local_time.hour % 10;
+		m_clock_regs.minutes1 = systime.local_time.minute / 10;
+		m_clock_regs.minutes2 = systime.local_time.minute % 10;
+		m_clock_regs.seconds1 = systime.local_time.second / 10;
+		m_clock_regs.seconds2 = systime.local_time.second % 10;
+		m_clock_regs.tenths = 0;
+
+		m_clock_regs.clock_mode = timer_disable;
+		m_clock_regs.clock_write_ptr = -1;
 	}
-	else
-	{
-		if (file)
-			file->read(state->m_fdc_ram, 1024);
-		else
-			memset(state->m_fdc_ram, 0, 1024);
-
-		{
-			/* Now we copy the host clock into the Lisa clock */
-			system_time systime;
-			machine.base_datetime(systime);
-
-			state->m_clock_regs.alarm = 0xfffffL;
-			/* The clock count starts on 1st January 1980 */
-			state->m_clock_regs.years = (systime.local_time.year - 1980) & 0xf;
-			state->m_clock_regs.days1 = (systime.local_time.day + 1) / 100;
-			state->m_clock_regs.days2 = ((systime.local_time.day + 1) / 10) % 10;
-			state->m_clock_regs.days3 = (systime.local_time.day + 1) % 10;
-			state->m_clock_regs.hours1 = systime.local_time.hour / 10;
-			state->m_clock_regs.hours2 = systime.local_time.hour % 10;
-			state->m_clock_regs.minutes1 = systime.local_time.minute / 10;
-			state->m_clock_regs.minutes2 = systime.local_time.minute % 10;
-			state->m_clock_regs.seconds1 = systime.local_time.second / 10;
-			state->m_clock_regs.seconds2 = systime.local_time.second % 10;
-			state->m_clock_regs.tenths = 0;
-		}
-		state->m_clock_regs.clock_mode = timer_disable;
-		state->m_clock_regs.clock_write_ptr = -1;
-	}
-
-
 #if 0
 	UINT32 temp32;
 	SINT8 temp8;
 	temp32 = (m_clock_regs.alarm << 12) | (m_clock_regs.years << 8) | (m_clock_regs.days1 << 4)
-			| m_clock_regs.days2;
+	| m_clock_regs.days2;
 
 	temp32 = (m_clock_regs.days3 << 28) | (m_clock_regs.hours1 << 24) | (m_clock_regs.hours2 << 20)
-			| (m_clock_regs.minutes1 << 16) | (m_clock_regs.minutes2 << 12)
-			| (m_clock_regs.seconds1 << 8) | (m_clock_regs.seconds2 << 4) | m_clock_regs.tenths;
+	| (m_clock_regs.minutes1 << 16) | (m_clock_regs.minutes2 << 12)
+	| (m_clock_regs.seconds1 << 8) | (m_clock_regs.seconds2 << 4) | m_clock_regs.tenths;
 
 	temp8 = clock_mode;         /* clock mode */
 
 	temp8 = m_clock_regs.clock_write_ptr;    /* clock byte to be written next (-1 if clock write disabled) */
 #endif
+
 }
+
 
 #ifdef UNUSED_FUNCTION
 void lisa_state::init_lisa1(void)
@@ -953,6 +942,8 @@ void lisa_state::machine_start()
 
 	/* read command every ms (don't know the real value) */
 	machine().scheduler().timer_pulse(attotime::from_msec(1), timer_expired_delegate(FUNC(lisa_state::set_COPS_ready),this));
+
+	m_nvram->set_base(m_fdc_ram, 1024);
 }
 
 void lisa_state::machine_reset()

@@ -10,12 +10,13 @@
 #define LISA_H_
 
 #include "emu.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
-#include "cpu/m68000/m68000.h"
 #include "sound/speaker.h"
 
 #define COP421_TAG      "u9f"
@@ -106,6 +107,7 @@ public:
 		m_fdc(*this, "fdc"),
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
+		m_nvram(*this, "nvram"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -127,6 +129,7 @@ public:
 	optional_device<applefdc_base_device> m_fdc;
 	required_device<scc8530_t> m_scc;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<UINT8> m_fdc_rom;
 	required_shared_ptr<UINT8> m_fdc_ram;
@@ -202,6 +205,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	UINT32 screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_mouse);
