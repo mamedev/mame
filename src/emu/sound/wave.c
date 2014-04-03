@@ -30,7 +30,7 @@ void wave_device::static_set_cassette_tag(device_t &device, const char *cassette
 const device_type WAVE = &device_creator<wave_device>;
 
 wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wawe", __FILE__),
+	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wave", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 	m_cassette_tag = 0;
