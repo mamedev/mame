@@ -132,11 +132,11 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/msm6242.h"
 #include "machine/microtch.h"
-#include "mcfglgcy.h"
 
 
 /***************************************************************************
@@ -156,8 +156,9 @@ public:
 		m_duart40_68681(*this, "duart40_68681"),
 		m_maincpu(*this,"maincpu"),
 		m_microtouch(*this,"microtouch"),
-			m_nvram(*this, "nvram"),
-			m_backup(*this, "backup")
+		m_nvram(*this,"nvram"),
+		m_ram62256(*this, "ram62256"),
+		m_backup(*this, "backup")
 		{ }
 
 	required_device<mc68681_device> m_duart18_68681;
@@ -166,9 +167,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_serial_device> m_microtouch;
+	required_device<nvram_device> m_nvram;
 
-	required_shared_ptr<UINT16> m_nvram;
+	required_shared_ptr<UINT16> m_ram62256;
 	required_shared_ptr<UINT16> m_backup;
+
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	UINT16  m_datA40000;
 
@@ -190,8 +194,8 @@ public:
 	DECLARE_WRITE16_MEMBER (io_board_x);
 	DECLARE_READ16_MEMBER( nevada_sec_r );
 	DECLARE_WRITE16_MEMBER( nevada_sec_w );
-	virtual void machine_reset();
 
+	DECLARE_MACHINE_START(nevada);
 	DECLARE_DRIVER_INIT(nevada);
 };
 
@@ -320,23 +324,13 @@ PALETTE_INIT_MEMBER(nevada_state, nevada)
 /********************   NVRAM SECTION   ************************************/
 /***************************************************************************/
 
-static  NVRAM_HANDLER( nevada )
+void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	nevada_state *state = machine.driver_data<nevada_state>();
-	if (read_or_write)
-		file->write(state->m_nvram,state->m_nvram.bytes());
-	else
-	{
-		if (file)
-			file->read(state->m_nvram,state->m_nvram.bytes());
-		else
-		{
-			UINT16* defaultram = (UINT16 *) state->memregion("defaults")->base();
-			memset(state->m_nvram,0x00,state->m_nvram.bytes());
-			if (defaultram) memcpy(state->m_nvram, state->memregion("defaults")->base(), state->memregion("defaults")->bytes());
-		}
-	}
+	memset(data, 0x00, size);
+	if (memregion("defaults")->base()) 
+		memcpy(data, memregion("defaults")->base(), memregion("defaults")->bytes());
 }
+
 
 /***************************************************************************
 
@@ -526,7 +520,7 @@ U40 MC68681 Pin27 OP4  JCM Bill Acceptor  (J4-6, J4-7 Control)
 */
 /***************************************************************************/
 static ADDRESS_MAP_START( nevada_map, AS_PROGRAM, 16,nevada_state )
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram62256")
 	AM_RANGE(0x00010000, 0x00021fff) AM_RAM AM_SHARE("backup")
 	AM_RANGE(0x00900000, 0x00900001) AM_DEVWRITE8("crtc",mc6845_device, address_w,0x00ff )
 	AM_RANGE(0x00908000, 0x00908001) AM_DEVWRITE8("crtc",mc6845_device,register_w,0x00ff )
@@ -594,12 +588,14 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 /*************************
-*     Machine Reset      *
+*     Machine start      *
 *************************/
 
-	void nevada_state::machine_reset()
+MACHINE_START_MEMBER(nevada_state, nevada)
 {
+	m_nvram->set_base(m_ram62256, 0x1000);
 }
+
 /***************************************************************************/
 
 /*************************
@@ -614,8 +610,9 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
 
+	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
-	MCFG_NVRAM_HANDLER(nevada)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
