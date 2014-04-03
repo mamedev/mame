@@ -1,3 +1,4 @@
+#include "machine/nvram.h"
 #include "sound/okiadpcm.h"
 
 class mjkjidai_adpcm_device;
@@ -7,17 +8,16 @@ class mjkjidai_state : public driver_device
 public:
 	mjkjidai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_nvram(*this, "nvram"),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_spriteram3(*this, "spriteram3"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_mjk_adpcm(*this, "adpcm"),
+		m_nvram(*this, "nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_nvram;
 	required_shared_ptr<UINT8> m_spriteram1;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_spriteram3;
@@ -25,6 +25,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mjkjidai_adpcm_device> m_mjk_adpcm;
+	required_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

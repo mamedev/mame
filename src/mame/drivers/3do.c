@@ -98,8 +98,6 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "imagedev/chd_cd.h"
 #include "cpu/arm/arm.h"
 #include "cpu/arm7/arm7.h"
-#include "mcfglgcy.h"
-
 
 
 #define X2_CLOCK_PAL    59000000
@@ -135,6 +133,7 @@ INPUT_PORTS_END
 void _3do_state::machine_start()
 {
 	m_bank2->set_base(memregion("user1")->base());
+	m_nvram->set_base(&m_nvmem, sizeof(m_nvmem));
 
 	/* configure overlay */
 	m_bank1->configure_entry(0, m_dram);
@@ -159,24 +158,6 @@ struct cdrom_interface _3do_cdrom =
 	NULL
 };
 
-static NVRAM_HANDLER( _3do )
-{
-	_3do_state *state = machine.driver_data<_3do_state>();
-	UINT8 *nvram = state->m_nvram;
-
-	if (read_or_write)
-		file->write(nvram,0x8000);
-	else
-	{
-		if (file)
-			file->read(nvram,0x8000);
-		else
-		{
-			/* fill in the default values */
-			memset(nvram,0xff,0x8000);
-		}
-	}
-}
 
 static MACHINE_CONFIG_START( 3do, _3do_state )
 
@@ -184,7 +165,7 @@ static MACHINE_CONFIG_START( 3do, _3do_state )
 	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MCFG_NVRAM_HANDLER(_3do)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
@@ -204,7 +185,7 @@ static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
-	MCFG_NVRAM_HANDLER(_3do)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
