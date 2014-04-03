@@ -19,7 +19,7 @@ public:
 	virtual void device_reset();
 
 	// device_nvram_interface overrides
-	virtual void nvram_default() { }
+	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file) { if (m_ext_bram != NULL) { file.read(m_ext_bram, m_ext_bram_size); } }
 	virtual void nvram_write(emu_file &file) { if (m_ext_bram != NULL) { file.write(m_ext_bram, m_ext_bram_size); } }
 

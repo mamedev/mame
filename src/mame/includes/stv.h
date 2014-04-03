@@ -34,7 +34,6 @@ public:
 	optional_ioport m_fake_comms;
 
 	UINT8     *m_backupram;
-	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
 	UINT16    *m_scsp_regs;
 	UINT16    *m_vdp2_regs;
