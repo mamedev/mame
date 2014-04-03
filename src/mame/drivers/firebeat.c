@@ -1723,11 +1723,6 @@ MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 	m_layer = 0;
 }
 
-const rtc65271_interface firebeat_rtc =
-{
-	DEVCB_NULL
-};
-
 WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
@@ -1749,7 +1744,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
+	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
 	MCFG_FUJITSU_29F016A_ADD("flash_main")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
@@ -1797,7 +1792,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_RTC65271_ADD("rtc", firebeat_rtc)
+	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
 	MCFG_FUJITSU_29F016A_ADD("flash_main")
 	MCFG_FUJITSU_29F016A_ADD("flash_snd1")

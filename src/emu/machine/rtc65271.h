@@ -9,34 +9,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RTC65271_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, RTC65271, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-// ======================> rtc65271_interface
+#define MCFG_RTC65271_INTERRUPT_CB(_devcb) \
+	devcb = &rtc65271_device::set_interrupt_callback(*device, DEVCB2_##_devcb);
 
-struct rtc65271_interface
-{
-	devcb_write_line    m_interrupt_cb;
-};
 
 // ======================> rtc65271_device
 
 class rtc65271_device : public device_t,
-						public device_nvram_interface,
-						public rtc65271_interface
+						public device_nvram_interface
 {
 public:
 	// construction/destruction
 	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
 public:
+
+	template<class _Object> static devcb2_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(object); }
+	
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( xram_r );
 	DECLARE_WRITE8_MEMBER( rtc_w );
@@ -70,7 +65,7 @@ private:
 	UINT8 m_SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
-	devcb_resolved_write_line m_interrupt_func;
+	devcb2_write_line    m_interrupt_cb;
 };
 
 // device type definition

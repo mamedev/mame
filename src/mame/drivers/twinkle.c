@@ -854,10 +854,6 @@ static void scsi_dma_write( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_a
 	}
 }
 
-static const rtc65271_interface twinkle_rtc =
-{
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
@@ -883,7 +879,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(twinkle_state, ide_interrupt))
 
-	MCFG_RTC65271_ADD("rtc", twinkle_rtc)
+	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
