@@ -112,6 +112,28 @@ public:
 	UINT8 m_piaide_portb;
 	UINT8 m_active_interrupt;
 	UINT8 m_interrupt;
+	
+	
+	// TODO: move this in proper device
+	
+	/* channel_data structure holds info about each 6844 DMA channel */
+	typedef struct m6844_channel_data
+	{
+		int active;
+		int address;
+		int counter;
+		UINT8 control;
+		int start_address;
+		int start_counter;
+	} m6844_channel_data;
+
+	/* 6844 description */
+	m6844_channel_data m_m6844_channel[4];
+	UINT8 m_m6844_priority;
+	UINT8 m_m6844_interrupt;
+	UINT8 m_m6844_chain;
+	DECLARE_READ8_MEMBER ( m6844_r );
+	DECLARE_WRITE8_MEMBER ( m6844_w );
 
 };
 
@@ -119,11 +141,6 @@ public:
 
 extern const wd17xx_interface swtpc09_wd17xx_interface;
 extern const ptm6840_interface swtpc09_6840_intf;
-
-
-READ8_HANDLER ( m6844_r );
-WRITE8_HANDLER ( m6844_w );
-
 
 #endif /* swtpc09_H_ */
 
