@@ -229,7 +229,7 @@ static const float pos_exp_rate[]=
 	s_to_rate(2664.0f)
 };
 
-static const int num_pos_exp_rates=ARRAY_LENGTH(linear_rate);
+static const int num_pos_exp_rates=ARRAY_LENGTH(pos_exp_rate);
 
 static const float neg_exp_rate[]=
 {
@@ -343,7 +343,7 @@ static const float neg_exp_rate[]=
 	s_to_rate(11200.0f)
 };
 
-static const int num_neg_exp_rates=ARRAY_LENGTH(linear_rate);
+static const int num_neg_exp_rates=ARRAY_LENGTH(neg_exp_rate);
 
 static const float decay_rate[16]=
 {
