@@ -43,6 +43,7 @@ test1f diagnostic hacks:
 #include "sound/scsp.h"
 #include "sound/cdda.h"
 #include "machine/smpc.h"
+#include "machine/nvram.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
@@ -52,8 +53,6 @@ test1f diagnostic hacks:
 #include "bus/saturn/dram.h"
 #include "bus/saturn/bram.h"
 
-#include "mcfglgcy.h"
-
 
 class sat_console_state : public saturn_state
 {
@@ -61,6 +60,8 @@ public:
 	sat_console_state(const machine_config &mconfig, device_type type, const char *tag)
 				: saturn_state(mconfig, type, tag)
 				, m_exp(*this, "exp")
+				, m_nvram(*this, "nvram")
+				, m_smpc_nv(*this, "smpc_nv")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
@@ -82,55 +83,13 @@ public:
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
 
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
 	required_device<sat_cart_slot_device> m_exp;
+	required_device<nvram_device> m_nvram;
+	required_device<nvram_device> m_smpc_nv;	// TODO: move this in the base class saturn_state and add it to stv in MAME
 };
 
-
-/* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
-static NVRAM_HANDLER(saturn)
-{
-	sat_console_state *state = machine.driver_data<sat_console_state>();
-	static const UINT32 BUP_SIZE = 32*1024;
-	UINT8 backup_file[(BUP_SIZE)+4];
-	static const UINT8 init[16] =
-	{
-		'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't'
-	};
-	UINT32 i;
-
-	if (read_or_write)
-	{
-		for(i=0;i<BUP_SIZE;i++)
-			backup_file[i] = state->m_backupram[i];
-		for(i=0;i<4;i++)
-			backup_file[i+(BUP_SIZE)] = state->m_smpc.SMEM[i];
-
-		file->write(backup_file, (BUP_SIZE)+4);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(backup_file, (BUP_SIZE)+4);
-
-			for(i=0;i<BUP_SIZE;i++)
-				state->m_backupram[i] = backup_file[i];
-			for(i=0;i<4;i++)
-				state->m_smpc.SMEM[i] = backup_file[i+BUP_SIZE];
-		}
-		else
-		{
-			UINT8 j;
-			memset(state->m_backupram, 0, BUP_SIZE);
-			for (i = 0; i < 4; i++)
-			{
-				for(j=0;j<16;j++)
-					state->m_backupram[i*16+j] = init[j];
-			}
-			memset(state->m_smpc.SMEM, 0, 4); // TODO: default for each region
-		}
-	}
-}
 
 READ8_MEMBER(sat_console_state::saturn_cart_type_r)
 {
@@ -585,11 +544,26 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFSETTING(0x01,"One Shot (Hack)")
 INPUT_PORTS_END
 
+
+/* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
+void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
+{
+	static const UINT8 init[64] = { 
+	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
+	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
+	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
+	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't', };
+	
+	memset(data, 0x00, size);
+	memcpy(data, init, sizeof(init));
+}
+
+
 static const sh2_cpu_core sh2_conf_master = { 0, NULL };
 static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
 
-MACHINE_START_MEMBER(sat_console_state,saturn)
+MACHINE_START_MEMBER(sat_console_state, saturn)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -601,6 +575,9 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 
 	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 	m_slave->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
+
+	m_nvram->set_base(m_backupram, 0x8000);
+	m_smpc_nv->set_base(&m_smpc.SMEM, 4);
 
 	if (m_exp)
 	{
@@ -708,7 +685,6 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	m_NMI_reset = 0;
 	m_smpc.slave_on = 0;
 
-
 	//memset(stv_m_workram_l, 0, 0x100000);
 	//memset(stv_m_workram_h, 0, 0x100000);
 
@@ -765,7 +741,8 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
 
-	MCFG_NVRAM_HANDLER(saturn)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", sat_console_state, nvram_init)
+	MCFG_NVRAM_ADD_0FILL("smpc_nv") // TODO: default for each region (+ move it inside SMPC when converted to device)
 
 	MCFG_TIMER_DRIVER_ADD("sector_timer", sat_console_state, stv_sector_cb)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", sat_console_state, stv_sh1_sim)
