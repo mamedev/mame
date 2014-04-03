@@ -89,7 +89,7 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 {
 	va_list arg;
 	va_start(arg, format);
-	printf(format, arg);
+	vprintf(format, arg);
 	va_end(arg);
 }
 
