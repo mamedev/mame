@@ -155,7 +155,8 @@ public:
 	
 	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
+	int exp_rom_load(device_image_interface &image, int index);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbc_exp_rom );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
 
 private:

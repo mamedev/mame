@@ -1959,116 +1959,98 @@ WRITE8_MEMBER(bbc_state::bbc_disc_w)
 /**************************************
    BBC B Rom loading functions
 ***************************************/
-DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcb_cart )
+
+int bbc_state::exp_rom_load(device_image_interface &image, int index)
 {
 	UINT8 *RAM = m_region_user1->base();
 	int size, read_;
-	int addr = 0;
-	int index = 0;
-
-	size = image.length();
-
-	if (strcmp(image.device().tag(),":cart1") == 0)
+	int addr = 0x8000 + (0x4000 * index);
+	
+	if (image.software_entry() == NULL)
 	{
-		index = 0;
-	}
-	if (strcmp(image.device().tag(),":cart2") == 0)
-	{
-		index = 1;
-	}
-	if (strcmp(image.device().tag(),":cart3") == 0)
-	{
-		index = 2;
-	}
-	if (strcmp(image.device().tag(),":cart4") == 0)
-	{
-		index = 3;
-	}
-	addr = 0x8000 + (0x4000 * index);
-
-
-	logerror("loading rom %s at %.4x size:%.4x\n", image.filename(), addr, size);
-
-
-	switch (size)
-	{
-	case 0x2000:
-		read_ = image.fread(RAM + addr, size);
+		size = image.length();
+		logerror("loading rom %s, at %.4x size:%.4x\n", image.filename(), addr, size);
+		
+		switch (size)
+		{
+			case 0x2000:
+				read_ = image.fread(RAM + addr, size);
+				if (read_ != size)
+					return 1;
+				image.fseek(0, SEEK_SET);
+				read_ = image.fread(RAM + addr + 0x2000, size);
+				break;
+			case 0x4000:
+				read_ = image.fread(RAM + addr, size);
+				break;
+			default:
+				read_ = 0;
+				logerror("bad rom file size of %.4x\n", size);
+				break;
+		}
+		
 		if (read_ != size)
-			return 1;
-		image.fseek(0, SEEK_SET);
-		read_ = image.fread(RAM + addr + 0x2000, size);
-		break;
-	case 0x4000:
-		read_ = image.fread(RAM + addr, size);
-		break;
-	default:
-		read_ = 0;
-		logerror("bad rom file size of %.4x\n", size);
-		break;
+			return IMAGE_INIT_FAIL;
 	}
+	return IMAGE_INIT_PASS;
+}
 
-	if (read_ != size)
-		return 1;
-	return 0;
+DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbc_exp_rom )
+{
+	if (strcmp(image.device().tag(),":exp_rom1") == 0)
+		return exp_rom_load(image, 0);
+
+	if (strcmp(image.device().tag(),":exp_rom2") == 0)
+		return exp_rom_load(image, 1);
+
+	if (strcmp(image.device().tag(),":exp_rom3") == 0)
+		return exp_rom_load(image, 2);
+	
+	if (strcmp(image.device().tag(),":exp_rom4") == 0)
+		return exp_rom_load(image, 3);
+
+	return IMAGE_INIT_FAIL;
 }
 
 
 /**************************************
    BBC Master Rom loading functions
 ***************************************/
+
 DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
 {
 	UINT8 *RAM = m_region_user1->base();
-	int size, read_;
-	int addr = 0;
-	int index = 0;
-
-	size = image.length();
+	UINT32 size;
+	int addr = 0, index = 0;
 
 	if (strcmp(image.device().tag(),":cart1") == 0)
-	{
 		index = 0;
-	}
 	if (strcmp(image.device().tag(),":cart2") == 0)
-	{
 		index = 1;
-	}
-	if (strcmp(image.device().tag(),":cart3") == 0)
+	addr += index * 0x8000;
+
+	if (image.software_entry() == NULL)
 	{
-		index = 2;
+		size = image.length();
+		logerror("loading rom %s, size:%.4x\n", image.filename(), size);
+
+		if (size != 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size");
+			return IMAGE_INIT_FAIL;
+		}
+		
+		image.fread(RAM + addr, size);
 	}
-	if (strcmp(image.device().tag(),":cart4") == 0)
+	else
 	{
-		index = 3;
-	}
-	addr = 0x8000 + (0x4000 * index);
+		size = image.get_software_region_length("rom");
+		logerror("loading rom %s, size:%.4x\n", image.filename(), size);
 
-
-	logerror("loading rom %s at %.4x size:%.4x\n", image.filename(), addr, size);
-
-
-	switch (size)
-	{
-	case 0x2000:
-		read_ = image.fread(RAM + addr, size);
-		if (read_ != size)
-			return 1;
-		image.fseek(0, SEEK_SET);
-		read_ = image.fread(RAM + addr + 0x2000, size);
-		break;
-	case 0x4000:
-		read_ = image.fread(RAM + addr, size);
-		break;
-	default:
-		read_ = 0;
-		logerror("bad rom file size of %.4x\n", size);
-		break;
+		memcpy(RAM + addr, image.get_software_region("rom"), size);
 	}
 
-	if (read_ != size)
-		return 1;
-	return 0;
+	return IMAGE_INIT_PASS;
 }
 
 
