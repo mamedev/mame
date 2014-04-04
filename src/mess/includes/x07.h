@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
+#include "machine/nvram.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
 #include "imagedev/cartslot.h"
@@ -164,13 +165,18 @@ public:
 			m_printer(*this, "printer"),
 			m_beep(*this, "beeper"),
 			m_ram(*this, RAM_TAG),
-			m_cassette(*this, "cassette")
+			m_nvram1(*this, "nvram1"),
+			m_nvram2(*this, "nvram2"),
+			m_cassette(*this, "cassette"),
+			m_warm_start(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<printer_image_device> m_printer;
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
+	required_device<nvram_device> m_nvram1;
+	required_device<nvram_device> m_nvram2;
 	required_device<cassette_image_device> m_cassette;
 
 	void machine_start();
@@ -183,6 +189,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
 	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
 	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
+
+	DECLARE_DRIVER_INIT(x07);
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void t6834_cmd(UINT8 cmd);
 	void t6834_r();
