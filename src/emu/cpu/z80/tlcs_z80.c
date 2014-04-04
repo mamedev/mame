@@ -49,6 +49,7 @@ static const z80sio_interface sio_intf =
 
 /* Daisy Chaining */
 
+#ifdef UNUSED
 static const z80_daisy_config tlcsz80_daisy_chain[] =
 {
 	{ TLCSZ80_INTERNAL_CTC_TAG },
@@ -56,6 +57,7 @@ static const z80_daisy_config tlcsz80_daisy_chain[] =
 	{ TLCSZ80_INTERNAL_SIO_TAG },
 	{ NULL }
 };
+#endif
 
 static ADDRESS_MAP_START( tlcs_z80_internal_io_map, AS_IO, 8, tlcs_z80_device )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(TLCSZ80_INTERNAL_CTC_TAG, z80ctc_device, read, write)
