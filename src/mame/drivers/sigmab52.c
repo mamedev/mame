@@ -129,7 +129,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "sound/3812intf.h"
-#include "video/hd63484.h"
+#include "video/h63484.h"
 
 
 class sigmab52_state : public driver_device
@@ -142,8 +142,8 @@ public:
 
 	int m_latch;
 	unsigned int m_acrtc_data;
-	DECLARE_WRITE8_MEMBER(acrtc_w);
-	DECLARE_READ8_MEMBER(acrtc_r);
+//  DECLARE_WRITE8_MEMBER(acrtc_w);
+//  DECLARE_READ8_MEMBER(acrtc_r);
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_WRITE8_MEMBER(unk_f710_w);
 	DECLARE_READ8_MEMBER(unk_f721_r);
@@ -154,7 +154,7 @@ public:
 	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	required_device<cpu_device> m_maincpu;
-	required_device<hd63484_device> m_hd63484;
+	required_device<h63484_device> m_hd63484;
 };
 
 
@@ -172,6 +172,7 @@ void sigmab52_state::video_start()
 
 UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+#if 0
 	int x, y, b, src;
 
 	address_space &space = machine().driver_data()->generic_space();
@@ -231,6 +232,7 @@ if (!machine().input().code_pressed(KEYCODE_O))
 			}
 		}
 	}
+#endif
 
 	return 0;
 }
@@ -245,6 +247,7 @@ PALETTE_INIT_MEMBER(sigmab52_state, sigmab52)
 *      ACRTC Access      *
 *************************/
 
+#if 0
 WRITE8_MEMBER(sigmab52_state::acrtc_w)
 {
 	if(!offset)
@@ -285,6 +288,7 @@ READ8_MEMBER(sigmab52_state::acrtc_r)
 		return 0x7b; //fake status read (instead m_hd63484->status_r(space, 0, 0xff); )
 	}
 }
+#endif
 
 
 /*************************
@@ -321,10 +325,10 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
 	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
 
-	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", h63484_device, status_r, address_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", h63484_device, data_r, data_w)
 
-	AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
+	//AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
 	AM_RANGE(0xf740, 0xf740) AM_READ_PORT("IN0")
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")    // random checks to active high to go further with the test.
 	AM_RANGE(0xf742, 0xf742) AM_READ_PORT("IN2")
@@ -366,6 +370,10 @@ ADDRESS_MAP_END
 
 */
 
+static ADDRESS_MAP_START( jwildb52_hd63484_map, AS_0, 16, sigmab52_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
+ADDRESS_MAP_END
 
 /*************************
 *      Input Ports       *
@@ -563,6 +571,7 @@ void sigmab52_state::machine_start()
 
 */
 
+#if 0
 	{
 		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
 		int i;
@@ -573,9 +582,10 @@ void sigmab52_state::machine_start()
 			m_hd63484->ram_w(space, i + 0x40000/2, rom[i], 0xffff);
 		}
 	}
+#endif
 }
 
-static const hd63484_interface jwildb52_hd63484_intf = { 1 };
+//static const hd63484_interface jwildb52_hd63484_intf = { 1 };
 
 
 /*************************
@@ -602,10 +612,10 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sigmab52_state, screen_update_jwildb52)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
+	MCFG_H63484_ADD("hd63484", SEC_CLOCK, jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(sigmab52_state, sigmab52)
@@ -621,11 +631,11 @@ ROM_START( jwildb52 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "poker.ic95", 0x10000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00002, 0x10000, CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
-	ROM_LOAD32_BYTE( "cards_2001-2.ic46", 0x00000, 0x10000, CRC(c1455d64) SHA1(ddb576ba471b5d2faa415ec425615cf5f9d87911) )
-	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00001, 0x10000, CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
-	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00003, 0x10000, CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00003, 0x10000, CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
+	ROM_LOAD32_BYTE( "cards_2001-2.ic46", 0x00001, 0x10000, CRC(c1455d64) SHA1(ddb576ba471b5d2faa415ec425615cf5f9d87911) )
+	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00000, 0x10000, CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
+	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00002, 0x10000, CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound-01-00.43", 0x8000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
@@ -641,11 +651,11 @@ ROM_START( jwildb52a )
 
 	/* No gfx & sound dumps. Using the ones from parent set for now... */
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00002, 0x10000, BAD_DUMP CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
-	ROM_LOAD32_BYTE( "cards_2001-2.ic46", 0x00000, 0x10000, BAD_DUMP CRC(c1455d64) SHA1(ddb576ba471b5d2faa415ec425615cf5f9d87911) )
-	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00001, 0x10000, BAD_DUMP CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
-	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00003, 0x10000, BAD_DUMP CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00003, 0x10000, BAD_DUMP CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
+	ROM_LOAD32_BYTE( "cards_2001-2.ic46", 0x00001, 0x10000, BAD_DUMP CRC(c1455d64) SHA1(ddb576ba471b5d2faa415ec425615cf5f9d87911) )
+	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00000, 0x10000, BAD_DUMP CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
+	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00002, 0x10000, BAD_DUMP CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound-01-00.43", 0x8000, 0x8000, BAD_DUMP CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
@@ -659,11 +669,11 @@ ROM_START( jwildb52h )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "jokers_wild_ver_xxx.ic95", 0x10000, 0x10000, CRC(07eb9007) SHA1(ee814c40c6d8c9ea9e5246cae0cfa2c30f2976ed) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "2006-1_harrahs.ic45", 0x00002, 0x10000, CRC(6e6871dc) SHA1(5dfc99c808c06ec34838324181988d4550c1ed1a) )
-	ROM_LOAD32_BYTE( "2006-2_harrahs.ic46", 0x00000, 0x10000, CRC(1039c62d) SHA1(11f0dbcbbff5f6e9028a0305f7e16a0654be40d4) )
-	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00001, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
-	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00003, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "2006-1_harrahs.ic45", 0x00003, 0x10000, CRC(6e6871dc) SHA1(5dfc99c808c06ec34838324181988d4550c1ed1a) )
+	ROM_LOAD32_BYTE( "2006-2_harrahs.ic46", 0x00001, 0x10000, CRC(1039c62d) SHA1(11f0dbcbbff5f6e9028a0305f7e16a0654be40d4) )
+	ROM_LOAD32_BYTE( "2006-3_harrahs.ic47", 0x00000, 0x10000, CRC(d66af95a) SHA1(70bba1aeea9221541b82642045ce8ecf26e1d08c) )
+	ROM_LOAD32_BYTE( "2006-4_harrahs.ic48", 0x00002, 0x10000, CRC(2bf196cb) SHA1(686ca0dd84c48f51efee5349ea3db65531dd4a52) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "poker-01-00.43", 0x8000, 0x8000, CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
