@@ -959,7 +959,7 @@ static void debugwin_view_draw_contents(debugview_info *view, HDC windc)
 				}
 
 				// add this character to the buffer
-				buffer[count++] = viewdata[col].byte;
+				buffer[count++] = viewdata[col].uchar;
 			}
 
 			// flush any remaining stuff
