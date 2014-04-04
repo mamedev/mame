@@ -426,7 +426,7 @@ bool samples_device::read_sample(emu_file &file, sample_t &sample)
 
 bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 {
-	// we already read the opening 'WAVE' header
+	// we already read the opening 'RIFF' tag
 	UINT32 offset = 4;
 
 	// get the total size
@@ -448,7 +448,10 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		return false;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
+	{
+		mame_printf_warning("Could not find WAVE header (%s)\n", file.filename());
 		return false;
+	}
 
 	// seek until we find a format tag
 	UINT32 length;
