@@ -261,12 +261,14 @@ WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_r)
 {
 	offset = BITSWAP16(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
+	offset ^= 0x800;
 	return m_spriteram[offset];
 }
 
 WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_spriteram_w)
 {
 	offset = BITSWAP16(offset, 15, 14, 13, 12, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0);
+	offset ^= 0x800;
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
