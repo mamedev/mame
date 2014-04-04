@@ -1696,11 +1696,11 @@ static void rawinput_init(running_machine &machine)
 		RAWINPUTDEVICELIST *device = &devlist[devnum];
 
 		// handle keyboards
-		if (device->dwType == RIM_TYPEKEYBOARD && !FORCE_DIRECTINPUT)
+		if (!FORCE_DIRECTINPUT && device->dwType == RIM_TYPEKEYBOARD)
 			rawinput_keyboard_enum(machine, device);
 
 		// handle mice
-		else if (device->dwType == RIM_TYPEMOUSE && !FORCE_DIRECTINPUT)
+		else if (!FORCE_DIRECTINPUT && device->dwType == RIM_TYPEMOUSE)
 			rawinput_mouse_enum(machine, device);
 	}
 
