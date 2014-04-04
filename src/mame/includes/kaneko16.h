@@ -142,6 +142,9 @@ public:
 	DECLARE_READ16_MEMBER(berlwall_oki_r);
 	DECLARE_WRITE16_MEMBER(berlwall_oki_w);
 
+	DECLARE_READ16_MEMBER(berlwall_spriteram_r);
+	DECLARE_WRITE16_MEMBER(berlwall_spriteram_w);
+
 	DECLARE_DRIVER_INIT(berlwall);
 	DECLARE_PALETTE_INIT(berlwall);
 	DECLARE_VIDEO_START(berlwall);

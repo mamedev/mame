@@ -33,7 +33,6 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void set_altspacing(device_t &device, int spacing);
 	static void set_fliptype(device_t &device, int fliptype);
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_priorities(device_t &device, int pri0, int pri1, int pri2, int pri3);
@@ -56,10 +55,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	// alt ram addressing (set when declaring device in MCFG)
-	//  used on Berlin Wall.. it's the same sprite chip, so probably just a different RAM hookup on the PCB, maybe also
-	//  related to the 'COPY BOARD' protection check on one set? investigate..
-	int m_altspacing;
 
 	// flip latching (set when declaring device in MCFG )  probably needs figuring out properly, only brapboys wants it?
 	int m_sprite_fliptype;
