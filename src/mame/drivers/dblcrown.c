@@ -1,16 +1,16 @@
 // license:MAME
-// copyright-holders:Angelo Salese
+// copyright-holders: Angelo Salese, Roberto Fresca.
 /***************************************************************************
 
     Double Crown (c) 1997 Cadence Technology / Dyna
 
-    driver by Angelo Salese
+    Driver by Angelo Salese
+	Additional work by Roberto Fresca.
 
     TODO:
     - Bogus "Hole" in main screen display;
     - Is the background pen really black?
     - Lots of unmapped I/Os (game doesn't make much use of the HW);
-    - outputs / lamps;
     - video / irq timings;
 
     Notes:
@@ -22,6 +22,7 @@
       these ...
 
 ============================================================================
+
     Excellent System
     boardlabel: ES-9411B
 
@@ -33,18 +34,22 @@
     2 * N341256P-25 - CMOS SRAM 256K-BIT(32KX8)
     4 * dipsw 8pos
     YMZ284-D (ay8910, but without i/o ports)
-    MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog? and for keeping nvram stable?
+    MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
+	and for nvram functions.
 
 ***************************************************************************/
 
+
+#define MAIN_CLOCK			XTAL_28_63636MHz
+#define CPU_CLOCK			MAIN_CLOCK / 6
+#define SND_CLOCK			MAIN_CLOCK / 12
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 
-#define MAIN_CLOCK XTAL_28_63636MHz
-
+#include "dblcrown.lh"
 #define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
@@ -90,9 +95,11 @@ public:
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(lamps_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 	DECLARE_PALETTE_INIT(dblcrown);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -103,10 +110,10 @@ protected:
 
 void dblcrown_state::video_start()
 {
-	m_pal_ram = auto_alloc_array(machine(), UINT8, 0x200*2);
-	m_vram = auto_alloc_array(machine(), UINT8, 0x1000*0x10);
+	m_pal_ram = auto_alloc_array(machine(), UINT8, 0x200 * 2);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x1000 * 0x10);
 
-	save_pointer(NAME(m_vram), 0x1000*0x10);
+	save_pointer(NAME(m_vram), 0x1000 * 0x10);
 }
 
 UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -118,34 +125,33 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 
 	count = 0xa000;
 
-	for (y=0;y<16;y++)
+	for (y = 0; y < 16; y++)
 	{
-		for (x=0;x<32;x++)
+		for (x = 0; x < 32; x++)
 		{
-			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
+			UINT16 tile = ((m_vram[count]) | (m_vram[count+1] << 8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4);
 
-			gfx_2->opaque(bitmap,cliprect,tile,col,0,0,x*16,y*16);
+			gfx_2->opaque(bitmap, cliprect, tile, col, 0, 0, x * 16, y * 16);
 
-			count+=2;
+			count += 2;
 		}
 	}
 
 	count = 0xb000;
 
-	for (y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (x = 0; x < 64; x++)
 		{
-			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
-			UINT8 col = (m_vram[count+1] >> 4); // ok?
+			UINT16 tile = ((m_vram[count]) | (m_vram[count + 1] << 8)) & 0xfff;
+			UINT8 col = (m_vram[count + 1] >> 4); // ok?
 
-			gfx->transpen(bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap, cliprect, tile, col, 0, 0, x * 8, y * 8, 0);
 
-			count+=2;
+			count += 2;
 		}
 	}
-
 
 	return 0;
 }
@@ -187,12 +193,12 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 	//  offset+=0x200;
 
 	m_pal_ram[offset] = data;
-	offset>>=1;
-	datax = m_pal_ram[offset*2] + 256*m_pal_ram[offset*2 + 1];
+	offset >>= 1;
+	datax = m_pal_ram[offset * 2] + 256 * m_pal_ram[offset * 2 + 1];
 
-	r = ((datax)&0x000f)>>0;
-	g = ((datax)&0x00f0)>>4;
-	b = ((datax)&0x0f00)>>8;
+	r = ((datax) & 0x000f) >> 0;
+	g = ((datax) & 0x00f0) >> 4;
+	b = ((datax) & 0x0f00) >> 8;
 	/* TODO: remaining bits */
 
 	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
@@ -255,7 +261,7 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 
 	res = 0;
 
-	for(i=0;i<4;i++)
+	for(i = 0; i < 4; i++)
 	{
 		if(m_mux_data & 1 << i)
 			res |= ioport(muxnames[i])->read();
@@ -272,7 +278,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 
 	res = 0xff;
 
-	for(i=0;i<4;i++)
+	for(i = 0; i < 4; i++)
 	{
 		if(ioport(muxnames[i])->read() != 0xff)
 			res &= ~(1 << i);
@@ -283,9 +289,19 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 
 WRITE8_MEMBER( dblcrown_state::output_w )
 {
-	// bit 4: coin counter
+/*  bits
+  7654 3210
+  ---- -x--  unknown (active after deal)
+  ---- x---  Payout counter pulse
+  ---x ----  Coin In counter pulse
+  -x-- ----  unknown (active after deal)
+  x-x- --xx  unknown
+*/
 
-	//popmessage("%02x",data);
+	coin_counter_w(machine(), 0, data & 0x10);	/* Coin In counter pulse */
+	coin_counter_w(machine(), 1 ,data & 0x08);	/* Payout counter pulse */
+
+//	popmessage("out: %02x",data);
 }
 
 
@@ -296,9 +312,45 @@ READ8_MEMBER( dblcrown_state::lamps_r )
 
 WRITE8_MEMBER( dblcrown_state::lamps_w )
 {
-	//popmessage("%02x",data);
+/*  bits
+  7654 3210
+  ---- ---x  Deal
+  ---- --x-  Bet
+  ---- -x--  unknown
+  ---- x---  Hold 5
+  ---x ----  Hold 4
+  --x- ----  Hold 3
+  -x-- ----  Hold 2
+  x--- ----  Hold 1
+*/
+	output_set_lamp_value(0, (data) & 1);       /* Deal */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Bet */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* unknown */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* Hold 2 */
+	output_set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
+
 	m_lamps_data = data;
+//	popmessage("lamps: %02X", data);
 }
+
+WRITE8_MEMBER(dblcrown_state::watchdog_w)
+/*
+  Always 0x01...
+*/
+{
+	if (data & 0x01)      /* check for refresh value (0x01) */
+	{
+		machine().watchdog_reset();
+	}
+	else
+	{
+		popmessage("Watchdog: %02x", data);
+	}
+}
+
 
 static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -324,11 +376,11 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWD")
 	AM_RANGE(0x04, 0x04) AM_READ(in_mux_r)
 	AM_RANGE(0x05, 0x05) AM_READ(in_mux_type_r)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r,lamps_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r,bank_w)
-	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r,mux_w)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r, lamps_w)
+	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r, bank_w)
+	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-//  AM_RANGE(0x30, 0x30) always 1?
+	AM_RANGE(0x30, 0x30) AM_WRITE(watchdog_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
@@ -379,9 +431,9 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Hold Type" )
+	PORT_DIPSETTING(    0x20, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
 	PORT_DIPNAME( 0x40, 0x40, "Input Test" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -561,10 +613,11 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dblcrown_map)
 	MCFG_CPU_IO_MAP(dblcrown_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1000))   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -584,7 +637,7 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -611,4 +664,6 @@ ROM_START( dblcrown )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
 
-GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
+
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */
+GAMEL( 1997, dblcrown, 0,        dblcrown, dblcrown, driver_device, 0,     ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
