@@ -909,6 +909,8 @@ static INPUT_PORTS_START( berlwalt )
 INPUT_PORTS_END
 
 
+
+
 /***************************************************************************
                                     Blaze On
 ***************************************************************************/
@@ -1650,7 +1652,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
+//	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
@@ -1714,7 +1716,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
@@ -1787,7 +1789,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1 -8)
-	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
@@ -1850,7 +1852,7 @@ static MACHINE_CONFIG_START( gtmr, kaneko16_gtmr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x8bit_2x4bit)
@@ -1972,7 +1974,7 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_2x4bit)
@@ -2099,7 +2101,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(40, 296-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_kaneko16)
+	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_state, screen_update_kaneko16)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -2240,6 +2242,8 @@ DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
 	kaneko16_unscramble_tiles("gfx3");
 	kaneko16_expand_sample_banks("oki1");
 }
+
+
 
 
 /***************************************************************************
@@ -2513,6 +2517,7 @@ ROM_START( berlwallt )
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bw000",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
+
 
 
 
@@ -3883,6 +3888,7 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", 0 )
 GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+
 
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
