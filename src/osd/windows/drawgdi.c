@@ -81,11 +81,8 @@ static void drawgdi_exit(void)
 
 static int drawgdi_window_init(win_window_info *window)
 {
-	gdi_info *gdi;
-	int i;
-
 	// allocate memory for our structures
-	gdi = global_alloc_clear(gdi_info);
+	gdi_info *gdi = global_alloc_clear(gdi_info);
 	window->drawdata = gdi;
 
 	// fill in the bitmap info header
@@ -99,12 +96,12 @@ static int drawgdi_window_init(win_window_info *window)
 	gdi->bminfo.bmiHeader.biClrImportant    = 0;
 
 	// initialize the palette to a gray ramp
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		gdi->bminfo.bmiColors[i].rgbRed         = i;
-		gdi->bminfo.bmiColors[i].rgbGreen       = i;
-		gdi->bminfo.bmiColors[i].rgbBlue        = i;
-		gdi->bminfo.bmiColors[i].rgbReserved    = i;
+		gdi->colors[i].rgbRed               = i;
+		gdi->colors[i].rgbGreen             = i;
+		gdi->colors[i].rgbBlue              = i;
+		gdi->colors[i].rgbReserved          = i;
 	}
 
 	return 0;
