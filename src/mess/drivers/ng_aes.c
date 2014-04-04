@@ -141,6 +141,8 @@ public:
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
 
+	DECLARE_INPUT_CHANGED_MEMBER(aes_j1);
+
 	DECLARE_MACHINE_START(neocd);
 	DECLARE_MACHINE_START(neogeo);
 	DECLARE_MACHINE_RESET(neogeo);
@@ -1313,15 +1315,15 @@ static INPUT_PORTS_START( mjpanel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aes )
-	PORT_START("CTRLSEL")  /* Select Controller Type */
+	PORT_START("CTRLSEL") /* Select Controller Type */
 	PORT_CONFNAME( 0x0f, 0x01, "P1 Controller")
-	PORT_CONFSETTING(  0x00, "Unconnected" )
-	PORT_CONFSETTING(  0x01, "NeoGeo Controller" )
-	PORT_CONFSETTING(  0x02, "NeoGeo Mahjong Panel" )
+	PORT_CONFSETTING(    0x00, "Unconnected" )
+	PORT_CONFSETTING(    0x01, "NeoGeo Controller" )
+	PORT_CONFSETTING(    0x02, "NeoGeo Mahjong Panel" )
 	PORT_CONFNAME( 0xf0, 0x10, "P2 Controller")
-	PORT_CONFSETTING(  0x00, "Unconnected" )
-	PORT_CONFSETTING(  0x10, "NeoGeo Controller" )
-	PORT_CONFSETTING(  0x20, "NeoGeo Mahjong Panel" )
+	PORT_CONFSETTING(    0x00, "Unconnected" )
+	PORT_CONFSETTING(    0x10, "NeoGeo Controller" )
+	PORT_CONFSETTING(    0x20, "NeoGeo Mahjong Panel" )
 
 	PORT_INCLUDE( controller )
 
@@ -1334,15 +1336,25 @@ static INPUT_PORTS_START( aes )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(2)
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show */
-													/* a piracy warning screen if the hardware and BIOS don't match */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */
 	PORT_BIT( 0x0018, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* what is this? Universe BIOS uses these bits to detect MVS or AES hardware */
 	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_audio_result, NULL)
+
+	PORT_START("JP") // J1 and J2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short J1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_j1, 0)
+//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is J2 for? somehow related to system reset, disable watchdog?
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(ng_aes_state::aes_j1)
+{
+	// Shorting J1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor
+	if (newval)
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+}
 
 
 static INPUT_PORTS_START( neocd )
