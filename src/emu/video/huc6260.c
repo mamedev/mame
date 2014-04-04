@@ -43,27 +43,13 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 const device_type HUC6260 = &device_creator<huc6260_device>;
 
 
-void huc6260_device::device_config_complete()
-{
-	const huc6260_interface *intf = reinterpret_cast<const huc6260_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<huc6260_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_get_next_pixel_data, 0, sizeof(m_get_next_pixel_data));
-		memset(&m_get_time_til_next_event, 0, sizeof(m_get_time_til_next_event));
-		memset(&m_hsync_changed, 0, sizeof(m_hsync_changed));
-		memset(&m_vsync_changed, 0, sizeof(m_vsync_changed));
-	}
-}
-
-
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_next_pixel_data_cb(*this),
+		m_time_til_next_event_cb(*this),
+		m_vsync_changed_cb(*this),
+		m_hsync_changed_cb(*this)
 {
 }
 
@@ -82,7 +68,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data = m_get_next_pixel_data( 0, 0xffff );
+			m_pixel_data = m_next_pixel_data_cb( 0, 0xffff );
 			g_profiler.stop();
 			if ( m_greyscales )
 			{
@@ -97,7 +83,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		switch( h )
 		{
 		case HUC6260_HSYNC_START:       /* Start of HSync */
-			m_hsync_changed( 0 );
+			m_hsync_changed_cb( 0 );
 //          if ( v == 0 )
 //          {
 //              /* Check if the screen should be resized */
@@ -118,7 +104,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case 0:     /* End of HSync */
-			m_hsync_changed( 1 );
+			m_hsync_changed_cb( 1 );
 			m_pixel_clock = 0;
 			v = ( v + 1 ) % m_height;
 			bitmap_line = &m_bmp->pix16(v);
@@ -127,7 +113,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case HUC6260_HSYNC_START + 30:      /* End/Start of VSync */
 			if ( v>= m_height - 4 )
 			{
-				m_vsync_changed( ( v >= m_height - 4 && v < m_height - 1 ) ? 0 : 1 );
+				m_vsync_changed_cb( ( v >= m_height - 4 && v < m_height - 1 ) ? 0 : 1 );
 			}
 			break;
 		}
@@ -158,7 +144,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	/* Ask our slave device for time until next possible event */
 	{
-		UINT16 next_event_clocks = m_get_time_til_next_event( 0, 0xffff );
+		UINT16 next_event_clocks = m_time_til_next_event_cb( 0, 0xffff );
 		int event_hpos, event_vpos;
 
 		/* Adjust for pixel clocks per pixel */
@@ -255,16 +241,16 @@ void huc6260_device::device_start()
 	m_bmp = auto_bitmap_ind16_alloc( machine(), HUC6260_WPF, HUC6260_LPF );
 
 	/* Resolve callbacks */
-	m_hsync_changed.resolve( hsync_changed, *this );
-	m_vsync_changed.resolve( vsync_changed, *this );
-	m_get_next_pixel_data.resolve( get_next_pixel_data, *this );
-	m_get_time_til_next_event.resolve( get_time_til_next_event, *this );
+	m_hsync_changed_cb.resolve();
+	m_vsync_changed_cb.resolve();
+	m_next_pixel_data_cb.resolve();
+	m_time_til_next_event_cb.resolve();
 
 	/* We want to have a valid screen and valid callbacks */
-	assert( ! m_hsync_changed.isnull() );
-	assert( ! m_vsync_changed.isnull() );
-	assert( ! m_get_next_pixel_data.isnull() );
-	assert( ! m_get_time_til_next_event.isnull() );
+	assert( ! m_hsync_changed_cb.isnull() );
+	assert( ! m_vsync_changed_cb.isnull() );
+	assert( ! m_next_pixel_data_cb.isnull() );
+	assert( ! m_time_til_next_event_cb.isnull() );
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));

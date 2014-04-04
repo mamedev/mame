@@ -302,15 +302,6 @@ WRITE_LINE_MEMBER(pce_state::pce_irq_changed)
 }
 
 
-static const huc6260_interface pce_huc6260_config =
-{
-	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, next_pixel ),
-	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, time_until_next_event ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, vsync_changed ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, hsync_changed )
-};
-
-
 static const huc6202_interface sgx_huc6202_config =
 {
 	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, next_pixel ),
@@ -325,15 +316,6 @@ static const huc6202_interface sgx_huc6202_config =
 	DEVCB_DEVICE_LINE_MEMBER( "huc6270_1", huc6270_device, hsync_changed ),
 	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, read ),
 	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, write ),
-};
-
-
-static const huc6260_interface sgx_huc6260_config =
-{
-	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, next_pixel ),
-	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, time_until_next_event ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, vsync_changed ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, hsync_changed )
 };
 
 
@@ -361,7 +343,11 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
-	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, pce_huc6260_config )
+	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_state, pce_irq_changed))
@@ -406,7 +392,11 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
-	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, sgx_huc6260_config )
+	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6202", huc6202_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6202", huc6202_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_state, pce_irq_changed))
