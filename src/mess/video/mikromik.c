@@ -8,16 +8,14 @@
 //  i8275_interface crtc_intf
 //-------------------------------------------------
 
-static I8275_DISPLAY_PIXELS( crtc_display_pixels )
+I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 {
-	mm1_state *state = device->machine().driver_data<mm1_state>();
-
-	UINT8 romdata = state->m_char_rom->base()[(charcode << 4) | linecount];
+	UINT8 romdata = m_char_rom->base()[(charcode << 4) | linecount];
 
 	int d0 = BIT(romdata, 0);
 	int d7 = BIT(romdata, 7);
 	int gpa0 = BIT(gpa, 0);
-	int llen = state->m_llen;
+	int llen = m_llen;
 	int i;
 
 	UINT8 data = (romdata << 1) | (d7 & d0);
@@ -31,7 +29,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		bitmap.pix32(y, x + i) = state->m_palette->pen(color);
+		bitmap.pix32(y, x + i) = m_palette->pen(color);
 	}
 }
 
@@ -116,7 +114,7 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 
 	MCFG_DEVICE_ADD(I8275_TAG, I8275x, XTAL_18_720MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DISPLAY_CALLBACK(crtc_display_pixels)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mm1_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq0_w))
 	MCFG_I8275_VRTC_CALLBACK(DEVWRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)

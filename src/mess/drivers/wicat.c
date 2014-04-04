@@ -87,6 +87,7 @@ public:
 	DECLARE_READ16_MEMBER(via_r);
 	DECLARE_WRITE16_MEMBER(via_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
+	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<m68000_device> m_maincpu;
@@ -730,12 +731,10 @@ WRITE_LINE_MEMBER(wicat_state::crtc_cb)
 	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_crtc_irq);
 }
 
-I8275_DISPLAY_PIXELS(wicat_display_pixels)
+I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	wicat_state *state = device->machine().driver_data<wicat_state>();
-
-	UINT8 romdata = state->m_chargen->base()[((charcode << 4) | linecount) + 1];
-	const pen_t *pen = state->m_palette->pens();
+	UINT8 romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
+	const pen_t *pen = m_palette->pens();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -889,7 +888,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_DEVICE_ADD("video", I8275x, XTAL_19_6608MHz/8)
 	MCFG_I8275_CHARACTER_WIDTH(9)
-	MCFG_I8275_DISPLAY_CALLBACK(wicat_display_pixels)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))
 	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))
 	MCFG_VIDEO_SET_SCREEN("screen")
