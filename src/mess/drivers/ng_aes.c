@@ -141,7 +141,7 @@ public:
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
 
-	DECLARE_INPUT_CHANGED_MEMBER(aes_j1);
+	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 	DECLARE_MACHINE_START(neocd);
 	DECLARE_MACHINE_START(neogeo);
@@ -1344,14 +1344,14 @@ static INPUT_PORTS_START( aes )
 	PORT_BIT( 0x00e0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no upd4990a */
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_audio_result, NULL)
 
-	PORT_START("JP") // J1 and J2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short J1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_j1, 0)
-//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is J2 for? somehow related to system reset, disable watchdog?
+	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, ng_aes_state, aes_jp1, 0)
+//	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ng_aes_state::aes_j1)
+INPUT_CHANGED_MEMBER(ng_aes_state::aes_jp1)
 {
-	// Shorting J1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor
+	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
 	if (newval)
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
 }
