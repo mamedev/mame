@@ -300,8 +300,7 @@ WRITE8_MEMBER( dblcrown_state::output_w )
 
 	coin_counter_w(machine(), 0, data & 0x10);	/* Coin In counter pulse */
 	coin_counter_w(machine(), 1 ,data & 0x08);	/* Payout counter pulse */
-
-//	popmessage("out: %02x",data);
+//	popmessage("out: %02x", data);
 }
 
 
@@ -316,7 +315,7 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
   7654 3210
   ---- ---x  Deal
   ---- --x-  Bet
-  ---- -x--  unknown
+  ---- -x--  Cancel
   ---- x---  Hold 5
   ---x ----  Hold 4
   --x- ----  Hold 3
@@ -325,7 +324,7 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
 */
 	output_set_lamp_value(0, (data) & 1);       /* Deal */
 	output_set_lamp_value(1, (data >> 1) & 1);  /* Bet */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* unknown */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Cancel */
 	output_set_lamp_value(3, (data >> 3) & 1);  /* Hold 5 */
 	output_set_lamp_value(4, (data >> 4) & 1);  /* Hold 4 */
 	output_set_lamp_value(5, (data >> 5) & 1);  /* Hold 3 */
@@ -333,7 +332,6 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
 	output_set_lamp_value(7, (data >> 7) & 1);  /* Hold 1 */
 
 	m_lamps_data = data;
-//	popmessage("lamps: %02X", data);
 }
 
 WRITE8_MEMBER(dblcrown_state::watchdog_w)

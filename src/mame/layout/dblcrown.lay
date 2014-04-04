@@ -72,6 +72,19 @@
 		</text>
 	</element>
 
+	<element name="cancel" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.12" green="0.12" blue="0.0" />
+		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
 	<element name="bet" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="1.0" />
@@ -107,12 +120,27 @@
 		</rect>
 	</element>
 
+	<element name="cpanel2">
+		<rect>
+			<color red="0.045" green="0.045" blue="0.045" />
+		</rect>
+	</element>
+
 	<element name="hold_b" defstate="0">
 		<rect state="1">
 			<color red="0.8" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="0">
 			<color red="0.1" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="cancel_b" defstate="0">
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.08" green="0.08" blue="0.0" />
 		</rect>
 	</element>
 
@@ -146,61 +174,73 @@
 			<bounds left="0" right="4" top="3" bottom="3.34" />
 		</bezel>
 
+		<bezel element="cpanel2">
+			<bounds left="0" right="4" top="3" bottom="3.17" />
+		</bezel>
+
 <!-- define lamps -->
 
 		<bezel name="lamp0" element="deal_b">
-			<bounds x="3.50" y="3.05" width="0.40" height="0.24" />
+			<bounds x="3.55" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp0" element="deal">
-			<bounds x="3.52" y="3.07" width="0.36" height="0.20" />
+			<bounds x="3.57" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp1" element="bet_b">
-			<bounds x="3.00" y="3.05" width="0.40" height="0.24" />
+			<bounds x="3.10" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp1" element="bet">
-			<bounds x="3.02" y="3.07" width="0.36" height="0.20" />
+			<bounds x="3.12" y="3.07" width="0.31" height="0.20" />
+		</bezel>
+
+
+		<bezel name="lamp2" element="cancel_b">
+			<bounds x="2.35" y="3.05" width="0.35" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="cancel">
+			<bounds x="2.37" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp3" element="hold_b">
-			<bounds x="2.10" y="3.05" width="0.40" height="0.24" />
+			<bounds x="1.90" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp3" element="hold5">
-			<bounds x="2.12" y="3.07" width="0.36" height="0.20" />
+			<bounds x="1.92" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp4" element="hold_b">
-			<bounds x="1.60" y="3.05" width="0.40" height="0.24" />
+			<bounds x="1.45" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp4" element="hold4">
-			<bounds x="1.62" y="3.07" width="0.36" height="0.20" />
+			<bounds x="1.47" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp5" element="hold_b">
-			<bounds x="1.10" y="3.05" width="0.40" height="0.24" />
+			<bounds x="1.00" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp5" element="hold3">
-			<bounds x="1.12" y="3.07" width="0.36" height="0.20" />
+			<bounds x="1.02" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp6" element="hold_b">
-			<bounds x="0.60" y="3.05" width="0.40" height="0.24" />
+			<bounds x="0.55" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp6" element="hold2">
-			<bounds x="0.62" y="3.07" width="0.36" height="0.20" />
+			<bounds x="0.57" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
 		<bezel name="lamp7" element="hold_b">
-			<bounds x="0.10" y="3.05" width="0.40" height="0.24" />
+			<bounds x="0.10" y="3.05" width="0.35" height="0.24" />
 		</bezel>
 		<bezel name="lamp7" element="hold1">
-			<bounds x="0.12" y="3.07" width="0.36" height="0.20" />
+			<bounds x="0.12" y="3.07" width="0.31" height="0.20" />
 		</bezel>
 
 
