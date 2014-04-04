@@ -64,25 +64,6 @@ static int get_cmd_len(int cbyte)
 	return 6;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ncr5380_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const NCR5380interface *intf = reinterpret_cast<const NCR5380interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<NCR5380interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-	}
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -95,7 +76,8 @@ const device_type NCR5380 = &device_creator<ncr5380_device>;
 //-------------------------------------------------
 
 ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__)
+	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__),
+	m_irq_cb(*this)
 {
 }
 
@@ -110,7 +92,7 @@ void ncr5380_device::device_start()
 	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	m_next_req_flag = 0;
-	m_irq_func.resolve(m_irq_cb, *this);
+	m_irq_cb.resolve_safe();
 
 	save_item(NAME(m_5380_Registers));
 	save_item(NAME(m_5380_Command));

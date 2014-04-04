@@ -48,7 +48,6 @@
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/6522via.h"
-#include "machine/ncr5380.h"
 #include "machine/applefdc.h"
 #include "machine/swim.h"
 #include "machine/sonydriv.h"
@@ -842,11 +841,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const struct NCR5380interface macplus_5380intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_scsi_irq)    // IRQ (unconnected on the Mac Plus)
-};
-
 static const struct NCR539Xinterface mac_539x_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(mac_state, irq_539x_1_w),
@@ -987,7 +981,8 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_MODIFY(mac_floppy_interface)
 
@@ -1078,7 +1073,8 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1130,7 +1126,8 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
 	MCFG_SCSIDEV_ADD("scsi:cdrom1", SCSICD, SCSI_ID_4)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1193,7 +1190,8 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1435,7 +1433,8 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
 	MCFG_NUBUS_SLOT_ADD("pds","pds030", mac_pds030_cards, NULL)
@@ -1500,7 +1499,8 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1582,7 +1582,8 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_SWIM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
@@ -1778,7 +1779,8 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR5380_ADD("scsi:ncr5380", C7M, macplus_5380intf)
+	MCFG_DEVICE_ADD("scsi:ncr5380", NCR5380, C7M)
+	MCFG_NCR5380_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, mac_scsi_irq))
 
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
