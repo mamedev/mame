@@ -1,3 +1,5 @@
+// license:MAME|GPL-2.0+
+// copyright-holders:Felipe Correa
 /*
   Replicator 1 desktop 3d printer
 
