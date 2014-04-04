@@ -38,15 +38,20 @@
 #include "crt9007.h"
 
 
-// device type definition
-const device_type CRT9007 = &device_creator<crt9007_device>;
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type CRT9007 = &device_creator<crt9007_t>;
+
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 #define HAS_VALID_PARAMETERS \
 	(m_reg[0x00] && m_reg[0x01] && m_reg[0x07] && m_reg[0x08] && m_reg[0x09])
@@ -217,7 +222,7 @@ const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( crt9007, AS_0, 8, crt9007_device )
+static ADDRESS_MAP_START( crt9007, AS_0, 8, crt9007_t )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -231,7 +236,7 @@ ADDRESS_MAP_END
 //  readbyte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT8 crt9007_device::readbyte(offs_t address)
+inline UINT8 crt9007_t::readbyte(offs_t address)
 {
 	return space().read_byte(address);
 }
@@ -241,7 +246,7 @@ inline UINT8 crt9007_device::readbyte(offs_t address)
 //  trigger_interrupt -
 //-------------------------------------------------
 
-inline void crt9007_device::trigger_interrupt(int line)
+inline void crt9007_t::trigger_interrupt(int line)
 {
 	if (INTERRUPT_ENABLE & line)
 	{
@@ -252,7 +257,7 @@ inline void crt9007_device::trigger_interrupt(int line)
 		if (!(status & STATUS_INTERRUPT_PENDING))
 		{
 			if (LOG) logerror("CRT9007 '%s' INT 1\n", tag());
-			m_out_int_func(ASSERT_LINE);
+			m_write_int(ASSERT_LINE);
 		}
 	}
 }
@@ -262,7 +267,7 @@ inline void crt9007_device::trigger_interrupt(int line)
 //  update_cblank_line -
 //-------------------------------------------------
 
-inline void crt9007_device::update_cblank_line()
+inline void crt9007_t::update_cblank_line()
 {
 	int x = m_screen->hpos();
 	int y = m_screen->vpos();
@@ -276,7 +281,7 @@ inline void crt9007_device::update_cblank_line()
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CBLANK %u\n", tag(), y, x, m_cblank);
 
-		m_out_cblank_func(m_cblank);
+		m_write_cblank(m_cblank);
 	}
 }
 
@@ -285,7 +290,7 @@ inline void crt9007_device::update_cblank_line()
 //  update_hsync_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_hsync_timer(int state)
+inline void crt9007_t::update_hsync_timer(int state)
 {
 	int y = m_screen->vpos();
 
@@ -302,7 +307,7 @@ inline void crt9007_device::update_hsync_timer(int state)
 //  update_vsync_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_vsync_timer(int state)
+inline void crt9007_t::update_vsync_timer(int state)
 {
 	int next_y = state ? m_vsync_start : m_vsync_end;
 
@@ -316,7 +321,7 @@ inline void crt9007_device::update_vsync_timer(int state)
 //  update_vlt_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_vlt_timer(int state)
+inline void crt9007_t::update_vlt_timer(int state)
 {
 	// this signal is active during all visible scan lines and during the horizontal trace at vertical retrace
 	int y = m_screen->vpos();
@@ -334,7 +339,7 @@ inline void crt9007_device::update_vlt_timer(int state)
 //  update_curs_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_curs_timer(int state)
+inline void crt9007_t::update_curs_timer(int state)
 {
 	// this signal is active for 1 character time for all scanlines within the data row
 	// TODO
@@ -345,7 +350,7 @@ inline void crt9007_device::update_curs_timer(int state)
 //  update_drb_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_drb_timer(int state)
+inline void crt9007_t::update_drb_timer(int state)
 {
 	// this signal is active for 1 full scan line (VLT edge to edge) at the top scan line of each new row
 	// there is 1 extra DRB signal during the 1st scanline of the vertical retrace interval
@@ -381,7 +386,7 @@ inline void crt9007_device::update_drb_timer(int state)
 //  update_dma_timer -
 //-------------------------------------------------
 
-inline void crt9007_device::update_dma_timer()
+inline void crt9007_t::update_dma_timer()
 {
 	// TODO
 }
@@ -391,7 +396,7 @@ inline void crt9007_device::update_dma_timer()
 //  recompute_parameters -
 //-------------------------------------------------
 
-inline void crt9007_device::recompute_parameters()
+inline void crt9007_t::recompute_parameters()
 {
 	// check that necessary registers have been loaded
 	if (!HAS_VALID_PARAMETERS) return;
@@ -444,14 +449,24 @@ inline void crt9007_device::recompute_parameters()
 //**************************************************************************
 
 //-------------------------------------------------
-//  crt9007_device - constructor
+//  crt9007_t - constructor
 //-------------------------------------------------
 
-crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock, "crt9007", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007))
+crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, CRT9007, "SMC CRT9007", tag, owner, clock, "crt9007", __FILE__),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(crt9007)),
+	m_write_int(*this),
+	m_write_dmar(*this),
+	m_write_hs(*this),
+	m_write_vs(*this),
+	m_write_vlt(*this),
+	m_write_curs(*this),
+	m_write_drb(*this),
+	m_write_cblank(*this),
+	m_write_slg(*this),
+	m_write_sld(*this)
 {
 	for (int i = 0; i < 0x3d; i++)
 		m_reg[i] = 0;
@@ -459,40 +474,10 @@ crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void crt9007_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const crt9007_interface *intf = reinterpret_cast<const crt9007_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<crt9007_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_dmar_cb, 0, sizeof(m_out_dmar_cb));
-		memset(&m_out_vs_cb, 0, sizeof(m_out_vs_cb));
-		memset(&m_out_hs_cb, 0, sizeof(m_out_hs_cb));
-		memset(&m_out_vlt_cb, 0, sizeof(m_out_vlt_cb));
-		memset(&m_out_curs_cb, 0, sizeof(m_out_curs_cb));
-		memset(&m_out_drb_cb, 0, sizeof(m_out_drb_cb));
-		memset(&m_out_cblank_cb, 0, sizeof(m_out_cblank_cb));
-		memset(&m_out_slg_cb, 0, sizeof(m_out_slg_cb));
-		memset(&m_out_sld_cb, 0, sizeof(m_out_sld_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void crt9007_device::device_start()
+void crt9007_t::device_start()
 {
 	// allocate timers
 	m_hsync_timer = timer_alloc(TIMER_HSYNC);
@@ -503,22 +488,16 @@ void crt9007_device::device_start()
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_dmar_func.resolve(m_out_dmar_cb, *this);
-	m_out_hs_func.resolve(m_out_hs_cb, *this);
-	m_out_vs_func.resolve(m_out_vs_cb, *this);
-	m_out_vlt_func.resolve(m_out_vlt_cb, *this);
-	m_out_curs_func.resolve(m_out_curs_cb, *this);
-	m_out_drb_func.resolve(m_out_drb_cb, *this);
-	m_out_cblank_func.resolve(m_out_cblank_cb, *this);
-	m_out_slg_func.resolve(m_out_slg_cb, *this);
-	m_out_sld_func.resolve(m_out_sld_cb, *this);
-
-	// set horizontal pixels per column
-	m_hpixels_per_column = hpixels_per_column;
-
-	// register for state saving
-//  state_save_register_device_item(this, 0, );
+	m_write_int.resolve_safe();
+	m_write_dmar.resolve_safe();
+	m_write_hs.resolve_safe();
+	m_write_vs.resolve_safe();
+	m_write_vlt.resolve_safe();
+	m_write_curs.resolve_safe();
+	m_write_drb.resolve_safe();
+	m_write_cblank.resolve_safe();
+	m_write_slg.resolve_safe();
+	m_write_sld.resolve_safe();
 }
 
 
@@ -526,43 +505,43 @@ void crt9007_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void crt9007_device::device_reset()
+void crt9007_t::device_reset()
 {
 	m_disp = 0;
 	m_vs = 0;
 	m_cblank = 0;
 
 	// HS = 1
-	m_out_hs_func(1);
+	m_write_hs(1);
 
 	// VS = 1
-	m_out_vs_func(1);
+	m_write_vs(1);
 
 	// CBLANK = 1
-	m_out_cblank_func(0);
+	m_write_cblank(0);
 
 	// CURS = 0
-	m_out_curs_func(0);
+	m_write_curs(0);
 
 	// VLT = 0
-	m_out_vlt_func(0);
+	m_write_vlt(0);
 
 	// DRB = 1
-	m_out_drb_func(1);
+	m_write_drb(1);
 
 	// INT = 0
-	m_out_int_func(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 
 	// 28 (DMAR) = 0
-	m_out_dmar_func(CLEAR_LINE);
+	m_write_dmar(CLEAR_LINE);
 
 	// 29 (WBEN) = 0
 
 	// 30 (SLG) = 0
-	m_out_slg_func(0);
+	m_write_slg(0);
 
 	// 31 (SLD) = 0
-	m_out_sld_func(0);
+	m_write_sld(0);
 
 	// 32 (LPSTB) = 0
 }
@@ -572,7 +551,7 @@ void crt9007_device::device_reset()
 //  device_clock_changed - handle clock change
 //-------------------------------------------------
 
-void crt9007_device::device_clock_changed()
+void crt9007_t::device_clock_changed()
 {
 	recompute_parameters();
 }
@@ -582,7 +561,7 @@ void crt9007_device::device_clock_changed()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void crt9007_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int x = m_screen->hpos();
 	int y = m_screen->vpos();
@@ -594,7 +573,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : HS %u\n", tag(), y, x, m_hs);
 
-		m_out_hs_func(m_hs);
+		m_write_hs(m_hs);
 
 		update_cblank_line();
 
@@ -606,7 +585,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VS %u\n", tag(), y, x, m_vs);
 
-		m_out_vs_func(param);
+		m_write_vs(param);
 
 		if (m_vs)
 		{
@@ -628,7 +607,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VLT %u\n", tag(), y, x, m_vlt);
 
-		m_out_vlt_func(param);
+		m_write_vlt(param);
 
 		update_vlt_timer(param);
 		break;
@@ -636,7 +615,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_CURS:
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CURS %u\n", tag(), y, x, param);
 
-		m_out_curs_func(param);
+		m_write_curs(param);
 
 		update_curs_timer(param);
 		break;
@@ -646,7 +625,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : DRB %u\n", tag(), y, x, m_drb);
 
-		m_out_drb_func(param);
+		m_write_drb(param);
 
 		if (!m_drb && !DMA_DISABLE)
 		{
@@ -657,7 +636,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_dmar = 1;
 
 			if (LOG) logerror("CRT9007 '%s' DMAR 1\n", tag());
-			m_out_dmar_func(ASSERT_LINE);
+			m_write_dmar(ASSERT_LINE);
 		}
 
 		update_drb_timer(param);
@@ -677,7 +656,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *crt9007_device::memory_space_config(address_spacenum spacenum) const
+const address_space_config *crt9007_t::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
@@ -687,7 +666,7 @@ const address_space_config *crt9007_device::memory_space_config(address_spacenum
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( crt9007_device::read )
+READ8_MEMBER( crt9007_t::read )
 {
 	UINT8 data = 0;
 
@@ -717,7 +696,7 @@ READ8_MEMBER( crt9007_device::read )
 		// reset interrupt pending bit
 		m_status &= ~STATUS_INTERRUPT_PENDING;
 		if (LOG) logerror("CRT9007 '%s' INT 0\n", tag());
-		m_out_int_func(CLEAR_LINE);
+		m_write_int(CLEAR_LINE);
 		break;
 
 	case 0x3b:
@@ -743,7 +722,7 @@ READ8_MEMBER( crt9007_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( crt9007_device::write )
+WRITE8_MEMBER( crt9007_t::write )
 {
 	m_reg[offset] = data;
 
@@ -913,7 +892,7 @@ WRITE8_MEMBER( crt9007_device::write )
 //  ack_w - DMA acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_device::ack_w )
+WRITE_LINE_MEMBER( crt9007_t::ack_w )
 {
 	if (LOG) logerror("CRT9007 '%s' ACK: %u\n", tag(), state);
 
@@ -931,7 +910,7 @@ WRITE_LINE_MEMBER( crt9007_device::ack_w )
 //  lpstb_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
+WRITE_LINE_MEMBER( crt9007_t::lpstb_w )
 {
 	if (LOG) logerror("CRT9007 '%s' LPSTB: %u\n", tag(), state);
 
@@ -945,31 +924,12 @@ WRITE_LINE_MEMBER( crt9007_device::lpstb_w )
 
 
 //-------------------------------------------------
-//  vlt_r -
+//  set_character_width -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( crt9007_device::vlt_r )
+void crt9007_t::set_character_width(int value)
 {
-	return m_vlt;
-}
+	m_hpixels_per_column = value;
 
-
-//-------------------------------------------------
-//  wben_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( crt9007_device::wben_r )
-{
-	return m_wben;
-}
-
-
-//-------------------------------------------------
-//  set_hpixels_per_column -
-//-------------------------------------------------
-
-void crt9007_device::set_hpixels_per_column(int hpixels_per_column)
-{
-	m_hpixels_per_column = hpixels_per_column;
 	recompute_parameters();
 }

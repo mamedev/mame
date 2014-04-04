@@ -9,8 +9,23 @@
 
 **********************************************************************/
 
-#include "emu.h"
+/*
+
+	TODO:
+
+	- RCLK and WCLK are clocked simultaneously since that's what tandy2k does and we have no other users
+
+*/
+
 #include "crt9212.h"
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type CRT9212 = &device_creator<crt9212_t>;
 
 
 
@@ -21,112 +36,94 @@
 #define LOG 0
 
 
-#define REN \
-	m_in_ren_cb()
-
-#define WEN \
-	m_in_wen_cb()
-
-#define WEN2 \
-	m_in_wen2_cb()
-
-#define ROF(_state) \
-	m_out_rof_cb(_state);
-
-#define WOF(_state) \
-	m_out_wof_cb(_state);
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-// device type definition
-const device_type CRT9212 = &device_creator<crt9212_device>;
-
 //-------------------------------------------------
-//  crt9212_device - constructor
+//  crt9212_t - constructor
 //-------------------------------------------------
 
-crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CRT9212, "SMC CRT9212", tag, owner, clock, "crt9212", __FILE__),
-		m_out_rof_cb(*this),
-		m_out_wof_cb(*this),
-		m_in_ren_cb(*this),
-		m_in_wen_cb(*this),
-		m_in_wen2_cb(*this)
+crt9212_t::crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, CRT9212, "SMC CRT9212", tag, owner, clock, "crt9212", __FILE__),
+	m_write_dout(*this),
+	m_write_rof(*this),
+	m_write_wof(*this),
+	m_data(0),
+	m_clrcnt(0),
+	m_tog(0),
+	m_ren(0),
+	m_wen1(1),
+	m_wen2(0),
+	m_oe(0),
+	m_rclk(0),
+	m_wclk(0),
+	m_buffer(0),
+	m_rac(0),
+	m_wac(0)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void crt9212_device::device_start()
+void crt9212_t::device_start()
 {
 	// resolve callbacks
-	m_out_rof_cb.resolve_safe();
-	m_out_wof_cb.resolve_safe();
-	m_in_ren_cb.resolve_safe(0);
-	m_in_wen_cb.resolve_safe(0);
-	m_in_wen2_cb.resolve_safe(0);
+	m_write_dout.resolve_safe();
+	m_write_rof.resolve_safe();
+	m_write_wof.resolve_safe();
 
-	// register for state saving
-	save_item(NAME(m_input));
-	save_item(NAME(m_output));
+	// allocate timers
+	m_rwclk_timer = timer_alloc();
+
+	if (clock())
+	{
+		m_rwclk_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	}
+
+	// state saving
+	save_item(NAME(m_data));
+	save_item(NAME(m_clrcnt));
+	save_item(NAME(m_tog));
+	save_item(NAME(m_ren));
+	save_item(NAME(m_wen1));
+	save_item(NAME(m_wen2));
+	save_item(NAME(m_oe));
+	save_item(NAME(m_rclk));
+	save_item(NAME(m_wclk));
+	save_item(NAME(m_ram[0]));
+	save_item(NAME(m_ram[1]));
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_rac));
 	save_item(NAME(m_wac));
-	save_item(NAME(m_tog));
-	save_item(NAME(m_clrcnt));
-	save_item(NAME(m_rclk));
-	save_item(NAME(m_wclk));
 }
 
 
 //-------------------------------------------------
-//  read - buffer read
+//  device_clock_changed - handle clock change
 //-------------------------------------------------
 
-READ8_MEMBER( crt9212_device::read )
+void crt9212_t::device_clock_changed()
 {
-	return m_output;
+	m_rwclk_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
 
 //-------------------------------------------------
-//  write - buffer write
+//  device_timer - handle timer events
 //-------------------------------------------------
 
-WRITE8_MEMBER( crt9212_device::write )
+void crt9212_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_input = data;
-}
+	rclk_w(1);
+	rclk_w(0);
 
-
-//-------------------------------------------------
-//  clrcnt_w - clear address counters
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( crt9212_device::clrcnt_w )
-{
-	m_clrcnt = state;
-}
-
-
-//-------------------------------------------------
-//  tog_w - toggle buffer
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( crt9212_device::tog_w )
-{
-	m_tog = state;
+	wclk_w(1);
+	wclk_w(0);
 }
 
 
@@ -134,7 +131,7 @@ WRITE_LINE_MEMBER( crt9212_device::tog_w )
 //  rclk_w - read clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9212_device::rclk_w )
+WRITE_LINE_MEMBER( crt9212_t::rclk_w )
 {
 	if (m_rclk && !state)
 	{
@@ -147,21 +144,21 @@ WRITE_LINE_MEMBER( crt9212_device::rclk_w )
 
 				// clear write address counter
 				m_wac = 0;
-				WOF(0);
+				m_write_wof(0);
 			}
 			else
 			{
 				// clear read address counter
 				m_rac = 0;
-				ROF(0);
+				m_write_rof(0);
 			}
 		}
 		else
 		{
-			if (REN && (m_rac < CRT9212_RAM_SIZE))
+			if (m_ren && (m_rac < CRT9212_RAM_SIZE))
 			{
 				//
-				m_output = m_ram[m_rac][!m_buffer];
+				m_write_dout(m_ram[m_rac][!m_buffer]);
 
 				// increment read address counter
 				m_rac++;
@@ -169,7 +166,7 @@ WRITE_LINE_MEMBER( crt9212_device::rclk_w )
 				if (m_rac == CRT9212_RAM_SIZE)
 				{
 					// set read overflow
-					ROF(1);
+					m_write_rof(1);
 				}
 			}
 		}
@@ -183,14 +180,14 @@ WRITE_LINE_MEMBER( crt9212_device::rclk_w )
 //  wclk_w - write clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9212_device::wclk_w )
+WRITE_LINE_MEMBER( crt9212_t::wclk_w )
 {
-	if (!m_rclk && state)
+	if (!m_wclk && state)
 	{
-		if (WEN && WEN2 && (m_wac < CRT9212_RAM_SIZE))
+		if (m_wen1 && m_wen2 && (m_wac < CRT9212_RAM_SIZE))
 		{
 			//
-			m_ram[m_rac][m_buffer] = m_input;
+			m_ram[m_rac][m_buffer] = m_data;
 
 			// increment read address counter
 			m_wac++;
@@ -198,7 +195,7 @@ WRITE_LINE_MEMBER( crt9212_device::wclk_w )
 			if (m_wac == CRT9212_RAM_SIZE)
 			{
 				// set write overflow
-				WOF(1);
+				m_write_wof(1);
 			}
 		}
 	}

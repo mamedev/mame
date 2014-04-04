@@ -41,8 +41,8 @@
 class tandy2k_state : public driver_device
 {
 public:
-	tandy2k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tandy2k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I80186_TAG),
 		m_uart(*this, I8251A_TAG),
 		m_i8255a(*this, I8255A_TAG),
@@ -73,10 +73,10 @@ public:
 	required_device<i8272a_device> m_fdc;
 	required_device<pic8259_device> m_pic0;
 	required_device<pic8259_device> m_pic1;
-	required_device<crt9007_device> m_vpac;
-	required_device<crt9212_device> m_drb0;
-	required_device<crt9212_device> m_drb1;
-	required_device<crt9021_device> m_vac;
+	required_device<crt9007_t> m_vpac;
+	required_device<crt9212_t> m_drb0;
+	required_device<crt9212_t> m_drb1;
+	required_device<crt9021_t> m_vac;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 	DECLARE_READ8_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	DECLARE_WRITE8_MEMBER( drb_attr_w );
 
 	/* DMA state */
 	UINT8 m_dma_mux;

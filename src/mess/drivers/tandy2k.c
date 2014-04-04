@@ -235,7 +235,7 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 	if (m_clkcnt != BIT(data, 6))
 	{
-		m_vpac->set_hpixels_per_column(character_width);
+		m_vpac->set_character_width(character_width);
 		m_clkcnt = BIT(data, 6);
 	}
 
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
-//  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_device, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
+//  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_t, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
 	AM_RANGE(0x00100, 0x0017f) AM_READWRITE(vpac_r, vpac_w)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
@@ -353,20 +353,30 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_drb_w )
 	m_drb1->tog_w(state);
 }
 
-static CRT9007_INTERFACE( vpac_intf )
+WRITE8_MEMBER( tandy2k_state::drb_attr_w )
 {
-	10,
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_1_TAG, pic8259_device, ir1_w),
-	DEVCB_NULL, // DMAR     80186 HOLD
-	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, vsync_w), // VS
-	DEVCB_NULL, // HS
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vpac_vlt_w), // VLT
-	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, cursor_w), // CURS
-	DEVCB_DRIVER_LINE_MEMBER(tandy2k_state, vpac_drb_w), // DRB
-	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, retbl_w), // CBLANK
-	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, slg_w), // SLG
-	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, sld_w) // SLD
-};
+	/*
+
+	    bit     description
+
+	    0       BLC -> DBLC
+	    1       BKC -> DBKC
+	    2       CHABL
+	    3       MS0
+	    4       MS1
+	    5       BLINK
+	    6       INT
+	    7       REVID
+
+	*/
+
+	m_vac->chabl_w(BIT(data, 2));
+	m_vac->ms0_w(BIT(data, 3));
+	m_vac->ms1_w(BIT(data, 4));
+	m_vac->blink_w(BIT(data, 5));
+	m_vac->intin_w(BIT(data, 6));
+	m_vac->revid_w(BIT(data, 7));
+}
 
 // Intel 8251A Interface
 
@@ -632,25 +642,29 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
+	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/16)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
+	MCFG_CRT9007_CHARACTER_WIDTH(10)
+	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
+	//MCFG_CRT9007_DMAR_CALLBACK(80186 HOLD)
+	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, vsync_w))
+	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
+	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, cursor_w))
+	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(tandy2k_state, vpac_drb_w))
+	MCFG_CRT9007_CBLANK_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, retbl_w))
+	MCFG_CRT9007_SLG_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, slg_w))
+	MCFG_CRT9007_SLD_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, sld_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
-	// ROF
-	// WOF
-	MCFG_CRT9212_IN_REN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, vlt_r)) // REN
-	MCFG_CRT9212_IN_WEN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, wben_r)) // WEN
-	MCFG_CRT9212_IN_WEN2_CB(VCC) // WEN2
-	MCFG_DEVICE_ADD(CRT9212_1_TAG, CRT9212, 0)
-	// ROF
-	// WOF
-	MCFG_CRT9212_IN_REN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, vlt_r)) // REN
-	MCFG_CRT9212_IN_WEN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, wben_r)) // WEN
-	MCFG_CRT9212_IN_WEN2_CB(VCC) // WEN2
+
+	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, XTAL_16MHz*28/16/8)
+	MCFG_CRT9212_DOUT_CALLBACK(DEVWRITE8(CRT9021B_TAG, crt9021_t, write))
+
+	MCFG_DEVICE_ADD(CRT9212_1_TAG, CRT9212, XTAL_16MHz*28/16/8)
+	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(tandy2k_state, drb_attr_w))
+
 	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/16/8)
-	MCFG_CRT9021_IN_DATA_CB(DEVREAD8(CRT9212_0_TAG, crt9212_device, read)) // data
-	MCFG_CRT9021_IN_ATTR_CB(DEVREAD8(CRT9212_1_TAG, crt9212_device, read)) // attributes
-	MCFG_CRT9021_IN_ATTEN_CB(VCC)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

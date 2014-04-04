@@ -36,46 +36,53 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CRT9021_IN_DATA_CB(_devcb) \
-	devcb = &crt9021_device::set_in_data_callback(*device, DEVCB2_##_devcb);
+#define CRT9021_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, UINT8 data, int intout)
 
-#define MCFG_CRT9021_IN_ATTR_CB(_devcb) \
-	devcb = &crt9021_device::set_in_attr_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_CRT9021_IN_ATTEN_CB(_devcb) \
-	devcb = &crt9021_device::set_in_atten_callback(*device, DEVCB2_##_devcb);	
+#define MCFG_CRT9021_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
+	crt9021_t::static_set_display_callback(*device, crt9021_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> crt9021_device
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, UINT8 data, int intout)> crt9021_draw_character_delegate;
 
-class crt9021_device :  public device_t,
-						public device_video_interface
+
+// ======================> crt9021_t
+
+class crt9021_t :  public device_t,
+				   public device_video_interface
 {
 public:
 	// construction/destruction
-	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crt9021_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
-	template<class _Object> static devcb2_base &set_in_data_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_data_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_attr_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_attr_cb.set_callback(object); }
-	template<class _Object> static devcb2_base &set_in_atten_callback(device_t &device, _Object object) { return downcast<crt9021_device &>(device).m_in_atten_cb.set_callback(object); }
+	static void static_set_display_callback(device_t &device, crt9021_draw_character_delegate callback) { downcast<crt9021_t &>(device).m_display_cb = callback; }
 
-	DECLARE_WRITE_LINE_MEMBER( slg_w );
-	DECLARE_WRITE_LINE_MEMBER( sld_w );
-	DECLARE_WRITE_LINE_MEMBER( cursor_w );
-	DECLARE_WRITE_LINE_MEMBER( retbl_w );
+	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
+	DECLARE_WRITE_LINE_MEMBER( ms0_w ) { m_ms0 = state; }
+	DECLARE_WRITE_LINE_MEMBER( ms1_w ) { m_ms1 = state; }
+	DECLARE_WRITE_LINE_MEMBER( revid_w ) { m_revid = state; }
+	DECLARE_WRITE_LINE_MEMBER( chabl_w ) { m_chabl = state; }
+	DECLARE_WRITE_LINE_MEMBER( blink_w ) { m_blink = state; }
+	DECLARE_WRITE_LINE_MEMBER( intin_w ) { m_intin = state; }
+	DECLARE_WRITE_LINE_MEMBER( atten_w ) { m_atten = state; }
+	DECLARE_WRITE_LINE_MEMBER( cursor_w ) { m_cursor = state; }
+	DECLARE_WRITE_LINE_MEMBER( retbl_w ) { m_retbl = state; }
+	DECLARE_WRITE_LINE_MEMBER( ld_sh_w );
+	DECLARE_WRITE_LINE_MEMBER( sld_w ) { m_sld = state; }
+	DECLARE_WRITE_LINE_MEMBER( slg_w ) { m_slg = state; }
+	DECLARE_WRITE_LINE_MEMBER( blc_w ) { m_blc = state; }
+	DECLARE_WRITE_LINE_MEMBER( bkc_w ) { m_bkc = state; }
+	DECLARE_WRITE_LINE_MEMBER( sl0_w ) { m_sl0 = state; }
+	DECLARE_WRITE_LINE_MEMBER( sl1_w ) { m_sl1 = state; }
+	DECLARE_WRITE_LINE_MEMBER( sl2_w ) { m_sl2 = state; }
+	DECLARE_WRITE_LINE_MEMBER( sl3_w ) { m_sl3 = state; }
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -87,16 +94,47 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb2_read8             m_in_data_cb;
-	devcb2_read8             m_in_attr_cb;
+	enum
+	{
+		MS_WIDE_GRAPHICS,
+		MS_CHARACTER,
+		MS_THIN_GRAPHICS,
+		MS_UNDERLINE
+	};
 
-	devcb2_read_line         m_in_atten_cb;
+	crt9021_draw_character_delegate m_display_cb;
 
-	int m_slg;
-	int m_sld;
+	bitmap_rgb32 m_bitmap;
+
+	// inputs
+	UINT8 m_data;
+	int m_ms0;
+	int m_ms1;
+	int m_revid;
+	int m_chabl;
+	int m_blink;
+	int m_intin;
+	int m_atten;
 	int m_cursor;
 	int m_retbl;
+	int m_ld_sh;
+	int m_sld;
+	int m_slg;
+	int m_blc;
+	int m_bkc;
+	int m_sl0;
+	int m_sl1;
+	int m_sl2;
+	int m_sl3;
 	int m_vsync;
+
+	// outputs
+	UINT8 m_sr;
+	int m_intout;
+	int m_sl;
+
+	// timers
+	emu_timer *m_vdc_timer;
 };
 
 

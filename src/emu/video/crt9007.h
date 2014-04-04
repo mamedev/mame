@@ -52,14 +52,38 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CRT9007_ADD(_tag, _clock, _config, _map) \
-	MCFG_DEVICE_ADD(_tag, CRT9007, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+#define MCFG_CRT9007_CHARACTER_WIDTH(_value) \
+	crt9007_t::static_set_character_width(*device, _value);
 
+#define MCFG_CRT9007_INT_CALLBACK(_write) \
+	devcb = &crt9007_t::set_int_wr_callback(*device, DEVCB2_##_write);
 
-#define CRT9007_INTERFACE(name) \
-	const crt9007_interface (name) =
+#define MCFG_CRT9007_DMAR_CALLBACK(_write) \
+	devcb = &crt9007_t::set_dmar_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_VS_CALLBACK(_write) \
+	devcb = &crt9007_t::set_vs_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_HS_CALLBACK(_write) \
+	devcb = &crt9007_t::set_hs_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_VLT_CALLBACK(_write) \
+	devcb = &crt9007_t::set_vlt_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_CURS_CALLBACK(_write) \
+	devcb = &crt9007_t::set_curs_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_DRB_CALLBACK(_write) \
+	devcb = &crt9007_t::set_drb_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_CBLANK_CALLBACK(_write) \
+	devcb = &crt9007_t::set_cblank_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_SLG_CALLBACK(_write) \
+	devcb = &crt9007_t::set_slg_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_CRT9007_SLD_CALLBACK(_write) \
+	devcb = &crt9007_t::set_sld_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -67,53 +91,38 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> crt9007_t
 
-// ======================> crt9007_interface
-
-struct crt9007_interface
-{
-	int hpixels_per_column;     /* number of pixels per video memory address */
-
-	devcb_write_line        m_out_int_cb;
-	devcb_write_line        m_out_dmar_cb;
-
-	devcb_write_line        m_out_vs_cb;
-	devcb_write_line        m_out_hs_cb;
-
-	devcb_write_line        m_out_vlt_cb;
-	devcb_write_line        m_out_curs_cb;
-	devcb_write_line        m_out_drb_cb;
-	devcb_write_line        m_out_cblank_cb;
-
-	devcb_write_line        m_out_slg_cb;
-	devcb_write_line        m_out_sld_cb;
-};
-
-
-
-// ======================> crt9007_device
-
-class crt9007_device :  public device_t,
-						public device_memory_interface,
-						public device_video_interface,
-						public crt9007_interface
+class crt9007_t :  public device_t,
+				   public device_memory_interface,
+				   public device_video_interface
 {
 public:
 	// construction/destruction
-	crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	crt9007_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_character_width(device_t &device, int value) { downcast<crt9007_t &>(device).m_hpixels_per_column = value; }
+
+	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dmar_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_dmar.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vs_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_vs.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hs_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_hs.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vlt_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_vlt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_curs_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_curs.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drb_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_drb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cblank_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_cblank.set_callback(object); }
+	template<class _Object> static devcb2_base &set_slg_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_slg.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sld_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_sld.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
-	DECLARE_READ_LINE_MEMBER( vlt_r );
-	DECLARE_READ_LINE_MEMBER( wben_r );
 
-	void set_hpixels_per_column(int hpixels_per_column);
+	void set_character_width(int value);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_clock_changed();
@@ -123,12 +132,15 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
-	static const device_timer_id TIMER_HSYNC = 0;
-	static const device_timer_id TIMER_VSYNC = 1;
-	static const device_timer_id TIMER_VLT = 2;
-	static const device_timer_id TIMER_CURS = 3;
-	static const device_timer_id TIMER_DRB = 4;
-	static const device_timer_id TIMER_DMA = 5;
+	enum
+	{
+		TIMER_HSYNC,
+		TIMER_VSYNC,
+		TIMER_VLT,
+		TIMER_CURS,
+		TIMER_DRB,
+		TIMER_DMA
+	};
 
 	inline UINT8 readbyte(offs_t address);
 
@@ -143,16 +155,19 @@ private:
 
 	inline void recompute_parameters();
 
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_dmar_func;
-	devcb_resolved_write_line   m_out_hs_func;
-	devcb_resolved_write_line   m_out_vs_func;
-	devcb_resolved_write_line   m_out_vlt_func;
-	devcb_resolved_write_line   m_out_curs_func;
-	devcb_resolved_write_line   m_out_drb_func;
-	devcb_resolved_write_line   m_out_cblank_func;
-	devcb_resolved_write_line   m_out_slg_func;
-	devcb_resolved_write_line   m_out_sld_func;
+	// address space configurations
+	const address_space_config      m_space_config;
+
+	devcb2_write_line   m_write_int;
+	devcb2_write_line   m_write_dmar;
+	devcb2_write_line   m_write_hs;
+	devcb2_write_line   m_write_vs;
+	devcb2_write_line   m_write_vlt;
+	devcb2_write_line   m_write_curs;
+	devcb2_write_line   m_write_drb;
+	devcb2_write_line   m_write_cblank;
+	devcb2_write_line   m_write_slg;
+	devcb2_write_line   m_write_sld;
 
 	// registers
 	UINT8 m_reg[0x3d];
@@ -175,7 +190,7 @@ private:
 	int m_cblank;
 	int m_vlt;
 	int m_drb;
-	int m_wben;
+	//int m_wben;
 	//int m_slg;
 	//int m_sld;
 	int m_lpstb;
@@ -194,9 +209,6 @@ private:
 	emu_timer *m_curs_timer;
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
-
-	// address space configurations
-	const address_space_config      m_space_config;
 };
 
 
