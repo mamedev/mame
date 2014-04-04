@@ -600,8 +600,8 @@ void es5510_device::list_program(void(p)(const char *, ...)) {
 	LOG(("ES5501: Starting!\n"));
 
 	char buf[1024];
-	bool is_written[0xff], is_read[0xff];
-	char name[0xff][16];
+	bool is_written[0x100], is_read[0x100];
+	char name[0x100][16];
 	int addr;
 
 	for (int i = 0; i < 0x100; i++) {
