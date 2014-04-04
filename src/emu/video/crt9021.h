@@ -39,7 +39,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define CRT9021_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, UINT8 data, int intout)
+#define CRT9021_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, UINT8 video, int intout)
 
 
 #define MCFG_CRT9021_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
@@ -50,7 +50,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, UINT8 data, int intout)> crt9021_draw_character_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, UINT8 video, int intout)> crt9021_draw_character_delegate;
 
 
 // ======================> crt9021_t

@@ -132,7 +132,7 @@ void crt9021_t::device_start()
 	save_item(NAME(m_vsync));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_intout));
-	save_item(NAME(m_sld));
+	save_item(NAME(m_sl));
 }
 
 

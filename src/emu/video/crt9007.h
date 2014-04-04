@@ -76,6 +76,9 @@
 #define MCFG_CRT9007_DRB_CALLBACK(_write) \
 	devcb = &crt9007_t::set_drb_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_CRT9007_WBEN_CALLBACK(_write) \
+	devcb = &crt9007_t::set_wben_wr_callback(*device, DEVCB2_##_write);
+
 #define MCFG_CRT9007_CBLANK_CALLBACK(_write) \
 	devcb = &crt9007_t::set_cblank_wr_callback(*device, DEVCB2_##_write);
 
@@ -110,6 +113,7 @@ public:
 	template<class _Object> static devcb2_base &set_vlt_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_vlt.set_callback(object); }
 	template<class _Object> static devcb2_base &set_curs_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_curs.set_callback(object); }
 	template<class _Object> static devcb2_base &set_drb_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_drb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_wben_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_wben.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cblank_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_cblank.set_callback(object); }
 	template<class _Object> static devcb2_base &set_slg_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_slg.set_callback(object); }
 	template<class _Object> static devcb2_base &set_sld_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_sld.set_callback(object); }
@@ -165,6 +169,7 @@ private:
 	devcb2_write_line   m_write_vlt;
 	devcb2_write_line   m_write_curs;
 	devcb2_write_line   m_write_drb;
+	devcb2_write_line   m_write_wben;
 	devcb2_write_line   m_write_cblank;
 	devcb2_write_line   m_write_slg;
 	devcb2_write_line   m_write_sld;

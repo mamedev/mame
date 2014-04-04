@@ -54,15 +54,16 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
+		m_palette(*this, "palette"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, I8272A_TAG ":0:525qd"),
 		m_floppy1(*this, I8272A_TAG ":1:525qd"),
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
-		m_kbdclk(0),
 		m_hires_ram(*this, "hires_ram"),
-		m_char_ram(*this, "char_ram")
+		m_char_ram(*this, "char_ram"),
+		m_kbdclk(0)
 	{
 	}
 
@@ -77,16 +78,17 @@ public:
 	required_device<crt9212_t> m_drb0;
 	required_device<crt9212_t> m_drb1;
 	required_device<crt9021_t> m_vac;
+	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<tandy2k_keyboard_device> m_kb;
+	required_shared_ptr<UINT16> m_hires_ram;
+	required_shared_ptr<UINT16> m_char_ram;
 
 	virtual void machine_start();
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void speaker_update();
 	void dma_request(int line, int state);
@@ -110,12 +112,13 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
-	DECLARE_WRITE_LINE_MEMBER( vac_ld_ht_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_wben_w );
+	DECLARE_WRITE8_MEMBER( drb_attr_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 	DECLARE_READ8_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
-	DECLARE_WRITE8_MEMBER( drb_attr_w );
+	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 
 	/* DMA state */
 	UINT8 m_dma_mux;
@@ -134,9 +137,6 @@ public:
 	int m_pb_sel;
 
 	/* video state */
-	required_shared_ptr<UINT16> m_hires_ram;
-	required_shared_ptr<UINT16> m_char_ram;
-	UINT16 m_palette[16];
 	UINT8 m_vram_base;
 	int m_vidouts;
 	int m_clkspd;

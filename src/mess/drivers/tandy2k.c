@@ -306,44 +306,12 @@ INPUT_PORTS_END
 
 // Video
 
-UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	if (m_vidouts)
-	{
-		m_vac->screen_update(screen, bitmap, cliprect);
-	}
-
-	return 0;
-}
-/*
-static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
-{
-    tandy2k_state *state = device->machine().driver_data<tandy2k_state>();
-    address_space &program = state->m_maincpu->space(AS_PROGRAM);
-
-    for (int sx = 0; sx < x_count; sx++)
-    {
-        UINT32 videoram_addr = ((state->m_vram_base << 15) | (va << 1)) + sx;
-        UINT8 videoram_data = program.read_word(videoram_addr);
-        UINT16 charram_addr = (videoram_data << 4) | sl;
-        UINT8 charram_data = state->m_char_ram[charram_addr] & 0xff;
-
-        for (int bit = 0; bit < 10; bit++)
-        {
-            if (BIT(charram_data, 7))
-            {
-                bitmap.pix16(y, x + (sx * 10) + bit) = 1;
-            }
-
-            charram_data <<= 1;
-        }
-    }
-}
-*/
-
 WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
 {
+	m_drb0->ren_w(state);
 	m_drb0->clrcnt_w(state);
+
+	m_drb1->ren_w(state);
 	m_drb1->clrcnt_w(state);
 }
 
@@ -351,6 +319,12 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_drb_w )
 {
 	m_drb0->tog_w(state);
 	m_drb1->tog_w(state);
+}
+
+WRITE_LINE_MEMBER( tandy2k_state::vpac_wben_w )
+{
+	m_drb0->wen1_w(state);
+	m_drb1->wen1_w(state);
 }
 
 WRITE8_MEMBER( tandy2k_state::drb_attr_w )
@@ -376,6 +350,18 @@ WRITE8_MEMBER( tandy2k_state::drb_attr_w )
 	m_vac->blink_w(BIT(data, 5));
 	m_vac->intin_w(BIT(data, 6));
 	m_vac->revid_w(BIT(data, 7));
+}
+
+CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
+{
+	const pen_t *pen = m_palette->pens();
+
+	for (int i = 0; i < 8; i++)
+	{
+		int color = BIT(video, 7 - i);
+
+		bitmap.pix32(y, x++) = pen[color];
+	}
 }
 
 // Intel 8251A Interface
@@ -638,9 +624,11 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
+	
+	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/16)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
@@ -651,6 +639,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
 	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, cursor_w))
 	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(tandy2k_state, vpac_drb_w))
+	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(tandy2k_state, vpac_wben_w))
 	MCFG_CRT9007_CBLANK_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, retbl_w))
 	MCFG_CRT9007_SLG_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, slg_w))
 	MCFG_CRT9007_SLD_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, sld_w))
@@ -664,7 +653,6 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 
 	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/16/8)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

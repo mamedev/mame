@@ -464,6 +464,7 @@ crt9007_t::crt9007_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_write_vlt(*this),
 	m_write_curs(*this),
 	m_write_drb(*this),
+	m_write_wben(*this),
 	m_write_cblank(*this),
 	m_write_slg(*this),
 	m_write_sld(*this)
@@ -495,6 +496,7 @@ void crt9007_t::device_start()
 	m_write_vlt.resolve_safe();
 	m_write_curs.resolve_safe();
 	m_write_drb.resolve_safe();
+	m_write_wben.resolve_safe();
 	m_write_cblank.resolve_safe();
 	m_write_slg.resolve_safe();
 	m_write_sld.resolve_safe();
@@ -536,6 +538,7 @@ void crt9007_t::device_reset()
 	m_write_dmar(CLEAR_LINE);
 
 	// 29 (WBEN) = 0
+	m_write_wben(1); // HACK
 
 	// 30 (SLG) = 0
 	m_write_slg(0);
