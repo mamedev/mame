@@ -1523,6 +1523,8 @@ ROM_START( aes )
 	ROM_SYSTEM_BIOS( 9, "unibios13","Universe Bios (Hack, Ver. 1.3)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */
 	// Universe BIOS versions older than 1.3 don't support AES hardware
+	ROM_SYSTEM_BIOS( 10, "debug","Development System ROM" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) // Official debug (development) ROM, for home-use base board
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 

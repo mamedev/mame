@@ -1930,8 +1930,6 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 21, "uni-bios_1_1.rom",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
 	ROM_SYSTEM_BIOS( 22, "unibios10","Universe Bios (Hack, Ver. 1.0)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 22, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
-//  ROM_SYSTEM_BIOS( 23, "debug",      "Debug MVS (Hack?)" )
-//  ROM_LOAD16_WORD_SWAP_BIOS( 23, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \
