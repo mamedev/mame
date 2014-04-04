@@ -1,3 +1,5 @@
+#include "machine/nvram.h"
+
 class seicross_state : public driver_device
 {
 public:
@@ -8,9 +10,9 @@ public:
 		m_row_scroll(*this, "row_scroll"),
 		m_spriteram2(*this, "spriteram2"),
 		m_colorram(*this, "colorram"),
-		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
+		m_nvram(*this, "nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -19,10 +21,10 @@ public:
 	required_shared_ptr<UINT8> m_row_scroll;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_nvram;
 	
 	UINT8 m_portb;
 	tilemap_t *m_bg_tilemap;
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	UINT8 m_irq_mask;
 	DECLARE_WRITE8_MEMBER(seicross_videoram_w);
@@ -38,6 +40,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	optional_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };

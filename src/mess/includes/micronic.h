@@ -13,6 +13,7 @@
 #include "video/hd61830.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
 
@@ -30,8 +31,11 @@ public:
 		m_lcdc(*this, HD61830_TAG),
 		m_beep(*this, "beeper"),
 		m_rtc(*this, MC146818_TAG),
+		m_nvram1(*this, "nvram1"),
+		m_nvram2(*this, "nvram2"),
 		m_ram(*this, RAM_TAG),
 		m_ram_base(*this, "ram_base"),
+		m_status_flag(1),
 		m_bank1(*this, "bank1"),
 		m_bit0(*this, "BIT0"),
 		m_bit1(*this, "BIT1"),
@@ -41,16 +45,20 @@ public:
 		m_bit5(*this, "BIT5"),
 		m_backbattery(*this, "BACKBATTERY"),
 		m_mainbattery(*this, "MAINBATTERY"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<beep_device> m_beep;
 	required_device<mc146818_device> m_rtc;
+	required_device<nvram_device> m_nvram1;
+	required_device<nvram_device> m_nvram2;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	DECLARE_READ8_MEMBER( keypad_r );
 	DECLARE_READ8_MEMBER( status_flag_r );
@@ -70,7 +78,7 @@ public:
 	UINT8 m_banks_num;
 	UINT8 m_kp_matrix;
 	UINT8 m_lcd_contrast;
-	bool m_lcd_backlight;
+	int m_lcd_backlight;
 	UINT8 m_status_flag;
 	DECLARE_PALETTE_INIT(micronic);
 

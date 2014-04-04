@@ -116,7 +116,6 @@
 #include "emu.h"
 #include "includes/micronic.h"
 #include "rendlay.h"
-#include "mcfglgcy.h"
 
 READ8_MEMBER( micronic_state::keypad_r )
 {
@@ -300,29 +299,12 @@ static INPUT_PORTS_START( micronic )
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("END") PORT_CODE(KEYCODE_END)
 INPUT_PORTS_END
 
-static NVRAM_HANDLER( micronic )
-{
-	micronic_state *state = machine.driver_data<micronic_state>();
 
-	if (read_or_write)
-	{
-		file->write(state->m_ram_base, 0x8000);
-		file->write(state->m_ram->pointer(), state->m_ram->size());
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_ram_base, 0x8000);
-			file->read(state->m_ram->pointer(), state->m_ram->size());
-			state->m_status_flag = 0x01;
-		}
-		else
-		{
-			state->m_status_flag = 0x00;
-		}
-	}
+void micronic_state::nvram_init(nvram_device &nvram, void *data, size_t size)
+{
+	m_status_flag = 0;
 }
+
 
 PALETTE_INIT_MEMBER(micronic_state, micronic)
 {
@@ -336,11 +318,19 @@ void micronic_state::machine_start()
 	m_bank1->configure_entries(0x00, 0x02, memregion(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
-	m_banks_num = (m_ram->size()>>15) + 1;
+	m_banks_num = (m_ram->size() >> 15) + 1;
 	m_bank1->configure_entries(0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
 
+	m_nvram1->set_base(m_ram_base, 0x8000);
+	m_nvram2->set_base(m_ram->pointer(), m_ram->size());
+
 	/* register for state saving */
-//  save_item(NAME(state->));
+	save_item(NAME(m_banks_num));
+	save_item(NAME(m_kp_matrix));
+	save_item(NAME(m_lcd_contrast));
+	save_item(NAME(m_lcd_backlight));
+	save_item(NAME(m_status_flag));
+	// TODO: restore RAM bank at state load...
 }
 
 void micronic_state::machine_reset()
@@ -386,7 +376,8 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("224K")
 
-	MCFG_NVRAM_HANDLER(micronic)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)	// base ram
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)	// additional ram banks
 
 	MCFG_MC146818_ADD( MC146818_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(micronic_state, mc146818_irq))

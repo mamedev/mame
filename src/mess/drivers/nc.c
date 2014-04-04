@@ -105,7 +105,7 @@
 #include "sound/beep.h"
 #include "machine/ram.h"
 #include "rendlay.h"
-#include "mcfglgcy.h"
+
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
