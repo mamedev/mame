@@ -79,6 +79,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	UPD3301_DRAW_CHARACTER_MEMBER( pc8001_display_pixels );
 };
 
 class pc8001mk2_state : public pc8001_state

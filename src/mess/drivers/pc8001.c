@@ -364,17 +364,15 @@ static const rgb_t PALETTE_PC8001[] =
 	rgb_t::white
 };
 
-static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
+UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 {
-	pc8001_state *state = device->machine().driver_data<pc8001_state>();
-
-	UINT8 data = state->m_char_rom->base()[(cc << 3) | lc];
+	UINT8 data = m_char_rom->base()[(cc << 3) | lc];
 	int i;
 
 	if (lc >= 8) return;
 	if (csr) data = 0xff;
 
-	if (state->m_width80)
+	if (m_width80)
 	{
 		for (i = 0; i < 8; i++)
 		{
@@ -400,16 +398,6 @@ static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 		}
 	}
 }
-
-static UPD3301_INTERFACE( pc8001_upd3301_intf )
-{
-	8,
-	pc8001_display_pixels,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8257_TAG, i8257_device, i8257_drq2_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* 8255 Interface */
 
@@ -559,7 +547,11 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
-	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
+	
+	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
+	MCFG_UPD3301_CHARACTER_WIDTH(8)
+	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
+	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, i8257_drq2_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pc8001_state, write_centronics_ack))
@@ -599,7 +591,11 @@ static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8257_ADD(I8257_TAG, 4000000, dmac_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
-	MCFG_UPD3301_ADD(UPD3301_TAG, 14318180, pc8001_upd3301_intf)
+
+	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, 14318180)
+	MCFG_UPD3301_CHARACTER_WIDTH(8)
+	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
+	MCFG_UPD3301_VRTC_CALLBACK(DEVWRITELINE(I8257_TAG, i8257_device, i8257_drq2_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 

@@ -42,23 +42,29 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_UPD3301_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, UPD3301, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define UPD3301_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
 
 
-#define UPD3301_INTERFACE(name) \
-	const upd3301_interface (name) =
+#define MCFG_UPD3301_CHARACTER_WIDTH(_value) \
+	upd3301_device::static_set_character_width(*device, _value);
+
+#define MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
+	upd3301_device::static_set_display_callback(*device, upd3301_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_UPD3301_DRQ_CALLBACK(_write) \
+	devcb = &upd3301_device::set_drq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UPD3301_INT_CALLBACK(_write) \
+	devcb = &upd3301_device::set_int_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UPD3301_HRTC_CALLBACK(_write) \
+	devcb = &upd3301_device::set_hrtc_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UPD3301_VRTC_CALLBACK(_write) \
+	devcb = &upd3301_device::set_vrtc_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -66,37 +72,25 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> upd3301_display_pixels_func
-
-typedef void (*upd3301_display_pixels_func)(device_t *device, bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa);
-#define UPD3301_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)
-
-
-// ======================> upd3301_interface
-
-struct upd3301_interface
-{
-	int m_width;                    // char width in pixels
-
-	upd3301_display_pixels_func m_display_cb;
-
-	devcb_write_line        m_out_int_cb;
-	devcb_write_line        m_out_drq_cb;
-	devcb_write_line        m_out_hrtc_cb;
-	devcb_write_line        m_out_vrtc_cb;
-};
-
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int sx, UINT8 cc, UINT8 lc, int hlgt, int rvv, int vsp, int sl0, int sl12, int csr, int gpa)> upd3301_draw_character_delegate;
 
 
 // ======================> upd3301_device
 
 class upd3301_device :  public device_t,
-						public device_video_interface,
-						public upd3301_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_character_width(device_t &device, int value) { downcast<upd3301_device &>(device).m_width = value; }
+	static void static_set_display_callback(device_t &device, upd3301_draw_character_delegate callback) { downcast<upd3301_device &>(device).m_display_cb = callback; }
+
+	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_drq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_hrtc.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vrtc_wr_callback(device_t &device, _Object object) { return downcast<upd3301_device &>(device).m_write_vrtc.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -109,31 +103,36 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_clock_changed();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	static const device_timer_id TIMER_HRTC = 0;
-	static const device_timer_id TIMER_VRTC = 1;
-	static const device_timer_id TIMER_DRQ = 2;
+	enum
+	{
+		TIMER_HRTC,
+		TIMER_VRTC,
+		TIMER_DRQ
+	};
 
-	inline void set_interrupt(int state);
-	inline void set_drq(int state);
-	inline void set_display(int state);
-	inline void reset_counters();
-	inline void update_hrtc_timer(int state);
-	inline void update_vrtc_timer(int state);
-	inline void recompute_parameters();
+	void set_interrupt(int state);
+	void set_drq(int state);
+	void set_display(int state);
+	void reset_counters();
+	void update_hrtc_timer(int state);
+	void update_vrtc_timer(int state);
+	void recompute_parameters();
 
 	void draw_scanline();
 
-	devcb_resolved_write_line       m_out_int_func;
-	devcb_resolved_write_line       m_out_drq_func;
-	devcb_resolved_write_line       m_out_hrtc_func;
-	devcb_resolved_write_line       m_out_vrtc_func;
+	devcb2_write_line   m_write_int;
+	devcb2_write_line   m_write_drq;
+	devcb2_write_line   m_write_hrtc;
+	devcb2_write_line   m_write_vrtc;
+
+	upd3301_draw_character_delegate m_display_cb;
+	int m_width;
 
 	// screen drawing
 	bitmap_rgb32 *m_bitmap;     // bitmap

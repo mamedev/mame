@@ -22,12 +22,8 @@
 
 */
 
-#include "emu.h"
 #include "upd3301.h"
 
-
-// device type definition
-const device_type UPD3301 = &device_creator<upd3301_device>;
 
 
 //**************************************************************************
@@ -66,123 +62,10 @@ enum
 
 
 //**************************************************************************
-//  INLINE HELPERS
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
-//-------------------------------------------------
-//  set_interrupt -
-//-------------------------------------------------
-
-inline void upd3301_device::set_interrupt(int state)
-{
-	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", tag(), state);
-
-	m_out_int_func(state);
-
-	if (!state)
-	{
-		m_status &= ~(STATUS_N | STATUS_E);
-	}
-}
-
-
-//-------------------------------------------------
-//  set_drq -
-//-------------------------------------------------
-
-inline void upd3301_device::set_drq(int state)
-{
-	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", tag(), state);
-
-	m_out_drq_func(state);
-}
-
-
-//-------------------------------------------------
-//  set_display -
-//-------------------------------------------------
-
-inline void upd3301_device::set_display(int state)
-{
-	if (state)
-	{
-		m_status |= STATUS_VE;
-	}
-	else
-	{
-		m_status &= ~STATUS_VE;
-	}
-}
-
-
-//-------------------------------------------------
-//  reset_counters -
-//-------------------------------------------------
-
-inline void upd3301_device::reset_counters()
-{
-	set_interrupt(0);
-	set_drq(0);
-}
-
-
-//-------------------------------------------------
-//  update_hrtc_timer -
-//-------------------------------------------------
-
-inline void upd3301_device::update_hrtc_timer(int state)
-{
-	int y = m_screen->vpos();
-
-	int next_x = state ? m_h : 0;
-	int next_y = state ? y : ((y + 1) % ((m_l + m_v) * m_width));
-
-	attotime duration = m_screen->time_until_pos(next_y, next_x);
-
-	m_hrtc_timer->adjust(duration, !state);
-}
-
-
-//-------------------------------------------------
-//  update_vrtc_timer -
-//-------------------------------------------------
-
-inline void upd3301_device::update_vrtc_timer(int state)
-{
-	int next_y = state ? (m_l * m_r) : 0;
-
-	attotime duration = m_screen->time_until_pos(next_y, 0);
-
-	m_vrtc_timer->adjust(duration, !state);
-}
-
-
-//-------------------------------------------------
-//  recompute_parameters -
-//-------------------------------------------------
-
-inline void upd3301_device::recompute_parameters()
-{
-	int horiz_pix_total = (m_h + m_z) * m_width;
-	int vert_pix_total = (m_l + m_v) * m_r;
-
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
-
-	rectangle visarea;
-
-	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
-
-	if (LOG)
-	{
-		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	}
-
-	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
-
-	update_hrtc_timer(0);
-	update_vrtc_timer(0);
-}
+const device_type UPD3301 = &device_creator<upd3301_device>;
 
 
 
@@ -194,52 +77,33 @@ inline void upd3301_device::recompute_parameters()
 //  upd3301_device - constructor
 //-------------------------------------------------
 
-upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_status(0),
-		m_param_count(0),
-		m_data_fifo_pos(0),
-		m_attr_fifo_pos(0),
-		m_input_fifo(0),
-		m_me(0),
-		m_h(80),
-		m_l(20),
-		m_r(10),
-		m_v(6),
-		m_z(32),
-		m_attr_blink(0),
-		m_attr_frame(0),
-		m_cm(0),
-		m_cx(0),
-		m_cy(0),
-		m_cursor_blink(0),
-		m_cursor_frame(0)
+upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
+	device_video_interface(mconfig, *this),
+	m_write_int(*this),
+	m_write_drq(*this),
+	m_write_hrtc(*this),
+	m_write_vrtc(*this),
+	m_width(0),
+	m_status(0),
+	m_param_count(0),
+	m_data_fifo_pos(0),
+	m_attr_fifo_pos(0),
+	m_input_fifo(0),
+	m_me(0),
+	m_h(80),
+	m_l(20),
+	m_r(10),
+	m_v(6),
+	m_z(32),
+	m_attr_blink(0),
+	m_attr_frame(0),
+	m_cm(0),
+	m_cx(0),
+	m_cy(0),
+	m_cursor_blink(0),
+	m_cursor_frame(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd3301_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd3301_interface *intf = reinterpret_cast<const upd3301_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd3301_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
-		memset(&m_out_hrtc_cb, 0, sizeof(m_out_hrtc_cb));
-		memset(&m_out_vrtc_cb, 0, sizeof(m_out_vrtc_cb));
-	}
 }
 
 
@@ -249,16 +113,17 @@ void upd3301_device::device_config_complete()
 
 void upd3301_device::device_start()
 {
+	// resolve callbacks
+	m_display_cb.bind_relative_to(*owner());
+	m_write_drq.resolve_safe();
+	m_write_int.resolve_safe();
+	m_write_hrtc.resolve_safe();
+	m_write_vrtc.resolve_safe();
+
 	// allocate timers
 	m_hrtc_timer = timer_alloc(TIMER_HRTC);
 	m_vrtc_timer = timer_alloc(TIMER_VRTC);
 	m_drq_timer = timer_alloc(TIMER_DRQ);
-
-	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_drq_func.resolve(m_out_drq_cb, *this);
-	m_out_hrtc_func.resolve(m_out_hrtc_cb, *this);
-	m_out_vrtc_func.resolve(m_out_vrtc_cb, *this);
 
 	// state saving
 	save_item(NAME(m_y));
@@ -329,7 +194,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_HRTC:
 		if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", tag(), param);
 
-		m_out_hrtc_func(param);
+		m_write_hrtc(param);
 		m_hrtc = param;
 
 		update_hrtc_timer(param);
@@ -338,7 +203,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_VRTC:
 		if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", tag(), param);
 
-		m_out_vrtc_func(param);
+		m_write_vrtc(param);
 		m_vrtc = param;
 
 		if (param && !m_me)
@@ -609,7 +474,7 @@ void upd3301_device::draw_scanline()
 			int csr = m_cm && m_cursor_blink && ((y / m_r) == m_cy) && (sx == m_cx);
 			int gpa = 0; // TODO
 
-			m_display_cb(this, *m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
+			m_display_cb(*m_bitmap, y, sx, cc, lc, hlgt, rvv, vsp, sl0, sl12, csr, gpa);
 		}
 	}
 
@@ -655,3 +520,120 @@ UINT32 upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	return 0;
 }
+
+
+//-------------------------------------------------
+//  set_interrupt -
+//-------------------------------------------------
+
+void upd3301_device::set_interrupt(int state)
+{
+	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", tag(), state);
+
+	m_write_int(state);
+
+	if (!state)
+	{
+		m_status &= ~(STATUS_N | STATUS_E);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_drq -
+//-------------------------------------------------
+
+void upd3301_device::set_drq(int state)
+{
+	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", tag(), state);
+
+	m_write_drq(state);
+}
+
+
+//-------------------------------------------------
+//  set_display -
+//-------------------------------------------------
+
+void upd3301_device::set_display(int state)
+{
+	if (state)
+	{
+		m_status |= STATUS_VE;
+	}
+	else
+	{
+		m_status &= ~STATUS_VE;
+	}
+}
+
+
+//-------------------------------------------------
+//  reset_counters -
+//-------------------------------------------------
+
+void upd3301_device::reset_counters()
+{
+	set_interrupt(0);
+	set_drq(0);
+}
+
+
+//-------------------------------------------------
+//  update_hrtc_timer -
+//-------------------------------------------------
+
+void upd3301_device::update_hrtc_timer(int state)
+{
+	int y = m_screen->vpos();
+
+	int next_x = state ? m_h : 0;
+	int next_y = state ? y : ((y + 1) % ((m_l + m_v) * m_width));
+
+	attotime duration = m_screen->time_until_pos(next_y, next_x);
+
+	m_hrtc_timer->adjust(duration, !state);
+}
+
+
+//-------------------------------------------------
+//  update_vrtc_timer -
+//-------------------------------------------------
+
+void upd3301_device::update_vrtc_timer(int state)
+{
+	int next_y = state ? (m_l * m_r) : 0;
+
+	attotime duration = m_screen->time_until_pos(next_y, 0);
+
+	m_vrtc_timer->adjust(duration, !state);
+}
+
+
+//-------------------------------------------------
+//  recompute_parameters -
+//-------------------------------------------------
+
+void upd3301_device::recompute_parameters()
+{
+	int horiz_pix_total = (m_h + m_z) * m_width;
+	int vert_pix_total = (m_l + m_v) * m_r;
+
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
+
+	rectangle visarea;
+
+	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
+
+	if (LOG)
+	{
+		if (LOG) logerror("UPD3301 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	}
+
+	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+
+	update_hrtc_timer(0);
+	update_vrtc_timer(0);
+}
+
