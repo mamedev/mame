@@ -42,6 +42,7 @@ void kaneko16_state::kaneko16_fill_bitmap(palette_device* palette, _BitmapClass 
 
 
 	typename _BitmapClass::pixel_t *dest;
+	(void)dest; // shut up Visual Studio
 	if (sizeof(*dest) == 2)
 	{
 		bitmap.fill(pen, cliprect);
