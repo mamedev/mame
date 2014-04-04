@@ -232,6 +232,32 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_eeprom_w)
                                 The Berlin Wall
 ***************************************************************************/
 
+READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
+{
+	UINT16 ret;
+
+	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
+	{
+		mem_mask >>= 8;
+	}
+
+	ret = m_oki->read(space, offset, mem_mask);
+	ret = ret | ret << 8;
+
+	return ret;
+}
+
+WRITE16_MEMBER(kaneko16_berlwall_state::berlwall_oki_w)
+{
+	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
+	{
+		data >>= 8;
+		mem_mask >>= 8;
+	}
+
+	m_oki->write(space, offset, data, mem_mask);
+}
+
 static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM     // Work RAM
@@ -251,7 +277,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w) // Sound
 	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay2_YM2149_r, kaneko16_ay2_YM2149_w)
 	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
-	AM_RANGE(0x800400, 0x800401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x800400, 0x800401) AM_READWRITE( berlwall_oki_r, berlwall_oki_w )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 ADDRESS_MAP_END
@@ -1630,10 +1656,13 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
-	MCFG_SCREEN_PALETTE("palette")
+//	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048 + 32768)   /* 32768 static colors for the bg */
+	MCFG_PALETTE_ADD("palette", 2048 )    
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
+	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 	MCFG_PALETTE_INIT_OWNER(kaneko16_berlwall_state,berlwall)
 
@@ -1764,7 +1793,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-
+	
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x8, 320, 240);
@@ -2484,6 +2513,7 @@ ROM_START( berlwallt )
 	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "bw000",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
+
 
 
 /***************************************************************************
@@ -3853,6 +3883,7 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", 0 )
 GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", 0 )

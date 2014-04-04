@@ -24,25 +24,40 @@ VIDEO_START_MEMBER(kaneko16_state,kaneko16)
 
 
 
-void kaneko16_state::kaneko16_fill_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+/* Fill the bitmap with a single colour. This is wrong, but will work most of
+   the times. To do it right, each pixel should be drawn with pen 0
+   of the bottomost tile that covers it (which is pretty tricky to do) */
+template<class _BitmapClass>
+void kaneko16_state::kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect)
 {
+	int pen = 0;
+
 	if (m_kaneko_spr)
-		if(m_kaneko_spr->get_sprite_type()== 1)
+	{
+		if (m_kaneko_spr->get_sprite_type() == 1)
 		{
-			bitmap.fill(0x7f00, cliprect);
-			return;
+			pen = 0x7f00;
 		}
+	}
 
 
-
-	/* Fill the bitmap with pen 0. This is wrong, but will work most of
-	   the times. To do it right, each pixel should be drawn with pen 0
-	   of the bottomost tile that covers it (which is pretty tricky to do) */
-	bitmap.fill(0, cliprect);
-
+	typename _BitmapClass::pixel_t *dest;
+	if (sizeof(*dest) == 2)
+	{
+		bitmap.fill(pen, cliprect);
+	}
+	else
+	{
+		const pen_t *pal = palette->pens();
+		bitmap.fill(pal[pen], cliprect);
+	}
 }
 
-UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+
+
+template<class _BitmapClass>
+UINT32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -66,7 +81,7 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, bitmap_ind16 
 
 UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	kaneko16_fill_bitmap(bitmap,cliprect);
+	kaneko16_fill_bitmap(m_palette, bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!m_disp_enable) return 0;
@@ -91,7 +106,7 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette.set_pen_color(2048 + i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
@@ -134,7 +149,7 @@ VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 			if ((r & 0x10) && (b & 0x10))
 				g = (g - 1) & 0x1f;     /* decrease with wraparound */
 
-			m_bg15_bitmap.pix16(y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
+			m_bg15_bitmap.pix16(y, sx * 256 + x) = ((g << 10) | (r << 5) | b);
 		}
 
 	VIDEO_START_CALL_MEMBER(kaneko16);
@@ -164,29 +179,50 @@ READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_r)
 WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_w)
 {
 	COMBINE_DATA(&m_bg15_reg[0]);
+//	printf("kaneko16_bg15_reg_w %04x\n", m_bg15_reg[0]);
+	double brt1 = data & 0xff;
+	brt1 = brt1 / 255.0;
+
+	for (int i = 0; i < 0x8000;i++)
+		m_bgpalette->set_pen_contrast(i, brt1);
 }
 
 
-void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_bg15_bitmap.valid())
 	{
 		int select  =   m_bg15_select[ 0 ];
 //      int reg     =   m_bg15_reg[ 0 ];
 		int flip    =   select & 0x20;
-		int sx, sy;
+		int sx;//, sy;
 
-		if (flip)   select ^= 0x1f;
+	//	if (flip)   select ^= 0x1f;
 
 		sx      =   (select & 0x1f) * 256;
-		sy      =   0;
+	//	sy      =   0;
 
-		copybitmap(bitmap, m_bg15_bitmap, flip, flip, -sx, -sy, cliprect);
+		const pen_t *pal = m_bgpalette->pens();
+		UINT16* srcbitmap;
+		UINT32* dstbitmap;
+
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			if (!flip) srcbitmap = &m_bg15_bitmap.pix16(y);
+			else srcbitmap =  &m_bg15_bitmap.pix16(255-y);
+			dstbitmap = &bitmap.pix32(y);
+
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				UINT16 pix = srcbitmap[x + sx];
+				dstbitmap[x] = pal[pix&0x7fff];
+			}
+		}
 
 //      flag = 0;
 	}
 }
-UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
 	kaneko16_render_15bpp_bitmap(bitmap,cliprect);
