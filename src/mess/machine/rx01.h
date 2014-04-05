@@ -9,6 +9,8 @@
 #ifndef __RX01__
 #define __RX01__
 
+#include "imagedev/flopdrv.h"
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -61,7 +63,7 @@ private:
 		RX01_INIT
 	};
 
-	device_t *m_image[2];
+	legacy_floppy_image_device *m_image[2];
 	UINT8 m_buffer[128];
 	int m_buf_pos;
 

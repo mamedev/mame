@@ -107,11 +107,11 @@ void hec2hrp_state::hector_minidisc_init()
 	fdc->dden_w(1);// density select => always 1 (0 ?a plante !)
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	floppy_mon_w(floppy_get_device(machine(), 0), 0); // Moteur floppy A:
-	//floppy_mon_w(floppy_get_device(space.machine(), 1), BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
+	floppy_get_device(machine(), 0)->floppy_mon_w( 0); // Moteur floppy A:
+	//floppy_get_device(machine(), 1)->floppy_mon_w(BIT(data, 7));   // Moteur floppy B:, not implanted on the real machine
 
 	//Set the drive ready !
-	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), FLOPPY_DRIVE_READY, 0);// Disc 0 ready !
+	floppy_get_device(machine(), 0)->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);// Disc 0 ready !
 
 }
 

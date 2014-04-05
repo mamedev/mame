@@ -382,26 +382,6 @@ inline void h63484_device::writeword(offs_t address, UINT16 data)
 }
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void h63484_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const h63484_interface *intf = reinterpret_cast<const h63484_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<h63484_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		// ...
-	}
-}
-
 inline void h63484_device::fifo_w_clear()
 {
 	int i;
@@ -1974,7 +1954,7 @@ WRITE16_MEMBER( h63484_device::data_w )
 
 void h63484_device::device_start()
 {
-	//h63484->space = device->memory().space(AS_0);
+	m_display_cb.bind_relative_to(*owner());
 }
 
 //-------------------------------------------------
@@ -2062,13 +2042,10 @@ void h63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cl
 			for (int b=0; b<ppw; b++)
 			{
 				int x = sx + g * ppw + b;
-				if (cliprect.contains(x, y))
-				{
-					if (m_display_cb)
-						m_display_cb(this, bitmap, y, x, data & mask);
-					else
-						bitmap.pix16(y, x) = data & mask;
-				}
+				if (!m_display_cb.isnull())
+					m_display_cb(bitmap, cliprect, y, x, data & mask);
+				else if (cliprect.contains(x, y))
+					bitmap.pix16(y, x) = data & mask;
 
 				data >>= bpp;
 			}

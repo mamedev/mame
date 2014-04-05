@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "machine/rx01.h"
-#include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 
 static LEGACY_FLOPPY_OPTIONS_START( rx01 )
@@ -74,8 +73,8 @@ machine_config_constructor rx01_device::device_mconfig_additions() const
 
 void rx01_device::device_start()
 {
-	m_image[0] = subdevice(FLOPPY_0);
-	m_image[1] = subdevice(FLOPPY_1);
+	m_image[0] = subdevice<legacy_floppy_image_device>(FLOPPY_0);
+	m_image[1] = subdevice<legacy_floppy_image_device>(FLOPPY_1);
 }
 
 
@@ -87,9 +86,9 @@ void rx01_device::device_reset()
 {
 	for(int i=0;i<2;i++)
 	{
-		floppy_mon_w(m_image[i], 0); // turn it on
-		floppy_drive_set_controller(m_image[i], this);
-		floppy_drive_set_rpm(m_image[i], 360.);
+		m_image[i]->floppy_mon_w(0); // turn it on
+		m_image[i]->floppy_drive_set_controller(this);
+		m_image[i]->floppy_drive_set_rpm(360.);
 	}
 	m_rxes = 0;
 	m_rxcs = 0;
@@ -128,7 +127,7 @@ void rx01_device::command_write(UINT16 data)
 	m_unit = BIT(data,4);
 	m_interrupt = BIT(data,6);
 
-	floppy_drive_set_ready_state(m_image[m_unit], 1,0);
+	m_image[m_unit]->floppy_drive_set_ready_state(1,0);
 
 
 	if (BIT(data,14)) // Initialize
@@ -164,7 +163,7 @@ void rx01_device::command_write(UINT16 data)
 			case 7: // Read Error Register
 					m_state = RX01_COMPLETE;
 					// set ready signal according to current drive status
-					m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;
+					m_rxes |= m_image[m_unit]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 7;
 					break;
 		}
 	}
@@ -195,7 +194,7 @@ UINT16 rx01_device::data_read()
 void rx01_device::service_command()
 {
 	printf("service_command %d\n",m_state);
-	m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;
+	m_rxes |= m_image[m_unit]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 7;
 	switch(m_state) {
 		case RX01_FILL :
 						m_buffer[m_buf_pos] = m_rxdb & 0xff;
@@ -241,25 +240,25 @@ void rx01_device::service_command()
 
 void rx01_device::position_head()
 {
-	int cur_track = floppy_drive_get_current_track(m_image[m_unit]);
+	int cur_track = m_image[m_unit]->floppy_drive_get_current_track();
 	int dir = (cur_track < m_rxta) ? +1 : -1;
 
 	while (m_rxta != cur_track)
 	{
 		cur_track += dir;
 
-		floppy_drive_seek(m_image[m_unit], dir);
+		m_image[m_unit]->floppy_drive_seek(dir);
 	}
 }
 
 void rx01_device::read_sector()
 {
 	/* read data */
-	floppy_drive_read_sector_data(m_image[m_unit], 0, m_rxsa, (char *)m_buffer, 128);
+	m_image[m_unit]->floppy_drive_read_sector_data(0, m_rxsa, (char *)m_buffer, 128);
 }
 
 void rx01_device::write_sector(int ddam)
 {
 	/* write data */
-	floppy_drive_write_sector_data(m_image[m_unit], 0, m_rxsa, (char *)m_buffer, 128, ddam);
+	m_image[m_unit]->floppy_drive_write_sector_data(0, m_rxsa, (char *)m_buffer, 128, ddam);
 }

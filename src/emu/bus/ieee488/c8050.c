@@ -618,7 +618,7 @@ READ8_MEMBER( c8050_device::miot_pb_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= floppy_wpt_r(m_unit[m_drive].m_image) << 3;
+	data |= m_unit[m_drive].m_image->floppy_wpt_r() << 3;
 
 	// drive type
 	data |= 0x10;
@@ -1017,10 +1017,10 @@ inline void c8050_device::read_current_track(int unit)
 	m_bit_count = 0;
 
 	// read track data
-	floppy_drive_read_track_data_info_buffer(m_unit[unit].m_image, m_side, m_unit[unit].m_track_buffer, &m_unit[unit].m_track_len);
+	m_unit[unit].m_image->floppy_drive_read_track_data_info_buffer(m_side, m_unit[unit].m_track_buffer, &m_unit[unit].m_track_len);
 
 	// extract track length
-	m_unit[unit].m_track_len = floppy_drive_get_current_track_size(m_unit[unit].m_image, m_side);
+	m_unit[unit].m_track_len = m_unit[unit].m_image->floppy_drive_get_current_track_size(m_side);
 }
 
 
@@ -1038,7 +1038,7 @@ inline void c8050_device::spindle_motor(int unit, int mtr)
 			read_current_track(unit);
 		}
 
-		floppy_mon_w(m_unit[unit].m_image, mtr);
+		m_unit[unit].m_image->floppy_mon_w(mtr);
 
 		m_unit[unit].m_mtr = mtr;
 	}
@@ -1066,7 +1066,7 @@ inline void c8050_device::mpi_step_motor(int unit, int stp)
 		if (tracks != 0)
 		{
 			// step read/write head
-			floppy_drive_seek(m_unit[unit].m_image, tracks);
+			m_unit[unit].m_image->floppy_drive_seek(tracks);
 
 			// read new track data
 			read_current_track(unit);
@@ -1199,13 +1199,13 @@ void c8050_device::device_start()
 	// install image callbacks
 	m_unit[0].m_image = m_image0;
 
-	floppy_install_load_proc(m_image0, c8050_device::on_disk0_change);
+	m_image0->floppy_install_load_proc(c8050_device::on_disk0_change);
 
 	if (m_image1)
 	{
 		m_unit[1].m_image = m_image1;
 
-		floppy_install_load_proc(m_image1, c8050_device::on_disk1_change);
+		m_image1->floppy_install_load_proc(c8050_device::on_disk1_change);
 	}
 
 	// register for state saving

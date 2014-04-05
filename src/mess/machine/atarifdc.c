@@ -16,7 +16,6 @@
 #include "atarifdc.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
-#include "imagedev/flopdrv.h"
 #include "formats/atari_dsk.h"
 
 #define VERBOSE_SERIAL  0
@@ -746,13 +745,13 @@ static MACHINE_CONFIG_FRAGMENT( atari_fdc )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
 MACHINE_CONFIG_END
 
-device_t *atari_fdc_device::atari_floppy_get_device_child(int drive)
+legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int drive)
 {
 	switch(drive) {
-		case 0 : return subdevice(FLOPPY_0);
-		case 1 : return subdevice(FLOPPY_1);
-		case 2 : return subdevice(FLOPPY_2);
-		case 3 : return subdevice(FLOPPY_3);
+		case 0 : return subdevice<legacy_floppy_image_device>(FLOPPY_0);
+		case 1 : return subdevice<legacy_floppy_image_device>(FLOPPY_1);
+		case 2 : return subdevice<legacy_floppy_image_device>(FLOPPY_2);
+		case 3 : return subdevice<legacy_floppy_image_device>(FLOPPY_3);
 	}
 	return NULL;
 }
@@ -786,7 +785,7 @@ void atari_fdc_device::device_start()
 
 	for(id=0;id<4;id++)
 	{
-		floppy_install_load_proc(atari_floppy_get_device_child(id), _atari_load_proc);
+		atari_floppy_get_device_child(id)->floppy_install_load_proc(_atari_load_proc);
 	}
 }
 

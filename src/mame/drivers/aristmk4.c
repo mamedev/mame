@@ -12,10 +12,12 @@
     ***************** INITIALISATION *********************************************************************
 
     Method 1 :
-    * Key in with the Jackpot Key followed by the Audit Key
+    * Key in with the Jackpot Key followed by the Audit Key (K+L Keys)
+    * Hit UP (W key) twice (for gunnrose only)
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * A value (displayed below) will appear next to RF/AMT on the right of the screen
     * Key out both the Jackpot and Audit Keys
+    
 
     This method works with the following games:
     3bagflnz 200
@@ -36,6 +38,7 @@
     swtht2nz 200
     wildone  200
     wtigernz 200
+    gunnrose
 
     Method 2 :
     * Key in with the Jackpot Key followed by the Audit Key
@@ -65,7 +68,7 @@
     eforest
     fhunter
     fhuntera
-
+    
     Technical Notes:
 
     68B09EP Motorola Processor
@@ -173,8 +176,11 @@
     Promoted Fortune Hunter and clone to working status, as they were in fact working for quite a while.
     Fixed ROM names for kgbird/kgbirda; 5c and 10c variants were mixed up.
 
-    11/12/13 - Lord-Data
+    11/12/2014 - Lord-Data
     Added hopper and meter outputs.
+
+    27/03/2014
+    Added new game: Gun's and Roses Poker - gunnrose
 
     ****************************************************************************
 
@@ -272,6 +278,7 @@
 #include "kgbird.lh"   // NZ 25cr with double up
 #include "topgear.lh"  // NZ 5 line without gamble
 #include "wildone.lh"  // Video poker
+#include "gunnrose.lh" // Video poker
 #include "gldnpkr.lh"  // Video poker
 
 UINT8 crtc_cursor_index = 0;
@@ -2371,6 +2378,30 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
+ROM_START( gunnrose ) // MK2.5
+	ROM_REGION(0x10000, "maincpu", 0 )
+		/* VIDEO AND SOUND EPROM */
+	ROM_LOAD("gnr.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3F3F4809534065C33ECA2CFFF0D1D2A3E3992406))	// 1VL/SH136 RED AND BLACK
+
+		/* GAME EPROMS */
+	ROM_LOAD("gnr.u9", 0x08000, 0x8000, CRC(4fb5f757) SHA1(A4129BCA7E573FAAC0D11DE41A9BF8EA144091EE))	// E/C606191SMP
+
+		/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("gnr.u8",  0x00000, 0x2000, CRC(dec9e695) SHA1(A596C4243D6D39E0611FF714E19E14188C90B6F1))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u10", 0x02000, 0x2000, CRC(e83b8e79) SHA1(595F41A5F59F938581A57B445370AA716C6B1409))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u12", 0x04000, 0x2000, CRC(9134d029) SHA1(D698FB91D8F5FA78FFD056149421008D3F12C456))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u9t", 0x06000, 0x2000, CRC(73a0c2cd) SHA1(662056D570EAA069483D378B77EFCFB42EFF6D0D))	// E/C606191SMP
+	ROM_LOAD("gnr.u11", 0x08000, 0x2000, CRC(c50adffe) SHA1(A7C4A3CDD4D5D31A1420E47859408CAA75CE2636))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u13", 0x0a000, 0x2000, CRC(e0a6bfc5) SHA1(07E4C8191503F0EA2DE4F7CE18FE6290D20EF80E))	// 1VL/SH136 RED AND BLACK
+
+		/* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 ) /* are either of these correct?  They are taken from different games */
+	//ROM_LOAD("2cm07.u71", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, BAD_DUMP CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+	
+ROM_END
+
 GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", GAME_NOT_WORKING, layout_topgear )
 GAMEL( 1996, eforest,  0,        aristmk4, eforest,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  )
 GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits
@@ -2397,3 +2428,4 @@ GAMEL( 1996, fhuntera, fhunter,  aristmk4, fhunter,  aristmk4_state, aristmk4, R
 GAMEL( 1996, arcwins,  0,        aristmk4, arcwins,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, USA)",             0, layout_arcwins  )
 GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",         0, layout_wildone  ) // 20c, $2 = 10 credits, video poker
 GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4_state, aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, New Zealand)", 0, layout_gldnpkr ) // possibly 20c, 1 coin = 1 credit, video poker
+GAMEL( 1993, gunnrose, 0,  aristmk4_poker, wildone,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Guns and Roses (C606191SMP, Australia)",    GAME_WRONG_COLORS, layout_gunnrose  )

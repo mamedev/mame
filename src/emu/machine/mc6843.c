@@ -139,10 +139,10 @@ void mc6843_device::device_reset()
 	/* setup/reset floppy drive */
 	for ( i = 0; i < 4; i++ )
 	{
-		device_t * img = floppy_image( i );
-		floppy_mon_w(img, CLEAR_LINE);
-		floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
-		floppy_drive_set_rpm( img, 300. );
+		legacy_floppy_image_device * img = floppy_image( i );
+		img->floppy_mon_w(CLEAR_LINE);
+		img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0 );
+		img->floppy_drive_set_rpm( 300. );
 	}
 	
 	/* reset registers */
@@ -162,9 +162,9 @@ void mc6843_device::device_reset()
 
 
 
-device_t* mc6843_device::floppy_image( UINT8 drive )
+legacy_floppy_image_device* mc6843_device::floppy_image( UINT8 drive )
 {
-	device_t *img = floppy_get_device( machine(), drive );
+	legacy_floppy_image_device *img = floppy_get_device( machine(), drive );
 	if (!img && owner()) {
 		// For slot devices, drives are typically attached to the slot rather than the machine
 		const char *floppy_name = NULL;
@@ -182,13 +182,13 @@ device_t* mc6843_device::floppy_image( UINT8 drive )
 			floppy_name = FLOPPY_3;
 			break;
 		}
-		img = owner()->subdevice(floppy_name);
+		img = owner()->subdevice<legacy_floppy_image_device>(floppy_name);
 	}
 	return img;
 }
 
 
-device_t* mc6843_device::floppy_image( )
+legacy_floppy_image_device* mc6843_device::floppy_image( )
 {
 	return floppy_image( m_drive );
 }
@@ -262,24 +262,24 @@ void mc6843_device::cmd_end( )
 /* Seek Track Zero bottom half */
 void mc6843_device::finish_STZ( )
 {
-	device_t* img = floppy_image( );
+	legacy_floppy_image_device* img = floppy_image( );
 	int i;
 
 	/* seek to track zero */
 	for ( i=0; i<83; i++ )
 	{
-		if (floppy_tk00_r(img) == CLEAR_LINE)
+		if (img->floppy_tk00_r() == CLEAR_LINE)
 			break;
-		floppy_drive_seek( img, -1 );
+		img->floppy_drive_seek( -1 );
 	}
 
-	LOG(( "%f mc6843_finish_STZ: actual=%i\n", machine().time().as_double(), floppy_drive_get_current_track( img ) ));
+	LOG(( "%f mc6843_finish_STZ: actual=%i\n", machine().time().as_double(), img->floppy_drive_get_current_track() ));
 
 	/* update state */
 	m_CTAR = 0;
 	m_GCR = 0;
 	m_SAR = 0;
-	m_STRB |= floppy_tk00_r(img) << 4;
+	m_STRB |= img->floppy_tk00_r() << 4;
 
 	cmd_end( );
 }
@@ -289,13 +289,13 @@ void mc6843_device::finish_STZ( )
 /* Seek bottom half */
 void mc6843_device::finish_SEK( )
 {
-	device_t* img = floppy_image( );
+	legacy_floppy_image_device* img = floppy_image( );
 
 	/* seek to track */
 	// TODO: not sure how CTAR bit 7 is handled here, but this is the safest approach for now
-	floppy_drive_seek( img, m_GCR - (m_CTAR & 0x7F) );
+	img->floppy_drive_seek( m_GCR - (m_CTAR & 0x7F) );
 
-	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", machine().time().as_double(), (m_CTAR & 0x7F), m_GCR, floppy_drive_get_current_track( img ) ));
+	LOG(( "%f mc6843_finish_SEK: from %i to %i (actual=%i)\n", machine().time().as_double(), (m_CTAR & 0x7F), m_GCR, img->floppy_drive_get_current_track() ));
 
 	/* update state */
 	m_CTAR = m_GCR;
@@ -308,12 +308,12 @@ void mc6843_device::finish_SEK( )
 /* preamble to all sector read / write commands, returns 1 if found */
 int mc6843_device::address_search( chrn_id* id )
 {
-	device_t* img = floppy_image( );
+	legacy_floppy_image_device* img = floppy_image( );
 	int r = 0;
 
 	while ( 1 )
 	{
-		if ( ( ! floppy_drive_get_next_id( img, m_side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
+		if ( ( ! img->floppy_drive_get_next_id( m_side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
 		{
 			/* read address error */
 			LOG(( "%f mc6843_address_search: get_next_id failed\n", machine().time().as_double() ));
@@ -343,7 +343,7 @@ int mc6843_device::address_search( chrn_id* id )
 			return 1;
 		}
 
-		if ( floppy_drive_get_flag_state( img, FLOPPY_DRIVE_INDEX ) )
+		if ( img->floppy_drive_get_flag_state( FLOPPY_DRIVE_INDEX ) )
 		{
 			r++;
 			if ( r >= 4 )
@@ -403,14 +403,14 @@ void mc6843_device::finish_RCR( )
 void mc6843_device::cont_SR( )
 {
 	chrn_id id;
-	device_t* img = floppy_image( );
+	legacy_floppy_image_device* img = floppy_image( );
 
 	/* sector seek */
 	if ( ! address_search_read( &id ) )
 		return;
 
 	/* sector read */
-	floppy_drive_read_sector_data( img, m_side, id.data_id, m_data, 128 );
+	img->floppy_drive_read_sector_data( m_side, id.data_id, m_data, 128 );
 	m_data_idx = 0;
 	m_data_size = 128;
 	m_STRA |= 0x01;     /* set Data Transfer Request */
@@ -551,7 +551,7 @@ READ8_MEMBER( mc6843_device::read )
 		data = m_CTAR;
 		LOG(( "%f %s mc6843_r: read CTAR %i (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), data,
-				floppy_drive_get_current_track( floppy_image( ) ) ));
+				floppy_image()->floppy_drive_get_current_track()));
 		break;
 
 	case 2: /* Interrupt Status Register (ISR) */
@@ -569,14 +569,14 @@ READ8_MEMBER( mc6843_device::read )
 	case 3: /* Status Register A (STRA) */
 	{
 		/* update */
-		device_t* img = floppy_image( );
-		int flag = floppy_drive_get_flag_state( img, FLOPPY_DRIVE_READY);
+		legacy_floppy_image_device* img = floppy_image( );
+		int flag = img->floppy_drive_get_flag_state( FLOPPY_DRIVE_READY);
 		m_STRA &= 0xa3;
 		if ( flag & FLOPPY_DRIVE_READY )
 			m_STRA |= 0x04;
 
-		m_STRA |= !floppy_tk00_r(img) << 3;
-		m_STRA |= !floppy_wpt_r(img) << 4;
+		m_STRA |= !img->floppy_tk00_r() << 3;
+		m_STRA |= !img->floppy_wpt_r() << 4;
 
 		if ( m_index_pulse )
 			m_STRA |= 0x40;
@@ -605,7 +605,7 @@ READ8_MEMBER( mc6843_device::read )
 		data = m_LTAR;
 		LOG(( "%f %s mc6843_r: read LTAR %i (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), data,
-				floppy_drive_get_current_track( floppy_image( ) ) ));
+				floppy_image()->floppy_drive_get_current_track()));
 		break;
 
 	default:
@@ -639,12 +639,12 @@ WRITE8_MEMBER( mc6843_device::write )
 			if ( m_data_idx >= m_data_size )
 			{
 				/* end of sector write */
-				device_t* img = floppy_image( );
+				legacy_floppy_image_device* img = floppy_image( );
 
 				LOG(( "%f %s mc6843_w: write sector %i\n", machine().time().as_double(), machine().describe_context(), m_data_id ));
 
-				floppy_drive_write_sector_data(
-					img, m_side, m_data_id,
+				img->floppy_drive_write_sector_data(
+					m_side, m_data_id,
 					m_data, m_data_size,
 					(cmd == CMD_SWD) ? ID_FLAG_DELETED_DATA : 0 );
 
@@ -701,12 +701,12 @@ WRITE8_MEMBER( mc6843_device::write )
 				if ( (m_data[2] == 0) && (m_data[4] == 0) )
 				{
 					/* valid address id field */
-					device_t* img = floppy_image( );
+					legacy_floppy_image_device* img = floppy_image( );
 					UINT8 track  = m_data[1];
 					UINT8 sector = m_data[3];
 					UINT8 filler = 0xe5; /* standard Thomson filler */
 					LOG(( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector));
-					floppy_drive_format_sector( img, m_side, sector, track, 0, sector, 0, filler );
+					img->floppy_drive_format_sector( m_side, sector, track, 0, sector, 0, filler );
 				}
 				else
 				{
@@ -736,7 +736,7 @@ WRITE8_MEMBER( mc6843_device::write )
 		m_CTAR = data;
 		LOG(( "%f %s mc6843_w: set CTAR to %i %02X (actual=%i) \n",
 				machine().time().as_double(), machine().describe_context(), m_CTAR, data,
-				floppy_drive_get_current_track( floppy_image( ) ) ));
+				floppy_image()->floppy_drive_get_current_track()));
 		break;
 
 	case 2: /* Command Register (CMR) */
@@ -816,7 +816,7 @@ WRITE8_MEMBER( mc6843_device::write )
 		m_LTAR = data & 0x7f;
 		LOG(( "%f %s mc6843_w: set LTAR to %i %02X (actual=%i)\n",
 				machine().time().as_double(), machine().describe_context(), m_LTAR, data,
-				floppy_drive_get_current_track( floppy_image( ) ) ));
+				floppy_image()->floppy_drive_get_current_track()));
 		break;
 
 	default:

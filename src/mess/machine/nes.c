@@ -962,8 +962,8 @@ DRIVER_INIT_MEMBER(nes_state,famicom)
 	m_fds_ram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
 	save_pointer(NAME(m_fds_ram), 0x8000);
 
-	floppy_install_load_proc(floppy_get_device(machine(), 0), nes_load_proc);
-	floppy_install_unload_proc(floppy_get_device(machine(), 0), nes_unload_proc);
+	floppy_get_device(machine(), 0)->floppy_install_load_proc(nes_load_proc);
+	floppy_get_device(machine(), 0)->floppy_install_unload_proc(nes_unload_proc);
 
 	// setup alt input handlers for additional FC input devices
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);

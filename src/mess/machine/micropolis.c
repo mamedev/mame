@@ -28,7 +28,6 @@ BE02 and BE03 - read data, write data
 
 
 #include "emu.h"
-#include "imagedev/flopdrv.h"
 #include "machine/micropolis.h"
 
 
@@ -162,15 +161,15 @@ void micropolis_device::device_reset()
 	{
 		if(m_floppy_drive_tags[i])
 		{
-			device_t *img = NULL;
+			legacy_floppy_image_device *img = NULL;
 
-			img = siblingdevice(m_floppy_drive_tags[i]);
+			img = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[i]);
 
 			if (img)
 			{
-				floppy_drive_set_controller(img, this);
-				//floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
-				floppy_drive_set_rpm( img, 300.);
+				img->floppy_drive_set_controller(this);
+				//img->floppy_drive_set_index_pulse_callback( wd17xx_index_pulse_callback);
+				img->floppy_drive_set_rpm( 300.);
 			}
 		}
 	}
@@ -197,7 +196,7 @@ void micropolis_device::read_sector()
 	m_data_count = m_sector_length;
 
 	/* read data */
-	floppy_drive_read_sector_data(m_drive, 0, m_sector, (char *)m_buffer, m_sector_length);
+	m_drive->floppy_drive_read_sector_data(0, m_sector, (char *)m_buffer, m_sector_length);
 }
 
 
@@ -213,7 +212,7 @@ void micropolis_device::write_sector()
 	m_data_count = m_sector_length;
 
 	/* write data */
-	floppy_drive_write_sector_data(m_drive, 0, m_sector, (char *)m_buffer, m_sector_length, m_write_cmd & 0x01);
+	m_drive->floppy_drive_write_sector_data(0, m_sector, (char *)m_buffer, m_sector_length, m_write_cmd & 0x01);
 #endif
 }
 
@@ -231,7 +230,7 @@ void micropolis_device::set_drive(UINT8 drive)
 		logerror("micropolis_set_drive: $%02x\n", drive);
 
 	if (m_floppy_drive_tags[drive])
-		m_drive = siblingdevice(m_floppy_drive_tags[drive]);
+		m_drive = siblingdevice<legacy_floppy_image_device>(m_floppy_drive_tags[drive]);
 }
 
 
@@ -287,9 +286,9 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	{
 	case 1:
 		m_drive_num = data & 3;
-		floppy_mon_w(m_drive, 1); // turn off the old drive
+		m_drive->floppy_mon_w(1); // turn off the old drive
 		set_drive(m_drive_num); // select new drive
-		floppy_mon_w(m_drive, 0); // turn it on
+		m_drive->floppy_mon_w(0); // turn it on
 		break;
 	case 2:  // not emulated, not used in sorcerer
 		break;
@@ -323,13 +322,13 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 	if (BIT(data, 5))
 		m_status |= STAT_READY;
 
-	floppy_drive_set_ready_state(m_drive, 1,0);
+	m_drive->floppy_drive_set_ready_state(1,0);
 
 
 	if (!m_track)
 		m_status |= STAT_TRACK0;
 
-	floppy_drive_seek(m_drive, direction);
+	m_drive->floppy_drive_seek(direction);
 }
 
 

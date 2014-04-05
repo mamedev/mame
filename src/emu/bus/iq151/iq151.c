@@ -218,5 +218,5 @@ bool iq151cart_slot_device::call_softlist_load(software_list_device &swlist, con
 
 void iq151cart_slot_device::get_default_card_software(astring &result)
 {
-	software_get_default_slot(result, NULL);
+	software_get_default_slot(result, "basic6");
 }

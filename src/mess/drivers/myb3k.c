@@ -127,8 +127,8 @@ WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
 	m_fdc->set_drive(data & 3);
-	floppy_mon_w(floppy_get_device(machine(), data & 3), !(data & 4) ? 1: 0);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x4,0);
+	floppy_get_device(machine(), data & 3)->floppy_mon_w(!(data & 4) ? 1: 0);
+	floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(data & 0x4,0);
 	//m_fdc->set_side((data & 0x10)>>4);
 }
 

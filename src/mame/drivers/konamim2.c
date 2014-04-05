@@ -1150,9 +1150,7 @@ INPUT_PORTS_END
 
 static const powerpc_config ppc602_config =
 {
-	33000000,           /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	NULL,
-	NULL
+	33000000           /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
 };
 
 INTERRUPT_GEN_MEMBER(konamim2_state::m2)

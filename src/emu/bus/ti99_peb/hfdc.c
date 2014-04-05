@@ -304,11 +304,11 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 		if (index==-1) return 0;
 
 		/* Get floppy status. */
-		if (floppy_drive_get_flag_state(m_floppy_unit[index], FLOPPY_DRIVE_INDEX) == FLOPPY_DRIVE_INDEX)
+		if (m_floppy_unit[index]->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX) == FLOPPY_DRIVE_INDEX)
 			reply |= DS_INDEX;
-		if (floppy_tk00_r(m_floppy_unit[index]) == CLEAR_LINE)
+		if (m_floppy_unit[index]->floppy_tk00_r() == CLEAR_LINE)
 			reply |= DS_TRK00;
-		if (floppy_wpt_r(m_floppy_unit[index]) == CLEAR_LINE)
+		if (m_floppy_unit[index]->floppy_wpt_r() == CLEAR_LINE)
 			reply |= DS_WRPROT;
 
 		/* if (image_exists(disk_img)) */
@@ -321,7 +321,7 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 	{
 		UINT8 state;
 		index = slog2((m_output1_latch>>4) & 0x0f)-1;
-		mfm_harddisk_device *hd = static_cast<mfm_harddisk_device *>(m_harddisk_unit[index]);
+		mfm_harddisk_device *hd = m_harddisk_unit[index];
 		state = hd->get_status();
 
 		if (state & MFMHD_TRACK00)      reply |= DS_TRK00;
@@ -338,8 +338,6 @@ READ8_MEMBER( myarc_hfdc_device::auxbus_in )
 WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 {
 	int index;
-	device_t* selected_drive = NULL;
-
 	switch (offset)
 	{
 	case INPUT_STATUS:
@@ -363,16 +361,15 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 		{
 			// Floppy selected
 			index = slog2(data & 0x0f);
-			if (index>=0) selected_drive = m_floppy_unit[index];
+			if (index>=0) m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 		}
 		else
 		{
 			// HD selected
 			index = slog2((data>>4) & 0x0f);
-			if (index>=0) selected_drive = m_harddisk_unit[index-1];
+			if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
 		}
 
-		m_hdc9234->connect_drive(selected_drive);
 		m_output1_latch = data;
 		break;
 
@@ -536,14 +533,14 @@ void myarc_hfdc_device::device_reset()
 	m_selected = false;
 
 	// Find the floppies and hard disks
-	m_floppy_unit[0] = m_slot->get_drive(FLOPPY_0);
-	m_floppy_unit[1] = m_slot->get_drive(FLOPPY_1);
-	m_floppy_unit[2] = m_slot->get_drive(FLOPPY_2);
-	m_floppy_unit[3] = m_slot->get_drive(FLOPPY_3);
+	m_floppy_unit[0] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_0));
+	m_floppy_unit[1] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_1));
+	m_floppy_unit[2] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_2));
+	m_floppy_unit[3] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_3));
 
-	m_harddisk_unit[0] = m_slot->get_drive(MFMHD_0);
-	m_harddisk_unit[1] = m_slot->get_drive(MFMHD_1);
-	m_harddisk_unit[2] = m_slot->get_drive(MFMHD_2);
+	m_harddisk_unit[0] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_0));
+	m_harddisk_unit[1] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_1));
+	m_harddisk_unit[2] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_2));
 
 	if (ioport("HFDCDIP")->read()&0x55)
 		ti99_set_80_track_drives(TRUE);
@@ -560,7 +557,7 @@ void myarc_hfdc_device::device_reset()
 		{
 			//  floppy_drive_set_controller(card->floppy_unit[i], device);
 			//  floppy_drive_set_index_pulse_callback(floppy_unit[i], smc92x4_index_pulse_callback);
-			floppy_drive_set_geometry(m_floppy_unit[i], floptype);
+			m_floppy_unit[i]->floppy_drive_set_geometry(floptype);
 		}
 	}
 

@@ -42,24 +42,6 @@ void vp575_device::update_interrupts()
 	m_slot->dma_in_w(dma_in);
 }
 
-WRITE_LINE_MEMBER( vp575_device::exp1_int_w ) { m_int[0] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp2_int_w ) { m_int[1] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp3_int_w ) { m_int[2] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp4_int_w ) { m_int[3] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp5_int_w ) { m_int[4] = state; update_interrupts(); }
-
-WRITE_LINE_MEMBER( vp575_device::exp1_dma_out_w ) { m_dma_out[0] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp2_dma_out_w ) { m_dma_out[1] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp3_dma_out_w ) { m_dma_out[2] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp4_dma_out_w ) { m_dma_out[3] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp5_dma_out_w ) { m_dma_out[4] = state; update_interrupts(); }
-
-WRITE_LINE_MEMBER( vp575_device::exp1_dma_in_w ) { m_dma_in[0] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp2_dma_in_w ) { m_dma_in[1] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp3_dma_in_w ) { m_dma_in[2] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp4_dma_in_w ) { m_dma_in[3] = state; update_interrupts(); }
-WRITE_LINE_MEMBER( vp575_device::exp5_dma_in_w ) { m_dma_in[4] = state; update_interrupts(); }
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( vp575 )
@@ -67,15 +49,29 @@ WRITE_LINE_MEMBER( vp575_device::exp5_dma_in_w ) { m_dma_in[4] = state; update_i
 
 static MACHINE_CONFIG_FRAGMENT( vp575 )
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp1", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp1_int_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp1_dma_out_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp1_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp1_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp1_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp1_dma_in_w))
+
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp2", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp2_int_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp2_dma_out_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp2_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp2_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp2_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp2_dma_in_w))
+
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp3", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp3_int_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp3_dma_out_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp3_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp3_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp3_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp3_dma_in_w))
+
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp4", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp4_int_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp4_dma_out_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp4_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp4_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp4_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp4_dma_in_w))
+
 	MCFG_VIP_EXPANSION_SLOT_ADD("exp5", XTAL_3_52128MHz/2, vip_expansion_cards, NULL)
-	MCFG_VIP_EXPANSION_SLOT_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp5_int_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp5_dma_out_w), DEVWRITELINE(DEVICE_SELF_OWNER, vp575_device, exp5_dma_in_w))
+	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vp575_device, exp5_int_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vp575_device, exp5_dma_out_w))
+	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vp575_device, exp5_dma_in_w))
 MACHINE_CONFIG_END
 
 

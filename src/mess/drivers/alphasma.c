@@ -383,7 +383,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
 	MCFG_CPU_IO_MAP(alphasmart_io)
-	MCFG_MC68HC11_CONFIG(0, 0, 0x00) // FIXME: internal ram should be 192, but the 68hc11 core doesn't handle internal RAM correctly
+	MCFG_MC68HC11_CONFIG(0, 192, 0x00)
 
 	MCFG_KS0066_F05_ADD("ks0066_0")
 	MCFG_HD44780_LCD_SIZE(2, 40)

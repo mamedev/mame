@@ -93,10 +93,10 @@ private:
 	UINT8           m_output2_latch;
 
 	/* Connected floppy drives. */
-	device_t*       m_floppy_unit[HFDC_MAX_FLOPPY];
+	legacy_floppy_image_device*       m_floppy_unit[HFDC_MAX_FLOPPY];
 
 	/* Connected harddisk drives. */
-	device_t*       m_harddisk_unit[HFDC_MAX_HARD];
+	mfm_harddisk_device*       m_harddisk_unit[HFDC_MAX_HARD];
 
 	/* DMA address latch */
 	UINT32          m_dma_address;

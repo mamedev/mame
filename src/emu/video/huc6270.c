@@ -94,24 +94,10 @@ const device_type HUC6270 = &device_creator<huc6270_device>;
 
 const UINT8 huc6270_device::vram_increments[4] = { 1, 32, 64, 128 };
 
-
-void huc6270_device::device_config_complete()
-{
-	const huc6270_interface *intf = reinterpret_cast<const huc6270_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<huc6270_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_irq_changed, 0, sizeof(m_irq_changed));
-	}
-}
-
-
 huc6270_device::huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__)
+	: device_t(mconfig, HUC6270, "HuC6270 VDC", tag, owner, clock, "huc6270", __FILE__),
+	m_vram_size(0),
+	m_irq_changed_cb(*this)
 {
 }
 
@@ -293,7 +279,7 @@ void huc6270_device::select_sprites()
 		if ( m_cr & 0x02 )
 		{
 			m_status |= HUC6270_OR;
-			m_irq_changed( ASSERT_LINE );
+			m_irq_changed_cb( ASSERT_LINE );
 		}
 	}
 }
@@ -306,7 +292,7 @@ inline void huc6270_device::handle_vblank()
 		if ( m_cr & 0x08 )
 		{
 			m_status |= HUC6270_VD;
-			m_irq_changed( ASSERT_LINE );
+			m_irq_changed_cb( ASSERT_LINE );
 		}
 
 		/* Should we initiate a VRAM->SATB DMA transfer.
@@ -331,7 +317,7 @@ inline void huc6270_device::handle_vblank()
 			{
 				m_satb_countdown = 4;
 //                  m_status |= HUC6270_DS;
-//                  m_irq_changed( ASSERT_LINE );
+//                  m_irq_changed_cb( ASSERT_LINE );
 			}
 		}
 
@@ -471,7 +457,7 @@ READ16_MEMBER( huc6270_device::next_pixel )
 			if ( collission && ( m_cr & 0x01 ) )
 			{
 				m_status |= HUC6270_CR;
-				m_irq_changed( ASSERT_LINE );
+				m_irq_changed_cb( ASSERT_LINE );
 			}
 		}
 	}
@@ -533,7 +519,7 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 				if ( m_dcr & 0x0002 )
 				{
 					m_status |= HUC6270_DV;
-					m_irq_changed( ASSERT_LINE );
+					m_irq_changed_cb( ASSERT_LINE );
 				}
 				m_dma_enabled = 0;
 			}
@@ -559,7 +545,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			if ( m_satb_countdown == 0 )
 			{
 				m_status |= HUC6270_DS;
-				m_irq_changed( ASSERT_LINE );
+				m_irq_changed_cb( ASSERT_LINE );
 			}
 		}
 
@@ -581,7 +567,7 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 		if ( m_raster_count == m_rcr && ( m_cr & 0x04 ) )
 		{
 			m_status |= HUC6270_RR;
-			m_irq_changed( ASSERT_LINE );
+			m_irq_changed_cb( ASSERT_LINE );
 		}
 	}
 
@@ -598,7 +584,7 @@ READ8_MEMBER( huc6270_device::read )
 		case 0x00:  /* status */
 			data = m_status;
 			m_status &= ~( HUC6270_VD | HUC6270_DV | HUC6270_RR | HUC6270_CR | HUC6270_OR | HUC6270_DS );
-			m_irq_changed( CLEAR_LINE );
+			m_irq_changed_cb( CLEAR_LINE );
 			break;
 
 		case 0x02:
@@ -654,7 +640,7 @@ WRITE8_MEMBER( huc6270_device::write )
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
 //                  {
 //                      m_status |= HUC6270_RR;
-//                      m_irq_changed( ASSERT_LINE );
+//                      m_irq_changed_cb( ASSERT_LINE );
 //                  }
 //if (LOG) printf("%04x: RCR (%03x) written at %d,%d\n", activecpu_get_pc(), huc6270->m_rcr, video_screen_get_vpos(device->machine->first_screen()), video_screen_get_hpos(device->machine->first_screen()) );
 					break;
@@ -745,7 +731,7 @@ WRITE8_MEMBER( huc6270_device::write )
 //                  if ( m_raster_count == m_rcr && m_cr & 0x04 )
 //                  {
 //                      m_status |= HUC6270_RR;
-//                      m_irq_changed( ASSERT_LINE );
+//                      m_irq_changed_cb( ASSERT_LINE );
 //                  }
 					break;
 
@@ -814,14 +800,12 @@ WRITE8_MEMBER( huc6270_device::write )
 void huc6270_device::device_start()
 {
 	/* Resolve callbacks */
-	m_irq_changed.resolve( irq_changed, *this );
+	m_irq_changed_cb.resolve_safe();
 
-	assert( ! m_irq_changed.isnull() );
+	m_vram = auto_alloc_array_clear(machine(), UINT16, m_vram_size/sizeof(UINT16));
+	m_vram_mask = (m_vram_size >> 1) - 1;
 
-	m_vram = auto_alloc_array_clear(machine(), UINT16, vram_size/sizeof(UINT16));
-	m_vram_mask = (vram_size >> 1) - 1;
-
-	save_pointer(NAME(m_vram), vram_size/sizeof(UINT16));
+	save_pointer(NAME(m_vram), m_vram_size/sizeof(UINT16));
 
 	save_item(NAME(m_register_index));
 	save_item(NAME(m_mawr));

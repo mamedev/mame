@@ -126,7 +126,7 @@ void ms0515_state::machine_reset()
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;
 
-	floppy_mon_w(machine().device(FLOPPY_0), 0); // turn it on
+	machine().device<legacy_floppy_image_device>(FLOPPY_0)->floppy_mon_w(0); // turn it on
 }
 
 /* Input ports */

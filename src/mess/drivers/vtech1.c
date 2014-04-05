@@ -669,7 +669,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 
 	for(id=0;id<2;id++)
 	{
-		floppy_install_load_proc(floppy_get_device(machine(), id), vtech1_load_proc);
+		floppy_get_device(machine(), id)->floppy_install_load_proc(vtech1_load_proc);
 	}
 }
 

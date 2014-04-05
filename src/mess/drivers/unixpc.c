@@ -117,7 +117,7 @@ WRITE16_MEMBER( unixpc_state::disk_control_w )
 {
 	logerror("disk_control_w: %04x\n", data);
 
-	floppy_mon_w(m_floppy, !BIT(data, 5));
+	m_floppy->floppy_mon_w(!BIT(data, 5));
 
 	// bit 6 = floppy selected / not selected
 	m_wd2797->set_drive(0);

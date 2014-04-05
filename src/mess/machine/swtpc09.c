@@ -154,21 +154,21 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 	    case 0x0e:
 		    m_fdc->set_drive(0);
 		     // need to set drive ready as sw checks before doing anything
-		    floppy_drive_set_ready_state(machine().device("floppy0"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
 			break;
 	    case 0x0d:
 		    m_fdc->set_drive(1);
-		    floppy_drive_set_ready_state(machine().device("floppy1"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
 			break;
 
 	    case 0x0b:
 		    m_fdc->set_drive(2);
-		    floppy_drive_set_ready_state(machine().device("floppy2"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 	    case 0x07:
 		    m_fdc->set_drive(3);
-		    floppy_drive_set_ready_state(machine().device("floppy3"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 		default:
@@ -422,21 +422,21 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 	    case 0x01:
 		    m_fdc->set_drive(0);
 		     // need to set drive ready as sw checks before doing anything
-		    floppy_drive_set_ready_state(machine().device("floppy0"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
 			break;
 	    case 0x02:
 		    m_fdc->set_drive(1);
-		    floppy_drive_set_ready_state(machine().device("floppy1"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
 			break;
 
 	    case 0x04:
 		    m_fdc->set_drive(2);
-		    floppy_drive_set_ready_state(machine().device("floppy2"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 	    case 0x08:
 		    m_fdc->set_drive(3);
-		    floppy_drive_set_ready_state(machine().device("floppy3"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 		default:
@@ -476,21 +476,21 @@ WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 	    case 0x00:
 		    m_fdc->set_drive(0);
 		     // need to set drive ready as sw checks before doing anything
-		    floppy_drive_set_ready_state(machine().device("floppy0"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy0")->floppy_drive_set_ready_state(1,0);
 			break;
 	    case 0x01:
 		    m_fdc->set_drive(1);
-		    floppy_drive_set_ready_state(machine().device("floppy1"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy1")->floppy_drive_set_ready_state(1,0);
 			break;
 
 	    case 0x02:
 		    m_fdc->set_drive(2);
-		    floppy_drive_set_ready_state(machine().device("floppy2"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy2")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 	    case 0x03:
 		    m_fdc->set_drive(3);
-		    floppy_drive_set_ready_state(machine().device("floppy3"), 1,0);
+		    machine().device<legacy_floppy_image_device>("floppy3")->floppy_drive_set_ready_state(1,0);
 	        break;
 
 		default:

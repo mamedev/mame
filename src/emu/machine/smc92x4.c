@@ -200,7 +200,7 @@ smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, d
 
 int smc92x4_device::image_is_single_density()
 {
-	floppy_image_legacy *image = flopimg_get_image(m_drive);
+	floppy_image_legacy *image = m_drive->flopimg_get_image();
 	return (floppy_get_track_size(image, 0, 0)<4000);
 }
 
@@ -436,7 +436,6 @@ void smc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int redcur;
 	int precomp;
 	int write_long;
-	mfm_harddisk_device *harddisk;
 
 	switch (id)
 	{
@@ -481,14 +480,13 @@ void smc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			else
 			{
 				if (VERBOSE>5) LOG("smc92x4 step %s direction %d\n", m_drive->tag(), m_step_direction);
-				floppy_drive_seek(m_drive, m_step_direction);
+				m_drive->floppy_drive_seek(m_step_direction);
 			}
 		}
 		else
 		{
 			if (VERBOSE>6) LOG("smc92x4 step harddisk direction %d\n", m_step_direction);
-			harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-			harddisk->seek(m_step_direction);
+			m_harddisk->seek(m_step_direction);
 		}
 		sync_status_in();
 		break;
@@ -566,7 +564,6 @@ void smc92x4_device::read_id_field(int *steps, int *direction, chrn_id_hd *id)
 {
 	int des_cylinder, cur_cylinder;
 	bool found = false;
-	mfm_harddisk_device *harddisk;
 
 	sync_latches_out();
 	sync_status_in();
@@ -579,7 +576,7 @@ void smc92x4_device::read_id_field(int *steps, int *direction, chrn_id_hd *id)
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
 		chrn_id idflop;
-		if (flopimg_get_image(m_drive) == NULL)
+		if (m_drive->flopimg_get_image() == NULL)
 		{
 			if (VERBOSE>2) LOG("smc92x4 warn: No disk in drive\n");
 			m_register_r[CHIP_STATUS] |= CS_SYNCERR;
@@ -590,7 +587,7 @@ void smc92x4_device::read_id_field(int *steps, int *direction, chrn_id_hd *id)
 		if ((image_is_single_density() && in_single_density_mode())
 			|| (!image_is_single_density() && !in_single_density_mode()))
 		{
-			found = floppy_drive_get_next_id(m_drive, m_register_w[DESIRED_HEAD]&0x0f, &idflop);
+			found = m_drive->floppy_drive_get_next_id(m_register_w[DESIRED_HEAD]&0x0f, &idflop);
 			copyid(idflop, id); /* Need to use bigger values for HD, but we don't use separate variables here */
 		}
 		else
@@ -608,9 +605,7 @@ void smc92x4_device::read_id_field(int *steps, int *direction, chrn_id_hd *id)
 	}
 	else
 	{
-		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-
-		harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
+		m_harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
 		sync_status_in();
 		if (!(m_register_r[DRIVE_STATUS]& DS_READY))
 		{
@@ -670,7 +665,6 @@ int smc92x4_device::verify(chrn_id_hd *id, bool check_sector)
 	int found = false;
 	int foundsect = false;
 	int des_cylinder = 0;
-	mfm_harddisk_device *harddisk;
 
 	// Set command termination code. The error code is set first, and
 	// on success, it is cleared.
@@ -683,7 +677,7 @@ int smc92x4_device::verify(chrn_id_hd *id, bool check_sector)
 		if (m_selected_drive_type & TYPE_FLOPPY)
 		{
 			chrn_id idflop;
-			found = floppy_drive_get_next_id(m_drive, m_register_w[DESIRED_HEAD]&0x0f, &idflop);
+			found = m_drive->floppy_drive_get_next_id(m_register_w[DESIRED_HEAD]&0x0f, &idflop);
 			copyid(idflop, id);
 			if (/* pass==1 && */!found)
 			{
@@ -694,8 +688,7 @@ int smc92x4_device::verify(chrn_id_hd *id, bool check_sector)
 		}
 		else
 		{
-			harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-			harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
+			m_harddisk->get_next_id(m_register_w[DESIRED_HEAD]&0x0f, id);
 			sync_status_in();
 			if (!(m_register_r[DRIVE_STATUS]& DS_READY))
 			{
@@ -742,7 +735,6 @@ int smc92x4_device::verify(chrn_id_hd *id, bool check_sector)
 void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 {
 	int i, retry, sector_len;
-	mfm_harddisk_device *harddisk;
 
 	int sector_data_id;
 	dynamic_buffer buf;
@@ -780,13 +772,12 @@ void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
-		floppy_drive_read_sector_data(m_drive, id.H, sector_data_id, buf, sector_len);
+		m_drive->floppy_drive_read_sector_data(id.H, sector_data_id, buf, sector_len);
 	}
 	else
 	{
 		// TODO: Should we get the sector length from the harddisk?
-		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-		harddisk->read_sector(id.C, id.H, id.R, buf);
+		m_harddisk->read_sector(id.C, id.H, id.R, buf);
 	}
 	sync_status_in();
 
@@ -837,7 +828,6 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 	int retry, i, sector_len;
 	dynamic_buffer buf;
 	int sector_data_id;
-	mfm_harddisk_device *harddisk;
 	sync_latches_out();
 	sync_status_in();
 
@@ -876,12 +866,11 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
 		if (VERBOSE>4) LOG("smc92x4 info: write sector CHS=(%d,%d,%d)\n", id.C, id.H, id.R);
-		floppy_drive_write_sector_data(m_drive, id.H, sector_data_id, buf, sector_len, false);
+		m_drive->floppy_drive_write_sector_data(id.H, sector_data_id, buf, sector_len, false);
 	}
 	else
 	{
-		harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-		harddisk->write_sector(id.C, id.H, id.R, buf);
+		m_harddisk->write_sector(id.C, id.H, id.R, buf);
 	}
 	sync_status_in();
 
@@ -1344,7 +1333,7 @@ void smc92x4_device::format_floppy_track(int flags)
 
 	sync_status_in();
 
-	floppy = flopimg_get_image(m_drive);
+	floppy = m_drive->flopimg_get_image();
 
 	if (floppy != NULL)
 		data_count = floppy_get_track_size(floppy, 0, 0);
@@ -1486,7 +1475,7 @@ void smc92x4_device::format_floppy_track(int flags)
 	memset(&buffer[index], gap_byte, gap4);
 	index += gap4;
 
-	floppy_drive_write_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, buffer, &data_count);
+	m_drive->floppy_drive_write_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, buffer, &data_count);
 	sync_status_in();
 }
 
@@ -1505,8 +1494,6 @@ void smc92x4_device::format_harddisk_track(int flags)
 
 	int normal_data_mark = flags & 0x10;
 	int data_count=0;
-
-	mfm_harddisk_device *harddisk = static_cast<mfm_harddisk_device *>(m_drive);
 
 	dynamic_buffer buffer;
 
@@ -1585,7 +1572,7 @@ void smc92x4_device::format_harddisk_track(int flags)
 	for (i=0; i < gap4; i++) buffer[index++] = gap_byte;
 
 	// Now write the whole track
-	harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
+	m_harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
 
 	sync_status_in();
 }
@@ -1618,7 +1605,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 
 	sync_latches_out();
 
-	floppy = flopimg_get_image(m_drive);
+	floppy = m_drive->flopimg_get_image();
 
 	/* Determine the track size. We cannot allow different sizes in this design. */
 	if (floppy != NULL)
@@ -1634,7 +1621,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 
 	buffer = global_alloc_array(UINT8, data_count);
 
-	floppy_drive_read_track_data_info_buffer(m_drive, m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
+	m_drive->floppy_drive_read_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
 	sync_status_in();
 
 	// Transfer the buffer to the external memory. We assume the memory
@@ -1662,15 +1649,13 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 	int i;
 	UINT8 *buffer;
 	int data_count=0;
-	mfm_harddisk_device *harddisk = static_cast<mfm_harddisk_device *>(m_drive);
-
 	sync_latches_out();
 
-	data_count = harddisk->get_track_length();
+	data_count = m_harddisk->get_track_length();
 	buffer = global_alloc_array(UINT8, data_count);
 
 	/* buffer and data_count are allocated and set by the function. */
-	harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
+	m_harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
 	sync_status_in();
 
 	if (!(m_register_r[DRIVE_STATUS] & DS_READY))
@@ -2004,9 +1989,18 @@ void smc92x4_device::set_timing(bool realistic)
 	if (VERBOSE>0) LOG("smc92x4: use realistic timing: %02x\n", realistic);
 }
 
-void smc92x4_device::connect_drive(device_t *drive)
+void smc92x4_device::connect_floppy_drive(legacy_floppy_image_device *drive)
 {
 	m_drive = drive;
+	if (VERBOSE>3)
+	{
+		if (drive==NULL) LOG("smc92x4: Unselect all drives\n");
+		else LOG("smc92x4: Connect drive %s\n", drive->tag());
+	}
+}
+void smc92x4_device::connect_hard_drive(mfm_harddisk_device *drive)
+{
+	m_harddisk = drive;
 	if (VERBOSE>3)
 	{
 		if (drive==NULL) LOG("smc92x4: Unselect all drives\n");

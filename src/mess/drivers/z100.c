@@ -380,8 +380,8 @@ WRITE8_MEMBER( z100_state::z207_fdc_w )
 			m_z207_cur_drive = data & 3;
 			break;
 		case 5: // aux control
-			floppy_mon_w(floppy_get_device(machine(), m_z207_cur_drive), !BIT(data, 1));
-			floppy_drive_set_ready_state(floppy_get_device(machine(), m_z207_cur_drive), data & 2,0);
+			floppy_get_device(machine(), m_z207_cur_drive)->floppy_mon_w(!BIT(data, 1));
+			floppy_get_device(machine(), m_z207_cur_drive)->floppy_drive_set_ready_state(data & 2,0);
 			break;
 
 	}

@@ -527,10 +527,10 @@ WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
 	m_fdc->dden_w(!BIT(data, 7));
 
 	/* CLEAR_LINE means to turn motors on */
-	floppy_mon_w(floppy_get_device(machine(), 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 2), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 3), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_get_device(machine(), 0)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_get_device(machine(), 1)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_get_device(machine(), 2)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
+	floppy_get_device(machine(), 3)->floppy_mon_w((data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER( trs80_state::sys80_f8_w )
@@ -781,10 +781,10 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 
 	if (drive > 3)
 	{   /* Turn motors off */
-		floppy_mon_w(floppy_get_device(machine(), 0), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(machine(), 1), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(machine(), 2), ASSERT_LINE);
-		floppy_mon_w(floppy_get_device(machine(), 3), ASSERT_LINE);
+		floppy_get_device(machine(), 0)->floppy_mon_w(ASSERT_LINE);
+		floppy_get_device(machine(), 1)->floppy_mon_w(ASSERT_LINE);
+		floppy_get_device(machine(), 2)->floppy_mon_w(ASSERT_LINE);
+		floppy_get_device(machine(), 3)->floppy_mon_w(ASSERT_LINE);
 		return;
 	}
 
@@ -792,10 +792,10 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 	m_fdc->set_side(m_head);
 
 	/* Turn motors on */
-	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 1), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 2), CLEAR_LINE);
-	floppy_mon_w(floppy_get_device(machine(), 3), CLEAR_LINE);
+	floppy_get_device(machine(), 0)->floppy_mon_w(CLEAR_LINE);
+	floppy_get_device(machine(), 1)->floppy_mon_w(CLEAR_LINE);
+	floppy_get_device(machine(), 2)->floppy_mon_w(CLEAR_LINE);
+	floppy_get_device(machine(), 3)->floppy_mon_w(CLEAR_LINE);
 }
 
 /*************************************

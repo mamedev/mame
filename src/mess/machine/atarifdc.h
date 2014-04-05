@@ -6,6 +6,8 @@
 #ifndef _ATARIFDC_H
 #define _ATARIFDC_H
 
+#include "imagedev/flopdrv.h"
+
 class atari_fdc_device : public device_t
 {
 public:
@@ -28,7 +30,7 @@ private:
 	void add_serin(UINT8 data, int with_checksum);
 	void a800_serial_command();
 	void a800_serial_write();
-	device_t *atari_floppy_get_device_child(int drive);
+	legacy_floppy_image_device *atari_floppy_get_device_child(int drive);
 
 	struct atari_drive
 	{

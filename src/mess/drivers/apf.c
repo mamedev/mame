@@ -260,9 +260,9 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 
 	m_fdc->set_drive(drive);
 	floppy_image_legacy *floppy;
-	floppy = flopimg_get_image(floppy_get_device(machine(), drive));
-	floppy_mon_w(floppy_get_device(machine(), drive), (floppy != NULL) ? 0 : 1);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), drive), (floppy != NULL) ? 1 : 0,0);
+	floppy = floppy_get_device(machine(), drive)->flopimg_get_image();
+	floppy_get_device(machine(), drive)->floppy_mon_w((floppy != NULL) ? 0 : 1);
+	floppy_get_device(machine(), drive)->floppy_drive_set_ready_state((floppy != NULL) ? 1 : 0,0);
 
 
 	logerror("disc w %04x %04x\n",offset,data);

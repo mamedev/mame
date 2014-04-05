@@ -5,6 +5,8 @@
 #ifndef __990_DK__
 #define __990_DK__
 
+#include "imagedev/flopdrv.h"
+
 extern const device_type FD800;
 
 #define MAX_FLOPPIES 4
@@ -57,7 +59,7 @@ private:
 
 	struct
 	{
-		device_image_interface *img;
+		legacy_floppy_image_device *img;
 		int phys_cylinder;
 		int log_cylinder[2];
 		int seclen;

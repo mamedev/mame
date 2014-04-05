@@ -146,7 +146,7 @@ protected:
 private:
 	void set_ready_line();
 	void set_all_geometries(floppy_type_t type);
-	void set_geometry(device_t *drive, floppy_type_t type);
+	void set_geometry(legacy_floppy_image_device *drive, floppy_type_t type);
 
 	// Recent address
 	int             m_address;

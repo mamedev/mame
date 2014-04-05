@@ -103,21 +103,21 @@ static int sony_enable2(void)
 static void load_track_data(device_t *device,int floppy_select)
 {
 	int track_size;
-	device_image_interface *cur_image;
+	legacy_floppy_image_device *cur_image;
 	UINT8 *new_data;
 	floppy_t *f;
 
 	f = &sony.floppy[floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
+	cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select);
 
-	floppy_image_legacy *fimg = flopimg_get_image(&cur_image->device());
+	floppy_image_legacy *fimg = cur_image->flopimg_get_image();
 
 	if (!fimg)
 	{
 		return;
 	}
 
-	track_size = floppy_get_track_size(fimg, f->head, floppy_drive_get_current_track(&cur_image->device()));
+	track_size = floppy_get_track_size(fimg, f->head, cur_image->floppy_drive_get_current_track());
 	if (f->loadedtrack_data) auto_free(device->machine(),f->loadedtrack_data);
 	new_data = auto_alloc_array(device->machine(),UINT8,track_size);
 	if (!new_data)
@@ -125,7 +125,7 @@ static void load_track_data(device_t *device,int floppy_select)
 		return;
 	}
 
-	floppy_drive_read_track_data_info_buffer(&cur_image->device(), f->head, new_data, &track_size);
+	cur_image->floppy_drive_read_track_data_info_buffer(f->head, new_data, &track_size);
 	f->loadedtrack_valid = 1;
 	f->loadedtrack_dirty = 0;
 	f->loadedtrack_size = track_size;
@@ -137,17 +137,17 @@ static void load_track_data(device_t *device,int floppy_select)
 
 static void save_track_data(device_t *device, int floppy_select)
 {
-	device_image_interface *cur_image;
+	legacy_floppy_image_device *cur_image;
 	floppy_t *f;
 	int len;
 
 	f = &sony.floppy[floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select));
+	cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select);
 
 	if (f->loadedtrack_dirty)
 	{
 		len = f->loadedtrack_size;
-		floppy_drive_write_track_data_info_buffer(&cur_image->device(), f->head, f->loadedtrack_data, &len);
+		cur_image->floppy_drive_write_track_data_info_buffer(f->head, f->loadedtrack_data, &len);
 		f->loadedtrack_dirty = 0;
 	}
 }
@@ -157,14 +157,14 @@ static void save_track_data(device_t *device, int floppy_select)
 UINT8 sony_read_data(device_t *device)
 {
 	UINT8 result = 0;
-	device_image_interface *cur_image;
+	legacy_floppy_image_device *cur_image;
 	floppy_t *f;
 
 	if (sony_enable2() || (! sony.floppy_enable))
 		return 0xFF;            /* right ??? */
 
 	f = &sony.floppy[sony.floppy_select];
-	cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select));
+	cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select);
 	if (!cur_image->exists())
 		return 0xFF;
 
@@ -206,10 +206,9 @@ void sony_write_data(device_t *device,UINT8 data)
 
 
 
-static int sony_rpm(floppy_t *f, device_t *cur_image)
+static int sony_rpm(floppy_t *f, legacy_floppy_image_device *cur_image)
 {
 	int result = 0;
-	device_image_interface *image =dynamic_cast<device_image_interface *>(cur_image);
 	/*
 	 * The Mac floppy controller was interesting in that its speed was adjusted
 	 * while the thing was running.  On the tracks closer to the rim, it was
@@ -253,8 +252,8 @@ static int sony_rpm(floppy_t *f, device_t *cur_image)
 			439     /* 64-79:   timing value ???? (acceptable range {021E-0222} */
 		};
 #endif
-		if (cur_image && image->exists())
-			result = speeds[floppy_drive_get_current_track(cur_image) / 16];
+		if (cur_image && cur_image->exists())
+			result = speeds[cur_image->floppy_drive_get_current_track() / 16];
 	}
 	return result;
 }
@@ -264,7 +263,7 @@ int sony_read_status(device_t *device)
 	int result = 1;
 	int action;
 	floppy_t *f;
-	device_image_interface *cur_image;
+	legacy_floppy_image_device *cur_image;
 
 	action = ((sony.lines & (SONY_CA1 | SONY_CA0)) << 2) | (sony.sel_line << 1) | ((sony.lines & SONY_CA2) >> 2);
 
@@ -277,7 +276,7 @@ int sony_read_status(device_t *device)
 	if ((! sony_enable2()) && sony.floppy_enable)
 	{
 		f = &sony.floppy[sony.floppy_select];
-		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select));
+		cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select);
 		if (!cur_image->exists())
 			cur_image = NULL;
 
@@ -314,7 +313,7 @@ int sony_read_status(device_t *device)
 			break;
 		case 0x06:  /* Disk is locked 0=locked 1=unlocked */
 			if (cur_image)
-				result = floppy_wpt_r(&cur_image->device());
+				result = cur_image->floppy_wpt_r();
 			else
 				result = 0;
 			break;
@@ -324,7 +323,7 @@ int sony_read_status(device_t *device)
 		case 0x09:  /* Number of sides: 0=single sided, 1=double sided */
 			if (cur_image)
 			{
-				floppy_image_legacy *fimg = flopimg_get_image(&cur_image->device());
+				floppy_image_legacy *fimg = cur_image->flopimg_get_image();
 				if (fimg)
 				{
 					result = floppy_get_heads_per_disk(fimg) - 1;
@@ -335,7 +334,7 @@ int sony_read_status(device_t *device)
 		case 0x0a:  /* At track 0: 0=track zero 1=not track zero */
 			logerror("%s sony.status(): reading Track 0\n", device->machine().describe_context());
 			if (cur_image)
-				result = floppy_tk00_r(&cur_image->device());
+				result = cur_image->floppy_tk00_r();
 			else
 				result = 0;
 			break;
@@ -346,7 +345,7 @@ int sony_read_status(device_t *device)
 			{
 				if (cur_image)
 				{
-					if (!floppy_dskchg_r(&cur_image->device()))
+					if (!cur_image->floppy_dskchg_r())
 					{
 						f->disk_switched = 1;
 					}
@@ -372,7 +371,7 @@ int sony_read_status(device_t *device)
 			/* (time in seconds) / (60 sec/minute) * (rounds/minute) * (60 pulses) * (2 pulse phases) */
 			if (cur_image)
 			{
-				result = ((int) (device->machine().time().as_double() / 60.0 * sony_rpm(f, &cur_image->device()) * 60.0 * 2.0)) & 1;
+				result = ((int) (device->machine().time().as_double() / 60.0 * sony_rpm(f, cur_image) * 60.0 * 2.0)) & 1;
 			}
 			break;
 		case 0x0f:  /* 400k/800k: Drive installed: 0=drive connected, 1=drive not connected */
@@ -400,7 +399,7 @@ static void sony_doaction(device_t *device)
 {
 	int action;
 	floppy_t *f;
-	device_image_interface *cur_image;
+	legacy_floppy_image_device *cur_image;
 
 	action = ((sony.lines & (SONY_CA1 | SONY_CA0)) << 2) | ((sony.lines & SONY_CA2) >> 2) | (sony.sel_line << 1);
 
@@ -413,7 +412,7 @@ static void sony_doaction(device_t *device)
 	if (sony.floppy_enable)
 	{
 		f = &sony.floppy[sony.floppy_select];
-		cur_image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select));
+		cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, sony.floppy_select);
 		if (!cur_image->exists())
 			cur_image = NULL;
 
@@ -433,21 +432,21 @@ static void sony_doaction(device_t *device)
 			{
 				save_track_data(device,sony.floppy_select);
 				if (f->step)
-					floppy_drive_seek(&cur_image->device(), -1);
+					cur_image->floppy_drive_seek(-1);
 				else
-					floppy_drive_seek(&cur_image->device(), +1);
+					cur_image->floppy_drive_seek(+1);
 				f->loadedtrack_valid = 0;
 			}
 			break;
 		case 0x08:  /* Turn motor on */
 			f->motor_on = CLEAR_LINE;
 			if (cur_image)
-				floppy_mon_w(&cur_image->device(), f->motor_on);
+				cur_image->floppy_mon_w(f->motor_on);
 			break;
 		case 0x09:  /* Turn motor off */
 			f->motor_on = ASSERT_LINE;
 			if (cur_image)
-				floppy_mon_w(&cur_image->device(), f->motor_on);
+				cur_image->floppy_mon_w(f->motor_on);
 			break;
 		case 0x0d:  /* Eject disk */
 			if (cur_image)
@@ -542,7 +541,7 @@ sonydriv_floppy_image_device::sonydriv_floppy_image_device(const machine_config 
 void sonydriv_floppy_image_device::device_start()
 {
 	legacy_floppy_image_device::device_start();
-	floppy_set_type(this, FLOPPY_TYPE_SONY);
+	floppy_set_type(FLOPPY_TYPE_SONY);
 
 	sony.floppy[0].is_fdhd = 0;
 	sony.floppy[1].is_fdhd = 0;

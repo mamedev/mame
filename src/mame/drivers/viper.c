@@ -1988,9 +1988,7 @@ INPUT_PORTS_END
 
 static const powerpc_config viper_ppc_cfg =
 {
-	100000000,
-	NULL,
-	NULL
+	100000000
 };
 
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)

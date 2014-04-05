@@ -59,10 +59,15 @@
 	MCFG_DEVICE_ADD(_tag, VIP_EXPANSION_SLOT, _clock) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_VIP_EXPANSION_SLOT_CALLBACKS(_irq, _dma_out, _dma_in) \
-	downcast<vip_expansion_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
-	downcast<vip_expansion_slot_device *>(device)->set_dma_out_callback(DEVCB2_##_dma_out); \
-	downcast<vip_expansion_slot_device *>(device)->set_dma_in_callback(DEVCB2_##_dma_in);
+
+#define MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(_write) \
+	devcb = &vip_expansion_slot_device::set_int_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(_write) \
+	devcb = &vip_expansion_slot_device::set_dma_out_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(_write) \
+	devcb = &vip_expansion_slot_device::set_dma_in_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -81,9 +86,9 @@ public:
 	// construction/destruction
 	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _dma_out> void set_dma_out_callback(_dma_out dma_out) { m_write_dma_out.set_callback(dma_out); }
-	template<class _dma_in> void set_dma_in_callback(_dma_in dma_in) { m_write_dma_in.set_callback(dma_in); }
+	template<class _Object> static devcb2_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_int.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_out.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_in_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_in.set_callback(object); }
 
 	// computer interface
 	UINT8 program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
@@ -101,7 +106,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( run_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( interrupt_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( interrupt_w ) { m_write_int(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_out_w ) { m_write_dma_out(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_in_w ) { m_write_dma_in(state); }
 
@@ -109,7 +114,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	devcb2_write_line m_write_irq;
+	devcb2_write_line m_write_int;
 	devcb2_write_line m_write_dma_out;
 	devcb2_write_line m_write_dma_in;
 

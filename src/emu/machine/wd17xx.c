@@ -154,7 +154,6 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
 
 /***************************************************************************
     CONSTANTS
@@ -494,11 +493,11 @@ void wd1770_device::wd17xx_command_restore()
 	if (1) // image_slotexists(m_drive) : FIXME
 	{
 		/* keep stepping until track 0 is received or 255 steps have been done */
-		while (floppy_tk00_r(m_drive) && (step_counter != 0))
+		while (m_drive->floppy_tk00_r() && (step_counter != 0))
 		{
 			/* update time to simulate seek time busy signal */
 			m_busy_count++;
-			floppy_drive_seek(m_drive, m_direction);
+			m_drive->floppy_drive_seek(m_direction);
 			step_counter--;
 		}
 	}
@@ -539,7 +538,7 @@ void wd1770_device::write_track()
 			//int len     = m_buffer[i+4];
 			int filler  = 0xe5; /* IBM and Thomson */
 			int density = m_density;
-			floppy_drive_format_sector(m_drive,side,sector,track,
+			m_drive->floppy_drive_format_sector(side,sector,track,
 						m_hd,sector,density?1:0,filler);
 			i += 128; /* at least... */
 		}
@@ -556,7 +555,7 @@ void wd1770_device::write_track()
 	selected format.
 	*/
 	m_data_count = 0;
-	floppy = flopimg_get_image(m_drive);
+	floppy = m_drive->flopimg_get_image();
 	if (floppy != NULL)
 		m_data_count = floppy_get_track_size(floppy, m_hd, m_track);
 
@@ -568,7 +567,7 @@ void wd1770_device::write_track()
 				m_data_count = wd17xx_dden() ? TRKSIZE_SD : TRKSIZE_DD;
 		}
 
-	floppy_drive_write_track_data_info_buffer( m_drive, m_hd, (char *)m_buffer, &(m_data_count) );
+	m_drive->floppy_drive_write_track_data_info_buffer( m_hd, (char *)m_buffer, &(m_data_count) );
 
 	m_data_offset = 0;
 
@@ -707,7 +706,7 @@ void wd1770_device::read_track()
 	/* Determine the track size. We cannot allow different sizes in this
 	design (see above, write_track). */
 	m_data_count = 0;
-	floppy = flopimg_get_image(m_drive);
+	floppy = m_drive->flopimg_get_image();
 	if (floppy != NULL)
 		m_data_count = floppy_get_track_size(floppy, m_hd, m_track);
 
@@ -719,7 +718,7 @@ void wd1770_device::read_track()
 				m_data_count = wd17xx_dden() ? TRKSIZE_SD : TRKSIZE_DD;
 		}
 
-	floppy_drive_read_track_data_info_buffer( m_drive, m_hd, (char *)m_buffer, &(m_data_count) );
+	m_drive->floppy_drive_read_track_data_info_buffer( m_hd, (char *)m_buffer, &(m_data_count) );
 
 	m_data_offset = 0;
 
@@ -736,7 +735,7 @@ void wd1770_device::wd17xx_read_id()
 	m_status &= ~(STA_2_CRC_ERR | STA_2_REC_N_FND);
 
 	/* get next id from disc */
-	if (floppy_drive_get_next_id(m_drive, m_hd, &id))
+	if (m_drive->floppy_drive_get_next_id(m_hd, &id))
 	{
 		UINT16 crc = 0xffff;
 
@@ -809,7 +808,7 @@ int wd1770_device::wd17xx_locate_sector()
 
 	while (revolution_count!=4)
 	{
-		if (floppy_drive_get_next_id(m_drive, m_hd, &id))
+		if (m_drive->floppy_drive_get_next_id(m_hd, &id))
 		{
 			/* compare track */
 			if (id.C == m_track)
@@ -834,7 +833,7 @@ int wd1770_device::wd17xx_locate_sector()
 		}
 
 			/* index set? */
-		if (floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_INDEX))
+		if (m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX))
 		{
 			/* update revolution count */
 			revolution_count++;
@@ -886,7 +885,7 @@ void wd1770_device::wd17xx_read_sector()
 		m_data_count = m_sector_length;
 
 		/* read data */
-		floppy_drive_read_sector_data(m_drive, m_hd, m_sector_data_id, (char *)m_buffer, m_sector_length);
+		m_drive->floppy_drive_read_sector_data(m_hd, m_sector_data_id, (char *)m_buffer, m_sector_length);
 
 		wd17xx_timed_data_request();
 
@@ -936,7 +935,7 @@ void wd1770_device::wd17xx_write_sector()
 		m_data_count = m_sector_length;
 
 		/* write data */
-		floppy_drive_write_sector_data(m_drive, m_hd, m_sector_data_id, (char *)m_buffer, m_sector_length, m_write_cmd & 0x01);
+		m_drive->floppy_drive_write_sector_data(m_hd, m_sector_data_id, (char *)m_buffer, m_sector_length, m_write_cmd & 0x01);
 	}
 }
 
@@ -957,7 +956,7 @@ void wd1770_device::wd17xx_verify_seek()
 	/* must be found within 5 revolutions otherwise error */
 	while (revolution_count!=5)
 	{
-		if (floppy_drive_get_next_id(m_drive, m_hd, &id))
+		if (m_drive->floppy_drive_get_next_id( m_hd, &id))
 		{
 			/* compare track */
 			if (id.C == m_track)
@@ -969,7 +968,7 @@ void wd1770_device::wd17xx_verify_seek()
 		}
 
 			/* index set? */
-		if (floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_INDEX))
+		if (m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_INDEX))
 		{
 			/* update revolution count */
 			revolution_count++;
@@ -992,7 +991,7 @@ TIMER_CALLBACK_MEMBER( wd1770_device::wd17xx_read_sector_callback )
 	if (VERBOSE)
 		logerror("wd179x: Read Sector callback.\n");
 
-	if (!floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_READY))
+	if (!m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 		wd17xx_complete_command(DELAY_NOTREADY);
 	else
 		wd17xx_read_sector();
@@ -1008,12 +1007,12 @@ TIMER_CALLBACK_MEMBER( wd1770_device::wd17xx_write_sector_callback )
 	if (VERBOSE)
 		logerror("wd179x: Write Sector callback.\n");
 
-	if (!floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_READY))
+	if (!m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 		wd17xx_complete_command(DELAY_NOTREADY);
 	else
 	{
 		/* drive write protected? */
-		if (floppy_wpt_r(m_drive) == CLEAR_LINE)
+		if (m_drive->floppy_wpt_r() == CLEAR_LINE)
 		{
 			m_status |= STA_2_WRITE_PRO;
 
@@ -1080,7 +1079,7 @@ void wd1770_device::set_drive(UINT8 drive)
 
 	if (m_intf->floppy_drive_tags[drive] != NULL)
 	{
-		m_drive = siblingdevice(m_intf->floppy_drive_tags[drive]);
+		m_drive = siblingdevice<legacy_floppy_image_device>(m_intf->floppy_drive_tags[drive]);
 	}
 }
 
@@ -1201,7 +1200,7 @@ READ8_MEMBER( wd1770_device::status_r )
 	else
 	{
 		m_status &= ~STA_1_NOT_READY;
-		if (!floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_READY))
+		if (!m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			m_status |= STA_1_NOT_READY;
 	}
 
@@ -1216,7 +1215,7 @@ READ8_MEMBER( wd1770_device::status_r )
 		result |= m_idx << 1;
 
 		/* bit 2, track 0 state, inverted */
-		result |= !floppy_tk00_r(m_drive) << 2;
+		result |= !m_drive->floppy_tk00_r() << 2;
 
 		if (m_command_type==TYPE_I)
 		{
@@ -1227,7 +1226,7 @@ READ8_MEMBER( wd1770_device::status_r )
 		}
 
 		/* bit 6, write protect, inverted */
-		result |= !floppy_wpt_r(m_drive) << 6;
+		result |= !m_drive->floppy_wpt_r() << 6;
 	}
 
 	/* eventually set data request bit */
@@ -1283,10 +1282,10 @@ WRITE8_MEMBER( wd1770_device::command_w )
 	if (type() == WD1770 || type() == WD1772)
 	{
 		m_mo = ASSERT_LINE;
-		floppy_mon_w(m_drive, CLEAR_LINE);
+		m_drive->floppy_mon_w(CLEAR_LINE);
 	}
 
-	floppy_drive_set_ready_state(m_drive, 1,0);
+	m_drive->floppy_drive_set_ready_state(1,0);
 
 	if (!BIT(m_interrupt, 3))
 	{
@@ -1409,14 +1408,14 @@ WRITE8_MEMBER( wd1770_device::command_w )
 			m_status &= ~STA_2_LOST_DAT;
 			wd17xx_clear_drq();
 
-			if (!floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_READY))
+			if (!m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 			{
 				wd17xx_complete_command(DELAY_NOTREADY);
 			}
 			else
 			{
 				/* drive write protected? */
-				if (floppy_wpt_r(m_drive) == CLEAR_LINE)
+				if (m_drive->floppy_wpt_r() == CLEAR_LINE)
 				{
 				/* yes */
 					m_status |= STA_2_WRITE_PRO;
@@ -1452,7 +1451,7 @@ WRITE8_MEMBER( wd1770_device::command_w )
 
 			wd17xx_clear_drq();
 
-			if (floppy_drive_get_flag_state(m_drive, FLOPPY_DRIVE_READY))
+			if (m_drive->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY))
 				wd17xx_read_id();
 			else
 				wd17xx_complete_command(DELAY_NOTREADY);
@@ -1519,7 +1518,7 @@ WRITE8_MEMBER( wd1770_device::command_w )
 			/* update track reg */
 			m_track += m_direction;
 
-			floppy_drive_seek(m_drive, m_direction);
+			m_drive->floppy_drive_seek(m_direction);
 		}
 
 		/* simulate seek time busy signal */
@@ -1541,7 +1540,7 @@ WRITE8_MEMBER( wd1770_device::command_w )
 		/* simulate seek time busy signal */
 		m_busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
-		floppy_drive_seek(m_drive, m_direction);
+		m_drive->floppy_drive_seek(m_direction);
 
 		if (data & FDC_STEP_UPDATE)
 			m_track += m_direction;
@@ -1564,7 +1563,7 @@ WRITE8_MEMBER( wd1770_device::command_w )
 		/* simulate seek time busy signal */
 		m_busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
-		floppy_drive_seek(m_drive, m_direction);
+		m_drive->floppy_drive_seek(m_direction);
 
 		if (data & FDC_STEP_UPDATE)
 			m_track += m_direction;
@@ -1586,7 +1585,7 @@ WRITE8_MEMBER( wd1770_device::command_w )
 		m_busy_count = 0;  //((data & FDC_STEP_RATE) + 1);
 
 		/* for now only allows a single drive to be selected */
-		floppy_drive_seek(m_drive, m_direction);
+		m_drive->floppy_drive_seek(m_direction);
 
 		if (data & FDC_STEP_UPDATE)
 			m_track += m_direction;
@@ -2045,14 +2044,14 @@ void wd1770_device::device_reset()
 	for (i = 0; i < 4; i++)
 	{
 		if(m_intf->floppy_drive_tags[i]!=NULL) {
-			device_t *img = NULL;
+			legacy_floppy_image_device *img = NULL;
 
-			img = siblingdevice(m_intf->floppy_drive_tags[i]);
+			img = siblingdevice<legacy_floppy_image_device>(m_intf->floppy_drive_tags[i]);
 
 			if (img!=NULL) {
-				floppy_drive_set_controller(img,this);
-				floppy_drive_set_index_pulse_callback(img, wd17xx_index_pulse_callback);
-				floppy_drive_set_rpm( img, 300.);
+				img->floppy_drive_set_controller(this);
+				img->floppy_drive_set_index_pulse_callback(wd17xx_index_pulse_callback);
+				img->floppy_drive_set_rpm( 300.);
 			}
 		}
 	}

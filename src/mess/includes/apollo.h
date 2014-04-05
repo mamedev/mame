@@ -301,19 +301,231 @@ public:
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
 	~apollo_graphics_15i();
 
-	// access to legacy token
-	class apollo_graphics *token() const { assert(m_token != NULL); return m_token; }
-	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
+
+	// monochrome control
+	DECLARE_READ8_MEMBER( apollo_mcr_r );
+	DECLARE_WRITE8_MEMBER( apollo_mcr_w );
+
+	// monochrome and color memory
+	DECLARE_READ16_MEMBER( apollo_mem_r );
+	DECLARE_WRITE16_MEMBER( apollo_mem_w );
+
+	// color control
+	DECLARE_READ8_MEMBER( apollo_ccr_r );
+	DECLARE_WRITE8_MEMBER( apollo_ccr_w );
+	
+	DECLARE_READ16_MEMBER( apollo_mgm_r );
+	DECLARE_WRITE16_MEMBER( apollo_mgm_w );
+
+	DECLARE_READ16_MEMBER( apollo_cgm_r );
+	DECLARE_WRITE16_MEMBER( apollo_cgm_w );
+		
+	void vblank_state_changed(screen_device &screen, bool vblank_state);
+
+	int is_mono() { return m_n_planes == 1; }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-private:
-	// internal state
-	class apollo_graphics *m_token;
+protected:
+	class lut_fifo;
+	class bt458;
+
+	const char *cr_text(offs_t offset, UINT8 data, UINT8 rw);
+
+	void increment_h_clock();
+	void increment_v_clock();
+	void increment_p_clock();
+
+	void log_cr1(const char * text);
+	void set_cr1(UINT8 data);
+	void set_cr3a(UINT8 data);
+	void set_cr3b(UINT8 data);
+	void set_lut_cr(UINT8 data);
+
+	void register_vblank_callback();
+	
+	UINT32 set_msb0(UINT32 value, UINT8 data)
+	{
+		return (value & 0xffffff00) | data;
+	}
+	UINT32 set_lsb0(UINT32 value, UINT8 data)
+	{
+		return (value & 0xffff00ff) | (data << 8);
+	}
+	UINT32 set_msb1(UINT32 value, UINT8 data)
+	{
+		return (value & 0xff00ffff) | (data << 16);
+	}
+	UINT32 set_lsb1(UINT32 value, UINT8 data)
+	{
+		return (value & 0x00ffffff) | (data << 24);
+	}
+	UINT8 get_msb1(UINT32 value)
+	{
+		return (value >> 16) & 0xff;
+	}
+	UINT8 get_lsb1(UINT32 value)
+	{
+		return (value >> 24) & 0xff;
+	}
+
+	void set_status_rmw();
+	UINT16 rop(UINT16 dest_data, UINT16 src_data, UINT8 plane);
+	void set_source_data(UINT32 offset);
+	UINT32 get_source_data(UINT8 plane);
+	void blt(UINT32 dest_addr, UINT16 mem_mask);
+
+	UINT8 get_pixel(UINT32 offset, UINT16 mask);
+	UINT8 c4p_read_adc(UINT8 data);
+	UINT8 c8p_read_adc(UINT8 data);
+
+	void screen_update1(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+protected:
+	UINT16 m_n_planes;
+	UINT16 m_width;
+	UINT16 m_height;
+	UINT16 m_buffer_width;
+	UINT16 m_buffer_height;
+
+	UINT8 m_sr;
+	UINT8 m_device_id;
+	UINT16 m_write_enable_register;
+	UINT32 m_rop_register;
+	UINT16 m_diag_mem_request;
+	UINT8 m_cr0;
+	UINT8 m_cr1;
+	UINT8 m_cr2;
+	UINT8 m_cr2b;
+	UINT8 m_cr2_s_data;
+	UINT8 m_cr2_s_plane;
+	UINT8 m_cr2_d_plane;
+	UINT8 m_cr3a;
+	UINT8 m_cr3b;
+	UINT8 m_ad_result;
+	UINT8 m_ad_pending;
+
+	UINT8 m_lut_control;
+	UINT8 m_lut_data;
+
+	UINT8 m_update_flag;
+	UINT8 m_update_pending;
+
+	UINT8 m_blt_cycle_count;
+	UINT32 m_image_offset;
+	UINT32 m_guard_latch[8];
+
+	int m_h_clock;
+	int m_v_clock;
+	int m_p_clock;
+	int m_data_clock;
+
+	UINT16 *m_image_memory;
+	int m_image_plane_size;
+	int m_image_memory_size;
+
+	UINT32 m_color_lookup_table[16];
+
+	lut_fifo *m_lut_fifo;
+	bt458 *m_bt458;
 };
+
+
+#define LUT_FIFO_SIZE   1024
+
+
+//**************************************************************************
+// class LUT Fifo
+//**************************************************************************
+
+class apollo_graphics_15i::lut_fifo
+{
+public:
+	lut_fifo()
+	{
+		reset();
+	}
+
+	void reset()
+	{
+		m_size = LUT_FIFO_SIZE;
+		m_get_index = 0;
+		m_put_index = 0;
+	}
+
+	void put(const UINT8 data)
+	{
+		if (!is_full())
+		{
+			m_data[m_put_index] = data;
+			m_put_index = (m_put_index + 1) % m_size;
+		}
+	}
+
+	UINT8 get()
+	{
+		UINT8 data = is_empty() ? 0xff : m_data[m_get_index];
+		m_get_index = (m_get_index + 1) % m_size;
+		return data;
+	}
+
+	int is_empty()
+	{
+		return m_get_index == m_put_index;
+	}
+
+	int is_full()
+	{
+		return ((m_put_index + 1) % m_size) == m_get_index;
+	}
+
+private:
+	UINT16 m_size;
+	UINT16 m_get_index;
+	UINT16 m_put_index;
+	UINT8 m_data[LUT_FIFO_SIZE];
+};
+
+//**************************************************************************
+//  class Brooktree Bt458
+//**************************************************************************
+
+class apollo_graphics_15i::bt458
+{
+public:
+	bt458(running_machine &running_machine);
+	void start();
+	void reset();
+	UINT8 read(UINT8 c10);
+	void write(UINT8 data, UINT8 c10);
+	UINT32 get_rgb(UINT8 index);
+
+private:
+	running_machine &machine() const
+	{
+		assert(m_machine != NULL);
+		return *m_machine;
+	}
+
+	UINT8 m_color_counter;
+	UINT8 m_red;
+	UINT8 m_green;
+
+	UINT8 m_address_register;
+	UINT32 m_color_palette_RAM[256];
+	UINT32 m_overlay_color[4];
+	UINT8 m_read_mask_register;
+	UINT8 m_blink_mask_register;
+	UINT8 m_command_register;
+	UINT8 m_control_test_register;
+
+	running_machine *m_machine;
+};
+
+
 
 extern const device_type APOLLO_GRAPHICS;
 
@@ -344,16 +556,5 @@ extern const device_type APOLLO_MONO19I;
 
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
-DECLARE_READ8_DEVICE_HANDLER( apollo_mcr_r ) ;
-DECLARE_WRITE8_DEVICE_HANDLER(apollo_mcr_w );
-
-DECLARE_READ16_DEVICE_HANDLER( apollo_mgm_r );
-DECLARE_WRITE16_DEVICE_HANDLER( apollo_mgm_w );
-
-DECLARE_READ8_DEVICE_HANDLER( apollo_ccr_r ) ;
-DECLARE_WRITE8_DEVICE_HANDLER(apollo_ccr_w );
-
-DECLARE_READ16_DEVICE_HANDLER( apollo_cgm_r );
-DECLARE_WRITE16_DEVICE_HANDLER( apollo_cgm_w );
 
 #endif /* APOLLO_H_ */

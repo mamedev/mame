@@ -100,17 +100,17 @@ WRITE8_MEMBER(partner_state::partner_floppy_w){
 			default   : m_fdc->data_w(space, 0,data);break;
 		}
 	} else {
-		floppy_mon_w(floppy_get_device(machine(), 0), 1);
-		floppy_mon_w(floppy_get_device(machine(), 1), 1);
+		floppy_get_device(machine(), 0)->floppy_mon_w(1);
+		floppy_get_device(machine(), 1)->floppy_mon_w(1);
 		if (((data >> 6) & 1)==1) {
 			m_fdc->set_drive(0);
-			floppy_mon_w(floppy_get_device(machine(), 0), 0);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
+			floppy_get_device(machine(), 0)->floppy_mon_w(0);
+			floppy_get_device(machine(), 0)->floppy_drive_set_ready_state(1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
 			m_fdc->set_drive(1);
-			floppy_mon_w(floppy_get_device(machine(), 1), 0);
-			floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
+			floppy_get_device(machine(), 1)->floppy_mon_w(0);
+			floppy_get_device(machine(), 1)->floppy_drive_set_ready_state(1, 1);
 		}
 		m_fdc->set_side(data >> 7);
 	}

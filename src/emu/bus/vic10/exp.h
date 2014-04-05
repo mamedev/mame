@@ -61,6 +61,19 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
+#define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
+	devcb = &vic10_expansion_slot_device::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(_write) \
+	devcb = &vic10_expansion_slot_device::set_res_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(_write) \
+	devcb = &vic10_expansion_slot_device::set_cnt_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_VIC10_EXPANSION_SLOT_SP_CALLBACK(_write) \
+	devcb = &vic10_expansion_slot_device::set_sp_wr_callback(*device, DEVCB2_##_write);
+
+
 #define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _res) \
 	downcast<vic10_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB2_##_irq, DEVCB2_##_res);
 
@@ -85,15 +98,10 @@ public:
 	// construction/destruction
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq, class _res> void set_irq_callbacks(_irq irq, _res res) {
-		m_write_irq.set_callback(irq);
-		m_write_res.set_callback(res);
-	}
-
-	template<class _cnt, class _sp> void set_serial_callbacks(_cnt cnt, _sp sp) {
-		m_write_cnt.set_callback(cnt);
-		m_write_sp.set_callback(sp);
-	}
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_res.set_callback(object); }
+	template<class _Object> static devcb2_base &set_cnt_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_cnt.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sp_wr_callback(device_t &device, _Object object) { return downcast<vic10_expansion_slot_device &>(device).m_write_sp.set_callback(object); }
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);

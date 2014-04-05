@@ -243,7 +243,7 @@ WRITE8_MEMBER(concept_fdc_device::reg_w)
 			// floppy_drive_set_motor_state(floppy_get_device(machine(),  current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 			/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
 			m_wd179x->dden_w(BIT(data, 7));
-			floppy_drive_set_ready_state(floppy_get_device(machine(), current_drive), 1, 0);
+			floppy_get_device(machine(), current_drive)->floppy_drive_set_ready_state(1, 0);
 			break;
 
 		case  8:    // FDC COMMAMD REG

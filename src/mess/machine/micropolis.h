@@ -11,6 +11,7 @@
 #define __MICROPOLIS_H__
 
 #include "devcb.h"
+#include "imagedev/flopdrv.h"
 
 
 /***************************************************************************
@@ -88,7 +89,7 @@ private:
 	UINT32  m_sector_length;          /* sector length (byte) */
 
 	/* this is the drive currently selected */
-	device_t *m_drive;
+	legacy_floppy_image_device *m_drive;
 
 	void read_sector();
 	void write_sector();

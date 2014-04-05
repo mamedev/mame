@@ -564,7 +564,7 @@ MACHINE_RESET_MEMBER(svi318_state,svi318)
 
 	for(drive=0;drive<2;drive++)
 	{
-		floppy_install_load_proc(floppy_get_device(machine(), drive), svi318_load_proc);
+		floppy_get_device(machine(), drive)->floppy_install_load_proc(svi318_load_proc);
 	}
 }
 

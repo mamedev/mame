@@ -566,22 +566,22 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
 {
-  thomson_index_callback(machine().device(FLOPPY_0), state);
+  thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_0), state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
 {
-  thomson_index_callback(machine().device(FLOPPY_1), state);
+  thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_1), state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
 {
-  thomson_index_callback(machine().device(FLOPPY_2), state);
+  thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_2), state);
 }
 
 WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
 {
-  thomson_index_callback(machine().device(FLOPPY_3), state);
+  thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_3), state);
 }
 
 static const floppy_interface thomson_floppy_interface_0 =

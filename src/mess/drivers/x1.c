@@ -1037,8 +1037,8 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 			break;
 		case 0x0ffc:
 			m_fdc->set_drive(data & 3);
-			floppy_mon_w(floppy_get_device(machine(), data & 3), !BIT(data, 7));
-			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x80,0);
+			floppy_get_device(machine(), data & 3)->floppy_mon_w(!BIT(data, 7));
+			floppy_get_device(machine(), data & 3)->floppy_drive_set_ready_state(data & 0x80,0);
 			m_fdc->set_side(BIT(data, 4));
 			break;
 		case 0x0ffd:

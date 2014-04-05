@@ -566,8 +566,8 @@ struct powerpc_state
 	/* for use by specific implementations */
 	ppcimp_state *  impstate;
 
-	read32_device_func  dcr_read_func;
-	write32_device_func dcr_write_func;
+	read32_delegate  dcr_read_func;
+	write32_delegate dcr_write_func;
 
 	ppc_dcstore_handler dcstore_handler;
 

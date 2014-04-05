@@ -165,8 +165,6 @@ typedef void (*ppc4xx_spu_tx_handler)(device_t *device, UINT8 data);
 struct powerpc_config
 {
 	UINT32      bus_frequency;
-	read32_device_func  dcr_read_func;
-	write32_device_func dcr_write_func;
 };
 
 typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
@@ -188,7 +186,8 @@ void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval);
 void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler);
 void ppc4xx_set_dma_read_handler(device_t *device, int channel, ppc4xx_dma_read_handler handler, int rate);
 void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_write_handler handler, int rate);
-
+void ppc4xx_set_dcr_read_handler(device_t *device, read32_delegate dcr_read_func);
+void ppc4xx_set_dcr_write_handler(device_t *device, write32_delegate dcr_write_func);
 
 DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);
 DECLARE_LEGACY_CPU_DEVICE(PPC403GCX, ppc403gcx);

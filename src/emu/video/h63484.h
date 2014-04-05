@@ -14,38 +14,37 @@
 #include "emu.h"
 
 
+typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)> h63484_display_delegate;
+
+
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_H63484_ADD(_tag, _clock, _config, _map) \
+#define MCFG_H63484_ADD(_tag, _clock, _map) \
 	MCFG_DEVICE_ADD(_tag, H63484, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
-#define H63484_INTERFACE(name) \
-	const h63484_interface (name) =
+#define MCFG_H63484_ADDRESS_MAP(_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
-typedef void (*h63484_display_pixels_func)(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT16 data);
-#define H63484_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT16 data)
+#define MCFG_H63484_DISPLAY_CALLBACK_OWNER(_class, _method) \
+	h63484_device::static_set_display_callback(*device, h63484_display_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-// ======================> h63484_interface
+#define H63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, UINT16 data)
 
-struct h63484_interface
-{
-	h63484_display_pixels_func  m_display_cb;
-};
 
 // ======================> h63484_device
 
 class h63484_device :   public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public h63484_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_display_callback(device_t &device, h63484_display_delegate callback) { downcast<h63484_device &>(device).m_display_cb = callback; }
 
 	DECLARE_WRITE16_MEMBER( address_w );
 	DECLARE_WRITE16_MEMBER( data_w );
@@ -62,7 +61,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
 	inline UINT16 readword(offs_t address);
 	inline void writeword(offs_t address, UINT16 data);
@@ -105,6 +103,7 @@ private:
 	int translate_command(UINT16 data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
 
+	h63484_display_delegate  m_display_cb;
 
 	UINT8 m_ar;
 	UINT8 m_vreg[0x100];

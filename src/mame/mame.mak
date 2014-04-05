@@ -2322,6 +2322,7 @@ $(DRIVERS)/aristmk4.o:  $(LAYOUT)/aristmk4.lh \
 			$(LAYOUT)/kgbird.lh \
 			$(LAYOUT)/topgear.lh \
 			$(LAYOUT)/wildone.lh \
+			$(LAYOUT)/gunnrose.lh \
 			$(LAYOUT)/gldnpkr.lh \
 
 $(DRIVERS)/asteroid.o:  $(LAYOUT)/astdelux.lh

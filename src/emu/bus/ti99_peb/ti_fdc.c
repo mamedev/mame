@@ -648,20 +648,20 @@ WRITE8_MEMBER(ti_fdc_legacy_device::cruwrite)
     the default implementation sets the drive geometry to the geometry
     of the medium.
 */
-void ti_fdc_legacy_device::set_geometry(device_t *drive, floppy_type_t type)
+void ti_fdc_legacy_device::set_geometry(legacy_floppy_image_device *drive, floppy_type_t type)
 {
 	// This assertion may fail when the names of the floppy devices change.
 	// Unfortunately, the wd17xx device assumes the floppy drives at root
 	// level, so we use an explicitly qualified tag. See peribox.h.
 	assert (drive!=NULL);
-	floppy_drive_set_geometry(drive, type);
+	drive->floppy_drive_set_geometry(type);
 }
 
 void ti_fdc_legacy_device::set_all_geometries(floppy_type_t type)
 {
-	set_geometry(machine().device(PFLOPPY_0), type);
-	set_geometry(machine().device(PFLOPPY_1), type);
-	set_geometry(machine().device(PFLOPPY_2), type);
+	set_geometry(machine().device<legacy_floppy_image_device>(PFLOPPY_0), type);
+	set_geometry(machine().device<legacy_floppy_image_device>(PFLOPPY_1), type);
+	set_geometry(machine().device<legacy_floppy_image_device>(PFLOPPY_2), type);
 }
 
 /*

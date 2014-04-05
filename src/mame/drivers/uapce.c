@@ -311,13 +311,6 @@ WRITE_LINE_MEMBER(uapce_state::pce_irq_changed)
 }
 
 
-static const huc6270_interface pce_huc6270_config =
-{
-	0x10000,
-	DEVCB_DRIVER_LINE_MEMBER(uapce_state,pce_irq_changed)
-};
-
-
 static const huc6260_interface pce_huc6260_config =
 {
 	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, next_pixel ),
@@ -343,7 +336,9 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
 	MCFG_HUC6260_ADD( "huc6260", PCE_MAIN_CLOCK, pce_huc6260_config )
-	MCFG_HUC6270_ADD( "huc6270", pce_huc6270_config )
+	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x10000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(uapce_state, pce_irq_changed))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)

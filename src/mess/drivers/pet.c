@@ -135,7 +135,6 @@ ROM sockets:  UA3   2K or 4K character
     TODO:
 
     - accurate video timing for non-CRTC models
-    - PET 4000-12 (40 column CRTC models)
     - High Speed Graphics board
     - keyboard layouts
         - Swedish
@@ -1069,6 +1068,13 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 //  MC6845_INTERFACE( crtc_intf )
 //-------------------------------------------------
 
+static MC6845_BEGIN_UPDATE( pet_begin_update )
+{
+	bitmap.fill(rgb_t::black);
+
+	return 0;
+}
+
 static MC6845_UPDATE_ROW( pet80_update_row )
 {
 	pet80_state *state = device->machine().driver_data<pet80_state>();
@@ -1118,7 +1124,7 @@ static MC6845_INTERFACE( crtc_intf )
 	true,
 	0,0,0,0,
 	2*8,
-	NULL,
+	pet_begin_update,
 	pet80_update_row,
 	NULL,
 	DEVCB_NULL,
@@ -1132,11 +1138,6 @@ static MC6845_INTERFACE( crtc_intf )
 //-------------------------------------------------
 //  MC6845_INTERFACE( pet40_crtc_intf )
 //-------------------------------------------------
-static MC6845_BEGIN_UPDATE( pet_begin_update )
-{
-	bitmap.fill(rgb_t::black);
-	return 0;
-}
 
 static MC6845_UPDATE_ROW( pet40_update_row )
 {

@@ -429,7 +429,7 @@ void osborne1_state::machine_reset()
 	memset( m_ram->pointer() + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
-		floppy_install_load_proc(floppy_get_device(machine(), drive), osborne1_load_proc);
+		floppy_get_device(machine(), drive)->floppy_install_load_proc(osborne1_load_proc);
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), this));
 }

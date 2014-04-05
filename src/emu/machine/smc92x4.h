@@ -98,7 +98,8 @@ public:
 
 	// Used to reconfigure the drive connections. Drive selection is done
 	// using the select lines and maybe also the user-programmable outputs.
-	void connect_drive(device_t *drive);
+	void connect_floppy_drive(legacy_floppy_image_device *drive);
+	void connect_hard_drive(mfm_harddisk_device *drive);
 
 	void reset();
 
@@ -221,7 +222,8 @@ private:
 	// Hard disks must be instances of mfmhd_device; floppy disks are the common drives.
 	// We expect the embedding board to replace the drive according to the
 	// select lines.
-	device_t    *m_drive;
+	legacy_floppy_image_device    *m_drive;
+	mfm_harddisk_device			  *m_harddisk;
 };
 
 #define MCFG_SMC92X4_ADD(_tag, _intrf) \

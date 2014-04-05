@@ -41,6 +41,11 @@ public:
 
 	DECLARE_WRITE16_MEMBER ( dm7000_enet_w );
 	DECLARE_READ16_MEMBER ( dm7000_enet_r );
+	
+	DECLARE_READ32_MEMBER( dcr_r );
+	DECLARE_WRITE32_MEMBER( dcr_w );
+	
+	
 	UINT16          m_enet_regs[32];
 
 	UINT32          dcr[1024];
