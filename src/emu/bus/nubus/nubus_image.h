@@ -9,16 +9,7 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct disk_data
-{
-	device_t *device;
-	UINT32 size;
-	UINT8 *data;
-	bool ejected;
-
-	device_image_interface *image;
-};
+class messimg_disk_image_device;
 
 // ======================> nubus_image_device
 
@@ -48,7 +39,7 @@ protected:
 		DECLARE_WRITE32_MEMBER(image_super_w);
 
 public:
-	disk_data *m_image;
+	messimg_disk_image_device *m_image;
 };
 
 

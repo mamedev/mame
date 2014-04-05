@@ -12,6 +12,7 @@ const device_type WPCASIC = &device_creator<wpc_device>;
 
 wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,WPCASIC,"Williams WPC ASIC",tag,owner,clock, "wpc", __FILE__),
+		m_dmd_visiblepage(0),
 		m_irq_cb(*this),
 		m_firq_cb(*this),
 		m_sounddata_r(*this),

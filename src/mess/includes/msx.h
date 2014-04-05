@@ -167,6 +167,15 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( msx_cart );
 	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 
+	// from msx_slot
+	DECLARE_READ8_MEMBER(konami_scc_bank5);
+	DECLARE_READ8_MEMBER(msx_diskrom_page1_r);
+	DECLARE_READ8_MEMBER(msx_diskrom_page2_r);
+	DECLARE_READ8_MEMBER(msx_diskrom2_page1_r);
+	DECLARE_READ8_MEMBER(msx_diskrom2_page2_r);
+	DECLARE_READ8_MEMBER(soundcartridge_scc);
+	DECLARE_READ8_MEMBER(soundcartridge_sccp);
+
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;

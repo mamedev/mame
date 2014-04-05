@@ -27,25 +27,8 @@
  FUNCTION PROTOTYPES
  ***************************************************************************/
 
-struct disk_data
-{
-	device_t *device;
-	UINT16 type;
-	UINT16 cylinders;
-	UINT16 heads;
-	UINT16 sectors;
-	UINT32 sectorbytes;
-	UINT32 sector_count;
-
-	device_image_interface *image;
-
-	// configuration data
-	UINT8 config_data[10];
-
-	// ESDI defect list data
-	UINT8 esdi_defect_list[256];
-};
-
+class omti_disk_image_device;
+ 
 /* ----- device interface ----- */
 
 class omti8621_device : public device_t, public device_isa16_card_interface
@@ -87,7 +70,7 @@ protected:
 	void set_interrupt(enum line_state line_state);
 
 private:
-	disk_data *our_disks[OMTI_MAX_LUN+1];
+	omti_disk_image_device *our_disks[OMTI_MAX_LUN+1];
 
 	UINT16 jumper;
 

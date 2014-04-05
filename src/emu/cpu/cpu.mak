@@ -490,7 +490,8 @@ ifneq ($(filter H8,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h8
 CPUOBJS += $(CPUOBJ)/h8/h8.o $(CPUOBJ)/h8/h8h.o $(CPUOBJ)/h8/h8s2000.o $(CPUOBJ)/h8/h8s2600.o \
            $(CPUOBJ)/h8/h83337.o \
-           $(CPUOBJ)/h8/h83002.o $(CPUOBJ)/h8/h83006.o $(CPUOBJ)/h8/h83048.o \
+           $(CPUOBJ)/h8/h83002.o $(CPUOBJ)/h8/h83006.o  $(CPUOBJ)/h8/h83008.o \
+           $(CPUOBJ)/h8/h83048.o \
            $(CPUOBJ)/h8/h8s2245.o $(CPUOBJ)/h8/h8s2320.o $(CPUOBJ)/h8/h8s2357.o \
            $(CPUOBJ)/h8/h8s2655.o \
            $(CPUOBJ)/h8/h8_adc.o $(CPUOBJ)/h8/h8_port.o $(CPUOBJ)/h8/h8_intc.o \
@@ -541,6 +542,16 @@ $(CPUOBJ)/h8/h83002.o:			$(CPUSRC)/h8/h83002.c \
 
 $(CPUOBJ)/h8/h83006.o:			$(CPUSRC)/h8/h83006.c \
 								$(CPUSRC)/h8/h83006.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
+
+$(CPUOBJ)/h8/h83008.o:			$(CPUSRC)/h8/h83008.c \
+								$(CPUSRC)/h8/h83008.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h \
 								$(CPUSRC)/h8/h8_intc.h \

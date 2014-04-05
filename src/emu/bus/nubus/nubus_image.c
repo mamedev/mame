@@ -14,6 +14,7 @@
 
 #define MESSIMG_DISK_SECTOR_SIZE (512)
 
+
 // messimg_disk_image_device
 
 class messimg_disk_image_device :   public device_t,
@@ -38,15 +39,17 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 
-	disk_data *token() { return &m_token; }
-protected:
+	protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-
-	disk_data m_token;
+public:
+	UINT32 m_size;
+	UINT8 *m_data;
+	bool m_ejected;
 };
+
 
 // device type definition
 extern const device_type MESSIMG_DISK;
@@ -65,64 +68,46 @@ void messimg_disk_image_device::device_config_complete()
 };
 
 
-/***************************************************************************
- get_safe_disk_token - makes sure that the passed in device is a messimg disk
- ***************************************************************************/
-
-INLINE disk_data *get_safe_disk_token(device_t *device) {
-	assert(device != NULL);
-	assert(device->type() == MESSIMG_DISK);
-	return (disk_data *) downcast<messimg_disk_image_device *>(device)->token();
-}
-
 /*-------------------------------------------------
     device start callback
 -------------------------------------------------*/
 
 void messimg_disk_image_device::device_start()
 {
-	disk_data *disk = get_safe_disk_token(this);
-
-	disk->device = this;
-	disk->image = this;
-	disk->data = (UINT8 *)NULL;
+	m_data = (UINT8 *)NULL;
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
-		disk->size = (UINT32)ftell();
+		m_size = (UINT32)ftell();
 	}
 }
 
 bool messimg_disk_image_device::call_load()
 {
-	disk_data *disk = get_safe_disk_token(this);
-
 	fseek(0, SEEK_END);
-	disk->size = (UINT32)ftell();
-	if (disk->size > (256*1024*1024))
+	m_size = (UINT32)ftell();
+	if (m_size > (256*1024*1024))
 	{
 		printf("Mac image too large: must be 256MB or less!\n");
-		disk->size = 0;
+		m_size = 0;
 		return IMAGE_INIT_FAIL;
 	}
 
-	disk->data = (UINT8 *)auto_alloc_array_clear(machine(), UINT32, disk->size/sizeof(UINT32));
+	m_data = (UINT8 *)auto_alloc_array_clear(machine(), UINT32, m_size/sizeof(UINT32));
 	fseek(0, SEEK_SET);
-	fread(disk->data, disk->size);
-	disk->ejected = false;
+	fread(m_data, m_size);
+	m_ejected = false;
 
 	return IMAGE_INIT_PASS;
 }
 
 void messimg_disk_image_device::call_unload()
 {
-	disk_data *disk = get_safe_disk_token(this);
-
 	// TODO: track dirty sectors and only write those
 	fseek(0, SEEK_SET);
-	fwrite(disk->data, disk->size);
-	disk->size = 0;
-	//free(disk->data);
+	fwrite(m_data, m_size);
+	m_size = 0;
+	//free(m_data);
 }
 
 /*-------------------------------------------------
@@ -210,8 +195,7 @@ void nubus_image_device::device_start()
 	m_nubus->install_device(slotspace+4, slotspace+7, read32_delegate(FUNC(nubus_image_device::image_status_r), this), write32_delegate(FUNC(nubus_image_device::image_status_w), this));
 	m_nubus->install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32_delegate(FUNC(nubus_image_device::image_super_r), this), write32_delegate(FUNC(nubus_image_device::image_super_w), this));
 
-	device_t *device0 = subdevice(IMAGE_DISK0_TAG);
-	m_image = (disk_data *) downcast<messimg_disk_image_device *>(device0)->token();
+	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
 }
 
 //-------------------------------------------------
@@ -224,16 +208,16 @@ void nubus_image_device::device_reset()
 
 WRITE32_MEMBER( nubus_image_device::image_status_w )
 {
-	m_image->ejected = true;
+	m_image->m_ejected = true;
 }
 
 READ32_MEMBER( nubus_image_device::image_status_r )
 {
-	if(m_image->ejected) {
+	if(m_image->m_ejected) {
 		return 0;
 	}
 
-	if(m_image->size) {
+	if(m_image->m_size) {
 		return 1;
 	}
 	return 0;
@@ -245,12 +229,12 @@ WRITE32_MEMBER( nubus_image_device::image_w )
 
 READ32_MEMBER( nubus_image_device::image_r )
 {
-	return m_image->size;
+	return m_image->m_size;
 }
 
 WRITE32_MEMBER( nubus_image_device::image_super_w )
 {
-	UINT32 *image = (UINT32*)m_image->data;
+	UINT32 *image = (UINT32*)m_image->m_data;
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	mem_mask = ((mem_mask & 0xff) << 24) | ((mem_mask & 0xff00) << 8) | ((mem_mask & 0xff0000) >> 8) | ((mem_mask & 0xff000000) >> 24);
 
@@ -259,7 +243,7 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 
 READ32_MEMBER( nubus_image_device::image_super_r )
 {
-	UINT32 *image = (UINT32*)m_image->data;
+	UINT32 *image = (UINT32*)m_image->m_data;
 	UINT32 data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }

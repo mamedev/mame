@@ -105,6 +105,7 @@ private:
 		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 		void draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		void draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 		void load_bitmap();
 		void load_reel_bitmap(int number);
 		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
@@ -148,7 +149,7 @@ private:
 		int                 m_stateoffset;
 		int                 m_reelreversed;
 		int                 m_numsymbolsvisible;
-
+		int					m_beltreel;
 	};
 
 	// a texture encapsulates a texture for a given element in a given state

@@ -148,7 +148,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 			machine_config config(*system, m_options);
 			software_list_device_iterator iter(config.root_device());
-			if (iter.first() == NULL)
+			if (iter.count() == 0)
 				throw emu_fatalerror(MAMERR_FATALERROR, "Error: unknown option: %s\n", m_options.software_name());
 
 			bool found = false;
@@ -550,7 +550,7 @@ void cli_frontend::listsamples(const char *gamename)
 	{
 		// see if we have samples
 		samples_device_iterator iter(drivlist.config().root_device());
-		if (iter.first() == NULL)
+		if (iter.count() == 0)
 			continue;
 
 		// print a header

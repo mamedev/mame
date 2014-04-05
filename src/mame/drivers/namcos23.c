@@ -1637,16 +1637,26 @@ void namcos23_state::c435_matrix_vector_mul() // 0.1
 		logerror("WARNING: c435_matrix_vector_mul with size %d\n", m_c435_buffer[0] & 0xf);
 		return;
 	}
-	if(m_c435_buffer[3] != 0xffff)
-		logerror("WARNING: c435_matrix_vector_mul with +2=%04x\n", m_c435_buffer[3]);
 
-	INT32 *t       = c435_getv(m_c435_buffer[1]);
-	const INT16 *m = c435_getm(m_c435_buffer[2]);
-	const INT32 *v = c435_getv(m_c435_buffer[4]);
+	if(m_c435_buffer[3] != 0xffff) {
+		INT32 *t        = c435_getv(m_c435_buffer[1]);
+		const INT16 *m  = c435_getm(m_c435_buffer[2]);
+		const INT32 *vt = c435_getv(m_c435_buffer[3]);
+		const INT32 *v  = c435_getv(m_c435_buffer[4]);
 
-	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
-	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
-	t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14) + vt[0];
+		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14) + vt[1];
+		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14) + vt[2];
+
+	} else {
+		INT32 *t       = c435_getv(m_c435_buffer[1]);
+		const INT16 *m = c435_getm(m_c435_buffer[2]);
+		const INT32 *v = c435_getv(m_c435_buffer[4]);
+
+		t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
+		t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[5]*INT64(v[2])) >> 14);
+		t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+	}
 }
 
 void namcos23_state::c435_matrix_set() // 0.4
@@ -1791,9 +1801,9 @@ void namcos23_state::c435_pio_w(UINT16 data)
 		break;
 
 	case 0x4000:
-		switch(h & 0xf00) {
-		case 0x400: c435_scaling_set(); break;
-		case 0xf00: c435_state_set(); break;
+		switch(h & 0x3f00) {
+		case 0x0400: c435_scaling_set(); break;
+		case 0x0f00: c435_state_set(); break;
 		default: known = false; break;
 		}
 		break;

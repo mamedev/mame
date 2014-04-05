@@ -24,23 +24,6 @@
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
-/* channel_data structure holds info about each 6844 DMA channel */
-typedef struct m6844_channel_data
-{
-	int active;
-	int address;
-	int counter;
-	UINT8 control;
-	int start_address;
-	int start_counter;
-} m6844_channel_data;
-
-/* 6844 description */
-static m6844_channel_data m6844_channel[4];
-static UINT8 m6844_priority;
-static UINT8 m6844_interrupt;
-static UINT8 m6844_chain;
-
 /******* MC6840 PTM on MPID Board *******/
 /* 6840 PTM interface */
 const ptm6840_interface swtpc09_6840_intf =
@@ -206,32 +189,32 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 
     offset = (m_fdc_dma_address_reg & 0x0f)<<16;
 
-	if (m6844_channel[0].active == 1)  //active dma transfer
+	if (m_m6844_channel[0].active == 1)  //active dma transfer
 	{
-		if (!(m6844_channel[0].control & 0x01))  // dma write to memory
+		if (!(m_m6844_channel[0].control & 0x01))  // dma write to memory
 		{
 			UINT8 data = m_fdc->data_r(space, 0);
 
-			LOG(("swtpc09_dma_write_mem %05X %02X\n", m6844_channel[0].address + offset, data));
-			RAM[m6844_channel[0].address + offset] = data;
+			LOG(("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data));
+			RAM[m_m6844_channel[0].address + offset] = data;
 		}
 		else
 		{
-			UINT8 data = RAM[m6844_channel[0].address + offset];
+			UINT8 data = RAM[m_m6844_channel[0].address + offset];
 
 			m_fdc->data_w(space, 0, data);
-			//LOG(("swtpc09_dma_read_mem %04X %02X\n", m6844_channel[0].address, data));
+			//LOG(("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data));
 		}
 
-		m6844_channel[0].address++;
-		m6844_channel[0].counter--;
+		m_m6844_channel[0].address++;
+		m_m6844_channel[0].counter--;
 
-		if (m6844_channel[0].counter == 0)    // dma transfer has finished
+		if (m_m6844_channel[0].counter == 0)    // dma transfer has finished
 		{
-            m6844_channel[0].control |= 0x80; // set dend flag
-            if (m6844_interrupt & 0x01)       // interrupt for channel 0 is enabled?
+            m_m6844_channel[0].control |= 0x80; // set dend flag
+            if (m_m6844_interrupt & 0x01)       // interrupt for channel 0 is enabled?
             {
-		        m6844_interrupt	|= 0x80;      // set bit 7 to indicate active interrupt
+		        m_m6844_interrupt	|= 0x80;      // set bit 7 to indicate active interrupt
                 swtpc09_irq_handler(DMAC_IRQ, ASSERT_LINE);
 		    }
 		}
@@ -630,7 +613,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
     {
         if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 conroller this is the map
         {
-            mem.install_legacy_readwrite_handler(logical_address+0x000, logical_address+0x01f, FUNC(m6844_r), FUNC(m6844_w));
+            mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
      	    mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
     	    mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
     	    mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
@@ -640,8 +623,8 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 	    }
         else if (m_system_type == FLEX_DC4_PIAIDE)   // 2k ram for piaide on s09 board
         {
-            //mem.install_legacy_readwrite_handler(logical_address+0x000, logical_address+0x01f, FUNC(m6844_r), FUNC(m6844_w));
-     	    //mem.install_legacy_readwrite_handler(*fdc, logical_address+0x020, logical_address+0x023, 0, 0, FUNC(wd17xx_r), FUNC(wd17xx_w));
+            //mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
+     	    //mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
     	    //mem.install_readwrite_handler(logical_address+0x024, logical_address+0x03f, read8_delegate(FUNC(swtpc09_state::dmf2_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_control_reg_w),this));
     	    //mem.install_readwrite_handler(logical_address+0x040, logical_address+0x041, read8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf2_dma_address_reg_w),this));
             mem.install_ram(logical_address+0x000, logical_address+0x7ff, &RAM[0xf000]);
@@ -649,8 +632,8 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
             mem.install_write_handler(logical_address+0xff0, logical_address+0xfff, write8_delegate(FUNC(swtpc09_state::dat_w),this));
 	    }
 	    else    // assume DMF3 controller
-        {
-            mem.install_legacy_readwrite_handler(logical_address+0x000, logical_address+0x01f, FUNC(m6844_r), FUNC(m6844_w));
+        {            
+			mem.install_readwrite_handler(logical_address+0x000, logical_address+0x01f, read8_delegate(FUNC(swtpc09_state::m6844_r),this), write8_delegate(FUNC(swtpc09_state::m6844_w),this));
      	    mem.install_readwrite_handler(logical_address+0x020, logical_address+0x023, read8_delegate(FUNC(fd1793_device::read), fdc), write8_delegate(FUNC(fd1793_device::write),fdc));
     	    mem.install_readwrite_handler(logical_address+0x024, logical_address+0x024, read8_delegate(FUNC(swtpc09_state::dmf3_control_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_control_reg_w),this));
     	    mem.install_readwrite_handler(logical_address+0x025, logical_address+0x025, read8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_r),this), write8_delegate(FUNC(swtpc09_state::dmf3_dma_address_reg_w),this));
@@ -688,10 +671,9 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 
 /*  MC6844 DMA controller I/O */
 
-READ8_HANDLER( m6844_r )
+READ8_MEMBER( swtpc09_state::m6844_r )
 {
 	UINT8 result = 0;
-	swtpc09_state *state = space.machine().driver_data<swtpc09_state>();
 
 
 	/* switch off the offset we were given */
@@ -702,7 +684,7 @@ READ8_HANDLER( m6844_r )
 		case 0x04:
 		case 0x08:
 		case 0x0c:
-			result = m6844_channel[offset / 4].address >> 8;
+			result = m_m6844_channel[offset / 4].address >> 8;
 			break;
 
 		/* lower byte of address */
@@ -710,7 +692,7 @@ READ8_HANDLER( m6844_r )
 		case 0x05:
 		case 0x09:
 		case 0x0d:
-			result = m6844_channel[offset / 4].address & 0xff;
+			result = m_m6844_channel[offset / 4].address & 0xff;
 			break;
 
 		/* upper byte of counter */
@@ -718,7 +700,7 @@ READ8_HANDLER( m6844_r )
 		case 0x06:
 		case 0x0a:
 		case 0x0e:
-			result = m6844_channel[offset / 4].counter >> 8;
+			result = m_m6844_channel[offset / 4].counter >> 8;
 			break;
 
 		/* lower byte of counter */
@@ -726,7 +708,7 @@ READ8_HANDLER( m6844_r )
 		case 0x07:
 		case 0x0b:
 		case 0x0f:
-			result = m6844_channel[offset / 4].counter & 0xff;
+			result = m_m6844_channel[offset / 4].counter & 0xff;
 			break;
 
 		/* channel control */
@@ -734,31 +716,31 @@ READ8_HANDLER( m6844_r )
 		case 0x11:
 		case 0x12:
 		case 0x13:
-			result = m6844_channel[offset - 0x10].control;
+			result = m_m6844_channel[offset - 0x10].control;
 
 			/* a read here clears the DMA end flag */
-			m6844_channel[offset - 0x10].control &= ~0x80;
-            if (m6844_interrupt && 0x80) // if interrupt is active, then clear
+			m_m6844_channel[offset - 0x10].control &= ~0x80;
+            if (m_m6844_interrupt && 0x80) // if interrupt is active, then clear
             {
-                state->swtpc09_irq_handler(0x01, CLEAR_LINE);
-			    m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7
+                swtpc09_irq_handler(0x01, CLEAR_LINE);
+			    m_m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7
 			    LOG(("swtpc09_6844_r interrupt cleared \n"));
 			}
 			break;
 
 		/* priority control */
 		case 0x14:
-			result = m6844_priority;
+			result = m_m6844_priority;
 			break;
 
 		/* interrupt control */
 		case 0x15:
-			result = m6844_interrupt;
+			result = m_m6844_interrupt;
 			break;
 
 		/* chaining control */
 		case 0x16:
-			result = m6844_chain;
+			result = m_m6844_chain;
 			break;
 
 		/* 0x17-0x1f not used */
@@ -766,7 +748,7 @@ READ8_HANDLER( m6844_r )
 	}
     //LOG(("swtpc09_6844_r %02X %02X\n", offset, result & 0xff));
 
-    if (state->m_system_type == UNIFLEX_DMF2 || state->m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
+    if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
     {
         return ~result & 0xff;
 	}
@@ -777,12 +759,11 @@ READ8_HANDLER( m6844_r )
 }
 
 
-WRITE8_HANDLER( m6844_w )
+WRITE8_MEMBER( swtpc09_state::m6844_w )
 {
 	int i;
-	swtpc09_state *state = space.machine().driver_data<swtpc09_state>();
 
-    if (state->m_system_type == UNIFLEX_DMF2 || state->m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
+    if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
         data = ~data & 0xff;
 
     LOG(("swtpc09_6844_w %02X %02X\n", offset, data));
@@ -794,7 +775,7 @@ WRITE8_HANDLER( m6844_w )
 		case 0x04:
 		case 0x08:
 		case 0x0c:
-			m6844_channel[offset / 4].address = (m6844_channel[offset / 4].address & 0xff) | (data << 8);
+			m_m6844_channel[offset / 4].address = (m_m6844_channel[offset / 4].address & 0xff) | (data << 8);
 			break;
 
 		/* lower byte of address */
@@ -802,7 +783,7 @@ WRITE8_HANDLER( m6844_w )
 		case 0x05:
 		case 0x09:
 		case 0x0d:
-			m6844_channel[offset / 4].address = (m6844_channel[offset / 4].address & 0xff00) | (data & 0xff);
+			m_m6844_channel[offset / 4].address = (m_m6844_channel[offset / 4].address & 0xff00) | (data & 0xff);
 			break;
 
 		/* upper byte of counter */
@@ -810,7 +791,7 @@ WRITE8_HANDLER( m6844_w )
 		case 0x06:
 		case 0x0a:
 		case 0x0e:
-			m6844_channel[offset / 4].counter = (m6844_channel[offset / 4].counter & 0xff) | (data << 8);
+			m_m6844_channel[offset / 4].counter = (m_m6844_channel[offset / 4].counter & 0xff) | (data << 8);
 			break;
 
 		/* lower byte of counter */
@@ -818,7 +799,7 @@ WRITE8_HANDLER( m6844_w )
 		case 0x07:
 		case 0x0b:
 		case 0x0f:
-			m6844_channel[offset / 4].counter = (m6844_channel[offset / 4].counter & 0xff00) | (data & 0xff);
+			m_m6844_channel[offset / 4].counter = (m_m6844_channel[offset / 4].counter & 0xff00) | (data & 0xff);
 			break;
 
 		/* channel control */
@@ -826,30 +807,30 @@ WRITE8_HANDLER( m6844_w )
 		case 0x11:
 		case 0x12:
 		case 0x13:
-			m6844_channel[offset - 0x10].control = (m6844_channel[offset - 0x10].control & 0xc0) | (data & 0x3f);
+			m_m6844_channel[offset - 0x10].control = (m_m6844_channel[offset - 0x10].control & 0xc0) | (data & 0x3f);
 			break;
 
 		/* priority control */
 		case 0x14:
-			m6844_priority = data;
+			m_m6844_priority = data;
 
 			/* update each channel */
 			for (i = 0; i < 4; i++)
 			{
 				/* if we're going active... */
-				if (!m6844_channel[i].active && (data & (1 << i)))
+				if (!m_m6844_channel[i].active && (data & (1 << i)))
 				{
 					/* mark us active */
-					m6844_channel[i].active = 1;
+					m_m6844_channel[i].active = 1;
 					LOG(("swtpc09_dma_channel active %02X\n", i));
 
 					/* set the DMA busy bit and clear the DMA end bit */
-					m6844_channel[i].control |= 0x40;
-					m6844_channel[i].control &= ~0x80;
+					m_m6844_channel[i].control |= 0x40;
+					m_m6844_channel[i].control &= ~0x80;
 
 					/* set the starting address, counter, and time */
-					m6844_channel[i].start_address = m6844_channel[i].address;
-					m6844_channel[i].start_counter = m6844_channel[i].counter;
+					m_m6844_channel[i].start_address = m_m6844_channel[i].address;
+					m_m6844_channel[i].start_counter = m_m6844_channel[i].counter;
 
 
 					/* generate and play the sample */
@@ -857,23 +838,23 @@ WRITE8_HANDLER( m6844_w )
 				}
 
 				/* if we're going inactive... */
-				else if (m6844_channel[i].active && !(data & (1 << i)))
+				else if (m_m6844_channel[i].active && !(data & (1 << i)))
 				{
 					/* mark us inactive */
-					m6844_channel[i].active = 0;
+					m_m6844_channel[i].active = 0;
 				}
 			}
 			break;
 
 		/* interrupt control */
 		case 0x15:
-			m6844_interrupt = (m6844_interrupt & 0x80) | (data & 0x7f);
-            LOG(("swtpc09_m6844_interrupt_w %02X\n", m6844_interrupt));
+			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
+            LOG(("swtpc09_m_m6844_interrupt_w %02X\n", m_m6844_interrupt));
 			break;
 
 		/* chaining control */
 		case 0x16:
-			m6844_chain = data;
+			m_m6844_chain = data;
 			break;
 
 		/* 0x17-0x1f not used */
@@ -895,12 +876,12 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
 	{
-		m6844_channel[i].active = 0;
-		m6844_channel[i].control = 0x00;
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
 	}
-	m6844_priority = 0x00;
-	m6844_interrupt = 0x00;
-	m6844_chain = 0x00;
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
 
 }
 
@@ -917,12 +898,12 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
 	{
-		m6844_channel[i].active = 0;
-		m6844_channel[i].control = 0x00;
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
 	}
-	m6844_priority = 0x00;
-	m6844_interrupt = 0x00;
-	m6844_chain = 0x00;
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
 
 }
 
@@ -939,12 +920,12 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
 	{
-		m6844_channel[i].active = 0;
-		m6844_channel[i].control = 0x00;
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
 	}
-	m6844_priority = 0x00;
-	m6844_interrupt = 0x00;
-	m6844_chain = 0x00;
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
 
 }
 
@@ -963,11 +944,11 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
 	{
-		m6844_channel[i].active = 0;
-		m6844_channel[i].control = 0x00;
+		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].control = 0x00;
 	}
-	m6844_priority = 0x00;
-	m6844_interrupt = 0x00;
-	m6844_chain = 0x00;
+	m_m6844_priority = 0x00;
+	m_m6844_interrupt = 0x00;
+	m_m6844_chain = 0x00;
 
 }

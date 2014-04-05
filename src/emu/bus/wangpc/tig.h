@@ -38,6 +38,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+
 protected:
 	// device-level overrides
 	virtual void device_start();

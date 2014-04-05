@@ -396,17 +396,6 @@ UINT8 devcb_resolved_read8::from_port(offs_t offset, UINT8 mem_mask)
 
 
 //-------------------------------------------------
-//  from_read8space - helper to convert from a device
-//  line read value to an 8-bit value
-//-------------------------------------------------
-
-UINT8 devcb_resolved_read8::from_read8space(offs_t offset, UINT8 mem_mask)
-{
-	return (*m_helper.read8_space)(*m_object.space, offset, 0xff);
-}
-
-
-//-------------------------------------------------
 //  from_read8device - helper to convert from a device
 //  line read value to an 8-bit value
 //-------------------------------------------------
@@ -542,17 +531,6 @@ void devcb_resolved_write8::to_unmap(offs_t offset, UINT8 data, UINT8 mem_mask)
 void devcb_resolved_write8::to_port(offs_t offset, UINT8 data, UINT8 mem_mask)
 {
 	m_object.port->write(data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  to_write8space - helper to convert to an 8-bit
-//  memory read value from a line value
-//-------------------------------------------------
-
-void devcb_resolved_write8::to_write8space(offs_t offset, UINT8 data, UINT8 mem_mask)
-{
-	(*m_helper.write8_space)(*m_object.space, offset, data, mem_mask);
 }
 
 

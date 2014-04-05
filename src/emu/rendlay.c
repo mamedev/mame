@@ -666,6 +666,8 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_stateoffset = xml_get_attribute_int_with_subst(machine, compnode, "stateoffset", 0);
 		m_numsymbolsvisible = xml_get_attribute_int_with_subst(machine, compnode, "numsymbolsvisible", 3);
 		m_reelreversed = xml_get_attribute_int_with_subst(machine, compnode, "reelreversed", 0);
+		m_beltreel = xml_get_attribute_int_with_subst(machine, compnode, "beltreel", 0);
+		
 	}
 
 	// led7seg nodes
@@ -981,6 +983,165 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 /* state is a normalized value between 0 and 65536 so that we don't need to worry about how many motor steps here or in the .lay, only the number of symbols */
 void layout_element::component::draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
+	if (m_beltreel)
+	{
+		draw_beltreel(machine,dest,bounds,state);
+	}
+	else
+	{
+		const int max_state_used = 0x10000;
+
+		// shift the reels a bit based on this param, allows fine tuning
+		int use_state = (state + m_stateoffset) % max_state_used;
+
+		// compute premultiplied colors
+		UINT32 r = m_color.r * 255.0;
+		UINT32 g = m_color.g * 255.0;
+		UINT32 b = m_color.b * 255.0;
+		UINT32 a = m_color.a * 255.0;
+
+		// get the width of the string
+		render_font *font = machine.render().font_alloc("default");
+		float aspect = 1.0f;
+		INT32 width;
+		
+
+		int curry = 0;
+		int num_shown = m_numsymbolsvisible;
+
+		int ourheight = bounds.height();
+
+		for (int fruit = 0;fruit<m_numstops;fruit++)
+		{
+			int basey;
+
+			if (m_reelreversed==1)
+			{
+				basey = bounds.min_y + ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+			}
+			else
+			{
+				basey = bounds.min_y - ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+			}
+
+			// wrap around...
+			if (basey < bounds.min_y)
+				basey += ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
+			if (basey > bounds.max_y)
+				basey -= ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
+
+			int endpos = basey+ourheight/num_shown;
+
+			// only render the symbol / text if it's atually in view because the code is SLOW
+			if ((endpos >= bounds.min_y) && (basey <= bounds.max_y))
+			{
+				while (1)
+				{
+					width = font->string_width(ourheight/num_shown, aspect, m_stopnames[fruit]);
+					if (width < bounds.width())
+						break;
+					aspect *= 0.9f;
+				}
+
+				INT32 curx;
+				curx = bounds.min_x + (bounds.width() - width) / 2;
+
+				if (m_file[fruit])
+					if (!m_bitmap[fruit].valid())
+						load_reel_bitmap(fruit);
+
+				if (m_file[fruit]) // render gfx
+				{
+					bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
+
+					if (m_bitmap[fruit].valid())
+					{
+						render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], m_color);
+
+						for (int y = 0; y < ourheight/num_shown; y++)
+						{
+							int effy = basey + y;
+
+							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							{
+								UINT32 *src = &tempbitmap2.pix32(y);
+								UINT32 *d = &dest.pix32(effy);
+								for (int x = 0; x < dest.width(); x++)
+								{
+									int effx = x;
+									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									{
+										UINT32 spix = rgb_t(src[x]).a();
+										if (spix != 0)
+										{
+											d[effx] = src[x];
+										}
+									}
+								}
+							}
+
+						}
+					}
+				}
+				else // render text (fallback)
+				{
+					// allocate a temporary bitmap
+					bitmap_argb32 tempbitmap(dest.width(), dest.height());
+
+					// loop over characters
+					for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+					{
+						// get the font bitmap
+						rectangle chbounds;
+						font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, *s, chbounds);
+
+						// copy the data into the target
+						for (int y = 0; y < chbounds.height(); y++)
+						{
+							int effy = basey + y;
+
+							if (effy >= bounds.min_y && effy <= bounds.max_y)
+							{
+								UINT32 *src = &tempbitmap.pix32(y);
+								UINT32 *d = &dest.pix32(effy);
+								for (int x = 0; x < chbounds.width(); x++)
+								{
+									int effx = curx + x + chbounds.min_x;
+									if (effx >= bounds.min_x && effx <= bounds.max_x)
+									{
+										UINT32 spix = rgb_t(src[x]).a(); 
+										if (spix != 0)
+										{
+											rgb_t dpix = d[effx];
+											UINT32 ta = (a * (spix + 1)) >> 8;
+											UINT32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+											UINT32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+											UINT32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+											d[effx] = rgb_t(tr, tg, tb);
+										}
+									}
+								}
+							}
+						}
+
+						// advance in the X direction
+						curx += font->char_width(ourheight/num_shown, aspect, *s);
+
+					}
+
+				}
+			}
+
+			curry += ourheight/num_shown;
+		}
+	// free the temporary bitmap and font
+	machine.render().font_free(font);
+	}
+}
+
+
+void layout_element::component::draw_beltreel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
+{
 	const int max_state_used = 0x10000;
 
 	// shift the reels a bit based on this param, allows fine tuning
@@ -996,45 +1157,44 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
 	INT32 width;
-	int curry = 0;
+	int currx = 0;
 	int num_shown = m_numsymbolsvisible;
 
-	int ourheight = bounds.height();
+	int ourwidth = bounds.width();
 
 	for (int fruit = 0;fruit<m_numstops;fruit++)
 	{
-		int basey;
-
+		int basex;
 		if (m_reelreversed==1)
 		{
-			basey = bounds.min_y + ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+			basex = bounds.min_x + ((use_state)*(ourwidth/num_shown)/(max_state_used/m_numstops)) + currx;
 		}
 		else
 		{
-			basey = bounds.min_y - ((use_state)*(ourheight/num_shown)/(max_state_used/m_numstops)) + curry;
+			basex = bounds.min_x - ((use_state)*(ourwidth/num_shown)/(max_state_used/m_numstops)) + currx;
 		}
 
 		// wrap around...
-		if (basey < bounds.min_y)
-			basey += ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
-		if (basey > bounds.max_y)
-			basey -= ((max_state_used)*(ourheight/num_shown)/(max_state_used/m_numstops));
+		if (basex < bounds.min_x)
+			basex += ((max_state_used)*(ourwidth/num_shown)/(max_state_used/m_numstops));
+		if (basex > bounds.max_x)
+			basex -= ((max_state_used)*(ourwidth/num_shown)/(max_state_used/m_numstops));
 
-		int endpos = basey+ourheight/num_shown;
+		int endpos = basex+(ourwidth/num_shown);
 
 		// only render the symbol / text if it's atually in view because the code is SLOW
-		if ((endpos >= bounds.min_y) && (basey <= bounds.max_y))
+		if ((endpos >= bounds.min_x) && (basex <= bounds.max_x))
 		{
 			while (1)
 			{
-				width = font->string_width(ourheight/num_shown, aspect, m_stopnames[fruit]);
+				width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
 				if (width < bounds.width())
 					break;
 				aspect *= 0.9f;
 			}
 
 			INT32 curx;
-			curx = bounds.min_x + (bounds.width() - width) / 2;
+			curx = bounds.min_x;
 
 			if (m_file[fruit])
 				if (!m_bitmap[fruit].valid())
@@ -1042,23 +1202,23 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 
 			if (m_file[fruit]) // render gfx
 			{
-				bitmap_argb32 tempbitmap2(dest.width(), ourheight/num_shown);
+				bitmap_argb32 tempbitmap2(ourwidth/num_shown, dest.height());
 
 				if (m_bitmap[fruit].valid())
 				{
 					render_resample_argb_bitmap_hq(tempbitmap2, m_bitmap[fruit], m_color);
 
-					for (int y = 0; y < ourheight/num_shown; y++)
+					for (int y = 0; y < dest.height(); y++)
 					{
-						int effy = basey + y;
+						int effy = y;
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
 							UINT32 *src = &tempbitmap2.pix32(y);
 							UINT32 *d = &dest.pix32(effy);
-							for (int x = 0; x < dest.width(); x++)
+							for (int x = 0; x < ourwidth/num_shown; x++)
 							{
-								int effx = x;
+								int effx = basex + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
 									UINT32 spix = rgb_t(src[x]).a();
@@ -1083,12 +1243,12 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 				{
 					// get the font bitmap
 					rectangle chbounds;
-					font->get_scaled_bitmap_and_bounds(tempbitmap, ourheight/num_shown, aspect, *s, chbounds);
+					font->get_scaled_bitmap_and_bounds(tempbitmap, dest.height(), aspect, *s, chbounds);
 
 					// copy the data into the target
 					for (int y = 0; y < chbounds.height(); y++)
 					{
-						int effy = basey + y;
+						int effy = y;
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
@@ -1096,10 +1256,10 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 							UINT32 *d = &dest.pix32(effy);
 							for (int x = 0; x < chbounds.width(); x++)
 							{
-								int effx = curx + x + chbounds.min_x;
+								int effx = basex + curx + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									UINT32 spix = rgb_t(src[x]).a();
+									UINT32 spix = rgb_t(src[x]).a(); 
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
@@ -1115,21 +1275,19 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					}
 
 					// advance in the X direction
-					curx += font->char_width(ourheight/num_shown, aspect, *s);
+					curx += font->char_width(dest.height(), aspect, *s);
 
 				}
 
 			}
 		}
 
-		curry += ourheight/num_shown;
+		currx += ourwidth/num_shown;
 	}
 
 	// free the temporary bitmap and font
 	machine.render().font_free(font);
 }
-
-
 
 
 //-------------------------------------------------

@@ -97,6 +97,9 @@ public:
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mz3500);
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -137,15 +140,14 @@ CRTC regs
 (mirror of [5]?)
 */
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( mz3500_state::hgdc_display_pixels )
 {
 	// ...
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( mz3500_state::hgdc_draw_text )
 {
-	mz3500_state *state = device->machine().driver_data<mz3500_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile;
@@ -156,24 +158,24 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 hires;
 	UINT8 color_mode;
 
-//  popmessage("%02x",state->m_crtc[6]);
+//  popmessage("%02x",m_crtc[6]);
 
-	color_mode = state->m_crtc[4] & 1;
-	width80 = (state->m_crtc[5] & 2) >> 1;
-	hires = (state->m_crtc[6] & 1);
+	color_mode = m_crtc[4] & 1;
+	width80 = (m_crtc[5] & 2) >> 1;
+	hires = (m_crtc[6] & 1);
 	char_size = (hires) ? 16 : 8;
 
 	for( x = 0; x < pitch; x++ )
 	{
-		tile = (state->m_video_ram[((addr+x)*2) & 0x1fff] & 0xff);
-		attr = (state->m_video_ram[((addr+x)*2+1) & 0x3ffff] & 0x0f);
+		tile = (m_video_ram[((addr+x)*2) & 0x1fff] & 0xff);
+		attr = (m_video_ram[((addr+x)*2+1) & 0x3ffff] & 0x0f);
 
 		//if(hires)
 		//  tile <<= 1;
 
 		for( yi = 0; yi < lr; yi++)
 		{
-			tile_data = state->m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
+			tile_data = m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
 
 			for( xi = 0; xi < 8; xi++)
 			{
@@ -233,26 +235,6 @@ UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 	m_hgdc1->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
-
-
-
-static UPD7220_INTERFACE( hgdc_1_intf )
-{
-	NULL,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("upd7220_gfx", upd7220_device, ext_sync_w),
-	DEVCB_NULL
-};
-
-static UPD7220_INTERFACE( hgdc_2_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 READ8_MEMBER(mz3500_state::mz3500_ipl_r)
 {
@@ -852,8 +834,14 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
-	MCFG_UPD7220_ADD("upd7220_chr", MAIN_CLOCK/5, hgdc_1_intf, upd7220_1_map)
-	MCFG_UPD7220_ADD("upd7220_gfx", MAIN_CLOCK/5, hgdc_2_intf, upd7220_2_map)
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
+	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))	
+
+	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz3500_state, hgdc_display_pixels)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

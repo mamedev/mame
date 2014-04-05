@@ -482,22 +482,26 @@ void dsp56k_io_reset(dsp56k_core* cpustate)
 	external_p_wait_states_set(cpustate, 0x1f);
 }
 
-READ16_HANDLER( program_r )
+
+} // namespace DSP56K
+
+
+READ16_MEMBER( dsp56k_device::program_r )
 {
-	dsp56k_core* cpustate = get_safe_token(&space.device());
+	dsp56k_core* cpustate = get_safe_token(this);
 	return cpustate->program_ram[offset];
 }
 
-WRITE16_HANDLER( program_w )
+WRITE16_MEMBER( dsp56k_device::program_w )
 {
-	dsp56k_core* cpustate = get_safe_token(&space.device());
+	dsp56k_core* cpustate = get_safe_token(this);
 	cpustate->program_ram[offset] = data;
 }
 
 /* Work */
-READ16_HANDLER( peripheral_register_r )
+READ16_MEMBER( dsp56k_device::peripheral_register_r )
 {
-	dsp56k_core* cpustate = get_safe_token(&space.device());
+	dsp56k_core* cpustate = get_safe_token(this);
 	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
@@ -630,9 +634,9 @@ READ16_HANDLER( peripheral_register_r )
 	return cpustate->peripheral_ram[offset];
 }
 
-WRITE16_HANDLER( peripheral_register_w )
+WRITE16_MEMBER( dsp56k_device::peripheral_register_w )
 {
-	dsp56k_core* cpustate = get_safe_token(&space.device());
+	dsp56k_core* cpustate = get_safe_token(this);
 
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&cpustate->peripheral_ram[offset]);
@@ -784,8 +788,6 @@ WRITE16_HANDLER( peripheral_register_w )
 			break;
 	}
 }
-
-} // namespace DSP56K
 
 /* These two functions are exposed to the outside world */
 /* They represent the host side of the dsp56k's host interface */

@@ -453,24 +453,14 @@ INPUT_PORTS_END
 //  UPD7220_INTERFACE( hgdc_intf )
 //-------------------------------------------------
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( compis_state::hgdc_display_pixels )
 {
-	compis_state *state = device->machine().driver_data<compis_state>();
-	UINT8 i,gfx = state->m_video_ram[address];
-	const pen_t *pen = state->m_palette->pens();
+	UINT8 i,gfx = m_video_ram[address];
+	const pen_t *pen = m_palette->pens();
 
 	for(i=0; i<8; i++)
 		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
 }
-
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -722,8 +712,12 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
+	
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_state, hgdc_display_pixels)	
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// devices

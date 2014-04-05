@@ -18,7 +18,5 @@
 	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func);
 #define MCFG_MEMCARD_HANDLER(_func) \
 	config.m_memcard_handler = MEMCARD_HANDLER_NAME(_func);
-#define MCFG_NVRAM_HANDLER_CLEAR() \
-	config.m_nvram_handler = NULL;
 
 #endif  /* __MCFGLGCY_H__ */

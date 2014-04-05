@@ -375,6 +375,8 @@ struct SNES_SCANLINE
 	UINT8  blend_exception[SNES_SCR_WIDTH];
 };
 
+class snes_state;
+
 class snes_ppu_class  /* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 public:
@@ -450,6 +452,41 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
+	
+	struct OAM
+	{
+		UINT16 tile;
+		INT16 x, y;
+		UINT8 size, vflip, hflip, priority_bits, pal;
+		int height, width;
+	};
+
+	struct OAM m_oam_spritelist[SNES_SCR_WIDTH / 2];
+
+	UINT8 m_oam_itemlist[32];
+
+	struct TILELIST {
+		INT16 x;
+		UINT16 priority, pal, tileaddr;
+		int hflip;
+	};
+
+	struct TILELIST m_oam_tilelist[34];
+
+	#if SNES_LAYER_DEBUG
+	struct DEBUGOPTS
+	{
+		UINT8 bg_disabled[5];
+		UINT8 mode_disabled[8];
+		UINT8 draw_subscreen;
+		UINT8 windows_disabled;
+		UINT8 mosaic_disabled;
+		UINT8 colormath_disabled;
+		UINT8 sprite_reversed;
+		UINT8 select_pri[5];
+	};
+	struct DEBUGOPTS m_debug_options;
+	#endif
 
 	screen_device *m_screen;
 
@@ -527,7 +564,7 @@ public:
 	inline UINT32 get_vram_address(running_machine &machine);
 	UINT8 dbg_video(running_machine &machine, UINT16 curline);
 
-	void ppu_start(screen_device &screen);
+	void ppu_start(screen_device &screen,snes_state *state);
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
 
@@ -540,6 +577,8 @@ public:
 	UINT16 *m_oam_ram;     /* Object Attribute Memory */
 	UINT16 *m_cgram;   /* Palette RAM */
 	UINT8  *m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	
+	snes_state *m_state;
 };
 
 struct snes_cart_info
@@ -678,6 +717,7 @@ public:
 	DECLARE_READ8_MEMBER(snes_r_bank2);
 	DECLARE_WRITE8_MEMBER(snes_w_bank1);
 	DECLARE_WRITE8_MEMBER(snes_w_bank2);
+	DECLARE_READ8_MEMBER(snes_open_bus_r);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
@@ -739,7 +779,5 @@ enum
 	SNES_OAM,
 	SNES_COLOR
 };
-
-DECLARE_READ8_HANDLER( snes_open_bus_r );
 
 #endif /* _SNES_H_ */

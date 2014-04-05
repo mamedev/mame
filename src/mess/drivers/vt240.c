@@ -30,8 +30,7 @@ public:
 	vt240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_hgdc(*this, "upd7220")
-		,
+		m_hgdc(*this, "upd7220"),
 		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -48,12 +47,12 @@ public:
 	DECLARE_DRIVER_INIT(vt240);
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(vt240_irq);
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 };
 
 /* TODO */
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( vt240_state::hgdc_draw_text )
 {
-	//vt240_state *state = device->machine().driver_data<a5105_state>();
 	//int x;
 	//int xi,yi;
 	//int tile,color;
@@ -67,7 +66,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for( yi = 0; yi < lr; yi++)
 		{
-			tile_data = state->m_char_rom[(tile*8+yi) & 0x7ff];
+			tile_data = m_char_rom[(tile*8+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -131,15 +130,6 @@ void vt240_state::machine_reset()
 {
 }
 
-static UPD7220_INTERFACE( hgdc_intf )
-{
-	NULL,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(vt240_state::vt240_irq)
 {
 	//device.execute().set_input_line(I8085_RST65_LINE, ASSERT_LINE);
@@ -179,7 +169,9 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz / 4, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(vt240_state, hgdc_draw_text)
 MACHINE_CONFIG_END
 
 /* ROM definition */

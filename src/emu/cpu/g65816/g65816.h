@@ -59,15 +59,36 @@ enum
 
 /* Main interface function */
 DECLARE_LEGACY_CPU_DEVICE(G65816, g65816);
-DECLARE_LEGACY_CPU_DEVICE(_5A22, _5a22);
+
+CPU_GET_INFO( _5a22 );
+
+class _5a22_device : public legacy_cpu_device
+{
+public:
+	_5a22_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+	
+	DECLARE_WRITE8_MEMBER( wrmpya_w );
+	DECLARE_WRITE8_MEMBER( wrmpyb_w );
+	DECLARE_WRITE8_MEMBER( wrdivl_w );
+	DECLARE_WRITE8_MEMBER( wrdivh_w );
+	DECLARE_WRITE8_MEMBER( wrdvdd_w );
+	DECLARE_WRITE8_MEMBER( memsel_w );
+	DECLARE_READ8_MEMBER( rddivl_r );
+	DECLARE_READ8_MEMBER( rddivh_r );
+	DECLARE_READ8_MEMBER( rdmpyl_r );
+	DECLARE_READ8_MEMBER( rdmpyh_r );
+	
+	void set_5a22_map();
+};
+
+extern const device_type _5A22;
+
 
 #define CPU_TYPE_G65816 0
 #define CPU_TYPE_5A22 1
 
 
 void g65816_set_read_vector_callback(device_t *device, read8_delegate read_vector);
-
-void set_5a22_map(legacy_cpu_device &cpu);
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

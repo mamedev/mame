@@ -183,6 +183,7 @@ DRIVER_INIT_MEMBER(wpc_dot_state,wpc_dot)
 	m_bankmask = (memregion("code")->bytes() >> 14) - 1;
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
 	memset(m_ram,0,0x3000);
+	memset(m_dmdram,0,0x2000);
 	save_pointer(m_dmdram,"DMD RAM",0x2000);
 }
 

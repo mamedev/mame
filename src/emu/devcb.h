@@ -34,20 +34,12 @@
         write_line_device_func: (device, data)
         read8_device_func:      (device, offset)
         write8_device_func:     (device, offset, data)
-        read8_space_func:       (space, offset)
-        write8_space_func:      (space, offset, data)
         read16_device_func:     (device, offset)
         write16_device_func:    (device, offset, data)
-        read16_space_func:      (space, offset)
-        write16_space_func:     (space, offset, data)
         read32_device_func:     (device, offset)
         write32_device_func:    (device, offset, data)
-        read32_space_func:      (space, offset)
-        write32_space_func:     (space, offset, data)
         read64_device_func:     (device, offset)
         write64_device_func:    (device, offset, data)
-        read64_space_func:      (space, offset)
-        write64_space_func:     (space, offset, data)
 
 ***************************************************************************/
 
@@ -165,31 +157,31 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 #define DEVCB_NULL                              { DEVCB_TYPE_NULL }
 
 // line or read/write handlers for the driver device
-#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)      { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DRIVER_MEMBER(cls,memb)           { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
-#define DEVCB_DRIVER_MEMBER16(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-#define DEVCB_DRIVER_MEMBER32(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
-//#define DEVCB_DRIVER_MEMBER64(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)      { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER(cls,memb)           { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb> }
+#define DEVCB_DRIVER_MEMBER16(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb> }
+#define DEVCB_DRIVER_MEMBER32(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb> }
+//#define DEVCB_DRIVER_MEMBER64(cls,memb)         { DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb> }
 
 // line or read/write handlers for another device
-#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)  { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DEVICE_MEMBER(tag,cls,memb)       { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
-#define DEVCB_DEVICE_MEMBER16(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
-#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb>, NULL }
-//#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)  { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER(tag,cls,memb)       { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb> }
+#define DEVCB_DEVICE_MEMBER16(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb> }
+#define DEVCB_DEVICE_MEMBER32(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub32<cls, &cls::memb> }
+//#define DEVCB_DEVICE_MEMBER64(tag,cls,memb)     { DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub64<cls, &cls::memb> }
 
 // constant values
-#define DEVCB_CONSTANT(value)                   { DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
+#define DEVCB_CONSTANT(value)                   { DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL }
 #define DEVCB_LINE_GND                          DEVCB_CONSTANT(0)
 #define DEVCB_LINE_VCC                          DEVCB_CONSTANT(1)
 
-#define DEVCB_UNMAPPED                          { DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL, NULL }
+#define DEVCB_UNMAPPED                          { DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL }
 
 // read handlers for an I/O port by tag
-#define DEVCB_INPUT_PORT(tag)                   { DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL, NULL }
+#define DEVCB_INPUT_PORT(tag)                   { DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL }
 
 // write handlers for a CPU input line
-#define DEVCB_CPU_INPUT_LINE(tag,line)          { DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL, NULL }
+#define DEVCB_CPU_INPUT_LINE(tag,line)          { DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL }
 
 
 
@@ -218,13 +210,9 @@ union devcb_resolved_read_helpers
 	UINT8 *                 null_indicator;
 	read_line_device_func   read_line;
 	read8_device_func       read8_device;
-	read8_space_func        read8_space;
 	read16_device_func      read16_device;
-	read16_space_func       read16_space;
 	read32_device_func      read32_device;
-	read32_space_func       read32_space;
 	read64_device_func      read64_device;
-	read64_space_func       read64_space;
 };
 
 union devcb_resolved_write_helpers
@@ -232,13 +220,9 @@ union devcb_resolved_write_helpers
 	UINT8 *                 null_indicator;
 	write_line_device_func  write_line;
 	write8_device_func      write8_device;
-	write8_space_func       write8_space;
 	write16_device_func     write16_device;
-	write16_space_func      write16_space;
 	write32_device_func     write32_device;
-	write32_space_func      write32_space;
 	write64_device_func     write64_device;
-	write64_space_func      write64_space;
 	int                     input_line;
 };
 
@@ -254,7 +238,6 @@ struct devcb_read_line
 	const char *            name;           // name of the target function
 	read_line_device_func   readline;       // read line function
 	read8_device_func       readdevice;     // read device function
-	read8_space_func        readspace;      // read space function
 };
 
 
@@ -304,7 +287,6 @@ struct devcb_write_line
 	const char *            name;           // name of the target function
 	write_line_device_func  writeline;      // write line function
 	write8_device_func      writedevice;    // write device function
-	write8_space_func       writespace;     // write space function
 };
 
 
@@ -355,7 +337,6 @@ struct devcb_read8
 	const char *            name;           // name of the target function
 	read_line_device_func   readline;       // read line function
 	read8_device_func       readdevice;     // read device function
-	read8_space_func        readspace;      // read space function
 };
 
 
@@ -386,7 +367,6 @@ public:
 private:
 	// internal helpers
 	UINT8 from_port(offs_t offset, UINT8 mem_mask);
-	UINT8 from_read8space(offs_t offset, UINT8 mem_mask);
 	UINT8 from_read8device(offs_t offset, UINT8 mem_mask);
 	UINT8 from_readline(offs_t offset, UINT8 mem_mask);
 	UINT8 from_constant(offs_t offset, UINT8 mem_mask);
@@ -410,7 +390,6 @@ struct devcb_write8
 	const char *            name;           // name of the target function
 	write_line_device_func  writeline;      // write line function
 	write8_device_func      writedevice;    // write device function
-	write8_space_func       writespace;     // write space function
 };
 
 
@@ -442,7 +421,6 @@ private:
 	// internal helpers
 	void to_null(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_port(offs_t offset, UINT8 data, UINT8 mem_mask);
-	void to_write8space(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_write8device(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_writeline(offs_t offset, UINT8 data, UINT8 mem_mask);
 	void to_input(offs_t offset, UINT8 data, UINT8 mem_mask);
@@ -466,7 +444,6 @@ struct devcb_read16
 	const char *            name;           // name of the target function
 	read_line_device_func   readline;       // read line function
 	read16_device_func      readdevice;     // read device function
-	read16_space_func       readspace;      // read space function
 };
 
 
@@ -520,7 +497,6 @@ struct devcb_write16
 	const char *            name;           // name of the target function
 	write_line_device_func  writeline;      // write line function
 	write16_device_func     writedevice;    // write device function
-	write16_space_func      writespace;     // write space function
 };
 
 
@@ -574,7 +550,6 @@ struct devcb_read32
 	const char *            name;           // name of the target function
 	read_line_device_func   readline;       // read line function
 	read32_device_func      readdevice;     // read device function
-	read32_space_func       readspace;      // read space function
 };
 
 
@@ -628,7 +603,6 @@ struct devcb_write32
 	const char *            name;           // name of the target function
 	write_line_device_func  writeline;      // write line function
 	write32_device_func     writedevice;    // write device function
-	write32_space_func      writespace;     // write space function
 };
 
 
@@ -682,7 +656,6 @@ struct devcb_read64
 	const char *            name;           // name of the target function
 	read_line_device_func   readline;       // read line function
 	read64_device_func      readdevice;     // read device function
-	read64_space_func       readspace;      // read space function
 };
 
 
@@ -736,7 +709,6 @@ struct devcb_write64
 	const char *            name;           // name of the target function
 	write_line_device_func  writeline;      // write line function
 	write64_device_func     writedevice;    // write device function
-	write64_space_func      writespace;     // write space function
 };
 
 

@@ -23,7 +23,20 @@
 #define DSP56K_IRQ_RESET 3  /* Is this needed? */
 
 // Needed for MAME
-DECLARE_LEGACY_CPU_DEVICE(DSP56156, dsp56k);
+CPU_GET_INFO( dsp56k );
+
+class dsp56k_device : public legacy_cpu_device
+{
+public:
+	dsp56k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_READ16_MEMBER( program_r );
+	DECLARE_WRITE16_MEMBER( program_w );
+	DECLARE_READ16_MEMBER( peripheral_register_r );
+	DECLARE_WRITE16_MEMBER( peripheral_register_w );
+};
+
+extern const device_type DSP56156;
 
 
 /***************************************************************************

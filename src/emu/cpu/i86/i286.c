@@ -1424,6 +1424,17 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					i_outsw();
 					break;
 
+				case 0x8c: // i_mov_wsreg
+					m_modrm = fetch();
+					if((m_modrm & 0x38) > 0x18)
+					{
+						logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+						throw TRAP(FAULT_UD, (UINT16)-1);
+					}
+					PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
+					CLKM(MOV_RS,MOV_MS);
+					break;
+
 				case 0x8e: // i_mov_sregw
 					m_modrm = fetch();
 					m_src = GetRMWord();

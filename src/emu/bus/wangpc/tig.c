@@ -89,18 +89,9 @@ static ADDRESS_MAP_START( upd7220_0_map, AS_0, 8, wangpc_tig_device )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM // font memory
 ADDRESS_MAP_END
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_display_text)
+UPD7220_DRAW_TEXT_LINE_MEMBER( wangpc_tig_device::hgdc_draw_text )
 {
 }
-
-static UPD7220_INTERFACE( hgdc0_intf )
-{
-	NULL,
-	hgdc_display_text,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -112,18 +103,9 @@ static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, wangpc_tig_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM // graphics memory
 ADDRESS_MAP_END
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 {
 }
-
-static UPD7220_INTERFACE( hgdc1_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -140,9 +122,14 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
-	MCFG_UPD7220_ADD(UPD7720_0_TAG, XTAL_52_832MHz/28, hgdc0_intf, upd7220_0_map) // was /10?
+	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL_52_832MHz/28) 
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_0_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(wangpc_tig_device, hgdc_draw_text)	
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	MCFG_UPD7220_ADD(UPD7720_1_TAG, XTAL_52_832MHz/28, hgdc1_intf, upd7220_1_map) // was /16?
+
+	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL_52_832MHz/28)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)	
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
 

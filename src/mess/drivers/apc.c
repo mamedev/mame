@@ -151,6 +151,9 @@ public:
 	UINT8 m_dma_offset[4];
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 protected:
 	// driver_device overrides
@@ -179,24 +182,23 @@ UINT32 apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, co
 }
 
 
-static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( apc_state::hgdc_display_pixels )
 {
 	// ...
 }
 
-static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+UPD7220_DRAW_TEXT_LINE_MEMBER( apc_state::hgdc_draw_text )
 {
-	apc_state *state = device->machine().driver_data<apc_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int xi,yi,yi_trans;
 	int x;
 	UINT8 char_size;
 //  UINT8 interlace_on;
 
-//  if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
+//  if(m_video_ff[DISPLAY_REG] == 0) //screen is off
 //      return;
 
-//  interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
+//  interlace_on = m_video_reg[2] == 0x10; /* TODO: correct? */
 	char_size = 19;
 
 	for(x=0;x<pitch;x++)
@@ -208,12 +210,12 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT32 tile_addr;
 		UINT8 tile_sel;
 
-//      tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
+//      tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
 
-		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
-		tile_sel = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
-		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
+		tile = m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
+		tile_sel = m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
+		attr = (m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 		u_line = attr & 0x01;
 		o_line = attr & 0x02;
@@ -233,7 +235,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi);
 				res_y = y*lr+yi;
 
-				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				/*
@@ -257,18 +259,18 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(yi & 0x10)
 						tile_data = 0;
 					else
-						tile_data = state->m_aux_pcg[(tile & 0xff)*0x20+yi*2];
+						tile_data = m_aux_pcg[(tile & 0xff)*0x20+yi*2];
 				}
 				else
-					tile_data = state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi_trans & 0xf)*0x80)+((yi_trans & 0x10)<<8)];
+					tile_data = m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi_trans & 0xf)*0x80)+((yi_trans & 0x10)<<8)];
 
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
 				if(o_line && yi == 0) { tile_data = 0xff; }
 				if(v_line)  { tile_data|=1; }
-				if(blink && device->machine().first_screen()->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
+				if(blink && machine().first_screen()->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
 
-				if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
+				if(cursor_on && cursor_addr == tile_addr && machine().first_screen()->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)
@@ -758,26 +760,6 @@ void apc_state::machine_reset()
 	m_keyb.sig = 0;
 }
 
-
-static UPD7220_INTERFACE( hgdc_1_intf )
-{
-	NULL,
-	hgdc_draw_text,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-static UPD7220_INTERFACE( hgdc_2_intf )
-{
-	hgdc_display_pixels,
-	NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const gfx_layout charset_8x16 =
 {
 	8, 16,
@@ -1000,8 +982,13 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
-	MCFG_UPD7220_ADD("upd7220_chr", XTAL_3_579545MHz, hgdc_1_intf, upd7220_1_map) // unk clock
-	MCFG_UPD7220_ADD("upd7220_btm", XTAL_3_579545MHz, hgdc_2_intf, upd7220_2_map) // unk clock
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)	
+
+	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)	
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apc_state,apc)
