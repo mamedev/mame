@@ -670,11 +670,8 @@ WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 
 WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
 {
-	device_t *device = machine().device(I8255A_M6502_TAG);
-	i8255_device *ppi = static_cast<i8255_device*>(device);
-
-	ppi->pc2_w(BIT(data, 6));
-	ppi->pc4_w(BIT(data, 7));
+	m_ppi_6502->pc2_w(BIT(data, 6));
+	m_ppi_6502->pc4_w(BIT(data, 7));
 }
 
 static I8255A_INTERFACE( disp_ppi_intf )
@@ -689,11 +686,8 @@ static I8255A_INTERFACE( disp_ppi_intf )
 
 WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 {
-	device_t *device = machine().device(I8255A_DISP_TAG);
-	i8255_device *ppi = static_cast<i8255_device*>(device);
-
-	ppi->pc2_w(BIT(data, 7));
-	ppi->pc4_w(BIT(data, 6));
+	m_ppi_disp->pc2_w(BIT(data, 7));
+	m_ppi_disp->pc4_w(BIT(data, 6));
 }
 
 static I8255A_INTERFACE( m6502_ppi_intf )

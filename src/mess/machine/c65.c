@@ -423,17 +423,17 @@ void c65_state::c65_nmi(  )
 
 READ8_MEMBER(c65_state::c65_cia0_port_a_r)
 {
-	UINT8 cia0portb = machine().device<mos6526_device>("cia_0")->pb_r(space, 0);
+	UINT8 cia0portb = m_cia0->pb_r(space, 0);
 
-	return cbm_common_cia0_port_a_r(machine().device("cia_0"), cia0portb);
+	return cbm_common_cia0_port_a_r(m_cia0, cia0portb);
 }
 
 READ8_MEMBER(c65_state::c65_cia0_port_b_r)
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = machine().device<mos6526_device>("cia_0")->pa_r(space, 0);
+	UINT8 cia0porta = m_cia0->pa_r(space, 0);
 
-	value &= cbm_common_cia0_port_b_r(machine().device("cia_0"), cia0porta);
+	value &= cbm_common_cia0_port_b_r(m_cia0, cia0porta);
 
 	if (!(m_6511_port & 0x02))
 		value &= m_keyline;

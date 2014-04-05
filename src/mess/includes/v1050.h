@@ -67,6 +67,8 @@ public:
 		m_maincpu(*this, Z80_TAG),
 		m_subcpu(*this, M6502_TAG),
 		m_pic(*this, UPB8214_TAG),
+		m_ppi_disp(*this, I8255A_DISP_TAG),
+		m_ppi_6502(*this, I8255A_M6502_TAG),
 		m_rtc(*this, MSM58321RS_TAG),
 		m_uart_kb(*this, I8251A_KB_TAG),
 		m_uart_sio(*this, I8251A_SIO_TAG),
@@ -163,6 +165,8 @@ public: // HACK for MC6845
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<i8214_device> m_pic;
+	required_device<i8255_device> m_ppi_disp;
+	required_device<i8255_device> m_ppi_6502;
 	required_device<msm58321_device> m_rtc;
 	required_device<i8251_device> m_uart_kb;
 	required_device<i8251_device> m_uart_sio;
