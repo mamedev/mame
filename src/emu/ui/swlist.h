@@ -12,12 +12,15 @@
 #ifndef __UI_SWLIST_H__
 #define __UI_SWLIST_H__
 
+#include "softlist.h"
+
 // ======================> ui_menu_software_parts
 
 class ui_menu_software_parts : public ui_menu {
 public:
 	enum { T_ENTRY, T_FMGR };
-	ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const struct software_list *swl, const software_info *info, device_image_interface *image);	virtual ~ui_menu_software_parts();
+	ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const software_list *swl, const software_info *info, device_image_interface *image);
+	virtual ~ui_menu_software_parts();
 	virtual void populate();
 	virtual void handle();
 
@@ -29,7 +32,7 @@ private:
 
 	// variables
 	const software_list_device *	m_swlist;
-	const struct software_list *	m_software_list;
+	const software_list *			m_software_list;
 	const software_info	*			m_info;
 	device_image_interface *		m_image;
 };

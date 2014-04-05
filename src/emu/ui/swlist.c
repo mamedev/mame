@@ -30,7 +30,7 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const struct software_list *swl, const software_info *info, device_image_interface *image)
+ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const software_list *swl, const software_info *info, device_image_interface *image)
  	: ui_menu(machine, container)
 {
 	m_swlist = swlist;
