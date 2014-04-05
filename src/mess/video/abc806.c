@@ -327,11 +327,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 			if (!de) color = rgb_t::black;
 
-			bitmap.pix32(y, x++) = PALETTE_ABC[color];
+			bitmap.pix32(y, x++) = PALETTE_ABC[color & 0x07];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = PALETTE_ABC[color];
+				bitmap.pix32(y, x++) = PALETTE_ABC[color & 0x07];
 			}
 
 			chargen_data <<= 1;

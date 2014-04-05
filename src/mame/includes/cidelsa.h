@@ -64,6 +64,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
+	DECLARE_READ_LINE_MEMBER( cdp1869_pcb_r );
 	
 	CDP1869_CHAR_RAM_READ_MEMBER(cidelsa_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(cidelsa_charram_w);
@@ -79,8 +80,6 @@ public:
 	UINT8 *m_pageram;
 	UINT8 *m_pcbram;
 	UINT8 *m_charram;
-	DECLARE_CUSTOM_INPUT_MEMBER(cdp1869_pcb_r);
-	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -43,7 +43,7 @@
 #include "mc6845.h"
 
 
-#define LOG     (1)
+#define LOG     (0)
 
 
 const device_type MC6845 = &device_creator<mc6845_device>;
@@ -1445,6 +1445,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
+	set_clock_scale(1.0/8);
 }
 
 
@@ -1454,6 +1455,7 @@ mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, d
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
 		m_palette(*this, "palette")
 {
+	set_clock_scale(1.0/8);
 }
 
 
