@@ -47,6 +47,9 @@ const int CRT9212_RAM_SIZE  = 135;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_CRT9212_WEN2_VCC() \
+	crt9212_t::static_set_wen2(*device, 1);
+
 #define MCFG_CRT9212_DOUT_CALLBACK(_write) \
 	devcb = &crt9212_t::set_dout_wr_callback(*device, DEVCB2_##_write);
 
@@ -70,12 +73,14 @@ public:
 	// construction/destruction
 	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
+	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_t &>(device).m_wen2 = state; }
+
 	template<class _Object> static devcb2_base &set_dout_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_dout.set_callback(object); }
 	template<class _Object> static devcb2_base &set_rof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_rof.set_callback(object); }
 	template<class _Object> static devcb2_base &set_wof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_wof.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
-	DECLARE_WRITE_LINE_MEMBER( clrcnt_w ) { m_clrcnt = state; }
+	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
 	DECLARE_WRITE_LINE_MEMBER( tog_w ) { m_tog = state; }
 	DECLARE_WRITE_LINE_MEMBER( ren_w ) { m_ren = state; }
 	DECLARE_WRITE_LINE_MEMBER( wen1_w ) { m_wen1 = state; }
@@ -105,6 +110,10 @@ private:
 	int m_wclk;
 
 	// internal state
+	bool m_clrcnt_edge;
+	UINT8 m_data_latch;
+	int m_ren_int;
+	int m_wen_int;
 	UINT8 m_ram[CRT9212_RAM_SIZE][2];
 	int m_buffer;
 	int m_rac;

@@ -3,12 +3,12 @@
 #ifndef __TANDY2K__
 #define __TANDY2K__
 
-
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/harddriv.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -61,10 +61,39 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, I8272A_TAG ":0:525qd"),
 		m_floppy1(*this, I8272A_TAG ":1:525qd"),
+		m_rs232(*this, RS232_TAG),
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram"),
-		m_kbdclk(0)
+		m_dma_mux(0),
+		m_kbdclk(0),
+		m_kbddat(0),
+		m_kbdin(0),
+		m_extclk(0),
+		m_rxrdy(0),
+		m_txrdy(0),
+		m_pb_sel(0),
+		m_vram_base(0),
+		m_vidouts(0),
+		m_clkspd(0),
+		m_clkcnt(0),
+		m_blc(0),
+		m_bkc(0),
+		m_cblank(0),
+		m_dblc(0),
+		m_dbkc(0),
+		m_dblank(0),
+		m_slg(0),
+		m_sld(0),
+		m_cgra(0),
+		m_vidla(0),
+		m_outspkr(0),
+		m_spkrdata(0),
+		m_centronics_ack(0),
+		m_centronics_fault(0),
+		m_centronics_select(0),
+		m_centronics_perror(0),
+		m_centronics_busy(0)
 	{
 	}
 
@@ -86,15 +115,18 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
+	required_device<rs232_port_device> m_rs232;
 	required_device<tandy2k_keyboard_device> m_kb;
 	required_shared_ptr<UINT16> m_hires_ram;
-	required_shared_ptr<UINT16> m_char_ram;
+	optional_shared_ptr<UINT8> m_char_ram;
 
 	virtual void machine_start();
 
 	void speaker_update();
 	void dma_request(int line, int state);
 
+	DECLARE_READ8_MEMBER( char_ram_r );
+	DECLARE_WRITE8_MEMBER( char_ram_w );
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_READ8_MEMBER( enable_r );
 	DECLARE_WRITE8_MEMBER( enable_w );
@@ -115,13 +147,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vpac_vlt_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_drb_w );
 	DECLARE_WRITE_LINE_MEMBER( vpac_wben_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_cblank_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_slg_w );
+	DECLARE_WRITE_LINE_MEMBER( vpac_sld_w );
+	DECLARE_WRITE8_MEMBER( vidla_w );
 	DECLARE_WRITE8_MEMBER( drb_attr_w );
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 	DECLARE_READ8_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+
+	enum
+	{
+		LPINEN = 0,
+		KBDINEN,
+		PORTINEN
+	};
 
 	/* DMA state */
 	UINT8 m_dma_mux;
@@ -144,6 +192,16 @@ public:
 	int m_vidouts;
 	int m_clkspd;
 	int m_clkcnt;
+	int m_blc;
+	int m_bkc;
+	int m_cblank;
+	UINT8 m_dblc;
+	UINT8 m_dbkc;
+	UINT8 m_dblank;
+	int m_slg;
+	int m_sld;
+	UINT8 m_cgra;
+	UINT8 m_vidla;
 
 	/* sound state */
 	int m_outspkr;
@@ -154,12 +212,6 @@ public:
 	int m_centronics_select;
 	int m_centronics_perror;
 	int m_centronics_busy;
-
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 };
 
 #endif
