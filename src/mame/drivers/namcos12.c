@@ -1053,30 +1053,33 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_rtc(*this, "rtc"),
-		m_settings(*this, "namco_settings"),
-		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_sub(*this, "sub"),
-		m_adc(*this, "sub:adc")
-	{
-	}
+		m_adc(*this, "sub:adc"),
+		m_rtc(*this, "rtc"),
+		m_settings(*this, "namco_settings"),
+		m_sharedram(*this, "sharedram")
+	{ }
 
+	required_device<psxcpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<h83002_device> m_sub;
+	required_device<h8_adc_device> m_adc;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
 	required_shared_ptr<UINT16> m_sharedram;
-	UINT16 m_n_bankoffset;
 
+	UINT16 m_n_bankoffset;
 	UINT32 m_n_dmaoffset;
 	UINT32 m_n_tektagdmaoffset;
 	int m_has_tektagt_dma;
 
 	int m_ttt_cnt;
 	UINT32 m_ttt_val[2];
-
 	int m_s12_porta;
 	int m_s12_lastpB;
+
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(bankoffset_w);
@@ -1096,16 +1099,15 @@ public:
 	DECLARE_WRITE16_MEMBER(s12_mcu_portB_w);
 	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
 	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
+
 	DECLARE_DRIVER_INIT(namcos12);
 	DECLARE_DRIVER_INIT(ptblank2);
-	DECLARE_MACHINE_RESET(namcos12);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
-	required_device<psxcpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<h83002_device> m_sub;
-	required_device<h8_adc_device> m_adc;
+
+protected:
+	virtual void machine_reset();
 };
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1262,7 +1264,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(namcos12_state::system11gun_w)
 {
-	switch( offset )
+	switch (offset)
 	{
 	case 0:
 		/* blowback 1 */
@@ -1289,7 +1291,7 @@ READ16_MEMBER(namcos12_state::system11gun_r)
 {
 	UINT16 data = 0;
 
-	switch( offset )
+	switch (offset)
 	{
 	case 0:
 		data = ioport("LIGHT0_X")->read();
@@ -1300,7 +1302,7 @@ READ16_MEMBER(namcos12_state::system11gun_r)
 		break;
 
 	case 3:
-			data = ioport("LIGHT0_Y")->read() + 1;
+		data = ioport("LIGHT0_Y")->read() + 1;
 		break;
 
 	case 4:
@@ -1323,7 +1325,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
 {
 	// Second dma offset or protection ref values write
 
-	switch(offset)
+	switch (offset)
 	{
 	case 0:
 		m_n_tektagdmaoffset = data;
@@ -1342,11 +1344,13 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
 
 READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
 {
-	switch(offset)
+	switch (offset)
 	{
 	case 0:
 		// Reads are either ignored or bit 15 is tested for a busy flag
 		return 0x8000;
+	case 1:
+		break;
 	}
 
 	return 0;
@@ -1354,11 +1358,14 @@ READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
 
 WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
 {
-	switch( offset )
+	switch (offset)
 	{
 	case 0:
 		// Writes are 0 or rand(), only used as a "start prot value write" trigger
 		m_ttt_cnt = 0;
+		break;
+	case 1:
+		break;
 	}
 }
 
@@ -1403,7 +1410,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_3_r)
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(namcos12_state,namcos12)
+void namcos12_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bankoffset_w(space,0,0,0xffff);
@@ -1489,6 +1496,18 @@ WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
 }
 
+static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
+	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
+	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
+	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
+	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
+ADDRESS_MAP_END
+
+
 /* Golgo 13 lightgun inputs
  *
  * Note: The H8/3002's ADC is 10 bits wide, but
@@ -1498,34 +1517,21 @@ WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
-	ioport_port *port = ioport("LIGHT0_X");
-	if( port != NULL )
-		return port->read() << 2;
-
-	// if game has no lightgun ports, return 0
-	return 0;
+	return ioport("LIGHT0_X")->read() << 2;
 }
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
-	ioport_port *port = ioport("LIGHT0_Y");
-	if( port != NULL )
-		return port->read() << 2;
-
-	// if game has no lightgun ports, return 0
-	return 0;
+	return ioport("LIGHT0_Y")->read() << 2;
 }
 
-static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
-	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
-	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r )  // golgo 13 gun X-axis
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r )  // golgo 13 gun Y-axis
-	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
+static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r )
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r )
+
+	AM_IMPORT_FROM( s12h8iomap )
 ADDRESS_MAP_END
+
 
 DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
@@ -1552,8 +1558,9 @@ DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 }
 
 static MACHINE_CONFIG_START( coh700, namcos12_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
+	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL_100MHz)
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -1561,11 +1568,9 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 
-	MCFG_CPU_ADD("sub", H83002, 16737350 )
+	MCFG_CPU_ADD("sub", H83002, 16737350)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
 	MCFG_CPU_IO_MAP(s12h8iomap)
-
-	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
@@ -1589,7 +1594,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", 16737350*1.5 ) // measured at 29.168MHz, but that's too highpitched
+	MCFG_C352_ADD("c352", 16737350*1.5) // measured at 29.168MHz, but that's too highpitched
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1597,13 +1602,24 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
-	MCFG_CPU_MODIFY( "maincpu" )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tektagt, coh700 )
-	MCFG_CPU_MODIFY( "maincpu" )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( tektagt_map )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( golgo13, coh700 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_IO_MAP(golgo13_h8iomap)
 MACHINE_CONFIG_END
 
 
@@ -2835,8 +2851,8 @@ GAME( 1999, mrdrillrj, mrdrillr, coh700,   namcos124w,namcos12_state,namcos12, R
 GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
-GAME( 1999, golgo13,   0,        coh700,   golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
-GAME( 1999, g13knd,    0,        coh700,   golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
+GAME( 1999, golgo13,   0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
+GAME( 1999, g13knd,    0,        golgo13,  golgo13,  namcos12_state, namcos12, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC056 */
 GAME( 2000, kartduel,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC057 */
