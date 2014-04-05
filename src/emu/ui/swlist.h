@@ -12,14 +12,13 @@
 #ifndef __UI_SWLIST_H__
 #define __UI_SWLIST_H__
 
-#include "softlist.h"
-
 // ======================> ui_menu_software_parts
 
 class ui_menu_software_parts : public ui_menu {
 public:
 	enum { T_ENTRY, T_FMGR };
-	ui_menu_software_parts(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, software_info *info, const char *interface, software_part **part);
+	ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool opt_fmgr, int *result);
+	virtual ~ui_menu_software_parts();
 	virtual void populate();
 	virtual void handle();
 
@@ -30,11 +29,11 @@ private:
 	};
 
 	// variables
-	device_image_interface *m_image;
-	software_list_device *	m_swlist;
-	software_info *			m_info;
+	const software_info *	m_info;
 	const char *			m_interface;
-	software_part **		m_selected_part;
+	const software_part **	m_selected_part;
+	bool					m_opt_fmgr;
+	int *					m_result;
 };
 
 
@@ -42,7 +41,7 @@ private:
 
 class ui_menu_software_list : public ui_menu {
 public:
-	ui_menu_software_list(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, const char *interface, astring &result);
+	ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result);
 	virtual ~ui_menu_software_list();
 	virtual void populate();
 	virtual void handle();
@@ -56,7 +55,6 @@ private:
 	};
 
 	// variables
-	device_image_interface *		m_image;
 	software_list_device *			m_swlist; // currently selected list
 	const char *					m_interface;
 	astring &						m_result;
@@ -67,8 +65,8 @@ private:
 	// functions
 	int compare_entries(const entry_info *e1, const entry_info *e2, bool shortname);
 	entry_info *append_software_entry(const software_info *swinfo);
-	void select_entry(entry_info *entry);
 };
+
 
 
 #endif  /* __UI_SWLIST_H__ */

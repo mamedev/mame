@@ -136,7 +136,7 @@ public:
 
 	// methods
 	virtual void reset();
-	void handle(render_container *container);
+	virtual void handle(render_container *container);
 
 	// getters
 	bool is_visible() const { return m_menubar_visibility != MENUBAR_VISIBILITY_INVISIBLE; }

@@ -30,14 +30,23 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, software_info *info, const char *interface, software_part **part)
+ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_info *info, const char *interface, const software_part **part, bool opt_fmgr, int *result)
 	: ui_menu(machine, container)
 {
-	m_image = image;
-	m_swlist = swlist;
 	m_info = info;
 	m_interface = interface;
 	m_selected_part = part;
+	m_opt_fmgr = opt_fmgr;
+	m_result = result;
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+ui_menu_software_parts::~ui_menu_software_parts()
+{
 }
 
 
@@ -62,6 +71,14 @@ void ui_menu_software_parts::populate()
 			item_append(m_info->shortname(), menu_part_name.cstr(), 0, entry);
 		}
 	}
+
+	if (m_opt_fmgr)
+	{
+		software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
+		entry->type = T_FMGR;
+		entry->part = 0;
+		item_append("[file manager]", 0, 0, entry);
+	}
 }
 
 
@@ -76,15 +93,9 @@ void ui_menu_software_parts::handle()
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
 	{
-		// we have the part
- 		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
-
-		// load the image
-		astring image_name;
-		image_name.printf("%s:%s:%s", m_swlist->list_name(), m_info->shortname(), entry->part->name());
-		m_image->load(image_name);
-
-		// and exit
+		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
+		*m_result = entry->type;
+		*m_selected_part = entry->part;
 		ui_menu::stack_pop(machine());
 	}
 }
@@ -98,10 +109,9 @@ void ui_menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, const char *interface, astring &result)
+ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result)
 	: ui_menu(machine, container), m_result(result)
 {
-	m_image = image;
 	m_swlist = swlist;
 	m_interface = interface;
 	m_entrylist = NULL;
@@ -117,34 +127,6 @@ ui_menu_software_list::~ui_menu_software_list()
 {
 }
 
-
-//-------------------------------------------------
-//  select_entry
-//-------------------------------------------------
-
-void ui_menu_software_list::select_entry(entry_info *entry)
-{
-	software_info *swi;
-	software_part *swp;
-
-	swi = m_swlist->find(entry->short_name);
-
-	if (swi->has_multiple_parts(m_interface))
- 	{
-		// multi part software; need to spawn another menu
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, m_image, m_swlist, swi, m_interface, &swp)));
-	}
-	else
-	{
-		// single part software; just get the part
-		swp = swi->first_part();
-
-		// and load it
-		astring image_name;
-		image_name.printf("%s:%s:%s", m_swlist->list_name(), swi->shortname(), swp->name());
-		m_image->load(image_name);
-	}
-}
 
 //-------------------------------------------------
 //  compare_entries
@@ -276,12 +258,9 @@ void ui_menu_software_list::handle()
 		// handle selections
 		else if (event->iptkey == IPT_UI_SELECT)
 		{
-			// we're done (at least with this menu
- 			ui_menu::stack_pop(machine());
-
-			// select this entry
 			entry_info *entry = (entry_info *) event->itemref;
-			select_entry(entry);
+			m_result = entry->short_name;
+			ui_menu::stack_pop(machine());
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
@@ -372,7 +351,9 @@ void ui_menu_software_list::handle()
 			// reset the char buffer also in this case
 			if (m_filename_buffer[0] != '\0')
 				memset(m_filename_buffer, '\0', ARRAY_LENGTH(m_filename_buffer));
+			m_result = m_filename_buffer;
 			ui_menu::stack_pop(machine());
 		}
 	}
 }
+

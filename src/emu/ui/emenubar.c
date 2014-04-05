@@ -39,6 +39,10 @@
 //  MENUBAR IMPLEMENTATION
 //**************************************************************************
 
+astring ui_emu_menubar::s_softlist_result;
+device_image_interface *ui_emu_menubar::s_softlist_image;
+
+
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -46,6 +50,28 @@
 ui_emu_menubar::ui_emu_menubar(running_machine &machine)
 	: ui_menubar(machine)
 {
+}
+
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void ui_emu_menubar::handle(render_container *container)
+{
+	// check to see if we have a softlist selection
+	if (s_softlist_result.len() > 0)
+	{
+		// do the load
+		s_softlist_image->load(s_softlist_result);
+
+		// clear out state
+		s_softlist_image = NULL;
+		s_softlist_result.reset();
+	}
+
+	// call inherited method
+	ui_menubar::handle(container);
 }
 
 
@@ -554,8 +580,9 @@ void ui_emu_menubar::select_new_game()
 
 void ui_emu_menubar::select_from_software_list(device_image_interface *image, software_list_device *swlist)
 {
-	astring result;
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), image, swlist, NULL, result)));
+	s_softlist_image = image;
+	machine().ui().set_handler(ui_menu::ui_handler, 0);
+	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), swlist, image->image_interface(), s_softlist_result)));
 }
 
 

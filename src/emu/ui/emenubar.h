@@ -23,11 +23,17 @@ class ui_emu_menubar : public ui_menubar
 public:
 	ui_emu_menubar(running_machine &machine);
 
+	virtual void handle(render_container *container);
+
 protected:
 	virtual void menubar_build_menus();
 	virtual void menubar_draw_ui_elements();
 
 private:
+	// variables
+	static device_image_interface *s_softlist_image;
+	static astring s_softlist_result;
+
 	// menubar building
 	void build_file_menu();
 	void build_images_menu();
