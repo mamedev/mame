@@ -166,7 +166,7 @@ ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, d
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C03B, "2C03B PPU PPU", tag, owner, clock, "ppu2c03b", __FILE__)
+ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : ppu2c0x_device(mconfig, PPU_2C03B, "2C03B PPU", tag, owner, clock, "ppu2c03b", __FILE__)
 {
 }
 

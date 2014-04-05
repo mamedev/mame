@@ -107,13 +107,13 @@ void a7800_state::a7800_driver_init(int ispal, int lines)
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	a7800_driver_init(FALSE, 262);
+	a7800_driver_init(FALSE, 263);
 }
 
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	a7800_driver_init(TRUE, 312);
+	a7800_driver_init(TRUE, 313);
 }
 
 
@@ -520,11 +520,13 @@ READ8_MEMBER(a7800_state::a7800_TIA_r)
 
 WRITE8_MEMBER(a7800_state::a7800_TIA_w)
 {
-	switch(offset) {
-	case 0x01:
+	if (offset<0x20) { //INPTCTRL covers TIA registers 0x00-0x1F until locked
 		if(data & 0x01)
 		{
-			m_maria_flag=1;
+			if ((m_ctrl_lock)&&(offset==0x01))
+				m_maria_flag=1;
+			else if (!m_ctrl_lock)
+				m_maria_flag=1;
 		}
 		if(!m_ctrl_lock)
 		{
@@ -536,7 +538,6 @@ WRITE8_MEMBER(a7800_state::a7800_TIA_w)
 			else
 				memcpy( m_ROM + 0xC000, m_bios_bkup, 0x4000 );
 		}
-		break;
 	}
 	m_tia->tia_sound_w(space, offset, data);
 	m_ROM[offset] = data;

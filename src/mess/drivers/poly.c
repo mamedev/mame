@@ -140,12 +140,6 @@ READ8_MEMBER( poly_state::videoram_r )
 	return m_videoram[offset];
 }
 
-static SAA5050_INTERFACE( poly_saa5050_intf )
-{
-	DEVCB_DRIVER_MEMBER(poly_state, videoram_r),
-	40, 24, 40  /* x, y, size */
-};
-
 WRITE8_MEMBER( poly_state::kbd_put )
 {
 	m_term_data = data | 0x80;
@@ -184,7 +178,9 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_SAA5050_ADD("saa5050", 6000000, poly_saa5050_intf)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
+	MCFG_SAA5050_D_CALLBACK(READ8(poly_state, videoram_r))
+	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))

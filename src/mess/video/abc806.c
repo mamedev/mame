@@ -20,23 +20,9 @@
 
 
 
-// these are needed because the MC6845 emulation does
-// not position the active display area correctly
 #define HORIZONTAL_PORCH_HACK   109
 #define VERTICAL_PORCH_HACK     27
 
-
-static const rgb_t PALETTE_ABC[] =
-{
-	rgb_t::black, // black
-	rgb_t(0xff, 0x00, 0x00), // red
-	rgb_t(0x00, 0xff, 0x00), // green
-	rgb_t(0xff, 0xff, 0x00), // yellow
-	rgb_t(0x00, 0x00, 0xff), // blue
-	rgb_t(0xff, 0x00, 0xff), // magenta
-	rgb_t(0x00, 0xff, 0xff), // cyan
-	rgb_t::white // white
-};
 
 
 //-------------------------------------------------
@@ -82,7 +68,7 @@ WRITE8_MEMBER( abc806_state::hrc_w )
 
 READ8_MEMBER( abc806_state::charram_r )
 {
-	m_attr_data = m_color_ram[offset];
+	m_attr_data = m_attr_ram[offset];
 
 	return m_char_ram[offset];
 }
@@ -94,7 +80,7 @@ READ8_MEMBER( abc806_state::charram_r )
 
 WRITE8_MEMBER( abc806_state::charram_w )
 {
-	m_color_ram[offset] = m_attr_data;
+	m_attr_ram[offset] = m_attr_data;
 
 	m_char_ram[offset] = data;
 }
@@ -239,6 +225,7 @@ WRITE8_MEMBER( abc806_state::sso_w )
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
 	abc806_state *state = device->machine().driver_data<abc806_state>();
+	const pen_t *pen = state->m_palette->pens();
 
 //  UINT8 old_data = 0xff;
 	int fg_color = 7;
@@ -254,7 +241,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 data = state->m_char_ram[(ma + column) & 0x7ff];
-		UINT8 attr = state->m_color_ram[(ma + column) & 0x7ff];
+		UINT8 attr = state->m_attr_ram[(ma + column) & 0x7ff];
 		UINT16 rad_addr;
 		UINT8 rad_data;
 
@@ -283,7 +270,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 				e6 = BIT(attr, 1);
 
 				// read attributes from next byte
-				attr = state->m_color_ram[(ma + column + 1) & 0x7ff];
+				attr = state->m_attr_ram[(ma + column + 1) & 0x7ff];
 
 				if (attr != 0x00)
 				{
@@ -327,11 +314,11 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
 			if (!de) color = 0;
 
-			bitmap.pix32(y, x++) = PALETTE_ABC[color];
+			bitmap.pix32(y, x++) = pen[color];
 
 			if (e5 || e6)
 			{
-				bitmap.pix32(y, x++) = PALETTE_ABC[color];
+				bitmap.pix32(y, x++) = pen[color];
 			}
 
 			chargen_data <<= 1;
@@ -431,6 +418,8 @@ static MC6845_INTERFACE( crtc_intf )
 
 void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	UINT32 addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
@@ -446,7 +435,7 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
 				{
-					bitmap.pix32(y, x) = PALETTE_ABC[(dot >> 12) & 0x07];
+					bitmap.pix32(y, x) = pen[(dot >> 12) & 0x07];
 				}
 
 				dot <<= 4;
@@ -471,12 +460,9 @@ void abc806_state::video_start()
 
 	// allocate memory
 	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
-	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
+	m_attr_ram.allocate(ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving
-	save_pointer(NAME(m_char_ram.target()), ABC806_CHAR_RAM_SIZE);
-	save_pointer(NAME(m_color_ram), ABC806_ATTR_RAM_SIZE);
-	save_pointer(NAME(m_video_ram.target()), ABC806_VIDEO_RAM_SIZE);
 	save_item(NAME(m_txoff));
 	save_item(NAME(m_40));
 	save_item(NAME(m_flshclk_ctr));
@@ -499,9 +485,6 @@ void abc806_state::video_start()
 
 UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// HACK expand visible area to workaround MC6845
-	screen.set_visible_area(0, 767, 0, 311);
-
 	// clear screen
 	bitmap.fill(rgb_t::black, cliprect);
 
@@ -519,6 +502,23 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 //-------------------------------------------------
+//  PALETTE_INIT( abc806 )
+//-------------------------------------------------
+
+PALETTE_INIT_MEMBER( abc806_state, abc806 )
+{
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
+	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
+	palette.set_pen_color(6, rgb_t(0x00, 0xff, 0xff)); // cyan
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff)); // white
+}
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( abc806_video )
 //-------------------------------------------------
 
@@ -527,9 +527,11 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
+
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(abc806_state, abc806)
 MACHINE_CONFIG_END

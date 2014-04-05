@@ -31,38 +31,26 @@ gladiatr and Great Swordsman set.
 #define CMD_08 1
 #define CMD_4a 2
 
-struct I8741 {
-	UINT8 toData;    /* to host data      */
-	UINT8 fromData;  /* from host data    */
-	UINT8 fromCmd;   /* from host command */
-	UINT8 status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
-	UINT8 mode;
-	UINT8 phase;
-	UINT8 txd[8];
-	UINT8 rxd[8];
-	UINT8 parallelselect;
-	UINT8 txpoint;
-	int connect;
-	UINT8 pending4a;
-	int serial_out;
-	int coins;
-	read8_space_func portHandler;
-	const  char *portName;
-};
+const device_type TAITO8741_4PACK = &device_creator<taito8741_4pack_device>;
 
-static const struct TAITO8741interface *intf;
-//static I8741 *taito8741;
-static I8741 taito8741[MAX_TAITO8741];
+taito8741_4pack_device::taito8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TAITO8741_4PACK, "Taito 8741 MCU 4 pack", tag, owner, clock, "taito8741_4pack", __FILE__),
+	m_port_handler_0_r(*this),
+	m_port_handler_1_r(*this),
+	m_port_handler_2_r(*this),
+	m_port_handler_3_r(*this)
+{
+}
 
 /* for host data , write */
-static void taito8741_hostdata_w(I8741 *st,int data)
+void taito8741_4pack_device::hostdata_w(I8741 *st,int data)
 {
 	st->toData = data;
 	st->status |= 0x01;
 }
 
 /* from host data , read */
-static int taito8741_hostdata_r(I8741 *st)
+int taito8741_4pack_device::hostdata_r(I8741 *st)
 {
 	if( !(st->status & 0x02) ) return -1;
 	st->status &= 0xfd;
@@ -70,7 +58,7 @@ static int taito8741_hostdata_r(I8741 *st)
 }
 
 /* from host command , read */
-static int taito8741_hostcmd_r(I8741 *st)
+int taito8741_4pack_device::hostcmd_r(I8741 *st)
 {
 	if(!(st->status & 0x04)) return -1;
 	st->status &= 0xfb;
@@ -80,16 +68,16 @@ static int taito8741_hostcmd_r(I8741 *st)
 
 /* TAITO8741 I8741 emulation */
 
-static void taito8741_serial_rx(I8741 *st,UINT8 *data)
+void taito8741_4pack_device::serial_rx(I8741 *st,UINT8 *data)
 {
 	memcpy(st->rxd,data,8);
 }
 
 /* timer callback of serial tx finish */
-static TIMER_CALLBACK( taito8741_serial_tx )
+TIMER_CALLBACK_MEMBER( taito8741_4pack_device::serial_tx )
 {
 	int num = param;
-	I8741 *st = &taito8741[num];
+	I8741 *st = &m_taito8741[num];
 	I8741 *sst;
 
 	if( st->mode==TAITO8741_MASTER)
@@ -98,31 +86,35 @@ static TIMER_CALLBACK( taito8741_serial_tx )
 	st->txpoint = 1;
 	if(st->connect >= 0 )
 	{
-		sst = &taito8741[st->connect];
+		sst = &m_taito8741[st->connect];
 		/* transfer data */
-		taito8741_serial_rx(sst,st->txd);
+		serial_rx(sst,st->txd);
 		LOG(("8741-%d Serial data TX to %d\n",num,st->connect));
 		if( sst->mode==TAITO8741_SLAVE)
 			sst->serial_out = 1;
 	}
 }
 
-void TAITO8741_reset(int num)
+void taito8741_4pack_device::device_reset()
 {
-	I8741 *st = &taito8741[num];
-	st->status = 0x00;
-	st->phase = 0;
-	st->parallelselect = 0;
-	st->txpoint = 1;
-	st->pending4a = 0;
-	st->serial_out = 0;
-	st->coins = 0;
-	memset(st->rxd,0,8);
-	memset(st->txd,0,8);
+	for (int i=0;i<4;i++) 
+	{
+		I8741 *st = &m_taito8741[i];
+		st->number = i;
+		st->status = 0x00;
+		st->phase = 0;
+		st->parallelselect = 0;
+		st->txpoint = 1;
+		st->pending4a = 0;
+		st->serial_out = 0;
+		st->coins = 0;
+		memset(st->rxd,0,8);
+		memset(st->txd,0,8);
+	}
 }
 
 /* 8741 update */
-static void taito8741_update(address_space &space, int num)
+void taito8741_4pack_device::update(int num)
 {
 	I8741 *st,*sst;
 	int next = num;
@@ -130,9 +122,9 @@ static void taito8741_update(address_space &space, int num)
 
 	do{
 		num = next;
-		st = &taito8741[num];
+		st = &m_taito8741[num];
 		if( st->connect != -1 )
-				sst = &taito8741[st->connect];
+				sst = &m_taito8741[st->connect];
 		else sst = 0;
 		next = -1;
 		/* check pending command */
@@ -149,14 +141,14 @@ static void taito8741_update(address_space &space, int num)
 		case CMD_4a: /* wait for syncronus ? */
 			if(!st->pending4a)
 			{
-				taito8741_hostdata_w(st,0);
+				hostdata_w(st,0);
 				st->phase = CMD_IDLE;
 				next = num; /* continue this chip */
 			}
 			break;
 		case CMD_IDLE:
 			/* ----- data in port check ----- */
-			data = taito8741_hostdata_r(st);
+			data = hostdata_r(st);
 			if( data != -1 )
 			{
 				switch(st->mode)
@@ -177,18 +169,18 @@ static void taito8741_update(address_space &space, int num)
 					else
 					{ /* port select */
 						st->parallelselect = data & 0x07;
-						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
+						hostdata_w(st,port_read(st->number,st->parallelselect));
 					}
 				}
 			}
 			/* ----- new command fetch ----- */
-			data = taito8741_hostcmd_r(st);
+			data = hostcmd_r(st);
 			switch( data )
 			{
 			case -1: /* no command data */
 				break;
 			case 0x00: /* read from parallel port */
-				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0 );
+				hostdata_w(st,port_read(st->number,0));
 				break;
 			case 0x01: /* read receive buffer 0 */
 			case 0x02: /* read receive buffer 1 */
@@ -198,13 +190,13 @@ static void taito8741_update(address_space &space, int num)
 			case 0x06: /* read receive buffer 5 */
 			case 0x07: /* read receive buffer 6 */
 //if (data == 2 && num==0 && st->rxd[data-1]&0x80) logerror("Coin Get\n");
-				taito8741_hostdata_w(st,st->rxd[data-1]);
+				hostdata_w(st,st->rxd[data-1]);
 				break;
 			case 0x08:  /* latch received serial data */
-				st->txd[0] = st->portHandler ? st->portHandler(space,0,0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0;
+				st->txd[0] = port_read(st->number,0);
 				if( sst )
 				{
-					space.machine().scheduler().synchronize(FUNC(taito8741_serial_tx), num);
+					machine().scheduler().synchronize(timer_expired_delegate(FUNC(taito8741_4pack_device::serial_tx),this), num);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -230,17 +222,17 @@ static void taito8741_update(address_space &space, int num)
 					if(sst->pending4a)
 					{
 						sst->pending4a = 0; /* syncronus */
-						taito8741_hostdata_w(st,0); /* return for host */
+						hostdata_w(st,0); /* return for host */
 						next = st->connect;
 					}
 					else st->phase = CMD_4a;
 				}
 				break;
 			case 0x80:  /* 8741-3 : return check code */
-				taito8741_hostdata_w(st,0x66);
+				hostdata_w(st,0x66);
 				break;
 			case 0x81:  /* 8741-2 : return check code */
-				taito8741_hostdata_w(st,0x48);
+				hostdata_w(st,0x48);
 				break;
 			case 0xf0:  /* GSWORD 8741-1 : initialize ?? */
 				break;
@@ -252,120 +244,77 @@ static void taito8741_update(address_space &space, int num)
 	}while(next>=0);
 }
 
-int TAITO8741_start(const struct TAITO8741interface *taito8741intf)
+void taito8741_4pack_device::device_start()
 {
-	int i;
-
-	intf = taito8741intf;
-
-	//taito8741 = (I8741 *)malloc(intf->num*sizeof(I8741));
-	//if( taito8741 == 0 ) return 1;
-
-	for(i=0;i<intf->num;i++)
-	{
-		taito8741[i].connect     = intf->serial_connect[i];
-		taito8741[i].portHandler = intf->portHandler_r[i];
-		taito8741[i].portName    = intf->portName_r[i];
-		taito8741[i].mode        = intf->mode[i];
-		TAITO8741_reset(i);
-	}
-	return 0;
+	m_port_handler_0_r.resolve_safe(0);
+	m_port_handler_1_r.resolve_safe(0);
+	m_port_handler_2_r.resolve_safe(0);
+	m_port_handler_3_r.resolve_safe(0);
 }
 
 /* read status port */
-static int I8741_status_r(address_space &space, int num)
+int taito8741_4pack_device::status_r(int num)
 {
-	I8741 *st = &taito8741[num];
-	taito8741_update(space, num);
-	LOG(("%s:8741-%d ST Read %02x\n",space.machine().describe_context(),num,st->status));
+	I8741 *st = &m_taito8741[num];
+	update(num);
+	LOG(("%s:8741-%d ST Read %02x\n",machine().describe_context(),num,st->status));
 	return st->status;
 }
 
 /* read data port */
-static int I8741_data_r(address_space &space, int num)
+int taito8741_4pack_device::data_r(int num)
 {
-	I8741 *st = &taito8741[num];
+	I8741 *st = &m_taito8741[num];
 	int ret = st->toData;
 	st->status &= 0xfe;
-	LOG(("%s:8741-%d DATA Read %02x\n",space.machine().describe_context(),num,ret));
+	LOG(("%s:8741-%d DATA Read %02x\n",machine().describe_context(),num,ret));
 
 	/* update chip */
-	taito8741_update(space, num);
+	update(num);
 
 	switch( st->mode )
 	{
 	case TAITO8741_PORT: /* parallel data */
-		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect, 0xff) : st->portName ? space.machine().root_device().ioport(st->portName)->read() : 0);
+		hostdata_w(st,port_read(st->number,st->parallelselect));
 		break;
 	}
 	return ret;
 }
 
 /* Write data port */
-static void I8741_data_w(address_space &space, int num, int data)
+void taito8741_4pack_device::data_w(int num, int data)
 {
-	I8741 *st = &taito8741[num];
-	LOG(("%s:8741-%d DATA Write %02x\n",space.machine().describe_context(),num,data));
+	I8741 *st = &m_taito8741[num];
+	LOG(("%s:8741-%d DATA Write %02x\n",machine().describe_context(),num,data));
 	st->fromData = data;
 	st->status |= 0x02;
 	/* update chip */
-	taito8741_update(space, num);
+	update(num);
 }
 
 /* Write command port */
-static void I8741_command_w(address_space &space, int num, int data)
+void taito8741_4pack_device::command_w(int num, int data)
 {
-	I8741 *st = &taito8741[num];
-	LOG(("%s:8741-%d CMD Write %02x\n",space.machine().describe_context(),num,data));
+	I8741 *st = &m_taito8741[num];
+	LOG(("%s:8741-%d CMD Write %02x\n",machine().describe_context(),num,data));
 	st->fromCmd = data;
 	st->status |= 0x04;
 	/* update chip */
-	taito8741_update(space,num);
+	update(num);
 }
 
-/* Write port handler */
-WRITE8_HANDLER( TAITO8741_0_w )
+UINT8 taito8741_4pack_device::port_read(int num, int offset)
 {
-	if(offset&1) I8741_command_w(space,0,data);
-	else         I8741_data_w(space,0,data);
-}
-WRITE8_HANDLER( TAITO8741_1_w )
-{
-	if(offset&1) I8741_command_w(space,1,data);
-	else         I8741_data_w(space,1,data);
-}
-WRITE8_HANDLER( TAITO8741_2_w )
-{
-	if(offset&1) I8741_command_w(space,2,data);
-	else         I8741_data_w(space,2,data);
-}
-WRITE8_HANDLER( TAITO8741_3_w )
-{
-	if(offset&1) I8741_command_w(space,3,data);
-	else         I8741_data_w(space,3,data);
+	switch(num) 
+	{
+		case 0 : return m_port_handler_0_r(offset);
+		case 1 : return m_port_handler_1_r(offset);
+		case 2 : return m_port_handler_2_r(offset);
+		case 3 : return m_port_handler_3_r(offset);
+		default : return 0;
+	}
 }
 
-/* Read port handler */
-READ8_HANDLER( TAITO8741_0_r )
-{
-	if(offset&1) return I8741_status_r(space,0);
-	return I8741_data_r(space,0);
-}
-READ8_HANDLER( TAITO8741_1_r )
-{
-	if(offset&1) return I8741_status_r(space,1);
-	return I8741_data_r(space,1);
-}
-READ8_HANDLER( TAITO8741_2_r )
-{
-	if(offset&1) return I8741_status_r(space,2);
-	return I8741_data_r(space,2);
-}
-READ8_HANDLER( TAITO8741_3_r )
-{
-	if(offset&1) return I8741_status_r(space,3);
-	return I8741_data_r(space,3);
-}
 /****************************************************************************
 
 joshi Vollyball set.
@@ -378,56 +327,48 @@ joshi Vollyball set.
 
 ****************************************************************************/
 
-static int josvolly_nmi_enable;
+const device_type JOSVOLLY8741_4PACK = &device_creator<josvolly8741_4pack_device>;
 
-struct JV8741  {
-	UINT8 cmd;
-	UINT8 sts;
-	UINT8 txd;
-	UINT8 outport;
-	UINT8 rxd;
-	UINT8 connect;
-
-	UINT8 rst;
-
-	const char *initReadPort;
-};
-
-static JV8741 i8741[4];
-
-void josvolly_8741_reset(void)
+josvolly8741_4pack_device::josvolly8741_4pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, JOSVOLLY8741_4PACK, "joshi Vollyball 8741 MCU 4 pack", tag, owner, clock, "josvolly8741_4pack", __FILE__),
+	m_port_handler_0_r(*this),
+	m_port_handler_1_r(*this),
+	m_port_handler_2_r(*this),
+	m_port_handler_3_r(*this)
 {
-	int i;
+}
 
-	josvolly_nmi_enable = 0;
+void josvolly8741_4pack_device::device_start()
+{
+	m_port_handler_0_r.resolve_safe(0);
+	m_port_handler_1_r.resolve_safe(0);
+	m_port_handler_2_r.resolve_safe(0);
+	m_port_handler_3_r.resolve_safe(0);
+}
 
-	for(i=0;i<4;i++)
+
+void josvolly8741_4pack_device::device_reset()
+{
+	m_nmi_enable = 0;
+
+	for(int i=0;i<4;i++)
 	{
-		i8741[i].cmd = 0;
-		i8741[i].sts = 0; // 0xf0; /* init flag */
-		i8741[i].txd = 0;
-		i8741[i].outport = 0xff;
-		i8741[i].rxd = 0;
+		m_i8741[i].cmd = 0;
+		m_i8741[i].sts = 0; // 0xf0; /* init flag */
+		m_i8741[i].txd = 0;
+		m_i8741[i].outport = 0xff;
+		m_i8741[i].rxd = 0;
 
-		i8741[i].rst = 1;
-
+		m_i8741[i].rst = 1;
 	}
-	i8741[0].connect = 1;
-	i8741[1].connect = 0;
-
-	i8741[0].initReadPort = "DSW1";  /* DSW1 */
-	i8741[1].initReadPort = "DSW2";  /* DSW2 */
-	i8741[2].initReadPort = "DSW1";  /* DUMMY */
-	i8741[3].initReadPort = "DSW2";  /* DUMMY */
-
 }
 
 /* transmit data finish callback */
-static TIMER_CALLBACK( josvolly_8741_tx )
+TIMER_CALLBACK_MEMBER( josvolly8741_4pack_device::tx )
 {
 	int num = param;
-	JV8741 *src = &i8741[num];
-	JV8741 *dst = &i8741[src->connect];
+	JV8741 *src = &m_i8741[num];
+	JV8741 *dst = &m_i8741[src->connect];
 
 	dst->rxd = src->txd;
 
@@ -435,22 +376,22 @@ static TIMER_CALLBACK( josvolly_8741_tx )
 	dst->sts |=  0x01; /* RX ready  ? */
 }
 
-static void josvolly_8741_do(running_machine &machine, int num)
+void josvolly8741_4pack_device::update(int num)
 {
-	if( (i8741[num].sts & 0x02) )
+	if( (m_i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		machine.scheduler().timer_set (attotime::from_usec(1), FUNC(josvolly_8741_tx), num);
+		machine().scheduler().timer_set (attotime::from_usec(1), timer_expired_delegate(FUNC(josvolly8741_4pack_device::tx),this), num);
 	}
 }
 
-static void josvolly_8741_w(address_space &space, int num, int offset, int data)
+void josvolly8741_4pack_device::write(int num, int offset, int data)
 {
-	JV8741 *mcu = &i8741[num];
+	JV8741 *mcu = &m_i8741[num];
 
 	if(offset==1)
 	{
-		LOG(("%s:8741[%d] CW %02X\n", space.machine().describe_context(), num, data));
+		LOG(("%s:8741[%d] CW %02X\n", machine().describe_context(), num, data));
 
 		/* read pointer */
 		mcu->cmd = data;
@@ -472,7 +413,7 @@ static void josvolly_8741_w(address_space &space, int num, int offset, int data)
 			break;
 		case 2:
 #if 1
-			mcu->rxd = space.machine().root_device().ioport("DSW2")->read();
+			mcu->rxd = port_read(1);
 			mcu->sts |= 0x01; /* RD ready */
 #endif
 			break;
@@ -488,7 +429,7 @@ static void josvolly_8741_w(address_space &space, int num, int offset, int data)
 	else
 	{
 		/* data */
-		LOG(("%s:8741[%d] DW %02X\n", space.machine().describe_context(), num, data));
+		LOG(("%s:8741[%d] DW %02X\n", machine().describe_context(), num, data));
 
 		mcu->txd = data ^ 0x40; /* parity reverce ? */
 		mcu->sts |= 0x02;     /* TXD busy         */
@@ -496,46 +437,49 @@ static void josvolly_8741_w(address_space &space, int num, int offset, int data)
 		/* interrupt ? */
 		if(num == 0)
 		{
-			if(josvolly_nmi_enable)
+			if(m_nmi_enable)
 			{
-				space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-				josvolly_nmi_enable = 0;
+				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_nmi_enable = 0;
 			}
 		}
 #endif
 	}
-	josvolly_8741_do(space.machine(), num);
+	update(num);
 }
 
-static INT8 josvolly_8741_r(address_space &space,int num,int offset)
+UINT8 josvolly8741_4pack_device::read(int num,int offset)
 {
-	JV8741 *mcu = &i8741[num];
+	JV8741 *mcu = &m_i8741[num];
 	int ret;
 
 	if(offset==1)
 	{
 		if(mcu->rst)
-			mcu->rxd = space.machine().root_device().ioport(mcu->initReadPort)->read(); /* port in */
+			mcu->rxd = port_read(num); /* port in */
 		ret = mcu->sts;
-		LOG(("%s:8741[%d]       SR %02X\n",space.machine().describe_context(),num,ret));
+		LOG(("%s:8741[%d]       SR %02X\n",machine().describe_context(),num,ret));
 	}
 	else
 	{
 		/* clear status port */
 		mcu->sts &= ~0x01; /* RD ready */
 		ret = mcu->rxd;
-		LOG(("%s:8741[%d]       DR %02X\n",space.machine().describe_context(),num,ret));
+		LOG(("%s:8741[%d]       DR %02X\n",machine().describe_context(),num,ret));
 		mcu->rst = 0;
 	}
 	return ret;
 }
 
-WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(space,0,offset,data); }
-READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
-WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
-READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }
-
-WRITE8_HANDLER( josvolly_nmi_enable_w )
+UINT8 josvolly8741_4pack_device::port_read(int num)
 {
-	josvolly_nmi_enable = 1;
+	switch(num) 
+	{
+		case 0 : return m_port_handler_0_r(0);
+		case 1 : return m_port_handler_1_r(0);
+		case 2 : return m_port_handler_2_r(0);
+		case 3 : return m_port_handler_3_r(0);
+		default : return 0;
+	}
 }
+

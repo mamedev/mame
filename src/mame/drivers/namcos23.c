@@ -76,6 +76,13 @@
         raise: c0.Count   = 10c8e0
                c0.Compare = 10d880
 
+   Downhill bikers irq ack on level 3:
+        check ad000000 & 0400
+          if not, a4c3ff04 = 0
+        check ad000000 & 0800
+          if not, read a682000a, wait until it stops changing (?)
+        return
+
 
 ****************************************************************************
 
@@ -2557,7 +2564,7 @@ READ16_MEMBER(namcos23_state::c361_r)
 		// how does it work exactly? it's not understood in namcos22 either (also has a c361)
 		case 5:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
-			return m_screen->vpos()*2 | (m_screen->vblank() ? 1 : 0);
+			return (m_screen->vpos()*2) | (m_screen->vblank() ? 1 : 0);
 		case 6:
 			update_main_interrupts(m_main_irqcause & ~MAIN_C361_IRQ);
 			return m_screen->vblank() ? 1 : 0;
@@ -2613,7 +2620,7 @@ READ16_MEMBER(namcos23_state::ctl_r)
 	{
 		// 0100 set freezes gorgon (polygon fifo flag)
 		case 1:
-			return 0x0000 | ioport("DSW")->read();
+			return 0x0000 | ioport("DSW")->read() | ((m_main_irqcause & MAIN_C361_IRQ) ? 0x400 : 0);
 		case 2: case 3:
 		{
 			UINT16 res = m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;

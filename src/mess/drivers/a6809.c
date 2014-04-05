@@ -154,12 +154,6 @@ READ8_MEMBER( a6809_state::videoram_r )
 		return m_p_videoram[offset&0x3ff];
 }
 
-static SAA5050_INTERFACE( a6809_saa5050_intf )
-{
-	DEVCB_DRIVER_MEMBER(a6809_state, videoram_r),
-	40, 25, 40  /* x, y, size */
-};
-
 WRITE8_MEMBER( a6809_state::a6809_address_w )
 {
 	m_crtc->address_w( space, 0, data );
@@ -271,7 +265,11 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2, a6809_crtc6845_interface)
-	MCFG_SAA5050_ADD("saa5050", 6000000, a6809_saa5050_intf)
+
+	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
+	MCFG_SAA5050_D_CALLBACK(READ8(a6809_state, videoram_r))
+	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
+
 	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_c", a6809_state, a6809_c, attotime::from_hz(4800))

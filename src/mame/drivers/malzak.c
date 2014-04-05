@@ -316,12 +316,6 @@ READ8_MEMBER(malzak_state::videoram_r)
 	return m_videoram[offset];
 }
 
-static SAA5050_INTERFACE( malzac_saa5050_intf )
-{
-	DEVCB_DRIVER_MEMBER(malzak_state, videoram_r),
-	42, 24, 64  /* x, y, size */
-};
-
 void malzak_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user2")->base(), 0x400);
@@ -366,7 +360,9 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_S2636_ADD("s2636_1", malzac_s2636_1_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SAA5050_ADD("saa5050", 6000000, malzac_saa5050_intf)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
+	MCFG_SAA5050_D_CALLBACK(READ8(malzak_state, videoram_r))
+	MCFG_SAA5050_SCREEN_SIZE(42, 24, 64)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

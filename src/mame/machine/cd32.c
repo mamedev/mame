@@ -28,7 +28,7 @@ TODO: Add CDDA support
 const device_type AKIKO = &device_creator<akiko_device>;
 
 akiko_device::akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, AKIKO, "Akiko", tag, owner, clock, "akiko", __FILE__),
+	: device_t(mconfig, AKIKO, "CBM AKIKO", tag, owner, clock, "akiko", __FILE__),
 	m_c2p_input_index(0),
 	m_c2p_output_index(0),
 	m_i2c_scl_out(0),

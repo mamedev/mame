@@ -98,7 +98,7 @@ static MACHINE_CONFIG_START( iskr1031, iskr103x_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga_ec1841", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false) // hdc is WIP
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)
@@ -132,8 +132,8 @@ ROM_START( iskr1031 )
 	ROMX_LOAD( "150-06.bin", 0xfc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD( "150-07.bin", 0xfc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(2))
 
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+	//ROM_REGION(0x2000,"gfx1", 0)
+	//ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
 ROM_END
 
 /***************************************************************************

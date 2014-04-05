@@ -826,16 +826,16 @@ void h63484_device::draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey)
 	}
 }
 
-void h63484_device::draw_circle(INT16 cx, INT16 cy, double r, double s_angol, double e_angol, bool c)
+void h63484_device::draw_ellipse(INT16 cx, INT16 cy, double dx, double dy, double s_angol, double e_angol, bool c)
 {
-	double inc = 1.0 / (r * 100);
+	double inc = 1.0 / (MAX(dx, dy) * 100);
 	for (double angol = s_angol; fabs(angol - e_angol) >= inc*2; angol += inc * (c ? -1 : +1))
 	{
 		if (angol > DEGREE_TO_RADIAN(360))    angol -= DEGREE_TO_RADIAN(360);
 		if (angol < DEGREE_TO_RADIAN(0))      angol += DEGREE_TO_RADIAN(360);
 
-		double px = cos(angol) * r;
-		double py = sin(angol) * r;
+		double px = cos(angol) * dx;
+		double py = sin(angol) * dy;
 		set_dot(cx + round(px), cy + round(py), 0, 0);
 	}
 }
@@ -1373,7 +1373,38 @@ void h63484_device::command_arc_exec()
 	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
 	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
 
-	draw_circle(xc, yc, r, s_angol, e_angol, BIT(m_cr, 8));
+	draw_ellipse(xc, yc, r, r, s_angol, e_angol, BIT(m_cr, 8));
+
+	m_cpx = xe;
+	m_cpy = ye;
+}
+
+void h63484_device::command_earc_exec()
+{
+	UINT16 a = m_pr[0];
+	UINT16 b = m_pr[1];
+	INT16 xc = (INT16)m_pr[2];
+	INT16 yc = (INT16)m_pr[3];
+	INT16 xe = (INT16)m_pr[4];
+	INT16 ye = (INT16)m_pr[5];
+
+	if (BIT(m_cr, 10))
+	{
+		xc += m_cpx;
+		yc += m_cpy;
+		xe += m_cpx;
+		ye += m_cpy;
+	}
+
+	double r = sqrt(pow((double)(xc - m_cpx), 2) / a + pow((double)(yc - m_cpy), 2) / b);
+	double dx = sqrt((double)a);
+	double dy = sqrt((double)b);
+	double s_angol = atan2((double)(m_cpy - yc) / dy, (double)(m_cpx - xc) / dx);
+	double e_angol = atan2((double)(ye - yc) / dy, (double)(xe - xc) / dx);
+	if (s_angol < 0)    s_angol += DEGREE_TO_RADIAN(360);
+	if (e_angol < 0)    e_angol += DEGREE_TO_RADIAN(360);
+
+	draw_ellipse(xc, yc, r * dx, r * dy, s_angol, e_angol, BIT(m_cr, 8));
 
 	m_cpx = xe;
 	m_cpy = ye;
@@ -1654,7 +1685,8 @@ void h63484_device::process_fifo()
 			if(m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
-				draw_circle(m_cpx, m_cpy, m_pr[0] & 0x1fff, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
+				UINT16 r = m_pr[0] & 0x1fff;
+				draw_ellipse(m_cpx, m_cpy, r, r, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
 				command_end_seq();
 			}
 			break;
@@ -1663,8 +1695,10 @@ void h63484_device::process_fifo()
 			if(m_param_ptr == 3)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
+				double dx = (double)m_pr[3];
+				double dy = sqrt(pow(dx, 2) / ((double)m_pr[0] / m_pr[1]));
+				draw_ellipse(m_cpx, m_cpy, dx, dy, DEGREE_TO_RADIAN(0), DEGREE_TO_RADIAN(360), BIT(m_cr, 8));
 				command_end_seq();
-				fatalerror("HD63484 COMMAND_ELPS!\n");
 			}
 			break;
 
@@ -1683,8 +1717,8 @@ void h63484_device::process_fifo()
 			if(m_param_ptr == 6)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cEARC (%d, %d, %d, %d) %d, %d, %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2], m_pr[3], m_pr[4], m_pr[5]);
+				command_earc_exec();
 				command_end_seq();
-				fatalerror("HD63484 COMMAND_AEARC!\n");
 			}
 			break;
 

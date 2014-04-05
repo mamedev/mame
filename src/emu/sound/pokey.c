@@ -864,13 +864,11 @@ UINT8 pokey_device::read(offs_t offset)
 		if( m_AUDCTL & POLY9 )
 		{
 			data = m_poly9[m_p9] & 0xff;
-			synchronize(SYNC_NOOP); /* force resync */
 			LOG_RAND(("POKEY '%s' rand9[$%05x]: $%02x\n", tag(), m_p9, data));
 		}
 		else
 		{
 			data = (m_poly17[m_p17] >> 8) & 0xff;
-			synchronize(SYNC_NOOP); /* force resync */
 			LOG_RAND(("POKEY '%s' rand17[$%05x]: $%02x\n", tag(), m_p17, data));
 		}
 		break;

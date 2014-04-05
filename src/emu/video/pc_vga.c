@@ -179,7 +179,7 @@ ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, 
 }
 
 cirrus_vga_device::cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, CIRRUS_VGA, "CIRRUS_VGA", tag, owner, clock, "cirrus_vga", __FILE__)
+	: svga_device(mconfig, CIRRUS_VGA, "Cirrus Logic VGA", tag, owner, clock, "cirrus_vga", __FILE__)
 {
 }
 

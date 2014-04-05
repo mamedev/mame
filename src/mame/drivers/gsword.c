@@ -150,7 +150,7 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 
 
 #if 0
-int ::gsword_coins_in(void)
+int gsword_state::gsword_coins_in(void)
 {
 	/* emulate 8741 coin slot */
 	if (ioport("IN4")->read() & 0xc0)
@@ -186,16 +186,16 @@ READ8_MEMBER(gsword_state::gsword_hack_r)
 	return data;
 }
 
-static READ8_HANDLER( gsword_8741_2_r )
+READ8_MEMBER(gsword_state::gsword_8741_2_r )
 {
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return space.machine().root_device().ioport("IN0")->read();
+		return ioport("IN0")->read();
 	case 0x02: /* Player 1 Controller */
-		return space.machine().root_device().ioport("IN1")->read();
+		return ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller */
-		return space.machine().root_device().ioport("IN3")->read();
+		return ioport("IN3")->read();
 //  default:
 //      logerror("8741-2 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
 	}
@@ -203,48 +203,33 @@ static READ8_HANDLER( gsword_8741_2_r )
 	return 0;
 }
 
-static READ8_HANDLER( gsword_8741_3_r )
+READ8_MEMBER(gsword_state::gsword_8741_3_r )
 {
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return space.machine().root_device().ioport("IN2")->read();
+		return ioport("IN2")->read();
 	case 0x02: /* Player 1 Controller? */
-		return space.machine().root_device().ioport("IN1")->read();
+		return ioport("IN1")->read();
 	case 0x04: /* Player 2 Controller? */
-		return space.machine().root_device().ioport("IN3")->read();
+		return ioport("IN3")->read();
 	}
 	/* unknown */
 //  logerror("8741-3 unknown read %d PC=%04x\n",offset,space.device().safe_pc());
 	return 0;
 }
 
-static const struct TAITO8741interface gsword_8741interface=
-{
-	4,         /* 4 chips */
-	{ TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT },  /* program mode */
-	{ 1,0,0,0 },                                 /* serial port connection */
-	{ NULL,NULL,gsword_8741_2_r,gsword_8741_3_r },    /* port handler */
-	{ "DSW2","DSW1",NULL,NULL }
-};
-
 MACHINE_RESET_MEMBER(gsword_state,gsword)
 {
-	int i;
-
-	for(i=0;i<4;i++) TAITO8741_reset(i);
 	m_coins = 0;
 
 	/* snd CPU mask NMI during reset phase */
 	m_nmi_enable   = 0;
 	m_protect_hack = 0;
-
-	TAITO8741_start(&gsword_8741interface);
 }
 
 MACHINE_RESET_MEMBER(gsword_state,josvolly)
 {
-	josvolly_8741_reset();
 }
 
 INTERRUPT_GEN_MEMBER(gsword_state::gsword_snd_interrupt)
@@ -339,12 +324,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_WRITE_LEGACY(TAITO8741_0_w)  AM_READ_LEGACY(TAITO8741_0_r)
+	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_WRITE_LEGACY(josvolly_8741_0_w)  AM_READ_LEGACY(josvolly_8741_0_r)
+	AM_RANGE(0x7e, 0x7f) AM_DEVREADWRITE("josvolly_8741", josvolly8741_4pack_device, read_0, write_0)
 ADDRESS_MAP_END
 
 //
@@ -356,9 +341,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_READWRITE_LEGACY(TAITO8741_2_r,TAITO8741_2_w)
-	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_3_r,TAITO8741_3_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE_LEGACY(TAITO8741_1_r,TAITO8741_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_1, write_1)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(gsword_fake_0_r, gsword_AY8910_control_port_0_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(gsword_fake_1_r, gsword_AY8910_control_port_1_w)
@@ -388,7 +373,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN0")    // START
 
 //  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
-	AM_RANGE(0xA000, 0xA001) AM_WRITE_LEGACY(josvolly_8741_1_w) AM_READ_LEGACY(josvolly_8741_1_r)
+	AM_RANGE(0xA000, 0xA001) AM_DEVREADWRITE("josvolly_8741", josvolly8741_4pack_device, read_1, write_1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, gsword_state )
@@ -398,7 +383,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, gsword_state )
 	AM_RANGE(0x40, 0x40) AM_READWRITE(gsword_fake_1_r, gsword_AY8910_control_port_1_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 
-	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(josvolly_nmi_enable_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE("josvolly_8741", josvolly8741_4pack_device, nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear
 
 ADDRESS_MAP_END
@@ -666,6 +651,10 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(gsword_state,gsword)
 
+	MCFG_TAITO8741_ADD("taito8741")
+	MCFG_TAITO8741_MODES(TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT)
+	MCFG_TAITO8741_CONNECT(1,0,0,0)
+	MCFG_TAITO8741_PORT_HANDLERS(IOPORT("DSW2"),IOPORT("DSW1"),READ8(gsword_state,gsword_8741_2_r),READ8(gsword_state,gsword_8741_3_r))
 #if 1
 	/* to MCU timeout champbbj */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -714,6 +703,11 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gsword_state,josvolly)
+	
+	MCFG_JOSVOLLY8741_ADD("josvolly_8741")
+	MCFG_JOSVOLLY8741_CONNECT(1,0,0,0)
+	MCFG_JOSVOLLY8741_PORT_HANDLERS(IOPORT("DSW1"),IOPORT("DSW2"),IOPORT("DSW1"),IOPORT("DSW2"))
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
