@@ -91,8 +91,8 @@ void device_gfx_interface::interface_pre_start()
 								m_palette_tag);
 	
 	// if palette device isn't started, wait for it
-	if (!m_palette->started())
-		throw device_missing_dependencies();
+	// if (!m_palette->started())
+	//	throw device_missing_dependencies();
 }
 
 

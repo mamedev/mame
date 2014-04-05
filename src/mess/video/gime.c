@@ -386,6 +386,13 @@ void gime_base_device::device_post_load()
 	super::device_post_load();
 	update_memory();
 	update_cpu_clock();
+
+	// force the palette to update
+	for (offs_t i = 0; i <= 15; i++)
+	{
+		UINT8 value = read_palette_register(i);
+		write_palette_register(i, value);
+	}
 }
 
 

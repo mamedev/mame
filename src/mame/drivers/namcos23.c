@@ -2257,7 +2257,7 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 
 void namcos23_state::sub_irq(screen_device &screen, bool state)
 {
-	m_subcpu->set_input_line(1, state);
+	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(state);
 	m_lastpb = (m_lastpb & 0x7f) | (state << 7);
 }

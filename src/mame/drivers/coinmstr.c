@@ -1,8 +1,10 @@
-/*
-x
-  Coinmaster trivia games
+/*==================================================================================
 
-  preliminary driver by Pierpaolo Prazzoli
+  Coinmaster trivia and poker games.
+
+  Preliminary driver by Pierpaolo Prazzoli
+  Additional work by Roberto Fresca.
+
 
   TODO:
   - is there extra colour info in attr3 for suprnudge 2 and pokeroul?
@@ -11,7 +13,21 @@ x
   - finish question roms reading
   - hook up all the PIAs
 
-  Notes:
+
+====================================================================================
+
+  Technical notes....
+
+  
+  There are at least 2 different boards.
+  
+  A) Unknown, with 2x 6264 RAM, mapped $C000-$DFFF and $E000-$FFFF.
+  B) 'PCB-001-POK', with 3x 6116 RAM, mapped $E000-$E7FF, $E800-$EFFF, and $F000-$F7FF.
+
+  - All of them seems to have a connector for expansion (as Question Boards).
+
+  - The I/O ports are a mess. Devices could be mapped in different ways.
+
   - Some trivia seems to accept 2 type of eproms for question roms:
     0x4000 or 0x8000 bytes long. This check is done with the 1st read
     from the rom (I think from offset 0) and if it's 0x10, it means a
@@ -19,14 +35,106 @@ x
     Also supnudg2 only tests 0x20 as 1st byte, so accepting only
     the 2nd type of eproms.
 
-*/
 
+  * Coinmaster Joker Poker (PCB-001-POK)
+
+  AY-3-8912
+  ---------
+  
+  - IO pins connected to DIP switches bank.
+  - Data pin connected to CPU data pin.
+  - BC1 goes to PAL IC12 pin 12
+  - BC2 +5V
+  - BDIR goes to PAL IC12 pin 13
+  - A8 +5V
+
+  PIAs
+  ----
+  
+  PIA0 (IC24) Port A --> Input.
+  PIA0 (IC24) Port B --> Output.
+
+  PB output
+  PB0 to PB6 go to ULN2003 (IC19) then on PCB connector.
+  PB7 goes to ULM2003 (IC40) pin 1 then on PCB connector.
+
+  
+  PIA1 (IC39) Port A --> Output.
+  PIA1 (IC39) Port B --> Output.
+
+  PA0-PA7 go to 22 KOhm resistor, then a "pull up" capacitor, and then into the base of a transistor.
+		  Collector connected to +5V, emitter is the output (1 KOhm pulldown), it goes into an ULN2803
+		  and then to PCB connector. 3 of that transistors outputs (input of the ULN) are connected
+		  together and connected to another circuit that generate 2 more outputs on PCB connector. 
+		 (them seem unused no solder on the pcb connector)
+
+  PB0 to PB6 goes to ULN2003 (IC34) then on PCB connector.
+  PB7 goes to ULM2003 (IC40) pin 2 then on PCB connector.
+
+
+  PIA2 (IC32) Port A --> Input.
+  PIA2 (IC32) Port B --> Output.
+
+  PB0 to PB6 go to ULN2003 (IC31) then on PCB connector.
+  PB7 goes to ULM2003 (IC40) pin 3 then on PCB connector.
+
+  
+====================================================================================
+
+  Notes by game....
+
+  * Coinmaster Joker Poker
+
+  - For Joker Poker (set 2), to start, pulse the KEY OUT (W) to wipe
+    the credits set at boot stage and reset the game. Otherwise you'll
+    get 116 credits due to input inconsistences.
+
+  DIP switch #1 changes the minimal hand between "Jacks or Better" and
+  "Pair of Aces".
+ 
+  There are two bookkeeping modes. I think these are for different levels
+  like operator and manager/supervisor. With the DIP switch #4 you can
+  switch between them. Is possible that this input would be meant to be
+  routed to a real supervisor key.
+
+  Bookkeeping Types:
+
+  "Weekly Meters"
+
+  Just the operator bookkeeping mode. Only weekly credits in and out.
+  Erasable with CANCEL button. HOLD 5 shows the settings status.
+
+  "Meter Totals"
+
+  A complete bookkeeping, not erasable. Credits in/out, gamble in/out,
+  and complete statistics. In the principal bookkeeping screen, HOLD 1
+  brings up a sort of values, and HOLD 4 shows the current stake limit
+  (keep pressing HOLD 4, and press HIGH and LOW to set the stake limit
+  between 10-100).
+
+  Pressing DEAL/START, you can get the winning hands, occurence of
+  spades, diamonds, clubs and hearts. also number of jokers dealt.
+ 
+  With DIP switch #8 ON, you can enter a sort of test mode, where you
+  can set the cards using the HOLD buttons, and test the winning hands.
+
+  DIP switch #7 is the 'Factory Install Switch'. It behaves like a PC
+  CMOS eraser jumper. Turning it ON and then OFF, you will erase the
+  'Meter Totals' (all permanent meters and statistics).
+
+
+==================================================================================*/
+
+#define MASTER_CLOCK    XTAL_14MHz
+#define CPU_CLOCK      (MASTER_CLOCK/4)
+#define SND_CLOCK      (MASTER_CLOCK/8)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
 class coinmstr_state : public driver_device
@@ -52,6 +160,8 @@ public:
 	DECLARE_WRITE8_MEMBER(quizmstr_attr1_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr2_w);
 	DECLARE_WRITE8_MEMBER(quizmstr_attr3_w);
+	DECLARE_WRITE8_MEMBER(jpcoin2_attr1_w);
+	DECLARE_WRITE8_MEMBER(jpcoin2_attr2_w);
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);
@@ -222,6 +332,26 @@ static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
 ADDRESS_MAP_END
 
+/* 2x 6462 hardware C000-DFFF & E000-FFFF */
+static ADDRESS_MAP_START( jpcoin_map, AS_PROGRAM, 8, coinmstr_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM		/* 2x 6462 hardware */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
+ADDRESS_MAP_END
+
+/* 3x 6116 hardware E000-E800, E800-EFFF & F000-F7FF */
+static ADDRESS_MAP_START( jpcoin2_map, AS_PROGRAM, 8, coinmstr_state )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM		/* only for the 2x 6462 hardware */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_SHARE("attr_ram3")
+ADDRESS_MAP_END
+
 // Different I/O mappping for every game
 
 static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8, coinmstr_state )
@@ -256,21 +386,43 @@ static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8, coinmstr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8, coinmstr_state )
+/*
+out 40
+in  40
+in  43
+out 43
+out 42
+
+out 48  CRTC
+out 49  CRTC
+
+in  53
+out 53
+out 52
+out 50
+
+in  69
+out 69
+out 68
+in  6B
+out 6B
+out 6A
+
+out C1
+out C2
+out C3
+
+E0-E1 CRTC
+*/
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x41) AM_READNOP
-	AM_RANGE(0x40, 0x43) AM_WRITENOP
-	AM_RANGE(0x43, 0x43) AM_READNOP
 	AM_RANGE(0x48, 0x48) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x49, 0x49) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x50, 0x51) AM_READNOP
-	AM_RANGE(0x50, 0x53) AM_WRITENOP
-	AM_RANGE(0x53, 0x53) AM_READNOP
-	AM_RANGE(0x68, 0x69) AM_READNOP
-	AM_RANGE(0x68, 0x6b) AM_WRITENOP
-	AM_RANGE(0x6b, 0x6b) AM_READNOP
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0x78, 0x79) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x79, 0x79) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xc0, 0xc1) AM_READNOP
@@ -278,6 +430,26 @@ static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8, coinmstr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8, coinmstr_state )
+/*
+out 68
+in  69
+
+in  6B
+out 6B
+out 6A
+
+in  59
+out 59
+out 58
+out 5B
+out 5A
+
+in  7B
+out 7B
+out 7A
+
+E0-E1 CRTC
+*/
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_device, register_w)
@@ -287,6 +459,46 @@ static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8, coinmstr_state )
 	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) /* confirmed */
 	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE("pia2", pia6821_device, read, write) /* confirmed */
 	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jpcoin_io_map, AS_IO, 8, coinmstr_state )
+/*
+out C0
+in  C1
+
+in  C8
+out CA
+
+in  D0
+out D1
+out D2
+
+in  DA
+out DA
+
+E0-E1 CRTC
+*/
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("crtc", mc6845_device, address_w)           /* confirmed */
+	AM_RANGE(0xe1, 0xe1) AM_DEVWRITE("crtc", mc6845_device, register_w)          /* confirmed */
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("pia0", pia6821_device, read, write)    /* confirmed */
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)    /* confirmed */
+//	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
+	AM_RANGE(0xc4, 0xc4) AM_READ(ff_r)  /* needed to boot */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jpcoin2_io_map, AS_IO, 8, coinmstr_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("crtc", mc6845_device, address_w)           /* confirmed */
+	AM_RANGE(0xe1, 0xe1) AM_DEVWRITE("crtc", mc6845_device, register_w)          /* confirmed */
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)     /* confirmed */
+	AM_RANGE(0xc1, 0xc1) AM_DEVREAD("aysnd", ay8910_device, data_r)              /* confirmed */
+	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("pia0", pia6821_device, read, write)    /* confirmed */
+	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)    /* confirmed */
+	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)    /* confirmed */
 ADDRESS_MAP_END
 
 
@@ -608,46 +820,16 @@ static INPUT_PORTS_START( trailblz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( supnudg2 )
+static INPUT_PORTS_START( supnudg2 )	/* need to find the button 'B' to be playable */
 	PORT_START("PIA0.A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
-
-	PORT_START("PIA0.B")
-	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_NAME("1 Pound (5 credits)")	// coin x 5
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )	PORT_NAME("50 Pence (2.5 credits)")	// coin x 2.5
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )	PORT_NAME("20 Pence (1 credit)")	// coin x 1
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )	PORT_NAME("10 Pence (0.5 credit)")	// coin x 0.5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_A)  PORT_NAME("PIA0.A_0x10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_S)  PORT_NAME("PIA0.A_0x20")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_D)  PORT_NAME("PIA0.A_0x40")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_F)  PORT_NAME("PIA0.A_0x80")
 
 	PORT_START("PIA1.A")
 	PORT_DIPNAME( 0x01, 0x01, "PIA1.A" )
@@ -675,75 +857,15 @@ static INPUT_PORTS_START( supnudg2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("PIA1.B")
-	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	PORT_START("PIA2.A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x02, 0x02, "1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cont")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pass")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sel")
-	PORT_DIPNAME( 0x40, 0x40, "Show Refill?" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Show Stats?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("PIA2.B")
-	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_CODE(KEYCODE_N)  PORT_NAME("Pass")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_CODE(KEYCODE_Z)  PORT_NAME("Button A")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_CODE(KEYCODE_C)  PORT_NAME("Button C")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )   PORT_CODE(KEYCODE_1)  PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_T)  PORT_NAME("Test/Check Question Board")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_0)  PORT_NAME("Short Term Meters")  PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_9)  PORT_NAME("Refill")             PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_Q)  PORT_NAME("Remote Credits x5")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
@@ -812,25 +934,65 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_START("PIA1.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE (2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE (2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_3")                                        PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_4")                                        PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_5")                                        PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_6")                                        PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_7")                                        PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("PIA1.A_8")                                        PORT_CODE(KEYCODE_Y)
 
 	PORT_START("PIA1.B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("PIA2.A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.A" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+/*	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -838,7 +1000,7 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+*/
 	PORT_START("PIA2.B")
 	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -866,7 +1028,7 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -892,7 +1054,7 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jpcoin2 )
+static INPUT_PORTS_START( jpcoin )
 	PORT_START("PIA0.A")
 	PORT_DIPNAME( 0x01, 0x01, "PIA0.A" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1050,7 +1212,46 @@ static INPUT_PORTS_START( jpcoin2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "Minimal Hand" )
+	PORT_DIPSETTING(    0x01, "Jacks or Better" )
+	PORT_DIPSETTING(    0x00, "Pair of Aces" )
+	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jpcoin2 )
+	PORT_START("PIA0.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Bookkeeping")  PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("credits x10")  // credits x10
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("credits x1")   // credits x1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("credits x5")   // credits x5
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote x100")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Deal/Start")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Hold 5")
+
+	PORT_START("PIA0.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -1071,10 +1272,126 @@ static INPUT_PORTS_START( jpcoin2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Factory Install Switch" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.A")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.A" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA2.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Hold 4")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Low")     PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("High")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Key Out")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Bet")     PORT_IMPULSE(2)
+
+	PORT_START("PIA2.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Minimum Hand" )
+	PORT_DIPSETTING(    0x01, "Pair of Aces" )
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Bookkeeping Type" )
+	PORT_DIPSETTING(    0x08, "Weekly Meters" )
+	PORT_DIPSETTING(    0x00, "Meter Totals" )
+	PORT_DIPNAME( 0x10, 0x10, "Bonus 7s and 9s" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Factory Install Switch (Erase Meter Totals)" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -1146,7 +1463,7 @@ static MC6845_INTERFACE( h46505_intf )
 
 
 static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
-	MCFG_CPU_ADD("maincpu",Z80,8000000) // ?
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
@@ -1174,13 +1491,12 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
-
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16, h46505_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)
 	MCFG_SOUND_CONFIG(ay8912_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -1203,6 +1519,20 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pokeroul, coinmstr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pokeroul_io_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( jpcoin, coinmstr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
+	MCFG_CPU_IO_MAP(jpcoin_io_map)
+//	MCFG_NVRAM_ADD_0FILL("attr_ram3")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( jpcoin2, coinmstr )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jpcoin2_map)
+	MCFG_CPU_IO_MAP(jpcoin2_io_map)
+//	MCFG_NVRAM_ADD_0FILL("attr_ram3")
 MACHINE_CONFIG_END
 
 /*
@@ -1359,7 +1689,29 @@ ROM_START( pokeroul )
 	ROM_LOAD( "027c1.01_e14.7.88.ic23", 0x8000, 0x8000, CRC(71e5a2fc) SHA1(c28efcea1cf6c9872e70ff191932e3cdb5618917) )
 ROM_END
 
+/*
+ Looks like the 2x 6264, since checks C000-DFFF
+ 
+ BP 1D0 (PIAS init)
+ BP 1102 (calls)
+ 
+ Output C0
+ Input C1
+ 
+ Input C8
+ Output C9 (masked)
+ Output CA
+ 
+ Input D0
+ Output D1
+ Output D2
+ Input D3
+ Output DA
+ 
+ Output E0  CRTC
+ Output E1  CRTC
 
+*/
 ROM_START( jpcoin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2.bin", 0x0000, 0x2000, CRC(67e1aa60) SHA1(32301f60a7325f23047d84bb1e9416ea05753493) )
@@ -1371,20 +1723,44 @@ ROM_START( jpcoin )
 ROM_END
 
 /*
-unknown... seems joker poker from Coinmaster.
+Joker Poker from Coinmaster.
 It boots to an error screen, seems that PIAs are mapped at different offsets
-will take a look later...
+
+Original Coinmaster PCB
+Silkscreened: COINMASTER (c) 1884
+and VIDEO BOARD STOCK No PCB-001-POK
+
+1x SGS Z8400AB1 (Z80 A CPU).
+1x MC68A45P CRTC
+3x HD68B21P PIAs.
+
+3x Hitachi HM6116 (2048 X 8bit) RAM
+
+1x AY-3-8912.
+1x LM380 AMP
+
+1x 3.6 Volts, 100 mAh battery.
+1x 8 DIP switches bank.
+1x 14 MHz. Xtal.
+
+CPU CLK 3.5Mhz               14/4
+AY3-89-12 CLK 1.75Mhz        14/8
+
 */
 
 ROM_START( jpcoin2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jp88-1.ic9", 0x0000, 0x4000, CRC(60d31daf) SHA1(204537887388f1a174d1a09331186182be31e8ee) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "jp88-3.ic45", 0x0000, 0x2000, CRC(f2f92a7e) SHA1(ce6f6fd5af0049269357527650b51a1016caf636) ) 
 	ROM_LOAD( "jp88-2.ic41", 0x2000, 0x2000, CRC(57db61b2) SHA1(a3bc2056866cbb9fdca52e62f2ff4a952d1d7484) ) 
 ROM_END
 
+
+/*************************
+*      Driver Init       *
+*************************/
 
 DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
@@ -1403,11 +1779,14 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 }
 
 
+/*************************
+*      Game Drivers      *
+*************************/
 
-
-GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
-GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
-GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1990, pokeroul, 0, pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
-GAME( 1990, jpcoin,   0, pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)", GAME_NOT_WORKING ) // io stuff is different at least
-GAME( 1990, jpcoin2,  0, pokeroul, jpcoin2,  driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 2)", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                  FULLNAME                                   FLAGS   */
+GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",                      GAME_UNEMULATED_PROTECTION )
+GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                             GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
+GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II - P173 (Version 5.21)",    GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            GAME_NOT_WORKING )
+GAME( 1985, jpcoin,   0,        jpcoin ,  jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)",           GAME_NOT_WORKING ) // io stuff is different at least
+GAME( 1990, jpcoin2,  0,        jpcoin2,  jpcoin2,  driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )
