@@ -98,14 +98,6 @@ crt9021_t::crt9021_t(const machine_config &mconfig, const char *tag, device_t *o
 
 void crt9021_t::device_start()
 {
-	// allocate timers
-	m_vdc_timer = timer_alloc();
-
-	if (!m_display_cb.isnull())
-	{
-		m_vdc_timer->adjust(clocks_to_attotime(8), 0, clocks_to_attotime(8));
-	}
-
 	// register bitmap
 	m_screen->register_screen_bitmap(m_bitmap);
 
@@ -133,29 +125,6 @@ void crt9021_t::device_start()
 	save_item(NAME(m_sr));
 	save_item(NAME(m_intout));
 	save_item(NAME(m_sl));
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - handle clock change
-//-------------------------------------------------
-
-void crt9021_t::device_clock_changed()
-{
-	if (!m_display_cb.isnull())
-	{
-		m_vdc_timer->adjust(clocks_to_attotime(8), 0, clocks_to_attotime(8));
-	}
-}
-
-
-//-------------------------------------------------
-//  device_timer - handle timer events
-//-------------------------------------------------
-
-void crt9021_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	m_display_cb(m_bitmap, m_screen->vpos(), m_screen->hpos(), m_sr, m_intout);
 }
 
 
@@ -193,6 +162,8 @@ WRITE_LINE_MEMBER( crt9021_t::ld_sh_w )
 		{
 			// TODO
 		}
+
+		m_display_cb(m_bitmap, m_screen->vpos(), m_screen->hpos(), m_sr, m_intout);
 	}
 }
 

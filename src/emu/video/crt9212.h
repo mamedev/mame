@@ -87,8 +87,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_clock_changed();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	devcb2_write8			m_write_dout;
@@ -111,9 +109,6 @@ private:
 	int m_buffer;
 	int m_rac;
 	int m_wac;
-
-	// timers
-	emu_timer *m_rwclk_timer;
 };
 
 

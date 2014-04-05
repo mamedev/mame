@@ -51,7 +51,7 @@ const device_type CRT9007 = &device_creator<crt9007_t>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define HAS_VALID_PARAMETERS \
 	(m_reg[0x00] && m_reg[0x01] && m_reg[0x07] && m_reg[0x08] && m_reg[0x09])

@@ -9,14 +9,6 @@
 
 **********************************************************************/
 
-/*
-
-	TODO:
-
-	- RCLK and WCLK are clocked simultaneously since that's what tandy2k does and we have no other users
-
-*/
-
 #include "crt9212.h"
 
 
@@ -77,14 +69,6 @@ void crt9212_t::device_start()
 	m_write_rof.resolve_safe();
 	m_write_wof.resolve_safe();
 
-	// allocate timers
-	m_rwclk_timer = timer_alloc();
-
-	if (clock())
-	{
-		m_rwclk_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
-	}
-
 	// state saving
 	save_item(NAME(m_data));
 	save_item(NAME(m_clrcnt));
@@ -100,30 +84,6 @@ void crt9212_t::device_start()
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_rac));
 	save_item(NAME(m_wac));
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - handle clock change
-//-------------------------------------------------
-
-void crt9212_t::device_clock_changed()
-{
-	m_rwclk_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
-}
-
-
-//-------------------------------------------------
-//  device_timer - handle timer events
-//-------------------------------------------------
-
-void crt9212_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	rclk_w(1);
-	rclk_w(0);
-
-	wclk_w(1);
-	wclk_w(0);
 }
 
 

@@ -55,6 +55,7 @@ public:
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
 		m_palette(*this, "palette"),
+		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -79,6 +80,7 @@ public:
 	required_device<crt9212_t> m_drb1;
 	required_device<crt9021_t> m_vac;
 	required_device<palette_device> m_palette;
+	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -119,6 +121,7 @@ public:
 	DECLARE_READ8_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
+	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
 
 	/* DMA state */
 	UINT8 m_dma_mux;

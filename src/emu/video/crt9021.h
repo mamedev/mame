@@ -90,8 +90,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_clock_changed();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	enum
@@ -132,9 +130,6 @@ private:
 	UINT8 m_sr;
 	int m_intout;
 	int m_sl;
-
-	// timers
-	emu_timer *m_vdc_timer;
 };
 
 
