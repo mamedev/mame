@@ -297,15 +297,6 @@ void nemesis_state::video_start()
 	memset(m_charram, 0, m_charram.bytes());
 	memset(m_blank_tile, 0, ARRAY_LENGTH(m_blank_tile));
 
-	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(2)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(3)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(4)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(5)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(6)->set_source((UINT8 *)m_charram.target());
-	m_gfxdecode->gfx(7)->set_source((UINT8 *)m_charram.target());
-
 	/* Set up save state */
 	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));
 }

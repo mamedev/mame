@@ -9,17 +9,17 @@
 
 #define MCFG_K053250_ADD(_tag, _palette_tag, _screen_tag, offx, offy)  \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
+	MCFG_GFX_PALETTE(_palette_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	k053250_device::static_set_palette_tag(*device, "^" _palette_tag); \
 	k053250_device::static_set_offsets(*device, offx, offy);
 
 class k053250_device :	public device_t,
+						public device_gfx_interface,
 						public device_video_interface
 {
 public:
 	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void static_set_offsets(device_t &device, int offx, int offy);
 
 	DECLARE_READ16_MEMBER(reg_r);
@@ -47,12 +47,10 @@ private:
 	UINT8 m_page;
 	INT32 m_frame;
 
-	required_device<palette_device> m_palette;
-
 	// internal helpers
 	void unpack_nibbles();
 	void dma(int limiter);
-	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
+	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, UINT8 *source,
 									const rectangle &cliprect, int linepos, int scroll, int zoom,
 									UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri);
 };

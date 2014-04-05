@@ -431,8 +431,8 @@ INPUT_PORTS_END
 /*** GFX Decodes *************************************************************/
 
 /* We can't decode the sprite data like this because it isn't tile based.
-   Note that the bit indexes in these layouts are inverted compared to usual
-   MAME gfx layouts (0 = LSB, 7 = MSB) */
+   Note that the bit indexes are reversed compared to usual gfx layouts
+   (0-7 = LSB to MSB) */
 
 static const gfx_layout pgm8_charlayout =
 {
@@ -463,8 +463,8 @@ static const gfx_layout pgm32_charlayout =
 };
 
 GFXDECODE_START( pgm )
-	GFXDECODE_ENTRY( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
-	GFXDECODE_ENTRY( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
+	GFXDECODE_REVERSEBITS( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
+	GFXDECODE_REVERSEBITS( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
 
 /*** Machine Driver **********************************************************/

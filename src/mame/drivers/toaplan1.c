@@ -1771,18 +1771,6 @@ static const gfx_layout tilelayout =
 	16*8            /* every tile takes 16 consecutive bytes */
 };
 
-static const gfx_layout rallybik_spr_layout =
-{
-	16,16,          /* 16*16 sprites */
-	RGN_FRAC(1,4),  /* 2048 sprites */
-	4,              /* 4 bits per pixel */
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	32*8            /* every sprite takes 32 consecutive bytes */
-};
-
 
 static GFXDECODE_START( toaplan1 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,       0, 64 )
@@ -1791,7 +1779,6 @@ GFXDECODE_END
 
 static GFXDECODE_START( rallybik )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,             0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rallybik_spr_layout, 64*16, 64 )
 GFXDECODE_END
 
 
@@ -1825,8 +1812,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_rallybik_state, screen_eof_rallybik)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
-	MCFG_TOAPLAN_SCU_GFXDECODE("gfxdecode")
+	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallybik)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
@@ -2133,7 +2119,7 @@ ROM_START( rallybik )
 	ROM_LOAD16_BYTE( "b45-07.bin",  0x40000, 0x20000, CRC(cd3748b4) SHA1(a20eb19a0f813112b4e5d9cd91db29de9b37af17) )
 	ROM_LOAD16_BYTE( "b45-06.bin",  0x40001, 0x20000, CRC(144b085c) SHA1(84b7412d58fe9c5e9915896db92e80a621571b74) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "scu", 0 )
 	ROM_LOAD( "b45-11.rom",  0x00000, 0x10000, CRC(0d56e8bb) SHA1(c29cb53f846c73b7cf9936051fb0f9dd3805f53f) )
 	ROM_LOAD( "b45-10.rom",  0x10000, 0x10000, CRC(dbb7c57e) SHA1(268132965cd65b5e972ca9d0258c30b8a86f3703) )
 	ROM_LOAD( "b45-12.rom",  0x20000, 0x10000, CRC(cf5aae4e) SHA1(5832c52d2e9b86414d8ee2926fa190abe9e41da4) )

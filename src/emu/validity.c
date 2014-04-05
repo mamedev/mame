@@ -281,7 +281,6 @@ void validity_checker::validate_one(const game_driver &driver)
 		validate_driver();
 		validate_roms();
 		validate_inputs();
-		validate_display();
 		validate_devices();
 	}
 	catch (emu_fatalerror &err)
@@ -689,25 +688,6 @@ void validity_checker::validate_roms()
 		// reset the current device
 		m_current_device = NULL;
 	}
-}
-
-
-//-------------------------------------------------
-//  validate_display - validate display
-//  configurations
-//-------------------------------------------------
-
-void validity_checker::validate_display()
-{
-	// iterate over screen devices looking for paletted screens
-	screen_device_iterator iter(m_current_config->root_device());
-	for (const screen_device *scrconfig = iter.first(); scrconfig != NULL; scrconfig = iter.next())
-		if (scrconfig->format() == BITMAP_FORMAT_IND16)
-		{
-			// check for empty palette
-			//if (scrconfig->palette()->entries() == 0)
-//				mame_printf_error("Driver has zero palette entries but uses a palette-based bitmap format\n");
-		}
 }
 
 

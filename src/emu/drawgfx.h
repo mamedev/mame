@@ -19,48 +19,9 @@
 #define __DRAWGFX_H__
 
 
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_GFXDECODE_ADD(_tag, _palette_tag, _info) \
-	MCFG_DEVICE_ADD(_tag, GFXDECODE, 0) \
-	MCFG_GFX_PALETTE(_palette_tag) \
-	MCFG_GFXDECODE_INFO(_info) \
-
-#define MCFG_GFX_PALETTE(_palette_tag) \
-	gfxdecode_device::static_set_palette(*device, "^" _palette_tag);
-
-#define MCFG_GFXDECODE_INFO(_info) \
-	gfxdecode_device::static_set_gfxdecodeinfo(*device, GFXDECODE_NAME(_info));
-
-#define MCFG_GFXDECODE_MODIFY(_tag, _info) \
-	MCFG_DEVICE_MODIFY(_tag) \
-	MCFG_GFXDECODE_INFO(_info) \
-
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define MAX_GFX_PLANES          8
-#define MAX_GFX_SIZE            32
-#define MAX_ABS_GFX_SIZE        1024
-
-#define EXTENDED_XOFFS          { 0 }
-#define EXTENDED_YOFFS          { 0 }
-
-#define GFX_RAW                 0x12345678
-// When planeoffset[0] is set to GFX_RAW, the gfx data is left as-is, with no conversion.
-// No buffer is allocated for the decoded data, and gfxdata is set to point to the source
-// data.
-// xoffset[0] is an optional displacement (*8) from the beginning of the source data, while
-// yoffset[0] is the line modulo (*8) and charincrement the char modulo (*8). They are *8
-// for consistency with the usual behaviour, but the bottom 3 bits are not used.
-
-// This special mode can be used to save memory in games that require several different
-// handlings of the same ROM data (e.g. metro.c can use both 4bpp and 8bpp tiles, and both
-// 8x8 and 16x16; cps.c has 8x8, 16x16 and 32x32 tiles all fetched from the same ROMs).
 
 enum
 {
@@ -72,66 +33,8 @@ enum
 
 
 /***************************************************************************
-    MACROS
-***************************************************************************/
-
-// these macros describe gfx_layouts in terms of fractions of a region
-// they can be used for total, planeoffset, xoffset, yoffset
-#define RGN_FRAC(num,den)       (0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))
-#define IS_FRAC(offset)         ((offset) & 0x80000000)
-#define FRAC_NUM(offset)        (((offset) >> 27) & 0x0f)
-#define FRAC_DEN(offset)        (((offset) >> 23) & 0x0f)
-#define FRAC_OFFSET(offset)     ((offset) & 0x007fffff)
-
-// these macros are useful in gfx_layouts
-#define STEP2(START,STEP)       (START),(START)+(STEP)
-#define STEP4(START,STEP)       STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
-#define STEP8(START,STEP)       STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
-#define STEP16(START,STEP)      STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
-#define STEP32(START,STEP)      STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
-#define STEP64(START,STEP)      STEP32(START,STEP),STEP32((START)+32*(STEP),STEP)
-#define STEP128(START,STEP)     STEP64(START,STEP),STEP64((START)+64*(STEP),STEP)
-#define STEP256(START,STEP)     STEP128(START,STEP),STEP128((START)+128*(STEP),STEP)
-#define STEP512(START,STEP)     STEP256(START,STEP),STEP256((START)+256*(STEP),STEP)
-#define STEP1024(START,STEP)    STEP512(START,STEP),STEP512((START)+512*(STEP),STEP)
-#define STEP2048(START,STEP)    STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
-
-
-// these macros are used for declaring gfx_decode_entry_entry info arrays.
-#define GFXDECODE_NAME( name ) gfxdecodeinfo_##name
-#define GFXDECODE_EXTERN( name ) extern const gfx_decode_entry GFXDECODE_NAME(name)[]
-#define GFXDECODE_START( name ) const gfx_decode_entry GFXDECODE_NAME(name)[] = {
-#define GFXDECODE_ENTRY(region,offset,layout,start,colors) { region, offset, &layout, start, colors, 0, 0 },
-#define GFXDECODE_SCALE(region,offset,layout,start,colors,xscale,yscale) { region, offset, &layout, start, colors, xscale, yscale },
-#define GFXDECODE_END { 0 } };
-
-// these macros are used for declaring gfx_layout structures.
-#define GFXLAYOUT_RAW( name, width, height, linemod, charmod ) \
-const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, { linemod }, charmod };
-
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-struct gfx_layout
-{
-	UINT32 xoffs(int x) const { return (extxoffs != NULL) ? extxoffs[x] : xoffset[x]; }
-	UINT32 yoffs(int y) const { return (extyoffs != NULL) ? extyoffs[y] : yoffset[y]; }
-
-	UINT16          width;              // pixel width of each element
-	UINT16          height;             // pixel height of each element
-	UINT32          total;              // total number of elements, or RGN_FRAC()
-	UINT16          planes;             // number of bitplanes
-	UINT32          planeoffset[MAX_GFX_PLANES]; // bit offset of each bitplane
-	UINT32          xoffset[MAX_GFX_SIZE]; // bit offset of each horizontal pixel
-	UINT32          yoffset[MAX_GFX_SIZE]; // bit offset of each vertical pixel
-	UINT32          charincrement;      // distance between two consecutive elements (in bits)
-	const UINT32 *  extxoffs;           // extended X offset array for really big layouts
-	const UINT32 *  extyoffs;           // extended Y offset array for really big layouts
-};
-
 
 class gfx_element
 {
@@ -291,19 +194,6 @@ private:
 };
 
 
-struct gfx_decode_entry
-{
-	const char *    memory_region;      // memory region where the data resides
-	UINT32          start;              // offset of beginning of data to decode
-	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; NULL marks the end of the array
-	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
-	UINT16          total_color_codes;  // total number of color codes
-	UINT8           xscale;             // optional horizontal scaling factor; 0 means 1x
-	UINT8           yscale;             // optional vertical scaling factor; 0 means 1x
-};
-
-
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -449,36 +339,15 @@ inline UINT32 alpha_blend_r32(UINT32 d, UINT32 s, UINT8 level)
 // device type definition
 extern const device_type GFXDECODE;
 
-class gfxdecode_device : 	public device_t
+class gfxdecode_device : public device_t, public device_gfx_interface
 {
 public:
 	// construction/destruction
 	gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration
-	static void static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info);
-	static void static_set_palette(device_t &device, const char *tag);
-
-	palette_device *palette() const { return m_palette; }
-	gfx_element * gfx(int index) { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index]; }	
-	
-	void set_gfx(int index, gfx_element * val) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index].reset(val); }	
 protected:
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const;
-	virtual void device_start();
-	virtual void device_stop();
-private:
-	// devices
-	required_device<palette_device> m_palette;			// default palette assigned to gfx_elements
-
-	// configuration state
-	const gfx_decode_entry *m_gfxdecodeinfo;			// pointer to array of graphics decoding information
-	auto_pointer<gfx_element> m_gfx[MAX_GFX_ELEMENTS];	// array of pointers to graphic sets (chars, sprites)
+	virtual void device_start() {};
 };
-
-// device type iterator
-typedef device_type_iterator<&device_creator<gfxdecode_device>, gfxdecode_device> gfxdecode_device_iterator;
 
 GFXDECODE_EXTERN(empty);
 

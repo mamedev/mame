@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "drawgfxm.h"
-#include "validity.h"
 
 
 /***************************************************************************
@@ -71,264 +70,13 @@ static inline INT32 normalize_yscroll(bitmap_t &bitmap, INT32 yscroll)
 
 const device_type GFXDECODE = &device_creator<gfxdecode_device>;
 
-gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
-		m_palette(*this),
-		m_gfxdecodeinfo(NULL)
+gfxdecode_device::gfxdecode_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, GFXDECODE, "gfxdecode", tag, owner, clock, "gfxdecode", __FILE__),
+	device_gfx_interface(mconfig, *this)
 {
 }
 
-//**************************************************************************
-//  INITIALIZATION AND CONFIGURATION
-//**************************************************************************
 
-void gfxdecode_device::static_set_gfxdecodeinfo(device_t &device, const gfx_decode_entry *info)
-{
-	downcast<gfxdecode_device &>(device).m_gfxdecodeinfo = info;
-}
-
-void gfxdecode_device::static_set_palette(device_t &device, const char *tag)
-{
-	downcast<gfxdecode_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_stop - final cleanup
-//-------------------------------------------------
-
-void gfxdecode_device::device_stop()
-{
-}
-
-//-------------------------------------------------
-//  device_start - start up the device
-//-------------------------------------------------
-
-void gfxdecode_device::device_start()
-{
-	const gfx_decode_entry *gfxdecodeinfo = m_gfxdecodeinfo;
-	int curgfx;
-
-	// skip if nothing to do
-	if (gfxdecodeinfo == NULL)
-		return;
-
-	// loop over all elements
-	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
-	{
-		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		UINT32 region_length;
-		const UINT8 *region_base;
-
-		// resolve the region
-		if (gfxdecode->memory_region != NULL)
-		{
-			astring gfxregion;
-			owner()->subtag(gfxregion, gfxdecode->memory_region);
-			memory_region *region = owner()->memregion(gfxregion);
-			region_length = 8 * region->bytes();
-			region_base = region->base();
-		}
-		else
-		{
-			region_length = 0;
-			region_base = NULL;
-		}
-
-		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
-		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
-		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
-		const gfx_layout *gl = gfxdecode->gfxlayout;
-		int israw = (gl->planeoffset[0] == GFX_RAW);
-		int planes = gl->planes;
-		UINT32 width = gl->width;
-		UINT32 height = gl->height;
-		UINT32 total = gl->total;
-		UINT32 xormask = 0;
-		UINT32 charincrement = gl->charincrement;
-		gfx_layout glcopy;
-		int j;
-
-		// make a copy of the layout
-		glcopy = *gfxdecode->gfxlayout;
-
-		// copy the X and Y offsets into temporary arrays
-		memcpy(extxoffs, glcopy.xoffset, sizeof(glcopy.xoffset));
-		memcpy(extyoffs, glcopy.yoffset, sizeof(glcopy.yoffset));
-
-		// if there are extended offsets, copy them over top
-		if (glcopy.extxoffs != NULL)
-			memcpy(extxoffs, glcopy.extxoffs, glcopy.width * sizeof(extxoffs[0]));
-		if (glcopy.extyoffs != NULL)
-			memcpy(extyoffs, glcopy.extyoffs, glcopy.height * sizeof(extyoffs[0]));
-
-		// always use the extended offsets here
-		glcopy.extxoffs = extxoffs;
-		glcopy.extyoffs = extyoffs;
-
-		extpoffs = glcopy.planeoffset;
-
-		// expand X and Y by the scale factors
-		if (xscale > 1)
-		{
-			width *= xscale;
-			for (j = width - 1; j >= 0; j--)
-				extxoffs[j] = extxoffs[j / xscale];
-		}
-		if (yscale > 1)
-		{
-			height *= yscale;
-			for (j = height - 1; j >= 0; j--)
-				extyoffs[j] = extyoffs[j / yscale];
-		}
-
-		// if the character count is a region fraction, compute the effective total
-		if (IS_FRAC(total))
-		{
-			assert(region_length != 0);
-			total = region_length / charincrement * FRAC_NUM(total) / FRAC_DEN(total);
-		}
-
-		// for non-raw graphics, decode the X and Y offsets
-		if (!israw)
-		{
-			// loop over all the planes, converting fractions
-			for (j = 0; j < planes; j++)
-			{
-				UINT32 value1 = extpoffs[j];
-				if (IS_FRAC(value1))
-				{
-					assert(region_length != 0);
-					extpoffs[j] = FRAC_OFFSET(value1) + region_length * FRAC_NUM(value1) / FRAC_DEN(value1);
-				}
-			}
-
-			// loop over all the X/Y offsets, converting fractions
-			for (j = 0; j < width; j++)
-			{
-				UINT32 value2 = extxoffs[j];
-				if (IS_FRAC(value2))
-				{
-					assert(region_length != 0);
-					extxoffs[j] = FRAC_OFFSET(value2) + region_length * FRAC_NUM(value2) / FRAC_DEN(value2);
-				}
-			}
-
-			for (j = 0; j < height; j++)
-			{
-				UINT32 value3 = extyoffs[j];
-				if (IS_FRAC(value3))
-				{
-					assert(region_length != 0);
-					extyoffs[j] = FRAC_OFFSET(value3) + region_length * FRAC_NUM(value3) / FRAC_DEN(value3);
-				}
-			}
-		}
-
-		// otherwise, just use the line modulo
-		else
-		{
-			int base = gfxdecode->start;
-			int end = region_length/8;
-			int linemod = gl->yoffset[0];
-			while (total > 0)
-			{
-				int elementbase = base + (total - 1) * charincrement / 8;
-				int lastpixelbase = elementbase + height * linemod / 8 - 1;
-				if (lastpixelbase < end)
-					break;
-				total--;
-			}
-		}
-
-		// update glcopy
-		glcopy.width = width;
-		glcopy.height = height;
-		glcopy.total = total;
-
-		// allocate the graphics
-		m_gfx[curgfx].reset(global_alloc(gfx_element(m_palette, glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, xormask, gfxdecode->total_color_codes, gfxdecode->color_codes_start)));
-	}
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - validate graphics decoding
-//  configuration
-//-------------------------------------------------/
-
-void gfxdecode_device::device_validity_check(validity_checker &valid) const
-{
-
-	// bail if no gfx
-	if (!m_gfxdecodeinfo)
-		return;
-
-	// iterate over graphics decoding entries
-	for (int gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && m_gfxdecodeinfo[gfxnum].gfxlayout != NULL; gfxnum++)
-	{
-		const gfx_decode_entry &gfx = m_gfxdecodeinfo[gfxnum];
-		const gfx_layout &layout = *gfx.gfxlayout;
-
-		// make sure the region exists
-		const char *region = gfx.memory_region;
-		if (region != NULL)
-		{
-			// resolve the region
-			astring gfxregion;
-			
-			owner()->subtag(gfxregion, region);
-
-			// loop over gfx regions
-			UINT32 region_length = valid.region_length(gfxregion);
-			if (region_length == 0)
-				mame_printf_error("gfx[%d] references non-existent region '%s'\n", gfxnum, gfxregion.cstr());
-
-			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
-			else if (!IS_FRAC(layout.total))
-			{
-				// determine which plane is at the largest offset
-				int start = 0;
-				for (int plane = 0; plane < layout.planes; plane++)
-					if (layout.planeoffset[plane] > start)
-						start = layout.planeoffset[plane];
-				start &= ~(layout.charincrement - 1);
-
-				// determine the total length based on this info
-				int len = layout.total * layout.charincrement;
-
-				// do we have enough space in the region to cover the whole decode?
-				int avail = region_length - (gfx.start & ~(layout.charincrement / 8 - 1));
-
-				// if not, this is an error
-				if ((start + len) / 8 > avail)
-					mame_printf_error("gfx[%d] extends past allocated memory of region '%s'\n", gfxnum, region);
-			}
-		}
-
-		int xscale = (m_gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : m_gfxdecodeinfo[gfxnum].xscale;
-		int yscale = (m_gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : m_gfxdecodeinfo[gfxnum].yscale;
-
-		// verify raw decode, which can only be full-region and have no scaling
-		if (layout.planeoffset[0] == GFX_RAW)
-		{
-			if (layout.total != RGN_FRAC(1,1))
-				mame_printf_error("gfx[%d] with unsupported layout total\n", gfxnum);
-			if (xscale != 1 || yscale != 1)
-				mame_printf_error("gfx[%d] with unsupported xscale/yscale\n", gfxnum);
-		}
-
-		// verify traditional decode doesn't have too many planes or is not too large
-		else
-		{
-			if (layout.planes > MAX_GFX_PLANES)
-				mame_printf_error("gfx[%d] with invalid planes\n", gfxnum);
-			if (xscale * layout.width > MAX_ABS_GFX_SIZE || yscale * layout.height > MAX_ABS_GFX_SIZE)
-				mame_printf_error("gfx[%d] with invalid xscale/yscale\n", gfxnum);
-		}
-	}
-	
-}
 
 
 /***************************************************************************
@@ -443,7 +191,7 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	if (m_layout_is_raw)
 	{
 		// modulos are determined for us by the layout
-		m_line_modulo = ((gl.extyoffs != NULL) ? gl.extyoffs[0] : gl.yoffset[0]) / 8;
+		m_line_modulo = gl.yoffs(0) / 8;
 		m_char_modulo = gl.charincrement / 8;
 
 		// RAW graphics must have a pointer up front

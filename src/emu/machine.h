@@ -25,9 +25,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int MAX_GFX_ELEMENTS = 32;
-
-
 // machine phases
 enum machine_phase
 {

@@ -66,7 +66,6 @@ private:
 	void validate_inlines();
 	void validate_driver();
 	void validate_roms();
-	void validate_display();
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, int_map &port_map);
