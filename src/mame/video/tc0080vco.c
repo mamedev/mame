@@ -95,7 +95,8 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_bg1_scrollx(0),
 	m_bg1_scrolly(0),
 	m_flipscreen(0),
-	m_gfxdecode(*this)
+	m_gfxdecode(*this),
+	m_palette(*this)
 {
 }
 
@@ -107,6 +108,16 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0080vco_device &>(device).m_gfxdecode.set_tag(tag);
+}
+
+//-------------------------------------------------
+//  static_set_palette_tag: Set the tag of the
+//  palette device
+//-------------------------------------------------
+
+void tc0080vco_device::static_set_palette_tag(device_t &device, const char *tag)
+{
+	downcast<tc0080vco_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -149,6 +160,9 @@ void tc0080vco_device::device_start()
 	16*8
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tc0080vco_device::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
@@ -190,7 +204,7 @@ void tc0080vco_device::device_start()
 	m_scroll_ram    = m_ram + 0x20800 / 2;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_txnum, auto_alloc_clear(machine(), gfx_element(machine(), charlayout, (UINT8 *)m_char_ram, 64, 0)));
+	m_gfxdecode->set_gfx(m_txnum, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *)m_char_ram, 64, 0)));
 
 	save_pointer(NAME(m_ram), TC0080VCO_RAM_SIZE / 2);
 	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::postload), this));

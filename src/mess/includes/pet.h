@@ -41,6 +41,7 @@ public:
 			m_pia2(*this, M6520_2_TAG),
 			m_crtc(*this, MC6845_TAG),
 			m_ieee(*this, IEEE488_TAG),
+			m_palette(*this, "palette"),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
 			m_exp(*this, PET_EXPANSION_SLOT_TAG),
@@ -79,6 +80,7 @@ public:
 	required_device<pia6821_device> m_pia2;
 	optional_device<mc6845_device> m_crtc;
 	required_device<ieee488_device> m_ieee;
+	required_device<palette_device> m_palette;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<pet_datassette_port_device> m_cassette2;
 	required_device<pet_expansion_slot_device> m_exp;

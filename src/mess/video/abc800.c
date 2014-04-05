@@ -197,6 +197,8 @@ MACHINE_CONFIG_END
 void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
+	
+	const pen_t *pen = m_palette->pens();
 
 	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
 	{
@@ -211,8 +213,8 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
-				bitmap.pix32(y, x++) = RGB_MONOCHROME_YELLOW[color];
-				bitmap.pix32(y, x++) = RGB_MONOCHROME_YELLOW[color];
+				bitmap.pix32(y, x++) = pen[color];
+				bitmap.pix32(y, x++) = pen[color];
 
 				data <<= 2;
 			}
@@ -230,6 +232,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 	abc800m_state *state = device->machine().driver_data<abc800m_state>();
 
 	int column;
+	rgb_t fgpen = state->m_palette->pen(1);
 
 	// prevent wraparound
 	if (y >= 240) return;
@@ -256,7 +259,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 			if (BIT(data, 7))
 			{
-				bitmap.pix32(y, x) = RGB_MONOCHROME_YELLOW[1];
+				bitmap.pix32(y, x) = fgpen;
 			}
 
 			data <<= 1;
@@ -319,9 +322,10 @@ MACHINE_CONFIG_FRAGMENT( abc800m_video )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0,768-1, 0, 312-1)
+
+	MCFG_PALETTE_ADD_MONOCHROME_YELLOW("palette")
 MACHINE_CONFIG_END

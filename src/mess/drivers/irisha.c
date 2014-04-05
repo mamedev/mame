@@ -46,7 +46,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	DECLARE_WRITE_LINE_MEMBER(irisha_pic_set_int_line);
 	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 
 private:
 	bool m_sg1_line;
@@ -406,7 +406,9 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
-	MCFG_GFXDECODE_ADD("gfxdecode", irisha)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

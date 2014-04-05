@@ -183,7 +183,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 
 			for (i=0; i<y_multi; i++)
 			{
-				m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 						sprite + s_ptr,
 						colour,
 						fx,fy,
@@ -191,7 +191,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 						screen.priority(),pri_mask,0);
 
 				/* wrap-around y */
-				m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 						sprite + s_ptr,
 						colour,
 						fx,fy,
@@ -240,7 +240,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
 					{
-						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
@@ -248,7 +248,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 								screen.priority(),pri_mask,0);
 
 						/* wrap-around y */
-						m_gfxdecode->gfx(1)->prio_transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,

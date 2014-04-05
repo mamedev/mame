@@ -11,19 +11,17 @@
 
 #include "imagedev/flopdrv.h"
 
+#define MCFG_MC6843_IRQ_CALLBACK(_write) \
+	devcb = &mc6843_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-struct mc6843_interface
-{
-	devcb_write_line m_irq_cb;
-};
-
-class mc6843_device : public device_t,
-								public mc6843_interface
+class mc6843_device : public device_t
 {
 public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6843_device() {}
 	
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6843_device &>(device).m_write_irq.set_callback(object); }
+
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -33,7 +31,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -44,7 +41,7 @@ private:
 		TIMER_CONT
 	};
 	
-	devcb_resolved_write_line m_irq_func;
+	devcb2_write_line m_write_irq;
 
 	/* registers */
 	UINT8 m_CTAR;       /* current track */
@@ -85,14 +82,5 @@ private:
 };
 
 extern const device_type MC6843;
-
-
-#define MCFG_MC6843_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MC6843, 0)          \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_MC6843_REMOVE(_tag)        \
-	MCFG_DEVICE_REMOVE(_tag)
-
 
 #endif

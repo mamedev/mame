@@ -902,24 +902,10 @@ static void gfxset_update_bitmap(running_machine &machine, ui_gfx_state *state, 
 
 static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int index, bitmap_rgb32 &bitmap, int dstx, int dsty, int color, int rotate)
 {
-	static const rgb_t default_palette[] =
-	{
-		rgb_t(0,0,0), rgb_t(0,0,255), rgb_t(0,255,0), rgb_t(0,255,255),
-		rgb_t(255,0,0), rgb_t(255,0,255), rgb_t(255,255,0), rgb_t(255,255,255)
-	};
 	int width = (rotate & ORIENTATION_SWAP_XY) ? gfx->height() : gfx->width();
 	int height = (rotate & ORIENTATION_SWAP_XY) ? gfx->width() : gfx->height();
-	const rgb_t *palette = (machine.first_screen()->palette()->entries() != 0) ? machine.first_screen()->palette()->palette()->entry_list_raw() : NULL;
-	UINT32 palette_mask = ~0;
+	const rgb_t *palette = gfx->palette()->palette()->entry_list_raw() + gfx->colorbase() + color * gfx->granularity();
 	int x, y;
-
-	if (palette != NULL)
-		palette += gfx->colorbase() + color * gfx->granularity();
-	else
-	{
-		palette = default_palette;
-		palette_mask = 7;
-	}
 
 	// loop over rows in the cell
 	for (y = 0; y < height; y++)
@@ -955,7 +941,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 			s = src + effy * gfx->rowbytes();
 
 			// extract the pixel
-			*dest++ = 0xff000000 | palette[s[effx] & palette_mask];
+			*dest++ = 0xff000000 | palette[s[effx]];
 		}
 	}
 }
@@ -1166,7 +1152,6 @@ static void tilemap_update_bitmap(running_machine &machine, ui_gfx_state *state,
 
 		// allocate new stuff
 		state->bitmap = global_alloc(bitmap_rgb32(width, height));
-		state->bitmap->set_palette(machine.first_screen()->palette()->palette());
 		state->texture = machine.render().texture_alloc();
 		state->texture->set_bitmap(*state->bitmap, state->bitmap->cliprect(), TEXFORMAT_RGB32);
 

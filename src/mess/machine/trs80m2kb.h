@@ -32,9 +32,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TRS80M2_KEYBOARD_ADD(_clock) \
-	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0) \
-	downcast<trs80m2_keyboard_device *>(device)->set_clock_callback(DEVCB2_##_clock);
+#define MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(_write) \
+	devcb = &trs80m2_keyboard_device::set_clock_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -50,7 +49,7 @@ public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _clock> void set_clock_callback(_clock clock) { m_write_clock.set_callback(clock); }
+	template<class _Object> static devcb2_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

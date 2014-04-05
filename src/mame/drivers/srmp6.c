@@ -169,7 +169,7 @@ void srmp6_state::video_start()
 	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, tiles8x8_layout, (UINT8*)m_tileram, m_palette->entries() / 256, 0)));
 	m_gfxdecode->gfx(0)->set_granularity(256);
 
 	m_brightness = 0x60;
@@ -277,7 +277,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						m_gfxdecode->gfx(0)->alpha(m_palette,bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
+						m_gfxdecode->gfx(0)->alpha(bitmap,cliprect,tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 					}
 				}
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

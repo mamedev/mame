@@ -819,6 +819,7 @@ static MACHINE_CONFIG_START( wheelfir, wheelfir_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
 	MCFG_SCREEN_VBLANK_DRIVER(wheelfir_state, screen_eof_wheelfir)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NUM_COLORS)
 

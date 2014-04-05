@@ -94,9 +94,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
 	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mz3500);
@@ -148,7 +145,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	mz3500_state *state = device->machine().driver_data<mz3500_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile;
@@ -765,18 +762,6 @@ static GFXDECODE_START( mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
 GFXDECODE_END
 
-void mz3500_state::fdc_irq(bool state)
-{
-//  printf("%d IRQ\n",state);
-	m_master->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-
-}
-
-void mz3500_state::fdc_drq(bool state)
-{
-	printf("%02x DRQ\n",state);
-}
-
 void mz3500_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
@@ -802,9 +787,6 @@ void mz3500_state::machine_reset()
 
 	if (fdc)
 	{
-		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_irq), this));
-		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_drq), this));
-
 		m_fdd_sel = 0;
 		{
 			static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
@@ -864,6 +846,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_I8255A_ADD( "i8255", i8255_intf )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -880,7 +863,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz3500)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz3500)
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(mz3500_state, mz3500)

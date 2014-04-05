@@ -208,14 +208,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::hexion_scanline)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static const k053252_interface hexion_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(hexion_state,hexion_irq_ack_w),
-	DEVCB_DRIVER_LINE_MEMBER(hexion_state,hexion_nmi_ack_w),
-	0, 0
-};
 
 static MACHINE_CONFIG_START( hexion, hexion_state )
 
@@ -224,7 +216,9 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, hexion_scanline, "screen", 0, 1)
 
-	MCFG_K053252_ADD("k053252", 24000000/2, hexion_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, 24000000/2)
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, hexion_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, hexion_nmi_ack_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -233,8 +227,9 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update_hexion)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hexion)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 
 	/* sound hardware */

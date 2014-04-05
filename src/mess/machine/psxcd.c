@@ -151,7 +151,7 @@ void psxcd_device::device_stop()
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free(m_timers[i]->ptr());
+			global_free((command_result *)m_timers[i]->ptr());
 	}
 	while(res_queue)
 	{
@@ -169,7 +169,7 @@ void psxcd_device::device_reset()
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(m_timerinuse[i] && m_timers[i]->ptr())
-			global_free(m_timers[i]->ptr());
+			global_free((command_result *)m_timers[i]->ptr());
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
@@ -1220,7 +1220,7 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 	}
 }
 
-int psxcd_device::add_system_event(int type, UINT64 t, void *ptr)
+int psxcd_device::add_system_event(int type, UINT64 t, command_result *ptr)
 {
 	// t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / t;

@@ -137,7 +137,7 @@ UINT32 kaypro_state::screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 
 MC6845_UPDATE_ROW( kaypro2x_update_row )
 {
 	kaypro_state *state = device->machine().driver_data<kaypro_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT32 *p = &bitmap.pix32(y);
 	UINT16 x;
 	UINT8 gfx,fg,bg;
@@ -250,7 +250,7 @@ void kaypro_state::mc6845_screen_configure()
 
 	/* Resize the screen */
 	if ((width < 640) && (height < 400) && (bytes < 0x800)) /* bounds checking to prevent an assert or violation */
-		machine().primary_screen->set_visible_area(0, width, 0, height);
+		machine().first_screen()->set_visible_area(0, width, 0, height);
 }
 
 

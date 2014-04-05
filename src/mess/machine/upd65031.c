@@ -142,13 +142,13 @@ inline void upd65031_device::interrupt_refresh()
 	{
 		if (LOG) logerror("uPD65031 '%s': set int\n", tag());
 
-		m_out_int_func(ASSERT_LINE);
+		m_write_int(ASSERT_LINE);
 	}
 	else
 	{
 		if (LOG) logerror("uPD65031 '%s': clear int\n", tag());
 
-		m_out_int_func(CLEAR_LINE);
+		m_write_int(CLEAR_LINE);
 	}
 }
 
@@ -194,7 +194,11 @@ inline void upd65031_device::set_mode(int mode)
 //-------------------------------------------------
 
 upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD65031, "NEC uPD65031", tag, owner, clock, "upd65031", __FILE__)
+	: device_t(mconfig, UPD65031, "NEC uPD65031", tag, owner, clock, "upd65031", __FILE__),
+	m_read_kb(*this),
+	m_write_int(*this),
+	m_write_nmi(*this),
+	m_write_spkr(*this)
 {
 }
 
@@ -218,10 +222,6 @@ void upd65031_device::device_config_complete()
 	{
 		m_screen_update_cb = NULL;
 		m_out_mem_cb = NULL;
-		memset(&m_in_kb_cb, 0, sizeof(m_in_kb_cb));
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_spkr_cb, 0, sizeof(m_out_spkr_cb));
 	}
 }
 
@@ -233,10 +233,10 @@ void upd65031_device::device_config_complete()
 void upd65031_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_spkr_func.resolve(m_out_spkr_cb, *this);
-	m_int_kb_func.resolve(m_in_kb_cb, *this);
+	m_read_kb.resolve_safe(0);
+	m_write_int.resolve_safe();
+	m_write_nmi.resolve_safe();
+	m_write_spkr.resolve_safe();
 
 	// allocate timers
 	m_rtc_timer = timer_alloc(TIMER_RTC);
@@ -304,7 +304,7 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case TIMER_RTC:
 
 		// if a key is pressed sets the interrupt
-		if ((m_int & INT_GINT) && (m_int & INT_KEY) && m_int_kb_func(0) != 0xff)
+		if ((m_int & INT_GINT) && (m_int & INT_KEY) && m_read_kb(0) != 0xff)
 		{
 			if (LOG) logerror("uPD65031 '%s': Keyboard interrupt!\n", tag());
 
@@ -393,7 +393,7 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 	case TIMER_SPEAKER:
 		m_speaker_state = !m_speaker_state;
-		m_out_spkr_func(m_speaker_state ? 1 : 0);
+		m_write_spkr(m_speaker_state ? 1 : 0);
 		break;
 	}
 }
@@ -436,7 +436,7 @@ READ8_MEMBER( upd65031_device::read )
 				if (LOG) logerror("uPD65031 '%s': entering snooze!\n", tag());
 			}
 
-			UINT8 data = m_int_kb_func(offset>>8);
+			UINT8 data = m_read_kb(offset>>8);
 
 			if (LOG) logerror("uPD65031 '%s': key r %02x: %02x\n", tag(), offset>>8, data);
 
@@ -516,7 +516,7 @@ WRITE8_MEMBER( upd65031_device::write )
 				{
 					// speaker controlled by SBIT
 					m_speaker_state = BIT(data, 6);
-					m_out_spkr_func(m_speaker_state);
+					m_write_spkr(m_speaker_state);
 				}
 				else
 				{

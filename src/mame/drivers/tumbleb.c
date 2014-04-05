@@ -2057,6 +2057,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2064,7 +2065,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)	
 
@@ -2095,6 +2096,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_tumblepb)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2102,7 +2104,7 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2136,6 +2138,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_jumpkids)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2143,7 +2146,7 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -2173,6 +2176,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_fncywld)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2181,7 +2185,7 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fncywld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fncywld)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
@@ -2233,6 +2237,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_semicom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2240,7 +2245,7 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2343,6 +2348,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8-1, 31*8-2)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_suprtrio)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2350,7 +2356,7 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suprtrio)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprtrio)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2381,6 +2387,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tumbleb_state, screen_update_pangpang)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 3);
@@ -2388,7 +2395,7 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tumbleb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -3529,7 +3536,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 void tumbleb_state::suprtrio_decrypt_code()
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x80000/2);
+	dynamic_array<UINT16> buf(0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
@@ -3541,13 +3548,12 @@ void tumbleb_state::suprtrio_decrypt_code()
 		if ((i & 3) == 0) j ^= 0x08;
 		rom[i] = buf[j];
 	}
-	auto_free(machine(), buf);
 }
 
 void tumbleb_state::suprtrio_decrypt_gfx()
 {
 	UINT16 *rom = (UINT16 *)memregion("tilegfx")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
+	dynamic_array<UINT16> buf(0x100000/2);
 	int i;
 
 	/* decrypt tiles */
@@ -3558,7 +3564,6 @@ void tumbleb_state::suprtrio_decrypt_gfx()
 		if (i & 1) j ^= 0x04;
 		rom[i] = buf[j];
 	}
-	auto_free(machine(), buf);
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)

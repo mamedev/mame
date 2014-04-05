@@ -48,6 +48,9 @@ public:
 	void validate_tag(const char *tag);
 	int region_length(const char *tag) { return m_region_map.find(tag); }
 	
+	// generic registry of already-checked stuff
+	bool already_checked(const char *string) { return (m_already_checked.add(string, 1, false) == TMERR_DUPLICATE); }
+	
 private:
 	// internal helpers
 	const char *ioport_string_from_index(UINT32 index);
@@ -97,6 +100,7 @@ private:
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;
+	tagmap_t<UINT8>			m_already_checked;
 
 	// callbacks
 	output_delegate         m_saved_error_output;

@@ -365,7 +365,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
 #include "machine/naomigd.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "bitmap.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"

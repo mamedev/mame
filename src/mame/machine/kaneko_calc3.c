@@ -1549,7 +1549,7 @@ void kaneko_calc3_device::initial_scan_tables(running_machine& machine)
 
 	for (x=0;x<numregions;x++)
 	{
-		UINT8* tmpdstram = auto_alloc_array(machine, UINT8, 0x2000);
+		dynamic_buffer tmpdstram(0x2000);
 #if CALC3_VERBOSE_OUTPUT
 		int length;
 #endif
@@ -1585,7 +1585,6 @@ void kaneko_calc3_device::initial_scan_tables(running_machine& machine)
 			}
 		}
 #endif
-		auto_free(machine, tmpdstram);
 	}
 
 	// there is also a 0x1000 block of data at the end.. same on both games, maybe it's related to the decryption tables??

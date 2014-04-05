@@ -35,11 +35,10 @@ static const res_net_decode_info tagteam_decode_info =
 PALETTE_INIT_MEMBER(tagteam_state, tagteam)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &tagteam_decode_info, &tagteam_net_info);
+	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb, 0x20);
-	auto_free(machine(), rgb);
 }
 
 
@@ -165,7 +164,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 
 		
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -177,7 +176,7 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		sy += (flip_screen() ? -256 : 256);
 
 		
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);

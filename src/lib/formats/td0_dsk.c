@@ -820,7 +820,7 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int track_spt;
 	int offset = 0;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
-	UINT8 *imagebuf = global_alloc_array(UINT8, max_size);
+	dynamic_buffer imagebuf(max_size);
 	UINT8 header[12];
 
 	try
@@ -1005,7 +1005,6 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 	catch(bool ret)
 	{
-		global_free(imagebuf);
 		return ret;
 	}
 	return false;

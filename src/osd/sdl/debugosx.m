@@ -738,10 +738,10 @@ void console_create_window(running_machine &machine)
 - (NSSize)maximumFrameSize {
 	debug_view_xy				max;
 	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	const debug_view_source		*source = view->source_list().match_device(curcpu);
+	const debug_view_source		*source = view->source_for_device(curcpu);
 
 	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
 		debug_view_xy	current;
 		view->set_source(*source);
@@ -768,16 +768,16 @@ void console_create_window(running_machine &machine)
 - (int)selectedSubviewIndex {
 	const debug_view_source *source = view->source();
 	if (source != NULL)
-		return view->source_list().index(*source);
+		return view->source_list().indexof(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = view->source_list().index(*view->source());
+	const int	selected = view->source_list().indexof(*view->source());
 	if (selected != index) {
-		view->set_source(*view->source_list().by_index(index));
+		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
 			view->set_cursor_visible(false);
 	}
@@ -786,7 +786,7 @@ void console_create_window(running_machine &machine)
 
 - (void)selectSubviewForCPU:(device_t *)device {
 	const debug_view_source		*selected = view->source();
-	const debug_view_source		*source = view->source_list().match_device(device);
+	const debug_view_source		*source = view->source_for_device(device);
 	if ( selected != source ) {
 		view->set_source(*source);
 		if ([[self window] firstResponder] != self)
@@ -869,12 +869,12 @@ void console_create_window(running_machine &machine)
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:view->source_list().index(*source)];
+						   atIndex:index++] setTag:view->source_list().indexof(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
@@ -1023,10 +1023,10 @@ void console_create_window(running_machine &machine)
 - (NSSize)maximumFrameSize {
 	debug_view_xy				max;
 	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	const debug_view_source		*source = view->source_list().match_device(curcpu);
+	const debug_view_source		*source = view->source_for_device(curcpu);
 
 	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
 		debug_view_xy   current;
 		view->set_source(*source);
@@ -1053,16 +1053,16 @@ void console_create_window(running_machine &machine)
 - (int)selectedSubviewIndex {
 	const debug_view_source *source = view->source();
 	if (source != NULL)
-		return view->source_list().index(*source);
+		return view->source_list().indexof(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = view->source_list().index(*view->source());
+	const int	selected = view->source_list().indexof(*view->source());
 	if (selected != index) {
-		view->set_source(*view->source_list().by_index(index));
+		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
 			view->set_cursor_visible(false);
 	}
@@ -1071,7 +1071,7 @@ void console_create_window(running_machine &machine)
 
 - (void)selectSubviewForCPU:(device_t *)device {
 	const debug_view_source     *selected = view->source();
-	const debug_view_source     *source = view->source_list().match_device(device);
+	const debug_view_source     *source = view->source_for_device(device);
 	if ( selected != source ) {
 		view->set_source(*source);
 		if ([[self window] firstResponder] != self)
@@ -1226,12 +1226,12 @@ void console_create_window(running_machine &machine)
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:view->source_list().index(*source)];
+						   atIndex:index++] setTag:view->source_list().indexof(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
@@ -1261,11 +1261,11 @@ void console_create_window(running_machine &machine)
 - (NSSize)maximumFrameSize {
 	debug_view_xy				max;
 	device_t				*curcpu = debug_cpu_get_visible_cpu(*machine);
-	const debug_view_source		*source = view->source_list().match_device(curcpu);
+	const debug_view_source		*source = view->source_for_device(curcpu);
 
 
 	max.x = max.y = 0;
-	for (const debug_view_source *source = view->source_list().head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
 	{
 		debug_view_xy   current;
 		view->set_source(*source);
@@ -1296,7 +1296,7 @@ void console_create_window(running_machine &machine)
 
 - (void)selectSubviewForCPU:(device_t *)device {
 	//dv = get_view(dmain, DVT_STATE);
-	view->set_source(*view->source_list().match_device(device));
+	view->set_source(*view->source_for_device(device));
 }
 
 @end

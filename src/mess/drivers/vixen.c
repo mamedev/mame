@@ -411,6 +411,8 @@ void vixen_state::video_start()
 
 UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	for (int txadr = 0; txadr < 26; txadr++)
 	{
 		for (int scan = 0; scan < 10; scan++)
@@ -454,7 +456,7 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
 
-					bitmap.pix32((txadr * 10) + scan, (chadr * 8) + x) = RGB_MONOCHROME_AMBER[color];
+					bitmap.pix32((txadr * 10) + scan, (chadr * 8) + x) = pen[color];
 				}
 			}
 		}
@@ -786,7 +788,10 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
+
+	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

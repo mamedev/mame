@@ -109,15 +109,15 @@ PALETTE_INIT_MEMBER(lockon_state, lockon)
 
 		if (p2 & 0x80)
 		{
-			r = compute_res_net((p2 >> 2) & 0x1f, 0, &lockon_net_info);
-			g = compute_res_net(((p1 >> 5) & 0x7) | (p2 & 3) << 3, 1, &lockon_net_info);
-			b = compute_res_net((p1 & 0x1f), 2, &lockon_net_info);
+			r = compute_res_net((p2 >> 2) & 0x1f, 0, lockon_net_info);
+			g = compute_res_net(((p1 >> 5) & 0x7) | (p2 & 3) << 3, 1, lockon_net_info);
+			b = compute_res_net((p1 & 0x1f), 2, lockon_net_info);
 		}
 		else
 		{
-			r = compute_res_net((p2 >> 2) & 0x1f, 0, &lockon_pd_net_info);
-			g = compute_res_net(((p1 >> 5) & 0x7) | (p2 & 3) << 3, 1, &lockon_pd_net_info);
-			b = compute_res_net((p1 & 0x1f), 2, &lockon_pd_net_info);
+			r = compute_res_net((p2 >> 2) & 0x1f, 0, lockon_pd_net_info);
+			g = compute_res_net(((p1 >> 5) & 0x7) | (p2 & 3) << 3, 1, lockon_pd_net_info);
+			b = compute_res_net((p1 & 0x1f), 2, lockon_pd_net_info);
 		}
 
 		palette.set_pen_color(i, rgb_t(r, g, b));

@@ -315,8 +315,9 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", travrusa)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", travrusa)
 
 	MCFG_PALETTE_ADD("palette", 16*8+16*8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
@@ -542,7 +543,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 {
 	int A, j;
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x2000);
+	dynamic_buffer buffer(0x2000);
 
 	memcpy(buffer, rom, 0x2000);
 
@@ -552,8 +553,6 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 		j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
 		rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
 	}
-
-	auto_free(machine(), buffer);
 }
 
 DRIVER_INIT_MEMBER(travrusa_state,shtridra)

@@ -161,9 +161,9 @@ void nesapu_device::device_start()
 	int i;
 
 	/* Initialize global variables */
-	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds);
+	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds);
 	m_buffer_size = m_samps_per_sync;
-	m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds);
+	m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds);
 	m_apu_incsize = (float) (clock() / (float) m_real_rate);
 
 	/* Use initializer calls */
@@ -752,7 +752,6 @@ inline uint8 nesapu_device::apu_read(int address)
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
 inline void nesapu_device::apu_write(int address, uint8 value)
 {
-	assert(address >= 0 && address < ARRAY_LENGTH(m_APU.regs));
 	m_APU.regs[address]=value;
 	m_stream->update();
 	apu_regwrite(address,value);

@@ -331,8 +331,12 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		stream_sample_t *dest2 = outputs[1];
 		for (i = 0; i < samples; i++)
 		{
-			*dest1++ = limit(8*(*lmix++));
-			*dest2++ = limit(8*(*rmix++));
+			INT32 val;
+
+			val = 8 * (*lmix++);
+			*dest1++ = limit(val);
+			val = 8 * (*rmix++);
+			*dest2++ = limit(val);
 		}
 	}
 }

@@ -19,7 +19,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")  { }
 
 	UINT32 m_panel_data_reg;    /* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
@@ -49,6 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 void apexc_state::machine_start()
@@ -569,9 +571,8 @@ PALETTE_INIT_MEMBER(apexc_state, apexc)
 
 void apexc_state::video_start()
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
+	int width = m_screen->width();
+	int height = m_screen->height();
 
 	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);
@@ -590,7 +591,7 @@ void apexc_state::apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
 /* write a single char on screen */
 void apexc_state::apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
 {
-	m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,bitmap.cliprect(), character-32, color, 0, 0,
+	m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
 				x+1, y, 0);
 }
 
@@ -890,8 +891,9 @@ static MACHINE_CONFIG_START( apexc, apexc_state )
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apexc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apexc)
 	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
 

@@ -1224,6 +1224,7 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(balsente_state, screen_update_balsente)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 
@@ -2075,7 +2076,7 @@ void balsente_state::expand_roms(UINT8 cd_rom_mask)
 	/* load EF           from 0x2e000-0x30000 */
 	/* ROM region must be 0x40000 total */
 
-	UINT8 *temp = auto_alloc_array(machine(), UINT8, 0x20000);
+	dynamic_buffer temp(0x20000);
 	{
 		UINT8 *rom = memregion("maincpu")->base();
 		UINT32 len = memregion("maincpu")->bytes();
@@ -2129,8 +2130,6 @@ void balsente_state::expand_roms(UINT8 cd_rom_mask)
 			memcpy(&rom[base + 0x02000], (cd_rom_mask & 0x01) ? &cd_base[0x0000] : cd_common, 0x2000);
 			memcpy(&rom[base + 0x00000], &ab_base[0x0000], 0x2000);
 		}
-
-		auto_free(machine(), temp);
 	}
 }
 

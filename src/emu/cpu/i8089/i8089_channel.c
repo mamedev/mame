@@ -75,6 +75,7 @@ void i8089_channel::device_start()
 	save_item(NAME(m_xfer_pending));
 	save_item(NAME(m_dma_value));
 	save_item(NAME(m_dma_state));
+	save_item(NAME(m_prio));
 
 	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
 	{
@@ -97,6 +98,7 @@ void i8089_channel::device_reset()
 		m_r[i].w = 0;
 		m_r[i].t = 0;
 	}
+	m_prio = PRIO_IDLE;
 }
 
 
@@ -109,6 +111,8 @@ void i8089_channel::set_reg(int reg, UINT32 value, int tag)
 	if((reg == BC) || (reg == IX) || (reg == CC) || (reg == MC))
 	{
 		m_r[reg].w = value & 0xffff;
+		if((reg == CC) && executing())
+			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 		return;
 	}
 	m_r[reg].w = value & 0xfffff;
@@ -130,6 +134,7 @@ void i8089_channel::set_reg(int reg, UINT32 value, int tag)
 bool i8089_channel::executing()    { return BIT(m_r[PSW].w, 2); }
 bool i8089_channel::transferring() { return BIT(m_r[PSW].w, 6); }
 bool i8089_channel::priority()     { return BIT(m_r[PSW].w, 7); }
+int  i8089_channel::chan_prio()    { return m_prio; }
 bool i8089_channel::chained()      { return CC_CHAIN; }
 bool i8089_channel::lock()         { return CC_LOCK; }
 
@@ -204,6 +209,12 @@ int i8089_channel::execute_run()
 {
 	m_icount = 0;
 
+	if (chan_prio() == PRIO_CHAN_ATTN)
+	{
+		attention();
+		return m_icount++;
+	}
+
 	// active transfer?
 	if (transferring())
 	{
@@ -276,6 +287,9 @@ int i8089_channel::execute_run()
 				m_r[BC].w--;
 			}
 
+			m_r[BC].w &= 0xffff;
+			m_r[GA + CC_SOURCE].w &= 0xfffff;
+
 			if (VERBOSE_DMA)
 				logerror("[ %04x ]\n", m_dma_value);
 
@@ -322,6 +336,8 @@ int i8089_channel::execute_run()
 				if (VERBOSE_DMA)
 					logerror("[ %02x ]\n", m_dma_value & 0xff);
 			}
+
+			m_r[GB - CC_SOURCE].w &= 0xfffff;
 
 			if (CC_TMC & 0x03)
 				m_dma_state = DMA_COMPARE;
@@ -387,7 +403,12 @@ int i8089_channel::execute_run()
 
 		// dma transfer pending?
 		if (m_xfer_pending)
+		{
 			m_r[PSW].w |= 1 << 6;
+			m_prio = PRIO_DMA;
+		}
+		else
+			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 
 		// fetch first two instruction bytes
 		UINT16 op = m_iop->read_word(m_r[TP].t, m_r[TP].w);
@@ -686,6 +707,13 @@ void i8089_channel::attention()
 		if (VERBOSE)
 			logerror("%s('%s'): command received: update psw\n", shortname(), tag());
 
+		if(executing())
+			m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
+		else if(transferring())
+			m_prio = PRIO_DMA;
+		else
+			m_prio = PRIO_IDLE;
+
 		examine_ccw(ccw);
 		break;
 
@@ -702,6 +730,7 @@ void i8089_channel::attention()
 		m_r[TP].t = 1;
 
 		m_r[PSW].w |= 1 << 2;
+		m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 
 		if (VERBOSE)
 		{
@@ -716,6 +745,7 @@ void i8089_channel::attention()
 	case 2:
 		if (VERBOSE)
 			logerror("%s('%s'): command received: invalid command 010\n", shortname(), tag());
+		m_prio = PRIO_IDLE;
 
 		break;
 
@@ -728,9 +758,10 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		lpd(TP, PP, m_r[PP].w);
-		movbi_mi(CP, (INT8) 0xff, 1);
+		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
+		m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 
 		if (VERBOSE)
 		{
@@ -744,6 +775,7 @@ void i8089_channel::attention()
 	case 4:
 		if (VERBOSE)
 			logerror("%s('%s'): command received: invalid command 100\n", shortname(), tag());
+		m_prio = PRIO_IDLE;
 
 		break;
 
@@ -758,6 +790,7 @@ void i8089_channel::attention()
 		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
+		m_prio = chained() ? PRIO_PROG_CHAIN : PRIO_PROG;
 
 		if (VERBOSE)
 		{
@@ -790,11 +823,16 @@ void i8089_channel::attention()
 	}
 }
 
+void i8089_channel::ca()
+{
+	m_prio = PRIO_CHAN_ATTN;
+}
+
 WRITE_LINE_MEMBER( i8089_channel::ext_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
-	if(transferring())
+	if(transferring() && state)
 		terminate_dma((CC_TX - 1) * 4);
 }
 

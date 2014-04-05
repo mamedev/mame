@@ -21,7 +21,7 @@
 #include "machine/terminal.h"
 #include "machine/ram.h"
 #include "machine/6840ptm.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
@@ -124,8 +124,8 @@ public:
 	required_device<pic8259_device> m_pic8259_master;
 	required_device<pic8259_device> m_pic8259_slave;
 	required_device<ptm6840_device> m_ptm;
-	required_device<duartn68681_device> m_sio;
-	optional_device<duartn68681_device> m_sio2;
+	required_device<mc68681_device> m_sio;
+	optional_device<mc68681_device> m_sio2;
 	required_device<mc146818_device> m_rtc;
 	required_device<isa16_device> m_isa;
 
@@ -228,6 +228,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
+	TIMER_CALLBACK_MEMBER( apollo_rtc_timer );
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
@@ -237,6 +238,7 @@ private:
 	UINT8 sio_output_data;
 	int m_dma_channel;
 	bool m_cur_eop;
+	emu_timer *m_dn3000_timer;
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
@@ -297,10 +299,12 @@ class apollo_graphics_15i : public device_t
 public:
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
-	~apollo_graphics_15i() { global_free(m_token); }
+	~apollo_graphics_15i();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	class apollo_graphics *token() const { assert(m_token != NULL); return m_token; }
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -308,7 +312,7 @@ protected:
 	virtual void device_reset();
 private:
 	// internal state
-	void *m_token;
+	class apollo_graphics *m_token;
 };
 
 extern const device_type APOLLO_GRAPHICS;

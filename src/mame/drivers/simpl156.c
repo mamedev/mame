@@ -433,9 +433,10 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(simpl156_state, screen_update_simpl156)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_GFXDECODE_ADD("gfxdecode", simpl156)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", simpl156)
 
 	MCFG_DECO16IC_ADD("tilegen1", simpl156_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -1025,7 +1026,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
 	UINT8 *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 
 	UINT32 x;
 
@@ -1045,8 +1046,6 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 	}
 
 	memcpy(rom, buf1, length);
-
-	auto_free(machine(), buf1);
 
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco156_decrypt(machine());

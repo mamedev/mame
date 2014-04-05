@@ -131,6 +131,7 @@ void i8089_channel::hlt()
 {
 	movbi_mi(CP, 0x00, m_r[CP].w + 1);
 	m_r[PSW].w &= ~(1 << 2);
+	m_prio = PRIO_IDLE;
 }
 
 void i8089_channel::inc_r(int r)

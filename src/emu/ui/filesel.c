@@ -273,10 +273,10 @@ void ui_menu_file_create::populate()
 	item_append("New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	format = m_image->device_get_creatable_formats();
+	format = m_image->formatlist();
 	if (ENABLE_FORMATS && (format != NULL))
 	{
-		item_append("Image Format:", m_current_format->m_description, 0, ITEMREF_FORMAT);
+		item_append("Image Format:", m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;
 	}
 

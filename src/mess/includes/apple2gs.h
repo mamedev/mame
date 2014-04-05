@@ -163,6 +163,8 @@ public:
 	UINT8 m_echo_bank;
 	UINT64 m_last_adb_time;
 	int m_adb_dtime;
+	UINT32 m_a2_palette[16];
+	UINT32 m_shr_palette[256];
 
 	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
 
@@ -189,7 +191,7 @@ public:
 	DECLARE_PALETTE_INIT(apple2gs);
 	DECLARE_MACHINE_START(apple2gsr1);
 	DECLARE_MACHINE_START(apple2gscommon);
-	UINT32 screen_update_apple2gs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
 	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);
 	TIMER_CALLBACK_MEMBER(apple2gs_scanline_tick);

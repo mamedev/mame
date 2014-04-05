@@ -411,7 +411,7 @@ READ8_MEMBER(spectrum_state::spectrum_port_df_r)
 
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 {
-	int vpos = machine().primary_screen->vpos();
+	int vpos = machine().first_screen()->vpos();
 
 	return vpos<193 ? m_video_ram[(vpos&0xf8)<<2]:0xff;
 }
@@ -703,11 +703,12 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
 	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_spectrum)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", spectrum)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spectrum)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
 
 	/* sound hardware */

@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 	MCFG_PALETTE_ADD("palette", 4) //guess
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ssingles)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssingles)
 
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */, ssingles_mc6845_intf)

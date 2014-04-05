@@ -1736,11 +1736,10 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
-	UINT8* buffer;
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	buffer = auto_alloc_array(machine, UINT8, gfxregionsize);
+	dynamic_buffer buffer(gfxregionsize);
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
@@ -1749,8 +1748,6 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 	}
 
 	memcpy(gfxregion, buffer, gfxregionsize);
-
-	auto_free (machine, buffer);
 }
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
@@ -1941,11 +1938,6 @@ void hng64_state::machine_reset()
 }
 
 
-static MSM6242_INTERFACE( hng64_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
@@ -1963,9 +1955,10 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_IO_MAP(hng_comm_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MSM6242_ADD("rtc", hng64_rtc_intf)
+	
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hng64)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)

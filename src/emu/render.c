@@ -381,7 +381,7 @@ void render_texture::release()
 	for (int scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
 	{
 		m_manager->invalidate_all(m_scaled[scalenum].bitmap);
-		auto_free(m_manager->machine(), m_scaled[scalenum].bitmap);
+		global_free(m_scaled[scalenum].bitmap);
 		m_scaled[scalenum].bitmap = NULL;
 		m_scaled[scalenum].seqid = 0;
 	}
@@ -422,7 +422,7 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 		if (m_scaled[scalenum].bitmap != NULL)
 		{
 			m_manager->invalidate_all(m_scaled[scalenum].bitmap);
-			auto_free(m_manager->machine(), m_scaled[scalenum].bitmap);
+			global_free(m_scaled[scalenum].bitmap);
 		}
 		m_scaled[scalenum].bitmap = NULL;
 		m_scaled[scalenum].seqid = 0;
@@ -506,11 +506,11 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		if (scaled->bitmap != NULL)
 		{
 			m_manager->invalidate_all(scaled->bitmap);
-			auto_free(m_manager->machine(), scaled->bitmap);
+			global_free(scaled->bitmap);
 		}
 
 		// allocate a new bitmap
-		scaled->bitmap = auto_alloc(m_manager->machine(), bitmap_argb32(dwidth, dheight));
+		scaled->bitmap = global_alloc(bitmap_argb32(dwidth, dheight));
 		scaled->seqid = ++m_curseq;
 
 		// let the scaler do the work
@@ -536,37 +536,20 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 
 const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 {
-	const rgb_t *adjusted;
-	int numentries;
-
 	// override the palette with our adjusted palette
 	switch (m_format)
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
 
-			// if no adjustment necessary, return the raw palette
 			assert(m_bitmap->palette() != NULL);
-			adjusted = m_bitmap->palette()->entry_list_adjusted();
+
+			// if no adjustment necessary, return the raw palette
 			if (!container.has_brightness_contrast_gamma_changes())
-				return adjusted;
+				return m_bitmap->palette()->entry_list_adjusted();
 
-			// if this is the machine palette, return our precomputed adjusted palette
-			adjusted = container.bcg_lookup_table(m_format, m_bitmap->palette());
-			if (adjusted != NULL)
-				return adjusted;
-
-			// otherwise, ensure we have memory allocated and compute the adjusted result ourself
-			numentries = m_bitmap->palette()->num_colors() * m_bitmap->palette()->num_groups();
-			m_bcglookup.resize(numentries);
-			for (int index = 0; index < numentries; index++)
-			{
-				UINT8 r = container.apply_brightness_contrast_gamma(adjusted[index].r());
-				UINT8 g = container.apply_brightness_contrast_gamma(adjusted[index].g());
-				UINT8 b = container.apply_brightness_contrast_gamma(adjusted[index].b());
-				m_bcglookup[index] = rgb_t(adjusted[index].a(), r, g, b);
-			}
-			return m_bcglookup;
+			// otherwise, return our adjusted palette
+			return container.bcg_lookup_table(m_format, m_bitmap->palette());
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -597,17 +580,10 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 render_container::render_container(render_manager &manager, screen_device *screen)
 	: m_next(NULL),
 		m_manager(manager),
-		m_itemlist(manager.machine().respool()),
-		m_item_allocator(manager.machine().respool()),
 		m_screen(screen),
 		m_overlaybitmap(NULL),
-		m_overlaytexture(NULL),
-		m_palclient(NULL)
+		m_overlaytexture(NULL)
 {
-	// all palette entries are opaque by default
-	for (int color = 0; color < ARRAY_LENGTH(m_bcglookup); color++)
-		m_bcglookup[color] = rgb_t(0xff,0x00,0x00,0x00);
-
 	// make sure it is empty
 	empty();
 
@@ -619,9 +595,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
-		// allocate a client to the main palette
-		if (m_screen->palette() != NULL)
-			m_palclient = global_alloc(palette_client(*m_screen->palette()->palette()));
+		// can't allocate palette client yet since palette and screen devices aren't started yet
 	}
 
 	recompute_lookups();
@@ -639,9 +613,6 @@ render_container::~render_container()
 
 	// free the overlay texture
 	m_manager.texture_free(m_overlaytexture);
-
-	// release our palette client
-	global_free(m_palclient);
 }
 
 
@@ -757,7 +728,15 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-			return (palette != NULL && palette == &m_palclient->palette()) ? m_bcglookup : NULL;
+			if (m_palclient == NULL) // if adjusted palette hasn't been created yet, create it
+			{
+				assert(palette == m_screen->palette()->palette());
+				m_palclient.reset(global_alloc(palette_client(*palette)));
+				m_bcglookup.resize(palette->num_colors() * palette->num_groups());
+				recompute_lookups();
+			}
+			assert (palette == &m_palclient->palette());
+			return m_bcglookup;
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -932,7 +911,6 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	: m_next(NULL),
 		m_manager(manager),
 		m_curview(NULL),
-		m_filelist(*auto_alloc(manager.machine(), simple_list<layout_file>(manager.machine().respool()))),
 		m_flags(flags),
 		m_listindex(0),
 		m_width(640),
@@ -943,8 +921,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 		m_base_view(NULL),
 		m_base_orientation(ROT0),
 		m_maxtexwidth(65536),
-		m_maxtexheight(65536),
-		m_debug_containers(manager.machine().respool())
+		m_maxtexheight(65536)
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
@@ -993,7 +970,6 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 
 render_target::~render_target()
 {
-	auto_free(m_manager.machine(), &m_filelist);
 }
 
 
@@ -1632,7 +1608,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	bool result = true;
 	try
 	{
-		m_filelist.append(*auto_alloc(m_manager.machine(), layout_file(m_manager.machine(), *rootnode, dirname)));
+		m_filelist.append(*global_alloc(layout_file(m_manager.machine(), *rootnode, dirname)));
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -2409,12 +2385,9 @@ done:
 
 render_manager::render_manager(running_machine &machine)
 	: m_machine(machine),
-		m_targetlist(machine.respool()),
 		m_ui_target(NULL),
 		m_live_textures(0),
-		m_texture_allocator(machine.respool()),
-		m_ui_container(auto_alloc(machine, render_container(*this))),
-		m_screen_container_list(machine.respool())
+		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
 	config_register(machine, "video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
@@ -2483,7 +2456,7 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const char *layoutfile, UINT32 flags)
 {
-	return &m_targetlist.append(*auto_alloc(machine(), render_target(*this, layoutfile, flags)));
+	return &m_targetlist.append(*global_alloc(render_target(*this, layoutfile, flags)));
 }
 
 
@@ -2577,7 +2550,7 @@ void render_manager::texture_free(render_texture *texture)
 
 render_font *render_manager::font_alloc(const char *filename)
 {
-	return auto_alloc(machine(), render_font(*this, filename));
+	return global_alloc(render_font(*this, filename));
 }
 
 
@@ -2587,7 +2560,7 @@ render_font *render_manager::font_alloc(const char *filename)
 
 void render_manager::font_free(render_font *font)
 {
-	auto_free(machine(), font);
+	global_free(font);
 }
 
 
@@ -2614,7 +2587,7 @@ void render_manager::invalidate_all(void *refptr)
 
 render_container *render_manager::container_alloc(screen_device *screen)
 {
-	render_container *container = auto_alloc(machine(), render_container(*this, screen));
+	render_container *container = global_alloc(render_container(*this, screen));
 	if (screen != NULL)
 		m_screen_container_list.append(*container);
 	return container;
@@ -2627,8 +2600,7 @@ render_container *render_manager::container_alloc(screen_device *screen)
 
 void render_manager::container_free(render_container *container)
 {
-	m_screen_container_list.detach(*container);
-	auto_free(machine(), container);
+	m_screen_container_list.remove(*container);
 }
 
 

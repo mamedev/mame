@@ -12,9 +12,8 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_GAELCO_SERIAL_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, GAELCO_SERIAL, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_GAELCO_SERIAL_IRQ_HANDLER(_devcb) \
+	devcb = &gaelco_serial_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 /* external status bits */
 #define GAELCOSER_STATUS_READY          0x01
@@ -35,12 +34,6 @@
 /***************************************************************************
     DEVICE INTERFACE TYPE
 ***************************************************************************/
-
-struct gaelco_serial_interface
-{
-	devcb_write_line m_irq;
-};
-
 
 /* ----- device interface ----- */
 
@@ -66,12 +59,13 @@ struct osd_shared_mem
 	int creator;
 };
 
-class gaelco_serial_device : public device_t,
-												public gaelco_serial_interface
+class gaelco_serial_device : public device_t
 {
 public:
 	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~gaelco_serial_device() {}
+	
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( status_r);
 	DECLARE_WRITE8_MEMBER( data_w);
@@ -94,14 +88,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
 	virtual void device_reset();
 
 private:
 	// internal state
-	devcb_resolved_write_line m_irq_func;
+	devcb2_write_line m_irq_handler;
 
 	UINT8 m_status;
 	int m_last_in_msg_cnt;

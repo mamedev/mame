@@ -1556,12 +1556,13 @@ static MACHINE_CONFIG_START( xboard, segaxbd_state )
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", segaxbd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaxbd)
 	MCFG_PALETTE_ADD("palette", 8192*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaxbd_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SEGA_XBOARD_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")

@@ -480,11 +480,6 @@ WRITE_LINE_MEMBER(ip20_state::scsi_irq)
 {
 }
 
-static const struct WD33C93interface wd33c93_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ip20_state,scsi_irq)      /* command completion IRQ */
-};
-
 DRIVER_INIT_MEMBER(ip20_state,ip204415)
 {
 }
@@ -602,17 +597,19 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SCREEN_SIZE(800, 600)
 	MCFG_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
 	MCFG_SCREEN_UPDATE_DRIVER(ip20_state, screen_update_ip204415)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SCC8530_ADD("scc", 7000000, line_cb_t())
+	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)
-	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
+	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, ip20_state, scsi_irq))      /* command completion IRQ */
 
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^mono", 1.0)

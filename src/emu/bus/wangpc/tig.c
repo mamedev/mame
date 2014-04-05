@@ -138,10 +138,12 @@ static MACHINE_CONFIG_FRAGMENT( wangpc_tig )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 
 	MCFG_UPD7220_ADD(UPD7720_0_TAG, XTAL_52_832MHz/28, hgdc0_intf, upd7220_0_map) // was /10?
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 	MCFG_UPD7220_ADD(UPD7720_1_TAG, XTAL_52_832MHz/28, hgdc1_intf, upd7220_1_map) // was /16?
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END
 
 
@@ -181,11 +183,6 @@ wangpc_tig_device::wangpc_tig_device(const machine_config &mconfig, const char *
 
 void wangpc_tig_device::device_start()
 {
-	// initialize palette
-	m_palette->set_pen_color(0, 0, 0, 0);
-	m_palette->set_pen_color(1, 0, 0x80, 0);
-	m_palette->set_pen_color(2, 0, 0xff, 0);
-
 	// state saving
 	save_item(NAME(m_option));
 	save_item(NAME(m_attr));

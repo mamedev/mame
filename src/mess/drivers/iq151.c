@@ -433,6 +433,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SCREEN_UPDATE_DRIVER(iq151_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */

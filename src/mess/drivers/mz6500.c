@@ -16,11 +16,11 @@ class mz6500_state : public driver_device
 public:
 	mz6500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_hgdc(*this, "upd7220"),
-	m_fdc(*this, "upd765")
-	,
+		m_hgdc(*this, "upd7220"),
+		m_fdc(*this, "upd765"),
 		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette") { }
 
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
@@ -32,12 +32,13 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	mz6500_state *state = device->machine().driver_data<mz6500_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int gfx[3];
 	UINT8 i,pen;
 

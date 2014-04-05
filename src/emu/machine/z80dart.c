@@ -1337,5 +1337,7 @@ void z80dart_channel::set_rts(int state)
 WRITE_LINE_MEMBER(z80dart_channel::write_rx)
 {
 	m_rxd = state;
-	device_serial_interface::rx_w(state);
+	//only use rx_w when self-clocked
+	if(m_rxc)
+		device_serial_interface::rx_w(state);
 }

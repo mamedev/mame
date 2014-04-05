@@ -588,5 +588,5 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
 
 void tia_sound_free(void *chip)
 {
-	global_free(chip);
+	global_free((struct tia *)chip);
 }

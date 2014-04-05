@@ -113,7 +113,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 
 		if (!flash || (m_screen->frame_number() & 1))
 		{
-			m_gfxdecode->gfx(bank)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
 					number,
 					colr,
 					0,0,
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", diverboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", diverboy)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -276,6 +276,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+4, 40*8+1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(diverboy_state, screen_update_diverboy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -287,7 +288,16 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+/*
 
+both program roms contain the following string (at the same location)
+
+This Game is programmed by the freelance group GAMART.
+ADRESS: C\SAnt Ramon,11 08130-STA PERPETUA DE MOGODA - BARCELONA (SPAIN)
+Telephone (93) 560 27 32
+Fax (93) 574 18 34
+
+*/
 
 ROM_START( diverboy )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
@@ -321,4 +331,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Electronic Devices Italy", "Diver Boy", GAME_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", GAME_SUPPORTS_SAVE )

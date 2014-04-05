@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( osbexec_io, AS_IO, 8, osbexec_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read, write)               /* 6821 PIA @ UD12 */
 	/* 0x04 - 0x07 - 8253 @UD1 */
-	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE_LEGACY("mb8877", wd17xx_r, wd17xx_w )                /* MB8877 @ UB17 input clock = 1MHz */
+	AM_RANGE( 0x08, 0x0B ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("mb8877", mb8877_device, read, write )                /* MB8877 @ UB17 input clock = 1MHz */
 	AM_RANGE( 0x0C, 0x0F ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE("sio", z80sio2_device, ba_cd_r, ba_cd_w ) /* SIO @ UD4 */
 	AM_RANGE( 0x10, 0x13 ) AM_MIRROR( 0xff00 ) AM_DEVREADWRITE( "pia_1", pia6821_device, read, write)               /* 6821 PIA @ UD8 */
 	AM_RANGE( 0x14, 0x17 ) AM_MIRROR( 0xff00 ) AM_MASK( 0xff00 ) AM_READ(osbexec_kbd_r )                    /* KBD */
@@ -316,7 +316,7 @@ PALETTE_INIT_MEMBER(osbexec_state, osbexec)
 
 void osbexec_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -384,14 +384,14 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
 	switch ( data & 0x06 )
 	{
 	case 0x02:
-		wd17xx_set_drive( m_mb8877, 1 );
+		m_mb8877->set_drive( 1 );
 		break;
 	case 0x04:
-		wd17xx_set_drive( m_mb8877, 0 );
+		m_mb8877->set_drive( 0 );
 		break;
 	}
 
-	wd17xx_dden_w( m_mb8877, ( data & 0x01 ) ? 1 : 0 );
+	m_mb8877->dden_w(( data & 0x01 ) ? 1 : 0 );
 }
 
 
@@ -515,7 +515,7 @@ static const floppy_interface osbexec_floppy_interface =
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 {
-	int y = machine().primary_screen->vpos();
+	int y = machine().first_screen()->vpos();
 
 	/* Start of frame */
 	if ( y == 0 )
@@ -562,7 +562,7 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 		}
 	}
 
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( y + 1, 0 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( y + 1, 0 ) );
 }
 
 
@@ -587,7 +587,7 @@ void osbexec_state::machine_reset()
 
 	set_banks( machine() );
 
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
 
 	m_rtc = 0;
 }
@@ -610,6 +610,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 3 )
 	MCFG_PALETTE_INIT_OWNER(osbexec_state, osbexec)

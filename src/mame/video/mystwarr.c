@@ -19,12 +19,8 @@ static void mystwarr_decode_tiles(running_machine &machine)
 	int len = machine.root_device().memregion("gfx1")->bytes();
 	UINT8 *pFinish = s+len-3;
 	UINT8 *d, *decoded;
-	int gfxnum;
 
-	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS; gfxnum++)
-		if (state->m_gfxdecode->gfx(gfxnum) != NULL && state->m_gfxdecode->gfx(gfxnum)->srcdata() == s)
-			break;
-	assert(gfxnum != ARRAY_LENGTH(state->m_gfxdecode->gfx()));
+	int gfxnum = state->m_k056832->get_gfx_num();
 
 	decoded = auto_alloc_array(machine, UINT8, len);
 	d = decoded;

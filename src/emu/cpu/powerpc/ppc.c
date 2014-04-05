@@ -858,15 +858,15 @@ INLINE void ppc_exception(int exception_type)
 
 /***********************************************************************/
 
-#include "ppc_mem.c"
+#include "ppc_mem.inc"
 
-#include "ppc403.c"
-#include "ppc602.c"
-#include "ppc603.c"
+#include "ppc403.inc"
+#include "ppc602.inc"
+#include "ppc603.inc"
 
 /********************************************************************/
 
-#include "ppc_ops.c"
+#include "ppc_ops.inc"
 #include "ppc_ops.h"
 
 /* Initialization and shutdown */

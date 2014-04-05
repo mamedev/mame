@@ -203,9 +203,9 @@ void wd33c93_device::complete_immediate( int status )
 	regs[WD_AUXILIARY_STATUS] &= ~(ASR_CIP | ASR_BSY);
 
 	/* if we have a callback, call it */
-	if (!m_irq_func.isnull())
+	if (!m_irq_cb.isnull())
 	{
-		m_irq_func(1);
+		m_irq_cb(1);
 	}
 }
 
@@ -643,9 +643,9 @@ READ8_MEMBER(wd33c93_device::read)
 			{
 				regs[WD_AUXILIARY_STATUS] &= ~ASR_INT;
 
-				if (!m_irq_func.isnull())
+				if (!m_irq_cb.isnull())
 				{
-					m_irq_func(0);
+					m_irq_cb(0);
 				}
 
 				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", space.device().safe_pc(), regs[WD_SCSI_STATUS] ));
@@ -742,18 +742,9 @@ READ8_MEMBER(wd33c93_device::read)
 }
 
 wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__)
+	: device_t(mconfig, WD33C93, "33C93 SCSI", tag, owner, clock, "wd33c93", __FILE__),
+		m_irq_cb(*this)
 {
-}
-
-void wd33c93_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const WD33C93interface *intf = reinterpret_cast<const WD33C93interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<WD33C93interface *>(this) = *intf;
-	}
 }
 
 void wd33c93_device::device_start()
@@ -779,7 +770,7 @@ void wd33c93_device::device_start()
 			devices[scsidev->GetDeviceID()] = scsidev;
 		}
 	}
-	m_irq_func.resolve(m_irq_cb, *this);
+	m_irq_cb.resolve();
 
 	/* allocate a timer for commands */
 	cmd_timer = timer_alloc(0);

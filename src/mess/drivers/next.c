@@ -737,62 +737,62 @@ void next_state::timer_start()
 	timer_tm->adjust(attotime::from_usec(timer_vbase));
 }
 
-void next_state::scc_irq(bool state)
+WRITE_LINE_MEMBER(next_state::scc_irq)
 {
 	irq_set(17, state);
 }
 
-void next_state::keyboard_irq(bool state)
+WRITE_LINE_MEMBER(next_state::keyboard_irq)
 {
 	irq_set(3, state);
 }
 
-void next_state::power_irq(bool state)
+WRITE_LINE_MEMBER(next_state::power_irq)
 {
 	irq_set(2, state);
 }
 
-void next_state::nmi_irq(bool state)
+WRITE_LINE_MEMBER(next_state::nmi_irq)
 {
 	irq_set(31, state);
 }
 
-void next_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER(next_state::fdc_irq)
 {
 	irq_set(7, state);
 }
 
-void next_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER(next_state::fdc_drq)
 {
 	dma_drq_w(1, state);
 }
 
-void next_state::net_tx_irq(bool state)
+WRITE_LINE_MEMBER(next_state::net_tx_irq)
 {
 	irq_set(10, state);
 }
 
-void next_state::net_rx_irq(bool state)
+WRITE_LINE_MEMBER(next_state::net_rx_irq)
 {
 	irq_set(9, state);
 }
 
-void next_state::net_tx_drq(bool state)
+WRITE_LINE_MEMBER(next_state::net_tx_drq)
 {
 	dma_drq_w(17, state);
 }
 
-void next_state::net_rx_drq(bool state)
+WRITE_LINE_MEMBER(next_state::net_rx_drq)
 {
 	dma_drq_w(21, state);
 }
 
-void next_state::mo_irq(bool state)
+WRITE_LINE_MEMBER(next_state::mo_irq)
 {
 	irq_set(13, state);
 }
 
-void next_state::mo_drq(bool state)
+WRITE_LINE_MEMBER(next_state::mo_drq)
 {
 	dma_drq_w(5, state);
 }
@@ -831,11 +831,6 @@ void next_state::machine_start()
 	save_item(NAME(eventc_latch));
 
 	timer_tm = timer_alloc(0);
-
-	if(fdc) {
-		fdc->setup_intrq_cb(n82077aa_device::line_cb(FUNC(next_state::fdc_irq), this));
-		fdc->setup_drq_cb(n82077aa_device::line_cb(FUNC(next_state::fdc_drq), this));
-	}
 }
 
 void next_state::machine_reset()
@@ -965,13 +960,13 @@ static MACHINE_CONFIG_START( next_base, next_state )
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
-						line_cb_t(), line_cb_t(), line_cb_t())
-	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
-	MCFG_NEXTKBD_ADD("keyboard",
-						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
-						line_cb_t(FUNC(next_state::power_irq), static_cast<next_state *>(owner)),
-						line_cb_t(FUNC(next_state::nmi_irq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("scc", SCC8530, XTAL_25MHz)
+	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(next_state, scc_irq))
+	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
+	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(next_state, keyboard_irq))
+	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(next_state, power_irq))
+	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(next_state, nmi_irq))
 	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", false)
 	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, 0, false)
@@ -982,14 +977,15 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
 	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
 
-	MCFG_MB8795_ADD("net",
-					line_cb_t(FUNC(next_state::net_tx_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_rx_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_tx_drq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::net_rx_drq), static_cast<next_state *>(owner)))
-	MCFG_NEXTMO_ADD("mo",
-					line_cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
-					line_cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
+	MCFG_DEVICE_ADD("net", MB8795, 0)
+	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(next_state, net_tx_irq))
+	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(next_state, net_rx_irq))
+	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(next_state, net_tx_drq))
+	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(next_state, net_rx_drq))
+
+	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
+	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(next_state, mo_irq))
+	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(next_state, mo_drq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
@@ -999,6 +995,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(next_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(next_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
 
 	// software list

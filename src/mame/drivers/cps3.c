@@ -667,7 +667,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= gfx->machine().rand(); // ?? not used?
+											if (c&0xf0) dest[x] |= machine().rand(); // ?? not used?
 										}
 										else
 										{
@@ -904,12 +904,12 @@ void cps3_state::video_start()
 	save_pointer(NAME(m_char_ram), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, m_palette->entries() / 16, 0)));
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(1, auto_alloc(machine(), gfx_element(machine(), cps3_tiles16x16_layout, (UINT8 *)m_char_ram, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(1, global_alloc(gfx_element(m_palette, cps3_tiles16x16_layout, (UINT8 *)m_char_ram, m_palette->entries() / 64, 0)));
 	m_gfxdecode->gfx(1)->set_granularity(64);
 
 	//decode_charram();
@@ -2328,11 +2328,6 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 //static sh2_cpu_core sh2cp_conf_slave  = { 1, NULL };
 
 
-static const struct WD33C93interface wd33c93_intf =
-{
-	DEVCB_NULL            /* command completion IRQ */
-};
-
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
@@ -2567,7 +2562,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_1)
-	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2587,7 +2582,7 @@ static MACHINE_CONFIG_START( cps3, cps3_state )
 	MCFG_NVRAM_ADD_0FILL("eeprom")
 	MCFG_PALETTE_ADD("palette", 0x10000) // actually 0x20000 ...
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2692,7 +2687,15 @@ ROM_END
 
 ROM_START( sfiiiu )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "sfiii_usa.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
+	ROM_LOAD( "sfiii_usa_region_b1.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
+ROM_END
+
+ROM_START( sfiiia )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "sfiii_asia_region_bd.29f400.u2", 0x000000, 0x080000,  CRC(cbd28de7) SHA1(9c15ecb73b9587d20850e62e8683930a45caa01b) )
 
 	DISK_REGION( "scsi:cdrom" )
 	DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) )
@@ -2838,7 +2841,7 @@ ROM_END
 
 ROM_START( sfiiin )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "(__sfiiin)sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(ca2b715f) SHA1(86319987f9af4afd272a2488e73de8382743cb37) )
+	ROM_LOAD( "(__sfiiin)sfiii_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(ca2b715f) SHA1(86319987f9af4afd272a2488e73de8382743cb37) ) // this is a different VERSION of the bios compared to all other sets, not just an alt region code
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
 	ROM_LOAD( "sfiii-simm1.0", 0x00000, 0x200000, CRC(cfc9e45a) SHA1(5d9061f76680642e730373e3ac29b24926dc5c0c) )
@@ -3691,6 +3694,22 @@ ROM_START( cps3boot ) // for cart with standard SH2
 	DISK_IMAGE_READONLY( "no-battery_multi-game_bootleg_cd_for_hd6417095_sh2", 0, SHA1(123f2fcb0f3dd3d6b859e82a51d0127e46763776) )
 ROM_END
 
+ROM_START( cps3bs32 ) // for cart with standard SH2
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "sfiii_2nd_impact_converted_for_standard_sh2_v3", 0, SHA1(8f180d159e88042a1e819cefd39eef67f5e86e3d) )
+ROM_END
+
+ROM_START( cps3bs32a ) // for cart with standard SH2
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "no-battery_bios_29f400_for_hd6417095_sh2.u2", 0x000000, 0x080000, CRC(cb9bd5b0) SHA1(ea7ecb3deb69f5307a62d8f0d7d8e68d49013d07))
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "sfiii_2nd_impact_converted_for_standard_sh2_older", 0, SHA1(8a8e4138c3bf12435933ab9d9ace510513200843) ) // v1 or v2?
+ROM_END
+
 ROM_START( cps3boota ) // for cart with dead custom SH2 (or 2nd Impact CPU which is the same as a dead one)
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "no-battery_bios_29f400_for_dead_security_cart.u2", 0x000000, 0x080000, CRC(0fd56fb3) SHA1(5a8bffc07eb7da73cf4bca6718df72e471296bfd) )
@@ -3860,6 +3879,7 @@ GAME( 1996, warzardr1, redearth, redearth, cps3_re, cps3_state,   redearth, ROT0
 // 970204
 GAME( 1997, sfiii,     0,        sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiiiu,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiia,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiiij,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiiih,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiiin,    sfiii,    sfiii,    cps3, cps3_state,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", GAME_IMPERFECT_GRAPHICS )
@@ -3921,3 +3941,7 @@ GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure, Red Earth)", GAME_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
 GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (New Generation, 2nd Impact, 3rd Strike)", GAME_IMPERFECT_GRAPHICS )
+// these are test bootleg CDs for running 2nd Impact on a standard SH2
+GAME( 1999, cps3bs32,  cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, cps3bs32a, cps3boot, sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", GAME_IMPERFECT_GRAPHICS ) // older / buggier hack
+// there is a newer version for a standard CPU with all games, not dumped (possibly newer ones for dead cart too?)

@@ -684,14 +684,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void fdc_2hd_irq(bool state);
-	void fdc_2hd_drq(bool state);
-	void fdc_2dd_irq(bool state);
-	void fdc_2dd_drq(bool state);
-
-	void pc9801rs_fdc_irq(bool state);
-	void pc9801rs_fdc_drq(bool state);
-
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
 	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
@@ -731,11 +723,9 @@ public:
 	DECLARE_READ8_MEMBER(ppi_fdd_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_fdd_portc_w);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_drq);
-//  DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+    DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+    DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
 
 	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
 	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
@@ -794,7 +784,7 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
@@ -804,8 +794,8 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().primary_screen->visible_area().max_y + 1);
-//  interlace_on = ((device->machine().primary_screen->visible_area().max_y + 1) >= 400) ? 1 : 0;
+//  popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().first_screen()->visible_area().max_y + 1);
+//  interlace_on = ((device->machine().first_screen()->visible_area().max_y + 1) >= 400) ? 1 : 0;
 	interlace_on = state->m_video_ff[INTERLACE_REG];
 	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
@@ -816,13 +806,13 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			if(!device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+			if(!device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 				return;
 
 			pen = state->m_ext_gvram[(address*8+xi)+(state->m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
-			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
+			if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
 		}
 	}
@@ -841,10 +831,10 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 			if(interlace_on)
 			{
-				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+0))
 					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
 				/* TODO: it looks like that PC-98xx can only display even lines ... */
-				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
+				if(device->machine().first_screen()->visible_area().contains(res_x, res_y*2+1))
 					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 			}
 			else
@@ -856,7 +846,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int xi,yi;
 	int x;
 	UINT8 char_size;
@@ -931,7 +921,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					res_x = ((x+kanji_lr)*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
 					res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
 
-					if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+					if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 						continue;
 
 					tile_data = 0;
@@ -972,10 +962,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(v_line)  { tile_data|=8; }
 
 					/* TODO: proper blink rate for these two */
-					if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+					if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
-					if(blink && device->machine().primary_screen->frame_number() & 0x10)
+					if(blink && device->machine().first_screen()->frame_number() & 0x10)
 						tile_data^=0xff;
 
 					if(yi >= char_size)
@@ -988,7 +978,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 					if(state->m_video_ff[WIDTH40_REG])
 					{
-						if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
+						if(!device->machine().first_screen()->visible_area().contains(res_x+1, res_y))
 							continue;
 
 						if(pen != -1)
@@ -3338,19 +3328,7 @@ SLOT_INTERFACE_END
 
 //  Jast Sound, could be put independently
 
-void pc9801_state::fdc_2hd_irq(bool state)
-{
-//  printf("IRQ 2HD %d\n",state);
-	m_pic2->ir3_w(state);
-}
-
-void pc9801_state::fdc_2hd_drq(bool state)
-{
-//  printf("%02x DRQ\n",state);
-	m_dmac->dreq2_w(state ^ 1);
-}
-
-void pc9801_state::fdc_2dd_irq(bool state)
+WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 {
 	printf("IRQ 2DD %d\n",state);
 
@@ -3360,13 +3338,7 @@ void pc9801_state::fdc_2dd_irq(bool state)
 	}
 }
 
-void pc9801_state::fdc_2dd_drq(bool state)
-{
-//  printf("%02x DRQ\n",state);
-	m_dmac->dreq3_w(state ^ 1);
-}
-
-void pc9801_state::pc9801rs_fdc_irq(bool state)
+WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
 {
 	/* 0xffaf8 */
 
@@ -3378,7 +3350,7 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 		m_pic2->ir2_w(state);
 }
 
-void pc9801_state::pc9801rs_fdc_drq(bool state)
+WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_drq )
 {
 //  printf("DRQ %d\n",state);
 
@@ -3420,7 +3392,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
 
 	m_rtc->cs_w(1);
-	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode
+	m_rtc->oe_w(1);
 
 	m_ipl_rom = memregion("ipl")->base();
 	m_sound_bios = memregion("sound_bios")->base();
@@ -3434,9 +3406,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
 	if (fdc)
 	{
-		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_irq), this));
-		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
-
 		floppy_image_device *floppy;
 		floppy = machine().device<floppy_connector>("upd765_2hd:0")->get_device();
 		if(floppy)
@@ -3447,12 +3416,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 			floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc9801_state::pc9801_fdc_2hd_update_ready), this));
 	}
 
-	fdc = machine().device<upd765a_device>(":upd765_2dd");
-	if (fdc)
-	{
-		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
-		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
-	}
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
 	m_sys_type = 0x00 >> 6;
@@ -3476,11 +3439,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 		space.install_write_bank(0x100000,  0x100000 + m_ram_size - 1, "ext_wram");
 		membank("ext_wram")->set_base(m_ram->pointer() + 0xa0000);
 	}
-
-	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>(":upd765_2hd");
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_drq), this));
 
 	m_ide_rom = memregion("ide")->base();
 	m_sys_type = 0x80 >> 6;
@@ -3625,13 +3583,9 @@ WRITE_LINE_MEMBER( pc9801_state::keyboard_irq )
 	m_pic1->ir1_w(state);
 }
 
-static PC9801_KBD_INTERFACE( pc9801_keyboard_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, keyboard_irq )
-};
-
 static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
-	MCFG_PC9801_KBD_ADD( "keyb", 53, pc9801_keyboard_intf )
+    MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
+    MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE(pc9801_state, keyboard_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
@@ -3691,7 +3645,11 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
+    MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
+    MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, fdc_2dd_irq))
+    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3719,7 +3677,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3765,6 +3723,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
+    MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_irq))
+    MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_drq))
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3789,7 +3749,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -3849,6 +3809,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
+    MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3873,7 +3835,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_PALETTE_ADD("palette", 16+16+256)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
-	MCFG_GFXDECODE_ADD("gfxdecode", pc9801)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

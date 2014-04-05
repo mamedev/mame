@@ -54,7 +54,6 @@ RO-3-9506 = 8KiB (4Kiw) self decoding address mask rom with external address dec
 #include "includes/intv.h"
 #include "imagedev/cartslot.h"
 #include "sound/ay8910.h"
-#include "sound/sp0256.h"
 
 #ifndef VERBOSE
 #ifdef MAME_DEBUG
@@ -135,12 +134,6 @@ static const ay8910_interface intv_ay8914_ecs_interface =
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_r),
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_portb_r),
 	DEVCB_DRIVER_MEMBER(intv_state, intv_ecs_porta_w),
-	DEVCB_NULL
-};
-
-static const sp0256_interface intellivoice_sp0256 =
-{
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -823,7 +816,8 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SCREEN_UPDATE_DRIVER(intv_state, screen_update_intv)
 	MCFG_SCREEN_SIZE((STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE)
 	MCFG_SCREEN_VISIBLE_AREA(0, (STIC_OVERSCAN_LEFT_WIDTH+STIC_BACKTAB_WIDTH*STIC_CARD_WIDTH-1+STIC_OVERSCAN_RIGHT_WIDTH)*STIC_X_SCALE*INTV_X_SCALE-1, 0, (STIC_OVERSCAN_TOP_HEIGHT+STIC_BACKTAB_HEIGHT*STIC_CARD_HEIGHT+STIC_OVERSCAN_BOTTOM_HEIGHT)*STIC_Y_SCALE*INTV_Y_SCALE-1)
-
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
@@ -835,7 +829,6 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(intellivoice_sp0256)
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -878,7 +871,7 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", intvkbd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", intvkbd)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(intv_state, intv)
 	

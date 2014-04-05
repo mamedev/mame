@@ -249,8 +249,9 @@ static MACHINE_CONFIG_START( canyon, canyon_state )
 	MCFG_SCREEN_SIZE(256, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", canyon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", canyon)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
 

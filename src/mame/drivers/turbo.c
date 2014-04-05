@@ -939,7 +939,7 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
 
@@ -947,6 +947,7 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_turbo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
@@ -968,7 +969,7 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
 
@@ -976,6 +977,7 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_subroc3d)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,turbo)
 
@@ -1004,7 +1006,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", turbo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
 
@@ -1012,6 +1014,7 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(turbo_state, screen_update_buckrog)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(turbo_state,buckrog)
 

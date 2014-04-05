@@ -80,8 +80,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<serial_keyboard_device> m_keyboard;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<const UINT8> m_p_videoram;
-	required_shared_ptr<const UINT8> m_p_attribram;
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_attribram;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 };
@@ -310,7 +310,9 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
@@ -568,7 +570,9 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MCFG_GFXDECODE_ADD("gfxdecode", dg640)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dg640)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */

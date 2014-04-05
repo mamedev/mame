@@ -289,8 +289,9 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raiden)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -313,12 +314,6 @@ WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_enable_w),
-	DEVCB_DRIVER_MEMBER16(raiden_state, raidenb_layer_scroll_w),
-};
-
 static MACHINE_CONFIG_DERIVED( raidenb, raiden )
 
 	/* basic machine hardware */
@@ -328,7 +323,9 @@ static MACHINE_CONFIG_DERIVED( raidenb, raiden )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden_state, raidenb_layer_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden_state, raidenb_layer_scroll_w))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raidenb)

@@ -226,7 +226,7 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 
 	// Allocate the storage for the list of testable formats for a
 	// given cell size
-	int *candidates = global_alloc_array(int, formats_count);
+	dynamic_array<int> candidates(formats_count);
 
 	// Format we're finally choosing
 	int chosen_candidate = -1;
@@ -331,7 +331,6 @@ bool wd177x_format::save(io_generic *io, floppy_image *image)
 			io_generic_write(io, sectdata, get_image_offset(f, head, track), track_size);
 		}
 
-	global_free(candidates);
 	return true;
 }
 

@@ -75,6 +75,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_keypad1_1(*this, "KEYPAD1_1"),
 		m_keypad1_2(*this, "KEYPAD1_2"),
 		m_keypad1_3(*this, "KEYPAD1_3"),
@@ -119,6 +120,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_ioport m_keypad1_1;
 	required_ioport m_keypad1_2;
 	required_ioport m_keypad1_3;
@@ -134,7 +136,7 @@ protected:
 #else
 	required_ioport m_joys;
 	required_ioport m_config;
-#endif
+#endif	
 	inline UINT8 vc4000_joystick_return_to_centre(UINT8 joy);
 	void vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, int line);
 	inline void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int scale);

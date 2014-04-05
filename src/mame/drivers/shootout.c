@@ -272,8 +272,9 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shootout)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
@@ -300,8 +301,9 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shootout)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shootout)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 

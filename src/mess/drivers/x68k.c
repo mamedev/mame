@@ -132,9 +132,9 @@
 #include "includes/x68k.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/x68kexp.h"
-#include "machine/x68k_neptunex.h"
-#include "machine/x68k_scsiext.h"
+#include "bus/x68k/x68kexp.h"
+#include "bus/x68k/x68k_neptunex.h"
+#include "bus/x68k/x68k_scsiext.h"
 #include "machine/scsibus.h"
 #include "machine/scsihd.h"
 #include "x68000.lh"
@@ -729,7 +729,7 @@ READ16_MEMBER(x68k_state::x68k_fdc_r)
 	return 0xff;
 }
 
-void x68k_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
@@ -753,7 +753,7 @@ static void x68k_fdc_write_byte(running_machine &machine,int addr, int data)
 	return state->m_fdc.fdc->dma_w(data);
 }
 
-void x68k_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( x68k_state::fdc_drq )
 {
 	bool ostate = m_fdc.drq_state;
 	m_fdc.drq_state = state;
@@ -1409,22 +1409,6 @@ WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 	m_mfpdev->clock_w(state);
 }
 
-static MC68901_INTERFACE( mfp_interface )
-{
-	4000000,                                            /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),                      /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tbo_w),    /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_NULL,                                         /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, input_txd), /* serial output */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static struct serial_keyboard_interface x68k_keyboard_interface =
 {
 	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, write_rx)
@@ -1458,12 +1442,6 @@ static const okim6258_interface x68k_okim6258_interface =
 	FOSC_DIV_BY_512,
 	TYPE_4BITS,
 	OUTPUT_10BITS,
-};
-
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
-	DEVCB_NULL
 };
 
 static INPUT_PORTS_START( x68000 )
@@ -1731,15 +1709,15 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_crtc.reg[7] = 552;  // Vertical end
 	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	m_scanline = machine().primary_screen->vpos();// = m_crtc.reg[6];  // Vertical start
+	m_scanline = machine().first_screen()->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	m_crtc.vblank = 1;
-	irq_time = machine().primary_screen->time_until_pos(m_crtc.reg[6],2);
+	irq_time = machine().first_screen()->time_until_pos(m_crtc.reg[6],2);
 	m_vblank_irq->adjust(irq_time);
 
 	// start HBlank timer
-	m_scanline_timer->adjust(machine().primary_screen->scan_period(), 1);
+	m_scanline_timer->adjust(machine().first_screen()->scan_period(), 1);
 
 	/// TODO: get callbacks to trigger these
 	m_mfpdev->i0_w(1); // alarm
@@ -1798,8 +1776,6 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 	// check for disks
 	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
-	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
-	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
 
 	for(int drive=0;drive<4;drive++)
 	{
@@ -1842,8 +1818,6 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 
 	// check for disks
 	m_fdc.fdc = machine().device<upd72065_device>("upd72065");
-	m_fdc.fdc->setup_intrq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_irq), this));
-	m_fdc.fdc->setup_drq_cb(upd72065_device::line_cb(FUNC(x68k_state::fdc_drq), this));
 
 	for(int drive=0;drive<4;drive++)
 	{
@@ -1929,7 +1903,13 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_MACHINE_RESET_OVERRIDE(x68k_state, x68000 )
 
 	/* device hardware */
-	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, 4000000)
+	MCFG_MC68901_TIMER_CLOCK(4000000)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(WRITELINE(x68k_state, mfp_irq_callback))
+	MCFG_MC68901_OUT_TBO_CB(WRITELINE(x68k_state, mfp_tbo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
 
 	MCFG_X68K_KEYBOARD_ADD("keyboard", x68k_keyboard_interface)
 
@@ -1937,19 +1917,22 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	MCFG_HD63450_ADD( "hd63450", dmac_interface )
 
-	MCFG_SCC8530_ADD( "scc", 5000000, line_cb_t() )
+	MCFG_DEVICE_ADD( "scc", SCC8530, 5000000 )
 
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_RP5C15_OUT_ALARM_CB(DEVWRITELINE(MC68901_TAG, mc68901_device, i0_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MCFG_GFXDECODE_ADD("gfxdecode", x68k)
+//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", x68k)
 	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 	MCFG_PALETTE_INIT_OWNER(x68k_state, x68000 )
@@ -1971,6 +1954,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_UPD72065_ADD("upd72065", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(x68k_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(x68k_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", x68k_state::floppy_formats)

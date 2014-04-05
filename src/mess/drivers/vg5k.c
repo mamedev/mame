@@ -380,6 +380,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
 
 	MCFG_EF9345_ADD("ef9345", "screen")
+	MCFG_EF9345_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -389,7 +390,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SCREEN_SIZE(336, 300)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vg5k)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */

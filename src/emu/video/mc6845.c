@@ -1437,7 +1437,8 @@ ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag,
 mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: mc6845_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_palette(*this, "palette")
 {
 }
 
@@ -1445,7 +1446,8 @@ mos8563_device::mos8563_device(const machine_config &mconfig, device_type type, 
 mos8563_device::mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: mc6845_device(mconfig, MOS8563, "MOS8563", tag, owner, clock, "mos8563", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map))
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mos8563_videoram_map)),
+		m_palette(*this, "palette")
 {
 }
 
@@ -1456,25 +1458,36 @@ mos8568_device::mos8568_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-// VICE palette
-static const rgb_t MOS8563_PALETTE[] =
+static MACHINE_CONFIG_FRAGMENT(mos8563)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(mos8563_device, mos8563)
+MACHINE_CONFIG_END
+
+machine_config_constructor mos8563_device::device_mconfig_additions() const
 {
-	rgb_t::black,
-	rgb_t(0x55, 0x55, 0x55),
-	rgb_t(0x00, 0x00, 0xaa),
-	rgb_t(0x55, 0x55, 0xff),
-	rgb_t(0x00, 0xaa, 0x00),
-	rgb_t(0x55, 0xff, 0x55),
-	rgb_t(0x00, 0xaa, 0xaa),
-	rgb_t(0x55, 0xff, 0xff),
-	rgb_t(0xaa, 0x00, 0x00),
-	rgb_t(0xff, 0x55, 0x55),
-	rgb_t(0xaa, 0x00, 0xaa),
-	rgb_t(0xff, 0x55, 0xff),
-	rgb_t(0xaa, 0x55, 0x00),
-	rgb_t(0xff, 0xff, 0x55),
-	rgb_t(0xaa, 0xaa, 0xaa),
-	rgb_t::white
+        return MACHINE_CONFIG_NAME( mos8563 );
+}
+
+
+// VICE palette
+PALETTE_INIT_MEMBER(mos8563_device, mos8563)
+{
+	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
+	palette.set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
+	palette.set_pen_color(4, rgb_t(0x00, 0xaa, 0x00));
+	palette.set_pen_color(5, rgb_t(0x55, 0xff, 0x55));
+	palette.set_pen_color(6, rgb_t(0x00, 0xaa, 0xaa));
+	palette.set_pen_color(7, rgb_t(0x55, 0xff, 0xff));
+	palette.set_pen_color(8, rgb_t(0xaa, 0x00, 0x00));
+	palette.set_pen_color(9, rgb_t(0xff, 0x55, 0x55));
+	palette.set_pen_color(10, rgb_t(0xaa, 0x00, 0xaa));
+	palette.set_pen_color(11, rgb_t(0xff, 0x55, 0xff));
+	palette.set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
+	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
+	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
+	palette.set_pen_color(15, rgb_t::white);
 };
 
 
@@ -1513,6 +1526,8 @@ UINT8 mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle
 
 void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
+	const pen_t *pen = m_palette->pens();
+
 	ra += (m_vert_scroll & 0x0f);
 	ra &= 0x0f;
 
@@ -1550,7 +1565,7 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (x < 0) x = 0;
 				int color = BIT(code, 7) ? fg : bg;
 
-				bitmap.pix32(y, x) = MOS8563_PALETTE[color];
+				bitmap.pix32(y, x) = pen[color];
 			}
 		}
 		else
@@ -1586,7 +1601,7 @@ void mos8563_device::update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (x < 0) x = 0;
 				int color = BIT(data, 7) ? fg : bg;
 
-				bitmap.pix32(y, x) = MOS8563_PALETTE[color];
+				bitmap.pix32(y, x) = pen[color];
 
 				if ((bit < 8) || !HSS_SEMI) data <<= 1;
 			}

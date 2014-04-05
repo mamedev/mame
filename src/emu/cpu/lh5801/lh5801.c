@@ -89,7 +89,7 @@ lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
-#include "5801tbl.c"
+#include "5801tbl.inc"
 
 void lh5801_cpu_device::device_start()
 {

@@ -46,8 +46,9 @@ ui_menu_device_control<_DeviceType>::ui_menu_device_control(running_machine &mac
 	: ui_menu(machine, container)
 {
 	iterator iter(machine.root_device());
-	m_device = device ? device : downcast<_DeviceType *>(iter.first());
-	m_count = iter.count();
+	m_device = device ? device : iter.first();
+	iterator iter_cnt(machine.root_device());
+	m_count = iter_cnt.count();
 }
 
 
@@ -79,7 +80,7 @@ void ui_menu_device_control<_DeviceType>::previous()
 			index--;
 		else
 			index = m_count - 1;
-		m_device = downcast<_DeviceType *>(iter.byindex(index));
+		m_device = iter.byindex(index);
 	}
 }
 
@@ -100,7 +101,7 @@ void ui_menu_device_control<_DeviceType>::next()
 			index++;
 		else
 			index = 0;
-		m_device = downcast<_DeviceType *>(iter.byindex(index));
+		m_device = iter.byindex(index);
 	}
 }
 

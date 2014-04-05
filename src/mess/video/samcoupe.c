@@ -29,7 +29,7 @@
 
 void samcoupe_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 samcoupe_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -124,8 +124,8 @@ void samcoupe_state::draw_mode1_line(int y, int hpos)
 
 TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 {
-	int vpos = machine().primary_screen->vpos();
-	int hpos = machine().primary_screen->hpos();
+	int vpos = machine().first_screen()->vpos();
+	int hpos = machine().first_screen()->hpos();
 
 	int next_vpos = vpos;
 	int next_hpos = hpos + SAM_BLOCK*2;
@@ -168,5 +168,5 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
 		samcoupe_irq(SAM_LINE_INT);
 
 	/* schedule next update */
-	m_video_update_timer->adjust(machine().primary_screen->time_until_pos(next_vpos, next_hpos));
+	m_video_update_timer->adjust(machine().first_screen()->time_until_pos(next_vpos, next_hpos));
 }

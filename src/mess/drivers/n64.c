@@ -40,8 +40,8 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")                    // RSP DMEM
 	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")                    // RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)  // RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)  // RDP
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rcp", n64_periphs, sp_reg_r, sp_reg_w)  // RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rcp", n64_periphs, dp_reg_r, dp_reg_w)  // RDP
 	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)    // MIPS Interface
 	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)    // Video Interface
 	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)    // Audio Interface
@@ -60,8 +60,8 @@ static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_mess_state )
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")                    // RSP DMEM
 	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")                    // RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)  // RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)  // RDP
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rcp", n64_periphs, sp_reg_r, sp_reg_w)  // RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rcp", n64_periphs, dp_reg_r, dp_reg_w)  // RDP
 	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)    // MIPS Interface
 	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)    // Video Interface
 	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)    // Audio Interface

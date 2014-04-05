@@ -49,6 +49,7 @@ public:
 	m_fdc(*this, "ic68"),
 	m_floppy0(*this, "ic68:0"),
 	m_floppy1(*this, "ic68:1"),
+	m_palette(*this, "palette"),
 	m_screen_buffer(*this, "screen_buffer"),
 	m_data_selector_dtr(1),
 	m_data_selector_rts(1),
@@ -71,7 +72,7 @@ public:
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-
+	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT16> m_screen_buffer;
 
 	DECLARE_WRITE8_MEMBER( i8089_ca1_w );
@@ -81,8 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER( i8255_portc_w );
 	DECLARE_WRITE_LINE_MEMBER( timer_out1 );
 	DECLARE_WRITE_LINE_MEMBER( timer_out2 );
-	void wd2793_intrq_w(bool state);
-	void wd2793_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( wd2793_intrq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
@@ -237,15 +237,10 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 //  FLOPPY
 //**************************************************************************
 
-void apricot_state::wd2793_intrq_w(bool state)
+WRITE_LINE_MEMBER( apricot_state::wd2793_intrq_w )
 {
 	m_pic->ir4_w(state);
 	m_iop->ext1_w(state);
-}
-
-void apricot_state::wd2793_drq_w(bool state)
-{
-	m_iop->drq1_w(state);
 }
 
 static SLOT_INTERFACE_START( apricot_floppies )
@@ -272,6 +267,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *state = device->machine().driver_data<apricot_state>();
 	UINT8 *ram = state->m_ram->pointer();
+	const pen_t *pen = state->m_palette->pens();
 	int i, x;
 
 	if (state->m_video_mode)
@@ -292,7 +288,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 			{
 				int color = fill ? 1 : BIT(data, x);
 				if (BIT(code, 15)) color = !color; // reverse?
-				bitmap.pix32(y, x + i*10) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color ? 1 + BIT(code, 14) : 0];
+				bitmap.pix32(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
 	}
@@ -331,10 +327,6 @@ void apricot_state::machine_start()
 
 	// setup interrupt acknowledge callback for the main cpu
 	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::irq_callback), this));
-
-	// setup floppy disk controller callbacks
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(apricot_state::wd2793_drq_w), this));
 
 	// motor on is connected to gnd
 	m_floppy0->get_device()->mon_w(0);
@@ -393,6 +385,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_SCREEN_REFRESH_RATE(72)
 	MCFG_SCREEN_UPDATE_DRIVER(apricot_state, screen_update_apricot)
 
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
+
 	MCFG_MC6845_ADD("ic30", MC6845, "screen", XTAL_15MHz / 10, apricot_mc6845_intf)
 
 	// sound hardware
@@ -442,6 +436,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	// floppy
 	MCFG_WD2793x_ADD("ic68", XTAL_4MHz / 2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(apricot_state, wd2793_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

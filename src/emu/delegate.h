@@ -325,10 +325,14 @@ private:
 		return reinterpret_cast<delegate_generic_function>(funcptr);
 	}
 
-	// for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
+	
 	struct raw_mfp_data
 	{
+#if defined (__INTEL_COMPILER) && defined (PTR64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
+		int data[((sizeof(void *) + 4 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
+#else // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
 		int data[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
+#endif
 		bool operator==(const raw_mfp_data &rhs) const { return (memcmp(data, rhs.data, sizeof(data)) == 0); }
 	};
 

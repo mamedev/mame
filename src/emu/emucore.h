@@ -60,13 +60,6 @@
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
 
-// FPTR is used to cast a pointer to a scalar
-#ifdef PTR64
-typedef UINT64 FPTR;
-#else
-typedef UINT32 FPTR;
-#endif
-
 // pen_t is used to represent pixel values in bitmaps
 typedef UINT32 pen_t;
 

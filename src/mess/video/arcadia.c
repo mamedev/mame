@@ -302,9 +302,8 @@ void arcadia_state::video_start()
 	}
 
 	{
-		screen_device *screen = machine().first_screen();
-		int width = screen->width();
-		int height = screen->height();
+		int width = m_screen->width();
+		int height = m_screen->height();
 		m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
 	}
 }
@@ -454,8 +453,8 @@ void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 			{
 				m_bg[y+1][x>>3]|=b>>(x&7);
 				m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-				m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
-				m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y+1);
+				m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
+				m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y+1);
 			}
 		}
 	}
@@ -467,7 +466,7 @@ void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 			m_bg[y][x>>3]|=b>>(x&7);
 			m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-			m_gfxdecode->gfx(0)->opaque(m_palette,*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
+			m_gfxdecode->gfx(0)->opaque(*m_bitmap,m_bitmap->cliprect(), b,colour, 0,0,x,y);
 		}
 	}
 }
@@ -614,8 +613,7 @@ void arcadia_state::arcadia_draw_sprites()
 
 INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
+	int width = m_screen->width();
 
 	if (m_ad_delay<=0)
 	m_ad_select=m_reg.d.pal[1]&0x40;

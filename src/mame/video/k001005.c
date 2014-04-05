@@ -409,7 +409,7 @@ WRITE32_MEMBER( k001005_device::write )
 
 }
 
-/* emu/video/poly.c cannot handle atm callbacks passing a device parameter */
+/* legacy_poly_manager cannot handle atm callbacks passing a device parameter */
 
 #if POLY_DEVICE
 void k001005_device::draw_scanline( void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid )

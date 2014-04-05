@@ -64,7 +64,7 @@ void munchmo_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (sy = 0; sy < 256; sy += 8)
 		{
 			
-				gfx->opaque(m_palette,bitmap,cliprect,
+				gfx->opaque(bitmap,cliprect,
 				*source++,
 				0, /* color */
 				0,0, /* no flip */
@@ -94,7 +94,7 @@ void munchmo_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 		{
 			for (col = 0; col < 4; col++)
 			{
-				 gfx->opaque(m_palette,*m_tmpbitmap,m_tmpbitmap->cliprect(),
+				 gfx->opaque(*m_tmpbitmap,m_tmpbitmap->cliprect(),
 					rom[col + tile_number * 4 + row * 0x400],
 					m_palette_bank,
 					0,0, /* flip */
@@ -135,7 +135,7 @@ void munchmo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
 				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
-				 gfx->transpen(m_palette,bitmap,cliprect,
+				 gfx->transpen(bitmap,cliprect,
 					0x7f - (tile_number & 0x7f),
 					color_base - (attributes & 0x03),
 					0,0,                            /* no flip */

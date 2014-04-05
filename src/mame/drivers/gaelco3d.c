@@ -168,14 +168,6 @@ WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 }
 
 
-static const gaelco_serial_interface serial_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(gaelco3d_state, ser_irq)
-};
-
-
-
-
 /*************************************
  *
  *  Machine init
@@ -999,7 +991,9 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
-	MCFG_GAELCO_SERIAL_ADD("serial", 0, serial_interface)
+	
+	MCFG_DEVICE_ADD("serial", GAELCO_SERIAL, 0)
+	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(gaelco3d_state, ser_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1008,6 +1002,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_SCREEN_SIZE(576, 432)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco3d_state, screen_update_gaelco3d)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 

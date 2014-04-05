@@ -11,9 +11,7 @@
 
 #include "sblaster.h"
 #include "sound/speaker.h"
-#include "sound/3812intf.h"
 #include "sound/262intf.h"
-#include "sound/saa1099.h"
 #include "sound/dac.h"
 #include "machine/pic8259.h"
 
@@ -122,40 +120,45 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-static READ8_DEVICE_HANDLER( ym3812_16_r )
+READ8_MEMBER( sb8_device::ym3812_16_r )
 {
-	ym3812_device *ym3812 = (ym3812_device *) device;
-
 	UINT8 retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = ym3812->status_port_r( space, offset ); break;
+		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
 	}
 	return retVal;
 }
 
-static WRITE8_DEVICE_HANDLER( ym3812_16_w )
+WRITE8_MEMBER( sb8_device::ym3812_16_w )
 {
-	ym3812_device *ym3812 = (ym3812_device *) device;
-
 	switch(offset)
 	{
-		case 0 : ym3812->control_port_w( space, offset, data ); break;
-		case 1 : ym3812->write_port_w( space, offset, data ); break;
+		case 0 : m_ym3812->control_port_w( space, offset, data ); break;
+		case 1 : m_ym3812->write_port_w( space, offset, data ); break;
 	}
 }
 
-static READ8_DEVICE_HANDLER( saa1099_16_r )
+READ8_MEMBER( isa8_sblaster1_0_device::saa1099_16_r )
 {
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( saa1099_16_w )
+WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_1_16_w )
 {
 	switch(offset)
 	{
-		case 0 : dynamic_cast<saa1099_device*>(device)->saa1099_control_w( space, offset, data ); break;
-		case 1 : dynamic_cast<saa1099_device*>(device)->saa1099_data_w( space, offset, data ); break;
+		case 0 : m_saa1099_1->saa1099_control_w( space, offset, data ); break;
+		case 1 : m_saa1099_1->saa1099_data_w( space, offset, data ); break;
+	}
+}
+
+WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_2_16_w )
+{
+	switch(offset)
+	{
+		case 0 : m_saa1099_2->saa1099_control_w( space, offset, data ); break;
+		case 1 : m_saa1099_2->saa1099_data_w( space, offset, data ); break;
 	}
 }
 
@@ -1107,7 +1110,8 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 
 sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
 	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
-	device_isa8_card_interface(mconfig, *this)
+	device_isa8_card_interface(mconfig, *this),
+	m_ym3812(*this, "ym3812")
 {
 }
 
@@ -1122,7 +1126,9 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__)
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__),
+	m_saa1099_1(*this, "saa1099.1"),
+	m_saa1099_2(*this, "saa1099.2")
 {
 }
 
@@ -1157,8 +1163,8 @@ void sb8_device::device_start()
 	}
 	else
 	{
-		m_isa->install_device(subdevice("ym3812"),    0x0388, 0x0389, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
-		m_isa->install_device(subdevice("ym3812"),    0x0228, 0x0229, 0, 0, FUNC(ym3812_16_r), FUNC(ym3812_16_w) );
+		m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
+		m_isa->install_device(0x0228, 0x0229, 0, 0, read8_delegate( FUNC(sb8_device::ym3812_16_r), this ), write8_delegate( FUNC(sb8_device::ym3812_16_w), this ) );
 	}
 
 	m_timer = timer_alloc(0, NULL);
@@ -1183,8 +1189,8 @@ void isa8_sblaster1_0_device::device_start()
 {
 	set_isa_device();
 	// 1.0 always has the SAA1099s for CMS back-compatibility
-	m_isa->install_device(subdevice("saa1099.1"), 0x0220, 0x0221, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
-	m_isa->install_device(subdevice("saa1099.2"), 0x0222, 0x0223, 0, 0, FUNC(saa1099_16_r), FUNC(saa1099_16_w) );
+	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_1_16_w), this ) );
+	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );	
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0105;
 	sb8_device::device_start();

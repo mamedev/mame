@@ -36,7 +36,8 @@ public:
 	lola8a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_cass(*this, "cassette")
+		, m_cass(*this, "cassette"),
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -55,6 +56,8 @@ public:
 private:
 	UINT8 m_portb;
 	required_device<cassette_image_device> m_cass;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 static ADDRESS_MAP_START(lola8a_mem, AS_PROGRAM, 8, lola8a_state)
@@ -197,7 +200,7 @@ static MC6845_UPDATE_ROW( lola8a_update_row )
 {
 	lola8a_state *state = device->machine().driver_data<lola8a_state>();
 	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 
 	for (int sx = 0; sx < x_count; sx++)
 	{

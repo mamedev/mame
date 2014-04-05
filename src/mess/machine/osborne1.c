@@ -53,7 +53,7 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100: /* Floppy */
-			data = wd17xx_r( m_fdc, space, offset );
+			data = m_fdc->read( space, offset );
 			break;
 		case 0x200: /* Keyboard */
 			/* Row 0 */
@@ -104,7 +104,7 @@ WRITE8_MEMBER( osborne1_state::osborne1_2000_w )
 		switch( offset & 0x0F00 )
 		{
 		case 0x100: /* Floppy */
-			wd17xx_w( m_fdc, space, offset, data );
+			m_fdc->write(space, offset, data );
 			break;
 		case 0x900: /* IEEE488 PIA */
 			m_pia0->write(space, offset & 0x03, data );
@@ -260,7 +260,7 @@ WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
 
 WRITE8_MEMBER( osborne1_state::video_pia_port_a_w )
 {
-	wd17xx_dden_w(m_fdc, BIT(data, 0));
+	m_fdc->dden_w(BIT(data, 0));
 
 	data -= 0xea; // remove bias
 
@@ -278,10 +278,10 @@ WRITE8_MEMBER( osborne1_state::video_pia_port_b_w )
 	m_beep_state = BIT(data, 5);
 
 	if (BIT(data, 6))
-		wd17xx_set_drive( m_fdc, 0 );
+		m_fdc->set_drive( 0 );
 	else
 	if (BIT(data, 7))
-		wd17xx_set_drive( m_fdc, 1 );
+		m_fdc->set_drive( 1 );
 
 	//logerror("Video pia port b write: %02X\n", data );
 }
@@ -325,7 +325,7 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 {
-	int y = machine().primary_screen->vpos();
+	int y = machine().first_screen()->vpos();
 	UINT8 ra=0,chr,gfx,dim;
 	UINT16 x,ma;
 
@@ -378,7 +378,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 		m_beep->set_state( 0 );
 	}
 
-	m_video_timer->adjust(machine().primary_screen->time_until_pos(y + 1, 0 ));
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0 ));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
@@ -396,19 +396,19 @@ static void osborne1_load_proc(device_image_interface &image)
 	switch( size )
 	{
 	case 40 * 10 * 256:
-		wd17xx_dden_w(state->m_fdc, ASSERT_LINE);
+		state->m_fdc->dden_w(ASSERT_LINE);
 		break;
 	case 40 * 5 * 1024:
-		wd17xx_dden_w(state->m_fdc, CLEAR_LINE);
+		state->m_fdc->dden_w(CLEAR_LINE);
 		break;
 	case 40 * 8 * 512:
-		wd17xx_dden_w(state->m_fdc, ASSERT_LINE);
+		state->m_fdc->dden_w(ASSERT_LINE);
 		break;
 	case 40 * 18 * 128:
-		wd17xx_dden_w(state->m_fdc, ASSERT_LINE);
+		state->m_fdc->dden_w(ASSERT_LINE);
 		break;
 	case 40 * 9 * 512:
-		wd17xx_dden_w(state->m_fdc, CLEAR_LINE);
+		state->m_fdc->dden_w(CLEAR_LINE);
 		break;
 	}
 }
@@ -443,7 +443,7 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
 	m_video_timer = timer_alloc(TIMER_VIDEO);
-	m_video_timer->adjust(machine().primary_screen->time_until_pos(1, 0 ));
+	m_video_timer->adjust(machine().first_screen()->time_until_pos(1, 0 ));
 
 	timer_set(attotime::zero, TIMER_SETUP);
 }
@@ -451,7 +451,7 @@ DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 
 void osborne1_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

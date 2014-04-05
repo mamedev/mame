@@ -907,6 +907,7 @@ static MACHINE_CONFIG_START( rastersp, rastersp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rastersp_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 

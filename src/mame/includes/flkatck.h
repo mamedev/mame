@@ -48,7 +48,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };

@@ -41,7 +41,8 @@ public:
 		m_joysticks(*this, "joysticks") ,
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")  { }
 
 	DECLARE_READ8_MEMBER(arcadia_vsync_r);
 	DECLARE_READ8_MEMBER(arcadia_video_r);
@@ -117,5 +118,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 #endif /* ARCADIA_H_ */

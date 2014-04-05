@@ -187,7 +187,7 @@ private:
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;
 	required_ioport m_iop_s1;
@@ -757,7 +757,9 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sol20_state, screen_update)
 	MCFG_SCREEN_SIZE(576, 208)
 	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
-	MCFG_GFXDECODE_ADD("gfxdecode", sol20)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sol20)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

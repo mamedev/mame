@@ -113,11 +113,6 @@ Z80CTC_INTERFACE( kc85_ctc_intf )
 	DEVCB_DRIVER_LINE_MEMBER(kc_state, video_toggle_blink_state)
 };
 
-const kc_keyb_interface kc85_keyboard_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(kc_state, keyboard_cb)
-};
-
 static const cassette_interface kc_cassette_interface =
 {
 	kc_cassette_formats,
@@ -142,12 +137,14 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28_37516MHz/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
 
 	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(kc_state, kc85 )
 
-	MCFG_KC_KEYBOARD_ADD("keyboard", XTAL_4MHz, kc85_keyboard_interface)
+	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL_4MHz)
+	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -194,12 +191,14 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28_37516MHz/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_4_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
 
 	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(kc85_4_state, kc85 )
 
-	MCFG_KC_KEYBOARD_ADD("keyboard", XTAL_4MHz, kc85_keyboard_interface)
+	MCFG_DEVICE_ADD("keyboard", KC_KEYBOARD, XTAL_4MHz)
+	MCFG_KC_KEYBOARD_OUT_CALLBACK(WRITELINE(kc_state, keyboard_cb))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

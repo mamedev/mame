@@ -28,7 +28,8 @@ public:
 			m_fdc(*this, "upd765"),
 			m_floppy0(*this, "upd765:0:525dd"),
 			m_floppy1(*this, "upd765:1:525dd"),
-			m_video_ram(*this, "video_ram")
+			m_video_ram(*this, "video_ram"),
+			m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -53,11 +54,8 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-
 	required_shared_ptr<UINT8> m_video_ram;
-	int         m_fdc_int_line;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -79,16 +77,6 @@ WRITE8_MEMBER(dmv_state::leds_w)
 
 	for(int i=0; i<8; i++)
 		output_set_led_value(8-i, BIT(data, i));
-}
-
-void dmv_state::fdc_irq(bool state)
-{
-	m_fdc_int_line = state;
-}
-
-void dmv_state::fdc_drq(bool state)
-{
-	m_dmac->dreq3_w(state);
 }
 
 READ8_MEMBER(dmv_state::fdc_dma_r)
@@ -127,7 +115,7 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	// 16-bit CPU not available
 	data |= 0x02;
 
-	if (m_fdc_int_line)
+	if (m_fdc->get_irq())
 		data |= 0x08;
 
 	return data;
@@ -151,7 +139,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	dmv_state *state = device->machine().driver_data<dmv_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 * chargen = state->memregion("maincpu")->base() + 0x1000;
 
 	for( int x = 0; x < pitch; x++ )
@@ -173,7 +161,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }
@@ -233,8 +221,6 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(dmv_state::fdc_drq), this));
 }
 
 void dmv_state::machine_reset()
@@ -331,7 +317,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dmv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmv)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
@@ -339,6 +325,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_UPD7220_ADD( "upd7220", XTAL_5MHz/2, hgdc_intf, upd7220_map ) // unk clock
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
 	MCFG_UPD765A_ADD( "upd765", true, true )
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

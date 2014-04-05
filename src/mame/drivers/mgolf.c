@@ -92,14 +92,14 @@ UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bit
 	/* draw sprites */
 	for (i = 0; i < 2; i++)
 	{
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
 			m_video_ram[0x390 + 2 * i] - 7,
 			m_video_ram[0x398 + 4 * i] - 16, 0);
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			m_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,
@@ -362,8 +362,9 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update_mgolf)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mgolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgolf)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
 

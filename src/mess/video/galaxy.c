@@ -115,7 +115,7 @@ void galaxy_state::video_start()
 	m_gal_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxy_state::gal_video),this));
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
 
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 galaxy_state::screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

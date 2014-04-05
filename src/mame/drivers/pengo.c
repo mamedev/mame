@@ -382,7 +382,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", pengo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pengo)
 	MCFG_PALETTE_ADD("palette", 128*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)
@@ -390,6 +390,7 @@ static MACHINE_CONFIG_START( pengo, pengo_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pengo_state, screen_update_pacman)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 

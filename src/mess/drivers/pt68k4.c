@@ -44,7 +44,7 @@ TODO: 68230 device.  Better hardware documentation would be nice too, and workin
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/timekpr.h"
 #include "machine/pc_fdc.h"
 #include "formats/imd_dsk.h"
@@ -92,8 +92,8 @@ private:
 	virtual void machine_reset();
 	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
-	required_device<duartn68681_device> m_duart1;
-	required_device<duartn68681_device> m_duart2;
+	required_device<mc68681_device> m_duart1;
+	required_device<mc68681_device> m_duart2;
 	required_device<isa8_device> m_isa;
 	required_device<speaker_sound_device> m_speaker;
 
@@ -154,8 +154,8 @@ static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0xc00000, 0xdfffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, prog_r, prog_w, 0x00ff)
 	AM_RANGE(0xfa0000, 0xfbffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, io_r, io_w, 0x00ff)
-	AM_RANGE(0xfe0000, 0xfe001f) AM_DEVREADWRITE8(DUART1_TAG, duartn68681_device, read, write, 0x00ff)
-	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, duartn68681_device, read, write, 0x00ff)
+	AM_RANGE(0xfe0000, 0xfe001f) AM_DEVREADWRITE8(DUART1_TAG, mc68681_device, read, write, 0x00ff)
+	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0xfe01c0, 0xfe01c3) AM_READWRITE8(keyboard_r, keyboard_w, 0x00ff)
 	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE8(hiram_r, hiram_w, 0xff00)
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0x00ff)
@@ -263,11 +263,11 @@ static MACHINE_CONFIG_START( pt68k4, pt68k4_state )
 	MCFG_CPU_PROGRAM_MAP(pt68k4_mem)
 
 	// add the DUARTS.  first one has the console on channel A at 19200.
-	MCFG_DUARTN68681_ADD("duart1", XTAL_16MHz / 4)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
+	MCFG_MC68681_ADD("duart1", XTAL_16MHz / 4)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(pt68k4_state, duart1_irq))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(pt68k4_state, duart1_out))
 
-	MCFG_DUARTN68681_ADD("duart2", XTAL_16MHz / 4)
+	MCFG_MC68681_ADD("duart2", XTAL_16MHz / 4)
 
 	MCFG_PC_KBDC_ADD(KBDC_TAG, pc_kbdc_intf)
 	MCFG_PC_KBDC_SLOT_ADD(KBDC_TAG, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)

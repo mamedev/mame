@@ -34,7 +34,7 @@ WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 	m_gfxdecode->gfx(2)->mark_dirty(offset/8);
 	if (offset == 0xc7)
 	{
-		m_s2636_sound->soundport_w(0, data);
+		m_s2636->soundport_w(0, data);
 	}
 }
 
@@ -61,7 +61,7 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Draw first sprite */
 
-		m_gfxdecode->gfx(expand)->opaque(m_palette,m_spritebitmap,m_spritebitmap.cliprect(),
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap,m_spritebitmap.cliprect(),
 				first * 2,
 				0,
 				0,0,
@@ -80,7 +80,7 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Blackout second sprite */
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,m_spritebitmap,m_spritebitmap.cliprect(),
+		m_gfxdecode->gfx(1)->transpen(m_spritebitmap,m_spritebitmap.cliprect(),
 				second * 2,
 				1,
 				0,0,
@@ -99,7 +99,7 @@ int zac2650_state::SpriteCollision(int first,int second)
 
 		/* Zero bitmap */
 
-		m_gfxdecode->gfx(expand)->opaque(m_palette,m_spritebitmap,m_spritebitmap.cliprect(),
+		m_gfxdecode->gfx(expand)->opaque(m_spritebitmap,m_spritebitmap.cliprect(),
 				first * 2,
 				1,
 				0,0,
@@ -161,7 +161,7 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int x,y;
 
 			/* Sprite->Background collision detection */
-			m_gfxdecode->gfx(expand)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(expand)->transpen(bitmap,cliprect,
 					spriteno,
 					1,
 					0,0,
@@ -180,7 +180,7 @@ void zac2650_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				}
 			}
 
-			m_gfxdecode->gfx(expand)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(expand)->transpen(bitmap,cliprect,
 					spriteno,
 					0,
 					0,0,

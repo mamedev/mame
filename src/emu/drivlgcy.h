@@ -17,12 +17,6 @@
 //  MACROS
 //**************************************************************************
 
-#define MCFG_MACHINE_START(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_START, MACHINE_START_NAME(_func));
-
-#define MCFG_MACHINE_RESET(_func) \
-	driver_device::static_set_callback(*owner, driver_device::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func));
-
 #define MCFG_VIDEO_START(_func) \
 	driver_device::static_set_callback(*owner, driver_device::CB_VIDEO_START, VIDEO_START_NAME(_func));
 

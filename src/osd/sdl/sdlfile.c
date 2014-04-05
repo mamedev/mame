@@ -360,6 +360,29 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 
 
 //============================================================
+//  osd_truncate
+//============================================================
+
+file_error osd_truncate(osd_file *file, UINT64 offset)
+{
+	UINT32 result;
+
+	switch (file->type)
+	{
+		case SDLFILE_FILE:
+			result = ftruncate(file->handle, offset);
+			if (!result)
+				return error_to_file_error(errno);
+			return FILERR_NONE;
+			break;
+
+		default:
+			return FILERR_FAILURE;
+	}
+}
+
+
+//============================================================
 //  osd_close
 //============================================================
 

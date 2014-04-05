@@ -13,6 +13,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/centronics/ctronics.h"
 #include "machine/6526cia.h"
 #include "machine/amigafdc.h"
+#include "machine/msm6242.h"
 #include "cpu/m68000/m68000.h"
 
 
@@ -391,6 +392,7 @@ public:
 			m_cia_1(*this, "cia_1"),
 			m_centronics(*this, "centronics"),
 			m_sound(*this, "amiga"),
+			m_rtc(*this, "rtc"),
 			m_fdc(*this, "fdc"),
 			m_chip_ram(*this, "chip_ram", 0),
 			m_custom_regs(*this, "custom_regs", 0),
@@ -412,6 +414,7 @@ public:
 	required_device<legacy_mos6526_device> m_cia_1;
 	optional_device<centronics_device> m_centronics;
 	required_device<amiga_sound_device> m_sound;
+	optional_device<msm6242_device> m_rtc;
 	optional_device<amiga_fdc> m_fdc;
 	required_shared_ptr<UINT16> m_chip_ram;
 	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
@@ -494,6 +497,12 @@ public:
 	TIMER_CALLBACK_MEMBER(finish_serial_write);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
+	DECLARE_READ8_MEMBER( amiga_cia_0_portA_r );
+	DECLARE_READ8_MEMBER( amiga_cia_0_cdtv_portA_r );
+	DECLARE_WRITE8_MEMBER( amiga_cia_0_portA_w );
+	
+	DECLARE_READ16_MEMBER( amiga_clock_r );
+	DECLARE_WRITE16_MEMBER( amiga_clock_w );
 
 	DECLARE_READ8_MEMBER(amiga_cia_1_porta_r);
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
@@ -514,6 +523,10 @@ public:
 	DECLARE_READ16_MEMBER( amiga_ar23_mode_r );
 	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
 	void amiga_ar23_init( running_machine &machine, int ar3 );
+
+	DECLARE_READ8_MEMBER( amigacd_tpi6525_portc_r );
+	DECLARE_WRITE8_MEMBER( amigacd_tpi6525_portb_w );
+	DECLARE_WRITE_LINE_MEMBER( amigacd_tpi6525_irq );
 
 	int m_centronics_busy;
 	int m_centronics_perror;

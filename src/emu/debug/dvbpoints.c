@@ -64,11 +64,11 @@ void debug_view_breakpoints::enumerate_sources()
 	{
 		astring name;
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*auto_alloc(machine(), debug_view_source(name.cstr(), &dasm->device())));
+		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.head());
+	set_source(*m_source_list.first());
 }
 
 
@@ -262,7 +262,7 @@ int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint*
 	// Alloc
 	int numBPs = 0;
 	bpList = NULL;
-	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		const device_debug& debugInterface = *source->device()->debug();
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
@@ -271,7 +271,7 @@ int debug_view_breakpoints::breakpoints(SortMode sort, device_debug::breakpoint*
 	bpList = new device_debug::breakpoint*[numBPs];
 
 	int bpAddIndex = 0;
-	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		// Collect
 		device_debug& debugInterface = *source->device()->debug();

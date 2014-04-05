@@ -61,13 +61,13 @@ public:
 			m_row5(*this, "ROW5"),
 			m_row6(*this, "ROW6"),
 			m_row7(*this, "ROW7"),
-			m_restore(*this, "RESTORE"),
 			m_lock(*this, "LOCK"),
 			m_loram(1),
 			m_hiram(1),
 			m_charen(1),
 			m_va14(1),
 			m_va15(1),
+			m_restore(1),
 			m_cia1_irq(CLEAR_LINE),
 			m_cia2_irq(CLEAR_LINE),
 			m_vic_irq(CLEAR_LINE),
@@ -100,7 +100,6 @@ public:
 	optional_ioport m_row5;
 	optional_ioport m_row6;
 	optional_ioport m_row7;
-	optional_ioport m_restore;
 	optional_ioport m_lock;
 
 	virtual void machine_start();
@@ -133,6 +132,7 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
+	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
@@ -163,6 +163,7 @@ public:
 	int m_va15;
 
 	// interrupt state
+	int m_restore;
 	int m_cia1_irq;
 	int m_cia2_irq;
 	int m_vic_irq;

@@ -1760,7 +1760,7 @@ static const speaker_interface pokemini_speaker_interface =
 
 void pokemini_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 
@@ -1787,6 +1787,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	MCFG_SCREEN_SIZE( 96, 64 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MCFG_SCREEN_REFRESH_RATE( 72 )
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

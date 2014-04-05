@@ -54,8 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fdd_select_w);
 	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
 private:
 	static const device_timer_id TIMER_RESET = 0;

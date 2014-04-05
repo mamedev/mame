@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
-#include "machine/msm6222b.h"
+#include "video/msm6222b.h"
 #include "cpu/mcs96/i8x9x.h"
 
 static INPUT_PORTS_START( d110 )
@@ -240,6 +240,8 @@ static MACHINE_CONFIG_START( d110, d110_state )
 //  MCFG_SCREEN_SIZE(20*6-1, 2*9-1)
 	MCFG_SCREEN_SIZE(16*6-1, (16*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(d110_state, d110)
 

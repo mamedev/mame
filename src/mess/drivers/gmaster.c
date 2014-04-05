@@ -298,6 +298,7 @@ static MACHINE_CONFIG_START( gmaster, gmaster_state )
 	MCFG_SCREEN_SIZE(64, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1-3, 0, 64-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gmaster_state, screen_update_gmaster)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", sizeof(gmaster_palette)/sizeof(gmaster_palette[0]))
 	MCFG_PALETTE_INIT_OWNER(gmaster_state, gmaster)

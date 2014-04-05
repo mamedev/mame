@@ -79,7 +79,7 @@ void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, m_fix_ram[current_screen_character],
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, m_fix_ram[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -376,11 +376,12 @@ static MACHINE_CONFIG_START( astron, segald_state )
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, segald_state, screen_update_astron)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segald)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segald)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardare */

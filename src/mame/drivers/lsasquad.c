@@ -631,8 +631,9 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_lsasquad)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lsasquad)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
 
 	/* sound hardware */
@@ -686,8 +687,9 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lsasquad_state, screen_update_daikaiju)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lsasquad)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lsasquad)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
 
 	/* sound hardware */

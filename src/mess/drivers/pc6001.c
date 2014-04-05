@@ -1337,14 +1337,14 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 	{
 		/* Apparently bitmap modes changes the screen res to 320 x 200 */
 		{
-			rectangle visarea = machine().primary_screen->visible_area();
+			rectangle visarea = machine().first_screen()->visible_area();
 			int y_height;
 
 			y_height = (m_exgfx_bitmap_mode || m_exgfx_2bpp_mode) ? 200 : 240;
 
 			visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-			machine().primary_screen->configure(320, 240, visarea, machine().primary_screen->frame_period().attoseconds);
+			machine().first_screen()->configure(320, 240, visarea, machine().first_screen()->frame_period().attoseconds);
 		}
 	}
 
@@ -2319,17 +2319,15 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 //  MCFG_CPU_ADD("subcpu", I8049, 7987200)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pc6001m2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc6001m2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001)
-//  MCFG_SCREEN_REFRESH_RATE(M6847_NTSC_FRAMES_PER_SECOND)
-//  MCFG_SCREEN_UPDATE_STATIC(m6847)
 	MCFG_SCREEN_SIZE(320, 25+192+26)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16+4)
 	MCFG_PALETTE_INIT_OWNER(pc6001_state, pc6001)

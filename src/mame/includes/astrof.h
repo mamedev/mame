@@ -84,7 +84,7 @@ public:
 	void astrof_set_video_control_2( UINT8 data );
 	void spfghmk2_set_video_control_2( UINT8 data );
 	void tomahawk_set_video_control_2( UINT8 data );
-	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens );
+	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens, int num_pens );
 };
 
 /*----------- defined in audio/astrof.c -----------*/

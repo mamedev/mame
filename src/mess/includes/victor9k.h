@@ -92,7 +92,8 @@ public:
 			m_lms(0),
 			m_brdy(1),
 			m_sync(1),
-			m_gcrerr(0)
+			m_gcrerr(0),
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -213,6 +214,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
 	IRQ_CALLBACK_MEMBER(victor9k_irq_callback);
+	required_device<palette_device> m_palette;
 };
 
 #endif

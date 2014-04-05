@@ -539,24 +539,22 @@ void k05324x_device::k053245_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfx->prio_transtable(m_palette,bitmap,cliprect,
-							c,
-							color,
+					m_gfx->prio_transtable(bitmap,cliprect,
+							c,color,
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,m_palette->shadow_table());
+							drawmode_table);
 				}
 				else
 				{
-					m_gfx->prio_zoom_transtable(m_palette,bitmap,cliprect,
-							c,
-							color,
+					m_gfx->prio_zoom_transtable(bitmap,cliprect,
+							c,color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,m_palette->shadow_table());
+							drawmode_table);
 
 				}
 			}
@@ -787,24 +785,22 @@ void k05324x_device::k053245_sprites_draw_lethal( bitmap_ind16 &bitmap, const re
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					m_gfxdecode->gfx(0)->prio_transtable(m_palette,bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
-							c,
-							color,
+					m_gfxdecode->gfx(0)->prio_transtable(bitmap,cliprect, /* hardcoded to 0 (decoded 6bpp gfx) for le */
+							c,color,
 							fx,fy,
 							sx,sy,
 							priority_bitmap,pri,
-							drawmode_table,m_palette->shadow_table());
+							drawmode_table);
 				}
 				else
 				{
-					m_gfxdecode->gfx(0)->prio_zoom_transtable(m_palette,bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
-							c,
-							color,
+					m_gfxdecode->gfx(0)->prio_zoom_transtable(bitmap,cliprect,  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+							c,color,
 							fx,fy,
 							sx,sy,
 							(zw << 16) / 16,(zh << 16) / 16,
 							priority_bitmap,pri,
-							drawmode_table,m_palette->shadow_table());
+							drawmode_table);
 
 				}
 			}

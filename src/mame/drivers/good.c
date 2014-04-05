@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_CPU_PROGRAM_MAP(good_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", good)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -293,6 +293,7 @@ static MACHINE_CONFIG_START( good, good_state )
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(1*16, 23*16-1, 0*16, 14*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(good_state, screen_update_good)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

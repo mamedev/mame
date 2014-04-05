@@ -269,7 +269,6 @@ static LRESULT unregister_client(HWND hwnd, LPARAM id)
 
 static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 {
-	copydata_id_string *temp;
 	COPYDATASTRUCT copydata;
 	const char *name;
 	int datalen;
@@ -285,8 +284,9 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 		name = "";
 
 	// allocate memory for the message
-	datalen = sizeof(*temp) + strlen(name);
-	temp = (copydata_id_string *)global_alloc_array(UINT8, datalen);
+	datalen = sizeof(copydata_id_string) + strlen(name) + 1;
+	dynamic_buffer buffer(datalen);
+	copydata_id_string *temp = (copydata_id_string *)&buffer[0];
 	temp->id = id;
 	strcpy(temp->string, name);
 
@@ -296,8 +296,6 @@ static LRESULT send_id_string(running_machine &machine, HWND hwnd, LPARAM id)
 	copydata.lpData = temp;
 	SendMessage(hwnd, WM_COPYDATA, (WPARAM)output_hwnd, (LPARAM)&copydata);
 
-	// free the data
-	global_free(temp);
 	return 0;
 }
 

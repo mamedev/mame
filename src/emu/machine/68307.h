@@ -88,7 +88,7 @@ protected:
 static const device_type M68307 = &device_creator<m68307cpu_device>;
 
 extern void m68307_set_port_callbacks(m68307cpu_device *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w);
-extern void m68307_set_duart68681(m68307cpu_device* cpudev, device_t *duart68681);
+extern void m68307_set_duart68681(m68307cpu_device* cpudev, mc68681_device *duart68681);
 extern UINT16 m68307_get_cs(m68307cpu_device *device, offs_t address);
 extern void m68307_timer0_interrupt(m68307cpu_device *cpudev);
 extern void m68307_timer1_interrupt(m68307cpu_device *cpudev);

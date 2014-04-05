@@ -539,6 +539,6 @@ static void sdl_destroy_buffers(void)
 {
 	// release the buffer
 	if (stream_buffer)
-		global_free(stream_buffer);
+		global_free_array(stream_buffer);
 	stream_buffer = NULL;
 }

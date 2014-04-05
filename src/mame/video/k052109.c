@@ -230,6 +230,8 @@ void k052109_device::device_start()
 		32*8
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
 
 	/* decode the graphics */
 	switch (m_plane_order)

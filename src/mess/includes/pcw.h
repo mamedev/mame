@@ -117,7 +117,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	void pcw_fdc_interrupt(bool state);
+	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;

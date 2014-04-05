@@ -798,7 +798,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 
 
 				
-						gfx->transpen(m_palette,
+						gfx->transpen(
 						bitmap,
 						cliprect,
 						tile_number,
@@ -807,7 +807,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
 				
-						gfx->transpen(m_palette,
+						gfx->transpen(
 						bitmap,
 						cliprect,
 						tile_number,
@@ -816,7 +816,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						((sx+xstep*xtiles)&ZEROTEAM_MASK_X)-0x200,(sy+ystep*ytiles)&ZEROTEAM_MASK_Y,15);
 
 				
-						gfx->transpen(m_palette,
+						gfx->transpen(
 						bitmap,
 						cliprect,
 						tile_number,
@@ -825,7 +825,7 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 						(sx+xstep*xtiles)&ZEROTEAM_MASK_X,((sy+ystep*ytiles)&ZEROTEAM_MASK_Y)-0x200,15);
 
 				
-						gfx->transpen(m_palette,
+						gfx->transpen(
 						bitmap,
 						cliprect,
 						tile_number,
@@ -1858,13 +1858,7 @@ static GFXDECODE_START( raiden2 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, raiden2_spritelayout, 0x000, 128 )
 GFXDECODE_END
 
-SEIBU_CRTC_INTERFACE(crtc_intf)
-{
-	DEVCB_DRIVER_MEMBER16(raiden2_state, tilemap_enable_w),
-	DEVCB_DRIVER_MEMBER16(raiden2_state, tile_scroll_w),
-};
-
-
+	
 /* MACHINE DRIVERS */
 
 static MACHINE_CONFIG_START( raiden2, raiden2_state )
@@ -1886,11 +1880,15 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
@@ -1940,11 +1938,15 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 //  MCFG_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4,546,0,40*8,264,0,32*8) /* hand-tuned to match ~55.47 */
 	MCFG_SCREEN_UPDATE_DRIVER(raiden2_state, screen_update_raiden2)
-	MCFG_GFXDECODE_ADD("gfxdecode", raiden2)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden2)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_SEIBU_CRTC_ADD("crtc",crtc_intf,0)
+	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
+	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(raiden2_state, tilemap_enable_w))
+	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 

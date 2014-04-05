@@ -646,16 +646,6 @@ static SLOT_INTERFACE_START( mm1_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-void mm1_state::fdc_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void mm1_state::fdc_drq_w(bool state)
-{
-	m_dmac->dreq3_w(state);
-}
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -667,10 +657,6 @@ void mm1_state::fdc_drq_w(bool state)
 
 void mm1_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_drq_w), this));
-
 	// register for state saving
 	save_item(NAME(m_sense));
 	save_item(NAME(m_drive));
@@ -735,15 +721,15 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mm1_state, auxc_w))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ true, true)
-	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
 
+	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
-
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-
 	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
 

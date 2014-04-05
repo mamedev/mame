@@ -436,12 +436,6 @@ void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int p
 const smc92x4_interface ti99_smc92x4_interface =
 {
 	FALSE,      /* do not use the full track layout */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, dip_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, auxbus_out),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, auxbus_in),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, read_buffer),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, myarc_hfdc_device, write_buffer)
 };
 
 static const mm58274c_interface floppy_mm58274c_interface =
@@ -452,6 +446,12 @@ static const mm58274c_interface floppy_mm58274c_interface =
 
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_SMC92X4_ADD(FDC_TAG, ti99_smc92x4_interface )
+	MCFG_SMC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
+	MCFG_SMC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
+	MCFG_SMC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
+	MCFG_SMC92X4_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_device, auxbus_in))
+	MCFG_SMC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
+	MCFG_SMC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 	MCFG_MM58274C_ADD(CLOCK_TAG, floppy_mm58274c_interface)
 MACHINE_CONFIG_END
 

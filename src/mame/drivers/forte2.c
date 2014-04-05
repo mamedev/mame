@@ -145,7 +145,6 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	int i;
 	UINT8 *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
-	UINT8 *buf;
 
 	// data swap
 	for ( i = 0; i < memsize; i++ )
@@ -154,13 +153,12 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	buf = auto_alloc_array(machine(), UINT8, memsize);
+	dynamic_buffer buf(memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
-	auto_free(machine(), buf);
 
 }
 

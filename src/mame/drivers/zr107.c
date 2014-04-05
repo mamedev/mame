@@ -242,7 +242,7 @@ protected:
 VIDEO_START_MEMBER(zr107_state,jetwave)
 {
 	K001005_init(machine());
-	K001006_init(machine());
+	K001006_init(machine(),m_palette);
 }
 
 
@@ -292,7 +292,7 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 	m_k056832->set_layer_offs(6, -29, -27);
 	m_k056832->set_layer_offs(7, -29, -27);
 
-	K001006_init(machine());
+	K001006_init(machine(),m_palette);
 	K001005_init(machine());
 }
 
@@ -775,7 +775,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
@@ -839,7 +839,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")

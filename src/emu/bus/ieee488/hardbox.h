@@ -15,6 +15,11 @@
 #define __PET_HARDBOX__
 
 #include "ieee488.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "imagedev/harddriv.h"
+#include "includes/corvushd.h"
 
 
 
@@ -62,6 +67,7 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
+	required_device<corvus_hdc_t> m_hdc;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };

@@ -653,7 +653,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			gfx->transpen(state->m_palette,bitmap,clip,code,color,fx,fy,x,y,0);
+			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -714,7 +714,7 @@ static void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap)
 				y = 256 - y;
 			}
 
-			gfx->transpen(state->m_palette,bitmap,clip,code,color,fx,fy,x,y,0);
+			gfx->transpen(bitmap,clip,code,color,fx,fy,x,y,0);
 		}
 	}
 }
@@ -945,28 +945,6 @@ static GFXDECODE_START( vamphalf )
 GFXDECODE_END
 
 
-
-
-static QS1000_INTERFACE( qs1000_intf )
-{
-	/* External ROM */
-	true,
-
-	/* P1-P3 read handlers */
-	DEVCB_DRIVER_MEMBER(vamphalf_state, qs1000_p1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	/* P1-P3 write handlers */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vamphalf_state, qs1000_p3_w),
-};
-
-
-
-
-
 static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_CPU_ADD("maincpu", E116T, 50000000)    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
@@ -983,10 +961,11 @@ static MACHINE_CONFIG_START( common, vamphalf_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(31, 350, 16, 251)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_common)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sound_ym_oki )
@@ -1017,7 +996,10 @@ static MACHINE_CONFIG_FRAGMENT( sound_qs1000 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_QS1000_EXTERNAL_ROM(true)
+	MCFG_QS1000_IN_P1_CB(READ8(vamphalf_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(vamphalf_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1115,10 +1097,11 @@ static MACHINE_CONFIG_START( aoh, vamphalf_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(vamphalf_state, screen_update_aoh)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", vamphalf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vamphalf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

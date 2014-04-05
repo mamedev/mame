@@ -109,7 +109,7 @@
 
 #define PALETTE_INIT_NAME(_Name) palette_init_##_Name
 #define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
-#define PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &dummy, palette_device &palette)
+#define PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &dummy, palette_device &palette) // legacy
 #define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
 
 // standard 3-3-2 formats
@@ -209,6 +209,14 @@
 	MCFG_PALETTE_ADD(_tag, 2) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT(_tag) \
+	MCFG_PALETTE_ADD(_tag, 3) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_green_highlight), downcast<palette_device *>(device)));
+
+#define MCFG_PALETTE_ADD_MONOCHROME_YELLOW(_tag) \
+	MCFG_PALETTE_ADD(_tag, 2) \
+	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_monochrome_yellow), downcast<palette_device *>(device)));
+
 #define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
 	MCFG_PALETTE_ADD(_tag, 32768) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
@@ -227,10 +235,12 @@
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
+// not implemented yet
+#if 0
 #define MCFG_PALETTE_ADD_HARDCODED(_tag, _array) \
 	MCFG_PALETTE_ADD(_tag, sizeof(_array) / 3) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
-
+#endif
 
 
 
@@ -323,7 +333,7 @@ public:
 	
 	// getters
 	int entries() const { return m_entries; }
-	int indirect_entries() const { return m_indirect_colors.count(); }
+	int indirect_entries() const { return m_indirect_entries; }
 	palette_t *palette() const { return m_palette; }
 	const pen_t &pen(int index) const { return m_pens[index]; }
 	const pen_t *pens() const { return m_pens; }
@@ -372,6 +382,8 @@ public:
 	void palette_init_white_and_black(palette_device &palette);
 	void palette_init_monochrome_amber(palette_device &palette);
 	void palette_init_monochrome_green(palette_device &palette);
+	void palette_init_monochrome_green_highlight(palette_device &palette);
+	void palette_init_monochrome_yellow(palette_device &palette);
 	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
@@ -400,7 +412,7 @@ protected:
 private:
 	// configuration state
 	int					m_entries;				// number of entries in the palette
-	int					m_indirect_entries;		// number of initial indirect entries in the palette
+	int					m_indirect_entries;		// number of indirect colors in the palette
 	bool				m_enable_shadows;		// are shadows enabled?
 	bool				m_enable_hilights;		// are hilights enabled?
 	endianness_t		m_endianness;			// endianness of palette RAM

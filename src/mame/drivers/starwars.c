@@ -31,7 +31,6 @@
 #include "machine/x2212.h"
 #include "includes/starwars.h"
 #include "includes/slapstic.h"
-#include "drivlgcy.h"
 
 
 #define MASTER_CLOCK (12096000)
@@ -172,8 +171,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
-	AM_RANGE(0x4600, 0x461f) AM_WRITE_LEGACY(avgdvg_go_w)
-	AM_RANGE(0x4620, 0x463f) AM_WRITE_LEGACY(avgdvg_reset_w)
+	AM_RANGE(0x4600, 0x461f) AM_DEVWRITE("avg", avg_starwars_device, go_w)
+	AM_RANGE(0x4620, 0x463f) AM_DEVWRITE("avg", avg_starwars_device, reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
@@ -239,7 +238,7 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	/* Bit 6 is VG_HALT */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, NULL)
 	/* Bit 7 is MATH_RUN - see machine/starwars.c */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, NULL)
 
@@ -348,7 +347,8 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_VIDEO_START(avg_starwars)
+	MCFG_DEVICE_ADD("avg", AVG_STARWARS, 0)
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

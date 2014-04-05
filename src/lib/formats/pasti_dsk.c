@@ -62,8 +62,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 fh[16];
 	io_generic_read(io, fh, 0, 16);
 
-	UINT8 *raw_track = 0;
-	int raw_track_size = 0;
+	dynamic_buffer raw_track;
 
 	int tracks = fh[10];
 	int heads = 1+(tracks >= 160);
@@ -85,12 +84,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			int track_num = th[14];
 			int flags2    = th[15];
 
-			if(entry_len-16 > raw_track_size) {
-				if(raw_track)
-					global_free(raw_track);
-				raw_track_size = entry_len-16;
-				raw_track = global_alloc_array(UINT8, entry_len-16);
-			}
+			raw_track.resize(entry_len-16);
 
 			io_generic_read(io, raw_track, pos+16, entry_len-16);
 
@@ -275,7 +269,7 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 {
 	if(0)
 		printf("Track %d head %d sectors %d\n", track, head, obs.sector_count);
-	UINT32 *trackbuf = global_alloc_array(UINT32, 200000);
+	dynamic_array<UINT32> trackbuf(200000);
 	int pos = 0;
 
 	wd_sect_info sect_infos[256];
@@ -347,8 +341,6 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 		wd_generate_gap(trackbuf, pos, obs, 0, obs.track_size, false, 1000, 1000);
 
 	generate_track_from_levels(track, head, trackbuf, pos, 0, image);
-
-	global_free(trackbuf);
 }
 
 void pasti_format::wd_generate_track_from_sectors_only(int track, int head, floppy_image *image, wd_obs &obs)

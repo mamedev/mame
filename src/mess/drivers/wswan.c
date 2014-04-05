@@ -134,6 +134,8 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_SCREEN_UPDATE_DRIVER(wswan_state, screen_update)
 	MCFG_SCREEN_SIZE( WSWAN_X_PIXELS, WSWAN_Y_PIXELS )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -141,7 +143,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wswan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wswan)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wswan)
 

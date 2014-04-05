@@ -120,10 +120,10 @@ void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		ypos = (source[0] & 0x00ff) >> 0;
 		tileno = (source2[0] & 0x7ffe) >> 1;
 		xpos |=  (source2[0] & 0x0001) << 8;
-		 gfx->transpen(m_palette,bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
-		 gfx->transpen(m_palette,bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
-		 gfx->transpen(m_palette,bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
-		 gfx->transpen(m_palette,bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos, 0);
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		 gfx->transpen(bitmap,cliprect, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
 		source++;
 		source2++;
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", 1945kiii)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1945kiii)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -274,6 +274,7 @@ static MACHINE_CONFIG_START( k3, k3_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update_k3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -1941,7 +1941,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0xfff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -1952,6 +1952,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MCFG_SCREEN_UPDATE_DRIVER(segas24_state, screen_update_system24)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8192*2)
 

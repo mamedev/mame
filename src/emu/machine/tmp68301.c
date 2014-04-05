@@ -85,43 +85,24 @@ WRITE16_MEMBER(tmp68301_device::pdir_w)
 
 READ16_MEMBER(tmp68301_device::pdr_r)
 {
-	return m_in_parallel_func(0) & ~m_pdir;
+	return m_in_parallel_cb(0) & ~m_pdir;
 }
 
 WRITE16_MEMBER(tmp68301_device::pdr_w)
 {
-	m_out_parallel_func(0,data & m_pdir);
+	m_out_parallel_cb(0, data & m_pdir, mem_mask);
 }
 
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
 		device_memory_interface(mconfig, *this),
+		m_in_parallel_cb(*this),
+		m_out_parallel_cb(*this),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, NULL, *ADDRESS_MAP_NAME(tmp68301_regs))
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tmp68301_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tmp68301_interface *intf = reinterpret_cast<const tmp68301_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<tmp68301_interface *>(this) = *intf;
-
-	// or defaults to 0 if none provided
-	else
-	{
-		memset(&m_in_parallel_cb, 0, sizeof(m_in_parallel_cb));
-		memset(&m_out_parallel_cb, 0, sizeof(m_out_parallel_cb));
-
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -133,8 +114,8 @@ void tmp68301_device::device_start()
 	for (i = 0; i < 3; i++)
 		m_tmp68301_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmp68301_device::timer_callback), this));
 
-	m_in_parallel_func.resolve(m_in_parallel_cb, *this);
-	m_out_parallel_func.resolve(m_out_parallel_cb, *this);
+	m_in_parallel_cb.resolve_safe(0);
+	m_out_parallel_cb.resolve_safe();
 }
 
 //-------------------------------------------------

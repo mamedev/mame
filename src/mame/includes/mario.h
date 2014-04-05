@@ -2,6 +2,7 @@
 #define MARIO_H_
 
 #include "sound/discrete.h"
+#include "machine/z80dma.h"
 
 /*
  * From the schematics:
@@ -43,7 +44,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_z80dma(*this, "z80dma") { }
 
 	/* memory pointers */
 
@@ -103,6 +105,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<z80dma_device> m_z80dma;
 };
 
 /*----------- defined in audio/mario.c -----------*/

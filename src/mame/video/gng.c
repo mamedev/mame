@@ -122,7 +122,7 @@ void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 			flipy = !flipy;
 		}
 
-		gfx->transpen(m_palette,bitmap,cliprect,
+		gfx->transpen(bitmap,cliprect,
 				buffered_spriteram[offs] + ((attributes << 2) & 0x300),
 				(attributes >> 4) & 3,
 				flipx,flipy,

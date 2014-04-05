@@ -165,6 +165,7 @@ galaxianmo      // (c) Midway
 galaxiant       // (c) Taito
 galaxiani       // (c) Irem
 galaxrf         // bootleg (Recreativos Franco)
+galaxrfgg		// bootleg (Recreativos Franco)
 superg          // hack
 galapx          // hack
 moonaln         // [Nichibutsu] (Karateco license) or hack
@@ -846,11 +847,11 @@ tceptor2        // (c) 1986
 
 // Namco System 1 games
 shadowld        // (c) 1987 (YD3)
-youkaidk2       // (c) 1987 (Japan, YD2, Rev B)
-youkaidk1       // (c) 1987 (Japan, YD1)
-dspirit         // (c) 1987 (DS3)
+youkaidk2       // (c) 1987 (Japan, new version (YD2, Rev B))
+youkaidk1       // (c) 1987 (Japan, old version (YD1))
+dspirit         // (c) 1987 (new version (DS3))
 dspirit2        // (c) 1987 (DS2, Atari had rights to US market)
-dspirit1        // (c) 1987 (DS1)
+dspirit1        // (c) 1987 (old version (DS1))
 blazer          // (c) 1987 (Japan)
 quester         // (c) 1987 (Japan)
 questers        // (c) 1987 (Japan)
@@ -869,8 +870,8 @@ splatter        // (c) 1988 (World, SH3)
 splatter2       // (c) 1988 (World, SH2)
 splatterj       // (c) 1988 (Japan)
 faceoff         // (c) 1988 (Japan)
-rompers         // (c) 1989 (Japan, Rev B)
-romperso        // (c) 1989 (Japan)
+rompers         // (c) 1989 (Japan, new version (Rev B))
+romperso        // (c) 1989 (Japan, old version)
 blastoff        // (c) 1989 (Japan)
 ws89            // (c) 1989 (Japan)
 dangseed        // (c) 1989 (Japan)
@@ -902,12 +903,12 @@ dirtfoxj        // (c) 1989 (Japan)
 fourtrax        // 89.11
 valkyrie        // (c) 1989 (Japan)
 finehour        // (c) 1989 (Japan)
-burnforc        // (c) 1989 (Japan)
-burnforco       // (c) 1989 (Japan)
+burnforc        // (c) 1989 (Japan, new version)
+burnforco       // (c) 1989 (Japan, old version)
 marvland        // (c) 1989 (US)
 marvlandj       // (c) 1989 (Japan)
-kyukaidk        // (c) 1990 (Japan)
-kyukaidko       // (c) 1990 (Japan)
+kyukaidk        // (c) 1990 (Japan, new version)
+kyukaidko       // (c) 1990 (Japan, old version)
 dsaber          // (c) 1990
 dsaberj         // (c) 1990 (Japan)
 finalap2        // 90.8  Final Lap 2
@@ -2284,6 +2285,7 @@ contcircua      // B33 (c) 1987 Taito America Corporation (US)
 contcircj       // B33 (c) 1987 Taito Corporation (Japan)
 chasehq         // B52 (c) 1988 Taito Corporation Japan (World)
 chasehqj        // B52 (c) 1988 Taito Corporation (Japan)
+chasehqju		// B52 (c) 1988 Taito Corporation (Japan)
 chasehqu        // B52 (c) 1988 Taito America Corporation (US)
 enforce         // B58 (c) 1988 Taito Corporation Japan (World)
 enforcej        // B58 (c) 1988 Taito Corporation (Japan)
@@ -2940,6 +2942,7 @@ trojan          //  4/1986 (c) 1986 (US)
 trojana         //  4/1986 (c) 1986 (US)
 trojanr         //  4/1986 (c) 1986 + Romstar
 trojanj         //  4/1986 (c) 1986 (Japan)
+trojanb			// bootleg
 srumbler        //  9/1986 (c) 1986
 srumbler2       //  9/1986 (c) 1986
 srumbler3       //  9/1986 (c) 1986 + Tecfri
@@ -3132,6 +3135,7 @@ sf2acca         // hack
 sf2ceblp			// hack
 sf2accp2        // hack
 sf2amf          // bootleg
+sf2amf2			// bootleg
 sf2dkot2        // hack
 sf2m1           // hack
 sf2m2           // hack
@@ -3146,6 +3150,7 @@ sf2koryu        // hack
 sf2dongb        // hack
 sf2mdt          // bootleg
 sf2mdta         // bootleg
+sf2mdtb			// bootleg
 cworld2j        // 11/06/1992 (c) 1992 (Japan)
 varth           // 14/07/1992 (c) 1992 (World)
 varthr1         // 12/06/1992 (c) 1992 (World)
@@ -3497,6 +3502,7 @@ warzard         // 21/11/1996 (c) 1996 (Japan)
 warzardr1       // 23/10/1996 (c) 1996 (Japan)
 sfiii           // 04/02/1997 (c) 1997 (Euro)
 sfiiiu          // 04/02/1997 (c) 1997 (USA)
+sfiiia			// 04/02/1997 (c) 1997 (Asia)
 sfiiij          // 04/02/1997 (c) 1997 (Japan)
 sfiiih          // 04/02/1997 (c) 1997 (Hispanic)
 sfiii2          // 30/09/1997 (c) 1997 (USA)
@@ -3527,6 +3533,8 @@ jojobane        // 27/09/1999 (c) 1999 (Euro)
 jojobaner1      // 13/09/1999 (c) 1999 (Euro)
 cps3boot        // bootleg
 cps3boota       // bootleg
+cps3bs32		//
+cps3bs32a		//
 
 // Capcom ZN1
 cpzn1
@@ -5757,6 +5765,7 @@ pcktgalb        // bootleg
 pcktgal2        // (c) 1989 Data East Corporation (World?)
 pcktgal2j       // (c) 1989 Data East Corporation (World?)
 pokechmp        // Korean hack of Pocket Gal
+billlist		//
 spool3          // (c) 1989 Data East Corporation (World?)
 spool3i         // (c) 1990 Data East Corporation + I-Vics license
 battlera        // (c) 1988 Data East Corporation (World)
@@ -6277,10 +6286,11 @@ chqflagj        // GX717 (c) 1988 (Japan)
 ultraman        // GX910 (c) 1991 Banpresto/Bandai
 hexion          // GX122 (c) 1992
 lethalen        // GX191 (c) 1992
+lethalenub      // GX191 (c) 1992
 lethalenua      // GX191 (c) 1992
 lethalenux      // GX191 (c) 1992
-lethaleneab     // GX191 (c) 1992
 lethaleneae     // GX191 (c) 1992
+lethaleneab     // GX191 (c) 1992
 lethalenj       // GX191 (c) 1992
 tgtpanic        // GX601 (c) 1996
 
@@ -8848,6 +8858,7 @@ krzybowl        // (c) 1994 American Sammy
 magspeed        // (c) 1994 Allumer
 orbs            // (c) 1994 American Sammy
 keroppi         // (c) 1993 Sammy
+keroppij        // (c) 1993 Sammy
 extdwnhl        // (c) 1995 Sammy Japan
 gundhara        // (c) 1995 Banpresto
 sokonuke        // (c) 1995 Sammy Industries
@@ -8991,9 +9002,11 @@ banbam          // TVG16 (c) 1984 Sun Electronics
 ikki            // TVG17 (c) 1985 Sun Electronics (Japan)
 farmer          // TVG17 (c) 1985 Sun Electronics
 shanghai        // (c) 1988 Sunsoft (Sun Electronics)
+shanghaij       // (c) 1988 Sunsoft (Sun Electronics)
 shangha2        // (c) 1989 Sunsoft (Sun Electronics)
 shangha2a       // (c) 1989 Sunsoft (Sun Electronics)
 shangha3        // (c) 1993 Sunsoft
+shangha3u       // (c) 1993 Sunsoft
 shangha3j       // (c) 1993 Sunsoft
 heberpop        // (c) 1994 Sunsoft / Atlus
 blocken         // (c) 1994 KID / Visco
@@ -10334,6 +10347,7 @@ pitbossma       // (c) 1994 Merit
 pbss330         // (c) 1994 Merit
 pbst30          // (c) 1994 Merit
 pbst30b         // (c) 1993 Merit
+realbrod        // (c) 1995 Merit
 megat2          // (c) 1994 Merit
 megat2a         // (c) 1994 Merit
 megat2b         // (c) 1994 Merit
@@ -21837,6 +21851,7 @@ m3tlktwn    // Talk of The Town (Unknown)
 
 m4tst       // MPU4 Unit Test (Program 4)
 m4tst2      // MPU4 Unit Test (Program 2)
+m4rltst     // MPU4 Reel Test (3.0)
 m4clr       // MPU4 Meter Clear ROM
 
 
@@ -26028,7 +26043,6 @@ m4rhfev__a  //
 m4rhfev__b  //
 m4rhfev__c  //
 m4rhfev__d  //
-m4rhfev__e  //
 m4rhs       // Rocky Horror Show (Bwb)
 m4rhs__a    //
 m4rhs__b    //
@@ -26839,7 +26853,6 @@ m4shoknr    // Shock 'n' Roll (Mazooma - Qps)
 m4shoknr__a //
 m4shoknr__b //
 m4shoknr__c //
-m4shoknr__d //
 m4shkwav    // Shockwave (Mazooma - Qps)
 m4shkwav__a //
 m4shkwav__b //
@@ -31225,3 +31238,4 @@ arac6000
 number1    // 1996 San Remo Games
 gluck2     // 1992 Yung Yu / CYE
 
+amusco     // 1987, Amusco.

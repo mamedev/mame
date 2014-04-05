@@ -654,6 +654,7 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_SCREEN_VBLANK_DRIVER(microvision_state, screen_vblank)
 	MCFG_SCREEN_SIZE(16, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)

@@ -192,6 +192,9 @@ void bfm_adder2_device::device_reset()
 
 void bfm_adder2_device::device_start()
 {
+	if (!m_palette->started())
+		throw device_missing_dependencies();
+
 	adder2_decode_char_roms();
 
 	save_item(NAME(m_adder2_screen_page_reg));
@@ -458,9 +461,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 
 	if ( p )
 	{
-		UINT8 *s;
-
-		s = auto_alloc_array(machine(), UINT8, 0x40000 );
+		dynamic_buffer s( 0x40000 );
 		{
 			int x, y;
 
@@ -487,7 +488,6 @@ void bfm_adder2_device::adder2_decode_char_roms()
 				}
 				y++;
 			}
-			auto_free(machine(), s);
 		}
 	}
 }
@@ -544,11 +544,11 @@ static MACHINE_CONFIG_FRAGMENT( adder2 )
 	MCFG_SCREEN_SIZE( 400, 280)
 	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", adder2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", adder2)
 
 	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap

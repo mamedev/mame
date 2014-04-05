@@ -54,6 +54,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 private:
 	UINT8 m_port08;
 	UINT8 m_port09;
@@ -61,8 +62,6 @@ private:
 	bool m_ipl;
 	offs_t m_curr_bank;
 	floppy_image_device *m_floppy;
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	UINT8 convert(offs_t offset, bool state);
 	void setup_banks(UINT8 source);
 	virtual void machine_reset();
@@ -100,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
@@ -426,22 +425,14 @@ static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void altos5_state::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 {
 	UINT8 data = m_port08 | ((UINT8)(state) << 7);
 	m_pio0->port_a_write(data);
 }
 
-void altos5_state::fdc_drq_w(bool state)
-{
-	m_dma->rdy_w(state);
-}
-
 DRIVER_INIT_MEMBER( altos5_state, altos5 )
 {
-	m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(altos5_state::fdc_drq_w), this));
-
 	m_p_prom =  memregion("proms")->base();
 
 	UINT8 *RAM = memregion("maincpu")->base();
@@ -503,6 +494,8 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
 	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(altos5_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("z80dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

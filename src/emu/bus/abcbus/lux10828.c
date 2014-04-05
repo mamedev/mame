@@ -321,7 +321,7 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-void luxor_55_10828_device::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
@@ -329,7 +329,7 @@ void luxor_55_10828_device::fdc_intrq_w(bool state)
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
-void luxor_55_10828_device::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 {
 	m_fdc_drq = state;
 
@@ -349,6 +349,8 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
 	MCFG_MB8876x_ADD(MB8876_TAG, XTAL_4MHz/2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -437,10 +439,6 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 
 void luxor_55_10828_device::device_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_10828_device::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_10828_device::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));

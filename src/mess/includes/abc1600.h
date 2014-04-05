@@ -9,7 +9,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/8530scc.h"
-#include "machine/abckb.h"
+#include "bus/abckb/abckb.h"
 #include "machine/abc1600mac.h"
 #include "machine/e0516.h"
 #include "machine/nmc9306.h"
@@ -125,8 +125,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	UINT8 read_io(offs_t offset);
 	void write_io(offs_t offset, UINT8 data);
@@ -138,8 +137,6 @@ public:
 	void update_drdy0();
 	void update_drdy1();
 	void update_drdy2();
-
-	void scc_irq(bool status);
 
 	// DMA
 	int m_dmadis;

@@ -96,7 +96,7 @@ private:
 	void read_sector();
 	void play_sector();
 	UINT32 sub_loc(CDPOS src1, CDPOS src2);
-	int add_system_event(int type, UINT64 t, void *ptr);
+	int add_system_event(int type, UINT64 t, command_result *ptr);
 
 	UINT8 bcd_to_decimal(const UINT8 bcd) { return ((bcd>>4)*10)+(bcd&0xf); }
 	UINT8 decimal_to_bcd(const UINT8 dec) { return ((dec/10)<<4)|(dec%10); }

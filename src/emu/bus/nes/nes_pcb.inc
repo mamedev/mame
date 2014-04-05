@@ -554,19 +554,19 @@ void nes_cart_slot_device::call_load_pcb()
 	logerror("-- PRG WRAM: %d\n",  prgram_size);
 
 	// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
-	m_cart->prg_alloc(machine(), prg_size);
+	m_cart->prg_alloc(prg_size);
 	memcpy(m_cart->get_prg_base(), get_software_region("prg"), prg_size);
 	if (vrom_size)
 	{
-		m_cart->vrom_alloc(machine(), vrom_size);
+		m_cart->vrom_alloc(vrom_size);
 		memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 	}
 
 	// SETUP steps 7: allocate the remaining pointer, when needed
 	if (vram_size)
-		m_cart->vram_alloc(machine(), vram_size);
+		m_cart->vram_alloc(vram_size);
 	if (prgram_size)
-		m_cart->prgram_alloc(machine(), prgram_size);
+		m_cart->prgram_alloc(prgram_size);
 
 	// also nes_smb2j_device needs WRAM initialized to 0xff? check!
 	if (m_pcb_id == UNL_SMB2J)
@@ -577,17 +577,14 @@ void nes_cart_slot_device::call_load_pcb()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+		dynamic_buffer temp_nvram(tot_size);
 		battery_load(temp_nvram, tot_size, 0x00);
 		if (battery_size)
 		{
-			m_cart->battery_alloc(machine(), battery_size);
+			m_cart->battery_alloc(battery_size);
 			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
 		}
 		if (mapper_sram_size)
 			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, mapper_sram_size);
-
-		if (temp_nvram)
-			auto_free(machine(), temp_nvram);
 	}
 }

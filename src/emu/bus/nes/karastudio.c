@@ -127,15 +127,15 @@ bool nes_kstudio_slot_device::call_load()
 }
 
 
-bool nes_kstudio_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool nes_kstudio_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
-const char * nes_kstudio_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void nes_kstudio_slot_device::get_default_card_software(astring &result)
 {
-	return software_get_default_slot(config, options, this, "ks_exp");
+	software_get_default_slot(result, "ks_exp");
 }
 
 

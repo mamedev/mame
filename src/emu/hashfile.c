@@ -537,7 +537,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 
 const char *extra_info = NULL;
 
-const char *read_hash_config(device_image_interface &image, const char *sysname)
+bool read_hash_config(device_image_interface &image, const char *sysname, astring &result)
 {
 	hash_file *hashfile = NULL;
 	const hash_info *info = NULL;
@@ -545,7 +545,7 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 	/* open the hash file */
 	hashfile = hashfile_open(image.device().machine().options(), sysname, FALSE, NULL);
 	if (!hashfile)
-		return NULL;
+		return false;
 
 	/* look up this entry in the hash file */
 	info = hashfile_lookup(hashfile, &image.hash());
@@ -553,34 +553,27 @@ const char *read_hash_config(device_image_interface &image, const char *sysname)
 	if (!info || !info->extrainfo)
 	{
 		hashfile_close(hashfile);
-		return NULL;
+		return false;
 	}
 
-	extra_info = auto_strdup(image.device().machine(), info->extrainfo);
-	if (!extra_info)
-	{
-		hashfile_close(hashfile);
-		return NULL;
-	}
+	result.cpy(info->extrainfo);
 
 	/* copy the relevant entries */
 	hashfile_close(hashfile);
-
-	return extra_info;
+	return true;
 }
 
-const char *hashfile_extrainfo(device_image_interface &image)
+bool hashfile_extrainfo(device_image_interface &image, astring &result)
 {
-	const char *rc;
-
 	/* now read the hash file */
 	image.crc();
 	extra_info = NULL;
 	int drv = driver_list::find(image.device().machine().system());
 	int compat, open = drv;
+	bool hashfound;
 	do
 	{
-		rc = read_hash_config(image, driver_list::driver(open).name);
+		hashfound = read_hash_config(image, driver_list::driver(open).name, result);
 		// first check if there are compatible systems
 		compat = driver_list::compatible_with(open);
 		// if so, try to open its hashfile
@@ -594,8 +587,8 @@ const char *hashfile_extrainfo(device_image_interface &image)
 		}
 	}
 	// if no extrainfo has been found but we can try a compatible or a parent set, go back
-	while (rc == NULL && open != -1);
-	return rc;
+	while (!hashfound && open != -1);
+	return hashfound;
 }
 
 /***************************************************************************
@@ -616,11 +609,11 @@ static void *expat_malloc(size_t size)
 
 static void *expat_realloc(void *ptr, size_t size)
 {
-	if (ptr) global_free(ptr);
+	if (ptr) global_free_array((UINT8 *)ptr);
 	return global_alloc_array_clear(UINT8,size);
 }
 
 static void expat_free(void *ptr)
 {
-	global_free(ptr);
+	global_free_array((UINT8 *)ptr);
 }

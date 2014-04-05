@@ -109,13 +109,13 @@ public:
 	DECLARE_DRIVER_INIT(lnc);
 	DECLARE_MACHINE_START(btime);
 	DECLARE_MACHINE_RESET(btime);
-	DECLARE_VIDEO_START(btime);
 	DECLARE_PALETTE_INIT(btime);
 	DECLARE_MACHINE_RESET(lnc);
 	DECLARE_PALETTE_INIT(lnc);
 	DECLARE_MACHINE_START(mmonkey);
 	DECLARE_MACHINE_RESET(mmonkey);
 	DECLARE_VIDEO_START(bnj);
+	DECLARE_VIDEO_START(disco);
 	UINT32 screen_update_btime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cookrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

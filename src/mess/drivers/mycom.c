@@ -75,7 +75,8 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_audio(*this, "sn1")
-		, m_rtc(*this, "rtc")
+		, m_rtc(*this, "rtc"),
+		m_palette(*this, "palette")
 	{ }
 
 	DECLARE_READ8_MEMBER(mycom_upper_r);
@@ -117,6 +118,8 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
+public:	
+	required_device<palette_device> m_palette;	
 };
 
 
@@ -130,7 +133,7 @@ void mycom_state::video_start()
 static MC6845_UPDATE_ROW( mycom_update_row )
 {
 	mycom_state *state = device->machine().driver_data<mycom_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx=0,z;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -561,7 +564,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", mycom)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */

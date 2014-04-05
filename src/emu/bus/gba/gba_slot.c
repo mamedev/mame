@@ -27,9 +27,7 @@ const device_type GBA_CART_SLOT = &device_creator<gba_cart_slot_device>;
 device_gba_cart_interface::device_gba_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
 		m_rom(NULL),
-		m_nvram(NULL),
-		m_rom_size(0),
-		m_nvram_size(0)
+		m_rom_size(0)
 {
 }
 
@@ -46,13 +44,12 @@ device_gba_cart_interface::~device_gba_cart_interface()
 //  nvram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gba_cart_interface::nvram_alloc(running_machine &machine, UINT32 size)
+void device_gba_cart_interface::nvram_alloc(UINT32 size)
 {
 	if (m_nvram == NULL)
 	{
-		m_nvram = auto_alloc_array_clear(machine, UINT32, size/sizeof(UINT32));
-		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "GBA_CART", this->device().tag(), 0, m_nvram, m_nvram_size/sizeof(UINT32));
+		m_nvram.resize(size/sizeof(UINT32));
+		device().save_item(NAME(m_nvram));
 	}
 }
 
@@ -195,7 +192,7 @@ bool gba_cart_slot_device::call_load()
 		}
 
 		if (m_type == GBA_SRAM)
-			m_cart->nvram_alloc(machine(), 0x10000);
+			m_cart->nvram_alloc(0x10000);
 
 		// mirror the ROM
 		switch (cart_size)
@@ -240,9 +237,9 @@ void gba_cart_slot_device::call_unload()
  call softlist load
  -------------------------------------------------*/
 
-bool gba_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -396,28 +393,28 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-const char * gba_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void gba_cart_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "gba_rom";
 		UINT32 len = core_fsize(m_file);
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		type = get_cart_type(ROM, len);
+		type = get_cart_type(rom, len);
 		slot_string = gba_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		global_free(ROM);
 		clear();
 
-		return slot_string;
+		result.cpy(slot_string);
+		return;
 	}
 
-	return software_get_default_slot(config, options, this, "gba_rom");
+	software_get_default_slot(result, "gba_rom");
 }
 
 /*-------------------------------------------------

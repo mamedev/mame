@@ -492,8 +492,9 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_SIZE(128*8, 128*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(st0016_state, screen_update_st0016)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macs)
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)

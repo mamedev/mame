@@ -99,13 +99,13 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		else
 			sprite2 = sprite + 1;
 
-		m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 				sprite,
 				colour,fx,fy,x,y,0);
 
 		/* 1 more sprite drawn underneath */
 		if (extra)
-			m_gfxdecode->gfx(m_gfxregion)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 				sprite2,
 				colour,fx,fy,x,y+16,0);
 	}

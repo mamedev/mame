@@ -51,6 +51,7 @@ public:
 			m_sio(*this, Z80SIO_TAG),
 			m_fdc(*this, FD1771_TAG),
 			m_ram(*this, RAM_TAG),
+			m_palette(*this, "palette"),
 			m_floppy0(*this, FD1771_TAG":0"),
 			m_floppy1(*this, FD1771_TAG":1"),
 			m_rom(*this, Z80_TAG),
@@ -73,6 +74,7 @@ public:
 	required_device<z80sio0_device> m_sio;
 	required_device<wd_fdc_t> m_fdc;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_rom;
@@ -90,11 +92,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	void bankswitch(int bank);
 	void update_nmi();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 
 	/* keyboard state */
 	int m_keydata;                      /* keyboard data */

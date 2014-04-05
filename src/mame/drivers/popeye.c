@@ -481,8 +481,9 @@ static MACHINE_CONFIG_START( skyskipr, popeye_state )
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_popeye)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", popeye)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
 	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)
 	MCFG_PALETTE_INIT_OWNER(popeye_state, popeye)
 
@@ -678,18 +679,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 {
-	UINT8 *buffer;
 	UINT8 *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* decrypt the program ROMs */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		auto_free(machine(), buffer);
 	}
 
 	save_item(NAME(m_prot0));
@@ -699,18 +698,16 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 
 DRIVER_INIT_MEMBER(popeye_state,popeye)
 {
-	UINT8 *buffer;
 	UINT8 *rom = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* decrypt the program ROMs */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
 		memcpy(rom,buffer,len);
-		auto_free(machine(), buffer);
 	}
 
 	save_item(NAME(m_prot0));

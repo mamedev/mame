@@ -185,16 +185,6 @@ WRITE8_MEMBER(fastlane_state::volume_callback1)
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_interface_1 =
-{
-	DEVCB_DRIVER_MEMBER(fastlane_state,volume_callback0)
-};
-
-static const k007232_interface k007232_interface_2 =
-{
-	DEVCB_DRIVER_MEMBER(fastlane_state,volume_callback1)
-};
-
 void fastlane_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -216,8 +206,9 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_SCREEN_SIZE(37*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fastlane)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastlane)
 	MCFG_PALETTE_ADD("palette", 1024*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
@@ -230,12 +221,12 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(k007232_interface_1)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(k007232_interface_2)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 MACHINE_CONFIG_END

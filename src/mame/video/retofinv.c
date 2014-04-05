@@ -201,7 +201,7 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spritevisiblearea,
+				m_gfxdecode->gfx(1)->transmask(bitmap,spritevisiblearea,
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,

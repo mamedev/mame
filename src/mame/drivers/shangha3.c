@@ -486,8 +486,9 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -525,8 +526,9 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -565,8 +567,9 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", shangha3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
@@ -630,12 +633,31 @@ Memory: M1 = TMM2018AP-45 (2K x 8 SRAM)
 
 * = unpopulated 32 pin rom sockets silkscreened 27C040
 
+NOTE: For the "World" set, it differs from the US set (besides the US set having the data repeated) by 2 bytes.
+
+  0xB8B == 0x00 for world, 0x12 for US set (flag to show FBI warning screen)
+0x32800 == 0xB9 for world, 0xCB for US set (checksum adjustment)
+
 */
 
-ROM_START( shangha3 ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drugs" splash screen. Has two additional tiles sets to choose from. */
+ROM_START( shangha3 ) /* PCB labeled SUN04C - Has two additional tiles sets to choose from. */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ic3",  0x0000, 0x40000, CRC(4a9cdcfd) SHA1(c27b767ef2de90b36095b49baae9fa514f461c2c) ) /* ST M27C2001 EPROM with no label */
+	ROM_LOAD16_BYTE( "ic2",  0x0001, 0x40000, CRC(714bfdbc) SHA1(0ce611624e8a5e28cba5443b63b8872eed9f68fc) ) /* ST M27C2001 EPROM with no label */
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
+	ROM_LOAD( "27c4000.ic44", 0x200000, 0x080000, CRC(6344ffb7) SHA1(06bc5bcf94973ec152e7abf9cc658ef319eb4b65) ) // korean fonts, vs mode how to play etc? (probably for Korean program roms we don't have, but was on World board)
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* samples for M6295 */
+	ROM_LOAD( "s3j_v10.ic75", 0x0000, 0x40000, CRC(f0cdc86a) SHA1(b1017a9841a56e0f5d2714f550f64ed1f4e238e6) )
+ROM_END
+
+ROM_START( shangha3u ) /* PCB labeled SUN04C - Shows FBI "Winners Don't Use Drugs" splash screen (once). Has two additional tiles sets to choose from. */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ic3.ic3",  0x0000, 0x80000, CRC(53ef4988) SHA1(63f098d95865928a553e945fe60dea79aa16c603) ) /* ST M27C4001 EPROM labeled IC3 */
 	ROM_LOAD16_BYTE( "ic2.ic2",  0x0001, 0x80000, CRC(fdea0232) SHA1(8983a646412df01b6bc66994700796e7b7fcbb61) ) /* ST M27C4001 EPROM labeled IC2 */
+	/* both program ROMs are double sized with the identical halves */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "s3j_char-a1.ic43", 0x0000, 0x200000, CRC(2dbf9d17) SHA1(dd94ddc4bb02ab544aa3f89b614afc46678cc48d) ) /* 42pin MASK ROM */
@@ -720,7 +742,8 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_do_shadows = 0;
 }
 
-GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", 0 )
+GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", 0 )
+GAME( 1993, shangha3u, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", 0 )
 GAME( 1993, shangha3j, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
 GAME( 1994, heberpop,  0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
 GAME( 1994, blocken,   0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", GAME_IMPERFECT_GRAPHICS )

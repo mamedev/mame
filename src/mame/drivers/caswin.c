@@ -341,10 +341,11 @@ static MACHINE_CONFIG_START( vvillage, caswin_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vvillage)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vvillage)
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 

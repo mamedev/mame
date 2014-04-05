@@ -34,18 +34,17 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ram) {};
 
-	void nvram_alloc(running_machine &machine, UINT32 size);
+	void nvram_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_nvram_base() { return m_nvram; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_nvram_size() { return m_nvram_size; }
+	UINT32 get_nvram_size() { return m_nvram.bytes(); }
 	void set_rom_size(UINT32 val) { m_rom_size = val; }
 
 	// internal state
 	UINT32 *m_rom;  // this points to the cart rom region
-	UINT32 *m_nvram;
+	dynamic_array<UINT32> m_nvram;
 	UINT32 m_rom_size;  // this is the actual game size, not the rom region size!
-	UINT32 m_nvram_size;
 };
 
 
@@ -67,7 +66,7 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	void install_rom();
 
@@ -88,7 +87,7 @@ public:
 	virtual const char *file_extensions() const { return "gba,bin"; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);

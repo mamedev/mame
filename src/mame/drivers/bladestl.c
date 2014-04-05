@@ -279,10 +279,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_DRIVER_MEMBER(bladestl_state,bladestl_port_B_w)
 };
 
-static const k007342_interface bladestl_k007342_intf =
-{
-	0,  bladestl_tile_callback  /* gfx_num (for tile creation), callback */
-};
 
 static const k007420_interface bladestl_k007420_intf =
 {
@@ -333,13 +329,16 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bladestl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bladestl)
 	MCFG_PALETTE_ADD("palette", 32 + 16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
 	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
 
-	MCFG_K007342_ADD("k007342", bladestl_k007342_intf)
+	MCFG_K007342_ADD("k007342")
+	MCFG_K007342_GFXNUM(0)
+	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
 	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)

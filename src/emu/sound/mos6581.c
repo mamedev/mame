@@ -60,6 +60,10 @@ mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, d
 	m_token = global_alloc_clear(SID6581_t);
 }
 
+mos6581_device::~mos6581_device()
+{
+	global_free(m_token);
+}
 
 //-------------------------------------------------
 //  mos8580_device - constructor

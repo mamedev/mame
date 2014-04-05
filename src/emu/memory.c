@@ -772,7 +772,7 @@ private:
 	}
 
 	// internal state
-	handler_entry_read *        m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	auto_pointer<handler_entry_read> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -838,7 +838,7 @@ private:
 	}
 
 	// internal state
-	handler_entry_write *       m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	auto_pointer<handler_entry_write> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 // ======================> address_table_setoffset
@@ -852,9 +852,7 @@ public:
 	{
 		// allocate handlers for each entry, prepopulating the bankptrs for banks
 		for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
-		{
-			m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_setoffset());
-		}
+			m_handlers[entrynum].reset(global_alloc(handler_entry_setoffset()));
 
 		// Watchpoints and unmap states do not make sense for setoffset
 		m_handlers[STATIC_NOP]->set_delegate(setoffset_delegate(FUNC(address_table_setoffset::nop_so), this));
@@ -863,8 +861,6 @@ public:
 
 	~address_table_setoffset()
 	{
-		for (int handnum = 0; handnum < ARRAY_LENGTH(m_handlers); handnum++)
-			auto_free(m_space.machine(), m_handlers[handnum]);
 	}
 
 	handler_entry &handler(UINT32 index) const {    assert(index < ARRAY_LENGTH(m_handlers));   return *m_handlers[index]; }
@@ -892,7 +888,7 @@ private:
 	}
 
 	// internal state
-	handler_entry_setoffset *m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
+	auto_pointer<handler_entry_setoffset> m_handlers[TOTAL_MEMORY_BANKS];        // array of user-installed handlers
 };
 
 
@@ -1723,7 +1719,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 	: m_next(NULL),
 		m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
-		m_map(NULL),
 		m_addrmask(0xffffffffUL >> (32 - m_config.m_addrbus_width)),
 		m_bytemask(address_to_byte_end(m_addrmask)),
 		m_logaddrmask(0xffffffffUL >> (32 - m_config.m_logaddr_width)),
@@ -1732,7 +1727,7 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 		m_spacenum(spacenum),
 		m_debugger_access(false),
 		m_log_unmap(true),
-		m_direct(*auto_alloc(memory.device().machine(), direct_read_data(*this))),
+		m_direct(global_alloc(direct_read_data(*this))),
 		m_name(memory.space_config(spacenum)->name()),
 		m_addrchars((m_config.m_addrbus_width + 3) / 4),
 		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
@@ -1750,8 +1745,6 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 
 address_space::~address_space()
 {
-	auto_free(m_manager.machine(), &m_direct);
-	global_free(m_map);
 }
 
 
@@ -1869,7 +1862,7 @@ void address_space::prepare_map()
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
-	m_map = global_alloc(address_map(m_device, m_spacenum));
+	m_map.reset(global_alloc(address_map(m_device, m_spacenum)));
 
 	// merge in the submaps
 	m_map->uplift_submaps(machine(), m_device, *m_device.owner(), endianness());
@@ -1900,7 +1893,7 @@ void address_space::prepare_map()
 			if (manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr()) == NULL)
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
-				memory_share *share = auto_alloc(machine(), memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
+				memory_share *share = global_alloc(memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
 				manager().m_sharelist.append(fulltag, *share);
 			}
 		}
@@ -2963,7 +2956,7 @@ void address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask,
 	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
 
 	// recompute any direct access on this space if it is a read modification
-	m_space.m_direct.force_update(entry);
+	m_space.m_direct->force_update(entry);
 
 	//  verify_reference_counts();
 }
@@ -3089,7 +3082,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 		entries.push_back(entry);
 
 		// recompute any direct access on this space if it is a read modification
-		m_space.m_direct.force_update(entry);
+		m_space.m_direct->force_update(entry);
 	}
 
 	// Ranges in range_partial must duplicated then partially changed
@@ -3132,7 +3125,7 @@ void address_table::setup_range_masked(offs_t addrstart, offs_t addrend, offs_t 
 			entries.push_back(entry);
 
 			// recompute any direct access on this space if it is a read modification
-			m_space.m_direct.force_update(entry);
+			m_space.m_direct->force_update(entry);
 		}
 	}
 
@@ -3310,7 +3303,7 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 			for (int bit = 0; bit < lmirrorbits; bit++)
 				if (lmirrorcount & (1 << bit))
 					lmirrorbase |= lmirrorbit[bit];
-			m_space.m_direct.remove_intersecting_ranges(bytestart + lmirrorbase, byteend + lmirrorbase);
+			m_space.m_direct->remove_intersecting_ranges(bytestart + lmirrorbase, byteend + lmirrorbase);
 		}
 
 		// if this is not our first time through, and the level 2 entry matches the previous
@@ -3752,7 +3745,7 @@ address_table_read::address_table_read(address_space &space, bool large)
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
 		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
-		m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_read(space.data_width(), space.endianness(), bankptr));
+		m_handlers[entrynum].reset(global_alloc(handler_entry_read(space.data_width(), space.endianness(), bankptr)));
 	}
 
 	// we have to allocate different object types based on the data bus width
@@ -3800,8 +3793,6 @@ address_table_read::address_table_read(address_space &space, bool large)
 
 address_table_read::~address_table_read()
 {
-	for (int handnum = 0; handnum < ARRAY_LENGTH(m_handlers); handnum++)
-		auto_free(m_space.machine(), m_handlers[handnum]);
 }
 
 
@@ -3828,7 +3819,7 @@ address_table_write::address_table_write(address_space &space, bool large)
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
 		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
-		m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_write(space.data_width(), space.endianness(), bankptr));
+		m_handlers[entrynum].reset(global_alloc(handler_entry_write(space.data_width(), space.endianness(), bankptr)));
 	}
 
 	// we have to allocate different object types based on the data bus width
@@ -3876,8 +3867,6 @@ address_table_write::address_table_write(address_space &space, bool large)
 
 address_table_write::~address_table_write()
 {
-	for (int handnum = 0; handnum < ARRAY_LENGTH(m_handlers); handnum++)
-		auto_free(m_space.machine(), m_handlers[handnum]);
 }
 
 
@@ -3993,7 +3982,7 @@ direct_read_data::direct_range *direct_read_data::find_range(offs_t byteaddress,
 	if (range != NULL)
 		m_freerangelist.detach(*range);
 	else
-		range = auto_alloc(m_space.machine(), direct_range);
+		range = global_alloc(direct_range);
 
 	// fill in the range
 	m_space.read().derive_range(byteaddress, range->m_bytestart, range->m_byteend);
@@ -4168,7 +4157,6 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 
 memory_bank::~memory_bank()
 {
-	auto_free(machine(), m_entry);
 }
 
 

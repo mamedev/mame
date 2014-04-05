@@ -228,8 +228,9 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", microtan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", microtan)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -254,7 +255,8 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)

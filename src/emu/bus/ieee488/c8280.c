@@ -316,16 +316,6 @@ static SLOT_INTERFACE_START( c8280_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-void c8280_device::fdc_intrq_w(bool state)
-{
-	m_fdccpu->set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void c8280_device::fdc_drq_w(bool state)
-{
-	m_fdccpu->set_input_line(M6502_SET_OVERFLOW, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c8280 )
@@ -342,6 +332,8 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
 	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_IRQ_LINE))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_SET_OVERFLOW))
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -439,10 +431,6 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(c8280_device::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(c8280_device::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));

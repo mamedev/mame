@@ -250,8 +250,9 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update_pitnrun)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pitnrun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pitnrun)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(pitnrun_state, pitnrun)
 

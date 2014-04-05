@@ -796,12 +796,6 @@ WRITE_LINE_MEMBER(nc_state::nc100_rxrdy_callback)
 	nc_update_interrupts();
 }
 
-
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_tc8521_alarm_callback)
-};
-
 WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
 {
 	m_centronics_ack = state;
@@ -1122,7 +1116,7 @@ WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 	nc200_refresh_uart_interrupt();
 }
 
-void nc_state::nc200_fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( nc_state::nc200_fdc_interrupt )
 {
 #if 0
 	m_irq_latch &=~(1<<5);
@@ -1178,9 +1172,6 @@ MACHINE_START_MEMBER(nc_state,nc200)
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
 	m_keyboard_timer->adjust(attotime::from_msec(10));
-
-	/* serial timer */
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(nc_state::nc200_fdc_interrupt), this));
 }
 
 /*
@@ -1438,6 +1429,7 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_SCREEN_SIZE(480, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 64-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nc_state, screen_update_nc)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
@@ -1467,7 +1459,8 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1525,6 +1518,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_DEVICE_REMOVE("rtc")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(nc_state, nc200_fdc_interrupt))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 

@@ -303,8 +303,9 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxia)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
@@ -339,8 +340,9 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrowar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
 
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)

@@ -441,11 +441,11 @@ jaguar_cpu_device::~jaguar_cpu_device()
 		return;
 
 	if (mirror_table != NULL)
-		global_free(mirror_table);
+		global_free_array(mirror_table);
 	mirror_table = NULL;
 
 	if (condition_table != NULL)
-		global_free(condition_table);
+		global_free_array(condition_table);
 	condition_table = NULL;
 }
 

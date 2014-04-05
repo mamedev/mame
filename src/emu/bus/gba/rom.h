@@ -136,7 +136,7 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
 
 private:
-	gba_eeprom_device *m_eeprom;
+	auto_pointer<gba_eeprom_device> m_eeprom;
 };
 
 
@@ -156,7 +156,7 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_ram);
 
 private:
-	gba_eeprom_device *m_eeprom;
+	auto_pointer<gba_eeprom_device> m_eeprom;
 };
 
 

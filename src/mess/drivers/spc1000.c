@@ -51,7 +51,7 @@ public:
 		return state->m_p_videoram[0x1000+(ch&0x7F)*16+line];
 	}
 
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_IPLK;
 	UINT8 m_GMODE;

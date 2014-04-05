@@ -802,7 +802,6 @@ GAME_CUSTOM( 199?, m4rhfev__a,  m4rhfev,    "rt_sja__.7_0", 0x0000, 0x040000, CR
 GAME_CUSTOM( 199?, m4rhfev__b,  m4rhfev,    "rt_sjs__.7_0", 0x0000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4rhfev__c,  m4rhfev,    "rt_vc___.1_0", 0x0000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 4)" )
 GAME_CUSTOM( 199?, m4rhfev__d,  m4rhfev,    "rt_vc_d_.1_0", 0x0000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 5)" )
-GAME_CUSTOM( 199?, m4rhfev__e,  m4rhfev,    "rtv.p1",       0x0000, 0x008000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532), "Bwb","Red Hot Fever (Bwb) (MPU4) (set 6)" ) // doesn't belong here
 
 
 #define M4SINBD_EXTRA_ROMS \

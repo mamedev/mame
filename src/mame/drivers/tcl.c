@@ -139,8 +139,9 @@ static MACHINE_CONFIG_START( tcl, tcl_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tcl_state, screen_update_tcl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tcl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tcl)
 	MCFG_PALETTE_ADD("palette", 16*16)
 
 
@@ -195,7 +196,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	UINT8 *src = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer src(len);
 
 	int i,idx=0;
 	memcpy(src, dest, len);
@@ -216,7 +217,6 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 			WRITEDEST((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
 		}
 	}
-	auto_free(machine(), src);
 
 	space.set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
 }

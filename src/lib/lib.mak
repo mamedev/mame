@@ -41,9 +41,11 @@ UTILOBJS = \
 	$(LIBOBJ)/util/chd.o \
 	$(LIBOBJ)/util/chdcd.o \
 	$(LIBOBJ)/util/chdcodec.o \
+	$(LIBOBJ)/util/corealloc.o \
 	$(LIBOBJ)/util/corefile.o \
 	$(LIBOBJ)/util/corestr.o \
 	$(LIBOBJ)/util/coreutil.o \
+	$(LIBOBJ)/util/cstrpool.o \
 	$(LIBOBJ)/util/flac.o \
 	$(LIBOBJ)/util/harddisk.o \
 	$(LIBOBJ)/util/hashing.o \
@@ -352,9 +354,6 @@ ifdef MSVC_BUILD
 	FLACOPTS += -DVERSION=\\\"1.2.1\\\"
 else
 	FLACOPTS += -DVERSION=\"1.2.1\"
-endif
-ifneq (,$(findstring clang,$(CC)))
-	FLACOPTS += -Wno-unused-const-variable
 endif
 
 LIBFLACOBJS = \

@@ -177,7 +177,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 //  MCFG_VIDEO_START_OVERRIDE(vt240_state,vt240)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", vt240)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
 
 	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz / 4, hgdc_intf, upd7220_map) //unknown clock
 MACHINE_CONFIG_END

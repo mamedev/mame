@@ -14,34 +14,24 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PC9801_KBD_ADD(_tag,_freq,_config) \
-	MCFG_DEVICE_ADD(_tag, PC9801_KBD, _freq) \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define PC9801_KBD_INTERFACE(name) \
-	const pc9801_kbd_interface (name) =
+#define MCFG_PC9801_KBD_IRQ_CALLBACK(_write) \
+	devcb = &pc9801_kbd_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_kbd_interface
-
-struct pc9801_kbd_interface
-{
-	devcb_write_line        m_irq_cb;
-};
-
-
 // ======================> pc9801_kbd_device
 
-class pc9801_kbd_device : public device_t,
-							public pc9801_kbd_interface
+class pc9801_kbd_device : public device_t
 {
 public:
 	// construction/destruction
 	pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<pc9801_kbd_device &>(device).m_write_irq.set_callback(object); }
+
 	virtual ioport_constructor device_input_ports() const;
 
 	// I/O operations
@@ -55,9 +45,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 
-	devcb_resolved_write_line   m_irq_func;
+	devcb2_write_line   m_write_irq;
 
 	static const device_timer_id RX_TIMER = 1;
 	emu_timer *         m_rxtimer;

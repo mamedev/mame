@@ -69,7 +69,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
-	required_shared_ptr<const UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;

@@ -668,7 +668,7 @@ void ti99_tdf_format::generate_track_fm(int track, int head, int cell_size, UINT
 
 	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
 
-	global_free(buffer);
+	global_free_array(buffer);
 }
 
 void ti99_tdf_format::generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
@@ -771,7 +771,7 @@ void ti99_tdf_format::generate_track_mfm(int track, int head, int cell_size, UIN
 
 	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
 
-	global_free(buffer);
+	global_free_array(buffer);
 }
 
 /*

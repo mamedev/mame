@@ -46,8 +46,8 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// Populate the combo box & set the proper cpu
 	populateComboBox();
-	//const debug_view_source *source = mem->views[0]->view->source_list().match_device(curcpu);
-	//gtk_combo_box_set_active(zone_w, mem->views[0]->view->source_list().index(*source));
+	//const debug_view_source *source = mem->views[0]->view->source_for_device(curcpu);
+	//gtk_combo_box_set_active(zone_w, mem->views[0]->view->source_list().indexof(*source));
 	//mem->views[0]->view->set_source(*source);
 
 
@@ -111,7 +111,7 @@ DasmWindow::~DasmWindow()
 
 void DasmWindow::cpuChanged(int index)
 {
-	m_dasmView->view()->set_source(*m_dasmView->view()->source_list().by_index(index));
+	m_dasmView->view()->set_source(*m_dasmView->view()->source_list().find(index));
 	m_dasmView->viewport()->update();
 }
 
@@ -204,7 +204,7 @@ void DasmWindow::populateComboBox()
 		return;
 
 	m_cpuComboBox->clear();
-	for (const debug_view_source* source = m_dasmView->view()->source_list().head();
+	for (const debug_view_source* source = m_dasmView->view()->first_source();
 			source != NULL;
 			source = source->next())
 	{

@@ -131,14 +131,14 @@ void debug_view_memory::enumerate_sources()
 				{
 					address_space &space = memintf->space(spacenum);
 					name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
-					m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, space)));
+					m_source_list.append(*global_alloc(debug_view_memory_source(name, space)));
 				}
 
 	// then add all the memory regions
 	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
 	{
 		name.printf("Region '%s'", region->name());
-		m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, *region)));
+		m_source_list.append(*global_alloc(debug_view_memory_source(name, *region)));
 	}
 
 	// finally add all global array symbols
@@ -156,12 +156,12 @@ void debug_view_memory::enumerate_sources()
 		if (strncmp(itemname, "timer/", 6))
 		{
 			name.cpy(itemname);
-			m_source_list.append(*auto_alloc(machine(), debug_view_memory_source(name, base, valsize, valcount)));
+			m_source_list.append(*global_alloc(debug_view_memory_source(name, base, valsize, valcount)));
 		}
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.head());
+	set_source(*m_source_list.first());
 }
 
 

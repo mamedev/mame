@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "aica.h"
 #include "aicadsp.h"
 
 static UINT16 PACK(INT32 val)

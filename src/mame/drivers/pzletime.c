@@ -152,7 +152,7 @@ UINT32 pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind1
 
 			// is spriteram[offs + 0] & 0x200 flipy? it's always set
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, spr_offs, colour, 0, 1, sx, sy, 0);
 		}
 	}
 
@@ -341,7 +341,9 @@ static MACHINE_CONFIG_START( pzletime, pzletime_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
-	MCFG_GFXDECODE_ADD("gfxdecode", pzletime)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pzletime)
 	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)

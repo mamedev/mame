@@ -75,7 +75,7 @@ static const ay8910_interface nimbus_ay8910_interface =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(nimbus_msm5205_vck), /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state, nimbus_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 
@@ -292,6 +292,7 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	MCFG_SCREEN_VBLANK_DRIVER(rmnimbus_state, screen_eof_nimbus)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", SCREEN_NO_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(rmnimbus_state, rmnimbus)

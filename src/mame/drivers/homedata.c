@@ -1239,8 +1239,9 @@ static MACHINE_CONFIG_START( mrokumei, homedata_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mrokumei)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrokumei)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
@@ -1296,8 +1297,9 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", reikaids)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", reikaids)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
@@ -1346,8 +1348,9 @@ static MACHINE_CONFIG_START( pteacher, homedata_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
 	MCFG_SCREEN_VBLANK_DRIVER(homedata_state, screen_eof_homedata)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pteacher)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pteacher)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
@@ -1508,8 +1511,9 @@ static MACHINE_CONFIG_START( mirderby, homedata_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mirderby)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirderby)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
 	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)

@@ -168,8 +168,8 @@ public:
 
 	IRQ_CALLBACK_MEMBER(wangpc_irq_callback);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
 	int on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);

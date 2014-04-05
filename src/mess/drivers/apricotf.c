@@ -158,8 +158,6 @@ WRITE8_MEMBER( f1_state::system_w )
 
 void f1_state::machine_start()
 {
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(f1_state::wd2797_drq_w), this));
 }
 
 
@@ -214,16 +212,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  APRICOT_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static APRICOT_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  Z80SIO_INTERFACE( sio_intf )
@@ -295,15 +283,6 @@ static Z80CTC_INTERFACE( ctc_intf )
 //  floppy
 //-------------------------------------------------
 
-void f1_state::wd2797_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state);}
-
-void f1_state::wd2797_drq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_TEST, state);
-}
-
 static SLOT_INTERFACE_START( apricotf_floppies )
 	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
 	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
@@ -332,11 +311,13 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(f1_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", act_f1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
 
 	/* Devices */
-	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
+	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, sio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, ctc_intf)
 
@@ -347,6 +328,9 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 
 	// floppy
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_4MHz / 2 /* ? */)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_TEST))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", apricotf_floppies, "d32w", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

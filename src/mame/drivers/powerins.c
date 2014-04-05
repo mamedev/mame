@@ -353,8 +353,9 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update_powerins)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", powerins)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerins)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 

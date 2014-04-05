@@ -810,13 +810,14 @@ static MACHINE_CONFIG_START( base, exidy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy_state,  exidy_vblank_interrupt)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", exidy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exidy)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(exidy_state, screen_update_exidy)
+	MCFG_SCREEN_PALETTE("palette")
 
 MACHINE_CONFIG_END
 

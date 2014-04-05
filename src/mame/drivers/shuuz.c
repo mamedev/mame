@@ -232,7 +232,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", shuuz)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
@@ -245,6 +245,7 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(shuuz_state, screen_update_shuuz)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(shuuz_state,shuuz)
 

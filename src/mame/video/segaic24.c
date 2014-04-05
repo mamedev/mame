@@ -96,6 +96,9 @@ TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
 
 void segas24_tile::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
 		if (m_gfxdecode->gfx(char_gfx_index) == 0)
 			break;
@@ -117,7 +120,7 @@ void segas24_tile::device_start()
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(tile_ram), 0x10000/2);
 	save_pointer(NAME(char_ram), 0x80000/2);

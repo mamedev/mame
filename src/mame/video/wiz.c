@@ -140,7 +140,7 @@ void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 		if (m_flipx)
 			sx = 31 - sx;
 
-		gfx->transpen(m_palette,bitmap,cliprect,
+		gfx->transpen(bitmap,cliprect,
 			code,
 			palbank | color,
 			m_flipx,m_flipy,
@@ -171,7 +171,7 @@ void wiz_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		if ( m_flipx) sx = 240 - sx;
 		if (!m_flipy) sy = 240 - sy;
 
-		gfx->transpen(m_palette,bitmap,cliprect,
+		gfx->transpen(bitmap,cliprect,
 			code,
 			palbank | color,
 			m_flipx,m_flipy,

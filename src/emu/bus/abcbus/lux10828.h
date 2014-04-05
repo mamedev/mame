@@ -68,8 +68,8 @@ public:
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;

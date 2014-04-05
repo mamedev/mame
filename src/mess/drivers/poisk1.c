@@ -16,9 +16,6 @@
 #define CGA_PALETTE_SETS 83
 /* one for colour, one for mono, 81 for colour composite */
 
-#include "drivlgcy.h"
-#include "scrlegcy.h"
-
 #define VERBOSE_DBG 0
 
 #define DBG_LOG(N,M,A) \

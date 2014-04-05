@@ -103,7 +103,7 @@ private:
 	// internal state
 	const game_driver &     m_gamedrv;
 	emu_options &           m_options;
-	device_t *              m_root_device;
+	auto_pointer<device_t>  m_root_device;
 };
 
 

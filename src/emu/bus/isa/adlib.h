@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "isa.h"
+#include "sound/3812intf.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,12 +23,16 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
+		
+		DECLARE_READ8_MEMBER(ym3812_16_r);
+		DECLARE_WRITE8_MEMBER(ym3812_16_w);
 protected:
 		// device-level overrides
 		virtual void device_start();
 		virtual void device_reset();
 private:
 		// internal state
+		required_device<ym3812_device> m_ym3812;
 };
 
 

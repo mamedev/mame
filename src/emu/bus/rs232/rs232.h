@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 	DECLARE_WRITE_LINE_MEMBER( write_dtr );
 	DECLARE_WRITE_LINE_MEMBER( write_rts );
+	DECLARE_WRITE_LINE_MEMBER( write_etc );
 
 	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
 	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }
@@ -82,6 +83,7 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) {}
 	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) {}
 
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_dcd ) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }

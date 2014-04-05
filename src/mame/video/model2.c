@@ -87,7 +87,7 @@
 *********************************************************************************************************************************/
 #include "emu.h"
 #include "video/segaic24.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "includes/model2.h"
 
 #define MODEL2_VIDEO_DEBUG 0
@@ -924,7 +924,7 @@ static const poly_draw_scanline_func render_funcs[8] =
 
 static void model2_3d_render( model2_state *state, bitmap_rgb32 &bitmap, triangle *tri, const rectangle &cliprect )
 {
-	poly_manager *poly = state->m_poly;
+	legacy_poly_manager *poly = state->m_poly;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	UINT8       renderer;
 

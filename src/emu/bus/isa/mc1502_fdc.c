@@ -34,9 +34,6 @@
 
 const device_type MC1502_FDC = &device_creator<mc1502_fdc_device>;
 
-static DECLARE_READ8_DEVICE_HANDLER(mc1502_FDC_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(mc1502_FDC_w);
-
 FLOPPY_FORMATS_MEMBER( mc1502_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT,
 	FLOPPY_DSK_FORMAT
@@ -48,6 +45,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( mc1502_fdc )
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -147,7 +146,7 @@ UINT8 mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-void mc1502_fdc_device::mc1502_fdc_irq_drq(bool state)
+WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -155,28 +154,25 @@ void mc1502_fdc_device::mc1502_fdc_irq_drq(bool state)
 		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( mc1502_FDC_r )
+READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
 {
 	UINT8 data = 0xff;
-	mc1502_fdc_device *fdc  = downcast<mc1502_fdc_device *>(device);
 
 	switch( offset )
 	{
-		case 0: data = fdc->mc1502_wd17xx_aux_r();     break;
-		case 8: data = fdc->mc1502_wd17xx_drq_r();     break;
-		case 10: data = fdc->mc1502_wd17xx_motor_r();   break;
+		case 0: data = mc1502_wd17xx_aux_r();     break;
+		case 8: data = mc1502_wd17xx_drq_r();     break;
+		case 10: data = mc1502_wd17xx_motor_r();   break;
 	}
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( mc1502_FDC_w )
+WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
 {
-	mc1502_fdc_device *fdc  = downcast<mc1502_fdc_device *>(device);
-
 	switch( offset )
 	{
-		case 0: fdc->mc1502_wd17xx_aux_w(data);    break;
+		case 0: mc1502_wd17xx_aux_w(data);    break;
 	}
 }
 
@@ -215,16 +211,14 @@ void mc1502_fdc_device::device_start()
 	m_isa->install_device(0x010c, 0x010f, 0, 0,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(this, 0x0100, 0x010b, 0, 0, FUNC(mc1502_FDC_r), FUNC(mc1502_FDC_w) );
+	m_isa->install_device(0x0100, 0x010b, 0, 0, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 	// BIOS 5.31, 5.33
 /*
     m_isa->install_device(0x010c, 0x010f, 0, 0,
         READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
         WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-    m_isa->install_device(this, 0x0100, 0x010b, 0, 0, FUNC(mc1502_FDC_r), FUNC(mc1502_FDC_w) );
+    m_isa->install_device(0x0100, 0x010b, 0, 0, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 */
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));
-	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));
 	motor_on = 0;

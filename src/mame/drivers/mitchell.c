@@ -1089,8 +1089,9 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mgakuen)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgakuen)
 	
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1128,8 +1129,9 @@ static MACHINE_CONFIG_START( pang, mitchell_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mitchell)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mitchell)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1234,8 +1236,9 @@ static MACHINE_CONFIG_START( mstworld, mitchell_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mstworld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mstworld)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1267,8 +1270,9 @@ static MACHINE_CONFIG_START( marukin, mitchell_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", marukin)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marukin)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -1320,8 +1324,9 @@ static MACHINE_CONFIG_START( pkladiesbl, mitchell_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pkladiesbl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkladiesbl)
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
@@ -2234,7 +2239,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
 	int len = memregion("maincpu")->bytes();
-	UINT8* source = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer source(len);
 	UINT8* dst = memregion("maincpu")->base() ;
 	int x;
 
@@ -2271,7 +2276,6 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 			memcpy(&dst[((x / 2) * 0x4000) + 0x50000],&source[tablebank[x + 1] * 0x4000], 0x4000);
 		}
 	}
-	auto_free(machine(), source);
 
 	bootleg_decode();
 	configure_banks();

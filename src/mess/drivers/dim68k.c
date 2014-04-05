@@ -49,7 +49,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_speaker(*this, "speaker"),
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_palette(*this, "palette") { }
 
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
@@ -75,6 +76,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<UINT16> m_ram;
+	required_device<palette_device> m_palette;
 };
 
 READ16_MEMBER( dim68k_state::dim68k_duart_r )
@@ -225,7 +227,7 @@ void dim68k_state::video_start()
 MC6845_UPDATE_ROW( dim68k_update_row )
 {
 	dim68k_state *state = device->machine().driver_data<dim68k_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,x,xx,inv;
 	UINT16 chr16=0x2020; // set to spaces if screen is off
 	UINT32 *p = &bitmap.pix32(y);
@@ -334,7 +336,7 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", dim68k)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dim68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

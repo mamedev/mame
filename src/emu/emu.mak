@@ -249,7 +249,7 @@ $(LIBBUS): $(BUSOBJS)
 
 $(EMUOBJ)/rendfont.o:   $(EMUOBJ)/uismall.fh
 
-$(EMUOBJ)/video.o:  $(EMUSRC)/rendersw.c
+$(EMUOBJ)/video.o:  $(EMUSRC)/rendersw.inc
 
 #-------------------------------------------------
 # core layouts

@@ -475,13 +475,13 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 	MCFG_X2212_ADD_AUTOSAVE("nvram_4a")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", ccastles)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ccastles)
 	MCFG_PALETTE_ADD("palette", 32)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)   /* will be adjusted later */
 	MCFG_SCREEN_UPDATE_DRIVER(ccastles_state, screen_update_ccastles)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

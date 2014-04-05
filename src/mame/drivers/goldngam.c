@@ -568,8 +568,9 @@ static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 43*8-1, 1*8, 37*8-1)  // 312x288
 	MCFG_SCREEN_UPDATE_DRIVER(goldngam_state, screen_update_goldngam)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldngam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldngam)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(goldngam_state, goldngam)

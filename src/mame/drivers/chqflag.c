@@ -268,16 +268,6 @@ WRITE8_MEMBER(chqflag_state::volume_callback1)
 	m_k007232_2->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static const k007232_interface k007232_interface_1 =
-{
-	DEVCB_DRIVER_MEMBER(chqflag_state,volume_callback0)
-};
-
-static const k007232_interface k007232_interface_2 =
-{
-	DEVCB_DRIVER_MEMBER(chqflag_state,volume_callback1)
-};
-
 static const k051960_interface chqflag_k051960_intf =
 {
 	"gfx1", 0,
@@ -349,12 +339,13 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K051960_ADD("k051960", chqflag_k051960_intf)
 	MCFG_K051960_GFXDECODE("gfxdecode")
 	MCFG_K051960_PALETTE("palette")
@@ -375,14 +366,14 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(k007232_interface_1)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(k007232_interface_2)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 MACHINE_CONFIG_END

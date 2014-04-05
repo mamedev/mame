@@ -57,7 +57,7 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	required_device<ram_device> m_ram;
 	required_device<centronics_device> m_centronics;
-	required_device<s100_device> m_s100;
+	required_device<s100_bus_t> m_s100;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;

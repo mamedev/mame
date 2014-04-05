@@ -385,11 +385,11 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 			else
 				code &= ~0x10, code2 |= 0x10;
 
-			 gfx->transmask(m_palette,bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(),
+			 gfx->transmask(bitmap,cliprect, code2, color, xflip, yflip, x, y + gfx->height(),
 					m_palette->transpen_mask(*gfx, color, 0x10));
 		}
 
-		 gfx->transmask(m_palette,bitmap,cliprect, code, color, xflip, yflip, x, y,
+		 gfx->transmask(bitmap,cliprect, code, color, xflip, yflip, x, y,
 				m_palette->transpen_mask(*gfx, color, 0x10));
 
 		if (doubled) i += 4;
@@ -403,7 +403,7 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 			int y = m_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_videoram[offs] + 256 * m_char_bank,
 				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,
 				m_cocktail_flip, m_cocktail_flip, x, y, 0);

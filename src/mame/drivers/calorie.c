@@ -197,12 +197,12 @@ UINT32 calorie_state::screen_update_calorie(screen_device &screen, bitmap_ind16 
 		if (m_sprites[x + 1] & 0x10)
 		{
 				/* 32x32 sprites */
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, tileno | 0x40, color, flipx, flipy, xpos, ypos - 31, 0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, tileno, color, flipx, flipy, xpos, ypos - 15, 0);
 		}
 	}
 	return 0;
@@ -460,8 +460,9 @@ static MACHINE_CONFIG_START( calorie, calorie_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", calorie)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calorie)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

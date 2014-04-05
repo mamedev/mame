@@ -44,54 +44,6 @@ const input_seq input_seq::empty_seq;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> input_device_item
-
-// a single item on an input device
-class input_device_item
-{
-protected:
-	// construction/destruction
-	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
-	virtual ~input_device_item() { }
-
-public:
-	// getters
-	input_device &device() const { return m_device; }
-	input_manager &manager() const { return m_device.manager(); }
-	running_machine &machine() const { return m_device.machine(); }
-	const char *name() const { return m_name; }
-	void *internal() const { return m_internal; }
-	input_item_id itemid() const { return m_itemid; }
-	input_item_class itemclass() const { return m_itemclass; }
-	const char *token() const { return m_token; }
-	INT32 current() const { return m_current; }
-	INT32 memory() const { return m_memory; }
-
-	// helpers
-	INT32 update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
-	void set_memory(INT32 value) { m_memory = value; }
-
-	// readers
-	virtual INT32 read_as_switch(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_relative(input_item_modifier modifier) = 0;
-	virtual INT32 read_as_absolute(input_item_modifier modifier) = 0;
-
-protected:
-	// internal state
-	input_device &          m_device;               // reference to our owning device
-	astring                 m_name;                 // string name of item
-	void *                  m_internal;             // internal callback pointer
-	input_item_id           m_itemid;               // originally specified item id
-	input_item_class        m_itemclass;            // class of the item
-	item_get_state_func     m_getstate;             // get state callback
-	astring                 m_token;                // tokenized name for non-standard items
-
-	// live state
-	INT32                   m_current;              // current raw value
-	INT32                   m_memory;               // "memory" value, to remember where we started during polling
-};
-
-
 // ======================> input_device_switch_item
 
 // derived input item representing a switch input
@@ -848,9 +800,6 @@ input_device::input_device(input_class &_class, int devindex, const char *name, 
 		m_steadykey_enabled(_class.manager().machine().options().steadykey()),
 		m_lightgun_reload_button(_class.manager().machine().options().offscreen_reload())
 {
-	// reset the items
-	memset(m_item, 0, sizeof(m_item));
-
 	// additional work for joysticks
 	if (devclass() == DEVICE_CLASS_JOYSTICK)
 	{
@@ -899,15 +848,15 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	switch (m_class.standard_item_class(originalid))
 	{
 		case ITEM_CLASS_SWITCH:
-			item = auto_alloc(machine(), input_device_switch_item(*this, name, internal, itemid, getstate));
+			item = global_alloc(input_device_switch_item(*this, name, internal, itemid, getstate));
 			break;
 
 		case ITEM_CLASS_RELATIVE:
-			item = auto_alloc(machine(), input_device_relative_item(*this, name, internal, itemid, getstate));
+			item = global_alloc(input_device_relative_item(*this, name, internal, itemid, getstate));
 			break;
 
 		case ITEM_CLASS_ABSOLUTE:
-			item = auto_alloc(machine(), input_device_absolute_item(*this, name, internal, itemid, getstate));
+			item = global_alloc(input_device_absolute_item(*this, name, internal, itemid, getstate));
 			break;
 
 		default:
@@ -915,7 +864,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	}
 
 	// assign the new slot and update the maximum
-	m_item[itemid] = item;
+	m_item[itemid].reset(item);
 	m_maxitem = MAX(m_maxitem, itemid);
 	return itemid;
 }
@@ -1006,8 +955,6 @@ input_class::input_class(input_manager &manager, input_device_class devclass, bo
 		m_enabled(enabled),
 		m_multi(multi)
 {
-	memset(m_device, 0, sizeof(m_device));
-
 	// request a per-frame callback for the keyboard class
 	if (devclass == DEVICE_CLASS_KEYBOARD)
 		machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(input_class::frame_callback), this));
@@ -1038,13 +985,13 @@ input_device *input_class::add_device(int devindex, const char *name, void *inte
 	assert(m_device[devindex] == NULL);
 
 	// allocate a new device
-	input_device *device = m_device[devindex] = auto_alloc(machine(), input_device(*this, devindex, name, internal));
+	m_device[devindex].reset(global_alloc(input_device(*this, devindex, name, internal)));
 
 	// update the maximum index found
 	m_maxindex = MAX(m_maxindex, devindex);
 
 	mame_printf_verbose("Input: Adding %s #%d: %s\n", (*devclass_string_table)[m_devclass], devindex, name);
-	return device;
+	return m_device[devindex];
 }
 
 

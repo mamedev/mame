@@ -2,7 +2,11 @@
 #define __CONCEPT_EXP__
 
 #include "emu.h"
+#include "machine/wd17xx.h"
+#include "includes/corvushd.h"
 
+// FIXME: Concept expansion ports should just use the Apple II Bus device!
+// The code below is outdated and inaccurate!
 
 class concept_exp_card_device;
 
@@ -29,7 +33,7 @@ protected:
 
 
 // device type definition
-extern const device_type CONCEPT_EXP_PORT;
+extern const ATTR_DEPRECATED device_type CONCEPT_EXP_PORT;
 
 
 //**************************************************************************
@@ -84,7 +88,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
-	device_t *m_wd179x;
+	fd1793_device *m_wd179x;
 
 	UINT8 m_fdc_local_status;
 	UINT8 m_fdc_local_command;
@@ -107,10 +111,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 protected:
+	required_device<corvus_hdc_t> m_hdc;
 };
 
 
-extern const device_type CONCEPT_FDC;
-extern const device_type CONCEPT_HDC;
+extern const ATTR_DEPRECATED device_type CONCEPT_FDC;
+extern const ATTR_DEPRECATED device_type CONCEPT_HDC;
 
 #endif

@@ -224,7 +224,7 @@ void popobear_state::video_start()
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, popobear_char_layout, (UINT8 *)m_vram_rearranged, m_palette->entries() / 16, 0)));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
@@ -650,6 +650,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update_popobear)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
@@ -659,7 +660,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

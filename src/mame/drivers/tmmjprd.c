@@ -179,7 +179,7 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		tileno >>=1;
 
 		// 255 for 8bpp
-		gfx->transpen(m_palette,bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
+		gfx->transpen(bitmap,cliprect,tileno,colr,!xflip,yflip,(xpos-xoffs)-8,(ypos)-8,255);
 	}
 }
 
@@ -748,7 +748,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tmmjprd)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tmmjprd)
 
 //  MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(60)
@@ -769,6 +769,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -777,6 +778,7 @@ static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_tmmjprd_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

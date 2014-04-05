@@ -101,10 +101,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READWRITE(rm380z_portlow_r, rm380z_portlow_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE_LEGACY("wd1771", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("wd1771", fd1771_device, status_r, command_w)
+	AM_RANGE(0xc1, 0xc1) AM_DEVREADWRITE("wd1771", fd1771_device, track_r, track_w)
+	AM_RANGE(0xc2, 0xc2) AM_DEVREADWRITE("wd1771", fd1771_device, sector_r, sector_w)
+	AM_RANGE(0xc3, 0xc3) AM_DEVREADWRITE("wd1771", fd1771_device, data_r, data_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(disk_0_control)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
@@ -156,8 +156,9 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	// and there is at least 1 pixel between each row of characters
 	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
 	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
-
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* RAM configurations */

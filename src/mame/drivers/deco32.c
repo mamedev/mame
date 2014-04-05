@@ -1751,8 +1751,9 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_captaven)
 	MCFG_SCREEN_VBLANK_DRIVER(deco32_state, screen_eof_captaven)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", captaven)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", captaven)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
@@ -1827,7 +1828,7 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fghthist)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
@@ -1889,7 +1890,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_fghthist)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fghthist)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
@@ -2013,6 +2014,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	MCFG_SCREEN_VBLANK_DRIVER(dragngun_state, screen_eof_dragngun)
+	//MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
@@ -2024,7 +2026,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,dragngun)
@@ -2111,7 +2113,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dragngun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(dragngun_state,lockload)
@@ -2190,7 +2192,6 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-
 	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
@@ -2211,7 +2212,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tattass)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattass)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO104_ADD("ioprot104")
@@ -2244,7 +2245,7 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)
+	MCFG_SCREEN_UPDATE_DRIVER(deco32_state, screen_update_nslasher)	
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
@@ -2264,7 +2265,7 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nslasher)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nslasher)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(deco32_state,nslasher)
@@ -3641,7 +3642,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3652,8 +3653,6 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
-
-	auto_free(machine(), tmp);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -3662,7 +3661,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
 	UINT8 *RAM = memregion("gfx1")->base();
-	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(tmp,RAM+0x80000,0x80000);
@@ -3673,8 +3672,6 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
-
-	auto_free(machine(), tmp);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine(), "gfx2");

@@ -312,6 +312,7 @@ static MACHINE_CONFIG_START( dribling, dribling_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 40, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(dribling_state, screen_update_dribling)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(dribling_state, dribling)

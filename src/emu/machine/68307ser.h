@@ -1,5 +1,5 @@
 #include "cpu/m68000/m68000.h"
-#include "machine/68681.h"
+#include "machine/mc68681.h"
 
 #define m68307SER_UMR1_UMR2  (0x01)
 #define m68307SER_USR_UCSR   (0x03)
@@ -24,10 +24,10 @@ class m68307_serial
 	void reset(void);
 	UINT8 m_uivr;
 
-	void m68307ser_set_duart68681(device_t *duart68681)
+	void m68307ser_set_duart68681(mc68681_device *duart68681)
 	{
 		m_duart68681 = duart68681;
 	}
 
-	device_t * m_duart68681;
+	mc68681_device * m_duart68681;
 };

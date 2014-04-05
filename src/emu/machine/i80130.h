@@ -24,24 +24,23 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_I80130_ADD(_tag, _clock, _irq) \
-	MCFG_DEVICE_ADD(_tag, I80130, _clock) \
-	downcast<i80130_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+#define MCFG_I80130_IRQ_CALLBACK(_write) \
+	devcb = &i80130_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_I80130_ACK_CALLBACK(_ack) \
-	downcast<i80130_device *>(device)->set_ack_callback(DEVCB2_##_ack);
+#define MCFG_I80130_ACK_CALLBACK(_write) \
+	devcb = &i80130_device::set_ack_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_I80130_LIR_CALLBACK(_lir) \
-	downcast<i80130_device *>(device)->set_lir_callback(DEVCB2_##_lir);
+#define MCFG_I80130_LIR_CALLBACK(_write) \
+	devcb = &i80130_device::set_lir_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_I80130_SYSTICK_CALLBACK(_systick) \
-	downcast<i80130_device *>(device)->set_systick_callback(DEVCB2_##_systick);
+#define MCFG_I80130_SYSTICK_CALLBACK(_write) \
+	devcb = &i80130_device::set_systick_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_I80130_DELAY_CALLBACK(_delay) \
-	downcast<i80130_device *>(device)->set_delay_callback(DEVCB2_##_delay);
+#define MCFG_I80130_DELAY_CALLBACK(_write) \
+	devcb = &i80130_device::set_delay_wr_callback(*device, DEVCB2_##_write);
 
-#define MCFG_I80130_BAUD_CALLBACK(_baud) \
-	downcast<i80130_device *>(device)->set_baud_callback(DEVCB2_##_baud);
+#define MCFG_I80130_BAUD_CALLBACK(_write) \
+	devcb = &i80130_device::set_baud_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -57,12 +56,12 @@ public:
 	// construction/destruction
 	i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _ack> void set_ack_callback(_ack ack) { m_write_ack.set_callback(ack); }
-	template<class _lir> void set_lir_callback(_lir lir) { m_write_lir.set_callback(lir); }
-	template<class _systick> void set_systick_callback(_systick systick) { m_write_systick.set_callback(systick); }
-	template<class _delay> void set_delay_callback(_delay delay) { m_write_delay.set_callback(delay); }
-	template<class _baud> void set_baud_callback(_baud baud) { m_write_baud.set_callback(baud); }
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ack_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_ack.set_callback(object); }
+	template<class _Object> static devcb2_base &set_lir_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_lir.set_callback(object); }
+	template<class _Object> static devcb2_base &set_systick_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_systick.set_callback(object); }
+	template<class _Object> static devcb2_base &set_delay_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_delay.set_callback(object); }
+	template<class _Object> static devcb2_base &set_baud_wr_callback(device_t &device, _Object object) { return downcast<i80130_device &>(device).m_write_baud.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(rom_map, 16);
 	virtual DECLARE_ADDRESS_MAP(io_map, 16);

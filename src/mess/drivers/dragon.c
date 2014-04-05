@@ -10,11 +10,11 @@
 #include "includes/dgnalpha.h"
 #include "imagedev/cassette.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/coco_232.h"
-#include "machine/coco_orch90.h"
-#include "machine/coco_pak.h"
-#include "machine/coco_fdc.h"
-#include "machine/coco_multi.h"
+#include "bus/coco/coco_232.h"
+#include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_fdc.h"
+#include "bus/coco/coco_multi.h"
 #include "formats/coco_dsk.h"
 #include "imagedev/flopdrv.h"
 
@@ -190,7 +190,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc")
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon_base, dragon64_state )
@@ -202,7 +203,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon_base, dragon64_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc")
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
@@ -214,7 +216,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_alpha_state::cartridge_config, dragon_cart, NULL)
 
 	// acia
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	// floppy
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)

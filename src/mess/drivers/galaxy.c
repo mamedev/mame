@@ -190,6 +190,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
 
@@ -198,7 +199,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxy)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 
@@ -226,6 +227,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
 

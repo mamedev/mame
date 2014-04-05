@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", radio86)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radio86)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(radio86_state,radio86)
 

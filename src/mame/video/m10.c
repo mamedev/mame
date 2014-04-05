@@ -98,7 +98,7 @@ VIDEO_START_MEMBER(m10_state,m10)
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 
-	m_back_gfx = auto_alloc(machine(), gfx_element(machine(), backlayout, m_chargen, 8, 0));
+	m_back_gfx = global_alloc(gfx_element(m_palette, backlayout, m_chargen, 8, 0));
 
 	m_gfxdecode->set_gfx(1, m_back_gfx);
 	return ;
@@ -106,7 +106,7 @@ VIDEO_START_MEMBER(m10_state,m10)
 
 VIDEO_START_MEMBER(m10_state,m15)
 {
-	m_gfxdecode->set_gfx(0,auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0)));
+	m_gfxdecode->set_gfx(0,global_alloc(gfx_element(m_palette, charlayout, m_chargen, 8, 0)));
 
 	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 
@@ -130,9 +130,9 @@ UINT32 m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap,
 
 	for (i = 0; i < 4; i++)
 		if (m_flip)
-			 m_back_gfx->opaque(m_palette,bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
+			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
 		else
-			 m_back_gfx->opaque(m_palette,bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
+			 m_back_gfx->opaque(bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
 
 	if (m_bottomline)
 	{

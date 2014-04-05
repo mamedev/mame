@@ -102,8 +102,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
 
-	void fdc_interrupt(bool state);
-	void fdc_dma_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

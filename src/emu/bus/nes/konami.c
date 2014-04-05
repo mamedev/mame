@@ -289,9 +289,9 @@ READ8_MEMBER(nes_konami_vrc2_device::read_m)
 	LOG_MMC(("VRC-2 read_m, offset: %04x\n", offset));
 
 	if (m_battery)
-		return m_battery[offset & (m_battery_size - 1)];
+		return m_battery[offset & (m_battery.count() - 1)];
 	else if (m_prgram)
-		return m_prgram[offset & (m_prgram_size - 1)];
+		return m_prgram[offset & (m_prgram.count() - 1)];
 	else    // sort of protection? it returns open bus in $7000-$7fff and (open bus & 0xfe) | m_latch in $6000-$6fff
 		return (offset < 0x1000) ? ((m_open_bus & 0xfe) | (m_latch & 1)) : m_open_bus;
 }
@@ -301,9 +301,9 @@ WRITE8_MEMBER(nes_konami_vrc2_device::write_m)
 	LOG_MMC(("VRC-2 write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_battery)
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 	else if (m_prgram)
-		m_prgram[offset & (m_prgram_size - 1)] = data;
+		m_prgram[offset & (m_prgram.count() - 1)] = data;
 	else if (offset < 0x1000)
 		m_latch = data;
 }

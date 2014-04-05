@@ -666,7 +666,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", plygonet)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", plygonet)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -675,6 +675,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32768)
 

@@ -988,13 +988,15 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update_wgp)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wgp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wgp)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1019,6 +1021,7 @@ static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 	MCFG_DEVICE_REMOVE("tc0100scn")
 	MCFG_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

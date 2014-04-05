@@ -275,7 +275,7 @@ void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 		color = spriteram[offs+1] & 0x0f;
 		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		m_gfxdecode->gfx(2)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2)->transmask(bitmap,cliprect,
 				sprite,
 				color,flipx,flipy,x,y,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(2), color, 0));
@@ -618,11 +618,11 @@ static MACHINE_CONFIG_START( panicr, panicr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update_panicr)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", panicr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panicr)
 	MCFG_PALETTE_ADD("palette", 256*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
 	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
@@ -719,7 +719,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(panicr_state,panicr)
 {
-	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x80000);
+	dynamic_buffer buf(0x80000);
 	UINT8 *rom;
 	int size;
 	int i,j;
@@ -822,8 +822,6 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
 		}
 	}
-
-	auto_free(machine(), buf);
 
 	m_tempbitmap_1 = auto_bitmap_ind16_alloc(machine(),256,256);
 	m_temprender = auto_bitmap_ind16_alloc(machine(),256,256);

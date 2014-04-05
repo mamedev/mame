@@ -82,7 +82,7 @@ void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect, code, color, flipx, flipy,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect, code, color, flipx, flipy,
 			sx, sy,
 			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0));
 	}

@@ -205,35 +205,35 @@ WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
 
 static GROM_CONFIG(pgrom0_config)
 {
-	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 0, PCODE_GROM_TAG, 0x0000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom1_config)
 {
-	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 1, PCODE_GROM_TAG, 0x2000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom2_config)
 {
-	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 2, PCODE_GROM_TAG, 0x4000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom3_config)
 {
-	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 3, PCODE_GROM_TAG, 0x6000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom4_config)
 {
-	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 4, PCODE_GROM_TAG, 0x8000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom5_config)
 {
-	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 5, PCODE_GROM_TAG, 0xa000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom6_config)
 {
-	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 6, PCODE_GROM_TAG, 0xc000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(pgrom7_config)
 {
-	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_pcode_card_device, ready_line), GROMFREQ
+	false, 7, PCODE_GROM_TAG, 0xe000, 0x1800, GROMFREQ
 };
 
 void ti_pcode_card_device::device_start()
@@ -281,13 +281,21 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 
 MACHINE_CONFIG_FRAGMENT( ti99_pcode )
 	MCFG_GROM_ADD( PGROM0_TAG, pgrom0_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM1_TAG, pgrom1_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM2_TAG, pgrom2_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM3_TAG, pgrom3_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM4_TAG, pgrom4_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM5_TAG, pgrom5_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM6_TAG, pgrom6_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 	MCFG_GROM_ADD( PGROM7_TAG, pgrom7_config )
+	MCFG_GROM_READY_CALLBACK(WRITELINE(ti_pcode_card_device, ready_line))
 MACHINE_CONFIG_END
 
 INPUT_PORTS_START( ti99_pcode )

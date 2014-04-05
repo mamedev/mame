@@ -73,7 +73,6 @@ public:
 			m_k0(*this, "K0"),
 			m_k1(*this, "K1"),
 			m_k2(*this, "K2"),
-			m_restore(*this, "RESTORE"),
 			m_lock(*this, "LOCK"),
 			m_caps(*this, "CAPS"),
 			m_40_80(*this, "40_80"),
@@ -89,6 +88,7 @@ public:
 			m_cnt1(1),
 			m_sp1(1),
 			m_iec_data_out(1),
+			m_restore(1),
 			m_cia1_irq(CLEAR_LINE),
 			m_cia2_irq(CLEAR_LINE),
 			m_vic_irq(CLEAR_LINE),
@@ -131,7 +131,6 @@ public:
 	required_ioport m_k0;
 	required_ioport m_k1;
 	required_ioport m_k2;
-	required_ioport m_restore;
 	required_ioport m_lock;
 	required_ioport m_caps;
 	required_ioport m_40_80;
@@ -192,7 +191,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( restore );
+	DECLARE_WRITE_LINE_MEMBER( write_restore );
 	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
@@ -230,6 +229,7 @@ public:
 	int m_iec_data_out;
 
 	// interrupt state
+	int m_restore;
 	int m_cia1_irq;
 	int m_cia2_irq;
 	int m_vic_irq;

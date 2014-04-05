@@ -25,7 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/68681.h"
+#include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "sound/2151intf.h"
 #include "machine/nvram.h"
@@ -204,10 +204,10 @@ static ADDRESS_MAP_START( hostmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("INPUTS_A_B")
 	AM_RANGE(0x960000, 0x960001) AM_WRITE(micro3d_reset_w)
 	AM_RANGE(0x980000, 0x980001) AM_READWRITE(micro3d_adc_r, micro3d_adc_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(micro3d_tms_host_r, micro3d_tms_host_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE("vgb", tms34010_device, host_r, host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP                 /* Lamps */
 	AM_RANGE(0x9e0000, 0x9e002f) AM_DEVREADWRITE8("mc68901", mc68901_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff00)
 	AM_RANGE(0xa20000, 0xa20001) AM_READ(micro3d_encoder_h_r)
 	AM_RANGE(0xa40002, 0xa40003) AM_READ(micro3d_encoder_l_r)
 ADDRESS_MAP_END
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( vgbmem, AS_PROGRAM, 16, micro3d_state )
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(micro3d_ti_uart_w)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION("tms_gfx", 0)
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION("tms34010", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("vgb", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("tms34010", 0)
 ADDRESS_MAP_END
 
@@ -299,31 +299,6 @@ static const tms34010_config vgb_config =
 	NULL
 };
 
-static const duart68681_config micro3d_duart68681_config =
-{
-	micro3d_duart_irq_handler,
-	micro3d_duart_tx,
-	micro3d_duart_input_r,
-	micro3d_duart_output_w
-};
-
-static MC68901_INTERFACE( mfp_intf )
-{
-	4000000,                                            /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),        /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_NULL,                                         /* TDO */
-	DEVCB_NULL,                                         /* serial output */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -348,8 +323,17 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
 
-	MCFG_DUART68681_ADD("duart68681", XTAL_3_6864MHz, micro3d_duart68681_config)
-	MCFG_MC68901_ADD("mc68901", 4000000, mfp_intf)
+	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
+	
+	MCFG_DEVICE_ADD("mc68901", MC68901, 4000000)
+	MCFG_MC68901_TIMER_CLOCK(4000000)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_4))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
@@ -359,6 +343,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

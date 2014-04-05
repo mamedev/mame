@@ -1376,6 +1376,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SCREEN_SIZE(264, 228) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 219) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
@@ -1410,6 +1411,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
@@ -1456,6 +1458,8 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SCREEN_UPDATE_DRIVER(iqunlim_state, screen_update)
 	MCFG_SCREEN_SIZE(256, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 

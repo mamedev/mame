@@ -644,7 +644,7 @@ static const gfx_layout spritelayout =
 static const gfx_layout tilelayout =
 {
 	16,16,
-	16+1,       /* 16 tiles (+1 empty tile used in the half-width bg tilemaps) */
+	16,
 	3,
 	{ 2*16*16*16+4, 2*16*16*16+0, 4 },
 	{ STEP4(3*16*8,1), STEP4(2*16*8,1), STEP4(1*16*8,1), STEP4(0*16*8,1) },
@@ -733,8 +733,9 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", decocass)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", decocass)
 	MCFG_PALETTE_ADD("palette", 32+2*8+2*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)

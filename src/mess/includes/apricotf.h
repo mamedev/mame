@@ -84,9 +84,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 
-	void wd2797_intrq_w(bool state);
-	void wd2797_drq_w(bool state);
-
 	int m_40_80;
 	int m_200_256;
 };

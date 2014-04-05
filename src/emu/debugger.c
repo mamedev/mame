@@ -67,7 +67,7 @@ void debugger_init(running_machine &machine)
 		machine_entry *entry;
 
 		/* initialize the submodules */
-		machine.m_debug_view = auto_alloc(machine, debug_view_manager(machine));
+		machine.m_debug_view.reset(global_alloc(debug_view_manager(machine)));
 		debug_cpu_init(machine);
 		debug_command_init(machine);
 		debug_console_init(machine);

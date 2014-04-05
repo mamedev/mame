@@ -734,11 +734,6 @@ static GFXDECODE_START( drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MCFG_CPU_PROGRAM_MAP( nakajies_map)
@@ -749,7 +744,9 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
 	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
-	MCFG_GFXDECODE_ADD("gfxdecode", wales210)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wales210)
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -760,7 +757,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END

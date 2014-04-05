@@ -184,6 +184,7 @@ static MACHINE_CONFIG_START( orao, orao_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

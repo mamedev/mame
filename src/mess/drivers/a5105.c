@@ -50,7 +50,8 @@ public:
 			m_floppy3(*this, "upd765a:3"),
 			m_video_ram(*this, "video_ram"),
 			m_ram(*this, RAM_TAG),
-			m_gfxdecode(*this, "gfxdecode")
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,13 +87,14 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 /* TODO */
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 
 	int xi,gfx;
 	UINT8 pen;
@@ -110,7 +112,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile,color;
@@ -125,7 +127,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		{
 			tile_data = state->m_char_ram[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x && device->machine().primary_screen->frame_number() & 0x10)
+			if(cursor_on && cursor_addr == addr+x && device->machine().first_screen()->frame_number() & 0x10)
 				tile_data^=0xff;
 
 			for( xi = 0; xi < 8; xi++)
@@ -139,12 +141,12 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(yi >= 8) { pen = 0; }
 
 				/* TODO: pitch is currently 40, this should actually go in the upd7220 device */
-				if(!device->machine().primary_screen->visible_area().contains(res_x*2+0, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x*2+0, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x*2+0) = palette[pen];
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x*2+1, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x*2+1, res_y))
 					continue;
 
 				bitmap.pix32(res_y, res_x*2+1) = palette[pen];
@@ -599,7 +601,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", a5105)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", a5105)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
 

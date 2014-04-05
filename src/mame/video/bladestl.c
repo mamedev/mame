@@ -20,18 +20,17 @@ PALETTE_INIT_MEMBER(bladestl_state, bladestl)
 }
 
 
-static void set_pens( running_machine &machine )
+void bladestl_state::set_pens()
 {
-	bladestl_state *state = machine.driver_data<bladestl_state>();
 	int i;
 
 	for (i = 0x00; i < 0x60; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
+		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		state->m_palette->set_indirect_color(i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -43,12 +42,10 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-void bladestl_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags )
+K007342_CALLBACK_MEMBER(bladestl_state::bladestl_tile_callback)
 {
-	bladestl_state *state = machine.driver_data<bladestl_state>();
-
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = state->m_layer_colorbase[layer];
+	*color = m_layer_colorbase[layer];
 }
 
 /***************************************************************************
@@ -75,7 +72,7 @@ void bladestl_sprite_callback( running_machine &machine, int *code,int *color )
 
 UINT32 bladestl_state::screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 
 	m_k007342->tilemap_update();
 

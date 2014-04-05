@@ -15,7 +15,7 @@ public:
 	virtual WRITE_LINE_MEMBER( input_txd ) { if (started()) m_bitbanger->output(state); }
 
 protected:
-	virtual void device_start() {}
+	virtual void device_start() { output_dcd(0); output_dsr(0); output_cts(0); }
 	virtual void device_reset() { output_rxd(1); }
 
 private:

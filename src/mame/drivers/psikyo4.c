@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", ps4)
+	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", ps4)
 	MCFG_PALETTE_ADD("lpalette", (0x2000/4) + 1) /* palette + clear colour */
 	MCFG_PALETTE_ADD("rpalette", (0x2000/4) + 1)
 

@@ -271,18 +271,6 @@ WRITE8_MEMBER(bottom9_state::volume_callback1)
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_interface_1 =
-{
-	DEVCB_DRIVER_MEMBER(bottom9_state,volume_callback0)
-};
-
-static const k007232_interface k007232_interface_2 =
-{
-	DEVCB_DRIVER_MEMBER(bottom9_state,volume_callback1)
-};
-
-
-
 static const k052109_interface bottom9_k052109_intf =
 {
 	"gfx1", 0,
@@ -346,12 +334,13 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", bottom9_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
@@ -366,12 +355,12 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_interface_1)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_interface_2)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END

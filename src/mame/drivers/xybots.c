@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", xybots)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xybots)
 	
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -205,6 +205,7 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(xybots_state, screen_update_xybots)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xybots_state,xybots)
 

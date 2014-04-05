@@ -154,8 +154,9 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
 	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update_ssrj)
 	MCFG_SCREEN_VBLANK_DRIVER(ssrj_state, screen_eof_ssrj)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ssrj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
 

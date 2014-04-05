@@ -353,10 +353,11 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(crospang_state, screen_update_crospang)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x300)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", crospang)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crospang)
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)

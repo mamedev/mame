@@ -102,7 +102,7 @@ READ8_MEMBER(einstein_state::einstein_80col_ram_r)
 static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine().driver_data<einstein_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = einstein->m_palette->palette()->entry_list_raw();
 	UINT8 *data = einstein->m_region_gfx1->base();
 	UINT8 char_code, data_byte;
 	int i, x;
@@ -820,7 +820,7 @@ static MACHINE_CONFIG_DERIVED( einstei2, einstein )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(einstein_state, screen_update_einstein2)
-	MCFG_GFXDECODE_ADD("gfxdecode", einstei2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", einstei2)
 
 	/* 2 additional colors for the 80 column screen */
 	MCFG_PALETTE_ADD("palette", TMS9928A_PALETTE_SIZE + 2)

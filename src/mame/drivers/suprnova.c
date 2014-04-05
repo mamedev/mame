@@ -741,17 +741,12 @@ GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
-static MSM6242_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_CPU_ADD("maincpu", SH2,28638000)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, skns_irq, "screen", 0, 1)
 
-	MCFG_MSM6242_ADD("rtc", rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -772,7 +767,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SCREEN_VBLANK_DRIVER(skns_state, screen_eof_skns)
 
 	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_GFXDECODE_ADD("gfxdecode", skns_bg)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skns_bg)
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 

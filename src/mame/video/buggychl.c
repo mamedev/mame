@@ -105,7 +105,7 @@ void buggychl_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flip_screen_y())
 			sy = 31 - sy;
 
-		m_gfxdecode->gfx(0)->opaque(m_palette,m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
+		m_gfxdecode->gfx(0)->opaque(m_tmp_bitmap1,m_tmp_bitmap1.cliprect(),
 				code,
 				2,
 				flip_screen_x(),flip_screen_y(),
@@ -144,7 +144,7 @@ void buggychl_state::draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (flipy)
 			sy = 31 - sy;
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code,
 				0,
 				flipx,flipy,

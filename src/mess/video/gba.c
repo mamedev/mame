@@ -1890,7 +1890,7 @@ void gba_state::draw_scanline(int y)
 
 void gba_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 gba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

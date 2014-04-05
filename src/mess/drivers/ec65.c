@@ -32,7 +32,8 @@ public:
 		m_via_0(*this, VIA6522_0_TAG),
 		m_via_1(*this, VIA6522_1_TAG),
 		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -44,6 +45,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 class ec65k_state : public driver_device
@@ -125,7 +127,7 @@ void ec65_state::video_start()
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
 	ec65_state *state = device->machine().driver_data<ec65_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -201,7 +203,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ec65)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)
@@ -216,7 +218,9 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
 
-	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
@@ -235,7 +239,7 @@ static MACHINE_CONFIG_START( ec65k, ec65k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ec65)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8, ec65_crtc6845_interface)

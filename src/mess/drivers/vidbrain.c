@@ -458,23 +458,6 @@ READ8_MEMBER(vidbrain_state::memory_read_byte)
 	return prog_space.read_byte(offset);
 }
 
-static UV201_INTERFACE( uv_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
-	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, hblank_w),
-	DEVCB_DRIVER_MEMBER(vidbrain_state, memory_read_byte)
-};
-
-
-//-------------------------------------------------
-//  VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-static VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_NULL
-};
-
 
 
 //**************************************************************************
@@ -567,8 +550,12 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_CPU_IO_MAP(vidbrain_io)
 
 	// video hardware
-	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
 	MCFG_DEFAULT_LAYOUT(layout_vidbrain)
+
+	MCFG_UV201_ADD(UV201_TAG, SCREEN_TAG, 3636363, uv_intf)
+	MCFG_UV201_EXT_INT_CALLBACK(WRITELINE(vidbrain_state, ext_int_w))
+	MCFG_UV201_HBLANK_CALLBACK(WRITELINE(vidbrain_state, hblank_w))
+	MCFG_UV201_DB_CALLBACK(READ8(vidbrain_state, memory_read_byte))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -583,7 +570,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_F3853_ADD(F3853_TAG, XTAL_4MHz/2, smi_intf)
 
 	// cartridge
-	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, expansion_intf, vidbrain_expansion_cards, NULL)
+	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")

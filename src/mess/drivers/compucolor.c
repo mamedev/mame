@@ -27,7 +27,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/compclr_flp.h"
+#include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
@@ -469,6 +469,7 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
 	MCFG_DEVICE_CONFIG(crtc_intf)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// devices
 	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)

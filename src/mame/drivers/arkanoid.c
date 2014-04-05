@@ -1218,8 +1218,9 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", arkanoid)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
@@ -1249,8 +1250,9 @@ static MACHINE_CONFIG_START( hexa, arkanoid_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hexa)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexa)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
@@ -1292,8 +1294,9 @@ static MACHINE_CONFIG_START( brixian, arkanoid_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", arkanoid)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arkanoid)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 512)
 	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
 
@@ -1800,7 +1803,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memregion("gfx1")->base();
-	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x18000);
+	dynamic_buffer buffer(0x18000);
 
 	for (tile = 0; tile < 0x3000; tile++)
 	{
@@ -1823,8 +1826,6 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	}
 
 	memcpy(srcgfx, buffer, 0x18000);
-
-	auto_free(machine(), buffer);
 
 	m_bootleg_id = BLOCK2;
 	arkanoid_bootleg_init();

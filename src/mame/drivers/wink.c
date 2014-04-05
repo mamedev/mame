@@ -367,8 +367,9 @@ static MACHINE_CONFIG_START( wink, wink_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wink)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
@@ -418,7 +419,7 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 {
 	UINT32 i;
 	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x8000);
+	dynamic_buffer buffer(0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 
@@ -435,8 +436,6 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 
 	for (i = 0x6000; i <= 0x7fff; i++)
 		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];
-
-	auto_free(machine(), buffer);
 
 	for (i = 0; i < 0x8000; i++)
 		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);

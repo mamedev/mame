@@ -569,21 +569,18 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	static const char magic[] = "ApplicationName:Addin";
 	address_space& flash = machine().device("flash0b")->memory().space(0);
 	UINT32 img_start = 0;
-	UINT8 *data;
 
-	data = (UINT8*)auto_alloc_array(machine(), UINT8, image.length());
+	dynamic_buffer data(image.length());
 	image.fread(data, image.length());
 
-	if(strncmp((const char*)data, magic, 21))
+	if(strncmp((const char*)&data[0], magic, 21))
 		return IMAGE_INIT_FAIL;
 
-	img_start = strlen((const char*)data) + 5;
+	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
 
 	for (UINT32 i=0; i<image.length() - img_start ;i++)
 		flash.write_byte(i, data[img_start + i]);
-
-	auto_free(machine(), data);
 
 	return IMAGE_INIT_PASS;
 }
@@ -637,11 +634,6 @@ static GFXDECODE_START( rex6000 )
 GFXDECODE_END
 
 
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(rex6000_state, alarm_irq)
-};
-
 static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
@@ -659,15 +651,18 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rex6000_state, screen_update)
 	MCFG_SCREEN_SIZE(240, 120)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_GFXDECODE_ADD("gfxdecode", rex6000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rex6000)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(TC8521_TAG, RP5C01, XTAL_32_768kHz)
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	/*
 	Fujitsu 29DL16X have feature which is capability of reading data from one

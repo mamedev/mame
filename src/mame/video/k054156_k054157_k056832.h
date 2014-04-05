@@ -106,6 +106,8 @@ public:
 	int get_lookup(int bits); /* Asterix */
 	void set_tile_bank(int bank); /* Asterix */
 
+	int get_gfx_num() const { return m_gfx_num; }
+
 	DECLARE_READ32_MEMBER( ram_long_r );
 	DECLARE_READ32_MEMBER( rom_long_r );
 	DECLARE_WRITE32_MEMBER( ram_long_w );

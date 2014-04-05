@@ -117,6 +117,8 @@
 #include "machine/nvram.h"
 #include "includes/goldstar.h"
 
+#include "goldstar.lh"
+#include "cherryb3.lh"
 #include "lucky8.lh"
 #include "bingowng.lh"
 
@@ -134,6 +136,49 @@ READ8_MEMBER(goldstar_state::protection_r)
 	m_dataoffset %= 4;
 	return data[m_dataoffset++];
 }
+
+WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x  Bet Red / Card 2.
+  ---- --x-  Stop 3 / Small / Info / Card 1
+  ---- -x--  Bet Blue / Double / Card 3
+  ---- x---  Stop 1 / Take
+  ---x ----  Stop 2 / Big / Bonus
+  --x- ----  Start / Stop All / Card 4
+*/
+	output_set_lamp_value(0, (data) & 1);       /* Bet Red / Card 2 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Stop 3 / Small / Info / Card 1 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Bet Blue / Double / Card 3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Stop 1 / Take */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 2 / Big / Bonus */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All / Card 4 */
+
+//	popmessage("lamps: %02X", data);
+}
+
+WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x  Stop 2 / Big
+  ---- --x-  Blue Bet / Double
+  ---- -x--  Stop 1 / Take
+  ---- x---  Red Bet
+  ---x ----  Stop 3 / Small / Info
+  --x- ----  Start / Stop All
+*/
+	output_set_lamp_value(0, (data) & 1);       /* Stop 2 / Big */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Blue Bet / Double */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Stop 1 / Take */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Red Bet */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 3 / Small / Info */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All */
+
+//	popmessage("lamps: %02X", data);
+}
+
 
 static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
@@ -160,6 +205,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(goldstar_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -198,15 +244,15 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-//  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
-//  AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)   // need flip?
+	AM_RANGE(0xf850, 0xf850) AM_WRITE(cb3_lamps_w)		/* Control Set 1 lamps */
+	AM_RANGE(0xf860, 0xf860) AM_WRITE(cb3_lamps_w)		/* Control Set 2 lamps */
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set1 is used...
-//  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set2 is used...
+//  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set 1 is used...
+//  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set 2 is used...
 //  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")   /* confirmed for ncb3 */
@@ -216,29 +262,32 @@ ADDRESS_MAP_END
 
 /* ncb3 findings...
 
+  c101-c102 = unknown writes...
   f800-f803 = 8255_1 (ctrl=9b) ; portA, B & C (input)
   f810-f813 = 8255_2 (ctrl=9b) ; portA, B & C (input)
   f820-f823 = 8255_3 (ctrl=90) ; portA (input); ports B & C (output)
   f830      = AY8910 RW
   f840      = AY8910 ctrl
-  f850      = Unknown
+  f850      = control set 1 lamps
+  f860      = control set 2 lamps
   f870      = PSG (init writes)
 
 
   I/O
 
   00 = RW  (chrygld, ncb3 in ctrl set1)
-  02 = RW  (ncb3 in ctrl set2)
-  06 = RW
+  02 = R  (W - ncb3 in ctrl set2)
+  06 = W
   08 = RW
   81 =  W
 
   00-0f = initial seq. writes
 
-  Controls Set1 = write to f850 (0x1a), read from 0002.
-  Controls Set2 = write to f860 (0x1a), read from 0000.
+  Controls Set 1 = write lamps to f850, read from 0002.
+  Controls Set 2 = write lamps to f860, read from 0000.
 
-  Controls Set2 is using reels stop buttons from Controls Set1.
+  Controls Set 2 is using reels stop buttons from Controls Set 1.
+  So, seems that control set 2 was meant for non-stop reels.
 
 */
 
@@ -248,15 +297,15 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	
-	/* Not sure... Need to be checked */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
+	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
 	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("reel3_scroll")
+	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
 
     /* Not really PPI's... They are emulated/simulated inside the CPLDs */
 	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
@@ -268,6 +317,7 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf650, 0xf650) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
 	AM_RANGE(0xf660, 0xf660) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
 	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
+
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1664,13 +1714,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldstar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Bet Red / 2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Small / 1 / Info")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 3 / Small / 1 / Info")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet Blue / D-UP / 3")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big / Ticket")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop 1 / Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop 2 / Big / Ticket")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("Start / Stop All / 4")
 
 	PORT_START("IN1")
@@ -1678,9 +1728,10 @@ static INPUT_PORTS_START( goldstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* this is not a coin, not sure what it is */
-													/* maybe it's used to buy tickets. Will check soon. */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* this is not a coin, not sure what it is */
+	/* maybe it's used to buy tickets. Will check soon. */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Collect")
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Statistics")
 
@@ -6324,8 +6375,9 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6359,8 +6411,9 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bl)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6393,8 +6446,9 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ml)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ml)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6427,8 +6481,9 @@ static MACHINE_CONFIG_START( goldfrui, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldfrui)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldfrui)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
@@ -6464,8 +6519,9 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", goldstar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6563,8 +6619,9 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chry10)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chry10)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6604,8 +6661,9 @@ static MACHINE_CONFIG_START( cb3e, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cb3e)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3e)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6645,8 +6703,9 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cb3c)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3c)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6685,8 +6744,9 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 
@@ -6726,8 +6786,9 @@ static MACHINE_CONFIG_START( wcherry, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cb3e)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3e)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state, cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6766,8 +6827,9 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmbitmap)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmbitmap)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6806,8 +6868,9 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6841,8 +6904,9 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cmast91)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmast91)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cmast91)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6882,8 +6946,9 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
@@ -6922,8 +6987,9 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -6961,8 +7027,9 @@ static MACHINE_CONFIG_START( bingownga, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bingownga)       /* GFX Decode is the only difference with the parent machine */
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingownga)       /* GFX Decode is the only difference with the parent machine */
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7017,8 +7084,9 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_magical)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", magodds)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,magodds)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7058,8 +7126,9 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 
@@ -7093,8 +7162,9 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7133,8 +7203,9 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ncb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7174,8 +7245,9 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7213,8 +7285,9 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_amcoe1a)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7252,8 +7325,9 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7286,8 +7360,9 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nfm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nfm)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7317,8 +7392,9 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_unkch)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", unkch)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -7366,8 +7442,9 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pkrmast)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkrmast)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -7402,8 +7479,9 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", megaline)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
@@ -11561,7 +11639,6 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 void goldstar_state::do_blockswaps(UINT8* ROM)
 {
 	int A;
-	UINT8 *buffer;
 
 	static const UINT16 cherry_swaptables[32] = {
 		/* to align with goldstar */
@@ -11577,7 +11654,7 @@ void goldstar_state::do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	dynamic_buffer buffer(0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
@@ -11585,8 +11662,6 @@ void goldstar_state::do_blockswaps(UINT8* ROM)
 	{
 		memcpy(ROM+A*0x800,buffer+cherry_swaptables[A],0x800);
 	}
-
-	auto_free(machine(), buffer);
 }
 
 void goldstar_state::dump_to_file( UINT8* ROM)
@@ -12253,8 +12328,8 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 **********************************************
 
        YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT    COMPANY              FULLNAME                                      FLAGS              LAYOUT */
-GAME(  199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0 )
-GAME(  199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0 )
+GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
+GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
@@ -12264,13 +12339,13 @@ GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,  
 
 
 // are these really dyna, or bootlegs?
-GAME(  199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
-GAME(  199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
-GAME(  199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
-GAME(  199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0 )
+GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
+GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
+GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
-GAME(  199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0 )
-GAME(  199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0 )
+GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
+GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_cherryb3 )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 

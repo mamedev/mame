@@ -204,6 +204,8 @@ MACHINE_CONFIG_FRAGMENT( omti_disk )
 	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
 
 	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -274,8 +276,7 @@ void omti8621_device::device_start()
 
 	m_installed = false;
 
-	sector_buffer = auto_alloc_array(machine(), UINT8, OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
-	assert(sector_buffer != NULL);
+	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
 	m_timer = timer_alloc(0, NULL);
 
@@ -315,9 +316,6 @@ void omti8621_device::device_reset()
 		}
 
 		m_isa->set_dma_channel(2, this, TRUE);
-
-		m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_irq_w), this));
-		m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(omti8621_device::fdc_drq_w), this));
 
 		m_installed = true;
 	}
@@ -1241,12 +1239,12 @@ void omti8621_device::set_jumper(UINT16 disk_type)
 }
 
 // FDC uses the standard IRQ 6 / DMA 2, doesn't appear to be configurable
-void omti8621_device::fdc_irq_w(bool state)
+WRITE_LINE_MEMBER( omti8621_device::fdc_irq_w )
 {
 	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void omti8621_device::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( omti8621_device::fdc_drq_w )
 {
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

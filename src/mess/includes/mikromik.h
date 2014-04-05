@@ -44,6 +44,7 @@ public:
 			m_fdc(*this, UPD765_TAG),
 			m_mpsc(*this, UPD7201_TAG),
 			m_hgdc(*this, UPD7220_TAG),
+			m_palette(*this, "palette"),
 			m_speaker(*this, "speaker"),
 			m_floppy0(*this, UPD765_TAG ":0:525qd"),
 			m_floppy1(*this, UPD765_TAG ":1:525qd"),
@@ -82,6 +83,7 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;
+	required_device<palette_device> m_palette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;

@@ -184,9 +184,9 @@ void z88cart_slot_device::call_unload()
     call softlist load
 -------------------------------------------------*/
 
-bool z88cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool z88cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -194,9 +194,9 @@ bool z88cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_ent
     get default card software
 -------------------------------------------------*/
 
-const char * z88cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void z88cart_slot_device::get_default_card_software(astring &result)
 {
-	return software_get_default_slot(config, options, this, "128krom");
+	software_get_default_slot(result, "128krom");
 }
 
 

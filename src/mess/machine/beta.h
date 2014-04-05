@@ -10,6 +10,8 @@
 #ifndef __BETA_H__
 #define __BETA_H__
 
+#include "machine/wd17xx.h"
+
 
 #define BETA_DISK_TAG   "beta"
 
@@ -31,6 +33,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sector_w);
 	DECLARE_WRITE8_MEMBER(data_w);
 	
+	DECLARE_WRITE_LINE_MEMBER(wd179x_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(wd179x_drq_w);
+	
 	int is_active();
 	void enable();
 	void disable();
@@ -48,7 +53,7 @@ protected:
 
 private:
 	// internal state
-	device_t *m_wd179x;
+	wd2793_device *m_wd179x;
 };
 
 extern const device_type BETA_DISK;

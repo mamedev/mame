@@ -66,6 +66,8 @@ public:
 	required_ioport m_iobase;
 	required_ioport m_biosopts;
 
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
@@ -102,7 +104,7 @@ private:
 	int command_status;
 
 	// data buffer
-	UINT8 *sector_buffer;
+	dynamic_buffer sector_buffer;
 	UINT8 *data_buffer;
 	int data_length;
 	int data_index;
@@ -142,9 +144,6 @@ private:
 	void set_jumper(UINT16 disk_type);
 	DECLARE_READ8_MEMBER(read8);
 	DECLARE_WRITE8_MEMBER(write8);
-	void fdc_irq_w(bool state);
-	void fdc_drq_w(bool state);
-
 };
 
 extern const device_type ISA16_OMTI8621;

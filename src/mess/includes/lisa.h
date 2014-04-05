@@ -196,7 +196,6 @@ public:
 	DECLARE_READ16_MEMBER(lisa_IO_r);
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
 
-	void set_scc_interrupt(bool value);
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);
 	DECLARE_DRIVER_INIT(lisa2);

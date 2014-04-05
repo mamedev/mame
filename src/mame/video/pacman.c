@@ -240,7 +240,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 
 			color = ( spriteram[offs + 1] & 0x1f ) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
-			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
@@ -248,7 +248,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
@@ -278,7 +278,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 			fx = (spriteram[offs] & 1) ^ m_inv_spr;
 			fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
 
-			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fx,fy,
@@ -286,7 +286,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,spriteclip,
+			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
 					( spriteram[offs] >> 2 ) | (m_spritebank << 6),
 					color,
 					fy,fx,          //FIXME: flipping bits are really supposed to be inverted here?
@@ -407,7 +407,7 @@ UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind1
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				(spriteram[offs] >> 2) | ((m_s2650_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
@@ -427,7 +427,7 @@ UINT32 pacman_state::screen_update_s2650games(screen_device &screen, bitmap_ind1
 		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
-		m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 				(spriteram[offs] >> 2) | ((m_s2650_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,

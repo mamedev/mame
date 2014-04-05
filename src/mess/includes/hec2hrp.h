@@ -146,8 +146,8 @@ public:
 	UINT32 screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(Callback_CK);
 
-	void disc2_fdc_interrupt(bool state);
-	void disc2_fdc_dma_irq(bool state);
+	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
+	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<cassette_image_device> m_cassette;
@@ -181,7 +181,6 @@ public:
 	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
 
 	void hector_disc2_reset();
-	void hector_disc2_init();
 };
 
 /* Sound function*/

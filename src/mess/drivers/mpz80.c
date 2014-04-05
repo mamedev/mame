@@ -651,27 +651,6 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 	check_interrupt();
 }
 
-static S100_INTERFACE( s100_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, s100_pint_w),
-	DEVCB_DRIVER_LINE_MEMBER(mpz80_state, s100_nmi_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, Z80_INPUT_LINE_WAIT),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // slot devices
 #include "bus/s100/dj2db.h"
 #include "bus/s100/djdma.h"
@@ -734,7 +713,10 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_CPU_IO_MAP(mpz80_io)
 
 	// S-100
-	MCFG_S100_BUS_ADD(s100_intf)
+	MCFG_S100_BUS_ADD()
+	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
+	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
 	MCFG_S100_SLOT_ADD("s100_1", mpz80_s100_cards, "mm65k16s")
 	MCFG_S100_SLOT_ADD("s100_2", mpz80_s100_cards, "wunderbus")
 	MCFG_S100_SLOT_ADD("s100_3", mpz80_s100_cards, "dj2db")

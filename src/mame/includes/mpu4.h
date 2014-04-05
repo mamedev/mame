@@ -180,6 +180,8 @@ public:
 	DECLARE_DRIVER_INIT(m_frkstn);
 	DECLARE_DRIVER_INIT(m4default_big);
 	DECLARE_DRIVER_INIT(m4default);
+	DECLARE_DRIVER_INIT(m4default_banks);
+	DECLARE_DRIVER_INIT(m4default_reels);
 	DECLARE_DRIVER_INIT(m_blsbys);
 	DECLARE_DRIVER_INIT(m_oldtmr);
 	DECLARE_DRIVER_INIT(m4tst);

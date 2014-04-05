@@ -218,6 +218,21 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/coleco/ctrl.h,BUSES += COLECO
+#-------------------------------------------------
+
+ifneq ($(filter COLECO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/coleco
+BUSOBJS += $(BUSOBJ)/coleco/ctrl.o
+BUSOBJS += $(BUSOBJ)/coleco/hand.o
+BUSOBJS += $(BUSOBJ)/coleco/sac.o
+BUSOBJS += $(BUSOBJ)/coleco/exp.o
+BUSOBJS += $(BUSOBJ)/coleco/std.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/ecbbus/ecbbus.h,BUSES += ECBBUS
 #-------------------------------------------------
 
@@ -690,6 +705,7 @@ BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
 BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
 BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o
+BUSOBJS += $(BUSOBJ)/rs232/teleprinter.o
 BUSOBJS += $(BUSOBJ)/rs232/terminal.o
 endif
 
@@ -713,6 +729,7 @@ endif
 ifneq ($(filter PCI,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/pci
 BUSOBJS += $(BUSOBJ)/pci/pci.o
+BUSOBJS += $(BUSOBJ)/pci/cirrus.o
 BUSOBJS += $(BUSOBJ)/pci/i82371ab.o
 BUSOBJS += $(BUSOBJ)/pci/i82371sb.o
 BUSOBJS += $(BUSOBJ)/pci/i82439tx.o
@@ -891,3 +908,94 @@ BUSOBJS += $(BUSOBJ)/gba/gba_slot.o
 BUSOBJS += $(BUSOBJ)/gba/rom.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/bml3/bml3bus.h,BUSES += BML3
+#-------------------------------------------------
+ifneq ($(filter BML3,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/bml3
+BUSOBJS += $(BUSOBJ)/bml3/bml3bus.o
+BUSOBJS += $(BUSOBJ)/bml3/bml3mp1802.o
+BUSOBJS += $(BUSOBJ)/bml3/bml3mp1805.o
+BUSOBJS += $(BUSOBJ)/bml3/bml3kanji.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/coco/cococart.h,BUSES += COCO
+#-------------------------------------------------
+ifneq ($(filter COCO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/coco
+BUSOBJS += $(BUSOBJ)/coco/cococart.o
+BUSOBJS += $(BUSOBJ)/coco/coco_232.o
+BUSOBJS += $(BUSOBJ)/coco/coco_orch90.o
+BUSOBJS += $(BUSOBJ)/coco/coco_pak.o
+BUSOBJS += $(BUSOBJ)/coco/coco_fdc.o
+BUSOBJS += $(BUSOBJ)/coco/coco_multi.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/cpc/cpcexp.h,BUSES += CPC
+#-------------------------------------------------
+ifneq ($(filter CPC,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/cpc
+BUSOBJS += $(BUSOBJ)/cpc/cpcexp.o
+BUSOBJS += $(BUSOBJ)/cpc/cpc_ssa1.o
+BUSOBJS += $(BUSOBJ)/cpc/cpc_rom.o
+BUSOBJS += $(BUSOBJ)/cpc/cpc_pds.o
+BUSOBJS += $(BUSOBJ)/cpc/mface2.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/epson_sio/epson_sio.h,BUSES += EPSON_SIO
+#-------------------------------------------------
+ifneq ($(filter EPSON_SIO,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/epson_sio
+BUSOBJS += $(BUSOBJ)/epson_sio/epson_sio.o
+BUSOBJS += $(BUSOBJ)/epson_sio/pf10.o
+BUSOBJS += $(BUSOBJ)/epson_sio/tf20.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/pce/pce_slot.h,BUSES += PCE
+#-------------------------------------------------
+ifneq ($(filter PCE,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/pce
+BUSOBJS += $(BUSOBJ)/pce/pce_slot.o
+BUSOBJS += $(BUSOBJ)/pce/pce_rom.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/x68k/x68kexp.h,BUSES += X68K
+#-------------------------------------------------
+ifneq ($(filter X68K,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/x68k
+BUSOBJS += $(BUSOBJ)/x68k/x68kexp.o
+BUSOBJS += $(BUSOBJ)/x68k/x68k_neptunex.o
+BUSOBJS += $(BUSOBJ)/x68k/x68k_scsiext.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/abckb/abckb.h,BUSES += ABCKB
+#-------------------------------------------------
+ifneq ($(filter ABCKB,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/abckb
+BUSOBJS += $(BUSOBJ)/abckb/abckb.o
+BUSOBJS += $(BUSOBJ)/abckb/abc77.o
+BUSOBJS += $(BUSOBJ)/abckb/abc99.o
+BUSOBJS += $(BUSOBJ)/abckb/abc800kb.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/compucolor/compclr_flp.h,BUSES += COMPUCOLOR
+#-------------------------------------------------
+ifneq ($(filter COMPUCOLOR,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/compucolor
+BUSOBJS += $(BUSOBJ)/compucolor/floppy.o
+endif

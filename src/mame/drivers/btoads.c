@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, btoads_state )
 	AM_RANGE(0xa8800000, 0xa8ffffff) AM_WRITENOP
 	AM_RANGE(0xb0000000, 0xb03fffff) AM_READWRITE(vram_bg0_r, vram_bg0_w) AM_SHARE("vram_bg0")
 	AM_RANGE(0xb4000000, 0xb43fffff) AM_READWRITE(vram_bg1_r, vram_bg1_w) AM_SHARE("vram_bg1")
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE_LEGACY(tms34020_io_register_r, tms34020_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("maincpu", tms34020_device, io_register_r, io_register_w)
 	AM_RANGE(0xfc000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 

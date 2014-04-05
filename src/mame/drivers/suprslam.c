@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_CPU_IO_MAP(sound_io_map)
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", suprslam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprslam)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -322,6 +322,7 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suprslam_state, screen_update_suprslam)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)

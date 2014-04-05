@@ -220,6 +220,7 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_SCREEN_SIZE(720, 560)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 560-1)
 	MCFG_SCREEN_UPDATE_DRIVER(concept_state, screen_update_concept)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -238,8 +239,10 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(concept_state, via_irq_func))
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, XTAL_1_8432MHz)
-	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	MCFG_CONCEPT_EXP_PORT_ADD("exp1", concept_exp_devices, NULL)
 	MCFG_CONCEPT_EXP_PORT_ADD("exp2", concept_exp_devices, "fdc")   // Flat cable Hard Disk Controller in Slot 2

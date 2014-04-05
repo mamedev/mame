@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
 	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midtunit_control_w)
 	AM_RANGE(0x02000000, 0x07ffffff) AM_READ(midtunit_gfxrom_r) AM_SHARE("gfxrom")
 	AM_RANGE(0x1f800000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0) /* mirror used by MK */
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
@@ -616,6 +616,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(midtunit_state,midtunit)
 MACHINE_CONFIG_END

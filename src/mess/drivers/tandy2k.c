@@ -368,31 +368,6 @@ static CRT9007_INTERFACE( vpac_intf )
 	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, sld_w) // SLD
 };
 
-static CRT9212_INTERFACE( drb0_intf )
-{
-	DEVCB_NULL, // ROF
-	DEVCB_NULL, // WOF
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r), // REN
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r), // WEN
-	DEVCB_LINE_VCC // WEN2
-};
-
-static CRT9212_INTERFACE( drb1_intf )
-{
-	DEVCB_NULL, // ROF
-	DEVCB_NULL, // WOF
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, vlt_r), // REN
-	DEVCB_DEVICE_LINE_MEMBER(CRT9007_TAG, crt9007_device, wben_r), // WEN
-	DEVCB_LINE_VCC // WEN2
-};
-
-static CRT9021_INTERFACE( vac_intf )
-{
-	DEVCB_DEVICE_MEMBER(CRT9212_0_TAG, crt9212_device, read), // data
-	DEVCB_DEVICE_MEMBER(CRT9212_1_TAG, crt9212_device, read), // attributes
-	DEVCB_LINE_VCC // ATTEN
-};
-
 // Intel 8251A Interface
 
 WRITE_LINE_MEMBER( tandy2k_state::rxrdy_w )
@@ -575,12 +550,7 @@ static I8255A_INTERFACE( ppi_intf )
 
 // Intel 8272 Interface
 
-void tandy2k_state::fdc_irq(bool state)
-{
-	m_pic0->ir4_w(state);
-}
-
-void tandy2k_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( tandy2k_state::fdc_drq )
 {
 	dma_request(0, state);
 }
@@ -629,9 +599,6 @@ void tandy2k_state::machine_start()
 
 	program.install_ram(0x00000, ram_size - 1, ram);
 
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(tandy2k_state::fdc_drq), this));
-
 	// register for state saving
 	save_item(NAME(m_dma_mux));
 	save_item(NAME(m_kbdclk));
@@ -666,9 +633,24 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, vpac_intf, vpac_mem)
-	MCFG_CRT9212_ADD(CRT9212_0_TAG, drb0_intf)
-	MCFG_CRT9212_ADD(CRT9212_1_TAG, drb1_intf)
-	MCFG_CRT9021_ADD(CRT9021B_TAG, XTAL_16MHz*28/16/8, vac_intf)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
+	// ROF
+	// WOF
+	MCFG_CRT9212_IN_REN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, vlt_r)) // REN
+	MCFG_CRT9212_IN_WEN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, wben_r)) // WEN
+	MCFG_CRT9212_IN_WEN2_CB(VCC) // WEN2
+	MCFG_DEVICE_ADD(CRT9212_1_TAG, CRT9212, 0)
+	// ROF
+	// WOF
+	MCFG_CRT9212_IN_REN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, vlt_r)) // REN
+	MCFG_CRT9212_IN_WEN_CB(DEVREADLINE(CRT9007_TAG, crt9007_device, wben_r)) // WEN
+	MCFG_CRT9212_IN_WEN2_CB(VCC) // WEN2
+	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/16/8)
+	MCFG_CRT9021_IN_DATA_CB(DEVREAD8(CRT9212_0_TAG, crt9212_device, read)) // data
+	MCFG_CRT9021_IN_ATTR_CB(DEVREAD8(CRT9212_1_TAG, crt9212_device, read)) // attributes
+	MCFG_CRT9021_IN_ATTEN_CB(VCC)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -700,6 +682,8 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -712,7 +696,9 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_TANDY2K_KEYBOARD_ADD(WRITELINE(tandy2k_state, kbdclk_w), WRITELINE(tandy2k_state, kbddat_w))
+	MCFG_DEVICE_ADD(TANDY2K_KEYBOARD_TAG, TANDY2K_KEYBOARD, 0)
+	MCFG_TANDY2000_KEYBOARD_CLOCK_CALLBACK(WRITELINE(tandy2k_state, kbdclk_w))
+	MCFG_TANDY2000_KEYBOARD_DATA_CALLBACK(WRITELINE(tandy2k_state, kbddat_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")

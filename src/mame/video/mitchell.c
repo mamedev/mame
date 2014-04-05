@@ -274,7 +274,7 @@ void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					m_flipscreen, m_flipscreen,

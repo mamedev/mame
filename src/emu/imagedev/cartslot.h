@@ -39,7 +39,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual void call_display_info() { if (!m_device_image_displayinfo.isnull()) m_device_image_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {   load_software_part_region( this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) {   load_software_part_region( *this, swlist, swname, start_entry ); return TRUE; }
 	virtual device_image_partialhash_func get_partial_hash() const { return m_device_image_partialhash; }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }

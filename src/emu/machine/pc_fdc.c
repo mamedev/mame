@@ -19,6 +19,8 @@ const device_type PC_FDC_AT = &device_creator<pc_fdc_at_device>;
 
 static MACHINE_CONFIG_FRAGMENT( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc_fdc_family_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc_fdc_family_device, drq_w))
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_family_device)
@@ -41,18 +43,11 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
 
-pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765")
+pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source), fdc(*this, "upd765"),
+	intrq_cb(*this),
+	drq_cb(*this)
 {
-}
-
-void pc_fdc_family_device::setup_intrq_cb(line_cb cb)
-{
-	intrq_cb = cb;
-}
-
-void pc_fdc_family_device::setup_drq_cb(line_cb cb)
-{
-	drq_cb = cb;
 }
 
 void pc_fdc_family_device::tc_w(bool state)
@@ -77,8 +72,8 @@ machine_config_constructor pc_fdc_family_device::device_mconfig_additions() cons
 
 void pc_fdc_family_device::device_start()
 {
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc_fdc_family_device::irq_w), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc_fdc_family_device::drq_w), this));
+	intrq_cb.resolve();
+	drq_cb.resolve();
 
 	for(int i=0; i<4; i++) {
 		char name[2] = {'0'+i, 0};
@@ -156,13 +151,13 @@ WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
 	dor_w(space, 0, data, mem_mask);
 }
 
-void pc_fdc_family_device::irq_w(bool state)
+WRITE_LINE_MEMBER( pc_fdc_family_device::irq_w )
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-void pc_fdc_family_device::drq_w(bool state)
+WRITE_LINE_MEMBER( pc_fdc_family_device::drq_w )
 {
 	fdc_drq = state;
 	check_drq();

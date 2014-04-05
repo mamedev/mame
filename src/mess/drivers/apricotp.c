@@ -405,16 +405,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  APRICOT_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-static APRICOT_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
@@ -498,17 +488,6 @@ static LEGACY_FLOPPY_OPTIONS_START( act )
 LEGACY_FLOPPY_OPTIONS_END
 */
 
-void fp_state::fdc_intrq_w(bool state)
-{
-	m_pic->ir1_w(state);
-}
-
-void fp_state::fdc_drq_w(bool state)
-{
-	m_dmac->dreq1_w(state);
-}
-
-
 WRITE_LINE_MEMBER( fp_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
@@ -540,10 +519,6 @@ WRITE_LINE_MEMBER( fp_state::write_centronics_perror )
 
 void fp_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_drq_w), this));
-
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fp_state::fp_irq_callback),this));
 
@@ -594,16 +569,17 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(fp_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)	
 
 	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_GFXDECODE_ADD("gfxdecode", act_f1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000, crtc_intf)
 
 	// sound hardware
@@ -612,7 +588,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
+	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 
@@ -624,6 +600,9 @@ static MACHINE_CONFIG_START( fp, fp_state )
 
 	MCFG_Z80SIO0_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir1_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq1_w))
+
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   floppy_image_device::default_floppy_formats)
 

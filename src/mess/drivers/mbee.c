@@ -748,7 +748,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mbee)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbee)
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state,mbee)
@@ -792,7 +792,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mbeeic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbeeic)
 	
 	MCFG_PALETTE_ADD("palette", 96)
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeic)

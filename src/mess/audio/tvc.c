@@ -16,9 +16,10 @@ const device_type TVC_SOUND = &device_creator<tvc_sound_device>;
 //  tvc_sound_device - constructor
 //-------------------------------------------------
 
-tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TVC_SOUND, "TVC 64 Custom Sound", tag, owner, clock, "tvc_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, TVC_SOUND, "TVC 64 Custom Sound", tag, owner, clock, "tvc_sound", __FILE__),
+	device_sound_interface(mconfig, *this),
+	m_write_sndint(*this)
 {
 }
 
@@ -27,11 +28,11 @@ tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 void tvc_sound_device::device_start()
 {
+	// resolve callbacks
+	m_write_sndint.resolve_safe();
+
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this );
 	m_sndint_timer = timer_alloc(TIMER_SNDINT);
-
-	// resolve callbacks
-	m_sndint_func.resolve(m_sndint_cb, *this);
 }
 
 //-------------------------------------------------
@@ -48,34 +49,12 @@ void tvc_sound_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tvc_sound_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tvc_sound_interface *intf = reinterpret_cast<const tvc_sound_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<tvc_sound_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_sndint_cb, 0, sizeof(m_sndint_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
 
 void tvc_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_sndint_func(1);
+	m_write_sndint(1);
 }
 
 //-------------------------------------------------

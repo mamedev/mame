@@ -51,7 +51,6 @@ very fussy with the state machine.
 #include "machine/amigakbd.h"
 #include "machine/amigacd.h"
 #include "machine/amigacrt.h"
-#include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
@@ -98,25 +97,20 @@ public:
 
 
 
-static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_portA_r );
-static DECLARE_READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r );
-static DECLARE_WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w );
 
 /***************************************************************************
   Battery Backed-Up Clock (MSM6264)
 ***************************************************************************/
 
-static READ16_HANDLER( amiga_clock_r )
+READ16_MEMBER( amiga_state::amiga_clock_r )
 {
-	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
-	return rtc->read(space,offset / 2);
+	return m_rtc->read(space, offset / 2);
 }
 
 
-static WRITE16_HANDLER( amiga_clock_w )
+WRITE16_MEMBER( amiga_state::amiga_clock_w )
 {
-	msm6242_device *rtc = space.machine().device<msm6242_device>("rtc");
-	rtc->write(space,offset / 2, data);
+	m_rtc->write(space, offset / 2, data);
 }
 
 
@@ -242,7 +236,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(cdtv_mem, AS_PROGRAM, 16, amiga_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE_LEGACY(amiga_clock_r, amiga_clock_w)
+	AM_RANGE(0xdc0000, 0xdc003f) AM_READWRITE(amiga_clock_r, amiga_clock_w)
 	AM_RANGE(0xdc8000, 0xdc87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xdf0000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")    /* Custom Chips */
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
@@ -516,8 +510,8 @@ static const legacy_mos6526_interface cia_0_ntsc_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -528,8 +522,8 @@ static const legacy_mos6526_interface cia_0_pal_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -552,8 +546,8 @@ static const legacy_mos6526_interface cia_0_cdtv_intf =
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, write_strobe),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_cdtv_portA_r),
-	DEVCB_DEVICE_HANDLER("cia_0", amiga_cia_0_portA_w),                     /* port A */
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_cdtv_portA_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amiga_cia_0_portA_w),                     /* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write) /* port B */
 };
@@ -572,12 +566,12 @@ static const legacy_mos6526_interface cia_1_cdtv_intf =
 
 static const tpi6525_interface cdtv_tpi_intf =
 {
-	DEVCB_DEVICE_LINE("tpi6525", amigacd_tpi6525_irq),
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amigacd_tpi6525_irq),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portb_w),
-	DEVCB_DEVICE_HANDLER("tpi6525", amigacd_tpi6525_portc_r),
+	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portb_w),
+	DEVCB_DRIVER_MEMBER(amiga_state, amigacd_tpi6525_portc_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -627,11 +621,6 @@ static MACHINE_CONFIG_FRAGMENT( amiga_cartslot )
 	MCFG_CARTSLOT_NOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MSM6242_INTERFACE( amiga_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( ntsc, amiga_state )
 	/* basic machine hardware */
@@ -657,6 +646,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 //  MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 262-1)
 	MCFG_SCREEN_RAW_PARAMS(AMIGA_68000_NTSC_CLOCK*2,228*4,214,228*4,262,34,262)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga )
@@ -664,7 +654,7 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
@@ -859,7 +849,7 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 //  MCFG_SCREEN_RAW_PARAMS(AMIGA_68EC020_NTSC_CLOCK,512*2,(129-8-8)*2,(449+8-1+8)*2,312,44-8,300+8)
 	MCFG_SCREEN_RAW_PARAMS(AMIGA_68EC020_NTSC_CLOCK,228*4,214,228*4,262,34,262)
 
-	MCFG_SCREEN_UPDATE_DRIVER(a1200_state, screen_update_amiga_aga)
+	MCFG_SCREEN_UPDATE_DRIVER(a1200_state, screen_update_amiga_aga)	
 
 	MCFG_VIDEO_START_OVERRIDE(a1200_state,amiga_aga)
 
@@ -871,7 +861,7 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
@@ -971,6 +961,7 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 //  MCFG_SCREEN_SIZE(228*4, 262)
 //  MCFG_SCREEN_VISIBLE_AREA(214, (228*4)-1, 34, 262-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amiga_state, amiga )
@@ -978,7 +969,7 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_VIDEO_START_OVERRIDE(amiga_state,amiga)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc",amiga_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(amiga_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amiga_state, write_centronics_busy))
@@ -1041,7 +1032,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
+READ8_MEMBER( amiga_state::amiga_cia_0_portA_r )
 {
 	UINT8 ret = space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;   /* Gameport 1 and 0 buttons */
 	ret |= space.machine().device<amiga_fdc>("fdc")->ciaapra_r();
@@ -1049,28 +1040,27 @@ static READ8_DEVICE_HANDLER( amiga_cia_0_portA_r )
 }
 
 
-static READ8_DEVICE_HANDLER( amiga_cia_0_cdtv_portA_r )
+READ8_MEMBER( amiga_state::amiga_cia_0_cdtv_portA_r )
 {
 	return space.machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;    /* Gameport 1 and 0 buttons */
 }
 
 
-static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
+WRITE8_MEMBER( amiga_state::amiga_cia_0_portA_w )
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
-	state->m_bank1->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
-		UINT32 mirror_mask = state->m_chip_ram.bytes();
+		UINT32 mirror_mask = m_chip_ram.bytes();
 
 		while( (mirror_mask<<1) < 0x100000 ) {
 			mirror_mask |= ( mirror_mask << 1 );
 		}
 
 		/* overlay disabled, map RAM on 0x000000 */
-		state->m_maincpu_program_space->install_write_bank(0x000000, state->m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
+		m_maincpu_program_space->install_write_bank(0x000000, m_chip_ram.bytes() - 1, 0, mirror_mask, "bank1");
 
 		/* if there is a cart region, check for cart overlay */
 		if (space.machine().root_device().memregion("user2")->base() != NULL)
@@ -1078,7 +1068,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 	}
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		state->m_maincpu_program_space->unmap_write(0x000000, state->m_chip_ram.bytes() - 1);
+		m_maincpu_program_space->unmap_write(0x000000, m_chip_ram.bytes() - 1);
 
 	set_led_status( space.machine(), 0, ( data & 2 ) ? 0 : 1 ); /* bit 2 = Power Led on Amiga */
 	output_set_value("power_led", ( data & 2 ) ? 0 : 1);
@@ -1118,7 +1108,7 @@ static void amiga_reset(running_machine &machine)
 	if (machine.root_device().ioport("hardware")->read() & 0x08)
 	{
 		/* Install RTC */
-		state->m_maincpu_program_space->install_legacy_readwrite_handler(0xdc0000, 0xdc003f, FUNC(amiga_clock_r), FUNC(amiga_clock_w));
+		state->m_maincpu_program_space->install_readwrite_handler(0xdc0000, 0xdc003f, read16_delegate(FUNC(amiga_state::amiga_clock_r), state), write16_delegate(FUNC(amiga_state::amiga_clock_w), state));
 	}
 	else
 	{

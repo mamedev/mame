@@ -197,7 +197,7 @@ void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-			 gfx->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+			 gfx->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
 		}
 	}
 }
@@ -311,10 +311,11 @@ MACHINE_CONFIG_FRAGMENT( mystston_video )
 	MCFG_VIDEO_START_OVERRIDE(mystston_state,mystston)
 	MCFG_VIDEO_RESET_OVERRIDE(mystston_state,mystston)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mystston)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mystston)
 	MCFG_PALETTE_ADD("palette", 0x40)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mystston_state, screen_update_mystston)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END

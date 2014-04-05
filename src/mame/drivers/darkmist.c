@@ -241,8 +241,9 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update_darkmist)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", darkmist)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkmist)
 	MCFG_PALETTE_ADD("palette", 0x100*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
 	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
@@ -313,7 +314,7 @@ ROM_END
 
 void darkmist_state::decrypt_gfx()
 {
-	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x40000);
+	dynamic_buffer buf(0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -385,8 +386,6 @@ void darkmist_state::decrypt_gfx()
 	{
 		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
 	}
-
-	auto_free(machine(), buf);
 }
 
 void darkmist_state::decrypt_snd()
@@ -403,7 +402,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);
+	dynamic_buffer buffer(0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	decrypt_gfx();
@@ -470,8 +469,6 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
-
-	auto_free(machine(), buffer);
 }
 
 GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Taito Corporation", "The Lost Castle In Darkmist", GAME_IMPERFECT_GRAPHICS|GAME_NO_COCKTAIL )

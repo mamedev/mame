@@ -316,7 +316,6 @@ static GFXDECODE_START( fp1100 )
 	//GFXDECODE_ENTRY( "chargen", 0x0000, fp1100_chars_8x8, 0, 1 )
 GFXDECODE_END
 
-//static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
 
 
 static MC6845_INTERFACE( mc6845_intf )
@@ -361,7 +360,7 @@ static MACHINE_CONFIG_START( fp1100, fp1100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_GFXDECODE_ADD("gfxdecode", fp1100)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp1100)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MAIN_CLOCK/2, mc6845_intf)   /* hand tuned to get ~60 fps */

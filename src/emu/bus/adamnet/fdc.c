@@ -113,11 +113,6 @@ ADDRESS_MAP_END
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-void adam_fdc_device::fdc_intrq_w(bool state)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 FLOPPY_FORMATS_MEMBER( adam_fdc_device::floppy_formats )
 	FLOPPY_ADAM_FORMAT
 FLOPPY_FORMATS_END
@@ -137,6 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_fdc )
 	MCFG_CPU_IO_MAP(adam_fdc_io)
 
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_4MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -203,7 +199,6 @@ adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag,
 
 void adam_fdc_device::device_start()
 {
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(adam_fdc_device::fdc_intrq_w), this));
 }
 
 

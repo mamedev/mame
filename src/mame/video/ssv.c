@@ -141,11 +141,10 @@ Note: press Z to show some info on each sprite (debug builds only)
 #endif
 
 
-static void ssv_drawgfx(    bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
+void ssv_state::ssv_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					int shadow )
 {
-	ssv_state *state = gfx->machine().driver_data<ssv_state>();
 	const UINT8 *addr, *source;
 	UINT8 pen;
 	UINT16 *dest;
@@ -183,7 +182,7 @@ static void ssv_drawgfx(    bitmap_ind16 &bitmap, const rectangle &cliprect, gfx
 
 	if (shadow)
 	{
-		SSV_DRAWGFX( { dest[sx] = ((dest[sx] & state->m_shadow_pen_mask) | (pen << state->m_shadow_pen_shift)) & 0x7fff; } )
+		SSV_DRAWGFX( { dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff; } )
 	}
 	else
 	{

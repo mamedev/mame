@@ -47,6 +47,8 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( mufdc_device )
 	MCFG_MCS3201_ADD("fdc")
 	MCFG_MCS3201_INPUT_HANDLER(READ8(mufdc_device, fdc_input_r))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(mufdc_device, fdc_irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(mufdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", drives, "35hd", mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", drives, "35hd", mufdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", drives, NULL, mufdc_device::floppy_formats)
@@ -164,9 +166,6 @@ void mufdc_device::device_reset()
 	m_isa->install_rom(this, 0xc8000, 0xc9fff, 0, 0, m_shortname, "option");
 	m_isa->install_device(0x3f0, 0x3f7, *m_fdc, &pc_fdc_interface::map);
 	m_isa->set_dma_channel(2, this, true);
-
-	m_fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(mufdc_device::fdc_irq_w), this));
-	m_fdc->setup_drq_cb(pc_fdc_interface::line_cb(FUNC(mufdc_device::fdc_drq_w), this));
 }
 
 
@@ -179,12 +178,12 @@ READ8_MEMBER( mufdc_device::fdc_input_r )
 	return ~m_config->read();
 }
 
-void mufdc_device::fdc_irq_w(bool state)
+WRITE_LINE_MEMBER( mufdc_device::fdc_irq_w )
 {
 	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void mufdc_device::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( mufdc_device::fdc_drq_w )
 {
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

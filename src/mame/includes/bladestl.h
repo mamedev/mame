@@ -51,8 +51,9 @@ public:
 	required_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void set_pens();
+	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 };
 
 /*----------- defined in video/bladestl.c -----------*/
-void bladestl_tile_callback(running_machine &machine, int layer, int bank, int *code, int *color, int *flags);
 void bladestl_sprite_callback(running_machine &machine, int *code, int *color);

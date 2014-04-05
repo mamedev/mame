@@ -677,9 +677,9 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 		if (drive < 4)
 		{
 			LOG(("lx390_motor_w, set drive %1d\n", drive));
-			wd17xx_set_drive(m_wd1771,drive);
+			m_wd1771->set_drive(drive);
 			LOG(("lx390_motor_w, set side %1d\n", m_wd17xx_state.head));
-			wd17xx_set_side(m_wd1771, m_wd17xx_state.head);
+			m_wd1771->set_side(m_wd17xx_state.head);
 		}
 }
 
@@ -708,19 +708,19 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 	switch(offset)
 	{
 	case 0:
-		d = wd17xx_status_r(m_wd1771, space, 0) ^ 0xff;
+		d = m_wd1771->status_r(space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx status: %02x\n", d));
 		break;
 	case 1:
-		d = wd17xx_track_r(m_wd1771, space, 0) ^ 0xff;
+		d = m_wd1771->track_r(space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx track:  %02x\n", d));
 		break;
 	case 2:
-		d = wd17xx_sector_r(m_wd1771, space, 0) ^ 0xff;
+		d = m_wd1771->sector_r(space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx sector: %02x\n", d));
 		break;
 	case 3:
-		d = wd17xx_data_r(m_wd1771, space, 0) ^ 0xff;
+		d = m_wd1771->data_r(space, 0) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data3:  %02x\n", d));
 		break;
 	case 6:
@@ -728,7 +728,7 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 		lx390_reset_bank(space, 0);
 		break;
 	case 7:
-		d = wd17xx_data_r(m_wd1771, space, 3) ^ 0xff;
+		d = m_wd1771->data_r(space, 3) ^ 0xff;
 		LOG(("lx390_fdc_r, WD17xx data7, force:  %02x\n", d));
 		break;
 	default:
@@ -746,7 +746,7 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 	{
 	case 0:
 		LOG(("lx390_fdc_w, WD17xx command: %02x\n", d));
-		wd17xx_command_w(m_wd1771, space, offset, d ^ 0xff);
+		m_wd1771->command_w(space, offset, d ^ 0xff);
 		if (m_wd17xx_state.drive & 1)
 			output_set_value("drv0", 2);
 		else if (m_wd17xx_state.drive & 2)
@@ -754,14 +754,14 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 		break;
 	case 1:
 		LOG(("lx390_fdc_w, WD17xx track:   %02x\n", d));
-		wd17xx_track_w(m_wd1771, space, offset, d ^ 0xff);
+		m_wd1771->track_w(space, offset, d ^ 0xff);
 		break;
 	case 2:
 		LOG(("lx390_fdc_w, WD17xx sector:  %02x\n", d));
-		wd17xx_sector_w(m_wd1771, space, offset, d ^ 0xff);
+		m_wd1771->sector_w(space, offset, d ^ 0xff);
 		break;
 	case 3:
-		wd17xx_data_w(m_wd1771, space, 0, d ^ 0xff);
+		m_wd1771->data_w(space, 0, d ^ 0xff);
 		LOG(("lx390_fdc_w, WD17xx data3:   %02x\n", d));
 		break;
 	case 6:
@@ -770,7 +770,7 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 		break;
 	case 7:
 		LOG(("lx390_fdc_w, WD17xx data7, force:   %02x\n", d));
-		wd17xx_data_w(m_wd1771, space, 3, d ^ 0xff);
+		m_wd1771->data_w(space, 3, d ^ 0xff);
 		break;
 	}
 }

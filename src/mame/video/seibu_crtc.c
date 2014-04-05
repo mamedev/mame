@@ -185,14 +185,14 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER( seibu_crtc_device::layer_en_w)
 {
-	if (!m_layer_en_func.isnull())
-		m_layer_en_func(0,data,mem_mask);
+	if (!m_layer_en_cb.isnull())
+		m_layer_en_cb(0,data,mem_mask);
 }
 
 WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
 {
-	if (!m_layer_scroll_func.isnull())
-		m_layer_scroll_func(offset,data,mem_mask);
+	if (!m_layer_scroll_cb.isnull())
+		m_layer_scroll_cb(offset,data,mem_mask);
 }
 
 //**************************************************************************
@@ -207,6 +207,8 @@ seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
+		m_layer_en_cb(*this),
+		m_layer_scroll_cb(*this),
 		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, NULL, *ADDRESS_MAP_NAME(seibu_crtc_vregs))
 {
 }
@@ -221,36 +223,14 @@ void seibu_crtc_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void seibu_crtc_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const seibu_crtc_interface *intf = reinterpret_cast<const seibu_crtc_interface *>(static_config());
-	if (intf != NULL)
-			*static_cast<seibu_crtc_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-//      memset(&m_layer_en, 0, sizeof(m_layer_en));
-	}
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void seibu_crtc_device::device_start()
 {
-	m_layer_en_func.resolve(m_layer_en_cb, *this);
-	m_layer_scroll_func.resolve(m_layer_scroll_cb, *this);
-
+	m_layer_en_cb.resolve();
+	m_layer_scroll_cb.resolve();
 }
 
 

@@ -142,7 +142,7 @@ READ32_MEMBER( psxrcnt_device::read )
 UINT64 psxrcnt_device::gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
-	return machine().firstcpu->total_cycles() * 2;
+	return ((cpu_device *)owner())->total_cycles() * 2;
 }
 
 int psxrcnt_device::root_divider( int n_counter )
@@ -221,6 +221,7 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 
 		n_duration *= root_divider( n_counter );
 
+		// TODO: figure out if this should be calculated from the cpu clock for 50mhz boards?
 		root->timer->adjust( attotime::from_hz(33868800) * n_duration, n_counter);
 	}
 }

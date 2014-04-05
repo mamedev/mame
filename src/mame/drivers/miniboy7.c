@@ -447,8 +447,9 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(miniboy7_state, screen_update_miniboy7)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", miniboy7)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)

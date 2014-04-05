@@ -693,7 +693,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		(downcast<tms34010_device*>(device))->io_register_w(device->space(AS_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1184,9 +1184,9 @@ static const char *const ioreg_name[] =
 };
 #endif
 
-WRITE16_HANDLER( tms34010_io_register_w )
+WRITE16_MEMBER( tms34010_device::io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1224,50 +1224,57 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 		case REG_HSTCTLH:
 			/* if the CPU is halting itself, stop execution right away */
-			if ((data & 0x8000) && !tms->external_host_access)
-				tms->icount = 0;
-			tms->device->set_input_line(INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			if (mem_mask & 0xff00)
+			{
+				if ((data & 0x8000) && !tms->external_host_access)
+					tms->icount = 0;
 
-			/* NMI issued? */
-			if (data & 0x0100)
-				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
+				tms->device->set_input_line(INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+
+				/* NMI issued? */
+				if (data & 0x0100)
+					tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), 0, tms);
+			}
 			break;
 
 		case REG_HSTCTLL:
-			/* the TMS34010 can change MSGOUT, can set INTOUT, and can clear INTIN */
-			if (!tms->external_host_access)
+			if (mem_mask & 0x00ff)
 			{
-				newreg = (oldreg & 0xff8f) | (data & 0x0070);
-				newreg |= data & 0x0080;
-				newreg &= data | ~0x0008;
-			}
+				/* the TMS34010 can change MSGOUT, can set INTOUT, and can clear INTIN */
+				if (!tms->external_host_access)
+				{
+					newreg = (oldreg & 0xff8f) | (data & 0x0070);
+					newreg |= data & 0x0080;
+					newreg &= data | ~0x0008;
+				}
 
-			/* the host can change MSGIN, can set INTIN, and can clear INTOUT */
-			else
-			{
-				newreg = (oldreg & 0xfff8) | (data & 0x0007);
-				newreg &= data | ~0x0080;
-				newreg |= data & 0x0008;
-			}
-			IOREG(tms, offset) = newreg;
+				/* the host can change MSGIN, can set INTIN, and can clear INTOUT */
+				else
+				{
+					newreg = (oldreg & 0xfff8) | (data & 0x0007);
+					newreg &= data | ~0x0080;
+					newreg |= data & 0x0008;
+				}
+				IOREG(tms, offset) = newreg;
 
-			/* the TMS34010 can set output interrupt? */
-			if (!(oldreg & 0x0080) && (newreg & 0x0080))
-			{
-				if (tms->config->output_int)
-					(*tms->config->output_int)(&space.device(), 1);
-			}
-			else if ((oldreg & 0x0080) && !(newreg & 0x0080))
-			{
-				if (tms->config->output_int)
-					(*tms->config->output_int)(&space.device(), 0);
-			}
+				/* the TMS34010 can set output interrupt? */
+				if (!(oldreg & 0x0080) && (newreg & 0x0080))
+				{
+					if (tms->config->output_int)
+						(*tms->config->output_int)(&space.device(), 1);
+				}
+				else if ((oldreg & 0x0080) && !(newreg & 0x0080))
+				{
+					if (tms->config->output_int)
+						(*tms->config->output_int)(&space.device(), 0);
+				}
 
-			/* input interrupt? (should really be state-based, but the functions don't exist!) */
-			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
-			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
-				IOREG(tms, REG_INTPEND) &= ~TMS34010_HI;
+				/* input interrupt? (should really be state-based, but the functions don't exist!) */
+				if (!(oldreg & 0x0008) && (newreg & 0x0008))
+					tms->device->machine().scheduler().synchronize(FUNC(internal_interrupt_callback), TMS34010_HI, tms);
+				else if ((oldreg & 0x0008) && !(newreg & 0x0008))
+					IOREG(tms, REG_INTPEND) &= ~TMS34010_HI;
+			}
 			break;
 
 		case REG_CONVSP:
@@ -1329,9 +1336,9 @@ static const char *const ioreg020_name[] =
 };
 #endif
 
-WRITE16_HANDLER( tms34020_io_register_w )
+WRITE16_MEMBER( tms34020_device::io_register_w )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1492,9 +1499,9 @@ WRITE16_HANDLER( tms34020_io_register_w )
     I/O REGISTER READS
 ***************************************************************************/
 
-READ16_HANDLER( tms34010_io_register_r )
+READ16_MEMBER( tms34010_device::io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1535,9 +1542,9 @@ READ16_HANDLER( tms34010_io_register_r )
 }
 
 
-READ16_HANDLER( tms34020_io_register_r )
+READ16_MEMBER( tms34020_device::io_register_r )
 {
-	tms34010_state *tms = get_safe_token(&space.device());
+	tms34010_state *tms = get_safe_token(this);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1588,9 +1595,10 @@ static void tms34010_state_postload(tms34010_state *tms)
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-void tms34010_host_w(device_t *cpu, int reg, int data)
+WRITE16_MEMBER( tms34010_device::host_w )
 {
-	tms34010_state *tms = get_safe_token(cpu);
+	int reg = offset;
+	tms34010_state *tms = get_safe_token(this);
 	unsigned int addr;
 
 	switch (reg)
@@ -1626,8 +1634,8 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
 		{
 			tms->external_host_access = TRUE;
 			address_space &space = tms->device->space(AS_PROGRAM);
-			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
-			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
+			if (mem_mask&0xff00) io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xff00);
+			if (mem_mask&0x00ff) io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0x00ff);
 			tms->external_host_access = FALSE;
 			break;
 		}
@@ -1645,12 +1653,13 @@ void tms34010_host_w(device_t *cpu, int reg, int data)
     HOST INTERFACE READS
 ***************************************************************************/
 
-int tms34010_host_r(device_t *cpu, int reg)
+READ16_MEMBER( tms34010_device::host_r )
 {
-	tms34010_state *tms = get_safe_token(cpu);
+	int reg = offset;
+	tms34010_state *tms = get_safe_token(this);
 	unsigned int addr;
 	int result = 0;
-
+	
 	/* swap to the target cpu */
 
 	switch (reg)

@@ -1365,7 +1365,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sfbonus)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sfbonus)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1373,6 +1373,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sfbonus_state, screen_update_sfbonus)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
 

@@ -9,18 +9,18 @@
 
 #define  KDAC_A_PCM_MAX    (2)      /* Channels per chip */
 
-struct k007232_interface
-{
-	devcb_write8 m_portwritehandler;
-};
+#define MCFG_K007232_PORT_WRITE_HANDLER(_devcb) \
+	devcb = &k007232_device::set_port_write_handler(*device, DEVCB2_##_devcb);
 
+	
 class k007232_device : public device_t,
-									public device_sound_interface,
-									public k007232_interface
+									public device_sound_interface
 {
 public:
 	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k007232_device() {}
+	
+	template<class _Object> static devcb2_base &set_port_write_handler(device_t &device, _Object object) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -39,7 +39,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
@@ -63,7 +62,7 @@ private:
 
 	sound_stream *  m_stream;
 	UINT32          m_fncode[0x200];
-	devcb_resolved_write8 m_portwritehandler_func;
+	devcb2_write8 m_port_write_handler;
 };
 
 extern const device_type K007232;

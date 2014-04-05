@@ -106,7 +106,7 @@ void multi8_state::video_start()
 
 void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
-	if(!machine().primary_screen->visible_area().contains(x, y))
+	if(!machine().first_screen()->visible_area().contains(x, y))
 		return;
 
 	if(width)
@@ -183,7 +183,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				}
 			}
 
-			// m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
+			// m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
 			if(mc6845_cursor_addr+0xc000 == count)
@@ -195,8 +195,8 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -673,9 +673,11 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi8_state, screen_update_multi8)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(multi8_state, multi8)
-	MCFG_GFXDECODE_ADD("gfxdecode", multi8)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", multi8)
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

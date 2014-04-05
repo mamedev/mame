@@ -99,8 +99,8 @@ TIMER_CALLBACK_MEMBER(sc61860_device::sc61860_2ms_tick)
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
-#include "scops.c"
-#include "sctable.c"
+#include "scops.inc"
+#include "sctable.inc"
 
 void sc61860_device::device_reset()
 {

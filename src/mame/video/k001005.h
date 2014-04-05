@@ -2,7 +2,7 @@
 #ifndef __K001005_H__
 #define __K001005_H__
 
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "cpu/sharc/sharc.h"
 
 #define POLY_DEVICE 0
@@ -77,7 +77,7 @@ private:
 
 	int m_bitmap_page;
 
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	poly_vertex m_prev_v[4];
 	int m_prev_poly_type;
 

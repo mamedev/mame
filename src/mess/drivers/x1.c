@@ -231,7 +231,7 @@ VIDEO_START_MEMBER(x1_state,x1)
 
 void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
-	if(!machine.primary_screen->visible_area().contains(x, y))
+	if(!machine.first_screen()->visible_area().contains(x, y))
 		return;
 
 	if(width && height)
@@ -429,7 +429,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 && machine.primary_screen->frame_number() & 0x10) //reverse flickering
+						if(color & 0x10 && machine.first_screen()->frame_number() & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))
@@ -995,13 +995,13 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			return wd17xx_status_r(m_fdc,space, offset);
+			return m_fdc->status_r(space, offset);
 		case 0x0ff9:
-			return wd17xx_track_r(m_fdc,space, offset);
+			return m_fdc->track_r(space, offset);
 		case 0x0ffa:
-			return wd17xx_sector_r(m_fdc,space, offset);
+			return m_fdc->sector_r(space, offset);
 		case 0x0ffb:
-			return wd17xx_data_r(m_fdc,space, offset);
+			return m_fdc->data_r(space, offset);
 		case 0x0ffc:
 			printf("FDC: read FM type\n");
 			return 0xff;
@@ -1024,22 +1024,22 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 	switch(offset+0xff8)
 	{
 		case 0x0ff8:
-			wd17xx_command_w(m_fdc,space, offset,data);
+			m_fdc->command_w(space, offset,data);
 			break;
 		case 0x0ff9:
-			wd17xx_track_w(m_fdc,space, offset,data);
+			m_fdc->track_w(space, offset,data);
 			break;
 		case 0x0ffa:
-			wd17xx_sector_w(m_fdc,space, offset,data);
+			m_fdc->sector_w(space, offset,data);
 			break;
 		case 0x0ffb:
-			wd17xx_data_w(m_fdc,space, offset,data);
+			m_fdc->data_w(space, offset,data);
 			break;
 		case 0x0ffc:
-			wd17xx_set_drive(m_fdc,data & 3);
+			m_fdc->set_drive(data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), !BIT(data, 7));
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), data & 0x80,0);
-			wd17xx_set_side(m_fdc, BIT(data, 4));
+			m_fdc->set_side(BIT(data, 4));
 			break;
 		case 0x0ffd:
 		case 0x0ffe:
@@ -1059,7 +1059,7 @@ static const wd17xx_interface x1_mb8877a_interface =
 
 WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
 {
-	z80dma_rdy_w(machine().device("dma"), state ^ 1);
+	m_dma->rdy_w(state ^ 1);
 }
 
 static const wd17xx_interface x1turbo_mb8877a_interface =
@@ -1098,11 +1098,11 @@ UINT16 x1_state::check_chr_addr()
 
 UINT16 x1_state::get_pcg_addr( UINT16 width, UINT8 y_char_size )
 {
-	int hbeam = machine().primary_screen->hpos() >> 3;
-	int vbeam = machine().primary_screen->vpos() / y_char_size;
+	int hbeam = machine().first_screen()->hpos() >> 3;
+	int vbeam = machine().first_screen()->vpos() / y_char_size;
 	UINT16 pcg_offset = ((hbeam + vbeam*width) + (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))) & 0x7ff;
 
-	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.primary_screen->vpos() & 7,width);
+	//printf("%08x %d %d %d %d\n",(hbeam+vbeam*width),hbeam,vbeam,machine.first_screen()->vpos() & 7,width);
 
 	return pcg_offset;
 }
@@ -1135,7 +1135,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
-		pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
+		pcg_offset+= machine().first_screen()->vpos() & (y_char_size-1);
 		if(addr) { pcg_offset+= ((addr-1)*0x800); }
 		res = gfx_data[pcg_offset];
 	}
@@ -1175,7 +1175,7 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 			y_char_size = (m_crtc_vreg[9]+1) > 8 ? (m_crtc_vreg[9]+1)-8 : m_crtc_vreg[9]+1;
 			if(y_char_size == 0) { y_char_size = 1; }
 			pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
-			pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
+			pcg_offset+= machine().first_screen()->vpos() & (y_char_size-1);
 			pcg_offset+= ((addr-1)*0x800);
 
 			m_pcg_ram[pcg_offset] = data;
@@ -1237,10 +1237,10 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	{
 		m_x_r = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1256,10 +1256,10 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	{
 		m_x_g = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-			machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+			machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1275,10 +1275,10 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	{
 		m_x_b = data;
 		set_current_palette();
-		//if(m_old_vpos != machine().primary_screen->vpos())
+		//if(m_old_vpos != machine().first_screen()->vpos())
 		//{
-		//  machine().primary_screen->update_partial(machine().primary_screen->vpos());
-		//  m_old_vpos = machine().primary_screen->vpos();
+		//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
+		//  m_old_vpos = machine().first_screen()->vpos();
 		//}
 	}
 }
@@ -1681,7 +1681,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
 	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), space, 0); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return m_dma->read(space, 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)   { return machine().device<z80sio0_device>("sio")->ba_cd_r(space, (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { return m_ctc->read(space,offset-0x1fa0); }
@@ -1734,7 +1734,7 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
-	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), space, 0,data); }
+	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { m_dma->write(space, 0,data); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)   { machine().device<z80sio0_device>("sio")->ba_cd_w(space, (offset-0x1f90) & 3,data); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC write %04x %02x\n",offset,data); }
 	else if(offset >= 0x1fa0 && offset <= 0x1fa3)   { m_ctc->write(space,offset-0x1fa0,data); }
@@ -1804,8 +1804,8 @@ READ8_MEMBER( x1_state::x1_portb_r )
 	UINT8 res = 0;
 	int vblank_line = m_crtc_vreg[6] * (m_crtc_vreg[9]+1);
 	int vsync_line = m_crtc_vreg[7] * (m_crtc_vreg[9]+1);
-	m_vdisp = (machine().primary_screen->vpos() < vblank_line) ? 0x80 : 0x00;
-	m_vsync = (machine().primary_screen->vpos() < vsync_line) ? 0x00 : 0x04;
+	m_vdisp = (machine().first_screen()->vpos() < vblank_line) ? 0x80 : 0x00;
+	m_vsync = (machine().first_screen()->vpos() < vsync_line) ? 0x00 : 0x04;
 
 //  popmessage("%d",vsync_line);
 //  popmessage("%d",vblank_line);
@@ -2526,7 +2526,7 @@ MACHINE_START_MEMBER(x1_state,x1)
 	save_pointer(NAME(m_emm_ram), 0x1000000);
 	save_pointer(NAME(m_pcg_ram), 0x1800);
 
-	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0)));
+	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0)));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2587,7 +2587,7 @@ static MACHINE_CONFIG_START( x1, x1_state )
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
 	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", x1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x1)
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 

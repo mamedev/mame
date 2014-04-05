@@ -32,7 +32,8 @@
 /****************************************************************************/
 
 ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, TI99_SPEECH8, "TI-99/8 Speech synthesizer (onboard)", tag, owner, clock, "ti99_speech8", __FILE__)
+: bus8z_device(mconfig, TI99_SPEECH8, "TI-99/8 Speech synthesizer (onboard)", tag, owner, clock, "ti99_speech8", __FILE__),
+  m_ready(*this)
 {
 }
 
@@ -115,8 +116,7 @@ WRITE_LINE_MEMBER( ti998_spsyn_device::speech8_ready )
 
 void ti998_spsyn_device::device_start()
 {
-	const speech8_config *conf = reinterpret_cast<const speech8_config *>(static_config());
-	m_ready.resolve(conf->ready, *this);
+	m_ready.resolve_safe();
 	m_vsp = subdevice<tms5220_device>(SPEECHSYN_TAG);
 	speechrom_device* mem = subdevice<speechrom_device>("vsm");
 	mem->set_reverse_bit_order(true);

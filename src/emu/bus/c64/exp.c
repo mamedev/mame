@@ -208,9 +208,9 @@ bool c64_expansion_slot_device::call_load()
 //  call_softlist_load -
 //-------------------------------------------------
 
-bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry);
+	load_software_part_region(*this, swlist, swname, start_entry);
 
 	return true;
 }
@@ -220,19 +220,20 @@ bool c64_expansion_slot_device::call_softlist_load(char *swlist, char *swname, r
 //  get_default_card_software -
 //-------------------------------------------------
 
-const char * c64_expansion_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void c64_expansion_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		if (!mame_stricmp(filetype(), "crt"))
 		{
-			return cbm_crt_get_card(m_file);
+			cbm_crt_get_card(result, m_file);
+			return;
 		}
 
 		clear();
 	}
 
-	return software_get_default_slot(config, options, this, "standard");
+	software_get_default_slot(result, "standard");
 }
 
 

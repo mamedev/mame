@@ -338,8 +338,9 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz700)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz700)
 	MCFG_PALETTE_ADD("palette", 256*2)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(mz_state, mz)
@@ -365,7 +366,8 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz_state, pit_irq_2))
 
 	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
-	MCFG_TTL74145_ADD("ls145", default_ttl74145)
+	
+	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 
 	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")

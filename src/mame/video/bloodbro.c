@@ -167,7 +167,7 @@ void bloodbro_state::bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &
 		{
 			for (y = 0;y <= height;y++)
 			{
-				m_gfxdecode->gfx(3)->prio_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 						tile_number++,
 						color,
 						flipx,flipy,
@@ -212,7 +212,7 @@ void bloodbro_state::weststry_draw_sprites(screen_device &screen, bitmap_ind16 &
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
 
-		m_gfxdecode->gfx(3)->prio_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(3)->prio_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

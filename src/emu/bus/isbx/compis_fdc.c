@@ -31,12 +31,12 @@ const device_type COMPIS_FDC = &device_creator<compis_fdc_device>;
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-void compis_fdc_device::fdc_irq(bool state)
+WRITE_LINE_MEMBER( compis_fdc_device::fdc_irq )
 {
 	m_slot->mintr1_w(state);
 }
 
-void compis_fdc_device::fdc_drq(bool state)
+WRITE_LINE_MEMBER( compis_fdc_device::fdc_drq )
 {
 	m_slot->mdrqt_w(state);
 }
@@ -56,6 +56,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( compis_fdc )
 	MCFG_I8272A_ADD(I8272_TAG, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":1", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -97,8 +99,6 @@ compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *
 
 void compis_fdc_device::device_start()
 {
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(compis_fdc_device::fdc_irq), this));
-	m_fdc->setup_drq_cb(i8272a_device::line_cb(FUNC(compis_fdc_device::fdc_drq), this));
 }
 
 

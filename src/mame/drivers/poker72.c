@@ -64,7 +64,7 @@ UINT32 poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind16 
 
 			tile|= m_tile_bank << 12;
 
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,color,fx,fy,x*8,y*8);
 
 			count+=2;
 		}
@@ -370,8 +370,9 @@ static MACHINE_CONFIG_START( poker72, poker72_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(poker72_state, screen_update_poker72)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", poker72)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", poker72)
 	MCFG_PALETTE_ADD("palette", 0xe00)
 	MCFG_PALETTE_INIT_OWNER(poker72_state, poker72)
 

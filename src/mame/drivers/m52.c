@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m52_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", m52)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m52)
 	MCFG_PALETTE_ADD("palette", 128*4+16*4+3*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(512+32+32)
 	MCFG_PALETTE_INIT_OWNER(m52_state, m52)
@@ -406,6 +406,7 @@ static MACHINE_CONFIG_START( m52, m52_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
 	MCFG_SCREEN_UPDATE_DRIVER(m52_state, screen_update_m52)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(m52_sound_c_audio)

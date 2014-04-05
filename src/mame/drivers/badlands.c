@@ -509,7 +509,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", badlands)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
@@ -522,6 +522,7 @@ static MACHINE_CONFIG_START( badlands, badlands_state )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
@@ -712,7 +713,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", badlandsb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlandsb)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
@@ -725,6 +726,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(badlands_state, screen_update_badlands)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 

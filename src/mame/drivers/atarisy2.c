@@ -1235,7 +1235,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarisy2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy2_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
@@ -1248,6 +1248,7 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 

@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
-#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "includes/pk8020.h"
@@ -215,8 +214,9 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pk8020)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pk8020)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 

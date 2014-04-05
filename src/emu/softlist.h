@@ -11,9 +11,13 @@
 
 #include "ui/menu.h"
 #include "expat.h"
-#include "pool.h"
+#include "cstrpool.h"
 
 
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 #define SOFTWARE_SUPPORTED_YES      0
 #define SOFTWARE_SUPPORTED_PARTIAL  1
@@ -24,6 +28,12 @@ enum softlist_type
 	SOFTWARE_LIST_ORIGINAL_SYSTEM,
 	SOFTWARE_LIST_COMPATIBLE_SYSTEM
 };
+
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
 #define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type) \
 	software_list_device::static_set_config(*device, _list, _list_type);
@@ -52,10 +62,129 @@ enum softlist_type
 	MCFG_DEVICE_REMOVE( _tag )
 
 
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> feature_list_item
+
+// an item in a list of name/value pairs
+class feature_list_item
+{
+	friend class simple_list<feature_list_item>;
+
+public:
+	// construction/destruction
+	feature_list_item(const char *name = NULL, const char *value = NULL)
+		: m_next(NULL),
+		  m_name(name),
+		  m_value(value) { }
+
+	// getters
+	feature_list_item *next() const { return m_next; }
+	const char *name() const { return m_name; }
+	const char *value() const { return m_value; }
+
+private:
+	// internal state		
+	feature_list_item * m_next;
+	const char *    	m_name;
+	const char *    	m_value;
+};
+
+
+// ======================> software_part
+
+// a single part of a software item
+class software_part
+{
+	friend class softlist_parser;
+	friend class simple_list<software_part>;
+	
+public:
+	// construction/destruction
+	software_part(software_info &info, const char *name = NULL, const char *interface = NULL);
+
+	// getters
+	software_part *next() const { return m_next; }
+	software_info &info() const { return m_info; }
+	const char *name() const { return m_name; }
+	const char *interface() const { return m_interface; }
+	feature_list_item *featurelist() const { return m_featurelist.first(); }
+	rom_entry *romdata(int index = 0) { return (index < m_romdata.count()) ? &m_romdata[index] : NULL; }
+
+	// helpers
+	bool is_compatible(const software_list_device &swlist) const;
+	bool matches_interface(const char *interface) const;
+	const char *feature(const char *feature_name) const;
+
+private:
+	// internal state
+	software_part *		m_next;
+	software_info &		m_info;
+	const char *		m_name;
+	const char *		m_interface;
+	simple_list<feature_list_item> m_featurelist;
+	dynamic_array<rom_entry> m_romdata;
+};
+
+
+// ======================> software_info
+
+// a single software item
+class software_info
+{
+	friend class softlist_parser;
+	friend class simple_list<software_info>;
+	
+public:
+	// construction/destruction
+	software_info(software_list_device &list, const char *name, const char *parent, const char *supported);
+	
+	// getters
+	software_info *next() const { return m_next; }
+	software_list_device &list() const { return m_list; }
+	const char *shortname() const { return m_shortname; }
+	const char *longname() const { return m_longname; }
+	const char *parentname() const { return m_parentname; }
+	const char *year() const { return m_year; }
+	const char *publisher() const { return m_publisher; }
+	feature_list_item *other_info() const { return m_other_info.first(); }
+	feature_list_item *shared_info() const { return m_shared_info.first(); }
+	UINT32 supported() const { return m_supported; }
+	int num_parts() const { return m_partdata.count(); }
+	software_part *first_part() const { return m_partdata.first(); }
+	software_part *last_part() const { return m_partdata.last(); }
+	
+	// additional operations
+	software_part *find_part(const char *partname, const char *interface = NULL);
+	bool has_multiple_parts(const char *interface) const;
+
+private:
+	// internal state
+	software_info *			m_next;
+	software_list_device &	m_list;
+	UINT32 					m_supported;
+	const char *			m_shortname;
+	const char *			m_longname;
+	const char *			m_parentname;
+	const char *			m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
+	const char *			m_publisher;
+	simple_list<feature_list_item> m_other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
+	simple_list<feature_list_item> m_shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
+											  // by each part of this software entry (after loading these are stored in partdata->featurelist)
+	simple_list<software_part> m_partdata;
+};
+
+
 // ======================> software_list_device
 
+// device representing a software list
 class software_list_device : public device_t
 {
+	friend class softlist_parser;
+
 public:
 	// construction/destruction
 	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -68,22 +197,48 @@ public:
 	const char *list_name() const { return m_list_name; }
 	softlist_type list_type() const { return m_list_type; }
 	const char *filter() const { return m_filter; }
+	const char *filename() { return m_file.filename(); }
 
-	// validation helpers
-	static void reset_checked_lists() { s_checked_lists.reset(); }
+	// getters that may trigger a parse
+	const char *description() { if (!m_parsed) parse(); return m_description; }
+	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
+	const char *errors_string() { if (!m_parsed) parse(); return m_errors; }
+
+	// operations
+	software_info *find(const char *look_for, software_info *prev = NULL);
+	software_info *first_software_info() { if (!m_parsed) parse(); return m_infolist.first(); }
+	void find_approx_matches(const char *name, int matches, software_info **list, const char *interface);
+	void release();
+
+	// string pool helpers
+	const char *add_string(const char *string) { return m_stringpool.add(string); }
+	bool string_pool_contains(const char *string) { return m_stringpool.contains(string); }
+
+	// static helpers
+	static software_list_device *find_by_name(const machine_config &mconfig, const char *name);
+	static void display_matches(const machine_config &config, const char *interface, const char *name);
 
 protected:
+	// internal helpers
+	void parse();
+	void internal_validity_check(validity_checker &valid) ATTR_COLD;
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 
 	// configuration state
-	const char *                m_list_name;
+	astring		  				m_list_name;
 	softlist_type               m_list_type;
 	const char *                m_filter;
 
-	// static state
-	static tagmap_t<UINT8>      s_checked_lists;
+	// internal state
+	bool						m_parsed;
+	emu_file    				m_file;
+	const char *				m_description;
+	astring 					m_errors;
+	simple_list<software_info> 	m_infolist;
+	const_string_pool			m_stringpool;
 };
 
 
@@ -94,116 +249,4 @@ extern const device_type SOFTWARE_LIST;
 typedef device_type_iterator<&device_creator<software_list_device>, software_list_device> software_list_device_iterator;
 
 
-
-/*********************************************************************
-
-    Internal structures and XML file handling
-
-*********************************************************************/
-
-/* Replace this with list<string>? */
-struct feature_list
-{
-	feature_list    *next;
-	char            *name;
-	char            *value;
-};
-
-struct software_part
-{
-	const char *name;
-	const char *interface_;
-	feature_list *featurelist;
-	struct rom_entry *romdata;
-};
-
-
-/* The software info struct holds basic software information. */
-struct software_info
-{
-	const char *shortname;
-	const char *longname;
-	const char *parentname;
-	const char *year;           // Copyright year on title screen, actual release dates can be tracked in external resources
-	const char *publisher;
-	feature_list *other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
-	feature_list *shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
-								// by each part of this software entry (after loading these are stored in partdata->featurelist)
-	UINT32 supported;
-	int part_entries;
-	int current_part_entry;
-	software_part *partdata;
-	struct software_info *next; // Used internally
-};
-
-
-enum softlist_parse_position
-{
-	POS_ROOT,
-	POS_MAIN,
-	POS_SOFT,
-	POS_PART,
-	POS_DATA
-};
-
-
-struct parse_state
-{
-	XML_Parser  parser;
-	int         done;
-
-	void (*error_proc)(const char *message);
-	void *param;
-
-	enum softlist_parse_position pos;
-	char **text_dest;
-};
-
-
-struct software_list
-{
-	emu_file    *file;
-	object_pool *pool;
-	parse_state state;
-	const char *description;
-	struct software_info    *software_info_list;
-	struct software_info    *current_software_info;
-	software_info   *softinfo;
-	const char *look_for;
-	int rom_entries;
-	int current_rom_entry;
-	void (*error_proc)(const char *message);
-	int list_entries;
-};
-
-/* Handling a software list */
-software_list *software_list_open(emu_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
-void software_list_close(const software_list *swlist);
-software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev);
-const char *software_list_get_description(const software_list *swlist);
-void software_list_parse(software_list *swlist, void (*error_proc)(const char *message), void *param);
-
-software_part *software_find_part(software_info *sw, const char *partname, const char *interface_);
-software_part *software_part_next(software_part *part);
-
-const software_info *software_list_find(const software_list *swlist, const char *look_for, const software_info *prev);
-const software_part *software_find_part(const software_info *sw, const char *partname, const char *interface_);
-const software_part *software_part_next(const software_part *part);
-
-/* helpers */
-const char *software_get_clone(emu_options &options, char *swlist, const char *swname);
-UINT32 software_get_support(emu_options &options, char *swlist, const char *swname);
-const char *software_part_get_feature(const software_part *part, const char *feature_name);
-void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart);
-
-bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name, char**list_name);
-
-void software_display_matches(const machine_config &config, emu_options &options,const char *interface,const char *swname_bckp);
-
-const char *software_get_default_slot(const machine_config &config, emu_options &options, const device_image_interface *image, const char* default_card_slot);
-
-bool is_software_compatible(const software_part *swpart, const software_list_device *swlist);
-bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interface);
-
-bool softlist_contain_interface(const char *interface, const char *part_interface);
 #endif

@@ -3652,8 +3652,9 @@ static MACHINE_CONFIG_START( tharrier, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tharrier)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tharrier)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
@@ -3696,8 +3697,9 @@ static MACHINE_CONFIG_START( manybloc, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_manybloc)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tharrier)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tharrier)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3737,8 +3739,9 @@ static MACHINE_CONFIG_START( mustang, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3782,8 +3785,9 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3813,8 +3817,9 @@ static MACHINE_CONFIG_START( bioship, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bioship)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bioship)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bioship)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3856,8 +3861,9 @@ static MACHINE_CONFIG_START( vandyke, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3902,8 +3908,9 @@ static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -3934,8 +3941,9 @@ static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3981,8 +3989,9 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4009,8 +4018,9 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4056,8 +4066,9 @@ static MACHINE_CONFIG_START( ssmissin, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4087,8 +4098,9 @@ static MACHINE_CONFIG_START( strahl, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_strahl)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_strahl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", strahl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", strahl)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -4130,8 +4142,9 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4174,8 +4187,9 @@ static MACHINE_CONFIG_START( macross, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4217,8 +4231,9 @@ static MACHINE_CONFIG_START( blkheart, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4260,8 +4275,9 @@ static MACHINE_CONFIG_START( gunnail, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4307,8 +4323,9 @@ static MACHINE_CONFIG_START( macross2, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_gunnail)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4351,8 +4368,9 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4394,8 +4412,9 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_tdragon2)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross2)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4437,8 +4456,9 @@ static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bjtwin)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bjtwin)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4473,8 +4493,9 @@ static MACHINE_CONFIG_START( atombjt, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_bjtwin)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", atombjt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atombjt)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -4935,8 +4956,9 @@ static MACHINE_CONFIG_START( stagger1, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_afega)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", stagger1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stagger1)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -5021,8 +5043,9 @@ static MACHINE_CONFIG_START( firehawk, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_firehawk)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", grdnstrm)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grdnstrm)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -5057,8 +5080,9 @@ static MACHINE_CONFIG_START( twinactn, nmk16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nmk16_state, screen_update_macross)
 	MCFG_SCREEN_VBLANK_DRIVER(nmk16_state, screen_eof_nmk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", macross)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", macross)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -5088,7 +5112,7 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 	int i;
 	UINT8 *RAM = machine.root_device().memregion( "maincpu" )->base();
 	size_t  size = machine.root_device().memregion( "maincpu" )->bytes();
-	UINT8 *buffer = auto_alloc_array(machine, UINT8,  size );
+	dynamic_buffer buffer( size );
 
 	memcpy( buffer, RAM, size );
 	for( i = 0; i < size; i++ )
@@ -5096,7 +5120,6 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 		RAM[ i ] = buffer[ BITSWAP24( i, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12,
 			a11, a10, a9, a8, a7, a6, a5, a4, a3, a2, a1, a0 ) ];
 	}
-	auto_free( machine, buffer );
 }
 
 

@@ -75,7 +75,8 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_speaker(*this, "speaker"),
 		m_acia0(*this, "acia0"),
-		m_acia1(*this, "acia1")
+		m_acia1(*this, "acia1"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -107,6 +108,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 
@@ -168,7 +171,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_update_row )
 {
 	v6809_state *state = device->machine().driver_data<v6809_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -347,7 +350,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", v6809)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

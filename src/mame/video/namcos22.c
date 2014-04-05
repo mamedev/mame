@@ -5,7 +5,7 @@
  *
  * - emulate slave dsp!
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures. The glitch may be in MAME core:
- *       it used to be much worse with the old poly.h
+ *       it used to be much worse with the legacy_poly_manager
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit.
  *       airco22b may have a similar problem. (is this related to dsp? or cpu?)
  * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
@@ -2390,9 +2390,9 @@ void namcos22_state::init_tables()
 
 	m_pointram = auto_alloc_array_clear(machine(), UINT32, 0x20000);
 
-	// textures
+	// force all texture tiles to be decoded now
 	for (int i = 0; i < m_gfxdecode->gfx(1)->elements(); i++)
-		m_gfxdecode->gfx(1)->decode(i);
+		m_gfxdecode->gfx(1)->get_data(i);
 
 	m_texture_tilemap = (UINT16 *)memregion("textilemap")->base();
 	m_texture_tiledata = (UINT8 *)m_gfxdecode->gfx(1)->get_data(0);

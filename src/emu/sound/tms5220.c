@@ -326,7 +326,7 @@ static INT16 clip_analog(INT16 cliptemp);
 static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
 
 // Pull in the ROM tables
-#include "tms5110r.c"
+#include "tms5110r.inc"
 
 
 void tms5220_device::set_variant(int variant)

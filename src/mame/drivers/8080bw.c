@@ -2658,7 +2658,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 	UINT32 x;
 	for (x = 0; x < length; x++)
 	{
@@ -2699,8 +2699,6 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 	}
 
 	memcpy(rom, buf1, length);
-
-	auto_free(machine(), buf1);
 }
 
 
@@ -3074,14 +3072,13 @@ DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT32 len = memregion("maincpu")->bytes();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer buffer(len);
 
 	// swap a8/a9
 	for (int i = 0; i < len; i++)
 		buffer[BITSWAP16(i, 15,14,13,12,11,10,8,9, 7,6,5,4,3,2,1,0)] = rom[i];
 
 	memcpy(rom, buffer, len);
-	auto_free(machine(), buffer);
 }
 
 

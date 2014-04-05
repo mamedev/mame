@@ -92,7 +92,7 @@ UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap,
 			//int blinkLine = (m_tile_control_ram[current_screen_character] & 0x40) >> 6;
 			//int blinkChar = (m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
@@ -331,6 +331,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -338,7 +339,7 @@ static MACHINE_CONFIG_START( esh, esh_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(esh_state, esh)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", esh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esh)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

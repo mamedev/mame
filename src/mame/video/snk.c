@@ -691,12 +691,12 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (sx > 512-16) sx -= 512;
 		if (sy > 256-16) sy -= 256;
 
-		gfx->transtable(state->m_palette,bitmap,cliprect,
+		gfx->transtable(bitmap,cliprect,
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			state->m_drawmode_table, state->m_palette->shadow_table());
+			state->m_drawmode_table);
 
 		source+=4;
 	}
@@ -757,12 +757,12 @@ void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sx > 512-size) sx -= 512;
 		if (sy > (m_yscroll_mask+1)-size) sy -= (m_yscroll_mask+1);
 
-		gfx->transtable(m_palette,bitmap,cliprect,
+		gfx->transtable(bitmap,cliprect,
 				tile_number,
 				color,
 				xflip,yflip,
 				sx,sy,
-				m_drawmode_table, m_palette->shadow_table());
+				m_drawmode_table);
 	}
 }
 
@@ -804,12 +804,12 @@ static void ikari_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		gfx->transtable(state->m_palette,bitmap,cliprect,
+		gfx->transtable(bitmap,cliprect,
 				tile_number,
 				color,
 				0,0,
 				sx,sy,
-				state->m_drawmode_table, state->m_palette->shadow_table());
+				state->m_drawmode_table);
 	}
 }
 
@@ -892,12 +892,12 @@ static void tdfever_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		gfx->transtable(state->m_palette,bitmap,cliprect,
+		gfx->transtable(bitmap,cliprect,
 				tile_number,
 				color,
 				flipx,flipy,
 				sx,sy,
-				state->m_drawmode_table, state->m_palette->shadow_table());
+				state->m_drawmode_table);
 	}
 }
 

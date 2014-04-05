@@ -206,9 +206,9 @@ bool iq151cart_slot_device::call_load()
     call softlist load
 -------------------------------------------------*/
 
-bool iq151cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool iq151cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
@@ -216,7 +216,7 @@ bool iq151cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_e
     get default card software
 -------------------------------------------------*/
 
-const char * iq151cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void iq151cart_slot_device::get_default_card_software(astring &result)
 {
-	return software_get_default_slot(config, options, this, NULL);
+	software_get_default_slot(result, NULL);
 }

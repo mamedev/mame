@@ -37,6 +37,8 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
@@ -57,8 +59,6 @@ private:
 	required_device<i8272a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
 	bool m_reset, m_motor;
 };
 

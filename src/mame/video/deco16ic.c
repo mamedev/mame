@@ -223,6 +223,9 @@ void deco16ic_device::device_config_complete()
 
 void deco16ic_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_bank_cb_func[0] = m_bank_cb0;
 	m_bank_cb_func[1] = m_bank_cb1;
 

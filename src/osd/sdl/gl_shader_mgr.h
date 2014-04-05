@@ -4,13 +4,6 @@
 
 // #define GLSL_SOURCE_ON_DISK 1
 
-enum GLSL_SHADER_TYPE {
-	GLSL_SHADER_TYPE_IDX16,
-	GLSL_SHADER_TYPE_RGB32_LUT,
-	GLSL_SHADER_TYPE_RGB32_DIRECT,
-	GLSL_SHADER_TYPE_NUMBER
-};
-
 enum GLSL_SHADER_FEATURE {
 	GLSL_SHADER_FEAT_PLAIN,
 	GLSL_SHADER_FEAT_BILINEAR,
@@ -41,7 +34,7 @@ int glsl_shader_free(glsl_shader_info *shinfo);
 /**
  * returns the GLSL program if ok/available, otherwise 0
  */
-GLhandleARB glsl_shader_get_program_mamebm(int glslShaderType, int glslShaderFeature, int idx);
+GLhandleARB glsl_shader_get_program_mamebm(int glslShaderFeature, int idx);
 
 const char * glsl_shader_get_filter_name_mamebm(int glslShaderFeature);
 

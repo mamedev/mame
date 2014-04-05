@@ -486,7 +486,7 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			pri_mask = 0xfe;
 
 		gfx->set_source_clip(tx, xsize, ty, ysize);
-		gfx->prio_zoom_transpen(m_palette,bitmap,cliprect,
+		gfx->prio_zoom_transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx, flipy,
@@ -1334,7 +1334,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bnstars)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bnstars)
 	MCFG_PALETTE_ADD("palette", 0x8000*2)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1345,6 +1345,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1352,6 +1353,7 @@ static MACHINE_CONFIG_START( bnstars, bnstars_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bnstars_state, screen_update_bnstars_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

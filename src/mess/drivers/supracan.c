@@ -567,7 +567,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				//printf("sprite data %04x %04x %04x %04x\n", supracan_vram[i+0] , supracan_vram[i+1] , supracan_vram[i+2] ,supracan_vram[i+3]  );
 
-				gfx->transpen(m_palette,bitmap,cliprect,tile,palette,sprite_xflip,sprite_yflip,
+				gfx->transpen(bitmap,cliprect,tile,palette,sprite_xflip,sprite_yflip,
 					x,
 					y,
 					0);
@@ -614,7 +614,7 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 						int tile_xflip = sprite_xflip ^ ((data & 0x0800)>>11);
 						int tile_yflip = sprite_yflip ^ ((data & 0x0400)>>10);
 
-						gfx->transpen(m_palette,bitmap,cliprect,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
+						gfx->transpen(bitmap,cliprect,tile,palette,tile_xflip,tile_yflip,xpos,ypos,0);
 					}
 				}
 			}
@@ -1525,7 +1525,7 @@ TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_off_callback)
 
 TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 {
-	int vpos = machine().primary_screen->vpos();
+	int vpos = machine().first_screen()->vpos();
 
 	m_video_regs[0] &= ~0x0002;
 
@@ -1556,10 +1556,10 @@ TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
 		break;
 	}
 
-	m_video_regs[1] = machine().primary_screen->vpos()-16; // for son of evil, wants vblank active around 224 instead...
+	m_video_regs[1] = machine().first_screen()->vpos()-16; // for son of evil, wants vblank active around 224 instead...
 
-	m_hbl_timer->adjust( machine().primary_screen->time_until_pos( vpos, 320 ) );
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
+	m_hbl_timer->adjust( machine().first_screen()->time_until_pos( vpos, 320 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( ( vpos + 1 ) % 256, 0 ) );
 }
 
 WRITE16_MEMBER( supracan_state::supracan_video_w )
@@ -1569,7 +1569,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 	int i;
 
 	// if any of this changes we need a partial update (see sango fighters intro)
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	machine().first_screen()->update_partial(machine().first_screen()->vpos());
 
 	COMBINE_DATA(&m_video_regs[offset]);
 	data = m_video_regs[offset];
@@ -1650,10 +1650,10 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 				verboselog("maincpu", 3, "video_flags = %04x\n", data);
 				m_video_flags = data;
 
-				rectangle visarea = machine().primary_screen->visible_area();
+				rectangle visarea = machine().first_screen()->visible_area();
 
 				visarea.set(0, ((m_video_flags & 0x100) ? 320 : 256) - 1, 8, 232 - 1);
-				machine().primary_screen->configure(348, 256, visarea, machine().primary_screen->frame_period().attoseconds);
+				machine().first_screen()->configure(348, 256, visarea, machine().first_screen()->frame_period().attoseconds);
 			}
 			break;
 		case 0x0a/2:
@@ -1662,7 +1662,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 				verboselog("maincpu", 0, "IRQ Trigger? = %04x\n", data);
 				if(data & 0x8000)
 				{
-					m_line_on_timer->adjust(machine().primary_screen->time_until_pos((data & 0x00ff), 0));
+					m_line_on_timer->adjust(machine().first_screen()->time_until_pos((data & 0x00ff), 0));
 				}
 				else
 				{
@@ -1676,7 +1676,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 				verboselog("maincpu", 0, "IRQ De-Trigger? = %04x\n", data);
 				if(data & 0x8000)
 				{
-					m_line_off_timer->adjust(machine().primary_screen->time_until_pos(data & 0x00ff, 0));
+					m_line_off_timer->adjust(machine().first_screen()->time_until_pos(data & 0x00ff, 0));
 				}
 				else
 				{
@@ -1794,7 +1794,7 @@ void supracan_state::machine_reset()
 {
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
-	m_video_timer->adjust( machine().primary_screen->time_until_pos( 0, 0 ) );
+	m_video_timer->adjust( machine().first_screen()->time_until_pos( 0, 0 ) );
 	m_irq_mask = 0;
 }
 
@@ -1924,11 +1924,13 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD( "palette", 32768 )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", supracan)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supracan)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")

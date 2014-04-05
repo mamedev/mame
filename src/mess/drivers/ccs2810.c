@@ -96,8 +96,6 @@ public:
 private:
 	UINT8 m_term_data;
 	UINT8 m_26_count;
-	bool m_drq;
-	bool m_intrq;
 	bool m_ss;
 	bool m_dden;
 	bool m_dsize;
@@ -213,7 +211,7 @@ d7 : drq
 READ8_MEMBER( ccs_state::port34_r )
 {
 	//return (UINT8)m_drq | (m_ds << 1) | ((UINT8)fdc->hld_r() << 5) | 0x40 | ((UINT8)m_intrq << 7);
-	return (UINT8)m_drq | (m_ds << 1) | 0x20 | 0x40 | ((UINT8)m_intrq << 7); // hld_r doesn't do anything
+	return (UINT8)m_fdc->drq_r() | (m_ds << 1) | 0x20 | 0x40 | ((UINT8)m_fdc->intrq_r() << 7); // hld_r doesn't do anything
 }
 
 /* Status 2
@@ -239,7 +237,7 @@ READ8_MEMBER( ccs_state::port04_r )
 		dside = m_floppy->twosid_r();
 	}
 	return (UINT8)trk00 | 0 | ((UINT8)wprt << 2) | ((UINT8)m_ss << 3) |
-		idx << 4 | ((UINT8)m_dden << 5) | ((UINT8)dside << 6) | ((UINT8)m_drq << 7);
+		idx << 4 | ((UINT8)m_dden << 5) | ((UINT8)dside << 6) | ((UINT8)m_fdc->drq_r() << 7);
 }
 
 /* Control 1
@@ -315,9 +313,6 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2810 )
 
 DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
 {
-	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(ccs_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(ccs_state::fdc_drq_w), this));
-
 	UINT8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
@@ -330,15 +325,6 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
 //  Disk
 //
 //*************************************
-void ccs_state::fdc_intrq_w(bool state)
-{
-	m_intrq = state;
-}
-
-void ccs_state::fdc_drq_w(bool state)
-{
-	m_drq = state;
-}
 
 static SLOT_INTERFACE_START( ccs_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )

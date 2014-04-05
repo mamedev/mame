@@ -1864,93 +1864,16 @@ WRITE_LINE_MEMBER(st_state::write_acia_clock)
 }
 
 
-//-------------------------------------------------
-//  MC68901_INTERFACE( mfp_intf )
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 {
 	m_mfp->clock_w(state);
 }
 
-static MC68901_INTERFACE( mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-
-
-//-------------------------------------------------
-//  MC68901_INTERFACE( atariste_mfp_intf )
-//-------------------------------------------------
-
-static MC68901_INTERFACE( atariste_mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-
-
-//-------------------------------------------------
-//  MC68901_INTERFACE( stbook_mfp_intf )
-//-------------------------------------------------
-
-
-// TODO power alarms (i7_w)
-
-#if 0
-static MC68901_INTERFACE( stbook_mfp_intf )
-{
-	Y1,                                                 /* timer clock */
-	0,                                                  /* receive clock */
-	0,                                                  /* transmit clock */
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_NULL,                                         /* GPIO write */
-	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
-	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, write_txd)
-};
-#endif
-
-void st_state::fdc_intrq_w(bool state)
-{
-	m_mfp->i5_w(!state);
-}
-
-void st_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
 		fdc_dma_transfer();
 }
-
-
-//-------------------------------------------------
-//  RP5C15_INTERFACE( rtc_intf )
-//-------------------------------------------------
-
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //**************************************************************************
@@ -2058,9 +1981,6 @@ void st_state::machine_start()
 		else
 			floppy_devices[i] = 0;
 	}
-
-	m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_drq_w), this));
-	m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_intrq_w), this));
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -2201,6 +2121,8 @@ static MACHINE_CONFIG_START( st, st_state )
 	// devices
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2209,7 +2131,13 @@ static MACHINE_CONFIG_START( st, st_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2277,9 +2205,11 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2288,7 +2218,13 @@ static MACHINE_CONFIG_START( megast, megast_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2366,6 +2302,8 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	// devices
 
 	MCFG_WD1772x_ADD(WD1772_TAG, Y2/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
@@ -2374,7 +2312,13 @@ static MACHINE_CONFIG_START( ste, ste_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, Y2/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
@@ -2422,8 +2366,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( megaste, ste )
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-	MCFG_SCC8530_ADD(Z8530_TAG, Y2/4, line_cb_t())
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2458,8 +2402,17 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_SOUND_CONFIG(stbook_psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
+	MCFG_DEVICE_ADD(MC68901_TAG, MC68901, U517/8)
+	MCFG_MC68901_TIMER_CLOCK(Y1)
+	MCFG_MC68901_RX_CLOCK(0)
+	MCFG_MC68901_TX_CLOCK(0)
+	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE(M68000_TAG, M68K_IRQ_6))
+	MCFG_MC68901_OUT_TDO_CB(WRITELINE(st_state, mfp_tdo_w))
+	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	
 	MCFG_WD1772x_ADD(WD1772_TAG, U517/2)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(st_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 

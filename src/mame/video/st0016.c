@@ -449,7 +449,7 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, auto_alloc(machine(), gfx_element(machine(), charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -509,7 +509,7 @@ void st0016_state::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, in
 
 					if(priority)
 					{
-						gfx->transpen(m_palette,bitmap,cliprect,
+						gfx->transpen(bitmap,cliprect,
 										code,
 										color,
 										flipx,flipy,

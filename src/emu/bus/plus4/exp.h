@@ -116,7 +116,7 @@ protected:
 
 	// image-level overrides
 	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 
@@ -130,7 +130,7 @@ protected:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	devcb2_write_line   m_write_irq;
 	devcb2_read8        m_read_dma_cd;

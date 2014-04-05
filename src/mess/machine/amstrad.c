@@ -41,8 +41,8 @@ This gives a total of 19968 NOPs per frame.
 #include "machine/mc146818.h"
 #include "machine/upd765.h"
 #include "bus/centronics/ctronics.h"
-#include "machine/cpc_rom.h"
-#include "machine/mface2.h"
+#include "bus/cpc/cpc_rom.h"
+#include "bus/cpc/mface2.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "includes/amstrad.h"
@@ -207,12 +207,6 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc)
 PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 {
 	palette.set_pen_colors(0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
-}
-
-
-void amstrad_state::aleste_interrupt(bool state)
-{
-	m_aleste_fdc_int = state;
 }
 
 
@@ -1142,33 +1136,19 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	return NULL;
 }
 
-WRITE_LINE_DEVICE_HANDLER(cpc_irq_w)
+WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, state);
+	m_gate_array.romdis = state;
+	amstrad_rethinkMemory();
 }
 
-WRITE_LINE_DEVICE_HANDLER(cpc_nmi_w)
+WRITE_LINE_MEMBER(amstrad_state::cpc_romen)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state);
-}
-
-WRITE_LINE_DEVICE_HANDLER(cpc_romdis)
-{
-	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
-
-	tstate->m_gate_array.romdis = state;
-	tstate->amstrad_rethinkMemory();
-}
-
-WRITE_LINE_DEVICE_HANDLER(cpc_romen)
-{
-	amstrad_state *tstate = device->machine().driver_data<amstrad_state>();
-
 	if(state != 0)
-		tstate->m_gate_array.mrer &= ~0x04;
+		m_gate_array.mrer &= ~0x04;
 	else
-		tstate->m_gate_array.mrer |= 0x04;
-	tstate->amstrad_rethinkMemory();
+		m_gate_array.mrer |= 0x04;
+	amstrad_rethinkMemory();
 }
 
 
@@ -2578,7 +2558,7 @@ READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
 
 	if(m_aleste_mode & 0x04)
 	{
-		if(m_aleste_fdc_int == 0)
+		if(m_fdc->get_irq() == 0)
 			data &= ~0x02;
 		else
 			data |= 0x02;
@@ -2678,14 +2658,18 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 
 		if (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
 		{
-			if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+			if(m_system_type != SYSTEM_GX4000)
 			{
-				return m_amx_mouse_data;
+				if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				{
+					return m_amx_mouse_data;
+				}
+				if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+				{
+					return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
+				}
 			}
-			if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
-			{
-				return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
-			}
+			
 			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
 		return 0xFF;
@@ -2718,30 +2702,33 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		}
 		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
-	// update AMX mouse inputs (normally done every 1/300th of a second)
-	if(m_io_ctrltype->read_safe(0) == 1)
-	{
-		static UINT8 prev_x,prev_y;
-		UINT8 data_x, data_y;
+	if(m_system_type != SYSTEM_GX4000)
+		{
+			// update AMX mouse inputs (normally done every 1/300th of a second)
+			if(m_io_ctrltype->read_safe(0) == 1)
+			{
+				static UINT8 prev_x,prev_y;
+				UINT8 data_x, data_y;
 
-		m_amx_mouse_data = 0x0f;
-		data_x = m_io_mouse1->read_safe(0) & 0xff;
-		data_y = m_io_mouse2->read_safe(0) & 0xff;
+				m_amx_mouse_data = 0x0f;
+				data_x = m_io_mouse1->read_safe(0) & 0xff;
+				data_y = m_io_mouse2->read_safe(0) & 0xff;
 
-		if(data_x > prev_x)
-			m_amx_mouse_data &= ~0x08;
-		if(data_x < prev_x)
-			m_amx_mouse_data &= ~0x04;
-		if(data_y > prev_y)
-			m_amx_mouse_data &= ~0x02;
-		if(data_y < prev_y)
-			m_amx_mouse_data &= ~0x01;
-		m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
-		prev_x = data_x;
-		prev_y = data_y;
+				if(data_x > prev_x)
+					m_amx_mouse_data &= ~0x08;
+				if(data_x < prev_x)
+					m_amx_mouse_data &= ~0x04;
+				if(data_y > prev_y)
+					m_amx_mouse_data &= ~0x02;
+				if(data_y < prev_y)
+					m_amx_mouse_data &= ~0x01;
+				m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
+				prev_x = data_x;
+				prev_y = data_y;
 
-		m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
-	}
+				m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
+			}
+		}
 	return 0xFF;
 }
 
@@ -3197,7 +3184,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	//                ... and so on.
 
 	UINT32 size, offset = 0;
-	UINT8 *temp_copy;
+	dynamic_buffer temp_copy;
 	unsigned char header[12];     // RIFF chunk
 	char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
 	char chunklen[4];             // chunk length (always little-endian)
@@ -3209,18 +3196,17 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		if (image.fread(temp_copy, size) != size)
 		{
 			logerror("IMG: failed to read from cart image\n");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
 	{
 		size= image.get_software_region_length("rom");
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
@@ -3242,7 +3228,6 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 			if ((size - offset) < 0x4000)
 			{
 				logerror("BIN: block %i loaded is smaller than 16kB in size\n", offset / 0x4000);
-				auto_free(machine(), temp_copy);
 				return IMAGE_INIT_FAIL;
 			}
 			offset += 0x4000;
@@ -3254,7 +3239,6 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
 			logerror("CPR: not an Amstrad CPC cartridge image\n");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
@@ -3312,10 +3296,8 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 	else    // CPR carts in our softlist
 	{
 		logerror("Gamelist cart in RIFF format\n");
-		auto_free(machine(), temp_copy);
 		return IMAGE_INIT_FAIL;
 	}
 
-	auto_free(machine(), temp_copy);
 	return IMAGE_INIT_PASS;
 }

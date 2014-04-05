@@ -76,7 +76,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "includes/dynax.h"
 #include "cpu/tlcs90/tlcs90.h"
-#include "machine/msm6242.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -341,9 +340,7 @@ WRITE8_MEMBER(dynax_state::yarunara_palette_w)
 
 		case 0x1c:  // RTC
 		{
-			msm6242_device *rtc = machine().device<msm6242_device>("rtc");
-
-			rtc->write(space, offset,data);
+			m_rtc->write(space, offset,data);
 		}
 		return;
 
@@ -1275,9 +1272,7 @@ READ8_MEMBER(dynax_state::tenkai_8000_r)
 		return m_romptr[offset];
 	else if ((m_rombank == 0x10) && (offset < 0x10))
 	{
-		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
-
-		return rtc->read(space, offset);
+		return m_rtc->read(space, offset);
 	}
 	else if (m_rombank == 0x12)
 		return tenkai_palette_r(space, offset);
@@ -1290,9 +1285,7 @@ WRITE8_MEMBER(dynax_state::tenkai_8000_w)
 {
 	if ((m_rombank == 0x10) && (offset < 0x10))
 	{
-		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
-
-		rtc->write(space, offset, data);
+		m_rtc->write(space, offset, data);
 		return;
 	}
 	else if (m_rombank == 0x12)
@@ -3970,7 +3963,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
-	m_rtc = machine().device("rtc");
 	m_ymsnd = machine().device("ymsnd");
 
 	save_item(NAME(m_sound_irq));
@@ -4102,6 +4094,7 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4160,6 +4153,7 @@ static MACHINE_CONFIG_START( hnoridur, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4205,6 +4199,7 @@ static MACHINE_CONFIG_START( hjingi, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4260,6 +4255,7 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4303,6 +4299,7 @@ static MACHINE_CONFIG_START( mjfriday, dynax_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4349,11 +4346,6 @@ INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
 	sprtmtch_update_irq(machine());
 }
 
-static MSM6242_INTERFACE( yarunara_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 
 	/* basic machine hardware */
@@ -4368,7 +4360,7 @@ static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", yarunara_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 
@@ -4429,11 +4421,6 @@ MACHINE_START_MEMBER(dynax_state,jantouki)
 	MACHINE_START_CALL_MEMBER(dynax);
 }
 
-static MSM6242_INTERFACE( jantouki_rtc_intf )
-{
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( jantouki, dynax_state )
 
@@ -4464,6 +4451,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_top)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -4471,6 +4459,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_bottom)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,jantouki)
 
@@ -4493,7 +4482,7 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", jantouki_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( janyuki, jantouki )
@@ -4635,10 +4624,6 @@ WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 }
 
-static MSM6242_INTERFACE( tenkai_rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,tenkai_rtc_irq)
-};
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )
 
@@ -4660,6 +4645,7 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SCREEN_SIZE(512, 256+22)
 	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4676,7 +4662,8 @@ static MACHINE_CONFIG_START( tenkai, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", tenkai_rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(dynax_state, tenkai_rtc_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
@@ -4728,6 +4715,7 @@ static MACHINE_CONFIG_START( gekisha, dynax_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
@@ -5121,11 +5109,12 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 	}
 
 	/* Address lines scrambling on the blitter data roms */
-	rom = auto_alloc_array(machine(), UINT8, 0xc0000);
-	memcpy(rom, gfx, 0xc0000);
-	for (i = 0; i < 0xc0000; i++)
-		gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
-	auto_free(machine(), rom);
+	{
+		dynamic_buffer rom(0xc0000);
+		memcpy(rom, gfx, 0xc0000);
+		for (i = 0; i < 0xc0000; i++)
+			gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
+	}
 }
 
 
@@ -5921,12 +5910,11 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 	int i;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer rom1(size);
 
 	memcpy(rom1, rom, size);
 	for (i = 0; i < size; i++)
 		rom[i] = BITSWAP8(rom1[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8, 1,6,5,4,3,2,7, 0)], 7,6, 1,4,3,2,5,0);
-	auto_free(machine(), rom1);
 }
 
 DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
@@ -5934,7 +5922,7 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 	int i, j;
 	UINT8   *rom = memregion("maincpu")->base();
 	size_t  size = memregion("maincpu")->bytes();
-	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
+	dynamic_buffer rom1(size);
 
 	memcpy(rom1, rom, size);
 	for (i = 0; i < size; i++)
@@ -5964,7 +5952,6 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 		}
 		rom[j] = rom1[i];
 	}
-	auto_free(machine(), rom1);
 
 	DRIVER_INIT_CALL(mjelct3);
 }

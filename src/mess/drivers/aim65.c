@@ -175,30 +175,6 @@ static const cassette_interface aim65_2_cassette_interface =
 	NULL
 };
 
-const dl1416_interface aim65_ds1_intf =
-{
-	DEVCB_DRIVER_MEMBER16(aim65_state, aim65_update_ds1)
-};
-
-const dl1416_interface aim65_ds2_intf =
-{
-	DEVCB_DRIVER_MEMBER16(aim65_state, aim65_update_ds2)
-};
-
-const dl1416_interface aim65_ds3_intf =
-{
-	DEVCB_DRIVER_MEMBER16(aim65_state, aim65_update_ds3)
-};
-
-const dl1416_interface aim65_ds4_intf =
-{
-	DEVCB_DRIVER_MEMBER16(aim65_state, aim65_update_ds4)
-};
-
-const dl1416_interface aim65_ds5_intf =
-{
-	DEVCB_DRIVER_MEMBER16(aim65_state, aim65_update_ds5)
-};
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -221,7 +197,6 @@ static const struct aim_cart_range aim_cart_table[] =
 DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 {
 	UINT32 size;
-	UINT8 *temp_copy;
 	const struct aim_cart_range *aim_cart = &aim_cart_table[0], *this_cart;
 
 	/* First, determine where this cart has to be loaded */
@@ -243,22 +218,21 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
+	dynamic_buffer temp_copy;
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
 
 		if (size > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
+		temp_copy.resize(size);
 		if (image.fread(temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
@@ -274,13 +248,11 @@ DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
 		}
 
 		size = image.get_software_region_length(this_cart->tag + 1);
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		memcpy(temp_copy, image.get_software_region(this_cart->tag + 1), size);
 	}
 
 	memcpy(memregion("maincpu")->base() + this_cart->offset, temp_copy, size);
-
-	auto_free(machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }
@@ -294,11 +266,16 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MCFG_DL1416T_ADD("ds1", aim65_ds1_intf)
-	MCFG_DL1416T_ADD("ds2", aim65_ds2_intf)
-	MCFG_DL1416T_ADD("ds3", aim65_ds3_intf)
-	MCFG_DL1416T_ADD("ds4", aim65_ds4_intf)
-	MCFG_DL1416T_ADD("ds5", aim65_ds5_intf)
+	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds1))
+	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds2))
+	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds3))
+	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds4))
+	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds5))
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

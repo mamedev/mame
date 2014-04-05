@@ -293,16 +293,16 @@ UINT32 v60_device::v60_update_psw_for_exception(int is_interrupt, int target_lev
 
 
 // Addressing mode decoding functions
-#include "am.c"
+#include "am.inc"
 
 // Opcode functions
-#include "op12.c"
-#include "op2.c"
-#include "op3.c"
-#include "op4.c"
-#include "op5.c"
-#include "op6.c"
-#include "op7a.c"
+#include "op12.inc"
+#include "op2.inc"
+#include "op3.inc"
+#include "op4.inc"
+#include "op5.inc"
+#include "op6.inc"
+#include "op7a.inc"
 
 UINT32 v60_device::opUNHANDLED()
 {
@@ -311,7 +311,7 @@ UINT32 v60_device::opUNHANDLED()
 }
 
 // Opcode jump table
-#include "optable.c"
+#include "optable.inc"
 
 void v60_device::device_start()
 {

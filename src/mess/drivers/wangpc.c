@@ -953,14 +953,14 @@ FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-void wangpc_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( wangpc_state::fdc_irq )
 {
 	if (LOG) logerror("FDC INT %u\n", state);
 
 	check_level2_interrupts();
 }
 
-void wangpc_state::fdc_drq(bool state)
+WRITE_LINE_MEMBER( wangpc_state::fdc_drq )
 {
 	if (LOG) logerror("FDC DRQ %u\n", state);
 
@@ -1022,20 +1022,6 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 	check_level2_interrupts();
 }
 
-static WANGPC_BUS_INTERFACE( bus_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, bus_irq2_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir3_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir5_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir6_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
-	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq1_w),
-	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq2_w),
-	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq3_w),
-	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_NMI)
-};
-
 
 
 //**************************************************************************
@@ -1056,9 +1042,6 @@ void wangpc_state::machine_start()
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
 	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk1_load), this));
 	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk1_unload), this));
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(wangpc_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(wangpc_state::fdc_drq), this));
 
 	// state saving
 	save_item(NAME(m_dma_page));
@@ -1166,6 +1149,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
 	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(wangpc_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(wangpc_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
@@ -1186,7 +1171,17 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_WANGPCKB_TXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
 
 	// bus
-	MCFG_WANGPC_BUS_ADD(bus_intf)
+	MCFG_WANGPC_BUS_ADD()
+	MCFG_WANGPC_BUS_IRQ2_CALLBACK(WRITELINE(wangpc_state, bus_irq2_w))
+	MCFG_WANGPC_BUS_IRQ3_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir3_w))
+	MCFG_WANGPC_BUS_IRQ4_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_WANGPC_BUS_IRQ5_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir5_w))
+	MCFG_WANGPC_BUS_IRQ6_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir6_w))
+	MCFG_WANGPC_BUS_IRQ7_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
+	MCFG_WANGPC_BUS_DRQ1_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq1_w))
+	MCFG_WANGPC_BUS_DRQ2_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq2_w))
+	MCFG_WANGPC_BUS_DRQ3_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq3_w))
+	MCFG_WANGPC_BUS_IOERROR_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
 	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, NULL)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "mvc")
 	MCFG_WANGPC_BUS_SLOT_ADD("slot3", 3, wangpc_cards, NULL)

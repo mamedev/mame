@@ -279,17 +279,12 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-void luxor_55_21046_device::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
-}
-
-void luxor_55_21046_device::fdc_drq_w(bool state)
-{
-	m_dma->rdy_w(state);
 }
 
 
@@ -316,6 +311,8 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_21046_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
 MACHINE_CONFIG_END
 
 
@@ -827,10 +824,6 @@ abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const 
 
 void luxor_55_21046_device::device_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_21046_device::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_21046_device::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));

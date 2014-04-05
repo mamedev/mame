@@ -733,7 +733,7 @@ SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(ibm5150_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
+	SLOT_INTERFACE("mousesys_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
 #define MCFG_CPU_PC(mem, port, type, clock, vblankfunc) \
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -856,7 +856,8 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -963,7 +964,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_aga )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", europc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", europc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -977,7 +978,8 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1048,7 +1050,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1066,7 +1068,8 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1124,7 +1127,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1142,6 +1145,8 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1201,7 +1206,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", t1000)
+	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1219,6 +1224,8 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", pc_state::floppy_formats)
 
 	/* internal ram */
@@ -1287,7 +1294,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibmpcjr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1379,7 +1386,7 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ibmpcjr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1397,7 +1404,8 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	//MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", pc_state::asst128_formats)
 
@@ -1482,7 +1490,8 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1535,7 +1544,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1553,7 +1562,8 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1605,7 +1615,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1623,7 +1633,8 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1675,7 +1686,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1693,7 +1704,8 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 
@@ -1745,7 +1757,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", ibm5150)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ibm5150)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1763,7 +1775,8 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
-
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(pc_state, fdc_interrupt))
+	MCFG_PC_FDC_DRQ_CALLBACK(DEVWRITELINE("dma8237", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", pc_state::floppy_formats)
 

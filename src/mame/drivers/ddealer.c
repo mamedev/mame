@@ -225,7 +225,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
 		}
 		count = 0;
@@ -238,7 +238,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, 0, flipy, (x * 16) - sx, (y * 16) - sy, 15);
 			}
 		}
 	}
@@ -257,7 +257,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
 		}
 		count = 0;
@@ -270,7 +270,7 @@ void ddealer_state::ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UI
 				UINT16 tile = (src[count] & 0x0fff);
 				UINT16 colr = (src[count] & 0xf000) >> 12;
 				count++;
-				 gfx->transpen(m_palette,bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
+				 gfx->transpen(bitmap,cliprect, tile, colr, flipy, flipy, (x * 16) + sx, (y * 16) + sy, 15);
 			}
 		}
 	}
@@ -630,7 +630,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	// M50747 or NMK-110 8131 MCU
 
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddealer)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -638,6 +638,7 @@ static MACHINE_CONFIG_START( ddealer, ddealer_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update_ddealer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)

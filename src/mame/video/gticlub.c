@@ -3,7 +3,7 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/voodoo.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/k001604.h"
 #include "video/gticlub.h"
 
@@ -63,8 +63,9 @@ static UINT32 K001006_addr[MAX_K001006_CHIPS] = { 0, 0 };
 static int K001006_device_sel[MAX_K001006_CHIPS] = { 0, 0 };
 
 static UINT32 *K001006_palette[MAX_K001006_CHIPS];
+static palette_device *m_palette;
 
-void K001006_init(running_machine &machine)
+void K001006_init(running_machine &machine, palette_device *palette)
 {
 	int i;
 	for (i=0; i<MAX_K001006_CHIPS; i++)
@@ -74,8 +75,9 @@ void K001006_init(running_machine &machine)
 		K001006_addr[i] = 0;
 		K001006_device_sel[i] = 0;
 		K001006_palette[i] = auto_alloc_array(machine, UINT32, 0x800);
-		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
+		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));		
 	}
+	m_palette = palette;
 }
 
 static UINT32 K001006_r(running_machine &machine, int chip, int offset, UINT32 mem_mask)
@@ -211,7 +213,7 @@ static int *tex_mirror_table[2][8];
 
 static int K001005_bitmap_page = 0;
 
-static poly_manager *poly;
+static legacy_poly_manager *poly;
 static poly_vertex prev_v[4];
 
 static UINT32 fog_r, fog_g, fog_b;
@@ -233,14 +235,14 @@ void K001005_init(running_machine &machine)
 {
 	int i,k;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine.first_screen()->width();
+	int height = machine.first_screen()->height();
 	K001005_zbuffer = auto_bitmap_ind32_alloc(machine, width, height);
 
 	gfxrom = machine.root_device().memregion("gfx1")->base();
 
-	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
-	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.primary_screen->width(), machine.primary_screen->height());
+	K001005_bitmap[0] = auto_bitmap_rgb32_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
+	K001005_bitmap[1] = auto_bitmap_rgb32_alloc(machine, machine.first_screen()->width(), machine.first_screen()->height());
 
 	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
@@ -831,7 +833,7 @@ static void draw_scanline_gouraud_blend(void *dest, INT32 scanline, const poly_e
 
 static void render_polygons(running_machine &machine)
 {
-	const rectangle& visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.first_screen()->visible_area();
 	poly_vertex v[4];
 	int poly_type;
 	int brightness;
@@ -1576,7 +1578,6 @@ void K001005_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void K001005_swap_buffers(running_machine &machine)
 {
-	palette_device *m_palette = machine.first_screen()->palette();
 	K001005_bitmap_page ^= 1;
 
 	//if (K001005_status == 2)

@@ -28,7 +28,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual bool call_create(int format_type, option_resolution *create_args);
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }

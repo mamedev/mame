@@ -506,7 +506,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", backfire)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
@@ -515,6 +515,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_backfire_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -522,6 +523,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_backfire_right)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)	
@@ -684,7 +686,7 @@ void backfire_state::descramble_sound()
 {
 	UINT8 *rom = memregion("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)
@@ -702,8 +704,6 @@ void backfire_state::descramble_sound()
 	}
 
 	memcpy(rom, buf1, length);
-
-	auto_free(machine(), buf1);
 }
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)

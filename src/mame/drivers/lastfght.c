@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastfght_state, screen_update_lastfght)
-
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

@@ -75,7 +75,7 @@ protected:
 		virtual void device_start();
 		virtual void device_reset();
 private:
-		s3virge_vga_device *m_vga;
+		s3virgedx_vga_device *m_vga;
 };
 
 

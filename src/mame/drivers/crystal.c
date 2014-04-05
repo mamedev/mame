@@ -921,6 +921,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
 	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
 

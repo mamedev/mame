@@ -9,7 +9,7 @@
 **************************************************************************/
 
 #include "sound/dmadac.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 

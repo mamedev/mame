@@ -1010,8 +1010,9 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update_namcos86)
 	MCFG_SCREEN_VBLANK_DRIVER(namcos86_state, screen_eof_namcos86)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos86)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos86)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(namcos86_state, namcos86)
 
@@ -1512,14 +1513,13 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 {
 	int size;
 	UINT8 *gfx;
-	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
 	gfx = memregion("gfx1")->base();
 	size = memregion("gfx1")->bytes() * 2 / 3;
-	buffer = auto_alloc_array(machine(), UINT8,  size );
 
 	{
+		dynamic_buffer buffer( size );
 		UINT8 *dest1 = gfx;
 		UINT8 *dest2 = gfx + ( size / 2 );
 		UINT8 *mono = gfx + size;
@@ -1536,15 +1536,13 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 			*mono ^= 0xff; mono++;
 		}
-
-		auto_free( machine(), buffer );
 	}
 
 	gfx = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes() * 2 / 3;
-	buffer = auto_alloc_array(machine(), UINT8,  size );
 
 	{
+		dynamic_buffer buffer( size );
 		UINT8 *dest1 = gfx;
 		UINT8 *dest2 = gfx + ( size / 2 );
 		UINT8 *mono = gfx + size;
@@ -1561,8 +1559,6 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 
 			*mono ^= 0xff; mono++;
 		}
-
-		auto_free( machine(), buffer );
 	}
 }
 

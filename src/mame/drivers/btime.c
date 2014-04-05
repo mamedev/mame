@@ -1313,17 +1313,16 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", btime)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", btime)
 	
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(btime_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1414,6 +1413,7 @@ static MACHINE_CONFIG_DERIVED( bnj, btime )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bnj)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
@@ -1469,6 +1469,8 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(32)
+
+	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)

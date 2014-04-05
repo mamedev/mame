@@ -29,7 +29,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 }
 
 #define DEVICE_S3C2410
-#include "machine/s3c24xx.c"
+#include "machine/s3c24xx.inc"
 #undef DEVICE_S3C2410
 
 UINT32 s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -77,6 +77,11 @@ s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, d
 		m_palette(*this)
 {
 	m_token = global_alloc_clear(s3c24xx_t);
+}
+
+s3c2410_device::~s3c2410_device()
+{
+	global_free(m_token);
 }
 
 //-------------------------------------------------
@@ -129,9 +134,9 @@ void s3c2410_touch_screen( device_t *device, int state)
 	s3c24xx_touch_screen( device, state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( s3c2410_pin_frnb_w )
+WRITE_LINE_MEMBER( s3c2410_device::frnb_w )
 {
-	s3c24xx_pin_frnb_w( device, state);
+	s3c24xx_pin_frnb_w(this, state);
 }
 
 void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc)

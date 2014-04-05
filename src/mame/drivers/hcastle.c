@@ -164,11 +164,6 @@ WRITE8_MEMBER(hcastle_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_config =
-{
-	DEVCB_DRIVER_MEMBER(hcastle_state,volume_callback) /* external port callback */
-};
-
 void hcastle_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -212,8 +207,9 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hcastle)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hcastle)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(128)
 	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
@@ -228,7 +224,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(hcastle_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.44)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 

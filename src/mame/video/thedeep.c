@@ -185,7 +185,7 @@ void thedeep_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 			for (y = 0; y < ny; y++)
 			{
-				m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 						code + (flipy ? (ny - y - 1) :  y),
 						color,
 						flipx,flipy,

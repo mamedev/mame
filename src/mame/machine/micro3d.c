@@ -9,7 +9,6 @@
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/am29000/am29000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/68681.h"
 #include "includes/micro3d.h"
 
 
@@ -29,29 +28,17 @@
  *
  *************************************/
 
-void micro3d_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
 {
-	micro3d_state *drvstate = device->machine().driver_data<micro3d_state>();
-	drvstate->m_maincpu->set_input_line_and_vector(3, state, vector);
+	m_maincpu->set_input_line_and_vector(3, state, m_duart68681->get_irq_vector());
 };
 
-void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 {
-	micro3d_state *state = device->machine().driver_data<micro3d_state>();
-
-	if (channel == 0)
-	{
-#if HOST_MONITOR_DISPLAY
-		mame_debug_printf("%c", data);
-#endif
-	}
-	else
-	{
-		state->m_m68681_tx0 = data;
-		state->m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-		// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
-		state->m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-	}
+	m_m68681_tx0 = state;
+	m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
+	m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 };
 
 READ8_MEMBER(micro3d_state::data_to_i8031)
@@ -61,7 +48,7 @@ READ8_MEMBER(micro3d_state::data_to_i8031)
 
 WRITE8_MEMBER(micro3d_state::data_from_i8031)
 {
-	duart68681_rx_data(m_duart68681, 1, data);
+	m_duart68681->rx_b_w(data);
 }
 
 /*
@@ -72,7 +59,7 @@ WRITE8_MEMBER(micro3d_state::data_from_i8031)
  * 4: -
  * 5: -
  */
-UINT8 micro3d_duart_input_r(device_t *device)
+READ8_MEMBER(micro3d_state::duart_input_r)
 {
 	return 0x2;
 }
@@ -81,10 +68,9 @@ UINT8 micro3d_duart_input_r(device_t *device)
  * 5: /I8051 reset
  * 7: Status LED
 */
-void micro3d_duart_output_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(micro3d_state::duart_output_w)
 {
-	micro3d_state *drvstate = device->machine().driver_data<micro3d_state>();
-	drvstate->m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -218,22 +204,6 @@ READ32_MEMBER(micro3d_state::micro3d_scc_r)
 		return 5;
 }
 
-
-/*************************************
- *
- *  Host<->TMS34010 interface
- *
- *************************************/
-
-READ16_MEMBER(micro3d_state::micro3d_tms_host_r)
-{
-	return tms34010_host_r(m_vgb, offset);
-}
-
-WRITE16_MEMBER(micro3d_state::micro3d_tms_host_w)
-{
-	tms34010_host_w(m_vgb, offset, data);
-}
 
 
 /*************************************
@@ -619,8 +589,6 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 
 	m_audiocpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
 	m_audiocpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
-
-	m_duart68681 = machine().device("duart68681");
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
 	non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */

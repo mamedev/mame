@@ -32,7 +32,8 @@ public:
 		m_isabus(*this, "isa"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
-		m_ram(*this, RAM_TAG) { }
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette") { }
 
 	required_device<cpu_device>  m_maincpu;
 	required_device<pic8259_device>  m_pic8259;
@@ -93,7 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
-
+	required_device<palette_device> m_palette;
 	const char *m_cputag;
 };
 

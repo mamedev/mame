@@ -41,8 +41,8 @@ public:
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 protected:
 	// device-level overrides

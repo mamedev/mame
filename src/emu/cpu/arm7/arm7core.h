@@ -183,7 +183,6 @@ struct arm_state
 	UINT32 m_pendingSwi;
 	int m_icount;
 	endianness_t m_endian;
-	legacy_cpu_device *m_device;
 	address_space *m_program;
 	direct_read_data *m_direct;
 

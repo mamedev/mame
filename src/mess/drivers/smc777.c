@@ -220,7 +220,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && machine().first_screen()->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
@@ -254,8 +254,8 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -402,13 +402,13 @@ READ8_MEMBER(smc777_state::smc777_fdc1_r)
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->status_r(space, offset) ^ 0xff;
 		case 0x01:
-			return wd17xx_track_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->track_r(space, offset) ^ 0xff;
 		case 0x02:
-			return wd17xx_sector_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->sector_r(space, offset) ^ 0xff;
 		case 0x03:
-			return wd17xx_data_r(m_fdc,space, offset) ^ 0xff;
+			return m_fdc->data_r(space, offset) ^ 0xff;
 		case 0x04: //irq / drq status
 			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
 
@@ -425,21 +425,21 @@ WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 	switch(offset)
 	{
 		case 0x00:
-			wd17xx_command_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->command_w(space, offset,data ^ 0xff);
 			break;
 		case 0x01:
-			wd17xx_track_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->track_w(space, offset,data ^ 0xff);
 			break;
 		case 0x02:
-			wd17xx_sector_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->sector_w(space, offset,data ^ 0xff);
 			break;
 		case 0x03:
-			wd17xx_data_w(m_fdc,space, offset,data ^ 0xff);
+			m_fdc->data_w(space, offset,data ^ 0xff);
 			break;
 		case 0x04:
 			// ---- xxxx select floppy drive (yes, 15 of them, A to P)
-			wd17xx_set_drive(m_fdc,data & 0x01);
-			//  wd17xx_set_side(m_fdc,(data & 0x10)>>4);
+			m_fdc->set_drive(data & 0x01);
+			//  m_fdc->set_side((data & 0x10)>>4);
 			if(data & 0xf0)
 				printf("floppy access %02x\n",data);
 			break;
@@ -988,7 +988,7 @@ void smc777_state::machine_start()
 	save_pointer(NAME(m_gvram), 0x8000);
 	save_pointer(NAME(m_pcg), 0x800);
 
-	m_gfxdecode->set_gfx(0, auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, smc777_charlayout, (UINT8 *)m_pcg, 8, 0)));
 }
 
 void smc777_state::machine_reset()
@@ -1089,11 +1089,12 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_SIZE(0x400, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 

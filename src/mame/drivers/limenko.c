@@ -91,6 +91,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -310,11 +311,10 @@ TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void limenko_state::draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
-	limenko_state *state = gfx->machine().driver_data<limenko_state>();
 	int pal_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
@@ -385,7 +385,7 @@ static void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
 				UINT16 *dest = &dest_bmp.pix16(y);
-				UINT8 *pri = &state->m_sprites_bitmap_pri.pix8(y);
+				UINT8 *pri = &m_sprites_bitmap_pri.pix8(y);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -452,7 +452,7 @@ void limenko_state::draw_sprites(UINT32 *sprites, const rectangle &cliprect, int
 			continue;
 
 		/* prepare GfxElement on the fly */
-		gfx_element gfx(machine(), gfxdata, width, height, width, m_palette->entries(), 0, 256);
+		gfx_element gfx(m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
 
 		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
@@ -711,26 +711,6 @@ GFXDECODE_END
 
 
 /*****************************************************************************************************
- INTERFACES
- *****************************************************************************************************/
-
-static QS1000_INTERFACE( qs1000_intf )
-{
-	/* External ROM */
-	true,
-
-	/* P1-P3 read handlers */
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	/* P1-P3 write handlers */
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p1_w),
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p2_w),
-	DEVCB_DRIVER_MEMBER(limenko_state, qs1000_p3_w),
-};
-
-/*****************************************************************************************************
   MACHINE DRIVERS
 *****************************************************************************************************/
 
@@ -750,15 +730,21 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_QS1000_EXTERNAL_ROM(true)
+	MCFG_QS1000_IN_P1_CB(READ8(limenko_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(limenko_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(limenko_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(limenko_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -781,8 +767,9 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_SCREEN_SIZE(384, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(limenko_state, screen_update_limenko)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", limenko)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", limenko)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

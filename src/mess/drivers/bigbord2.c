@@ -116,7 +116,8 @@ public:
 		m_dsw(*this, "DSW"),
 		m_bankr(*this, "bankr"),
 		m_bankv(*this, "bankv"),
-		m_banka(*this, "banka")
+		m_banka(*this, "banka"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -140,8 +141,6 @@ public:
 private:
 	UINT8 m_term_data;
 	UINT8 m_term_status;
-	bool m_fdc_irq;                     /* interrupt request */
-	bool m_fdc_drq;                     /* data request */
 	int m_c8[8];
 	floppy_image_device *m_floppy;
 	virtual void machine_start();
@@ -164,6 +163,8 @@ private:
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankv;
 	required_memory_bank m_banka;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 /* Status port
@@ -361,9 +362,9 @@ WRITE8_MEMBER( bigbord2_state::portcc_w )
 
 	bool dma_rdy = 0;
 	if ((data & 7) == 2)
-		dma_rdy = m_fdc_drq;
+		dma_rdy = m_fdc->drq_r();
 
-	z80dma_rdy_w(m_dma, dma_rdy);
+	m_dma->rdy_w(dma_rdy);
 }
 
 
@@ -384,7 +385,7 @@ static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
 	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80CTCA_TAG, z80ctc_device, read, write) //has issues
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTCB_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	//AM_RANGE(0xC0, 0xC3)   eprom programming port
 	AM_RANGE(0xC4, 0xC7) AM_READ(portc4_r)
 	AM_RANGE(0xC8, 0xCB) AM_WRITE(portc8_w)
@@ -513,16 +514,6 @@ static SLOT_INTERFACE_START( bigbord2_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void bigbord2_state::fdc_intrq_w(bool state)
-{
-	m_fdc_irq = state;
-}
-
-void bigbord2_state::fdc_drq_w(bool state)
-{
-	m_fdc_drq = state;
-}
-
 
 /* Video */
 
@@ -541,8 +532,6 @@ void bigbord2_state::machine_start()
 {
 	/* register for state saving */
 	save_item(NAME(m_term_data));
-	save_item(NAME(m_fdc_irq));
-	save_item(NAME(m_fdc_drq));
 }
 
 void bigbord2_state::machine_reset()
@@ -565,8 +554,6 @@ DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 	m_bankr->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 	m_bankv->configure_entries(0, 2, &RAM[0x6000], 0x10000);
 	m_banka->configure_entries(0, 2, &RAM[0x7000], 0x10000);
-	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bigbord2_state::fdc_drq_w), this));
 }
 
 
@@ -593,7 +580,7 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( bigbord2_update_row )
 {
 	bigbord2_state *state = device->machine().driver_data<bigbord2_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -651,7 +638,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", bigbord2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigbord2)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* keyboard */

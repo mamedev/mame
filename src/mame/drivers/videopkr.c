@@ -1262,8 +1262,9 @@ static MACHINE_CONFIG_START( videopkr, videopkr_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(2080)
 	MCFG_SCREEN_UPDATE_DRIVER(videopkr_state, screen_update_videopkr)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", videopkr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopkr)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(videopkr_state, videopkr)
 

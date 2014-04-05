@@ -41,12 +41,11 @@ static const res_net_info popper_net_info =
 PALETTE_INIT_MEMBER(popper_state, popper)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t   *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);
+	compute_res_net_all(rgb, color_prom, popper_decode_info, popper_net_info);
 	palette.set_pen_colors(0, rgb, 64);
 	palette.palette()->normalize_range(0, 63);
-	auto_free(machine(), rgb);
 }
 
 WRITE8_MEMBER(popper_state::popper_ol_videoram_w)
@@ -209,7 +208,7 @@ void popper_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 				flipy = !flipy;
 			}
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					m_spriteram[offs + 1],
 					(m_spriteram[offs + 2] & 0x0f),
 					flipx,flipy,

@@ -57,7 +57,7 @@ const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
 
 WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 {
-	m_bus->int_w(state);
+	m_bus->irq_w(state);
 }
 
 

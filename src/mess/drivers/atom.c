@@ -740,7 +740,6 @@ static const struct atom_cart_range atom_cart_table[] =
 DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
 {
 	UINT32 size;
-	UINT8 *temp_copy;
 	int mirror, i;
 	const struct atom_cart_range *atom_cart = &atom_cart_table[0], *this_cart;
 
@@ -763,29 +762,28 @@ DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
+	dynamic_buffer temp_copy;
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
 
 		if (size > 0x1000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
+		temp_copy.resize(size);
 		if (image.fread(temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
 	{
 		size = image.get_software_region_length( "rom");
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
@@ -794,8 +792,6 @@ DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
 		memcpy(memregion(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
-
-	auto_free(machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }

@@ -37,8 +37,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6581_POTXY_CALLBACKS(_potx, _poty) \
-	downcast<mos6581_device *>(device)->set_callbacks(DEVCB2_##_potx, DEVCB2_##_poty);
+#define MCFG_MOS6581_POTX_CALLBACK(_read) \
+	devcb = &mos6581_device::set_potx_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MOS6581_POTY_CALLBACK(_read) \
+	devcb = &mos6581_device::set_poty_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -56,12 +59,10 @@ class mos6581_device : public device_t,
 public:
 	mos6581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~mos6581_device() { global_free(m_token); }
+	~mos6581_device();
 
-	template<class _potx, class _poty> void set_callbacks(_potx potx, _poty poty) {
-		m_read_potx.set_callback(potx);
-		m_read_poty.set_callback(poty);
-	}
+	template<class _Object> static devcb2_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_potx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6581_device &>(device).m_read_poty.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

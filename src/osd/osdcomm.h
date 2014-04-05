@@ -111,6 +111,13 @@ __extension__ typedef signed long long      INT64;
 
 #endif
 
+/* pointer-sized values */
+#ifdef PTR64
+typedef UINT64								FPTR;
+#else
+typedef UINT32								FPTR;
+#endif
+
 
 
 /***************************************************************************

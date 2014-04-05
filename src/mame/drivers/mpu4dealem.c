@@ -8,7 +8,7 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 
 //     - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX2, but not there?)
 //     - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
-//                to give black on green.
+//                to give black on green. (Possibly colour 0 being used in place of colour 10?)
 
 
 #include "emu.h"
@@ -126,7 +126,7 @@ UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind1
 		{
 			int tile = m_dealem_videoram[count + 0x1000] | (m_dealem_videoram[count] << 8);
 			count++;
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,0,0,0,x * 8,y * 8);
 		}
 	}
 
@@ -229,8 +229,9 @@ static MACHINE_CONFIG_START( dealem, mpu4dealem_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)      /* Taken from 6845 init, registers 01 & 06 */
 	MCFG_SCREEN_REFRESH_RATE(56)                            /* Measured accurately from the flip-flop, but 6845 handles this */
 	MCFG_SCREEN_UPDATE_DRIVER(mpu4dealem_state, screen_update_dealem)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dealem)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dealem)
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(mpu4dealem_state,dealem)

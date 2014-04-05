@@ -53,9 +53,6 @@ public:
 	DECLARE_READ16_MEMBER( status_r );
 	DECLARE_READ16_MEMBER( data_r );
 
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
-
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -67,8 +64,8 @@ protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline UINT16 readword(offs_t address);
+	inline void writeword(offs_t address, UINT16 data);
 
 private:
 	inline void fifo_w_clear();
@@ -79,20 +76,35 @@ private:
 	inline void dequeue_r(UINT8 *data);
 	inline void recompute_parameters();
 	inline void command_end_seq();
+	void calc_offset(INT16 x, INT16 y, UINT32 &offset, UINT8 &bit_pos);
+	int get_bpp();
+	UINT16 get_dot(INT16 x, INT16 y);
+	bool set_dot(INT16 x, INT16 y, INT16 px, INT16 py);
+	bool set_dot(INT16 x, INT16 y, UINT16 color);
+	void draw_line(INT16 sx, INT16 sy, INT16 ex, INT16 ey);
+	void draw_circle(INT16 cx, INT16 cy, double r, double s_angol, double e_angol, bool c);
+	void paint(INT16 sx, INT16 sy);
 
 	void command_wpr_exec();
+	UINT16 command_rpr_exec();
 	void command_clr_exec();
 	void command_cpy_exec();
 	void command_rct_exec();
+	void command_line_exec();
+	void command_gcpy_exec();
+	void command_ptn_exec();
+	void command_plg_exec();
+	void command_frct_exec();
+	void command_arc_exec();
+
 	void process_fifo();
 	void exec_abort_sequence();
 	UINT16 video_registers_r(int offset);
 	void video_registers_w(int offset);
 	int translate_command(UINT16 data);
-	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int layer_n);
+	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
 
 
-	UINT8 *m_vram;
 	UINT8 m_ar;
 	UINT8 m_vreg[0x100];
 	UINT8 m_sr;
@@ -105,7 +117,7 @@ private:
 
 
 	UINT16 m_cr;
-	UINT16 m_pr[0x10];                  /* parameter byte register */
+	UINT16 m_pr[0x100];                  /* parameter byte register */
 	int m_param_ptr;                    /* parameter pointer */
 
 	UINT32 m_rwp[4];
@@ -116,6 +128,8 @@ private:
 	UINT8 m_org_dpd;
 	UINT16 m_cl0;
 	UINT16 m_cl1;
+	UINT16 m_ccmp;
+	UINT16 m_mask;
 
 	INT16 m_cpx;
 	INT16 m_cpy;
@@ -130,13 +144,32 @@ private:
 	UINT8 m_dn;
 
 	UINT16 m_ccr;
+	UINT16 m_omr;
+	UINT16 m_edg;
 	UINT16 m_dcr;
 
 	UINT16 m_hc, m_hds, m_hdw, m_hws, m_hww;
+	UINT16 m_sp[3];
 	UINT8 m_hsw;
 
 	UINT16 m_vc, m_vws, m_vww, m_vds;
 	UINT8 m_vsw;
+
+	UINT16 m_ppy;
+	UINT16 m_pzcy;
+	UINT16 m_ppx;
+	UINT16 m_pzcx;
+	UINT16 m_psx;
+	UINT16 m_pex;
+	UINT16 m_pzx;
+	UINT16 m_psy;
+	UINT16 m_pzy;
+	UINT16 m_pey;
+
+	UINT16 m_xmin;
+	UINT16 m_ymin;
+	UINT16 m_xmax;
+	UINT16 m_ymax;
 
 	const address_space_config      m_space_config;
 };

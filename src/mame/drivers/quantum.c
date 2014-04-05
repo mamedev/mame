@@ -50,7 +50,6 @@
 #include "sound/pokey.h"
 #include "sound/discrete.h"
 #include "machine/nvram.h"
-#include "drivlgcy.h"
 
 
 class quantum_state : public driver_device
@@ -58,13 +57,15 @@ class quantum_state : public driver_device
 public:
 	quantum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_avg(*this, "avg") { }
 
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_READ8_MEMBER(input_2_r);
 	required_device<cpu_device> m_maincpu;
+	required_device<avg_quantum_device> m_avg;
 };
 
 
@@ -118,8 +119,8 @@ WRITE16_MEMBER(quantum_state::led_w)
 		set_led_status(machine(), 1, data & 0x20);
 
 		/* bits 6 and 7 flip screen */
-		avg_set_flip_x (data & 0x40);
-		avg_set_flip_y (data & 0x80);
+		m_avg->set_flip_x (data & 0x40);
+		m_avg->set_flip_y (data & 0x80);
 	}
 }
 
@@ -143,8 +144,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x950000, 0x95001f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x958000, 0x958001) AM_WRITE(led_w)
 	AM_RANGE(0x960000, 0x960001) AM_WRITENOP
-	AM_RANGE(0x968000, 0x968001) AM_WRITE_LEGACY(avgdvg_reset_word_w)
-	AM_RANGE(0x970000, 0x970001) AM_WRITE_LEGACY(avgdvg_go_word_w)
+	AM_RANGE(0x968000, 0x968001) AM_DEVWRITE("avg", avg_quantum_device, reset_word_w)
+	AM_RANGE(0x970000, 0x970001) AM_DEVWRITE("avg", avg_quantum_device, go_word_w)
 	AM_RANGE(0x978000, 0x978001) AM_READNOP AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
@@ -158,7 +159,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( quantum )
 	PORT_START("SYSTEM")
 	/* YHALT here MUST BE ALWAYS 0  */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL) /* vg YHALT */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_quantum_device, done_r, NULL) /* vg YHALT */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
@@ -307,7 +308,8 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_VIDEO_START(avg_quantum)
+	MCFG_DEVICE_ADD("avg", AVG_QUANTUM, 0)	
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -83,21 +83,17 @@ WRITE_LINE_MEMBER( comx35_state::prd_w )
 static CDP1869_INTERFACE( pal_cdp1869_intf )
 {
 	CDP1869_COLOR_CLK_PAL,
-	CDP1869_PAL,
 	comx35_pcb_r,
 	comx35_charram_r,
-	comx35_charram_w,
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, prd_w)
+	comx35_charram_w
 };
 
 static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 {
 	CDP1869_COLOR_CLK_NTSC,
-	CDP1869_NTSC,
 	comx35_pcb_r,
 	comx35_charram_r,
-	comx35_charram_w,
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, prd_w)
+	comx35_charram_w
 };
 
 void comx35_state::video_start()
@@ -115,6 +111,8 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pal_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -129,6 +127,8 @@ MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, ntsc_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_PAL_NTSC_CALLBACK(GND)
+	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

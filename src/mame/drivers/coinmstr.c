@@ -1169,8 +1169,9 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(coinmstr_state, screen_update_coinmstr)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", coinmstr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
 
@@ -1389,7 +1390,7 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
 	UINT8 *rom = memregion("user1")->base();
 	int length = memregion("user1")->bytes();
-	UINT8 *buf = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf(length);
 	int i;
 
 	memcpy(buf,rom,length);
@@ -1399,8 +1400,6 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 		int adr = BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
 		rom[i] = BITSWAP8(buf[adr],3,2,4,1,5,0,6,7);
 	}
-
-	auto_free(machine(), buf);
 }
 
 

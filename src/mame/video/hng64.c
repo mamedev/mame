@@ -253,8 +253,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 
 				if (!chaini)
 				{
-					if (!blend) gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
@@ -273,8 +273,8 @@ static void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rect
 						pal&=0xf;
 					}
 
-					if (!blend) gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(state->m_palette,bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					source +=8;
 				}
 
@@ -1894,7 +1894,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 	setIdentity(objectMatrix);
 
 	struct polygon lastPoly = { 0 };
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine.first_screen()->visible_area();
 
 	/////////////////
 	// HEADER INFO //
@@ -2416,7 +2416,7 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = auto_alloc_array(machine, struct polygon, 1024*5);
+	dynamic_array<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7]);
 	switch (packet[0])
@@ -2501,15 +2501,13 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 			drawShaded(machine, &polys[i]);
 		}
 	}
-
-	auto_free(machine, polys);
 }
 
 void hng64_state::clear3d()
 {
 	int i;
 
-	const rectangle &visarea = machine().primary_screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	// Clear each of the display list buffers after drawing - todo: kill!
 	for (i = 0; i < 0x81; i++)
@@ -2788,7 +2786,7 @@ static void performFrustumClip(struct polygon *p)
 #ifdef UNUSED_FUNCTION
 static void plot(running_machine &machine, INT32 x, INT32 y, UINT32 color)
 {
-	UINT32* cb = &(colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x]);
+	UINT32* cb = &(colorBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x]);
 	*cb = color;
 }
 
@@ -2905,8 +2903,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 											float s_start, float s_delta, float t_start, float t_delta)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	float*  db = &(state->m_depthBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
-	UINT32* cb = &(state->m_colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
+	float*  db = &(state->m_depthBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x_start]);
+	UINT32* cb = &(state->m_colorBuffer3d[(y * machine.first_screen()->visible_area().max_x) + x_start]);
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;

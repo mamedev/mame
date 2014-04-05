@@ -241,7 +241,7 @@ void gp32_state::s3c240x_lcd_render_16( )
 
 TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	verboselog( machine(), 2, "LCD timer callback\n");
 	m_s3c240x_lcd.vpos = screen->vpos();
 	m_s3c240x_lcd.hpos = screen->hpos();
@@ -269,7 +269,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 
 void gp32_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 UINT32 gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -289,7 +289,7 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 		{
 			// make sure line counter is going
 			UINT32 lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
-			data = (data & ~0xFFFC0000) | ((lineval - machine().primary_screen->vpos()) << 18);
+			data = (data & ~0xFFFC0000) | ((lineval - machine().first_screen()->vpos()) << 18);
 		}
 		break;
 	}
@@ -299,7 +299,7 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 
 void gp32_state::s3c240x_lcd_configure()
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
@@ -325,7 +325,7 @@ void gp32_state::s3c240x_lcd_configure()
 
 void gp32_state::s3c240x_lcd_start()
 {
-	screen_device *screen = machine().primary_screen;
+	screen_device *screen = machine().first_screen();
 	verboselog( machine(), 1, "LCD start\n");
 	s3c240x_lcd_configure();
 	s3c240x_lcd_dma_init();

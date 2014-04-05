@@ -188,6 +188,7 @@ const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
 gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GAELCO_SERIAL, "gaelco_serial", tag, owner, clock, "gaelco_serial", __FILE__),
+	m_irq_handler(*this),
 	m_status(0),
 	m_last_in_msg_cnt(0),
 	m_slack_cnt(0),
@@ -197,26 +198,6 @@ gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const 
 	m_os_shmem(NULL),
 	m_shmem(NULL)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void gaelco_serial_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const gaelco_serial_interface *intf = reinterpret_cast<const gaelco_serial_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<gaelco_serial_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_irq, 0, sizeof(m_irq));
-	}
 }
 
 //-------------------------------------------------
@@ -232,7 +213,7 @@ void gaelco_serial_device::device_start()
 	//memset(state, 0, sizeof(*state));
 	//m_device = device;
 
-	m_irq_func.resolve(m_irq, *this);
+	m_irq_handler.resolve_safe();
 	m_sync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gaelco_serial_device::link_cb), this));
 
 	/* register for save states */
@@ -323,7 +304,7 @@ void gaelco_serial_device::process_in()
 			LOGMSG(("command receive %02x at %d (%d)\n", m_in_ptr->data, m_out_ptr->cnt, m_in_ptr->cnt));
 			if ((m_status & GAELCOSER_STATUS_IRQ_ENABLE) != 0)
 			{
-				m_irq_func(1);
+				m_irq_handler(1);
 				LOGMSG(("irq!\n"));
 			}
 		}
@@ -411,7 +392,7 @@ READ8_MEMBER( gaelco_serial_device::data_r)
 	process_in();
 	ret = (m_in_ptr->data & 0xff);
 
-	m_irq_func(0);
+	m_irq_handler(0);
 	LOGMSG(("read %02x at %d (%d)\n", ret, m_out_ptr->cnt, m_in_ptr->cnt));
 
 	/* if we are not sending, mark as as ready */

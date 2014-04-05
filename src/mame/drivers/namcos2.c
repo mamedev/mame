@@ -1729,8 +1729,9 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1803,8 +1804,9 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", namcos2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos2)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1850,8 +1852,9 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_finallap)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", finallap)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", finallap)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1902,8 +1905,9 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -1956,8 +1960,9 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sgunner)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sgunner)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2005,8 +2010,9 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_luckywld)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", luckywld)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckywld)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -2057,8 +2063,9 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_SCREEN_SIZE(384, 264)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_metlhawk)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", metlhawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlhawk)
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -5563,14 +5570,14 @@ GAME( 1989, valkyrie,  0,        default3, default, namcos2_state,  valkyrie, RO
 
 GAME( 1989, finehour,  0,        default2, default, namcos2_state,  finehour, ROT0,   "Namco", "Finest Hour (Japan)" , 0)
 
-GAME( 1989, burnforc,  0,        default3, default, namcos2_state,  burnforc, ROT0,   "Namco", "Burning Force (Japan, Rev C)", 0 )
-GAME( 1989, burnforco, burnforc, default3, default, namcos2_state,  burnforc, ROT0,   "Namco", "Burning Force (Japan)", 0 )
+GAME( 1989, burnforc,  0,        default3, default, namcos2_state,  burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
+GAME( 1989, burnforco, burnforc, default3, default, namcos2_state,  burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
 GAME( 1989, marvland,  0,        default,  default, namcos2_state,  marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
 GAME( 1989, marvlandj, marvland, default,  default, namcos2_state,  marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
-GAME( 1990, kyukaidk,  0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, Rev B)", 0 )
-GAME( 1990, kyukaidko, kyukaidk, default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan)", 0 )
+GAME( 1990, kyukaidk,  0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )
+GAME( 1990, kyukaidko, kyukaidk, default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", 0 )
 
 GAME( 1990, dsaber,    0,        default3, default, namcos2_state,  dsaber,   ROT90,  "Namco", "Dragon Saber", 0 )
 GAME( 1990, dsaberj,   dsaber,   default3, default, namcos2_state,  dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", 0 )

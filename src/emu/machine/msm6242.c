@@ -52,7 +52,7 @@ enum
 //**************************************************************************
 
 // device type definition
-const device_type msm6242 = &device_creator<msm6242_device>;
+const device_type MSM6242 = &device_creator<msm6242_device>;
 
 
 //**************************************************************************
@@ -64,8 +64,9 @@ const device_type msm6242 = &device_creator<msm6242_device>;
 //-------------------------------------------------
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock, "msm6242", __FILE__),
-		device_rtc_interface(mconfig, *this)
+	: device_t(mconfig, MSM6242, "msm6242", tag, owner, clock, "msm6242", __FILE__),
+		device_rtc_interface(mconfig, *this),
+		m_out_int_handler(*this)
 {
 }
 
@@ -77,9 +78,7 @@ msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, d
 
 void msm6242_device::device_start()
 {
-	const msm6242_interface *intf = reinterpret_cast<const msm6242_interface *>(static_config());
-	if (intf != NULL)
-		m_res_out_int_func.resolve(intf->m_out_int_func, *this);
+	m_out_int_handler.resolve();
 
 	// let's call the timer callback every tick
 	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
@@ -114,8 +113,8 @@ void msm6242_device::device_start()
 
 void msm6242_device::device_reset()
 {
-	if (!m_res_out_int_func.isnull())
-		m_res_out_int_func(CLEAR_LINE);
+	if (!m_out_int_handler.isnull())
+		m_out_int_handler(CLEAR_LINE);
 }
 
 
@@ -180,8 +179,8 @@ void msm6242_device::irq(UINT8 irq_type)
 			logerror("%s: MSM6242 logging IRQ #%d\n", machine().describe_context(), (int) irq_type);
 
 		// ...and assert the output line
-		if (!m_res_out_int_func.isnull())
-			m_res_out_int_func(ASSERT_LINE);
+		if (!m_out_int_handler.isnull())
+			m_out_int_handler(ASSERT_LINE);
 	}
 }
 
@@ -292,7 +291,7 @@ void msm6242_device::update_timer()
 	attotime callback_time = attotime::never;
 
 	// we only need to call back if the IRQ flag is on, and we have a handler
-	if (!m_res_out_int_func.isnull() && m_irq_flag == 1)
+	if (!m_out_int_handler.isnull() && m_irq_flag == 1)
 	{
 		switch(m_irq_type)
 		{
@@ -524,8 +523,8 @@ WRITE8_MEMBER( msm6242_device::write )
 			else
 			{
 				m_irq_flag = 0;
-				if ( !m_res_out_int_func.isnull() )
-					m_res_out_int_func( CLEAR_LINE );
+				if ( !m_out_int_handler.isnull() )
+					m_out_int_handler( CLEAR_LINE );
 
 				if (LOG_IRQ_ENABLE)
 					logerror("%s: MSM6242 disabling irq\n", machine().describe_context());

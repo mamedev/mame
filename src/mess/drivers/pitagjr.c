@@ -209,6 +209,7 @@ static MACHINE_CONFIG_START( pitajr, pitagjr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pitagjr_state, screen_update)
 	MCFG_SCREEN_SIZE( 200, 100 )    // FIXME
 	MCFG_SCREEN_VISIBLE_AREA( 0, 200-1, 0, 100-1 )
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 

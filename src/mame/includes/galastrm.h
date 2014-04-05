@@ -1,5 +1,5 @@
 #include "machine/eepromser.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 
@@ -55,7 +55,7 @@ public:
 	struct tempsprite *m_sprite_ptr_pre;
 	bitmap_ind16 m_tmpbitmaps;
 	bitmap_ind16 m_polybitmap;
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	int m_rsxb;
 	int m_rsyb;
 	int m_rsxoffs;

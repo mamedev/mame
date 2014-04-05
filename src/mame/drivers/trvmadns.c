@@ -342,7 +342,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(!(attr & 0x20))
-				gfx->opaque(m_palette,bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8));
 			count++;
 		}
 	}
@@ -360,7 +360,7 @@ UINT32 trvmadns_state::screen_update_trvmadns(screen_device &screen, bitmap_ind1
 			int flipy = attr & 2;
 
 			if(attr & 0x20)
-				gfx->transpen(m_palette,bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8),1);
+				gfx->transpen(bitmap,cliprect,tile,color,flipx,flipy,(x*8),(y*8),1);
 			count++;
 		}
 	}
@@ -387,8 +387,9 @@ static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", trvmadns)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)
 
 

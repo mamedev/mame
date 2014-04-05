@@ -95,16 +95,6 @@ WRITE16_MEMBER(sitcom_state::sitcom_update_ds1)
 	output_set_digit_value(4 + offset, data);
 }
 
-const dl1416_interface sitcom_ds0_intf =
-{
-	DEVCB_DRIVER_MEMBER16(sitcom_state, sitcom_update_ds0)
-};
-
-const dl1416_interface sitcom_ds1_intf =
-{
-	DEVCB_DRIVER_MEMBER16(sitcom_state, sitcom_update_ds1)
-};
-
 // SID line used as serial input from a pc
 READ_LINE_MEMBER( sitcom_state::sid_line )
 {
@@ -123,11 +113,14 @@ static MACHINE_CONFIG_START( sitcom, sitcom_state )
 	MCFG_CPU_IO_MAP(sitcom_io)
 	MCFG_I8085A_SID(READLINE(sitcom_state, sid_line))
 	MCFG_I8085A_SOD(WRITELINE(sitcom_state, sod_led))
+	
+	MCFG_DEFAULT_LAYOUT(layout_sitcom)
 
 	/* video hardware */
-	MCFG_DL1416B_ADD("ds0", sitcom_ds0_intf)
-	MCFG_DL1416B_ADD("ds1", sitcom_ds1_intf)
-	MCFG_DEFAULT_LAYOUT(layout_sitcom)
+	MCFG_DEVICE_ADD("ds0", DL1416B, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(sitcom_state, sitcom_update_ds0))
+	MCFG_DEVICE_ADD("ds1", DL1416B, 0)
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(sitcom_state, sitcom_update_ds1))
 MACHINE_CONFIG_END
 
 /* ROM definition */

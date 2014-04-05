@@ -28,7 +28,8 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_tms_vram(*this, "tms_vram"),
 		m_68hc11(*this, "68hc11"),
-		m_ay(*this, "aysnd")
+		m_ay(*this, "aysnd"),
+		m_tms(*this, "tms")
 	{
 	}
 
@@ -38,7 +39,6 @@ public:
 	UINT8 m_ay_sel;
 	UINT8 m_lastdataw;
 	UINT16 m_lastdatar;
-	device_t *m_tms;
 	DECLARE_READ16_MEMBER(ramdac_r);
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
@@ -50,6 +50,7 @@ public:
 	virtual void video_start();
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
+	required_device<tms34010_device> m_tms;
 };
 
 
@@ -61,7 +62,6 @@ public:
 
 void skeetsht_state::machine_reset()
 {
-	m_tms = machine().device("tms");
 }
 
 
@@ -131,13 +131,13 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
 	else
-		tms34010_host_w(m_tms, offset >> 1, (m_lastdataw << 8) | data);
+		m_tms->host_w(space, offset >> 1, (m_lastdataw << 8) | data, 0xffff);
 }
 
 READ8_MEMBER(skeetsht_state::tms_r)
 {
 	if ((offset & 1) == 0)
-		m_lastdatar = tms34010_host_r(m_tms, offset >> 1);
+		m_lastdatar = m_tms->host_r(space, offset >> 1, 0xffff);
 
 	return m_lastdatar >> ((offset & 1) ? 0 : 8);
 }
@@ -196,7 +196,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skeetsht_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("tms_vram")
 	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
 	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)

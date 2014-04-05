@@ -75,7 +75,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_rtc_interface overrides
@@ -102,35 +101,48 @@ private:
 		MODE_SHIFT,
 		MODE_TIME_SET,
 		MODE_TIME_READ,
-		MODE_TP_64HZ_SET,
-		MODE_TP_256HZ_SET,
-		MODE_TP_2048HZ_SET,
+		MODE_TP_64HZ,
+		MODE_TP_256HZ,
+		MODE_TP_2048HZ,
+		MODE_TP_4096HZ,
+		MODE_TP_1S_INT,
+		MODE_TP_10S_INT,
+		MODE_TP_30S_INT,
+		MODE_TP_60S_INT,
+		MODE_INT_RESET_OUTPUT,
+		MODE_INT_RUN_CLOCK,
+		MODE_INT_STOP_CLOCK,
 		MODE_TEST
 	};
 
-	devcb2_write_line   m_write_data;
-	devcb2_write_line   m_write_tp;
+	devcb2_write_line m_write_data;
+	devcb2_write_line m_write_tp;
 
-	UINT8 m_time_counter[5];    // time counter
-	UINT8 m_shift_reg[5];       // shift register
+	UINT8 m_time_counter[6];    // time counter
+	UINT8 m_shift_reg[7];       // shift register (40 bits, or 48 bits + serial command register)
 
 	int m_oe;                   // output enable
 	int m_cs;                   // chip select
 	int m_stb;                  // strobe
 	int m_data_in;              // data in
 	int m_data_out;             // data out
-	int m_c;                    // command
+	int m_c;                    // latched command
 	int m_clk;                  // shift clock
 	int m_tp;                   // time pulse
 	int m_c_unlatched;          // command waiting for STB
 
-	int m_variant;
+	bool m_testmode;            // testmode active
 
+	int m_variant;
+	
 	// timers
 	emu_timer *m_timer_clock;
 	emu_timer *m_timer_tp;
 	emu_timer *m_timer_data_out;
 	emu_timer *m_timer_test_mode;
+
+	bool is_serial_mode();
+	int get_data_out();
 };
 
 

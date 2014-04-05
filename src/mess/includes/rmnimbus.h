@@ -344,8 +344,6 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 
 #define MSM5205_TAG             "msm5205"
 
-void nimbus_msm5205_vck(device_t *device,int st);
-
 /* Mouse / Joystick */
 
 #define JOYSTICK0_TAG           "joystick0"
@@ -483,6 +481,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_io_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_msg_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
+	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
+
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
 	UINT8 get_pixel(UINT16 x, UINT16 y);

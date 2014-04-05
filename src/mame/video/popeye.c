@@ -60,7 +60,7 @@ static const res_net_decode_info popeye_7051_decode_info =
 {
 	1,		/*  one prom 5 lines */
 	0,		/*  start at 0 */
-	31,		/*  end at 31  */
+	15,		/*  end at 15 (banked) */
 	/*  R,   G,   B,  */
 	{   0,   0,   0 },		/*  offsets */
 	{   0,   3,   6 },		/*  shifts */
@@ -124,9 +124,9 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 	{
 		int prom_offs = i | ((i & 8) << 1);	/* address bits 3 and 4 are tied together */
 		int r, g, b;
-		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, &popeye_7051_txt_net_info);
-		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, &popeye_7051_txt_net_info);
-		b = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x03, 2, &popeye_7051_txt_net_info);
+		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, popeye_7051_txt_net_info);
+		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, popeye_7051_txt_net_info);
+		b = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x03, 2, popeye_7051_txt_net_info);
 		m_palette->set_pen_color(16 + (2 * i) + 0,rgb_t(0,0,0));
 		m_palette->set_pen_color(16 + (2 * i) + 1,rgb_t(r,g,b));
 	}
@@ -160,15 +160,14 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 
 #if USE_NEW_COLOR
 	/* sprites */
-	rgb_t	*rgb;
+	dynamic_array<rgb_t> rgb;
 	UINT8 cpi[512];
 
 	for (i=0; i<512; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
-	rgb = compute_res_net_all(machine(), &cpi[0], &popeye_7052_decode_info,  &popeye_7052_obj_net_info);
+	compute_res_net_all(rgb, &cpi[0], popeye_7052_decode_info, popeye_7052_obj_net_info);
 	m_palette->set_pen_colors(48, rgb, 256);
-	auto_free(machine(), rgb);
 #else
 	for (i = 0;i < 256;i++)
 	{
@@ -221,13 +220,12 @@ void popeye_state::set_background_palette(int bank)
 
 #if USE_NEW_COLOR
 	UINT8 cpi[16];
-	rgb_t	*rgb;
+	dynamic_array<rgb_t> rgb;
 	for (i=0; i<16; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
-	rgb = compute_res_net_all(machine(), cpi, &popeye_7051_decode_info, &popeye_7051_bck_net_info);
+	compute_res_net_all(rgb, &cpi[0], popeye_7051_decode_info, popeye_7051_bck_net_info);
 	m_palette->set_pen_colors(0, rgb, 16);
-	auto_free(machine(), rgb);
 
 #else
 	for (i = 0;i < 16;i++)
@@ -236,19 +234,19 @@ void popeye_state::set_background_palette(int bank)
 		int r,g,b;
 
 		/* red component */
-		bit0 = ((*color_prom ^ m_invertmask) >> 0) & 0x01;
-		bit1 = ((*color_prom ^ m_invertmask) >> 1) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 2) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 0) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 1) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 2) & 0x01;
 		r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* green component */
-		bit0 = ((*color_prom ^ m_invertmask) >> 3) & 0x01;
-		bit1 = ((*color_prom ^ m_invertmask) >> 4) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 5) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 3) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 4) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 5) & 0x01;
 		g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = ((*color_prom ^ m_invertmask) >> 6) & 0x01;
-		bit2 = ((*color_prom ^ m_invertmask) >> 7) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 6) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 7) & 0x01;
 		if (m_bitmap_type == TYPE_SKYSKIPR)
 		{
 			/* Sky Skipper has different weights */
@@ -459,7 +457,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 496 - sy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,

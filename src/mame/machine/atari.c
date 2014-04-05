@@ -58,20 +58,20 @@ void atari_interrupt_cb(pokey_device *device, int mask)
  *
  **************************************************************/
 
-void a600xl_mmu(running_machine &machine, UINT8 new_mmu)
+void atari_common_state::a600xl_mmu(UINT8 new_mmu)
 {
 	/* check if self-test ROM changed */
 	if ( new_mmu & 0x80 )
 	{
-		logerror("%s MMU SELFTEST RAM\n", machine.system().name);
-		machine.device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x5000, 0x57ff);
+		logerror("%s MMU SELFTEST RAM\n", machine().system().name);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x5000, 0x57ff);
 	}
 	else
 	{
-		logerror("%s MMU SELFTEST ROM\n", machine.system().name);
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
-		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
-		machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x5000);
+		logerror("%s MMU SELFTEST ROM\n", machine().system().name);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5000, 0x57ff, "bank2");
+		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5000, 0x57ff);
+		machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x5000);
 	}
 }
 
@@ -256,37 +256,26 @@ static void _antic_reset(running_machine &machine)
 }
 
 
-void atari_machine_start(running_machine &machine)
+void atari_common_state::atari_machine_start()
 {
 	gtia_interface gtia_intf;
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (machine.root_device().ioport("console") != NULL)
+	if (machine().root_device().ioport("console") != NULL)
 		gtia_intf.console_read = console_read;
-	if (machine.device<dac_device>("dac") != NULL)
+	if (machine().device<dac_device>("dac") != NULL)
 		gtia_intf.console_write = console_write;
-	gtia_init(machine, &gtia_intf);
+	gtia_init(machine(), &gtia_intf);
 
 	/* pokey */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(pokey_reset), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(pokey_reset), &machine()));
 
 	/* ANTIC */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(_antic_reset), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(_antic_reset), &machine()));
 
 	/* save states */
-	machine.save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
-	machine.save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
+	machine().save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
+	machine().save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
 }
 
-
-/*************************************
- *
- *  Atari 600XL
- *
- *************************************/
-
-MACHINE_START( atarixl )
-{
-	atari_machine_start(machine);
-}

@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", gauntlet)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gauntlet)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -524,6 +524,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 	/* the board uses a SYNGEN chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(gauntlet_state,gauntlet)
 
@@ -1662,7 +1663,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet2)
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
 	UINT8 *gfx2_base = memregion("gfx2")->base();
-	UINT8 *data = auto_alloc_array(machine(), UINT8, 0x8000);
+	dynamic_buffer data(0x8000);
 	int i;
 
 	common_init(118, 1);
@@ -1676,7 +1677,6 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];
 	}
-	auto_free(machine(), data);
 }
 
 

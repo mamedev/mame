@@ -517,6 +517,7 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0+48,255,0+16,255)
 	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)

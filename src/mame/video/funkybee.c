@@ -111,7 +111,7 @@ void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(2 + m_gfx_bank)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(2 + m_gfx_bank)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -133,7 +133,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (flip)
 			sy = 248 - sy;
 
-		m_gfxdecode->gfx(m_gfx_bank)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_bank)->transpen(bitmap,cliprect,
 				code, color,
 				flip, flip,
 				sx, sy,0);
@@ -146,7 +146,7 @@ void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &clipre
 		if (flip)
 			sy = 248 - sy;
 
-		m_gfxdecode->gfx(m_gfx_bank)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_bank)->transpen(bitmap,cliprect,
 				code, color,
 				flip, flip,
 				sx, sy,0);

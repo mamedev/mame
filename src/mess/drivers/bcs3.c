@@ -29,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -426,7 +426,9 @@ static MACHINE_CONFIG_START( bcs3, bcs3_state )
 	MCFG_SCREEN_SIZE(28*8, 12*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,28*8-1,0,12*10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bcs3_state, screen_update_bcs3)
-	MCFG_GFXDECODE_ADD("gfxdecode", bcs3)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bcs3)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 

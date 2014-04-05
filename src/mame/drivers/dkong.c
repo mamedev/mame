@@ -327,7 +327,6 @@ this is a legitimate Nintendo Kit.
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
-#include "machine/z80dma.h"
 #include "machine/latch8.h"
 #include "machine/eepromser.h"
 
@@ -754,9 +753,8 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 }
 
 WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
-{
-	device_t *device = machine().device("z80dma");
-	z80dma_rdy_w(device, data & 0x01);
+{	
+	m_z80dma->rdy_w(data & 0x01);
 }
 
 WRITE8_MEMBER(dkong_state::nmi_mask_w)
@@ -842,7 +840,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, AS_IO, 8, dkong_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)  /* dma controller */
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_device, read, write)  /* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
@@ -1666,8 +1664,9 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dkong)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)
@@ -1731,8 +1730,9 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dkong)	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)	
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)

@@ -122,11 +122,10 @@ static const res_net_info meyc8088_net_info =
 PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	rgb_t *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &meyc8088_decode_info, &meyc8088_net_info);
+	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
 	palette.set_pen_colors(0, rgb, 32);
-	auto_free(machine(), rgb);
 }
 
 UINT32 meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -391,6 +390,7 @@ static MACHINE_CONFIG_START( meyc8088, meyc8088_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
 	MCFG_SCREEN_VBLANK_DRIVER(meyc8088_state, screen_eof_meyc8088)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)

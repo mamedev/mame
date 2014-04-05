@@ -1164,7 +1164,7 @@ static int get_list_number(model1_state *state)
 static void end_frame(running_machine &machine)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	if((state->m_listctl[0] & 4) && (machine.primary_screen->frame_number() & 1))
+	if((state->m_listctl[0] & 4) && (machine.first_screen()->frame_number() & 1))
 		state->m_listctl[0] ^= 0x40;
 }
 

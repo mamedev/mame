@@ -603,6 +603,7 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab52_state, screen_update_jwildb52)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_HD63484_ADD("hd63484", jwildb52_hd63484_intf)
 

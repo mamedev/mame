@@ -226,7 +226,7 @@ UINT32 mpoker_state::screen_update_mpoker(screen_device &screen, bitmap_ind16 &b
 		{
 			UINT16 dat = m_video[count];
 			UINT16 col = m_video[count+0x400] & 0x7f;
-			gfx->opaque(m_palette,bitmap,cliprect,dat,col,0,0,x*16,y*16);
+			gfx->opaque(bitmap,cliprect,dat,col,0,0,x*16,y*16);
 			count++;
 		}
 
@@ -604,8 +604,9 @@ static MACHINE_CONFIG_START( mpoker, mpoker_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mpoker_state, screen_update_mpoker)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mpoker)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mpoker)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mpoker_state, mpoker)
 

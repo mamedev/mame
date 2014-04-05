@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "includes/midzeus.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/rgbutil.h"
 
 
@@ -57,7 +57,7 @@ struct poly_extra_data
  *
  *************************************/
 
-static poly_manager *poly;
+static legacy_poly_manager *poly;
 static UINT8 log_fifo;
 
 static UINT32 zeus_fifo[20];
@@ -510,7 +510,7 @@ if (regdata_count[offset] < 256)
 
 	/* writes to register $CC need to force a partial update */
 //  if ((offset & ~1) == 0xcc)
-//      machine.primary_screen->update_partial(machine.primary_screen->vpos());
+//      machine.first_screen()->update_partial(machine.first_screen()->vpos());
 
 	/* always write to low word? */
 	state->m_zeusbase[offset] = data;
@@ -562,7 +562,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			machine.primary_screen->update_partial(machine.primary_screen->vpos());
+			machine.first_screen()->update_partial(machine.first_screen()->vpos());
 			{
 				int vtotal = state->m_zeusbase[0x37] & 0xffff;
 				int htotal = state->m_zeusbase[0x34] >> 16;
@@ -570,7 +570,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 				rectangle visarea(state->m_zeusbase[0x33] >> 16, (state->m_zeusbase[0x34] & 0xffff) - 1, 0, state->m_zeusbase[0x35] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					machine.primary_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));
+					machine.first_screen()->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -582,7 +582,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 			{
 				UINT32 temp = state->m_zeusbase[0x38];
 				state->m_zeusbase[0x38] = oldval;
-				machine.primary_screen->update_partial(machine.primary_screen->vpos());
+				machine.first_screen()->update_partial(machine.first_screen()->vpos());
 				log_fifo = machine.input().code_pressed(KEYCODE_L);
 				state->m_zeusbase[0x38] = temp;
 			}

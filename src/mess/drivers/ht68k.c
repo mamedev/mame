@@ -28,7 +28,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/n68681.h"
+#include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 
 class ht68k_state : public driver_device
@@ -49,7 +49,7 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	required_device<duartn68681_device> m_duart;
+	required_device<mc68681_device> m_duart;
 	required_device<wd1770_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START(ht68k_mem, AS_PROGRAM, 16, ht68k_state)
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
 	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_t, read, write, 0x00ff) // FDC WD1770
-	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
+	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", mc68681_device, read, write, 0xff )
 	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -125,15 +125,15 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
 
 	/* video hardware */
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2 )
-	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
-	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
-	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
+	MCFG_MC68681_ADD( "duart68681", XTAL_8MHz / 2 )
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 

@@ -71,7 +71,7 @@ UINT32 sprint4_state::screen_update_sprint4(screen_device &screen, bitmap_ind16 
 		if (i & 1)
 			bank = 32;
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -117,7 +117,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 			if (i & 1)
 				bank = 32;
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,m_helper,rect,
+			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
 				(code >> 3) | bank,
 				4,
 				0, 0,

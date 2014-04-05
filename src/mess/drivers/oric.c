@@ -380,6 +380,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_SCREEN_SIZE(40*6, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(oric_state, oric)
@@ -429,7 +430,8 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_MACHINE_START_OVERRIDE(oric_state, telestrat )
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	/* via */
 	MCFG_DEVICE_ADD( "via6522_1", VIA6522, 1000000 )

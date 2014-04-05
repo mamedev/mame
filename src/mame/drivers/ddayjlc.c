@@ -410,7 +410,7 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 
 	{
@@ -421,9 +421,9 @@ UINT32 ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind16 
 			{
 				c = m_videoram[y * 32 + x];
 				if (x > 1 && x < 30)
-					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
+					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8, 0);
 				else
-					m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
+					m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, c + m_char_bank * 0x100, 2, 0, 0, x*8, y*8);
 			}
 	}
 	return 0;
@@ -533,8 +533,9 @@ static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ddayjlc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(ddayjlc_state, ddayjlc)
 
@@ -669,8 +670,8 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 
 	{
 		UINT32 oldaddr, newadr, length,j;
-		UINT8 *src, *dst, *temp;
-		temp = auto_alloc_array(machine(), UINT8, 0x10000);
+		UINT8 *src, *dst;
+		dynamic_buffer temp(0x10000);
 		src = temp;
 		dst = memregion("gfx1")->base();
 		length = memregion("gfx1")->bytes();
@@ -684,7 +685,6 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 			newadr += 32;
 			oldaddr += 16;
 		}
-		auto_free(machine(), temp);
 	}
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);

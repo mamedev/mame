@@ -695,8 +695,9 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_tsamurai)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tsamurai)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 
@@ -733,8 +734,9 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_vsgongf)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tsamurai)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,vsgongf)
 
@@ -775,8 +777,9 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_tsamurai)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tsamurai)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
 	MCFG_VIDEO_START_OVERRIDE(tsamurai_state,tsamurai)
 

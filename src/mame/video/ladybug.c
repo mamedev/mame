@@ -253,14 +253,14 @@ void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40) /* 16x16 */
-					m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
 				else    /* 8x8 */
-					m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,

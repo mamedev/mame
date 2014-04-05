@@ -258,7 +258,7 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 	/* bit 3 is index of drive to select */
 	UINT8 drive = BIT(data, 3);
 
-	wd17xx_set_drive(m_fdc, drive);
+	m_fdc->set_drive(drive);
 	floppy_image_legacy *floppy;
 	floppy = flopimg_get_image(floppy_get_device(machine(), drive));
 	floppy_mon_w(floppy_get_device(machine(), drive), (floppy != NULL) ? 0 : 1);
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	// These need to be confirmed, disk does not work
 	AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE( 0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
 	AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion

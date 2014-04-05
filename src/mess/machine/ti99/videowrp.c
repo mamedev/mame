@@ -215,8 +215,7 @@ WRITE8_MEMBER( ti_sound_system_device::write )
 
 void ti_sound_system_device::device_start(void)
 {
-	const ti_sound_config *conf = reinterpret_cast<const ti_sound_config *>(static_config());
-	m_console_ready.resolve(conf->ready, *this);
+	m_console_ready.resolve();
 	m_sound_chip = subdevice<sn76496_base_device>(TISOUNDCHIP_TAG);
 }
 

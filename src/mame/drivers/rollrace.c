@@ -236,8 +236,9 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update_rollrace)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rollrace)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
 

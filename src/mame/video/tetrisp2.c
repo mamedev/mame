@@ -377,7 +377,7 @@ static void tetrisp2_draw_sprites(  tetrisp2_state *state, _BitmapClass &bitmap,
 			if (priority_ram[(pri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
 
 
-			gfx->prio_zoom_transpen(state->m_palette,bitmap,cliprect,
+			gfx->prio_zoom_transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx, flipy,

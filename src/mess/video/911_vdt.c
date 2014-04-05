@@ -14,10 +14,6 @@ TODO:
 #include "911_vdt.h"
 #include "911_chr.h"
 #include "911_key.h"
-#include "sound/beep.h"
-#include "devlegcy.h"
-
-
 
 #define MAX_VDT 1
 
@@ -44,24 +40,32 @@ static const gfx_layout fontlayout_8bit =
 };
 
 static GFXDECODE_START( vdt911 )
-	/* array must use same order as vdt911_model_t!!! */
-	/* US */
+	// Caution: Array must use same order as vdt911_model_t
+	// US
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )
-	/* UK */
+
+	// UK
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_UK_chr_offset, fontlayout_7bit, 0, 4 )
-	/* French */
+
+	// French (without accented characters)
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_US_chr_offset, fontlayout_7bit, 0, 4 )
-	/* German */
+
+	// German
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_german_chr_offset, fontlayout_7bit, 0, 4 )
-	/* Swedish */
+
+	// Swedish
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_swedish_chr_offset, fontlayout_7bit, 0, 4 )
-	/* Norwegian */
+
+	// Norwegian
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_norwegian_chr_offset, fontlayout_7bit, 0, 4 )
-	/* Japanese */
+
+	// Japanese
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_japanese_chr_offset, fontlayout_8bit, 0, 4 )
-	/* Arabic */
-	/* GFXDECODE_ENTRY( vdt911_chr_region, vdt911_arabic_chr_offset, fontlayout_8bit, 0, 4 ) */
-	/* FrenchWP */
+
+	// Arabic
+	// GFXDECODE_ENTRY( vdt911_chr_region, vdt911_arabic_chr_offset, fontlayout_8bit, 0, 4 )
+
+	// FrenchWP (contains accented characters)
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
@@ -80,55 +84,17 @@ static const unsigned short vdt911_palette[] =
 	2, 1    /* low intensity, reverse */
 };
 
-struct vdt_t
-{
-	vdt911_screen_size_t screen_size;   /* char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model */
-	vdt911_model_t model;               /* country code */
-	void (*int_callback)(running_machine &machine, int state);  /* interrupt callback, called when the state of irq changes */
-
-	UINT8 data_reg;                     /* vdt911 write buffer */
-	UINT8 display_RAM[2048];            /* vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model) */
-
-	unsigned int cursor_address;        /* current cursor address (controlled by the computer, affects both display and I/O protocol) */
-	unsigned int cursor_address_mask;   /* 1023 for 960-char model, 2047 for 1920-char model */
-
-	emu_timer *beep_timer;              /* beep clock (beeps ends when timer times out) */
-	/*void *blink_clock;*/              /* cursor blink clock */
-
-	UINT8 keyboard_data;                /* last code pressed on keyboard */
-	unsigned int keyboard_data_ready : 1;       /* true if there is a new code in keyboard_data */
-	unsigned int keyboard_interrupt_enable : 1; /* true when keybord interrupts are enabled */
-
-	unsigned int display_enable : 1;        /* screen is black when false */
-	unsigned int dual_intensity_enable : 1; /* if true, MSBit of ASCII codes controls character highlight */
-	unsigned int display_cursor : 1;        /* if true, the current cursor location is displayed on screen */
-	unsigned int blinking_cursor_enable : 1;/* if true, the cursor will blink when displayed */
-	unsigned int blink_state : 1;           /* current cursor blink state */
-
-	unsigned int word_select : 1;           /* CRU interface mode */
-	unsigned int previous_word_select : 1;  /* value of word_select is saved here */
-
-	UINT8 last_key_pressed;
-	int last_modifier_state;
-	char foreign_mode;
-	gfxdecode_device * m_gfxdecode;
-	palette_device * m_palette;
-};
-
 /*
     Macros for model features
 */
 /* TRUE for japanese and arabic terminals, which use 8-bit charcodes and keyboard shift modes */
-#define USES_8BIT_CHARCODES(vdt) ((vdt->model == vdt911_model_Japanese) /*|| (vdt->model == vdt911_model_Arabic)*/)
+#define USES_8BIT_CHARCODES() ((m_model == vdt911_model_Japanese) /*|| (m_model == vdt911_model_Arabic)*/)
 /* TRUE for keyboards which have this extra key (on the left of TAB/SKIP)
     (Most localized keyboards have it) */
-#define HAS_EXTRA_KEY_67(vdt) (! ((vdt->model == vdt911_model_US) || (vdt->model == vdt911_model_UK) || (vdt->model == vdt911_model_French)))
+#define HAS_EXTRA_KEY_67() (! ((m_model == vdt911_model_US) || (m_model == vdt911_model_UK) || (m_model == vdt911_model_French)))
 /* TRUE for keyboards which have this extra key (on the right of space),
     AND do not use it as a modifier */
-#define HAS_EXTRA_KEY_91(vdt) ((vdt->model == vdt911_model_German) || (vdt->model == vdt911_model_Swedish) || (vdt->model == vdt911_model_Norwegian))
-
-static TIMER_CALLBACK(blink_callback);
-static TIMER_CALLBACK(beep_callback);
+#define HAS_EXTRA_KEY_91() ((m_model == vdt911_model_German) || (m_model == vdt911_model_Swedish) || (m_model == vdt911_model_Norwegian))
 
 /*
     Initialize vdt911 palette
@@ -173,13 +139,59 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 	}
 }
 
-/*
-    Initialize the 911 vdt core
-*/
-void vdt911_init(running_machine &machine)
+const device_type VDT911 = &device_creator<vdt911_device>;
+
+vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
+		m_beeper(*this, "beeper"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_keyint_line(*this),
+		m_lineint_line(*this)
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void vdt911_device::device_config_complete()
+{
+}
+
+enum
+{
+	BLINK_TIMER,
+	BEEP_TIMER,
+	LINE_TIMER
+};
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vdt911_device::device_start()
+{
+	m_last_key_pressed = 0x80;
+
+	m_keyint_line.resolve();
+	m_lineint_line.resolve();
+
+	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
+	/*m_blink_clock =*/
+
+	// m_beeper->set_frequency(2000);
+
+	m_blink_timer = timer_alloc(BLINK_TIMER);
+	m_beep_timer = timer_alloc(BEEP_TIMER);
+	m_line_timer = timer_alloc(LINE_TIMER);
+
+	m_blink_timer->adjust(attotime::from_msec(0), 0, attotime::from_msec(250));
+
 	UINT8 *base;
-	UINT8 *chr = machine.root_device().memregion(vdt911_chr_region)->base();
+	UINT8 *chr = machine().root_device().memregion(vdt911_chr_region)->base();
 
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;
@@ -207,6 +219,11 @@ void vdt911_init(running_machine &machine)
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
 	apply_char_overrides(sizeof(norwegian_overrides)/sizeof(char_override_t), norwegian_overrides, base);
 
+	/* set up French word processing character definitions */
+	base = chr+vdt911_frenchWP_chr_offset;
+	copy_character_matrix_array(char_defs+char_defs_US_base, base);
+	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
+
 	/* set up Katakana Japanese character definitions */
 	base = chr+vdt911_japanese_chr_offset;
 	copy_character_matrix_array(char_defs+char_defs_US_base, base);
@@ -222,125 +239,63 @@ void vdt911_init(running_machine &machine)
 	base = chr+vdt911_arabic_chr_offset+128*vdt911_single_char_len;
 	copy_character_matrix_array(char_defs+char_defs_arabic_base, base);
 #endif
-
-	/* set up French word processing character definitions */
-	base = chr+vdt911_frenchWP_chr_offset;
-	copy_character_matrix_array(char_defs+char_defs_US_base, base);
-	apply_char_overrides(sizeof(frenchWP_overrides)/sizeof(char_override_t), frenchWP_overrides, base);
-}
-
-static TIMER_CALLBACK(setup_beep)
-{
-	machine.device<beep_device>("beeper")->set_frequency(2000);
 }
 
 
-INLINE vdt_t *get_safe_token(device_t *device)
+void vdt911_device::device_reset()
 {
-	assert(device != NULL);
-	assert(device->type() == VDT911);
+	m_model = (vdt911_model_t)ioport("LOCALE")->read();
+	m_screen_size = (vdt911_screen_size_t)ioport("SCREEN")->read();
 
-	return (vdt_t *)downcast<vdt911_device *>(device)->token();
-}
-
-/*
-    Initialize one 911 vdt controller/terminal
-*/
-static DEVICE_START( vdt911 )
-{
-	vdt_t *vdt = get_safe_token(device);
-	const vdt911_init_params_t *params = (const vdt911_init_params_t *)device->static_config();
-	vdt->last_key_pressed = 0x80;
-	vdt->screen_size = params->screen_size;
-	vdt->model = params->model;
-	vdt->int_callback = params->int_callback;
-
-	if (vdt->screen_size == char_960)
-		vdt->cursor_address_mask = 0x3ff;   /* 1kb of RAM */
+	if (m_screen_size == char_960)
+		m_cursor_address_mask = 0x3ff;   /* 1kb of RAM */
 	else
-		vdt->cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
+		m_cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
 
-	device->machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep), 0, vdt);
-
-	/* set up cursor blink clock.  2Hz frequency -> .25s half-period. */
-	/*vdt->blink_clock =*/ device->machine().scheduler().timer_pulse(attotime::from_msec(250), FUNC(blink_callback), 0, vdt);
-
-	/* alloc beep timer */
-	vdt->beep_timer = device->machine().scheduler().timer_alloc(FUNC(beep_callback));
-}
-
-const device_type VDT911 = &device_creator<vdt911_device>;
-
-vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VDT911, "911 VDT", tag, owner, clock, "vdt911", __FILE__),
-		m_gfxdecode(*this, "gfxdecode"),		
-		m_palette(*this, "palette")
-{
-	m_token = global_alloc_clear(vdt_t);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vdt911_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void vdt911_device::device_start()
-{
-	vdt_t *vdt = get_safe_token(this);
-	vdt->m_gfxdecode = m_gfxdecode;
-	vdt->m_palette = m_palette;
-	DEVICE_START_NAME( vdt911 )(this);
-}
-
-
-
-/*
-    timer callback to toggle blink state
-*/
-static TIMER_CALLBACK(blink_callback)
-{
-	vdt_t *vdt = (vdt_t *)ptr;
-	vdt->blink_state = !vdt->blink_state;
+	m_line_timer->adjust(attotime::from_msec(0), 0, attotime::from_hz(get_refresh_rate()));
 }
 
 /*
-    timer callback to stop beep generator
+    Timer callbacks
 */
-static TIMER_CALLBACK(beep_callback)
+void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	machine.device<beep_device>("beeper")->set_state(0);
+	switch (id)
+	{
+	case BLINK_TIMER:
+		m_blink_state = !m_blink_state;
+		break;
+	case BEEP_TIMER:
+		m_beeper->set_state(0);
+		break;
+	case LINE_TIMER:
+		check_keyboard();
+		m_lineint_line(ASSERT_LINE);
+		m_lineint_line(CLEAR_LINE);
+		break;
+	}
 }
 
 /*
     CRU interface read
 */
-READ8_DEVICE_HANDLER( vdt911_cru_r )
+READ8_MEMBER( vdt911_device::cru_r )
 {
-	vdt_t *vdt = get_safe_token(device);
 	int reply=0;
 
 	offset &= 0x1;
 
-	if (! vdt->word_select)
+	if (!m_word_select)
 	{   /* select word 0 */
 		switch (offset)
 		{
 		case 0:
-			reply = vdt->display_RAM[vdt->cursor_address];
+			reply = m_display_RAM[m_cursor_address];
 			break;
 
 		case 1:
-			reply = vdt->keyboard_data & 0x7f;
-			if (vdt->keyboard_data_ready)
+			reply = m_keyboard_data & 0x7f;
+			if (m_keyboard_data_ready)
 				reply |= 0x80;
 			break;
 		}
@@ -350,20 +305,20 @@ READ8_DEVICE_HANDLER( vdt911_cru_r )
 		switch (offset)
 		{
 		case 0:
-			reply = vdt->cursor_address & 0xff;
+			reply = m_cursor_address & 0xff;
 			break;
 
 		case 1:
-			reply = (vdt->cursor_address >> 8) & 0x07;
-			if (vdt->keyboard_data & 0x80)
+			reply = (m_cursor_address >> 8) & 0x07;
+			if (m_keyboard_data & 0x80)
 				reply |= 0x08;
-			/*if (! vdt->terminal_ready)
+			/*if (!m_terminal_ready)
 			    reply |= 0x10;*/
-			if (vdt->previous_word_select)
+			if (m_previous_word_select)
 				reply |= 0x20;
-			/*if (vdt->keyboard_parity_error)
+			/*if (m_keyboard_parity_error)
 			    reply |= 0x40;*/
-			if (vdt->keyboard_data_ready)
+			if (m_keyboard_data_ready)
 				reply |= 0x80;
 			break;
 		}
@@ -375,12 +330,11 @@ READ8_DEVICE_HANDLER( vdt911_cru_r )
 /*
     CRU interface write
 */
-WRITE8_DEVICE_HANDLER( vdt911_cru_w )
+WRITE8_MEMBER( vdt911_device::cru_w )
 {
-	vdt_t *vdt = get_safe_token(device);
 	offset &= 0xf;
 
-	if (! vdt->word_select)
+	if (!m_word_select)
 	{   /* select word 0 */
 		switch (offset)
 		{
@@ -394,14 +348,14 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 		case 0x7:
 			/* display memory write data */
 			if (data)
-				vdt->data_reg |= (1 << offset);
+				m_data_reg |= (1 << offset);
 			else
-				vdt->data_reg &= ~ (1 << offset);
+				m_data_reg &= ~ (1 << offset);
 			break;
 
 		case 0x8:
 			/* write data strobe */
-				vdt->display_RAM[vdt->cursor_address] = vdt->data_reg;
+				m_display_RAM[m_cursor_address] = m_data_reg;
 			break;
 
 		case 0x9:
@@ -412,37 +366,37 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 		case 0xa:
 			/* cursor move */
 			if (data)
-				vdt->cursor_address--;
+				m_cursor_address--;
 			else
-				vdt->cursor_address++;
-			vdt->cursor_address &= vdt->cursor_address_mask;
+				m_cursor_address++;
+			m_cursor_address &= m_cursor_address_mask;
 			break;
 
 		case 0xb:
 			/* blinking cursor enable */
-			vdt->blinking_cursor_enable = data;
+			m_blinking_cursor_enable = data;
 			break;
 
 		case 0xc:
 			/* keyboard interrupt enable */
-			vdt->keyboard_interrupt_enable = data;
-			(*vdt->int_callback)(space.machine(), vdt->keyboard_interrupt_enable && vdt->keyboard_data_ready);
+			m_keyboard_interrupt_enable = data;
+			m_keyint_line(m_keyboard_interrupt_enable && m_keyboard_data_ready);
 			break;
 
 		case 0xd:
 			/* dual intensity enable */
-			vdt->dual_intensity_enable = data;
+			m_dual_intensity_enable = data;
 			break;
 
 		case 0xe:
 			/* display enable */
-			vdt->display_enable = data;
+			m_display_enable = data;
 			break;
 
 		case 0xf:
 			/* select word */
-			vdt->previous_word_select = vdt->word_select;
-			vdt->word_select = data;
+			m_previous_word_select = m_word_select;
+			m_word_select = data;
 			break;
 		}
 	}
@@ -463,10 +417,10 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 		case 0xa:
 			/* cursor address */
 			if (data)
-				vdt->cursor_address |= (1 << offset);
+				m_cursor_address |= (1 << offset);
 			else
-				vdt->cursor_address &= ~ (1 << offset);
-			vdt->cursor_address &= vdt->cursor_address_mask;
+				m_cursor_address &= ~ (1 << offset);
+			m_cursor_address &= m_cursor_address_mask;
 			break;
 
 		case 0xb:
@@ -475,31 +429,30 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 
 		case 0xc:
 			/* display cursor */
-			vdt->display_cursor = data;
+			m_display_cursor = data;
 			break;
 
 		case 0xd:
 			/* keyboard acknowledge */
-			if (vdt->keyboard_data_ready)
+			if (m_keyboard_data_ready)
 			{
-				vdt->keyboard_data_ready = 0;
-				if (vdt->keyboard_interrupt_enable)
-					(*vdt->int_callback)(space.machine(), 0);
+				m_keyboard_data_ready = 0;
+				if (m_keyboard_interrupt_enable)
+					m_keyint_line(CLEAR_LINE);
 			}
-			/*vdt->keyboard_parity_error = 0;*/
+			/*m_keyboard_parity_error = 0;*/
 			break;
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			space.machine().device<beep_device>("beeper")->set_state(1);
-
-			vdt->beep_timer->adjust(attotime::from_usec(300));
+			m_beeper->set_state(1);
+			m_beep_timer->adjust(attotime::from_usec(300));
 			break;
 
 		case 0xf:
 			/* select word */
-			vdt->previous_word_select = vdt->word_select;
-			vdt->word_select = data;
+			m_previous_word_select = m_word_select;
+			m_word_select = data;
 			break;
 		}
 	}
@@ -508,12 +461,12 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 /*
     Video refresh
 */
-void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
+void vdt911_device::refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
 {
-	vdt_t *vdt = get_safe_token(device);
-	gfx_element *gfx = vdt->m_gfxdecode->gfx(vdt->model);
-	int height = (vdt->screen_size == char_960) ? 12 : /*25*/24;
-	int use_8bit_charcodes = USES_8BIT_CHARCODES(vdt);
+	gfx_element *gfx = m_gfxdecode->gfx(m_model);
+	int height = (m_screen_size == char_960) ? 12 : /*25*/24;
+
+	int use_8bit_charcodes = USES_8BIT_CHARCODES();
 	int address = 0;
 	int i, j;
 	int cur_char;
@@ -522,34 +475,36 @@ void vdt911_refresh(device_t *device, bitmap_ind16 &bitmap, const rectangle &cli
 	/*if (use_8bit_charcodes)
 	    color = vdt->dual_intensity_enable ? 1 : 0;*/
 
-	if (! vdt->display_enable)
+	if (!m_display_enable)
 	{
 		rectangle my_rect(x, x + 80*7 - 1, y, y + height*10 - 1);
 
 		bitmap.fill(0, my_rect);
 	}
 	else
+	{
 		for (i=0; i<height; i++)
 		{
 			for (j=0; j<80; j++)
 			{
-				cur_char = vdt->display_RAM[address];
+				cur_char = m_display_RAM[address];
 				/* does dual intensity work with 8-bit character set? */
-				color = (vdt->dual_intensity_enable && (cur_char & 0x80)) ? 1 : 0;
-				if (! use_8bit_charcodes)
+				color = (m_dual_intensity_enable && (cur_char & 0x80)) ? 1 : 0;
+				if (!use_8bit_charcodes)
 					cur_char &= 0x7f;
 
 				/* display cursor in reverse video */
-				if ((address == vdt->cursor_address) && vdt->display_cursor
-						&& ((! vdt->blinking_cursor_enable) || vdt->blink_state))
-					color += 2;
+				if ((address == m_cursor_address) && m_display_cursor
+					&& ((!m_blinking_cursor_enable) || m_blink_state))
+				color += 2;
 
 				address++;
 
-				 gfx->opaque(*vdt->m_palette,bitmap,cliprect, cur_char, color, 0, 0,
-						x+j*7, y+i*10);
+				gfx->opaque(bitmap, cliprect, cur_char, color, 0, 0,
+					x+j*7, y+i*10);
 			}
 		}
+	}
 }
 
 static const unsigned char (*const key_translate[])[91] =
@@ -578,10 +533,8 @@ static const unsigned char (*const key_translate[])[91] =
     keyboard handler: should be called regularly by machine code, for instance
     every Video Blank Interrupt.
 */
-void vdt911_keyboard(device_t *device)
+void vdt911_device::check_keyboard()
 {
-	vdt_t *vdt = get_safe_token(device);
-
 	enum modifier_state_t
 	{
 		/* states for western keyboards and katakana/arabic keyboards in romaji/latin mode */
@@ -605,14 +558,14 @@ void vdt911_keyboard(device_t *device)
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
+		key_buf[i] = ioport(keynames[i])->read();
 	}
 
 	/* parse modifier keys */
-	if ((USES_8BIT_CHARCODES(vdt))
-		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && vdt->foreign_mode)))
+	if ((USES_8BIT_CHARCODES())
+		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && m_foreign_mode)))
 	{   /* we are in katakana/arabic mode */
-		vdt->foreign_mode = TRUE;
+		m_foreign_mode = true;
 
 		if ((key_buf[4] & 0x0400) || (key_buf[5] & 0x0020))
 			modifier_state = foreign_shift;
@@ -622,7 +575,7 @@ void vdt911_keyboard(device_t *device)
 	else
 	{   /* we are using a western keyboard, or a katakana/arabic keyboard in
         romaji/latin mode */
-		vdt->foreign_mode = FALSE;
+		m_foreign_mode = false;
 
 		if (key_buf[3] & 0x0040)
 			modifier_state = control;
@@ -647,10 +600,10 @@ void vdt911_keyboard(device_t *device)
 	key_buf[5] &= ~0x0120;
 
 	/* remove unused keys */
-	if (! HAS_EXTRA_KEY_91(vdt))
+	if (! HAS_EXTRA_KEY_91())
 		key_buf[5] &= ~0x0400;
 
-	if (! HAS_EXTRA_KEY_67(vdt))
+	if (! HAS_EXTRA_KEY_67())
 		key_buf[4] &= ~0x0004;
 
 
@@ -658,21 +611,21 @@ void vdt911_keyboard(device_t *device)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
 		repeat_timer = 0;
 
-	if (! (vdt->last_key_pressed & 0x80) && (key_buf[vdt->last_key_pressed >> 4] & (1 << (vdt->last_key_pressed & 0xf))))
+	if (!(m_last_key_pressed & 0x80) && (key_buf[m_last_key_pressed >> 4] & (1 << (m_last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
-		if (modifier_state == vdt->last_modifier_state)
+		if (modifier_state == m_last_modifier_state)
 		{
 			/* handle REPEAT mode if applicable */
 			if ((repeat_mode) && (++repeat_timer == repeat_delay))
 			{
-				if (vdt->keyboard_data_ready)
+				if (m_keyboard_data_ready)
 				{   /* keyboard buffer full */
 					repeat_timer--;
 				}
 				else
 				{   /* repeat current key */
-					vdt->keyboard_data_ready = 1;
+					m_keyboard_data_ready = 1;
 					repeat_timer = 0;
 				}
 			}
@@ -680,14 +633,14 @@ void vdt911_keyboard(device_t *device)
 		else
 		{
 			repeat_timer = 0;
-			vdt->last_modifier_state = special_debounce;
+			m_last_modifier_state = special_debounce;
 		}
 	}
 	else
 	{
-		vdt->last_key_pressed = 0x80;
+		m_last_key_pressed = 0x80;
 
-		if (vdt->keyboard_data_ready)
+		if (m_keyboard_data_ready)
 		{   /* keyboard buffer full */
 			/* do nothing */
 		}
@@ -699,13 +652,13 @@ void vdt911_keyboard(device_t *device)
 				{
 					if (key_buf[i] & (1 << j))
 					{
-						vdt->last_key_pressed = (i << 4) | j;
-						vdt->last_modifier_state = modifier_state;
+						m_last_key_pressed = (i << 4) | j;
+						m_last_modifier_state = modifier_state;
 
-						vdt->keyboard_data = (int)key_translate[vdt->model][modifier_state][vdt->last_key_pressed];
-						vdt->keyboard_data_ready = 1;
-						if (vdt->keyboard_interrupt_enable)
-							(*vdt->int_callback)(device->machine(), 1);
+						m_keyboard_data = (int)key_translate[m_model][modifier_state][m_last_key_pressed];
+						m_keyboard_data_ready = 1;
+						if (m_keyboard_interrupt_enable)
+							m_keyint_line(ASSERT_LINE);
 						return;
 					}
 				}
@@ -714,12 +667,159 @@ void vdt911_keyboard(device_t *device)
 	}
 }
 
+int vdt911_device::get_refresh_rate()
+{
+	// European models have 50 Hz
+	return ((m_model == vdt911_model_US) || (m_model == vdt911_model_Japanese))? 60 : 50;
+}
+
+UINT32 vdt911_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	refresh(bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+INPUT_PORTS_START( vdt911 )
+	PORT_START( "LOCALE" )
+	PORT_CONFNAME( 0x0f, 0x00, "Terminal language" )
+		PORT_CONFSETTING( vdt911_model_US, "English US" )
+		PORT_CONFSETTING( vdt911_model_UK, "English UK" )
+		PORT_CONFSETTING( vdt911_model_French, "French" )
+		PORT_CONFSETTING( vdt911_model_German, "German" )
+		PORT_CONFSETTING( vdt911_model_Swedish, "Swedish" )
+		PORT_CONFSETTING( vdt911_model_Norwegian, "Norwegian" )
+		PORT_CONFSETTING( vdt911_model_Japanese, "Japanese" )
+		// PORT_CONFSETTING( vdt911_model_Arabic, "Arabic" )
+		PORT_CONFSETTING( vdt911_model_FrenchWP, "French Word Processing" )
+
+	PORT_START( "SCREEN" )
+	PORT_CONFNAME( 0x01, char_960, "Terminal screen size" )
+		PORT_CONFSETTING( char_960, "960 chars (12 lines)")
+		PORT_CONFSETTING( char_1920, "1920 chars (24 lines)")
+
+	PORT_START("KEY0")  /* keys 1-16 */                                                                 \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)        \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)        \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)        \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)        \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)        \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)        \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)        \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)        \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CMD") PORT_CODE(KEYCODE_F9)       \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(red)") PORT_CODE(KEYCODE_F10)        \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ERASE FIELD") PORT_CODE(KEYCODE_END)  \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ERASE INPUT") PORT_CODE(KEYCODE_PGDN) \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(grey)") PORT_CODE(KEYCODE_F11)       \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UPPER CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)  PORT_TOGGLE\
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1)        \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2)        \
+																								\
+	PORT_START("KEY1")  /* keys 17-32 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)        \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4)        \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5)        \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6)        \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7)        \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8)        \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9)        \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0)        \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ [") PORT_CODE(KEYCODE_MINUS)    \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- ]") PORT_CODE(KEYCODE_EQUALS)   \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("_ =") PORT_CODE(KEYCODE_BACKSPACE)    \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 (numpad)") PORT_CODE(KEYCODE_7_PAD) \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 (numpad)") PORT_CODE(KEYCODE_8_PAD) \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (numpad)") PORT_CODE(KEYCODE_9_PAD) \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PRINT") PORT_CODE(KEYCODE_PRTSCR) \
+																								\
+	PORT_START("KEY2")  /* keys 33-48 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(up)") PORT_CODE(KEYCODE_UP)      \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_LALT)  \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER_PAD)  \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)      \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)      \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)      \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)      \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)      \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)      \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)      \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)      \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CHAR (left/right)") PORT_CODE(KEYCODE_OPENBRACE)  \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("FIELD (left/right)") PORT_CODE(KEYCODE_CLOSEBRACE)    \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) \
+																								\
+	PORT_START("KEY3")  /* keys 49-64 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 (numpad)") PORT_CODE(KEYCODE_4_PAD) \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 (numpad)") PORT_CODE(KEYCODE_5_PAD) \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 (numpad)") PORT_CODE(KEYCODE_6_PAD) \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(left)") PORT_CODE(KEYCODE_LEFT)  \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)    \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(right)") PORT_CODE(KEYCODE_RIGHT)    \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CONTROL") PORT_CODE(KEYCODE_LCONTROL) \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)      \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)      \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)      \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)      \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)      \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)      \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)      \
+																								\
+	PORT_START("KEY4")  /* keys 65-80 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON)    \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE)   \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(not on US keyboard)") PORT_CODE(KEYCODE_BACKSLASH)   \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SKIP TAB") PORT_CODE(KEYCODE_TAB) \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 (numpad)") PORT_CODE(KEYCODE_1_PAD) \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 (numpad)") PORT_CODE(KEYCODE_2_PAD) \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 (numpad)") PORT_CODE(KEYCODE_3_PAD) \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INS CHAR") PORT_CODE(KEYCODE_INSERT)  \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(down)") PORT_CODE(KEYCODE_DOWN)  \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL CHAR") PORT_CODE(KEYCODE_DEL) \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)      \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)      \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)      \
+																								\
+	PORT_START("KEY5")  /* keys 81-91 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)      \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)      \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)    \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH)    \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 (numpad)") PORT_CODE(KEYCODE_0_PAD) \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". (numpad)") PORT_CODE(KEYCODE_DEL_PAD)   \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(not on US keyboard)") PORT_CODE(KEYCODE_MINUS_PAD)   \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)  \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(not on US keyboard)") PORT_CODE(KEYCODE_PLUS_PAD)
+INPUT_PORTS_END
+
 static MACHINE_CONFIG_FRAGMENT( vdt911 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vdt911_device, screen_update)
+
+	MCFG_SCREEN_SIZE(560, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
+
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INDIRECT_ENTRIES(3)
 	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", vdt911)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vdt911)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -730,4 +830,9 @@ MACHINE_CONFIG_END
 machine_config_constructor vdt911_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vdt911 );
+}
+
+ioport_constructor vdt911_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( vdt911 );
 }

@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
@@ -71,6 +72,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_SIZE(280*2, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(apple3_state, apple3 )
@@ -106,8 +108,18 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
-	MCFG_MOS6551_TYPE(MOS6551_TYPE_ROCKWELL)		// must be Rockwell or the ROM shows "ACIA" and doesn't POST
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(apple3_state, apple3_acia_irq_func))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	// TODO: remove cts kludge from machine/apple3.c and come up with a good way of coping with pull up resistors.
 
 	/* rtc */
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)

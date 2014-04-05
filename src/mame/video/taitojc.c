@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "includes/taitojc.h"
 
 static const gfx_layout taitojc_char_layout =
@@ -315,7 +315,7 @@ void taitojc_state::video_start()
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), taitojc_char_layout, (UINT8 *)m_char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, taitojc_char_layout, (UINT8 *)m_char_ram, m_palette->entries() / 16, 0)));
 
 	m_texture = auto_alloc_array(machine(), UINT8, 0x400000);
 
@@ -483,7 +483,7 @@ void taitojc_renderer::render_texture_scan(INT32 scanline, const extent_t &exten
 void taitojc_renderer::render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length)
 {
 //  taitojc_state *state = machine.driver_data<taitojc_state>();
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle visarea = machine.first_screen()->visible_area();
 	vertex_t vert[4];
 	int i;
 	int ptr;

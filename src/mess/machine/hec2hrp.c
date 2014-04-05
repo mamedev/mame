@@ -102,9 +102,9 @@ TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 
 void hec2hrp_state::hector_minidisc_init()
 {
-	device_t *fdc = machine().device("wd179x");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	//set density
-	wd17xx_dden_w(fdc, 1);// density select => always 1 (0 ?a plante !)
+	fdc->dden_w(1);// density select => always 1 (0 ?a plante !)
 
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
 	floppy_mon_w(floppy_get_device(machine(), 0), 0); // Moteur floppy A:
@@ -118,22 +118,22 @@ void hec2hrp_state::hector_minidisc_init()
 READ8_MEMBER(hec2hrp_state::hector_179x_register_r)
 {
 int data=0;
-device_t *fdc = machine().device("wd179x");
+fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
 	switch (offset & 0x0ff)
 	{
 		/* minidisc floppy disc interface */
 		case 0x04:
-			data = wd17xx_status_r(fdc, space, 0);
+			data = fdc->status_r(space, 0);
 			break;
 		case 0x05:
-			data = wd17xx_track_r(fdc, space, 0);
+			data = fdc->track_r(space, 0);
 			break;
 		case 0x06:
-			data = wd17xx_sector_r(fdc, space, 0);
+			data = fdc->sector_r(space, 0);
 			break;
 		case 0x07:
-			data = wd17xx_data_r(fdc, space, 0);
+			data = fdc->data_r(space, 0);
 			break;
 		default:
 			break;
@@ -143,22 +143,22 @@ device_t *fdc = machine().device("wd179x");
 }
 WRITE8_MEMBER(hec2hrp_state::hector_179x_register_w)
 {
-device_t *fdc = machine().device("wd179x");
+fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 switch (offset)
 	{
 		/* minidisc floppy disc interface */
 		case 0x04:
-			wd17xx_command_w(fdc, space, 0, data);
+			fdc->command_w(space, 0, data);
 			break;
 		case 0x05:
-			wd17xx_track_w(fdc, space, 0, data);
+			fdc->track_w(space, 0, data);
 			break;
 		case 0x06:
-			wd17xx_sector_w(fdc, space, 0, data);
+			fdc->sector_w(space, 0, data);
 			break;
 		case 0x07:
 			/*write into command register*/
-			wd17xx_data_w(fdc, space, 0, data);
+			fdc->data_w(space, 0, data);
 			break;
 		case 0x08:
 			/*General purpose port (0x08) for the minidisk I/O */
@@ -167,11 +167,11 @@ switch (offset)
 			membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC );
 
 			// Set drive number
-			if (BIT(data, 6)) wd17xx_set_drive(fdc, 0);  // Set the correct drive number 0
-			//if (BIT(data, 7)) wd17xx_set_drive(fdc, 1);// Set the correct drive number 1,never here
+			if (BIT(data, 6)) fdc->set_drive(0);  // Set the correct drive number 0
+			//if (BIT(data, 7)) fdc->set_drive(1);// Set the correct drive number 1,never here
 
 			// Set side
-			wd17xx_set_side(fdc,BIT(data, 4) ? 1 : 0);// side select
+			fdc->set_side(BIT(data, 4) ? 1 : 0);// side select
 			}
 			break;
 
@@ -230,6 +230,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
 READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 {
 	UINT8 data = 0xff;
+
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8" };
 
 	if (offset ==7) /* Only when joy reading*/
@@ -254,8 +255,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 				/* floppy md master reset */
 				if (isHectorWithMiniDisc())
-					wd17xx_mr_w(machine().device("wd179x"), 1);
-
+					machine().device<fd1793_device>("wd179x")->mr_w(1);
 			}
 
 			else /* aviable for BR machines */

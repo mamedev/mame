@@ -21,6 +21,7 @@
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG     "ic14"
 #define RS232_TAG       "rs232"
+#define CORVUS_HDC_TAG	"corvus"
 
 class softbox_state : public driver_device
 {
@@ -29,12 +30,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_dbrg(*this, COM8116_TAG),
-			m_ieee(*this, IEEE488_TAG)
+			m_ieee(*this, IEEE488_TAG),
+			m_hdc(*this, CORVUS_HDC_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ieee488_device> m_ieee;
+	required_device<corvus_hdc_t> m_hdc;
 
 	virtual void machine_start();
 	virtual void device_reset_after_children();

@@ -27,9 +27,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
+ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container), m_driverlist(driver_list::total() + 1)
 {
-	m_driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
 	build_driver_list();
 	if(gamename)
 		strcpy(m_search, gamename);
@@ -43,8 +42,6 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 
 ui_menu_select_game::~ui_menu_select_game()
 {
-	global_free(m_drivlist);
-	global_free(m_driverlist);
 }
 
 
@@ -57,7 +54,7 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	m_drivlist = global_alloc(driver_enumerator(machine().options()));
+	m_drivlist.reset(global_alloc(driver_enumerator(machine().options())));
 	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array

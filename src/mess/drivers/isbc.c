@@ -61,12 +61,24 @@ public:
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rpc86_io, AS_IO, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
+	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
+	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
+	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x00dc, 0x00dd) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -130,10 +142,6 @@ static DEVICE_INPUT_DEFAULTS_START( isbc86_terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x03 ) // 8
 	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x00 ) // N
 	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x03 ) // 2
-DEVICE_INPUT_DEFAULTS_END
-
-static DEVICE_INPUT_DEFAULTS_START( rpc86_terminal )
-	// No UART hooked up yet
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( isbc286_terminal )
@@ -267,9 +275,30 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_IO_MAP(rpc86_io)
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir2_w))
+	MCFG_PIT8253_CLK1(XTAL_22_1184MHz/144)
+	MCFG_PIT8253_CLK2(XTAL_22_1184MHz/18)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(isbc_state, isbc86_tmr2_w))
+
+	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
+
+	MCFG_DEVICE_ADD("uart8251", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", rpc86_terminal)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir4_w))
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
+	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( isbc286, isbc_state )
@@ -341,9 +370,6 @@ ROM_START( isbc286 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
-//  ROM_REGION( 0x4000, "isbc215", ROMREGION_ERASEFF )
-//  ROM_LOAD16_BYTE( "174581.001.bin", 0x0000, 0x2000, CRC(ccdbc7ab) SHA1(5c2ebdde1b0252124177221ba9cacdb6d925a24d))
-//  ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
 ROM_END
 
 ROM_START( isbc2861 )

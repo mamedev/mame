@@ -15,8 +15,6 @@
 
 ***************************************************************************/
 
-#define MODERN_DRIVER_INIT
-
 #include "emu.h"
 #include "includes/segahang.h"
 #include "machine/segaic16.h"
@@ -821,12 +819,13 @@ static MACHINE_CONFIG_START( shared_base, segahang_state )
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", segahang)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segahang)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segahang_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

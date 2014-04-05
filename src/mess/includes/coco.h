@@ -16,7 +16,7 @@
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 #include "machine/6821pia.h"
-#include "machine/cococart.h"
+#include "bus/coco/cococart.h"
 #include "machine/coco_vhd.h"
 #include "machine/ram.h"
 #include "sound/dac.h"

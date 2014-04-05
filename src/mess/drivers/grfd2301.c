@@ -47,7 +47,7 @@ public:
 	virtual void machine_reset();
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	required_device<cpu_device> m_maincpu;
 
@@ -122,6 +122,8 @@ static MACHINE_CONFIG_START( grfd2301, grfd2301_state )
 	MCFG_SCREEN_UPDATE_DRIVER(grfd2301_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 

@@ -230,7 +230,7 @@ void unico_state::unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 						code++,
 						attr & 0x1f,
 						flipx, flipy,

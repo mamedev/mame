@@ -123,12 +123,10 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 	UINT8 *source_data;
 	int source_size;
 
-	UINT8 *result_data;
-
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	result_data = auto_alloc_array(machine, UINT8, source_size);
+	dynamic_buffer result_data(source_size);
 
 	for(i=0; i<source_size; i++)
 	{
@@ -138,7 +136,6 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 	}
 
 	memcpy (source_data, result_data, source_size);
-	auto_free (machine, result_data);
 }
 
 
@@ -148,12 +145,10 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 	UINT8 *source_data;
 	int source_size;
 
-	UINT8 *result_data;
-
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	result_data = auto_alloc_array(machine, UINT8, source_size);
+	dynamic_buffer result_data(source_size);
 
 	addr_xor ^= 0x1005d;
 
@@ -193,7 +188,6 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 	}
 
 	memcpy (source_data, result_data, source_size);
-	auto_free (machine, result_data);
 }
 
 void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const char *region)
@@ -202,12 +196,10 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 	UINT8 *source_data;
 	int source_size;
 
-	UINT8 *result_data;
-
 	source_data = machine.root_device().memregion       ( region )->base();
 	source_size = machine.root_device().memregion( region )->bytes();
 
-	result_data = auto_alloc_array(machine, UINT8, source_size);
+	dynamic_buffer result_data(source_size);
 
 	addr_xor ^= 0xc1c5b;
 
@@ -248,5 +240,4 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 	}
 
 	memcpy (source_data, result_data, source_size);
-	auto_free (machine, result_data);
 }

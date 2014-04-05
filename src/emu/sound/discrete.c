@@ -153,12 +153,12 @@ private:
  *
  *************************************/
 
-#include "disc_sys.c"       /* discrete core modules and support functions */
-#include "disc_wav.c"       /* Wave sources   - SINE/SQUARE/NOISE/etc */
-#include "disc_mth.c"       /* Math Devices   - ADD/GAIN/etc */
-#include "disc_inp.c"       /* Input Devices  - INPUT/CONST/etc */
-#include "disc_flt.c"       /* Filter Devices - RCF/HPF/LPF */
-#include "disc_dev.c"       /* Popular Devices - NE555/etc */
+#include "disc_sys.inc"       /* discrete core modules and support functions */
+#include "disc_wav.inc"       /* Wave sources   - SINE/SQUARE/NOISE/etc */
+#include "disc_mth.inc"       /* Math Devices   - ADD/GAIN/etc */
+#include "disc_inp.inc"       /* Input Devices  - INPUT/CONST/etc */
+#include "disc_flt.inc"       /* Filter Devices - RCF/HPF/LPF */
+#include "disc_dev.inc"       /* Popular Devices - NE555/etc */
 
 /*************************************
  *

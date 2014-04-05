@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "video/avgdvg.h"
 
 class asteroid_state : public driver_device
 {
@@ -14,7 +15,8 @@ public:
 		m_ram1(*this, "ram1"),
 		m_ram2(*this, "ram2"),
 		m_discrete(*this, "discrete") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dvg(*this, "dvg") { }
 
 	optional_shared_ptr<UINT8> m_ram1;
 	optional_shared_ptr<UINT8> m_ram2;
@@ -42,7 +44,9 @@ public:
 	DECLARE_WRITE8_MEMBER(asteroid_noise_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_snd_reset_w);
 	DECLARE_WRITE8_MEMBER(llander_sounds_w);
+	DECLARE_MACHINE_RESET(llander);
 	required_device<cpu_device> m_maincpu;
+	required_device<dvg_device> m_dvg;
 };
 
 /*----------- defined in audio/asteroid.c -----------*/

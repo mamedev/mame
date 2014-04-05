@@ -34,9 +34,6 @@
 
 const device_type P1_FDC = &device_creator<p1_fdc_device>;
 
-static DECLARE_READ8_DEVICE_HANDLER(p1_FDC_r);
-static DECLARE_WRITE8_DEVICE_HANDLER(p1_FDC_w);
-
 FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT,
 	FLOPPY_DSK_FORMAT
@@ -48,6 +45,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( fdc_b504 )
 	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(p1_fdc_device, p1_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -144,7 +143,7 @@ void p1_fdc_device::p1_wd17xx_aux_w(int data)
 	floppy1->mon_w(!(data & 8));
 }
 
-void p1_fdc_device::p1_fdc_irq_drq(bool state)
+WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -152,27 +151,24 @@ void p1_fdc_device::p1_fdc_irq_drq(bool state)
 		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( p1_FDC_r )
+READ8_MEMBER( p1_fdc_device::p1_fdc_r )
 {
 	UINT8 data = 0xff;
-	p1_fdc_device *fdc  = downcast<p1_fdc_device *>(device);
 
 	switch( offset )
 	{
-		case 0: data = fdc->p1_wd17xx_aux_r();     break;
-		case 2: data = fdc->p1_wd17xx_motor_r();   break;
+		case 0: data = p1_wd17xx_aux_r();     break;
+		case 2: data = p1_wd17xx_motor_r();   break;
 	}
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( p1_FDC_w )
+WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
 {
-	p1_fdc_device *fdc  = downcast<p1_fdc_device *>(device);
-
 	switch( offset )
 	{
-		case 0: fdc->p1_wd17xx_aux_w(data);    break;
+		case 0: p1_wd17xx_aux_w(data);    break;
 	}
 }
 
@@ -199,9 +195,7 @@ void p1_fdc_device::device_start()
 	m_isa->install_device(0x00c0, 0x00c3, 0, 0,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(this, 0x00c4, 0x00c7, 0, 0, FUNC(p1_FDC_r), FUNC(p1_FDC_w) );
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(p1_fdc_device::p1_fdc_irq_drq), this));
-	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(p1_fdc_device::p1_fdc_irq_drq), this));
+	m_isa->install_device(0x00c4, 0x00c7, 0, 0, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
 }
 
 

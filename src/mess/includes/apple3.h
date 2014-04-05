@@ -80,6 +80,7 @@ public:
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(apple3_acia_irq_func);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
@@ -112,6 +113,7 @@ public:
 	int m_enable_mask;
 
 private:
+	int m_acia_irq;
 	UINT8 m_via_0_a;
 	UINT8 m_via_0_b;
 	UINT8 m_via_1_a;

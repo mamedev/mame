@@ -17,12 +17,6 @@
 #include "pmlinux.h"
 #include "osdcomm.h"
 
-#ifdef PTR64
-typedef UINT64 FPTR;
-#else
-typedef UINT32 FPTR;
-#endif
-
 #include <alsa/asoundlib.h>
 
 /* I used many print statements to debug this code. I left them in the

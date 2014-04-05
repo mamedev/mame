@@ -34,39 +34,27 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RP5C15_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), RP5C15, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_RP5C15_OUT_ALARM_CB(_devcb) \
+	devcb = &rp5c15_device::set_out_alarm_callback(*device, DEVCB2_##_devcb);
 
-
-#define RP5C15_INTERFACE(name) \
-	const rp5c15_interface (name) =
-
-
+#define MCFG_RP5C15_OUT_CLKOUT_CB(_devcb) \
+	devcb = &rp5c15_device::set_out_clkout_callback(*device, DEVCB2_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> rp5c15_interface
-
-struct rp5c15_interface
-{
-	devcb_write_line        m_out_alarm_cb;
-	devcb_write_line        m_out_clkout_cb;
-};
-
-
-
 // ======================> rp5c15_device
 
 class rp5c15_device :   public device_t,
-						public device_rtc_interface,
-						public rp5c15_interface
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
 	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_alarm_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_clkout_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_clkout_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -74,7 +62,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -93,8 +80,8 @@ private:
 	static const device_timer_id TIMER_16HZ = 1;
 	static const device_timer_id TIMER_CLKOUT = 2;
 
-	devcb_resolved_write_line   m_out_alarm_func;
-	devcb_resolved_write_line   m_out_clkout_func;
+	devcb2_write_line        m_out_alarm_cb;
+	devcb2_write_line        m_out_clkout_cb;
 
 	UINT8 m_reg[2][13];         // clock registers
 	UINT8 m_ram[13];            // RAM

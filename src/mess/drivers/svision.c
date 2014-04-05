@@ -474,32 +474,30 @@ DRIVER_INIT_MEMBER(svision_state,svisions)
 DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 {
 	UINT32 size;
-	UINT8 *temp_copy;
+	dynamic_buffer temp_copy;
 	int mirror, i;
 
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
 
 		if (size > memregion("user1")->bytes())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 
+		temp_copy.resize(size);
 		if (image.fread( temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(machine(), temp_copy);
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
 	{
 		size = image.get_software_region_length("rom");
-		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		temp_copy.resize(size);
 		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
@@ -510,8 +508,6 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 	{
 		memcpy(memregion("user1")->base() + i * size, temp_copy, size);
 	}
-
-	auto_free(machine(), temp_copy);
 
 	return IMAGE_INIT_PASS;
 }
@@ -553,6 +549,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_SCREEN_SIZE(3+160+3, 160)
 	MCFG_SCREEN_VISIBLE_AREA(3+0, 3+160-1, 0, 160-1)
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_svision)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(svision_palette) * 3)
 	MCFG_PALETTE_INIT_OWNER(svision_state, svision )
@@ -605,6 +602,7 @@ static MACHINE_CONFIG_DERIVED( tvlinkp, svisionp )
 	MCFG_MACHINE_RESET_OVERRIDE(svision_state, tvlink )
 
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_NO_PALETTE
 	MCFG_SCREEN_UPDATE_DRIVER(svision_state, screen_update_tvlink)
 
 MACHINE_CONFIG_END

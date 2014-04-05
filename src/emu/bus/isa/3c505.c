@@ -396,9 +396,7 @@ const char *threecom3c505_device::cpu_context()
 //**************************************************************************
 
 threecom3c505_device::data_buffer::data_buffer() :
-	m_device(NULL),
-	m_size(0L),
-	m_data(NULL)
+	m_device(NULL)
 {
 }
 
@@ -406,8 +404,7 @@ void threecom3c505_device::data_buffer::start(threecom3c505_device *device, INT3
 {
 	m_device = device;
 	LOG2(("start threecom3c505_device::data_buffer with size %0x", size));
-	m_size = size;
-	m_data = auto_alloc_array(device->machine(), UINT8, size);
+	m_data.resize(size);
 }
 
 void threecom3c505_device::data_buffer::reset()
@@ -418,14 +415,14 @@ void threecom3c505_device::data_buffer::reset()
 
 void threecom3c505_device::data_buffer::copy(data_buffer *db) const
 {
-	db->m_size = m_size;
+	db->m_data.resize(m_data.count());
 	db->m_length = m_length;
-	memcpy(db->m_data, m_data, m_size);
+	memcpy(db->m_data, m_data, m_data.count());
 }
 
 int threecom3c505_device::data_buffer::append(UINT8 data)
 {
-	if (m_length >= m_size)
+	if (m_length >= m_data.count())
 	{
 		return 0;
 	}

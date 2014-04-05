@@ -378,18 +378,15 @@ MACHINE_CONFIG_END
 
 ROM_START (coleco)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
-ROM_END
-
-ROM_START (colecoa)
+	ROM_SYSTEM_BIOS( 0, "original", "Original" )
+	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
 	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
+	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
-ROM_START (colecob)
+ROM_START (svi603)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
 	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
@@ -409,8 +406,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
 CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision",                     0 )
-CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (Thick Characters)",  0 )
-CONS( 1983, colecob,  coleco,   0,      coleco,   coleco, driver_device, 0, "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
+CONS( 1983, svi603,  coleco,   0,      coleco,   coleco, driver_device, 0, "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
 CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device, 0, "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  driver_device, 0, "Telegames",        "Personal Arcade",                  0 )

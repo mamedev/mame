@@ -28,13 +28,15 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_uart(*this, "i8251"),
 	m_ppi(*this, "i8255"),
-	m_crtc(*this, "i8275")
+	m_crtc(*this, "i8275"),
+	m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_ppi;
 	required_device<i8275_device> m_crtc;
+	required_device<palette_device> m_palette;
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
@@ -88,7 +90,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
@@ -187,7 +189,7 @@ static MACHINE_CONFIG_START( sm1800, sm1800_state )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(sm1800_state, sm1800)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sm1800)	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sm1800)	
 
 	/* Devices */
 	MCFG_I8255_ADD ("i8255", sm1800_ppi8255_interface )

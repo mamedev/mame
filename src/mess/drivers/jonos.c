@@ -27,7 +27,7 @@ public:
 
 	DECLARE_DRIVER_INIT(jonos);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
@@ -130,7 +130,9 @@ static MACHINE_CONFIG_START( jonos, jonos_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jonos_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 299)
-	MCFG_GFXDECODE_ADD("gfxdecode", jonos)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jonos)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END
 

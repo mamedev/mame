@@ -5940,8 +5940,8 @@ int saturn_state::get_pixel_clock( void )
 /* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
 UINT8 saturn_state::get_hblank( void )
 {
-	const rectangle &visarea = machine().primary_screen->visible_area();
-	int cur_h = machine().primary_screen->hpos();
+	const rectangle &visarea = machine().first_screen()->visible_area();
+	int cur_h = machine().first_screen()->hpos();
 
 	if (cur_h > visarea.max_x) //TODO
 		return 1;
@@ -5952,7 +5952,7 @@ UINT8 saturn_state::get_hblank( void )
 UINT8 saturn_state::get_vblank( void )
 {
 	int cur_v,vblank;
-	cur_v = machine().primary_screen->vpos();
+	cur_v = machine().first_screen()->vpos();
 
 	vblank = get_vblank_start_position() * get_ystep_count();
 
@@ -5970,7 +5970,7 @@ UINT8 saturn_state::get_odd_bit( void )
 	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
 		return 1;
 
-	return machine().primary_screen->frame_number() & 1;
+	return machine().first_screen()->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position( void )
@@ -5988,7 +5988,7 @@ int saturn_state::get_vblank_start_position( void )
 
 int saturn_state::get_ystep_count( void )
 {
-	int max_y = machine().primary_screen->height();
+	int max_y = machine().first_screen()->height();
 	int y_step;
 
 	y_step = 2;
@@ -6004,7 +6004,7 @@ int saturn_state::get_hcounter( void )
 {
 	int hcount;
 
-	hcount = machine().primary_screen->hpos();
+	hcount = machine().first_screen()->hpos();
 
 	switch(STV_VDP2_HRES & 6)
 	{
@@ -6035,7 +6035,7 @@ int saturn_state::get_vcounter( void )
 {
 	int vcount;
 
-	vcount = machine().primary_screen->vpos();
+	vcount = machine().first_screen()->vpos();
 
 	/* Exclusive Monitor */
 	if(STV_VDP2_HRES & 4)
@@ -6043,7 +6043,7 @@ int saturn_state::get_vcounter( void )
 
 	/* Double Density Interlace */
 	if((STV_VDP2_LSMD & 3) == 3)
-		return (vcount & ~1) | (machine().primary_screen->frame_number() & 1);
+		return (vcount & ~1) | (machine().first_screen()->frame_number() & 1);
 
 	/* docs says << 1, but according to HW tests it's a typo. */
 	return (true_vcount[vcount & 0x1ff][STV_VDP2_VRES]); // Non-interlace
@@ -6119,7 +6119,7 @@ int saturn_state::stv_vdp2_start ( void )
 VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
 	int i;
-	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
+	machine().first_screen()->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
 	stv_vdp1_start();
 	m_vdpdebug_roz = 0;
@@ -6184,9 +6184,9 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
 		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
-		machine().primary_screen->configure(hblank_period, vblank_period, visarea, refresh );
+		machine().first_screen()->configure(hblank_period, vblank_period, visarea, refresh );
 	}
-//  machine().primary_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
+//  machine().first_screen()->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 }
 
 /*This is for calculating the rgb brightness*/

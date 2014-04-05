@@ -26,28 +26,26 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 		// Avoid "05-- 05--" recursion
 		if (shifted) return NULL;
 
-		Instruction* op = decodeInstruction(opc, w0, w1, true);
+		auto_pointer<Instruction> op(decodeInstruction(opc, w0, w1, true));
 		if (op)
 		{
 			// This parallel move only works for certain trailing instructions.
-			if (dynamic_cast<Add*>(op)  ||
-				dynamic_cast<Asr*>(op)  ||
-				dynamic_cast<Eor*>(op)  ||
-				dynamic_cast<Mac*>(op)  ||
-				dynamic_cast<Macr*>(op) ||
-				dynamic_cast<Mpy*>(op)  ||
-				dynamic_cast<Neg*>(op)  ||
-				dynamic_cast<Sub*>(op)  ||
-				dynamic_cast<Tfr*>(op)  ||
-				dynamic_cast<Tst*>(op)
+			if (dynamic_cast<Add*>(op.get())  ||
+				dynamic_cast<Asr*>(op.get())  ||
+				dynamic_cast<Eor*>(op.get())  ||
+				dynamic_cast<Mac*>(op.get())  ||
+				dynamic_cast<Macr*>(op.get()) ||
+				dynamic_cast<Mpy*>(op.get())  ||
+				dynamic_cast<Neg*>(op.get())  ||
+				dynamic_cast<Sub*>(op.get())  ||
+				dynamic_cast<Tfr*>(op.get())  ||
+				dynamic_cast<Tst*>(op.get())
 				/* TODO: More? */)
 			{
 				op->m_sizeIncrement = 1;
 				return op;
 			}
 		}
-
-		global_free(op);
 	}
 
 

@@ -41,7 +41,7 @@ public:
 	virtual bool call_create(int create_format, option_resolution *create_args);
 	virtual void call_unload();
 	virtual void call_display_info() { if (m_device_displayinfo) m_device_displayinfo(*this); }
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { load_software_part_region(this, swlist, swname, start_entry ); return TRUE; }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { load_software_part_region(*this, swlist, swname, start_entry ); return TRUE; }
 
 	virtual iodevice_t image_type() const { return IO_HARDDISK; }
 
@@ -70,8 +70,6 @@ protected:
 	chd_file        m_origchd;              /* handle to the original CHD */
 	chd_file        m_diffchd;              /* handle to the diff CHD */
 	hard_disk_file  *m_hard_disk_handle;
-
-	image_device_format m_format;
 };
 
 // device type definition

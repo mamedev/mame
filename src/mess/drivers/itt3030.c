@@ -293,12 +293,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 {
 	UINT8 ret = 0;
 
-	if (machine().primary_screen->vblank())
+	if (machine().first_screen()->vblank())
 	{
 		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
-	if (machine().primary_screen->hblank())
+	if (machine().first_screen()->hblank())
 	{
 		ret |= 0x80;    // set only bit 7 if hblank
 	}
@@ -362,7 +362,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		for(int x = 0; x < 80; x++ )
 		{
 			UINT8 code = m_vram[x + y*128];
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,  code , 0, 0,0, x*8,y*16);
 		}
 	}
 
@@ -612,6 +612,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*16-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
@@ -626,7 +627,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525dd", itt3030_state::itt3030_floppy_formats)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", itt3030)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", itt3030)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

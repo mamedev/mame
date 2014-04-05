@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "includes/n64.h"
-#include "video/polynew.h"
+#include "video/poly.h"
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"
 

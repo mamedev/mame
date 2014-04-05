@@ -1987,37 +1987,13 @@ static const x1_010_interface x1_010_sound_intf =
 	0x0000,     /* address */
 };
 
-static TMP68301_INTERFACE( tmp68301_default_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-static TMP68301_INTERFACE( tmp68301_gundamex_intf )
-{
-	DEVCB_DRIVER_MEMBER16(seta2_state,gundamex_eeprom_r),
-	DEVCB_DRIVER_MEMBER16(seta2_state,gundamex_eeprom_w)
-};
-
-static TMP68301_INTERFACE( tmp68301_reelquak_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER16(seta2_state,reelquak_leds_w)
-};
-
-static TMP68301_INTERFACE( tmp68301_samshoot_intf )
-{
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301", tmp68301_default_intf)
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2027,8 +2003,9 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", seta2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2058,7 +2035,9 @@ static MACHINE_CONFIG_DERIVED( gundamex, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
-	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_gundamex_intf)
+	MCFG_DEVICE_MODIFY("tmp68301")
+	MCFG_TMP68301_IN_PARALLEL_CB(READ16(seta2_state, gundamex_eeprom_r))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, gundamex_eeprom_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2126,7 +2105,8 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
-	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_reelquak_intf)
+	MCFG_DEVICE_MODIFY("tmp68301")
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, reelquak_leds_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2144,7 +2124,8 @@ static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
-	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_samshoot_intf)
+	MCFG_DEVICE_MODIFY("tmp68301")
+	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2228,8 +2209,9 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", funcube)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
@@ -2269,8 +2251,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301",tmp68301_default_intf)  // tmp68301_reelquak_intf   does this have a ticket dispenser?
-
+	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2280,8 +2261,9 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
 	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", funcube)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

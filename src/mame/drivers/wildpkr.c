@@ -287,6 +287,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wildpkr_state, screen_update_wildpkr)
+	MCFG_SCREEN_PALETTE("palette")
 
 //  MCFG_HD63484_ADD("hd63484", wildpkr_hd63484_intf)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")

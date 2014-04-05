@@ -299,4 +299,7 @@ protected:
 
 private:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT16 *gfx_base);
+	inline void f3_drawgfx(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,int code,int color,int flipx,int flipy,int sx,int sy,UINT8 pri_dst);
+	inline void f3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,int code,int color,int flipx,int flipy,int sx,int sy,int scalex,int scaley,UINT8 pri_dst);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

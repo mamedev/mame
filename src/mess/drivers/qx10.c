@@ -102,8 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER( qx10_18_w );
 	DECLARE_WRITE8_MEMBER( prom_sel_w );
 	DECLARE_WRITE8_MEMBER( cmos_sel_w );
-	void qx10_upd765_interrupt(bool state);
-	void drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
 	DECLARE_READ8_MEMBER( fdc_dma_r );
 	DECLARE_WRITE8_MEMBER( fdc_dma_w );
 	DECLARE_WRITE8_MEMBER( fdd_motor_w );
@@ -154,7 +153,7 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	qx10_state *state = device->machine().driver_data<qx10_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int xi,gfx[3];
 	UINT8 pen;
 
@@ -184,7 +183,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	qx10_state *state = device->machine().driver_data<qx10_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int x;
 	int xi,yi;
 	int tile;
@@ -210,7 +209,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
 
-			if(attr & 0x80 && device->machine().primary_screen->frame_number() & 0x10) //TODO: check for blinking interval
+			if(attr & 0x80 && device->machine().first_screen()->frame_number() & 0x10) //TODO: check for blinking interval
 				tile_data=0;
 
 			for( xi = 0; xi < 8; xi++)
@@ -220,7 +219,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16)
@@ -323,18 +322,13 @@ static SLOT_INTERFACE_START( qx10_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void qx10_state::qx10_upd765_interrupt(bool state)
+WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 {
 	m_fdcint = state;
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
 	m_pic_m->ir6_w(state);
-}
-
-void qx10_state::drq_w(bool state)
-{
-	m_dma_1->dreq0_w(!state);
 }
 
 WRITE8_MEMBER( qx10_state::fdd_motor_w )
@@ -408,8 +402,8 @@ static I8237_INTERFACE( qx10_dma8237_1_interface )
 	DEVCB_DRIVER_LINE_MEMBER(qx10_state, tc_w),
 	DEVCB_DRIVER_MEMBER(qx10_state, memory_read_byte),
 	DEVCB_DRIVER_MEMBER(qx10_state, memory_write_byte),
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_r)*/ DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_HANDLER("upd7220", upd7220_dack_w)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_r), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_r),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_r)*/ DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_MEMBER(qx10_state, fdc_dma_w), DEVCB_DRIVER_MEMBER(qx10_state, gdc_dack_w),/*DEVCB_DEVICE_MEMBER("upd7220", upd7220_device, dack_w)*/ DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
@@ -711,8 +705,6 @@ INPUT_PORTS_END
 void qx10_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(qx10_state::irq_callback),this));
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(qx10_state::qx10_upd765_interrupt), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(qx10_state::drq_w), this));
 }
 
 void qx10_state::machine_reset()
@@ -827,7 +819,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", qx10)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qx10)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
 
@@ -867,9 +859,12 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
+	MCFG_VIDEO_SET_SCREEN("screen")
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir2_w))
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(qx10_state, qx10_upd765_interrupt))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("8237dma_1", am9517a_device, dreq0_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 

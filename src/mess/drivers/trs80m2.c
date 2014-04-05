@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
 	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0xfd, 0xfd) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
@@ -383,6 +383,7 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
 	trs80m2_state *state = device->machine().driver_data<trs80m2_state>();
+	const pen_t *pen = state->m_palette->pens();
 
 	int x = 0;
 
@@ -400,7 +401,7 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 			int dout = BIT(data, 7);
 			int color = dcursor ^ drevid ^ dout;
 
-			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[color];
+			bitmap.pix32(y, x++) = pen[color];
 
 			data <<= 1;
 		}
@@ -703,16 +704,6 @@ static SLOT_INTERFACE_START( trs80m2_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
 SLOT_INTERFACE_END
 
-void trs80m2_state::fdc_intrq_w(bool state)
-{
-	m_pio->port_a_write(state);
-}
-
-void trs80m2_state::fdc_drq_w(bool state)
-{
-	m_dmac->rdy_w(state);
-}
-
 
 //-------------------------------------------------
 //  z80_daisy_config trs80m2_daisy_chain
@@ -749,10 +740,6 @@ IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
 
 void trs80m2_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_drq_w), this));
-
 	// register for state saving
 	save_item(NAME(m_boot_rom));
 	save_item(NAME(m_bank));
@@ -827,10 +814,19 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
@@ -842,14 +838,10 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
+	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
+	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal RAM
@@ -885,30 +877,36 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
 	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITE8(Z80PIO_TAG, z80pio_device, pa_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
+
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
+	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(trs80m2_state, write_centronics_busy))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(trs80m2_state, write_centronics_fault))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(trs80m2_state, write_centronics_perror))
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    floppy_image_device::default_floppy_formats)
-	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
-	MCFG_TRS80M2_KEYBOARD_ADD(WRITELINE(trs80m2_state, kb_clock_w))
+	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
+	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)

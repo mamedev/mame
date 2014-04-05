@@ -99,14 +99,14 @@ void compgolf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		fx = m_spriteram[offs] & 4;
 		fy = 0; /* ? */
 
-		m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,0);
 
 		/* Double Height */
 		if(m_spriteram[offs] & 0x10)
 		{
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				sprite + 1,
 				color, fx, fy, x, y + 16, 0);
 		}

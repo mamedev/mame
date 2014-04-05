@@ -116,7 +116,7 @@ void snug_bwg_device::operate_ready_line()
 /*
     Callbacks from the WD1773 chip
 */
-void snug_bwg_device::irq_w(bool state)
+WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 {
 	if (TRACE_SIGNALS) logerror("bwg: set intrq = %d\n", state);
 	m_IRQ = (line_state)state;
@@ -125,7 +125,7 @@ void snug_bwg_device::irq_w(bool state)
 	operate_ready_line();
 }
 
-void snug_bwg_device::drq_w(bool state)
+WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 {
 	if (TRACE_SIGNALS) logerror("bwg: set drq = %d\n", state);
 	m_DRQ = (line_state)state;
@@ -524,10 +524,6 @@ void snug_bwg_device::device_start(void)
 	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
-
-	// Connect the INTRQ and DRQ lines
-	m_wd1773->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(snug_bwg_device::irq_w), this));
-	m_wd1773->setup_drq_cb(wd_fdc_t::line_cb(FUNC(snug_bwg_device::drq_w), this));
 }
 
 void snug_bwg_device::device_reset()
@@ -560,6 +556,13 @@ void snug_bwg_device::device_reset()
 	m_selected = false;
 	m_debug_dataout = false;
 	m_rtc_enabled = false;
+	m_dataregLB = false;
+	m_lastK = false;
+	m_RTCsel = false;
+	m_inDsrArea = false;
+	m_address = 0;
+	m_WDsel = false;
+	m_WDsel0 = false;
 
 	for (int i=0; i < 4; i++)
 	{
@@ -629,6 +632,8 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_WD1773x_ADD(FDC_TAG, XTAL_8MHz)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
 	MCFG_MM58274C_ADD(CLOCK_TAG, bwg_mm58274c_interface)
 
 	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
@@ -669,7 +674,7 @@ const device_type TI99_BWG = &device_creator<snug_bwg_device>;
     Legacy implementation
 */
 snug_bwg_legacy_device::snug_bwg_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_BWG_LEG, "SNUG BwG Floppy Controller (legacy)", tag, owner, clock, "ti99_bwg", __FILE__),
+			: ti_expansion_card_device(mconfig, TI99_BWG_LEG, "SNUG BwG Floppy Controller LEGACY", tag, owner, clock, "ti99_bwg_leg", __FILE__),
 				m_wd1773(*this, FDCLEG_TAG),
 				m_clock(*this, CLOCK_TAG) { }
 
@@ -806,7 +811,7 @@ READ8Z_MEMBER(snug_bwg_legacy_device::readz)
 					// .... ..11 1111 0xx0
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
-					if (!space.debugger_access()) *value = wd17xx_r(m_wd1773, space, (m_address >> 1)&0x03);
+					if (!space.debugger_access()) *value = m_wd1773->read(space, (m_address >> 1)&0x03);
 					if (TRACE_RW) logerror("bwg: read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
 					if (TRACE_DATA)
 					{
@@ -890,7 +895,7 @@ WRITE8_MEMBER(snug_bwg_legacy_device::write)
 					// Note that the value is inverted again on the board,
 					// so we can drop the inversion
 					if (TRACE_RW) logerror("bwg: write FDC: %04x <- %02x\n", m_address & 0xffff, data);
-					if (!space.debugger_access()) wd17xx_w(m_wd1773, space, (m_address >> 1)&0x03, data);
+					if (!space.debugger_access()) m_wd1773->write(space, (m_address >> 1)&0x03, data);
 				}
 				else
 				{
@@ -993,7 +998,7 @@ WRITE8_MEMBER(snug_bwg_legacy_device::cruwrite)
 					if (m_DSEL != 0)
 						logerror("bwg: Multiple drives selected, %02x\n", m_DSEL);
 					m_DSEL |= drivebit;
-					wd17xx_set_drive(m_wd1773, drive);
+					m_wd1773->set_drive(drive);
 				}
 			}
 			else
@@ -1004,13 +1009,13 @@ WRITE8_MEMBER(snug_bwg_legacy_device::cruwrite)
 			/* Select side of disk (bit 7) */
 			m_SIDE = data;
 			if (TRACE_CRU) logerror("bwg: set side (bit 7) = %d\n", data);
-			wd17xx_set_side(m_wd1773, m_SIDE);
+			m_wd1773->set_side(m_SIDE);
 			break;
 
 		case 10:
 			/* double density enable (active low) */
 			if (TRACE_CRU) logerror("bwg: set double density (bit 10) = %d\n", data);
-			wd17xx_dden_w(m_wd1773, (data != 0) ? ASSERT_LINE : CLEAR_LINE);
+			m_wd1773->dden_w((data != 0) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 11:

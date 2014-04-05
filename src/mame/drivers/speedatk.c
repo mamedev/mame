@@ -334,10 +334,11 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update_speedatk)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16, mc6845_intf)   /* hand tuned to get ~60 fps */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", speedatk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedatk)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)

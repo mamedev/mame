@@ -482,8 +482,9 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bagman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -518,8 +519,9 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pickin)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
@@ -570,8 +572,9 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", bagman)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)

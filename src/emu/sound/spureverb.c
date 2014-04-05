@@ -57,10 +57,10 @@ reverb::~reverb()
 	for (int c=0; c<2; c++)
 	{
 		for (int f=0; f<4; f++)
-			global_free(y[c][f]);
-		global_free(x[c]);
-		global_free(ax[c]);
-		global_free(ay[c]);
+			global_free_array(y[c][f]);
+		global_free_array(x[c]);
+		global_free_array(ax[c]);
+		global_free_array(ay[c]);
 	}
 }
 

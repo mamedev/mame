@@ -82,6 +82,7 @@ private:
 	required_device<z80sti_device> m_sti;
 	required_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
+	required_device<palette_device> m_palette;
 	required_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_j3a;

@@ -132,11 +132,6 @@ static I8255_INTERFACE( amstrad_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(amstrad_state,amstrad_ppi_portc_w)  /* port C write */
 };
 
-DRIVER_INIT_MEMBER(amstrad_state,aleste)
-{
-	m_fdc->setup_intrq_cb(i8272a_device::line_cb(FUNC(amstrad_state::aleste_interrupt), this));
-}
-
 
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
@@ -844,8 +839,8 @@ CPC_EXPANSION_INTERFACE(cpc_exp_intf)
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
 	DEVCB_NULL,  // RESET
-	DEVCB_LINE(cpc_romdis),  // ROMDIS
-	DEVCB_LINE(cpc_romen)  // /ROMEN
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romdis),  // ROMDIS
+	DEVCB_DRIVER_LINE_MEMBER(amstrad_state, cpc_romen)  // /ROMEN
 };
 
 static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
@@ -891,6 +886,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_cpc)
@@ -966,6 +962,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
@@ -1025,6 +1022,7 @@ static MACHINE_CONFIG_START( gx4000, amstrad_state )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
 	MCFG_SCREEN_VBLANK_DRIVER(amstrad_state, screen_eof_amstrad)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_INIT_OWNER(amstrad_state,amstrad_plus)
@@ -1150,7 +1148,6 @@ ROM_START(cpc6128p)
 	ROM_REGION(0x04000, "user1", ROMREGION_ERASEFF)
 ROM_END
 
-
 #define rom_cpc464p  rom_cpc6128p
 #define rom_gx4000  rom_cpc6128p
 
@@ -1191,4 +1188,4 @@ COMP( 1990, cpc464p,  0,        0,      cpcplus, plus, driver_device,     0,    
 COMP( 1990, cpc6128p, 0,        0,      cpcplus, plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,   0,        0,      gx4000,  gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )
 COMP( 1989, kccomp,   cpc464,   0,      kccomp,  kccomp, driver_device,   0,       "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste, amstrad_state,   aleste,  "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,  aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              GAME_IMPERFECT_SOUND )

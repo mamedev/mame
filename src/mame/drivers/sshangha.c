@@ -417,7 +417,7 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sshangha_state, screen_update_sshangha)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sshangha)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sshangha)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 
 	MCFG_DECO16IC_ADD("tilegen1", sshangha_deco16ic_tilegen1_intf)

@@ -188,7 +188,13 @@ enum
 #define LOG logerror
 
 smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock, "smc92x4", __FILE__)
+: device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock, "smc92x4", __FILE__),
+  m_out_intrq(*this),
+  m_out_dip(*this),
+  m_out_auxbus(*this),
+  m_in_auxbus(*this),
+  m_in_dma(*this),
+  m_out_dma(*this)
 {
 }
 
@@ -272,9 +278,9 @@ void smc92x4_device::clear_interrupt()
 */
 void smc92x4_device::set_dma_address(int pos2316, int pos1508, int pos0700)
 {
-	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos2316]);
-	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos1508]);
-	m_out_auxbus(OUTPUT_DMA_ADDR, m_register_r[pos0700]);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, m_register_r[pos2316]);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, m_register_r[pos1508]);
+	m_out_auxbus((offs_t)OUTPUT_DMA_ADDR, m_register_r[pos0700]);
 }
 
 void smc92x4_device::dma_add_offset(int offset)
@@ -314,8 +320,8 @@ void smc92x4_device::sync_status_in()
 void smc92x4_device::sync_latches_out()
 {
 	m_output1 = (m_output1 & 0xf0) | (m_register_w[RETRY_COUNT]&0x0f);
-	m_out_auxbus(OUTPUT_OUTPUT1, m_output1);
-	m_out_auxbus(OUTPUT_OUTPUT2, m_output2);
+	m_out_auxbus((offs_t)OUTPUT_OUTPUT1, m_output1);
+	m_out_auxbus((offs_t)OUTPUT_OUTPUT2, m_output2);
 }
 
 /*************************************************************
@@ -792,7 +798,7 @@ void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 		m_out_dip(ASSERT_LINE);
 		for (i=0; i < sector_len; i++)
 		{
-			m_out_dma(0, buf[i]);
+			m_out_dma((offs_t)0, buf[i]);
 		}
 		m_out_dip(CLEAR_LINE);
 	}
@@ -1647,7 +1653,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 	m_out_dip(ASSERT_LINE);
 	for (i=0; i < data_count; i++)
 	{
-		m_out_dma(0, buffer[i]);
+		m_out_dma((offs_t)0, buffer[i]);
 	}
 	m_out_dip(CLEAR_LINE);
 
@@ -1688,7 +1694,7 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 	m_out_dip(ASSERT_LINE);
 	for (i=0; i < data_count; i++)
 	{
-		m_out_dma(0, buffer[i]);
+		m_out_dma((offs_t)0, buffer[i]);
 	}
 	m_out_dip(CLEAR_LINE);
 
@@ -1966,12 +1972,12 @@ void smc92x4_device::device_start()
 {
 	const smc92x4_interface *intf = reinterpret_cast<const smc92x4_interface *>(static_config());
 
-	m_out_intrq.resolve(intf->out_intrq, *this);
-	m_out_dip.resolve(intf->out_dip, *this);
-	m_out_auxbus.resolve(intf->out_auxbus, *this);
-	m_in_auxbus.resolve(intf->in_auxbus, *this);
-	m_out_dma.resolve(intf->dma_write, *this);
-	m_in_dma.resolve(intf->dma_read, *this);
+	m_out_intrq.resolve_safe();
+	m_out_dip.resolve_safe();
+	m_out_auxbus.resolve_safe();
+	m_in_auxbus.resolve_safe(0);
+	m_out_dma.resolve_safe();
+	m_in_dma.resolve_safe(0);
 
 	m_full_track_layout = intf->full_track_layout;
 

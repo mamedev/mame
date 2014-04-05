@@ -164,21 +164,6 @@ const riot6532_interface sym1_r6532_interface =
 	DEVCB_DRIVER_MEMBER(sym1_state, sym1_riot_b_w)
 };
 
-const ttl74145_interface sym1_ttl74145_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_0_w),
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_1_w),
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_2_w),
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_3_w),
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_4_w),
-	DEVCB_DRIVER_LINE_MEMBER(sym1_state, sym1_74145_output_5_w),
-	DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w),
-	DEVCB_NULL, // not connected
-	DEVCB_NULL, // not connected
-	DEVCB_NULL  // not connected
-};
-
-
 //**************************************************************************
 //  INPUT PORTS
 //**************************************************************************
@@ -339,8 +324,17 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 
 	// devices
 	MCFG_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
-	MCFG_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
-
+	
+	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
+	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))
+	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(sym1_state, sym1_74145_output_1_w))
+	MCFG_TTL74145_OUTPUT_LINE_2_CB(WRITELINE(sym1_state, sym1_74145_output_2_w))
+	MCFG_TTL74145_OUTPUT_LINE_3_CB(WRITELINE(sym1_state, sym1_74145_output_3_w))
+	MCFG_TTL74145_OUTPUT_LINE_4_CB(WRITELINE(sym1_state, sym1_74145_output_4_w))
+	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(sym1_state, sym1_74145_output_5_w))
+	MCFG_TTL74145_OUTPUT_LINE_6_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	// lines 7-9 not connected
+	
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
 

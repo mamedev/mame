@@ -169,7 +169,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
  * /NMI depending on choice (see system control below)
  * fdc interrupt callback. set/clear fdc int */
-void pcw_state::pcw_fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
 {
 	if (!state)
 		m_system_status &= ~(1<<5);
@@ -1002,7 +1002,6 @@ TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 void pcw_state::machine_start()
 {
 	m_fdc_interrupt_code = 2;
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pcw_state::pcw_fdc_interrupt), this));
 }
 
 void pcw_state::machine_reset()
@@ -1283,6 +1282,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_SCREEN_SIZE(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", PCW_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(pcw_state, pcw)
@@ -1293,6 +1293,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pcw_state, pcw_fdc_interrupt))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", pcw_state::floppy_formats)
@@ -1312,6 +1313,7 @@ static MACHINE_CONFIG_DERIVED( pcw8256, pcw )
 	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
@@ -1323,6 +1325,7 @@ static MACHINE_CONFIG_DERIVED( pcw8512, pcw )
 	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_pcw )
 

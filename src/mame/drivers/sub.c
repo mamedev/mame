@@ -169,8 +169,8 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 			tile += (m_attr[count]&0xe0)<<3;
 			col = (m_attr[count]&0x1f);
 
-			gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
-			gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+			gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+			gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
 
 			count++;
 		}
@@ -202,7 +202,7 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 			if(fx) { x = 0xe0 - x; }
 			fy = (spriteram_2[i+0] & 0x40) ? 0 : 1;
 
-			gfx_1->transpen(m_palette,bitmap,cliprect,spr_offs,col,0,fy,x,y,0);
+			gfx_1->transpen(bitmap,cliprect,spr_offs,col,0,fy,x,y,0);
 		}
 	}
 
@@ -222,8 +222,8 @@ UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap,
 
 			if(x >= 28)
 			{
-				gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
-				gfx->opaque(m_palette,bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+				gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+				gfx->opaque(bitmap,cliprect,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
 			}
 
 			count++;
@@ -452,8 +452,9 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sub)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
 	MCFG_PALETTE_INIT_OWNER(sub_state, sub)

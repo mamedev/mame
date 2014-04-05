@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   upd7810.h
+ *   upd7810.c
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.3
  *
  *   Copyright Juergen Buchmueller, all rights reserved.
@@ -1977,8 +1977,8 @@ void upd7810_device::state_string_export(const device_state_entry &entry, astrin
 	}
 }
 
-#include "7810tbl.c"
-#include "7810ops.c"
+#include "7810tbl.inc"
+#include "7810ops.inc"
 
 void upd7810_device::device_reset()
 {

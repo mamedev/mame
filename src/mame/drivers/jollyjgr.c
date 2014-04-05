@@ -545,7 +545,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 		if (offs < 3 * 4)
 			sy++;
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,color,
 				flipx,flipy,
 				sx,sy,0);
@@ -665,8 +665,9 @@ static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jollyjgr)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jollyjgr)
 	MCFG_PALETTE_ADD("palette", 32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 	MCFG_PALETTE_INIT_OWNER(jollyjgr_state, jollyjgr)
 

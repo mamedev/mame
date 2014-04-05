@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", thunderj)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thunderj)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(atarigen_state, scanline_int_write_line))
@@ -278,6 +278,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(thunderj_state, screen_update_thunderj)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(thunderj_state,thunderj)
 

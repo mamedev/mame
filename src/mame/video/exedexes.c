@@ -194,7 +194,7 @@ void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipx,flipy,

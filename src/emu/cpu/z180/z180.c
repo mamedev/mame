@@ -796,12 +796,12 @@ static UINT8 *SZHVC_sub;
 #include "z180ops.h"
 #include "z180tbl.h"
 
-#include "z180cb.c"
-#include "z180xy.c"
-#include "z180dd.c"
-#include "z180fd.c"
-#include "z180ed.c"
-#include "z180op.c"
+#include "z180cb.inc"
+#include "z180xy.inc"
+#include "z180dd.inc"
+#include "z180fd.inc"
+#include "z180ed.inc"
+#include "z180op.inc"
 
 UINT8 z180_device::z180_readcontrol(offs_t port)
 {

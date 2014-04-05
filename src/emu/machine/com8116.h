@@ -38,7 +38,7 @@
 	devcb = &com8116_device::set_fx4_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_COM8116_FR_HANDLER(_devcb) \
-	devcb = &com8116_device::set_ft_handler(*device, DEVCB2_##_devcb);
+	devcb = &com8116_device::set_fr_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_COM8116_FT_HANDLER(_devcb) \
 	devcb = &com8116_device::set_ft_handler(*device, DEVCB2_##_devcb);

@@ -400,7 +400,7 @@ OSDOBJS = \
 	$(SDLOBJ)/sdlmidi.o
 
 ifdef NO_USE_MIDI
-DEFS += "-DDISABLE_MIDI=1"
+DEFS += -DDISABLE_MIDI=1
 endif
 
 # Add SDL2.0 support
@@ -771,8 +771,7 @@ $(OBJ)/emu/video/tms9927.o : CCOMFLAGS += -Wno-error
 endif # solaris
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SDLSRC)/drawogl.c
-$(SDLOBJ)/drawogl.o : $(SDLSRC)/texcopy.c $(SDLSRC)/texsrc.h
+$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.inc $(SDLSRC)/drawogl.c
 
 # draw13 depends on blit13.h
 $(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
@@ -804,7 +803,7 @@ testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-$(SDLOBJ)/sdlmidi.o: $(SRC)/osd/portmedia/pmmidi.c
+$(SDLOBJ)/sdlmidi.o: $(SRC)/osd/portmedia/pmmidi.inc
 
 #-------------------------------------------------
 # clean up

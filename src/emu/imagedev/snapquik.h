@@ -23,7 +23,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 	virtual iodevice_t image_type() const { return IO_SNAPSHOT; }
 
 	virtual bool is_readable()  const { return 1; }

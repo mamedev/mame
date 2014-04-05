@@ -11,8 +11,7 @@
 
 #define RGB_MAX     191
 
-
-void grchamp_state::palette_generate()
+PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -47,7 +46,7 @@ void grchamp_state::palette_generate()
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		m_bgcolor[i] = rgb_t(r, g, b);
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -98,7 +97,6 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 
 void grchamp_state::video_start()
 {
-	palette_generate();
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
@@ -124,7 +122,7 @@ int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, i
 	{
 		/* draw the current player sprite into a work bitmap */
 		
-			m_gfxdecode->gfx(4)->opaque(m_palette,m_work_bitmap,
+			m_gfxdecode->gfx(4)->opaque(m_work_bitmap,
 			m_work_bitmap.cliprect(),
 			m_cpu0_out[4]&0xf,
 			1, /* color */
@@ -190,7 +188,7 @@ void grchamp_state::draw_sprites(grchamp_state *state, bitmap_ind16 &bitmap, con
 		int color = source[2];
 		int code = source[1);
 		
-			gfx->transpen(m_palette,bitmap,cliprect,
+			gfx->transpen(bitmap,cliprect,
 			bank + (code & 0x3f),
 			color,
 			code & 0x40,
@@ -357,6 +355,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		rgb_t(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
+	const pen_t *bgpen = m_palette->pens();
 	const UINT8 *amedata = memregion("gfx5")->base();
 	const UINT8 *headdata = memregion("gfx6")->base();
 	const UINT8 *pldata = memregion("gfx7")->base();
@@ -520,7 +519,7 @@ mame_printf_debug("Collide bg/object @ (%d,%d)\n", x, y);
 
 			/* otherwise, it's the background, unless it's been KILL'ed */
 			else if (!kill)
-				finalpix = m_bgcolor[mvid | bgcolor];
+				finalpix = bgpen[mvid | bgcolor];
 
 			/* in which case it's black */
 			else

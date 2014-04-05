@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
-	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(WRITELINE(vic20_state, write_light_pen))
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(vic20_state, write_light_pen))
 
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, vic20_user_port_cards, NULL)
 	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(vic20_state, exp_reset_w))
@@ -723,7 +723,9 @@ static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map, DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r), DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6560_POTX_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -748,7 +750,9 @@ static MACHINE_CONFIG_DERIVED( pal, vic20 )
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map, DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r), DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6560_POTX_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

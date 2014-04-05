@@ -140,12 +140,14 @@ static const UINT8 terminal_font[256*16] =
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_palette(*this, "palette"),
 		m_io_term_conf(*this, "TERM_CONF")
 {
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
+		m_palette(*this, "palette"),
 		m_io_term_conf(*this, "TERM_CONF")
 {
 }
@@ -235,19 +237,20 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 	UINT16 cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
-	UINT32 font_color;
+
 	switch (options & 0x30)
 	{
 	case 0x10:
-		font_color = 0x00ff7e00;
+		m_palette->set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
 		break;
 	case 0x20:
-		font_color = 0x00ffffff;
+		m_palette->set_pen_color(1, rgb_t::white);
 		break;
 	default:
-		font_color = 0x0000ff00;
+		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
 		break;
 	}
+	pen_t font_color = m_palette->pen(1);
 
 	m_framecnt++;
 
@@ -317,6 +320,9 @@ static MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
+
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 

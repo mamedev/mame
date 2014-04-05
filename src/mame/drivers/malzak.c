@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( malzak, malzak_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(malzak_state, screen_update_malzak)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", malzak)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", malzak)
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(malzak_state, malzak)
 

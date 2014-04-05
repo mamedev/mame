@@ -29,6 +29,7 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
+		m_palette(*this, "palette"),
 		m_screen(*this, "screen") { }
 
 	/* memory pointers */
@@ -57,6 +58,7 @@ public:
 	optional_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
 	required_device<k054338_device> m_k054338;
+	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
 	emu_timer *m_dmaend_timer;

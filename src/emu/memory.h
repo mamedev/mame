@@ -303,7 +303,7 @@ public:
 	address_spacenum spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map; }
 
-	direct_read_data &direct() const { return m_direct; }
+	direct_read_data &direct() const { return *m_direct; }
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
@@ -377,7 +377,7 @@ public:
 	void set_decrypted_region(offs_t addrstart, offs_t addrend, void *base);
 
 	// direct access
-	direct_update_delegate set_direct_update_handler(direct_update_delegate function) { return m_direct.set_direct_update(function); }
+	direct_update_delegate set_direct_update_handler(direct_update_delegate function) { return m_direct->set_direct_update(function); }
 	bool set_direct_region(offs_t &byteaddress);
 
 	// umap ranges (short form)
@@ -543,7 +543,7 @@ protected:
 	address_space *         m_next;             // next address space in the global list
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
-	address_map *           m_map;              // original memory map
+	auto_pointer<address_map> m_map;            // original memory map
 	offs_t                  m_addrmask;         // physical address mask
 	offs_t                  m_bytemask;         // byte-converted physical address mask
 	offs_t                  m_logaddrmask;      // logical address mask
@@ -552,7 +552,7 @@ protected:
 	address_spacenum        m_spacenum;         // address space index
 	bool                    m_debugger_access;  // treat accesses as coming from the debugger
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
-	direct_read_data &      m_direct;           // fast direct-access read info
+	auto_pointer<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
 	UINT8                   m_addrchars;        // number of characters to use for physical addresses
 	UINT8                   m_logaddrchars;     // number of characters to use for logical addresses

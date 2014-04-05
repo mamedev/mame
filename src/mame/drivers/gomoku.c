@@ -132,8 +132,9 @@ static MACHINE_CONFIG_START( gomoku, gomoku_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gomoku)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gomoku)
 	MCFG_PALETTE_ADD("palette", 64)
 	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
 

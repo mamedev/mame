@@ -97,7 +97,8 @@ public:
 		m_pic(*this, PIC8259_TAG),
 		m_fdc(*this, FDC_TAG),
 		m_speaker(*this, "speaker"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -110,6 +111,7 @@ public:
 	required_device<fd1793_device> m_fdc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
+	required_device<palette_device> m_palette;
 	//DECLARE_READ8_MEMBER(pic8259_r);
 	//DECLARE_WRITE8_MEMBER(pic8259_w);
 	//DECLARE_READ8_MEMBER(mbc55x_disk_r);

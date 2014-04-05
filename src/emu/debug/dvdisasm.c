@@ -62,7 +62,7 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 	// count the number of comments
 	int total_comments = 0;
-	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
 		total_comments += dasmsource.m_device.debug()->comment_count();
@@ -99,11 +99,11 @@ void debug_view_disasm::enumerate_sources()
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*auto_alloc(machine(), debug_view_disasm_source(name, dasm->device())));
+		m_source_list.append(*global_alloc(debug_view_disasm_source(name, dasm->device())));
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.head());
+	set_source(*m_source_list.first());
 }
 
 

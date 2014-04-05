@@ -61,7 +61,8 @@ public:
 			m_vram(*this, "vram") ,
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_dsp(*this, "dsp") { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;
@@ -80,8 +81,6 @@ public:
 	optional_device<roc10937_t> m_vfd;
 	optional_shared_ptr<UINT16> m_vram;
 	struct bt477_t m_bt477;
-	DECLARE_WRITE16_MEMBER(m68k_tms_w);
-	DECLARE_READ16_MEMBER(m68k_tms_r);
 	DECLARE_READ16_MEMBER(duart_1_r);
 	DECLARE_WRITE16_MEMBER(duart_1_w);
 	DECLARE_READ16_MEMBER(duart_2_r);
@@ -118,6 +117,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<palette_device> m_palette;
+	optional_device<tms34010_device> m_dsp;
 };
 
 

@@ -151,7 +151,7 @@ private:
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
 		dynamic_array<UINT16>   m_fd1089_decrypted;
-		fd1094_decryption_cache *m_fd1094_cache;
+		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
 	};
 
 	// internal helpers

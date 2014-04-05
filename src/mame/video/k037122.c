@@ -62,6 +62,9 @@ void k037122_device::device_start()
 	8*128
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	m_char_ram = auto_alloc_array_clear(machine(), UINT32, 0x200000 / 4);
 	m_tile_ram = auto_alloc_array_clear(machine(), UINT32, 0x20000 / 4);
 	m_reg = auto_alloc_array_clear(machine(), UINT32, 0x400 / 4);
@@ -72,7 +75,7 @@ void k037122_device::device_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index,auto_alloc_clear(machine(), gfx_element(machine(), k037122_char_layout, (UINT8*)m_char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index,global_alloc(gfx_element(m_palette, k037122_char_layout, (UINT8*)m_char_ram, m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);

@@ -261,6 +261,9 @@ static const gfx_layout char_layout =
 
 void tc0091lvc_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	memset(m_palette_ram, 0, sizeof(m_palette_ram));
 	memset(m_vregs, 0, sizeof(m_palette_ram));
 	memset(m_bitmap_ram, 0, sizeof(m_palette_ram));
@@ -294,7 +297,7 @@ void tc0091lvc_device::device_start()
 
 	//printf("m_gfx_index %d\n", m_gfx_index);
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), char_layout, (UINT8 *)m_pcg_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)m_pcg_ram, m_palette->entries() / 16, 0)));
 }
 
 void tc0091lvc_device::device_reset()
@@ -333,7 +336,7 @@ void tc0091lvc_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap
 			fy = !fy;
 		}
 
-		gfx->prio_transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
+		gfx->prio_transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,screen.priority(),(col & 0x08) ? 0xaa : 0x00,0);
 	}
 }
 

@@ -105,7 +105,8 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_mc6846(*this, "mc6846"),
 		m_mc6843(*this, "mc6843"),
-		m_acia6850(*this, "acia6850")
+		m_acia6850(*this, "acia6850"),
+		m_screen(*this, "screen")
 	{
 	}
 
@@ -295,6 +296,10 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_floppy_w );
 	DECLARE_READ8_MEMBER( to9_floppy_r );
 	DECLARE_WRITE8_MEMBER( to9_floppy_w );
+	WRITE_LINE_MEMBER( fdc_index_0_w );
+	WRITE_LINE_MEMBER( fdc_index_1_w );
+	WRITE_LINE_MEMBER( fdc_index_2_w );
+	WRITE_LINE_MEMBER( fdc_index_3_w );
 	void thomson_index_callback(device_t *device, int state);
 	DECLARE_PALETTE_INIT(thom);
 	
@@ -321,6 +326,7 @@ protected:
 	optional_device<mc6846_device> m_mc6846;
 	optional_device<mc6843_device> m_mc6843;
 	optional_device<acia6850_device> m_acia6850;
+	required_device<screen_device> m_screen;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;
@@ -551,7 +557,6 @@ protected:
 /*----------- defined in machine/thomson.c -----------*/
 
 extern const mc6846_interface to7_timer;
-extern const mea8000_interface to7_speech;
 extern const mc6846_interface to770_timer;
 extern const mc6846_interface to9_timer;
 

@@ -1478,11 +1478,6 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 	}
 }
 
-static const struct WD33C93interface wd33c93_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ip22_state,scsi_irq)      /* command completion IRQ */
-};
-
 void ip22_state::machine_start()
 {
 	sgi_mc_init(machine());
@@ -1638,7 +1633,8 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_4)
-	MCFG_WD33C93_ADD("scsi:wd33c93", wd33c93_intf)
+	MCFG_DEVICE_ADD("scsi:wd33c93", WD33C93, 0)
+	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, ip22_state,scsi_irq))
 
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^lspeaker", 1.0)

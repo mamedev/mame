@@ -23,6 +23,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	#define TC0100SCN_SINGLE_VDU    1024
 
@@ -88,7 +89,9 @@ private:
 	INT32        m_gfxbank, m_colbank;
 	INT32        m_bg0_colbank, m_bg1_colbank, m_tx_colbank;
 	int          m_dblwidth;
+
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -113,4 +116,8 @@ extern const device_type TC0100SCN;
 
 #define MCFG_TC0100SCN_GFXDECODE(_gfxtag) \
 	tc0100scn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#define MCFG_TC0100SCN_PALETTE(_palette_tag) \
+	tc0100scn_device::static_set_palette_tag(*device, "^" _palette_tag);
+
 #endif

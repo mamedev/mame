@@ -24,9 +24,8 @@
 static VIDEO_START( pc_aga );
 static PALETTE_INIT( pc_aga );
 static MC6845_UPDATE_ROW( aga_update_row );
-static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed );
-static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed );
 static VIDEO_START( pc200 );
+static MC6845_END_UPDATE( aga_end_update );
 
 
 static MC6845_INTERFACE( mc6845_aga_intf )
@@ -36,11 +35,11 @@ static MC6845_INTERFACE( mc6845_aga_intf )
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	aga_update_row,     /* update_row */
-	NULL,               /* end_update */
+	aga_end_update,     /* end_update */
 	DEVCB_NULL,         /* on_de_chaged */
 	DEVCB_NULL,         /* on_cur_chaged */
-	DEVCB_LINE(aga_hsync_changed),  /* on_hsync_changed */
-	DEVCB_LINE(aga_vsync_changed),  /* on_vsync_changed */
+	DEVCB_NULL,  /* on_hsync_changed */
+	DEVCB_NULL,  /* on_vsync_changed */
 	NULL
 };
 
@@ -60,10 +59,10 @@ static struct {
 
 	mc6845_update_row_func  update_row;
 	UINT8   cga_palette_lut_2bpp[4];
-	UINT8   vsync;
-	UINT8   hsync;
 
 	UINT8  *videoram;
+	
+	palette_device *palette;	
 } aga;
 
 
@@ -102,17 +101,8 @@ static MC6845_UPDATE_ROW( aga_update_row ) {
 	}
 }
 
-
-static WRITE_LINE_DEVICE_HANDLER( aga_hsync_changed ) {
-	aga.hsync = state ? 1 : 0;
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
-	aga.vsync = state ? 8 : 0;
-	if ( state ) {
-		aga.pc_framecnt++;
-	}
+static MC6845_END_UPDATE( aga_end_update ) {
+	aga.pc_framecnt++;
 }
 
 
@@ -124,7 +114,7 @@ static WRITE_LINE_DEVICE_HANDLER( aga_vsync_changed ) {
 
 /* colors need fixing in the mda_text_* functions ! */
 static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
@@ -185,7 +175,7 @@ static MC6845_UPDATE_ROW( mda_text_inten_update_row ) {
 
 static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT16  chr_base = ( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
 	int i;
@@ -246,7 +236,7 @@ static MC6845_UPDATE_ROW( mda_text_blink_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -275,7 +265,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -304,7 +294,7 @@ static MC6845_UPDATE_ROW( cga_text_inten_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -337,7 +327,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -372,7 +362,7 @@ static MC6845_UPDATE_ROW( cga_text_blink_alt_update_row ) {
 }
 
 static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT8 *videoram = aga.videoram;
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
@@ -398,7 +388,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bppl_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -431,7 +421,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	int i;
 
@@ -456,7 +446,7 @@ static MC6845_UPDATE_ROW( cga_gfx_2bpp_update_row ) {
 
 static MC6845_UPDATE_ROW( cga_gfx_1bpp_update_row ) {
 	UINT8 *videoram = aga.videoram;
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = aga.palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(y);
 	UINT8   fg = aga.cga_color_select & 0x0F;
 	int i;
@@ -563,7 +553,7 @@ static READ8_HANDLER ( pc_aga_cga_r )
 			data = mc6845->register_r( space, offset);
 			break;
 		case 10:
-			data = aga.vsync | ( ( data & 0x40 ) >> 4 ) | aga.hsync;
+			data = (mc6845->vsync_r() ? 8 : 0) | ( ( data & 0x40 ) >> 4 ) | mc6845->hsync_r();
 			break;
 		}
 	}
@@ -719,6 +709,7 @@ VIDEO_START( pc_aga )
 	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	aga.palette = machine.device<palette_device>(":palette");
 }
 
 VIDEO_START( pc200 )
@@ -750,6 +741,7 @@ VIDEO_START( pc200 )
 	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	aga.palette = machine.device<palette_device>(":palette");
 	memset(aga.videoram, 0, sizeof(UINT8) * 0x10000);
 }
 

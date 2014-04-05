@@ -68,7 +68,7 @@ void a7800_state::video_start()
 	m_maria_kangaroo = 0;
 	m_maria_rm = 0;
 
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
 /***************************************************************************

@@ -282,8 +282,9 @@ static MACHINE_CONFIG_START( yiear, yiear_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", yiear)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(yiear_state, yiear)
 

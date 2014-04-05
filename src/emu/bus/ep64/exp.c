@@ -50,7 +50,8 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
-	m_write_wait(*this)
+	m_write_wait(*this),
+	m_dave(*this)
 {
 }
 
@@ -61,7 +62,6 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 
 void ep64_expansion_bus_slot_device::device_start()
 {
-	m_dave = dynamic_cast<dave_device *>(m_owner->subdevice(m_dave_tag));
 	m_card = dynamic_cast<device_ep64_expansion_bus_card_interface *>(get_card_device());
 
 	// resolve callbacks

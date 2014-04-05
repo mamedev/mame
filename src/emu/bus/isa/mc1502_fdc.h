@@ -38,6 +38,9 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	TIMER_CALLBACK_MEMBER( motor_callback );
 
+	DECLARE_READ8_MEMBER(mc1502_fdc_r);
+	DECLARE_WRITE8_MEMBER(mc1502_fdc_w);
+	DECLARE_WRITE_LINE_MEMBER( mc1502_fdc_irq_drq );
 
 protected:
 	// device-level overrides
@@ -54,7 +57,6 @@ public:
 	UINT8 mc1502_wd17xx_aux_r();
 	UINT8 mc1502_wd17xx_drq_r();
 	UINT8 mc1502_wd17xx_motor_r();
-	void mc1502_fdc_irq_drq(bool state);
 
 };
 

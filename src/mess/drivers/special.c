@@ -374,6 +374,8 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
@@ -438,6 +440,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_I8255_ADD( "ppi8255", specimx_ppi8255_interface )
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
@@ -463,6 +466,8 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
 	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 
@@ -477,7 +482,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
-
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 

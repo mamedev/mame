@@ -477,9 +477,9 @@ static ADDRESS_MAP_START( mac_mem, AS_PROGRAM, 8, abc1600_state )
 	AM_RANGE(0x1ff006, 0x1ff006) AM_MIRROR(0xf9) AM_DEVREADWRITE(SAB1797_02P_TAG, fd1797_t, data_r, data_w)
 	AM_RANGE(0x1ff100, 0x1ff101) AM_MIRROR(0xfe) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, crtc_map)
 	AM_RANGE(0x1ff200, 0x1ff207) AM_MIRROR(0xf8) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x1ff300, 0x1ff300) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_0_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff400, 0x1ff400) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_1_TAG, z80dma_r, z80dma_w)
-	AM_RANGE(0x1ff500, 0x1ff500) AM_MIRROR(0xff) AM_DEVREADWRITE_LEGACY(Z8410AB1_2_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1ff300, 0x1ff300) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_0_TAG, z80dma_device, read, write)
+	AM_RANGE(0x1ff400, 0x1ff400) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_1_TAG, z80dma_device, read, write)
+	AM_RANGE(0x1ff500, 0x1ff500) AM_MIRROR(0xff) AM_DEVREADWRITE(Z8410AB1_2_TAG, z80dma_device, read, write)
 	AM_RANGE(0x1ff600, 0x1ff607) AM_MIRROR(0xf8) AM_READWRITE(scc_r, scc_w)
 	AM_RANGE(0x1ff700, 0x1ff707) AM_MIRROR(0xf8) AM_READWRITE(cio_r, cio_w)
 	AM_RANGE(0x1ff800, 0x1ffaff) AM_DEVICE(ABC1600_MOVER_TAG, abc1600_mover_device, io_map)
@@ -538,7 +538,7 @@ static Z80DMA_INTERFACE( dma0_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z8410AB1_1_TAG, z80dma_bai_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_1_TAG, z80dma_device, bai_w),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_r),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_mreq_w),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma0_iorq_r),
@@ -568,7 +568,7 @@ static Z80DMA_INTERFACE( dma1_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, dbrq_w),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z8410AB1_2_TAG, z80dma_bai_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z8410AB1_2_TAG, z80dma_device, bai_w),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_r),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_mreq_w),
 	DEVCB_DEVICE_MEMBER(ABC1600_MAC_TAG, abc1600_mac_device, dma1_iorq_r),
@@ -648,11 +648,6 @@ READ8_MEMBER( abc1600_state::scc_r )
 WRITE8_MEMBER( abc1600_state::scc_w )
 {
 	m_scc->reg_w(space, A1_A2, data);
-}
-
-void abc1600_state::scc_irq(bool status)
-{
-	m_maincpu->set_input_line(M68K_IRQ_5, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -803,17 +798,6 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	m_nvram->sk_w(clock);
 }
 
-static Z8536_INTERFACE( cio_intf )
-{
-	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_2),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pb_w),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_r),
-	DEVCB_DRIVER_MEMBER(abc1600_state, cio_pc_w)
-};
-
 
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
@@ -823,12 +807,7 @@ static SLOT_INTERFACE_START( abc1600_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-void abc1600_state::fdc_intrq_w(bool state)
-{
-	m_cio->pb7_w(state);
-}
-
-void abc1600_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( abc1600_state::fdc_drq_w )
 {
 	update_drdy0();
 }
@@ -886,10 +865,6 @@ void abc1600_state::machine_start()
 	// interrupt callback
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(abc1600_state::abc1600_int_ack),this));
 
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
@@ -946,11 +921,22 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z80DMA_ADD(Z8410AB1_1_TAG, XTAL_64MHz/16, dma1_intf)
 	MCFG_Z80DMA_ADD(Z8410AB1_2_TAG, XTAL_64MHz/16, dma2_intf)
 	MCFG_Z80DART_ADD(Z8470AB1_TAG, XTAL_64MHz/16, dart_intf)
-	MCFG_SCC8530_ADD(Z8530B1_TAG, XTAL_64MHz/16, line_cb_t(FUNC(abc1600_state::scc_irq), static_cast<abc1600_state *>(owner)))
-	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
+	MCFG_DEVICE_ADD(Z8530B1_TAG, SCC8530, XTAL_64MHz/16)
+	MCFG_Z8530_INTRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_5))
+	MCFG_DEVICE_ADD(Z8536B1_TAG, Z8536, XTAL_64MHz/16)
+	MCFG_Z8536_IRQ_CALLBACK(INPUTLINE(MC68008P8_TAG, M68K_IRQ_2))
+	MCFG_Z8536_PA_IN_CALLBACK(READ8(abc1600_state, cio_pa_r))
+	MCFG_Z8536_PB_IN_CALLBACK(READ8(abc1600_state, cio_pb_r))
+	MCFG_Z8536_PB_OUT_CALLBACK(WRITE8(abc1600_state, cio_pb_w))
+	MCFG_Z8536_PC_IN_CALLBACK(READ8(abc1600_state, cio_pc_r))
+	MCFG_Z8536_PC_OUT_CALLBACK(WRITE8(abc1600_state, cio_pc_w))
+
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
 	MCFG_FD1797x_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pb7_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(abc1600_state, fdc_drq_w))
+	
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -969,7 +955,7 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa7_w))
 	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, NULL)
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa6_w))
-	MCFG_ABCBUS_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF, abc1600_state, nmi_w))
+	MCFG_ABCBUS_SLOT_NMI_CALLBACK(WRITELINE(abc1600_state, nmi_w))
 	MCFG_ABCBUS_SLOT_XINT2_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa2_w))
 	MCFG_ABCBUS_SLOT_XINT3_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa3_w))
 	MCFG_ABCBUS_SLOT_XINT4_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa4_w))

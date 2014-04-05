@@ -234,8 +234,10 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galspnbl_state, screen_update_galspnbl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", galspnbl)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galspnbl)
 
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galspnbl_state, galspnbl)

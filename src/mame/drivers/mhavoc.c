@@ -192,7 +192,6 @@
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "includes/mhavoc.h"
-#include "drivlgcy.h"
 
 
 READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
@@ -265,9 +264,9 @@ static ADDRESS_MAP_START( alpha_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("IN0") AM_WRITENOP    /* Alpha Input Port 0 */
 	AM_RANGE(0x1400, 0x141f) AM_RAM AM_SHARE("colorram")    /* ColorRAM */
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)           /* Control Signals */
-	AM_RANGE(0x1640, 0x1640) AM_WRITE_LEGACY(avgdvg_go_w)               /* Vector Generator GO */
+	AM_RANGE(0x1640, 0x1640) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
 	AM_RANGE(0x1680, 0x1680) AM_WRITE(watchdog_reset_w)         /* Watchdog Clear */
-	AM_RANGE(0x16c0, 0x16c0) AM_WRITE_LEGACY(avgdvg_reset_w)            /* Vector Generator Reset */
+	AM_RANGE(0x16c0, 0x16c0) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
 	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
 	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavoc_rom_banksel_w)     /* Program ROM Page Select */
 	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)     /* Program RAM Page Select */
@@ -320,9 +319,9 @@ static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("IN1")                /* Gamma Input Port */
 	AM_RANGE(0x1080, 0x1080) AM_READ_PORT("DIAL")               /* Roller Controller Input*/
 	AM_RANGE(0x10a0, 0x10a0) AM_WRITE(alphaone_out_0_w)         /* Control Signals */
-	AM_RANGE(0x10a4, 0x10a4) AM_WRITE_LEGACY(avgdvg_go_w)               /* Vector Generator GO */
+	AM_RANGE(0x10a4, 0x10a4) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
 	AM_RANGE(0x10a8, 0x10a8) AM_WRITE(watchdog_reset_w)         /* Watchdog Clear */
-	AM_RANGE(0x10ac, 0x10ac) AM_WRITE_LEGACY(avgdvg_reset_w)            /* Vector Generator Reset */
+	AM_RANGE(0x10ac, 0x10ac) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
 	AM_RANGE(0x10b4, 0x10b4) AM_WRITE(mhavoc_rom_banksel_w)
 	AM_RANGE(0x10b8, 0x10b8) AM_WRITE(mhavoc_ram_banksel_w)
@@ -361,7 +360,7 @@ static INPUT_PORTS_START( mhavoc )
 	/* Bit 2 = Gamma xmtd flag */
 	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
 	/* Bit 0 = Vector generator halt flag */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_xmtd_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_rcvd_r, NULL)
@@ -460,7 +459,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alphaone )
 	PORT_START("IN0")   /* alpha (player_1 = 0) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, NULL)
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -517,8 +516,9 @@ static MACHINE_CONFIG_START( mhavoc, mhavoc_state )
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-
-	MCFG_VIDEO_START(avg_mhavoc)
+	
+	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, 0)
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

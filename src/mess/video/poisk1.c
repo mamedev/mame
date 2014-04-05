@@ -116,9 +116,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	// HIRES -- XXX
 	if (BIT(data, 7) != BIT(m_video.color_select_68, 7)) {
 		if (BIT(data, 7))
-			machine().primary_screen->set_visible_area(0, 640-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 640-1, 0, 200-1);
 		else
-			machine().primary_screen->set_visible_area(0, 320-1, 0, 200-1);
+			machine().first_screen()->set_visible_area(0, 320-1, 0, 200-1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -184,7 +184,7 @@ void p1_state::set_palette_luts(void)
 
 POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT16  odd, offset;
 	int i;
@@ -211,7 +211,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_2bpp_update_row )
 
 POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT8   fg = 15, bg = BG_COLOR(m_video.color_select_68);
 	UINT16  odd, offset;
@@ -243,7 +243,7 @@ POISK1_UPDATE_ROW( p1_state::cga_gfx_1bpp_update_row )
 
 POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 {
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	UINT32  *p = &bitmap.pix32(ra);
 	UINT8   fg, bg = BG_COLOR(m_video.color_select_68);
 	UINT16  odd, offset;

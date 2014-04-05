@@ -91,13 +91,6 @@ static const riot6532_interface r6532_interface_1 =
 };
 
 
-static const struct tia_interface tourtabl_tia_interface =
-{
-	DEVCB_DRIVER_MEMBER16(tourtabl_state,tourtabl_read_input_port),
-	DEVCB_DRIVER_MEMBER(tourtabl_state,tourtabl_get_databus_contents),
-	DEVCB_NULL
-};
-
 static INPUT_PORTS_START( tourtabl )
 
 	PORT_START("PADDLE4")
@@ -181,8 +174,11 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_RIOT6532_ADD("riot1", MASTER_CLOCK / 3, r6532_interface_0)
 	MCFG_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 
-	MCFG_TIA_NTSC_VIDEO_ADD("tia_video", tourtabl_tia_interface)
 	/* video hardware */
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tourtabl_state, tourtabl_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tourtabl_state, tourtabl_get_databus_contents))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)

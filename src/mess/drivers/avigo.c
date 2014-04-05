@@ -151,13 +151,6 @@ WRITE_LINE_MEMBER( avigo_state::tc8521_alarm_int )
 //#endif
 }
 
-
-static RP5C01_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(avigo_state, tc8521_alarm_int)
-};
-
-
 void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -899,9 +892,11 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(avigo_state, screen_update)
 	MCFG_SCREEN_SIZE(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT -1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_avigo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", avigo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avigo)
 	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)
 	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
 
@@ -911,7 +906,8 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */
 	MCFG_AMD_29F080_ADD("flash0")

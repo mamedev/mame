@@ -75,7 +75,9 @@ public:
 		m_io_x11(*this, "X11"),
 		m_io_x12(*this, "X12"),
 		m_io_x13(*this, "X13"),
-		m_io_x14(*this, "X14") { }
+		m_io_x14(*this, "X14"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette") { }
 
 	DECLARE_WRITE8_MEMBER( mbee_04_w );
 	DECLARE_WRITE8_MEMBER( mbee_06_w );
@@ -164,8 +166,6 @@ private:
 	size_t m_size;
 	UINT8 m_clock_pulse;
 	UINT8 m_mbee256_key_available;
-	UINT8 m_fdc_intrq;
-	UINT8 m_fdc_drq;
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;
@@ -218,11 +218,12 @@ private:
 	optional_ioport m_io_x12;
 	optional_ioport m_io_x13;
 	optional_ioport m_io_x14;
+	required_device<screen_device> m_screen;
+public:
+	required_device<palette_device> m_palette;
 
 	void machine_reset_common_disk();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 };
 
 

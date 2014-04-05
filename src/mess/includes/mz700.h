@@ -101,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(pio_port_c_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(pio_port_c_w);
+	DECLARE_WRITE_LINE_MEMBER(mz800_z80pio_irq);
 	DECLARE_READ8_MEMBER(mz800_z80pio_port_a_r);
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);

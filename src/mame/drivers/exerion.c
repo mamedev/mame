@@ -399,8 +399,9 @@ static MACHINE_CONFIG_START( exerion, exerion_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", exerion)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exerion)
 	MCFG_PALETTE_ADD("palette", 256*3)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
@@ -524,10 +525,10 @@ ROM_END
 DRIVER_INIT_MEMBER(exerion_state,exerion)
 {
 	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst, *temp;
+	UINT8 *src, *dst;
 
 	/* allocate some temporary space */
-	temp = auto_alloc_array(machine(), UINT8, 0x10000);
+	dynamic_buffer temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = temp;
@@ -565,8 +566,6 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
-
-	auto_free(machine(), temp);
 }
 
 

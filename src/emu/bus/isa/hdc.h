@@ -29,7 +29,8 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
-
+		DECLARE_READ8_MEMBER(pc_hdc_r);
+		DECLARE_WRITE8_MEMBER(pc_hdc_w);
 protected:
 		// device-level overrides
 		virtual void device_start();
@@ -56,7 +57,7 @@ private:
 		emu_timer *timer;
 
 		int data_cnt;                /* data count */
-		UINT8 *buffer;                  /* data buffer */
+		dynamic_buffer buffer;                  /* data buffer */
 		UINT8 *buffer_ptr;          /* data pointer */
 		UINT8 hdc_control;
 

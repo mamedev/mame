@@ -5,30 +5,27 @@
  
  also known to exist on this hardware:
    Hammer Boy
-   Nonamed (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
+   Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
+   After The War
 
 
 
-  trivia: Test mode graphics are the same as Little Robin(?!)
+  trivia: Test mode graphics are the same as Little Robin(?!), TMS is very similar too, suggesting they share a common codebase.
 
-*/
 
-/*
-
- need to work out what rand() bits are
-  - game is very timing sensitive, to get all the gfx to copy i'm having to OC the 68k x 16 and it still glitches (phoenix ship is broken, round 4 gfx don't copy properly)
-    probably due to above or irq handling
+ ToDo:
   - where should roms 6/7 map, they contain the 68k vectors, but the game expects RAM at 0, and it doesn't seem to read any of the other data from those roms.. they contain
     a cross hatch pattern amongst other things?
+ Sound:
+  - how does banking work? when the irq callbacks happen for each irq level? currently no way to access this because it's a daisy chain setup with the ctc?
+  - even if i hack that the title screen speech doesn't work properly - is there a timing register like little robin?
+ I/O:
+  - port_c_r / port_c_w should go through the 8255 but I don't see how to hook them up that way? various bits of the writes are lost?
 
-
-
+  Misc:
+  - some of the large phoenix graphics during stages 3/4 are corrupt for a frame when they re-enter at the top of the screen, possible original game bug?
   
-  - sound..
-
-  /
-
-
+  
   --
 
 
@@ -70,12 +67,14 @@
 #include "cpu/z80/z80daisy.h"
 #include "sound/dac.h"
 
+
 class megaphx_state : public driver_device
 {
 public:
 	megaphx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_ctc(*this, "ctc"),
@@ -84,10 +83,15 @@ public:
 		m_dac2(*this, "dac2" ),
 		m_dac3(*this, "dac3" ),
 		port_c_value(0),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette"),
+		m_tms(*this, "tms")
+	{ 
+		m_shiftfull = 0;
+		m_soundirq = 0;
+	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT16> m_mainram;
 	required_shared_ptr<UINT16> m_vram;
 	required_device<z80ctc_device> m_ctc;
@@ -97,14 +101,10 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<dac_device> m_dac3;
 
+
+
 	DECLARE_DRIVER_INIT(megaphx);
 	DECLARE_MACHINE_RESET(megaphx);
-
-
-	DECLARE_CUSTOM_INPUT_MEMBER(megaphx_rand_r);
-
-	DECLARE_READ16_MEMBER(tms_host_r);
-	DECLARE_WRITE16_MEMBER(tms_host_w);
 
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
@@ -128,13 +128,15 @@ public:
 	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
 
 	UINT8 dac_gain[4];
+	UINT8 m_soundbank[4];
 
 
-	/*
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to1);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to2);
-	*/
+	
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
+	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
+	
 
 	DECLARE_READ8_MEMBER(port_c_r);
 	DECLARE_WRITE8_MEMBER(port_c_w);
@@ -150,42 +152,50 @@ public:
 
 	UINT8 port_c_value;
 	required_device<palette_device> m_palette;
+	required_device<tms34010_device> m_tms;
 	int m_soundsent;
 	UINT8 m_sounddata;
 	UINT8 m_soundback;
+
+	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
+
+	// hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
+	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r)  { logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; };
+	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r)  { logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; };
+	DECLARE_READ8_MEMBER(megaphx_0309_hack_r)  { logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; };
+	DECLARE_READ8_MEMBER(megaphx_0323_hack_r)  { logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());  int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; };
+
+	void install_sound_hacks(void)
+	{
+		address_space &space = m_audiocpu->space(AS_PROGRAM);
+		space.install_read_handler(0x02cc, 0x02cc, read8_delegate(FUNC(megaphx_state::megaphx_02cc_hack_r), this));
+		space.install_read_handler(0x02e6, 0x02e6, read8_delegate(FUNC(megaphx_state::megaphx_02e6_hack_r), this));
+		space.install_read_handler(0x0309, 0x0309, read8_delegate(FUNC(megaphx_state::megaphx_0309_hack_r), this));
+		space.install_read_handler(0x0323, 0x0323, read8_delegate(FUNC(megaphx_state::megaphx_0323_hack_r), this));
+	}
+
+	int m_soundirq;
+	void update_sound_irqs(void)
+	{
+		if (m_soundirq) m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+
+
 };
 
-#include "sound/dac.h"
 
 
 
-CUSTOM_INPUT_MEMBER(megaphx_state::megaphx_rand_r)
-{
-	return rand();
-}
-
-
-
-
-
-READ16_MEMBER(megaphx_state::tms_host_r)
-{
-	return tms34010_host_r(machine().device("tms"), offset);
-}
-
-
-WRITE16_MEMBER(megaphx_state::tms_host_w)
-{
-	tms34010_host_w(machine().device("tms"), offset, data);
-}
 
 READ16_MEMBER(megaphx_state::megaphx_0x050002_r)
 {
+	space.machine().scheduler().synchronize();
 //	int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
 	m_soundback = 0;
 	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
-	return ret ^ (rand()&0x40);  // the 0x40 should be returned by the z80, so this still isn't working
+	return ret; 
 }
 
 WRITE16_MEMBER(megaphx_state::megaphx_0x050000_w)
@@ -205,7 +215,7 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
 
-	AM_RANGE(0x040000, 0x040007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
 
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(megaphx_0x050000_w) // z80 comms?
 	AM_RANGE(0x050002, 0x050003) AM_READ(megaphx_0x050002_r) // z80 comms?
@@ -236,7 +246,7 @@ static ADDRESS_MAP_START( megaphx_tms_map, AS_PROGRAM, 16, megaphx_state )
 	AM_RANGE(0x04000030, 0x0400003f) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
 	AM_RANGE(0x04000090, 0x0400009f) AM_WRITENOP
 
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -248,11 +258,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(megaphx_state::megaphx_sound_cmd_r)
 {
+	space.machine().scheduler().synchronize();
 	return m_sounddata;
 }
 
 READ8_MEMBER(megaphx_state::megaphx_sound_sent_r)
 {
+	space.machine().scheduler().synchronize();
 	int ret = m_soundsent;
 	m_soundsent = 0;
 	return ret;
@@ -261,7 +273,7 @@ READ8_MEMBER(megaphx_state::megaphx_sound_sent_r)
 WRITE8_MEMBER(megaphx_state::megaphx_sound_to_68k_w)
 {
 //	int pc = machine().device("audiocpu")->safe_pc();
-
+	space.machine().scheduler().synchronize();
 	//logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
 
 	m_soundback = data;
@@ -317,21 +329,28 @@ WRITE8_MEMBER(megaphx_state::dac3_gain_write)
 
 WRITE8_MEMBER(megaphx_state::dac0_rombank_write)
 {
+	m_soundbank[0] = data;
 
+//	printf("dac0_rombank_write %02x", data);
 }
 
 WRITE8_MEMBER(megaphx_state::dac1_rombank_write)
 {
+	m_soundbank[1] = data;
+//	printf("dac1_rombank_write %02x", data);
 
 }
 
 WRITE8_MEMBER(megaphx_state::dac2_rombank_write)
 {
-
+	m_soundbank[2] = data;
+//	printf("dac2_rombank_write %02x", data);
 }
 
 WRITE8_MEMBER(megaphx_state::dac3_rombank_write)
 {
+	m_soundbank[3] = data;
+//	printf("dac3_rombank_write %02x", data);
 
 }
 
@@ -384,16 +403,28 @@ static void megaphx_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int sc
 
 }
 
+
 static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
 	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-	memcpy(shiftreg, &state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], TOBYTE(0x2000));
+
+	if (state->m_shiftfull == 0)
+	{
+		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+
+		memcpy(shiftreg, &state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
+		state->m_shiftfull = 1;
+	}
 }
 
 static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
+//	printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+
 	megaphx_state *state = space.machine().driver_data<megaphx_state>();
-	memcpy(&state->m_vram[TOWORD(address)/* & ~TOWORD(0x1fff)*/], shiftreg, TOBYTE(0x2000));
+	memcpy(&state->m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
+
+	state->m_shiftfull = 0;
 }
 
 MACHINE_RESET_MEMBER(megaphx_state,megaphx)
@@ -405,7 +436,7 @@ static void m68k_gen_int(device_t *device, int state)
 	megaphx_state *drvstate = device->machine().driver_data<megaphx_state>();
 	if (state) drvstate->m_maincpu->set_input_line(4, ASSERT_LINE);
 	else drvstate->m_maincpu->set_input_line(4, CLEAR_LINE);
-//	printf("interrupt %d\n", state);
+
 }
 
 
@@ -446,7 +477,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 
-	PORT_START("PIC1") // via PIC
+	PORT_START("PIC1") // via PIC  (check the other bits aren't used for anything, eg. screen timing for sound playback like little robin)
 	PORT_DIPNAME( 0x0001, 0x0001, "XX" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -499,25 +530,24 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x0002, IP_ACTIVE_HIGH ) 
-	PORT_DIPNAME( 0x0004, 0x0004, "DSW2-04"  )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DSW2-08"  )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "DSW2-10"  )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DSW2-20"  )
+	PORT_DIPNAME( 0x001c, 0x0010, "Difficulty?"  ) // in hammer boy at least..
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0004, "1" )
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x000c, "3" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPSETTING(      0x0014, "5" )
+	PORT_DIPSETTING(      0x0018, "6" )
+	PORT_DIPSETTING(      0x001c, "7" )
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW2-20" ) // something to do with time in hammer boy??
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "DSW2-40"  )
+	PORT_DIPNAME( 0x0040, 0x0040, "DSW2-40" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "DSW2-80" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, megaphx_state )
@@ -660,30 +690,60 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 
 
-/*
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_to0)
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch0)
 {
-	logerror("z80ctc_to0 %d\n", state);
+//	int bank = m_soundbank[0] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x1;
+	else m_soundirq &= ~0x1;
+
+	update_sound_irqs();
 }
 
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_to1)
+
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch1)
 {
-	logerror("z80ctc_to1 %d\n", state);
+//	int bank = m_soundbank[1] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x2;
+	else m_soundirq &= ~0x2;
+
+	update_sound_irqs();
 }
 
-WRITE_LINE_MEMBER(megaphx_state::z80ctc_to2)
+
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch2)
 {
-	logerror("z80ctc_to2 %d\n", state);
+//	int bank = m_soundbank[2] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x4;
+	else m_soundirq &= ~0x4;
+
+	update_sound_irqs();
 }
-*/
+
+
+
+
+WRITE_LINE_MEMBER(megaphx_state::z80ctc_ch3)
+{
+//	int bank = m_soundbank[3] & 7;	membank("snddata")->set_entry(bank);
+//	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (state) m_soundirq |= 0x8;
+	else m_soundirq &= ~0x8;
+
+	update_sound_irqs();
+}
+
 	
+
 
 static Z80CTC_INTERFACE( z80ctc_intf ) // runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
 {
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 0
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 1
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),    // for channel 2
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)     // for channel 3
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch0),    // for channel 0
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch1),    // for channel 1
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch2),    // for channel 2
+	DEVCB_DRIVER_LINE_MEMBER(megaphx_state, z80ctc_ch3),    // for channel 3
 };
 
 static const z80_daisy_config daisy_chain[] =
@@ -703,9 +763,10 @@ static GFXDECODE_START( megaphx )
 	GFXDECODE_ENTRY( "roms67", 0, megaphxlay,     0x0000, 1 )
 GFXDECODE_END
 
+
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
-	MCFG_CPU_ADD("maincpu", M68000, 8000000*16) // ??  can't read xtal due to reflections, CPU is an 8Mhz part  // CLEARLY the 'rand' flags have more meaning (but don't seem to be vblank) I shouldn't have to do a *16 on the 68k clock just to get all the gfx!
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 //	MCFG_CPU_VBLANK_INT_DRIVER("screen", megaphx_state,  irq6_line_hold)
 
@@ -714,7 +775,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 	MCFG_CPU_CONFIG(tms_config_megaphx)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // unk freq
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // unk freq
 	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
@@ -724,6 +785,9 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(megaphx_state,megaphx)
 
+//	MCFG_QUANTUM_PERFECT_CPU("tms")
+
+
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -732,7 +796,7 @@ static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_PALETTE_ADD("palette", 256)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", megaphx)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaphx)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
@@ -757,11 +821,13 @@ DRIVER_INIT_MEMBER(megaphx_state,megaphx)
 
 	membank("snddata")->configure_entries(0, 8, memregion("user2")->base(), 0x8000);
 	membank("snddata")->set_entry(0);
+
+	install_sound_hacks();
 }
 
 
 ROM_START( megaphx )
-	ROM_REGION16_BE( 0x40000, "roms67", 0 )
+	ROM_REGION16_BE( 0x40000, "roms67", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
 	ROM_LOAD16_BYTE( "mph6.u32", 0x000001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
 	ROM_LOAD16_BYTE( "mph7.u21", 0x000000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
 
@@ -791,4 +857,4 @@ ROM_START( megaphx )
 	// there is a PIC responsible for some I/O tasks (what type? what internal rom size?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

@@ -253,7 +253,7 @@ UINT32 firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb32 
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				m_gfxdecode->gfx( 1 )->transpen(m_palette,bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
+				m_gfxdecode->gfx( 1 )->transpen(bitmap,cliprect, code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), 0 );
 			}
 		}
 	}
@@ -725,13 +725,14 @@ static MACHINE_CONFIG_START( firefox, firefox_state )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", firefox)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)
 	MCFG_PALETTE_ADD("palette", 512)
 
 
 	MCFG_LASERDISC_22VP931_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(64*8, 525, firefox_state, screen_update_firefox)
+	MCFG_LASERDISC_OVERLAY_DRIVER(64*8, 525, firefox_state, screen_update_firefox)	
 	MCFG_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 

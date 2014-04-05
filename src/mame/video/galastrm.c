@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "includes/galastrm.h"
 
 #define X_OFFSET 96
@@ -198,7 +198,7 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		if ((priority != 0 && sprite_ptr->primask != 0) ||
 			(priority == 0 && sprite_ptr->primask == 0))
 		{
-			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

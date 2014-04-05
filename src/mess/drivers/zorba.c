@@ -57,7 +57,8 @@ public:
 		m_crtc(*this, "crtc"),
 		m_fdc (*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1")
+		m_floppy1(*this, "fdc:1"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -65,7 +66,7 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(zorba);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(zorba);
 	DECLARE_MACHINE_RESET(zorba);
 	DECLARE_READ8_MEMBER(ram_r);
@@ -95,6 +96,8 @@ private:
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 static ADDRESS_MAP_START( zorba_mem, AS_PROGRAM, 8, zorba_state )
@@ -123,7 +126,7 @@ static ADDRESS_MAP_START( zorba_io, AS_IO, 8, zorba_state )
 	//AM_RANGE(0x25, 0x25) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
 	AM_RANGE(0x24, 0x25) AM_READ(keyboard_r) AM_WRITENOP
 	AM_RANGE(0x26, 0x26) AM_WRITE(intmask_w)
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE_LEGACY("dma", z80dma_r, z80dma_w)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("dma", z80dma_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -259,7 +262,7 @@ static I8275_DISPLAY_PIXELS( zorba_update_chr )
 {
 	int i;
 	zorba_state *state = device->machine().driver_data<zorba_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 gfx = state->m_p_chargen[(linecount & 15) + (charcode << 4)];
 
 	if (vsp)
@@ -356,6 +359,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_UPDATE_DRIVER(zorba_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 

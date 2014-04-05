@@ -169,8 +169,8 @@ READ8_MEMBER( pc1512_state::vdu_r )
 		// vertical sync
 		int flyback = 0;
 
-		if (machine().primary_screen->vpos() < VFP_LORES - 16) flyback = 1;
-		if (machine().primary_screen->vpos() > VFP_LORES + 200) flyback = 1;
+		if (machine().first_screen()->vpos() < VFP_LORES - 16) flyback = 1;
+		if (machine().first_screen()->vpos() > VFP_LORES + 200) flyback = 1;
 
 		data |= flyback << 3;
 		break;

@@ -59,115 +59,6 @@ debug_view_source::~debug_view_source()
 //  DEBUG VIEW SOURCE LIST
 //**************************************************************************
 
-//-------------------------------------------------
-//  debug_view_source_list - constructor
-//-------------------------------------------------
-
-debug_view_source_list::debug_view_source_list(running_machine &machine)
-	: m_machine(machine),
-		m_head(NULL),
-		m_tail(NULL),
-		m_count(0)
-{
-}
-
-
-//-------------------------------------------------
-//  ~debug_view_source_list - destructor
-//-------------------------------------------------
-
-debug_view_source_list::~debug_view_source_list()
-{
-	reset();
-}
-
-
-//-------------------------------------------------
-//  index - return the index of a source
-//-------------------------------------------------
-
-int debug_view_source_list::index(const debug_view_source &source) const
-{
-	int result = 0;
-	for (debug_view_source *cursource = m_head; cursource != NULL; cursource = cursource->m_next)
-	{
-		if (cursource == &source)
-			break;
-		result++;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  by_index - return a source given an index
-//-------------------------------------------------
-
-const debug_view_source *debug_view_source_list::by_index(int index) const
-{
-	if (m_head == NULL)
-		return NULL;
-	const debug_view_source *result;
-	for (result = m_head; index > 0 && result->m_next != NULL; result = result->m_next)
-		index--;
-	return result;
-}
-
-
-//-------------------------------------------------
-//  reset - free all the view_sources
-//-------------------------------------------------
-
-void debug_view_source_list::reset()
-{
-	// free from the head
-	while (m_head != NULL)
-	{
-		debug_view_source *source = m_head;
-		m_head = source->m_next;
-		auto_free(machine(), source);
-	}
-
-	// reset the tail pointer and index
-	m_tail = NULL;
-	m_count = 0;
-}
-
-
-//-------------------------------------------------
-//  append - add a view_source to the end of the
-//  list
-//-------------------------------------------------
-
-void debug_view_source_list::append(debug_view_source &source)
-{
-	// set the next and index values
-	source.m_next = NULL;
-
-	// append to the end
-	if (m_tail == NULL)
-		m_head = m_tail = &source;
-	else
-		m_tail->m_next = &source;
-	m_tail = &source;
-	m_count++;
-}
-
-
-//-------------------------------------------------
-//  match_device - find the first view that
-//  matches the given device
-//-------------------------------------------------
-
-const debug_view_source *debug_view_source_list::match_device(device_t *device) const
-{
-	for (debug_view_source *source = m_head; source != NULL; source = source->m_next)
-		if (device == source->m_device)
-			return source;
-	return m_head;
-}
-
-
 
 //**************************************************************************
 //  DEBUG VIEW
@@ -181,7 +72,6 @@ debug_view::debug_view(running_machine &machine, debug_view_type type, debug_vie
 	: m_next(NULL),
 		m_type(type),
 		m_source(NULL),
-		m_source_list(machine),
 		m_osdupdate(osdupdate),
 		m_osdprivate(osdprivate),
 		m_visible(10,10),
@@ -338,6 +228,20 @@ void debug_view::set_source(const debug_view_source &source)
 		view_notify(VIEW_NOTIFY_SOURCE_CHANGED);
 		end_update();
 	}
+}
+
+
+//-------------------------------------------------
+//  source_for_device - find the first source that
+//  matches the given device
+//-------------------------------------------------
+
+const debug_view_source *debug_view::source_for_device(device_t *device) const
+{
+	for (debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
+		if (device == source->device())
+			return source;
+	return m_source_list.first();
 }
 
 

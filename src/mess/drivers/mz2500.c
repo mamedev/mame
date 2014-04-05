@@ -712,7 +712,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine().primary_screen->configure(720, 480, visarea, machine().primary_screen->frame_period().attoseconds);
+	machine().first_screen()->configure(720, 480, visarea, machine().first_screen()->frame_period().attoseconds);
 
 	/* calculate CG window parameters here */
 	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
@@ -1032,8 +1032,8 @@ READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
 {
 	UINT8 vblank_bit, hblank_bit;
 
-	vblank_bit = machine().primary_screen->vblank() ? 0 : 1;
-	hblank_bit = machine().primary_screen->hblank() ? 0 : 2;
+	vblank_bit = machine().first_screen()->vblank() ? 0 : 1;
+	hblank_bit = machine().first_screen()->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }
@@ -1184,17 +1184,17 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 
 WRITE8_MEMBER(mz2500_state::mz2500_fdc_w)
 {
-	device_t* dev = machine().device("mb8877a");
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
 
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			wd17xx_set_drive(dev,data & 3);
+			fdc->set_drive(data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
-			wd17xx_set_side(dev,(data & 1));
+			fdc->set_side((data & 1));
 			break;
 	}
 }
@@ -1282,14 +1282,14 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::mz2500_wd17xx_r)
 {
-	device_t *device = machine().device("mb8877a");
-	return wd17xx_r(device, space, offset) ^ m_fdc_reverse;
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
+	return fdc->read(space, offset) ^ m_fdc_reverse;
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_wd17xx_w)
 {
-	device_t *device = machine().device("mb8877a");
-	wd17xx_w(device, space, offset, data ^ m_fdc_reverse);
+	mb8877_device *fdc = machine().device<mb8877_device>("mb8877a");
+	fdc->write(space, offset, data ^ m_fdc_reverse);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1307,7 +1307,7 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 	{
 		UINT8 vblank_bit;
 
-		vblank_bit = machine().primary_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
+		vblank_bit = machine().first_screen()->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
 		return vblank_bit;
 	}
@@ -1782,8 +1782,8 @@ void mz2500_state::machine_start()
 	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-	m_gfxdecode->set_gfx(3, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0)));
-	m_gfxdecode->set_gfx(4, auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0)));
+	m_gfxdecode->set_gfx(3, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0)));
+	m_gfxdecode->set_gfx(4, global_alloc(gfx_element(m_palette, mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0)));
 }
 
 void mz2500_state::machine_reset()
@@ -1884,7 +1884,7 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 {
 	UINT8 vblank_bit;
 
-	vblank_bit = machine().primary_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
+	vblank_bit = machine().first_screen()->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }
@@ -2090,12 +2090,6 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(mz2500_state,mz2500_rtc_alarm_irq),
-	DEVCB_NULL
-};
-
 static Z80SIO_INTERFACE( mz2500_sio_intf )
 {
 	0, 0, 0, 0,
@@ -2131,8 +2125,9 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_I8255_ADD( "i8255_0", ppi8255_intf )
 	MCFG_Z80PIO_ADD( "z80pio_1", 6000000, mz2500_pio1_intf )
 	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
-	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
-
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
+	
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))
@@ -2148,11 +2143,12 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mz2500)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz2500)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

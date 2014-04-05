@@ -93,7 +93,8 @@
     Constructor.
 */
 ti99_grom_device::ti99_grom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, GROM, "TI-99 GROM device", tag, owner, clock, "ti99_grom", __FILE__)
+: bus8z_device(mconfig, GROM, "TI-99 GROM device", tag, owner, clock, "ti99_grom", __FILE__),
+  m_gromready(*this)
 {
 }
 
@@ -252,7 +253,7 @@ void ti99_grom_device::device_start(void)
 	m_clockrate = conf->clockrate;
 	m_writable = conf->writable;
 	m_ident = conf->ident;
-	m_gromready.resolve(conf->ready, *this);
+	m_gromready.resolve_safe();
 
 	m_timer = timer_alloc(0);
 }

@@ -664,7 +664,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 				case 1:
 					if (m_wd1772) {
 						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return wd17xx_data_r(m_wd1772, space, offset&0xf);
+						return m_wd1772->data_r(space, offset&0xf);
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -719,7 +719,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 				case 1:
 						if (m_wd1772) {
 							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							wd17xx_data_w(m_wd1772, space, offset&0xf, data&0xff);
+							m_wd1772->data_w(space, offset&0xf, data&0xff);
 						} else {
 							logerror("Write to FDC device?\n");
 						}
@@ -738,16 +738,16 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								wd17xx_dden_w(m_wd1772, BIT(data, 1));
+								m_wd1772->dden_w(BIT(data, 1));
 								return;
 
 							case 0x40: // latch A
-								if (data & 1) { wd17xx_set_drive(m_wd1772,0); }
-								if (data & 2) { wd17xx_set_drive(m_wd1772,1); }
-								if (data & 4) { wd17xx_set_drive(m_wd1772,2); }
-								if (data & 8) { wd17xx_set_drive(m_wd1772,3); }
+								if (data & 1) { m_wd1772->set_drive(0); }
+								if (data & 2) { m_wd1772->set_drive(1); }
+								if (data & 4) { m_wd1772->set_drive(2); }
+								if (data & 8) { m_wd1772->set_drive(3); }
 
-								wd17xx_set_side(m_wd1772,(data & 0x10)>>4);
+								m_wd1772->set_side((data & 0x10)>>4);
 								//bit 5 is motor on
 								return;
 						}

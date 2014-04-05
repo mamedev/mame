@@ -127,9 +127,9 @@ UINT32 progolf_state::screen_update_progolf(screen_device &screen, bitmap_ind16 
 			{
 				int tile = videoram[count];
 
-				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
-				m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,tile,1,0,0,(256-x*8)+scroll-1024,y*8);
 
 				count++;
 			}
@@ -440,8 +440,9 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update_progolf)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", progolf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", progolf)
 	MCFG_PALETTE_ADD("palette", 32*3)
 	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
 

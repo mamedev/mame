@@ -63,29 +63,28 @@ private:
 
 	enum
 	{
-		ACIA6850_STATUS_RDRF = 0x01,
-		ACIA6850_STATUS_TDRE = 0x02,
-		ACIA6850_STATUS_DCD = 0x04,
-		ACIA6850_STATUS_CTS = 0x08,
-		ACIA6850_STATUS_FE = 0x10,
-		ACIA6850_STATUS_OVRN = 0x20,
-		ACIA6850_STATUS_PE = 0x40,
-		ACIA6850_STATUS_IRQ = 0x80
+		SR_RDRF = 0x01,
+		SR_TDRE = 0x02,
+		SR_DCD = 0x04,
+		SR_CTS = 0x08,
+		SR_FE = 0x10,
+		SR_OVRN = 0x20,
+		SR_PE = 0x40,
+		SR_IRQ = 0x80
 	};
 
 	enum serial_state
 	{
-		START,
-		DATA,
-		PARITY,
-		STOP
+		STATE_START,
+		STATE_DATA,
+		STATE_STOP
 	};
 
 	enum parity_type
 	{
-		NONE,
-		ODD,
-		EVEN
+		PARITY_NONE,
+		PARITY_ODD,
+		PARITY_EVEN
 	};
 
 	enum dcd_irq_state

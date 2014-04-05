@@ -160,7 +160,7 @@ Notes: (All IC's listed for completeness)
 
 #include "emu.h"
 #include "machine/ram.h"
-#include "machine/sed1200.h"
+#include "video/sed1200.h"
 #include "cpu/mcs96/i8x9x.h"
 
 static INPUT_PORTS_START( mt32 )
@@ -359,6 +359,8 @@ static MACHINE_CONFIG_START( mt32, mt32_state )
 //  MCFG_SCREEN_SIZE(20*6-1, 9)
 	MCFG_SCREEN_SIZE(20*6-1, (20*6-1)*3/4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 20*6-2, 0, (20*6-1)*3/4-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mt32_state, mt32)
 

@@ -314,7 +314,7 @@ void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 //      code = buffered_spriteram[offs + 1] + ((attr & 0x02) << 7);
 		code = buffered_spriteram[offs + 1] + ((attr & 0x06) << 7);  // for ninjemak, not sure ?
 
-		gfx->transpen(m_palette,bitmap,cliprect,
+		gfx->transpen(bitmap,cliprect,
 				code,
 				color + 16 * (spritepalettebank[code >> 2] & 0x0f),
 				flipx,flipy,

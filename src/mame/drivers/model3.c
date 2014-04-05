@@ -659,7 +659,6 @@ ALL VROM ROMs are 16M MASK
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
-#include "sound/scsp.h"
 #include "includes/model3.h"
 
 
@@ -1626,7 +1625,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 			}
 
 			// send to the sound board
-			scsp_midi_in(machine().device("scsp1"), space, 0, data, 0);
+			m_scsp1->midi_in(space, 0, data, 0);
 
 			if (m_sound_irq_enable)
 			{
@@ -5364,9 +5363,9 @@ WRITE16_MEMBER(model3_state::model3snd_ctrl)
 
 static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
+	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
@@ -5375,30 +5374,10 @@ static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(model3_state::scsp_irq)
+WRITE8_MEMBER(model3_state::scsp_irq)
 {
-	if (state > 0)
-	{
-		m_scsp_last_line = state;
-		m_audiocpu->set_input_line(state, ASSERT_LINE);
-	}
-	else
-		m_audiocpu->set_input_line(-state, CLEAR_LINE);
+	m_audiocpu->set_input_line(offset, data);
 }
-
-static const scsp_interface scsp_config =
-{
-	0,
-	DEVCB_DRIVER_LINE_MEMBER(model3_state,scsp_irq),
-	DEVCB_NULL
-};
-
-static const scsp_interface scsp2_interface =
-{
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 /* IRQs */
 /*
@@ -5468,18 +5447,18 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
-
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5508,18 +5487,18 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
@@ -5554,18 +5533,18 @@ static MACHINE_CONFIG_START( model3_20, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
@@ -5592,18 +5571,18 @@ static MACHINE_CONFIG_START( model3_21, model3_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 383)
 	MCFG_SCREEN_SIZE(496, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("scsp1", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SCSP_IRQ_CB(WRITE8(model3_state, scsp_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SOUND_ADD("scsp2", SCSP, 0)
-	MCFG_SOUND_CONFIG(scsp2_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END

@@ -6,6 +6,11 @@
     This floppy disk controller supports IBM-format 8" SSSD and DSSD floppies.
 
     Raphael Nabet 2003
+
+    Rewritten as class
+    Michael Zapf 2014
+
+    TODO: Make it work
 */
 
 #include "emu.h"
@@ -13,40 +18,6 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 #include "990_dk.h"
-
-#define MAX_FLOPPIES 4
-
-enum buf_mode_t {
-	bm_off, bm_read, bm_write
-};
-static struct
-{
-	running_machine *machine;
-	UINT16 recv_buf;
-	UINT16 stat_reg;
-	UINT16 xmit_buf;
-	UINT16 cmd_reg;
-
-	int interrupt_f_f;
-	void (*interrupt_callback)(running_machine &, int state);
-
-	UINT8 buf[128];
-	int buf_pos;
-	buf_mode_t buf_mode;
-	int unit;
-	int head;
-	int sector;
-	/*int non_seq_mode;*/
-	int ddam;
-
-	struct
-	{
-		device_image_interface *img;
-		int phys_cylinder;
-		int log_cylinder[2];
-		int seclen;
-	} drv[MAX_FLOPPIES];
-} fd800;
 
 /* status bits */
 enum
@@ -69,63 +40,56 @@ enum
 	status_unit_shift   = 13
 };
 
-LEGACY_FLOPPY_OPTIONS_START(fd800)
-#if 1
-	/* SSSD 8" */
-	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-#elif 0
-	/* DSSD 8" */
-	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-#endif
-LEGACY_FLOPPY_OPTIONS_END
+const device_type FD800 = &device_creator<fd800_legacy_device>;
 
-static void fd800_field_interrupt(void)
+fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),
+	m_int_line(*this)
 {
-	if (fd800.interrupt_callback)
-		(*fd800.interrupt_callback)(*fd800.machine, (fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
 }
 
-static void fd800_unload_proc(device_image_interface &image)
+void fd800_legacy_device::set_interrupt_line()
 {
-	int unit = floppy_get_drive(&image.device());
-
-	fd800.drv[unit].log_cylinder[0] = fd800.drv[unit].log_cylinder[1] = -1;
+	if ((m_stat_reg & status_interrupt) && ! m_interrupt_f_f)
+		m_int_line(ASSERT_LINE);
+	else
+		m_int_line(CLEAR_LINE);
 }
 
-void fd800_machine_init(running_machine &machine, void (*interrupt_callback)(running_machine &machine, int state))
+
+/* void fd800_legacy_device::unload_proc(device_image_interface &image)
 {
-	int i;
+    int unit = floppy_get_drive(&image.device());
 
-	fd800.machine = &machine;
-	fd800.interrupt_callback = interrupt_callback;
-
-	fd800.stat_reg = 0;
-	fd800.interrupt_f_f = 1;
-
-	fd800.buf_pos = 0;
-	fd800.buf_mode = bm_off;
-
-	for (i=0; i<MAX_FLOPPIES; i++)
-	{
-		fd800.drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
-		fd800.drv[i].phys_cylinder = -1;
-		fd800.drv[i].log_cylinder[0] = fd800.drv[i].log_cylinder[1] = -1;
-		fd800.drv[i].seclen = 64;
-		floppy_install_unload_proc(&fd800.drv[i].img->device(), fd800_unload_proc);
-	}
-
-	fd800_field_interrupt();
+    m_drv[unit].log_cylinder[0] = m_drv[unit].log_cylinder[1] = -1;
 }
+
+
+void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int state))
+{
+    int i;
+
+    m_machine = &machine;
+    m_interrupt_callback = interrupt_callback;
+
+    m_stat_reg = 0;
+    m_interrupt_f_f = 1;
+
+    m_buf_pos = 0;
+    m_buf_mode = bm_off;
+
+    for (i=0; i<MAX_FLOPPIES; i++)
+    {
+        m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine, i));
+        m_drv[i].phys_cylinder = -1;
+        m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
+        m_drv[i].seclen = 64;
+        floppy_install_unload_proc(&m_drv[i].img->device(), unload_proc);
+    }
+
+    set_interrupt_line();
+}
+*/
 
 /*
     Read the first id field that can be found on the floppy disk.
@@ -137,7 +101,7 @@ void fd800_machine_init(running_machine &machine, void (*interrupt_callback)(run
 
     Return TRUE if an ID was found
 */
-static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
+int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
 	/*UINT8 revolution_count;*/
 	chrn_id id;
@@ -146,7 +110,7 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 
 	/*while (revolution_count < 2)*/
 	/*{*/
-		if (floppy_drive_get_next_id(&fd800.drv[unit].img->device(), head, &id))
+		if (floppy_drive_get_next_id(&m_drv[unit].img->device(), head, &id))
 		{
 			if (cylinder_id)
 				*cylinder_id = id.C;
@@ -169,7 +133,7 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 
     Return TRUE if the given sector ID was found
 */
-static int fd800_find_sector(int unit, int head, int sector, int *data_id)
+int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_id)
 {
 	UINT8 revolution_count;
 	chrn_id id;
@@ -178,7 +142,7 @@ static int fd800_find_sector(int unit, int head, int sector, int *data_id)
 
 	while (revolution_count < 2)
 	{
-		if (floppy_drive_get_next_id(&fd800.drv[unit].img->device(), head, &id))
+		if (floppy_drive_get_next_id(&m_drv[unit].img->device(), head, &id))
 		{
 			/* compare id */
 			if ((id.R == sector) && (id.N == 0))
@@ -203,58 +167,58 @@ static int fd800_find_sector(int unit, int head, int sector, int *data_id)
 
     Return FALSE if the seek was successful
 */
-static int fd800_do_seek(int unit, int cylinder, int head)
+int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 {
 	int retries;
 
 	if (cylinder > 76)
 	{
-		fd800.stat_reg |= status_invalid_cmd;
+		m_stat_reg |= status_invalid_cmd;
 		return TRUE;
 	}
 
-	if (!fd800.drv[unit].img->exists())
+	if (m_drv[unit].img == NULL || !m_drv[unit].img->exists())
 	{
-		fd800.stat_reg |= status_drv_not_ready; /* right??? */
+		m_stat_reg |= status_drv_not_ready; /* right??? */
 		return TRUE;
 	}
 
-	if (fd800.drv[unit].log_cylinder[head] == -1)
+	if (m_drv[unit].log_cylinder[head] == -1)
 	{   /* current track ID is unknown: read it */
-		if (!fd800_read_id(unit, head, &fd800.drv[unit].log_cylinder[head], NULL))
+		if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
 		{
-			fd800.stat_reg |= status_ID_not_found;
+			m_stat_reg |= status_ID_not_found;
 			return TRUE;
 		}
 	}
 	/* exit if we are already at the requested track */
-	if (fd800.drv[unit].log_cylinder[head] == cylinder)
+	if (m_drv[unit].log_cylinder[head] == cylinder)
 	{
-		/*fd800.stat_reg |= status_OP_complete;*/
+		/*m_stat_reg |= status_OP_complete;*/
 		return FALSE;
 	}
 	for (retries=0; retries<10; retries++)
 	{   /* seek to requested track */
-		floppy_drive_seek(&fd800.drv[unit].img->device(), cylinder-fd800.drv[unit].log_cylinder[head]);
+		floppy_drive_seek(&m_drv[unit].img->device(), cylinder-m_drv[unit].log_cylinder[head]);
 		/* update physical track position */
-		if (fd800.drv[unit].phys_cylinder != -1)
-			fd800.drv[unit].phys_cylinder += cylinder-fd800.drv[unit].log_cylinder[head];
+		if (m_drv[unit].phys_cylinder != -1)
+			m_drv[unit].phys_cylinder += cylinder-m_drv[unit].log_cylinder[head];
 		/* read new track ID */
-		if (!fd800_read_id(unit, head, &fd800.drv[unit].log_cylinder[head], NULL))
+		if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], NULL))
 		{
-			fd800.drv[unit].log_cylinder[head] = -1;
-			fd800.stat_reg |= status_ID_not_found;
+			m_drv[unit].log_cylinder[head] = -1;
+			m_stat_reg |= status_ID_not_found;
 			return TRUE;
 		}
 		/* exit if we have reached the requested track */
-		if (fd800.drv[unit].log_cylinder[head] == cylinder)
+		if (m_drv[unit].log_cylinder[head] == cylinder)
 		{
-			/*fd800.stat_reg |= status_OP_complete;*/
+			/*m_stat_reg |= status_OP_complete;*/
 			return FALSE;
 		}
 	}
 	/* track not found */
-	fd800.stat_reg |= status_seek_err;
+	m_stat_reg |= status_seek_err;
 	return TRUE;
 }
 
@@ -265,32 +229,32 @@ static int fd800_do_seek(int unit, int cylinder, int head)
 
     Return FALSE if the restore was successful
 */
-static int fd800_do_restore(int unit)
+int fd800_legacy_device::do_restore(int unit)
 {
 	int seek_count = 0;
 	int seek_complete;
 
-	if (!fd800.drv[unit].img->exists())
+	if (!m_drv[unit].img->exists())
 	{
-		fd800.stat_reg |= status_drv_not_ready; /* right??? */
+		m_stat_reg |= status_drv_not_ready; /* right??? */
 		return TRUE;
 	}
 
 	/* limit iterations to 76 to prevent an endless loop if the disc is locked */
-	while (!(seek_complete = !floppy_tk00_r(&fd800.drv[unit].img->device())) && (seek_count < 76))
+	while (!(seek_complete = !floppy_tk00_r(&m_drv[unit].img->device())) && (seek_count < 76))
 	{
-		floppy_drive_seek(&fd800.drv[unit].img->device(), -1);
+		floppy_drive_seek(&m_drv[unit].img->device(), -1);
 		seek_count++;
 	}
 	if (! seek_complete)
 	{
-		fd800.drv[unit].phys_cylinder = -1;
-		fd800.stat_reg |= status_seek_err;
+		m_drv[unit].phys_cylinder = -1;
+		m_stat_reg |= status_seek_err;
 	}
 	else
 	{
-		fd800.drv[unit].phys_cylinder = 0;
-		/*fd800.stat_reg |= status_OP_complete;*/
+		m_drv[unit].phys_cylinder = 0;
+		/*m_stat_reg |= status_OP_complete;*/
 	}
 
 	return ! seek_complete;
@@ -299,60 +263,60 @@ static int fd800_do_restore(int unit)
 /*
     Perform a read operation for one sector
 */
-static void fd800_do_read(void)
+void fd800_legacy_device::do_read(void)
 {
 	int data_id;
 
-	if ((fd800.sector == 0) || (fd800.sector > 26))
+	if ((m_sector == 0) || (m_sector > 26))
 	{
-		fd800.stat_reg |= status_invalid_cmd;
+		m_stat_reg |= status_invalid_cmd;
 		return;
 	}
 
-	if (!fd800_find_sector(fd800.unit, fd800.head, fd800.sector, &data_id))
+	if (!find_sector(m_unit, m_head, m_sector, &data_id))
 	{
-		fd800.stat_reg |= status_ID_not_found;
+		m_stat_reg |= status_ID_not_found;
 		return;
 	}
 
-	floppy_drive_read_sector_data(&fd800.drv[fd800.unit].img->device(), fd800.head, data_id, fd800.buf, 128);
-	fd800.buf_pos = 0;
-	fd800.buf_mode = bm_read;
-	fd800.recv_buf = (fd800.buf[fd800.buf_pos<<1] << 8) | fd800.buf[(fd800.buf_pos<<1)+1];
+	floppy_drive_read_sector_data(&m_drv[m_unit].img->device(), m_head, data_id, m_buf, 128);
+	m_buf_pos = 0;
+	m_buf_mode = bm_read;
+	m_recv_buf = (m_buf[m_buf_pos<<1] << 8) | m_buf[(m_buf_pos<<1)+1];
 
-	fd800.stat_reg |= status_XFER_ready;
-	fd800.stat_reg |= status_OP_complete;   /* right??? */
+	m_stat_reg |= status_XFER_ready;
+	m_stat_reg |= status_OP_complete;   /* right??? */
 }
 
 /*
     Perform a write operation for one sector
 */
-static void fd800_do_write(void)
+void fd800_legacy_device::do_write(void)
 {
 	int data_id;
 
-	if (fd800.drv[fd800.unit].seclen < 64)
+	if (m_drv[m_unit].seclen < 64)
 		/* fill with 0s */
-		memset(fd800.buf+(fd800.drv[fd800.unit].seclen<<1), 0, (64-fd800.drv[fd800.unit].seclen)<<1);
+		memset(m_buf+(m_drv[m_unit].seclen<<1), 0, (64-m_drv[m_unit].seclen)<<1);
 
-	if (!fd800_find_sector(fd800.unit, fd800.head, fd800.sector, &data_id))
+	if (!find_sector(m_unit, m_head, m_sector, &data_id))
 	{
-		fd800.stat_reg |= status_ID_not_found;
+		m_stat_reg |= status_ID_not_found;
 		return;
 	}
 
-	floppy_drive_write_sector_data(&fd800.drv[fd800.unit].img->device(), fd800.head, data_id, fd800.buf, 128, fd800.ddam);
-	fd800.buf_pos = 0;
-	fd800.buf_mode = bm_write;
+	floppy_drive_write_sector_data(&m_drv[m_unit].img->device(), m_head, data_id, m_buf, 128, m_ddam);
+	m_buf_pos = 0;
+	m_buf_mode = bm_write;
 
-	fd800.stat_reg |= status_XFER_ready;
-	fd800.stat_reg |= status_OP_complete;   /* right??? */
+	m_stat_reg |= status_XFER_ready;
+	m_stat_reg |= status_OP_complete;   /* right??? */
 }
 
 /*
     Execute a fdc command
 */
-static void fd800_do_cmd(void)
+void fd800_legacy_device::do_cmd(void)
 {
 	int unit;
 	int cylinder;
@@ -361,43 +325,43 @@ static void fd800_do_cmd(void)
 	int sector;
 
 
-	if (fd800.buf_mode != bm_off)
+	if (m_buf_mode != bm_off)
 	{   /* All commands in the midst of read or write are interpreted as Stop */
-		unit = (fd800.cmd_reg >> 10) & 3;
+		unit = (m_cmd_reg >> 10) & 3;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		fd800.buf_pos = 0;
-		fd800.buf_mode = bm_off;
+		m_buf_pos = 0;
+		m_buf_mode = bm_off;
 
-		fd800.stat_reg |= status_OP_complete;
+		m_stat_reg |= status_OP_complete;
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 
 		return;
 	}
 
-	switch (fd800.cmd_reg >> 12)
+	switch (m_cmd_reg >> 12)
 	{
 	case 0:     /* select
                     bits 16-25: 0s
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
+		unit = (m_cmd_reg >> 10) & 3;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if (!fd800.drv[unit].img->exists())
-			fd800.stat_reg |= status_drv_not_ready; /* right??? */
-		else if (fd800.drv[unit].img->is_readonly())
-			fd800.stat_reg |= status_write_prot;
+		if (!m_drv[unit].img->exists())
+			m_stat_reg |= status_drv_not_ready; /* right??? */
+		else if (m_drv[unit].img->is_readonly())
+			m_stat_reg |= status_write_prot;
 		else
-			fd800.stat_reg |= status_OP_complete;
+			m_stat_reg |= status_OP_complete;
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 1:     /* seek
@@ -405,57 +369,57 @@ static void fd800_do_cmd(void)
                     bits 23-24: 0s
                     bits 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
-		cylinder = fd800.cmd_reg & 0x7f;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
+		cylinder = m_cmd_reg & 0x7f;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if (!fd800_do_seek(unit, cylinder, head))
-			fd800.stat_reg |= status_OP_complete;
+		if (!do_seek(unit, cylinder, head))
+			m_stat_reg |= status_OP_complete;
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 2:     /* restore
                     bits 16-25: 0s
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
+		unit = (m_cmd_reg >> 10) & 3;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if (!fd800_do_restore(unit))
-			fd800.stat_reg |= status_OP_complete;
+		if (!do_restore(unit))
+			m_stat_reg |= status_OP_complete;
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 3:     /* sector length
                     bits 16-22: sector word count (0-64)
                     bits 23-25: 0s
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		seclen = fd800.cmd_reg & 0x7f;
+		unit = (m_cmd_reg >> 10) & 3;
+		seclen = m_cmd_reg & 0x7f;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
 		if ((seclen > 64) || (seclen == 0))
 		{
-			fd800.stat_reg |= status_invalid_cmd;
+			m_stat_reg |= status_invalid_cmd;
 		}
 		else
 		{
-			fd800.drv[unit].seclen = seclen;
-			fd800.stat_reg |= status_OP_complete;
+			m_drv[unit].seclen = seclen;
+			m_stat_reg |= status_OP_complete;
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 4:     /* read
@@ -464,47 +428,47 @@ static void fd800_do_cmd(void)
                     bit 24: no sequential sectoring (1=active)
                     bit 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
-		/*non_seq_mode = (fd800.cmd_reg >> 8) & 1;*/
-		sector = fd800.cmd_reg & 0x1f;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
+		/*non_seq_mode = (m_cmd_reg >> 8) & 1;*/
+		sector = m_cmd_reg & 0x1f;
 
-		fd800.unit = unit;
-		fd800.head = head;
-		fd800.sector = sector;
-		/*fd800.non_seq_mode = non_seq_mode;*/
+		m_unit = unit;
+		m_head = head;
+		m_sector = sector;
+		/*m_non_seq_mode = non_seq_mode;*/
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		fd800_do_read();
+		do_read();
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 5:     /* read ID
                     bits 16-24: 0s
                     bit 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if (!fd800_read_id(unit, head, &cylinder, &sector))
+		if (!read_id(unit, head, &cylinder, &sector))
 		{
-			fd800.stat_reg |= status_ID_not_found;
+			m_stat_reg |= status_ID_not_found;
 		}
 		else
 		{
-			fd800.recv_buf = (cylinder << 8) | sector;
-			fd800.stat_reg |= status_OP_complete;
+			m_recv_buf = (cylinder << 8) | sector;
+			m_stat_reg |= status_OP_complete;
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 6:     /* read unformatted
@@ -520,32 +484,32 @@ static void fd800_do_cmd(void)
                     bits 21-24: 0s
                     bit 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
-		sector = fd800.cmd_reg & 0x1f;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
+		sector = m_cmd_reg & 0x1f;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if ((fd800.sector == 0) || (fd800.sector > 26))
+		if ((m_sector == 0) || (m_sector > 26))
 		{
-			fd800.stat_reg |= status_invalid_cmd;
+			m_stat_reg |= status_invalid_cmd;
 		}
 		else
 		{
-			fd800.unit = unit;
-			fd800.head = head;
-			fd800.sector = sector;
-			fd800.ddam = 0;
+			m_unit = unit;
+			m_head = head;
+			m_sector = sector;
+			m_ddam = 0;
 
-			fd800.buf_pos = 0;
-			fd800.buf_mode = bm_write;
-			fd800.stat_reg |= status_XFER_ready;
-			fd800.stat_reg |= status_OP_complete;   /* right??? */
+			m_buf_pos = 0;
+			m_buf_mode = bm_write;
+			m_stat_reg |= status_XFER_ready;
+			m_stat_reg |= status_OP_complete;   /* right??? */
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 8:     /* write delete
@@ -553,32 +517,32 @@ static void fd800_do_cmd(void)
                     bits 21-24: 0s
                     bit 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
-		sector = fd800.cmd_reg & 0x1f;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
+		sector = m_cmd_reg & 0x1f;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		if ((fd800.sector == 0) || (fd800.sector > 26))
+		if ((m_sector == 0) || (m_sector > 26))
 		{
-			fd800.stat_reg |= status_invalid_cmd;
+			m_stat_reg |= status_invalid_cmd;
 		}
 		else
 		{
-			fd800.unit = unit;
-			fd800.head = head;
-			fd800.sector = sector;
-			fd800.ddam = 1;
+			m_unit = unit;
+			m_head = head;
+			m_sector = sector;
+			m_ddam = 1;
 
-			fd800.buf_pos = 0;
-			fd800.buf_mode = bm_write;
-			fd800.stat_reg |= status_XFER_ready;
-			fd800.stat_reg |= status_OP_complete;   /* right??? */
+			m_buf_pos = 0;
+			m_buf_mode = bm_write;
+			m_stat_reg |= status_XFER_ready;
+			m_stat_reg |= status_OP_complete;   /* right??? */
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 9:     /* format track
@@ -592,49 +556,49 @@ static void fd800_do_cmd(void)
 	case 10:    /* load int mask
                     bit 16: bad mask for interrupt (0 = unmask or enable interrupt)
                     bits 17-27: 0s */
-		fd800.interrupt_f_f = fd800.cmd_reg & 1;
-		fd800_field_interrupt();
+		m_interrupt_f_f = m_cmd_reg & 1;
+		set_interrupt_line();
 		break;
 
 	case 11:    /* stop
                     bits 16-25: 0s
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
+		unit = (m_cmd_reg >> 10) & 3;
 
 		/* reset status */
-		fd800.stat_reg = unit << status_unit_shift;
+		m_stat_reg = unit << status_unit_shift;
 
-		fd800.stat_reg |= status_OP_complete;
+		m_stat_reg |= status_OP_complete;
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 12:    /* step head
                     bits 16-22: track number (0-76)
                     bits 23-25: 0s
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		cylinder = fd800.cmd_reg & 0x7f;
+		unit = (m_cmd_reg >> 10) & 3;
+		cylinder = m_cmd_reg & 0x7f;
 
 		if (cylinder > 76)
 		{
-			fd800.stat_reg |= status_invalid_cmd;
+			m_stat_reg |= status_invalid_cmd;
 		}
-		else if ((fd800.drv[unit].phys_cylinder != -1) || (!fd800_do_restore(unit)))
+		else if ((m_drv[unit].phys_cylinder != -1) || (!do_restore(unit)))
 		{
-			floppy_drive_seek(&fd800.drv[unit].img->device(), cylinder-fd800.drv[unit].phys_cylinder);
-			fd800.stat_reg |= status_OP_complete;
+			floppy_drive_seek(&m_drv[unit].img->device(), cylinder-m_drv[unit].phys_cylinder);
+			m_stat_reg |= status_OP_complete;
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 13:    /* maintenance commands
                     bits 16-23: according to extended command code
                     bits 24-27: extended command code (0-7) */
-		switch ((fd800.cmd_reg >> 8) & 15)
+		switch ((m_cmd_reg >> 8) & 15)
 		{
 		case 0: /* reset
                     bits 16-23: 0s */
@@ -686,29 +650,29 @@ static void fd800_do_cmd(void)
                     bit 24: no sequential sectoring (1=active)
                     bit 25: head number (1=upper)
                     bits 26-27: unit number (0-3) */
-		unit = (fd800.cmd_reg >> 10) & 3;
-		head = (fd800.cmd_reg >> 9) & 1;
-		/*non_seq_mode = (fd800.cmd_reg >> 8) & 1;*/
-		cylinder = fd800.cmd_reg & 0x7f;
+		unit = (m_cmd_reg >> 10) & 3;
+		head = (m_cmd_reg >> 9) & 1;
+		/*non_seq_mode = (m_cmd_reg >> 8) & 1;*/
+		cylinder = m_cmd_reg & 0x7f;
 
-		if (!fd800_do_seek(unit, cylinder, head))
+		if (!do_seek(unit, cylinder, head))
 		{
-			fd800.unit = unit;
-			fd800.head = head;
-			fd800.sector = 1;
-			/*fd800.non_seq_mode = non_seq_mode;*/
+			m_unit = unit;
+			m_head = head;
+			m_sector = 1;
+			/*m_non_seq_mode = non_seq_mode;*/
 
-			fd800_do_read();
+			do_read();
 		}
 
-		fd800.stat_reg |= status_interrupt;
-		fd800_field_interrupt();
+		m_stat_reg |= status_interrupt;
+		set_interrupt_line();
 		break;
 
 	case 15:    /* Clear Status port
                     bits 16-27: 0s */
-		fd800.stat_reg = 0;
-		fd800_field_interrupt();
+		m_stat_reg = 0;
+		set_interrupt_line();
 		break;
 	}
 }
@@ -735,7 +699,7 @@ static void fd800_do_cmd(void)
         30: unit MSB
         31: Interrupt (CBUSY???) (1 -> controller is ready)
 */
-	READ8_HANDLER(fd800_cru_r)
+READ8_MEMBER( fd800_legacy_device::cru_r )
 {
 	int reply = 0;
 
@@ -744,13 +708,13 @@ static void fd800_do_cmd(void)
 	case 0:
 	case 1:
 		/* receive buffer */
-		reply = fd800.recv_buf >> (offset*8);
+		reply = m_recv_buf >> (offset*8);
 		break;
 
 	case 2:
 	case 3:
 		/* status register */
-		reply = fd800.stat_reg >> ((offset-2)*8);
+		reply = m_stat_reg >> ((offset-2)*8);
 		break;
 	}
 
@@ -769,7 +733,7 @@ static void fd800_do_cmd(void)
     27: FD unit number MSB/extended command code
     28-31: command code
 */
-WRITE8_HANDLER(fd800_cru_w)
+WRITE8_MEMBER( fd800_legacy_device::cru_w )
 {
 	switch (offset)
 	{
@@ -791,61 +755,61 @@ WRITE8_HANDLER(fd800_cru_w)
 	case 15:
 		/* transmit buffer */
 		if (data)
-			fd800.xmit_buf |= 1 << offset;
+			m_xmit_buf |= 1 << offset;
 		else
-			fd800.xmit_buf &= ~(1 << offset);
+			m_xmit_buf &= ~(1 << offset);
 		if (offset == 15)
 		{
-			switch (fd800.buf_mode)
+			switch (m_buf_mode)
 			{
 			case bm_off:
 				break;
 			case bm_read:
-				fd800.buf_pos++;
-				if (fd800.buf_pos == fd800.drv[fd800.unit].seclen)
+				m_buf_pos++;
+				if (m_buf_pos == m_drv[m_unit].seclen)
 				{   /* end of sector */
-					if (fd800.sector == 26)
+					if (m_sector == 26)
 					{   /* end of track -> end command (right???) */
-						fd800.stat_reg &= ~status_XFER_ready;
-						fd800.stat_reg |= status_OP_complete;
-						fd800.stat_reg |= status_interrupt;
-						fd800.buf_mode = bm_off;
-						fd800_field_interrupt();
+						m_stat_reg &= ~status_XFER_ready;
+						m_stat_reg |= status_OP_complete;
+						m_stat_reg |= status_interrupt;
+						m_buf_mode = bm_off;
+						set_interrupt_line();
 					}
 					else
 					{   /* read next sector */
-						fd800.sector++;
-						fd800.stat_reg &= ~status_XFER_ready | status_OP_complete | status_interrupt;
-						fd800_do_read();
-						fd800.stat_reg |= status_interrupt;
-						fd800_field_interrupt();
+						m_sector++;
+						m_stat_reg &= ~status_XFER_ready | status_OP_complete | status_interrupt;
+						do_read();
+						m_stat_reg |= status_interrupt;
+						set_interrupt_line();
 					}
 				}
 				else
-					fd800.recv_buf = (fd800.buf[fd800.buf_pos<<1] << 8) | fd800.buf[(fd800.buf_pos<<1)+1];
+					m_recv_buf = (m_buf[m_buf_pos<<1] << 8) | m_buf[(m_buf_pos<<1)+1];
 				break;
 
 			case bm_write:
-				fd800.buf[fd800.buf_pos<<1] = fd800.xmit_buf >> 8;
-				fd800.buf[(fd800.buf_pos<<1)+1] = fd800.xmit_buf & 0xff;
-				fd800.buf_pos++;
-				if (fd800.buf_pos == fd800.drv[fd800.unit].seclen)
+				m_buf[m_buf_pos<<1] = m_xmit_buf >> 8;
+				m_buf[(m_buf_pos<<1)+1] = m_xmit_buf & 0xff;
+				m_buf_pos++;
+				if (m_buf_pos == m_drv[m_unit].seclen)
 				{   /* end of sector */
-					fd800_do_write();
-					if (fd800.sector == 26)
+					do_write();
+					if (m_sector == 26)
 					{
 						/* end of track -> end command (right???) */
-						fd800.stat_reg &= ~status_XFER_ready;
-						fd800.stat_reg |= status_OP_complete;
-						fd800.stat_reg |= status_interrupt;
-						fd800.buf_mode = bm_off;
-						fd800_field_interrupt();
+						m_stat_reg &= ~status_XFER_ready;
+						m_stat_reg |= status_OP_complete;
+						m_stat_reg |= status_interrupt;
+						m_buf_mode = bm_off;
+						set_interrupt_line();
 					}
 					else
 					{   /* increment to next sector */
-						fd800.sector++;
-						fd800.stat_reg |= status_interrupt;
-						fd800_field_interrupt();
+						m_sector++;
+						m_stat_reg |= status_interrupt;
+						set_interrupt_line();
 					}
 				}
 				break;
@@ -871,11 +835,55 @@ WRITE8_HANDLER(fd800_cru_w)
 	case 31:
 		/* command register */
 		if (data)
-			fd800.cmd_reg |= 1 << (offset-16);
+			m_cmd_reg |= 1 << (offset-16);
 		else
-			fd800.cmd_reg &= ~(1 << (offset-16));
+			m_cmd_reg &= ~(1 << (offset-16));
 		if (offset == 31)
-			fd800_do_cmd();
+			do_cmd();
 		break;
 	}
+}
+
+LEGACY_FLOPPY_OPTIONS_START(fd800)
+#if 1
+	/* SSSD 8" */
+	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+#elif 0
+	/* DSSD 8" */
+	LEGACY_FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+#endif
+LEGACY_FLOPPY_OPTIONS_END
+
+void fd800_legacy_device::device_start(void)
+{
+	logerror("fd800: start\n");
+	m_int_line.resolve();
+
+	for (int i=0; i<MAX_FLOPPIES; i++)
+	{
+		m_drv[i].img = dynamic_cast<device_image_interface *>(floppy_get_device(machine(), i));
+		m_drv[i].phys_cylinder = -1;
+		m_drv[i].log_cylinder[0] = m_drv[i].log_cylinder[1] = -1;
+		m_drv[i].seclen = 64;
+	}
+}
+
+void fd800_legacy_device::device_reset(void)
+{
+	logerror("fd800: reset\n");
+	m_stat_reg = 0;
+	m_interrupt_f_f = 1;
+
+	m_buf_pos = 0;
+	m_buf_mode = bm_off;
 }

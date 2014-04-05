@@ -81,7 +81,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix32(y, x) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
+			bitmap.pix32(y, x) = state->m_palette->pen(color);
 
 			data <<= 1;
 		}
@@ -128,9 +128,10 @@ MACHINE_CONFIG_FRAGMENT( v1050_video )
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+	
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN_HIGHLIGHT("palette")
 MACHINE_CONFIG_END

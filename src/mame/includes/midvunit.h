@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#include "video/polynew.h"
+#include "video/poly.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
 

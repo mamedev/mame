@@ -433,14 +433,6 @@ static const k053247_interface esckids_k053246_intf =
 	vendetta_sprite_callback
 };
 
-static const k053252_interface esckids_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	12*8, 1*8
-};
 
 void vendetta_state::machine_start()
 {
@@ -498,12 +490,13 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(vendetta_state, screen_update_vendetta)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", vendetta_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
@@ -545,7 +538,8 @@ static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 	MCFG_K053246_ADD("k053246", esckids_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", 6000000, esckids_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, 6000000)
+	MCFG_K053252_OFFSETS(12*8, 1*8)
 MACHINE_CONFIG_END
 
 

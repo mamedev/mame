@@ -513,10 +513,11 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_lastduel)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", lastduel)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastduel)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,lastduel)
@@ -556,10 +557,11 @@ static MACHINE_CONFIG_START( madgear, lastduel_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(lastduel_state, screen_update_madgear)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", madgear)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madgear)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(lastduel_state,madgear)

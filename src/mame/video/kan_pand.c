@@ -233,7 +233,7 @@ void kaneko_pandora_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (sy & 0x100)
 			sy -= 0x200;
 
-		m_gfxdecode->gfx(m_gfx_region)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(m_gfx_region)->transpen(bitmap,cliprect,
 				tile,
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,

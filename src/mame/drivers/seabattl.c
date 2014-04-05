@@ -160,7 +160,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 		{
 			for ( x = 0; x < 32; x++ )
 			{
-				m_gfxdecode->gfx(2)->opaque(m_palette,bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(2)->opaque(bitmap,cliprect, (y & 0x0f) + (((x & 0x0f) + ((screen.frame_number() & 0xe0) >> 4)) << 4), 0, 0, 0, x*8, y*8 );
 			}
 		}
 	}
@@ -184,7 +184,7 @@ UINT32 seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_ind1
 			int x = ((offset & 0x0f) << 4) - ((m_objram[offset] & 0xf0) >> 4);
 			int y = (offset & 0xf0);
 
-			m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect, code, 0, 0, 0, x, y, 0);
+			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, 0, 0, 0, x, y, 0);
 		}
 	}
 
@@ -511,8 +511,9 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seabattl_state, screen_update_seabattl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", seabattl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seabattl)
 	MCFG_PALETTE_ADD("palette", 26)
 	MCFG_PALETTE_INIT_OWNER(seabattl_state, seabattl)
 

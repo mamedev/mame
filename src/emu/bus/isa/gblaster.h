@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "isa.h"
+#include "sound/saa1099.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,12 +23,18 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
+		
+		DECLARE_READ8_MEMBER(saa1099_16_r);
+		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
+		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
 protected:
 		// device-level overrides
 		virtual void device_start();
 		virtual void device_reset();
 private:
 		// internal state
+		required_device<saa1099_device> m_saa1099_1;
+		required_device<saa1099_device> m_saa1099_2;
 };
 
 

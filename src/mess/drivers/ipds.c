@@ -19,12 +19,14 @@ public:
 	ipds_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "i8275")
+		m_crtc(*this, "i8275"),
+		m_palette(*this, "palette")
 	{
 	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
+	required_device<palette_device> m_palette;
 	DECLARE_READ8_MEMBER(ipds_b0_r);
 	DECLARE_READ8_MEMBER(ipds_b1_r);
 	DECLARE_READ8_MEMBER(ipds_c0_r);
@@ -81,7 +83,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	ipds_state *state = device->machine().driver_data<ipds_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
@@ -152,7 +154,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", ipds)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ipds)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_I8275_ADD  ( "i8275", ipds_i8275_interface)

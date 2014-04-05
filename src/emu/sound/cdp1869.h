@@ -163,11 +163,11 @@
 #define CDP1869_CHAR_RAM_WRITE(name) void name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
 #define CDP1869_PCB_READ(name) int name(device_t *device, UINT16 pma, UINT8 cma, UINT8 pmd)
 
-#define CDP1869_PAL \
-	DEVCB_LINE_VCC
+#define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
+	devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB2_##_read);
 
-#define CDP1869_NTSC \
-	DEVCB_LINE_GND
+#define MCFG_CDP1869_PRD_CALLBACK(_write) \
+	devcb = &cdp1869_device::set_prd_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -187,9 +187,6 @@ struct cdp1869_interface
 	// pixel clock of the chip is the device clock
 	int color_clock;            // the chroma clock of the chip
 
-	// screen format
-	devcb_read_line                 in_pal_ntsc_cb;
-
 	// page memory color bit read function
 	cdp1869_pcb_read_func           in_pcb_cb;
 
@@ -198,9 +195,6 @@ struct cdp1869_interface
 
 	// character memory write function
 	cdp1869_char_ram_write_func     out_char_ram_cb;
-
-	// if specified, this gets called for every change of the predisplay pin (CDP1870/76 pin 1)
-	devcb_write_line                out_prd_cb;
 };
 
 
@@ -216,6 +210,11 @@ class cdp1869_device :  public device_t,
 public:
 	// construction/destruction
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
+	template<class _Object> static devcb2_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }
+
+	DECLARE_PALETTE_INIT(cdp1869);
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
@@ -240,6 +239,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_post_load();
@@ -264,13 +264,12 @@ protected:
 	inline UINT16 get_pma();
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
-	void initialize_palette();
 	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
 
 private:
-	devcb_resolved_read_line        m_in_pal_ntsc_func;
-	devcb_resolved_write_line       m_out_prd_func;
+	devcb2_read_line        m_read_pal_ntsc;
+	devcb2_write_line       m_write_prd;
 	cdp1869_pcb_read_func           m_in_pcb_func;
 	cdp1869_char_ram_read_func      m_in_char_ram_func;
 	cdp1869_char_ram_write_func     m_out_char_ram_func;
@@ -278,9 +277,10 @@ private:
 	//address_space *m_page_ram;
 	emu_timer *m_prd_timer;
 	sound_stream *m_stream;
+	required_device<palette_device> m_palette;
+	const address_space_config      m_space_config;
 
 	// video state
-	rgb_t m_palette[8+64];
 	int m_prd;                      // predisplay
 	int m_dispoff;                  // display off
 	int m_fresvert;                 // full resolution vertical
@@ -305,8 +305,6 @@ private:
 	UINT8 m_toneamp;                // tone output amplitude
 	UINT8 m_wnfreq;                 // white noise range select
 	UINT8 m_wnamp;                  // white noise output amplitude
-
-	const address_space_config      m_space_config;
 };
 
 

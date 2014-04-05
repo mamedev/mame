@@ -131,8 +131,8 @@ driver_enumerator::driver_enumerator(emu_options &options)
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(global_alloc_array(UINT8, s_driver_count)),
-		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_included(s_driver_count, 0),
+		m_config(s_driver_count, 0)
 {
 	include_all();
 }
@@ -142,8 +142,8 @@ driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(global_alloc_array(UINT8, s_driver_count)),
-		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_included(s_driver_count, 0),
+		m_config(s_driver_count, 0)
 {
 	filter(string);
 }
@@ -153,8 +153,8 @@ driver_enumerator::driver_enumerator(emu_options &options, const game_driver &dr
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(global_alloc_array(UINT8, s_driver_count)),
-		m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+		m_included(s_driver_count, 0),
+		m_config(s_driver_count, 0)
 {
 	filter(driver);
 }
@@ -166,13 +166,7 @@ driver_enumerator::driver_enumerator(emu_options &options, const game_driver &dr
 
 driver_enumerator::~driver_enumerator()
 {
-	// free any configs
-	for (int index = 0; index < s_driver_count; index++)
-		global_free(m_config[index]);
-
-	// free the arrays
-	global_free(m_included);
-	global_free(m_config);
+	// configs are freed by the cache
 }
 
 
@@ -248,7 +242,10 @@ int driver_enumerator::filter(const game_driver &driver)
 
 void driver_enumerator::include_all()
 {
-	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
+	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count);
+	m_filtered_count = s_driver_count;
+	
+	// always exclude the empty driver
 	int empty = find("___empty");
 	assert(empty != -1);
 	m_included[empty] = 0;
@@ -263,6 +260,7 @@ void driver_enumerator::include_all()
 bool driver_enumerator::next()
 {
 	// always advance one
+	release_current();
 	m_current++;
 
 	// if we have a filter, scan forward to the next match
@@ -286,6 +284,7 @@ bool driver_enumerator::next()
 bool driver_enumerator::next_excluded()
 {
 	// always advance one
+	release_current();
 	m_current++;
 
 	// if we have a filter, scan forward to the next match
@@ -317,7 +316,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 		srand(osd_ticks());
 
 		// allocate a temporary list
-		int *templist = global_alloc_array(int, m_filtered_count);
+		dynamic_array<int> templist(m_filtered_count);
 		int arrayindex = 0;
 		for (int index = 0; index < s_driver_count; index++)
 			if (m_included[index])
@@ -337,13 +336,11 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 		// copy out the first few entries
 		for (int matchnum = 0; matchnum < count; matchnum++)
 			results[matchnum] = templist[matchnum % m_filtered_count];
-
-		global_free(templist);
 		return;
 	}
 
 	// allocate memory to track the penalty value
-	int *penalty = global_alloc_array(int, count);
+	dynamic_array<int> penalty(count);
 
 	// initialize everyone's states
 	for (int matchnum = 0; matchnum < count; matchnum++)
@@ -382,21 +379,27 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 				penalty[matchnum] = curpenalty;
 			}
 		}
-
-	// free our temp memory
-	global_free(penalty);
 }
 
 
-driver_enumerator::config_entry::config_entry(machine_config &config, int index)
-	: m_next(NULL),
-		m_config(&config),
-		m_index(index)
-{
-}
+//-------------------------------------------------
+//  release_current - release bulky memory
+//  structures from the current entry because
+//	we're done with it
+//-------------------------------------------------
 
-
-driver_enumerator::config_entry::~config_entry()
+void driver_enumerator::release_current()
 {
-	global_free(m_config);
+	// skip if no current entry
+	if (m_current < 0 || m_current >= s_driver_count)
+		return;
+	
+	// skip if we haven't cached a config
+	if (m_config[m_current] == NULL)
+		return;
+
+	// iterate over software lists in this entry and reset
+	software_list_device_iterator deviter(m_config[m_current]->root_device());
+	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
+		swlistdev->release();
 }

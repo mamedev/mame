@@ -145,7 +145,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define EXPAND_RASTERIZERS
 
 #include "emu.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 #include "video/rgbutil.h"
 #include "voodoo.h"
 #include "vooddefs.h"
@@ -5707,6 +5707,11 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_token = global_alloc_clear(voodoo_state);
+}
+
+voodoo_device::~voodoo_device()
+{
+	global_free(m_token);
 }
 
 //-------------------------------------------------

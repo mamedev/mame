@@ -7,18 +7,12 @@
 #ifndef __UPD1771_H__
 #define __UPD1771_H__
 
-#include "devcb.h"
+#include "emu.h"
 
 #define MAX_PACKET_SIZE 0x8000
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct upd1771_interface
-{
-	devcb_write_line    m_ack_callback;
-};
+#define MCFG_UPD1771_ACK_HANDLER(_devcb) \
+	devcb = &upd1771c_device::set_ack_handler(*device, DEVCB2_##_devcb);
 
 
 /***************************************************************************
@@ -26,20 +20,20 @@ struct upd1771_interface
 ***************************************************************************/
 
 class upd1771c_device : public device_t,
-						public device_sound_interface,
-						public upd1771_interface
+						public device_sound_interface
 {
 public:
 	upd1771c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd1771c_device() {}
 
+	template<class _Object> static devcb2_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
+	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER( pcm_write );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -49,7 +43,7 @@ protected:
 private:
 	// internal state
 	sound_stream *m_channel;
-	devcb_resolved_write_line m_ack_out_func;
+	devcb2_write_line m_ack_handler;
 	emu_timer *m_timer;
 
 	TIMER_CALLBACK_MEMBER(ack_callback);

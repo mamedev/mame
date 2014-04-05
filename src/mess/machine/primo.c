@@ -82,7 +82,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (machine().primary_screen->vblank()) ? 0x20 : 0x00;
+	data |= (machine().first_screen()->vblank()) ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 

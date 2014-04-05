@@ -564,15 +564,66 @@ static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-static WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)
+WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
 {
-	device->machine().driver_data<thomson_state>()->thomson_index_callback(device, state);
+  thomson_index_callback(machine().device(FLOPPY_0), state);
 }
 
-
-static const floppy_interface thomson_floppy_interface =
+WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
 {
-	DEVCB_LINE(thomson_index_callback),
+  thomson_index_callback(machine().device(FLOPPY_1), state);
+}
+
+WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
+{
+  thomson_index_callback(machine().device(FLOPPY_2), state);
+}
+
+WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
+{
+  thomson_index_callback(machine().device(FLOPPY_3), state);
+}
+
+static const floppy_interface thomson_floppy_interface_0 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_0_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+
+static const floppy_interface thomson_floppy_interface_1 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_1_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+static const floppy_interface thomson_floppy_interface_2 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_2_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(thomson),
+	NULL,
+	NULL
+};
+static const floppy_interface thomson_floppy_interface_3 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(thomson_state, fdc_index_3_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -622,6 +673,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 				0, THOM_TOTAL_HEIGHT - 1 )
 	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
 	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD ( "palette", 4097 ) /* 12-bit color + transparency */
 	MCFG_PALETTE_INIT_OWNER(thomson_state, thom)
@@ -644,12 +696,20 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_MC6846_ADD( "mc6846", to7_timer )
 
 /* speech synthesis */
-	MCFG_MEA8000_ADD( "mea8000", to7_speech )
+  MCFG_DEVICE_ADD("mea8000", MEA8000, 0)
+  MCFG_MEA8000_DAC("speech")
 
 /* floppy */
-	MCFG_MC6843_ADD( "mc6843", to7_6843_itf )
-	MCFG_WD2793_ADD( "wd2793", default_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(thomson_floppy_interface)
+	MCFG_DEVICE_ADD("mc6843", MC6843, 0)
+	MCFG_WD2793_ADD("wd2793", default_wd17xx_interface )
+	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_0)
+	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_1)
+	MCFG_DEVICE_ADD(FLOPPY_2, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_2)
+	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
+	MCFG_DEVICE_CONFIG(thomson_floppy_interface_3)
 
 /* network */
 	MCFG_MC6854_ADD( "mc6854", to7_network_iface )
@@ -673,15 +733,16 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1))
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
-	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("acia", MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
 
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (CC 90-232) */

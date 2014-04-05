@@ -33,7 +33,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_acia(*this, "acia")
+		m_acia(*this, "acia"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -51,6 +52,8 @@ private:
 	UINT8 m_term_data;
 	required_device<z80_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 static ADDRESS_MAP_START(mx2178_mem, AS_PROGRAM, 8, mx2178_state)
@@ -101,7 +104,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 static MC6845_UPDATE_ROW( update_row )
 {
 	mx2178_state *state = device->machine().driver_data<mx2178_state>();
-	const rgb_t *pens = bitmap.palette()->entry_list_raw();
+	const rgb_t *pens = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -183,7 +186,7 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", mx2178)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */

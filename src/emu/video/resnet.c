@@ -242,8 +242,6 @@ double compute_resistor_net_outputs(
 
 	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
 	double r[MAX_NETS][MAX_RES_PER_NET];        /* resistances */
-	double *o;                  /* calulated outputs */
-	double *os;                 /* calulated, scaled outputss */
 	int r_pd[MAX_NETS];         /* pulldown resistances */
 	int r_pu[MAX_NETS];         /* pullup resistances */
 
@@ -258,8 +256,8 @@ double compute_resistor_net_outputs(
 
 	/* parse input parameters */
 
-	o  = global_alloc_array(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
-	os = global_alloc_array(double, (1<<MAX_RES_PER_NET) *  MAX_NETS);
+	dynamic_array<double> o((1<<MAX_RES_PER_NET) *  MAX_NETS);
+	dynamic_array<double> os((1<<MAX_RES_PER_NET) *  MAX_NETS);
 
 	networks_no = 0;
 	for (n = 0; n < MAX_NETS; n++)
@@ -420,8 +418,6 @@ if (VERBOSE)
 }
 /* debug end */
 
-	global_free(o);
-	global_free(os);
 	return (scale);
 
 }
@@ -450,25 +446,25 @@ if (VERBOSE)
 
 #define TTL_VOH         (4.0)
 
-int compute_res_net(int inputs, int channel, const res_net_info *di)
+int compute_res_net(int inputs, int channel, const res_net_info &di)
 {
 	double rTotal=0.0;
 	double v = 0;
 	int i;
 
-	double vBias = di->rgb[channel].vBias;
-	double vOH = di->vOH;
-	double vOL = di->vOL;
-	double minout = di->rgb[channel].minout;
-	double cut = di->rgb[channel].cut;
-	double vcc = di->vcc;
+	double vBias = di.rgb[channel].vBias;
+	double vOH = di.vOH;
+	double vOL = di.vOL;
+	double minout = di.rgb[channel].minout;
+	double cut = di.rgb[channel].cut;
+	double vcc = di.vcc;
 	double ttlHRes = 0;
-	double rGnd = di->rgb[channel].rGnd;
-	UINT8  OpenCol = di->OpenCol;
+	double rGnd = di.rgb[channel].rGnd;
+	UINT8  OpenCol = di.OpenCol;
 
 	/* Global options */
 
-	switch (di->options & RES_NET_AMP_MASK)
+	switch (di.options & RES_NET_AMP_MASK)
 	{
 		case RES_NET_AMP_USE_GLOBAL:
 			/* just ignore */
@@ -492,7 +488,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			fatalerror("compute_res_net: Unknown amplifier type\n");
 	}
 
-	switch (di->options & RES_NET_VCC_MASK)
+	switch (di.options & RES_NET_VCC_MASK)
 	{
 		case RES_NET_VCC_5V:
 			vcc = 5.0;
@@ -504,7 +500,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			fatalerror("compute_res_net: Unknown vcc type\n");
 	}
 
-	switch (di->options & RES_NET_VBIAS_MASK)
+	switch (di.options & RES_NET_VBIAS_MASK)
 	{
 		case RES_NET_VBIAS_USE_GLOBAL:
 			/* just ignore */
@@ -522,7 +518,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			fatalerror("compute_res_net: Unknown vcc type\n");
 	}
 
-	switch (di->options & RES_NET_VIN_MASK)
+	switch (di.options & RES_NET_VIN_MASK)
 	{
 		case RES_NET_VIN_OPEN_COL:
 			OpenCol = 1;
@@ -551,7 +547,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 
 	/* Per channel options */
 
-	switch (di->rgb[channel].options & RES_NET_AMP_MASK)
+	switch (di.rgb[channel].options & RES_NET_AMP_MASK)
 	{
 		case RES_NET_AMP_USE_GLOBAL:
 			/* use global defaults */
@@ -575,7 +571,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			fatalerror("compute_res_net: Unknown amplifier type\n");
 	}
 
-	switch (di->rgb[channel].options & RES_NET_VBIAS_MASK)
+	switch (di.rgb[channel].options & RES_NET_VBIAS_MASK)
 	{
 		case RES_NET_VBIAS_USE_GLOBAL:
 			/* use global defaults */
@@ -595,7 +591,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 
 	/* Input impedances */
 
-	switch (di->options & RES_NET_MONITOR_MASK)
+	switch (di.options & RES_NET_MONITOR_MASK)
 	{
 		case RES_NET_MONITOR_INVERT:
 		case RES_NET_MONITOR_SANYO_EZV20:
@@ -611,29 +607,29 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 
 	/* compute here - pass a / low inputs */
 
-	for (i=0; i<di->rgb[channel].num; i++)
+	for (i=0; i<di.rgb[channel].num; i++)
 	{
 		int level = ((inputs >> i) & 1);
-		if (di->rgb[channel].R[i] != 0.0 && !level)
+		if (di.rgb[channel].R[i] != 0.0 && !level)
 		{
 			if (OpenCol)
 			{
-				rTotal += 1.0 / di->rgb[channel].R[i];
-				v += vOL / di->rgb[channel].R[i];
+				rTotal += 1.0 / di.rgb[channel].R[i];
+				v += vOL / di.rgb[channel].R[i];
 			}
 			else
 			{
-				rTotal += 1.0 / di->rgb[channel].R[i];
-				v += vOL / di->rgb[channel].R[i];
+				rTotal += 1.0 / di.rgb[channel].R[i];
+				v += vOL / di.rgb[channel].R[i];
 			}
 		}
 	}
 
 	/* Mix in rbias and rgnd */
-	if ( di->rgb[channel].rBias != 0.0 )
+	if ( di.rgb[channel].rBias != 0.0 )
 	{
-		rTotal += 1.0 / di->rgb[channel].rBias;
-		v += vBias / di->rgb[channel].rBias;
+		rTotal += 1.0 / di.rgb[channel].rBias;
+		v += vBias / di.rgb[channel].rBias;
 	}
 	if (rGnd != 0.0)
 		rTotal += 1.0 / rGnd;
@@ -643,7 +639,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	 * There will be now current into/from the TTL gate
 	 */
 
-	if ( (di->options & RES_NET_VIN_MASK)==RES_NET_VIN_TTL_OUT)
+	if ( (di.options & RES_NET_VIN_MASK)==RES_NET_VIN_TTL_OUT)
 	{
 		if (v / rTotal > vOH)
 			OpenCol = 1;
@@ -651,10 +647,10 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 
 	/* Second pass - high inputs */
 
-	for (i=0; i<di->rgb[channel].num; i++)
+	for (i=0; i<di.rgb[channel].num; i++)
 	{
 		int level = ((inputs >> i) & 1);
-		if (di->rgb[channel].R[i] != 0.0 && level)
+		if (di.rgb[channel].R[i] != 0.0 && level)
 		{
 			if (OpenCol)
 			{
@@ -663,8 +659,8 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 			}
 			else
 			{
-				rTotal += 1.0 / (di->rgb[channel].R[i] + ttlHRes);
-				v += vOH / (di->rgb[channel].R[i] + ttlHRes);
+				rTotal += 1.0 / (di.rgb[channel].R[i] + ttlHRes);
+				v += vOH / (di.rgb[channel].R[i] + ttlHRes);
 			}
 		}
 	}
@@ -673,7 +669,7 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	v *= rTotal;
 	v = MAX(minout, v - cut);
 
-	switch (di->options & RES_NET_MONITOR_MASK)
+	switch (di.options & RES_NET_MONITOR_MASK)
 	{
 		case RES_NET_MONITOR_INVERT:
 			v = vcc - v;
@@ -693,30 +689,28 @@ int compute_res_net(int inputs, int channel, const res_net_info *di)
 	return (int) (v * 255 / vcc + 0.4);
 }
 
-rgb_t *compute_res_net_all(running_machine &machine, const UINT8 *prom, const res_net_decode_info *rdi, const res_net_info *di)
+void compute_res_net_all(dynamic_array<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di)
 {
 	UINT8 r,g,b;
 	int i,j,k;
-	rgb_t *rgb;
 
-	rgb = auto_alloc_array(machine, rgb_t, rdi->end - rdi->start + 1);
-	for (i=rdi->start; i<=rdi->end; i++)
+	rgb.resize(rdi.end - rdi.start + 1);
+	for (i=rdi.start; i<=rdi.end; i++)
 	{
 		UINT8 t[3] = {0,0,0};
 		int s;
-		for (j=0;j<rdi->numcomp;j++)
+		for (j=0;j<rdi.numcomp;j++)
 			for (k=0; k<3; k++)
 			{
-				s = rdi->shift[3*j+k];
+				s = rdi.shift[3*j+k];
 				if (s>0)
-					t[k] = t[k] | ( (prom[i+rdi->offset[3*j+k]]>>s) & rdi->mask[3*j+k]);
+					t[k] = t[k] | ( (prom[i+rdi.offset[3*j+k]]>>s) & rdi.mask[3*j+k]);
 				else
-					t[k] = t[k] | ( (prom[i+rdi->offset[3*j+k]]<<(0-s)) & rdi->mask[3*j+k]);
+					t[k] = t[k] | ( (prom[i+rdi.offset[3*j+k]]<<(0-s)) & rdi.mask[3*j+k]);
 			}
 		r = compute_res_net(t[0], RES_NET_CHAN_RED, di);
 		g = compute_res_net(t[1], RES_NET_CHAN_GREEN, di);
 		b = compute_res_net(t[2], RES_NET_CHAN_BLUE, di);
-		rgb[i-rdi->start] = rgb_t(r,g,b);
+		rgb[i-rdi.start] = rgb_t(r,g,b);
 	}
-	return rgb;
 }

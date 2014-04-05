@@ -22,6 +22,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_screen(*this, "screen") { }
 
 	UINT8       m_cpu0_out[16];
@@ -50,7 +51,6 @@ public:
 	tilemap_t * m_center_tilemap;
 	tilemap_t * m_right_tilemap;
 
-	rgb_t       m_bgcolor[0x20];
 	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
 	DECLARE_WRITE8_MEMBER(led_board_w);
 	DECLARE_WRITE8_MEMBER(cpu1_outputs_w);
@@ -73,6 +73,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_left_tile_info);
 	TILE_GET_INFO_MEMBER(get_right_tile_info);
 	TILE_GET_INFO_MEMBER(get_center_tile_info);
+	DECLARE_PALETTE_INIT(grchamp);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -87,6 +88,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;	
 };
 

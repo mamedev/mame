@@ -60,6 +60,7 @@ public:
 	tilemap_t   *m_fg_tilemap;
 	tilemap_t   *m_bg_tilemap_l;
 	tilemap_t   *m_bg_tilemap_r;
+	UINT8     m_empty_tile[16*16];
 	INT32     m_watchdog_count;
 	INT32     m_watchdog_flip;
 	INT32     m_color_missiles;

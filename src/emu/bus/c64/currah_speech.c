@@ -108,18 +108,6 @@ const rom_entry *c64_currah_speech_cartridge_device::device_rom_region() const
 	return ROM_NAME( c64_currah_speech );
 }
 
-
-//-------------------------------------------------
-//  sp0256_interface sp0256_intf
-//-------------------------------------------------
-
-static sp0256_interface sp0256_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_currah_speech )
 //-------------------------------------------------
@@ -127,7 +115,6 @@ static sp0256_interface sp0256_intf =
 static MACHINE_CONFIG_FRAGMENT( c64_currah_speech )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 4000000) // ???
-	MCFG_SOUND_CONFIG(sp0256_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

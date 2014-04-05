@@ -581,8 +581,9 @@ static MACHINE_CONFIG_START( burglarx, unico_state )
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", unico)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
@@ -626,8 +627,9 @@ static MACHINE_CONFIG_START( zeropnt, unico_state )
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", unico)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)
@@ -668,8 +670,9 @@ static MACHINE_CONFIG_START( zeropnt2, unico_state )
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", unico)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
 	MCFG_PALETTE_ADD("palette", 8192)
 
 	MCFG_VIDEO_START_OVERRIDE(unico_state,unico)

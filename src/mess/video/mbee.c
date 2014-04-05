@@ -291,11 +291,10 @@ void mbee_state::mbee_video_kbd_scan( int param )
 
 READ8_MEMBER( mbee_state::m6545_status_r )
 {
-	screen_device *screen = machine().first_screen();
-	const rectangle &visarea = screen->visible_area();
+	const rectangle &visarea = m_screen->visible_area();
 
 	UINT8 data = m_sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
-	int y = machine().primary_screen->vpos();
+	int y = m_screen->vpos();
 
 	if( y < visarea.min_y || y > visarea.max_y )
 		data |= 0x20;   /* vertical blanking */
@@ -419,7 +418,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee256_update_addr )
 MC6845_UPDATE_ROW( mbee_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -458,7 +457,7 @@ MC6845_UPDATE_ROW( mbee_update_row )
 MC6845_UPDATE_ROW( mbeeic_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,fg,bg;
 	UINT16 mem,x,col;
 	UINT16 colourm = (state->m_08 & 0x0e) << 7;
@@ -502,7 +501,7 @@ MC6845_UPDATE_ROW( mbeeic_update_row )
 MC6845_UPDATE_ROW( mbeeppc_update_row )
 {
 	mbee_state *state = device->machine().driver_data<mbee_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 gfx,fg,bg;
 	UINT16 mem,x,col,chr;
 	UINT32 *p = &bitmap.pix32(y);

@@ -284,7 +284,7 @@ void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 						sprite + (duplicate ? 0 : (gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)])),
 						color,
 						flipx,flipy,

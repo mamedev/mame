@@ -40,15 +40,16 @@ const device_type C64_TURBO232 = &device_creator<c64_turbo232_cartridge_device>;
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
+	MCFG_MOS6551_XTAL(XTAL_3_6864MHz)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, rxd_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, cts_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, write_cts))
 MACHINE_CONFIG_END
 
 
@@ -195,10 +196,10 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 
 					switch (m_es & ES_S_MASK)
 					{
-					case ES_S_230400: m_acia->set_rxc(XTAL_3_6864MHz); break;
-					case ES_S_115200: m_acia->set_rxc(XTAL_3_6864MHz/2); break;
-					case ES_S_57600: m_acia->set_rxc(XTAL_3_6864MHz/4); break;
-					case ES_S_UNDEFINED: m_acia->set_rxc(0); break;
+					case ES_S_230400: m_acia->set_xtal(XTAL_3_6864MHz); break;
+					case ES_S_115200: m_acia->set_xtal(XTAL_3_6864MHz/2); break;
+					case ES_S_57600: m_acia->set_xtal(XTAL_3_6864MHz/4); break;
+					case ES_S_UNDEFINED: m_acia->set_xtal(0); break;
 					}
 				}
 			}

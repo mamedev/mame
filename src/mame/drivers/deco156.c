@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvysmsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", hvysmsh)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 
@@ -629,7 +629,7 @@ void deco156_state::descramble_sound( const char *tag )
 {
 	UINT8 *rom = memregion(tag)->base();
 	int length = memregion(tag)->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)
@@ -647,8 +647,6 @@ void deco156_state::descramble_sound( const char *tag )
 	}
 
 	memcpy(rom,buf1,length);
-
-	auto_free(machine(), buf1);
 }
 
 DRIVER_INIT_MEMBER(deco156_state,hvysmsh)

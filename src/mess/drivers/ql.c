@@ -272,10 +272,10 @@ READ8_MEMBER( ql_state::disk_io_r )
 
 	switch (offset)
 	{
-		case 0x0000 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0001 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0002 : result=wd17xx_r(m_fdc, space, offset); break;
-		case 0x0003 : result=wd17xx_r(m_fdc, space, offset); break;
+		case 0x0000 : result=m_fdc->read(space, offset); break;
+		case 0x0001 : result=m_fdc->read(space, offset); break;
+		case 0x0002 : result=m_fdc->read(space, offset); break;
+		case 0x0003 : result=m_fdc->read(space, offset); break;
 		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
@@ -289,10 +289,10 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 
 	switch (offset)
 	{
-		case 0x0000 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0001 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0002 : wd17xx_w(m_fdc, space, offset, data); break;
-		case 0x0003 : wd17xx_w(m_fdc, space, offset, data); break;
+		case 0x0000 : m_fdc->write(space, offset, data); break;
+		case 0x0001 : m_fdc->write(space, offset, data); break;
+		case 0x0002 : m_fdc->write(space, offset, data); break;
+		case 0x0003 : m_fdc->write(space, offset, data); break;
 		case 0x0004 : if(m_disk_type==DISK_TYPE_SANDY)
 						sandy_set_control(data);break;
 		case 0x0008 : if(m_disk_type==DISK_TYPE_SANDY)
@@ -332,12 +332,12 @@ READ8_MEMBER( ql_state::cart_rom_r )
 void ql_state::trump_card_set_control(UINT8 data)
 {
 	if(data & TRUMP_DRIVE0_MASK)
-		wd17xx_set_drive(m_fdc,0);
+		m_fdc->set_drive(0);
 
 	if(data & TRUMP_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);
+		m_fdc->set_drive(1);
 
-	wd17xx_set_side(m_fdc,(data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
+	m_fdc->set_side((data & TRUMP_SIDE_MASK) >> TRUMP_SIDE_SHIFT);
 }
 
 void ql_state::sandy_set_control(UINT8 data)
@@ -347,12 +347,12 @@ void ql_state::sandy_set_control(UINT8 data)
 	m_disk_io_byte=data;
 
 	if(data & SANDY_DRIVE0_MASK)
-		wd17xx_set_drive(m_fdc,0);
+		m_fdc->set_drive(0);
 
 	if(data & SANDY_DRIVE1_MASK)
-		wd17xx_set_drive(m_fdc,1);
+		m_fdc->set_drive(1);
 
-	wd17xx_set_side(m_fdc,(data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
+	m_fdc->set_side((data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
 	if ((data & SANDY_SIDE_MASK) & (LOG_DISK_READ | LOG_DISK_WRITE))
 	{
 		logerror("Accessing side 1\n");
@@ -708,18 +708,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  ZX8301_INTERFACE( ql_zx8301_intf )
-//-------------------------------------------------
-
-static ZX8301_INTERFACE( ql_zx8301_intf )
-{
-	M68008_TAG,
-	SCREEN_TAG,
-	DEVCB_DEVICE_LINE_MEMBER(ZX8302_TAG, zx8302_device, vsync_w)
-};
-
-
-//-------------------------------------------------
 //  ZX8302_INTERFACE( ql_zx8302_intf )
 //-------------------------------------------------
 
@@ -773,26 +761,6 @@ READ_LINE_MEMBER( ql_state::zx8302_raw2_r )
 {
 	return m_mdv1->data2_r() | m_mdv2->data2_r();
 }
-
-static ZX8302_INTERFACE( ql_zx8302_intf )
-{
-	X2,
-	DEVCB_CPU_INPUT_LINE(M68008_TAG, M68K_IRQ_2),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_baudx4_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
-	DEVCB_NULL, // TXD1
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, write_txd),
-	DEVCB_NULL, // NETOUT
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
-	DEVCB_DEVICE_LINE_MEMBER(MDV_1, microdrive_image_device, comms_in_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdrdw_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_erase_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw1_r),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_w),
-	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_raw2_r)
-};
-
 
 //-------------------------------------------------
 //  floppy_interface ql_floppy_interface
@@ -865,7 +833,6 @@ wd17xx_interface ql_wd17xx_interface =
 
 static MICRODRIVE_CONFIG( mdv1_config )
 {
-	DEVCB_DEVICE_LINE_MEMBER(MDV_2, microdrive_image_device, comms_in_w),
 	NULL,
 	NULL,
 };
@@ -877,7 +844,6 @@ static MICRODRIVE_CONFIG( mdv1_config )
 
 static MICRODRIVE_CONFIG( mdv2_config )
 {
-	DEVCB_NULL,
 	NULL,
 	NULL
 };
@@ -996,11 +962,33 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_ZX8301_ADD(ZX8301_TAG, X1, ql_zx8301_intf)
-	MCFG_ZX8302_ADD(ZX8302_TAG, X1, ql_zx8302_intf)
+	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
+	MCFG_ZX8301_CPU(M68008_TAG)
+	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	
+	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
+	MCFG_ZX8302_RTC_CLOCK(X2)
+	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
+	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(ql_state, ql_baudx4_w))
+	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(ql_state, ql_comdata_w))
+	// TXD1
+	MCFG_ZX8302_OUT_TXD2_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	// NETOUT
+	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(ql_state, zx8302_mdselck_w))
+	MCFG_ZX8302_OUT_MDSELD_CB(DEVWRITELINE(MDV_1, microdrive_image_device, comms_in_w))
+	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(ql_state, zx8302_mdrdw_w))
+	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(ql_state, zx8302_erase_w))
+	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(ql_state, zx8302_raw1_w))
+	MCFG_ZX8302_IN_RAW1_CB(READLINE(ql_state, zx8302_raw1_r))
+	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
+	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
+	
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
+	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE

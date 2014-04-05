@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cbuster_state, screen_update_twocrude)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cbuster)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbuster)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DECO16IC_ADD("tilegen1", twocrude_deco16ic_tilegen1_intf)

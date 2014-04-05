@@ -131,9 +131,9 @@ gromport_device::gromport_device(const machine_config &mconfig, const char *tag,
 	:   bus8z_device(mconfig, GROMPORT, "Cartridge port", tag, owner, clock, "gromport", __FILE__),
 		device_slot_interface(mconfig, *this),
 		m_connector(NULL),
-		m_reset_on_insert(true)
-{
-}
+		m_reset_on_insert(true),
+		m_console_ready(*this),
+		m_console_reset(*this) { }
 
 /* Only called for addresses 6000-7fff and GROM addresses (see datamux config) */
 READ8Z_MEMBER(gromport_device::readz)
@@ -167,6 +167,8 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 
 void gromport_device::device_start()
 {
+	m_console_ready.resolve();
+	m_console_reset.resolve();
 }
 
 void gromport_device::device_reset()
@@ -198,9 +200,6 @@ void gromport_device::cartridge_inserted()
 
 void gromport_device::device_config_complete()
 {
-	const gromport_config *intf = reinterpret_cast<const gromport_config *>(static_config());
-	m_console_ready.resolve(intf->ready, *this);
-	m_console_reset.resolve(intf->reset, *this);
 	m_connector = static_cast<ti99_cartridge_connector_device*>(first_subdevice());
 	set_grom_base(0x9800, 0xf800);
 }
@@ -1325,10 +1324,10 @@ void ti99_cartridge_device::set_slot(int i)
 	m_slot = i;
 }
 
-bool ti99_cartridge_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool ti99_cartridge_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	if (VERBOSE>8) LOG("ti99_cartridge_device: swlist = %s, swname = %s\n", swlist, swname);
-	load_software_part_region(this, swlist, swname, start_entry);
+	if (VERBOSE>8) LOG("ti99_cartridge_device: swlist = %s, swname = %s\n", swlist.list_name(), swname);
+	load_software_part_region(*this, swlist, swname, start_entry);
 	m_softlist = true;
 	m_rpk = NULL;
 	return true;
@@ -1368,23 +1367,23 @@ void ti99_cartridge_device::device_config_complete()
 
 static GROM_CONFIG(grom3_config)
 {
-	false, 3, CARTGROM_TAG, 0x0000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 3, CARTGROM_TAG, 0x0000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom4_config)
 {
-	false, 4, CARTGROM_TAG, 0x2000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 4, CARTGROM_TAG, 0x2000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom5_config)
 {
-	false, 5, CARTGROM_TAG, 0x4000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 5, CARTGROM_TAG, 0x4000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom6_config)
 {
-	false, 6, CARTGROM_TAG, 0x6000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 6, CARTGROM_TAG, 0x6000, 0x1800, GROMFREQ
 };
 static GROM_CONFIG(grom7_config)
 {
-	false, 7, CARTGROM_TAG, 0x8000, 0x1800, DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti99_cartridge_device, ready_line), GROMFREQ
+	false, 7, CARTGROM_TAG, 0x8000, 0x1800, GROMFREQ
 };
 
 /*
@@ -1392,10 +1391,15 @@ static GROM_CONFIG(grom7_config)
 */
 static MACHINE_CONFIG_FRAGMENT( ti99_cartridge )
 	MCFG_GROM_ADD( GROM3_TAG, grom3_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM4_TAG, grom4_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM5_TAG, grom5_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM6_TAG, grom6_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 	MCFG_GROM_ADD( GROM7_TAG, grom7_config )
+    MCFG_GROM_READY_CALLBACK(WRITELINE(ti99_cartridge_device, ready_line))
 MACHINE_CONFIG_END
 
 machine_config_constructor ti99_cartridge_device::device_mconfig_additions() const

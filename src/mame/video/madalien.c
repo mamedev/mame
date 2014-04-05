@@ -145,8 +145,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
 
-	m_gfxdecode->gfx(2)->opaque(m_palette,*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
-	m_gfxdecode->gfx(2)->opaque(m_palette,*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
+	m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 0, 0x00, 0x00);
+	m_gfxdecode->gfx(2)->opaque(*m_headlight_bitmap,m_headlight_bitmap->cliprect(), 0, 0, 0, 1, 0x00, 0x40);
 }
 
 
@@ -385,8 +385,9 @@ MACHINE_CONFIG_FRAGMENT( madalien_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", madalien)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madalien)
 	MCFG_PALETTE_ADD("palette", 0x30)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
 	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)

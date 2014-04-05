@@ -254,8 +254,9 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update_speedbal)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", speedbal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -272,7 +273,7 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 {
 	// sprite tiles are in an odd order, rearrange to simplify video drawing function
 	UINT8* rom = memregion("sprites")->base();
-	UINT8* temp = auto_alloc_array(machine(), UINT8, 0x200*128);
+	dynamic_buffer temp(0x200*128);
 
 	for (int i=0;i<0x200;i++)
 	{
@@ -281,7 +282,6 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 	}
 
 	memcpy(rom,temp,0x200*128);
-	auto_free(machine(), temp);
 }
 
 

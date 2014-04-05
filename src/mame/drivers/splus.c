@@ -685,6 +685,7 @@ static MACHINE_CONFIG_START( splus, splus_state )   // basic machine hardware
 	MCFG_SCREEN_UPDATE_DRIVER(splus_state, screen_update)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_X2404P_ADD("i2cmem")
 

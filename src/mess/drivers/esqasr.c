@@ -59,8 +59,9 @@ public:
 
 	virtual void machine_reset();
 
-public:
-	DECLARE_DRIVER_INIT(asr);
+	DECLARE_DRIVER_INIT(asr);	
+	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	DECLARE_READ16_MEMBER(esq5506_read_adc);	
 };
 
 void esqasr_state::machine_reset()
@@ -78,11 +79,11 @@ static ADDRESS_MAP_START( asrx_map, AS_PROGRAM, 32, esqasr_state )
 	AM_RANGE(0x0be00000, 0x0befffff) AM_RAM
 ADDRESS_MAP_END
 
-static void esq5506_otto_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
 {
 }
 
-static READ16_DEVICE_HANDLER(esq5506_read_adc)
+READ16_MEMBER(esqasr_state::esq5506_read_adc)
 {
 	return 0;
 }
@@ -94,8 +95,8 @@ static const es5506_interface es5506_config =
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
 	1,          /* channels */
-	DEVCB_LINE(esq5506_otto_irq), /* irq */
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
+	DEVCB_DRIVER_LINE_MEMBER(esqasr_state,esq5506_otto_irq), /* irq */
+	DEVCB_DRIVER_MEMBER16(esqasr_state, esq5506_read_adc)
 };
 
 static MACHINE_CONFIG_START( asr, esqasr_state )

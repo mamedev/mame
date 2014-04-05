@@ -377,7 +377,7 @@ UINT32 fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind1
 			if(bpp)
 				color&=0x3;
 
-			m_gfxdecode->gfx(bpp)->opaque(m_palette,bitmap,cliprect,tile,color,0,0,x*8,y*8);
+			m_gfxdecode->gfx(bpp)->opaque(bitmap,cliprect,tile,color,0,0,x*8,y*8);
 			count++;
 
 		}
@@ -692,6 +692,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
@@ -700,7 +701,7 @@ static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	MCFG_I8255A_ADD( "fcppi0", ppi8255_intf )
 	MCFG_V3021_ADD("rtc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", fortecar)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fortecar)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(fortecar_state, fortecar)
 

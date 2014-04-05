@@ -450,6 +450,7 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
@@ -724,7 +725,7 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -735,7 +736,6 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }
@@ -744,7 +744,7 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -754,7 +754,6 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }
@@ -763,7 +762,7 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 {
 	UINT32 length = memregion("user2")->bytes();
 	UINT8 *rom = memregion("user2")->base();
-	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -775,7 +774,6 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 		dstaddr ^= 0x20000;
 		rom[dstaddr] = original[srcaddr];
 	}
-	auto_free(machine(), original);
 
 	alg_init();
 }

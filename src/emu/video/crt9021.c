@@ -85,31 +85,11 @@ enum
 
 crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock, "crt9021", __FILE__),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_in_data_cb(*this),
+		m_in_attr_cb(*this),
+		m_in_atten_cb(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void crt9021_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const crt9021_interface *intf = reinterpret_cast<const crt9021_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<crt9021_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&in_data_cb, 0, sizeof(in_data_cb));
-		memset(&in_attr_cb, 0, sizeof(in_attr_cb));
-		memset(&in_atten_cb, 0, sizeof(in_atten_cb));
-	}
 }
 
 
@@ -122,9 +102,9 @@ void crt9021_device::device_start()
 	// allocate timers
 
 	// resolve callbacks
-	m_in_data_func.resolve(in_data_cb, *this);
-	m_in_attr_func.resolve(in_attr_cb, *this);
-	m_in_atten_func.resolve(in_atten_cb, *this);
+	m_in_data_cb.resolve_safe(0);
+	m_in_attr_cb.resolve_safe(0);
+	m_in_atten_cb.resolve_safe(0);
 
 	// register for state saving
 	save_item(NAME(m_slg));

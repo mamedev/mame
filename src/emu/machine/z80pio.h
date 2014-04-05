@@ -119,6 +119,7 @@ public:
 	UINT8 port_b_read() { return port_read(PORT_B); }
 	void port_a_write(UINT8 data) { port_write(PORT_A, data); }
 	void port_b_write(UINT8 data) { port_write(PORT_B, data); }
+	DECLARE_WRITE8_MEMBER( pa_w ) { port_a_write(data); }
 
 	// standard read/write, with C/D in bit 1, B/A in bit 0
 	DECLARE_READ8_MEMBER( read );

@@ -39,7 +39,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_8250(*this, "ins8250"),
-		m_beep(*this, "beeper")
+		m_beep(*this, "beeper"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -48,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
@@ -59,6 +60,8 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_8250;
 	required_device<beep_device> m_beep;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 
@@ -214,7 +217,7 @@ void zrt80_state::video_start()
 static MC6845_UPDATE_ROW( zrt80_update_row )
 {
 	zrt80_state *state = device->machine().driver_data<zrt80_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -316,7 +319,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
-	MCFG_GFXDECODE_ADD("gfxdecode", zrt80)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zrt80)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* sound hardware */

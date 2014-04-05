@@ -113,7 +113,7 @@ class debug_view_source
 {
 	DISABLE_COPYING(debug_view_source);
 
-	friend class debug_view_source_list;
+	friend class simple_list<debug_view_source>;
 
 public:
 	// construction/destruction
@@ -132,38 +132,6 @@ private:
 	astring                 m_name;                 // name of the source item
 	device_t *              m_device;               // associated device (if applicable)
 	bool                    m_is_octal;             // is view in octal or hex
-};
-
-
-// a debug_view_source_list contains a list of debug_view_sources
-class debug_view_source_list
-{
-	DISABLE_COPYING(debug_view_source_list);
-
-public:
-	// construction/destruction
-	debug_view_source_list(running_machine &machine);
-	~debug_view_source_list();
-
-	// getters
-	running_machine &machine() const { return m_machine; }
-	const debug_view_source *head() const { return m_head; }
-	int count() const { return m_count; }
-	int index(const debug_view_source &source) const;
-	const debug_view_source *by_index(int index) const;
-
-	// operations
-	void reset();
-	void append(debug_view_source &view_source);
-	const debug_view_source *match_device(device_t *device) const;
-	int match_device_index(device_t *device) const { return index(*match_device(device)); }
-
-private:
-	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	debug_view_source *     m_head;                 // head of the list
-	debug_view_source *     m_tail;                 // end of the tail
-	UINT32                  m_count;                // number of items in the list
 };
 
 
@@ -190,7 +158,8 @@ public:
 	bool cursor_supported() { flush_updates(); return m_supports_cursor; }
 	bool cursor_visible() { flush_updates(); return m_cursor_visible; }
 	const debug_view_source *source() const { return m_source; }
-	const debug_view_source_list &source_list() const { return m_source_list; }
+	const debug_view_source *first_source() { return m_source_list.first(); }
+	const simple_list<debug_view_source> &source_list() const { return m_source_list; }
 
 	// setters
 	void set_size(int width, int height);
@@ -199,8 +168,11 @@ public:
 	void set_cursor_position(debug_view_xy pos);
 	void set_cursor_visible(bool visible = true);
 	void set_source(const debug_view_source &source);
+
+	// helpers
 	void process_char(int character) { view_char(character); }
 	void process_click(int button, debug_view_xy pos) { view_click(button, pos); }
+	const debug_view_source *source_for_device(device_t *device) const;
 
 protected:
 	// internal updating helpers
@@ -225,7 +197,7 @@ protected:
 	debug_view *            m_next;             // link to the next view
 	debug_view_type         m_type;             // type of view
 	const debug_view_source *m_source;          // currently selected data source
-	debug_view_source_list  m_source_list;      // list of available data sources
+	simple_list<debug_view_source> m_source_list; // list of available data sources
 
 	// OSD data
 	debug_view_osd_update_func m_osdupdate;     // callback for the update

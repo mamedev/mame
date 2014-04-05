@@ -24,18 +24,17 @@ PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 }
 
 
-static void set_pens( running_machine &machine )
+void rockrage_state::set_pens()
 {
-	rockrage_state *state = machine.driver_data<rockrage_state>();
 	int i;
 
 	for (i = 0x00; i < 0x80; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i] | (state->m_paletteram[i | 1] << 8);
+		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
 
 		rgb_t color = rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		state->m_palette->set_indirect_color(i >> 1, color);
+		m_palette->set_indirect_color(i >> 1, color);
 	}
 }
 
@@ -46,15 +45,13 @@ static void set_pens( running_machine &machine )
 
 ***************************************************************************/
 
-void rockrage_tile_callback( running_machine &machine, int layer, int bank, int *code, int *color, int *flags )
+K007342_CALLBACK_MEMBER(rockrage_state::rockrage_tile_callback)
 {
-	rockrage_state *state = machine.driver_data<rockrage_state>();
-
 	if (layer == 1)
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x01) << 9);
 	else
-		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((state->m_vreg & 0x04) << 7) | ((state->m_vreg & 0x08) << 9);
-	*color = state->m_layer_colorbase[layer] + (*color & 0x0f);
+		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((m_vreg & 0x04) << 7) | ((m_vreg & 0x08) << 9);
+	*color = m_layer_colorbase[layer] + (*color & 0x0f);
 }
 
 /***************************************************************************
@@ -94,7 +91,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 
 UINT32 rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 
 	m_k007342->tilemap_update();
 

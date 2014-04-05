@@ -341,7 +341,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				int addr = (code * 2) & (TILES_LEN - 1);
 
 				if (zoomx == 32 && zoomy == 32)
-					m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -349,7 +349,7 @@ void psikyo_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,
@@ -460,7 +460,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 				int addr = (code * 2) & (TILES_LEN-1);
 
 				if (zoomx == 32 && zoomy == 32)
-					m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							TILES[addr+1] * 256 + TILES[addr],
 							attr >> 8,
 							flipx, flipy,
@@ -468,7 +468,7 @@ void psikyo_state::draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bi
 							screen.priority(),
 							pri[(attr & 0xc0) >> 6],trans_pen);
 				else
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
 								TILES[addr+1] * 256 + TILES[addr],
 								attr >> 8,
 								flipx, flipy,

@@ -136,7 +136,7 @@ UINT32 flyball_state::screen_update_flyball(screen_device &screen, bitmap_ind16 
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw pitcher */
-	m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+	m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, m_pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
 
 	/* draw ball */
 
@@ -454,8 +454,9 @@ static MACHINE_CONFIG_START( flyball, flyball_state )
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(flyball_state, screen_update_flyball)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", flyball)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flyball)
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(flyball_state, flyball)
 

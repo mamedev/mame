@@ -1024,6 +1024,7 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
+	MCFG_SCREEN_PALETTE("palette")
 
 MACHINE_CONFIG_END
 

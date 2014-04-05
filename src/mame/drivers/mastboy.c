@@ -531,7 +531,7 @@ UINT32 mastboy_state::screen_update_mastboy(screen_device &screen, bitmap_ind16 
 			}
 
 
-			gfx->opaque(m_palette,bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
+			gfx->opaque(bitmap,cliprect,tileno,attr,0,0,x*8,y*8);
 
 			count+=4;
 
@@ -903,8 +903,9 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update_mastboy)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mastboy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 

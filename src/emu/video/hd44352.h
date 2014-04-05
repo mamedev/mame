@@ -12,32 +12,25 @@
 #define __hd44352_H__
 
 
-#define MCFG_HD44352_ADD( _tag, _clock, _config) \
-	MCFG_DEVICE_ADD( _tag, HD44352, _clock ) \
-	MCFG_DEVICE_CONFIG( _config )
+#define MCFG_HD44352_ON_CB(_devcb) \
+	devcb = &hd44352_device::set_on_callback(*device, DEVCB2_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
-// ======================> hd44352_interface
-
-struct hd44352_interface
-{
-	devcb_write_line    m_on_cb;        // ON line
-};
-
 // ======================> hd44352_device
 
 class hd44352_device :
-						public device_t,
-						public hd44352_interface
+						public device_t
 {
 public:
 	// construction/destruction
 	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
+	
 	// device interface
 	UINT8 data_read();
 	void data_write(UINT8 data);
@@ -50,7 +43,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
 
 private:
@@ -80,7 +72,7 @@ private:
 	UINT8 m_cursor_y;
 	UINT8 m_cursor_lcd;
 
-	devcb_resolved_write_line m_on;         // ON line callback
+	devcb2_write_line    m_on_cb;        // ON line callback
 };
 
 // device type definition

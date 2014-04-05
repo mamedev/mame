@@ -457,9 +457,10 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	compis_state *state = device->machine().driver_data<compis_state>();
 	UINT8 i,gfx = state->m_video_ram[address];
+	const pen_t *pen = state->m_palette->pens();
 
 	for(i=0; i<8; i++)
-		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[BIT(gfx, i)];
+		bitmap.pix32(y, x + i) = pen[BIT(gfx, i)];
 }
 
 static UPD7220_INTERFACE( hgdc_intf )
@@ -722,12 +723,15 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// devices
-	MCFG_I80130_ADD(I80130_TAG, XTAL_16MHz/2, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
+	MCFG_DEVICE_ADD(I80130_TAG, I80130, XTAL_16MHz/2)
+	MCFG_I80130_IRQ_CALLBACK(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
 	//MCFG_I80130_SYSTICK_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir3_w))
 	MCFG_I80130_DELAY_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir7_w))
-	MCFG_I80130_BAUD_CALLBACK(DEVWRITELINE(DEVICE_SELF, compis_state, tmr2_w))
+	MCFG_I80130_BAUD_CALLBACK(WRITELINE(compis_state, tmr2_w))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz/8)
@@ -749,6 +753,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_MM58274C_ADD(MM58174A_TAG, rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, rxa_w))
@@ -761,10 +766,8 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
-
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir1_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE(I80130_TAG, i80130_device, ir0_w))

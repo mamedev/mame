@@ -150,7 +150,7 @@ void astrocorp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 				{
 					for (xwrap = 0 ; xwrap <= 0x200 ; xwrap += 0x200)
 					{
-						m_gfxdecode->gfx(0)->transpen(m_palette,bitmap,cliprect,
+						m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 								code, 0,
 								0, 0,
 								sx + x * 16 - xwrap, sy + y * 16 - ywrap, 0xff);
@@ -483,8 +483,9 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 
@@ -535,8 +536,9 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(astrocorp_state, screen_update_astrocorp)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", astrocorp)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrocorp)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
 

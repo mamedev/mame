@@ -675,7 +675,7 @@ UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 		if(!(m_crtc.param[0][2] & 0x20))
 			return 1;
 
-		if(((machine().primary_screen->frame_number() / blink_speed) & 1) == 0)
+		if(((machine().first_screen()->frame_number() / blink_speed) & 1) == 0)
 			return 1;
 
 		return 0;
@@ -754,7 +754,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 				res_x = x*8+xi*(width+1);
 				res_y = y*y_height+yi;
 
-				if(!machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(gfx_mode)
@@ -771,7 +771,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 					UINT8 blink_mask;
 
 					blink_mask = 0;
-					if(blink && ((machine().primary_screen->frame_number() / blink_speed) & 3) == 1)
+					if(blink && ((machine().first_screen()->frame_number() / blink_speed) & 3) == 1)
 						blink_mask = 1;
 
 					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
@@ -799,7 +799,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 					bitmap.pix16(res_y, res_x) = m_palette->pen(color);
 					if(width)
 					{
-						if(!machine().primary_screen->visible_area().contains(res_x+1, res_y))
+						if(!machine().first_screen()->visible_area().contains(res_x+1, res_y))
 							continue;
 
 						bitmap.pix16(res_y, res_x+1) = m_palette->pen(color);
@@ -1241,7 +1241,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ext_rom_bank_w)
 
 UINT8 pc8801_state::pc8801_pixel_clock(void)
 {
-	int ysize = machine().primary_screen->height(); /* TODO: correct condition*/
+	int ysize = machine().first_screen()->height(); /* TODO: correct condition*/
 
 	return (ysize >= 400);
 }
@@ -1269,7 +1269,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
 
-	machine().primary_screen->configure(xsize, ysize, visarea, refresh);
+	machine().first_screen()->configure(xsize, ysize, visarea, refresh);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
@@ -2415,7 +2415,6 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 void pc8801_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc8801_state::pc8801_irq_callback),this));
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
@@ -2564,11 +2563,6 @@ PALETTE_INIT_MEMBER(pc8801_state, pc8801)
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
-void pc8801_state::fdc_irq_w(bool state)
-{
-	m_fdccpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /* YM2203 Interface */
 
 READ8_MEMBER(pc8801_state::opn_porta_r)
@@ -2650,6 +2644,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+    MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)
 	#endif
@@ -2670,8 +2666,9 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pc8801 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc8801 )
 	MCFG_PALETTE_ADD("palette", 0x10)
 	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
 

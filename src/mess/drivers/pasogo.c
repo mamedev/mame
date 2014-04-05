@@ -660,7 +660,7 @@ UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &b
 	if (w!=width || h!=height)
 	{
 		width = w; height = h;
-//      machine().primary_screen->set_visible_area(0, width - 1, 0, height - 1);
+//      machine().first_screen()->set_visible_area(0, width - 1, 0, height - 1);
 		screen.set_visible_area(0, width - 1, 0, height - 1);
 	}
 #endif
@@ -978,6 +978,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(pasogo_palette))
 	MCFG_PALETTE_INIT_OWNER(pasogo_state, pasogo)

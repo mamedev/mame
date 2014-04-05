@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", jailbrek)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update_jailbrek)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

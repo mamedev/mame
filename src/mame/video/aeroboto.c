@@ -53,16 +53,13 @@ void aeroboto_state::video_start()
 
 	#if STARS_LAYOUT
 	{
-		UINT8 *temp;
 		int i;
 
-		temp = auto_alloc_array(machine(), UINT8, m_stars_length);
+		dynamic_buffer temp(m_stars_length);
 		memcpy(temp, m_stars_rom, m_stars_length);
 
 		for (i = 0; i < m_stars_length; i++)
 			m_stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
-
-		auto_free(machine(), temp);
 	}
 	#endif
 }
@@ -134,7 +131,7 @@ void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 240 - y;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				m_spriteram[offs + 1],
 				m_spriteram[offs + 2] & 0x07,
 				flip_screen(), flip_screen(),

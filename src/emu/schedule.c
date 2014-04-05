@@ -315,13 +315,10 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_execute_list(NULL),
 	m_basetime(attotime::zero),
 	m_timer_list(NULL),
-	m_timer_allocator(machine.respool()),
 	m_callback_timer(NULL),
 	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
-	m_quantum_list(machine.respool()),
-	m_quantum_allocator(machine.respool()),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// append a single never-expiring timer so there is always one in the list

@@ -80,8 +80,6 @@ struct sdl_window_config
 	int                 height;                     // decoded height
 	int                 depth;                      // decoded depth
 	int                 refresh;                    // decoded refresh
-
-	int                 totalColors;         // total colors from machine
 };
 
 
@@ -118,7 +116,6 @@ struct sdl_video_config
 	int                 glsl_shader_mamebm_num; // custom glsl shader set number, mame bitmap
 	char *              glsl_shader_scrn[GLSL_SHADER_MAX]; // custom glsl shader set, screen bitmap
 	int                 glsl_shader_scrn_num; // custom glsl shader number, screen bitmap
-	int                 glsl_vid_attributes;    // glsl brightness, contrast and gamma for RGB bitmaps
 	int                 pbo;
 	int                 vbo;
 	int                 allowtexturerect;   // allow GL_ARB_texture_rectangle, default: no

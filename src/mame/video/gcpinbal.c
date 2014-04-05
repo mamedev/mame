@@ -199,7 +199,7 @@ void gcpinbal_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				m_gfxdecode->gfx(0)->prio_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 						code,
 						col,
 						flipx, flipy,

@@ -94,7 +94,7 @@ void dp8390_device::do_tx() {
 	}
 	m_regs.cr &= ~4;
 	check_irq();
-	global_free(buf);
+	global_free_array(buf);
 }
 
 void dp8390_device::set_cr(UINT8 newcr) {

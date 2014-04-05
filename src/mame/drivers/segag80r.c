@@ -828,13 +828,13 @@ static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", segag80r)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segag80r)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(segag80r_state, screen_update_segag80r)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1400,13 +1400,13 @@ ROM_END
 
 void segag80r_state::monsterb_expand_gfx(const char *region)
 {
-	UINT8 *temp, *dest;
+	UINT8 *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memregion(region)->base();
-	temp = auto_alloc_array(machine(), UINT8, 0x4000);
+	dynamic_buffer temp(0x4000);
 	memcpy(temp, dest, 0x4000);
 
 	/* 16 effective total banks */
@@ -1415,7 +1415,6 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 		memcpy(&dest[0x0000 + i * 0x800], &temp[0x0000 + (i & 3) * 0x800], 0x800);
 		memcpy(&dest[0x8000 + i * 0x800], &temp[0x2000 + (i >> 2) * 0x800], 0x800);
 	}
-	auto_free(machine(), temp);
 }
 
 

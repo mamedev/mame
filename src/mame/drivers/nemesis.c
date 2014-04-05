@@ -1499,11 +1499,6 @@ WRITE8_MEMBER(nemesis_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_config =
-{
-	DEVCB_DRIVER_MEMBER(nemesis_state,volume_callback) /* external port callback */
-};
-
 /******************************************************************************/
 
 void nemesis_state::machine_start()
@@ -1559,8 +1554,9 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1610,8 +1606,9 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1663,8 +1660,9 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1714,8 +1712,9 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1768,8 +1767,9 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1781,7 +1781,7 @@ static MACHINE_CONFIG_START( salamand, nemesis_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.50)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.08)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.08)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.08)
@@ -1813,8 +1813,9 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1822,7 +1823,7 @@ static MACHINE_CONFIG_START( blkpnthr, nemesis_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
@@ -1854,8 +1855,9 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1863,7 +1865,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
@@ -1899,8 +1901,9 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1908,7 +1911,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.30)
@@ -1943,8 +1946,9 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 
@@ -1956,7 +1960,7 @@ static MACHINE_CONFIG_START( hcrash, nemesis_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(nemesis_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.10)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.10)
@@ -2695,8 +2699,9 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nemesis_state, screen_update_nemesis)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", nemesis)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nemesis)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 

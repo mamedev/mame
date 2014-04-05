@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(bank0_w)
@@ -469,14 +469,14 @@ static SLOT_INTERFACE_START( super6_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void super6_state::fdc_intrq_w(bool state)
+WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	m_ctc->trg3(!state);
 }
 
-void super6_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
@@ -518,10 +518,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void super6_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(super6_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(super6_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_s100));
 	save_item(NAME(m_bank0));
@@ -564,6 +560,8 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, 1000000)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(super6_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,    floppy_image_device::default_floppy_formats)

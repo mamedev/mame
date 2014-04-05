@@ -24,7 +24,7 @@
 
     In addition, there are several optimizations enabled which make
     assumptions about the code which may not be valid for other
-    applications. Check dsp32ops.c for details.
+    applications. Check dsp32ops.inc for details.
 
 ***************************************************************************/
 
@@ -565,7 +565,7 @@ void dsp32c_device::update_pins(void)
 //  CORE INCLUDE
 //**************************************************************************
 
-#include "dsp32ops.c"
+#include "dsp32ops.inc"
 
 
 

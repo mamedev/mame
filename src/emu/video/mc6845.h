@@ -108,7 +108,7 @@ struct mc6845_interface
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	devcb_write_line            m_out_vsync_func;
 
-	/* Called whenenever the update address changes
+	/* Called whenever the update address changes
 	 * For vblank/hblank timing strobe indicates the physical update.
 	 * vblank/hblank timing not supported yet! */
 
@@ -393,6 +393,8 @@ public:
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
+	DECLARE_PALETTE_INIT(mos8563);
+
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( register_r );
@@ -406,11 +408,13 @@ public:
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	const address_space_config      m_videoram_space_config;
+	required_device<palette_device> m_palette;
 
 	UINT8 m_char_buffer[80];
 	UINT8 m_attr_buffer[80];

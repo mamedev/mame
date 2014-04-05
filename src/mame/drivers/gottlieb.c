@@ -1739,7 +1739,7 @@ static MACHINE_CONFIG_START( gottlieb_core, gottlieb_state )
 	MCFG_SCREEN_RAW_PARAMS(SYSTEM_CLOCK/4, GOTTLIEB_VIDEO_HCOUNT, 0, GOTTLIEB_VIDEO_HBLANK, GOTTLIEB_VIDEO_VCOUNT, 0, GOTTLIEB_VIDEO_VBLANK)
 	MCFG_SCREEN_UPDATE_DRIVER(gottlieb_state, screen_update_gottlieb)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", gfxdecode)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gfxdecode)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	// basic speaker configuration
@@ -1767,6 +1767,7 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 
@@ -1858,6 +1859,7 @@ static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
 	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 

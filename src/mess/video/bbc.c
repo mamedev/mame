@@ -108,13 +108,13 @@ void bbc_state::set_pixel_lookup()
 WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 {
 	// Make sure vpos is never <0 2008-10-11 PHS.
-	int vpos=machine().primary_screen->vpos();
+	int vpos=machine().first_screen()->vpos();
 	if(vpos==0)
-		machine().primary_screen->update_partial(vpos);
+		machine().first_screen()->update_partial(vpos);
 	else
-		machine().primary_screen->update_partial(vpos -1 );
+		machine().first_screen()->update_partial(vpos -1 );
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().primary_screen->vpos() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().first_screen()->vpos() );
 
 
 	switch (offset&0x01)
@@ -165,7 +165,7 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 static MC6845_UPDATE_ROW( vid_update_row )
 {
 	bbc_state *state = device->machine().driver_data<bbc_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 
 	if (state->m_videoULA_teletext_normal_select)
 	{

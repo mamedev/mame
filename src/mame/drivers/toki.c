@@ -427,8 +427,9 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", toki)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -456,8 +457,9 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tokib)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -782,7 +784,7 @@ ROM_END
 DRIVER_INIT_MEMBER(toki_state,toki)
 {
 	UINT8 *ROM = memregion("oki")->base();
-	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
+	dynamic_buffer buffer(0x20000);
 	int i;
 
 	memcpy(buffer,ROM,0x20000);
@@ -791,15 +793,13 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 
-	auto_free(machine(), buffer);
-
 	m_seibu_sound->decrypt("audiocpu",0x2000);
 }
 
 
 DRIVER_INIT_MEMBER(toki_state,tokib)
 {
-	UINT8 *temp = auto_alloc_array(machine(), UINT8, 65536 * 2);
+	dynamic_buffer temp(65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
@@ -832,8 +832,6 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-
-	auto_free (machine(), temp);
 }
 
 DRIVER_INIT_MEMBER(toki_state,jujuba)
@@ -872,7 +870,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	{
 		UINT8 *ROM = memregion("oki")->base();
-		UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x20000);
+		dynamic_buffer buffer(0x20000);
 		int i;
 
 		memcpy(buffer,ROM,0x20000);
@@ -880,8 +878,6 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		{
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
-
-		auto_free(machine(), buffer);
 	}
 }
 

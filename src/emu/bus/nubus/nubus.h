@@ -85,6 +85,7 @@ public:
 	// construction/destruction
 	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	~nubus_device() { m_device_list.detach_all(); }
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 

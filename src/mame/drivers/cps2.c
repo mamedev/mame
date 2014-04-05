@@ -1257,6 +1257,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
+	MCFG_SCREEN_PALETTE("palette")
 /*
     Measured clocks:
         V = 59.6376Hz
@@ -1268,7 +1269,7 @@ static MACHINE_CONFIG_START( cps2, cps_state )
          8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
         16MHz -> same as 8 but with a /2 divider; also a possibility
 */
-	MCFG_GFXDECODE_ADD("gfxdecode", cps2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps2)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps2)
@@ -8496,15 +8497,13 @@ void cps_state::gigaman2_gfx_reorder()
 	int i;
 	int length = memregion( "gfx" )->bytes();
 	UINT16 *rom = (UINT16 *)memregion("gfx")->base();
-	UINT16 *buf = auto_alloc_array(machine(), UINT16, length );
+	dynamic_array<UINT16> buf( length );
 
 	memcpy (buf, rom, length);
 
 	for (i = 0; i < length/2; i++) {
 		rom[i] = buf[((i & ~7) >> 2) | ((i & 4) << 18) | ((i & 2) >> 1) | ((i & 1) << 21)];
 	}
-
-	auto_free( machine(), buf );
 }
 
 DRIVER_INIT_MEMBER(cps_state,gigaman2)

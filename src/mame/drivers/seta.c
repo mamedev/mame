@@ -6605,7 +6605,92 @@ INPUT_PORTS_END
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
+
 static INPUT_PORTS_START( keroppi )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Prize Out") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COINS") //Coins
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Prize Hopper") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("DSW") //2 DSWs - $600001 & 3.b
+	PORT_DIPNAME( 0x0001, 0x0001, "Unknown 2-1" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Unknown 2-2" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 2-3" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Unknown 2-4" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 2-5" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 2-6" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 2-7" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 2-8" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, "Unknown 1-1" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "Unknown 1-2" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Unknown 1-3" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Unknown 1-4" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Unknown 1-6" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 1-7" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 1-8" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( keroppij )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7285,6 +7370,8 @@ static GFXDECODE_START( orbs )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
+
+
 /***************************************************************************
                                 Wiggie Waggle / Super Bar
 ****************************************************************************/
@@ -7500,8 +7587,9 @@ static MACHINE_CONFIG_START( tndrcade, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7552,8 +7640,9 @@ static MACHINE_CONFIG_START( twineagl, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
@@ -7596,8 +7685,9 @@ static MACHINE_CONFIG_START( downtown, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7656,8 +7746,9 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 33*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", usclssic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usclssic)
 
 	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
@@ -7709,8 +7800,9 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7751,8 +7843,9 @@ static MACHINE_CONFIG_START( metafox, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -7789,8 +7882,9 @@ static MACHINE_CONFIG_START( atehate, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7834,8 +7928,9 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
 
 	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
@@ -7871,8 +7966,9 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", blandia)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blandia)
 
 	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
@@ -7912,8 +8008,9 @@ static MACHINE_CONFIG_START( blockcar, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -7986,8 +8083,9 @@ static MACHINE_CONFIG_START( daioh, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8030,8 +8128,9 @@ static MACHINE_CONFIG_START( drgnunit, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", downtown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", downtown)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -8067,8 +8166,9 @@ static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", qzkklgy2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", qzkklgy2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
@@ -8119,8 +8219,9 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_setaroul)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_setaroul)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", setaroul)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", setaroul)
 
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(seta_state,setaroul)
@@ -8159,8 +8260,9 @@ static MACHINE_CONFIG_START( eightfrc, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8202,8 +8304,9 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zingzip)
 
 	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -8267,8 +8370,9 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -8312,8 +8416,9 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -8348,8 +8453,9 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -8393,8 +8499,9 @@ static MACHINE_CONFIG_START( kamenrid, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8432,8 +8539,9 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", orbs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbs)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8448,11 +8556,13 @@ static MACHINE_CONFIG_START( orbs, seta_state )
 MACHINE_CONFIG_END
 
 
+
+
 /***************************************************************************
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( keroppi, seta_state )
+static MACHINE_CONFIG_START( keroppij, seta_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
@@ -8472,8 +8582,9 @@ static MACHINE_CONFIG_START( keroppi, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", orbs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbs)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8487,6 +8598,9 @@ static MACHINE_CONFIG_START( keroppi, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( keroppi, keroppij )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", tndrcade)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Krazy Bowl
@@ -8510,8 +8624,9 @@ static MACHINE_CONFIG_START( krzybowl, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8553,8 +8668,9 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jjsquawk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jjsquawk)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -8598,8 +8714,9 @@ static MACHINE_CONFIG_START( magspeed, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8647,8 +8764,9 @@ static MACHINE_CONFIG_START( msgundam, seta_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_VBLANK_DRIVER(seta_state, screen_eof_seta_buffer_sprites)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8686,8 +8804,9 @@ static MACHINE_CONFIG_START( oisipuzl, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
@@ -8725,8 +8844,9 @@ static MACHINE_CONFIG_START( triplfun, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
@@ -8762,8 +8882,9 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8803,8 +8924,9 @@ static MACHINE_CONFIG_START( rezon, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -8844,8 +8966,9 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8917,8 +9040,9 @@ static MACHINE_CONFIG_START( wiggie, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", wiggie)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiggie)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8953,8 +9077,9 @@ static MACHINE_CONFIG_START( wits, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -8991,8 +9116,9 @@ static MACHINE_CONFIG_START( umanclub, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -9033,8 +9159,9 @@ static MACHINE_CONFIG_START( utoukond, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -9084,8 +9211,9 @@ static MACHINE_CONFIG_START( wrofaero, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", msgundam)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", msgundam)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -9129,8 +9257,9 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", zingzip)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zingzip)
 
 	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -9186,8 +9315,9 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
 	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -9235,8 +9365,9 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", crazyfgt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crazyfgt)
 
 	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
@@ -9277,10 +9408,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::inttoote_interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static MSM6242_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( inttoote, seta_state )
 
@@ -9303,8 +9430,9 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_inttoote)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", inttoote)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inttoote)
 
 	MCFG_PALETTE_ADD("palette", 512 * 1)
 	MCFG_PALETTE_INIT_OWNER(seta_state,inttoote)
@@ -9320,7 +9448,7 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", rtc_intf)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jockeyc, inttoote )
@@ -10405,6 +10533,20 @@ ROM_END
 
 ROM_START( keroppi )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "keroppi jr. code (u10) v1.0.u10",  0x000000, 0x040000, CRC(1fc2e895) SHA1(08f1f48d4f601cf51583bf8854a9fa7016337cfc) )
+	ROM_LOAD16_BYTE( "keroppi jr. code (u9) v1.0.u9",    0x000001, 0x040000, CRC(e0599e7b) SHA1(46b5ecc2864ab9e75540764453df5a2e6b6195e0) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "keroppi jr. chr(u11) v1.0.u11",  0x000000, 0x080000, CRC(74148c23) SHA1(26e642e2e0ad2b2af749355e9c46605061b100bc) )
+	ROM_LOAD( "keroppi jr. chr(u12) v1.0.u12",  0x080000, 0x080000, CRC(6f4dae98) SHA1(da88837278cea956485f11ef55da8a4e9504c97a) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "keroppi jr. snd (u15) v1.0.u15",  0x000000, 0x080000, CRC(c98dacf0) SHA1(b508433e2383af1e8bd5fda253c9925c48443490) ) // == = ft-001-007.u15
+	ROM_LOAD( "keroppi jr. snd (u16) v1.0.u16",  0x080000, 0x080000, CRC(d61e5a32) SHA1(aa2edf39e72ac15a8c8dd016b87bea17472f0f94) )
+ROM_END
+
+ROM_START( keroppij )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "ft-001-001.u10",  0x000000, 0x080000, CRC(37861e7d) SHA1(4bf75f119b0ef1420c96844224850867fa8e273f) )
 	ROM_LOAD16_BYTE( "ft-001-002.u9",   0x000001, 0x080000, CRC(f531d4ef) SHA1(75a99695679de083765700c250bd1fdfd8be9981) )
 
@@ -11020,12 +11162,11 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
 	int rom_size;
-	UINT8 *buf;
 	UINT8 *rom;
 	int rpos;
 
 	rom_size = 0x80000;
-	buf = auto_alloc_array(machine(), UINT8, rom_size);
+	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx2")->base() + 0x40000;
 
@@ -11044,8 +11185,6 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	}
 
 	memcpy( rom, buf, rom_size );
-
-	auto_free(machine(), buf);
 }
 
 
@@ -11260,7 +11399,8 @@ GAME( 1994, magspeed, 0,        magspeed, magspeed, driver_device, 0,        ROT
 
 GAME( 1994, orbs,     0,        orbs,     orbs, driver_device,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
 
-GAME( 1993, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1995, keroppi,  0,        keroppi,  keroppi, driver_device,  0,        ROT0,   "American Sammy",         "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
+GAME( 1993, keroppij, keroppi,  keroppij, keroppij,driver_device,  0,        ROT0,   "Sammy Industries",       "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, driver_device, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
 

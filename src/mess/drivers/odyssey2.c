@@ -748,13 +748,6 @@ static GFXDECODE_START( odyssey2 )
 GFXDECODE_END
 
 
-static const sp0256_interface the_voice_sp0256 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(odyssey2_state,the_voice_lrq_callback),
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_FRAGMENT( odyssey2_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
@@ -775,8 +768,9 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -786,7 +780,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	/* The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -805,8 +799,9 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
 
@@ -816,7 +811,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
@@ -834,8 +829,9 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -848,7 +844,7 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
@@ -869,8 +865,9 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", odyssey2 )	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )	
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
@@ -883,7 +880,7 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
-	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SP0256_DATA_REQUEST_CB(WRITELINE(odyssey2_state, the_voice_lrq_callback))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)

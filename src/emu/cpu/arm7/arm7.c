@@ -31,7 +31,7 @@
        It can be used as is, or used to demonstrate how to utilize the arm7 core to create a cpu
        that uses the core, since there are numerous different mcu packages that incorporate an arm7 core.
 
-       See the notes in the arm7core.c file itself regarding issues/limitations of the arm7 core.
+       See the notes in the arm7core.inc file itself regarding issues/limitations of the arm7 core.
     **
 
 TODO:
@@ -493,7 +493,7 @@ bool arm7_cpu_device::memory_translate(address_spacenum spacenum, int intention,
 
 
 /* include the arm7 core */
-#include "arm7core.c"
+#include "arm7core.inc"
 
 /***************************************************************************
  * CPU SPECIFIC IMPLEMENTATIONS
@@ -1222,4 +1222,4 @@ UINT8 arm7_cpu_device::arm7_cpu_read8(UINT32 addr)
 	return m_program->read_byte(addr);
 }
 
-#include "arm7drc.c"
+#include "arm7drc.inc"

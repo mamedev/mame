@@ -560,17 +560,6 @@ static const ay8910_interface psg_intf =
 
 
 //-------------------------------------------------
-//  sp0256_interface sp0256_intf
-//-------------------------------------------------
-
-static const sp0256_interface sp0256_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
@@ -736,12 +725,14 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(ace_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_6_5MHz, 416, 0, 336, 312, 0, 304)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("set_irq", ace_state, set_irq, SCREEN_TAG, 31*8, 264)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("clear_irq", ace_state, clear_irq, SCREEN_TAG, 32*8, 264)
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ace)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -755,7 +746,6 @@ static MACHINE_CONFIG_START( ace, ace_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL_3MHz)
-	MCFG_SOUND_CONFIG(sp0256_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

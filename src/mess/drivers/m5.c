@@ -560,11 +560,6 @@ static SLOT_INTERFACE_START( m5_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-void m5_state::fdc_irq(bool state)
-{
-	m_fd5cpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 //-------------------------------------------------
 //  z80_daisy_config m5_daisy_chain
 //-------------------------------------------------
@@ -602,8 +597,6 @@ void m5_state::machine_start()
 	case 68*1024:
 		break;
 	}
-
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(m5_state::fdc_irq), this));
 
 	// register for state saving
 	save_item(NAME(m_fd5_data));
@@ -655,6 +648,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(Z80_FD5_TAG, INPUT_LINE_IRQ0))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
 
 	// cartridge

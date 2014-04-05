@@ -59,8 +59,8 @@ public:
 	UINT8 m_framecnt;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<const UINT8> m_p_colorram;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_colorram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(port88_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
@@ -250,7 +250,9 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SCREEN_SIZE(40*8, 24*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
-	MCFG_GFXDECODE_ADD("gfxdecode", z9001)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z9001)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* Sound */

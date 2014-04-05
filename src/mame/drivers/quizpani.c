@@ -199,7 +199,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_GFXDECODE_ADD("gfxdecode", quizpani)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", quizpani)
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
@@ -209,6 +209,7 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quizpani_state, screen_update_quizpani)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

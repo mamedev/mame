@@ -129,13 +129,13 @@ void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		flipx = spriteram[offs+1] & 0x08;
 		flipy = spriteram[offs+1] & 0x04;
 
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
 		/* wraparound */
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,

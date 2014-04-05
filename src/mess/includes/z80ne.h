@@ -15,6 +15,7 @@
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
+#include "machine/wd17xx.h"
 
 /***************************************************************************
     CONSTANTS
@@ -147,7 +148,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
-	optional_device<device_t> m_wd1771;
+	optional_device<fd1771_device> m_wd1771;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;

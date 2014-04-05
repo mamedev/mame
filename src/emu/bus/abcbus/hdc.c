@@ -57,7 +57,7 @@ const rom_entry *abc_hdc_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( abc_hdc_mem, AS_PROGRAM, 8, abc_hdc_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0x0000, 0x0ff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
 

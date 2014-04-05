@@ -572,8 +572,9 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(senjyo_state, screen_update_senjyo)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", senjyo)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", senjyo)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512+2)  /* 512 real palette + 2 for the radar */
 

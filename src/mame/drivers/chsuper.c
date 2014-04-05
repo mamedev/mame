@@ -72,7 +72,7 @@ UINT32 chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 		{
 			int tile = ((m_vram[count+1]<<8) | m_vram[count]) & 0xffff;
 
-			gfx->opaque(m_palette,bitmap,cliprect,tile,0,0,0,x*4,y*8);
+			gfx->opaque(bitmap,cliprect,tile,0,0,0,x*4,y*8);
 			count+=2;
 		}
 	}
@@ -215,10 +215,11 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_SCREEN_UPDATE_DRIVER(chsuper_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chsuper)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")

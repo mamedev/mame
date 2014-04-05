@@ -18,11 +18,13 @@
     * implement tape interface?
 
     Raphael Nabet 2003
+
+    Rewritten as class
+    Michael Zapf, 2014
 */
 
 #include "emu.h"
 #include "733_asr.h"
-#include "devlegcy.h"
 
 enum
 {
@@ -33,34 +35,6 @@ enum
 	asr_window_width = 640,
 	asr_window_height = 480,
 	asr_scroll_step = 8
-};
-
-struct asr_t
-{
-#if 0
-	UINT8 OutQueue[ASROutQueueSize];
-	int OutQueueHead;
-	int OutQueueLen;
-#endif
-
-	UINT8 recv_buf;
-	UINT8 xmit_buf;
-
-	UINT8 status;
-	UINT8 mode;
-	UINT8 last_key_pressed;
-	int last_modifier_state;
-
-	unsigned char repeat_timer;
-	int new_status_flag;
-
-	int x;
-
-	void (*int_callback)(running_machine &, int state);
-
-	bitmap_ind16 *bitmap;
-	gfxdecode_device *m_gfxdecode;
-	palette_device *m_palette;
 };
 
 enum
@@ -101,11 +75,49 @@ PALETTE_INIT_MEMBER(asr733_device, asr733)
 	palette.set_pen_color(1,rgb_t::black); /* black */
 }
 
-/*
-    Initialize the asr core
-*/
-void asr733_init(running_machine &machine)
+
+const device_type ASR733 = &device_creator<asr733_device>;
+
+asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_keyint_line(*this),
+		m_lineint_line(*this)
 {
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void asr733_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void asr733_device::device_start()
+{
+	screen_device *screen = machine().first_screen();
+	int width = screen->width();
+	int height = screen->height();
+	const rectangle &visarea = screen->visible_area();
+
+	m_last_key_pressed = 0x80;
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), width, height);
+
+	m_bitmap->fill(0, visarea);
+
+	m_keyint_line.resolve();
+	m_lineint_line.resolve();
+
+	m_line_timer = timer_alloc(0);
+
 	UINT8 *dst;
 
 	static const unsigned char fontdata6x8[asrfontdata_size] =
@@ -160,95 +172,9 @@ void asr733_init(running_machine &machine)
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00
 	};
 
-	dst = machine.root_device().memregion(asr733_chr_region)->base();
+	dst = machine().root_device().memregion(asr733_chr_region)->base();
 
 	memcpy(dst, fontdata6x8, asrfontdata_size);
-}
-
-INLINE asr_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ASR733);
-
-	return (asr_t *)downcast<asr733_device *>(device)->token();
-}
-
-static DEVICE_START( asr733 )
-{
-	asr_t *asr = get_safe_token(device);
-	const asr733_init_params_t *params = (const asr733_init_params_t *)device->static_config();
-	screen_device *screen = device->machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
-	const rectangle &visarea = screen->visible_area();
-
-	asr->last_key_pressed = 0x80;
-	asr->bitmap = auto_bitmap_ind16_alloc(device->machine(), width, height);
-
-	asr->bitmap->fill(0, visarea);
-
-	asr->int_callback = params->int_callback;
-}
-
-static void asr_field_interrupt(device_t *device)
-{
-	asr_t *asr = get_safe_token(device);
-	if ((asr->mode & AM_enint_mask) && (asr->new_status_flag))  /* right??? */
-	{
-		asr->status |= AS_int_mask;
-		if (asr->int_callback)
-			(*asr->int_callback)(device->machine(), 1);
-	}
-	else
-	{
-		asr->status &= ~AS_int_mask;
-		if (asr->int_callback)
-			(*asr->int_callback)(device->machine(), 0);
-	}
-}
-
-static DEVICE_RESET( asr733 )
-{
-	asr_t *asr = get_safe_token(device);
-
-	/*asr->OutQueueLen = 0;*/
-
-	asr->status = AS_dsr_mask | AS_wrq_mask;
-	asr->mode = 0;
-
-	asr_field_interrupt(device);
-}
-
-const device_type ASR733 = &device_creator<asr733_device>;
-
-asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
-		m_palette(*this, "palette"),
-		m_gfxdecode(*this, "gfxdecode")		
-{
-	m_token = global_alloc_clear(asr_t);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void asr733_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void asr733_device::device_start()
-{
-	asr_t *asr = get_safe_token(this);
-	asr->m_gfxdecode = m_gfxdecode;
-	asr->m_palette = m_palette;
-	DEVICE_START_NAME( asr733 )(this);
 }
 
 //-------------------------------------------------
@@ -257,30 +183,43 @@ void asr733_device::device_start()
 
 void asr733_device::device_reset()
 {
-	DEVICE_RESET_NAME( asr733 )(this);
+	/*m_OutQueueLen = 0;*/
+
+	m_status = AS_dsr_mask | AS_wrq_mask;
+	m_mode = 0;
+	m_line_timer->adjust(attotime::from_msec(0), 0, attotime::from_hz(60));
+
+	set_interrupt_line();
 }
 
-
+void asr733_device::set_interrupt_line()
+{
+	if ((m_mode & AM_enint_mask) && (m_new_status_flag))  /* right??? */
+	{
+		m_status |= AS_int_mask;
+		m_keyint_line(ASSERT_LINE);
+	}
+	else
+	{
+		m_status &= ~AS_int_mask;
+		m_keyint_line(CLEAR_LINE);
+	}
+}
 
 /* write a single char on screen */
-static void asr_draw_char(device_t *device, int character, int x, int y, int color)
+void asr733_device::draw_char(int character, int x, int y, int color)
 {
-	asr_t *asr = get_safe_token(device);
-
-	 asr->m_gfxdecode->gfx(0)->opaque(*asr->m_palette,*asr->bitmap,asr->bitmap->cliprect(), character-32, color, 0, 0,
-				x+1, y);
+		m_gfxdecode->gfx(0)->opaque(*m_bitmap, m_bitmap->cliprect(), character-32, color, 0, 0, x+1, y);
 }
 
-static void asr_linefeed(device_t *device)
+void asr733_device::linefeed()
 {
-	asr_t *asr = get_safe_token(device);
 	UINT8 buf[asr_window_width];
-	int y;
 
-	for (y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
+	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
-		extract_scanline8(*asr->bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
-		draw_scanline8(*asr->bitmap, asr_window_offset_x, y, asr_window_width, buf,downcast<asr733_device *>(device)->m_palette->pens());
+		extract_scanline8(*m_bitmap, asr_window_offset_x, y+asr_scroll_step, asr_window_width, buf);
+		draw_scanline8(*m_bitmap, asr_window_offset_x, y, asr_window_width, buf, m_palette->pens());
 	}
 
 	const rectangle asr_scroll_clear_window(
@@ -289,13 +228,11 @@ static void asr_linefeed(device_t *device)
 		asr_window_offset_y+asr_window_height-asr_scroll_step,  /* min_y */
 		asr_window_offset_y+asr_window_height-1                 /* max_y */
 	);
-	asr->bitmap->fill(0, asr_scroll_clear_window);
+	m_bitmap->fill(0, asr_scroll_clear_window);
 }
 
-static void asr_transmit(device_t *device, UINT8 data)
+void asr733_device::transmit(UINT8 data)
 {
-	asr_t *asr = get_safe_token(device);
-
 	switch (data)
 	{
 	/* aux device control chars */
@@ -327,18 +264,18 @@ static void asr_transmit(device_t *device, UINT8 data)
 
 	case 0x08:
 		/* BS: backspace */
-		if (asr->x > 0)
-			asr->x--;
+		if (m_x > 0)
+			m_x--;
 		break;
 
 	case 0x0A:
 		/* LF: line feed */
-		asr_linefeed(device);
+		linefeed();
 		break;
 
 	case 0x0D:
 		/* CR: carriage return */
-		asr->x = 0;
+		m_x = 0;
 		break;
 
 
@@ -347,34 +284,33 @@ static void asr_transmit(device_t *device, UINT8 data)
 			/* ignore control characters */
 			break;
 
-		if (asr->x == 80)
+		if (m_x == 80)
 		{
-			asr->x = 0;
-			asr_linefeed(device);
+			m_x = 0;
+			linefeed();
 		}
-		asr_draw_char(device, data, asr_window_offset_x+asr->x*8, asr_window_offset_y+asr_window_height-8, 0);
-		asr->x++;
+		draw_char(data, asr_window_offset_x + m_x*8, asr_window_offset_y+asr_window_height-8, 0);
+		m_x++;
 		break;
 	}
 
-	asr->status |= AS_wrq_mask;
-	asr->new_status_flag = 1;   /* right??? */
-	asr_field_interrupt(device);
+	m_status |= AS_wrq_mask;
+	m_new_status_flag = 1;   /* right??? */
+	set_interrupt_line();
 }
 
 #if 0
-static void asr_receive_callback(int dummy)
+void asr733_device::receive_callback(int dummy)
 {
-	asr_t *asr = get_safe_token(device);
 	(void) dummy;
 
-	asr->recv_buf = asr->OutQueue[asr->OutQueueHead];
-	asr->OutQueueHead = (asr->OutQueueHead + 1) % ASROutQueueSize;
-	asr->OutQueueLen--;
+	m_recv_buf = m_OutQueue[m_OutQueueHead];
+	m_OutQueueHead = (m_OutQueueHead + 1) % ASROutQueueSize;
+	m_OutQueueLen--;
 
-	asr->status |= AS_rrq_mask;
-	asr->new_status_flag = 1;   /* right??? */
-	asr_field_interrupt(device);
+	m_status |= AS_rrq_mask;
+	m_new_status_flag = 1;   /* right??? */
+	set_interrupt_line();
 }
 #endif
 
@@ -390,21 +326,20 @@ static void asr_receive_callback(int dummy)
     14: DSR data set ready, 1 if online
     15: INT interrupt, 1 if interrupt
 */
-READ8_DEVICE_HANDLER( asr733_cru_r )
+READ8_MEMBER( asr733_device::cru_r )
 {
-	asr_t *asr = get_safe_token(device);
 	int reply = 0;
 
 	switch (offset)
 	{
 	case 0:
 		/* receive buffer */
-		reply = asr->recv_buf;
+		reply = m_recv_buf;
 		break;
 
 	case 1:
 		/* status register */
-		reply = asr->status;
+		reply = m_status;
 		break;
 	}
 
@@ -422,10 +357,8 @@ READ8_DEVICE_HANDLER( asr733_cru_r )
     14: enable interrupts, 1 to enable interrupts
     15: diagnostic mode, 0 for normal mode
 */
-WRITE8_DEVICE_HANDLER( asr733_cru_w )
+WRITE8_MEMBER( asr733_device::cru_w )
 {
-	asr_t *asr = get_safe_token(device);
-
 	switch (offset)
 	{
 	case 0:
@@ -438,11 +371,11 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 	case 7:
 		/* transmit buffer */
 		if (data)
-			asr->xmit_buf |= 1 << offset;
+			m_xmit_buf |= 1 << offset;
 		else
-			asr->xmit_buf &= ~ (1 << offset);
-		if ((offset == 7) && (asr->mode & AM_dtr_mask) && (asr->mode & AM_rts_mask))    /* right??? */
-			asr_transmit(device, asr->xmit_buf);
+			m_xmit_buf &= ~ (1 << offset);
+		if ((offset == 7) && (m_mode & AM_dtr_mask) && (m_mode & AM_rts_mask))    /* right??? */
+			transmit(m_xmit_buf);
 		break;
 
 	case 8:     /* not used */
@@ -453,22 +386,22 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 	case 14:    /* enable interrupts, 1 to enable interrupts */
 	case 15:    /* diagnostic mode, 0 for normal mode */
 		if (data)
-			asr->mode |= 1 << (offset - 8);
+			m_mode |= 1 << (offset - 8);
 		else
-			asr->mode &= ~ (1 << (offset - 8));
+			m_mode &= ~ (1 << (offset - 8));
 		if (offset == 14)
-			asr_field_interrupt(device);
+			set_interrupt_line();
 		break;
 
 	case 11:    /* clear write request (write any value to execute) */
 	case 12:    /* clear read request (write any value to execute) */
-		asr->status &= ~ (1 << (offset - 8));
-		asr_field_interrupt(device);
+		m_status &= ~ (1 << (offset - 8));
+		set_interrupt_line();
 		break;
 
 	case 13:    /* clear new status flag - whatever it means (write any value to execute) */
-		asr->new_status_flag = 0;
-		asr_field_interrupt(device);
+		m_new_status_flag = 0;
+		set_interrupt_line();
 		break;
 	}
 }
@@ -476,12 +409,21 @@ WRITE8_DEVICE_HANDLER( asr733_cru_w )
 /*
     Video refresh
 */
-void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y)
+void asr733_device::refresh(bitmap_ind16 &bitmap, int x, int y)
 {
-	asr_t *asr = get_safe_token(device);
-	copybitmap(bitmap, *asr->bitmap, 0, 0, x, y, asr->bitmap->cliprect());
+	copybitmap(bitmap, *m_bitmap, 0, 0, x, y, m_bitmap->cliprect());
 }
 
+
+/*
+    Time callbacks
+*/
+void asr733_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	check_keyboard();
+	m_lineint_line(ASSERT_LINE);
+	m_lineint_line(CLEAR_LINE);
+}
 
 static const unsigned char key_translate[3][51] =
 {
@@ -663,9 +605,8 @@ static const unsigned char key_translate[3][51] =
     keyboard handler: should be called regularly by machine code, for instance
     every Video Blank Interrupt.
 */
-void asr733_keyboard(device_t *device)
+void asr733_device::check_keyboard()
 {
-	asr_t *asr = get_safe_token(device);
 	enum modifier_state_t
 	{
 		/* key modifier states */
@@ -689,7 +630,7 @@ void asr733_keyboard(device_t *device)
 	/* for (i = 0; i < 6; i++) */
 	for (i = 0; i < 4; i++)
 	{
-		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
+		key_buf[i] = ioport(keynames[i])->read();
 	}
 
 	/* process key modifiers */
@@ -710,40 +651,40 @@ void asr733_keyboard(device_t *device)
 
 	if (! repeat_mode)
 		/* reset REPEAT timer if the REPEAT key is not pressed */
-		asr->repeat_timer = 0;
+		m_repeat_timer = 0;
 
-	if ( ! (asr->last_key_pressed & 0x80) && (key_buf[asr->last_key_pressed >> 4] & (1 << (asr->last_key_pressed & 0xf))))
+	if ( !(m_last_key_pressed & 0x80) && (key_buf[m_last_key_pressed >> 4] & (1 << (m_last_key_pressed & 0xf))))
 	{
 		/* last key has not been released */
-		if (modifier_state == asr->last_modifier_state)
+		if (modifier_state == m_last_modifier_state)
 		{
 			/* handle REPEAT mode if applicable */
-			if ((repeat_mode) && (++asr->repeat_timer == repeat_delay))
+			if ((repeat_mode) && (++m_repeat_timer == repeat_delay))
 			{
-				if (asr->status & AS_rrq_mask)
+				if (m_status & AS_rrq_mask)
 				{   /* keyboard buffer full */
-					asr->repeat_timer--;
+					m_repeat_timer--;
 				}
 				else
 				{   /* repeat current key */
-					asr->status |= AS_rrq_mask;
-					asr->new_status_flag = 1;   /* right??? */
-					asr_field_interrupt(device);
-					asr->repeat_timer = 0;
+					m_status |= AS_rrq_mask;
+					m_new_status_flag = 1;   /* right??? */
+					set_interrupt_line();
+					m_repeat_timer = 0;
 				}
 			}
 		}
 		else
 		{
-			asr->repeat_timer = 0;
-			asr->last_modifier_state = special_debounce;
+			m_repeat_timer = 0;
+			m_last_modifier_state = special_debounce;
 		}
 	}
 	else
 	{
-		asr->last_key_pressed = 0x80;
+		m_last_key_pressed = 0x80;
 
-		if (asr->status & AS_rrq_mask)
+		if (m_status & AS_rrq_mask)
 		{   /* keyboard buffer full */
 			/* do nothing */
 		}
@@ -756,13 +697,13 @@ void asr733_keyboard(device_t *device)
 				{
 					if (key_buf[i] & (1 << j))
 					{
-						asr->last_key_pressed = (i << 4) | j;
-						asr->last_modifier_state = modifier_state;
+						m_last_key_pressed = (i << 4) | j;
+						m_last_modifier_state = modifier_state;
 
-						asr->recv_buf = (int)key_translate[modifier_state][asr->last_key_pressed];
-						asr->status |= AS_rrq_mask;
-						asr->new_status_flag = 1;   /* right??? */
-						asr_field_interrupt(device);
+						m_recv_buf = (int)key_translate[modifier_state][m_last_key_pressed];
+						m_status |= AS_rrq_mask;
+						m_new_status_flag = 1;   /* right??? */
+						set_interrupt_line();
 						return;
 					}
 				}
@@ -771,12 +712,95 @@ void asr733_keyboard(device_t *device)
 	}
 }
 
+UINT32 asr733_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	refresh(bitmap, 0, 0);
+	return 0;
+}
+
 static MACHINE_CONFIG_FRAGMENT( asr733 )
-	MCFG_GFXDECODE_ADD("gfxdecode", asr733)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asr733)
 
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, asr733_device, screen_update)
+
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
+
+INPUT_PORTS_START( asr733 )
+	PORT_START("KEY0")  /* keys 1-16 */                                                                 \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)      \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)      \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)      \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)      \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)      \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)      \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)      \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)      \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)      \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)      \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_MINUS)  \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_EQUALS) \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)      \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)      \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)      \
+																								\
+	PORT_START("KEY1")  /* keys 17-32 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)      \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)      \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)      \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)      \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)      \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)      \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)      \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_CLOSEBRACE) \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)    \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)      \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)      \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)      \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)      \
+																								\
+	PORT_START("KEY2")  /* keys 33-48 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)      \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)      \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)      \
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)  \
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RUB OUT") PORT_CODE(KEYCODE_BACKSPACE)    \
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_RALT)  \
+		/* hack for my mac that does not disciminate the right ALT key */                       \
+		/* PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_LALT) */    \
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) \
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)      \
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)      \
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)      \
+		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)      \
+		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)      \
+		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)      \
+		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)      \
+		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)  \
+		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)   \
+																								\
+	PORT_START("KEY3")  /* keys 49-51 */                                                                \
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)  \
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) \
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE)
+INPUT_PORTS_END
+
+ioport_constructor asr733_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( asr733 );
+}
 
 //-------------------------------------------------
 //  machine_config_additions - return a pointer to

@@ -135,6 +135,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

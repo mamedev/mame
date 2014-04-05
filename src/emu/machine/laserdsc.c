@@ -91,7 +91,8 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_videopalette(NULL),
 		m_overenable(false),
 		m_overindex(0),
-		m_overtex(NULL)
+		m_overtex(NULL),
+		m_overlay_palette(*this)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -290,6 +291,15 @@ void laserdisc_device::static_set_overlay_scale(device_t &device, float scalex, 
 
 }
 
+//-------------------------------------------------
+//  static_set_overlay_palette - set the screen palette
+//  configuration
+//-------------------------------------------------
+
+void laserdisc_device::static_set_overlay_palette(device_t &device, const char *tag)
+{
+	downcast<laserdisc_device &>(device).m_overlay_palette.set_tag(tag);
+}
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -301,6 +311,10 @@ void laserdisc_device::static_set_overlay_scale(device_t &device, float scalex, 
 
 void laserdisc_device::device_start()
 {
+	// if we have a palette and it's not started, wait for it
+	if (m_overlay_palette != NULL && !m_overlay_palette->started())
+		throw device_missing_dependencies();
+	
 	// initialize the various pieces
 	init_disc();
 	init_video();
@@ -349,6 +363,18 @@ void laserdisc_device::device_reset()
 	m_sliderupdate = machine().time();
 }
 
+
+//-------------------------------------------------
+//  device_validity_check - verify device
+//  configuration
+//-------------------------------------------------
+
+void laserdisc_device::device_validity_check(validity_checker &valid) const
+{
+	texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+	if (m_overlay_palette == NULL && texformat == TEXFORMAT_PALETTE16)
+		mame_printf_error("Overlay screen does not have palette defined\n");		
+}
 
 //-------------------------------------------------
 //  device_timer - handle timers set by this
@@ -820,7 +846,7 @@ void laserdisc_device::init_video()
 		{
 			m_overbitmap[index].set_format(format, texformat);
 			if (format==BITMAP_FORMAT_IND16)
-				m_overbitmap[index].set_palette(machine().first_screen()->palette()->palette());
+				m_overbitmap[index].set_palette(m_overlay_palette->palette());
 			m_overbitmap[index].resize(m_overwidth, m_overheight);
 		}
 

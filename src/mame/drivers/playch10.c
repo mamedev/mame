@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", playch10)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
 	MCFG_PALETTE_ADD("palette", 256+8*4*16)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
 	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
@@ -688,12 +688,14 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	MCFG_PPU2C03B_ADD("ppu", playch10_ppu_interface)

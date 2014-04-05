@@ -2149,8 +2149,9 @@ static MACHINE_CONFIG_START( bishjan, subsino2_state )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
@@ -2177,8 +2178,9 @@ static MACHINE_CONFIG_START( mtrain, subsino2_state )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, mtrain )
@@ -2208,8 +2210,9 @@ static MACHINE_CONFIG_START( saklove, subsino2_state )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
@@ -2243,8 +2246,9 @@ static MACHINE_CONFIG_START( xplan, subsino2_state )
 	MCFG_SCREEN_REFRESH_RATE( 58.7270 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // game reads vblank state
 	MCFG_SCREEN_UPDATE_DRIVER(subsino2_state, screen_update_subsino2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ss9601 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ss9601 )
 	MCFG_PALETTE_ADD( "palette", 256 )
 
 	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )

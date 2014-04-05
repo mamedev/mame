@@ -52,6 +52,7 @@ protected:
 
 private:
 	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;

@@ -318,6 +318,9 @@ void gp9001vdp_device::create_tilemaps(int region)
 
 void gp9001vdp_device::device_start()
 {
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	top.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_TOP_VRAM_SIZE/2);
 	fg.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_FG_VRAM_SIZE/2);
 	bg.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_BG_VRAM_SIZE/2);
@@ -813,7 +816,7 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 					else       sx = sx_base + dim_x;
 
 					/*
-					gfx->transpen(m_palette,bitmap,cliprect,sprite,
+					gfx->transpen(bitmap,cliprect,sprite,
 					    color,
 					    flipx,flipy,
 					    sx,sy,0);
@@ -903,8 +906,8 @@ void gp9001vdp_device::draw_sprites( running_machine &machine, bitmap_ind16 &bit
 
 void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine& machine, bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
 {
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine.first_screen()->width();
+	int height = machine.first_screen()->height();
 	int y,x;
 	bitmap_ind16 &tmb = tilemap->pixmap();
 	UINT16* srcptr;

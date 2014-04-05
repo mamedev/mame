@@ -432,19 +432,19 @@ WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
 
 READ8_MEMBER(fm7_state::fm7_fdc_r)
 {
-	device_t* dev = machine().device("fdc");
+	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
 	{
 		case 0:
-			return wd17xx_status_r(dev,space, offset);
+			return fdc->status_r(space, offset);
 		case 1:
-			return wd17xx_track_r(dev,space, offset);
+			return fdc->track_r(space, offset);
 		case 2:
-			return wd17xx_sector_r(dev,space, offset);
+			return fdc->sector_r(space, offset);
 		case 3:
-			return wd17xx_data_r(dev,space, offset);
+			return fdc->data_r(space, offset);
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -466,24 +466,24 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 
 WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 {
-	device_t* dev = machine().device("fdc");
+	mb8877_device *fdc = machine().device<mb8877_device>("fdc");
 	switch(offset)
 	{
 		case 0:
-			wd17xx_command_w(dev,space, offset,data);
+			fdc->command_w(space, offset,data);
 			break;
 		case 1:
-			wd17xx_track_w(dev,space, offset,data);
+			fdc->track_w(space, offset,data);
 			break;
 		case 2:
-			wd17xx_sector_w(dev,space, offset,data);
+			fdc->sector_w(space, offset,data);
 			break;
 		case 3:
-			wd17xx_data_w(dev,space, offset,data);
+			fdc->data_w(space, offset,data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
-			wd17xx_set_side(dev,data & 0x01);
+			fdc->set_side(data & 0x01);
 			logerror("FDC: wrote %02x to 0x%04x (side)\n",data,offset+0xfd18);
 			break;
 		case 5:
@@ -494,7 +494,7 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 			}
 			else
 			{
-				wd17xx_set_drive(dev,data & 0x03);
+				fdc->set_drive(data & 0x03);
 				floppy_mon_w(floppy_get_device(machine(), data & 0x03), !BIT(data, 7));
 				floppy_drive_set_ready_state(floppy_get_device(machine(), data & 0x03), data & 0x80,0);
 				logerror("FDC: wrote %02x to 0x%04x (drive)\n",data,offset+0xfd18);
@@ -1896,7 +1896,7 @@ void fm7_state::machine_reset()
 	m_subtimer->adjust(attotime::from_msec(20),0,attotime::from_msec(20));
 	m_keyboard_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
-		m_fm77av_vsync_timer->adjust(machine().primary_screen->time_until_vblank_end());
+		m_fm77av_vsync_timer->adjust(machine().first_screen()->time_until_vblank_end());
 
 	m_irq_mask = 0x00;
 	m_irq_flags = 0x00;
@@ -2042,12 +2042,12 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
@@ -2091,12 +2091,12 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
@@ -2146,6 +2146,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8 + 4096)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
@@ -2193,12 +2194,12 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)
@@ -2240,12 +2241,12 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(fm7_state, fm7)

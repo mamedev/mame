@@ -32,6 +32,7 @@ public:
 			m_usart(*this, P8251A_TAG),
 			m_discrete(*this, DISCRETE_TAG),
 			m_ieee488(*this, IEEE488_TAG),
+			m_palette(*this, "palette"),
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, FDC1797_TAG":0"),
 			m_floppy1(*this, FDC1797_TAG":1"),
@@ -62,6 +63,7 @@ public:
 	required_device<i8251_device> m_usart;
 	required_device<discrete_sound_device> m_discrete;
 	required_device<ieee488_device> m_ieee488;
+	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

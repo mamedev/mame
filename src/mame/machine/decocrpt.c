@@ -602,7 +602,7 @@ static void deco_decrypt(running_machine &machine,const char *rgntag,const UINT8
 {
 	UINT16 *rom = (UINT16 *)machine.root_device().memregion(rgntag)->base();
 	int len = machine.root_device().memregion(rgntag)->bytes()/2;
-	UINT16 *buffer = auto_alloc_array(machine, UINT16, len);
+	dynamic_array<UINT16> buffer(len);
 	int i;
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
@@ -638,8 +638,6 @@ static void deco_decrypt(running_machine &machine,const char *rgntag,const UINT8
 						swap_patterns[pat][14],
 						swap_patterns[pat][15]);
 	}
-
-	auto_free(machine, buffer);
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
 	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)

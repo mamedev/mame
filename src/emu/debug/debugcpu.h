@@ -38,6 +38,9 @@ typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 
 struct xml_data_node;
 
+
+// ======================> device_debug
+
 class device_debug
 {
 	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);

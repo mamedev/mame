@@ -239,15 +239,6 @@ WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static const k053252_interface rollerg_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(rollerg_state,rollerg_irq_ack_w),
-	DEVCB_NULL,
-	14*8, 2*8
-};
-
 void rollerg_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -284,12 +275,13 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(rollerg_state, screen_update_rollerg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K053244_ADD("k053244", rollerg_k05324x_intf)
 	MCFG_K053244_GFXDECODE("gfxdecode")
@@ -299,7 +291,9 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_PALETTE("palette")
 	
-	MCFG_K053252_ADD("k053252", 3000000*2, rollerg_k053252_intf)
+	MCFG_DEVICE_ADD("k053252", K053252, 3000000*2)
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(rollerg_state,rollerg_irq_ack_w))
+	MCFG_K053252_OFFSETS(14*8, 2*8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -241,6 +241,11 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 	memset((void*)&m_inline_config,0,sizeof(m_inline_config));
 }
 
+latch8_device::~latch8_device()
+{
+	global_free(m_token);
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is

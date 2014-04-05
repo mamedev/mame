@@ -151,6 +151,8 @@ PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 			apple2gs_palette[(3*i)]*17,
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
+
+		m_a2_palette[i] = rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17);
 	}
 }
 
@@ -344,9 +346,9 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MCFG_SCREEN_UPDATE_DRIVER(apple2gs_state, screen_update_apple2gs)
 
-	MCFG_PALETTE_ADD( "palette", 16+256 )
-	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs )
-	MCFG_GFXDECODE_ADD("gfxdecode", apple2gs )
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(apple2gs_state, apple2gs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apple2gs )
 
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gs )
 	MCFG_MACHINE_RESET_OVERRIDE(apple2gs_state, apple2gs )
@@ -392,7 +394,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_IWM_ADD("fdc", apple2_fdc_interface)
 
 	/* SCC */
-	MCFG_SCC8530_ADD("scc", APPLE2GS_14M/2, line_cb_t())
+	MCFG_DEVICE_ADD("scc", SCC8530, APPLE2GS_14M/2)
 
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_interface,15,16)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADDITIONAL_ADD(apple2gs_floppy35_floppy_interface)

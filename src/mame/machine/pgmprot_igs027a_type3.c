@@ -714,7 +714,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 // todo, collapse these to an address swap
 void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
 {
-	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x800000);
+	dynamic_buffer buffer(0x800000);
 	int writeaddress = 0;
 
 	for (int j = 0; j < 0x800; j += 0x200)
@@ -726,14 +726,13 @@ void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
 		}
 	}
 	memcpy(src, buffer, 0x800000);
-	auto_free(machine(), buffer);
 }
 
 
 
 void pgm_arm_type3_state::pgm_descramble_happy6_2(UINT8* src)
 {
-	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x800000);
+	dynamic_buffer buffer(0x800000);
 	int writeaddress = 0;
 	for (int k = 0; k < 0x800000; k += 0x100000)
 	{
@@ -747,7 +746,6 @@ void pgm_arm_type3_state::pgm_descramble_happy6_2(UINT8* src)
 		}
 	}
 	memcpy(src, buffer, 0x800000);
-	auto_free(machine(), buffer);
 }
 
 INPUT_PORTS_START( happy6 )

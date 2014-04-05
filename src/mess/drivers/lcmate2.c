@@ -221,12 +221,6 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static RP5C15_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
@@ -240,10 +234,12 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_SIZE(120, 18)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_GFXDECODE_ADD("gfxdecode", lcmate2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lcmate2)
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 20)
@@ -256,7 +252,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_RP5C15_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 /* ROM definition */

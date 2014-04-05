@@ -62,9 +62,7 @@ struct summary_file
 	char            source[100];
 	UINT8           status[MAX_COMPARES];
 	UINT8           matchbitmap[MAX_COMPARES];
-	char *          text[MAX_COMPARES];
-	UINT32          textsize[MAX_COMPARES];
-	UINT32          textalloc[MAX_COMPARES];
+	astring         text[MAX_COMPARES];
 };
 
 
@@ -403,21 +401,8 @@ static int read_summary_log(const char *filename, int index)
 				if (!foundchars)
 					continue;
 
-				/* see if we have enough room */
-				if (curfile->textsize[index] + (curptr - linestart) + 1 >= curfile->textalloc[index])
-				{
-					curfile->textalloc[index] = curfile->textsize[index] + (curptr - linestart) + 256;
-					curfile->text[index] = (char *)realloc(curfile->text[index], curfile->textalloc[index]);
-					if (curfile->text[index] == NULL)
-					{
-						fprintf(stderr, "Unable to allocate memory for text\n");
-						goto error;
-					}
-				}
-
 				/* append our text */
-				strcpy(curfile->text[index] + curfile->textsize[index], linestart);
-				curfile->textsize[index] += curptr - linestart;
+				curfile->text[index].cat(linestart);
 			}
 		}
 
@@ -474,11 +459,7 @@ static summary_file *parse_driver_tag(char *linestart, int index)
 
 	/* clear out any old status for this file */
 	curfile->status[index] = STATUS_NOT_PRESENT;
-	if (curfile->text[index] != NULL)
-		free(curfile->text[index]);
-	curfile->text[index] = NULL;
-	curfile->textsize[index] = 0;
-	curfile->textalloc[index] = 0;
+	curfile->text[index].reset();
 
 	/* strip leading/trailing spaces from the status */
 	colon = trim_string(colon + 1);
@@ -1016,11 +997,11 @@ static void create_linked_file(astring &dirname, const summary_file *curfile, co
 		if (imageindex != -1)
 			core_fprintf(linkfile, " [%d]", imageindex);
 		core_fprintf(linkfile, "\t</p>\n");
-		if (curfile->text[listnum] != NULL)
+		if (curfile->text[listnum].len() != 0)
 		{
 			core_fprintf(linkfile, "\t<p>\n");
 			core_fprintf(linkfile, "\t<b>Errors:</b>\n");
-			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum]);
+			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum].cstr());
 			core_fprintf(linkfile, "\t</p>\n");
 		}
 	}

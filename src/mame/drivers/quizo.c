@@ -219,6 +219,7 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update_quizo)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(quizo_state, quizo)

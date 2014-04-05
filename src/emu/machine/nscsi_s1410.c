@@ -58,7 +58,7 @@ void nscsi_s1410_device::scsi_command()
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 		int track_length = blocks*bytes_per_sector;
-		UINT8 *data = global_alloc_array(UINT8,track_length);
+		dynamic_buffer data(track_length);
 		memset(data, 0xc6, track_length);
 
 		if(!hard_disk_write(harddisk, lba, data)) {
@@ -67,7 +67,6 @@ void nscsi_s1410_device::scsi_command()
 		} else {
 			scsi_status_complete(SS_GOOD);
 		}
-		global_free(data);
 		}
 		break;
 

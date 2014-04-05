@@ -236,7 +236,7 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 
 	// Allocate the storage for the list of testable formats for a
 	// given cell size
-	int *candidates = global_alloc_array(int, formats_count);
+	dynamic_array<int> candidates(formats_count);
 
 	// Format we're finally choosing
 	int chosen_candidate = -1;
@@ -340,8 +340,6 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 			extract_sectors(image, f, sectors, track, head);
 			io_generic_write(io, sectdata, (track*f.head_count + head)*track_size, track_size);
 		}
-
-	global_free(candidates);
 
 	return true;
 }

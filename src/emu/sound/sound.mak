@@ -61,12 +61,12 @@ endif
 
 $(SOUNDOBJ)/discrete.o: $(SOUNDSRC)/discrete.c \
 						$(SOUNDSRC)/discrete.h \
-						$(SOUNDSRC)/disc_dev.c \
-						$(SOUNDSRC)/disc_sys.c \
-						$(SOUNDSRC)/disc_flt.c \
-						$(SOUNDSRC)/disc_inp.c \
-						$(SOUNDSRC)/disc_mth.c \
-						$(SOUNDSRC)/disc_wav.c
+						$(SOUNDSRC)/disc_dev.inc \
+						$(SOUNDSRC)/disc_sys.inc \
+						$(SOUNDSRC)/disc_flt.inc \
+						$(SOUNDSRC)/disc_inp.inc \
+						$(SOUNDSRC)/disc_mth.inc \
+						$(SOUNDSRC)/disc_wav.inc
 
 
 #-------------------------------------------------
@@ -536,11 +536,6 @@ ifneq ($(filter AICA,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/aica.o $(SOUNDOBJ)/aicadsp.o
 endif
 
-$(SOUNDOBJ)/scsp.o: $(SOUNDSRC)/scsplfo.c
-$(SOUNDOBJ)/aica.o: $(SOUNDSRC)/aicalfo.c
-
-
-
 #-------------------------------------------------
 # Seta custom sound chips
 #@src/emu/sound/st0016.h,SOUNDS += ST0016
@@ -689,7 +684,7 @@ ifneq ($(filter TMS5110,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5110.o
 endif
 
-$(SOUNDOBJ)/tms5110.o:  $(SOUNDSRC)/tms5110r.c
+$(SOUNDOBJ)/tms5110.o:  $(SOUNDSRC)/tms5110r.inc
 
 
 
@@ -701,7 +696,7 @@ ifneq ($(filter TMS5220,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5220.o $(EMUMACHINE)/spchrom.o
 endif
 
-$(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5110r.c
+$(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5110r.inc
 
 
 
@@ -745,7 +740,7 @@ ifneq ($(filter VLM5030,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/vlm5030.o
 endif
 
-$(SOUNDOBJ)/vlm5030.o:  $(SOUNDSRC)/tms5110r.c
+$(SOUNDOBJ)/vlm5030.o:  $(SOUNDSRC)/tms5110r.inc
 
 
 

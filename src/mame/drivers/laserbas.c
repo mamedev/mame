@@ -327,6 +327,7 @@ static MACHINE_CONFIG_START( laserbas, laserbas_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbas_state, screen_update_laserbas)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 3000000/4, mc6845_intf) /* unknown clock, hand tuned to get ~60 fps */
 

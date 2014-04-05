@@ -141,5 +141,4 @@ const sam6883_interface coco12_state::sam6883_config =
 {
 	MAINCPU_TAG,
 	AS_PROGRAM,
-	DEVCB_DRIVER_MEMBER(coco12_state, sam_read)
 };

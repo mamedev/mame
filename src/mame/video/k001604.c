@@ -90,6 +90,9 @@ void k001604_device::device_start()
 		16*256
 	};
 
+	if(!m_gfxdecode->started())
+		throw device_missing_dependencies();
+
 	int roz_tile_size;
 
 	m_gfx_index[0] = m_gfx_index_1;
@@ -120,8 +123,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(m_gfx_index[0], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index[1], auto_alloc_clear(machine(), gfx_element(machine(), k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[0], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_8x8, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index[1], global_alloc(gfx_element(m_palette, k001604_char_layout_layer_16x16, (UINT8*)&m_char_ram[0], m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
 	save_pointer(NAME(m_char_ram), 0x200000 / 4);
@@ -250,7 +253,7 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 	int ex = cliprect.max_x;
 	int ey = cliprect.max_y;
 
-	const rgb_t *clut = bitmap.palette()->entry_list_raw();
+	const rgb_t *clut = m_palette->palette()->entry_list_raw();
 
 	int window_x, window_y, window_xmask, window_ymask;
 

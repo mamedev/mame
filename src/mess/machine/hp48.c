@@ -499,7 +499,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	case 0x29:
 	{
 		int last_line = HP48_IO_8(0x28) & 0x3f; /* last line of main bitmap before menu */
-		int cur_line = space.machine().primary_screen->vpos();
+		int cur_line = space.machine().first_screen()->vpos();
 		if ( last_line <= 1 ) last_line = 0x3f;
 		data = ( cur_line >= 0 && cur_line <= last_line ) ? last_line - cur_line : 0;
 		if ( offset == 0x29 )

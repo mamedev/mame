@@ -3,6 +3,7 @@
       Dynax hardware
 
 ***************************************************************************/
+#include "machine/msm6242.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 
@@ -19,7 +20,8 @@ public:
 			m_oki(*this, "oki"),
 			m_msm(*this, "msm"),
 			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+			m_palette(*this, "palette"),
+			m_rtc(*this, "rtc")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -162,12 +164,12 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
-	device_t *m_rtc;
 	device_t *m_ymsnd;
 	optional_device<okim6295_device> m_oki;
 	optional_device<msm5205_device> m_msm;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<msm6242_device> m_rtc;
 	device_t *m_top_scr;
 	device_t *m_bot_scr;
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);

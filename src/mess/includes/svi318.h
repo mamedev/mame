@@ -142,8 +142,9 @@ protected:
 	required_ioport m_line10;
 	required_ioport m_joysticks;
 	required_ioport m_buttons;
+public:	
 	optional_device<palette_device> m_palette;
-
+protected:
 	void svi318_set_banks();
 	void svi318_80col_init();
 	void svi318_vdp_interrupt(int i);

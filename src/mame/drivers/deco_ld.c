@@ -185,7 +185,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		gfx->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 
 	for(i=0x3e0;i<0x400;i+=4)
@@ -200,7 +200,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		fx = (spriteram[i+0] & 0x04) ? 1 : 0;
 		fy = (spriteram[i+0] & 0x02) ? 1 : 0;
 
-		gfx->transpen(m_palette,bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
+		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
 	}
 }
 
@@ -222,7 +222,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram0[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(m_palette,bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile|0x400,colour,0,0,x*8,y*8,0);
 		}
 	}
 
@@ -234,7 +234,7 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 			int tile = m_vram1[x+y*32] | ((attr & 3) << 8);
 			int colour = (6 & 0x7); /* TODO */
 
-			gfx->transpen(m_palette,bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile,colour,0,0,x*8,y*8,0);
 		}
 	}
 
@@ -479,10 +479,11 @@ static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc") //Sony LDP-1000A, is it truly compatible with the Pioneer?
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_GFXDECODE_ADD("gfxdecode", rblaster)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rblaster)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 

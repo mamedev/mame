@@ -97,44 +97,18 @@ const rom_entry *comx_eb_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  COMX_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-WRITE_LINE_DEVICE_HANDLER( int_w )
-{
-	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
-	eb->set_int(device->tag(), state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( wait_w )
-{
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
-	slot->wait_w(state);
-}
-
-WRITE_LINE_DEVICE_HANDLER( clear_w )
-{
-	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
-	slot->clear_w(state);
-}
-
-static COMX_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_LINE(int_w),
-	DEVCB_LINE(wait_w),
-	DEVCB_LINE(clear_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( comx_eb )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_eb )
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, expansion_intf, comx_expansion_cards, "fd")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, expansion_intf, comx_expansion_cards, "clm")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, expansion_intf, comx_expansion_cards, "joy")
-	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, expansion_intf, comx_expansion_cards, "ram")
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT1_TAG, comx_expansion_cards, "fd")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot1_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT2_TAG, comx_expansion_cards, "clm")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot2_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT3_TAG, comx_expansion_cards, "joy")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot3_irq_w))
+	MCFG_COMX_EXPANSION_SLOT_ADD(SLOT4_TAG, comx_expansion_cards, "ram")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(comx_eb_device, slot4_irq_w))
 MACHINE_CONFIG_END
 
 
@@ -146,39 +120,6 @@ MACHINE_CONFIG_END
 machine_config_constructor comx_eb_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( comx_eb );
-}
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  set_int - set INT line state
-//-------------------------------------------------
-
-void comx_eb_device::set_int(const char *tag, int state)
-{
-	int slot = 0;
-
-	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
-	{
-		if (!strcmp(tag, m_expansion_slot[slot]->tag())) break;
-	}
-
-	assert(slot < MAX_EB_SLOTS);
-
-	m_int[slot] = state;
-
-	int irq = CLEAR_LINE;
-
-	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
-	{
-		irq |= m_int[slot];
-	}
-
-	m_slot->int_w(irq);
 }
 
 
@@ -213,7 +154,7 @@ void comx_eb_device::device_start()
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		m_int[slot] = CLEAR_LINE;
+		m_irq[slot] = CLEAR_LINE;
 	}
 }
 

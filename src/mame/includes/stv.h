@@ -181,7 +181,7 @@ public:
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
 	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	DECLARE_WRITE8_MEMBER(scsp_irq);
 	int m_scsp_last_line;
 
 	UINT8 smpc_direct_mode(UINT8 pad_n);
@@ -813,5 +813,4 @@ public:
 #define IRQ_VDP1_END   1 << 13
 #define IRQ_ABUS       1 << 15
 
-extern void scsp_irq(device_t *device, int irq);
 GFXDECODE_EXTERN( stv );

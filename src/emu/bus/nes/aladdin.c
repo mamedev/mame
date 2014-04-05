@@ -135,38 +135,37 @@ bool nes_aladdin_slot_device::call_load()
 }
 
 
-bool nes_aladdin_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool nes_aladdin_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
-const char * nes_aladdin_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void nes_aladdin_slot_device::get_default_card_software(astring &result)
 {
-	if (open_image_file(options))
+	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string = "algn";
 		UINT32 len = core_fsize(m_file);
-		UINT8 *ROM = global_alloc_array(UINT8, len);
+		dynamic_buffer rom(len);
 		UINT8 mapper;
 	
-		core_fread(m_file, ROM, len);
+		core_fread(m_file, rom, len);
 
-		mapper = (ROM[6] & 0xf0) >> 4;
-		mapper |= ROM[7] & 0xf0;
+		mapper = (rom[6] & 0xf0) >> 4;
+		mapper |= rom[7] & 0xf0;
 
 //		if (mapper == 71)
 //			slot_string = "algn";
 		if (mapper == 232)
 			slot_string = "algq";
 
-		global_free(ROM);
 		clear();
 		
-		return slot_string;
+		result.cpy(slot_string);
 	}
 	else
-		return software_get_default_slot(config, options, this, "algn");
+		software_get_default_slot(result, "algn");
 }
 
 

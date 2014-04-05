@@ -457,10 +457,9 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 		bitmap_rgb32 &dst_bitmap, bitmap_ind16 &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
-		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output )
+		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output, palette_device *palette )
 {
 	static const int colormask[8]={1,3,7,0xf,0x1f,0x3f,0x7f,0xff};
-	palette_device *m_palette = machine.first_screen()->palette();
 	int cy, cx;
 	int ecx;
 	int src_pitch, incxy, incxx;
@@ -506,7 +505,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 	ecx = tx = -tx;
 
 	tilebpp = (tilebpp-1) & 7;
-	pal_base = m_palette->pens();
+	pal_base = palette->pens();
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap.rowpixels();
@@ -638,7 +637,7 @@ INLINE void K053936GP_copyroz32clip( running_machine &machine,
 static void K053936GP_zoom_draw(running_machine &machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
 		bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tmap,
-		int tilebpp, int blend, int alpha, int pixeldouble_output)
+		int tilebpp, int blend, int alpha, int pixeldouble_output, palette_device *palette)
 {
 	UINT16 *lineaddr;
 
@@ -676,7 +675,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 			K053936GP_copyroz32clip(machine,
 					bitmap, src_bitmap, my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
-					tilebpp, blend, alpha, clip, pixeldouble_output);
+					tilebpp, blend, alpha, clip, pixeldouble_output, palette);
 			y++;
 		}
 	}
@@ -701,19 +700,19 @@ static void K053936GP_zoom_draw(running_machine &machine,
 		K053936GP_copyroz32clip(machine,
 				bitmap, src_bitmap, cliprect, src_cliprect,
 				startx<<5, starty<<5, incxx<<5, incxy<<5, incyx<<5, incyy<<5,
-				tilebpp, blend, alpha, clip, pixeldouble_output);
+				tilebpp, blend, alpha, clip, pixeldouble_output, palette);
 	}
 }
 
 void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output, UINT16* temp_m_k053936_0_ctrl_16, UINT16* temp_m_k053936_0_linectrl_16,UINT16* temp_m_k053936_0_ctrl, UINT16* temp_m_k053936_0_linectrl)
+		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output, UINT16* temp_m_k053936_0_ctrl_16, UINT16* temp_m_k053936_0_linectrl_16,UINT16* temp_m_k053936_0_ctrl, UINT16* temp_m_k053936_0_linectrl, palette_device *palette)
 {
 	if (temp_m_k053936_0_ctrl_16)
 	{
-		K053936GP_zoom_draw(machine, 0,temp_m_k053936_0_ctrl_16,temp_m_k053936_0_linectrl_16,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+		K053936GP_zoom_draw(machine, 0,temp_m_k053936_0_ctrl_16,temp_m_k053936_0_linectrl_16,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output, palette);
 	}
 	else
 	{
-		K053936GP_zoom_draw(machine, 0,temp_m_k053936_0_ctrl,temp_m_k053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+		K053936GP_zoom_draw(machine, 0,temp_m_k053936_0_ctrl,temp_m_k053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output, palette);
 	}
 }

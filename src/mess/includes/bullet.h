@@ -101,9 +101,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	void bankswitch();
 	void update_dma_rdy();

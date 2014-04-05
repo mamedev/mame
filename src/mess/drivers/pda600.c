@@ -194,11 +194,6 @@ static GFXDECODE_START( pda600 )
 	GFXDECODE_ENTRY( "maincpu", 0x61d3, pda600_charlayout_13a, 0, 1 )
 GFXDECODE_END
 
-static HD64610_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( pda600, pda600_state )
 	/* basic machine hardware */
@@ -213,14 +208,16 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 	MCFG_SCREEN_SIZE(240, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
 	MCFG_SCREEN_UPDATE_DRIVER( pda600_state, screen_update )
-	MCFG_GFXDECODE_ADD("gfxdecode", pda600)
+	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_HD64610_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+	MCFG_DEVICE_ADD("rtc", HD64610, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -1534,8 +1534,9 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbros)
 	MCFG_SCREEN_VBLANK_DRIVER(snowbros_state, screen_eof_snowbros)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", snowbros)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snowbros)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1647,8 +1648,9 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_honeydol)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", honeydol)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", honeydol)
 	MCFG_PALETTE_ADD("palette", 0x800/2)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1685,8 +1687,9 @@ static MACHINE_CONFIG_START( twinadv, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_twinadv)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twinadv)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twinadv)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -1758,8 +1761,9 @@ static MACHINE_CONFIG_START( snowbro3, snowbros_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snowbros_state, screen_update_snowbro3)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sb3)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sb3)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
@@ -2722,51 +2726,46 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 
 DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 {
-	UINT8 *buffer;
 	UINT8 *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
 			else buffer[i] = src[i];
 
 		memcpy(src,buffer,len);
-		auto_free(machine(), buffer);
 	}
 
 	src = memregion("soundcpu")->base();
 	len = memregion("soundcpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
 		memcpy(src,buffer,len);
-		auto_free(machine(), buffer);
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
 
 DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 {
-	UINT8 *buffer;
 	UINT8 *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
-	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
+		dynamic_buffer buffer(len);
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,buffer,len);
-		auto_free(machine(), buffer);
 	}
 }
 

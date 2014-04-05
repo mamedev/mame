@@ -166,7 +166,7 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
 
 	void get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon);
 	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
@@ -184,7 +184,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
+	virtual void get_default_card_software(astring &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

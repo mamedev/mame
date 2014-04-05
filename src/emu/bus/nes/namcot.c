@@ -150,9 +150,7 @@ void nes_namcot340_device::device_start()
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
-
-	m_n163_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_n163_ram), 0x2000);
+	save_item(NAME(m_n163_ram));
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
@@ -179,9 +177,7 @@ void nes_namcot175_device::device_start()
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_protect));
-
-	m_n163_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_n163_ram), 0x2000);
+	save_item(NAME(m_n163_ram));
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
@@ -211,9 +207,7 @@ void nes_namcot163_device::device_start()
 	save_item(NAME(m_wram_protect));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_chr_bank));
-
-	m_n163_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
-	save_pointer(NAME(m_n163_ram), 0x2000);
+	save_item(NAME(m_n163_ram));
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
@@ -519,7 +513,7 @@ READ8_MEMBER(nes_namcot175_device::read_m)
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
 	if (m_battery && !m_wram_protect)
-		return m_battery[offset & (m_battery_size - 1)];
+		return m_battery[offset & (m_battery.count() - 1)];
 
 	return m_open_bus;   // open bus
 }
@@ -529,7 +523,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_m)
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
 	if (m_battery && !m_wram_protect)
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 }
 
 WRITE8_MEMBER(nes_namcot175_device::write_h)
@@ -601,8 +595,8 @@ READ8_MEMBER(nes_namcot163_device::chr_r)
 
 READ8_MEMBER(nes_namcot163_device::read_m)
 {
-	if (m_battery && offset < m_battery_size)
-		return m_battery[offset & (m_battery_size - 1)];
+	if (m_battery && offset < m_battery.count())
+		return m_battery[offset & (m_battery.count() - 1)];
 
 	return m_open_bus;   // open bus
 }
@@ -612,7 +606,7 @@ WRITE8_MEMBER(nes_namcot163_device::write_m)
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
 	int bank = (offset & 0x1800) >> 11;
 	if (m_battery && !BIT(m_wram_protect, bank))
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 }
 
 WRITE8_MEMBER(nes_namcot163_device::write_l)

@@ -245,7 +245,7 @@ void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		do
 		{
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
 					flip_screen(),flip_screen(),
 					sx,sy + 16 * i * dir,15);
@@ -304,7 +304,7 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		do
 		{
-			m_gfxdecode->gfx(2)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 					code + i,col,
 					flip_screen(),flip_screen(),
 					sx,sy + 16 * i * dir,15);

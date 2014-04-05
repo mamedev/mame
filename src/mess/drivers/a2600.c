@@ -56,7 +56,8 @@ public:
 		m_joy2(*this, CONTROL2_TAG) ,
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_modeFE_trigger_on_next_access(false) { }
+		m_modeFE_trigger_on_next_access(false),
+		m_screen(*this, "screen") { }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
@@ -169,6 +170,7 @@ protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	bool m_modeFE_trigger_on_next_access;
+	required_device<screen_device> m_screen;
 };
 
 
@@ -1427,7 +1429,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              machine.primary_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
+//              machine.first_screen()->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
 			}
 		}
 	}
@@ -1444,31 +1446,16 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              machine.primary_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
+//              machine.first_screen()->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
 			}
 		}
 	}
 }
 
-static const tia_interface a2600_tia_interface =
-{
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback)
-};
-
-static const tia_interface a2600_tia_interface_pal =
-{
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_read_input_port),
-	DEVCB_DRIVER_MEMBER(a2600_state, a2600_get_databus_contents),
-	DEVCB_DRIVER_MEMBER16(a2600_state, a2600_tia_vsync_callback_pal)
-};
-
 
 MACHINE_START_MEMBER(a2600_state,a2600)
 {
-	screen_device *screen = machine().first_screen();
-	m_current_screen_height = screen->height();
+	m_current_screen_height = m_screen->height();
 	m_extra_RAM = machine().memory().region_alloc("user2", 0x8600, 1, ENDIANNESS_LITTLE);
 	memset( m_riot_ram, 0x00, 0x80 );
 	m_current_reset_bank_counter = 0xFF;
@@ -1948,8 +1935,11 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_NTSC_VIDEO_ADD("tia_video", a2600_tia_interface)
-
+	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback))
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
@@ -1983,7 +1973,11 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 
 	/* video hardware */
-	MCFG_TIA_PAL_VIDEO_ADD("tia_video", a2600_tia_interface_pal)
+	MCFG_DEVICE_ADD("tia_video", TIA_PAL_VIDEO, 0)
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
+	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback_pal))
+	
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )

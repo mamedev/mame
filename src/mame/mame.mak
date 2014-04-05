@@ -297,7 +297,6 @@ VIDEOS += HUC6270
 #VIDEOS += HUC6272
 #VIDEOS += I8244
 VIDEOS += I8275
-VIDEOS += K053250
 VIDEOS += M50458
 VIDEOS += MB90082
 VIDEOS += MB_VCU
@@ -436,7 +435,6 @@ MACHINES += NSCSI
 MACHINES += PCF8593
 MACHINES += PCI
 MACHINES += PCKEYBRD
-MACHINES += PD4990A_OLD
 MACHINES += PIC8259
 MACHINES += PIT8253
 MACHINES += PLA
@@ -1255,6 +1253,7 @@ $(MAMEOBJ)/konami.a: \
 	$(VIDEO)/k051733.o \
 	$(VIDEO)/k051960.o \
 	$(VIDEO)/k052109.o \
+	$(VIDEO)/k053250.o \
 	$(VIDEO)/k053251.o \
 	$(VIDEO)/k054156_k054157_k056832.o \
 	$(VIDEO)/k053244_k053245.o \
@@ -1491,7 +1490,7 @@ $(MAMEOBJ)/pce.a: \
 	$(DRIVERS)/paranoia.o \
 	$(DRIVERS)/tourvis.o \
 	$(DRIVERS)/uapce.o \
-	$(MACHINE)/pcecommn.o $(VIDEO)/vdc.o \
+	$(MACHINE)/pcecommn.o \
 
 $(MAMEOBJ)/phoenix.a: \
 	$(DRIVERS)/naughtyb.o $(VIDEO)/naughtyb.o \
@@ -2047,6 +2046,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/amaticmg.o \
 	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
+	$(DRIVERS)/amusco.o \
 	$(DRIVERS)/arachnid.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/astrafr.o \
@@ -2458,7 +2458,9 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 
-$(DRIVERS)/goldstar.o:  $(LAYOUT)/lucky8.lh \
+$(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
+			$(LAYOUT)/cherryb3.lh \
+			$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/bingowng.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
@@ -2733,7 +2735,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 # misc dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neogeo.inc
 $(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.inc \
 			$(MAMESRC)/video/jagblit.inc
 $(DRIVERS)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h

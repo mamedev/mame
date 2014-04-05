@@ -1193,21 +1193,21 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_0->address_w(space, offset, data);
+		m_ay8910_cclimber->address_w(space, offset, data);
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		m_ay8910_0->data_w(space, offset, data);
+		m_ay8910_cclimber->data_w(space, offset, data);
 }
 
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
 	if (!m_mshuttle_ay8910_cs)
-		return m_ay8910_0->data_r(space, offset);
+		return m_ay8910_cclimber->data_r(space, offset);
 	return 0xff;
 }
 
@@ -1731,12 +1731,12 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(galaxian_stars_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxian_flip_screen_xy_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(mshuttle_ay8910_cs_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(cclimber_sample_rate_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(cclimber_sample_volume_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -5168,7 +5168,7 @@ static MACHINE_CONFIG_START( galaxian_base, galaxian_state )
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", galaxian)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 
@@ -5406,12 +5406,7 @@ static MACHINE_CONFIG_DERIVED( mshuttle, galaxian_base )
 	MCFG_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
-	MCFG_SOUND_CONFIG(cclimber_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SAMPLES_ADD("samples", cclimber_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
 
 
@@ -5758,7 +5753,7 @@ void galaxian_state::decode_anteater_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
+	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -5770,7 +5765,6 @@ void galaxian_state::decode_anteater_gfx()
 		srcoffs |= (BIT(offs,0) ^ BIT(offs,6) ^ 1) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	auto_free(machine(), scratch);
 }
 
 
@@ -5778,7 +5772,7 @@ void galaxian_state::decode_losttomb_gfx()
 {
 	UINT32 romlength = memregion("gfx1")->bytes();
 	UINT8 *rombase = memregion("gfx1")->base();
-	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
+	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
 	memcpy(scratch, rombase, romlength);
@@ -5790,7 +5784,6 @@ void galaxian_state::decode_losttomb_gfx()
 		srcoffs |= ((BIT(offs,1) & BIT(offs,7)) | ((1 ^ BIT(offs,1)) & (BIT(offs,8)))) << 10;
 		rombase[offs] = scratch[srcoffs];
 	}
-	auto_free(machine(), scratch);
 }
 
 
@@ -6793,6 +6786,21 @@ ROM_START( galaxrf )
 	ROM_REGION( 0x0020, "proms", 0 ) // assumed to be the same
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
+
+ROM_START( galaxrfgg )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gxrf.7f",       0x0000, 0x1000, CRC(c06eeb10) SHA1(cf1006a7ff02fe8b04a096d802fb8d8937dd913d) )
+	ROM_LOAD( "gxrf.7j",       0x1000, 0x1000, CRC(182ff334) SHA1(11e84aa887679e3fa977f00dd0b57a7df8ca7d88) )
+	ROM_LOAD( "gxrf.7l",       0x2000, 0x0800, CRC(ee827e75) SHA1(67306fdfa54aa4e3e9ccaa7f518e58711b6759fe) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "gxrf.1jh",       0x0000, 0x0800, CRC(23e627ff) SHA1(11f8f50fcaa29f757f27d77ea2b977f65dc87e38) )
+	ROM_LOAD( "gxrf.1lk",       0x0800, 0x0800, CRC(0dbcee5b) SHA1(b169c6e539a583a99e1e3ef5982d4c1ab395551f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "gxrf.6l",       0x0000, 0x0020, CRC(992350e5) SHA1(e901b1abd11cc0f02dd6d87b429d8997f762c15d) )
+ROM_END
+
 
 ROM_START( astrians )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -10595,6 +10603,7 @@ GAME( 1979, galaxbsf2, galaxian,galaxian, galaxian, galaxian_state, galaxian, RO
 GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,  galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, galaxrfgg,galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian Growing Galaxip / Galaxian Nave Creciente (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole, galaxian_state,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )

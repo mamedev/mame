@@ -125,7 +125,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4);
 
-			gfx_2->opaque(m_palette,bitmap,cliprect,tile,col,0,0,x*16,y*16);
+			gfx_2->opaque(bitmap,cliprect,tile,col,0,0,x*16,y*16);
 
 			count+=2;
 		}
@@ -140,7 +140,7 @@ UINT32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 			UINT16 tile = ((m_vram[count])|(m_vram[count+1]<<8)) & 0xfff;
 			UINT8 col = (m_vram[count+1] >> 4); // ok?
 
-			gfx->transpen(m_palette,bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
+			gfx->transpen(bitmap,cliprect,tile,col,0,0,x*8,y*8,0);
 
 			count+=2;
 		}
@@ -573,8 +573,9 @@ static MACHINE_CONFIG_START( dblcrown, dblcrown_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dblcrown_state, screen_update)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dblcrown)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblcrown)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
@@ -606,8 +607,8 @@ ROM_START( dblcrown )
 	ROM_REGION( 0x1000*0x10, "vram", ROMREGION_ERASE00 )
 #endif
 
-	ROM_REGION( 0x0bf1, "pals", 0 ) // in Jedec format
-	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0bf1, CRC(997b0ba9) SHA1(1c121ab74f33d5162b619740b08cc7bc694c257d) )
+	ROM_REGION( 0x0bf1, "plds", 0 )
+	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
 
-GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",      "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX
+GAME( 1997, dblcrown,  0,   dblcrown,  dblcrown,  driver_device, 0,       ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", GAME_IMPERFECT_GRAPHICS ) // 1997 DYNA copyright in tile GFX

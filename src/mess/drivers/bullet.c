@@ -620,7 +620,7 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_READWRITE(win_r, wstrobe_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
-	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(brom_r, brom_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(exdsk_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(exdma_w)
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
 	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(mbank_w)
 	AM_RANGE(0x19, 0x19) AM_READWRITE(scsi_r, scsi_w)
-	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
+	AM_RANGE(0x1a, 0x1a) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x1b, 0x1b) AM_READ(hwsts_r)
 ADDRESS_MAP_END
 
@@ -815,7 +815,7 @@ void bullet_state::update_dma_rdy()
 		break;
 	}
 
-	z80dma_rdy_w(m_dmac, rdy);
+	m_dmac->rdy_w(rdy);
 }
 
 READ8_MEMBER( bullet_state::dma_mreq_r )
@@ -879,7 +879,7 @@ void bulletf_state::update_dma_rdy()
 		rdy = m_fdrdy;
 	}
 
-	z80dma_rdy_w(m_dmac, rdy);
+	m_dmac->rdy_w(rdy);
 }
 
 READ8_MEMBER( bulletf_state::dma_mreq_r )
@@ -1060,17 +1060,7 @@ static SLOT_INTERFACE_START( bullet_35_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-void bullet_state::fdc_intrq_w(bool state)
-{
-	m_dart->dcda_w(state);
-}
-
-void bulletf_state::fdc_intrq_w(bool state)
-{
-	m_dart->rib_w(state);
-}
-
-void bullet_state::fdc_drq_w(bool state)
+WRITE_LINE_MEMBER( bullet_state::fdc_drq_w )
 {
 	m_fdrdy = !state;
 	update_dma_rdy();
@@ -1125,10 +1115,6 @@ static const z80_daisy_config daisy_chain[] =
 
 void bullet_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_segst));
 	save_item(NAME(m_brom));
@@ -1153,10 +1139,6 @@ void bullet_state::machine_start()
 
 void bulletf_state::machine_start()
 {
-	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_drq_w), this));
-
 	// state saving
 	save_item(NAME(m_fdrdy));
 	save_item(NAME(m_rome));
@@ -1244,6 +1226,8 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
@@ -1295,6 +1279,8 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
 	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bullet_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    floppy_image_device::default_floppy_formats)

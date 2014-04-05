@@ -564,17 +564,29 @@ const char *xml_normalize_string(const char *string)
 
 static void *expat_malloc(size_t size)
 {
-	return malloc(size);
-}
-
-static void *expat_realloc(void *ptr, size_t size)
-{
-	return realloc(ptr, size);
+	UINT32 *result = (UINT32 *)malloc(size + 4 * sizeof(UINT32));
+	*result = size;
+	return &result[4];
 }
 
 static void expat_free(void *ptr)
 {
-	free(ptr);
+	if (ptr != NULL)
+		free(&((UINT32 *)ptr)[-4]);
+}
+
+static void *expat_realloc(void *ptr, size_t size)
+{
+	void *newptr = expat_malloc(size);
+	if (newptr == NULL)
+		return NULL;
+	if (ptr != NULL)
+	{
+		UINT32 oldsize = ((UINT32 *)ptr)[-4];
+		memcpy(newptr, ptr, oldsize);
+		expat_free(ptr);
+	}
+	return newptr;
 }
 
 
@@ -658,7 +670,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 
 
 /*-------------------------------------------------
-    expat_data - expat callback for a additional
+    expat_data - expat callback for an additional
     element data
 -------------------------------------------------*/
 
@@ -678,9 +690,15 @@ static void expat_data(void *data, const XML_Char *s, int len)
 		oldlen = (int)strlen((*curnode)->value);
 
 	/* realloc */
-	newdata = (char *)realloc((void *)(*curnode)->value, oldlen + len + 1);
+	newdata = (char *)malloc(oldlen + len + 1);
 	if (newdata == NULL)
 		return;
+	if ((*curnode)->value != NULL)
+	{
+		memcpy(newdata, (*curnode)->value, oldlen);
+		free((*curnode)->value);
+	}
+	(*curnode)->value = newdata;
 
 	/* copy in the new data a NULL-terminate */
 	memcpy(&newdata[oldlen], s, len);

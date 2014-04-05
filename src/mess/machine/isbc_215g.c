@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 
+// Currently only emulates Shugart interface disks (aka ST406)
+// despite the controller supporting many different disk types (hard sectored, onboard controllers, ANSI X3T9)
+// Xenix supports the Quantum Q540 CHS 512,8,9 with 1024B sectors
+
 // TODO: multibus
 
 #include "isbc_215g.h"
@@ -27,7 +31,6 @@ void isbc_215g_device::find_sector()
 	// 2:     head
 	// 3:     sector
 	UINT16 cyl = ((m_idcompare[0] & 0xf) << 8) | m_idcompare[1];
-	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	UINT16 bps = 128 << ((m_idcompare[0] >> 4) & 3);
 
 	if(!m_geom[m_drive])
@@ -49,7 +52,7 @@ void isbc_215g_device::find_sector()
 		return;
 
 	m_idfound = true;
-	hard_disk_read(drive->get_hard_disk_file(), (cyl * m_geom[m_drive]->heads + m_head) * m_geom[m_drive]->sectors + m_idcompare[2], m_sector);
+	m_lba[m_drive] = (cyl * m_geom[m_drive]->heads + m_head) * m_geom[m_drive]->sectors + m_idcompare[2];
 	m_secoffset = 0;
 	return;
 }
@@ -57,9 +60,27 @@ void isbc_215g_device::find_sector()
 UINT16 isbc_215g_device::read_sector()
 {
 	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
+	if(!m_secoffset)
+		hard_disk_read(drive->get_hard_disk_file(), m_lba[m_drive], m_sector);
 	if(m_secoffset >= wps)
 		return 0;
 	return m_sector[m_secoffset++];
+}
+
+bool isbc_215g_device::write_sector(UINT16 data)
+{
+	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
+	if(m_secoffset >= wps)
+		return true;
+	m_sector[m_secoffset++] = data;
+	if(m_secoffset == wps)
+	{
+		hard_disk_write(drive->get_hard_disk_file(), m_lba[m_drive], m_sector);
+		return true;
+	}
+	return false;
 }
 
 READ16_MEMBER(isbc_215g_device::io_r)
@@ -89,7 +110,7 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			data |= (m_sbx1->get_card_device() ? 0 : 1) << 8;
 			data |= m_isbx_irq[0] << 9;
 			data |= m_isbx_irq[1] << 10;
-			data |= m_index << 15;
+			data |= ((m_index--) <= 0) ? 0x8000 : 0; // fake an index pulse
 			break;
 		case 0x04:
 			//read status 2
@@ -170,16 +191,16 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			else if(m_amsrch)
 				logerror("isbc_215g: address search without read gate\n");
 		case 0x01:
-			m_stepdir = (data & 0x80) ? 0 : 1;
+			m_stepdir = (data & 0x80) ? 1 : 0;
 			break;
 		case 0x04:
 			//clear index and id latch
-			m_index = false;
+			m_index = 10;
 			m_idfound = false;
 			break;
 		case 0x08:
 			//cmd data bus/head sel
-			m_head = data & 3;
+			m_head = data & 7;
 			m_out_irq_func((data & 0x100) ? 1 : 0);
 			break;
 		case 0x0c:
@@ -192,12 +213,28 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			// 5: extr 2
 			// 6: format
 			// 7: format wr gate
-			m_drive = (data >> 3) & 1; // st406 two drives only
+			if(!m_step && (data & 1) && m_geom[m_drive])
+			{
+				if(m_cyl[m_drive] && !m_stepdir)
+					m_cyl[m_drive]--;
+				else if((m_cyl[m_drive] < m_geom[m_drive]->cylinders) && m_stepdir)
+					m_cyl[m_drive]++;
+			}
+			m_step = data & 1;
+			m_drive = (data >> 3) & 1; // shugart interface, two drives only
 			if(((data >> 1) & 1) != m_fdctc)
 			{
 				m_fdctc = !m_fdctc;
 				m_sbx2->opt0_w(m_fdctc);
 			}
+			if((data & 0xc0) == 0xc0) // low-level format
+			{
+				if(!m_format)
+					m_format_bytes = 5; // sync + sector id
+				m_format = true;
+			}
+			else
+				m_format = false;
 			break;
 		case 0x10:
 			//pit ch 0
@@ -213,6 +250,30 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			break;
 		case 0x14:
 			//write buffer
+			if(m_wrgate)
+			{
+				if(m_format)
+				{
+					m_format_bytes -= 2;
+					if(m_format_bytes <= 0)
+					{
+						m_dmac->ext1_w(1);
+						m_dmac->ext1_w(0);
+						m_format_bytes = 5;
+					}
+				}
+				else
+				{
+					if(m_geom[m_drive])
+					{
+						if(write_sector(data))
+						{
+							m_dmac->ext1_w(1);
+							m_dmac->ext1_w(0);
+						}
+					}
+				}
+			}
 			break;
 		case 0x18:
 			//sector id/format
@@ -341,13 +402,18 @@ void isbc_215g_device::device_start()
 {
 	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
 	m_cyl[0] = m_cyl[1] = 0;
+	m_lba[0] = m_lba[1] = 0;
 	m_idcompare[0] = m_idcompare[1] = m_idcompare[2] = m_idcompare[3] = 0;
-	m_index = false;
+	m_index = 10;
 	m_idfound = false;
 	m_drive = 0;
 	m_head = 0;
 	m_stepdir = false;
-
+	m_step = false;
+	m_format = false;
+	m_wrgate = false;
+	m_rdgate = false;
+	m_format_bytes = 0;
 	m_out_irq_func.resolve_safe();
 
 }
@@ -356,10 +422,11 @@ WRITE8_MEMBER(isbc_215g_device::write)
 {
 	if(!offset)
 	{
+		data &= 3;
 		if(!data && (m_reset == 2))
 			m_dmac->reset();
 		m_out_irq_func(0);
-		m_dmac->ca_w(data != 2);
+		m_dmac->ca_w(data == 1);
 		m_dmac->ca_w(0);
 		m_reset = data;
 	}

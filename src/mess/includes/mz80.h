@@ -47,9 +47,9 @@ public:
 	bool m_prev_state;
 	UINT8 m_mz80k_cursor_cnt;
 	UINT8 m_mz80k_keyboard_line;
-	required_shared_ptr<const UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	DECLARE_DRIVER_INIT(mz80k);
 	virtual void machine_reset();
 	virtual void video_start();

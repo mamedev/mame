@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", cloud9)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloud9)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	MCFG_SCREEN_VBLANK_TIME(0)          /* VBLANK is handled manually */
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(cloud9_state, screen_update_cloud9)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

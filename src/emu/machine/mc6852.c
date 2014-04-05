@@ -24,12 +24,15 @@
 
 */
 
-#include "emu.h"
 #include "mc6852.h"
 
 
-// device type definition
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
 const device_type MC6852 = &device_creator<mc6852_device>;
+
 
 
 //**************************************************************************
@@ -84,19 +87,6 @@ const device_type MC6852 = &device_creator<mc6852_device>;
 #define C3_CTUF         0x08
 
 
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-inline void mc6852_device::receive()
-{
-}
-
-inline void mc6852_device::transmit()
-{
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -106,33 +96,20 @@ inline void mc6852_device::transmit()
 //  mc6852_device - constructor
 //-------------------------------------------------
 
-mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__)
+mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, MC6852, "MC6852", tag, owner, clock, "mc6852", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_write_tx_data(*this),
+	m_write_irq(*this),
+	m_write_sm_dtr(*this),
+	m_write_tuf(*this),
+	m_rx_clock(0),
+	m_tx_clock(0),
+	m_cts(1),
+	m_dcd(1),
+	m_sm_dtr(0),
+	m_tuf(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6852_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc6852_interface *intf = reinterpret_cast<const mc6852_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc6852_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_tx_data_cb, 0, sizeof(m_out_tx_data_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_sm_dtr_cb, 0, sizeof(m_out_sm_dtr_cb));
-		memset(&m_out_tuf_cb, 0, sizeof(m_out_tuf_cb));
-	}
 }
 
 
@@ -143,29 +120,15 @@ void mc6852_device::device_config_complete()
 void mc6852_device::device_start()
 {
 	// resolve callbacks
-	m_out_tx_data_func.resolve(m_out_tx_data_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_sm_dtr_func.resolve(m_out_sm_dtr_cb, *this);
-	m_out_tuf_func.resolve(m_out_tuf_cb, *this);
-
-	if (m_rx_clock > 0)
-	{
-		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rx_clock));
-	}
-
-	if (m_tx_clock > 0)
-	{
-		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_tx_clock));
-	}
+	m_write_tx_data.resolve_safe();
+	m_write_irq.resolve_safe();
+	m_write_sm_dtr.resolve_safe();
+	m_write_tuf.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_scr));
-	save_item(NAME(m_rx_fifo));
-	save_item(NAME(m_tx_fifo));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_rdr));
@@ -183,6 +146,15 @@ void mc6852_device::device_start()
 
 void mc6852_device::device_reset()
 {
+	m_rx_fifo = std::queue<UINT8>();
+	m_tx_fifo = std::queue<UINT8>();
+
+	transmit_register_reset();
+	receive_register_reset();
+
+	set_rcv_rate(m_rx_clock);
+	set_tra_rate(m_tx_clock);
+
 	/* set receiver shift register to all 1's */
 	m_rsr = 0xff;
 
@@ -197,16 +169,37 @@ void mc6852_device::device_reset()
 
 void mc6852_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (id)
-	{
-	case TIMER_RX:
-		receive();
-		break;
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
 
-	case TIMER_TX:
-		transmit();
-		break;
-	}
+
+//-------------------------------------------------
+//  tra_callback -
+//-------------------------------------------------
+
+void mc6852_device::tra_callback()
+{
+	m_write_tx_data(transmit_register_get_data_bit());
+}
+
+
+//-------------------------------------------------
+//  tra_complete -
+//-------------------------------------------------
+
+void mc6852_device::tra_complete()
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  rcv_complete -
+//-------------------------------------------------
+
+void mc6852_device::rcv_complete()
+{
+	// TODO
 }
 
 
@@ -220,11 +213,14 @@ READ8_MEMBER( mc6852_device::read )
 
 	if (BIT(offset, 0))
 	{
-		/* receive data FIFO */
+		if (m_rx_fifo.size() > 0)
+		{
+			data = m_rx_fifo.front();
+			m_rx_fifo.pop();
+		}
 	}
 	else
 	{
-		/* status */
 		data = m_status;
 	}
 
@@ -259,6 +255,10 @@ WRITE8_MEMBER( mc6852_device::write )
 
 		case C1_AC_TX_FIFO:
 			/* transmit data FIFO */
+			if (m_tx_fifo.size() < 3)
+			{
+				m_tx_fifo.push(data);
+			}
 			break;
 		}
 	}
@@ -302,74 +302,4 @@ WRITE8_MEMBER( mc6852_device::write )
 
 		m_cr[0] = data;
 	}
-}
-
-
-//-------------------------------------------------
-//  rx_clk_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc6852_device::rx_clk_w )
-{
-	if (state) receive();
-}
-
-
-//-------------------------------------------------
-//  tx_clk_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc6852_device::tx_clk_w )
-{
-	if (state) transmit();
-}
-
-
-//-------------------------------------------------
-//  cts_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc6852_device::cts_w )
-{
-	m_cts = state;
-}
-
-
-//-------------------------------------------------
-//  dcd_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc6852_device::dcd_w )
-{
-	m_dcd = state;
-}
-
-
-//-------------------------------------------------
-//  sm_dtr_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mc6852_device::sm_dtr_r )
-{
-	return m_sm_dtr;
-}
-
-
-//-------------------------------------------------
-//  tuf_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mc6852_device::tuf_r )
-{
-	return m_tuf;
-}
-
-
-//-------------------------------------------------
-//  write_rx -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc6852_device::write_rx )
-{
-	m_rxd = state;
 }

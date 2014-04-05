@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include "machine/pd4990a.h"
+#include "machine/upd1990a.h"
 
 #define NEOGEO_MASTER_CLOCK                     (24000000)
 #define NEOGEO_MAIN_CPU_CLOCK                   (NEOGEO_MASTER_CLOCK / 2)
@@ -17,9 +17,7 @@
 #define NEOGEO_VTOTAL                           (0x108)
 #define NEOGEO_VBEND                            (0x010)
 #define NEOGEO_VBSTART                          (0x0f0)
-#define NEOGEO_VSSTART                          (0x000)
-#define NEOGEO_VBLANK_RELOAD_HPOS               (0x11f)
-
+#define NEOGEO_VSSTART                          (0x100)
 
 
 class neogeo_state : public driver_device
@@ -29,7 +27,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
@@ -40,16 +37,18 @@ public:
 		m_upd4990a(*this, "upd4990a"),
 		m_save_ram(*this, "saveram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
-	DECLARE_WRITE16_MEMBER(io_control_w);
+	DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_WRITE16_MEMBER(audio_command_w);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
-	DECLARE_WRITE16_MEMBER(system_control_w);
+	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
+	DECLARE_WRITE8_MEMBER(system_control_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
 	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
@@ -134,9 +133,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
 
 	// MVS-specific
-	DECLARE_WRITE16_MEMBER(watchdog_w);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_controller_r);
@@ -188,8 +185,7 @@ protected:
 	void create_sprite_line_timer(  );
 	void start_sprite_line_timer(  );
 	UINT16 get_video_control(  );
-	void audio_cpu_assert_nmi();
-	void audio_cpu_clear_nmi();
+	void audio_cpu_check_nmi();
 	void select_controller( UINT8 data );
 	void set_save_ram_unlock( UINT8 data );
 	void set_outputs(  );
@@ -332,7 +328,7 @@ protected:
 	memory_bank           *m_bank_audio_cart[4];
 
 	// MVS-specific devices
-	optional_device<upd4990a_old_device> m_upd4990a;
+	optional_device<upd4990a_device> m_upd4990a;
 	optional_shared_ptr<UINT16> m_save_ram;
 
 	required_device<screen_device> m_screen;
@@ -345,6 +341,8 @@ protected:
 	UINT32     m_main_cpu_bank_address;
 	UINT8      m_controller_select;
 	bool       m_recurse;
+	bool       m_audio_cpu_nmi_enabled;
+	bool       m_audio_cpu_nmi_pending;
 
 	// MVS-specific state
 	UINT8      m_save_ram_unlocked;

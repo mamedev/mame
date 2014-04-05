@@ -78,11 +78,6 @@ extern const device_type V9938VIDEO;
 extern const device_type TISOUND_94624;
 extern const device_type TISOUND_76496;
 
-struct ti_sound_config
-{
-	devcb_write_line                ready;
-};
-
 #define TI_SOUND_CONFIG(name) \
 	const ti_sound_config(name) =
 
@@ -90,20 +85,23 @@ class ti_sound_system_device : public bus8z_device
 {
 public:
 	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *tag, const char *name, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source) { };
+	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_console_ready(*this) { };
 
 	// Cannot read from sound; just ignore silently
 	DECLARE_READ8Z_MEMBER(readz) { };
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
+	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti_sound_system_device &>(device).m_console_ready.set_callback(object); }
+
 protected:
 	virtual void device_start(void);
 	virtual machine_config_constructor device_mconfig_additions() const =0;
 
 private:
-	sn76496_base_device*        m_sound_chip;
-	devcb_resolved_write_line   m_console_ready;
+	sn76496_base_device*    m_sound_chip;
+	devcb2_write_line       m_console_ready;
 };
 
 /*
@@ -167,14 +165,14 @@ protected:
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(_blank))                    \
 	MCFG_SCREEN_SIZE(_x, _y)                                                \
 	MCFG_SCREEN_VISIBLE_AREA(0, _x - 1, 0, _y - 1)                          \
-	MCFG_SCREEN_PALETTE(VDP_TAG ":palette")                                   \
+	MCFG_SCREEN_PALETTE(VDP_TAG ":palette")
+#define MCFG_TI_SOUND_94624_ADD(_tag)            \
+	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0)
 
-#define MCFG_TI_SOUND_94624_ADD(_tag, _conf)            \
-	MCFG_DEVICE_ADD(_tag, TISOUND_94624, 0) \
-	MCFG_DEVICE_CONFIG( _conf )
+#define MCFG_TI_SOUND_76496_ADD(_tag)            \
+	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0)
 
-#define MCFG_TI_SOUND_76496_ADD(_tag, _conf)            \
-	MCFG_DEVICE_ADD(_tag, TISOUND_76496, 0) \
-	MCFG_DEVICE_CONFIG( _conf )
+#define MCFG_TI_SOUND_READY_HANDLER( _ready ) \
+	devcb = &ti_sound_system_device::static_set_int_callback( *device, DEVCB2_##_ready );
 
 #endif /* __TIVIDEO__ */

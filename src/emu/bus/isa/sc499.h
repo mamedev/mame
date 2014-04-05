@@ -104,7 +104,7 @@ private:
 	UINT32 m_ctape_block_index;
 	UINT64 m_image_length;
 
-	UINT8 *m_ctape_block_buffer;
+	dynamic_buffer m_ctape_block_buffer;
 
 	device_image_interface *m_image;
 

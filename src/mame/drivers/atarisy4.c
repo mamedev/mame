@@ -17,7 +17,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "video/poly.h"
+#include "video/polylgcy.h"
 
 
 class atarisy4_state : public driver_device
@@ -40,7 +40,7 @@ public:
 	required_shared_ptr<UINT16> m_m68k_ram;
 	UINT16 *m_shared_ram[2];
 	required_shared_ptr<UINT16> m_screen_ram;
-	poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
 	DECLARE_READ16_MEMBER(m68k_shared_0_r);

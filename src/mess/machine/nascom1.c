@@ -54,16 +54,16 @@ READ8_MEMBER(nascom1_state::nascom2_fdc_select_r)
 
 WRITE8_MEMBER(nascom1_state::nascom2_fdc_select_w)
 {
-	device_t *fdc = machine().device("wd1793");
+	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 	m_nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
 
-	if (data & 0x01) wd17xx_set_drive(fdc,0);
-	if (data & 0x02) wd17xx_set_drive(fdc,1);
-	if (data & 0x04) wd17xx_set_drive(fdc,2);
-	if (data & 0x08) wd17xx_set_drive(fdc,3);
-	if (data & 0x10) wd17xx_set_side(fdc,(data & 0x10) >> 4);
+	if (data & 0x01) fdc->set_drive(0);
+	if (data & 0x02) fdc->set_drive(1);
+	if (data & 0x04) fdc->set_drive(2);
+	if (data & 0x08) fdc->set_drive(3);
+	if (data & 0x10) fdc->set_side((data & 0x10) >> 4);
 }
 
 

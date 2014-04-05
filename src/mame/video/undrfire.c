@@ -175,7 +175,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 				}
 				else
 				{
-					m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(bitmap,cliprect,
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
@@ -194,7 +194,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
@@ -313,7 +313,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 			}
 			else
 			{
-				m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(sprite_ptr->gfx)->zoom_transpen(bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -328,7 +328,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,

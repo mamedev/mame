@@ -100,6 +100,7 @@ void i8089_device::device_start()
 	save_item(NAME(m_master));
 	save_item(NAME(m_ca));
 	save_item(NAME(m_sel));
+	save_item(NAME(m_last_chan));
 
 	// assign memory spaces
 	m_mem = &space(AS_PROGRAM);
@@ -125,6 +126,7 @@ void i8089_device::device_config_complete()
 void i8089_device::device_reset()
 {
 	m_initialized = false;
+	m_last_chan = 0;
 }
 
 //-------------------------------------------------
@@ -325,9 +327,24 @@ void i8089_device::execute_run()
 {
 	do
 	{
-		// allocate cycles to the two channels, very very incomplete
-		m_icount -= m_ch1->execute_run();
-		m_icount -= m_ch2->execute_run();
+		bool next_chan;
+
+		if(m_ch1->chan_prio() < m_ch2->chan_prio())
+			next_chan = 0;
+		else if(m_ch1->chan_prio() > m_ch2->chan_prio())
+			next_chan = 1;
+		else if(m_ch1->priority() && !m_ch2->priority())
+			next_chan = 0;
+		else if(!m_ch1->priority() && m_ch2->priority())
+			next_chan = 1;
+		else
+			next_chan = !m_last_chan;
+
+		m_last_chan = next_chan;
+		if(!next_chan)
+			m_icount -= m_ch1->execute_run();
+		else
+			m_icount -= m_ch2->execute_run();
 	}
 	while (m_icount > 0);
 }
@@ -349,9 +366,9 @@ WRITE_LINE_MEMBER( i8089_device::ca_w )
 		else
 		{
 			if (m_sel == 0)
-				m_ch1->attention();
+				m_ch1->ca();
 			else
-				m_ch2->attention();
+				m_ch2->ca();
 		}
 	}
 

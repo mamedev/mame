@@ -46,8 +46,7 @@ void device_slot_interface::static_option_add(device_t &device, const char *name
 	if (option != NULL)
 		throw emu_fatalerror("slot '%s' duplicate option '%s\n", device.tag(), name);
 
-	option = pool_alloc(intf.m_options.pool(), device_slot_option(name, devtype));
-	intf.m_options.append(name, *option);
+	intf.m_options.append(name, *global_alloc(device_slot_option(name, devtype)));
 }
 
 device_slot_option *device_slot_interface::static_option(device_t &device, const char *name)

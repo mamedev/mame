@@ -312,8 +312,8 @@ void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		gfx->transpen(m_palette,*m_sprite_bitmap,m_sprite_clip,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,15);
-//      gfx->transpen(m_palette,bitmap,cliprect,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,0);
+		gfx->transpen(*m_sprite_bitmap,m_sprite_clip,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,15);
+//      gfx->transpen(bitmap,cliprect,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
 		source-=2;
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rabbit)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rabbit)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -897,6 +897,7 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update_rabbit)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(XGRB)

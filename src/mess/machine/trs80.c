@@ -520,11 +520,11 @@ WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
 
 	if (drive < 4)
 	{
-		wd17xx_set_drive(m_fdc,drive);
-		wd17xx_set_side(m_fdc,m_head);
+		m_fdc->set_drive(drive);
+		m_fdc->set_side(m_head);
 	}
 
-	wd17xx_dden_w(m_fdc, !BIT(data, 7));
+	m_fdc->dden_w(!BIT(data, 7));
 
 	/* CLEAR_LINE means to turn motors on */
 	floppy_mon_w(floppy_get_device(machine(), 0), (data & 0x0f) ? CLEAR_LINE : ASSERT_LINE);
@@ -576,10 +576,10 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 		mem.install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
 		mem.install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
 		mem.install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
-		mem.install_legacy_write_handler (*m_fdc, 0x37ec, 0x37ec, FUNC(wd17xx_command_w));
-		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ed, 0x37ed, FUNC(wd17xx_track_r), FUNC(wd17xx_track_w));
-		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ee, 0x37ee, FUNC(wd17xx_sector_r), FUNC(wd17xx_sector_w));
-		mem.install_legacy_readwrite_handler (*m_fdc, 0x37ef, 0x37ef, FUNC(wd17xx_data_r), FUNC(wd17xx_data_w));
+		mem.install_write_handler (0x37ec, 0x37ec, write8_delegate(FUNC(fd1793_device::command_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_device::track_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::track_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_device::sector_r),(fd1793_device*)m_fdc), write8_delegate(FUNC(fd1793_device::sector_w),(fd1793_device*)m_fdc));
+		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_device::data_r),(fd1793_device*)m_fdc),write8_delegate( FUNC(fd1793_device::data_w),(fd1793_device*)m_fdc));
 		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
 		mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
 	}
@@ -699,7 +699,7 @@ READ8_MEMBER( trs80_state::trs80_wd179x_r )
 {
 	UINT8 data = 0xff;
 	if (BIT(m_io_config->read(), 7))
-		data = wd17xx_status_r(m_fdc, space, offset);
+		data = m_fdc->status_r(space, offset);
 
 	return data;
 }
@@ -788,8 +788,8 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 		return;
 	}
 
-	wd17xx_set_drive(m_fdc,drive);
-	wd17xx_set_side(m_fdc,m_head);
+	m_fdc->set_drive(drive);
+	m_fdc->set_side(m_head);
 
 	/* Turn motors on */
 	floppy_mon_w(floppy_get_device(machine(), 0), CLEAR_LINE);

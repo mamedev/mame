@@ -30,7 +30,6 @@ private:
 	UINT8 m_term_data;
 	virtual void machine_reset();
 	virtual void machine_start();
-	void fdc_irq(bool state);
 	required_device<generic_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
 };
@@ -78,7 +77,6 @@ INPUT_PORTS_END
 
 void microdec_state::machine_start()
 {
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(microdec_state::fdc_irq), this));
 }
 
 void microdec_state::machine_reset()
@@ -95,10 +93,6 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
 	DEVCB_DRIVER_MEMBER(microdec_state, kbd_put)
 };
-
-void microdec_state::fdc_irq(bool state)
-{
-}
 
 static SLOT_INTERFACE_START( microdec_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )

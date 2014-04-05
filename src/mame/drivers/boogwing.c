@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
 	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", boogwing)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
 
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

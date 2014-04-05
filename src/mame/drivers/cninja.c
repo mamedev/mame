@@ -947,8 +947,9 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1012,8 +1013,9 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
@@ -1076,8 +1078,9 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cninjabl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninjabl)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1125,8 +1128,9 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cninja)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cninja)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1189,8 +1193,9 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", robocop2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robocop2)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1259,7 +1264,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", mutantf)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mutantf)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")

@@ -228,8 +228,8 @@ void casloopy_state::video_start()
 	for(int i=0;i<0x10000;i++)
 		m_vram[i] = i & 0xff;
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), casloopy_4bpp_layout, m_vram, 0x10, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, auto_alloc(machine(), gfx_element(machine(), casloopy_8bpp_layout, m_vram, 1, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, casloopy_4bpp_layout, m_vram, 0x10, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index+1, global_alloc(gfx_element(m_palette, casloopy_8bpp_layout, m_vram, 1, 0)));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -267,7 +267,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 
 			tile &= 0x7ff; //???
 
-			gfx->transpen(m_palette,bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
+			gfx->transpen(bitmap,cliprect,tile,7,0,0,x*8,y*8,0xffffffff);
 
 			count+=2;
 		}
@@ -296,11 +296,11 @@ READ16_MEMBER(casloopy_state::casloopy_vregs_r)
 {
 	if(offset == 4/2)
 	{
-		return (machine().primary_screen->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
+		return (machine().first_screen()->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
 	}
 
 	if(offset == 2/2)
-		return machine().rand();/*(machine().primary_screen->hblank() << 8) | (machine().primary_screen->hpos() & 0xff);*/ // hblank + hpos?
+		return machine().rand();/*(machine().first_screen()->hblank() << 8) | (machine().first_screen()->hpos() & 0xff);*/ // hblank + hpos?
 
 	if(offset == 0/2)
 		return machine().rand(); // pccllect
@@ -494,10 +494,11 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 //  MCFG_SCREEN_SIZE(444, 263)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
 	
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")

@@ -106,15 +106,15 @@ bool nes_ntb_slot_device::call_load()
 }
 
 
-bool nes_ntb_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool nes_ntb_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry );
+	load_software_part_region(*this, swlist, swname, start_entry );
 	return TRUE;
 }
 
-const char * nes_ntb_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+void nes_ntb_slot_device::get_default_card_software(astring &result)
 {
-	return software_get_default_slot(config, options, this, "ntbrom");
+	software_get_default_slot(result, "ntbrom");
 }
 
 //-----------------------------------------------
@@ -255,9 +255,9 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
 	LOG_MMC(("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_battery && m_wram_enable)
-		m_battery[offset & (m_battery_size - 1)] = data;
+		m_battery[offset & (m_battery.count() - 1)] = data;
 	if (m_prgram && m_wram_enable)
-		m_prgram[offset & (m_prgram_size - 1)] = data;
+		m_prgram[offset & (m_prgram.count() - 1)] = data;
 	if (!m_wram_enable && !m_timer_on)
 	{
 		m_timer_on = 1;
@@ -271,9 +271,9 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 	LOG_MMC(("Sunsoft DCS read_m, offset: %04x\n", offset));
 
 	if (m_battery && m_wram_enable)
-		return m_battery[offset & (m_battery_size - 1)];
+		return m_battery[offset & (m_battery.count() - 1)];
 	if (m_prgram && m_wram_enable)
-		return m_prgram[offset & (m_prgram_size - 1)];
+		return m_prgram[offset & (m_prgram.count() - 1)];
 
 	return m_open_bus;   // open bus
 }

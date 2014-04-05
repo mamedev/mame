@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	
 	MCFG_K037122_ADD("k037122_1", "screen", 0)
 	MCFG_K037122_GFXDECODE("gfxdecode")

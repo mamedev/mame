@@ -413,8 +413,9 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update_pipeline)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", pipeline)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipeline)
 
 	MCFG_PALETTE_ADD("palette", 0x100+0x100)
 	MCFG_PALETTE_INIT_OWNER(pipeline_state, pipeline)

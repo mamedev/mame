@@ -267,7 +267,7 @@ void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					m_gfxdecode->gfx(3)->transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(3)->transpen(bitmap,cliprect,
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,

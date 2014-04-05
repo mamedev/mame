@@ -137,7 +137,7 @@ void m68307_set_port_callbacks(m68307cpu_device *device, m68307_porta_read_callb
 	device->m_m68307_portb_w = portb_w;
 }
 
-void m68307_set_duart68681(m68307cpu_device* cpudev, device_t *duart68681)
+void m68307_set_duart68681(m68307cpu_device* cpudev, mc68681_device *duart68681)
 {
 	if (cpudev->m68307SERIAL)
 		cpudev->m68307SERIAL->m68307ser_set_duart68681(duart68681);

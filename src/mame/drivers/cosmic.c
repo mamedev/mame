@@ -1004,6 +1004,7 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
@@ -1026,7 +1027,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
@@ -1052,7 +1053,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_CPU_PROGRAM_MAP(cosmica_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", cosmica)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cosmica)
 	MCFG_PALETTE_ADD("palette", 8+16*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
@@ -1098,6 +1099,7 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmicg)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
@@ -1120,7 +1122,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
@@ -1153,7 +1155,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", panic)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panic)
 	MCFG_PALETTE_ADD("palette", 16+8*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)

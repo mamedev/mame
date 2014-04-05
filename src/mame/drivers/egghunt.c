@@ -123,7 +123,7 @@ void egghunt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					color,
 					flipscreen,flipscreen,
@@ -429,8 +429,9 @@ static MACHINE_CONFIG_START( egghunt, egghunt_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", egghunt)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", egghunt)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)

@@ -93,7 +93,6 @@ protected:
 	virtual void video_start();
 
 private:
-	void nc200_fdc_interrupt(bool state);
 	void nc200_video_set_backlight(int state);
 	void nc_card_save(device_image_interface &image);
 	int nc_card_calculate_mask(int size);

@@ -266,6 +266,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)

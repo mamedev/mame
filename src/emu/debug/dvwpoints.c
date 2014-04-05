@@ -63,11 +63,11 @@ void debug_view_watchpoints::enumerate_sources()
 	{
 		astring name;
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*auto_alloc(machine(), debug_view_source(name.cstr(), &dasm->device())));
+		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.head());
+	set_source(*m_source_list.first());
 }
 
 
@@ -299,7 +299,7 @@ int debug_view_watchpoints::watchpoints(SortMode sort, device_debug::watchpoint*
 	// Alloc
 	int numWPs = 0;
 	wpList = NULL;
-	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
@@ -312,7 +312,7 @@ int debug_view_watchpoints::watchpoints(SortMode sort, device_debug::watchpoint*
 	wpList = new device_debug::watchpoint*[numWPs];
 
 	int wpAddIndex = 0;
-	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
+	for (const debug_view_source *source = m_source_list.first(); source != NULL; source = source->next())
 	{
 		// Collect
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)

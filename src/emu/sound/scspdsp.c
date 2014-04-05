@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "scsp.h"
 #include "scspdsp.h"
 
 static UINT16 PACK(INT32 val)

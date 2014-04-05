@@ -496,7 +496,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", deco_mlc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", deco_mlc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_VIDEO_START_OVERRIDE(deco_mlc_state,mlc)
@@ -801,7 +801,7 @@ void deco_mlc_state::descramble_sound(  )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
+	dynamic_buffer buf1(length);
 
 	UINT32 x;
 
@@ -820,8 +820,6 @@ void deco_mlc_state::descramble_sound(  )
 	}
 
 	memcpy(rom,buf1,length);
-
-	auto_free(machine(), buf1);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)

@@ -1919,12 +1919,13 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_SCREEN_SIZE(342,262)   // to be verified
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segas16a_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SEGA_SYS16A_SPRITES_ADD("sprites")
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", segas16a)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas16a)
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware

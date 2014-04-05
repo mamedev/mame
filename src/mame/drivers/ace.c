@@ -99,19 +99,19 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 	/* first of all, fill the screen with the background color */
 	bitmap.fill(0, cliprect);
 
-	m_gfxdecode->gfx(1)->opaque(m_palette,bitmap,cliprect,
+	m_gfxdecode->gfx(1)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
 			m_objpos[0], m_objpos[1]);
 
-	m_gfxdecode->gfx(2)->opaque(m_palette,bitmap,cliprect,
+	m_gfxdecode->gfx(2)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
 			m_objpos[2], m_objpos[3]);
 
-	m_gfxdecode->gfx(3)->opaque(m_palette,bitmap,cliprect,
+	m_gfxdecode->gfx(3)->opaque(bitmap,cliprect,
 			0,
 			0,
 			0, 0,
@@ -119,7 +119,7 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		m_gfxdecode->gfx(4)->opaque(m_palette,bitmap,/* ?? */
+		m_gfxdecode->gfx(4)->opaque(bitmap,/* ?? */
 				cliprect,
 				offs,
 				0,
@@ -352,8 +352,9 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ace)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* sound hardware */

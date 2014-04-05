@@ -620,11 +620,6 @@ WRITE8_MEMBER(twin16_state::volume_callback)
 	m_k007232->set_volume(1,0,(data & 0x0f) * 0x11);
 }
 
-static const k007232_interface k007232_config =
-{
-	DEVCB_DRIVER_MEMBER(twin16_state,volume_callback) /* external port callback */
-};
-
 /* Interrupt Generators */
 
 INTERRUPT_GEN_MEMBER(twin16_state::CPUA_interrupt)
@@ -677,8 +672,9 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -693,7 +689,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
@@ -729,8 +725,9 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
 	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", twin16)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 	MCFG_PALETTE_ENABLE_SHADOWS()
@@ -745,7 +742,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(k007232_config)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)

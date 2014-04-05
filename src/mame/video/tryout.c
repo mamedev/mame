@@ -209,17 +209,17 @@ void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y + inc,0);
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite+1,
 				color,fx,fy,x,y,0);
 		}
 		else
 		{
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				sprite,
 				color,fx,fy,x,y,0);
 		}

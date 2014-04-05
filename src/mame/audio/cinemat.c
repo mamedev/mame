@@ -867,14 +867,14 @@ static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 		target_pitch = 0x5800 + (target_pitch << 12);
 
 		/* once per frame slide the pitch toward the target */
-		if (machine.primary_screen->frame_number() > state->m_last_frame)
+		if (machine.first_screen()->frame_number() > state->m_last_frame)
 		{
 			if (state->m_current_pitch > target_pitch)
 				state->m_current_pitch -= 225;
 			if (state->m_current_pitch < target_pitch)
 				state->m_current_pitch += 150;
 			samples->set_frequency(4, state->m_current_pitch);
-			state->m_last_frame = machine.primary_screen->frame_number();
+			state->m_last_frame = machine.first_screen()->frame_number();
 		}
 
 		/* remember the previous value */
@@ -970,7 +970,7 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			state->m_target_volume = 0;
 
 		/* ramp the thrust volume */
-		if (samples->playing(2) && machine.primary_screen->frame_number() > state->m_last_frame)
+		if (samples->playing(2) && machine.first_screen()->frame_number() > state->m_last_frame)
 		{
 			if (state->m_current_volume > state->m_target_volume)
 				state->m_current_volume -= 0.078f;
@@ -980,7 +980,7 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 				samples->set_volume(2, state->m_current_volume);
 			else
 				samples->stop(2);
-			state->m_last_frame = machine.primary_screen->frame_number();
+			state->m_last_frame = machine.first_screen()->frame_number();
 		}
 
 		/* fire - falling edge */
@@ -1250,14 +1250,14 @@ static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_c
 		target_pitch = 0x10000 + (target_pitch << 12);
 
 		/* once per frame slide the pitch toward the target */
-		if (machine.primary_screen->frame_number() > state->m_last_frame)
+		if (machine.first_screen()->frame_number() > state->m_last_frame)
 		{
 			if (state->m_current_pitch > target_pitch)
 				state->m_current_pitch -= 300;
 			if (state->m_current_pitch < target_pitch)
 				state->m_current_pitch += 200;
 			samples->set_frequency(4, state->m_current_pitch);
-			state->m_last_frame = machine.primary_screen->frame_number();
+			state->m_last_frame = machine.first_screen()->frame_number();
 		}
 
 		/* remember the previous value */

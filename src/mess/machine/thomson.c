@@ -786,10 +786,6 @@ void thomson_state::to7_modem_init()
 
 /* ------------  dispatch MODEM / speech extension ------------ */
 
-
-const mea8000_interface to7_speech = { "speech", DEVCB_NULL };
-
-
 READ8_MEMBER( thomson_state::to7_modem_mea8000_r )
 {
 	if ( space.debugger_access() )

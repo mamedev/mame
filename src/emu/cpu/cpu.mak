@@ -109,9 +109,9 @@ $(CPUOBJ)/arm7/arm7.o:  $(CPUSRC)/arm7/arm7.c \
 						$(CPUSRC)/arm7/arm7help.h \
 						$(CPUSRC)/arm7/arm7thmb.c \
 						$(CPUSRC)/arm7/arm7ops.c \
-						$(CPUSRC)/arm7/arm7core.c \
-						$(CPUSRC)/arm7/arm7drc.c \
-						$(CPUSRC)/arm7/arm7tdrc.c
+						$(CPUSRC)/arm7/arm7core.inc \
+						$(CPUSRC)/arm7/arm7drc.inc \
+						$(CPUSRC)/arm7/arm7tdrc.inc
 
 $(CPUOBJ)/arm7/arm7ops.o:   $(CPUSRC)/arm7/arm7ops.c \
 						$(CPUSRC)/arm7/arm7.h \
@@ -168,7 +168,7 @@ endif
 
 $(CPUOBJ)/adsp2100/adsp2100.o:  $(CPUSRC)/adsp2100/adsp2100.c \
 								$(CPUSRC)/adsp2100/adsp2100.h \
-								$(CPUSRC)/adsp2100/2100ops.c
+								$(CPUSRC)/adsp2100/2100ops.inc
 
 
 
@@ -185,13 +185,13 @@ endif
 
 $(CPUOBJ)/sharc/sharc.o:    $(CPUSRC)/sharc/sharc.c \
 							$(CPUSRC)/sharc/sharc.h \
-							$(CPUSRC)/sharc/sharcops.c \
+							$(CPUSRC)/sharc/sharcops.inc \
 							$(CPUSRC)/sharc/sharcops.h \
 							$(CPUSRC)/sharc/sharcdsm.c \
 							$(CPUSRC)/sharc/sharcdsm.h \
-							$(CPUSRC)/sharc/compute.c \
-							$(CPUSRC)/sharc/sharcdma.c \
-							$(CPUSRC)/sharc/sharcmem.c
+							$(CPUSRC)/sharc/compute.inc \
+							$(CPUSRC)/sharc/sharcdma.inc \
+							$(CPUSRC)/sharc/sharcmem.inc
 
 
 
@@ -222,7 +222,7 @@ CPUOBJS += $(CPUOBJ)/dsp16/dsp16.o
 DASMOBJS += $(CPUOBJ)/dsp16/dsp16dis.o
 endif
 
-$(CPUOBJ)/dsp16/dsp16.o:    $(CPUSRC)/dsp16/dsp16ops.c \
+$(CPUOBJ)/dsp16/dsp16.o:    $(CPUSRC)/dsp16/dsp16ops.inc \
 							$(CPUSRC)/dsp16/dsp16.c \
 							$(CPUSRC)/dsp16/dsp16.h
 
@@ -240,7 +240,7 @@ endif
 
 $(CPUOBJ)/dsp32/dsp32.o:    $(CPUSRC)/dsp32/dsp32.c \
 							$(CPUSRC)/dsp32/dsp32.h \
-							$(CPUSRC)/dsp32/dsp32ops.c
+							$(CPUSRC)/dsp32/dsp32ops.inc
 
 
 
@@ -369,7 +369,7 @@ endif
 
 $(CPUOBJ)/cop400/cop400.o:  $(CPUSRC)/cop400/cop400.c \
 							$(CPUSRC)/cop400/cop400.h \
-							$(CPUSRC)/cop400/cop400op.c
+							$(CPUSRC)/cop400/cop400op.inc
 
 
 
@@ -418,8 +418,8 @@ endif
 
 $(CPUOBJ)/t11/t11.o:    $(CPUSRC)/t11/t11.c \
 						$(CPUSRC)/t11/t11.h \
-						$(CPUSRC)/t11/t11ops.c \
-						$(CPUSRC)/t11/t11table.c
+						$(CPUSRC)/t11/t11ops.inc \
+						$(CPUSRC)/t11/t11table.inc
 
 
 
@@ -652,7 +652,7 @@ endif
 
 $(CPUOBJ)/e132xs/e132xs.o:  $(CPUSRC)/e132xs/e132xs.c \
 							$(CPUSRC)/e132xs/e132xs.h \
-							$(CPUSRC)/e132xs/e132xsop.c
+							$(CPUSRC)/e132xs/e132xsop.inc
 
 
 
@@ -780,7 +780,7 @@ endif
 
 $(CPUOBJ)/mcs51/mcs51.o:    $(CPUSRC)/mcs51/mcs51.c \
 							$(CPUSRC)/mcs51/mcs51.h \
-							$(CPUSRC)/mcs51/mcs51ops.c
+							$(CPUSRC)/mcs51/mcs51ops.inc
 
 #-------------------------------------------------
 # Intel MCS-96
@@ -858,12 +858,12 @@ $(CPUOBJ)/i86/i286.o:   $(CPUSRC)/i86/i286.c \
 $(CPUOBJ)/i386/i386.o:  $(CPUSRC)/i386/i386.c \
 						$(CPUSRC)/i386/i386.h \
 						$(CPUSRC)/i386/i386priv.h \
-						$(CPUSRC)/i386/i386op16.c \
-						$(CPUSRC)/i386/i386op32.c \
-						$(CPUSRC)/i386/i386ops.c \
-						$(CPUSRC)/i386/i486ops.c \
-						$(CPUSRC)/i386/pentops.c \
-						$(CPUSRC)/i386/x87ops.c \
+						$(CPUSRC)/i386/i386op16.inc \
+						$(CPUSRC)/i386/i386op32.inc \
+						$(CPUSRC)/i386/i386ops.inc \
+						$(CPUSRC)/i386/i486ops.inc \
+						$(CPUSRC)/i386/pentops.inc \
+						$(CPUSRC)/i386/x87ops.inc \
 						$(CPUSRC)/i386/i386ops.h \
 						$(CPUSRC)/i386/cycles.h
 
@@ -882,7 +882,7 @@ endif
 
 $(CPUOBJ)/i860/i860.o:  $(CPUSRC)/i860/i860.c \
 												$(CPUSRC)/i860/i860.h \
-												$(CPUSRC)/i860/i860dec.c
+												$(CPUSRC)/i860/i860dec.inc
 
 #-------------------------------------------------
 # Intel i960
@@ -912,7 +912,7 @@ DASMOBJS += $(CPUOBJ)/lh5801/5801dasm.o
 endif
 
 $(CPUOBJ)/lh5801/lh5801.o:  $(CPUSRC)/lh5801/lh5801.c \
-							$(CPUSRC)/lh5801/5801tbl.c \
+							$(CPUSRC)/lh5801/5801tbl.inc \
 							$(CPUSRC)/lh5801/lh5801.h
 
 
@@ -1288,8 +1288,8 @@ endif
 
 $(CPUOBJ)/m6800/m6800.o:    $(CPUSRC)/m6800/m6800.c \
 							$(CPUSRC)/m6800/m6800.h \
-							$(CPUSRC)/m6800/6800ops.c \
-							$(CPUSRC)/m6800/6800tbl.c
+							$(CPUSRC)/m6800/6800ops.inc \
+							$(CPUSRC)/m6800/6800tbl.inc
 
 
 
@@ -1306,7 +1306,7 @@ endif
 
 $(CPUOBJ)/m6805/m6805.o:    $(CPUSRC)/m6805/m6805.c \
 							$(CPUSRC)/m6805/m6805.h \
-							$(CPUSRC)/m6805/6805ops.c
+							$(CPUSRC)/m6805/6805ops.inc
 
 
 
@@ -1367,7 +1367,9 @@ DASMOBJS += $(CPUOBJ)/mc68hc11/hc11dasm.o
 endif
 
 $(CPUOBJ)/mc68hc11/mc68hc11.o:  $(CPUSRC)/mc68hc11/mc68hc11.c \
-								$(CPUSRC)/mc68hc11/hc11ops.c
+								$(CPUSRC)/mc68hc11/mc68hc11.h \
+								$(CPUSRC)/mc68hc11/hc11ops.inc \
+								$(CPUSRC)/mc68hc11/hc11ops.h
 
 
 
@@ -1413,7 +1415,7 @@ endif
 
 # rule to ensure we build the header before building the core CPU file
 $(CPUOBJ)/m68000/m68kcpu.o:     $(CPUOBJ)/m68000/m68kops.c \
-								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.c $(CPUSRC)/m68000/m68kmmu.h
+								$(CPUSRC)/m68000/m68kcpu.h $(CPUSRC)/m68000/m68kfpu.inc $(CPUSRC)/m68000/m68kmmu.h
 
 # m68kcpu.h now includes m68kops.h; m68kops.h won't exist until m68kops.c has been made
 $(CPUSRC)/m68000/m68kcpu.h: $(CPUOBJ)/m68000/m68kops.c
@@ -1444,7 +1446,8 @@ $(CPUOBJ)/dsp56k/dsp56pcu.o:    $(CPUSRC)/dsp56k/dsp56pcu.c \
 								$(CPUSRC)/dsp56k/dsp56pcu.h
 
 $(CPUOBJ)/dsp56k/dsp56k.o:  $(CPUSRC)/dsp56k/dsp56k.c \
-							$(CPUSRC)/dsp56k/dsp56k.h
+							$(CPUSRC)/dsp56k/dsp56k.h \
+							$(CPUSRC)/dsp56k/dsp56ops.inc
 
 $(CPUOBJ)/dsp56k/opcode.o:  $(CPUSRC)/dsp56k/opcode.c \
 							$(CPUSRC)/dsp56k/opcode.h
@@ -1542,7 +1545,7 @@ endif
 $(CPUOBJ)/nec/nec.o:    $(CPUSRC)/nec/nec.c \
 						$(CPUSRC)/nec/nec.h \
 						$(CPUSRC)/nec/necea.h \
-						$(CPUSRC)/nec/necinstr.c \
+						$(CPUSRC)/nec/necinstr.inc \
 						$(CPUSRC)/nec/necinstr.h \
 						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
@@ -1551,8 +1554,8 @@ $(CPUOBJ)/nec/nec.o:    $(CPUSRC)/nec/nec.c \
 $(CPUOBJ)/nec/v25.o:    $(CPUSRC)/nec/v25.c \
 						$(CPUSRC)/nec/nec.h \
 						$(CPUSRC)/nec/necea.h \
-						$(CPUSRC)/nec/necinstr.c \
-						$(CPUSRC)/nec/v25instr.c \
+						$(CPUSRC)/nec/necinstr.inc \
+						$(CPUSRC)/nec/v25instr.inc \
 						$(CPUSRC)/nec/v25instr.h \
 						$(CPUSRC)/nec/necmacro.h \
 						$(CPUSRC)/nec/necmodrm.h \
@@ -1578,18 +1581,18 @@ CPUOBJS += $(CPUOBJ)/v60/v60.o
 DASMOBJS += $(CPUOBJ)/v60/v60d.o
 endif
 
-$(CPUOBJ)/v60/v60.o:    $(CPUSRC)/v60/am.c \
-						$(CPUSRC)/v60/am1.c \
-						$(CPUSRC)/v60/am2.c \
-						$(CPUSRC)/v60/am3.c \
-						$(CPUSRC)/v60/op12.c \
-						$(CPUSRC)/v60/op2.c \
-						$(CPUSRC)/v60/op3.c \
-						$(CPUSRC)/v60/op4.c \
-						$(CPUSRC)/v60/op5.c \
-						$(CPUSRC)/v60/op6.c \
-						$(CPUSRC)/v60/op7a.c \
-						$(CPUSRC)/v60/optable.c \
+$(CPUOBJ)/v60/v60.o:    $(CPUSRC)/v60/am.inc \
+						$(CPUSRC)/v60/am1.inc \
+						$(CPUSRC)/v60/am2.inc \
+						$(CPUSRC)/v60/am3.inc \
+						$(CPUSRC)/v60/op12.inc \
+						$(CPUSRC)/v60/op2.inc \
+						$(CPUSRC)/v60/op3.inc \
+						$(CPUSRC)/v60/op4.inc \
+						$(CPUSRC)/v60/op5.inc \
+						$(CPUSRC)/v60/op6.inc \
+						$(CPUSRC)/v60/op7a.inc \
+						$(CPUSRC)/v60/optable.inc \
 						$(CPUSRC)/v60/v60.c \
 						$(CPUSRC)/v60/v60.h \
 						$(CPUSRC)/v60/v60d.c
@@ -1638,8 +1641,8 @@ DASMOBJS += $(CPUOBJ)/upd7810/7810dasm.o
 endif
 
 $(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
-								$(CPUSRC)/upd7810/7810tbl.c \
-								$(CPUSRC)/upd7810/7810ops.c \
+								$(CPUSRC)/upd7810/7810tbl.inc \
+								$(CPUSRC)/upd7810/7810ops.inc \
 								$(CPUSRC)/upd7810/upd7810.h
 
 
@@ -1714,8 +1717,8 @@ DASMOBJS += $(CPUOBJ)/saturn/saturnds.o
 endif
 
 $(CPUOBJ)/saturn/saturn.o:  $(CPUSRC)/saturn/saturn.c \
-							$(CPUSRC)/saturn/sattable.c \
-							$(CPUSRC)/saturn/satops.c \
+							$(CPUSRC)/saturn/sattable.inc \
+							$(CPUSRC)/saturn/satops.inc \
 							$(CPUSRC)/saturn/saturn.h
 
 
@@ -1749,8 +1752,8 @@ DASMOBJS += $(CPUOBJ)/sc61860/scdasm.o
 endif
 
 $(CPUOBJ)/sc61860/sc61860.o:    $(CPUSRC)/sc61860/sc61860.h \
-								$(CPUSRC)/sc61860/scops.c \
-								$(CPUSRC)/sc61860/sctable.c
+								$(CPUSRC)/sc61860/scops.inc \
+								$(CPUSRC)/sc61860/sctable.inc
 
 
 
@@ -1868,8 +1871,8 @@ endif
 
 $(CPUOBJ)/tms7000/tms7000.o:    $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/tms7000.c \
-								$(CPUSRC)/tms7000/tms70op.c \
-								$(CPUSRC)/tms7000/tms70tb.c
+								$(CPUSRC)/tms7000/tms70op.inc \
+								$(CPUSRC)/tms7000/tms70tb.inc
 
 $(CPUOBJ)/tms7000/7000dasm.o:   $(CPUSRC)/tms7000/tms7000.h \
 								$(CPUSRC)/tms7000/7000dasm.c
@@ -2071,7 +2074,7 @@ DASMOBJS += $(CPUOBJ)/tlcs900/dasm900.o
 endif
 
 $(CPUOBJ)/tlcs900/tlcs900.o:    $(CPUSRC)/tlcs900/tlcs900.c \
-								$(CPUSRC)/tlcs900/900tbl.c \
+								$(CPUSRC)/tlcs900/900tbl.inc \
 								$(CPUSRC)/tlcs900/tlcs900.h
 
 $(CPUOBJ)/tlcs900/dasm900.o:    $(CPUSRC)/tlcs900/dasm900.c
@@ -2125,14 +2128,14 @@ endif
 
 $(CPUOBJ)/z180/z180.o:  $(CPUSRC)/z180/z180.c \
 						$(CPUSRC)/z180/z180.h \
-						$(CPUSRC)/z180/z180op.c \
+						$(CPUSRC)/z180/z180op.inc \
 						$(CPUSRC)/z180/z180ops.h \
 						$(CPUSRC)/z180/z180tbl.h \
-						$(CPUSRC)/z180/z180cb.c \
-						$(CPUSRC)/z180/z180dd.c \
-						$(CPUSRC)/z180/z180ed.c \
-						$(CPUSRC)/z180/z180fd.c \
-						$(CPUSRC)/z180/z180xy.c
+						$(CPUSRC)/z180/z180cb.inc \
+						$(CPUSRC)/z180/z180dd.inc \
+						$(CPUSRC)/z180/z180ed.inc \
+						$(CPUSRC)/z180/z180fd.inc \
+						$(CPUSRC)/z180/z180xy.inc
 
 
 
@@ -2151,8 +2154,8 @@ $(CPUOBJ)/z8000/z8000.o:    $(CPUSRC)/z8000/z8000.c \
 							$(CPUSRC)/z8000/z8000.h \
 							$(CPUSRC)/z8000/z8000cpu.h \
 							$(CPUSRC)/z8000/z8000dab.h \
-							$(CPUSRC)/z8000/z8000ops.c \
-							$(CPUSRC)/z8000/z8000tbl.c
+							$(CPUSRC)/z8000/z8000ops.inc \
+							$(CPUSRC)/z8000/z8000tbl.inc
 
 
 
@@ -2168,7 +2171,7 @@ DASMOBJS += $(CPUOBJ)/z8/z8dasm.o
 endif
 
 $(CPUOBJ)/z8/z8.o:  $(CPUSRC)/z8/z8.c \
-					$(CPUSRC)/z8/z8ops.c \
+					$(CPUSRC)/z8/z8ops.inc \
 					$(CPUSRC)/z8/z8.h
 
 

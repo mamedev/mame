@@ -7,6 +7,7 @@
 /.cproject
 /.project
 /cfg
+/depend_*.mak
 /diff
 /nvram
 /obj

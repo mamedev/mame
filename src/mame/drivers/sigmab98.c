@@ -305,7 +305,7 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				m_gfxdecode->gfx(gfx)->zoom_transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap,cliprect,
 										code++, color,
 										flipx, flipy,
 										(sx + x * dim) / 0x10000, (sy + y * dim) / 0x10000,
@@ -1704,8 +1704,9 @@ static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
@@ -1746,8 +1747,9 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_DRIVER(sigmab98_state, screen_eof_sammymdl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", sigmab98)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sigmab98)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)

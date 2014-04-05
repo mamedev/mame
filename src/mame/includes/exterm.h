@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/dac.h"
+#include "cpu/tms32010/tms32010.h"
 
 class exterm_state : public driver_device
 {
@@ -46,7 +47,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audioslave;
-	required_device<cpu_device> m_slave;
+	required_device<tms34010_device> m_slave;
 	required_device<dac_device> m_dac;
 };
 

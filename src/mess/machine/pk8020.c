@@ -156,10 +156,10 @@ READ8_MEMBER(pk8020_state::devices_r)
 					}
 					break;
 		case 0x18: switch(offset & 3) {
-						case 0 : return wd17xx_status_r(m_wd1793,space, 0);
-						case 1 : return wd17xx_track_r(m_wd1793,space, 0);
-						case 2 : return wd17xx_sector_r(m_wd1793,space, 0);
-						case 3 : return wd17xx_data_r(m_wd1793,space, 0);
+						case 0 : return m_wd1793->status_r(space, 0);
+						case 1 : return m_wd1793->track_r(space, 0);
+						case 2 : return m_wd1793->sector_r(space, 0);
+						case 3 : return m_wd1793->data_r(space, 0);
 					}
 					break;
 		case 0x20: switch(offset & 1) {
@@ -186,10 +186,10 @@ WRITE8_MEMBER(pk8020_state::devices_w)
 					}
 					break;
 		case 0x18: switch(offset & 3) {
-						case 0 : wd17xx_command_w(m_wd1793,space, 0,data);break;
-						case 1 : wd17xx_track_w(m_wd1793,space, 0,data);break;
-						case 2 : wd17xx_sector_w(m_wd1793,space, 0,data);break;
-						case 3 : wd17xx_data_w(m_wd1793,space, 0,data);break;
+						case 0 : m_wd1793->command_w(space, 0,data);break;
+						case 1 : m_wd1793->track_w(space, 0,data);break;
+						case 2 : m_wd1793->sector_w(space, 0,data);break;
+						case 3 : m_wd1793->data_w(space, 0,data);break;
 					}
 					break;
 		case 0x20: switch(offset & 1) {
@@ -844,21 +844,21 @@ WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
 	floppy_mon_w(floppy_get_device(machine(), 1), 1);
 	floppy_mon_w(floppy_get_device(machine(), 2), 1);
 	floppy_mon_w(floppy_get_device(machine(), 3), 1);
-	wd17xx_set_side(m_wd1793,BIT(data,4));
+	m_wd1793->set_side(BIT(data,4));
 	if (BIT(data,0)) {
-		wd17xx_set_drive(m_wd1793,0);
+		m_wd1793->set_drive(0);
 		floppy_mon_w(floppy_get_device(machine(), 0), 0);
 		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 1);
 	} else if (BIT(data,1)) {
-		wd17xx_set_drive(m_wd1793,1);
+		m_wd1793->set_drive(1);
 		floppy_mon_w(floppy_get_device(machine(), 1), 0);
 		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 1);
 	} else if (BIT(data,2)) {
-		wd17xx_set_drive(m_wd1793,2);
+		m_wd1793->set_drive(2);
 		floppy_mon_w(floppy_get_device(machine(), 2), 0);
 		floppy_drive_set_ready_state(floppy_get_device(machine(), 2), 1, 1);
 	} else if (BIT(data,3)) {
-		wd17xx_set_drive(m_wd1793,3);
+		m_wd1793->set_drive(3);
 		floppy_mon_w(floppy_get_device(machine(), 3), 0);
 		floppy_drive_set_ready_state(floppy_get_device(machine(), 3), 1, 1);
 	}

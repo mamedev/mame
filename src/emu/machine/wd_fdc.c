@@ -65,7 +65,11 @@ const device_type WD1773x = &device_creator<wd1773_t>;
 #define TRACE_STATE 0
 
 wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	intrq_cb(*this),
+	drq_cb(*this),
+	hld_cb(*this),
+	enp_cb(*this)
 {
 	force_ready = false;
 }
@@ -77,6 +81,11 @@ void wd_fdc_t::set_force_ready(bool _force_ready)
 
 void wd_fdc_t::device_start()
 {
+	intrq_cb.resolve();
+	drq_cb.resolve();
+	hld_cb.resolve();
+	enp_cb.resolve();
+
 	t_gen = timer_alloc(TM_GEN);
 	t_cmd = timer_alloc(TM_CMD);
 	t_track = timer_alloc(TM_TRACK);
@@ -156,26 +165,6 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 
 	if(prev_ready != next_ready)
 		ready_callback(floppy, next_ready);
-}
-
-void wd_fdc_t::setup_intrq_cb(line_cb cb)
-{
-	intrq_cb = cb;
-}
-
-void wd_fdc_t::setup_drq_cb(line_cb cb)
-{
-	drq_cb = cb;
-}
-
-void wd_fdc_t::setup_hld_cb(line_cb cb)
-{
-	hld_cb = cb;
-}
-
-void wd_fdc_t::setup_enp_cb(line_cb cb)
-{
-	enp_cb = cb;
 }
 
 void wd_fdc_t::dden_w(bool _dden)

@@ -47,6 +47,8 @@ const device_type RAINBOW_VIDEO = &device_creator<rainbow_video_device>;
 vt100_video_device::vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_video_interface(mconfig, *this),
+						m_read_ram(*this),
+						m_write_clear_video_interrupt(*this),
 						m_palette(*this, "palette")
 {
 }
@@ -55,6 +57,8 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 vt100_video_device::vt100_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, VT100_VIDEO, "VT100 Video", tag, owner, clock, "vt100_video", __FILE__),
 						device_video_interface(mconfig, *this),
+						m_read_ram(*this),
+						m_write_clear_video_interrupt(*this),
 						m_palette(*this, "palette")
 {
 }
@@ -82,8 +86,6 @@ void vt100_video_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_ram_cb, 0, sizeof(m_in_ram_cb));
-		memset(&m_clear_video_cb, 0, sizeof(m_clear_video_cb));
 		m_char_rom_tag = "";
 	}
 }
@@ -95,8 +97,8 @@ void vt100_video_device::device_config_complete()
 void vt100_video_device::device_start()
 {
 	/* resolve callbacks */
-	m_in_ram_func.resolve(m_in_ram_cb, *this);
-	m_clear_video_interrupt.resolve(m_clear_video_cb, *this);
+	m_read_ram.resolve_safe(0);
+	m_write_clear_video_interrupt.resolve_safe();
 
 	m_gfx = machine().root_device().memregion(m_char_rom_tag)->base();
 	assert(m_gfx != NULL);
@@ -264,7 +266,7 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 				break;
 			case 0x09:
 				// clear vertical frequency interrupt;
-				m_clear_video_interrupt(0, 0);
+				m_write_clear_video_interrupt(0);
 
 				break;
 			case 0x0a:
@@ -438,12 +440,12 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	UINT8 display_type = 3;  // binary 11
 	UINT16 temp = 0;
 
-	if (m_in_ram_func(0) != 0x7f)
+	if (m_read_ram(0) != 0x7f)
 		return;
 
 	while (line < (m_height + m_skip_lines))
 	{
-		code = m_in_ram_func(addr + xpos);
+		code = m_read_ram(addr + xpos);
 		if (code == 0x7f)
 		{
 			// end of line, fill empty till end of line
@@ -455,7 +457,7 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 				}
 			}
 			// move to new data
-			temp = m_in_ram_func(addr + xpos + 1) * 256 + m_in_ram_func(addr + xpos + 2);
+			temp = m_read_ram(addr + xpos + 1) * 256 + m_read_ram(addr + xpos + 2);
 			addr = (temp) & 0x1fff;
 			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO)
 			if (addr & 0x1000) addr &= 0xfff; else addr |= 0x2000;
@@ -708,7 +710,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 
 	while (line < (m_height + m_skip_lines))
 	{
-		code = m_in_ram_func(addr + xpos);
+		code = m_read_ram(addr + xpos);
 
 		if ( code == 0x00 )        // TODO: investigate side effect on regular zero character!
 				display_type |= 0x80; // DEFAULT: filler chars (till end of line) and empty lines (00) will be blanked
@@ -732,10 +734,10 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			attr_addr = 0x1000 | ( (addr + xpos + 1) & 0x0fff );
 
 			// MOVE TO NEW DATA
-			temp = m_in_ram_func(addr + xpos + 2) * 256 + m_in_ram_func(addr + xpos + 1);
+			temp = m_read_ram(addr + xpos + 2) * 256 + m_read_ram(addr + xpos + 1);
 			addr = (temp) & 0x0fff;
 
-			temp = m_in_ram_func(attr_addr);
+			temp = m_read_ram(attr_addr);
 			scroll_region = (temp) & 1;
 			display_type  = (temp >> 1) & 3;
 
@@ -752,7 +754,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			if (line >= m_skip_lines)
 			{
 				attr_addr = 0x1000 | ( (addr + xpos) & 0x0fff );
-				temp = m_in_ram_func(attr_addr); // get character attribute
+				temp = m_read_ram(attr_addr); // get character attribute
 
 				// CONFIRMED: Reverse active on 1.  No attributes = 0x0E
 				// 1 = display char. in REVERSE   (encoded as 8)

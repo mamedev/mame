@@ -113,8 +113,7 @@ void nes_x1_005_device::device_start()
 	common_start();
 	save_item(NAME(m_latch));
 
-	m_x1_005_ram = auto_alloc_array_clear(machine(), UINT8, 0x80);
-	save_pointer(NAME(m_x1_005_ram), 0x80);
+	save_item(NAME(m_x1_005_ram));
 
 	m_mapper_sram_size = 0x80;
 	m_mapper_sram = m_x1_005_ram;
@@ -137,8 +136,7 @@ void nes_x1_017_device::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_mmc_vrom_bank));
 
-	m_x1_017_ram = auto_alloc_array_clear(machine(), UINT8, 0x1400);
-	save_pointer(NAME(m_x1_017_ram), 0x1400);
+	save_item(NAME(m_x1_017_ram));
 
 	m_mapper_sram_size = 0x1400;
 	m_mapper_sram = m_x1_017_ram;

@@ -43,22 +43,16 @@
 /*****************************************************************************/
 /****  Management of the interrupts (NMI and INT)between uPD765 and Z80 ******/
 /*****************************************************************************/
-void hec2hrp_state::hector_disc2_init()
-{
-	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(hec2hrp_state::disc2_fdc_interrupt), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(hec2hrp_state::disc2_fdc_dma_irq), this));
-}
 
 /* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization */
-void hec2hrp_state::disc2_fdc_interrupt(bool state)
+WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_interrupt )
 {
 	m_IRQ_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization */
-void hec2hrp_state::disc2_fdc_dma_irq(bool state)
+WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_dma_irq )
 {
 	m_NMI_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);

@@ -144,11 +144,6 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-
 	DECLARE_DRIVER_INIT(apc);
 	DECLARE_PALETTE_INIT(apc);
 
@@ -192,7 +187,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	apc_state *state = device->machine().driver_data<apc_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	int xi,yi,yi_trans;
 	int x;
 	UINT8 char_size;
@@ -238,7 +233,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi);
 				res_y = y*lr+yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
+				if(!device->machine().first_screen()->visible_area().contains(res_x, res_y))
 					continue;
 
 				/*
@@ -271,9 +266,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
 				if(o_line && yi == 0) { tile_data = 0xff; }
 				if(v_line)  { tile_data|=1; }
-				if(blink && device->machine().primary_screen->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
+				if(blink && device->machine().first_screen()->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
 
-				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+				if(cursor_on && cursor_addr == tile_addr && device->machine().first_screen()->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)
@@ -741,18 +736,6 @@ CASETBL:
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 INPUT_PORTS_END
 
-void apc_state::fdc_drq(bool state)
-{
-//  printf("%02x DRQ\n",state);
-	m_dmac->dreq1_w(state);
-}
-
-void apc_state::fdc_irq(bool state)
-{
-//  printf("IRQ %d\n",state);
-	machine().device<pic8259_device>("pic8259_slave")->ir4_w(state);
-}
-
 IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 {
 	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
@@ -763,8 +746,6 @@ void apc_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
 
 	m_fdc->set_rate(500000);
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
 
 	m_rtc->cs_w(1);
 //  m_rtc->oe_w(1);
@@ -982,8 +963,6 @@ PALETTE_INIT_MEMBER(apc_state,apc)
 		palette.set_pen_color(i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-static const upd1771_interface upd1771c_config = { DEVCB_NULL };
-
 static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* basic machine hardware */
@@ -1005,6 +984,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
@@ -1017,7 +998,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_SCREEN_SIZE(640, 494)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", apc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", apc)
 
 	MCFG_UPD7220_ADD("upd7220_chr", XTAL_3_579545MHz, hgdc_1_intf, upd7220_1_map) // unk clock
 	MCFG_UPD7220_ADD("upd7220_btm", XTAL_3_579545MHz, hgdc_2_intf, upd7220_2_map) // unk clock
@@ -1028,7 +1009,6 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
-	MCFG_SOUND_CONFIG( upd1771c_config )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

@@ -29,6 +29,10 @@
 #include "machine/mm58274c.h"
 #include "rendlay.h"
 #include "sound/speaker.h"
+#include "machine/nsc810.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/null_modem.h"
+#include "machine/nvram.h"
 
 class hunter2_state : public driver_device
 {
@@ -37,19 +41,30 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_rs232(*this, "serial")
+		, m_rom(*this, "roms")
+		, m_ram(*this, "rams")
+		, m_nvram(*this, "nvram")
 	{ }
 
 	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
+	DECLARE_WRITE8_MEMBER(port81_w);
+	DECLARE_WRITE8_MEMBER(port82_w);
+	DECLARE_WRITE8_MEMBER(port84_w);
 	DECLARE_WRITE8_MEMBER(port86_w);
 	DECLARE_WRITE8_MEMBER(portbb_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(a_timer);
 	DECLARE_PALETTE_INIT(hunter2);
 	DECLARE_DRIVER_INIT(hunter2);
+	DECLARE_WRITE_LINE_MEMBER(timer0_out);
+	DECLARE_WRITE_LINE_MEMBER(timer1_out);
+	DECLARE_WRITE_LINE_MEMBER(cts_w);
+	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
 private:
 	UINT8 m_keydata;
@@ -57,6 +72,10 @@ private:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<rs232_port_device> m_rs232;
+	required_memory_region m_rom;
+	required_memory_region m_ram;
+	required_device<nvram_device> m_nvram;
 };
 
 static ADDRESS_MAP_START(hunter2_mem, AS_PROGRAM, 8, hunter2_state)
@@ -70,17 +89,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("nsc810", nsc810_device, read, write) // device not yet emulated
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
-	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-	AM_RANGE(0x03, 0x1F) AM_WRITENOP
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write) // device not yet emulated
+//	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+//	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
+//	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
+//	AM_RANGE(0x03, 0x1F) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
 	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(port80_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(port81_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(port82_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(port84_w)
 	AM_RANGE(0x86, 0x86) AM_WRITE(port86_w)
 	AM_RANGE(0xbb, 0xbb) AM_WRITE(portbb_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(porte0_w)
@@ -90,7 +112,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( hunter2 )
 	PORT_START("X0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')
@@ -101,7 +123,7 @@ static INPUT_PORTS_START( hunter2 )
 
 	PORT_START("X1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
@@ -134,13 +156,13 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('\"')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR('/')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 
 	PORT_START("X5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
@@ -155,8 +177,8 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 INPUT_PORTS_END
 
@@ -176,14 +198,32 @@ READ8_MEMBER( hunter2_state::port00_r )
 	return data;
 }
 
+READ8_MEMBER( hunter2_state::port01_r )
+{
+	UINT8 res = 0x00;
+
+	if(m_rs232->dsr_r())
+		res |= 0x80;
+
+	return res;
+}
+
 WRITE8_MEMBER( hunter2_state::port01_w )
 {
 	m_keydata = data;
+	//logerror("Key row select %02x\n",data);
 }
 
 READ8_MEMBER( hunter2_state::port02_r )
 {
-	return 0x2c;
+	UINT8 res = 0x28;
+
+	if(m_rs232->rxd_r())
+		res |= 0x01;
+	if(m_rs232->dcd_r())
+		res |= 0x02;
+
+	return res;
 }
 
 WRITE8_MEMBER( hunter2_state::port60_w )
@@ -197,7 +237,24 @@ Bits 1,0,7,6: Contrast level.
 
 WRITE8_MEMBER( hunter2_state::port80_w )
 {
-// bit 0 does something
+}
+
+WRITE8_MEMBER( hunter2_state::port81_w )
+{
+	m_rs232->write_txd(data & 0x01);
+//	logerror("TXD write %02x\n",data);
+}
+
+WRITE8_MEMBER( hunter2_state::port82_w )
+{
+	m_rs232->write_dtr(data & 0x01);
+//	logerror("DTR write %02x\n",data);
+}
+
+WRITE8_MEMBER( hunter2_state::port84_w )
+{
+	m_rs232->write_rts(data & 0x01);
+//	logerror("RTS write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -214,6 +271,12 @@ Bit 3 = Enable RSTA interrupts
 WRITE8_MEMBER( hunter2_state::portbb_w )
 {
 	m_irq_mask = data;
+	if(!(data & 0x08))
+		m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
+	if(!(data & 0x04))
+		m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
+	if(!(data & 0x02))
+		m_maincpu->set_input_line(NSC800_RSTC, CLEAR_LINE);
 }
 
 /*
@@ -266,8 +329,8 @@ void hunter2_state::machine_reset()
 // it is presumed that writing to rom will go nowhere
 DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 {
-	UINT8 *rom = memregion("roms")->base();
-	UINT8 *ram = memregion("rams")->base();
+	UINT8 *rom = m_rom->base();
+	UINT8 *ram = m_ram->base();
 	membank("bankr0")->configure_entries( 0, 10, &rom[0x00000], 0x0000);
 	membank("bankr0")->configure_entries(16, 16, &ram[0x00000], 0xc000);
 	membank("bankr1")->configure_entries( 0, 10, &rom[0x04000], 0x0000);
@@ -280,6 +343,8 @@ DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
 	membank("bankw1")->configure_entries(16, 16, &ram[0x04000], 0xc000);
 	membank("bankw2")->configure_entries( 0, 10, &ram[0xc0000], 0x0000);
 	membank("bankw2")->configure_entries(16, 16, &ram[0x08000], 0xc000);
+
+	m_nvram->set_base(ram,m_ram->bytes());
 }
 
 PALETTE_INIT_MEMBER(hunter2_state, hunter2)
@@ -299,11 +364,36 @@ static const mm58274c_interface rtc_intf =
 	1   /*  first day of week */
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(hunter2_state::a_timer)
+WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
-	if BIT(m_irq_mask, 3)
-		m_maincpu->set_input_line(NSC800_RSTA, HOLD_LINE);
+	if(state == ASSERT_LINE)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
+
+WRITE_LINE_MEMBER(hunter2_state::timer1_out)
+{
+	if(m_irq_mask & 0x08)
+		m_maincpu->set_input_line(NSC800_RSTA, state);
+}
+
+WRITE_LINE_MEMBER(hunter2_state::cts_w)
+{
+	if(BIT(m_irq_mask, 1))
+	{
+		m_maincpu->set_input_line(NSC800_RSTC, state);
+		printf("CTS: RSTC set %i\n",state);
+	}
+}
+
+WRITE_LINE_MEMBER(hunter2_state::rxd_w)
+{
+	if(BIT(m_irq_mask, 2))
+		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
+}
+
+SLOT_INTERFACE_START( hunter2_rs232_devices )
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
@@ -317,6 +407,8 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_SCREEN_UPDATE_DEVICE("lcdc", hd61830_device, screen_update)
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
@@ -330,6 +422,20 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* Devices */
 	MCFG_MM58274C_ADD("rtc", rtc_intf)
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
+
+	MCFG_NSC810_ADD("iotimer",XTAL_4MHz,XTAL_4MHz)
+	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,port00_r))
+	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,port01_r))
+	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,port01_w))
+	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,port02_r))
+	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
+	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
+
+	MCFG_RS232_PORT_ADD("serial",hunter2_rs232_devices,NULL)
+	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
+	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 /* ROM definition */

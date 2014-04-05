@@ -381,7 +381,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -390,7 +390,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", brkthru)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", brkthru)
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(brkthru_state, brkthru)
@@ -439,7 +439,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 	              = 57.444855Hz
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

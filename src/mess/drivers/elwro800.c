@@ -574,10 +574,11 @@ static MACHINE_CONFIG_START( elwro800, elwro800_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(elwro800_state, screen_update_spectrum )
 	MCFG_SCREEN_VBLANK_DRIVER(elwro800_state, screen_eof_spectrum)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(elwro800_state, spectrum )
-	MCFG_GFXDECODE_ADD("gfxdecode", elwro800)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", elwro800)
 
 	MCFG_VIDEO_START_OVERRIDE(elwro800_state, spectrum )
 

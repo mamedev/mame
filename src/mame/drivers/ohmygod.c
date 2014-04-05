@@ -329,8 +329,9 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 0*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(ohmygod_state, screen_update_ohmygod)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ohmygod)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ohmygod)
 	
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)

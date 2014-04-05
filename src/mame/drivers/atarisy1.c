@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", atarisy1)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy1)
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
@@ -744,6 +744,7 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 

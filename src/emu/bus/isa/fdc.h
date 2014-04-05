@@ -28,6 +28,8 @@ public:
 
 	required_device<pc_fdc_interface> fdc;
 
+	DECLARE_WRITE_LINE_MEMBER( irq_w );
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
@@ -38,11 +40,6 @@ protected:
 	virtual UINT8 dack_r(int line);
 	virtual void dack_w(int line, UINT8 data);
 	virtual void eop_w(int state);
-
-private:
-	void irq_w(bool state);
-	void drq_w(bool state);
-
 };
 
 class isa8_fdc_xt_device : public isa8_fdc_device {

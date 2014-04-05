@@ -429,6 +429,7 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(shougi_state, screen_update_shougi)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)

@@ -258,7 +258,7 @@ UINT32 dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bi
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			m_gfxdecode->gfx(0)->opaque(m_palette,bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
 
 	return 0;
@@ -772,11 +772,12 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 
 	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dlair)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dlair)
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)

@@ -342,13 +342,10 @@ void nes_cart_slot_device::call_load_ines()
 	UINT8 header[0x10];
 	UINT8 mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
-	const char *mapinfo = NULL;
+	astring mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 	bool bus_conflict = FALSE;
-
-	// check if the image is recognized by nes.hsi
-	mapinfo = hashfile_extrainfo(*this);
 
 	// read out the header
 	fseek(0, SEEK_SET);
@@ -380,7 +377,7 @@ void nes_cart_slot_device::call_load_ines()
 	}
 
 	// use info from nes.hsi if available!
-	if (mapinfo)
+	if (hashfile_extrainfo(*this, mapinfo))
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
@@ -395,7 +392,7 @@ void nes_cart_slot_device::call_load_ines()
 		}
 		else
 		{
-			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo);
+			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.cstr());
 		}
 	}
 	else
@@ -721,9 +718,9 @@ void nes_cart_slot_device::call_load_ines()
 
 	// SETUP step 5: allocate pointers for PRG/VROM
 	if (prg_size)
-		m_cart->prg_alloc(machine(), prg_size);
+		m_cart->prg_alloc(prg_size);
 	if (vrom_size)
-		m_cart->vrom_alloc(machine(), vrom_size);
+		m_cart->vrom_alloc(vrom_size);
 
 	// if there is a trainer, skip it for the moment
 	if (m_cart->get_trainer())
@@ -778,13 +775,13 @@ void nes_cart_slot_device::call_load_ines()
 
 	// SETUP steps 7: allocate the remaining pointer, when needed
 	if (vram_size)
-		m_cart->vram_alloc(machine(), vram_size);
+		m_cart->vram_alloc(vram_size);
 	if (prgram_size || m_cart->get_trainer())
 	{
 		if (prgram_size)
-			m_cart->prgram_alloc(machine(), prgram_size);
+			m_cart->prgram_alloc(prgram_size);
 		else
-			m_cart->prgram_alloc(machine(), 0x2000);
+			m_cart->prgram_alloc(0x2000);
 		if (m_cart->get_trainer())
 		{
 			fseek(0x10, SEEK_SET);
@@ -798,19 +795,16 @@ void nes_cart_slot_device::call_load_ines()
 	if (battery_size || mapper_sram_size)
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
-		UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+		dynamic_buffer temp_nvram(tot_size);
 		battery_load(temp_nvram, tot_size, 0x00);
 		if (battery_size)
 		{
 			//printf("here %d\n", battery_size);
-			m_cart->battery_alloc(machine(), battery_size);
+			m_cart->battery_alloc(battery_size);
 			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
 		}
 		if (mapper_sram_size)
 			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, m_cart->get_mapper_sram_size());
-
-		if (temp_nvram)
-			auto_free(machine(), temp_nvram);
 	}
 }
 
@@ -818,12 +812,9 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 {
 	UINT8 mapper, submapper = 0;
 	bool ines20 = FALSE;
-	const char *mapinfo = NULL;
+	astring mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
-
-	// check if the image is recognized by nes.hsi
-//  mapinfo = hashfile_extrainfo(*this);
 
 	mapper = (ROM[6] & 0xf0) >> 4;
 
@@ -843,7 +834,8 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	}
 
 	// use info from nes.hsi if available!
-	if (mapinfo)
+//	if (hashfile_extrainfo(*this, mapinfo))
+	if (0)
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{

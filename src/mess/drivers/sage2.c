@@ -409,7 +409,7 @@ void sage2_state::update_fdc_int()
 	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie && m_fdc_int);
 }
 
-void sage2_state::fdc_irq(bool state)
+WRITE_LINE_MEMBER( sage2_state::fdc_irq )
 {
 	m_fdc_int = state;
 	update_fdc_int();
@@ -439,9 +439,6 @@ void sage2_state::machine_start()
 {
 	// find memory regions
 	m_rom = memregion(M68000_TAG)->base();
-
-	// setup floppy callbacks
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sage2_state::fdc_irq), this));
 }
 
 
@@ -510,6 +507,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(sage2_state, fdc_irq))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(sage2_state, write_centronics_ack))

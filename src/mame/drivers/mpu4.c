@@ -38,6 +38,10 @@ ROM_START( m4clr )
 	ROM_LOAD( "meter-zero.p1",  0x8000, 0x8000,  CRC(e74297e5) SHA1(49a2cc85eda14199975ec37a794b685c839d3ab9))
 ROM_END
 
+ROM_START( m4rltst )
+	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
+ROM_END
 
 
 
@@ -704,9 +708,9 @@ ROM_END
 
 ROM_START( m4lineupa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lu2_10p1.bin", 0x0000, 0x004000, CRC(2fb89062) SHA1(55e86de8fd0d36cca9aab8ad5aae7b4f5a62b940) )
-	ROM_LOAD( "lu2_10p2.bin", 0x0000, 0x004000, CRC(9d820af2) SHA1(63d27df91f80e47eb8c9685fcd2c3eff902a2ef8) )
-	ROM_LOAD( "lu2_10p3.bin", 0x0000, 0x002000, CRC(8c8a210c) SHA1(2599d979f1a62e9ef6acc70d0ad5c9b4a65d712a) )
+	ROM_LOAD( "lu2_10p1.bin", 0xc000, 0x004000, CRC(2fb89062) SHA1(55e86de8fd0d36cca9aab8ad5aae7b4f5a62b940) )
+	ROM_LOAD( "lu2_10p2.bin", 0x8000, 0x004000, CRC(9d820af2) SHA1(63d27df91f80e47eb8c9685fcd2c3eff902a2ef8) )
+	ROM_LOAD( "lu2_10p3.bin", 0x6000, 0x002000, CRC(8c8a210c) SHA1(2599d979f1a62e9ef6acc70d0ad5c9b4a65d712a) )
 ROM_END
 
 
@@ -1306,12 +1310,12 @@ ROM_END
 
 ROM_START( m4twista )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "twistagain-98-mkii.bin", 0x0000, 0x008000, CRC(1cbc7b58) SHA1(eda998a64272fe6796243c2db48ef988b9668c35) )
+	ROM_LOAD( "twistagain-98-mkii.bin", 0x8000, 0x008000, CRC(1cbc7b58) SHA1(eda998a64272fe6796243c2db48ef988b9668c35) )
 ROM_END
 
 ROM_START( m4twistb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "twistagain-mki-27.bin", 0x0000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
+	ROM_LOAD( "twistagain-mki-27.bin", 0x8000, 0x008000, CRC(357f7072) SHA1(8a23509fff79a83a819b27eff8de8db08c679e3f) )
 ROM_END
 
 
@@ -2084,6 +2088,7 @@ ROM_START( m4blkgd )
 	M4BLKGD_EXTRAS
 ROM_END
 
+//Early rom banks empty? May need different loading
 ROM_START( m4blkgda )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "blackgoldversion2.4.bin", 0x0000, 0x040000, CRC(fad4e360) SHA1(23c6a13e8d1ca307b0ef22edffed536675985aca) )
@@ -2369,9 +2374,10 @@ ROM_END
 
 
 /* Barcrest */
-GAME( 198?, m4tst,        0, mod2    ,   mpu4, mpu4_state,       m4tst,   ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
-GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4tst2,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
-GAME( 198?, m4clr,        0, mod2    ,   mpu4, driver_device,       0,       ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
+GAME( 198?, m4tst,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
+GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
+GAME( 198?, m4clr,        0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Meter Clear ROM",GAME_MECHANICAL )
+GAME( 198?, m4rltst,      0, mod2    ,   mpu4, mpu4_state,       m4default,  ROT0, "Barcrest","MPU4 Reel Test (3.0)",GAME_MECHANICAL )
 
 #define GAME_FLAGS (GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK)
 
@@ -2729,7 +2735,7 @@ GAME( 199?, m4goldnn    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4
 
 
 
-GAME( 198?, m4funh      , 0         , mod4oki           , mpu4  , mpu4_state, m4default         , 0,       "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
+GAME(198?, m4funh      , 0         , mod4oki    ,mpu4  			, mpu4_state, m4default         , 0,       "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
 
 GAME(199?, m4sunseta    ,m4sunset   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )

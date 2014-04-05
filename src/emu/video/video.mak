@@ -105,6 +105,15 @@ VIDEOOBJS+= $(VIDEOOBJ)/ef9340_1.o
 endif
 
 #-------------------------------------------------
+#
+#@src/emu/video/ef9345.h,VIDEOS += EF9345
+#-------------------------------------------------
+
+ifneq ($(filter EF9345,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/ef9345.o
+endif
+
+#-------------------------------------------------
 #@src/emu/video/epic12.h,VIDEOS += EPIC12
 #-------------------------------------------------
 
@@ -143,6 +152,15 @@ endif
 
 ifneq ($(filter FIXFREQ,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/fixfreq.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/video/gf4500.h,VIDEOS += GF4500
+#-------------------------------------------------
+
+ifneq ($(filter GF4500,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/gf4500.o
 endif
 
 #-------------------------------------------------
@@ -275,15 +293,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/video/k053250.h,VIDEOS += K053250
-#-------------------------------------------------
-
-ifneq ($(filter K053250,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/k053250.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/video/m50458.h,VIDEOS += M50458
 #-------------------------------------------------
 
@@ -329,11 +338,29 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/msm6222b.h,VIDEOS += MSM6222B
+#-------------------------------------------------
+
+ifneq ($(filter MSM6222B,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/msm6222b.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/msm6255.h,VIDEOS += MSM6255
 #-------------------------------------------------
 
 ifneq ($(filter MSM6255,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/msm6255.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/video/mos6566.h,VIDEOS += MOS6566
+#-------------------------------------------------
+
+ifneq ($(filter MOS6566,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/mos6566.o
 endif
 
 #-------------------------------------------------
@@ -357,11 +384,11 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/video/poly.h,VIDEOS += POLY
+#@src/emu/video/polylgcy.h,VIDEOS += POLY
 #-------------------------------------------------
 
 ifneq ($(filter POLY,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/poly.o
+VIDEOOBJS+= $(VIDEOOBJ)/polylgcy.o
 endif
 
 #-------------------------------------------------
@@ -393,6 +420,14 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/sed1200.h,VIDEOS += SED1200
+#-------------------------------------------------
+ifneq ($(filter SED1200,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/sed1200.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/sed1330.h,VIDEOS += SED1330
 #-------------------------------------------------
 ifneq ($(filter SED1330,$(VIDEOS)),)
@@ -416,6 +451,15 @@ endif
 ifneq ($(filter STVVDP,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/stvvdp1.o       \
 			$(VIDEOOBJ)/stvvdp2.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/video/t6a04.h,VIDEOS += T6A04
+#-------------------------------------------------
+
+ifneq ($(filter T6A04,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/t6a04.o
 endif
 
 #-------------------------------------------------
@@ -488,6 +532,15 @@ endif
 
 ifneq ($(filter UPD7227,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/upd7227.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/video/vic4567.h,VIDEOS += VIC4567
+#-------------------------------------------------
+
+ifneq ($(filter VIC4567,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/vic4567.o
 endif
 
 #-------------------------------------------------

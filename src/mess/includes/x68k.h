@@ -69,9 +69,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tbo_w );
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
-
 	void floppy_load_unload();
 	int floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);

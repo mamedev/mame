@@ -473,10 +473,11 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SCREEN_SIZE(40*16, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 35*16-1, 0, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16, mc6845_intf)   /* 52.786 Hz (similar to Major Poker) */
 
-	MCFG_GFXDECODE_ADD("gfxdecode", chance32)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chance32)
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

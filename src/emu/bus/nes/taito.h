@@ -61,7 +61,7 @@ public:
 private:
 	UINT8 m_latch;
 	// Taito X1-005 chip contains 80 bytes of internal ram, possibly battery backed up
-	UINT8 *m_x1_005_ram;
+	UINT8 m_x1_005_ram[0x80];
 };
 
 
@@ -86,7 +86,7 @@ private:
 	UINT8 m_reg[3]; //mapper ram protect
 	UINT8 m_mmc_vrom_bank[6];
 	// Taito X1-017 chip contains 5K of internal ram, battery backed up
-	UINT8 *m_x1_017_ram;
+	UINT8 m_x1_017_ram[0x1400];
 };
 
 

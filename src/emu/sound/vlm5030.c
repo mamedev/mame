@@ -132,7 +132,7 @@ enum {
 };
 
 /* Pull in the ROM tables */
-#include "tms5110r.c"
+#include "tms5110r.inc"
 
 /*
   speed parameter

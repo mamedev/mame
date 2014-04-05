@@ -166,7 +166,7 @@ private:
 	INT32               m_snap_height;              // height of snapshots (0 == auto)
 
 	// movie recording
-	emu_file *          m_mngfile;                  // handle to the open movie file
+	auto_pointer<emu_file> m_mngfile;               // handle to the open movie file
 	avi_file *          m_avifile;                  // handle to the open movie file
 	attotime            m_movie_frame_period;       // period of a single movie frame
 	attotime            m_movie_next_frame_time;    // time of next frame

@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", dgnbeta)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dgnbeta)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
 

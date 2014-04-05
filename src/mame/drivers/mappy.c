@@ -1719,7 +1719,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,superpac)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", superpac)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superpac)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,superpac)
@@ -1727,6 +1727,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_superpac)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
@@ -1800,7 +1801,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_NAMCO56XX_ADD("namcoio_2", intf1_interleave)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", phozon)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phozon)
 	MCFG_PALETTE_ADD("palette", 64*4+64*4)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,phozon)
@@ -1808,6 +1809,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_phozon)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
@@ -1838,7 +1840,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_MACHINE_RESET_OVERRIDE(mappy_state,mappy)
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", mappy)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mappy)
 	MCFG_PALETTE_ADD("palette", 64*4+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(32)
 	MCFG_PALETTE_INIT_OWNER(mappy_state,mappy)
@@ -1846,6 +1848,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_mappy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 

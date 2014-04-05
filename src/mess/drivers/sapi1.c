@@ -53,7 +53,8 @@ public:
 		m_line2(*this, "LINE2"),
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -86,6 +87,8 @@ private:
 	required_ioport m_line3;
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
+public:	
+	optional_device<palette_device> m_palette;
 };
 
 static const UINT8 MHB2501[] = {
@@ -407,7 +410,7 @@ UINT32 sapi1_state::screen_update_sapi3(screen_device &screen, bitmap_ind16 &bit
 static MC6845_UPDATE_ROW( update_row )
 {
 	sapi1_state *state = device->machine().driver_data<sapi1_state>();
-	const rgb_t *palette = bitmap.palette()->entry_list_raw();
+	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
 	UINT8 chr,gfx,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -568,6 +571,8 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_SIZE(40*6, 24*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */
@@ -602,6 +607,7 @@ static MACHINE_CONFIG_DERIVED( sapi3b, sapi3 )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // guess
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_SCREEN_NO_PALETTE
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sapi3a, sapi1_state )

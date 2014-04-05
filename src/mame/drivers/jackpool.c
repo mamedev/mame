@@ -72,7 +72,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 				int tile = (m_vram[count+(0x2000/2)] & 0x7fff);
 				int attr = (m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
-				gfx->opaque(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8);
+				gfx->opaque(bitmap,cliprect,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
@@ -89,7 +89,7 @@ UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind1
 					int attr = (m_vram[count+0x800] & 0x1f00)>>8;
 					int t_pen = (m_vram[count+0x800] & 0x1000);
 
-					gfx->transpen(m_palette,bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
+					gfx->transpen(bitmap,cliprect,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
 
 				count++;
@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jackpool)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -278,6 +278,7 @@ static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

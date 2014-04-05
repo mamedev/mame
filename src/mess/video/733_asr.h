@@ -5,113 +5,82 @@ enum
 {
 	/* 8 bytes per character definition */
 	asr733_single_char_len = 8,
-
 	asr733_chr_region_len   = 128*asr733_single_char_len
 };
 
-struct asr733_init_params_t
-{
-	void (*int_callback)(running_machine &machine, int state);
-};
-
-void asr733_init(running_machine &machine);
 class asr733_device : public device_t
 {
 public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~asr733_device() { global_free(m_token); }
 
 	DECLARE_PALETTE_INIT(asr733);
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-	
+	DECLARE_READ8_MEMBER(cru_r);
+	DECLARE_WRITE8_MEMBER(cru_w);
+
+	template<class _Object> static devcb2_base &static_set_keyint_callback(device_t &device, _Object object)
+	{
+		return downcast<asr733_device &>(device).m_keyint_line.set_callback(object);
+	}
+	template<class _Object> static devcb2_base &static_set_lineint_callback(device_t &device, _Object object)
+	{
+		return downcast<asr733_device &>(device).m_lineint_line.set_callback(object);
+	}
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-	virtual machine_config_constructor device_mconfig_additions() const;
-public:	
-	required_device<palette_device> m_palette;
+	void device_config_complete();
+	void device_start();
+	void device_reset();
+	machine_config_constructor device_mconfig_additions() const;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	ioport_constructor device_input_ports() const;
+
 private:
 	// internal state
-	void *m_token;
-	required_device<gfxdecode_device> m_gfxdecode;
+#if 0
+	UINT8 m_OutQueue[ASROutQueueSize];
+	int m_OutQueueHead;
+	int m_OutQueueLen;
+#endif
+
+	void check_keyboard();
+	void refresh(bitmap_ind16 &bitmap, int x, int y);
+
+	void set_interrupt_line();
+	void draw_char(int character, int x, int y, int color);
+	void linefeed();
+	void transmit(UINT8 data);
+
+	emu_timer *m_line_timer;                // screen line timer
+
+	UINT8   m_recv_buf;
+	UINT8   m_xmit_buf;
+
+	UINT8   m_status;
+	UINT8   m_mode;
+	UINT8   m_last_key_pressed;
+	int     m_last_modifier_state;
+
+	unsigned char m_repeat_timer;
+	int     m_new_status_flag;
+
+	int     m_x;
+
+	bitmap_ind16*       m_bitmap;
+
+	required_device<palette_device>     m_palette;
+	required_device<gfxdecode_device>   m_gfxdecode;
+	devcb2_write_line                   m_keyint_line;
+	devcb2_write_line                   m_lineint_line;
 };
 
 extern const device_type ASR733;
 
+#define MCFG_ASR733_KEYINT_HANDLER( _intcallb ) \
+	devcb = &asr733_device::static_set_keyint_callback( *device, DEVCB2_##_intcallb );
 
-#define MCFG_ASR733_VIDEO_ADD(_tag, _intf) \
-	MCFG_DEVICE_ADD(_tag, ASR733, 0) \
-	MCFG_DEVICE_CONFIG(_intf)
-
-DECLARE_READ8_DEVICE_HANDLER(asr733_cru_r);
-DECLARE_WRITE8_DEVICE_HANDLER(asr733_cru_w);
-
-void asr733_refresh(device_t *device, bitmap_ind16 &bitmap, int x, int y);
-
-void asr733_keyboard(device_t *device);
-
-#define ASR733_KEY_PORTS                                                                        \
-	PORT_START("KEY0")  /* keys 1-16 */                                                                 \
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)      \
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)      \
-		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)      \
-		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)      \
-		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)      \
-		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)      \
-		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)      \
-		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)      \
-		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)      \
-		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)      \
-		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_MINUS)  \
-		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_EQUALS) \
-		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)      \
-		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)      \
-		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)      \
-		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)      \
-																								\
-	PORT_START("KEY1")  /* keys 17-32 */                                                                \
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)      \
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)      \
-		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)      \
-		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)      \
-		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)      \
-		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)      \
-		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)      \
-		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_CLOSEBRACE) \
-		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) \
-		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)    \
-		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)      \
-		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)      \
-		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)      \
-		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)      \
-		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)      \
-		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)      \
-																								\
-	PORT_START("KEY2")  /* keys 33-48 */                                                                \
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)      \
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)      \
-		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)      \
-		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)  \
-		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RUB OUT") PORT_CODE(KEYCODE_BACKSPACE)    \
-		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_RALT)  \
-		/* hack for my mac that does not disciminate the right ALT key */                       \
-		/* PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPEAT") PORT_CODE(KEYCODE_LALT) */    \
-		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) \
-		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)      \
-		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)      \
-		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)      \
-		PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)      \
-		PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)      \
-		PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)      \
-		PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)      \
-		PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)  \
-		PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)   \
-																								\
-	PORT_START("KEY3")  /* keys 49-51 */                                                                \
-		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)  \
-		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT) \
-		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE)
+#define MCFG_ASR733_LINEINT_HANDLER( _intcallb ) \
+	devcb = &asr733_device::static_set_lineint_callback( *device, DEVCB2_##_intcallb );

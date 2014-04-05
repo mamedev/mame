@@ -491,6 +491,7 @@ public:
 	// getters
 	running_machine &machine() const;
 	tilemap_device *device() const { return m_device; }
+	palette_device *palette() const { return m_palette; }
 	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	memory_array &basemem() { return m_basemem; }
@@ -510,6 +511,7 @@ public:
 	// setters
 	void enable(bool enable = true) { m_enable = enable; }
 	void set_user_data(void *user_data) { m_user_data = user_data; }
+	void set_palette(palette_device *palette) { m_palette = palette; }
 	void set_palette_offset(UINT32 offset) { m_palette_offset = offset; }
 	void set_scrolldx(int dx, int dx_flipped) { m_dx = dx; m_dx_flipped = dx_flipped; }
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }
@@ -612,6 +614,7 @@ private:
 	// managers and devices
 	tilemap_manager *           m_manager;              // reference to the owning manager
 	tilemap_device *            m_device;               // pointer to our owning device
+	palette_device *            m_palette;              // palette used for drawing
 	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
 
@@ -629,10 +632,8 @@ private:
 
 	// logical <-> memory mappings
 	tilemap_mapper_delegate     m_mapper;               // callback to map a row/column to a memory index
-	logical_index *             m_memory_to_logical;    // map from memory index to logical index
-	logical_index               m_max_logical_index;    // maximum valid logical index
-	tilemap_memory_index *      m_logical_to_memory;    // map from logical index to memory index
-	tilemap_memory_index        m_max_memory_index;     // maximum valid memory index
+	dynamic_array<logical_index> m_memory_to_logical;   // map from memory index to logical index
+	dynamic_array<tilemap_memory_index> m_logical_to_memory; // map from logical index to memory index
 
 	// callback to interpret video RAM for the tilemap
 	tilemap_get_info_delegate   m_tile_get_info;        // callback to get information about a tile
@@ -662,7 +663,7 @@ private:
 
 	// transparency mapping
 	bitmap_ind8                 m_flagsmap;             // per-pixel flags
-	UINT8 *                     m_tileflags;            // per-tile flags
+	dynamic_array<UINT8>        m_tileflags;            // per-tile flags
 	UINT8                       m_pen_to_flags[MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS]; // mapping of pens to flags
 };
 
@@ -677,6 +678,7 @@ class tilemap_manager
 public:
 	// construction/destuction
 	tilemap_manager(running_machine &machine);
+	~tilemap_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }

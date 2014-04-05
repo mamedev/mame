@@ -355,8 +355,9 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ashnojoe)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ashnojoe)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 

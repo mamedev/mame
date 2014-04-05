@@ -266,12 +266,12 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scregg)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
-	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -298,12 +298,12 @@ static MACHINE_CONFIG_START( scregg, scregg_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", scregg)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scregg)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
-	MCFG_VIDEO_START_OVERRIDE(scregg_state,btime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

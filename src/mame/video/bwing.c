@@ -222,17 +222,6 @@ void bwing_state::video_start()
 
 //  m_bgfx = m_gfxdecode->gfx(3);
 	m_gfxdecode->gfx(3)->set_source(m_srbase[1] + 0x1000);
-/*
-    WTF??
-
-    dwptr = m_gfxdecode->gfx(2)->pen_usage();
-    if (dwptr)
-    {
-        dwptr[0] = 0;
-        for(i = 1; i < BW_NTILES; i++)
-            dwptr[i) = -1;
-    }
-*/
 }
 
 //****************************************************************************
@@ -272,9 +261,9 @@ void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 
 
 		// single/double
 		if (!(attrib & 0x10))
-			 gfx->transpen(m_palette,bmp,clip, code, color, fx, fy, x, y, 0);
+			 gfx->transpen(bmp,clip, code, color, fx, fy, x, y, 0);
 		else
-			 gfx->zoom_transpen(m_palette,bmp,clip, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
+			 gfx->zoom_transpen(bmp,clip, code, color, fx, fy, x, y, 1<<16, 2<<16, 0);
 	}
 }
 

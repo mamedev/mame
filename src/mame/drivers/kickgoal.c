@@ -659,8 +659,9 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", kickgoal)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kickgoal)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
@@ -695,8 +696,9 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kickgoal_state, screen_update_kickgoal)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", actionhw)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", actionhw)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 

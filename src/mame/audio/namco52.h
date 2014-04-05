@@ -28,10 +28,10 @@ class namco_52xx_device : public device_t
 {
 public:
 	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~namco_52xx_device() { global_free(m_token); }
+	~namco_52xx_device();
 
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	struct namco_52xx_state *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -39,7 +39,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	// internal state
-	void *m_token;
+	struct namco_52xx_state *m_token;
 };
 
 extern const device_type NAMCO_52XX;

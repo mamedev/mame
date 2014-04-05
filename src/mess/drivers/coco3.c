@@ -235,12 +235,6 @@ static const gime_interface coco_gime_config =
 	MAINCPU_TAG,
 	RAM_TAG,
 	CARTRIDGE_TAG,
-
-	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, ca1_w),  /* horizontal sync */
-	DEVCB_DEVICE_LINE_MEMBER(PIA0_TAG, pia6821_device, cb1_w),  /* field sync */
-	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER(coco3_state, gime_firq_w),
-	DEVCB_DRIVER_MEMBER(coco_state, floating_bus_read)
 };
 
 static MACHINE_CONFIG_START( coco3, coco3_state )
@@ -274,9 +268,15 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 
 	// video hardware
+	MCFG_DEFAULT_LAYOUT(layout_coco3)
+
 	MCFG_DEVICE_ADD(GIME_TAG, GIME_NTSC, XTAL_3_579545MHz)
 	MCFG_DEVICE_CONFIG(coco_gime_config)
-	MCFG_DEFAULT_LAYOUT(layout_coco3)
+	MCFG_GIME_HSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, ca1_w)) // TODO not hooked up in gime.c
+	MCFG_GIME_FSYNC_CALLBACK(DEVWRITELINE(PIA0_TAG, pia6821_device, cb1_w)) // TODO not hooked up in gime.c
+	MCFG_GIME_IRQ_CALLBACK(WRITELINE(coco3_state, gime_irq_w))
+	MCFG_GIME_FIRQ_CALLBACK(WRITELINE(coco3_state, gime_firq_w))
+	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
 
 	// composite monitor
 	MCFG_SCREEN_ADD(COMPOSITE_SCREEN_TAG, RASTER)

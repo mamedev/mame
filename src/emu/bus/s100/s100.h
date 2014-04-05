@@ -83,18 +83,64 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_S100_BUS_ADD(_config) \
-	MCFG_DEVICE_ADD(S100_TAG, S100, 0) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define S100_INTERFACE(_name) \
-	const s100_bus_interface (_name) =
-
+#define MCFG_S100_BUS_ADD() \
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, 0)
 
 #define MCFG_S100_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, S100_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_S100_IRQ_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_irq_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_NMI_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_nmi_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI0_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi0_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI1_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi1_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI2_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi2_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI3_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi3_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI4_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi4_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI5_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi5_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI6_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi6_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_VI7_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_vi7_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_DMA0_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_dma0_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_DMA1_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_dma1_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_DMA2_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_dma2_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_DMA3_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_dma3_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_RDY_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_rdy_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_HOLD_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_hold_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_S100_ERROR_CALLBACK(_write) \
+	devcb = &s100_bus_t::set_error_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -102,134 +148,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> s100_slot_device
-
-class s100_device;
-
-class s100_slot_device : public device_t,
-							public device_slot_interface
-{
-public:
-	// construction/destruction
-	s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_start();
-
-private:
-	s100_device  *m_bus;
-};
-
-
-// device type definition
-extern const device_type S100_SLOT;
-
-
-// ======================> s100_bus_interface
-
-struct s100_bus_interface
-{
-	devcb_write_line    m_out_int_cb;
-	devcb_write_line    m_out_nmi_cb;
-	devcb_write_line    m_out_vi0_cb;
-	devcb_write_line    m_out_vi1_cb;
-	devcb_write_line    m_out_vi2_cb;
-	devcb_write_line    m_out_vi3_cb;
-	devcb_write_line    m_out_vi4_cb;
-	devcb_write_line    m_out_vi5_cb;
-	devcb_write_line    m_out_vi6_cb;
-	devcb_write_line    m_out_vi7_cb;
-	devcb_write_line    m_out_dma0_cb;
-	devcb_write_line    m_out_dma1_cb;
-	devcb_write_line    m_out_dma2_cb;
-	devcb_write_line    m_out_dma3_cb;
-	devcb_write_line    m_out_rdy_cb;
-	devcb_write_line    m_out_hold_cb;
-	devcb_write_line    m_out_error_cb;
-};
-
-class device_s100_card_interface;
-
-
-// ======================> s100_device
-
-class s100_device : public device_t,
-					public s100_bus_interface
-{
-public:
-	// construction/destruction
-	s100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	void add_s100_card(device_s100_card_interface *card);
-
-	DECLARE_READ8_MEMBER( smemr_r );
-	DECLARE_WRITE8_MEMBER( mwrt_w );
-
-	DECLARE_READ8_MEMBER( sinp_r );
-	DECLARE_WRITE8_MEMBER( sout_w );
-
-	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( vi0_w );
-	DECLARE_WRITE_LINE_MEMBER( vi1_w );
-	DECLARE_WRITE_LINE_MEMBER( vi2_w );
-	DECLARE_WRITE_LINE_MEMBER( vi3_w );
-	DECLARE_WRITE_LINE_MEMBER( vi4_w );
-	DECLARE_WRITE_LINE_MEMBER( vi5_w );
-	DECLARE_WRITE_LINE_MEMBER( vi6_w );
-	DECLARE_WRITE_LINE_MEMBER( vi7_w );
-	DECLARE_WRITE_LINE_MEMBER( dma0_w );
-	DECLARE_WRITE_LINE_MEMBER( dma1_w );
-	DECLARE_WRITE_LINE_MEMBER( dma2_w );
-	DECLARE_WRITE_LINE_MEMBER( dma3_w );
-	DECLARE_WRITE_LINE_MEMBER( rdy_w );
-	DECLARE_WRITE_LINE_MEMBER( hold_w );
-	DECLARE_WRITE_LINE_MEMBER( error_w );
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_config_complete();
-
-private:
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_write_line   m_out_nmi_func;
-	devcb_resolved_write_line   m_out_vi0_func;
-	devcb_resolved_write_line   m_out_vi1_func;
-	devcb_resolved_write_line   m_out_vi2_func;
-	devcb_resolved_write_line   m_out_vi3_func;
-	devcb_resolved_write_line   m_out_vi4_func;
-	devcb_resolved_write_line   m_out_vi5_func;
-	devcb_resolved_write_line   m_out_vi6_func;
-	devcb_resolved_write_line   m_out_vi7_func;
-	devcb_resolved_write_line   m_out_dma0_func;
-	devcb_resolved_write_line   m_out_dma1_func;
-	devcb_resolved_write_line   m_out_dma2_func;
-	devcb_resolved_write_line   m_out_dma3_func;
-	devcb_resolved_write_line   m_out_rdy_func;
-	devcb_resolved_write_line   m_out_hold_func;
-	devcb_resolved_write_line   m_out_error_func;
-
-	simple_list<device_s100_card_interface> m_device_list;
-};
-
-
-// device type definition
-extern const device_type S100;
-
+class s100_bus_t;
 
 // ======================> device_s100_card_interface
 
-// class representing interface-specific live s100 card
 class device_s100_card_interface : public device_slot_card_interface
 {
-	friend class s100_device;
+	friend class s100_bus_t;
 
 public:
 	// construction/destruction
 	device_s100_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_s100_card_interface();
+	virtual ~device_s100_card_interface() { }
 
 	device_s100_card_interface *next() const { return m_next; }
 
@@ -269,9 +199,116 @@ public:
 	virtual void s100_slave_clr_w(int state) { }
 
 public:
-	s100_device  *m_bus;
+	s100_bus_t  *m_bus;
 	device_s100_card_interface *m_next;
 };
+
+
+
+// ======================> s100_bus_t
+
+class s100_bus_t : public device_t
+{
+public:
+	// construction/destruction
+	s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~s100_bus_t() { m_device_list.detach_all(); }
+
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_nmi.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi0.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi1.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi2.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi3.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi4_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi4.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi5_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi5.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi6_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi6.set_callback(object); }
+	template<class _Object> static devcb2_base &set_vi7_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_vi7.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma0_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma0.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma1_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma1.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma2_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma2.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma3_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_dma3.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rdy_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_rdy.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hold_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_hold.set_callback(object); }
+	template<class _Object> static devcb2_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_error.set_callback(object); }
+
+	void add_card(device_s100_card_interface *card);
+
+	DECLARE_READ8_MEMBER( smemr_r );
+	DECLARE_WRITE8_MEMBER( mwrt_w );
+
+	DECLARE_READ8_MEMBER( sinp_r );
+	DECLARE_WRITE8_MEMBER( sout_w );
+
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi0_w ) { m_write_vi0(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi1_w ) { m_write_vi1(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi2_w ) { m_write_vi2(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi3_w ) { m_write_vi3(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi4_w ) { m_write_vi4(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi5_w ) { m_write_vi5(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi6_w ) { m_write_vi6(state); }
+	DECLARE_WRITE_LINE_MEMBER( vi7_w ) { m_write_vi7(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma0_w ) { m_write_dma0(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma1_w ) { m_write_dma1(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma2_w ) { m_write_dma2(state); }
+	DECLARE_WRITE_LINE_MEMBER( dma3_w ) { m_write_dma3(state); }
+	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
+	DECLARE_WRITE_LINE_MEMBER( hold_w ) { m_write_hold(state); }
+	DECLARE_WRITE_LINE_MEMBER( error_w ) { m_write_error(state); }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_nmi;
+	devcb2_write_line   m_write_vi0;
+	devcb2_write_line   m_write_vi1;
+	devcb2_write_line   m_write_vi2;
+	devcb2_write_line   m_write_vi3;
+	devcb2_write_line   m_write_vi4;
+	devcb2_write_line   m_write_vi5;
+	devcb2_write_line   m_write_vi6;
+	devcb2_write_line   m_write_vi7;
+	devcb2_write_line   m_write_dma0;
+	devcb2_write_line   m_write_dma1;
+	devcb2_write_line   m_write_dma2;
+	devcb2_write_line   m_write_dma3;
+	devcb2_write_line   m_write_rdy;
+	devcb2_write_line   m_write_hold;
+	devcb2_write_line   m_write_error;
+
+	simple_list<device_s100_card_interface> m_device_list;
+};
+
+
+// ======================> s100_slot_t
+
+class s100_slot_t : public device_t,
+					public device_slot_interface
+{
+public:
+	// construction/destruction
+	s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual void device_start();
+
+private:
+	s100_bus_t  *m_bus;
+};
+
+
+
+// device type definition
+extern const device_type S100_BUS;
+extern const device_type S100_SLOT;
+
+
 
 
 #endif

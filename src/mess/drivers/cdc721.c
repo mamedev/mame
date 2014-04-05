@@ -25,7 +25,7 @@ public:
 	DECLARE_PALETTE_INIT(cdc721);
 	const UINT8 *m_p_chargen;
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	required_device<cpu_device> m_maincpu;
 
@@ -122,9 +122,10 @@ static MACHINE_CONFIG_START( cdc721, cdc721_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cdc721_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
-	MCFG_GFXDECODE_ADD("gfxdecode", cdc721)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cdc721)
 MACHINE_CONFIG_END
 
 ROM_START( cdc721 )

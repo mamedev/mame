@@ -452,21 +452,11 @@ WRITE8_MEMBER(spy_state::volume_callback0)
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-static const k007232_interface spy_k007232_interface_1 =
-{
-	DEVCB_DRIVER_MEMBER(spy_state,volume_callback0)
-};
-
 WRITE8_MEMBER(spy_state::volume_callback1)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
-
-static const k007232_interface spy_k007232_interface_2 =
-{
-	DEVCB_DRIVER_MEMBER(spy_state,volume_callback1)
-};
 
 WRITE_LINE_MEMBER(spy_state::irqhandler)
 {
@@ -536,12 +526,13 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(spy_state, screen_update_spy)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K052109_ADD("k052109", spy_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
@@ -557,12 +548,12 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
-	MCFG_SOUND_CONFIG(spy_k007232_interface_1)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(spy_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
 	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
-	MCFG_SOUND_CONFIG(spy_k007232_interface_2)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(spy_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END

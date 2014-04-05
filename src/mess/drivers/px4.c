@@ -13,7 +13,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
-#include "machine/epson_sio.h"
+#include "bus/epson_sio/epson_sio.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
@@ -1380,6 +1380,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SCREEN_SIZE(240, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_px4)
 

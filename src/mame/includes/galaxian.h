@@ -45,6 +45,7 @@ public:
 			m_ay8910_0(*this, "8910.0"),
 			m_ay8910_1(*this, "8910.1"),
 			m_ay8910_2(*this, "8910.2"),
+			m_ay8910_cclimber(*this, "cclimber_audio:aysnd"),
 			m_digitalker(*this, "digitalker"),
 			m_ppi8255_0(*this, "ppi8255_0"),
 			m_ppi8255_1(*this, "ppi8255_1"),
@@ -62,6 +63,7 @@ public:
 	optional_device<ay8910_device> m_ay8910_0;
 	optional_device<ay8910_device> m_ay8910_1;
 	optional_device<ay8910_device> m_ay8910_2;
+	optional_device<ay8910_device> m_ay8910_cclimber;
 	optional_device<digitalker_device> m_digitalker;
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;

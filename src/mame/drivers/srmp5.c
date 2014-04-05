@@ -212,7 +212,8 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 		{
 			if (m_tileduty[i] == 1)
 			{
-				m_gfxdecode->gfx(0)->decode(i);
+				m_gfxdecode->gfx(0)->mark_dirty(i);
+				m_gfxdecode->gfx(0)->get_data(i);
 				m_tileduty[i] = 0;
 			}
 		}
@@ -554,7 +555,7 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 
 	MCFG_PALETTE_ADD("palette", 0x1800)
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode", srmp5 )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
 #endif
 	MCFG_VIDEO_START_OVERRIDE(st0016_state,st0016)
 

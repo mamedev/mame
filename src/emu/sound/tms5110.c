@@ -84,7 +84,7 @@
 #define CTL_STATE_NEXT_OUTPUT   (2)
 
 /* Pull in the ROM tables */
-#include "tms5110r.c"
+#include "tms5110r.inc"
 
 #define DEBUG_5110  0
 
@@ -1215,7 +1215,7 @@ void tms5110_device::set_frequency(int frequency)
 
 /******************************************************************************
 
-     DEVICE_START( tmsprom ) -- allocate buffers initialize
+     device_start( tmsprom ) -- allocate buffers initialize
 
 ******************************************************************************/
 

@@ -755,6 +755,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
 	MCFG_SCREEN_SIZE(64, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
@@ -785,8 +786,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
 	MCFG_SCREEN_SIZE(128, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jtces23)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces23)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */
@@ -806,8 +808,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
 	MCFG_SCREEN_UPDATE_DRIVER(jtc_state, screen_update)
 	MCFG_SCREEN_SIZE(320, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", jtces40)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jtces40)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
 

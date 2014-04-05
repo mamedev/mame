@@ -79,9 +79,9 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	rgb_t   *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &phoenix_net_info);
+	compute_res_net_all(rgb, color_prom, phoenix_decode_info, phoenix_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -90,16 +90,15 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 		palette.set_pen_color(i,rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
-	auto_free(machine(), rgb);
 }
 
 PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	rgb_t   *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &survival_net_info);
+	compute_res_net_all(rgb, color_prom, phoenix_decode_info, survival_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -108,16 +107,15 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 		palette.set_pen_color(i,rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
-	auto_free(machine(), rgb);
 }
 
 PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
-	rgb_t   *rgb;
+	dynamic_array<rgb_t> rgb;
 
-	rgb = compute_res_net_all(machine(), color_prom, &phoenix_decode_info, &pleiades_net_info);
+	compute_res_net_all(rgb, color_prom, phoenix_decode_info, pleiades_net_info);
 	/* native order */
 	for (i=0;i<256;i++)
 	{
@@ -126,7 +124,6 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 		palette.set_pen_color(i,rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
-	auto_free(machine(), rgb);
 }
 
 /***************************************************************************

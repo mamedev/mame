@@ -397,13 +397,13 @@ void atari_fdc_device::add_serin(UINT8 data, int with_checksum)
 
 static void ATTR_PRINTF(1,2) atari_set_frame_message(const char *fmt, ...)
 {
-	va_list arg;
-	va_start(arg, fmt);
+	//va_list arg;
+	//va_start(arg, fmt);
 
-	vsprintf(atari_frame_message, fmt, arg);
-	atari_frame_counter = 30; /* FIXME */
+	//vsprintf(atari_frame_message, fmt, arg);
+	//atari_frame_counter = 30; /* FIXME */
 
-	va_end(arg);
+	//va_end(arg);
 }
 
 void atari_fdc_device::a800_serial_command()

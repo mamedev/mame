@@ -49,7 +49,7 @@ const rom_entry *hd61830_device::device_rom_region() const
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 static const int CYCLES[] =
 {
@@ -379,8 +379,13 @@ UINT16 hd61830_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clip
 
 		for (int x = 0; x < m_hp; x++)
 		{
-			bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
-			bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
+			if(y >= 0 && y < bitmap.height())
+			{
+				if(((sx * m_hp) + x) >= 0 && ((sx * m_hp) + x) < bitmap.width())
+					bitmap.pix16(y, (sx * m_hp) + x) = BIT(data1, x);
+				if(((sx * m_hp) + x + m_hp) >= 0 && ((sx * m_hp) + x + m_hp) < bitmap.width())
+					bitmap.pix16(y, (sx * m_hp) + x + m_hp) = BIT(data2, x);
+			}
 		}
 	}
 	return ra;
@@ -483,14 +488,18 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	UINT16 ma = 0;
 	for (int y = 0; y < (m_nx / m_vp); y++)
 	{
-		for (int x = 0; x < m_hn; x++)
+		for (int x = 0; x < m_hn; x+=2)
 		{
-			UINT16 ma = y * m_hn + x;
-			UINT8 md = readbyte(ma);
+			UINT8 md1 = readbyte(ma);
+			UINT8 md2 = readbyte(ma+1);
 
-			draw_char(bitmap, cliprect, ma, x, y, md);
+			draw_char(bitmap, cliprect, ma, x, y, md1);
+			draw_char(bitmap, cliprect, ma+1, x+1, y, md2);
+
+			ma+=2;
 		}
 	}
 }

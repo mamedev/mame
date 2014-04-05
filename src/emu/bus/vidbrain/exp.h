@@ -58,14 +58,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define VIDEOBRAIN_EXPANSION_INTERFACE(_name) \
-	const videobrain_expansion_slot_interface (_name) =
-
-
-#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, VIDEOBRAIN_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
+	devcb = &videobrain_expansion_slot_device::set_extres_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -73,70 +72,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> videobrain_expansion_slot_interface
-
-struct videobrain_expansion_slot_interface
-{
-	devcb_write_line    m_out_extres_cb;
-};
-
-
-// ======================> videobrain_expansion_slot_device
-
-class device_videobrain_expansion_card_interface;
-
-class videobrain_expansion_slot_device : public device_t,
-											public videobrain_expansion_slot_interface,
-											public device_slot_interface,
-											public device_image_interface
-{
-public:
-	// construction/destruction
-	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~videobrain_expansion_slot_device();
-
-	// computer interface
-	UINT8 bo_r(address_space &space, offs_t offset, int cs1, int cs2);
-	void bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2);
-
-	DECLARE_READ8_MEMBER( cs1_r );
-	DECLARE_WRITE8_MEMBER( cs1_w );
-	DECLARE_READ8_MEMBER( cs2_r );
-	DECLARE_WRITE8_MEMBER( cs2_w );
-	DECLARE_READ8_MEMBER( unmap_r );
-	DECLARE_WRITE8_MEMBER( unmap_w );
-
-	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( extres_w );
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-
-	// image-level overrides
-	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
-
-	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 0; }
-	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 1; }
-	virtual const char *image_interface() const { return "vidbrain_cart"; }
-	virtual const char *file_extensions() const { return "bin"; }
-	virtual const option_guide *create_option_guide() const { return NULL; }
-
-	// slot interface overrides
-	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-
-	devcb_resolved_write_line   m_out_extres_func;
-
-	device_videobrain_expansion_card_interface *m_cart;
-};
-
+class videobrain_expansion_slot_device;
 
 // ======================> device_videobrain_expansion_card_interface
 
@@ -147,7 +83,7 @@ class device_videobrain_expansion_card_interface : public device_slot_card_inter
 public:
 	// construction/destruction
 	device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_videobrain_expansion_card_interface();
+	virtual ~device_videobrain_expansion_card_interface() { }
 
 protected:
 	// initialization
@@ -166,6 +102,62 @@ protected:
 
 	size_t m_rom_mask;
 	size_t m_ram_mask;
+};
+
+
+// ======================> videobrain_expansion_slot_device
+
+class videobrain_expansion_slot_device : public device_t,
+										 public device_slot_interface,
+										 public device_image_interface
+{
+public:
+	// construction/destruction
+	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~videobrain_expansion_slot_device() { }
+
+	template<class _Object> static devcb2_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }
+
+	// computer interface
+	UINT8 bo_r(address_space &space, offs_t offset, int cs1, int cs2);
+	void bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2);
+
+	DECLARE_READ8_MEMBER( cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
+	DECLARE_WRITE8_MEMBER( cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }
+	DECLARE_READ8_MEMBER( cs2_r ) { return bo_r(space, offset + 0x1800, 1, 0); }
+	DECLARE_WRITE8_MEMBER( cs2_w ) { bo_w(space, offset + 0x1800, data, 1, 0); }
+	DECLARE_READ8_MEMBER( unmap_r ) { return bo_r(space, offset + 0x3000, 1, 0); }
+	DECLARE_WRITE8_MEMBER( unmap_w ) { bo_w(space, offset + 0x3000, data, 1, 0); }
+
+	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete() { update_names(); }
+	virtual void device_start();
+
+	// image-level overrides
+	virtual bool call_load();
+	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
+
+	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 0; }
+	virtual bool is_creatable() const { return 0; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 1; }
+	virtual const char *image_interface() const { return "vidbrain_cart"; }
+	virtual const char *file_extensions() const { return "bin"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	// slot interface overrides
+	virtual void get_default_card_software(astring &result);
+
+	devcb2_write_line   m_write_extres;
+
+	device_videobrain_expansion_card_interface *m_cart;
 };
 
 

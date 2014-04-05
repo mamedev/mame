@@ -205,8 +205,7 @@ cfx9850 // Casio CFX-9850
 
 // Coleco
 coleco  // ColecoVision (Original BIOS)
-colecoa   // ColecoVision (Thick Characters)
-colecob   // Spectravideo SVI-603 Coleco Game Adapter
+svi603   // Spectravideo SVI-603 Coleco Game Adapter
 czz50    // Bit Corporation Chuang Zao Zhe 50
 dina      // Telegames Dina
 prsarcde  // Telegames Personal Arcade
@@ -353,7 +352,7 @@ mu100   // 1997 MU-100
 mt32
 cm32l
 d110
-sc55	// 1991 Sound Canvas SC-55
+sc55    // 1991 Sound Canvas SC-55
 
 //***************COMPUTERS**************************************************
 
@@ -995,6 +994,7 @@ ip244415    // IP24: Indigo 2, R4400, 150MHz
 // Texas Instruments
 ti990_10  // 1975 TI 990/10
 ti990_4   // 1976 TI 990/4
+ti990_4v   // 1976 TI 990/4 with video display terminal
 990189  // 1978 TM 990/189
 990189v   // 1980 TM 990/189 with Color Video Board
 
@@ -1222,6 +1222,7 @@ misterx // 1988 (Yeno) MisterX
 pc2000 // 1993 PreComputer 2000
 gl2000 // 1993 Genius Leader 2000
 gl2000p // 1993 Genius Leader 2000 Plus
+gl2000c // 1994 Genius Leader 2000 Compact
 gln // 199? Genius Leader Notebook
 itunlim  // 199? IT Unlimited
 iqunlim  // 199? IQ Unlimited (680x0)
@@ -1232,6 +1233,8 @@ gl4000 // Genius Leader 4000 Quadro (Germany)
 gl4004 // Genius Leader 4004 Quadro L (Germany)
 gl5000 // Genius Leader 5000 (Germany)
 gl5005x // Genius Leader 5005X (Germany)
+gmtt     // 1998 Genius Master Table Top (Germany)
+gbs5505x // 2001 Genius BrainStation 5505X (Germany)
 prestige // PreComputer Prestige Elite
 gl6000sl // Genius Leader 6000SL (Germany)
 gl7007sl // Genius Leader 7007SL (Germany)
@@ -1939,7 +1942,7 @@ batmantv    // The Batman, 2004
 harriet // 1990
 
 // Fanuc
-fanucs15	// 1990
+fanucs15    // 1990
 
 //********** Misc **********************************************************
 
@@ -2343,3 +2346,4 @@ compclr2
 m6805evs
 mx2178
 hunter2
+amust

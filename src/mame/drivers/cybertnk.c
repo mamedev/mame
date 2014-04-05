@@ -311,7 +311,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 		// seems to be priority related, cases seen are 0xc0 and 0x00 (once the palette bits are masked out)
 		if ((param2&0x80) == pri)
 		{
-			gfx->transpen(state->m_palette,bitmap,cliprect,param1,col,0,0,-param3+screen_shift,i/4,0);
+			gfx->transpen(bitmap,cliprect,param1,col,0,0,-param3+screen_shift,i/4,0);
 		}
 
 
@@ -851,6 +851,7 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_left)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -858,8 +859,9 @@ static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cybertnk)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cybertnk)
 	MCFG_PALETTE_ADD("palette", 0x4000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 

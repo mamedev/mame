@@ -32,7 +32,8 @@ public:
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_crtc(*this, "crtc"),
-		m_beep(*this, "beeper")
+		m_beep(*this, "beeper"),
+		m_palette(*this, "palette")
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -48,8 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER(common_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
 	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
-	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(kaypro_fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_READ8_MEMBER(kaypro_videoram_r);
 	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
 	DECLARE_MACHINE_START(kayproii);
@@ -89,8 +90,6 @@ private:
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
-	void fdc_intrq_w(bool state);
-	void fdc_drq_w(bool state);
 	required_device<cpu_device> m_maincpu;
 	optional_device<z80pio_device> m_pio_g;
 	optional_device<z80pio_device> m_pio_s;
@@ -102,6 +101,8 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
+public:	
+	required_device<palette_device> m_palette;
 };
 
 

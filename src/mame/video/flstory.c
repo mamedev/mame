@@ -192,14 +192,14 @@ void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 			else
 				sy = 240 - sy - 1 ;
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code,
 						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,
@@ -249,14 +249,14 @@ void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 			else
 				sy = 240 - sy + 1 ;
 
-			m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					code,
 					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				m_gfxdecode->gfx(1)->transpen(m_palette,bitmap,cliprect,
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 						code,
 						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,

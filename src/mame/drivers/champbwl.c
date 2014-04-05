@@ -497,8 +497,9 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
 	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", champbwl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,arknoid2)
@@ -562,8 +563,9 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
 	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", champbwl)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	MCFG_PALETTE_INIT_OWNER(champbwl_state,arknoid2)

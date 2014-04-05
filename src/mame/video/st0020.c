@@ -78,7 +78,7 @@ void st0020_device::device_start()
 		if (m_gfxdecode->gfx(m_gfx_index) == 0)
 			break;
 
-	m_gfxdecode->set_gfx(m_gfx_index, auto_alloc(machine(), gfx_element(machine(), layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, m_palette->entries() / 64, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, layout_16x8x8_2, (UINT8 *)m_st0020_gfxram, m_palette->entries() / 64, 0)));
 
 	m_gfxdecode->gfx(m_gfx_index)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
@@ -393,7 +393,7 @@ void st0020_device::st0020_draw_zooming_sprites(running_machine &machine, bitmap
 			{
 				for (y = ystart; y != yend; y += yinc)
 				{
-					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(m_palette,bitmap,cliprect,
+					m_gfxdecode->gfx(m_gfx_index)->zoom_transpen(bitmap,cliprect,
 									code++,
 									color,
 									flipx, flipy,

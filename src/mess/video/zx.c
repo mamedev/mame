@@ -48,10 +48,9 @@ void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
  */
 void zx_state::zx_ula_bkgnd(UINT8 color)
 {
-	screen_device *screen = machine().first_screen();
-	int width = screen->width();
-	int height = screen->height();
-	const rectangle &visarea = screen->visible_area();
+	int width = m_screen->width();
+	int height = m_screen->height();
+	const rectangle &visarea = m_screen->visible_area();
 
 	if (m_ula_frame_vsync == 0 && color != m_old_c)
 	{
@@ -59,8 +58,8 @@ void zx_state::zx_ula_bkgnd(UINT8 color)
 		rectangle r;
 		bitmap_ind16 &bitmap = m_bitmap;
 
-		new_y = machine().primary_screen->vpos();
-		new_x = machine().primary_screen->hpos();
+		new_y = machine().first_screen()->vpos();
+		new_x = machine().first_screen()->hpos();
 /*      logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", state->m_old_x, state->m_old_y, new_x, new_y);*/
 		y = m_old_y;
 		for (;;)
@@ -103,15 +102,14 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 	 * An NMI is issued on the ZX81 every 64us for the blanked
 	 * scanlines at the top and bottom of the display.
 	 */
-	screen_device *screen = machine().first_screen();
-	int height = screen->height();
-	const rectangle& r1 = screen->visible_area();
+	int height = m_screen->height();
+	const rectangle& r1 = m_screen->visible_area();
 	rectangle r;
 
 	bitmap_ind16 &bitmap = m_bitmap;
 	r.set(r1.min_x, r1.max_x, m_ula_scanline_count, m_ula_scanline_count);
 	bitmap.fill(1, r);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine().first_screen()->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	if (++m_ula_scanline_count == height)
 		m_ula_scanline_count = 0;
@@ -126,7 +124,7 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 	 */
 	if (m_ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().first_screen()->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
 
 		m_ula_irq_active = 0;
 		m_maincpu->set_input_line(0, HOLD_LINE);

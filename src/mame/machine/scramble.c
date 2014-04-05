@@ -387,7 +387,6 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 {
 	offs_t i, len;
 	UINT8 *RAM;
-	UINT8 *scratch;
 
 
 	DRIVER_INIT_CALL(scobra);
@@ -400,7 +399,7 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	scratch = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer scratch(len);
 
 	memcpy(scratch, RAM, len);
 
@@ -416,15 +415,12 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 
 		RAM[i] = scratch[j];
 	}
-
-	auto_free(machine(), scratch);
 }
 
 DRIVER_INIT_MEMBER(scramble_state,minefld)
 {
 	offs_t i, len;
 	UINT8 *RAM;
-	UINT8 *scratch;
 
 
 	DRIVER_INIT_CALL(scobra);
@@ -436,7 +432,7 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 	RAM = memregion("gfx1")->base();
 	len = memregion("gfx1")->bytes();
 
-	scratch = auto_alloc_array(machine(), UINT8, len);
+	dynamic_buffer scratch(len);
 
 	memcpy(scratch, RAM, len);
 
@@ -453,8 +449,6 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 
 		RAM[i] = scratch[j];
 	}
-
-	auto_free(machine(), scratch);
 }
 
 #ifdef UNUSED_FUNCTION

@@ -10,18 +10,6 @@
 
   QSpace position is simulated by panning the sound in the stereo space.
 
-  Register
-  0  xxbb   xx = unknown bb = start high address
-  1  ssss   ssss = sample start address
-  2  pitch
-  3  unknown (always 0x8000)
-  4  loop offset from end address
-  5  end
-  6  master channel volume
-  7  not used
-  8  Balance (left=0x0110  centre=0x0120 right=0x0130)
-  9  unknown (most fixed samples use 0 for this register)
-
   Many thanks to CAB (the author of Amuse), without whom this probably would
   never have been finished.
 
@@ -34,19 +22,9 @@
 #include "emu.h"
 #include "qsound.h"
 
-// Debug defines
-#define LOG_WAVE 0
-#define VERBOSE  0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-
 // device type definition
 const device_type QSOUND = &device_creator<qsound_device>;
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 // program map for the DSP (points to internal 4096 words of internal ROM)
 static ADDRESS_MAP_START( dsp16_program_map, AS_PROGRAM, 16, qsound_device )
@@ -92,10 +70,7 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 		m_stream(NULL),
 		m_sample_rom_length(0),
 		m_sample_rom(NULL),
-		m_cpu(NULL),
-		m_frq_ratio(0.0f),
-		m_fpRawDataL(NULL),
-		m_fpRawDataR(NULL)
+		m_cpu(NULL)
 {
 }
 
@@ -128,71 +103,36 @@ machine_config_constructor qsound_device::device_mconfig_additions() const
 
 void qsound_device::device_start()
 {
-	int i;
-
 	// find our CPU
 	m_cpu = subdevice<dsp16_device>("qsound");
 
-	m_sample_rom = (QSOUND_SRC_SAMPLE *)*region();
+	m_sample_rom = (INT8*)*region();
 	m_sample_rom_length = region()->bytes();
 
 	memset(m_channel, 0, sizeof(m_channel));
 
-	m_frq_ratio = 16.0;
-
 	/* Create pan table */
-	for (i=0; i<33; i++)
-	{
-		m_pan_table[i]=(int)((256/sqrt(32.0)) * sqrt((double)i));
-	}
-
-	LOG(("Pan table\n"));
-	for (i=0; i<33; i++)
-		LOG(("%02x ", m_pan_table[i]));
+	for (int i = 0; i < 33; i++)
+		m_pan_table[i] = (int)((256 / sqrt(32.0)) * sqrt((double)i));
 
 	/* Allocate stream */
-	m_stream = stream_alloc(0, 2, clock() / QSOUND_CLOCKDIV);
-
-	if (LOG_WAVE)
-	{
-		m_fpRawDataR=fopen("qsoundr.raw", "w+b");
-		m_fpRawDataL=fopen("qsoundl.raw", "w+b");
-	}
+	m_stream = stream_alloc(0, 2, clock() / 166); // /166 clock divider
 
 	/* state save */
-	for (i=0; i<QSOUND_CHANNELS; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		save_item(NAME(m_channel[i].bank), i);
 		save_item(NAME(m_channel[i].address), i);
-		save_item(NAME(m_channel[i].pitch), i);
+		save_item(NAME(m_channel[i].freq), i);
 		save_item(NAME(m_channel[i].loop), i);
 		save_item(NAME(m_channel[i].end), i);
 		save_item(NAME(m_channel[i].vol), i);
-		save_item(NAME(m_channel[i].pan), i);
-		save_item(NAME(m_channel[i].key), i);
+		save_item(NAME(m_channel[i].enabled), i);
 		save_item(NAME(m_channel[i].lvol), i);
 		save_item(NAME(m_channel[i].rvol), i);
-		save_item(NAME(m_channel[i].lastdt), i);
-		save_item(NAME(m_channel[i].offset), i);
+		save_item(NAME(m_channel[i].sample), i);
+		save_item(NAME(m_channel[i].step_ptr), i);
 	}
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void qsound_device::device_stop()
-{
-	if (m_fpRawDataR)
-	{
-		fclose(m_fpRawDataR);
-	}
-	m_fpRawDataR = NULL;
-	if (m_fpRawDataL)
-	{
-		fclose(m_fpRawDataL);
-	}
-	m_fpRawDataL = NULL;
 }
 
 
@@ -202,201 +142,185 @@ void qsound_device::device_stop()
 
 void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	int i,j;
-	int rvol, lvol, count;
-	struct QSOUND_CHANNEL *pC=&m_channel[0];
-	stream_sample_t  *datap[2];
+	// Clear the buffers
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
-	datap[0] = outputs[0];
-	datap[1] = outputs[1];
-	memset( datap[0], 0x00, samples * sizeof(*datap[0]) );
-	memset( datap[1], 0x00, samples * sizeof(*datap[1]) );
-
-	for (i=0; i<QSOUND_CHANNELS; i++)
+	for (int ch = 0; ch < 16; ch++)
 	{
-		if (pC->key)
+		if (m_channel[ch].enabled)
 		{
-			QSOUND_SAMPLE *pOutL=datap[0];
-			QSOUND_SAMPLE *pOutR=datap[1];
-			rvol=(pC->rvol*pC->vol)>>8;
-			lvol=(pC->lvol*pC->vol)>>8;
+			stream_sample_t *lmix=outputs[0];
+			stream_sample_t *rmix=outputs[1];
+			int rvol = (m_channel[ch].rvol * m_channel[ch].vol) >> 8;
+			int lvol = (m_channel[ch].lvol * m_channel[ch].vol) >> 8;
 
-			for (j=samples-1; j>=0; j--)
+			// Go through the buffer and add voice contributions
+			for (int i = 0; i < samples; i++)
 			{
-				count=(pC->offset)>>16;
-				pC->offset &= 0xffff;
-				if (count)
+				if (m_channel[ch].step_ptr & ~0xfff)
 				{
-					pC->address += count;
-					if (pC->address >= pC->end)
+					m_channel[ch].address += (m_channel[ch].step_ptr >> 12);
+					m_channel[ch].step_ptr &= 0xfff;
+					
+					if (m_channel[ch].address >= m_channel[ch].end)
 					{
-						if (!pC->loop)
+						if (m_channel[ch].loop)
 						{
-							/* Reached the end of a non-looped sample */
-							pC->key=0;
+							// Reached the end, restart the loop
+							m_channel[ch].address = (m_channel[ch].end - m_channel[ch].loop) & 0xffff;
+						}
+						else
+						{
+							// Reached the end of a non-looped sample
+							m_channel[ch].enabled = false;
 							break;
 						}
-						/* Reached the end, restart the loop */
-						pC->address = (pC->end - pC->loop) & 0xffff;
 					}
-					pC->lastdt=m_sample_rom[(pC->bank+pC->address)%(m_sample_rom_length)];
+					m_channel[ch].sample = read_sample(m_channel[ch].bank | m_channel[ch].address);
 				}
 
-				(*pOutL) += ((pC->lastdt * lvol) >> 6);
-				(*pOutR) += ((pC->lastdt * rvol) >> 6);
-				pOutL++;
-				pOutR++;
-				pC->offset += pC->pitch;
+				*lmix++ += ((m_channel[ch].sample * lvol) >> 6);
+				*rmix++ += ((m_channel[ch].sample * rvol) >> 6);
+				m_channel[ch].step_ptr += m_channel[ch].freq;
 			}
 		}
-		pC++;
 	}
-
-	if (m_fpRawDataL)
-		fwrite(datap[0], samples*sizeof(QSOUND_SAMPLE), 1, m_fpRawDataL);
-	if (m_fpRawDataR)
-		fwrite(datap[1], samples*sizeof(QSOUND_SAMPLE), 1, m_fpRawDataR);
 }
 
 
-WRITE8_MEMBER( qsound_device::qsound_w )
+WRITE8_MEMBER(qsound_device::qsound_w)
 {
 	switch (offset)
 	{
 		case 0:
-			m_data=(m_data&0xff)|(data<<8);
+			m_data = (m_data & 0x00ff) | (data << 8);
 			break;
 
 		case 1:
-			m_data=(m_data&0xff00)|data;
+			m_data = (m_data & 0xff00) | data;
 			break;
 
 		case 2:
-			qsound_set_command(data, m_data);
+			write_data(data, m_data);
 			break;
 
 		default:
-			logerror("%s: unexpected qsound write to offset %d == %02X\n", machine().describe_context(), offset, data);
+			logerror("%s: qsound_w %d = %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 
-READ8_MEMBER( qsound_device::qsound_r )
+READ8_MEMBER(qsound_device::qsound_r)
 {
 	/* Port ready bit (0x80 if ready) */
 	return 0x80;
 }
 
 
-void qsound_device::qsound_set_command(int data, int value)
+void qsound_device::write_data(UINT8 address, UINT16 data)
 {
-	int ch=0,reg=0;
-	if (data < 0x80)
+	int ch = 0, reg = 0;
+
+	if (address < 0x80)
 	{
-		ch=data>>3;
-		reg=data & 0x07;
+		ch = address >> 3;
+		reg = address & 7;
+	}
+	else if (address < 0x90)
+	{
+		ch = address & 0xf;
+		reg = 8;
+	}
+	else if (address >= 0xba && address < 0xca)
+	{
+		ch = address - 0xba;
+		reg = 9;
 	}
 	else
 	{
-		if (data < 0x90)
-		{
-			ch=data-0x80;
-			reg=8;
-		}
-		else
-		{
-			if (data >= 0xba && data < 0xca)
-			{
-				ch=data-0xba;
-				reg=9;
-			}
-			else
-			{
-				/* Unknown registers */
-				ch=99;
-				reg=99;
-			}
-		}
+		// unknown
+		reg = address;
 	}
 
 	switch (reg)
 	{
-		case 0: /* Bank */
-			ch=(ch+1)&0x0f; /* strange ... */
-			m_channel[ch].bank=(value&0x7f)<<16;
-#ifdef MAME_DEBUG
-			if (!(value & 0x8000))
-				popmessage("Register3=%04x",value);
-#endif
-
-			break;
-		case 1: /* start */
-			m_channel[ch].address=value;
-			break;
-		case 2: /* pitch */
-			m_channel[ch].pitch=value * 16;
-			if (!value)
-			{
-				/* Key off */
-				m_channel[ch].key=0;
-			}
-			break;
-		case 3: /* unknown */
-			m_channel[ch].reg3=value;
-#ifdef MAME_DEBUG
-			if (value != 0x8000)
-				popmessage("Register3=%04x",value);
-#endif
-			break;
-		case 4: /* loop offset */
-			m_channel[ch].loop=value;
-			break;
-		case 5: /* end */
-			m_channel[ch].end=value;
-			break;
-		case 6: /* master volume */
-			if (value==0)
-			{
-				/* Key off */
-				m_channel[ch].key=0;
-			}
-			else if (m_channel[ch].key==0)
-			{
-				/* Key on */
-				m_channel[ch].key=1;
-				m_channel[ch].offset=0;
-				m_channel[ch].lastdt=0;
-			}
-			m_channel[ch].vol=value;
+		case 0:
+			// bank, high bits unknown
+			ch = (ch + 1) & 0xf; // strange ...
+			m_channel[ch].bank = (data & 0x7f) << 16;
 			break;
 
-		case 7:  /* unused */
-#ifdef MAME_DEBUG
-				popmessage("UNUSED QSOUND REG 7=%04x",value);
-#endif
-
+		case 1:
+			// start/cur address
+			m_channel[ch].address = data;
 			break;
+
+		case 2:
+			// frequency
+			m_channel[ch].freq = data;
+			if (data == 0)
+			{
+				// key off
+				m_channel[ch].enabled = false;
+			}
+			break;
+
+		case 3: 
+			// unknown, always 0x8000?
+			break;
+
+		case 4:
+			// loop address
+			m_channel[ch].loop = data;
+			break;
+
+		case 5:
+			// end address
+			m_channel[ch].end = data;
+			break;
+
+		case 6:
+			// master volume
+			if (data == 0)
+			{
+				// key off
+				m_channel[ch].enabled = false;
+			}
+			else if (!m_channel[ch].enabled)
+			{
+				// key off -> key on
+				m_channel[ch].enabled = true;
+				m_channel[ch].step_ptr = 0;
+				m_channel[ch].sample = 0;
+			}
+			m_channel[ch].vol = data;
+			break;
+
+		case 7:
+			// unused?
+			break;
+
 		case 8:
+		{
+			// panning (left=0x0110, centre=0x0120, right=0x0130)
+			int pandata = (data - 0x10) & 0x3f;
+			if (pandata > 32)
 			{
-				int pandata=(value-0x10)&0x3f;
-				if (pandata > 32)
-				{
-					pandata=32;
-				}
-				m_channel[ch].rvol=m_pan_table[pandata];
-				m_channel[ch].lvol=m_pan_table[32-pandata];
-				m_channel[ch].pan = value;
+				pandata = 32;
 			}
+			m_channel[ch].rvol = m_pan_table[pandata];
+			m_channel[ch].lvol = m_pan_table[32 - pandata];
 			break;
-			case 9:
-			m_channel[ch].reg9=value;
-/*
-#ifdef MAME_DEBUG
-            popmessage("QSOUND REG 9=%04x",value);
-#endif
-*/
+		}
+		
+		case 9:
+			// unknown (most fixed samples use 0 for this register)
+			break;
+
+		default:
+			//logerror("%s: write_data %02x = %04x\n", machine().describe_context(), address, data);
 			break;
 	}
-	LOG(("QSOUND WRITE %02x CH%02d-R%02d =%04x\n", data, ch, reg, value));
 }

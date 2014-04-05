@@ -201,8 +201,9 @@ static MACHINE_CONFIG_START( tryout, tryout_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update_tryout)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", tryout)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tryout)
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(tryout_state, tryout)
 

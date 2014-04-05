@@ -36,7 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_keyline;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -299,6 +299,8 @@ static MACHINE_CONFIG_START( beehive, beehive_state )
 	MCFG_SCREEN_UPDATE_DRIVER(beehive_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
+	MCFG_SCREEN_PALETTE("palette")
+	
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 MACHINE_CONFIG_END
 

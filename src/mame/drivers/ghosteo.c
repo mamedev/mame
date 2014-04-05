@@ -273,7 +273,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 		case 0xFF :
 		{
 			nand.mode = NAND_M_INIT;
-			s3c2410_pin_frnb_w( m_s3c2410, 1);
+			 m_s3c2410->frnb_w(1);
 		}
 		break;
 		case 0x00 :
@@ -313,8 +313,8 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 			nand.addr_load_ptr++;
 			if ((nand.mode == NAND_M_READ) && (nand.addr_load_ptr == 4))
 			{
-				s3c2410_pin_frnb_w( m_s3c2410, 0);
-				s3c2410_pin_frnb_w( m_s3c2410, 1);
+				m_s3c2410->frnb_w(0);
+				m_s3c2410->frnb_w(1);
 			}
 		}
 		break;
@@ -625,22 +625,6 @@ void ghosteo_state::machine_reset()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 }
 
-static QS1000_INTERFACE( qs1000_intf )
-{
-	/* External ROM */
-	true,
-
-	/* P1-P3 read handlers */
-	DEVCB_DRIVER_MEMBER(ghosteo_state, qs1000_p1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	/* P1-P3 write handlers */
-	DEVCB_DRIVER_MEMBER(ghosteo_state, qs1000_p1_w),
-	DEVCB_DRIVER_MEMBER(ghosteo_state, qs1000_p2_w),
-	DEVCB_DRIVER_MEMBER(ghosteo_state, qs1000_p3_w)
-};
-
 static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 	/* basic machine hardware */
@@ -666,7 +650,12 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_QS1000_EXTERNAL_ROM(true)
+	MCFG_QS1000_IN_P1_CB(READ8(ghosteo_state, qs1000_p1_r))
+	MCFG_QS1000_OUT_P1_CB(WRITE8(ghosteo_state, qs1000_p1_w))
+	MCFG_QS1000_OUT_P2_CB(WRITE8(ghosteo_state, qs1000_p2_w))
+	MCFG_QS1000_OUT_P3_CB(WRITE8(ghosteo_state, qs1000_p3_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

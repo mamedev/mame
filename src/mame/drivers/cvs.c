@@ -1026,7 +1026,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", cvs)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cvs)
 
 	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
@@ -1039,6 +1039,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 	MCFG_SCREEN_UPDATE_DRIVER(cvs_state, screen_update_cvs)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_S2636_ADD("s2636_0", s2636_0_config)
 	MCFG_S2636_ADD("s2636_1", s2636_1_config)

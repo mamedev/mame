@@ -1455,9 +1455,10 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 240) /* just to get ~60 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", gunpey)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 

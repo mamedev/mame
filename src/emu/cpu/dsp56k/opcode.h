@@ -32,8 +32,8 @@ public:
 	const size_t instAccumulatorBitsModified() const;
 
 private:
-	Instruction* m_instruction;
-	ParallelMove* m_parallelMove;
+	auto_pointer<Instruction> m_instruction;
+	auto_pointer<ParallelMove> m_parallelMove;
 
 	UINT16 m_word0;
 	//UINT16 m_word1;

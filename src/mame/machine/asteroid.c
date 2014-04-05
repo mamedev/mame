@@ -134,5 +134,10 @@ WRITE8_MEMBER(asteroid_state::astdelux_led_w)
 void asteroid_state::machine_reset()
 {
 	asteroid_bank_switch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
-	avgdvg_reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+}
+
+MACHINE_RESET_MEMBER(asteroid_state, llander)
+{
+	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }

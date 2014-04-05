@@ -274,13 +274,13 @@ void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 			for (x = 0;x <= size;x++)
 			{
 				UINT32 transmask =  m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 0x1f);
-				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,visarea,
+				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				m_gfxdecode->gfx(1)->transmask(m_palette,bitmap,visarea,
+				m_gfxdecode->gfx(1)->transmask(bitmap,visarea,
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,

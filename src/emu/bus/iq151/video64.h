@@ -40,7 +40,8 @@ protected:
 private:
 	UINT8 *     m_videoram;
 	UINT8 *     m_chargen;
-	required_device<gfxdecode_device> m_gfxdecode;	
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 };
 
 

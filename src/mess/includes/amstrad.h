@@ -14,11 +14,11 @@
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
 #include "imagedev/snapquik.h"
-#include "machine/cpcexp.h"
-#include "machine/cpc_ssa1.h"
-#include "machine/cpc_rom.h"
-#include "machine/mface2.h"
-#include "machine/cpc_pds.h"
+#include "bus/cpc/cpcexp.h"
+#include "bus/cpc/cpc_ssa1.h"
+#include "bus/cpc/cpc_rom.h"
+#include "bus/cpc/mface2.h"
+#include "bus/cpc/cpc_pds.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"
@@ -179,7 +179,6 @@ public:
 	UINT8 m_ppi_port_inputs[3];
 	UINT8 m_ppi_port_outputs[3];
 	int m_aleste_rtc_function;
-	int m_aleste_fdc_int;
 	int m_prev_reg;
 	UINT16 m_GateArray_render_colours[17];
 	UINT8 m_mode0_lookup[256];
@@ -199,7 +198,6 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_cpc_io_w);
 	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
 	void amstrad_plus_seqcheck(int data);
-	DECLARE_DRIVER_INIT(aleste);
 	DECLARE_MACHINE_START(amstrad);
 	DECLARE_MACHINE_RESET(amstrad);
 	DECLARE_VIDEO_START(amstrad);
@@ -222,7 +220,6 @@ public:
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
 	TIMER_CALLBACK_MEMBER(cb_set_resolution);
-	DECLARE_WRITE_LINE_MEMBER(aleste_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_vsync_changed);
@@ -234,7 +231,8 @@ public:
 	DECLARE_READ8_MEMBER(amstrad_ppi_portb_r);
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
-	void aleste_interrupt(bool state);
+	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
+	DECLARE_WRITE_LINE_MEMBER( cpc_romen );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -319,13 +317,6 @@ protected:
 
 
 /*----------- defined in machine/amstrad.c -----------*/
-
-
-WRITE_LINE_DEVICE_HANDLER( cpc_irq_w );
-WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
-WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
-WRITE_LINE_DEVICE_HANDLER( cpc_romen );
-
 
 extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;

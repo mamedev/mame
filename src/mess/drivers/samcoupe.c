@@ -125,7 +125,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
-	screen_device *scr = machine().primary_screen;
+	screen_device *scr = machine().first_screen();
 	UINT8 data;
 
 	if (offset & 0x100)
@@ -533,10 +533,6 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-static MSM6242_INTERFACE( samcoupe_rtc_intf )
-{
-	DEVCB_NULL
-};
 
 static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	/* basic machine hardware */
@@ -550,6 +546,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
 	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 128)
 	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
@@ -565,7 +562,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
-	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
+	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD("cassette", samcoupe_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 

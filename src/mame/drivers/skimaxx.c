@@ -49,7 +49,8 @@ public:
 		m_fpga_ctrl(*this, "fpga_ctrl"),
 		m_fg_buffer(*this, "fg_buffer"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu") { }
+		m_subcpu(*this, "subcpu"),
+		m_tms(*this, "tms") { }
 
 	required_shared_ptr<UINT32> m_blitter_regs;
 	required_shared_ptr<UINT32> m_fpga_ctrl;
@@ -65,8 +66,6 @@ public:
 	UINT32 m_blitter_src_dy;
 	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
 	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
-	DECLARE_WRITE32_MEMBER(m68k_tms_w);
-	DECLARE_READ32_MEMBER(m68k_tms_r);
 	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(skimaxx_unk1_r);
@@ -77,6 +76,7 @@ public:
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<tms34010_device> m_tms;
 };
 
 
@@ -217,22 +217,6 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-/*************************************
- *
- *  TMS34010 host interface
- *
- *************************************/
-
-WRITE32_MEMBER(skimaxx_state::m68k_tms_w)
-{
-	tms34010_host_w(machine().device("tms"), offset, data);
-}
-
-READ32_MEMBER(skimaxx_state::m68k_tms_r)
-{
-	return tms34010_host_r(machine().device("tms"), offset);
-}
-
 
 /*************************************
  *
@@ -314,7 +298,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
-	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
+	AM_RANGE(0x10100000, 0x1010000f) AM_DEVREADWRITE16("tms", tms34010_device, host_r, host_w, 0x0000ffff)
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")  // above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP // watchdog_r?
@@ -376,7 +360,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
 	AM_RANGE(0x02100000, 0x0210000f) AM_RAM
 	AM_RANGE(0x04000000, 0x047fffff) AM_ROM AM_REGION("tmsgfx", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("tms", 0)
 ADDRESS_MAP_END
 
@@ -534,9 +518,9 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	MCFG_SCREEN_SIZE(0x400, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_ind16)
+	MCFG_SCREEN_PALETTE("palette")
 
-
-//  MCFG_GFXDECODE_ADD("gfxdecode", skimaxx )
+//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", skimaxx )
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 

@@ -53,7 +53,8 @@ public:
 		m_io_lpenconf(*this, "LPENCONF"),
 		m_io_lpenx(*this, "LPENX"),
 		m_io_lpeny(*this, "LPENY"),
-		m_io_coin(*this, "COIN") { }
+		m_io_coin(*this, "COIN"),
+		m_screen(*this, "screen") { }
 
 	required_shared_ptr<UINT8> m_gce_vectorram;
 	int m_64k_cart;
@@ -135,6 +136,7 @@ protected:
 	required_ioport m_io_lpenx;
 	required_ioport m_io_lpeny;
 	optional_ioport m_io_coin;
+	required_device<screen_device> m_screen;
 
 	void vectrex_configuration();
 	void vectrex_multiplexer(int mux);

@@ -344,15 +344,6 @@ static const k053247_interface rng_k055673_intf =
 	rng_sprite_callback
 };
 
-static const k053252_interface rng_k053252_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	9*8, 24
-};
-
 void rungun_state::machine_start()
 {
 	UINT8 *ROM = memregion("soundcpu")->base();
@@ -388,7 +379,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
-	MCFG_GFXDECODE_ADD("gfxdecode", rungun)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rungun)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -400,6 +391,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rungun_state, screen_update_rng)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -410,7 +402,9 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")
-	MCFG_K053252_ADD("k053252", 16000000/2, rng_k053252_intf)
+	
+	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
+	MCFG_K053252_OFFSETS(9*8, 24)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

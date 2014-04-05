@@ -540,7 +540,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", 1942)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1942)
 	
 	MCFG_PALETTE_ADD("palette", 64*4+4*32*8+16*16)
 	MCFG_PALETTE_INDIRECT_ENTRIES(256)
@@ -552,7 +552,7 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update_1942)
-
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", 1942p)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1942p)
 	MCFG_PALETTE_ADD("palette", 0x500)
 	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
 	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942p)
@@ -613,6 +613,7 @@ static MACHINE_CONFIG_START( 1942p, _1942_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update_1942p)
+	MCFG_SCREEN_PALETTE("palette")
 
 
 	/* sound hardware */

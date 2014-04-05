@@ -81,8 +81,7 @@ void nes_ffe4_device::device_start()
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 
-	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
-	save_pointer(NAME(m_exram), 0x8000);
+	save_item(NAME(m_exram));
 	save_item(NAME(m_exram_enabled));
 	save_item(NAME(m_exram_bank));
 

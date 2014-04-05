@@ -131,8 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	void fdc_interrupt(bool state);
-	void fdc_dma_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt);
 	void pc_select_dma_channel(int channel, bool state);
 	void pc_eop_w(int channel, bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

@@ -334,7 +334,7 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
-	UINT8 *img = global_alloc_array(UINT8, size);
+	dynamic_buffer img(size);
 	io_generic_read(io, img, 0, size);
 
 	UINT64 pos;
@@ -410,10 +410,9 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		for(int i=0; i<sector_count; i++)
 			if(sects[i].data && (sects[i].data < img || sects[i].data >= img+size))
-				global_free(sects[i].data);
+				global_free_array(sects[i].data);
 	}
 
-	global_free(img);
 	return true;
 }
 

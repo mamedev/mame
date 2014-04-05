@@ -221,6 +221,7 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 		if (m_reverse)
 		{
 			first = m_activelast - 4;
+			// TODO: this sets last to index m_activelist[-4]
 			last = m_activelist - 4;
 			step = -4;
 		}
