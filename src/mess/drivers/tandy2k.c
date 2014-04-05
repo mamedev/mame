@@ -12,11 +12,11 @@
 
     TODO:
 
-	- video
+	- video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
+    - DMA
+    - floppy
     - keyboard ROM
     - hires graphics board
-    - floppy 720K DSQD
-    - DMA
     - WD1010
     - hard disk
     - mouse
@@ -27,8 +27,30 @@
 
 // Read/Write Handlers
 
+void tandy2k_state::update_drq()
+{
+	int drq0 = CLEAR_LINE;
+	int drq1 = CLEAR_LINE;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (BIT(m_dma_mux, 0 + i))
+		{
+			if (BIT(m_dma_mux, 4 + i))
+				drq1 |= m_busdmarq[i];
+			else
+				drq0 |= m_busdmarq[i];
+		}
+	}
+
+	m_maincpu->drq0_w(drq0);
+	m_maincpu->drq1_w(drq1);
+}
+
 void tandy2k_state::dma_request(int line, int state)
 {
+	m_busdmarq[line] = state;
+	update_drq();
 }
 
 void tandy2k_state::speaker_update()
@@ -165,6 +187,8 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	int dme = (drq0 > 2) || (drq1 > 2);
 
 	m_pic1->ir6_w(dme);
+	
+	update_drq();
 }
 
 READ8_MEMBER( tandy2k_state::kbint_clr_r )
@@ -656,7 +680,6 @@ READ8_MEMBER( tandy2k_state::irq_callback )
 
 void tandy2k_state::machine_start()
 {
-	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
@@ -664,6 +687,10 @@ void tandy2k_state::machine_start()
 	program.install_ram(0x00000, ram_size - 1, ram);
 
 	m_char_ram.allocate(0x1000);
+
+	// HACK these should be connected to FDC HLD output
+	m_floppy0->mon_w(0);
+	m_floppy1->mon_w(0);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -704,7 +731,6 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
 	MCFG_CRT9007_CHARACTER_WIDTH(10)
 	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	//MCFG_CRT9007_DMAR_CALLBACK(80186 HOLD)
 	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, vsync_w))
 	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
 	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, cursor_w))
@@ -758,6 +784,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
+	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
