@@ -41,8 +41,6 @@ kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, co
 	m_sprite_yoffs = 0;
 
 	m_sprite_fliptype = 0;
-
-	m_altspacing = 0;
 /*
     Sx = Sprites with priority x, x = tiles with priority x,
     Sprites - Tiles Order (bottom -> top):
@@ -93,12 +91,6 @@ void kaneko16_sprite_device::set_priorities(device_t &device, int pri0, int pri1
 	dev.m_priority.sprite[3] = pri3;
 }
 
-
-void kaneko16_sprite_device::set_altspacing(device_t &device, int spacing)
-{
-	kaneko16_sprite_device &dev = downcast<kaneko16_sprite_device &>(device);
-	dev.m_altspacing = spacing;
-}
 
 void kaneko16_sprite_device::set_fliptype(device_t &device, int fliptype)
 {
@@ -195,8 +187,7 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(running_machine &machi
 {
 	int attr, xoffs, offs;
 
-	if (m_altspacing)   offs = i * 16/2 + 0x8/2;
-	else                offs = i * 8/2;
+	offs = i * 8/2;
 
 	if (offs >= (spriteram16_bytes/2))  return -1;
 

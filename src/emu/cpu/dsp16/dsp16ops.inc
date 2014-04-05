@@ -361,8 +361,8 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	// TODO
 
 	// LMV (mathematical overflow)
-	if ((result | U64(0xf00000000)) != U64(0xf00000000) &&
-		(result | U64(0xf00000000)) != U64(0x000000000))
+	if ((result & U64(0xf00000000)) != U64(0xf00000000) &&
+		(result & U64(0xf00000000)) != U64(0x000000000))
 		m_psw |= 0x1000;
 	else
 		m_psw &= (~0x1000);

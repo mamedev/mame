@@ -482,7 +482,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)		// sys_regs
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", psion_state, nvram_init)		// RAM
+	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
@@ -529,7 +529,7 @@ static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram3", psion_state, nvram_init)	// paged RAM
+	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
@@ -537,7 +537,7 @@ static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlz_mem)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram3", psion_state, nvram_init)	// paged RAM
+	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */

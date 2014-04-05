@@ -1,7 +1,9 @@
-﻿/*
+// license:MAME|GPL-2.0+
+// copyright-holders:Felipe Correa
+/*
   Replicator 1 desktop 3d printer
 
-  driver by Felipe Corrêa da Silva Sanches <fsanches@metamaquina.com.br>
+  driver by Felipe Correa da Silva Sanches <fsanches@metamaquina.com.br>
 
   Licensed under GPLv2 or later.
 

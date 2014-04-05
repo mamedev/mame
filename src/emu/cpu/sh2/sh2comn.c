@@ -536,6 +536,13 @@ WRITE32_HANDLER( sh2_internal_w )
 
 	switch( offset )
 	{
+	case 0x00:
+		//if(mem_mask == 0xff)
+		//	printf("%c",data & 0xff);
+		break;
+	case 0x01:
+		//printf("%08x %02x %02x\n",mem_mask,offset,data);
+		break;
 		// Timers
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
@@ -747,6 +754,11 @@ READ32_HANDLER( sh2_internal_r )
 //  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
 	switch( offset )
 	{
+	case 0x00:
+		break;
+	case 0x01:
+		return sh2->m[1] | 0x80000000; // TDRE: Trasmit Data Register Empty. Force it to be '1' for the time being.
+
 	case 0x04: // TIER, FTCSR, FRC
 		if ( mem_mask == 0x00ff0000 )
 		{

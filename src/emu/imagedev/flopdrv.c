@@ -704,14 +704,66 @@ const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_drtn(0),
+		m_stp(0),
+		m_wtg(0),
+		m_mon(0),
+		m_idx(0),
+		m_tk00(0),
+		m_wpt(0),
+		m_rdy(0),
+		m_dskchg(0),
+		m_drive_id(0),
+		m_active(0),
+		m_flags(0),
+		m_max_track(0),
+		m_num_sides(0),
+		m_current_track(0),
+		m_index_pulse_callback(NULL),
+		m_rpm(0.0f),
+		m_ready_state_change_callback(NULL),
+		m_id_index(0),
+		m_controller(NULL),
+		m_floppy(NULL),
+		m_track(0),
+		m_load_proc(NULL),
+		m_unload_proc(NULL),
+		m_floppy_drive_type(0)
 {
+	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_drtn(0),
+		m_stp(0),
+		m_wtg(0),
+		m_mon(0),
+		m_idx(0),
+		m_tk00(0),
+		m_wpt(0),
+		m_rdy(0),
+		m_dskchg(0),
+		m_drive_id(0),
+		m_active(0),
+		m_flags(0),
+		m_max_track(0),
+		m_num_sides(0),
+		m_current_track(0),
+		m_index_pulse_callback(NULL),
+		m_rpm(0.0f),
+		m_ready_state_change_callback(NULL),
+		m_id_index(0),
+		m_controller(NULL),
+		m_floppy(NULL),
+		m_track(0),
+		m_load_proc(NULL),
+		m_unload_proc(NULL),
+		m_floppy_drive_type(0)
 {
+	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
 //-------------------------------------------------

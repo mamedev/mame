@@ -1767,9 +1767,7 @@ void h63484_device::exec_abort_sequence()
 
 UINT16 h63484_device::video_registers_r(int offset)
 {
-	UINT16 res;
-
-	res = 0;
+	UINT16 res = (m_vreg[offset] << 8) | (m_vreg[offset+1] & 0xff);
 
 	switch(offset)
 	{
@@ -1910,9 +1908,7 @@ READ16_MEMBER( h63484_device::status_r )
 
 READ16_MEMBER( h63484_device::data_r )
 {
-	int res;
-
-	res = 0xffff;
+	UINT16 res = 0xffff;
 
 	if(m_ar == 0) // FIFO read
 	{
@@ -1932,7 +1928,7 @@ READ16_MEMBER( h63484_device::data_r )
 WRITE16_MEMBER( h63484_device::address_w )
 {
 	if(ACCESSING_BITS_0_7)
-		m_ar = data & 0xff;
+		m_ar = data & 0xfe;
 }
 
 WRITE16_MEMBER( h63484_device::data_w )
@@ -1948,6 +1944,50 @@ WRITE16_MEMBER( h63484_device::data_w )
 	if(m_ar & 0x80)
 	{
 		m_ar+=2;
+		m_ar &= 0xff; // TODO: what happens if it overflows?
+	}
+}
+
+READ8_MEMBER( h63484_device::status_r )
+{
+	return m_sr;
+}
+
+WRITE8_MEMBER( h63484_device::address_w )
+{
+	m_ar = data;
+}
+
+READ8_MEMBER( h63484_device::data_r )
+{
+	UINT8 res = 0xff;
+
+	if(m_ar < 2) // FIFO read
+		dequeue_r(&res);
+	else
+		res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
+
+	return res;
+}
+
+WRITE8_MEMBER( h63484_device::data_w )
+{
+	m_vreg[m_ar] = data;
+
+	if(m_ar < 2) // FIFO write
+	{
+		queue_w(data);
+		if (m_ar & 1)
+			process_fifo();
+
+		m_ar ^= 1;
+	}
+	else
+		video_registers_w(m_ar & 0xfe);
+
+	if(m_ar & 0x80)
+	{
+		m_ar++;
 		m_ar &= 0xff; // TODO: what happens if it overflows?
 	}
 }

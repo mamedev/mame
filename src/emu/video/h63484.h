@@ -48,9 +48,13 @@ public:
 
 	DECLARE_WRITE16_MEMBER( address_w );
 	DECLARE_WRITE16_MEMBER( data_w );
-
 	DECLARE_READ16_MEMBER( status_r );
 	DECLARE_READ16_MEMBER( data_r );
+
+	DECLARE_WRITE8_MEMBER( address_w );
+	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER( status_r );
+	DECLARE_READ8_MEMBER( data_r );
 
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;

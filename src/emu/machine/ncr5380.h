@@ -8,11 +8,6 @@
 
 #include "machine/scsihle.h"
 
-struct NCR5380interface
-{
-	devcb_write_line m_irq_cb;  /* irq callback */
-};
-
 // 5380 registers
 enum
 {
@@ -36,16 +31,17 @@ enum
 #define R5380_CURDATA_DTACK (R5380_CURDATA | 0x10)
 
 // device stuff
-#define MCFG_NCR5380_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, NCR5380, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
-class ncr5380_device : public device_t,
-						public NCR5380interface
+#define MCFG_NCR5380_IRQ_CB(_devcb) \
+	devcb = &ncr5380_device::set_irq_callback(*device, DEVCB2_##_devcb);
+
+class ncr5380_device : public device_t
 {
 public:
 	// construction/destruction
 	ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<ncr5380_device &>(device).m_irq_cb.set_callback(object); }
 
 	// our API
 	UINT8 ncr5380_read_reg(UINT32 offset);
@@ -59,7 +55,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();
-	virtual void device_config_complete();
 
 private:
 	scsihle_device *m_scsi_devices[8];
@@ -69,7 +64,7 @@ private:
 	UINT8 m_5380_Command[32];
 	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
 	UINT8 m_5380_Data[512];
-	devcb_resolved_write_line m_irq_func;
+	devcb2_write_line m_irq_cb;  /* irq callback */
 };
 
 // device type definition
