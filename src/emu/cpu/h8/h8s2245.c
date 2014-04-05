@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "h8s2245.h"
-#include "h8_adc.h"
 
 const device_type H8S2241 = &device_creator<h8s2241_device>;
 const device_type H8S2242 = &device_creator<h8s2242_device>;
@@ -24,6 +23,8 @@ h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, 
 	porte(*this, "porte"),
 	portf(*this, "portf"),
 	portg(*this, "portg"),
+	timer8_0(*this, "timer8_0"),
+	timer8_1(*this, "timer8_1"),
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	timer16_1(*this, "timer16:1"),
@@ -50,6 +51,8 @@ h8s2245_device::h8s2245_device(const machine_config &mconfig, const char *tag, d
 	porte(*this, "porte"),
 	portf(*this, "portf"),
 	portg(*this, "portg"),
+	timer8_0(*this, "timer8_0"),
+	timer8_1(*this, "timer8_1"),
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	timer16_1(*this, "timer16:1"),
@@ -94,6 +97,8 @@ static MACHINE_CONFIG_FRAGMENT(h8s2245)
 	MCFG_H8_PORT_ADD("porte", h8_device::PORT_E, 0x00, 0x00)
 	MCFG_H8_PORT_ADD("portf", h8_device::PORT_F, 0x00, 0x00)
 	MCFG_H8_PORT_ADD("portg", h8_device::PORT_G, 0xe0, 0x00)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_0", "intc", 64, 65, 66, "timer8_1", h8_timer8_channel_device::CHAIN_OVERFLOW, true,  false)
+	MCFG_H8H_TIMER8_CHANNEL_ADD("timer8_1", "intc", 68, 69, 70, "timer8_0", h8_timer8_channel_device::CHAIN_A,        false, false)
 	MCFG_H8_TIMER16_ADD("timer16", 3, 0x00)
 	MCFG_H8S_TIMER16_CHANNEL_ADD("timer16:0", 4, 0x60, "intc", 32,
 								 h8_timer16_channel_device::DIV_1,
@@ -204,6 +209,14 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2245_device)
 	AM_RANGE(0xffff90, 0xffff97) AM_DEVREAD8(     "adc",       h8_adc_device,             addr8_r,          0xffff)
 	AM_RANGE(0xffff98, 0xffff99) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcsr_r, adcsr_w, 0xff00)
 	AM_RANGE(0xffff98, 0xffff99) AM_DEVREADWRITE8("adc",       h8_adc_device,             adcr_r,  adcr_w,  0x00ff)
+	AM_RANGE(0xffffb0, 0xffffb1) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcr_r,   tcr_w,   0xff00)
+	AM_RANGE(0xffffb0, 0xffffb1) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcr_r,   tcr_w,   0x00ff)
+	AM_RANGE(0xffffb2, 0xffffb3) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcsr_r,  tcsr_w,  0xff00)
+	AM_RANGE(0xffffb2, 0xffffb3) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcsr_r,  tcsr_w,  0x00ff)
+	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0xff00)
+	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0x00ff)
+	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0xff00)
+	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0x00ff)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tstr_r,  tstr_w,  0xff00)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tsyr_r,  tsyr_w,  0x00ff)
 	AM_RANGE(0xffffd0, 0xffffd1) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tcr_r,   tcr_w,   0xff00)

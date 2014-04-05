@@ -495,7 +495,7 @@ CPUOBJS += $(CPUOBJ)/h8/h8.o $(CPUOBJ)/h8/h8h.o $(CPUOBJ)/h8/h8s2000.o $(CPUOBJ)
            $(CPUOBJ)/h8/h8s2245.o $(CPUOBJ)/h8/h8s2320.o $(CPUOBJ)/h8/h8s2357.o \
            $(CPUOBJ)/h8/h8s2655.o \
            $(CPUOBJ)/h8/h8_adc.o $(CPUOBJ)/h8/h8_port.o $(CPUOBJ)/h8/h8_intc.o \
-           $(CPUOBJ)/h8/h8_timer16.o $(CPUOBJ)/h8/h8_sci.o
+           $(CPUOBJ)/h8/h8_timer8.o $(CPUOBJ)/h8/h8_timer16.o $(CPUOBJ)/h8/h8_sci.o
 DASMOBJS +=
 endif
 
@@ -527,6 +527,7 @@ $(CPUOBJ)/h8/h83337.o:			$(CPUSRC)/h8/h83337.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -547,6 +548,7 @@ $(CPUOBJ)/h8/h83006.o:			$(CPUSRC)/h8/h83006.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -557,6 +559,7 @@ $(CPUOBJ)/h8/h83008.o:			$(CPUSRC)/h8/h83008.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -578,6 +581,7 @@ $(CPUOBJ)/h8/h8s2245.o:			$(CPUSRC)/h8/h8s2245.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -589,6 +593,7 @@ $(CPUOBJ)/h8/h8s2320.o:			$(CPUSRC)/h8/h8s2320.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -600,6 +605,7 @@ $(CPUOBJ)/h8/h8s2357.o:			$(CPUSRC)/h8/h8s2357.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
@@ -612,6 +618,7 @@ $(CPUOBJ)/h8/h8s2655.o:			$(CPUSRC)/h8/h8s2655.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer8.h \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 

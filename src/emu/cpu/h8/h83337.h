@@ -53,6 +53,7 @@
 #include "h8_adc.h"
 #include "h8_port.h"
 #include "h8_intc.h"
+#include "h8_timer8.h"
 #include "h8_timer16.h"
 #include "h8_sci.h"
 
@@ -61,8 +62,14 @@ public:
 	h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER(wscr_r);
+	DECLARE_WRITE8_MEMBER(wscr_w);	
+	DECLARE_READ8_MEMBER(stcr_r);
+	DECLARE_WRITE8_MEMBER(stcr_w);	
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);	
+	DECLARE_READ8_MEMBER(mdcr_r);
+	DECLARE_WRITE8_MEMBER(mdcr_w);	
 
 protected:
 	required_device<h8_intc_device> intc;
@@ -76,6 +83,8 @@ protected:
 	required_device<h8_port_device> port7;
 	required_device<h8_port_device> port8;
 	required_device<h8_port_device> port9;
+	required_device<h8_timer8_channel_device> timer8_0;
+	required_device<h8_timer8_channel_device> timer8_1;
 	required_device<h8_timer16_device> timer16;
 	required_device<h8_timer16_channel_device> timer16_0;
 	required_device<h8_sci_device> sci0;

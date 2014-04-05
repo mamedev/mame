@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "h83337.h"
-#include "h8_adc.h"
 
 const device_type H83334 = &device_creator<h83334_device>;
 const device_type H83336 = &device_creator<h83336_device>;
@@ -20,6 +19,8 @@ h83337_device::h83337_device(const machine_config &mconfig, device_type type, co
 	port7(*this, "port7"),
 	port8(*this, "port8"),
 	port9(*this, "port9"),
+	timer8_0(*this, "timer8_0"),
+	timer8_1(*this, "timer8_1"),
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	sci0(*this, "sci0"),
@@ -40,6 +41,8 @@ h83337_device::h83337_device(const machine_config &mconfig, const char *tag, dev
 	port7(*this, "port7"),
 	port8(*this, "port8"),
 	port9(*this, "port9"),
+	timer8_0(*this, "timer8_0"),
+	timer8_1(*this, "timer8_1"),
 	timer16(*this, "timer16"),
 	timer16_0(*this, "timer16:0"),
 	sci0(*this, "sci0"),
@@ -72,6 +75,8 @@ static MACHINE_CONFIG_FRAGMENT(h83337)
 	MCFG_H8_PORT_ADD("port7", h8_device::PORT_7, 0x00, 0x00)
 	MCFG_H8_PORT_ADD("port8", h8_device::PORT_8, 0x80, 0x80)
 	MCFG_H8_PORT_ADD("port9", h8_device::PORT_9, 0x00, 0x00)
+	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_0", "intc", 19, 20, 21, 8, 2, 64, 32, 1024, 256)
+	MCFG_H8_TIMER8_CHANNEL_ADD("timer8_1", "intc", 22, 23, 24, 8, 2, 64, 128, 1024, 2048)
 	MCFG_H8_TIMER16_ADD("timer16", 1, 0xff)
 	MCFG_H8_TIMER16_CHANNEL_ADD("timer16:0", 4, 0, "intc", 32)
 	MCFG_H8_SCI_ADD("sci0", "intc", 27, 28, 29, 30)
@@ -115,11 +120,20 @@ DEVICE_ADDRESS_MAP_START(map, 16, h83337_device)
 	AM_RANGE(0xffbe, 0xffbf) AM_DEVREADWRITE8("port8",     h8_port_device,            port_r,  dr_w,    0x00ff)
 	AM_RANGE(0xffc0, 0xffc1) AM_DEVWRITE8(    "port9",     h8_port_device,                     ddr_w,   0xff00)
 	AM_RANGE(0xffc0, 0xffc1) AM_DEVREADWRITE8("port9",     h8_port_device,            port_r,  dr_w,    0x00ff)
-
+	AM_RANGE(0xffc2, 0xffc3) AM_READWRITE8(                                           wscr_r,  wscr_w,  0xff00)
+	AM_RANGE(0xffc2, 0xffc3) AM_READWRITE8(                                           stcr_r,  stcr_w,  0x00ff)
 	AM_RANGE(0xffc4, 0xffc5) AM_READWRITE8(                                           syscr_r, syscr_w, 0xff00)
+	AM_RANGE(0xffc4, 0xffc5) AM_READWRITE8(                                           mdcr_r,  mdcr_w,  0x00ff)
 	AM_RANGE(0xffc6, 0xffc7) AM_DEVREADWRITE8("intc",      h8_intc_device,            iscr_r,  iscr_w,  0xff00)
 	AM_RANGE(0xffc6, 0xffc7) AM_DEVREADWRITE8("intc",      h8_intc_device,            ier_r,   ier_w,   0x00ff)
-
+	AM_RANGE(0xffc8, 0xffc9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcr_r,   tcr_w,   0xff00)
+	AM_RANGE(0xffc8, 0xffc9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcsr_r,  tcsr_w,  0x00ff)
+	AM_RANGE(0xffca, 0xffcb) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0xffff)
+	AM_RANGE(0xffcc, 0xffcd) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0xff00)
+	AM_RANGE(0xffd0, 0xffd1) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcr_r,   tcr_w,   0xff00)
+	AM_RANGE(0xffd0, 0xffd1) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcsr_r,  tcsr_w,  0x00ff)
+	AM_RANGE(0xffd2, 0xffd3) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0xffff)
+	AM_RANGE(0xffd4, 0xffd5) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0xff00)
 	AM_RANGE(0xffd8, 0xffd9) AM_DEVREADWRITE8("sci0",      h8_sci_device,             smr_r,   smr_w,   0xff00)
 	AM_RANGE(0xffd8, 0xffd9) AM_DEVREADWRITE8("sci0",      h8_sci_device,             brr_r,   brr_w,   0x00ff)
 	AM_RANGE(0xffda, 0xffdb) AM_DEVREADWRITE8("sci0",      h8_sci_device,             scr_r,   scr_w,   0xff00)
@@ -169,6 +183,8 @@ void h83337_device::internal_update(UINT64 current_time)
 	add_event(event_time, adc->internal_update(current_time));
 	add_event(event_time, sci0->internal_update(current_time));
 	add_event(event_time, sci1->internal_update(current_time));
+	add_event(event_time, timer8_0->internal_update(current_time));
+	add_event(event_time, timer8_1->internal_update(current_time));
 	add_event(event_time, timer16_0->internal_update(current_time));
 
 	recompute_bcount(event_time);
@@ -194,4 +210,36 @@ WRITE8_MEMBER(h83337_device::syscr_w)
 {
 	syscr = data;
 	logerror("%s: syscr = %02x\n", tag(), data);
+}
+
+READ8_MEMBER(h83337_device::wscr_r)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(h83337_device::wscr_w)
+{
+	logerror("%s: wscr = %02x\n", tag(), data);
+}
+
+READ8_MEMBER(h83337_device::stcr_r)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(h83337_device::stcr_w)
+{
+	logerror("%s: stcr = %02x\n", tag(), data);
+	timer8_0->set_extra_clock_bit(data & 0x01);
+	timer8_1->set_extra_clock_bit(data & 0x02);
+}
+
+READ8_MEMBER(h83337_device::mdcr_r)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(h83337_device::mdcr_w)
+{
+	logerror("%s: mdcr = %02x\n", tag(), data);
 }

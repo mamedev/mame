@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "h83002.h"
-#include "h8_adc.h"
 
 const device_type H83002 = &device_creator<h83002_device>;
 

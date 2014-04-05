@@ -2157,7 +2157,7 @@ macro jsr32 %opc %spreg
 
 6e80         ff80         0 mov.b    r8l      r16d16h  o
 	prefetch_start();
-	TMP1 = UINT16(r16_r(IR[0] >> 4) + IR[1]);
+	TMP1 = UINT16(r16_r((IR[0] >> 4) & 7) + IR[1]);
 	TMP2 = r8_r(IR[0]);
 	set_nzv8(TMP2);
 	write8(TMP1, TMP2);
@@ -2189,7 +2189,7 @@ macro jsr32 %opc %spreg
 
 6f80         ff80         0 mov.w    r16l     r16d16h  o
 	prefetch_start();
-	TMP1 = UINT16(r16_r(IR[0] >> 4) + IR[1]);
+	TMP1 = UINT16(r16_r((IR[0] >> 4) & 7) + IR[1]);
 	TMP2 = r16_r(IR[0]);
 	set_nzv16(TMP2);
 	write16(TMP1, TMP2);
