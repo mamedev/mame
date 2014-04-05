@@ -19,8 +19,7 @@
 class ui_menu_software_parts : public ui_menu {
 public:
 	enum { T_ENTRY, T_FMGR };
-	ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const software_list *swl, const software_info *info, device_image_interface *image);
-	virtual ~ui_menu_software_parts();
+	ui_menu_software_parts(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, software_info *info, const char *interface, software_part **part);
 	virtual void populate();
 	virtual void handle();
 
@@ -31,10 +30,11 @@ private:
 	};
 
 	// variables
-	const software_list_device *	m_swlist;
-	const software_list *			m_software_list;
-	const software_info	*			m_info;
-	device_image_interface *		m_image;
+	device_image_interface *m_image;
+	software_list_device *	m_swlist;
+	software_info *			m_info;
+	const char *			m_interface;
+	software_part **		m_selected_part;
 };
 
 
@@ -42,7 +42,7 @@ private:
 
 class ui_menu_software_list : public ui_menu {
 public:
-	ui_menu_software_list(running_machine &machine, render_container *container, const software_list_device *swlist, device_image_interface *image);
+	ui_menu_software_list(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, const char *interface, astring &result);
 	virtual ~ui_menu_software_list();
 	virtual void populate();
 	virtual void handle();
@@ -56,8 +56,10 @@ private:
 	};
 
 	// variables
-	const software_list_device *	m_swlist; // currently selected list
 	device_image_interface *		m_image;
+	software_list_device *			m_swlist; // currently selected list
+	const char *					m_interface;
+	astring &						m_result;
 	entry_info *					m_entrylist;
 	char							m_filename_buffer[1024];
 	bool							m_ordered_by_shortname;

@@ -30,22 +30,14 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, const software_list_device *swlist, const software_list *swl, const software_info *info, device_image_interface *image)
- 	: ui_menu(machine, container)
+ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, software_info *info, const char *interface, software_part **part)
+	: ui_menu(machine, container)
 {
-	m_swlist = swlist;
-	m_software_list = swl;
-	m_info = info;
 	m_image = image;
-}
-
-
-//-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
-ui_menu_software_parts::~ui_menu_software_parts()
-{
+	m_swlist = swlist;
+	m_info = info;
+	m_interface = interface;
+	m_selected_part = part;
 }
 
 
@@ -57,7 +49,7 @@ void ui_menu_software_parts::populate()
 {
 	for (const software_part *swpart = m_info->first_part(); swpart != NULL; swpart = swpart->next())
 	{
-		if (swpart->matches_interface(NULL))	// FIXME
+		if (swpart->matches_interface(m_interface))
 		{
 			software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
 			// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
@@ -79,7 +71,6 @@ void ui_menu_software_parts::populate()
 
 void ui_menu_software_parts::handle()
 {
-#if 0
 	// process the menu
 	const ui_menu_event *event = process(0);
 
@@ -90,13 +81,12 @@ void ui_menu_software_parts::handle()
 
 		// load the image
 		astring image_name;
-		image_name.printf("%s:%s:%s", m_swlist->list_name(), m_info->shortname, entry->part->name);
+		image_name.printf("%s:%s:%s", m_swlist->list_name(), m_info->shortname(), entry->part->name());
 		m_image->load(image_name);
 
 		// and exit
 		ui_menu::stack_pop(machine());
 	}
-#endif
 }
 
 
@@ -108,11 +98,12 @@ void ui_menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, const software_list_device *swlist, device_image_interface *image)
-	: ui_menu(machine, container)
+ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, device_image_interface *image, software_list_device *swlist, const char *interface, astring &result)
+	: ui_menu(machine, container), m_result(result)
 {
-	m_swlist = swlist;
 	m_image = image;
+	m_swlist = swlist;
+	m_interface = interface;
 	m_entrylist = NULL;
 	m_ordered_by_shortname = true;
 }
@@ -133,34 +124,26 @@ ui_menu_software_list::~ui_menu_software_list()
 
 void ui_menu_software_list::select_entry(entry_info *entry)
 {
-	// TEMPORARILY DISABLING
-#if 0
-	const struct software_list *swl;
-	const software_info *swi;
-	const software_part *swp;
+	software_info *swi;
+	software_part *swp;
 
-	swl = software_list_open(machine().options(), m_swlist->list_name(), false, NULL);
-	swi = software_list_find(swl, entry->short_name, NULL);
+	swi = m_swlist->find(entry->short_name);
 
-	if (swinfo_has_multiple_parts(swi, m_image->image_interface()))
+	if (swi->has_multiple_parts(m_interface))
  	{
 		// multi part software; need to spawn another menu
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, m_swlist, swl, swi, m_image)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, m_image, m_swlist, swi, m_interface, &swp)));
 	}
 	else
 	{
 		// single part software; just get the part
-		swp = software_find_part(swi, NULL, NULL);
+		swp = swi->first_part();
 
 		// and load it
 		astring image_name;
-		image_name.printf("%s:%s:%s", m_swlist->list_name(), swi->shortname, swp->name);
+		image_name.printf("%s:%s:%s", m_swlist->list_name(), swi->shortname(), swp->name());
 		m_image->load(image_name);
-
-		// and dispose of the list
-		software_list_close(swl);
 	}
-#endif
 }
 
 //-------------------------------------------------
@@ -208,7 +191,6 @@ int ui_menu_software_list::compare_entries(const entry_info *e1, const entry_inf
 ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(const software_info *swinfo)
 {
 	entry_info *entry = NULL;
-#if 0
 	entry_info **entryptr;
 	bool entry_updated = FALSE;
 
@@ -240,7 +222,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 		entry->next = *entryptr;
 		*entryptr = entry;
 	}
-#endif
+
 	return entry;
 }
 
@@ -251,7 +233,6 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 
 void ui_menu_software_list::populate()
 {
-#if 0
 	// build up the list of entries for the menu
 	for (const software_info *swinfo = m_swlist->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 		append_software_entry(swinfo);
@@ -262,7 +243,6 @@ void ui_menu_software_list::populate()
 	// append all of the menu entries
 	for (entry_info *entry = m_entrylist; entry != NULL; entry = entry->next)
 		item_append(entry->short_name, entry->long_name, 0, entry);
-#endif
 }
 
 

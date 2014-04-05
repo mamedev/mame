@@ -38,10 +38,10 @@ private:
 	void build_help_menu();
 
 	// miscellaneous
-	bool is_softlist_relevant(const software_list_device *swlist, const char *interface, astring &list_description);
+	bool is_softlist_relevant(software_list_device *swlist, const char *interface, astring &list_description);
 	void set_ui_handler(UINT32 (*callback)(running_machine &, render_container *, UINT32), UINT32 param);
 	void select_new_game();
-	void select_from_software_list(device_image_interface *image, const software_list_device *swlist);
+	void select_from_software_list(device_image_interface *image, software_list_device *swlist);
 	void tape_control(cassette_image_device *image);
 	void bitbanger_control(bitbanger_device *image);
 	void load(device_image_interface *image);

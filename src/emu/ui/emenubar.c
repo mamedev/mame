@@ -242,7 +242,7 @@ bool ui_emu_menubar::build_software_list_menus(menu_item &menu, device_image_int
 	// first do "original system" softlists, then do compatible ones
 	for (int typenum = 0; typenum < ARRAY_LENGTH(types); typenum++)
 	{
-		for (const software_list_device *swlist = softlist_iter.first(); swlist != NULL; swlist = softlist_iter.next())
+		for (software_list_device *swlist = softlist_iter.first(); swlist != NULL; swlist = softlist_iter.next())
 		{
 			if ((swlist->list_type() == types[typenum]) && is_softlist_relevant(swlist, image->image_interface(), description))
 			{
@@ -505,27 +505,21 @@ void ui_emu_menubar::build_help_menu()
 //  is_softlist_relevant
 //-------------------------------------------------
 
-bool ui_emu_menubar::is_softlist_relevant(const software_list_device *swlist, const char *interface, astring &list_description)
+bool ui_emu_menubar::is_softlist_relevant(software_list_device *swlist, const char *interface, astring &list_description)
 {
 	bool result = false;
 
-#if 0
-	const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
-	if (list != NULL)
+	for (software_info *swinfo = swlist->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 	{
-		for (const software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
+		software_part *part = swinfo->find_part(NULL, NULL);
+		if (part->matches_interface(interface))
 		{
-			const software_part *part = software_find_part(swinfo, NULL, NULL);
-			if (softlist_contain_interface(interface, part->interface_))
-			{
-				list_description.printf("%s...", list->description);
-				result = true;
-				break;
-			}
+			list_description.printf("%s...", swlist->description());
+			result = true;
+			break;
 		}
-		software_list_close(list);
 	}
-#endif
+
 	return result;
 }
 
@@ -558,9 +552,10 @@ void ui_emu_menubar::select_new_game()
 //  select_from_software_list
 //-------------------------------------------------
 
-void ui_emu_menubar::select_from_software_list(device_image_interface *image, const software_list_device *swlist)
+void ui_emu_menubar::select_from_software_list(device_image_interface *image, software_list_device *swlist)
 {
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), swlist, image)));
+	astring result;
+	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), image, swlist, NULL, result)));
 }
 
 
