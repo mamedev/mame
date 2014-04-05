@@ -9,16 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
 #include "includes/lisa.h"
-#include "machine/sonydriv.h"
-#include "machine/applefdc.h"
 #include "formats/ap_dsk35.h"
-#include "machine/6522via.h"
-#include "sound/speaker.h"
-#include "mcfglgcy.h"
 
 
 /***************************************************************************
@@ -162,7 +156,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* nvram */
-	MCFG_NVRAM_HANDLER(lisa)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", lisa_state, nvram_init)
 
 	/* devices */
 	MCFG_IWM_ADD("fdc", lisa2_fdc_interface)

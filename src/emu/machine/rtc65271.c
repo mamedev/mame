@@ -449,14 +449,14 @@ void rtc65271_device::field_interrupts()
 	if (m_regs[reg_C] & m_regs[reg_B] & (reg_C_PF | reg_C_AF | reg_C_UF))
 	{
 		m_regs[reg_C] |= reg_C_IRQF;
-		if (!m_interrupt_func.isnull())
-			m_interrupt_func(1);
+		if (!m_interrupt_cb.isnull())
+			m_interrupt_cb(1);
 	}
 	else
 	{
 		m_regs[reg_C] &= ~reg_C_IRQF;
-		if (!m_interrupt_func.isnull())
-			m_interrupt_func(0);
+		if (!m_interrupt_cb.isnull())
+			m_interrupt_cb(0);
 	}
 }
 
@@ -672,28 +672,9 @@ const device_type RTC65271 = &device_creator<rtc65271_device>;
 
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RTC65271, "RTC65271", tag, owner, clock, "rtc65271", __FILE__),
-		device_nvram_interface(mconfig, *this)
+		device_nvram_interface(mconfig, *this),
+		m_interrupt_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void rtc65271_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const rtc65271_interface *intf = reinterpret_cast<const rtc65271_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<rtc65271_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interrupt_cb, 0, sizeof(m_interrupt_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -704,7 +685,7 @@ void rtc65271_device::device_start()
 	m_update_timer = machine().scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)this);
 	m_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_SQW_timer = machine().scheduler().timer_alloc(FUNC(rtc_SQW_callback), (void *)this);
-	m_interrupt_func.resolve(m_interrupt_cb, *this);
+	m_interrupt_cb.resolve();
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cur_reg));

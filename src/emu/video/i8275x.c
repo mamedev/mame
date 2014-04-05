@@ -93,7 +93,6 @@ i8275x_device::i8275x_device(const machine_config &mconfig, const char *tag, dev
 	m_write_drq(*this),
 	m_write_hrtc(*this),
 	m_write_vrtc(*this),
-	m_display_cb(NULL),
 	m_status(0),
 	m_param_idx(0),
 	m_param_end(0),
@@ -124,6 +123,7 @@ void i8275x_device::device_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
+	m_display_cb.bind_relative_to(*owner());
 	m_write_drq.resolve_safe();
 	m_write_irq.resolve_safe();
 	m_write_hrtc.resolve_safe();
@@ -334,8 +334,8 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					lc = (lc - 1) & 0x0f;
 				}
 
-				if (m_display_cb)
-				m_display_cb(this, m_bitmap,
+				if (!m_display_cb.isnull())
+				m_display_cb(m_bitmap,
 					sx * m_hpixels_per_column, // x position on screen of starting point
 					m_scanline, // y position on screen
 					lc, // current line of char

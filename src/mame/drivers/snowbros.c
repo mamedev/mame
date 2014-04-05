@@ -2394,7 +2394,7 @@ DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
 
 
 
-//for (i = 0;i < sizeof(cookbib2_mcu68k)/sizeof(cookbib2_mcu68k[0]);i++)
+//for (i = 0;i < ARRAY_LENGTH(cookbib2_mcu68k);i++)
 //      m_hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
 
 //  for (i = 0;i < 0x200/2;i++)

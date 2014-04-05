@@ -25,7 +25,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "includes/mjkjidai.h"
-#include "mcfglgcy.h"
 
 /* Start of ADPCM custom chip code */
 
@@ -133,12 +132,6 @@ READ8_MEMBER(mjkjidai_state::keyboard_r)
 
 	res |= (ioport("IN3")->read() & 0xc0);
 
-	if (m_nvram_init_count)
-	{
-		m_nvram_init_count--;
-		res &= 0xbf;
-	}
-
 	return res;
 }
 
@@ -153,27 +146,12 @@ WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
 	}
 }
 
-static NVRAM_HANDLER( mjkjidai )
-{
-	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-
-	if (read_or_write)
-		file->write(state->m_nvram, state->m_nvram.bytes());
-	else if (file)
-		file->read(state->m_nvram, state->m_nvram.bytes());
-	else
-	{
-		state->m_nvram_init_count = 1;
-	}
-}
-
-
 
 static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("nvram")   // cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("nvram")   // cleared and initialized on startup if bit 6 of port 00 is 0
 	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_SHARE("spriteram1")          // shared with tilemap ram
 	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_SHARE("spriteram2")      // shared with tilemap ram
 	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_SHARE("spriteram3")      // shared with tilemap ram
@@ -385,7 +363,7 @@ static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 	MCFG_CPU_IO_MAP(mjkjidai_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mjkjidai_state,  vblank_irq)
 
-	MCFG_NVRAM_HANDLER(mjkjidai)
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -442,6 +420,9 @@ ROM_START( mjkjidai )
 
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "mkj-40.14c",   0x00000, 0x8000, CRC(4d8fcc4a) SHA1(24c2b8031367035c89c6649a084bce0714f3e8d4) )
+
+	ROM_REGION( 0x1000, "nvram", 0 )    /* preformatted NVRAM */
+	ROM_LOAD( "default.nv",   0x00000, 0x1000, CRC(eccc0263) SHA1(679010f096536e8bb572551e9d0776cad72145e2) )
 ROM_END
 
 

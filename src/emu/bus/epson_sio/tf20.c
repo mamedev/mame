@@ -289,7 +289,7 @@ WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
 {
 	m_rxc = state;
-	m_sio_input->rx_w(m_txda & m_rxc);
+	m_sio_input->rx_w(m_txda && m_rxc);
 }
 
 //-------------------------------------------------
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
 WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
 {
 	m_pinc = state;
-	m_sio_input->pin_w(!m_dtra | m_pinc);
+	m_sio_input->pin_w(!m_dtra || m_pinc);
 }
 
 //-------------------------------------------------
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
 WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
 {
 	m_txda = state;
-	m_sio_input->rx_w(m_txda & m_rxc);
+	m_sio_input->rx_w(m_txda && m_rxc);
 }
 
 //-------------------------------------------------
@@ -319,7 +319,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
 WRITE_LINE_MEMBER( epson_tf20_device::dtra_w )
 {
 	m_dtra = state;
-	m_sio_input->pin_w(!m_dtra | m_pinc);
+	m_sio_input->pin_w(!m_dtra || m_pinc);
 }
 
 //-------------------------------------------------

@@ -123,7 +123,7 @@ static float linear_rate[]=
 	s_to_rate(6080.0f)
 };
 
-static const int num_linear_rates=sizeof(linear_rate)/sizeof(linear_rate[0]);
+static const int num_linear_rates=ARRAY_LENGTH(linear_rate);
 
 static const float pos_exp_rate[]=
 {
@@ -229,7 +229,7 @@ static const float pos_exp_rate[]=
 	s_to_rate(2664.0f)
 };
 
-static const int num_pos_exp_rates=sizeof(linear_rate)/sizeof(linear_rate[0]);
+static const int num_pos_exp_rates=ARRAY_LENGTH(pos_exp_rate);
 
 static const float neg_exp_rate[]=
 {
@@ -343,7 +343,7 @@ static const float neg_exp_rate[]=
 	s_to_rate(11200.0f)
 };
 
-static const int num_neg_exp_rates=sizeof(linear_rate)/sizeof(linear_rate[0]);
+static const int num_neg_exp_rates=ARRAY_LENGTH(neg_exp_rate);
 
 static const float decay_rate[16]=
 {
@@ -396,7 +396,7 @@ static const float linear_release_rate[]=
 	s_to_rate(3040.0f)
 };
 
-static const int num_linear_release_rates=sizeof(linear_release_rate)/sizeof(linear_release_rate[0]);
+static const int num_linear_release_rates=ARRAY_LENGTH(linear_release_rate);
 
 static const float exp_release_rate[]=
 {
@@ -429,7 +429,7 @@ static const float exp_release_rate[]=
 	s_to_rate(7008.0f)
 };
 
-static const int num_exp_release_rates=sizeof(exp_release_rate)/sizeof(exp_release_rate[0]);
+static const int num_exp_release_rates=ARRAY_LENGTH(exp_release_rate);
 
 //
 //

@@ -82,6 +82,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pia0_porta_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(keyboard_r);
+	I8275_DRAW_CHARACTER_MEMBER( zorba_update_chr );
+
 private:
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -258,12 +260,11 @@ PALETTE_INIT_MEMBER( zorba_state, zorba )
 	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
 }
 
-static I8275_DISPLAY_PIXELS( zorba_update_chr )
+I8275_DRAW_CHARACTER_MEMBER( zorba_state::zorba_update_chr )
 {
 	int i;
-	zorba_state *state = device->machine().driver_data<zorba_state>();
-	const rgb_t *palette = state->m_palette->palette()->entry_list_raw();
-	UINT8 gfx = state->m_p_chargen[(linecount & 15) + (charcode << 4)];
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8 gfx = m_p_chargen[(linecount & 15) + (charcode << 4)];
 
 	if (vsp)
 		gfx = 0;
@@ -396,7 +397,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 
 	MCFG_DEVICE_ADD("crtc", I8275x, XTAL_14_31818MHz/7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DISPLAY_CALLBACK(zorba_update_chr)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_FD1793x_ADD("fdc", XTAL_24MHz / 24)

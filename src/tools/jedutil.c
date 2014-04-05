@@ -119,8 +119,6 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ARRAY_LEN(_array) (sizeof(_array) / sizeof(_array[0]))
-
 #define NO_OUTPUT_ENABLE_FUSE_ROW 0xFFFF
 
 /* Output pin flags */
@@ -1873,93 +1871,93 @@ static pin_fuse_columns pal20l2pinfusecolumns[] = {
 
 static pal_data paldata[] = {
 	{"PAL10L8", 320,
-		pal10l8pinfuserows, ARRAY_LEN(pal10l8pinfuserows),
-		pal10l8pinfusecolumns, ARRAY_LEN(pal10l8pinfusecolumns),
+		pal10l8pinfuserows, ARRAY_LENGTH(pal10l8pinfuserows),
+		pal10l8pinfusecolumns, ARRAY_LENGTH(pal10l8pinfusecolumns),
 		print_pal10l8_product_terms,
 		config_pal10l8_pins,
 		NULL,
 		NULL},
 	{"PAL10H8", 320,
-		pal10h8pinfuserows, ARRAY_LEN(pal10h8pinfuserows),
-		pal10h8pinfusecolumns, ARRAY_LEN(pal10h8pinfusecolumns),
+		pal10h8pinfuserows, ARRAY_LENGTH(pal10h8pinfuserows),
+		pal10h8pinfusecolumns, ARRAY_LENGTH(pal10h8pinfusecolumns),
 		print_pal10h8_product_terms,
 		config_pal10h8_pins,
 		NULL,
 		NULL},
 	{"PAL12H6", 384,
-		pal12h6pinfuserows, ARRAY_LEN(pal12h6pinfuserows),
-		pal12h6pinfusecolumns, ARRAY_LEN(pal12h6pinfusecolumns),
+		pal12h6pinfuserows, ARRAY_LENGTH(pal12h6pinfuserows),
+		pal12h6pinfusecolumns, ARRAY_LENGTH(pal12h6pinfusecolumns),
 		print_pal12h6_product_terms,
 		config_pal12h6_pins,
 		NULL,
 		NULL},
 	{"PAL14H4", 448,
-		pal14h4pinfuserows, ARRAY_LEN(pal14h4pinfuserows),
-		pal14h4pinfusecolumns, ARRAY_LEN(pal14h4pinfusecolumns),
+		pal14h4pinfuserows, ARRAY_LENGTH(pal14h4pinfuserows),
+		pal14h4pinfusecolumns, ARRAY_LENGTH(pal14h4pinfusecolumns),
 		print_pal14h4_product_terms,
 		config_pal14h4_pins,
 		NULL,
 		NULL},
 	{"PAL16H2", 512,
-		pal16h2pinfuserows, ARRAY_LEN(pal16h2pinfuserows),
-		pal16h2pinfusecolumns, ARRAY_LEN(pal16h2pinfusecolumns),
+		pal16h2pinfuserows, ARRAY_LENGTH(pal16h2pinfuserows),
+		pal16h2pinfusecolumns, ARRAY_LENGTH(pal16h2pinfusecolumns),
 		print_pal16h2_product_terms,
 		config_pal16h2_pins,
 		NULL,
 		NULL},
 	{"PAL16C1", 512,
-		pal16c1pinfuserows, ARRAY_LEN(pal16c1pinfuserows),
-		pal16c1pinfusecolumns, ARRAY_LEN(pal16c1pinfusecolumns),
+		pal16c1pinfuserows, ARRAY_LENGTH(pal16c1pinfuserows),
+		pal16c1pinfusecolumns, ARRAY_LENGTH(pal16c1pinfusecolumns),
 		print_pal16c1_product_terms,
 		config_pal16c1_pins,
 		NULL,
 		NULL},
 	{"PAL12L6", 384,
-		pal12l6pinfuserows, ARRAY_LEN(pal12l6pinfuserows),
-		pal12l6pinfusecolumns, ARRAY_LEN(pal12l6pinfusecolumns),
+		pal12l6pinfuserows, ARRAY_LENGTH(pal12l6pinfuserows),
+		pal12l6pinfusecolumns, ARRAY_LENGTH(pal12l6pinfusecolumns),
 		print_pal12l6_product_terms,
 		config_pal12l6_pins,
 		NULL,
 		NULL},
 	{"PAL14L4", 448,
-		pal14l4pinfuserows, ARRAY_LEN(pal14l4pinfuserows),
-		pal14l4pinfusecolumns, ARRAY_LEN(pal14l4pinfusecolumns),
+		pal14l4pinfuserows, ARRAY_LENGTH(pal14l4pinfuserows),
+		pal14l4pinfusecolumns, ARRAY_LENGTH(pal14l4pinfusecolumns),
 		print_pal14l4_product_terms,
 		config_pal14l4_pins,
 		NULL,
 		NULL},
 	{"PAL16L2", 512,
-		pal16l2pinfuserows, ARRAY_LEN(pal16l2pinfuserows),
-		pal16l2pinfusecolumns, ARRAY_LEN(pal16l2pinfusecolumns),
+		pal16l2pinfuserows, ARRAY_LENGTH(pal16l2pinfuserows),
+		pal16l2pinfusecolumns, ARRAY_LENGTH(pal16l2pinfusecolumns),
 		print_pal16l2_product_terms,
 		config_pal16l2_pins,
 		NULL,
 		NULL},
 	/*{"15S8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"PAL16L8", 2048,
-		pal16l8pinfuserows, ARRAY_LEN(pal16l8pinfuserows),
-		pal16l8pinfusecolumns, ARRAY_LEN(pal16l8pinfusecolumns),
+		pal16l8pinfuserows, ARRAY_LENGTH(pal16l8pinfuserows),
+		pal16l8pinfusecolumns, ARRAY_LENGTH(pal16l8pinfusecolumns),
 		print_pal16l8_product_terms,
 		config_pal16l8_pins,
 		NULL,
 		NULL},
 	{"PAL16R4", 2048,
-		pal16r4pinfuserows, ARRAY_LEN(pal16r4pinfuserows),
-		pal16r4pinfusecolumns, ARRAY_LEN(pal16r4pinfusecolumns),
+		pal16r4pinfuserows, ARRAY_LENGTH(pal16r4pinfuserows),
+		pal16r4pinfusecolumns, ARRAY_LENGTH(pal16r4pinfusecolumns),
 		print_pal16r4_product_terms,
 		config_pal16r4_pins,
 		NULL,
 		NULL},
 	{"PAL16R6", 2048,
-		pal16r6pinfuserows, ARRAY_LEN(pal16r6pinfuserows),
-		pal16r6pinfusecolumns, ARRAY_LEN(pal16r6pinfusecolumns),
+		pal16r6pinfuserows, ARRAY_LENGTH(pal16r6pinfuserows),
+		pal16r6pinfusecolumns, ARRAY_LENGTH(pal16r6pinfusecolumns),
 		print_pal16r6_product_terms,
 		config_pal16r6_pins,
 		NULL,
 		NULL},
 	{"PAL16R8", 2048,
-		pal16r8pinfuserows, ARRAY_LEN(pal16r8pinfuserows),
-		pal16r8pinfusecolumns, ARRAY_LEN(pal16r8pinfusecolumns),
+		pal16r8pinfuserows, ARRAY_LENGTH(pal16r8pinfuserows),
+		pal16r8pinfusecolumns, ARRAY_LENGTH(pal16r8pinfusecolumns),
 		print_pal16r8_product_terms,
 		config_pal16r8_pins,
 		NULL,
@@ -1967,85 +1965,85 @@ static pal_data paldata[] = {
 	/*{"PAL16RA8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"PAL16V8R", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"PALCE16V8", 2194,
-		palce16v8pinfuserows, ARRAY_LEN(palce16v8pinfuserows),
-		palce16v8pinfusecolumns, ARRAY_LEN(palce16v8pinfusecolumns),
+		palce16v8pinfuserows, ARRAY_LENGTH(palce16v8pinfuserows),
+		palce16v8pinfusecolumns, ARRAY_LENGTH(palce16v8pinfusecolumns),
 		print_palce16v8_product_terms,
 		config_palce16v8_pins,
 		NULL,
 		NULL},
 	{"GAL16V8", 2194,
-		gal16v8pinfuserows, ARRAY_LEN(gal16v8pinfuserows),
-		gal16v8pinfusecolumns, ARRAY_LEN(gal16v8pinfusecolumns),
+		gal16v8pinfuserows, ARRAY_LENGTH(gal16v8pinfuserows),
+		gal16v8pinfusecolumns, ARRAY_LENGTH(gal16v8pinfusecolumns),
 		print_gal16v8_product_terms,
 		config_gal16v8_pins,
 		is_gal16v8_product_term_enabled,
 		NULL},
 	{"18CV8", 2696,
-		peel18cv8pinfuserows, ARRAY_LEN(peel18cv8pinfuserows),
-		peel18cv8pinfusecolumns, ARRAY_LEN(peel18cv8pinfusecolumns),
+		peel18cv8pinfuserows, ARRAY_LENGTH(peel18cv8pinfuserows),
+		peel18cv8pinfusecolumns, ARRAY_LENGTH(peel18cv8pinfusecolumns),
 		print_peel18cv8_product_terms,
 		config_peel18cv8_pins,
 		NULL,
 		get_peel18cv8_pin_fuse_state},
 	{"GAL18V10", 3540,
-		gal18v10pinfuserows, ARRAY_LEN(gal18v10pinfuserows),
-		gal18v10pinfusecolumns, ARRAY_LEN(gal18v10pinfusecolumns),
+		gal18v10pinfuserows, ARRAY_LENGTH(gal18v10pinfuserows),
+		gal18v10pinfusecolumns, ARRAY_LENGTH(gal18v10pinfusecolumns),
 		print_gal18v10_product_terms,
 		config_gal18v10_pins,
 		NULL,
 		NULL},
 	{"PAL20L8", 2560,
-		pal20l8pinfuserows, ARRAY_LEN(pal20l8pinfuserows),
-		pal20l8pinfusecolumns, ARRAY_LEN(pal20l8pinfusecolumns),
+		pal20l8pinfuserows, ARRAY_LENGTH(pal20l8pinfuserows),
+		pal20l8pinfusecolumns, ARRAY_LENGTH(pal20l8pinfusecolumns),
 		print_pal20l8_product_terms,
 		config_pal20l8_pins,
 		NULL,
 		NULL},
 	{"PAL20L10", 1600,
-		pal20l10pinfuserows, ARRAY_LEN(pal20l10pinfuserows),
-		pal20l10pinfusecolumns, ARRAY_LEN(pal20l10pinfusecolumns),
+		pal20l10pinfuserows, ARRAY_LENGTH(pal20l10pinfuserows),
+		pal20l10pinfusecolumns, ARRAY_LENGTH(pal20l10pinfusecolumns),
 		print_pal20l10_product_terms,
 		config_pal20l10_pins,
 		NULL,
 		NULL},
 	{"PAL20R4", 2560,
-		pal20r4pinfuserows, ARRAY_LEN(pal20r4pinfuserows),
-		pal20r4pinfusecolumns, ARRAY_LEN(pal20r4pinfusecolumns),
+		pal20r4pinfuserows, ARRAY_LENGTH(pal20r4pinfuserows),
+		pal20r4pinfusecolumns, ARRAY_LENGTH(pal20r4pinfusecolumns),
 		print_pal20r4_product_terms,
 		config_pal20r4_pins,
 		NULL,
 		NULL},
 	{"PAL20R6", 2560,
-		pal20r6pinfuserows, ARRAY_LEN(pal20r6pinfuserows),
-		pal20r6pinfusecolumns, ARRAY_LEN(pal20r6pinfusecolumns),
+		pal20r6pinfuserows, ARRAY_LENGTH(pal20r6pinfuserows),
+		pal20r6pinfusecolumns, ARRAY_LENGTH(pal20r6pinfusecolumns),
 		print_pal20r6_product_terms,
 		config_pal20r6_pins,
 		NULL,
 		NULL},
 	{"PAL20R8", 2560,
-		pal20r8pinfuserows, ARRAY_LEN(pal20r8pinfuserows),
-		pal20r8pinfusecolumns, ARRAY_LEN(pal20r8pinfusecolumns),
+		pal20r8pinfuserows, ARRAY_LENGTH(pal20r8pinfuserows),
+		pal20r8pinfusecolumns, ARRAY_LENGTH(pal20r8pinfusecolumns),
 		print_pal20r8_product_terms,
 		config_pal20r8_pins,
 		NULL,
 		NULL},
 	{"PAL20X4", 1600,
-		pal20x4pinfuserows, ARRAY_LEN(pal20x4pinfuserows),
-		pal20x4pinfusecolumns, ARRAY_LEN(pal20x4pinfusecolumns),
+		pal20x4pinfuserows, ARRAY_LENGTH(pal20x4pinfuserows),
+		pal20x4pinfusecolumns, ARRAY_LENGTH(pal20x4pinfusecolumns),
 		print_pal20x4_product_terms,
 		config_pal20x4_pins,
 		NULL,
 		NULL},
 	{"PAL20X8", 1600,
-		pal20x8pinfuserows, ARRAY_LEN(pal20x8pinfuserows),
-		pal20x8pinfusecolumns, ARRAY_LEN(pal20x8pinfusecolumns),
+		pal20x8pinfuserows, ARRAY_LENGTH(pal20x8pinfuserows),
+		pal20x8pinfusecolumns, ARRAY_LENGTH(pal20x8pinfusecolumns),
 		print_pal20x8_product_terms,
 		config_pal20x8_pins,
 		NULL,
 		NULL},
 	{"PAL20X10", 1600,
-		pal20x10pinfuserows, ARRAY_LEN(pal20x10pinfuserows),
-		pal20x10pinfusecolumns, ARRAY_LEN(pal20x10pinfusecolumns),
+		pal20x10pinfuserows, ARRAY_LENGTH(pal20x10pinfuserows),
+		pal20x10pinfusecolumns, ARRAY_LENGTH(pal20x10pinfusecolumns),
 		print_pal20x10_product_terms,
 		config_pal20x10_pins,
 		NULL,
@@ -2055,220 +2053,220 @@ static pal_data paldata[] = {
 	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
 	{"PLS100", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
 	{"82S153", 1842,
-		_82s153_pls153pinfuserows, ARRAY_LEN(_82s153_pls153pinfuserows),
-		_82s153_pls153pinfusecolumns, ARRAY_LEN(_82s153_pls153pinfusecolumns),
+		_82s153_pls153pinfuserows, ARRAY_LENGTH(_82s153_pls153pinfuserows),
+		_82s153_pls153pinfusecolumns, ARRAY_LENGTH(_82s153_pls153pinfusecolumns),
 		print_82s153_pls153_product_terms,
 		config_82s153_pls153_pins,
 		NULL,
 		NULL},
 	{"PLS153", 1842,
-		_82s153_pls153pinfuserows, ARRAY_LEN(_82s153_pls153pinfuserows),
-		_82s153_pls153pinfusecolumns, ARRAY_LEN(_82s153_pls153pinfusecolumns),
+		_82s153_pls153pinfuserows, ARRAY_LENGTH(_82s153_pls153pinfuserows),
+		_82s153_pls153pinfusecolumns, ARRAY_LENGTH(_82s153_pls153pinfusecolumns),
 		print_82s153_pls153_product_terms,
 		config_82s153_pls153_pins,
 		NULL,
 		NULL},
 	{"CK2605", 1106,
-		ck2605pinfuserows, ARRAY_LEN(ck2605pinfuserows),
-		ck2605pinfusecolumns, ARRAY_LEN(ck2605pinfusecolumns),
+		ck2605pinfuserows, ARRAY_LENGTH(ck2605pinfuserows),
+		ck2605pinfusecolumns, ARRAY_LENGTH(ck2605pinfusecolumns),
 		print_ck2605_product_terms,
 		config_ck2605_pins,
 		NULL,
 		NULL},
 #if defined(ricoh_pals)
 	{"EPL10P8", 664,
-		epl10p8pinfuserows, ARRAY_LEN(epl10p8pinfuserows),
-		epl10p8pinfusecolumns, ARRAY_LEN(epl10p8pinfusecolumns),
+		epl10p8pinfuserows, ARRAY_LENGTH(epl10p8pinfuserows),
+		epl10p8pinfusecolumns, ARRAY_LENGTH(epl10p8pinfusecolumns),
 		print_epl10p8_product_terms,
 		config_epl10p8_pins,
 		NULL,
 		NULL},
 	{"EPL12P6", 786,
-		epl12p6pinfuserows, ARRAY_LEN(epl12p6pinfuserows),
-		epl12p6pinfusecolumns, ARRAY_LEN(epl12p6pinfusecolumns),
+		epl12p6pinfuserows, ARRAY_LENGTH(epl12p6pinfuserows),
+		epl12p6pinfusecolumns, ARRAY_LENGTH(epl12p6pinfusecolumns),
 		print_epl12p6_product_terms,
 		config_epl12p6_pins,
 		NULL,
 		NULL},
 	{"EPL14P4", 908,
-		epl14p4pinfuserows, ARRAY_LEN(epl14p4pinfuserows),
-		epl14p4pinfusecolumns, ARRAY_LEN(epl14p4pinfusecolumns),
+		epl14p4pinfuserows, ARRAY_LENGTH(epl14p4pinfuserows),
+		epl14p4pinfusecolumns, ARRAY_LENGTH(epl14p4pinfusecolumns),
 		print_epl14p4_product_terms,
 		config_epl14p4_pins,
 		NULL,
 		NULL},
 	{"EPL16P2", 1030,
-		epl16p2pinfuserows, ARRAY_LEN(epl16p2pinfuserows),
-		epl16p2pinfusecolumns, ARRAY_LEN(epl16p2pinfusecolumns),
+		epl16p2pinfuserows, ARRAY_LENGTH(epl16p2pinfuserows),
+		epl16p2pinfusecolumns, ARRAY_LENGTH(epl16p2pinfusecolumns),
 		print_epl16p2_product_terms,
 		config_epl16p2_pins,
 		NULL,
 		NULL},
 	{"EPL16P8", 2072,
-		epl16p8pinfuserows, ARRAY_LEN(epl16p8pinfuserows),
-		epl16p8pinfusecolumns, ARRAY_LEN(epl16p8pinfusecolumns),
+		epl16p8pinfuserows, ARRAY_LENGTH(epl16p8pinfuserows),
+		epl16p8pinfusecolumns, ARRAY_LENGTH(epl16p8pinfusecolumns),
 		print_epl16p8_product_terms,
 		config_epl16p8_pins,
 		NULL,
 		NULL},
 	{"EPL16RP8", 2072,
-		epl16rp8pinfuserows, ARRAY_LEN(epl16rp8pinfuserows),
-		epl16rp8pinfusecolumns, ARRAY_LEN(epl16rp8pinfusecolumns),
+		epl16rp8pinfuserows, ARRAY_LENGTH(epl16rp8pinfuserows),
+		epl16rp8pinfusecolumns, ARRAY_LENGTH(epl16rp8pinfusecolumns),
 		print_epl16rp8_product_terms,
 		config_epl16rp8_pins,
 		NULL,
 		NULL},
 	{"EPL16RP6", 2072,
-		epl16rp6pinfuserows, ARRAY_LEN(epl16rp6pinfuserows),
-		epl16rp6pinfusecolumns, ARRAY_LEN(epl16rp6pinfusecolumns),
+		epl16rp6pinfuserows, ARRAY_LENGTH(epl16rp6pinfuserows),
+		epl16rp6pinfusecolumns, ARRAY_LENGTH(epl16rp6pinfusecolumns),
 		print_epl16rp6_product_terms,
 		config_epl16rp6_pins,
 		NULL,
 		NULL},
 	{"EPL16RP4", 2072,
-		epl16rp4pinfuserows, ARRAY_LEN(epl16rp4pinfuserows),
-		epl16rp4pinfusecolumns, ARRAY_LEN(epl16rp4pinfusecolumns),
+		epl16rp4pinfuserows, ARRAY_LENGTH(epl16rp4pinfuserows),
+		epl16rp4pinfusecolumns, ARRAY_LENGTH(epl16rp4pinfusecolumns),
 		print_epl16rp4_product_terms,
 		config_epl16rp4_pins,
 		NULL,
 		NULL},
 #endif
 	{"PAL10P8", 328,
-		pal10p8pinfuserows, ARRAY_LEN(pal10p8pinfuserows),
-		pal10p8pinfusecolumns, ARRAY_LEN(pal10p8pinfusecolumns),
+		pal10p8pinfuserows, ARRAY_LENGTH(pal10p8pinfuserows),
+		pal10p8pinfusecolumns, ARRAY_LENGTH(pal10p8pinfusecolumns),
 		print_pal10p8_product_terms,
 		config_pal10p8_pins,
 		NULL,
 		NULL},
 	{"PAL12P6", 390,
-		pal12p6pinfuserows, ARRAY_LEN(pal12p6pinfuserows),
-		pal12p6pinfusecolumns, ARRAY_LEN(pal12p6pinfusecolumns),
+		pal12p6pinfuserows, ARRAY_LENGTH(pal12p6pinfuserows),
+		pal12p6pinfusecolumns, ARRAY_LENGTH(pal12p6pinfusecolumns),
 		print_pal12p6_product_terms,
 		config_pal12p6_pins,
 		NULL,
 		NULL},
 	{"PAL14P4", 452,
-		pal14p4pinfuserows, ARRAY_LEN(pal14p4pinfuserows),
-		pal14p4pinfusecolumns, ARRAY_LEN(pal14p4pinfusecolumns),
+		pal14p4pinfuserows, ARRAY_LENGTH(pal14p4pinfuserows),
+		pal14p4pinfusecolumns, ARRAY_LENGTH(pal14p4pinfusecolumns),
 		print_pal14p4_product_terms,
 		config_pal14p4_pins,
 		NULL,
 		NULL},
 	{"PAL16P2", 514,
-		pal16p2pinfuserows, ARRAY_LEN(pal16p2pinfuserows),
-		pal16p2pinfusecolumns, ARRAY_LEN(pal16p2pinfusecolumns),
+		pal16p2pinfuserows, ARRAY_LENGTH(pal16p2pinfuserows),
+		pal16p2pinfusecolumns, ARRAY_LENGTH(pal16p2pinfusecolumns),
 		print_pal16p2_product_terms,
 		config_pal16p2_pins,
 		NULL,
 		NULL},
 	{"PAL16P8", 2056,
-		pal16p8pinfuserows, ARRAY_LEN(pal16p8pinfuserows),
-		pal16p8pinfusecolumns, ARRAY_LEN(pal16p8pinfusecolumns),
+		pal16p8pinfuserows, ARRAY_LENGTH(pal16p8pinfuserows),
+		pal16p8pinfusecolumns, ARRAY_LENGTH(pal16p8pinfusecolumns),
 		print_pal16p8_product_terms,
 		config_pal16p8_pins,
 		NULL,
 		NULL},
 	{"PAL16RP4", 2056,
-		pal16rp4pinfuserows, ARRAY_LEN(pal16rp4pinfuserows),
-		pal16rp4pinfusecolumns, ARRAY_LEN(pal16rp4pinfusecolumns),
+		pal16rp4pinfuserows, ARRAY_LENGTH(pal16rp4pinfuserows),
+		pal16rp4pinfusecolumns, ARRAY_LENGTH(pal16rp4pinfusecolumns),
 		print_pal16rp4_product_terms,
 		config_pal16rp4_pins,
 		NULL,
 		NULL},
 	{"PAL16RP6", 2056,
-		pal16rp6pinfuserows, ARRAY_LEN(pal16rp6pinfuserows),
-		pal16rp6pinfusecolumns, ARRAY_LEN(pal16rp6pinfusecolumns),
+		pal16rp6pinfuserows, ARRAY_LENGTH(pal16rp6pinfuserows),
+		pal16rp6pinfusecolumns, ARRAY_LENGTH(pal16rp6pinfusecolumns),
 		print_pal16rp6_product_terms,
 		config_pal16rp6_pins,
 		NULL,
 		NULL},
 	{"PAL16RP8", 2056,
-		pal16rp8pinfuserows, ARRAY_LEN(pal16rp8pinfuserows),
-		pal16rp8pinfusecolumns, ARRAY_LEN(pal16rp8pinfusecolumns),
+		pal16rp8pinfuserows, ARRAY_LENGTH(pal16rp8pinfuserows),
+		pal16rp8pinfusecolumns, ARRAY_LENGTH(pal16rp8pinfusecolumns),
 		print_pal16rp8_product_terms,
 		config_pal16rp8_pins,
 		NULL,
 		NULL},
 	{"PAL6L16", 192,
-		pal6l16pinfuserows, ARRAY_LEN(pal6l16pinfuserows),
-		pal6l16pinfusecolumns, ARRAY_LEN(pal6l16pinfusecolumns),
+		pal6l16pinfuserows, ARRAY_LENGTH(pal6l16pinfuserows),
+		pal6l16pinfusecolumns, ARRAY_LENGTH(pal6l16pinfusecolumns),
 		print_pal6l16_product_terms,
 		config_pal6l16_pins,
 		NULL,
 		NULL},
 	{"PAL8L14", 224,
-		pal8l14pinfuserows, ARRAY_LEN(pal8l14pinfuserows),
-		pal8l14pinfusecolumns, ARRAY_LEN(pal8l14pinfusecolumns),
+		pal8l14pinfuserows, ARRAY_LENGTH(pal8l14pinfuserows),
+		pal8l14pinfusecolumns, ARRAY_LENGTH(pal8l14pinfusecolumns),
 		print_pal8l14_product_terms,
 		config_pal8l14_pins,
 		NULL,
 		NULL},
 	{"PAL12H10", 480,
-		pal12h10pinfuserows, ARRAY_LEN(pal12h10pinfuserows),
-		pal12h10pinfusecolumns, ARRAY_LEN(pal12h10pinfusecolumns),
+		pal12h10pinfuserows, ARRAY_LENGTH(pal12h10pinfuserows),
+		pal12h10pinfusecolumns, ARRAY_LENGTH(pal12h10pinfusecolumns),
 		print_pal12h10_product_terms,
 		config_pal12h10_pins,
 		NULL,
 		NULL},
 	{"PAL12L10", 480,
-		pal12l10pinfuserows, ARRAY_LEN(pal12l10pinfuserows),
-		pal12l10pinfusecolumns, ARRAY_LEN(pal12l10pinfusecolumns),
+		pal12l10pinfuserows, ARRAY_LENGTH(pal12l10pinfuserows),
+		pal12l10pinfusecolumns, ARRAY_LENGTH(pal12l10pinfusecolumns),
 		print_pal12l10_product_terms,
 		config_pal12l10_pins,
 		NULL,
 		NULL},
 	{"PAL14H8", 560,
-		pal14h8pinfuserows, ARRAY_LEN(pal14h8pinfuserows),
-		pal14h8pinfusecolumns, ARRAY_LEN(pal14h8pinfusecolumns),
+		pal14h8pinfuserows, ARRAY_LENGTH(pal14h8pinfuserows),
+		pal14h8pinfusecolumns, ARRAY_LENGTH(pal14h8pinfusecolumns),
 		print_pal14h8_product_terms,
 		config_pal14h8_pins,
 		NULL,
 		NULL},
 	{"PAL14L8", 560,
-		pal14l8pinfuserows, ARRAY_LEN(pal14l8pinfuserows),
-		pal14l8pinfusecolumns, ARRAY_LEN(pal14l8pinfusecolumns),
+		pal14l8pinfuserows, ARRAY_LENGTH(pal14l8pinfuserows),
+		pal14l8pinfusecolumns, ARRAY_LENGTH(pal14l8pinfusecolumns),
 		print_pal14l8_product_terms,
 		config_pal14l8_pins,
 		NULL,
 		NULL},
 	{"PAL16H6", 640,
-		pal16h6pinfuserows, ARRAY_LEN(pal16h6pinfuserows),
-		pal16h6pinfusecolumns, ARRAY_LEN(pal16h6pinfusecolumns),
+		pal16h6pinfuserows, ARRAY_LENGTH(pal16h6pinfuserows),
+		pal16h6pinfusecolumns, ARRAY_LENGTH(pal16h6pinfusecolumns),
 		print_pal16h6_product_terms,
 		config_pal16h6_pins,
 		NULL,
 		NULL},
 	{"PAL16L6", 640,
-		pal16l6pinfuserows, ARRAY_LEN(pal16l6pinfuserows),
-		pal16l6pinfusecolumns, ARRAY_LEN(pal16l6pinfusecolumns),
+		pal16l6pinfuserows, ARRAY_LENGTH(pal16l6pinfuserows),
+		pal16l6pinfusecolumns, ARRAY_LENGTH(pal16l6pinfusecolumns),
 		print_pal16l6_product_terms,
 		config_pal16l6_pins,
 		NULL,
 		NULL},
 	{"PAL18H4", 720,
-		pal18h4pinfuserows, ARRAY_LEN(pal18h4pinfuserows),
-		pal18h4pinfusecolumns, ARRAY_LEN(pal18h4pinfusecolumns),
+		pal18h4pinfuserows, ARRAY_LENGTH(pal18h4pinfuserows),
+		pal18h4pinfusecolumns, ARRAY_LENGTH(pal18h4pinfusecolumns),
 		print_pal18h4_product_terms,
 		config_pal18h4_pins,
 		NULL,
 		NULL},
 	{"PAL18L4", 720,
-		pal18l4pinfuserows, ARRAY_LEN(pal18l4pinfuserows),
-		pal18l4pinfusecolumns, ARRAY_LEN(pal18l4pinfusecolumns),
+		pal18l4pinfuserows, ARRAY_LENGTH(pal18l4pinfuserows),
+		pal18l4pinfusecolumns, ARRAY_LENGTH(pal18l4pinfusecolumns),
 		print_pal18l4_product_terms,
 		config_pal18l4_pins,
 		NULL,
 		NULL},
 	{"PAL20C1", 640,
-		pal20c1pinfuserows, ARRAY_LEN(pal20c1pinfuserows),
-		pal20c1pinfusecolumns, ARRAY_LEN(pal20c1pinfusecolumns),
+		pal20c1pinfuserows, ARRAY_LENGTH(pal20c1pinfuserows),
+		pal20c1pinfusecolumns, ARRAY_LENGTH(pal20c1pinfusecolumns),
 		print_pal20c1_product_terms,
 		config_pal20c1_pins,
 		NULL,
 		NULL},
 	{"PAL20L2", 640,
-		pal20l2pinfuserows, ARRAY_LEN(pal20l2pinfuserows),
-		pal20l2pinfusecolumns, ARRAY_LEN(pal20l2pinfusecolumns),
+		pal20l2pinfuserows, ARRAY_LENGTH(pal20l2pinfuserows),
+		pal20l2pinfusecolumns, ARRAY_LENGTH(pal20l2pinfusecolumns),
 		print_pal20l2_product_terms,
 		config_pal20l2_pins,
 		NULL,
@@ -2327,7 +2325,7 @@ static const pal_data* find_pal_data(const char *name)
 {
 	int index;
 
-	for (index = 0; index < ARRAY_LEN(paldata); ++index)
+	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
 	{
 		if (!core_stricmp(name, paldata[index].name))
 		{
@@ -2987,7 +2985,7 @@ static void config_palce16v8_pin_as_7_product_terms_and_oe_term(UINT16 pin)
 		{19, 0, 32, 224}};
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(pinfuserows); ++index)
+	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
 	{
 		if (pinfuserows[index].pin == pin)
 		{
@@ -3021,7 +3019,7 @@ static void config_palce16v8_pin_as_8_product_terms(UINT16 pin)
 		{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(pinfuserows); ++index)
+	for (index = 0; index < ARRAY_LENGTH(pinfuserows); ++index)
 	{
 		if (pinfuserows[index].pin == pin)
 		{
@@ -3787,7 +3785,7 @@ static void print_epl10p8_product_terms(const pal_data* pal, const jed_data* jed
 
 	printf("Equations:\n\n");
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		flags = outputpins[index].flags;
 
@@ -4246,8 +4244,8 @@ static void config_pal10l8_pins(const pal_data* pal, const jed_data* jed)
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4270,8 +4268,8 @@ static void config_pal10h8_pins(const pal_data* pal, const jed_data* jed)
 		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4292,8 +4290,8 @@ static void config_pal12l6_pins(const pal_data* pal, const jed_data* jed)
 		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4314,8 +4312,8 @@ static void config_pal12h6_pins(const pal_data* pal, const jed_data* jed)
 		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4334,8 +4332,8 @@ static void config_pal14l4_pins(const pal_data* pal, const jed_data* jed)
 		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4354,8 +4352,8 @@ static void config_pal14h4_pins(const pal_data* pal, const jed_data* jed)
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4372,8 +4370,8 @@ static void config_pal16l2_pins(const pal_data* pal, const jed_data* jed)
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4390,8 +4388,8 @@ static void config_pal16h2_pins(const pal_data* pal, const jed_data* jed)
 		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4408,8 +4406,8 @@ static void config_pal16c1_pins(const pal_data* pal, const jed_data* jed)
 		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4438,7 +4436,7 @@ static void config_pal16l8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -4474,7 +4472,7 @@ static void config_pal16r4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -4498,7 +4496,7 @@ static void config_pal16r4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -4526,7 +4524,7 @@ static void config_pal16r6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -4542,7 +4540,7 @@ static void config_pal16r6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -4566,8 +4564,8 @@ static void config_pal16r8_pins(const pal_data* pal, const jed_data* jed)
 		{18, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{19, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -4654,7 +4652,7 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 	static UINT16 sg0 = 2192;
 	static UINT16 sg1 = 2193;
 	UINT16 input_pins[18];
-	pin_output_config output_pins[ARRAY_LEN(macrocells)];
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
 	UINT16 index, input_pin_count, output_pin_count;
 
 	input_pin_count = 0;
@@ -4670,9 +4668,9 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 
 			memcpy(input_pins, input_pins_regs, sizeof(input_pins_regs));
 
-			input_pin_count = ARRAY_LEN(input_pins_regs);
+			input_pin_count = ARRAY_LENGTH(input_pins_regs);
 
-			for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 			{
 				if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
 				{
@@ -4744,9 +4742,9 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 
 			memcpy(input_pins, input_pins_io, sizeof(input_pins_io));
 
-			input_pin_count = ARRAY_LEN(input_pins_io);
+			input_pin_count = ARRAY_LENGTH(input_pins_io);
 
-			for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 			{
 				if (does_output_enable_fuse_row_allow_output(pal, jed, macrocells[index].fuserowoutputenable))
 				{
@@ -4785,9 +4783,9 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 
 			memcpy(input_pins, input_pins_i_or_o, sizeof(input_pins_i_or_o));
 
-			input_pin_count = ARRAY_LEN(input_pins_i_or_o);
+			input_pin_count = ARRAY_LENGTH(input_pins_i_or_o);
 
-			for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 			{
 				if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
 				{
@@ -4934,7 +4932,7 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 	static UINT16 input_pins_registered[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
 	static UINT16 input_pins_combinatorialcomplex[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
 	static UINT16 input_pins_combinatorialsimple[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
-	pin_output_config output_pins[ARRAY_LEN(macrocells)];
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
 	UINT16 index, output_pin_count;
 
 	output_pin_count = 0;
@@ -4950,12 +4948,12 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 		{
 			/* Complex Mode */
 
-			set_input_pins(input_pins_combinatorialcomplex, ARRAY_LEN(input_pins_combinatorialcomplex));
+			set_input_pins(input_pins_combinatorialcomplex, ARRAY_LENGTH(input_pins_combinatorialcomplex));
 
 			memcpy(gal16v8pinfuserows, pinfuserows_combinatorial, sizeof(pinfuserows_combinatorial));
 			memcpy(gal16v8pinfusecolumns, pinfusecolumns_combinatorialcomplex, sizeof(pinfusecolumns_combinatorialcomplex));
 
-			for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 			{
 				if (is_gal16v8_product_term_enabled(pal, jed, pal->pinfuserows[index].fuserowoutputenable) &&
 					does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
@@ -4990,12 +4988,12 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 		{
 			/* Simple Mode */
 
-			set_input_pins(input_pins_combinatorialsimple, ARRAY_LEN(input_pins_combinatorialsimple));
+			set_input_pins(input_pins_combinatorialsimple, ARRAY_LENGTH(input_pins_combinatorialsimple));
 
 			memcpy(gal16v8pinfuserows, pinfuserows_registered, sizeof(pinfuserows_registered));
 			memcpy(gal16v8pinfusecolumns, pinfusecolumns_combinatorialsimple, sizeof(pinfusecolumns_combinatorialsimple));
 
-			for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+			for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 			{
 				if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
 				{
@@ -5040,11 +5038,11 @@ static void config_gal16v8_pins(const pal_data* pal, const jed_data* jed)
 	{
 		/* Registered */
 
-		set_input_pins(input_pins_registered, ARRAY_LEN(input_pins_registered));
+		set_input_pins(input_pins_registered, ARRAY_LENGTH(input_pins_registered));
 
 		memcpy(gal16v8pinfusecolumns, pinfusecolumns_registered, sizeof(pinfusecolumns_registered));
 
-		for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+		for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 		{
 			if (jed_get_fuse(jed, macrocells[index].ac1_fuse))
 			{
@@ -5129,14 +5127,14 @@ static void config_peel18cv8_pins(const pal_data* pal, const jed_data* jed)
 		{18, 2668, 2669, 2670, 2671},
 		{19, 2664, 2665, 2666, 2667}};
 	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-	pin_output_config output_pins[ARRAY_LEN(macrocells)];
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
 	UINT16 index, output_pin_count;
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 
 	output_pin_count = 0;
 
-	for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(macrocells); ++index)
 	{
 		if (jed_get_fuse(jed, macrocells[index].feedback1_fuse) &&
 			!jed_get_fuse(jed, macrocells[index].feedback2_fuse))
@@ -5267,12 +5265,12 @@ static void config_gal18v10_pins(const pal_data* pal, const jed_data* jed)
 		{18, 3458, 3459},
 		{19, 3456, 3457}};
 	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-	pin_output_config output_pins[ARRAY_LEN(macrocells)];
+	pin_output_config output_pins[ARRAY_LENGTH(macrocells)];
 	UINT16 index, output_pin_count;
 
 	output_pin_count = 0;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		if (jed_get_fuse(jed, macrocells[index].s1_fuse))
 		{
@@ -5315,7 +5313,7 @@ static void config_gal18v10_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5355,7 +5353,7 @@ static void config_pal20l8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5395,7 +5393,7 @@ static void config_pal20l10_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5431,7 +5429,7 @@ static void config_pal20r4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -5455,7 +5453,7 @@ static void config_pal20r4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5483,7 +5481,7 @@ static void config_pal20r6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -5499,7 +5497,7 @@ static void config_pal20r6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5523,8 +5521,8 @@ static void config_pal20r8_pins(const pal_data* pal, const jed_data* jed)
 		{21, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{22, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5549,8 +5547,8 @@ static void config_pal20x4_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 /*-------------------------------------------------
@@ -5573,8 +5571,8 @@ static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5599,8 +5597,8 @@ static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5638,7 +5636,7 @@ static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5677,7 +5675,7 @@ static void config_ck2605_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -5711,7 +5709,7 @@ static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -5726,8 +5724,8 @@ static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5759,7 +5757,7 @@ static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -5774,8 +5772,8 @@ static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5805,7 +5803,7 @@ static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -5820,8 +5818,8 @@ static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5849,7 +5847,7 @@ static void config_epl16p2_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -5864,8 +5862,8 @@ static void config_epl16p2_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5899,7 +5897,7 @@ static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -5914,8 +5912,8 @@ static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5949,7 +5947,7 @@ static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 		output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -5964,8 +5962,8 @@ static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -5999,7 +5997,7 @@ static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 
@@ -6024,8 +6022,8 @@ static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6059,7 +6057,7 @@ static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+	for (index = 0; index < ARRAY_LENGTH(memory_cells); ++index)
 	{
 		output_pins[index].pin = memory_cells[index].pin;
 
@@ -6083,8 +6081,8 @@ static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 #endif
 
@@ -6101,7 +6099,7 @@ static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[8];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		output_pins[index].pin = index + 12;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -6116,8 +6114,8 @@ static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6133,7 +6131,7 @@ static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[6];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		output_pins[index].pin = index + 13;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -6148,8 +6146,8 @@ static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6165,7 +6163,7 @@ static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[4];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		output_pins[index].pin = index + 14;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -6180,8 +6178,8 @@ static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6197,7 +6195,7 @@ static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed)
 	pin_output_config output_pins[2];
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		output_pins[index].pin = index + 15;
 		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
@@ -6212,8 +6210,8 @@ static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6251,7 +6249,7 @@ static void config_pal16p8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -6305,7 +6303,7 @@ static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -6356,7 +6354,7 @@ static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -6393,7 +6391,7 @@ static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(registered_pins); ++index)
 	{
 		output_pins[output_pin_count].pin = registered_pins[index];
 		output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
@@ -6427,7 +6425,7 @@ static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed)
 		++output_pin_count;
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
 	set_output_pins(output_pins, output_pin_count);
 }
 
@@ -6452,7 +6450,7 @@ static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
 		{19, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
 	UINT16 index;
 
-	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	for (index = 0; index < ARRAY_LENGTH(output_pins); ++index)
 	{
 		if (!jed_get_fuse(jed, 2055 - index))
 		{
@@ -6464,8 +6462,8 @@ static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
 		}
 	}
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6496,8 +6494,8 @@ static void config_pal6l16_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6526,8 +6524,8 @@ static void config_pal8l14_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6552,8 +6550,8 @@ static void config_pal12h10_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{23, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6578,8 +6576,8 @@ static void config_pal12l10_pins(const pal_data* pal, const jed_data* jed)
 		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6602,8 +6600,8 @@ static void config_pal14h8_pins(const pal_data* pal, const jed_data* jed)
 		{21, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{22, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6626,8 +6624,8 @@ static void config_pal14l8_pins(const pal_data* pal, const jed_data* jed)
 		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6648,8 +6646,8 @@ static void config_pal16h6_pins(const pal_data* pal, const jed_data* jed)
 		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{21, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6670,8 +6668,8 @@ static void config_pal16l6_pins(const pal_data* pal, const jed_data* jed)
 		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6690,8 +6688,8 @@ static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed)
 		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6710,8 +6708,8 @@ static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed)
 		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6728,8 +6726,8 @@ static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed)
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -6746,8 +6744,8 @@ static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed)
 		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
 		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
 
-	set_input_pins(input_pins, ARRAY_LEN(input_pins));
-	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+	set_input_pins(input_pins, ARRAY_LENGTH(input_pins));
+	set_output_pins(output_pins, ARRAY_LENGTH(output_pins));
 }
 
 
@@ -7213,7 +7211,7 @@ static int command_viewlist(int argc, char *argv[])
 		return print_usage();
 	}
 
-	for (index = 0; index < ARRAY_LEN(paldata); ++index)
+	for (index = 0; index < ARRAY_LENGTH(paldata); ++index)
 	{
 		printf("%s\n", paldata[index].name);
 	}
@@ -7239,7 +7237,7 @@ int main(int argc, char *argv[])
 		return print_usage();
 	}
 
-	for (index = 0; index < ARRAY_LEN(command_entries); ++index)
+	for (index = 0; index < ARRAY_LENGTH(command_entries); ++index)
 	{
 		if (!strcmp(argv[1], command_entries[index].command))
 			return command_entries[index].command_func(argc - 2, &argv[2]);

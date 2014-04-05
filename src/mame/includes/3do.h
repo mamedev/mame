@@ -7,6 +7,9 @@
 #ifndef _3DO_H_
 #define _3DO_H_
 
+#include "machine/nvram.h"
+
+
 struct SLOW2 {
 	/* 03180000 - 0318003f - configuration group */
 	/* 03180040 - 0318007f - diagnostic UART */
@@ -139,18 +142,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dram(*this, "dram"),
 		m_vram(*this, "vram"),
+		m_nvram(*this, "nvram"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_dram;
 	required_shared_ptr<UINT32> m_vram;
+	required_device<nvram_device> m_nvram;
 	SLOW2 m_slow2;
 	MADAM m_madam;
 	CLIO m_clio;
 	SVF m_svf;
 	DSPP m_dspp;
-	UINT8 m_nvram[0x8000];
+	UINT8 m_nvmem[0x8000];
 
 //  UINT8 m_video_bits[512];
 	DECLARE_READ8_MEMBER(_3do_nvarea_r);

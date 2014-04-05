@@ -2415,6 +2415,8 @@ $(DRIVERS)/corona.o:    $(LAYOUT)/re800.lh \
 
 $(DRIVERS)/darius.o:    $(LAYOUT)/darius.lh
 
+$(DRIVERS)/dblcrown.o:  $(LAYOUT)/dblcrown.lh
+
 $(DRIVERS)/de_2.o:      $(LAYOUT)/de2.lh \
 			$(LAYOUT)/de2a3.lh
 

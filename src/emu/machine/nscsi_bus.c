@@ -447,7 +447,7 @@ bool nscsi_full_device::command_done()
 
 nscsi_full_device::control *nscsi_full_device::buf_control_push()
 {
-	if(buf_control_wpos == int(sizeof(buf_control)/sizeof(buf_control[0])))
+	if(buf_control_wpos == int(ARRAY_LENGTH(buf_control)))
 		throw emu_fatalerror("%s: buf_control overflow\n", tag());
 
 	control *c = buf_control + buf_control_wpos;

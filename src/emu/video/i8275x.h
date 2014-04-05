@@ -45,11 +45,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define I8275_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
+
+
 #define MCFG_I8275_CHARACTER_WIDTH(_value) \
 	i8275x_device::static_set_character_width(*device, _value);
 
-#define MCFG_I8275_DISPLAY_CALLBACK(_func) \
-	i8275x_device::static_set_display_callback(*device, _func);
+#define MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
+	i8275x_device::static_set_display_callback(*device, i8275_draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_I8275_DRQ_CALLBACK(_write) \
 	devcb = &i8275x_device::set_drq_wr_callback(*device, DEVCB2_##_write);
@@ -70,13 +73,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class i8275x_device;
-
-
-// ======================> i8275_display_pixels_func
-
-typedef void (*i8275_display_pixels_func)(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt);
-#define I8275_DISPLAY_PIXELS(name)  void name(i8275x_device *device, bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)
+typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, UINT8 linecount, UINT8 charcode, UINT8 lineattr, UINT8 lten, UINT8 rvv, UINT8 vsp, UINT8 gpa, UINT8 hlgt)> i8275_draw_character_delegate;
 
 
 // ======================> i8275x_device
@@ -89,7 +86,7 @@ public:
 	i8275x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_character_width(device_t &device, int value) { downcast<i8275x_device &>(device).m_hpixels_per_column = value; }
-	static void static_set_display_callback(device_t &device, i8275_display_pixels_func func) { downcast<i8275x_device &>(device).m_display_cb = func; }
+	static void static_set_display_callback(device_t &device, i8275_draw_character_delegate callback) { downcast<i8275x_device &>(device).m_display_cb = callback; }
 
 	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<i8275x_device &>(device).m_write_drq.set_callback(object); }
 	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8275x_device &>(device).m_write_irq.set_callback(object); }
@@ -178,7 +175,7 @@ protected:
 	devcb2_write_line   m_write_hrtc;
 	devcb2_write_line   m_write_vrtc;
 
-	i8275_display_pixels_func m_display_cb;
+	i8275_draw_character_delegate m_display_cb;
 	int m_hpixels_per_column;
 
 	bitmap_rgb32 m_bitmap;

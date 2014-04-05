@@ -94,7 +94,7 @@ static const char *const PIC16C62xFormats[] = {
 	NULL
 };
 
-#define MAX_OPS (((sizeof(PIC16C62xFormats) / sizeof(PIC16C62xFormats[0])) - 1) / PTRS_PER_FORMAT)
+#define MAX_OPS ((ARRAY_LENGTH(PIC16C62xFormats) - 1) / PTRS_PER_FORMAT)
 
 struct PIC16C62xOpcode  {
 	word mask;          /* instruction mask */

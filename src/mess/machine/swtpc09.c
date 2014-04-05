@@ -41,7 +41,7 @@ WRITE8_MEMBER( swtpc09_state::ptm_o1_callback )
 
 	m_pia_counter++;
 	//pia_counter = pia_counter && 0xff;
-    if (m_pia_counter && 0x80) pia->ca1_w(1);
+    if (m_pia_counter & 0x80) pia->ca1_w(1);
 }
 
 WRITE8_MEMBER( swtpc09_state::ptm_o3_callback )
@@ -720,7 +720,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 
 			/* a read here clears the DMA end flag */
 			m_m6844_channel[offset - 0x10].control &= ~0x80;
-            if (m_m6844_interrupt && 0x80) // if interrupt is active, then clear
+            if (m_m6844_interrupt & 0x80) // if interrupt is active, then clear
             {
                 swtpc09_irq_handler(0x01, CLEAR_LINE);
 			    m_m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7

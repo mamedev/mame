@@ -11,6 +11,7 @@
 #include "machine/i8251.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
+#include "machine/nvram.h"
 #include "sound/beep.h"
 
 #define NC_NUM_COLOURS 4
@@ -41,7 +42,8 @@ public:
 		m_beeper2(*this, "beep.2"),
 		m_centronics(*this, "centronics"),
 		m_uart(*this, "uart"),
-		m_uart_clock(*this, "uart_clock")
+		m_uart_clock(*this, "uart_clock"),
+		m_nvram(*this, "nvram")
 	{
 	}
 
@@ -115,6 +117,7 @@ public: // HACK FOR MC6845
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
 	required_device<clock_device> m_uart_clock;
+	required_device<nvram_device> m_nvram;
 
 	char m_memory_config[4];
 	emu_timer *m_keyboard_timer;

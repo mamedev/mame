@@ -272,7 +272,7 @@ void famibox_state::famicombox_bankswitch(UINT8 bank)
 	};
 
 
-	for (int i = 0; i < sizeof(famicombox_banks)/sizeof(famicombox_banks[0]); i++ )
+	for (int i = 0; i < ARRAY_LENGTH(famicombox_banks); i++ )
 	{
 		if ( bank == famicombox_banks[i].bank ||
 				famicombox_banks[i].bank == 0 )

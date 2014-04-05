@@ -201,6 +201,12 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
+ROM_START( pecom32 )
+	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "090786.bin", 0x8000, 0x4000, CRC(b3b1ea23) SHA1(de69f22568161ced801973345fa39d6d207b9e8c) )
+ROM_END
+
+
 ROM_START( pecom64 )
 	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver4", "version 4")
@@ -214,4 +220,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT   COMPANY  FULLNAME      FLAGS */
-COMP( 1987, pecom64,     0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 64",    0)
+COMP( 1987, pecom32,       0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 32",    0)
+COMP( 1987, pecom64, pecom32,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 64",    0)

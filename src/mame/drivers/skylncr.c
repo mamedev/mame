@@ -1134,26 +1134,27 @@ ROM_END
   5x HM6116L-120
 
   One extra ROM (u48) is blank.
-  Sure is the one that store the palette at offset $C000.
+  Sure is the one that store the palette at offset $C000,
+  among the missing graphics.
 
-  Also suspect that graphics ROMs are underdumped since
-  they lack of at least 4 extra big girl pictures. 
+  Also graphics ROMs are half the standard size and
+  they lack of at least 4 extra big girl pictures.
 
   BP 170 to see the palette registers...
 
 */
 ROM_START( sstar97 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "27256.u15",    0x0000, 0x8000, BAD_DUMP CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )	// underdump?
+	ROM_LOAD( "27256.u15",    0x0000, 0x8000, CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
 	ROM_LOAD( "unknown.u48",  0x8000, 0x8000, BAD_DUMP CRC(9f4c02e3) SHA1(05975184130ea7dd3bb5d32eff77b585bd53e6b5) )	// palette borrowed from other game
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx1", 0 )	// all ROMs are 28-pins 27512
 	ROM_LOAD16_BYTE( "bor_dun_4.u23", 0x00000, 0x10000, CRC(82c9db19) SHA1(3611fb59bb7c962c7fabe7a29fa72b632fa69bed) )
 	ROM_LOAD16_BYTE( "bor_dun_2.u25", 0x00001, 0x10000, CRC(42ee9b7a) SHA1(b39f677f58072ea7dcd7f49208be1a7b70bdc5e5) )
 	ROM_LOAD16_BYTE( "bor_dun_3.u24", 0x20000, 0x10000, CRC(6d70879b) SHA1(83cbe67cda95e5f3d95065015f6b1b2044b88989) )
 	ROM_LOAD16_BYTE( "bor_dun_1.u26", 0x20001, 0x10000, CRC(1b8b84ac) SHA1(b914bad0b1fb58cf581d1227e8127c6afb906fb7) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx2", 0 )	// all ROMs are 28-pins 27512
 	ROM_LOAD16_BYTE( "bor_dun_8.u19", 0x00000, 0x10000, CRC(daf651a7) SHA1(d4e472aa90aa2b52c997b2f2272007b139e3cbc2) )
 	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x10000, CRC(1d88bc70) SHA1(49246d96a4ce2b8e9b10e928d7dd13973feac883) )
 	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x20000, 0x10000, CRC(7e28ba2f) SHA1(ac8d4e95efce87456f569a71650bd7afcb59095e) )

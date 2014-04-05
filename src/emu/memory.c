@@ -2901,7 +2901,7 @@ address_table::address_table(address_space &space, bool large)
 {
 	// make our static table all watchpoints
 	if (s_watchpoint_table[0] != STATIC_WATCHPOINT)
-		for (unsigned int i=0; i != sizeof(s_watchpoint_table)/sizeof(s_watchpoint_table[0]); i++)
+		for (unsigned int i=0; i != ARRAY_LENGTH(s_watchpoint_table); i++)
 			s_watchpoint_table[i] = STATIC_WATCHPOINT;
 
 	// initialize everything to unmapped

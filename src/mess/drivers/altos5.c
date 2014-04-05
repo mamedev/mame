@@ -119,11 +119,11 @@ UINT8 altos5_state::convert(offs_t offset, bool state)
 	UINT8 data = m_p_prom[offset];
 
 	// if IPL and /A12, point at rom
-	if (!state & m_ipl & !BIT(offset, 0))
+	if (!state && m_ipl && !BIT(offset, 0))
 		data = 0x31;
 	else
 	// if WPRT point at nothing
-	if (state & BIT(data, 7))
+	if (state && BIT(data, 7))
 		data = 0x30;
 
 	// mask off wprt (no longer needed)

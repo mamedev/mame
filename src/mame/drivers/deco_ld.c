@@ -175,7 +175,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 	for(i=0;i<0x20;i+=4)
 	{
-		if(!spriteram[i+0] & 1)
+		if(~spriteram[i+0] & 1)
 			continue;
 
 		spr_offs = spriteram[i+1]|tile_bank;
@@ -190,7 +190,7 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 	for(i=0x3e0;i<0x400;i+=4)
 	{
-		if(!spriteram[i+0] & 1)
+		if(~spriteram[i+0] & 1)
 			continue;
 
 		spr_offs = spriteram[i+1]|tile_bank;

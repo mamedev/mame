@@ -2265,6 +2265,7 @@ $(MESS_DRIVERS)/pcw.o:      $(MESS_LAYOUT)/pcw.lh
 $(MESS_DRIVERS)/pmi80.o:    $(MESS_LAYOUT)/pmi80.lh
 $(MESS_DRIVERS)/poly880.o:  $(MESS_LAYOUT)/poly880.lh
 $(MESS_DRIVERS)/pro80.o:    $(MESS_LAYOUT)/pro80.lh
+$(MESS_DRIVERS)/pve500.o:   $(MESS_LAYOUT)/pve500.lh
 $(MESS_DRIVERS)/px4.o:      $(MESS_LAYOUT)/px4.lh
 $(MESS_DRIVERS)/px8.o:      $(MESS_LAYOUT)/px8.lh
 $(MESS_DRIVERS)/ravens.o:   $(MESS_LAYOUT)/ravens.lh

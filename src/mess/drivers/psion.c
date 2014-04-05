@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "includes/psion.h"
 #include "rendlay.h"
-#include "mcfglgcy.h"
 
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
@@ -332,34 +331,13 @@ INPUT_PORTS_START( psion )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D [)]") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
-static NVRAM_HANDLER( psion )
+
+void psion_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	psion_state *state = machine.driver_data<psion_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->m_sys_register, 0xc0);
-		file->write(state->m_ram, state->m_ram.bytes());
-		if (state->m_ram_bank_count)
-			file->write(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_sys_register, 0xc0);
-			file->read(state->m_ram, state->m_ram.bytes());
-			if (state->m_ram_bank_count)
-				file->read(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
-
-			//warm start
-			state->m_stby_pwr = 1;
-		}
-		else
-			//cold start
-			state->m_stby_pwr = 0;
-	}
+	//cold start (by default is 1=warm start)
+	m_stby_pwr = 0;
 }
+
 
 void psion_state::machine_start()
 {
@@ -406,6 +384,11 @@ void psion_state::machine_start()
 		membank("rambank")->set_entry(0);
 	}
 
+	m_nvram1->set_base(m_sys_register, 0xc0);
+	m_nvram2->set_base(m_ram, m_ram.bytes());
+	if (m_nvram3)
+		m_nvram3->set_base(m_paged_ram, m_ram_bank_count * 0x4000);
+	
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
 	save_item(NAME(m_tcsr_value));
@@ -498,7 +481,8 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_NVRAM_HANDLER(psion)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)		// sys_regs
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", psion_state, nvram_init)		// RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
@@ -544,12 +528,16 @@ static MACHINE_CONFIG_DERIVED( psionp350, psion_2lines )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionp350_mem)
+
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram3", psion_state, nvram_init)	// paged RAM
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psionlz, psion_4lines )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psionlz_mem)
+
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram3", psion_state, nvram_init)	// paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */

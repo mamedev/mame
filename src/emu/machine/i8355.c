@@ -65,7 +65,8 @@ inline UINT8 i8355_device::read_port(int port)
 
 	if (m_ddr[port] != 0xff)
 	{
-		data |= m_in_port_func[port](0) & ~m_ddr[port];
+		if (port == 0) {data |= m_in_pa_cb(0) & ~m_ddr[port];}
+		else { data |= m_in_pb_cb(0) & ~m_ddr[port];}
 	}
 
 	return data;
@@ -80,7 +81,8 @@ inline void i8355_device::write_port(int port, UINT8 data)
 {
 	m_output[port] = data;
 
-	m_out_port_func[port](0, m_output[port] & m_ddr[port]);
+	if (port == 0) {m_out_pa_cb((offs_t)0, m_output[port] & m_ddr[port]);}
+	else {m_out_pb_cb((offs_t)0, m_output[port] & m_ddr[port]);}
 }
 
 
@@ -96,34 +98,13 @@ inline void i8355_device::write_port(int port, UINT8 data)
 i8355_device::i8355_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8355, "Intel 8355", tag, owner, clock, "i8355", __FILE__),
 		device_memory_interface(mconfig, *this),
+		m_in_pa_cb(*this),
+		m_out_pa_cb(*this),
+		m_in_pb_cb(*this),
+		m_out_pb_cb(*this),
 		m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(i8355))
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8355_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8355_interface *intf = reinterpret_cast<const i8355_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8355_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -132,10 +113,10 @@ void i8355_device::device_config_complete()
 void i8355_device::device_start()
 {
 	// resolve callbacks
-	m_in_port_func[0].resolve(m_in_pa_cb, *this);
-	m_in_port_func[1].resolve(m_in_pb_cb, *this);
-	m_out_port_func[0].resolve(m_out_pa_cb, *this);
-	m_out_port_func[1].resolve(m_out_pb_cb, *this);
+	m_in_pa_cb.resolve_safe(0);
+	m_in_pb_cb.resolve_safe(0);
+	m_out_pa_cb.resolve_safe();
+	m_out_pb_cb.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_output));

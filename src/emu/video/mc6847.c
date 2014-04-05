@@ -929,7 +929,7 @@ mc6847_friend_device::character_map::character_map(const UINT8 *text_fontdata, b
 	}
 
 	// loop through all modes
-	for (mode = 0; mode < sizeof(m_entries) / sizeof(m_entries[0]); mode++)
+	for (mode = 0; mode < ARRAY_LENGTH(m_entries); mode++)
 	{
 		const UINT8 *fontdata;
 		UINT8 character_mask;

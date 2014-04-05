@@ -164,8 +164,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 	}
 }
 
-READ8_MEMBER(_3do_state::_3do_nvarea_r) { return m_nvram[offset]; }
-WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvram[offset] = data; }
+READ8_MEMBER(_3do_state::_3do_nvarea_r) { return m_nvmem[offset]; }
+WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvmem[offset] = data; }
 
 
 

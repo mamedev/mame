@@ -369,7 +369,7 @@ void ql_state::sandy_set_control(UINT8 data)
 		m_fdc->set_drive(1);
 
 	m_fdc->set_side((data & SANDY_SIDE_MASK) >> SANDY_SIDE_SHIFT);
-	if ((data & SANDY_SIDE_MASK) & (LOG_DISK_READ | LOG_DISK_WRITE))
+	if ((data & SANDY_SIDE_MASK) && (LOG_DISK_READ | LOG_DISK_WRITE))
 	{
 		logerror("Accessing side 1\n");
 	}

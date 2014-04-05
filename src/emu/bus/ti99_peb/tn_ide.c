@@ -5,7 +5,7 @@
     Thierry Nouspikel's IDE card emulation
 
     This card is just a prototype.  It has been designed by Thierry Nouspikel,
-    and its description was published in 2001.  The card have been revised in
+    and its description was published in 2001.  The card has been revised in
     2004.
 
     The specs have been published in <http://www.nouspikel.com/ti99/ide.html>.
@@ -332,13 +332,9 @@ void nouspikel_ide_interface_device::device_reset()
 	m_tms9995_mode =  false; // (device->type()==TMS9995);
 }
 
-static const rtc65271_interface ide_rtc_cfg =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nouspikel_ide_interface_device, clock_interrupt_callback)
-};
-
 MACHINE_CONFIG_FRAGMENT( tn_ide )
-	MCFG_RTC65271_ADD( "ide_rtc", ide_rtc_cfg )
+	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
+	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", NULL, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
 MACHINE_CONFIG_END

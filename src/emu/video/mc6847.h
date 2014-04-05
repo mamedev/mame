@@ -151,7 +151,7 @@ protected:
 				UINT8 character = data[i];
 
 				// based on the mode, determine which entry to use
-				const entry *e = &m_entries[mode % (sizeof(m_entries) / sizeof(m_entries[0]))];
+				const entry *e = &m_entries[mode % ARRAY_LENGTH(m_entries)];
 
 				// identify the character in the font data
 				const UINT8 *font_character = e->m_fontdata + (character & e->m_character_mask) * 12;

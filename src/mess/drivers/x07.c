@@ -28,9 +28,7 @@
 
 ****************************************************************************/
 
-
 #include "includes/x07.h"
-#include "mcfglgcy.h"
 
 /***************************************************************************
     T6834 IMPLEMENTATION
@@ -1324,37 +1322,10 @@ static INPUT_PORTS_START( x07 )
 INPUT_PORTS_END
 
 
-static NVRAM_HANDLER( x07 )
+void x07_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	x07_state *state = machine.driver_data<x07_state>();
-
-	if (read_or_write)
-	{
-		file->write(state->m_t6834_ram, sizeof(state->m_t6834_ram));
-		file->write(state->m_ram->pointer(), state->m_ram->size());
-	}
-	else
-	{
-		if (file)
-		{
-			file->read(state->m_t6834_ram, sizeof(state->m_t6834_ram));
-			file->read(state->m_ram->pointer(), state->m_ram->size());
-			state->m_warm_start = 1;
-		}
-		else
-		{
-			memset(state->m_t6834_ram, 0, sizeof(state->m_t6834_ram));
-			memset(state->m_ram->pointer(), 0, state->m_ram->size());
-
-			for(int i = 0; i < 12; i++)
-				strcpy((char*)state->m_t6834_ram + udk_offset[i], udk_ini[i]);
-
-			//copy default chars in the UDC
-			memcpy(state->m_t6834_ram + 0x200, (UINT8*)machine.root_device().memregion("gfx1")->base() + 0x400, 0x100);
-			memcpy(state->m_t6834_ram + 0x300, (UINT8*)machine.root_device().memregion("gfx1")->base() + 0x700, 0x100);
-			state->m_warm_start = 0;
-		}
-	}
+	memcpy(data, memregion("default")->base(), size);
+	m_warm_start = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(x07_state::blink_timer)
@@ -1402,6 +1373,9 @@ void x07_state::machine_start()
 	m_beep_stop = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::beep_stop),this));
 	m_cass_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::cassette_poll),this));
 	m_cass_tick = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x07_state::cassette_tick),this));
+
+	m_nvram1->set_base(&m_t6834_ram, 0x800);
+	m_nvram2->set_base(m_ram->pointer(), m_ram->size());
 
 	/* Save State */
 	save_item(NAME(m_sleep));
@@ -1525,7 +1499,8 @@ static MACHINE_CONFIG_START( x07, x07_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
-	MCFG_NVRAM_HANDLER( x07 )
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)	// t6834 RAM
+	MCFG_NVRAM_ADD_0FILL("nvram2") // RAM banks
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1561,9 +1536,25 @@ ROM_START( x07 )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x0800, BAD_DUMP CRC(b1e59a6e) SHA1(b0c06315a2d5c940a8f288fb6a3428d738696e69) )
+
+	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
+
+DRIVER_INIT_MEMBER(x07_state, x07)  
+{ 
+	UINT8 *RAM = memregion("default")->base();
+	UINT8 *GFX = memregion("gfx1")->base();
+	
+	for (int i = 0; i < 12; i++)
+		strcpy((char *)RAM + udk_offset[i], udk_ini[i]);
+	
+	//copy default chars in the UDC
+	memcpy(RAM + 0x200, GFX + 0x400, 0x100);
+	memcpy(RAM + 0x300, GFX + 0x700, 0x100);
+}
+
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07, driver_device,     0,      "Canon",  "X-07",     GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT                COMPANY   FULLNAME    FLAGS */
+COMP( 1983, x07,    0,      0,       x07,       x07,     x07_state,   x07,   "Canon",  "X-07",     GAME_SUPPORTS_SAVE)
