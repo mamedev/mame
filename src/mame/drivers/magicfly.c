@@ -976,7 +976,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(magicfly_state,7mezzo)
+	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
 
 MACHINE_CONFIG_END
 
