@@ -38,11 +38,11 @@
     The Fortune I hardware consisted of the following games:
       Regular Draw Poker
       Progressive Draw Poker
-      Joker Wild Draw Poker
+      Joker Wild Poker
       Double Up Draw Poker
       Credit Draw Poker
       Lucky 7 Poker (Seven Card Stud Poker)
-      Regular 21 (Blackjack)
+      Twenty One
       Live 21
       Count Down 21
       Two Hand 21
@@ -1336,6 +1336,7 @@ static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
 MACHINE_CONFIG_END
+
 
 /*************************
 *        Rom Load        *
