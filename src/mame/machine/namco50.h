@@ -3,14 +3,10 @@
 #ifndef NAMCO50_H
 #define NAMCO50_H
 
-
+#include "cpu/mb88xx/mb88xx.h"
 
 #define MCFG_NAMCO_50XX_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_50XX, _clock)
-
-DECLARE_READ8_DEVICE_HANDLER( namco_50xx_read );
-void namco_50xx_read_request(device_t *device);
-DECLARE_WRITE8_DEVICE_HANDLER( namco_50xx_write );
 
 
 /* device get info callback */
@@ -18,22 +14,34 @@ class namco_50xx_device : public device_t
 {
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~namco_50xx_device();
+	
+	WRITE8_MEMBER( write );
+	WRITE_LINE_MEMBER(read_request);
+	READ8_MEMBER( read );
+	
+	READ8_MEMBER( K_r );
+	READ8_MEMBER( R0_r );
+	READ8_MEMBER( R2_r );
+	WRITE8_MEMBER( O_w );
 
-	// access to legacy token
-	struct namco_50xx_state *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	
+	TIMER_CALLBACK_MEMBER( latch_callback );
+	TIMER_CALLBACK_MEMBER( readrequest_callback );
+	TIMER_CALLBACK_MEMBER( irq_clear );
+	void irq_set();	
 private:
 	// internal state
-	struct namco_50xx_state *m_token;
+	required_device<mb88_cpu_device> m_cpu;
+	UINT8                   m_latched_cmd;
+	UINT8                   m_latched_rw;
+	UINT8                   m_portO;
 };
 
 extern const device_type NAMCO_50XX;
-
-
 
 #endif  /* NAMCO50_H */

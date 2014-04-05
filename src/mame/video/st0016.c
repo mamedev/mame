@@ -449,7 +449,7 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) st0016_charram, 0x40, 0)));
+	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, charlayout, (UINT8 *) st0016_charram, 0, 0x40, 0)));
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;

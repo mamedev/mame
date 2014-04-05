@@ -11,11 +11,13 @@
 
  - SIO interface for Game Gear (needs netplay, I guess)
  - Gear to Gear Port SMS Controller Adaptor
- - SMS Store Display Unit (Kiosk)
- - SMS Disk System (floppy disk drive) - unreleased
+ - SMS Store Display Unit (kiosk console)
+ - Sega Demo Unit II (kiosk expansion device)
+ - SMS Disk System (floppy disk drive expansion device) - unreleased
  - Sega Graphic Board (black version) - unreleased
  - Rapid button of japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
+ - Link between two Mark III's through keyboard, supported by F-16 Fighting Falcon
  - Mark III expansion slot, used by keyboard and FM module
  - Software compatibility flags, by region and/or BIOS
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
@@ -263,30 +265,6 @@ static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
 	AM_RANGE(0xdc00, 0xdc00) AM_READ(sms_store_select2)         /* Game selector port #2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
-	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_dc_r, sms_ym2413_register_port_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_dd_r, sms_ym2413_data_port_w)
-	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_dd_r)
-ADDRESS_MAP_END
-
-
 // I/O ports $3E and $3F do not exist on Mark III
 static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -310,34 +288,37 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
+	AM_IMPORT_FROM(sg1000m3_io)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
+ADDRESS_MAP_END
+
+
 // It seems the Korean versions do some more strict decoding on the I/O
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
+// Enri's doc about the Japanese SMS also doesn't mention them.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-// Assume the same for the japanese SMS, which derived the first korean
-// version.
 static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(sg1000m3_io)
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
 	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
-	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_dc_r, sms_ym2413_register_port_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_dd_r, sms_ym2413_data_port_w)
-	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
-	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_dd_r)
 ADDRESS_MAP_END
+
+
+// The first Korean version also seems to lack I/O port $3F.
+// Games detect the first version as Japanese region (opposite to the second
+// version). The region detection tests the behavior of the TH bits of port
+// $DD. Port $3F sets the mode used by those bits. If the first version would
+// use the same mode used by Japanese SMS, it would't support the Light Phaser,
+// as it does. If it would use the standard mode of other SMS versions, the
+// system would be detected as Export region.
+static ADDRESS_MAP_START( sms1kr_io, AS_IO, 8, sms_state )
+	AM_IMPORT_FROM(sg1000m3_io)
+	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -428,28 +409,6 @@ WRITE_LINE_MEMBER(sms_state::sms_int_callback)
 {
 	m_maincpu->set_input_line(0, state);
 }
-
-static const sega315_5124_interface _315_5124_ntsc_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
-static const sega315_5124_interface _315_5124_pal_intf =
-{
-	true,
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
-static const sega315_5124_interface sms_store_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(smssdisp_state,sms_store_int_callback),
-	DEVCB_DRIVER_LINE_MEMBER(sms_state,sms_pause_callback)
-};
-
 
 static SLOT_INTERFACE_START(sms_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  SEGA8_ROM_STD)
@@ -549,9 +508,13 @@ static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 
@@ -585,8 +548,11 @@ static MACHINE_CONFIG_DERIVED( sms1_ntsc, sms_ntsc_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(false)
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
@@ -617,8 +583,11 @@ static MACHINE_CONFIG_START( sms_sdisp, smssdisp_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", sms_store_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(smssdisp_state, sms_store_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	MCFG_CPU_ADD("control", Z80, XTAL_53_693175MHz/15)
 	MCFG_CPU_PROGRAM_MAP(sms_store_mem)
@@ -709,8 +678,11 @@ static MACHINE_CONFIG_DERIVED( sms2_pal, sms_pal_base )
 		SEGA315_5124_HEIGHT_PAL, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_PAL_240_TBORDER_HEIGHT + 240)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_SEGA315_5246_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(true)
+	MCFG_SEGA315_5246_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
@@ -745,39 +717,54 @@ static MACHINE_CONFIG_DERIVED( sms1_pal, sms_pal_base )
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_SEGA315_5124_ADD("sms_vdp", _315_5124_pal_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
 	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(true)
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, NULL)
 	MCFG_SMS_EXPANSION_ADD("exp", sms_expansion_devices, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
+static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(smsj_io)
-
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sg1000m3_io)
-
-	// Mark III does not have TH input
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_CPU_IO_MAP(sms1kr_io)
 
 	MCFG_DEVICE_REMOVE("slot")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( sms1_krfm, sms1_kr )
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( smsj, sms1_krfm )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(smsj_io)
+
+	// Mark III does not have TH connected. Also, according with Enri's docs
+	// (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm), the Japanese SMS
+	// only allows read of TH direction, through port $dd, not its input state.
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sg1000m3, smsj )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sg1000m3_io)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smsj_io)
+
+	MCFG_DEVICE_REMOVE("slot")
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gamegear, sms_state )
@@ -800,8 +787,11 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 
-	MCFG_SEGA315_5378_ADD("sms_vdp", _315_5124_ntsc_intf)
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
 	MCFG_SEGA315_5378_SET_SCREEN("screen")
+	MCFG_SEGA315_5378_IS_PAL(false)
+	MCFG_SEGA315_5378_INT_CB(WRITELINE(sms_state, sms_int_callback))
+	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
@@ -897,7 +887,7 @@ ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM24
 	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48d44a13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
 ROM_END
 
-ROM_START(sms2kr)
+ROM_START(smskr)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_FILL(0x0000, 0x4000, 0xff)
 
@@ -917,6 +907,8 @@ ROM_START(gamegear)
 ROM_END
 
 #define rom_gamegeaj rom_gamegear
+#define rom_sms1krfm rom_smsj
+#define rom_sms1kr rom_smsj
 
 /***************************************************************************
 
@@ -929,23 +921,26 @@ ROM_END
      - built-in Hang On/Safari Hunt v2.4 - 1988
      - built-in Hang On v3.4 - 1988
      - built-in Missile Defense 3-D v4.4 - 1988
-     - built-in Hang On/Astro Warrior ????
+     - built-in Hang On/Astro Warrior - 19??
    - Sega Master System II (sms)
      - built-in Alex Kidd in Miracle World - 1990
 
   JP
    - Sega SG-1000 Mark III (sg1000m3)
-     - no bios
+     - no bios - 1985
    - Sega Master System (I) (smsj)
      - without built-in game v2.1 - 1987
 
   KR
-   - Samsung Gam*Boy (same as smsj)
+   - Samsung Gam*Boy (I) - with FM Chip (sms1krfm)
      - without built-in game v2.1 - 1989
-       (same smsj driver used, despite units with plug-in AC adaptor
-        have FM and the ones with built-in AC adaptor do not)
-   - Samsung Gam*Boy II / Aladdin Boy (sms2kr)
-     - built-in Alex Kidd in Miracle World (Korean) - 1992 for A.Boy
+   - Samsung Gam*Boy (I) (sms1kr)
+     - without built-in game v2.1 - 19??
+   - Samsung Gam*Boy II / Aladdin Boy (smskr)
+     - built-in Alex Kidd in Miracle World (Korean) - 1991 (GB II) / 1992 (AB)
+  Note about KR:
+     - units of Gam*Boy (I) with plug-in AC adaptor have FM and the ones with
+       built-in AC adaptor do not.
 
   EU
    - Sega Master System (I) (sms1pal)
@@ -953,7 +948,7 @@ ROM_END
      - built-in Hang On/Safari Hunt v2.4 - 1988
      - built-in Hang On v3.4 - 1988
      - built-in Missile Defense 3-D v4.4 - 1988
-     - built-in Hang On/Astro Warrior ????
+     - built-in Hang On/Astro Warrior - 19??
    - Sega Master System II (smspal)
      - built-in Alex Kidd in Miracle World - 1990
      - built-in Sonic the Hedgehog - 1991
@@ -967,14 +962,14 @@ ROM_END
      - built-in Alex Kidd in Miracle World - 1992
      - built-in Sonic the Hedgehog - 1993
      - built-in World Cup Italia '90 (Super Futebol II) - 1994
-     - built-in Hang On/Safari Hunt v2.4 (blue L.Phaser pack)
+     - built-in Hang On/Safari Hunt v2.4 (blue L.Phaser pack) - 199?
    - Tec Toy Master System Super Compact (no driver)
-     - built-in Alex Kidd in Miracle World - 1993 (or 1994?)
      - built-in Sonic the Hedgehog - 1993
+     - built-in Alex Kidd in Miracle World - 1994 ?
      - built-in World Cup Italia '90 (Super Futebol II) - 1994
    - Tec Toy Master System Girl (no driver)
-     - built-in Monica no Castelo do Dragao
-     - built-in Sonic the Hedgehog (T. Monica em O Resgate pack)
+     - built-in Monica no Castelo do Dragao - 199?
+     - built-in Sonic the Hedgehog (T. Monica em O Resgate pack) - 199?
   Notes about BR:
    - PAL-M has same frequency and line count of NTSC
    - Tec Toy later changed its logo twice and its name to Tectoy
@@ -985,18 +980,21 @@ ROM_END
    - Sega Game Box 9
    - Sega Mark III Soft Desk 5
    - Sega Mark III Soft Desk 10
+   - Sega Shooting Zone
 
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT     CLASS           INIT      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sg1000m3, sms_state,      sg1000m3, "Sega",     "SG-1000 Mark III",                 GAME_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3,   sms,        0,      sg1000m3,    sg1000m3, sms_state,      sg1000m3, "Sega",     "SG-1000 Mark III",                 GAME_SUPPORTS_SAVE )
 CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1,     sms_state,      sms1,     "Sega",     "Master System I",                  GAME_SUPPORTS_SAVE )
 CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1,     sms_state,      sms1,     "Sega",     "Master System I (PAL)" ,           GAME_SUPPORTS_SAVE )
 CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,      smssdisp_state, smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj,     sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
+CONS( 1987, smsj,       sms,        0,      smsj,        smsj,     sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
 CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,      sms_state,      sms1,     "Sega",     "Master System II",                 GAME_SUPPORTS_SAVE )
 CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,      sms_state,      sms1,     "Sega",     "Master System II (PAL)",           GAME_SUPPORTS_SAVE )
-CONS( 1990, sms2kr,     sms,        0,      sms2_kr,     sms,      sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
+CONS( 1989, sms1krfm,   sms,        0,      sms1_krfm,   smsj,     sms_state,      sms1krfm, "Samsung",  "Gam*Boy I - FM (Korea)",           GAME_SUPPORTS_SAVE )
+CONS( 19??, sms1kr,     sms,        0,      sms1_kr,     smsj,     sms_state,      sms1kr,   "Samsung",  "Gam*Boy I (Korea)",                GAME_SUPPORTS_SAVE )
+CONS( 1991, smskr,      sms,        0,      sms2_kr,     sms,      sms_state,      smskr,    "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
 
 CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,       sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
 CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,       sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SUPPORTS_SAVE )

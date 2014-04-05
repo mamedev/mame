@@ -46,24 +46,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MM74C922_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MM74C922, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	mm74c922_device::static_set_config(*device, 4);
+#define MCFG_MM74C922_OSC(_value) \
+	mm74c922_device::static_set_cap_osc(*device, _value);
 
+#define MCFG_MM74C922_DEBOUNCE(_value) \
+	mm74c922_device::static_set_cap_debounce(*device, _value);
 
-#define MCFG_MM74C923_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MM74C923, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	mm74c922_device::static_set_config(*device, 5);
+#define MCFG_MM74C922_DA_CALLBACK(_write) \
+	devcb = &mm74c922_device::set_da_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_MM74C922_X1_CALLBACK(_read) \
+	devcb = &mm74c922_device::set_x1_rd_callback(*device, DEVCB2_##_read);
 
-#define MM74C922_INTERFACE(name) \
-	const mm74c922_interface (name)=
+#define MCFG_MM74C922_X2_CALLBACK(_read) \
+	devcb = &mm74c922_device::set_x2_rd_callback(*device, DEVCB2_##_read);
 
+#define MCFG_MM74C922_X3_CALLBACK(_read) \
+	devcb = &mm74c922_device::set_x3_rd_callback(*device, DEVCB2_##_read);
 
-#define MM74C923_INTERFACE(name) \
-	const mm74c922_interface (name)=
+#define MCFG_MM74C922_X4_CALLBACK(_read) \
+	devcb = &mm74c922_device::set_x4_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_MM74C922_X5_CALLBACK(_read) \
+	devcb = &mm74c922_device::set_x5_rd_callback(*device, DEVCB2_##_read);
 
 
 
@@ -71,52 +76,47 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mm74c922_interface
-
-struct mm74c922_interface
-{
-	double              m_cap_osc;
-	double              m_cap_debounce;
-
-	devcb_write_line    m_out_da_cb;
-
-	devcb_read8         m_in_x1_cb;
-	devcb_read8         m_in_x2_cb;
-	devcb_read8         m_in_x3_cb;
-	devcb_read8         m_in_x4_cb;
-	devcb_read8         m_in_x5_cb;
-};
-
-
 // ======================> mm74c922_device
 
-class mm74c922_device :  public device_t,
-							public mm74c922_interface
+class mm74c922_device :  public device_t
 {
 public:
 	// construction/destruction
 	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_config(device_t &device, int max_y);
+	static void static_set_cap_osc(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_osc = value; }
+	static void static_set_cap_debounce(device_t &device, double value) { downcast<mm74c922_device &>(device).m_cap_debounce = value; }
 
-	UINT8 data_out_r();
+	template<class _Object> static devcb2_base &set_da_wr_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_write_da.set_callback(object); }
+	template<class _Object> static devcb2_base &set_x1_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x1.set_callback(object); }
+	template<class _Object> static devcb2_base &set_x2_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x2.set_callback(object); }
+	template<class _Object> static devcb2_base &set_x3_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x3.set_callback(object); }
+	template<class _Object> static devcb2_base &set_x4_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x4.set_callback(object); }
+	template<class _Object> static devcb2_base &set_x5_rd_callback(device_t &device, _Object object) { return downcast<mm74c922_device &>(device).m_read_x5.set_callback(object); }
+
+	UINT8 read();
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	inline void change_output_lines();
-	inline void clock_scan_counters();
-	inline void detect_keypress();
+	void change_output_lines();
+	void clock_scan_counters();
+	void detect_keypress();
+
+	devcb2_write_line 	m_write_da;
+	devcb2_read8 		m_read_x1;
+	devcb2_read8 		m_read_x2;
+	devcb2_read8 		m_read_x3;
+	devcb2_read8 		m_read_x4;
+	devcb2_read8 		m_read_x5;
+
+	double              m_cap_osc;
+	double              m_cap_debounce;
 
 	int m_max_y;
-
-	devcb_resolved_write_line   m_out_da_func;
-	devcb_resolved_read8        m_in_x_func[5];
 
 	int m_inhibit;              // scan counter clock inhibit
 	int m_x;                    // currently scanned column

@@ -211,12 +211,6 @@ static GFXDECODE_START( drmicro )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout8, 256, 32 ) /* sprites */
 GFXDECODE_END
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(drmicro_state,pcm_w),          /* IRQ handler */
-	MSM5205_S64_4B  /* 6 KHz */
-};
-
 
 /*************************************
  *
@@ -277,7 +271,8 @@ static MACHINE_CONFIG_START( drmicro, drmicro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(drmicro_state, pcm_w))          /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

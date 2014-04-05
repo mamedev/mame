@@ -80,7 +80,7 @@
 #include "bus/nubus/pds30_mc30.h"
 
 // 68000 PDS cards
-#include "video/pds_tpdfpd.h"
+#include "bus/macpds/pds_tpdfpd.h"
 
 #include "includes/mac.h"
 #include "mac.lh"

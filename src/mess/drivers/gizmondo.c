@@ -45,12 +45,13 @@ class gizmondo_state : public driver_device
 public:
 	gizmondo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_s3c2440(*this, "s3c2440"),
 		m_maincpu(*this, "maincpu"),
 		m_gf4500(*this, "gf4500")
 		{ }
 
 	UINT32 m_port[9];
-	device_t *m_s3c2440;
+	required_device<s3c2440_device> m_s3c2440;
 	DECLARE_DRIVER_INIT(gizmondo);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -129,8 +130,8 @@ WRITE32_MEMBER(gizmondo_state::s3c2440_gpio_port_w)
 
 INPUT_CHANGED_MEMBER(gizmondo_state::port_changed)
 {
-	s3c2440_request_eint( m_s3c2440, 4);
-	//s3c2440_request_irq( device, S3C2440_INT_EINT1);
+	m_s3c2440->s3c2440_request_eint( 4);
+	//m_s3c2440->s3c2440_request_irq( S3C2440_INT_EINT1);
 }
 
 #if 0
@@ -147,7 +148,6 @@ QUICKLOAD_LOAD_MEMBER( gizmondo_state, gizmondo )
 
 void gizmondo_state::machine_start()
 {
-	m_s3c2440 = machine().device( "s3c2440");
 	m_port[S3C2440_GPIO_PORT_B] = 0x055E;
 	m_port[S3C2440_GPIO_PORT_C] = 0x5F20;
 	m_port[S3C2440_GPIO_PORT_D] = 0x4F60;

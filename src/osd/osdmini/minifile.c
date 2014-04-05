@@ -145,7 +145,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *)malloc(sizeof(*result) + strlen(path) + 1);
+	result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + strlen(path) + 1);
 	strcpy((char *)(result + 1), path);
 	result->name = (char *)(result + 1);
 	result->type = ENTTYPE_NONE;
@@ -171,7 +171,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 {
 	// derive the full path of the file in an allocated string
 	// for now just fake it since we don't presume any underlying file system
-	*dst = strdup(path);
+	*dst = core_strdup(path);
 	return FILERR_NONE;
 }
 

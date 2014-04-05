@@ -9,9 +9,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/megavdp.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "video/315_5313.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 
@@ -73,9 +73,9 @@ public:
 	DECLARE_READ16_MEMBER( genesis_vdp_r );
 	DECLARE_WRITE16_MEMBER( genesis_vdp_w );
 
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_sndirqline_callback_segas18);
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv6irqline_callback_segas18);
-	DECLARE_WRITE_LINE_MEMBER(genesis_vdp_lv4irqline_callback_segas18);
+	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_s18);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_s18);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_s18);
 
 
 	// custom I/O
@@ -88,8 +88,8 @@ public:
 	// video rendering
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_HANDLER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
 
 protected:
 	// timer IDs
@@ -124,7 +124,7 @@ protected:
 	required_device<m68000_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
-	required_device<sega_genesis_vdp_device> m_vdp;
+	required_device<sega315_5313_device> m_vdp;
 	required_device<nvram_device> m_nvram;
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;

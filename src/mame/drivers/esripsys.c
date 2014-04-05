@@ -196,31 +196,29 @@ WRITE8_MEMBER(esripsys_state::fdt_w)
  *
  *************************************/
 
-static READ16_DEVICE_HANDLER( fdt_rip_r )
+READ16_MEMBER( esripsys_state::fdt_rip_r )
 {
-	esripsys_state *state = space.machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
-	if (!state->m_fasel)
-		return (state->m_fdt_a[offset] << 8) | state->m_fdt_a[offset + 1];
+	if (!m_fasel)
+		return (m_fdt_a[offset] << 8) | m_fdt_a[offset + 1];
 	else
-		return (state->m_fdt_b[offset] << 8) | state->m_fdt_b[offset + 1];
+		return (m_fdt_b[offset] << 8) | m_fdt_b[offset + 1];
 }
 
-static WRITE16_DEVICE_HANDLER( fdt_rip_w )
+WRITE16_MEMBER( esripsys_state::fdt_rip_w )
 {
-	esripsys_state *state = space.machine().driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
-	if (!state->m_fasel)
+	if (!m_fasel)
 	{
-		state->m_fdt_a[offset + 0] = data >> 8;
-		state->m_fdt_a[offset + 1] = data & 0xff;
+		m_fdt_a[offset + 0] = data >> 8;
+		m_fdt_a[offset + 1] = data & 0xff;
 	}
 	else
 	{
-		state->m_fdt_b[offset + 0] = data >> 8;
-		state->m_fdt_b[offset + 1] = data & 0xff;
+		m_fdt_b[offset + 0] = data >> 8;
+		m_fdt_b[offset + 1] = data & 0xff;
 	}
 }
 
@@ -235,8 +233,7 @@ static WRITE16_DEVICE_HANDLER( fdt_rip_w )
    D7 = /FDONE
 */
 
-UINT8 esripsys_state::static_rip_status_in(running_machine &machine) { return machine.driver_data<esripsys_state>()->rip_status_in(); }
-UINT8 esripsys_state::rip_status_in()
+READ8_MEMBER(esripsys_state::rip_status_in)
 {
 	int vpos =  m_screen->vpos();
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
@@ -681,15 +678,6 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	save_item(NAME(m_fbsel));
 }
 
-static const esrip_config rip_config =
-{
-	fdt_rip_r,
-	fdt_rip_w,
-	&esripsys_state::static_rip_status_in,
-	esripsys_draw,
-	"proms"
-};
-
 static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
@@ -701,7 +689,11 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 
 	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(video_cpu_map)
-	MCFG_CPU_ESRIP_CONFIG(rip_config)
+	MCFG_ESRIP_FDT_R_CALLBACK(READ16(esripsys_state, fdt_rip_r))
+	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(esripsys_state, fdt_rip_w))
+	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(esripsys_state, rip_status_in))
+	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
+	MCFG_ESRIP_LBRM_PROM("proms")
 
 	MCFG_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)

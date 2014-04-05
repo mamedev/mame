@@ -84,6 +84,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
 	void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count);
+	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
+	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
+	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
 
 	// processor state
 	int m_clear;                // CPU mode

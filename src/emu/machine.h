@@ -112,8 +112,6 @@ const int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger is e
 //**************************************************************************
 
 // forward declarations
-class gfx_element;
-class colortable_t;
 class cheat_manager;
 class render_manager;
 class sound_manager;
@@ -123,7 +121,6 @@ class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
 
-struct palette_private;
 struct romload_private;
 struct ui_input_private;
 struct debugcpu_private;

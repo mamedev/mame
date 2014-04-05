@@ -1093,7 +1093,6 @@ void nc_state::nc200_refresh_uart_interrupt()
 
 WRITE_LINE_MEMBER(nc_state::nc200_txrdy_callback)
 {
-	//nc_state *drvstate = machine().driver_data<nc_state>();
 //  m_nc200_uart_interrupt_irq &=~(1<<0);
 //
 //  if (state)
@@ -1101,7 +1100,7 @@ WRITE_LINE_MEMBER(nc_state::nc200_txrdy_callback)
 //      m_nc200_uart_interrupt_irq |=(1<<0);
 //  }
 //
-//  nc200_refresh_uart_interrupt(machine());
+//  nc200_refresh_uart_interrupt();
 }
 
 WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)

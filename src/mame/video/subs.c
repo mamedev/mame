@@ -112,8 +112,8 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 	/* Update sound */
 	address_space &space = machine().driver_data()->generic_space();
-	discrete_sound_w(m_discrete, space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);   // Launch data
-	discrete_sound_w(m_discrete, space, SUBS_CRASH_DATA, spriteram[5] >> 4);      // Crash/explode data
+	m_discrete->write(space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);   // Launch data
+	m_discrete->write(space, SUBS_CRASH_DATA, spriteram[5] >> 4);      // Crash/explode data
 	return 0;
 }
 

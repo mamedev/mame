@@ -9,7 +9,6 @@
  *
  */
 
-#include "video/pc_cga.h"
 #include "video/cgapal.h"
 
 const unsigned char cga_palette[16 * CGA_PALETTE_SETS][3] =

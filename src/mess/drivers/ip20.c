@@ -108,14 +108,14 @@ UINT32 ip20_state::screen_update_ip204415(screen_device &screen, bitmap_ind16 &b
 
 
 
-#define RTC_DAYOFWEEK   state->m_RTC.nRAM[0x0e]
-#define RTC_YEAR        state->m_RTC.nRAM[0x0b]
-#define RTC_MONTH       state->m_RTC.nRAM[0x0a]
-#define RTC_DAY         state->m_RTC.nRAM[0x09]
-#define RTC_HOUR        state->m_RTC.nRAM[0x08]
-#define RTC_MINUTE      state->m_RTC.nRAM[0x07]
-#define RTC_SECOND      state->m_RTC.nRAM[0x06]
-#define RTC_HUNDREDTH   state->m_RTC.nRAM[0x05]
+#define RTC_DAYOFWEEK   m_RTC.nRAM[0x0e]
+#define RTC_YEAR        m_RTC.nRAM[0x0b]
+#define RTC_MONTH       m_RTC.nRAM[0x0a]
+#define RTC_DAY         m_RTC.nRAM[0x09]
+#define RTC_HOUR        m_RTC.nRAM[0x08]
+#define RTC_MINUTE      m_RTC.nRAM[0x07]
+#define RTC_SECOND      m_RTC.nRAM[0x06]
+#define RTC_HUNDREDTH   m_RTC.nRAM[0x05]
 
 READ32_MEMBER(ip20_state::hpc_r)
 {
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )
 	AM_RANGE( 0x0c000000, 0x0c7fffff ) AM_RAM AM_SHARE("share8")
 	AM_RANGE( 0x10000000, 0x107fffff ) AM_RAM AM_SHARE("share9")
 	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
+	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc_r, hpc_w )
 	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
@@ -470,7 +470,7 @@ static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )
 	AM_RANGE( 0xac000000, 0xac7fffff ) AM_RAM AM_SHARE("share8")
 	AM_RANGE( 0xb0000000, 0xb07fffff ) AM_RAM AM_SHARE("share9")
 	AM_RANGE( 0xb8000000, 0xb87fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_READWRITE_LEGACY(sgi_mc_r, sgi_mc_w )
+	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0xbfb80000, 0xbfb8ffff ) AM_READWRITE(hpc_r, hpc_w )
 	AM_RANGE( 0xbfbd9000, 0xbfbd903f ) AM_READWRITE(int_r, int_w )
 	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
@@ -498,8 +498,6 @@ void ip20_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer_rtc)
 {
-	ip20_state *state = machine().driver_data<ip20_state>();
-
 	// update RTC every 10 milliseconds
 	m_RTC.nTemp++;
 	if (m_RTC.nTemp >= 10)
@@ -557,8 +555,6 @@ TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer_rtc)
 
 void ip20_state::machine_start()
 {
-	sgi_mc_init(machine());
-
 	m_HPC.nMiscStatus = 0;
 	m_HPC.nParBufPtr = 0;
 	m_HPC.nLocalIOReg0Mask = 0;
@@ -605,6 +601,8 @@ static MACHINE_CONFIG_START( ip204415, ip20_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_DEVICE_ADD("scc", SCC8530, 7000000)
+	
+	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_6)

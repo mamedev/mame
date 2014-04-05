@@ -1771,13 +1771,6 @@ static const ay8910_interface champwr_ay8910_config =
 	DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
 };
 
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(taitol_state,champwr_msm5205_vck),/* VCK function */
-	MSM5205_S48_4B      /* 8 kHz */
-};
-
 static const ay8910_interface single_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1864,7 +1857,8 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 	MCFG_YM2203_AY8910_INTF(&champwr_ay8910_config)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(taitol_state, champwr_msm5205_vck)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

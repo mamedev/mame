@@ -98,7 +98,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 	}
 
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
-	if (filename != NULL && mame_stricmp(filename, "default") == 0)
+	if (filename != NULL && core_stricmp(filename, "default") == 0)
 		filename = "ui.bdf";
 
 	// attempt to load the cached version of the font first

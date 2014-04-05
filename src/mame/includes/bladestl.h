@@ -53,7 +53,6 @@ public:
 	required_device<palette_device> m_palette;
 	void set_pens();
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
+	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
 };
 
-/*----------- defined in video/bladestl.c -----------*/
-void bladestl_sprite_callback(running_machine &machine, int *code, int *color);

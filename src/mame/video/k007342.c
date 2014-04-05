@@ -49,8 +49,7 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	//m_regs[8],
 	//m_scrollx[2],
 	//m_scrolly[2],
-	m_gfxdecode(*this),
-	m_callback(k007342_delegate()),
+	m_gfxdecode(*this),	
 	m_gfxnum(0)
 {
 }

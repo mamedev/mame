@@ -67,9 +67,9 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 	coin_lockout_w(machine(), 0, !(m_misc_flags & 0x08));
 	coin_lockout_w(machine(), 1, !(m_misc_flags & 0x08));
 
-	discrete_sound_w(m_discrete, space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
-	discrete_sound_w(m_discrete, space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise
-	discrete_sound_w(m_discrete, space, TRIPLHNT_BEAR_EN, m_misc_flags & 0x80);    // bear
+	m_discrete->write(space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
+	m_discrete->write(space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise
+	m_discrete->write(space, TRIPLHNT_BEAR_EN, m_misc_flags & 0x80);    // bear
 
 	is_witch_hunt = ioport("0C09")->read() == 0x40;
 	bit = ~m_misc_flags & 0x40;

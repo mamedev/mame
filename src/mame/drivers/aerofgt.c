@@ -2065,7 +2065,7 @@ ROM_START( spikes91b ) // todo, check how this differs, only 1 of the 68k pair a
 
 	ROM_REGION( 0x020000, "user1", 0 ) /* lookup tables for the sprites  */
 	ROM_LOAD( "10(__spikes91b).ic104",    0x00000, 0x8000, CRC(b6fe4e57) SHA1(6b62936ff9d0f39fd02c3db488d53bc035c2272d) )
-	ROM_LOAD( "9(__spikes91b).ic103 ",    0x10000, 0x8000, CRC(5479ed35) SHA1(ca26289318352901841fcdf26d9b43e797ac39b6) )
+	ROM_LOAD( "9(__spikes91b).ic103",     0x10000, 0x8000, CRC(5479ed35) SHA1(ca26289318352901841fcdf26d9b43e797ac39b6) )
 
 	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU + M5205 Samples */
 	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )

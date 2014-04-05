@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
+	DECLARE_WRITE_LINE_MEMBER(pgm_sound_irq);
 
 	DECLARE_DRIVER_INIT(pgm);
 
@@ -104,7 +105,6 @@ public:
 	void draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw );
 	void draw_sprite_new_basic( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri );
 	void draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap );
-	void invert_tiledata();
 	void expand_colourdata();
 	void pgm_basic_init( bool set_bank = true);
 };

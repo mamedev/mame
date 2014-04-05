@@ -306,9 +306,9 @@ static void determine_bios_rom(romload_private *romdata, device_t *device, const
 
 			/* Allow '-bios n' to still be used */
 			sprintf(bios_number, "%d", bios_flags - 1);
-			if (mame_stricmp(bios_number, specbios) == 0 || mame_stricmp(biosname, specbios) == 0)
+			if (core_stricmp(bios_number, specbios) == 0 || core_stricmp(biosname, specbios) == 0)
 				device->set_system_bios(bios_flags);
-			if (defaultname != NULL && mame_stricmp(biosname, defaultname) == 0)
+			if (defaultname != NULL && core_stricmp(biosname, defaultname) == 0)
 				default_no = bios_flags;
 			bios_count++;
 		}

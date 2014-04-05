@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#include "osdcore.h"
+#include "corealloc.h"
 #include "textbuf.h"
 
 
@@ -87,24 +87,24 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	text_buffer *text;
 
 	/* allocate memory for the text buffer object */
-	text = (text_buffer *)osd_malloc(sizeof(*text));
+	text = (text_buffer *)global_alloc(text_buffer);
 	if (!text)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (char *)osd_malloc_array(bytes);
+	text->buffer = (char *)global_alloc_array(char, bytes);
 	if (!text->buffer)
 	{
-		osd_free(text);
+		global_free(text);
 		return NULL;
 	}
 
 	/* allocate memory for the lines array */
-	text->lineoffs = (INT32 *)osd_malloc_array(lines * sizeof(text->lineoffs[0]));
+	text->lineoffs = (INT32 *)global_alloc_array(INT32, lines);
 	if (!text->lineoffs)
 	{
-		osd_free(text->buffer);
-		osd_free(text);
+		global_free_array(text->buffer);
+		global_free(text);
 		return NULL;
 	}
 
@@ -125,10 +125,10 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 void text_buffer_free(text_buffer *text)
 {
 	if (text->lineoffs)
-		osd_free(text->lineoffs);
+		global_free_array(text->lineoffs);
 	if (text->buffer)
-		osd_free(text->buffer);
-	osd_free(text);
+		global_free_array(text->buffer);
+	global_free(text);
 }
 
 

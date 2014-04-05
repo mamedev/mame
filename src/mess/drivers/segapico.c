@@ -116,9 +116,6 @@ C = MB3514 / 9325 M36
 */
 
 #include "emu.h"
-#include "includes/megadriv.h"
-#include "bus/megadrive/md_slot.h"
-#include "bus/megadrive/rom.h"
 #include "includes/md_cons.h"
 #include "sound/upd7759.h"
 
@@ -145,6 +142,11 @@ public:
 	UINT16 pico_read_penpos(int pen);
 	DECLARE_READ16_MEMBER(pico_68k_io_read);
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
+	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
+
+	DECLARE_DRIVER_INIT(pico);
+	DECLARE_DRIVER_INIT(picou);
+	DECLARE_DRIVER_INIT(picoj);
 };
 
 class pico_state : public pico_base_state
@@ -156,7 +158,6 @@ public:
 
 	optional_device<pico_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(pico);
-
 };
 
 
@@ -191,7 +192,7 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 	switch (offset)
 	{
 		case 0: /* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
-			retdata = (m_export << 6) | (m_pal << 5);
+			retdata = m_version_hi_nibble;
 			break;
 		case 1:
 			retdata = m_io_pad->read_safe(0);
@@ -268,20 +269,12 @@ READ16_MEMBER(pico_base_state::pico_68k_io_read )
 }
 
 
-static void sound_cause_irq( device_t *device, int chip )
+WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
 {
-	pico_base_state *state = device->machine().driver_data<pico_base_state>();
 //  printf("sound irq\n");
 	/* upd7759 callback */
-	state->m_maincpu->set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
-
-
-const upd775x_interface pico_upd7759_interface  =
-{
-	sound_cause_irq
-};
-
 
 WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 {
@@ -307,7 +300,7 @@ static ADDRESS_MAP_START( pico_mem, AS_PROGRAM, 16, pico_base_state )
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
@@ -351,7 +344,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_picocart));
 
-
+	m_vdp->stop_timers();
 }
 
 static MACHINE_CONFIG_START( pico, pico_state )
@@ -369,7 +362,7 @@ static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -389,7 +382,7 @@ static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(pico_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -412,9 +405,34 @@ ROM_START( picoj )
 ROM_END
 
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, md_cons_state,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,      pico,      0,      pico,            pico, md_cons_state,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, md_cons_state,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)
+DRIVER_INIT_MEMBER(pico_base_state, pico)
+{
+	DRIVER_INIT_CALL(megadrie);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x60; // Export PAL
+}
+
+DRIVER_INIT_MEMBER(pico_base_state, picou)
+{
+	DRIVER_INIT_CALL(megadriv);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x40; // Export NTSC
+}
+
+DRIVER_INIT_MEMBER(pico_base_state, picoj)
+{
+	DRIVER_INIT_CALL(megadrij);
+	DRIVER_INIT_CALL(mess_md_common);
+
+	m_version_hi_nibble = 0x00; // JPN NTSC
+}
+
+
+CONS( 1994, pico,       0,         0,      picopal,         pico, pico_base_state,   pico,    "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico, pico_base_state,   picou,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_base_state,   picoj,   "Sega",   "Pico (Japan, NTSC)", 0)
 
 /*
 
@@ -503,7 +521,6 @@ public:
 
 	optional_device<copera_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(copera);
-
 };
 
 
@@ -513,7 +530,8 @@ static ADDRESS_MAP_START( copera_mem, AS_PROGRAM, 16, copera_state )
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
@@ -559,7 +577,7 @@ static MACHINE_CONFIG_START( copera, copera_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(pico_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(copera_state,sound_cause_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -571,4 +589,4 @@ ROM_START( copera )
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
 
-CONS( 1993, copera,       0,         0,      copera,         pico, md_cons_state,   md_jpn,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", GAME_NOT_WORKING)
+CONS( 1993, copera,       0,         0,      copera,         pico, pico_base_state,   picoj,    "Yamaha / Sega",   "Yamaha Mixt Book Player Copera", GAME_NOT_WORKING)

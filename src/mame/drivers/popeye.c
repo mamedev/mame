@@ -290,10 +290,9 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static CUSTOM_INPUT( pop_field_r )
+CUSTOM_INPUT_MEMBER( popeye_state::pop_field_r )
 {
-	popeye_state *state = field.machine().driver_data<popeye_state>();
-	return state->m_field ^ 1;
+	return m_field ^ 1;
 }
 
 static INPUT_PORTS_START( popeye )
@@ -322,7 +321,7 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pop_field_r, (void *) 0) /* inverted init e/o signal (even odd) */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, popeye_state,pop_field_r, NULL) /* inverted init e/o signal (even odd) */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )

@@ -775,6 +775,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 
 	/* fdc */
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 
@@ -831,6 +832,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 
 	/* fdc */
 	MCFG_I8271_ADD("i8271", bbc_i8271_interface)
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(bbc_state, bbc_i8271_interrupt))
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bbc_floppy_interface)
 

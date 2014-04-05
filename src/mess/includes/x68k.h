@@ -9,6 +9,7 @@
 #ifndef X68K_H_
 #define X68K_H_
 
+#include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
 #include "sound/okim6258.h"
@@ -42,6 +43,12 @@ public:
 
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_okim6258(*this, "okim6258"),
+			m_hd63450(*this, "hd63450"),
+			m_ram(*this, RAM_TAG),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_palette(*this, "palette"),
 			m_mfpdev(*this, MC68901_TAG),
 			m_rtc(*this, RP5C15_TAG),
 			m_nvram16(*this, "nvram16"),
@@ -49,13 +56,14 @@ public:
 			m_gvram16(*this, "gvram16"),
 			m_tvram16(*this, "tvram16"),
 			m_gvram32(*this, "gvram32"),
-			m_tvram32(*this, "tvram32"),
-		m_maincpu(*this, "maincpu"),
-		m_okim6258(*this, "okim6258"),
-		m_ram(*this, RAM_TAG),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+			m_tvram32(*this, "tvram32") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6258_device> m_okim6258;
+	required_device<hd63450_device> m_hd63450;
+	required_device<ram_device> m_ram;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
 
@@ -239,6 +247,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
+	
+	//dmac
+	void dma_irq(int channel);
+	DECLARE_WRITE8_MEMBER(dma_end);
+	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_READ8_MEMBER(fdc_read_byte);
+	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 
 	int x68k_read_mouse();
 	void x68k_set_adpcm();
@@ -250,8 +265,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
 
-	DECLARE_WRITE16_MEMBER(x68k_dmac_w);
-	DECLARE_READ16_MEMBER(x68k_dmac_r);
 	DECLARE_WRITE16_MEMBER(x68k_scc_w);
 	DECLARE_WRITE16_MEMBER(x68k_fdc_w);
 	DECLARE_READ16_MEMBER(x68k_fdc_r);
@@ -306,11 +319,6 @@ private:
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6258_device> m_okim6258;
-	required_device<ram_device> m_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	bitmap_ind16* x68k_get_gfx_page(int pri,int type);
 	attotime prescale(int val);
 	void mfp_trigger_irq(int irq);

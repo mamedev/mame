@@ -90,6 +90,8 @@ public:
 	int m_keylatch;             // key latch
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
+	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
+	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 };
 
 // ---------- defined in video/tmc600.c ----------

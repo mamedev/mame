@@ -164,7 +164,6 @@ WRITE8_MEMBER( wmg_state::wmg_vram_select_w )
 
 void wmg_state::wmg_def_install_io_space(address_space &space)
 {
-	williams_state *state = space.machine().driver_data<williams_state>();
 	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
 	pia6821_device *pia_1 = space.machine().device<pia6821_device>("pia_1");
 
@@ -180,7 +179,7 @@ void wmg_state::wmg_def_install_io_space(address_space &space)
 	space.install_write_handler    (0xcbff, 0xcbff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),this));
 	space.install_read_handler     (0xcb00, 0xcbff, read8_delegate(FUNC(williams_state::williams_video_counter_r),this));
 	space.install_readwrite_handler(0xcc00, 0xcfff, read8_delegate(FUNC(wmg_state::wmg_nvram_r), this), write8_delegate(FUNC(wmg_state::wmg_nvram_w),this));
-	membank("bank4")->set_base(state->m_generic_paletteram_8);
+	membank("bank4")->set_base(m_generic_paletteram_8);
 }
 
 WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )

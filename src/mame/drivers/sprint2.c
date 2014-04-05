@@ -94,9 +94,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 	}
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	discrete_sound_w(m_discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
-	discrete_sound_w(m_discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	discrete_sound_w(m_discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
+	m_discrete->write(space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
+	m_discrete->write(space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	m_discrete->write(space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -203,25 +203,25 @@ WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
 	m_attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(m_discrete, space, SPRINT2_ATTRACT_EN, m_attract);
+	m_discrete->write(space, SPRINT2_ATTRACT_EN, m_attract);
 }
 
 
 WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT2_NOISE_RESET, 0);
+	m_discrete->write(space, SPRINT2_NOISE_RESET, 0);
 }
 
 
 WRITE8_MEMBER(sprint2_state::sprint2_skid1_w)
 {
 	// also DOMINOS_TUMBLE_EN
-	discrete_sound_w(m_discrete, space, SPRINT2_SKIDSND1_EN, offset & 1);
+	m_discrete->write(space, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
 WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT2_SKIDSND2_EN, offset & 1);
+	m_discrete->write(space, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 

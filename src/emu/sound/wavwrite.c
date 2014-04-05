@@ -1,4 +1,4 @@
-#include "osdcore.h"
+#include "coretmpl.h"
 #include "sound/wavwrite.h"
 
 struct wav_file
@@ -16,7 +16,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	UINT16 align, temp16;
 
 	/* allocate memory for the wav struct */
-	wav = (wav_file *) osd_malloc(sizeof(wav_file));
+	wav = (wav_file *) global_alloc(wav_file);
 	if (!wav)
 		return NULL;
 
@@ -24,7 +24,7 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	wav->file = fopen(filename, "wb");
 	if (!wav->file)
 	{
-		osd_free(wav);
+		global_free(wav);
 		return NULL;
 	}
 
@@ -106,7 +106,7 @@ void wav_close(wav_file *wav)
 	fwrite(&temp32, 1, 4, wav->file);
 
 	fclose(wav->file);
-	osd_free(wav);
+	global_free(wav);
 }
 
 
@@ -122,13 +122,13 @@ void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
 
 void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc_array(samples * sizeof(temp[0]));
+	/* resize dynamic array */
+	temp.resize(samples);
 	if (!temp)
 		return;
 
@@ -142,21 +142,18 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	/* write and flush */
 	fwrite(temp, 2, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	osd_free(temp);
 }
 
 
 void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc_array(samples * 2 * sizeof(temp[0]));
+	/* resize dynamic array */
+	temp.resize(samples * 2);
 	if (!temp)
 		return;
 
@@ -167,21 +164,18 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	/* write and flush */
 	fwrite(temp, 4, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	osd_free(temp);
 }
 
 
 void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, int shift)
 {
-	INT16 *temp;
+	dynamic_array<INT16> temp;
 	int i;
 
 	if (!wav) return;
 
-	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc_array(samples * 2 * sizeof(temp[0]));
+	/* resize dynamic array */
+	temp.resize(samples);
 	if (!temp)
 		return;
 
@@ -196,7 +190,4 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	/* write and flush */
 	fwrite(temp, 4, samples, wav->file);
 	fflush(wav->file);
-
-	/* free memory */
-	osd_free(temp);
 }

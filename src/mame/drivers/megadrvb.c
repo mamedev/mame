@@ -648,11 +648,12 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( megadrvb, md_boot_state )
 	MCFG_FRAGMENT_ADD(md_ntsc)
+	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(md_boot_state, md_6button)
 {
-	MACHINE_START_CALL_MEMBER(megadriv);
+	MACHINE_START_CALL_MEMBER(md_bootleg);
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
 	m_io_pad_6b[1] = ioport("EXTRA2");

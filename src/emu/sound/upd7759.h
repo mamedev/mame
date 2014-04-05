@@ -14,19 +14,15 @@
 
 #define UPD7759_STANDARD_CLOCK      XTAL_640kHz
 
-struct upd775x_interface
-{
-	void (*m_drqcallback)(device_t *device, int param);   /* drq callback (per chip, slave mode only) */
-};
-
 class upd775x_device : public device_t,
-									public device_sound_interface,
-									public upd775x_interface
+									public device_sound_interface
 {
 public:
 	upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~upd775x_device() {}
 
+	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
+	
 	void set_bank_base(offs_t base);
 
 	void reset_w(UINT8 data);
@@ -36,7 +32,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -86,6 +81,8 @@ protected:
 	UINT32      m_romoffset;                  /* ROM offset to make save/restore easier */
 	UINT32      m_rommask;                    /* maximum address offset */
 
+	devcb2_write_line m_drqcallback;
+	
 	void update_adpcm(int data);
 	void advance_state();
 };
@@ -125,5 +122,10 @@ public:
 extern const device_type UPD7759;
 extern const device_type UPD7756;
 
+#define MCFG_UPD7759_DRQ_CALLBACK(_write) \
+	devcb = &upd7759_device::set_drq_callback(*device, DEVCB2_##_write);
+
+#define MCFG_UPD7756_DRQ_CALLBACK(_write) \
+	devcb = &upd7756_device::set_drq_callback(*device, DEVCB2_##_write);
 
 #endif /* __UPD7759_H__ */

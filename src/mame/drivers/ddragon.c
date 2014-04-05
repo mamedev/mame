@@ -936,27 +936,6 @@ static GFXDECODE_START( ddragon )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 8 )   /* colors 256-383 */
 GFXDECODE_END
 
-
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddragon_state,dd_adpcm_int_1),   /* interrupt function */
-	MSM5205_S48_4B  /* 8kHz */
-};
-
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ddragon_state,dd_adpcm_int_2),   /* interrupt function */
-	MSM5205_S48_4B  /* 8kHz */
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -1002,11 +981,13 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK / 32)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK / 32)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1067,11 +1048,13 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_1))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(ddragon_state, dd_adpcm_int_2))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

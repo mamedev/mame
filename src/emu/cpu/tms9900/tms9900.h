@@ -39,20 +39,6 @@ static const char opname[][5] =
 	"*int"
 };
 
-struct tms99xx_config
-{
-	devcb_write8        external_callback;
-	devcb_read8         irq_level;
-	devcb_write_line    instruction_acquisition;
-	devcb_write_line    clock_out;
-	devcb_write_line    wait_line;
-	devcb_write_line    holda_line;
-	devcb_write_line    dbin_line;
-};
-
-#define TMS99xx_CONFIG(name) \
-	const tms99xx_config(name) =
-
 class tms99xx_device : public cpu_device
 {
 public:
@@ -69,6 +55,15 @@ public:
 	// data and address bus and enter the HOLD state. The entrance of this state
 	// is acknowledged by the HOLDA output line.
 	void set_hold(int state);
+
+	// Callbacks
+	template<class _Object> static devcb2_base &static_set_extop_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_external_operation.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_intlevel_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_get_intlevel.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_iaq_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_iaq_line.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_clkout_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_clock_out_line.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_wait_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_wait_line.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_holda_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_holda_line.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -170,22 +165,22 @@ protected:
 	// Clock output. This is not a pin of the TMS9900 because the TMS9900
 	// needs an external clock, and usually one of those external lines is
 	// used for this purpose.
-	devcb_resolved_write_line   m_clock_out_line;
+	devcb2_write_line   m_clock_out_line;
 
 	// Wait output. When asserted (high), the CPU is in a wait state.
-	devcb_resolved_write_line   m_wait_line;
+	devcb2_write_line   m_wait_line;
 
 	// HOLD Acknowledge line. When asserted (high), the CPU is in HOLD state.
-	devcb_resolved_write_line   m_holda_line;
+	devcb2_write_line   m_holda_line;
 
 	// Signal to the outside world that we are now getting an instruction
-	devcb_resolved_write_line   m_iaq_line;
+	devcb2_write_line   m_iaq_line;
 
 	// Get the value of the interrupt level lines
-	devcb_resolved_read8    m_get_intlevel;
+	devcb2_read8    m_get_intlevel;
 
 	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb_resolved_write_line   m_dbin_line;
+	devcb2_write_line   m_dbin_line;
 
 	// Trigger external operation. This is achieved by putting a special value in
 	// the most significant three bits of the address bus (TMS9995: data bus) and
@@ -207,7 +202,7 @@ protected:
 	// We could realize this via the CRU access as well, but the data bus access
 	// is not that simple to emulate. For the sake of homogenity between the
 	// chip emulations we use a dedicated callback.
-	devcb_resolved_write8   m_external_operation;
+	devcb2_write8   m_external_operation;
 
 
 private:

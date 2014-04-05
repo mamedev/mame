@@ -100,29 +100,20 @@ void jvh_state::machine_reset()
 {
 }
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_NULL,     // External operation
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,      // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 DRIVER_INIT_MEMBER(jvh_state,jvh)
 {
 }
 
 static MACHINE_CONFIG_START( jvh, jvh_state )
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io, cpuconf)
+	// CPU TMS9980A; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 	MCFG_CPU_ADD("cpu2", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jvh2, jvh_state )
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io, cpuconf)
+	// CPU TMS9980At; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 	MCFG_CPU_ADD("cpu2", M6800, 1000000)
 	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
 MACHINE_CONFIG_END

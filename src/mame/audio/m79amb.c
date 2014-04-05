@@ -325,9 +325,9 @@ WRITE8_MEMBER(m79amb_state::m79amb_8000_w)
 	/* these values are not latched */
 	/* they are pulsed when the port is addressed */
 	/* the discrete system will just trigger from them */
-	discrete_sound_w(m_discrete, space, M79AMB_SHOT_EN, data & 0x01);
-	discrete_sound_w(m_discrete, space, M79AMB_BOOM_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, M79AMB_THUD_EN, data & 0x04);
+	m_discrete->write(space, M79AMB_SHOT_EN, data & 0x01);
+	m_discrete->write(space, M79AMB_BOOM_EN, data & 0x02);
+	m_discrete->write(space, M79AMB_THUD_EN, data & 0x04);
 };
 
 WRITE8_MEMBER(m79amb_state::m79amb_8003_w)
@@ -335,9 +335,9 @@ WRITE8_MEMBER(m79amb_state::m79amb_8003_w)
 	/* Self Test goes low on reset and lights LED */
 	/* LED goes off on pass */
 	output_set_value("SELF_TEST", data & 0x01);
-	discrete_sound_w(m_discrete, space, M79AMB_MC_REV_EN, data & 0x02);
-	discrete_sound_w(m_discrete, space, M79AMB_MC_CONTROL_EN, data & 0x04);
-	discrete_sound_w(m_discrete, space, M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);
-	discrete_sound_w(m_discrete, space, M79AMB_WHISTLE_B_EN, data & 0x10);
-	discrete_sound_w(m_discrete, space, M79AMB_WHISTLE_A_EN, data & 0x20);
+	m_discrete->write(space, M79AMB_MC_REV_EN, data & 0x02);
+	m_discrete->write(space, M79AMB_MC_CONTROL_EN, data & 0x04);
+	m_discrete->write(space, M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);
+	m_discrete->write(space, M79AMB_WHISTLE_B_EN, data & 0x10);
+	m_discrete->write(space, M79AMB_WHISTLE_A_EN, data & 0x20);
 }

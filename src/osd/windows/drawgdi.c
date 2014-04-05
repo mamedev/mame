@@ -82,7 +82,7 @@ static void drawgdi_exit(void)
 static int drawgdi_window_init(win_window_info *window)
 {
 	gdi_info *gdi;
-	int i;
+	UINT8 i;
 
 	// allocate memory for our structures
 	gdi = global_alloc_clear(gdi_info);

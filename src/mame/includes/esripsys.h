@@ -96,8 +96,9 @@ public:
 	DECLARE_WRITE8_MEMBER(frame_w);
 	DECLARE_READ8_MEMBER(fdt_r);
 	DECLARE_WRITE8_MEMBER(fdt_w);
-	static UINT8 static_rip_status_in(running_machine &machine);
-	UINT8 rip_status_in();
+	DECLARE_READ16_MEMBER( fdt_rip_r );
+	DECLARE_WRITE16_MEMBER( fdt_rip_w );
+	DECLARE_READ8_MEMBER(rip_status_in);
 	DECLARE_WRITE8_MEMBER(g_iobus_w);
 	DECLARE_READ8_MEMBER(g_iobus_r);
 	DECLARE_WRITE8_MEMBER(g_ioadd_w);
@@ -123,10 +124,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
 	required_device<dac_device> m_dac;
 	required_device<screen_device> m_screen;	
+	ESRIP_DRAW(esripsys_draw);
 };
-
-
-/*----------- defined in video/esripsys.c -----------*/
-int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 
 #endif // _ESRIPSYS_H_

@@ -214,7 +214,7 @@
 #define SND_CLOCK   XTAL_16_9344MHz
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83006.h"
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 
@@ -388,27 +388,22 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 	//0x800008 "arrow" w?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coinmvga_io_map, AS_IO, 8, coinmvga_state )
+static ADDRESS_MAP_START( coinmvga_io_map, AS_IO, 16, coinmvga_state )
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
-//  AM_RANGE(H8_PORT_4, H8_PORT_4)
-//  AM_RANGE(H8_PORT_5, H8_PORT_5)
-//  AM_RANGE(H8_PORT_6, H8_PORT_6)
-//  AM_RANGE(H8_PORT_7, H8_PORT_7) <---- 0006 RW colorama
-//  AM_RANGE(H8_PORT_8, H8_PORT_8)
-//  AM_RANGE(H8_PORT_9, H8_PORT_9)
-//  AM_RANGE(H8_PORT_A, H8_PORT_A)
-//  AM_RANGE(H8_PORT_B, H8_PORT_B)
+//  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
+//  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
+//  AM_RANGE(h8_device::PORT_6, h8_device::PORT_6)
+//  AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
+//  AM_RANGE(h8_device::PORT_8, h8_device::PORT_8)
+//  AM_RANGE(h8_device::PORT_9, h8_device::PORT_9)
+//  AM_RANGE(h8_device::PORT_A, h8_device::PORT_A)
+//  AM_RANGE(h8_device::PORT_B, h8_device::PORT_B)
 
 /*  Analog Inputs */
-//  AM_RANGE(H8_ADC_0_H, H8_ADC_0_L)
-//  AM_RANGE(H8_ADC_1_H, H8_ADC_1_L)
-//  AM_RANGE(H8_ADC_2_H, H8_ADC_2_L)
-//  AM_RANGE(H8_ADC_3_H, H8_ADC_3_L)
-
-/*  Serial ports */
-//  AM_RANGE(H8_SERIAL_0, H8_SERIAL_0)
-//  AM_RANGE(H8_SERIAL_1, H8_SERIAL_1)
-
+//  AM_RANGE(h8_device::ADC_0, h8_device::ADC_0)
+//  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
+//  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
+//  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
 ADDRESS_MAP_END
 
 /*  unknown writes (cmrltv75):

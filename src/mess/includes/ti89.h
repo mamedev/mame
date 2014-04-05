@@ -73,7 +73,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 keypad_r (running_machine &machine);
+	UINT8 keypad_r();
 	DECLARE_WRITE16_MEMBER ( ti68k_io_w );
 	DECLARE_READ16_MEMBER ( ti68k_io_r );
 	DECLARE_WRITE16_MEMBER ( ti68k_io2_w );

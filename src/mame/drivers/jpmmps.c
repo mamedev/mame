@@ -19,7 +19,7 @@
   Notes:
   MPS1- The hardware still uses TMS CPUs, but now with matrix driven lamps amongst other things. Later games used AY8910 as a sound chip instead of the SN76489.
 
-  MPS2- Basically MPS1 manufactured on a more compact board, replacing discrete logic with 'custom cells' - which are rebaged 8255 PPIs. This is the better
+  MPS2- Basically MPS1 manufactured on a more compact board, replacing discrete logic with 'custom cells' - which are rebadged 8255 PPIs. This is the better
   target to emulate, but some BwBs may struggle with the timing.
 
   this should be pretty easy to get going, my only concern is patches other drivers have to work around
@@ -203,17 +203,6 @@ MACHINE_START_MEMBER(jpmmps_state,jpmmps)
 
 }
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 void jpmmps_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
@@ -222,8 +211,8 @@ void jpmmps_state::machine_reset()
 
 static MACHINE_CONFIG_START( jpmmps, jpmmps_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map, cpuconf95)
+	// CPU TMS9995, standard variant; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
 
 	MCFG_I8255_ADD( "ppi8255_ic26", ppi8255_intf_ic26 )
 	MCFG_I8255_ADD( "ppi8255_ic21", ppi8255_intf_ic21 )

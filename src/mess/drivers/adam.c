@@ -292,7 +292,6 @@ Mark Gordon
 	- spinner INT
     - printer
     - SPI
-    - sound (PSG RDY -> Z80 WAIT)
 
     http://drushel.cwru.edu/atm/atm.html
     http://rich.dirocco.org/Coleco/adam/ADAM.htm
@@ -1014,9 +1013,7 @@ void adam_state::machine_start()
 
 void adam_state::machine_reset()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
-
-	if (image->exists())
+	if (m_cart->exists())
 	{
 		// game reset
 		m_game = 1;
@@ -1075,7 +1072,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL_7_15909MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	// TODO Z80 RDY
+	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
 
 	// devices
 	MCFG_ADAMNET_BUS_ADD()

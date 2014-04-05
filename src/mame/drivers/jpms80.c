@@ -95,20 +95,9 @@ void jpms80_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
 }
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map, cpuconf95)
+	// CPU TMS9995, standard variant; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CLOCK, jpms80_map, jpms80_io_map)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_TMS9902_ADD("tms9902duart", tms9902_config,    DUART_CLOCK)

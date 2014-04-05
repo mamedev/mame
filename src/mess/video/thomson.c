@@ -1232,3 +1232,29 @@ WRITE8_MEMBER( thomson_state::to8_vcart_w )
 		return;
 	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
 }
+
+WRITE8_MEMBER( thomson_state::mo6_vcart_lo_w )
+{
+	UINT8* dst = m_thom_vram + ( ( offset + 0x3000 + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	assert( offset < 0x1000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_cart_vpage >= 4  )
+		return;
+	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
+}
+
+WRITE8_MEMBER( thomson_state::mo6_vcart_hi_w )
+{
+	UINT8* dst = m_thom_vram + ( ( offset + 0x4000 * m_to8_cart_vpage ) & m_ram->mask() );
+	assert( offset < 0x3000 );
+	if ( *dst == data )
+		return;
+	*dst = data;
+	/* dirty whole scanline */
+	if ( m_to8_cart_vpage >= 4  )
+		return;
+	m_thom_vmem_dirty[ (offset & 0x1fff) / 40 ] = 1;
+}

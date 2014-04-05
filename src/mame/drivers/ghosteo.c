@@ -344,7 +344,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 				if ((nand.byte_addr >= 0x200) && (nand.byte_addr < 0x204))
 				{
 					UINT8 mecc[4];
-					s3c2410_nand_calculate_mecc( m_flash + nand.page_addr * 0x200, 0x200, mecc);
+					m_s3c2410->s3c2410_nand_calculate_mecc( m_flash + nand.page_addr * 0x200, 0x200, mecc);
 					data = mecc[nand.byte_addr-0x200];
 				}
 				else
@@ -579,7 +579,7 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
-	UINT32 ret = s3c2410_lcd_r(m_s3c2410, space, offset+0x10/4, mem_mask);
+	UINT32 ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
 
 
 	int pc = space.device().safe_pc();

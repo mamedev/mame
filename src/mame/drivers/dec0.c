@@ -1392,12 +1392,6 @@ WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
 	m_automat_msm5205_vclk_toggle ^= 1;
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dec0_automat_state,automat_vclk_cb),
-	MSM5205_S48_4B
-};
-
 
 static MACHINE_CONFIG_START( automat, dec0_automat_state )
 
@@ -1454,7 +1448,8 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000/2)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, automat_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1514,7 +1509,8 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000/2)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, automat_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

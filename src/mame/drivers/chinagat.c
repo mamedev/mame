@@ -510,13 +510,6 @@ WRITE_LINE_MEMBER(chinagat_state::chinagat_irq_handler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-/* This on the bootleg board, instead of the m6295 */
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(chinagat_state,saiyugoub1_m5205_irq_w), /* Interrupt function */
-	MSM5205_S64_4B          /* vclk input mode (6030Hz, 4-bit) */
-};
-
 /* This is only on the second bootleg board */
 static const ay8910_interface ay8910_config =
 {
@@ -649,7 +642,8 @@ static MACHINE_CONFIG_START( saiyugoub1, chinagat_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

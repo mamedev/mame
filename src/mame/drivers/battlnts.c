@@ -208,12 +208,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const k007420_interface bladestl_k007420_intf =
-{
-	0x3ff,  battlnts_sprite_callback    /* banklimit, callback */
-};
-
-
 void battlnts_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -260,7 +254,9 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_K007342_CALLBACK_OWNER(battlnts_state, battlnts_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
-	MCFG_K007420_ADD("k007420", bladestl_k007420_intf)
+	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_BANK_LIMIT(0x3ff)
+	MCFG_K007420_CALLBACK_OWNER(battlnts_state, battlnts_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */

@@ -90,17 +90,17 @@ void z8k_disass_mode(running_machine &machine, int ref, int params, const char *
 	if (params == 1)
 	{
 		len = strlen(param[0]);
-		if (!mame_strnicmp(param[0], "segmented", len) || !mame_stricmp(param[0], "z8001")) {
+		if (!core_strnicmp(param[0], "segmented", len) || !core_stricmp(param[0], "z8001")) {
 			z8k_segm = true;
 			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
 			debug_console_printf(machine, "Disassembler mode set to Z8001/segmented\n");
 		}
-		else if (!mame_strnicmp(param[0], "non-segmented", len) || !mame_stricmp(param[0], "z8002")) {
+		else if (!core_strnicmp(param[0], "non-segmented", len) || !core_stricmp(param[0], "z8002")) {
 			z8k_segm = false;
 			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
 			debug_console_printf(machine, "Disassembler mode set to Z8002/non-segmented\n");
 		}
-		else if (!mame_strnicmp(param[0], "automatic", len)) {
+		else if (!core_strnicmp(param[0], "automatic", len)) {
 			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
 			debug_console_printf(machine, "Disassembler mode set to automatic\n");
 		}

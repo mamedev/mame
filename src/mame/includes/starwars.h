@@ -78,11 +78,5 @@ public:
 	required_device<cpu_device> m_audiocpu;
 };
 
-
-/*----------- defined in machine/starwars.c -----------*/
-void starwars_mproc_init(running_machine &machine);
-void starwars_mproc_reset(running_machine &machine);
-
 /*----------- defined in audio/starwars.c -----------*/
-
 extern const riot6532_interface starwars_riot6532_intf;

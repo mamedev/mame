@@ -322,20 +322,10 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void generate_interrupt( running_machine &machine, int state )
+WRITE_LINE_MEMBER(capbowl_state::generate_tms34061_interrupt)
 {
-	capbowl_state *driver = machine.driver_data<capbowl_state>();
-	driver->m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
-
-static const struct tms34061_interface tms34061intf =
-{
-	8,                      /* VRAM address is (row << rowshift) | col */
-	0x10000,                /* size of video RAM */
-	generate_interrupt      /* interrupt gen callback */
-};
-
-
 
 /*************************************
  *
@@ -383,7 +373,10 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update_capbowl)
 
-	MCFG_TMS34061_ADD("tms34061", tms34061intf)
+	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
+	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
+	MCFG_TMS34061_VRAM_SIZE(0x10000) /* size of video RAM */
+	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(capbowl_state, generate_tms34061_interrupt))      /* interrupt gen callback */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

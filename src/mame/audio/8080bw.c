@@ -244,7 +244,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
 {
-	discrete_sound_w(m_discrete, space, BALLBOMB_MUSIC_DATA, data|0x80);
+	m_discrete->write(space, BALLBOMB_MUSIC_DATA, data|0x80);
 }
 
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
@@ -353,7 +353,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
-	discrete_sound_w(m_discrete, space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
@@ -697,27 +697,27 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
 {
-	discrete_sound_w(m_discrete, space, POLARIS_MUSIC_DATA, data);
+	m_discrete->write(space, POLARIS_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 {
 	/* 0x01 - SX0 - Shot */
-	discrete_sound_w(m_discrete, space, POLARIS_SX0_EN, data & 0x01);
+	m_discrete->write(space, POLARIS_SX0_EN, data & 0x01);
 
 	/* 0x02 - SX1 - Ship Hit (Sub) */
-	discrete_sound_w(m_discrete, space, POLARIS_SX1_EN, data & 0x02);
+	m_discrete->write(space, POLARIS_SX1_EN, data & 0x02);
 
 	/* 0x04 - SX2 - Ship */
-	discrete_sound_w(m_discrete, space, POLARIS_SX2_EN, data & 0x04);
+	m_discrete->write(space, POLARIS_SX2_EN, data & 0x04);
 
 	/* 0x08 - SX3 - Explosion */
-	discrete_sound_w(m_discrete, space, POLARIS_SX3_EN, data & 0x08);
+	m_discrete->write(space, POLARIS_SX3_EN, data & 0x08);
 
 	/* 0x10 - SX4 */
 
 	/* 0x20 - SX5 - Sound Enable */
-	discrete_sound_w(m_discrete, space, POLARIS_SX5_EN, data & 0x20);
+	m_discrete->write(space, POLARIS_SX5_EN, data & 0x20);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
@@ -727,16 +727,16 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
-	discrete_sound_w(m_discrete, space, POLARIS_SX6_EN, data & 0x01);
+	m_discrete->write(space, POLARIS_SX6_EN, data & 0x01);
 
 	/* 0x02 - SX7 - Plane Up */
-	discrete_sound_w(m_discrete, space, POLARIS_SX7_EN, data & 0x02);
+	m_discrete->write(space, POLARIS_SX7_EN, data & 0x02);
 
 	/* 0x08 - SX9 - Hit */
-	discrete_sound_w(m_discrete, space, POLARIS_SX9_EN, data & 0x08);
+	m_discrete->write(space, POLARIS_SX9_EN, data & 0x08);
 
 	/* 0x10 - SX10 - Hit */
-	discrete_sound_w(m_discrete, space, POLARIS_SX10_EN, data & 0x10);
+	m_discrete->write(space, POLARIS_SX10_EN, data & 0x10);
 }
 
 
@@ -887,8 +887,8 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	    Note that the schematic has SX2 and SX4 the wrong way around.
 	    See MT 2662 for video proof. */
 
-	discrete_sound_w(m_discrete, space, SCHASER_DOT_EN, data & 0x01);
-	discrete_sound_w(m_discrete, space, SCHASER_DOT_SEL, data & 0x02);
+	m_discrete->write(space, SCHASER_DOT_EN, data & 0x01);
+	m_discrete->write(space, SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
 	 * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -949,9 +949,9 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	   bit 4 - Field Control B (SX10)
 	   bit 5 - Flip Screen */
 
-	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, BIT(data, 0));
+	m_discrete->write(space, SCHASER_MUSIC_BIT, BIT(data, 0));
 
-	discrete_sound_w(m_discrete, space, SCHASER_SND_EN, BIT(data, 1));
+	m_discrete->write(space, SCHASER_SND_EN, BIT(data, 1));
 	machine().sound().system_enable(BIT(data, 1));
 
 	coin_lockout_global_w(machine(), BIT(data, 2));
@@ -1123,7 +1123,7 @@ const samples_interface lupin3_samples_interface =
 
 WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
 {
-	discrete_sound_w(m_discrete, space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)

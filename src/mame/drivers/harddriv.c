@@ -393,12 +393,6 @@ static const tms34010_config msp_config =
 	hdmsp_irq_gen                   /* generate interrupt */
 };
 
-
-static const dsp32_config dsp32c_config =
-{
-	hddsk_update_pif                /* a change has occurred on an output pin */
-};
-
 /*************************************
  *
  *  Driver board memory maps
@@ -1460,7 +1454,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
-	MCFG_DSP32C_CONFIG(dsp32c_config)
+	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
 	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	MCFG_EEPROM_2816_ADD("dsk_10c") // MK48Z02
@@ -1476,7 +1470,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk2 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
-	MCFG_DSP32C_CONFIG(dsp32c_config)
+	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
 	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */

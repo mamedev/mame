@@ -614,7 +614,7 @@ DEVICE_IMAGE_LOAD_MEMBER( a2600_state, a2600_cart )
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && m_banking_mode == 0xff; i++)
 			{
-				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+				if (!core_stricmp(mapper, mapper_types[i].mapper_name))
 				{
 					m_banking_mode = mapper_types[i].mapper_type;
 				}

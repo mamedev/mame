@@ -81,16 +81,6 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void speech_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -152,11 +142,9 @@ WRITE8_MEMBER( speech_sound_device::p2_w )
  *
  *************************************/
 
-void speech_sound_device::drq_w(device_t *device, int level)
+WRITE_LINE_MEMBER(speech_sound_device::drq_w)
 {
-	speech_sound_device *speech = device->machine().device<speech_sound_device>("segaspeech");
-
-	speech->m_drq = (level == ASSERT_LINE);
+	m_drq = (state == ASSERT_LINE);
 }
 
 
@@ -226,20 +214,6 @@ static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, driver_device )
 ADDRESS_MAP_END
 
 
-
-/*************************************
- *
- *  Speech board sound interfaces
- *
- *************************************/
-
-static const struct sp0250_interface sp0250_interface =
-{
-	speech_sound_device::drq_w
-};
-
-
-
 /*************************************
  *
  *  Speech board machine drivers
@@ -256,7 +230,7 @@ MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 	/* sound hardware */
 	MCFG_SOUND_ADD("segaspeech", SEGASPEECH, 0)
 	MCFG_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(sp0250_interface)
+	MCFG_SP0250_DRQ_CALLBACK(DEVWRITELINE("segaspeech", speech_sound_device, drq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

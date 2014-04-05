@@ -37,11 +37,10 @@ void harddriv_state::hdsnd_init()
  *
  *************************************/
 
-static void update_68k_interrupts(running_machine &machine)
+void harddriv_state::update_68k_interrupts()
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	state->m_soundcpu->set_input_line(1, state->m_mainflag ? ASSERT_LINE : CLEAR_LINE);
-	state->m_soundcpu->set_input_line(3, state->m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(1, m_mainflag ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(3, m_irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -66,18 +65,17 @@ READ16_MEMBER(harddriv_state::hd68k_snd_status_r)
 }
 
 
-static TIMER_CALLBACK( delayed_68k_w )
+TIMER_CALLBACK_MEMBER( harddriv_state::delayed_68k_w )
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	state->m_maindata = param;
-	state->m_mainflag = 1;
-	update_68k_interrupts(machine);
+	m_maindata = param;
+	m_mainflag = 1;
+	update_68k_interrupts();
 }
 
 
 WRITE16_MEMBER(harddriv_state::hd68k_snd_data_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_68k_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::delayed_68k_w), this), data);
 	logerror("%06X:main write to sound=%04X\n", space.device().safe_pcbase(), data);
 }
 
@@ -87,7 +85,7 @@ WRITE16_MEMBER(harddriv_state::hd68k_snd_reset_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_mainflag = m_soundflag = 0;
-	update_68k_interrupts(machine());
+	update_68k_interrupts();
 	logerror("%06X:Reset sound\n", space.device().safe_pcbase());
 }
 
@@ -102,7 +100,7 @@ WRITE16_MEMBER(harddriv_state::hd68k_snd_reset_w)
 READ16_MEMBER(harddriv_state::hdsnd68k_data_r)
 {
 	m_mainflag = 0;
-	update_68k_interrupts(machine());
+	update_68k_interrupts();
 	logerror("%06X:sound read from main=%04X\n", space.device().safe_pcbase(), m_maindata);
 	return m_maindata;
 }
@@ -206,7 +204,7 @@ WRITE16_MEMBER(harddriv_state::hdsnd68k_speech_w)
 WRITE16_MEMBER(harddriv_state::hdsnd68k_irqclr_w)
 {
 	m_irq68k = 0;
-	update_68k_interrupts(machine());
+	update_68k_interrupts();
 }
 
 
@@ -318,7 +316,7 @@ WRITE16_MEMBER(harddriv_state::hdsnddsp_gen68kirq_w)
 {
 	/* generate 68k IRQ */
 	m_irq68k = 1;
-	update_68k_interrupts(machine());
+	update_68k_interrupts();
 }
 
 

@@ -5,7 +5,7 @@
 
 Carts released in Japan
 
-1. Dig Dug (ディグダグ )
+1. Dig Dug (ディグダグ)
 2. Tank Battalion (タンクバタリアン)
 3. Bosconian (ボスコニアン)
 4. Galax (ギャラックス)
@@ -74,24 +74,16 @@ and why some of the dumps below have weird size?
 <softwarelist name="m5" description="Sord M5 cartridges">
 
 <!-- Games -->
-	<software name="fruitsrc">
-		<description>Fruit Search</description>
-		<year>1983</year>
-		<publisher>Takara</publisher>
-		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="fruit search (1983)(takara)(jp).bin" size="4096" crc="333ac50f" sha1="a838fbf0bc4513d3b6bcc3165f1eac33ca27d6fa" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
 
-	<software name="drgnatck">
-		<description>Dragon Attack</description>
-		<year>1983</year>
-		<publisher>Takara</publisher>
+	<software name="digdug">
+		<description>Dig Dug</description>
+		<year>1982</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="1" />
+		<info name="alt_title" value="ディグダグ" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="4096">
-				<rom name="dragon attack (1983)(takara)(jp).bin" size="4096" crc="5862d06c" sha1="f2707ad6dd564df01e7f81a21a00842e17cd49a4" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="digdug.rom" size="8192" crc="9b207054" sha1="971f7bc1b6247d17a488f6e07eabc07580219ed9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,6 +98,45 @@ and why some of the dumps below have weird size?
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="tank battlaion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galax">
+		<description>Galax</description>
+		<year>1981</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="4" />
+		<info name="alt_title" value="ギャラックス" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="galax.rom" size="8192" crc="62c26c8c" sha1="5f73e90f9b551501e6fd5b9a63cfcfaea7691821" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powerpac">
+		<description>Power Pac</description>
+		<year>1982</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="5" />
+		<info name="alt_title" value="パワーパック" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="powerpac.rom" size="8192" crc="3ce70f7f" sha1="2ee74f02f0249ff7192b4f29c1a061fc4f1eb920" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warpwarp">
+		<description>Warp &amp; Warp</description>
+		<year>1981</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="6" />
+		<info name="alt_title" value="ワープ&amp;ワープ" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="warpwarp.rom" size="8192" crc="1b9e2e58" sha1="38c1721eb04188e1201c31dde2fc03963b685d69" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -133,6 +164,19 @@ and why some of the dumps below have weird size?
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8448">
 				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8448" crc="0f70fa69" sha1="4e4900f42cbc76e4e795ed32ee18b2e27246e90f" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpatrol">
+		<description>Moon Patrol</description>
+		<year>1981</year>
+		<publisher>Irem</publisher>
+		<info name="serial" value="9" />
+		<info name="alt_title" value="ムーンパトロール" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="moonpatrol.rom" size="8192" crc="1324c6c0" sha1="fa61c047b0051efa23a6607e4c1f7726ff683caf" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -216,6 +260,19 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
+	<software name="apploon">
+		<description>Apploon</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="17" />
+		<info name="alt_title" value="アップルーン" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="apploon.rom" size="8192" crc="558cf858" sha1="743906ecab6439766fe374ccdf64b9c2acecbf97" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="upupball" supported="no">
 		<description>Up Up Balloon</description>
 		<year>1983</year>
@@ -225,6 +282,19 @@ and why some of the dumps below have weird size?
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8320">
 				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappy">
+		<description>Mappy</description>
+		<year>1983</year>
+		<publisher>Namco</publisher>
+		<info name="serial" value="19" />
+		<info name="alt_title" value="マッピー" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="mappy.rom" size="8192" crc="b83f6d83" sha1="c94c4def1a64fade08179b08b1d6f6178ff56a3f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -254,6 +324,58 @@ and why some of the dumps below have weird size?
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="jongkyo">
+		<description>Jong Kyo</description>
+		<year>1983?</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="24" />
+		<info name="alt_title" value="ジャン狂" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="mahjong.rom" size="16384" crc="b32c9e08" sha1="0b24213ef49a6ad04bc8ecff616b94ccf0f7a8aa" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="adidas">
+		<description>Adidas Lucky Shoot</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Adidas ラッキー シュート" />
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="adidas.rom" size="8192" crc="d6ef9cae" sha1="80314f4351b9c0ebeb48f7757694717950d5a9b0" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnatck">
+		<description>Dragon Attack</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="dragon attack (1983)(takara)(jp).bin" size="4096" crc="5862d06c" sha1="f2707ad6dd564df01e7f81a21a00842e17cd49a4" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitsrc">
+		<description>Fruit Search</description>
+		<year>1983</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="m5_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="fruit search (1983)(takara)(jp).bin" size="4096" crc="333ac50f" sha1="a838fbf0bc4513d3b6bcc3165f1eac33ca27d6fa" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+
 
 <!-- Program + Languages -->
 	<software name="basicf">

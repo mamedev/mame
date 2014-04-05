@@ -1866,6 +1866,7 @@ dsoccr94j       // (c) 1994 Irem (Japan)
 gunforc2        // (c) 1994 Irem
 geostorm        // (c) 1994 Irem (Japan)
 // M107
+airass			// (c) 1993 Irem (World)
 firebarr        // (c) 1993 Irem (Japan)
 dsoccr94        // (c) 1994 Irem (Data East Corporation license)
 kftgoal         // (c) 1994 Jaleco
@@ -2563,10 +2564,10 @@ slapfigha       // A76 / TP-???
 slapfighb1      // bootleg but (c) 1986 Taito Corporation
 slapfighb2      // bootleg but (c) 1986 Taito Corporation
 slapfighb3      // bootleg but (c) 1986 Taito Corporation
-getstar         // A68 (c) 1986 Taito Corporation
+grdian          // A68 (c) 1986 Taito Corporation
 getstarj        // A68 (c) 1986 Taito Corporation
-gtstarb1        // GX-006 bootleg but (c) 1986 Taito Corporation
-gtstarb2        // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarb1       // GX-006 bootleg but (c) 1986 Taito Corporation
+getstarb2       // GX-006 bootleg but (c) 1986 Taito Corporation
 mjsister        // (c) 1986 Toaplan
 fshark          // B02 / TP-007 (c) 1987 Taito Corporation (World)
 skyshark        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
@@ -5219,7 +5220,8 @@ alpiltdx        // 1999.?? Airline Pilots Deluxe (Rev B)
 				// 1999.?? Pocket Shooting
 spawn           // 1999.?? Spawn In the Demon's Hand
 18wheelr        // 2000.01 18 Wheeler Deluxe (Rev A)
-18wheels        // 2000.01 18 Wheeler (Rev A)
+18wheels        // 2000.01 18 Wheeler (Standard)
+18wheelu        // 2000.01 18 Wheeler (Upright)
 doa2m           // 2000.01 Dead or Alive 2 Millennium
 totd            // 2000.01 The Typing of the Dead (Rev A)
 tduno2          // 2000.02 Touch de UNO! 2
@@ -5398,7 +5400,8 @@ vstrik3         // 2001.04 Virtua Striker 3 Ver. 2002 (GD-ROM)
 vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
 wldrider        // 2001.05 Wild Riders
-clubkrte        // 2001.06 Club Kart
+clubkrte        // 2001.06 Club Kart: European Session
+clubkrtd        // 2001.06 Club Kart: European Session (Rev D)
 beachspi        // 2001.07 Beach Spikers
 vf4cart         // 2001.08.02 Virtua Fighter 4 (cartridge)
 vf4             // 2001.08.02 Virtua Fighter 4 (GD-ROM)
@@ -5415,7 +5418,8 @@ initdv2j        // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-	        		// 2002.?? Club Kart: European Session
+clubk2k3	// 2003.?? Club Kart: European Session 2003
+clubk2kf
 initdexp        // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
 				// 2003.03 World Club Champion Football Serie A 2001-2002 Ver.2
@@ -7414,6 +7418,7 @@ doubledr        // 0082 (c) 1995 Technos
 pbobblen        // 0083 (c) 1994 Taito
 pbobblenb       // bootleg
 kof95           // 0084 (c) 1995 SNK
+kof95a          // 0084 (c) 1995 SNK, alternate board
 kof95h          // 0084 (c) 1995 SNK
 				// 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only)
 tws96           // 0086 (c) 1996 Tecmo
@@ -7493,6 +7498,7 @@ rbff2h          // 0240 (c) 1998 SNK
 rbff2k          // 0140 Censored Korean release of rbff2
 mslug2          // 0241 (c) 1998 SNK
 kof98           // 0242 (c) 1998 SNK
+kof98a          // 0242 (c) 1998 SNK, alternate board
 kof98k          // 0242 (c) 1998 SNK
 kof98ka         // 0242 (c) 1998 SNK
 kof98h          // 0242 (c) 1998 SNK
@@ -9294,6 +9300,7 @@ popspops        // (c) 1999
 firehawk        // (c) 2001 ESD
 mangchi         // (c) 2000
 spec2k          // (c) 2000 Yonatech
+spec2kv
 
 // ESD games
 // http://www.esdgame.co.kr/english/
@@ -10097,6 +10104,7 @@ nostj           // (c) 1993 Face
 nostk           // (c) 1993 Face
 4enraya         // (c) 1990 IDSA
 4enrayaa        //
+4enlinea		// (c) 1991 System Compumatic
 unkpacg         // (c) 19?? ???
 oneshot         // no copyright notice
 maddonna        // (c) 1995 Tuning

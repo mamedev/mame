@@ -10,15 +10,12 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ICS2115_ADD(_tag, _clock, _irqf) \
-	MCFG_DEVICE_ADD(_tag, ICS2115, _clock) \
-	MCFG_IRQ_FUNC(_irqf)
-#define MCFG_ICS2115_REPLACE(_tag, _clock, _irqf) \
-	MCFG_DEVICE_REPLACE(_tag, ICS2115, _clock) \
-	MCFG_IRQ_FUNC(_irqf)
+#define MCFG_ICS2115_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, ICS2115, _clock)
 
-#define MCFG_IRQ_FUNC(_irqf) \
-	ics2115_device::static_set_irqf(*device, _irqf);
+#define MCFG_ICS2115_IRQ_CB(_devcb) \
+	devcb = &ics2115_device::set_irq_callback(*device, DEVCB2_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -95,15 +92,14 @@ public:
 	// construction/destruction
 	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
+	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<ics2115_device &>(device).m_irq_cb.set_callback(object); }
 
-	static DECLARE_READ8_DEVICE_HANDLER(read);
-	static DECLARE_WRITE8_DEVICE_HANDLER(write);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 	//UINT8 read(offs_t offset);
 	//void write(offs_t offset, UINT8 data);
-	static TIMER_CALLBACK(timer_cb_0);
-	static TIMER_CALLBACK(timer_cb_1);
+	TIMER_CALLBACK_MEMBER(timer_cb_0);
+	TIMER_CALLBACK_MEMBER(timer_cb_1);
 
 	sound_stream *m_stream;
 
@@ -119,7 +115,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	void (*m_irq_cb)(device_t *device, int state);
+	devcb2_write_line m_irq_cb;
 
 	UINT8 *m_rom;
 	INT16 m_ulaw[256];

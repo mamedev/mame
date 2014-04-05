@@ -395,17 +395,6 @@ static GFXDECODE_START( nsmpoker )
 GFXDECODE_END
 
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 void nsmpoker_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
@@ -418,8 +407,8 @@ void nsmpoker_state::machine_reset()
 
 static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap, cpuconf95)
+	// CPU TMS9995, standard variant; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nsmpoker_state,  nsmpoker_interrupt)
 
 	/* video hardware */

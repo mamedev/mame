@@ -30,7 +30,7 @@
 
 #define PORT                                \
 	((m_pdr & m_ddr) |                  \
-		((!m_in_port_func.isnull() ? m_in_port_func( 0 ) : 0) & \
+		((!m_in_port_cb.isnull() ? m_in_port_cb( 0 ) : 0) & \
 		~m_ddr))
 
 #define CTO                             \
@@ -44,33 +44,14 @@
 const device_type MC6846 = &device_creator<mc6846_device>;
 
 mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__)
+	: device_t(mconfig, MC6846, "Motorola MC6846 programmable timer", tag, owner, clock, "mc6846", __FILE__),
+	m_out_port_cb(*this),
+	m_out_cp1_cb(*this),
+	m_out_cp2_cb(*this),
+	m_in_port_cb(*this),
+	m_out_cto_cb(*this),
+	m_irq_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6846_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc6846_interface *intf = reinterpret_cast<const mc6846_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc6846_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_port_cb, 0, sizeof(m_out_port_cb));
-		memset(&m_out_cp1_cb, 0, sizeof(m_out_cp1_cb));
-		memset(&m_out_cp2_cb, 0, sizeof(m_out_cp2_cb));
-		memset(&m_in_port_cb, 0, sizeof(m_in_port_cb));
-		memset(&m_out_cto_cb, 0, sizeof(m_out_cto_cb));
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -82,18 +63,18 @@ void mc6846_device::device_start()
 	m_interval = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_expire), this));
 	m_one_shot = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_one_shot), this));
 
-	m_out_port_func.resolve(m_out_port_cb, *this);  /* 8-bit output */
-	m_out_cp1_func.resolve(m_out_cp1_cb, *this);   /* 1-bit output */
-	m_out_cp2_func.resolve(m_out_cp2_cb, *this);   /* 1-bit output */
+	m_out_port_cb.resolve();  /* 8-bit output */
+	m_out_cp1_cb.resolve_safe();   /* 1-bit output */
+	m_out_cp2_cb.resolve();   /* 1-bit output */
 
 	/* CPU read from the outside through chip */
-	m_in_port_func.resolve(m_in_port_cb, *this); /* 8-bit input */
+	m_in_port_cb.resolve(); /* 8-bit input */
 
 	/* asynchronous timer output to outside world */
-	m_out_cto_func.resolve(m_out_cto_cb, *this); /* 1-bit output */
+	m_out_cto_cb.resolve(); /* 1-bit output */
 
 	/* timer interrupt */
-	m_irq_func.resolve(m_irq_cb, *this);
+	m_irq_cb.resolve();
 
 	save_item(NAME(m_csr));
 	save_item(NAME(m_pcr));
@@ -171,14 +152,14 @@ inline void mc6846_device::update_irq()
 	if ( cif )
 	{
 		m_csr |= 0x80;
-		if ( !m_irq_func.isnull() )
-			m_irq_func( 1 );
+		if ( !m_irq_cb.isnull() )
+			m_irq_cb( 1 );
 	}
 	else
 	{
 		m_csr &= ~0x80;
-		if ( !m_irq_func.isnull() )
-			m_irq_func( 0 );
+		if ( !m_irq_cb.isnull() )
+			m_irq_cb( 0 );
 	}
 }
 
@@ -192,8 +173,8 @@ inline void mc6846_device::update_cto()
 		LOG (( "%f: mc6846 CTO set to %i\n", machine().time().as_double(), cto ));
 		m_old_cto = cto;
 	}
-	if ( !m_out_cto_func.isnull() )
-		m_out_cto_func( 0, cto );
+	if ( !m_out_cto_cb.isnull() )
+		m_out_cto_cb( (offs_t) 0, cto );
 }
 
 
@@ -410,8 +391,8 @@ WRITE8_MEMBER(mc6846_device::write)
 		if (data & 0x10)
 		{
 			m_cp2_cpu = (data >> 3) & 1;
-			if ( !m_out_cp2_func.isnull() )
-				m_out_cp2_func( 0, m_cp2_cpu );
+			if ( !m_out_cp2_cb.isnull() )
+				m_out_cp2_cb( (offs_t) 0, m_cp2_cpu );
 		}
 		else
 			logerror( "%s mc6846 acknowledge not implemented\n", machine().describe_context() );
@@ -423,8 +404,8 @@ WRITE8_MEMBER(mc6846_device::write)
 		if ( ! (m_pcr & 0x80) )
 		{
 			m_ddr = data;
-			if ( !m_out_port_func.isnull() )
-				m_out_port_func( 0, m_pdr & m_ddr );
+			if ( !m_out_port_cb.isnull() )
+				m_out_port_cb( (offs_t) 0, m_pdr & m_ddr );
 		}
 		break;
 
@@ -433,8 +414,8 @@ WRITE8_MEMBER(mc6846_device::write)
 		if ( ! (m_pcr & 0x80) )
 		{
 			m_pdr = data;
-			if ( !m_out_port_func.isnull() )
-				m_out_port_func( 0, m_pdr & m_ddr );
+			if ( !m_out_port_cb.isnull() )
+				m_out_port_cb( (offs_t) 0, m_pdr & m_ddr );
 			if ( m_csr1_to_be_cleared && (m_csr & 2) )
 			{
 				m_csr &= ~2;

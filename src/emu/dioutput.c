@@ -27,6 +27,14 @@ device_output_interface::device_output_interface(const machine_config &mconfig, 
 {
 }
 
+//-------------------------------------------------
+//  device_output_interface - destructor
+//-------------------------------------------------
+
+device_output_interface::~device_output_interface()
+{
+}
+
 void device_output_interface::set_output_value(int value)
 {
 	if (m_output_name)

@@ -48,10 +48,10 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( gatearray_w );
-	UINT16 pb2000c_kb_r(running_machine &machine);
-	UINT16 pb1000_kb_r(running_machine &machine);
-	void kb_matrix_w(running_machine &machine, UINT8 matrix);
-	UINT16 read_touchscreen(running_machine &machine, UINT8 line);
+	UINT16 pb2000c_kb_r();
+	UINT16 pb1000_kb_r();
+	void kb_matrix_w(UINT8 matrix);
+	UINT16 read_touchscreen(UINT8 line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 };
@@ -338,12 +338,12 @@ static void lcd_data_w(hd61700_cpu_device &device, UINT8 data)
 }
 
 
-UINT16 pb1000_state::read_touchscreen(running_machine &machine, UINT8 line)
+UINT16 pb1000_state::read_touchscreen(UINT8 line)
 {
-	UINT8 x = machine.root_device().ioport("POSX")->read()/0x40;
-	UINT8 y = machine.root_device().ioport("POSY")->read()/0x40;
+	UINT8 x = ioport("POSX")->read()/0x40;
+	UINT8 y = ioport("POSY")->read()/0x40;
 
-	if (machine.root_device().ioport("TOUCH")->read())
+	if (ioport("TOUCH")->read())
 	{
 		if (x == line-7)
 			return (0x1000<<y);
@@ -353,7 +353,7 @@ UINT16 pb1000_state::read_touchscreen(running_machine &machine, UINT8 line)
 }
 
 
-UINT16 pb1000_state::pb1000_kb_r(running_machine &machine)
+UINT16 pb1000_state::pb1000_kb_r()
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -363,21 +363,21 @@ UINT16 pb1000_state::pb1000_kb_r(running_machine &machine)
 		//Read all the input lines
 		for (int line = 1; line <= 12; line++)
 		{
-			data |= machine.root_device().ioport(bitnames[line])->read();
-			data |= read_touchscreen(machine, line);
+			data |= ioport(bitnames[line])->read();
+			data |= read_touchscreen(line);
 		}
 
 	}
 	else
 	{
-		data = machine.root_device().ioport(bitnames[m_kb_matrix & 0x0f])->read();
-		data |= read_touchscreen(machine, m_kb_matrix & 0x0f);
+		data = ioport(bitnames[m_kb_matrix & 0x0f])->read();
+		data |= read_touchscreen(m_kb_matrix & 0x0f);
 	}
 
 	return data;
 }
 
-UINT16 pb1000_state::pb2000c_kb_r(running_machine &machine)
+UINT16 pb1000_state::pb2000c_kb_r()
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	UINT16 data = 0;
@@ -387,19 +387,19 @@ UINT16 pb1000_state::pb2000c_kb_r(running_machine &machine)
 		//Read all the input lines
 		for (int line = 1; line <= 12; line++)
 		{
-			data |= machine.root_device().ioport(bitnames[line])->read();
+			data |= ioport(bitnames[line])->read();
 		}
 
 	}
 	else
 	{
-		data = machine.root_device().ioport(bitnames[m_kb_matrix & 0x0f])->read();
+		data = ioport(bitnames[m_kb_matrix & 0x0f])->read();
 	}
 
 	return data;
 }
 
-void pb1000_state::kb_matrix_w(running_machine &machine, UINT8 matrix)
+void pb1000_state::kb_matrix_w(UINT8 matrix)
 {
 	if (matrix & 0x80)
 	{
@@ -428,7 +428,7 @@ static void kb_matrix_w_call(hd61700_cpu_device &device, UINT8 matrix)
 {
 	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	state->kb_matrix_w(device.machine(), matrix);
+	state->kb_matrix_w(matrix);
 }
 
 static UINT8 pb1000_port_r(hd61700_cpu_device &device)
@@ -454,14 +454,14 @@ static UINT16 pb1000_kb_r_call(hd61700_cpu_device &device)
 {
 	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	return state->pb1000_kb_r(device.machine());
+	return state->pb1000_kb_r();
 }
 
 static UINT16 pb2000c_kb_r_call(hd61700_cpu_device &device)
 {
 	pb1000_state *state = device.machine().driver_data<pb1000_state>();
 
-	return state->pb2000c_kb_r(device.machine());
+	return state->pb2000c_kb_r();
 }
 
 static const hd61700_config pb1000_config =

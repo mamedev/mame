@@ -30,7 +30,9 @@ const device_type TMS34061 = &device_creator<tms34061_device>;
 tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS34061, "tms34061", tag, owner, clock, "tms34061", __FILE__),
 	device_video_interface(mconfig, *this),
-	//m_regs[TMS34061_REGCOUNT],
+	m_rowshift(0),
+	m_vramsize(0),
+	m_interrupt_cb(*this),
 	m_xmask(0),
 	m_yshift(0),
 	m_vrammask(0),
@@ -39,35 +41,9 @@ tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag,
 	m_latchdata(0),
 	m_shiftreg(NULL),
 	m_timer(NULL)
-	//m_display.blanked(0),
-	//m_display.vram(NULL),
-	//m_display.latchram(NULL),
-	//m_display.regs(NULL),
-	//m_display.dispstart(0),
-	//m_display.screen(NULL)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms34061_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tms34061_interface *intf = reinterpret_cast<const tms34061_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tms34061_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_rowshift = 0;
-	m_vramsize = 0;
-	//(*m_interrupt)(int state)
-	}
+	memset(m_regs, 0, sizeof(m_regs));
+	memset(&m_display, 0, sizeof(m_display));
 }
 
 //-------------------------------------------------
@@ -76,6 +52,9 @@ void tms34061_device::device_config_complete()
 
 void tms34061_device::device_start()
 {
+	/* resolve callbak */
+	m_interrupt_cb.resolve();
+	
 	/* reset the data */
 	m_vrammask = m_vramsize - 1;
 
@@ -151,13 +130,13 @@ static const char *const regnames[] =
 void tms34061_device::update_interrupts()
 {
 	/* if we have a callback, process it */
-	if (m_interrupt)
+	if (!m_interrupt_cb.isnull())
 	{
 		/* if the status bit is set, and ints are enabled, turn it on */
 		if ((m_regs[TMS34061_STATUS] & 0x0001) && (m_regs[TMS34061_CONTROL1] & 0x0400))
-			(*m_interrupt)(m_screen->machine(), ASSERT_LINE);
+			m_interrupt_cb(ASSERT_LINE);
 		else
-			(*m_interrupt)(m_screen->machine(), CLEAR_LINE);
+			m_interrupt_cb(CLEAR_LINE);
 	}
 }
 

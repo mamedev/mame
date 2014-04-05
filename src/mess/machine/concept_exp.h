@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "machine/wd17xx.h"
-#include "includes/corvushd.h"
+#include "machine/corvushd.h"
 
 // FIXME: Concept expansion ports should just use the Apple II Bus device!
 // The code below is outdated and inaccurate!

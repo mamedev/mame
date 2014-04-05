@@ -432,6 +432,7 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(oric_state, telestrat_acia_callback))
 
 	/* via */
 	MCFG_DEVICE_ADD( "via6522_1", VIA6522, 1000000 )

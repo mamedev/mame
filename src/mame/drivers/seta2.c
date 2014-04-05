@@ -109,7 +109,8 @@ reelquak:
 #include "emu.h"
 #include "includes/seta2.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/h83002/h8.h"
+#include "machine/tmp68301.h"
+#include "cpu/h8/h83006.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
@@ -508,6 +509,118 @@ ADDRESS_MAP_END
                                Funcube series
 ***************************************************************************/
 
+// Touchscreen
+
+#define MCFG_FUNCUBE_TOUCHSCREEN_ADD( _tag, _clock ) \
+	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
+
+#define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
+	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB2_##_devcb);
+
+class funcube_touchscreen_device : public device_t,
+								   public device_serial_interface
+{
+public:
+	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual ioport_constructor device_input_ports() const;
+	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	virtual void tra_complete();
+	virtual void tra_callback();
+
+private:
+	devcb2_write_line m_tx_cb;
+	required_ioport m_x;
+	required_ioport m_y;
+	required_ioport m_btn;
+	
+	UINT8 m_button_state;
+	int m_serial_pos;
+	UINT8 m_serial[4];
+};
+
+const device_type FUNCUBE_TOUCHSCREEN = &device_creator<funcube_touchscreen_device>;
+
+static INPUT_PORTS_START( funcube_touchscreen )
+	PORT_START("touch_btn")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch Screen" )
+
+	PORT_START("touch_x")
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X ) PORT_MINMAX(0,0x5c+1) PORT_CROSSHAIR(X, -(1.0 * 0x05d/0x5c), -1.0/0x5c, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START("touch_y")
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
+INPUT_PORTS_END
+
+funcube_touchscreen_device::funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, FUNCUBE_TOUCHSCREEN, "Funcube Touchscreen", tag, owner, clock, "funcube_touchscrene", __FILE__),
+	device_serial_interface(mconfig, *this),
+	m_tx_cb(*this),
+	m_x(*this, "touch_x"),
+	m_y(*this, "touch_y"),
+	m_btn(*this, "touch_btn")
+{
+}
+
+ioport_constructor funcube_touchscreen_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(funcube_touchscreen);
+}
+
+void funcube_touchscreen_device::device_start()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_tra_rate(9600);
+	m_button_state = 0x00;
+	emu_timer *tm = timer_alloc(0);
+	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
+	m_tx_cb.resolve_safe();
+}
+
+void funcube_touchscreen_device::device_reset()
+{
+	m_serial_pos = 0;
+	memset(m_serial, 0, sizeof(m_serial));
+	m_tx_cb(1);
+}
+
+void funcube_touchscreen_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id) {
+		device_serial_interface::device_timer(timer, id, param, ptr);
+		return;
+	}
+
+	UINT8 button_state = m_btn->read();
+	if(m_button_state != button_state) {
+		m_button_state = button_state;
+		m_serial[0] = button_state ? 0xfe : 0xfd;
+		m_serial[1] = m_x->read();
+		m_serial[2] = m_y->read();
+		m_serial[3] = 0xff;
+		m_serial_pos = 0;
+		transmit_register_setup(m_serial[m_serial_pos++]);
+	}
+}
+
+void funcube_touchscreen_device::tra_complete()
+{
+	if(m_serial_pos != 4)
+		transmit_register_setup(m_serial[m_serial_pos++]);
+}
+
+void funcube_touchscreen_device::tra_callback()
+{
+	m_tx_cb(transmit_register_get_data_bit());
+}
+
+
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
@@ -623,7 +736,7 @@ ADDRESS_MAP_END
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL_14_7456MHz)
 
-READ8_MEMBER(seta2_state::funcube_coins_r)
+READ16_MEMBER(seta2_state::funcube_coins_r)
 {
 	UINT8 ret = ioport("SWITCH")->read();
 	UINT8 coin_bit0 = 1;    // active low
@@ -653,24 +766,6 @@ READ8_MEMBER(seta2_state::funcube_coins_r)
 	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
 }
 
-READ8_MEMBER(seta2_state::funcube_serial_r)
-{
-	UINT8 ret = 0xff;
-
-	switch( m_funcube_serial_count )
-	{
-		case 4: ret = m_funcube_serial_fifo[0]; break;
-		case 3: ret = m_funcube_serial_fifo[1]; break;
-		case 2: ret = m_funcube_serial_fifo[2]; break;
-		case 1: ret = m_funcube_serial_fifo[3]; break;
-	}
-
-	if (m_funcube_serial_count)
-		m_funcube_serial_count--;
-
-	return ret;
-}
-
 void seta2_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
@@ -678,7 +773,7 @@ void seta2_state::funcube_debug_outputs()
 #endif
 }
 
-WRITE8_MEMBER(seta2_state::funcube_leds_w)
+WRITE16_MEMBER(seta2_state::funcube_leds_w)
 {
 	*m_funcube_leds = data;
 
@@ -694,13 +789,13 @@ WRITE8_MEMBER(seta2_state::funcube_leds_w)
 	funcube_debug_outputs();
 }
 
-READ8_MEMBER(seta2_state::funcube_outputs_r)
+READ16_MEMBER(seta2_state::funcube_outputs_r)
 {
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
 }
 
-WRITE8_MEMBER(seta2_state::funcube_outputs_w)
+WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 {
 	*m_funcube_outputs = data;
 
@@ -717,27 +812,24 @@ WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 	funcube_debug_outputs();
 }
 
-READ8_MEMBER(seta2_state::funcube_battery_r)
+READ16_MEMBER(seta2_state::funcube_battery_r)
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }
 
-static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8, seta2_state )
-	AM_RANGE( H8_PORT_7,   H8_PORT_7   )    AM_READ(funcube_coins_r )
-	AM_RANGE( H8_PORT_4,   H8_PORT_4   )    AM_READ(funcube_battery_r )
-	AM_RANGE( H8_PORT_A,   H8_PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
-	AM_RANGE( H8_PORT_B,   H8_PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
-//  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
-	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )    AM_READ(funcube_serial_r )
+// cabinet linking on sci0
+static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 16, seta2_state )
+	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
+	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_READ(funcube_battery_r )
+	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
+	AM_RANGE( h8_device::PORT_B,   h8_device::PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( funcube2_sub_io, AS_IO, 8, seta2_state )
-	AM_RANGE( H8_PORT_7,   H8_PORT_7   )    AM_READ(funcube_coins_r )
-	AM_RANGE( H8_PORT_4,   H8_PORT_4   )    AM_NOP  // unused
-	AM_RANGE( H8_PORT_A,   H8_PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
-	AM_RANGE( H8_PORT_B,   H8_PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
-//  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
-	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )    AM_READ(funcube_serial_r )
+static ADDRESS_MAP_START( funcube2_sub_io, AS_IO, 16, seta2_state )
+	AM_RANGE( h8_device::PORT_7,   h8_device::PORT_7   )    AM_READ(funcube_coins_r )
+	AM_RANGE( h8_device::PORT_4,   h8_device::PORT_4   )    AM_NOP  // unused
+	AM_RANGE( h8_device::PORT_A,   h8_device::PORT_A   )    AM_READWRITE(funcube_outputs_r, funcube_outputs_w ) AM_SHARE("funcube_outputs")
+	AM_RANGE( h8_device::PORT_B,   h8_device::PORT_B   )    AM_WRITE(funcube_leds_w )                           AM_SHARE("funcube_leds")
 ADDRESS_MAP_END
 
 
@@ -1727,15 +1819,6 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( funcube )
-	PORT_START("TOUCH_PRESS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch Screen" )
-
-	PORT_START("TOUCH_X")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X ) PORT_MINMAX(0,0x5c+1) PORT_CROSSHAIR(X, -(1.0 * 0x05d/0x5c), -1.0/0x5c, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
-
-	PORT_START("TOUCH_Y")
-	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
-
 	PORT_START("SWITCH")    // c00030.l
 	PORT_BIT(     0x01, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(1)  // coin solenoid 1
 	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_SPECIAL  )                  // coin solenoid 2
@@ -2150,37 +2233,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(seta2_state::funcube_sub_timer_irq)
-{
-	if ( m_funcube_serial_count )
-	{
-		device.execute().set_input_line(H8_SCI_1_RX, HOLD_LINE);
-	}
-	else
-	{
-		UINT8 press   = ioport("TOUCH_PRESS")->read();
-		UINT8 release = m_funcube_press && !press;
-
-		if ( press || release )
-		{
-			m_funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
-			m_funcube_serial_fifo[1] = ioport("TOUCH_X")->read();
-			m_funcube_serial_fifo[2] = ioport("TOUCH_Y")->read();
-			m_funcube_serial_fifo[3] = 0xff;
-			m_funcube_serial_count = 4;
-		}
-
-		m_funcube_press = press;
-	}
-
-	device.execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
-}
-
 MACHINE_RESET_MEMBER(seta2_state,funcube)
 {
 	m_funcube_coin_start_cycles = 0;
-	m_funcube_serial_count = 0;
-	m_funcube_press = 0;
 	m_funcube_hopper_motor = 0;
 }
 
@@ -2193,9 +2248,11 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
 	MCFG_CPU_IO_MAP(funcube_sub_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, funcube_sub_timer_irq,  60*10)
 
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+
+	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
+	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(DEVWRITELINE(":sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

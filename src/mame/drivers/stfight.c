@@ -530,12 +530,6 @@ static GFXDECODE_START( cshooter )
 GFXDECODE_END
 
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(stfight_state, stfight_adpcm_int), // Interrupt function
-	MSM5205_S48_4B  // 8KHz, 4-bit
-};
-
 static MACHINE_CONFIG_START( stfight, stfight_state )
 
 	/* basic machine hardware */
@@ -584,7 +578,8 @@ static MACHINE_CONFIG_START( stfight, stfight_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

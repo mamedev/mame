@@ -101,6 +101,8 @@ public:
 	UINT8 read_input_matrix(running_machine &machine, int row);
 
 
+	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	
 	DECLARE_READ16_MEMBER(sc4_mem_r);
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 

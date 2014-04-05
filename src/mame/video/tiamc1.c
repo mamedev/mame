@@ -141,6 +141,8 @@ void tiamc1_state::video_start()
 
 	m_bg_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
+	m_bg_tilemap1->set_scrolldx(4, 4);
+	m_bg_tilemap2->set_scrolldx(4, 4);
 
 	m_bg_vshift = 0;
 	m_bg_hshift = 0;
@@ -177,21 +179,19 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#if 0
 	int i;
 
 	for (i = 0; i < 32; i++)
 	{
-		m_bg_tilemap1->set_scrolly(i, m_bg_vshift ^ 0xff);
-		m_bg_tilemap2->set_scrolly(i, m_bg_vshift ^ 0xff);
+		m_bg_tilemap1->set_scrolly(i, m_bg_vshift);
+		m_bg_tilemap2->set_scrolly(i, m_bg_vshift);
 	}
 
 	for (i = 0; i < 32; i++)
 	{
-		m_bg_tilemap1->set_scrollx(i, m_bg_hshift ^ 0xff);
-		m_bg_tilemap2->set_scrollx(i, m_bg_hshift ^ 0xff);
+		m_bg_tilemap1->set_scrollx(i, m_bg_hshift);
+		m_bg_tilemap2->set_scrollx(i, m_bg_hshift);
 	}
-#endif
 
 	if (m_layers_ctrl & 0x80)
 		m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);

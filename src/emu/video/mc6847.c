@@ -130,6 +130,8 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
 		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_write_hsync(*this),
+		m_write_fsync(*this),
 		m_character_map(fontdata, is_mc6847t1)
 {
 	m_tpfs = tpfs;
@@ -164,6 +166,9 @@ ATTR_FORCE_INLINE emu_timer *mc6847_friend_device::setup_timer(device_timer_id i
 
 void mc6847_friend_device::device_start(void)
 {
+	m_write_hsync.resolve_safe();
+	m_write_fsync.resolve_safe();
+
 	/* create the timers */
 	m_frame_timer = setup_timer(    TIMER_FRAME,        0,                      m_tpfs * TIMER_HSYNC_PERIOD);
 	m_hsync_on_timer = setup_timer( TIMER_HSYNC_ON,     TIMER_HSYNC_ON_TIME,    TIMER_HSYNC_PERIOD);
@@ -351,8 +356,7 @@ ATTR_FORCE_INLINE void mc6847_friend_device::change_horizontal_sync(bool line)
 			logerror("%s: change_horizontal_sync(): line=%d\n", describe_context(), line ? 1 : 0);
 
 		// invoke callback
-		if (!m_res_out_hsync_func.isnull())
-			m_res_out_hsync_func(line);
+		m_write_hsync(line);
 
 		// call virtual function
 		horizontal_sync_changed(m_horizontal_sync);
@@ -379,8 +383,7 @@ ATTR_FORCE_INLINE void mc6847_friend_device::change_field_sync(bool line)
 			logerror("%s: change_field_sync(): line=%d\n", describe_context(), line ? 1 : 0);
 
 		/* invoke callback */
-		if (!m_res_out_fsync_func.isnull())
-			m_res_out_fsync_func(line);
+		m_write_fsync(line);
 
 		/* call virtual function */
 		field_sync_changed(m_field_sync);
@@ -599,8 +602,6 @@ void mc6847_base_device::device_start()
 
 	/* resolve callbacks */
 	m_res_input_func.resolve(config->m_input_func, *this);
-	m_res_out_hsync_func.resolve(config->m_out_hsync_func, *this);
-	m_res_out_fsync_func.resolve(config->m_out_fsync_func, *this);
 	m_get_char_rom = config->m_get_char_rom;
 
 	/* set up fixed mode */

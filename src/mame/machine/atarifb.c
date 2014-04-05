@@ -13,10 +13,10 @@ WRITE8_MEMBER(atarifb_state::atarifb_out1_w)
 {
 	m_CTRLD = data;
 
-	discrete_sound_w(m_discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
-	discrete_sound_w(m_discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
-	discrete_sound_w(m_discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
-	discrete_sound_w(m_discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
+	m_discrete->write(space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	m_discrete->write(space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 }
 
 
@@ -24,10 +24,10 @@ WRITE8_MEMBER(atarifb_state::atarifb4_out1_w)
 {
 	m_CTRLD = data;
 
-	discrete_sound_w(m_discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
-	discrete_sound_w(m_discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
-	discrete_sound_w(m_discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
-	discrete_sound_w(m_discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
+	m_discrete->write(space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	m_discrete->write(space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 	coin_counter_w(machine(), 1, data & 0x80);
 }
@@ -37,10 +37,10 @@ WRITE8_MEMBER(atarifb_state::abaseb_out1_w)
 {
 	m_CTRLD = data;
 
-	discrete_sound_w(m_discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
-	discrete_sound_w(m_discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
-	discrete_sound_w(m_discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
-	discrete_sound_w(m_discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
+	m_discrete->write(space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	m_discrete->write(space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 	if (data & 0x80)
 	{
@@ -69,10 +69,10 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 	/* bit 5-6 = trackball CTRL bits */
 	/* bit 7 = Rule LED */
 
-	discrete_sound_w(m_discrete, space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
-	discrete_sound_w(m_discrete, space, ATARIFB_HIT_EN, data & 0x02);         // Hit
-	discrete_sound_w(m_discrete, space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
-	discrete_sound_w(m_discrete, space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
+	m_discrete->write(space, ATARIFB_WHISTLE_EN, data & 0x01);     // Whistle
+	m_discrete->write(space, ATARIFB_HIT_EN, data & 0x02);         // Hit
+	m_discrete->write(space, ATARIFB_ATTRACT_EN, data & 0x10);     // Attract
+	m_discrete->write(space, ATARIFB_NOISE_EN, data & 0x04);           // Noise Enable / Kicker
 
 //  set_led_status(machine(), 0, data & 0x10);  // !!!!!!!!!! Is this correct????
 	set_led_status(machine(), 1, data & 0x80);
@@ -81,7 +81,7 @@ WRITE8_MEMBER(atarifb_state::soccer_out1_w)
 
 WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
 {
-	discrete_sound_w(m_discrete, space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
+	m_discrete->write(space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
 	coin_counter_w (machine(), 0, data & 0x10);
 }
@@ -89,7 +89,7 @@ WRITE8_MEMBER(atarifb_state::atarifb_out2_w)
 
 WRITE8_MEMBER(atarifb_state::soccer_out2_w)
 {
-	discrete_sound_w(m_discrete, space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
+	m_discrete->write(space, ATARIFB_CROWD_DATA, data & 0x0f); // Crowd
 
 	coin_counter_w (machine(), 0, data & 0x10);
 	coin_counter_w (machine(), 1, data & 0x20);

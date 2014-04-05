@@ -231,12 +231,6 @@ WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(goal92_state,goal92_adpcm_int),   /* interrupt function */
-	MSM5205_S96_4B      /* 4KHz 4-bit */
-};
-
 static const gfx_layout layout_8x8x4 =
 {
 	8,8,
@@ -340,7 +334,8 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(goal92_state, goal92_adpcm_int))   /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

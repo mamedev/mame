@@ -603,7 +603,7 @@ UINT32 firebeat_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 {
 	bitmap.fill(0, cliprect);
 
-	if ((mame_strnicmp(screen.machine().system().name, "popn", 4) == 0) || (mame_strnicmp(screen.machine().system().name, "bm3", 3) == 0))
+	if ((core_strnicmp(screen.machine().system().name, "popn", 4) == 0) || (core_strnicmp(screen.machine().system().name, "bm3", 3) == 0))
 	{
 		gcu_exec_display_list( bitmap, cliprect, chip, 0x1f80000);
 	}
@@ -751,7 +751,7 @@ void firebeat_state::GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask
 		case 0x40:      /* framebuffer config */
 			// HACK: switch display lists at the right times for the ParaParaParadise games until we
 			// do the video emulation properly
-			if (mame_strnicmp(machine().system().name, "pp", 2) == 0)
+			if (core_strnicmp(machine().system().name, "pp", 2) == 0)
 			{
 				switch (data)
 				{
@@ -771,7 +771,7 @@ void firebeat_state::GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask
 						break;
 				}
 			}
-			else if (mame_strnicmp(machine().system().name, "kbm", 3) == 0)
+			else if (core_strnicmp(machine().system().name, "kbm", 3) == 0)
 			{
 				switch (data)
 				{

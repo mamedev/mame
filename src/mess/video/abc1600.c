@@ -50,11 +50,6 @@
 #define REPLACE     BIT(m_flag, 7)
 
 
-// image position
-#define HFP         96
-#define VFP         23
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -167,11 +162,9 @@ inline UINT16 abc1600_mover_device::get_crtca(UINT16 ma, UINT8 ra, UINT8 column)
 	return (cr << 10) | ((ra & 0x0f) << 6) | ((cc << 1) & 0x3c);
 }
 
-void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
-	if (y > 0x3ff) return;
-
-	int x = HFP;
+	int x = 0;
 	const pen_t *pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column += 2)
@@ -185,9 +178,9 @@ void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitma
 
 			for (int bit = 0; bit < 16; bit++)
 			{
-				int color = (BIT(data, 15) ^ PIX_POL) && !BLANK;
+				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
 
-				bitmap.pix32(y + VFP, x++) = pen[color];
+				bitmap.pix32(vbp + y, hbp + x++) = pen[color];
 
 				data <<= 1;
 			}
@@ -198,7 +191,7 @@ void abc1600_mover_device::crtc_update_row(device_t *device, bitmap_rgb32 &bitma
 static MC6845_UPDATE_ROW( abc1600_update_row )
 {
 	abc1600_mover_device *mover = downcast<abc1600_mover_device *>(device->owner());
-	mover->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param);
+	mover->crtc_update_row(device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param);
 }
 
 static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )

@@ -613,6 +613,7 @@ mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, d
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(TYPE_6526),
+		m_tod_clock(0),
 		m_write_irq(*this),
 		m_write_pc(*this),
 		m_write_cnt(*this),
@@ -777,15 +778,8 @@ void mos6526_device::device_reset()
 
 void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (!m_tod_stopped)
-	{
-		clock_tod();
-
-		if (m_tod == m_alarm)
-		{
-			m_icr |= ICR_ALARM;
-		}
-	}
+	tod_w(1);
+	tod_w(0);
 }
 
 
@@ -1099,62 +1093,12 @@ WRITE8_MEMBER( mos8520_device::write )
 
 
 //-------------------------------------------------
-//  pa_r - port A read
-//-------------------------------------------------
-
-UINT8 mos6526_device::pa_r()
-{
-	return m_pa;
-}
-
-READ8_MEMBER( mos6526_device::pa_r )
-{
-	return pa_r();
-}
-
-
-//-------------------------------------------------
-//  pb_r - port B read
-//-------------------------------------------------
-
-UINT8 mos6526_device::pb_r()
-{
-	return m_pb;
-}
-
-READ8_MEMBER( mos6526_device::pb_r )
-{
-	return pb_r();
-}
-
-
-//-------------------------------------------------
-//  sp_r - serial port read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos6526_device::sp_r )
-{
-	return m_sp;
-}
-
-
-//-------------------------------------------------
 //  sp_w - serial port write
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mos6526_device::sp_w )
 {
 	m_sp = state;
-}
-
-
-//-------------------------------------------------
-//  cnt_r - serial counter read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( mos6526_device::cnt_r )
-{
-	return m_cnt;
 }
 
 
@@ -1188,4 +1132,22 @@ WRITE_LINE_MEMBER( mos6526_device::flag_w )
 	}
 
 	m_flag = state;
+}
+
+
+//-------------------------------------------------
+//  tod_w - time-of-day clock write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mos6526_device::tod_w )
+{
+	if (state && !m_tod_stopped)
+	{
+		clock_tod();
+
+		if (m_tod == m_alarm)
+		{
+			m_icr |= ICR_ALARM;
+		}
+	}
 }

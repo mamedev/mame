@@ -333,13 +333,6 @@ static GFXDECODE_START( rastan )
 GFXDECODE_END
 
 
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(rastan_state,rastan_msm5205_vck), /* VCK function */
-	MSM5205_S48_4B      /* 8 kHz */
-};
-
 void rastan_state::machine_start()
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
@@ -422,7 +415,8 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(rastan_state, rastan_msm5205_vck)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", rastan_tc0140syt_intf)

@@ -108,8 +108,6 @@
 
 gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, const char *shortname, const char *source)
 	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false, shortname, source),
-		m_write_hsync(*this),
-		m_write_fsync(*this),
 		m_write_irq(*this),
 		m_write_firq(*this),
 		m_read_floating_bus(*this)
@@ -167,8 +165,6 @@ void gime_base_device::device_start(void)
 	}
 
 	// resolve callbacks
-	m_write_hsync.resolve_safe();
-	m_write_fsync.resolve_safe();
 	m_write_irq.resolve_safe();
 	m_write_firq.resolve_safe();
 	m_read_floating_bus.resolve_safe(0);

@@ -66,18 +66,23 @@
 #define TTL_9316_DIP(_name)                                                         \
         NET_REGISTER_DEV(9316_dip, _name)
 
+NETLIB_SUBDEVICE(9316_subABCD,
+    netlist_ttl_input_t m_A;
+    netlist_ttl_input_t m_B;
+    netlist_ttl_input_t m_C;
+    netlist_ttl_input_t m_D;
+
+    ATTR_HOT inline UINT8 read_ABCD();
+);
+
 NETLIB_SUBDEVICE(9316_sub,
 	ATTR_HOT void update_outputs_all(const UINT8 cnt);
 	ATTR_HOT void update_outputs(const UINT8 cnt);
 
 	netlist_ttl_input_t m_CLK;
 
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
-
 	UINT8 m_cnt;
+	NETLIB_NAME(9316_subABCD) *m_ABCD;
 	netlist_sig_t m_loadq;
 	netlist_sig_t m_ent;
 
@@ -90,6 +95,7 @@ NETLIB_SUBDEVICE(9316_sub,
 
 NETLIB_DEVICE(9316,
 	NETLIB_NAME(9316_sub) sub;
+    NETLIB_NAME(9316_subABCD) subABCD;
 	netlist_ttl_input_t m_ENP;
 	netlist_ttl_input_t m_ENT;
 	netlist_ttl_input_t m_CLRQ;

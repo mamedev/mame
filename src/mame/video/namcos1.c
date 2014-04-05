@@ -175,36 +175,33 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-READ8_HANDLER( namcos1_videoram_r )
+READ8_MEMBER( namcos1_state::namcos1_videoram_r )
 {
-	namcos1_state *state = space.machine().driver_data<namcos1_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( namcos1_videoram_w )
+WRITE8_MEMBER( namcos1_state::namcos1_videoram_w )
 {
-	namcos1_state *state = space.machine().driver_data<namcos1_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 	if (offset < 0x7000)
 	{   /* background 0-3 */
 		int layer = offset >> 13;
 		int num = (offset & 0x1fff) >> 1;
-		state->m_bg_tilemap[layer]->mark_tile_dirty(num);
+		m_bg_tilemap[layer]->mark_tile_dirty(num);
 	}
 	else
 	{   /* foreground 4-5 */
 		int layer = (offset >> 11 & 1) + 4;
 		int num = ((offset & 0x7ff) - 0x10) >> 1;
 		if (num >= 0 && num < 0x3f0)
-			state->m_bg_tilemap[layer]->mark_tile_dirty(num);
+			m_bg_tilemap[layer]->mark_tile_dirty(num);
 	}
 }
 
 
-WRITE8_HANDLER( namcos1_paletteram_w )
+WRITE8_MEMBER( namcos1_state::namcos1_paletteram_w )
 {
-	namcos1_state *state = space.machine().driver_data<namcos1_state>();
-	if (state->m_paletteram[offset] == data)
+	if (m_paletteram[offset] == data)
 		return;
 
 	if ((offset & 0x1800) != 0x1800)
@@ -212,26 +209,26 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		int r,g,b;
 		int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
 
-		state->m_paletteram[offset] = data;
+		m_paletteram[offset] = data;
 
 		offset &= ~0x1800;
-		r = state->m_paletteram[offset];
-		g = state->m_paletteram[offset + 0x0800];
-		b = state->m_paletteram[offset + 0x1000];
-		state->m_palette->set_pen_color(color,rgb_t(r,g,b));
+		r = m_paletteram[offset];
+		g = m_paletteram[offset + 0x0800];
+		b = m_paletteram[offset + 0x1000];
+		m_palette->set_pen_color(color,rgb_t(r,g,b));
 	}
 	else
 	{
 		int i, j;
 
-		state->m_cus116[offset & 0x0f] = data;
+		m_cus116[offset & 0x0f] = data;
 
 		for (i = 0x1800; i < 0x8000; i += 0x2000)
 		{
 			offset = (offset & 0x0f) | i;
 
 			for (j = 0; j < 0x80; j++, offset += 0x10)
-				state->m_paletteram[offset] = data;
+				m_paletteram[offset] = data;
 		}
 	}
 }
@@ -239,34 +236,32 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 
 
 
-READ8_HANDLER( namcos1_spriteram_r )
+READ8_MEMBER( namcos1_state::namcos1_spriteram_r )
 {
-	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)
-		return state->m_spriteram[offset];
+		return m_spriteram[offset];
 	/* 1xxx playfield control ram */
 	else
-		return state->m_playfield_control[offset & 0x1f];
+		return m_playfield_control[offset & 0x1f];
 }
 
-WRITE8_HANDLER( namcos1_spriteram_w )
+WRITE8_MEMBER( namcos1_state::namcos1_spriteram_w )
 {
-	namcos1_state *state = space.machine().driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)
 	{
-		state->m_spriteram[offset] = data;
+		m_spriteram[offset] = data;
 
 		/* a write to this offset tells the sprite chip to buffer the sprite list */
 		if (offset == 0x0ff2)
-			state->m_copy_sprites = 1;
+			m_copy_sprites = 1;
 	}
 	/* 1xxx playfield control ram */
 	else
-		state->m_playfield_control[offset & 0x1f] = data;
+		m_playfield_control[offset & 0x1f] = data;
 }
 
 
@@ -297,13 +292,12 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void namcos1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	namcos1_state *state = screen.machine().driver_data<namcos1_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x800;
+	UINT8 *spriteram = m_spriteram + 0x800;
 	const UINT8 *source = &spriteram[0x800-0x20];   /* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
-	gfx_element *gfx = state->m_gfxdecode->gfx(1);
+	gfx_element *gfx = m_gfxdecode->gfx(1);
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
@@ -333,7 +327,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -361,7 +355,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					screen.priority(), pri_mask,
-					state->m_drawmode_table);
+					m_drawmode_table);
 
 		source -= 0x10;
 	}

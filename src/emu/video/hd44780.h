@@ -52,6 +52,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(control_read);
 	virtual DECLARE_WRITE8_MEMBER(data_write);
 	virtual DECLARE_READ8_MEMBER(data_read);
+
+	const UINT8 *render();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -123,6 +125,7 @@ private:
 	int         m_rw_state;
 	bool        m_nibble;
 	int         m_charset_type;
+	UINT8		m_render_buf[80*16];
 
 	enum        { DDRAM, CGRAM };
 };

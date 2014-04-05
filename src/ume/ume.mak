@@ -25,8 +25,8 @@ include $(SRC)/mess/mess.mak
 depend: maketree $(MAKEDEP_TARGET)
 	@echo Rebuilding depend_$(TARGET).mak...
 	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/emu > depend_emu.mak
-	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/mame > depend_mame.mak
-	$(MAKEDEP) -I. $(INCPATH) -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/mess > depend_mess.mak
+	$(MAKEDEP) -I. $(INCPATH) -I$(SRC)/mame -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/mame > depend_mame.mak
+	$(MAKEDEP) -I. $(INCPATH) -I$(SRC)/mess -X$(SRC)/emu -X$(SRC)/osd/... -X$(OBJ)/... $(SRC)/mess > depend_mess.mak
 
 	@echo -include depend_emu.mak > depend_ume.mak
 	@echo -include depend_mame.mak >> depend_ume.mak

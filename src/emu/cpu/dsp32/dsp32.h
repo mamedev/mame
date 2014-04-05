@@ -95,29 +95,19 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dsp32c_device;
-
-
-// ======================> dsp32_config
-
-struct dsp32_config
-{
-	void (*m_output_pins_changed)(dsp32c_device &device, UINT32 pins);  // a change has occurred on an output pin
-};
-
-
+#define MCFG_DSP32C_OUTPUT_CALLBACK(_write) \
+	devcb = &dsp32c_device::set_output_pins_callback(*device, DEVCB2_##_write);
 
 // ======================> dsp32c_device
 
-class dsp32c_device : public cpu_device,
-						public dsp32_config
+class dsp32c_device : public cpu_device
 {
 public:
 	// construction/destruction
 	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// inline configuration helpers
-	static void static_set_config(device_t &device, const dsp32_config &config);
+	template<class _Object> static devcb2_base &set_output_pins_callback(device_t &device, _Object object) { return downcast<dsp32c_device &>(device).m_output_pins_changed.set_callback(object); }
+
 
 	// public interfaces
 	void pio_w(int reg, int data);
@@ -443,6 +433,7 @@ protected:
 	address_space * m_program;
 	direct_read_data *m_direct;
 
+	devcb2_write32 m_output_pins_changed;
 	// tables
 	static void (dsp32c_device::*const s_dsp32ops[])(UINT32 op);
 	static const UINT32 s_regmap[4][16];

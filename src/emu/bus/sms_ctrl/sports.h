@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Sega Master System "Sports Pad" emulation
+    Sega Master System "Sports Pad" (US model) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

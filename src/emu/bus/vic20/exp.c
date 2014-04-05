@@ -116,13 +116,13 @@ bool vic20_expansion_slot_device::call_load()
 	{
 		if (software_entry() == NULL)
 		{
-			if (!mame_stricmp(filetype(), "20")) fread(m_card->m_blk1, 0x2000);
-			else if (!mame_stricmp(filetype(), "40")) fread(m_card->m_blk2, 0x2000);
-			else if (!mame_stricmp(filetype(), "60")) fread(m_card->m_blk3, 0x2000);
-			else if (!mame_stricmp(filetype(), "70")) fread(m_card->m_blk3, 0x2000, 0x1000);
-			else if (!mame_stricmp(filetype(), "a0")) fread(m_card->m_blk5, 0x2000);
-			else if (!mame_stricmp(filetype(), "b0")) fread(m_card->m_blk5, 0x2000, 0x1000);
-			else if (!mame_stricmp(filetype(), "crt"))
+			if (!core_stricmp(filetype(), "20")) fread(m_card->m_blk1, 0x2000);
+			else if (!core_stricmp(filetype(), "40")) fread(m_card->m_blk2, 0x2000);
+			else if (!core_stricmp(filetype(), "60")) fread(m_card->m_blk3, 0x2000);
+			else if (!core_stricmp(filetype(), "70")) fread(m_card->m_blk3, 0x2000, 0x1000);
+			else if (!core_stricmp(filetype(), "a0")) fread(m_card->m_blk5, 0x2000);
+			else if (!core_stricmp(filetype(), "b0")) fread(m_card->m_blk5, 0x2000, 0x1000);
+			else if (!core_stricmp(filetype(), "crt"))
 			{
 				// read the header
 				UINT8 header[2];

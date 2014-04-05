@@ -4249,16 +4249,6 @@ public:
 	virtual void set_output_ptr(stream_sample_t *ptr) = 0;
 };
 
-
-/*************************************
- *
- *  Interface to the external world
- *
- *************************************/
-
-DECLARE_WRITE8_DEVICE_HANDLER( discrete_sound_w );
-DECLARE_READ8_DEVICE_HANDLER( discrete_sound_r );
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************

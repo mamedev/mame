@@ -293,5 +293,82 @@ private:
     netlist_list_t<_StackClass, _NumElem> m_list;
 };
 
+template <class _ListClass>
+struct plinked_list_element
+{
+    plinked_list_element() : m_next(NULL) {}
+    _ListClass * m_next;
+
+};
+
+template <class _ListClass>
+class plinked_list
+{
+public:
+
+    plinked_list() : m_head(NULL) {}
+
+    ATTR_HOT inline void insert(const _ListClass &before, _ListClass &elem)
+    {
+        if (m_head == &before)
+        {
+            elem.m_next = m_head;
+            m_head = elem;
+        }
+        else
+        {
+            _ListClass *p = m_head;
+            while (p != NULL)
+            {
+                if (p->m_next == &before)
+                {
+                    elem->m_next = &before;
+                    p->m_next = &elem;
+                    return;
+                }
+                p = p->m_next;
+            }
+            assert_always(false, "element not found");
+        }
+    }
+
+    ATTR_HOT inline void insert(_ListClass &elem)
+    {
+        elem.m_next = m_head;
+        m_head = &elem;
+    }
+
+    ATTR_HOT inline void add(_ListClass &elem)
+    {
+        _ListClass **p = &m_head;
+        while (*p != NULL)
+        {
+            p = &((*p)->m_next);
+        }
+        *p = &elem;
+        elem.m_next = NULL;
+    }
+
+    ATTR_HOT inline void remove(const _ListClass &elem)
+    {
+        _ListClass **p = &m_head;
+        while (*p != &elem)
+        {
+            assert(*p != NULL);
+            p = &((*p)->m_next);
+        }
+        (*p) = elem.m_next;
+    }
+
+
+    ATTR_HOT static inline _ListClass *next(const _ListClass &elem) { return elem.m_next; }
+    ATTR_HOT static inline _ListClass *next(const _ListClass *elem) { return elem->m_next; }
+    ATTR_HOT inline _ListClass *first() const { return m_head; }
+    ATTR_HOT inline void clear() { m_head = NULL; }
+    ATTR_HOT inline bool is_empty() const { return (m_head == NULL); }
+
+private:
+    _ListClass *m_head;
+};
 
 #endif /* NLLISTS_H_ */

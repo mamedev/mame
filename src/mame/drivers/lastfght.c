@@ -63,7 +63,7 @@ Notes:
 *********************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
 
 class lastfght_state : public driver_device
@@ -129,7 +129,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(unknown_interrupt);
 };
 
 
@@ -447,8 +446,6 @@ static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(lastfght_c00002_r )
 	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(lastfght_c00004_r )
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(lastfght_c00006_r, lastfght_c00006_w )
-
-	AM_RANGE( 0xff0000, 0xffffff ) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -520,11 +517,6 @@ INPUT_PORTS_END
                                 Machine Drivers
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(lastfght_state::unknown_interrupt)
-{
-	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
-}
-
 void lastfght_state::machine_start()
 {
 	save_item(NAME(m_clr_offset));
@@ -571,7 +563,6 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP( lastfght_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lastfght_state, unknown_interrupt, 60)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

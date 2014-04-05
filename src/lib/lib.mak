@@ -144,6 +144,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/fdi_dsk.o     \
 	$(LIBOBJ)/formats/fm7_cas.o     \
 	$(LIBOBJ)/formats/fmsx_cas.o    \
+	$(LIBOBJ)/formats/fmtowns_dsk.o \
 	$(LIBOBJ)/formats/g64_dsk.o     \
 	$(LIBOBJ)/formats/gtp_cas.o     \
 	$(LIBOBJ)/formats/hect_dsk.o    \
@@ -348,7 +349,7 @@ else
 ARCHFLAGS = -DWORDS_BIGENDIAN=0
 endif
 
-FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H=0 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS) -O0
+FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS) -O0
 ifdef MSVC_BUILD
 	# vconv will convert the \" to just a "
 	FLACOPTS += -DVERSION=\\\"1.2.1\\\"

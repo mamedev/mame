@@ -145,6 +145,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
+	m_vdp->stop_timers();	// 315-5124 timers
 
 	// save state
 	save_item(NAME(m_mcu_data));
@@ -550,12 +551,12 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
 
 READ16_MEMBER( segas18_state::genesis_vdp_r )
 {
-	return m_vdp->megadriv_vdp_r(space,offset,mem_mask);
+	return m_vdp->vdp_r(space, offset, mem_mask);
 }
 
 WRITE16_MEMBER( segas18_state::genesis_vdp_w )
 {
-	m_vdp->megadriv_vdp_w(space,offset,data,mem_mask);
+	m_vdp->vdp_w(space, offset, data, mem_mask);
 }
 
 
@@ -1191,15 +1192,15 @@ GFXDECODE_END
 
 
 // are any of the VDP interrupt lines hooked up to anything?
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_sndirqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_sndirqline_callback_s18)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv6irqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_lv6irqline_callback_s18)
 {
 }
 
-WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv4irqline_callback_segas18)
+WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
 {
 }
 
@@ -1208,13 +1209,6 @@ WRITE_LINE_MEMBER(segas18_state::genesis_vdp_lv4irqline_callback_segas18)
  *  Machine driver
  *
  *************************************/
-
-static const sega315_5124_interface sms_vdp_ntsc_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
 
 static MACHINE_CONFIG_START( system18, segas18_state )
 
@@ -1232,16 +1226,16 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_sndirqline_callback_segas18));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_lv6irqline_callback_segas18));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segas18_state, genesis_vdp_lv4irqline_callback_segas18));
-	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
-	sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(*device, 0x2000);
-	sega_genesis_vdp_device::static_set_palette_tag(*device,":palette");
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(false)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));
+	MCFG_SEGA315_5313_ALT_TIMING(1);
+	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
+	MCFG_SEGA315_5313_PALETTE("palette")
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
 
 
 	// video hardware

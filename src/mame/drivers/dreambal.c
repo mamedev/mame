@@ -54,7 +54,7 @@ public:
 	DECLARE_READ16_MEMBER( dreambal_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dreambal_protection_region_0_104_w );
 
-	DECLARE_WRITE16_HANDLER( dreambal_eeprom_w )
+	DECLARE_WRITE16_MEMBER( dreambal_eeprom_w )
 	{
 		if (data&0xfff8)
 		{

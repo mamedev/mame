@@ -41,11 +41,31 @@
 #ifndef __TMS99COMMON_H__
 #define __TMS99COMMON_H__
 
-#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap, _config)       \
+#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap )       \
 	MCFG_DEVICE_ADD(_tag, _device, _clock)      \
 	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
-	MCFG_DEVICE_IO_MAP(_iomap)                  \
-	MCFG_DEVICE_CONFIG(_config)
+	MCFG_DEVICE_IO_MAP(_iomap)
+
+#define MCFG_TMS99xx_EXTOP_HANDLER( _extop) \
+	devcb = &tms99xx_device::static_set_extop_callback( *device, DEVCB2_##_extop );
+
+#define MCFG_TMS99xx_INTLEVEL_HANDLER( _intlevel ) \
+	devcb = &tms99xx_device::static_set_intlevel_callback( *device, DEVCB2_##_intlevel );
+
+#define MCFG_TMS99xx_IAQ_HANDLER( _iaq )    \
+	devcb = &tms99xx_device::static_set_iaq_callback( *device, DEVCB2_##_iaq );
+
+#define MCFG_TMS99xx_CLKOUT_HANDLER( _clkout ) \
+	devcb = &tms99xx_device::static_set_clkout_callback( *device, DEVCB2_##_clkout );
+
+#define MCFG_TMS99xx_WAIT_HANDLER( _wait ) \
+	devcb = &tms99xx_device::static_set_wait_callback( *device, DEVCB2_##_wait );
+
+#define MCFG_TMS99xx_HOLDA_HANDLER( _holda ) \
+	devcb = &tms99xx_device::static_set_holda_callback( *device, DEVCB2_##_holda );
+
+#define MCFG_TMS99xx_DBIN_HANDLER( _dbin ) \
+	devcb = &tms99xx_device::static_set_dbin_callback( *device, DEVCB2_##_dbin );
 
 enum
 {

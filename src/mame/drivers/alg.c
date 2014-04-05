@@ -413,30 +413,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const legacy_mos6526_interface cia_0_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_0_irq),                                /* irq_func */
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_porta_w),   /* port A */
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_0_portb_w)    /* port B */
-};
-
-static const legacy_mos6526_interface cia_1_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_1_irq),                                /* irq_func */
-	DEVCB_NULL, /* pc_func */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_r),
-	DEVCB_DRIVER_MEMBER(alg_state,alg_cia_1_porta_w),   /* port A */
-	DEVCB_NULL,
-	DEVCB_NULL                              /* port B */
-};
-
 static MACHINE_CONFIG_START( alg_r1, alg_state )
 
 	/* basic machine hardware */
@@ -477,11 +453,20 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* cia */
-	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_0_intf)
-	MCFG_LEGACY_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_1_intf)
+	MCFG_DEVICE_ADD("cia_0", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(alg_state,alg_cia_0_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_0_porta_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(alg_state,alg_cia_0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_0_portb_w))
+	MCFG_DEVICE_ADD("cia_1", LEGACY_MOS8520, AMIGA_68000_NTSC_CLOCK / 10)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(amiga_state, amiga_cia_1_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(alg_state,alg_cia_1_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(alg_state,alg_cia_1_porta_w))
 
 	/* fdc */
-	MCFG_AMIGA_FDC_ADD("fdc", AMIGA_68000_NTSC_CLOCK)
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, AMIGA_68000_NTSC_CLOCK)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", legacy_mos6526_device, flag_w))
 MACHINE_CONFIG_END
 
 

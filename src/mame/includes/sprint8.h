@@ -58,9 +58,5 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-/*----------- defined in drivers/sprint8.c -----------*/
-
-void sprint8_set_collision(running_machine &machine, int n);
 /*----------- defined in audio/sprint8.c -----------*/
-
 DISCRETE_SOUND_EXTERN( sprint8 );

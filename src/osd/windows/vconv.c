@@ -68,10 +68,10 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-fomit-frame-pointer",     "" },
 	{ 0,        "-Werror",                  "/WX" },
 	//{ VS7,        "-Wall",                    "/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
-	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347 /wd4987 /wd4250 /wd4435" },
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347 /wd4987 /wd4250 /wd4435 /wd4150" },
 	{ 0,        "-Wall",                    "/W0" },
 	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
-	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245" },
+	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245 /wd4388" },
 	{ 0,        "-W*",                      "" },
 	{ VS2005,   "-march=*",                 "" },       // deprecated in VS2005
 	{ 0,        "-march=pentium",           "/G5" },
@@ -81,6 +81,8 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-march=athlon",            "/G7" },
 	{ 0,        "-march=pentium4",          "/G7" },
 	{ 0,        "-march=athlon64",          "/G7" },
+	{ VS71,     "-msse",                   "/arch:SSE" },
+	{ 0,        "-msse",                   "" },
 	{ VS71,     "-msse2",                   "/arch:SSE2" },
 	{ 0,        "-msse2",                   "" },
 	{ 0,        "-msse3",                   "" },
@@ -222,6 +224,7 @@ static DWORD get_exe_version(const char *executable)
 //  build_command_line
 //============================================================
 
+// TODO: VS2012 and up enable SSE2 instructions by default - we should make older versions consistent with this
 static void build_command_line(int argc, char *argv[])
 {
 	const translation_info *transtable;

@@ -88,6 +88,8 @@ TODO:
    so ui disabled */
 
 #include "includes/pcw16.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/ser_mouse.h"
 
 // interrupt counter
 /* controls which bank of 2mb address space is paged into memory */
@@ -488,7 +490,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 				/* busy */
 				m_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;
 				/* keyboard takes data */
-				at_keyboard_write(machine(),m_keyboard_data_shift);
+				m_keyboard->write(space, 0, m_keyboard_data_shift);
 				/* set clock low - no furthur transmissions */
 				pcw16_keyboard_set_clock_state(0);
 				/* set int */
@@ -514,16 +516,18 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_keyboard_timer_callback)
+WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 {
-	at_keyboard_polling();
+	if(!state)
+		return;
+
 	if (pcw16_keyboard_can_transmit())
 	{
 		int data;
 
-		data = at_keyboard_read();
+		data = m_keyboard->read(machine().driver_data()->generic_space(), 0);
 
-		if (data!=-1)
+		if (data)
 		{
 //          if (data==4)
 //          {
@@ -917,29 +921,21 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_0){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_0){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_0){ }
-
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_tx_1){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_dtr_1){ }
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_rts_1){ }
-
 static const ins8250_interface pcw16_com_interface[2]=
 {
 	{
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_0),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_1),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport1", rs232_port_device, write_rts),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_1),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
 	{
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_tx_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_dtr_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_rts_1),
-		DEVCB_DRIVER_LINE_MEMBER(pcw16_state,pcw16_com_interrupt_2),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_txd),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_dtr),
+		DEVCB_DEVICE_LINE_MEMBER("serport2", rs232_port_device, write_rts),
+		DEVCB_DRIVER_LINE_MEMBER(pcw16_state, pcw16_com_interrupt_2),
 		DEVCB_NULL,
 		DEVCB_NULL
 	}
@@ -1008,10 +1004,6 @@ void pcw16_state::machine_start()
 	m_system_status = 0;
 	m_interrupt_counter = 0;
 
-	/* initialise keyboard */
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
-	at_keyboard_set_scan_code_set(3);
-
 	m_beeper->set_state(0);
 	m_beeper->set_frequency(3750);
 }
@@ -1028,6 +1020,9 @@ static INPUT_PORTS_START(pcw16)
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
+static SLOT_INTERFACE_START(pcw16_com)
+	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* basic machine hardware */
@@ -1038,8 +1033,20 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 
 
 	MCFG_NS16550_ADD( "ns16550_1", pcw16_com_interface[0], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_RS232_PORT_ADD( "serport1", pcw16_com, "msystems_mouse" )
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
 	MCFG_NS16550_ADD( "ns16550_2", pcw16_com_interface[1], XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_RS232_PORT_ADD( "serport2", pcw16_com, NULL )
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_2", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1074,13 +1081,13 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
+	
+	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
 	/* rtc timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
-	/* keyboard timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pcw16_state, pcw16_keyboard_timer_callback, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
 /***************************************************************************

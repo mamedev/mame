@@ -33,6 +33,10 @@
 #ifndef __KR2376__
 #define __KR2376__
 
+
+#define MCFG_KR2376_STROBE_CALLBACK(_write) \
+	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB2_##_write);
+
 /*
  * Input pins
  */
@@ -48,25 +52,13 @@ enum kr2376_output_pin_t
 	KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
 };
 
-typedef void (*kr2376_on_strobe_changed_func) (device_t *device, int level);
-#define KR2376_ON_STROBE_CHANGED(name) void name(device_t *device, int level)
-
-/* interface */
-struct kr2376_interface
-{
-	/* The clock of the chip (Typical 50 kHz) */
-	int m_our_clock;
-
-	/* This will be called for every change of the strobe pin (pin 16). Optional */
-	devcb_write_line m_on_strobe_changed_cb;
-};
-
-class kr2376_device : public device_t,
-								public kr2376_interface
+class kr2376_device : public device_t
 {
 public:
 	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~kr2376_device() {}
+
+	template<class _Object> static devcb2_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
 	
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
@@ -79,7 +71,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual ioport_constructor device_input_ports() const;
@@ -99,7 +90,7 @@ private:
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
-	devcb_resolved_write_line m_on_strobe_changed;
+	devcb2_write_line m_write_strobe;
 	
 	enum
 	{
@@ -112,12 +103,5 @@ private:
 };
 
 extern const device_type KR2376;
-
-
-#define MCFG_KR2376_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, KR2376, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define KR2376_INTERFACE(name) const kr2376_interface (name)=
 
 #endif

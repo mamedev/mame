@@ -86,7 +86,8 @@ void sms_state::sms_get_inputs( address_space &space )
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
 	// Sega Mark III does not have TH line connected.
-	if (!m_is_mark_iii)
+	// Also, the japanese Master System does not set port $dd with TH input.
+	if (!m_is_mark_iii && !m_is_smsj)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -268,17 +269,30 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 
 	sms_get_inputs(space);
 
-	// Reset Button
-	if ( m_port_reset )
-	{
-		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
-	}
-
 	// Check if TR of controller port 2 is set to output (0)
 	if (!(m_io_ctrl_reg & 0x04))
 	{
 		// Read TR state set through IO control port
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
+	}
+
+	if (m_is_smsj)
+	{
+		// For japanese Master System, set upper 4 bits with TH/TR
+		// direction bits of IO control register, according to Enri's
+		// docs (http://www43.tok2.com/home/cmpslv/Sms/EnrSms.htm).
+		// This makes the console incapable of using the Light Phaser.
+		m_port_dd_reg &= ~0x10 | ((m_io_ctrl_reg & 0x01) << 4);
+		m_port_dd_reg &= ~0x20 | ((m_io_ctrl_reg & 0x04) << 3);
+		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x02) << 5);
+		m_port_dd_reg &= ~0x80 | ((m_io_ctrl_reg & 0x08) << 4);
+		return m_port_dd_reg;
+	}
+
+	// Reset Button
+	if ( m_port_reset )
+	{
+		m_port_dd_reg &= ~0x10 | (m_port_reset->read() & 0x01) << 4;
 	}
 
 	// Check if TH of controller port 1 is set to output (0)
@@ -334,8 +348,8 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 
 READ8_MEMBER(sms_state::gg_input_port_2_r)
 {
-	//logerror("joy 2 read, val: %02x, pc: %04x\n", ((m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80)), activecpu_get_pc());
-	return ((m_is_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80));
+	//logerror("joy 2 read, val: %02x, pc: %04x\n", (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80), activecpu_get_pc());
+	return (m_is_gg_region_japan ? 0x00 : 0x40) | (m_port_start->read() & 0x80);
 }
 
 
@@ -547,9 +561,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 		UINT8 data = 0xff;
 
 		if (m_mem_device_enabled & ENABLE_CART)
-			data &= m_cartslot->read_cart(space, 0x4000 + (offset & 0x1fff));
-		if (m_mem_device_enabled & ENABLE_CARD)
-			data &= m_cardslot->read_cart(space, 0x4000 + (offset & 0x1fff));
+			data &= m_cartslot->read_cart(space, 0x6000 + (offset & 0x1fff));
 
 		return data;
 	}
@@ -681,7 +693,7 @@ void sms_state::setup_media_slots()
 	{
 		m_mem_device_enabled |= ENABLE_EXT_RAM;
 	}
-	else if (!m_is_gamegear && m_is_region_japan && (m_mem_device_enabled & ENABLE_CART))
+	else if (m_has_jpn_sms_cart_slot && (m_mem_device_enabled & ENABLE_CART))
 	{
 		// a bunch of SG1000 carts (compatible with SG1000 Mark III) use their own RAM...
 		// TODO: are BASIC and Music actually compatible with Mark III??
@@ -754,19 +766,22 @@ MACHINE_START_MEMBER(sms_state,sms)
 	{
 		m_mainram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 		save_pointer(NAME(m_mainram), 0x2000);
-	}
 
-	// alibaba and blockhol are ports of games for the MSX system. The
-	// MSX bios usually initializes callback "vectors" at the top of RAM.
-	// The code in alibaba does not do this so the IRQ vector only contains
-	// the "call $4010" without a following RET statement. That is basically
-	// a bug in the program code. The only way this cartridge could have run
-	// successfully on a real unit is if the RAM would be initialized with
-	// a F0 pattern on power up; F0 = RET P. Do that only for consoles of
-	// Japan region (including Korea), until confirmed on other consoles.
-	if (m_is_region_japan)
-	{
-		memset(m_mainram, 0xf0, 0x2000);
+		// alibaba and blockhol are ports of games for the MSX system. The
+		// MSX bios usually initializes callback "vectors" at the top of RAM.
+		// The code in alibaba does not do this so the IRQ vector only contains
+		// the "call $4010" without a following RET statement. That is basically
+		// a bug in the program code. The only way this cartridge could have run
+		// successfully on a real unit is if the RAM would be initialized with
+		// a F0 pattern on power up; F0 = RET P. 
+		// This initialization breaks the some Game Gear games though (e.g. 
+		// tempojr), suggesting that not all systems had the same initialization.
+		// For the moment we apply this to systems that have the Japanese SMS 
+		// cartridge slot.
+		if (m_has_jpn_sms_cart_slot)
+		{
+			memset(m_mainram, 0xf0, 0x2000);
+		}
 	}
 
 	save_item(NAME(m_paused));
@@ -799,7 +814,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	if (m_is_sdisp)
 	{
 		save_item(NAME(m_store_control));
-		save_item(NAME(m_current_cartridge));
+		save_item(NAME(m_store_cart_selection_data));
 
 		m_slots[0] = m_cartslot;
 		for (int i = 1; i < 16; i++)
@@ -812,6 +827,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 			sprintf(str,"slot%i",i + 16 + 1);
 			m_cards[i] = machine().device<sega8_card_slot_device>(str);
 		}
+		store_select_cart(m_store_cart_selection_data);
 	}
 }
 
@@ -845,7 +861,8 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	if (m_is_sdisp)
 	{
 		m_store_control = 0;
-		m_current_cartridge = 0;
+		m_store_cart_selection_data = 0;
+		store_select_cart(m_store_cart_selection_data);
 	}
 
 	setup_bios();
@@ -860,30 +877,34 @@ READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 
 WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 {
+	store_select_cart(data);
+	m_store_cart_selection_data = data;
+	setup_media_slots();
+}
+
+
+// There are two known models of the Store Display Unit:
+//
+// - the one with 16 cart slots and 3 card slots;
+// - the one with 16 cart slots and 16 card slots.
+//
+// On front panel of both models there are only 16 game switches, 
+// that seems to change the active cart/card slot pair or, for the 4th
+// game switch onward of the 16-3 model, the active cart slot only.
+
+void sms_state::store_select_cart(UINT8 data)
+{
 	UINT8 slot = data >> 4;
-	UINT8 slottype;
+	UINT8 slottype = data & 0x08;
 
-	// There are two known models of the Store Display Unit:
-	//
-	// - the one with 16 cart slots and 3 card slots;
-	// - the one with 16 cart slots and 16 card slots.
-	//
-	// On front panel of both models there are only 16 game switches, 
-	// that seems to change the active cart/card slot pair or, for the 4th
-	// game switch onward of the 16-3 model, the active cart slot only.
+	// The SMS Store Display only uses the logical cartridge slot to map
+	// the active cartridge or card slot, of its multiple ones.
+	if (slottype == 0)
+		m_cartslot = m_slots[slot];
+	else
+		m_cartslot = m_cards[slot];
 
-	m_cartslot = m_slots[slot];
-	m_cardslot = m_cards[slot];
-
-	// TODO: check how the selection between the cart and the card slot of
-	// the active pair behaves, and how the slot type bit is set:
-	//
-	// - is there a priority set by hardware, as on Mark III?
-	// - does the BIOS a detection routine to check the presence of ROM on
-	// each slot of the pair, to enable the first where a ROM was found?
-
-	slottype = data & 0x08;
-	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot );
+	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
 
@@ -935,9 +956,9 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 
 DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 {
-	m_is_region_japan = 1;
 	m_is_mark_iii = 1;
 	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
@@ -949,16 +970,33 @@ DRIVER_INIT_MEMBER(sms_state,sms1)
 
 DRIVER_INIT_MEMBER(sms_state,smsj)
 {
-	m_is_region_japan = 1;
+	m_is_smsj = 1;
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
-DRIVER_INIT_MEMBER(sms_state,sms2kr)
+DRIVER_INIT_MEMBER(sms_state,sms1krfm)
 {
-	m_is_region_japan = 1;
+	m_has_bios_2000 = 1;
+	m_has_fm = 1;
+	m_has_jpn_sms_cart_slot = 1;
+}
+
+
+DRIVER_INIT_MEMBER(sms_state,sms1kr)
+{
+	m_has_bios_2000 = 1;
+	m_has_jpn_sms_cart_slot = 1;
+}
+
+
+DRIVER_INIT_MEMBER(sms_state,smskr)
+{
 	m_has_bios_full = 1;
+	// Despite having a Japanese cartridge slot, this version is detected as Export region.
+	m_has_jpn_sms_cart_slot = 1;
 }
 
 
@@ -977,9 +1015,9 @@ DRIVER_INIT_MEMBER(sms_state,gamegear)
 
 DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 {
-	m_is_region_japan = 1;
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
+	m_is_gg_region_japan = 1;
 }
 
 

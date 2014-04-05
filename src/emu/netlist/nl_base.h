@@ -364,7 +364,7 @@ private:
 // netlist_core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_core_terminal_t : public netlist_owned_object_t
+class netlist_core_terminal_t : public netlist_owned_object_t, public plinked_list_element<netlist_core_terminal_t>
 {
     NETLIST_PREVENT_COPYING(netlist_core_terminal_t)
 public:
@@ -402,8 +402,6 @@ public:
     }
 
     const netlist_logic_family_desc_t *m_family_desc;
-
-    netlist_core_terminal_t *m_update_list_next;
 
 protected:
     ATTR_COLD virtual void save_register()
@@ -568,8 +566,8 @@ public:
     ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
     /* Everything below is used by the logic subsystem */
-    ATTR_HOT void inc_active();
-    ATTR_HOT void dec_active();
+    ATTR_HOT void inc_active(netlist_core_terminal_t &term);
+    ATTR_HOT void dec_active(netlist_core_terminal_t &term);
 
     ATTR_HOT inline const netlist_sig_t Q() const
     {
@@ -627,7 +625,7 @@ public:
 
     ATTR_HOT void solve();
 
-    netlist_core_terminal_t *m_head;
+    plinked_list<netlist_core_terminal_t> m_list;
 
 protected:  //FIXME: needed by current solver code
 
@@ -1159,15 +1157,15 @@ ATTR_HOT inline void netlist_input_t::inactivate()
     if (EXPECTED(!is_state(STATE_INP_PASSIVE)))
     {
         set_state(STATE_INP_PASSIVE);
-        net().dec_active();
+        net().dec_active(*this);
     }
 }
 
 ATTR_HOT inline void netlist_input_t::activate()
 {
-    if (EXPECTED(is_state(STATE_INP_PASSIVE)))
+    if (is_state(STATE_INP_PASSIVE))
     {
-        net().inc_active();
+        net().inc_active(*this);
         set_state(STATE_INP_ACTIVE);
     }
 }
@@ -1176,7 +1174,7 @@ ATTR_HOT inline void netlist_input_t::activate_hl()
 {
     if (is_state(STATE_INP_PASSIVE))
     {
-        net().inc_active();
+        net().inc_active(*this);
         set_state(STATE_INP_HL);
     }
 }
@@ -1185,7 +1183,7 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 {
     if (is_state(STATE_INP_PASSIVE))
     {
-        net().inc_active();
+        net().inc_active(*this);
         set_state(STATE_INP_LH);
     }
 }

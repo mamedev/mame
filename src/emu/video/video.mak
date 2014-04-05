@@ -25,6 +25,15 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/315_5313.h,VIDEOS += SEGA315_5313
+#-------------------------------------------------
+
+ifneq ($(filter SEGA315_5313,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/315_5313.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/bufsprite.h,VIDEOS += BUFSPRITE
 #-------------------------------------------------
 
@@ -363,18 +372,12 @@ ifneq ($(filter MOS6566,$(VIDEOS)),)
 VIDEOOBJS+= $(VIDEOOBJ)/mos6566.o
 endif
 
-#-------------------------------------------------
-#
-#@src/emu/video/pc_cga.h,VIDEOS += PC_CGA
-#-------------------------------------------------
 
-ifneq ($(filter PC_CGA,$(VIDEOS)),)
-VIDEOOBJS+= $(VIDEOOBJ)/pc_cga.o        \
-			$(VIDEOOBJ)/cgapal.o
-endif
+VIDEOOBJS+= $(VIDEOOBJ)/cgapal.o
 
 #-------------------------------------------------
 #
+
 #@src/emu/video/pc_vga.h,VIDEOS += PC_VGA
 #-------------------------------------------------
 

@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "video/resnet.h"
 #include "includes/dkong.h"
-#include "machine/latch8.h"
 
 #define RADARSCP_BCK_COL_OFFSET         256
 #define RADARSCP_GRID_COL_OFFSET        (RADARSCP_BCK_COL_OFFSET + 256)
@@ -708,7 +707,7 @@ void dkong_state::radarscp_step(int line_cnt)
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
 	address_space &space = machine().driver_data()->generic_space();
-	m_rflip_sig = latch8_bit2_r(m_dev_6h, space, 0) & m_lfsr_5I;
+	m_rflip_sig = m_dev_6h->bit2_r(space, 0) & m_lfsr_5I;
 
 	/* blue background generation */
 
@@ -773,7 +772,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	 *
 	 * Mixed with ANS line (bit 5) from Port B of 8039
 	 */
-	if (m_grid_on && latch8_bit5_r(m_dev_vp2, space, 0))
+	if (m_grid_on && m_dev_vp2->bit5_r(space, 0))
 	{
 		diff = (0.0 - m_cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );

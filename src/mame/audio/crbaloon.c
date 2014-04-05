@@ -30,13 +30,13 @@
 
 WRITE8_MEMBER(crbaloon_state::crbaloon_audio_set_music_freq)
 {
-	discrete_sound_w(m_discrete, space, CRBALOON_MUSIC_DATA, data);
+	m_discrete->write(space, CRBALOON_MUSIC_DATA, data);
 }
 
 
 WRITE8_MEMBER(crbaloon_state::crbaloon_audio_set_music_enable)
 {
-	discrete_sound_w(m_discrete, space, CRBALOON_MUSIC_EN, data);
+	m_discrete->write(space, CRBALOON_MUSIC_EN, data);
 }
 
 
@@ -64,7 +64,7 @@ void crbaloon_state::crbaloon_audio_set_appear_enable(int enabled)
 
 WRITE8_MEMBER(crbaloon_state::crbaloon_audio_set_laugh_enable)
 {
-	discrete_sound_w(m_discrete, space, CRBALOON_LAUGH_EN, data);
+	m_discrete->write(space, CRBALOON_LAUGH_EN, data);
 }
 
 

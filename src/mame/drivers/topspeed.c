@@ -521,23 +521,6 @@ static GFXDECODE_START( topspeed )
 GFXDECODE_END
 
 
-/**************************************************************
-                        MSM5205 (SOUND)
-**************************************************************/
-
-static const msm5205_interface msm5205_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(topspeed_state, msm5205_1_vck), // VCK function
-	MSM5205_S48_4B      // 8 kHz, 4-bit
-};
-
-static const msm5205_interface msm5205_config_2 =
-{
-	DEVCB_NULL,         // VCK function
-	MSM5205_SEX_4B      // Slave mode, 4-bit
-};
-
-
 /***********************************************************
                      DEVICES
 ***********************************************************/
@@ -546,15 +529,6 @@ static const pc080sn_interface pc080sn_intf =
 {
 	1,          // gfxnum
 	0, 8, 0, 0  // x_offset, y_offset, y_invert, dblwidth
-};
-
-static const tc0220ioc_interface io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"),
-	DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"),
-	DEVCB_INPUT_PORT("IN1"),
-	DEVCB_INPUT_PORT("IN2")
 };
 
 static const tc0140syt_interface tc0140syt_intf =
@@ -628,7 +602,12 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 	MCFG_TC0140SYT_ADD("tc0140syt", tc0140syt_intf)
-	MCFG_TC0220IOC_ADD("tc0220ioc", io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -653,11 +632,12 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(msm5205_config_1)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(msm5205_config_2)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 
 	MCFG_FILTER_VOLUME_ADD("filter1l", 0)

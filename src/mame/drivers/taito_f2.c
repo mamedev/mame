@@ -2979,19 +2979,6 @@ static const tc0480scp_interface metalb_tc0480scp_intf =
 static const tc0280grd_interface taitof2_tc0280grd_intf = { 2 };
 static const tc0280grd_interface taitof2_tc0430grw_intf = { 2 };
 
-static const tc0220ioc_interface taitof2_io220_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
-static const tc0510nio_interface taitof2_io510_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
-
 static const tc0140syt_interface taitof2_tc0140syt_intf =
 {
 	"maincpu", "audiocpu"
@@ -3051,14 +3038,24 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 
 	/* basic machine hardware */
 
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 
 	/* basic machine hardware */
 
-	MCFG_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
@@ -3700,7 +3697,12 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
 
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3756,7 +3758,12 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,common)
 
-	MCFG_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -97,6 +97,14 @@ READ8_MEMBER(sms_expansion_slot_device::read_ram)
 		return 0xff;
 }
 
+int sms_expansion_slot_device::get_lphaser_xoffs()
+{
+	if (m_device)
+		return m_device->get_lphaser_xoffs();
+	else
+		return 0;
+}
+
 
 //-------------------------------------------------
 // write
@@ -119,15 +127,6 @@ WRITE8_MEMBER(sms_expansion_slot_device::write_ram)
 	if (m_device)
 		m_device->write_ram(space, offset, data);
 }
-
-int sms_expansion_slot_device::get_lphaser_xoffs()
-{
-	if (m_device)
-		return m_device->get_lphaser_xoffs();
-	else
-		return 0;
-}
-
 
 
 //-------------------------------------------------

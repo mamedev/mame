@@ -471,11 +471,6 @@ static GFXDECODE_START( splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
 
-static const msm5205_interface splash_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(splash_state,splash_msm5205_int), /* IRQ handler */
-	MSM5205_S48_4B      /* 8KHz */
-};
 
 MACHINE_RESET_MEMBER(splash_state,splash)
 {
@@ -517,7 +512,8 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MCFG_SOUND_CONFIG(splash_msm5205_interface)     /* Sample rate = 384kHz/48 */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, splash_msm5205_int)) /* IRQ handler */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz */     /* Sample rate = 384kHz/48 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -606,18 +602,6 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 	}
 }
 
-static const msm5205_interface msm_interface1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(splash_state,adpcm_int1),         /* interrupt function */
-	MSM5205_S48_4B  /* 1 / 48 */
-};
-
-static const msm5205_interface msm_interface2 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(splash_state,adpcm_int2),         /* interrupt function */
-	MSM5205_S96_4B  /* 1 / 96 */
-};
-
 static MACHINE_CONFIG_START( funystrp, splash_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* 12 MHz (24/2) */
@@ -648,11 +632,13 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_400kHz)
-	MCFG_SOUND_CONFIG(msm_interface1)       /* Sample rate = 400kHz/64 */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, adpcm_int1))         /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 1 / 48 */       /* Sample rate = 400kHz/64 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_400kHz)
-	MCFG_SOUND_CONFIG(msm_interface2)       /* Sample rate = 400kHz/96 */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, adpcm_int2))         /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 */       /* Sample rate = 400kHz/96 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

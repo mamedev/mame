@@ -169,8 +169,8 @@ static const gfx_layout popobear_char_layout =
 	0x4000,
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 8,0,24,16,40,32,56,48 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 64) },
 	8*64
 };
 
@@ -224,7 +224,7 @@ void popobear_state::video_start()
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, popobear_char_layout, (UINT8 *)m_vram_rearranged, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(m_gfx_index, global_alloc(gfx_element(m_palette, popobear_char_layout, (UINT8 *)m_vram_rearranged, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
 
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);

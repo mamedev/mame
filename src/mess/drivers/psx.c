@@ -392,7 +392,7 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 		}
 
 		n_uncompressed = 0x200000;
-		p_n_uncompressed = (unsigned char *)malloc( n_uncompressed );
+		p_n_uncompressed = global_alloc_array( unsigned char, n_uncompressed );
 
 		if( uncompress( p_n_uncompressed, &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
 		{
@@ -407,7 +407,7 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 			n_return = 1;
 		}
 
-		free( p_n_uncompressed );
+		global_free_array( p_n_uncompressed );
 	}
 	return n_return;
 }
@@ -439,7 +439,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 		}
 
 		m_exe_size = 0;
-		free( m_exe_buffer );
+		global_free_array( m_exe_buffer );
 	}
 	return address;
 }
@@ -449,7 +449,7 @@ QUICKLOAD_LOAD_MEMBER( psx1_state, psx_exe_load )
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 
 	m_exe_size = 0;
-	m_exe_buffer = (UINT8*)malloc( quickload_size );
+	m_exe_buffer = global_alloc_array( UINT8, quickload_size );
 	if( m_exe_buffer == NULL )
 	{
 		logerror( "psx_exe_load: out of memory\n" );
@@ -457,7 +457,7 @@ QUICKLOAD_LOAD_MEMBER( psx1_state, psx_exe_load )
 	}
 	if( image.fread( m_exe_buffer, quickload_size ) != quickload_size )
 	{
-		free( m_exe_buffer );
+		global_free_array( m_exe_buffer );
 		return IMAGE_INIT_FAIL;
 	}
 	m_exe_size = quickload_size;

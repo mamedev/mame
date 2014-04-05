@@ -33,7 +33,7 @@
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
 
 
 class csplayh5_state : public driver_device

@@ -162,7 +162,6 @@ class render_font;
 struct object_transform;
 class layout_element;
 class layout_view;
-class layout_file;
 
 
 // texture scaling callback
@@ -579,6 +578,8 @@ private:
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
 
+
+#include "rendlay.h"
 
 // ======================> render_target
 

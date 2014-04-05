@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 
-// Currently only emulates Shugart interface disks (aka ST406)
+// Currently only emulates Shugart SA1000 interface disks (aka ST506)
 // despite the controller supporting many different disk types (hard sectored, onboard controllers, ANSI X3T9)
 // Xenix supports the Quantum Q540 CHS 512,8,9 with 1024B sectors
 

@@ -160,13 +160,15 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
+	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette", dragon_state::coco_cassette_interface)
 	MCFG_PRINTER_ADD(PRINTER_TAG)
 
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
 	MCFG_MC6847_ADD(VDG_TAG, MC6847_PAL, XTAL_4_433619MHz, dragon_state::mc6847_config)
-
+	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(dragon_state, horizontal_sync))
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(dragon_state, field_sync))
 	// sound hardware
 	MCFG_FRAGMENT_ADD( coco_sound )
 MACHINE_CONFIG_END

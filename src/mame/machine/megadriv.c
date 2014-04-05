@@ -25,11 +25,7 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "includes/megadriv.h"
 
 
-
 MACHINE_CONFIG_EXTERN( megadriv );
-
-extern timer_device* megadriv_scanline_timer;
-
 
 void megadriv_z80_hold(running_machine &machine)
 {
@@ -277,33 +273,6 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 	return retdata;
 }
 
-/* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
-UINT8 md_base_state::megatech_bios_port_cc_dc_r(int offset, int ctrl)
-{
-	UINT8 retdata;
-
-	if (ctrl == 0x55)
-	{
-			/* A keys */
-			retdata = ((m_io_pad_3b[0]->read() & 0x40) >> 2) |
-				((m_io_pad_3b[1]->read() & 0x40) >> 4) | 0xeb;
-	}
-	else
-	{
-		if (offset == 0)
-		{
-			retdata = (m_io_pad_3b[0]->read() & 0x3f) | ((m_io_pad_3b[1]->read() & 0x03) << 6);
-		}
-		else
-		{
-			retdata = ((m_io_pad_3b[1]->read() & 0x3c) >> 2) | 0xf0;
-		}
-
-	}
-
-	return retdata;
-}
-
 UINT8 md_base_state::megadrive_io_read_ctrl_port(int portnum)
 {
 	UINT8 retdata;
@@ -352,10 +321,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 	{
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
-			retdata = m_export << 7 | // Export
-						m_pal << 6 | // NTSC or PAL?
-						(m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
-						0x00 | // Unused (Always 0)
+			retdata = m_version_hi_nibble |
 						0x00 | // Bit 3 of Version Number
 						0x00 | // Bit 2 of Version Number
 						0x00 | // Bit 1 of Version Number
@@ -513,9 +479,8 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 //  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_SHARE("megadrive_vdp_vsram")
 //  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_SHARE("megadrive_vdp_cram")
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
-
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w) // the earth defend
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
@@ -808,8 +773,8 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
@@ -886,34 +851,26 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 
 	if (!m_vdp->m_use_alt_timing)
 	{
-		megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
-		megadriv_scanline_timer->adjust(attotime::zero);
+		m_vdp->m_megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
+		m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
-	if (m_other_hacks)
-	{
-	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-		if (m_megadrive_ram)
-			memset(m_megadrive_ram,0x00,0x10000);
-	}
+	if (m_megadrive_ram)
+		memset(m_megadrive_ram, 0x00, 0x10000);
 
 	m_vdp->device_reset_old();
-
-	// if the system has a 32x, pause the extra CPUs until they are actually turned on
-	if (m_32x)
-		m_32x->pause_cpu();
 }
 
 void md_base_state::megadriv_stop_scanline_timer()
 {
 	if (!m_vdp->m_use_alt_timing)
-		megadriv_scanline_timer->reset();
+		m_vdp->m_megadriv_scanline_timer->reset();
 }
 
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_sndirqline_callback_genesis_z80)
+WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 {
 	if (m_z80snd)
 	{
@@ -929,7 +886,7 @@ WRITE_LINE_MEMBER(md_base_state::genesis_vdp_sndirqline_callback_genesis_z80)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv6irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -938,7 +895,7 @@ WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv6irqline_callback_genesis_68k)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-WRITE_LINE_MEMBER(md_base_state::genesis_vdp_lv4irqline_callback_genesis_68k)
+WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -963,25 +920,8 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 }
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
-	MCFG_TIMER_ADD("md_scan_timer", megadriv_scanline_timer_callback)
+	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
-
-
-
-
-static const sega315_5124_interface sms_vdp_ntsc_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
-static const sega315_5124_interface sms_vdp_pal_intf =
-{
-	true,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
 
 
 MACHINE_CONFIG_FRAGMENT( md_ntsc )
@@ -999,24 +939,22 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(false)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1048,24 +986,22 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
-	MCFG_DEVICE_CONFIG( sms_vdp_pal_intf )
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(true)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_sndirqline_callback_genesis_z80));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv6irqline_callback_genesis_68k));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(md_base_state, vdp_lv4irqline_callback_genesis_68k));
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_sndirqline_callback_genesis_z80));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv6irqline_callback_genesis_68k));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(md_base_state, genesis_vdp_lv4irqline_callback_genesis_68k));
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state, screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state, screen_eof_megadriv) /* Used to Sync the timing */
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-
-	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state, megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1086,24 +1022,6 @@ static int megadriv_tas_callback(device_t *device)
 	return 0; // writeback not allowed
 }
 
-// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-// likewise segaCD, at least when reading wordram? we might need to check what mode we're in here..
-UINT16 vdp_get_word_from_68k_mem_delayed(running_machine &machine, UINT32 source, address_space & space68k)
-{
-	if (source <= 0x3fffff)
-	{
-		source -= 2;    // compensate DMA lag
-		return space68k.read_word(source);
-	}
-	else if ((source >= 0xe00000) && (source <= 0xffffff))
-		return space68k.read_word(source);
-	else
-	{
-		printf("DMA Read unmapped %06x\n",source);
-		return machine.rand();
-	}
-}
-
 void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
@@ -1116,44 +1034,28 @@ void md_base_state::megadriv_init_common()
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 
-	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
-
-	if (machine().device("sega32x"))
-		printf("32X found 'sega32x'\n");
-
-	if (machine().device("segacd"))
-	{
-		printf("SegaCD found 'segacd'\n");
-		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
-	}
-
 	m68k_set_tas_callback(m_maincpu, megadriv_tas_callback);
 
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
-
-	m_export = 0;
-	m_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
-	m_other_hacks = 0;
-
 	megadriv_init_common();
 
 	m_vdp->set_use_cram(0); // C2 uses its own palette ram
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
+	
+	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
 }
 
 
 
-DRIVER_INIT_MEMBER(md_base_state,megadriv)
+DRIVER_INIT_MEMBER(md_base_state, megadriv)
 {
-	m_other_hacks = 1;
-
 	megadriv_init_common();
 
 	// todo: move this to the device interface?
@@ -1161,22 +1063,12 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-	if (m_32x)
-	{
-		m_32x->set_framerate(60);
-		m_32x->set_32x_pal(FALSE);
-	}
-	if (m_segacd)
-		m_segacd->set_framerate(60);
 
-	m_export = 1;
-	m_pal = 0;
+	m_version_hi_nibble = 0xa0;	// Export NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state,megadrij)
+DRIVER_INIT_MEMBER(md_base_state, megadrij)
 {
-	m_other_hacks = 1;
-
 	megadriv_init_common();
 
 	// todo: move this to the device interface?
@@ -1184,22 +1076,12 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-	if (m_32x)
-	{
-		m_32x->set_framerate(60);
-		m_32x->set_32x_pal(FALSE);
-	}
-	if (m_segacd)
-		m_segacd->set_framerate(60);
-
-	m_export = 0;
-	m_pal = 0;
+	
+	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
 }
 
-DRIVER_INIT_MEMBER(md_base_state,megadrie)
+DRIVER_INIT_MEMBER(md_base_state, megadrie)
 {
-	m_other_hacks = 1;
-
 	megadriv_init_common();
 
 	// todo: move this to the device interface?
@@ -1207,77 +1089,9 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	m_vdp->set_vdp_pal(TRUE);
 	m_vdp->set_framerate(50);
 	m_vdp->set_total_scanlines(313);
-	if (m_32x)
-	{
-		m_32x->set_framerate(50);
-		m_32x->set_32x_pal(TRUE);
-	}
-	if (m_segacd)
-		m_segacd->set_framerate(50);
 
-	m_export = 1;
-	m_pal = 1;
+	m_version_hi_nibble = 0xe0;	// Export PAL no-SCD
 }
-
-DRIVER_INIT_MEMBER(md_base_state,mpnew)
-{
-	DRIVER_INIT_CALL(megadrij);
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
-}
-
-/* used by megatech */
-READ8_MEMBER(md_base_state::z80_unmapped_port_r )
-{
-//  printf("unmapped z80 port read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER(md_base_state::z80_unmapped_port_w )
-{
-//  printf("unmapped z80 port write %04x\n",offset);
-}
-
-READ8_MEMBER(md_base_state::z80_unmapped_r )
-{
-	printf("unmapped z80 read %04x\n",offset);
-	return 0;
-}
-
-WRITE8_MEMBER(md_base_state::z80_unmapped_w )
-{
-	printf("unmapped z80 write %04x\n",offset);
-}
-
-
-/* sets the megadrive z80 to it's normal ports / map */
-void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
-{
-	ym2612_device *ym2612 = machine().device<ym2612_device>("ymsnd");
-
-	/* INIT THE PORTS *********************************************************************************************/
-	machine().device(tag)->memory().space(AS_IO).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_port_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_port_w),this));
-
-	/* catch any addresses that don't get mapped */
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_w),this));
-
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
-
-
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(FUNC(mtech_state::megadriv_z80_vdp_read),this), write8_delegate(FUNC(mtech_state::megadriv_z80_vdp_write),this));
-	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(mtech_state::z80_read_68k_banked_data),this), write8_delegate(FUNC(mtech_state::z80_write_68k_banked_data),this));
-}
-
-
-
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {
@@ -1290,7 +1104,7 @@ void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 		if (!m_vdp->m_use_alt_timing)
 		{
 			m_vdp->vdp_handle_eof();
-			megadriv_scanline_timer->adjust(attotime::zero);
+			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
 		}
 	}
 }

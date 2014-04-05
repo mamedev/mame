@@ -193,8 +193,6 @@ private:
 	void set_filter_list();
 	void set_interrupt(enum line_state state);
 
-	static TIMER_CALLBACK( static_do_command );
-
 	void log_command();
 	void log_response();
 	void log_tx_data();

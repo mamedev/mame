@@ -580,15 +580,6 @@ static MC6845_INTERFACE( crtc_intf )
 };
 
 
-/* Sound Interfaces */
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(docastle_state,idsoccer_adpcm_int), // interrupt function
-	MSM5205_S64_4B      // 6 kHz    ???
-};
-
-
 /* Machine Drivers */
 
 void docastle_state::machine_reset()
@@ -688,7 +679,8 @@ static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(docastle_state, idsoccer_adpcm_int)) // interrupt function
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)      // 6 kHz    ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

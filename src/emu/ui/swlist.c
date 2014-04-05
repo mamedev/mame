@@ -46,7 +46,6 @@ ui_menu_software_parts::ui_menu_software_parts(running_machine &machine, render_
 
 ui_menu_software_parts::~ui_menu_software_parts()
 {
-	software_list_close(m_software_list);
 }
 
 
@@ -58,7 +57,7 @@ void ui_menu_software_parts::populate()
 {
 	for (const software_part *swpart = m_info->first_part(); swpart != NULL; swpart = swpart->next())
 	{
-		if (swpart->matches_interface(m_interface))
+		if (swpart->matches_interface(NULL))	// FIXME
 		{
 			software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
 			// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
@@ -80,6 +79,7 @@ void ui_menu_software_parts::populate()
 
 void ui_menu_software_parts::handle()
 {
+#if 0
 	// process the menu
 	const ui_menu_event *event = process(0);
 
@@ -96,6 +96,7 @@ void ui_menu_software_parts::handle()
 		// and exit
 		ui_menu::stack_pop(machine());
 	}
+#endif
 }
 
 
@@ -132,6 +133,8 @@ ui_menu_software_list::~ui_menu_software_list()
 
 void ui_menu_software_list::select_entry(entry_info *entry)
 {
+	// TEMPORARILY DISABLING
+#if 0
 	const struct software_list *swl;
 	const software_info *swi;
 	const software_part *swp;
@@ -157,6 +160,7 @@ void ui_menu_software_list::select_entry(entry_info *entry)
 		// and dispose of the list
 		software_list_close(swl);
 	}
+#endif
 }
 
 //-------------------------------------------------
@@ -180,7 +184,7 @@ int ui_menu_software_list::compare_entries(const entry_info *e1, const entry_inf
 		e2_basename = (e2->long_name != NULL) ? e2->long_name : "";
 	}
 
-	result = mame_stricmp(e1_basename, e2_basename);
+	result = core_stricmp(e1_basename, e2_basename);
 	if (result == 0)
 	{
 		result = strcmp(e1_basename, e2_basename);
@@ -204,6 +208,7 @@ int ui_menu_software_list::compare_entries(const entry_info *e1, const entry_inf
 ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(const software_info *swinfo)
 {
 	entry_info *entry = NULL;
+#if 0
 	entry_info **entryptr;
 	bool entry_updated = FALSE;
 
@@ -235,7 +240,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 		entry->next = *entryptr;
 		*entryptr = entry;
 	}
-
+#endif
 	return entry;
 }
 
@@ -246,6 +251,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 
 void ui_menu_software_list::populate()
 {
+#if 0
 	// build up the list of entries for the menu
 	for (const software_info *swinfo = m_swlist->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 		append_software_entry(swinfo);
@@ -256,6 +262,7 @@ void ui_menu_software_list::populate()
 	// append all of the menu entries
 	for (entry_info *entry = m_entrylist; entry != NULL; entry = entry->next)
 		item_append(entry->short_name, entry->long_name, 0, entry);
+#endif
 }
 
 
@@ -343,7 +350,7 @@ void ui_menu_software_list::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(compare_name, m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
 								match = i;
 						}
 
@@ -364,7 +371,7 @@ void ui_menu_software_list::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(compare_name, m_filename_buffer, i) == 0)
+							if (core_strnicmp(compare_name, m_filename_buffer, i) == 0)
 								match = i;
 						}
 

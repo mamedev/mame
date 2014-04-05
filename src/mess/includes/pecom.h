@@ -53,7 +53,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(q_w);
 	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
-
+	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
+	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);
+	CDP1869_PCB_READ_MEMBER(pecom_pcb_r);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

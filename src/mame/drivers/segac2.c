@@ -78,7 +78,6 @@
 
 #include "includes/megadriv.h"
 
-#include "machine/megavdp.h"
 
 #define XL1_CLOCK           XTAL_640kHz
 #define XL2_CLOCK           XTAL_53_693175MHz
@@ -87,6 +86,100 @@
 #define LOG_PROTECTION      1
 #define LOG_PALETTE         0
 #define LOG_IOCHIP          0
+
+
+class segac2_state : public md_base_state
+{
+public:
+	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_paletteram(*this, "paletteram"),
+	m_upd7759(*this, "upd"),
+	m_screen(*this, "screen"),
+	m_palette(*this, "palette") { }
+	
+	// for Print Club only
+	int m_cam_data;
+	
+	int m_segac2_enable_display;
+	
+	required_shared_ptr<UINT16> m_paletteram;
+	
+	/* internal states */
+	UINT8       m_misc_io_data[0x10];   /* holds values written to the I/O chip */
+	
+	/* protection-related tracking */
+	int (*m_prot_func)(int in);     /* emulation of protection chip */
+	UINT8       m_prot_write_buf;       /* remembers what was written */
+	UINT8       m_prot_read_buf;        /* remembers what was returned */
+	
+	/* palette-related variables */
+	UINT8       m_segac2_alt_palette_mode;
+	UINT8       m_palbank;
+	UINT8       m_bg_palbase;
+	UINT8       m_sp_palbase;
+	
+	/* sound-related variables */
+	UINT8       m_sound_banks;      /* number of sound banks */
+	
+	DECLARE_DRIVER_INIT(c2boot);
+	DECLARE_DRIVER_INIT(bloxeedc);
+	DECLARE_DRIVER_INIT(columns);
+	DECLARE_DRIVER_INIT(columns2);
+	DECLARE_DRIVER_INIT(tfrceac);
+	DECLARE_DRIVER_INIT(tfrceacb);
+	DECLARE_DRIVER_INIT(borench);
+	DECLARE_DRIVER_INIT(twinsqua);
+	DECLARE_DRIVER_INIT(ribbit);
+	DECLARE_DRIVER_INIT(puyo);
+	DECLARE_DRIVER_INIT(tantr);
+	DECLARE_DRIVER_INIT(tantrkor);
+	DECLARE_DRIVER_INIT(potopoto);
+	DECLARE_DRIVER_INIT(stkclmns);
+	DECLARE_DRIVER_INIT(stkclmnj);
+	DECLARE_DRIVER_INIT(ichir);
+	DECLARE_DRIVER_INIT(ichirk);
+	DECLARE_DRIVER_INIT(ichirj);
+	DECLARE_DRIVER_INIT(ichirjbl);
+	DECLARE_DRIVER_INIT(puyopuy2);
+	DECLARE_DRIVER_INIT(zunkyou);
+	DECLARE_DRIVER_INIT(pclub);
+	DECLARE_DRIVER_INIT(pclubjv2);
+	DECLARE_DRIVER_INIT(pclubjv4);
+	DECLARE_DRIVER_INIT(pclubjv5);
+	void segac2_common_init(int (*func)(int in));
+	DECLARE_VIDEO_START(segac2_new);
+	DECLARE_MACHINE_START(segac2);
+	DECLARE_MACHINE_RESET(segac2);
+	
+	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int m_segac2_bg_pal_lookup[4];
+	int m_segac2_sp_pal_lookup[4];
+	void recompute_palette_tables();
+	
+	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
+	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	
+	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
+	DECLARE_READ16_MEMBER( palette_r );
+	DECLARE_WRITE16_MEMBER( palette_w );
+	DECLARE_READ16_MEMBER( io_chip_r );
+	DECLARE_WRITE16_MEMBER( io_chip_w );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_READ16_MEMBER( prot_r );
+	DECLARE_WRITE16_MEMBER( prot_w );
+	DECLARE_WRITE16_MEMBER( counter_timer_w );
+	DECLARE_READ16_MEMBER( printer_r );
+	DECLARE_WRITE16_MEMBER( print_club_camera_w );
+	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
+	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	optional_device<upd7759_device> m_upd7759;
+	optional_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
+};
+
 
 /******************************************************************************
     Machine init
@@ -102,6 +195,8 @@ MACHINE_START_MEMBER(segac2_state,segac2)
 	save_item(NAME(m_misc_io_data));
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
+	
+	m_vdp->stop_timers();
 }
 
 
@@ -220,9 +315,6 @@ WRITE16_MEMBER(segac2_state::palette_w )
 
 	/* set the color */
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-
-//  megadrive_vdp_palette_lookup[offset] = (b) | (g << 5) | (r << 10);
-//  megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g << 5) | (r << 10);
 
 	tmpr = r >> 1;
 	tmpg = g >> 1;
@@ -602,7 +694,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segac2_state )
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -1317,33 +1409,27 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_sndirqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
 {
-	if (state==ASSERT_LINE)
+	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv6irqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::genesis_vdp_lv4irqline_callback_segac2)
+WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 {
-	if (state==ASSERT_LINE)
+	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	else
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-static const sega315_5124_interface sms_vdp_ntsc_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
 
 static MACHINE_CONFIG_START( segac, segac2_state )
 
@@ -1355,17 +1441,15 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-//  MCFG_FRAGMENT_ADD(megadriv_timers)
-
-	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
+	MCFG_SEGA315_5313_IS_PAL(false)
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_sndirqline_callback_c2));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv6irqline_callback_c2));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(segac2_state, vdp_lv4irqline_callback_c2));
+	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_DEVICE_CONFIG( sms_vdp_ntsc_intf )
-	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_sndirqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv6irqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, DEVCB2_WRITELINE(segac2_state, genesis_vdp_lv4irqline_callback_segac2));
-	sega_genesis_vdp_device::set_genesis_vdp_alt_timing(*device, 1);
 
-	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)

@@ -69,7 +69,6 @@ TODO:
 - CPU speed/ YM2149 frequencies
 - Input ports need to be cleaned up
 - NVRAM does not work for lvcards?
-- AGEMAME marks lvpoker/ponttekh as GAME_SUPPORTS_SAVE, needs checking.
 
 ***************************************************************************/
 

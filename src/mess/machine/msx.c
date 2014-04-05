@@ -125,7 +125,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && type < 0; i++)
 			{
-				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
+				if (!core_stricmp(mapper, mapper_types[i].mapper_name))
 					type = mapper_types[i].mapper_type;
 			}
 
@@ -308,7 +308,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 	memset (st, 0, sizeof (slot_state));
 
 	st->m_type = type;
-	sramfile = auto_alloc_array(machine(), char, strlen (image.filename () + 1));
+	sramfile = auto_alloc_array(machine(), char, strlen (image.filename ()) + 1);
 
 	if (sramfile)
 	{

@@ -285,9 +285,9 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 //  device interface
 //**************************************************************************
 
-UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+const UINT8 *hd44780_device::render()
 {
-	bitmap.fill(0, cliprect);
+	memset(m_render_buf, 0, sizeof(m_render_buf));
 
 	if (m_display_on)
 	{
@@ -314,29 +314,41 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					char_base = m_ddram[char_pos] * 0x10;
 				}
 
-				for (int y=0; y<m_char_size; y++)
-				{
-					UINT8 * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
+				const UINT8 * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
+				UINT8 *dest = m_render_buf + 16*(line*line_size + pos);
+				memcpy (dest, charset + char_base, m_char_size);
 
-					for (int x=0; x<5; x++)
-						pixel_update(bitmap, line, pos, y, x, BIT(charset[char_base + y], 4 - x));
-				}
-
-				// if is the correct position draw cursor and blink
 				if (char_pos == m_ac)
 				{
 					// draw the cursor
-					UINT8 cursor_pos = (m_char_size == 8) ? m_char_size : m_char_size + 1;
 					if (m_cursor_on)
-						for (int x=0; x<5; x++)
-							pixel_update(bitmap, line, pos, cursor_pos - 1, x, 1);
+						dest[m_char_size-1] = 0x1f;
 
 					if (!m_blink && m_blink_on)
-						for (int y=0; y<(cursor_pos - 1); y++)
-							for (int x=0; x<5; x++)
-								pixel_update(bitmap, line, pos, y, x, 1);
+						memset(dest, 0x1f, m_char_size);
 				}
 			}
+		}
+	}
+
+	return m_render_buf;
+}
+
+UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	const UINT8 *img = render();
+
+	UINT8 line_size = 80 / m_num_line;
+
+	for (int line=0; line<m_num_line; line++)
+	{
+		for (int pos=0; pos<line_size; pos++)
+		{
+			const UINT8 *src = img + 16*(line*line_size + pos);
+			for (int y=0; y<m_char_size; y++)
+				for (int x=0; x<5; x++)
+					pixel_update(bitmap, line, pos, y, x, BIT(src[y], 4 - x));
 		}
 	}
 

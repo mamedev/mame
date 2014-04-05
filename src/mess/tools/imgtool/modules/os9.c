@@ -711,7 +711,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *stream, option_resolution *opts)
 {
 	imgtoolerr_t err;
-	UINT8 *header;
+	dynamic_buffer header;
 	UINT32 heads, tracks, sectors, sector_bytes, first_sector_id;
 	UINT32 cluster_size, owner_id;
 	UINT32 allocation_bitmap_bits, allocation_bitmap_lsns;
@@ -732,12 +732,7 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	first_sector_id = option_resolution_lookup_int(opts, 'F');
 	title = "";
 
-	header = (UINT8*)malloc(sector_bytes);
-	if (!header)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	header.resize(sector_bytes);
 
 	if (sector_bytes > 256)
 		sector_bytes = 256;
@@ -845,8 +840,6 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 		goto done;
 
 done:
-	if (header)
-		free(header);
 	return err;
 }
 
@@ -1037,7 +1030,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 	imgtool_image *image = imgtool_partition_image(partition);
 	struct os9_fileinfo file_info;
 	size_t write_size;
-	void *buf = NULL;
+	dynamic_buffer buf;
 	int i = -1;
 	UINT32 lsn = 0;
 	UINT32 count = 0;
@@ -1046,12 +1039,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 
 	disk_info = os9_get_diskinfo(image);
 
-	buf = malloc(disk_info->sector_size);
-	if (!buf)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	buf.resize(disk_info->sector_size);
 
 	err = os9_lookup_path(image, path, CREATE_FILE, &file_info, NULL, NULL, NULL);
 	if (err)
@@ -1086,8 +1074,6 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 	}
 
 done:
-	if (buf)
-		free(buf);
 	return err;
 }
 

@@ -111,12 +111,6 @@ void hyprolyb_adpcm_device::vck_callback( int st )
 	m_vck_ready = 0x80;
 }
 
-static const msm5205_interface hyprolyb_msm5205_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback), /* VCK function */
-	MSM5205_S96_4B      /* 4 kHz */
-};
-
 MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
 	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
@@ -124,7 +118,8 @@ MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
 	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(hyprolyb_msm5205_config)
+	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

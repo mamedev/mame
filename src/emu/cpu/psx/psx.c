@@ -266,13 +266,13 @@ WRITE32_MEMBER( psxcpu_device::rom_config_w )
 	}
 }
 
-READ32_HANDLER( psxcpu_device::com_delay_r )
+READ32_MEMBER( psxcpu_device::com_delay_r )
 {
 	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return m_com_delay;
 }
 
-WRITE32_HANDLER( psxcpu_device::com_delay_w )
+WRITE32_MEMBER( psxcpu_device::com_delay_w )
 {
 	COMBINE_DATA( &m_com_delay ); // TODO: check byte writes
 	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
@@ -2050,14 +2050,7 @@ void psxcpu_device::state_string_export( const device_state_entry &entry, astrin
 
 offs_t psxcpu_device::disasm_disassemble( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options )
 {
-	DasmPSXCPU_state state;
-
-	state.pc = m_pc;
-	state.delayr = m_delayr;
-	state.delayv = m_delayv;
-	memcpy( state.r, m_r, sizeof( state.r ) );
-
-	return DasmPSXCPU( &state, buffer, pc, opram );
+	return DasmPSXCPU( this, buffer, pc, opram );
 }
 
 
@@ -3351,32 +3344,32 @@ psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
 }
 
-READ32_HANDLER( psxcpu_device::gpu_r )
+READ32_MEMBER( psxcpu_device::gpu_r )
 {
 	return m_gpu_read_handler( space, offset, mem_mask );
 }
 
-WRITE32_HANDLER( psxcpu_device::gpu_w )
+WRITE32_MEMBER( psxcpu_device::gpu_w )
 {
 	m_gpu_write_handler( space, offset, data, mem_mask );
 }
 
-READ16_HANDLER( psxcpu_device::spu_r )
+READ16_MEMBER( psxcpu_device::spu_r )
 {
 	return m_spu_read_handler( space, offset, mem_mask );
 }
 
-WRITE16_HANDLER( psxcpu_device::spu_w )
+WRITE16_MEMBER( psxcpu_device::spu_w )
 {
 	m_spu_write_handler( space, offset, data, mem_mask );
 }
 
-READ8_HANDLER( psxcpu_device::cd_r )
+READ8_MEMBER( psxcpu_device::cd_r )
 {
 	return m_cd_read_handler( space, offset, mem_mask );
 }
 
-WRITE8_HANDLER( psxcpu_device::cd_w )
+WRITE8_MEMBER( psxcpu_device::cd_w )
 {
 	m_cd_write_handler( space, offset, data, mem_mask );
 }

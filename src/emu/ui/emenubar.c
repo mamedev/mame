@@ -509,6 +509,7 @@ bool ui_emu_menubar::is_softlist_relevant(const software_list_device *swlist, co
 {
 	bool result = false;
 
+#if 0
 	const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 	if (list != NULL)
 	{
@@ -524,6 +525,7 @@ bool ui_emu_menubar::is_softlist_relevant(const software_list_device *swlist, co
 		}
 		software_list_close(list);
 	}
+#endif
 	return result;
 }
 

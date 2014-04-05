@@ -14,28 +14,28 @@ sub sound functions
 
 WRITE8_MEMBER(subs_state::subs_sonar1_w)
 {
-	discrete_sound_w(m_discrete, space, SUBS_SONAR1_EN, offset & 0x01);
+	m_discrete->write(space, SUBS_SONAR1_EN, offset & 0x01);
 }
 
 WRITE8_MEMBER(subs_state::subs_sonar2_w)
 {
-	discrete_sound_w(m_discrete, space, SUBS_SONAR2_EN, offset & 0x01);
+	m_discrete->write(space, SUBS_SONAR2_EN, offset & 0x01);
 }
 
 WRITE8_MEMBER(subs_state::subs_crash_w)
 {
-	discrete_sound_w(m_discrete, space, SUBS_CRASH_EN, offset & 0x01);
+	m_discrete->write(space, SUBS_CRASH_EN, offset & 0x01);
 }
 
 WRITE8_MEMBER(subs_state::subs_explode_w)
 {
-	discrete_sound_w(m_discrete, space, SUBS_EXPLODE_EN, offset & 0x01);
+	m_discrete->write(space, SUBS_EXPLODE_EN, offset & 0x01);
 }
 
 WRITE8_MEMBER(subs_state::subs_noise_reset_w)
 {
 	/* Pulse noise reset */
-	discrete_sound_w(m_discrete, space, SUBS_NOISE_RESET, 0);
+	m_discrete->write(space, SUBS_NOISE_RESET, 0);
 }
 
 

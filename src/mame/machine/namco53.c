@@ -56,87 +56,65 @@
 
 #include "emu.h"
 #include "namco53.h"
-#include "cpu/mb88xx/mb88xx.h"
-#include "devlegcy.h"
 
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-
-struct namco_53xx_state
+READ8_MEMBER( namco_53xx_device::K_r )
 {
-	device_t *  m_cpu;
-	UINT8                   m_portO;
-	devcb_resolved_read8    m_k;
-	devcb_resolved_read8    m_in[4];
-	devcb_resolved_write8   m_p;
-};
-
-INLINE namco_53xx_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == NAMCO_53XX);
-
-	return (namco_53xx_state *)downcast<namco_53xx_device *>(device)->token();
+	return m_k(0);
 }
 
-
-
-static READ8_HANDLER( namco_53xx_K_r )
+READ8_MEMBER( namco_53xx_device::Rx_r )
 {
-	namco_53xx_state *state = get_safe_token(space.device().owner());
-	return state->m_k(0);
+	switch(offset) {
+		case 0 : return m_in_0(0); 
+		case 1 : return m_in_1(0); 
+		case 2 : return m_in_2(0); 
+		case 3 : return m_in_3(0); 
+		default : return 0xff;
+	}
+	
 }
 
-static READ8_HANDLER( namco_53xx_Rx_r )
+WRITE8_MEMBER( namco_53xx_device::O_w )
 {
-	namco_53xx_state *state = get_safe_token(space.device().owner());
-	return state->m_in[offset](0);
-}
-
-static WRITE8_HANDLER( namco_53xx_O_w )
-{
-	namco_53xx_state *state = get_safe_token(space.device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		state->m_portO = (state->m_portO & 0x0f) | (out << 4);
+		m_portO = (m_portO & 0x0f) | (out << 4);
 	else
-		state->m_portO = (state->m_portO & 0xf0) | (out);
+		m_portO = (m_portO & 0xf0) | (out);
 }
 
-static WRITE8_HANDLER( namco_53xx_P_w )
+WRITE8_MEMBER( namco_53xx_device::P_w )
 {
-	namco_53xx_state *state = get_safe_token(space.device().owner());
-	state->m_p(0, data);
+	m_p(space, 0, data);
 }
 
 
-static TIMER_CALLBACK( namco_53xx_irq_clear )
+TIMER_CALLBACK_MEMBER( namco_53xx_device::irq_clear )
 {
-	namco_53xx_state *state = get_safe_token((device_t *)ptr);
-	state->m_cpu->execute().set_input_line(0, CLEAR_LINE);
+	m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
-void namco_53xx_read_request(device_t *device)
+WRITE_LINE_MEMBER(namco_53xx_device::read_request)
 {
-	namco_53xx_state *state = get_safe_token(device);
-	state->m_cpu->execute().set_input_line(0, ASSERT_LINE);
+	m_cpu->set_input_line(0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	device->machine().scheduler().timer_set(attotime::from_usec(21), FUNC(namco_53xx_irq_clear), 0, (void *)device);
+	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_53xx_device::irq_clear),this), 0);
 }
 
-READ8_DEVICE_HANDLER( namco_53xx_read )
+READ8_MEMBER( namco_53xx_device::read )
 {
-	namco_53xx_state *state = get_safe_token(device);
-	UINT8 res = state->m_portO;
+	UINT8 res = m_portO;
 
-	namco_53xx_read_request(device);
+	read_request(0);
 
 	return res;
 }
@@ -147,10 +125,10 @@ READ8_DEVICE_HANDLER( namco_53xx_read )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( namco_53xx_map_io, AS_IO, 8,namco_53xx_device )
-	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ_LEGACY(namco_53xx_K_r)
-	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE_LEGACY(namco_53xx_O_w)
-	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE_LEGACY(namco_53xx_P_w)
-	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READ_LEGACY(namco_53xx_Rx_r)
+	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(K_r)
+	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(O_w)
+	AM_RANGE(MB88_PORTP,  MB88_PORTP)  AM_WRITE(P_w)
+	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READ(Rx_r)
 ADDRESS_MAP_END
 
 
@@ -165,55 +143,35 @@ ROM_START( namco_53xx )
 	ROM_LOAD( "53xx.bin",     0x0000, 0x0400, CRC(b326fecb) SHA1(758d8583d658e4f1df93184009d86c3eb8713899) )
 ROM_END
 
-
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-static DEVICE_START( namco_53xx )
-{
-	const namco_53xx_interface *config = (const namco_53xx_interface *)device->static_config();
-	namco_53xx_state *state = get_safe_token(device);
-	astring tempstring;
-
-	assert(config != NULL);
-
-	/* find our CPU */
-	state->m_cpu = device->subdevice("mcu");
-	assert(state->m_cpu != NULL);
-
-	/* resolve our read/write callbacks */
-	state->m_k.resolve(config->k, *device);
-	state->m_in[0].resolve(config->in[0], *device);
-	state->m_in[1].resolve(config->in[1], *device);
-	state->m_in[2].resolve(config->in[2], *device);
-	state->m_in[3].resolve(config->in[3], *device);
-	state->m_p.resolve(config->p, *device);
-
-	device->save_item(NAME(state->m_portO));
-}
-
-
 const device_type NAMCO_53XX = &device_creator<namco_53xx_device>;
 
 namco_53xx_device::namco_53xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO_53XX, "Namco 53xx", tag, owner, clock, "namco53", __FILE__)
+	: device_t(mconfig, NAMCO_53XX, "Namco 53xx", tag, owner, clock, "namco53", __FILE__),
+	m_cpu(*this, "mcu"),
+	m_portO(0),
+	m_k(*this),
+	m_in_0(*this),
+	m_in_1(*this),
+	m_in_2(*this),
+	m_in_3(*this),
+	m_p(*this)
 {
-	m_token = global_alloc_clear(namco_53xx_state);
 }
-
-namco_53xx_device::~namco_53xx_device()
-{
-	global_free(m_token);
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void namco_53xx_device::device_start()
 {
-	DEVICE_START_NAME( namco_53xx )(this);
+	/* resolve our read/write callbacks */
+	m_k.resolve_safe(0);
+	m_in_0.resolve_safe(0);
+	m_in_1.resolve_safe(0);
+	m_in_2.resolve_safe(0);
+	m_in_3.resolve_safe(0);
+	m_p.resolve_safe();
+
+	save_item(NAME(m_portO));
 }
 
 //-------------------------------------------------

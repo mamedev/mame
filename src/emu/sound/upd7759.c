@@ -189,7 +189,8 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 		m_rom(NULL),
 		m_rombase(NULL),
 		m_romoffset(0),
-		m_rommask(0)
+		m_rommask(0),
+		m_drqcallback(*this)
 {
 }
 
@@ -209,26 +210,6 @@ upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd775x_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd775x_interface *intf = reinterpret_cast<const upd775x_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<upd775x_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_drqcallback = NULL;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -238,6 +219,8 @@ void upd775x_device::device_start()
 
 void upd7759_device::device_start()
 {
+	m_drqcallback.resolve_safe();
+	
 	/* chip configuration */
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 
@@ -268,7 +251,7 @@ void upd7759_device::device_start()
 		if (romsize >= 0x20000) m_rommask = 0x1ffff;
 		else m_rommask = romsize - 1;
 
-		m_drqcallback = NULL;
+		m_drqcallback.set_callback(DEVCB2_NULL);
 	}
 
 	/* assume /RESET and /START are both high */
@@ -311,6 +294,8 @@ void upd7759_device::device_start()
 
 void upd7756_device::device_start()
 {
+	m_drqcallback.resolve_safe();
+	
 	/* chip configuration */
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 
@@ -339,7 +324,7 @@ void upd7756_device::device_start()
 		if (romsize >= 0x20000) m_rommask = 0x1ffff;
 		else m_rommask = romsize - 1;
 
-		m_drqcallback = NULL;
+		m_drqcallback.set_callback(DEVCB2_NULL);
 	}
 
 	/* assume /RESET and /START are both high */
@@ -720,8 +705,8 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		/* if the DRQ changed, update it */
 		logerror("upd7759_slave_update: DRQ %d->%d\n", olddrq, m_drq);
-		if (olddrq != m_drq && m_drqcallback)
-			(*m_drqcallback)(this, m_drq);
+		if (olddrq != m_drq)
+			m_drqcallback(m_drq);
 
 		/* set a timer to go off when that is done */
 		if (m_state != STATE_IDLE)

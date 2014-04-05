@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
+	void unlock_shared_ram();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
@@ -222,27 +223,26 @@ ADDRESS_MAP_END
 
 /* sub 6809 */
 
-static void unlock_shared_ram(address_space &space)
+void sothello_state::unlock_shared_ram()
 {
-	sothello_state *state = space.machine().driver_data<sothello_state>();
-	if(!state->m_subcpu->suspended(SUSPEND_REASON_HALT))
+	if(!m_subcpu->suspended(SUSPEND_REASON_HALT))
 	{
-		state->m_subcpu_status|=1;
+		m_subcpu_status|=1;
 	}
 	else
 	{
-		logerror("Sub cpu active! @%x\n",space.device().safe_pc());
+		//logerror("Sub cpu active! @%x\n",device().safe_pc());
 	}
 }
 
 WRITE8_MEMBER(sothello_state::subcpu_status_w)
 {
-	unlock_shared_ram(space);
+	unlock_shared_ram();
 }
 
 READ8_MEMBER(sothello_state::subcpu_status_r)
 {
-	unlock_shared_ram(space);
+	unlock_shared_ram();
 	return 0;
 }
 
@@ -340,13 +340,6 @@ WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 	m_soundcpu->set_input_line(0, ASSERT_LINE );
 }
 
-
-static const msm5205_interface msm_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sothello_state,adpcm_int),      /* interrupt function */
-	MSM5205_S48_4B  /* changed on the fly */
-};
-
 void sothello_state::machine_reset()
 {
 }
@@ -403,7 +396,8 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm",MSM5205, MSM_CLOCK)
-	MCFG_SOUND_CONFIG(msm_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

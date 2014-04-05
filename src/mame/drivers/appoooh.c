@@ -379,20 +379,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(appoooh_state,appoooh_adpcm_int),/* interrupt function */
-	MSM5205_S64_4B  /* 6KHz               */
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -440,7 +426,8 @@ static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, appoooh_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -169,8 +169,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"

@@ -113,7 +113,7 @@ READ8_MEMBER(gyruss_state::gyruss_portA_r)
 
 WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
 {
-	discrete_sound_w(m_discrete, space, NODE(16), data);
+	m_discrete->write(space, NODE(16), data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
@@ -121,7 +121,7 @@ WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
 	m_audiocpu_2->set_input_line(0, CLEAR_LINE);
 }
 
-static void filter_w( device_t *device, int chip, int data )
+void gyruss_state::filter_w(address_space &space, int chip, int data )
 {
 	int i;
 
@@ -130,20 +130,19 @@ static void filter_w( device_t *device, int chip, int data )
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
-		address_space &space = device->machine().driver_data()->generic_space();
-		discrete_sound_w(device, space, NODE(3 * chip + i + 21), data & 3);
+		m_discrete->write(space, NODE(3 * chip + i + 21), data & 3);
 		data >>= 2;
 	}
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
 {
-	filter_w(m_discrete, 0, data);
+	filter_w(space, 0, data);
 }
 
 WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
 {
-	filter_w(m_discrete, 1, data);
+	filter_w(space, 1, data);
 }
 
 

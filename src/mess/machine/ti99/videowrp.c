@@ -43,12 +43,12 @@ ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const ch
 }
 
 ti_sound_sn94624_device::ti_sound_sn94624_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_sound_system_device(mconfig, TISOUND_94624, tag, "Onboard sound (SN94624)", owner, clock, "ti_sound_sn94624", __FILE__)
+	: ti_sound_system_device(mconfig, TISOUND_94624, "Onboard sound (SN94624)", tag, owner, clock, "ti_sound_sn94624", __FILE__)
 {
 }
 
 ti_sound_sn76496_device::ti_sound_sn76496_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_sound_system_device(mconfig, TISOUND_76496, tag, "Onboard sound (SN76496)", owner, clock, "ti_sound_sn76496", __FILE__)
+	: ti_sound_system_device(mconfig, TISOUND_76496, "Onboard sound (SN76496)", tag, owner, clock, "ti_sound_sn76496", __FILE__)
 {
 }
 

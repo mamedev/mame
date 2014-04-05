@@ -232,7 +232,7 @@ sws93       1993    334         $014e
 
 READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 {
-	switch (machine().driver_data<namcos2_shared_state>()->m_gametype)
+	switch (m_gametype)
 	{
 	case NAMCOS2_ORDYNE:
 		switch(offset)
@@ -406,7 +406,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 
 WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
 {
-	int gametype = machine().driver_data<namcos2_shared_state>()->m_gametype;
+	int gametype = m_gametype;
 	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
 	{
 		if (data == 0x615E) sendval = 1;

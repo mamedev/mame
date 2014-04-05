@@ -5,18 +5,17 @@
 #ifndef __V1050__
 #define __V1050__
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/scsi/s1410.h"
 #include "machine/clock.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
-#include "machine/s1410.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"

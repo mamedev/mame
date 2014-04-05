@@ -854,7 +854,7 @@ void cli_frontend::verifyroms(const char *gamename)
 			for (device_t *dev = iter.first(); dev != NULL; dev = iter.next())
 			{
 				if (dev->owner() != NULL && (*(dev->shortname()) != 0) && dev->rom_region() != NULL && (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE)) {
-					if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+					if (core_strwildcmp(gamename, dev->shortname()) == 0)
 					{
 						matched++;
 
@@ -917,7 +917,7 @@ void cli_frontend::verifyroms(const char *gamename)
 							device->config_complete();
 
 					if (device_map.add(dev->shortname(), 0, false) != TMERR_DUPLICATE) {
-						if (mame_strwildcmp(gamename, dev->shortname()) == 0)
+						if (core_strwildcmp(gamename, dev->shortname()) == 0)
 						{
 							matched++;
 							if (dev->rom_region() != NULL)
@@ -1419,7 +1419,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
-			if (mame_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
 				if (swlistdev->first_software_info() != NULL)
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
@@ -1452,7 +1452,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
-			if (mame_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
 				if (swlistdev->first_software_info() != NULL)
 				{
 					matched++;

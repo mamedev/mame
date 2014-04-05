@@ -106,28 +106,9 @@ static const char *const ethernet_regname[64] =
 ***************************************************************************/
 
 smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_irq_handler(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void smc91c9x_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const smc91c9x_interface *intf = reinterpret_cast<const smc91c9x_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<smc91c9x_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interrupt, 0, sizeof(m_interrupt));
-	}
 }
 
 //-------------------------------------------------
@@ -136,7 +117,7 @@ void smc91c9x_device::device_config_complete()
 
 void smc91c9x_device::device_start()
 {
-	m_irq_handler = m_interrupt;
+	m_irq_handler.resolve_safe();
 
 	/* register ide states */
 	save_item(NAME(m_reg));
@@ -230,8 +211,8 @@ void smc91c9x_device::update_ethernet_irq()
 
 	/* update the IRQ state */
 	m_irq_state = ((mask & state) != 0);
-	if (m_irq_handler != NULL)
-		(*m_irq_handler)(this, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	if (!m_irq_handler.isnull())
+		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

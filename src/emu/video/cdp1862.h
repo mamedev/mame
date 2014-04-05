@@ -45,18 +45,20 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CDP1862_ADD(_tag, _screen_tag, _clock, _rd, _bd, _gd) \
-	MCFG_DEVICE_ADD(_tag, CDP1862, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	downcast<cdp1862_device *>(device)->set_rd_callback(DEVCB2_##_rd); \
-	downcast<cdp1862_device *>(device)->set_bd_callback(DEVCB2_##_bd); \
-	downcast<cdp1862_device *>(device)->set_gd_callback(DEVCB2_##_gd);
+#define MCFG_CDP1861_RD_CALLBACK(_read) \
+	devcb = &cdp1862_device::set_rd_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_CDP1861_BD_CALLBACK(_read) \
+	devcb = &cdp1862_device::set_bd_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_CDP1861_GD_CALLBACK(_read) \
+	devcb = &cdp1862_device::set_gd_rd_callback(*device, DEVCB2_##_read);
 
 #define MCFG_CDP1862_LUMINANCE(_r, _b, _g, _bkg) \
-	downcast<cdp1862_device *>(device)->set_luminance_resistors(_r, _b, _g, _bkg);
+	cdp1862_device::static_set_luminance(*device, _r, _b, _g, _bkg);
 
 #define MCFG_CDP1862_CHROMINANCE(_r, _b, _g, _bkg) \
-	downcast<cdp1862_device *>(device)->set_chrominance_resistors(_r, _b, _g, _bkg);
+	cdp1862_device::static_set_chrominance(*device, _r, _b, _g, _bkg);
 
 
 
@@ -73,11 +75,12 @@ public:
 	// construction/destruction
 	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _rd> void set_rd_callback(_rd rd) { m_read_rd.set_callback(rd); }
-	template<class _bd> void set_bd_callback(_bd bd) { m_read_bd.set_callback(bd); }
-	template<class _gd> void set_gd_callback(_gd gd) { m_read_gd.set_callback(gd); }
-	void set_luminance_resistors(double r, double b, double g, double bkg) { m_lum_r = r; m_lum_b = b; m_lum_g = g; m_lum_bkg = bkg; }
-	void set_chrominance_resistors(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
+	template<class _Object> static devcb2_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(object); }
+	template<class _Object> static devcb2_base &set_bd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(object); }
+	template<class _Object> static devcb2_base &set_gd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_gd.set_callback(object); }
+
+	static void static_set_luminance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_lum_r = r; downcast<cdp1862_device &>(device).m_lum_b = b; downcast<cdp1862_device &>(device).m_lum_g = g; downcast<cdp1862_device &>(device).m_lum_bkg = bkg; }
+	static void static_set_chrominance(device_t &device, double r, double b, double g, double bkg) { downcast<cdp1862_device &>(device).m_chr_r = r; downcast<cdp1862_device &>(device).m_chr_b = b; downcast<cdp1862_device &>(device).m_chr_g = g; downcast<cdp1862_device &>(device).m_chr_bkg = bkg; }
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );

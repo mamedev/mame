@@ -904,12 +904,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(jangou_state,jngolady_vclk_cb),
-	MSM5205_S96_4B
-};
-
 /*************************************
  *
  *  Machine driver
@@ -1035,7 +1029,8 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 	MCFG_DEVICE_REMOVE("cvsd")
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(jangou_state, jngolady_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

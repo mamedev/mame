@@ -23,21 +23,30 @@
 #define MSM6585_S20   (7+8)  /* prescaler 1/20(32KHz), data 4bit */
 
 
-struct msm5205_interface
-{
-	devcb_write_line m_vclk_cb;   /* VCLK callback              */
-	int m_select;       /* prescaler / bit width selector        */
-};
+#define MCFG_MSM5205_PRESCALER_SELECTOR(_select) \
+	msm5205_device::set_prescaler_selector(*device, _select);
 
+#define MCFG_MSM5205_VCLK_CB(_devcb) \
+	devcb = &msm5205_device::set_vclk_callback(*device, DEVCB2_##_devcb);
+
+
+#define MCFG_MSM6585_PRESCALER_SELECTOR(_select) \
+	msm6585_device::set_prescaler_selector(*device, _select);
+
+#define MCFG_MSM6585_VCLK_CB(_devcb) \
+	devcb = &msm6585_device::set_vclk_callback(*device, DEVCB2_##_devcb);
+	
 
 class msm5205_device : public device_t,
-							public device_sound_interface,
-							public msm5205_interface
+							public device_sound_interface
 {
 public:
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~msm5205_device() {}
+	
+	static void set_prescaler_selector(device_t &device, int select) { downcast<msm5205_device &>(device).m_select = select; }
+	template<class _Object> static devcb2_base &set_vclk_callback(device_t &device, _Object object) { return downcast<msm5205_device &>(device).m_vclk_cb.set_callback(object); }
 
 	// reset signal should keep for 2cycle of VCLK
 	void reset_w(int reset);
@@ -55,7 +64,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -78,7 +86,8 @@ protected:
 	INT32 m_signal;             /* current ADPCM signal         */
 	INT32 m_step;               /* current ADPCM step           */
 	int m_diff_lookup[49*16];
-	devcb_resolved_write_line m_vclk_callback;
+	int m_select;
+	devcb2_write_line m_vclk_cb;
 };
 
 extern const device_type MSM5205;

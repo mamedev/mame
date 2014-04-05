@@ -42,7 +42,7 @@ class device_output_interface : public device_interface
 public:
 	// construction/destruction
 	device_output_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_output_interface() { };
+	virtual ~device_output_interface();
 
 	static void set_output_index(device_t &device, int index) { dynamic_cast<device_output_interface &>(device).m_output_index = index; }
 	static void set_output_name(device_t &device, const char *name) { dynamic_cast<device_output_interface &>(device).m_output_name = name; }

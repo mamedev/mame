@@ -60,11 +60,9 @@ K007342_CALLBACK_MEMBER(rockrage_state::rockrage_tile_callback)
 
 ***************************************************************************/
 
-void rockrage_sprite_callback( running_machine &machine, int *code, int *color )
+K007420_CALLBACK_MEMBER(rockrage_state::rockrage_sprite_callback)
 {
-	rockrage_state *state = machine.driver_data<rockrage_state>();
-
-	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((state->m_vreg & 0x03) << 1);
+	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((m_vreg & 0x03) << 1);
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
 	*color = 0;
 }

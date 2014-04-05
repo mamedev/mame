@@ -281,7 +281,6 @@ BUSOBJS += $(BUSOBJ)/ieee488/c2040fdc.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8050.o
 BUSOBJS += $(BUSOBJ)/ieee488/c8280.o
 BUSOBJS += $(BUSOBJ)/ieee488/d9060.o
-BUSOBJS += $(BUSOBJ)/ieee488/d9060hd.o
 BUSOBJS += $(BUSOBJ)/ieee488/softbox.o
 BUSOBJS += $(BUSOBJ)/ieee488/hardbox.o
 BUSOBJS += $(BUSOBJ)/ieee488/shark.o
@@ -372,6 +371,7 @@ BUSOBJS += $(BUSOBJ)/isa/mc1502_rom.o
 BUSOBJS += $(BUSOBJ)/isa/xsu_cards.o
 BUSOBJS += $(BUSOBJ)/isa/sc499.o
 BUSOBJS += $(BUSOBJ)/isa/3c505.o
+BUSOBJS += $(BUSOBJ)/isa/aga.o
 endif
 
 #-------------------------------------------------
@@ -652,6 +652,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/a2pic.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2estd80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eext80col.o
 BUSOBJS += $(BUSOBJ)/a2bus/a2eramworks3.o
+BUSOBJS += $(BUSOBJ)/a2bus/a2corvus.o
 endif
 
 #-------------------------------------------------
@@ -887,6 +888,31 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/ti99_peb/peribox.h,BUSES += TI99PEB
+#-------------------------------------------------
+
+ifneq ($(filter TI99PEB,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/ti99_peb
+BUSOBJS += $(BUSOBJ)/ti99_peb/peribox.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/bwg.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/evpc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/hfdc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/horizon.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/hsgpl.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/memex.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/myarcmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/pcode.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/samsmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/spchsyn.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_32kmem.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_fdc.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/ti_rs232.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/tn_ide.o
+BUSOBJS += $(BUSOBJ)/ti99_peb/tn_usbsm.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/gameboy/gb_slot.h,BUSES += GAMEBOY
 #-------------------------------------------------
 
@@ -998,4 +1024,26 @@ endif
 ifneq ($(filter COMPUCOLOR,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/compucolor
 BUSOBJS += $(BUSOBJ)/compucolor/floppy.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/scsi/???.h,BUSES += SCSI
+#-------------------------------------------------
+ifneq ($(filter SCSI,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/scsi
+BUSOBJS += $(BUSOBJ)/scsi/acb4070.o
+BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
+BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o
+BUSOBJS += $(BUSOBJ)/scsi/s1410.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/macpds/macpds.h,BUSES += MACPDS
+#-------------------------------------------------
+ifneq ($(filter MACPDS,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/macpds
+BUSOBJS += $(BUSOBJ)/macpds/macpds.o
+BUSOBJS += $(BUSOBJ)/macpds/pds_tpdfpd.o
 endif

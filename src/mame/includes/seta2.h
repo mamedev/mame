@@ -29,8 +29,8 @@ public:
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_vregs;
 
-	optional_shared_ptr<UINT8> m_funcube_outputs;
-	optional_shared_ptr<UINT8> m_funcube_leds;
+	optional_shared_ptr<UINT16> m_funcube_outputs;
+	optional_shared_ptr<UINT16> m_funcube_leds;
 
 	optional_device<x1_010_device> m_x1;
 	optional_device<okim9810_device> m_oki;
@@ -47,10 +47,6 @@ public:
 
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;
-	UINT8 m_funcube_press;
-
-	UINT8 m_funcube_serial_fifo[4];
-	UINT8 m_funcube_serial_count;
 
 	DECLARE_WRITE16_MEMBER(seta2_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta2_sound_bank_w);
@@ -71,12 +67,11 @@ public:
 	DECLARE_WRITE32_MEMBER(coldfire_regs_w);
 	DECLARE_READ32_MEMBER(coldfire_regs_r);
 	DECLARE_READ32_MEMBER(funcube_debug_r);
-	DECLARE_READ8_MEMBER(funcube_coins_r);
-	DECLARE_READ8_MEMBER(funcube_serial_r);
-	DECLARE_WRITE8_MEMBER(funcube_leds_w);
-	DECLARE_READ8_MEMBER(funcube_outputs_r);
-	DECLARE_WRITE8_MEMBER(funcube_outputs_w);
-	DECLARE_READ8_MEMBER(funcube_battery_r);
+	DECLARE_READ16_MEMBER(funcube_coins_r);
+	DECLARE_WRITE16_MEMBER(funcube_leds_w);
+	DECLARE_READ16_MEMBER(funcube_outputs_r);
+	DECLARE_WRITE16_MEMBER(funcube_outputs_w);
+	DECLARE_READ16_MEMBER(funcube_battery_r);
 	DECLARE_READ16_MEMBER(gundamex_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gundamex_eeprom_w);
 	DECLARE_READ32_MEMBER(oki_read);

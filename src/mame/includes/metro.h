@@ -144,7 +144,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vram_0_clr_w);
 	DECLARE_WRITE16_MEMBER(vram_1_clr_w);
 	DECLARE_WRITE16_MEMBER(vram_2_clr_w);
-	DECLARE_WRITE8_MEMBER(puzzlet_portb_w);
+	DECLARE_WRITE16_MEMBER(puzzlet_portb_w);
 	DECLARE_WRITE16_MEMBER(metro_k053936_w);
 	DECLARE_WRITE16_MEMBER(metro_vram_0_w);
 	DECLARE_WRITE16_MEMBER(metro_vram_1_w);

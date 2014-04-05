@@ -602,7 +602,7 @@ expect that the software reads these once on startup only.
     I8255 Device, for VCC/UVC
 ******************************************************************************/
 
-void fidelz80_state::update_display(running_machine &machine)
+void fidelz80_state::update_display()
 {
 	// data for the 4x 7seg leds, bits are 0bxABCDEFG
 	UINT8 out_digit = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
@@ -661,7 +661,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portb_w )
 
 		m_led_selected = data;
 
-		update_display(machine());
+		update_display();
 	}
 
 	// ignoring the language switch enable for now, is bit 0x40
@@ -678,7 +678,7 @@ WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 
 	m_digit_data = data;
 
-	update_display(machine());
+	update_display();
 }
 
 READ8_MEMBER( fidelz80_state::vcc_portb_r )
@@ -694,7 +694,7 @@ WRITE8_MEMBER( fidelz80_state::vcc_porta_w )
 
 	m_digit_data = data;
 
-	update_display(machine());
+	update_display();
 }
 
 static I8255_INTERFACE( cc10_ppi8255_intf )

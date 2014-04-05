@@ -23,18 +23,6 @@ enum
 	INT_9980A_CLEAR= 7
 };
 
-struct tms9980a_config
-{
-	devcb_write8        external_callback;
-	devcb_write_line    instruction_acquisition;
-	devcb_write_line    clock_out;
-	devcb_write_line    holda_line;
-	devcb_write_line    dbin_line;
-};
-
-#define TMS9980A_CONFIG(name) \
-	const tms9980a_config(name) =
-
 class tms9980a_device : public tms99xx_device
 {
 public:

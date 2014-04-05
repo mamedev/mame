@@ -366,13 +366,6 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface tturfbl_msm5205_interface  =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,tturfbl_msm5205_callback),
-	MSM5205_S48_4B
-};
-
-
 READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 {
 	if (m_soundbank_ptr)
@@ -1166,12 +1159,6 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 	if (m_sample_select == 0)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
-static const msm5205_interface shdancbl_msm5205_interface  =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,shdancbl_msm5205_callback),
-	MSM5205_S48_4B
-};
 
 READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 {
@@ -2022,20 +2009,11 @@ static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 MACHINE_CONFIG_END
 
 
-static void sound_cause_nmi( device_t *device, int chip )
+WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
-	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-
 	/* upd7759 callback */
-	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
-
-
-const upd775x_interface sys16_upd7759_interface  =
-{
-	sound_cause_nmi
-};
-
 
 static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
@@ -2047,7 +2025,7 @@ static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_CONFIG(sys16_upd7759_interface)
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas1x_bootleg_state,sound_cause_nmi))	
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END
@@ -2070,7 +2048,8 @@ static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 
 	MCFG_SOUND_ADD("5205", MSM5205, 220000)
-	MCFG_SOUND_CONFIG(tturfbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, tturfbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2207,7 +2186,8 @@ static MACHINE_CONFIG_DERIVED( tturfbl, system16_7759 )
 
 	MCFG_DEVICE_REMOVE("7759")
 	MCFG_SOUND_ADD("5205", MSM5205, 220000)
-	MCFG_SOUND_CONFIG(tturfbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, tturfbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
@@ -2347,7 +2327,8 @@ static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 	MCFG_DEVICE_REMOVE("5c68")
 
 	MCFG_SOUND_ADD("5205", MSM5205, 200000)
-	MCFG_SOUND_CONFIG(shdancbl_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, shdancbl_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

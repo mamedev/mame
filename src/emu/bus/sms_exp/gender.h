@@ -40,6 +40,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
+	virtual int get_lphaser_xoffs();
+
 protected:
 	// device-level overrides
 	virtual void device_start();

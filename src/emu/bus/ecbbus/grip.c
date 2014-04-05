@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	int column, bit;
 
@@ -238,9 +238,9 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, c
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = m_flash ? 0 : BIT(data, bit);
+			int color = (m_flash ? 0 : BIT(data, bit)) && de;
 
-			bitmap.pix32(y, x) = m_palette->pen(color);
+			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(color);
 		}
 	}
 }
@@ -249,7 +249,7 @@ static MC6845_UPDATE_ROW( grip_update_row )
 {
 	grip_device *grip = downcast<grip_device *>(device->owner());
 
-	grip->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
+	grip->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
 }
 /*
 static MC6845_UPDATE_ROW( grip5_update_row )
@@ -288,7 +288,7 @@ static const speaker_interface speaker_intf =
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

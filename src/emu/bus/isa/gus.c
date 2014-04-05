@@ -384,6 +384,8 @@ void gf1_device::device_config_complete()
 
 void gf1_device::device_start()
 {
+	acia6850_device::device_start();
+
 	int i;
 	double out = (double)(1 << 13);
 

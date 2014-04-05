@@ -97,8 +97,7 @@ CPUS += SPC700
 CPUS += E1
 CPUS += I860
 CPUS += I960
-CPUS += H83002
-CPUS += H83334
+CPUS += H8
 CPUS += V810
 CPUS += M37710
 CPUS += POWERPC
@@ -272,6 +271,7 @@ SOUNDS += MOS7360
 #-------------------------------------------------
 
 VIDEOS += SEGA315_5124
+VIDEOS += SEGA315_5313
 VIDEOS += BUFSPRITE
 #VIDEOS += CDP1861
 #VIDEOS += CDP1862
@@ -303,7 +303,6 @@ VIDEOS += MB_VCU
 VIDEOS += MC6845
 #VIDEOS += MC6847
 #VIDEOS += MSM6255
-VIDEOS += PC_CGA
 VIDEOS += PC_VGA
 VIDEOS += POLY
 VIDEOS += PSX
@@ -493,6 +492,7 @@ MACHINES += PCCARD
 # specify available bus cores
 #-------------------------------------------------
 BUSES += CENTRONICS
+BUSES += ISA
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1355,7 +1355,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/namcos1.o $(MACHINE)/namcos1.o $(VIDEO)/namcos1.o \
 	$(DRIVERS)/namcos10.o \
 	$(DRIVERS)/namcos11.o $(MACHINE)/ns11prot.o \
-	$(DRIVERS)/namcos12.o \
+	$(DRIVERS)/namcos12.o $(MACHINE)/namco_settings.o \
 	$(DRIVERS)/namcos2.o $(MACHINE)/namcos2.o $(VIDEO)/namcos2.o \
 	$(DRIVERS)/namcos21.o $(VIDEO)/namcos21.o \
 	$(DRIVERS)/namcos22.o $(VIDEO)/namcos22.o \
@@ -1378,6 +1378,7 @@ $(MAMEOBJ)/namco.a: \
 	$(MACHINE)/namco62.o \
 	$(AUDIO)/namco52.o \
 	$(AUDIO)/namco54.o \
+	$(VIDEO)/c45.o \
 	$(VIDEO)/bosco.o \
 	$(VIDEO)/digdug.o \
 	$(MACHINE)/xevious.o $(VIDEO)/xevious.o \
@@ -1545,10 +1546,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/lindbergh.o \
 	$(MACHINE)/megadriv.o \
-	$(MACHINE)/megacd.o \
-	$(MACHINE)/megacdcd.o \
-	$(MACHINE)/mega32x.o \
-	$(MACHINE)/megavdp.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
@@ -1565,7 +1562,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/triforce.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
-	$(DRIVERS)/segae.o $(MACHINE)/segamsys.o \
+	$(DRIVERS)/segae.o \
 	$(DRIVERS)/shtzone.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \
 	$(DRIVERS)/segag80v.o $(AUDIO)/segag80v.o $(VIDEO)/segag80v.o \
@@ -2037,6 +2034,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/3do.o $(MACHINE)/3do.o \
 	$(DRIVERS)/3x3puzzl.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
+	$(DRIVERS)/4enlinea.o \
 	$(DRIVERS)/5clown.o \
 	$(DRIVERS)/a1supply.o \
 	$(DRIVERS)/acefruit.o \
@@ -2728,8 +2726,6 @@ $(DRIVERS)/zac_2.o: $(LAYOUT)/zac_2.lh
 $(DRIVERS)/zac_proto.o: $(LAYOUT)/zac_proto.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
-
-$(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 #-------------------------------------------------
 # misc dependencies

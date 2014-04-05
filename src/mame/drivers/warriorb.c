@@ -460,19 +460,6 @@ static const tc0100scn_interface warriorb_tc0100scn_intf_r =
 };
 
 
-
-static const tc0220ioc_interface darius2d_io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
-static const tc0510nio_interface warriorb_io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
 static const tc0140syt_interface warriorb_tc0140syt_intf =
 {
 	"maincpu", "audiocpu"
@@ -506,8 +493,12 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", darius2d_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)
@@ -580,8 +571,12 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_CPU_ADD("audiocpu", Z80,16000000/4)    /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-
-	MCFG_TC0510NIO_ADD("tc0510nio", warriorb_io_intf)
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warriorb)

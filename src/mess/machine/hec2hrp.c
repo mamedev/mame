@@ -413,7 +413,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 
 WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 {
-	device_t *discrete = machine().device("discrete");
+	discrete_device *discrete = machine().device<discrete_device>("discrete");
 	m_hector_color[1] =  data        & 0x07;
 	m_hector_color[3] = (data >> 3)  & 0x07;
 
@@ -421,7 +421,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	discrete_sound_w(discrete, space, NODE_01,  (data & 0x80) ? 0:1 );
+	discrete->write(space, NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 

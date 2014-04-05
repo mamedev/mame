@@ -958,3 +958,51 @@ READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
 
 	return data;
 }
+
+pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ibm5160_mb_device(mconfig, tag, owner, clock)
+{
+}
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+static MACHINE_CONFIG_FRAGMENT( pc_noppi_mb_config )
+	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+
+	MCFG_DEVICE_REMOVE("pc_kbdc")
+	MCFG_DEVICE_REMOVE("ppi8255")
+MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( pc_noppi_mb )
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor pc_noppi_mb_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( pc_noppi_mb_config );
+}
+
+ioport_constructor pc_noppi_mb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pc_noppi_mb );
+}
+
+void pc_noppi_mb_device::device_start()
+{
+	install_device(0x0000, 0x000f, 0, 0, read8_delegate(FUNC(am9517a_device::read), (am9517a_device*)m_dma8237), write8_delegate(FUNC(am9517a_device::write), (am9517a_device*)m_dma8237) );
+	install_device(0x0020, 0x0021, 0, 0, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_pic8259), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_pic8259) );
+	install_device(0x0040, 0x0043, 0, 0, read8_delegate(FUNC(pit8253_device::read), (pit8253_device*)m_pit8253), write8_delegate(FUNC(pit8253_device::write), (pit8253_device*)m_pit8253) );
+	install_device(0x0080, 0x0087, 0, 0, read8_delegate(FUNC(ibm5160_mb_device::pc_page_r), this), write8_delegate(FUNC(ibm5160_mb_device::pc_page_w),this) );
+	install_device(0x00a0, 0x00a1, 0, 0, read8_delegate(), write8_delegate(FUNC(ibm5160_mb_device::nmi_enable_w),this));
+	/* MESS managed RAM */
+	if ( m_ram->pointer() )
+		membank( "bank10" )->set_base( m_ram->pointer() );
+}
+
+const device_type PCNOPPI_MOTHERBOARD = &device_creator<pc_noppi_mb_device>;

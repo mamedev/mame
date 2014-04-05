@@ -61,8 +61,8 @@ int nc_state::nc_card_load(device_image_interface &image, unsigned char **ptr)
 
 	if (datasize!=0)
 	{
-		/* malloc memory for this data */
-		data = (unsigned char *)malloc(datasize);
+		/* alloc memory for this data */
+		data = global_alloc_array(unsigned char, datasize);
 
 		if (data!=NULL)
 		{
@@ -130,7 +130,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nc_state, nc_pcmcia_card )
 	/* free ram allocated to card */
 	if (m_card_ram!=NULL)
 	{
-		free(m_card_ram);
+		global_free_array(m_card_ram);
 		m_card_ram = NULL;
 	}
 	m_card_size = 0;

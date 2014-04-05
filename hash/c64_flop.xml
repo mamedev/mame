@@ -1100,21 +1100,56 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="174848">
-				<rom name="tsuit215-1.d64" size="174848" crc="CF1070B7" sha1="E7D31E4F55B771AA9595B27D294C72BC205E8770" offset="0" />
+				<rom name="tsuit215-1.d64" size="174848" crc="cf1070b7" sha1="e7d31e4f55b771aa9595b27d294c72bc205e8770" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="tsuit215-2.d64" size="174848" crc="12430B99" sha1="A9522A3971D7E331412DFAD52C297881AE4CEA3C" offset="0" />
+				<rom name="tsuit215-2.d64" size="174848" crc="12430b99" sha1="a9522a3971d7e331412dfad52c297881ae4cea3c" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="174848">
-				<rom name="tsuit215-3.d64" size="174848" crc="C5898390" sha1="23E1AE5419983ED993D49B9D6D8FDD27B3632856" offset="0" />
+				<rom name="tsuit215-3.d64" size="174848" crc="c5898390" sha1="23e1ae5419983ed993d49b9d6d8fdd27b3632856" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicetest">
+		<description>Versatile Commodore Emulator testprogs</description>
+		<year>2014</year>
+		<publisher>VICE Team</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="cputest"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cputest.d64" size="174848" crc="5a54f04e" sha1="e078223545030ae73ec034638589fffed5c8d8ef" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="cia"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cia.d64" size="174848" crc="51bcfc2c" sha1="a91beb1ca414a903d2e2f230bb3a781e4932159a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="cianew"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cianew.d64" size="174848" crc="6892b708" sha1="82560a96a6de683733c037a3982a51210f63b135" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="testjoy"/>
+			<dataarea name="flop" size="174848">
+				<rom name="testjoy.d64" size="174848" crc="befdc13e" sha1="2635eb02aace327ded1e4ff9161a069706a2bf05" offset="0" />
 			</dataarea>
 		</part>
 	</software>

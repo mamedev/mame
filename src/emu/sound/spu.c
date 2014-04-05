@@ -2545,7 +2545,7 @@ void spu_device::update_reverb()
 //          printf("spu: reverb=%s\n",cur_reverb_preset->name);
 			spu_reverb_cfg=&cur_reverb_preset->cfg;
 
-			if ((mame_stricmp("reverb off",cur_reverb_preset->name)) && (spu_reverb_cfg->band_gain<=0.0f))
+			if ((core_stricmp("reverb off",cur_reverb_preset->name)) && (spu_reverb_cfg->band_gain<=0.0f))
 			{
 //              printf("spu: no reverb config for %s\n",cur_reverb_preset->name);
 			}

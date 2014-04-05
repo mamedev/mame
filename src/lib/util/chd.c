@@ -2362,8 +2362,7 @@ void chd_file_compressor::compress_begin()
 	m_read_error = false;
 
 	// reset work item state
-	m_work_buffer.resize(hunk_bytes() * (WORK_BUFFER_HUNKS + 1));
-	memset(m_work_buffer, 0, m_work_buffer.count());
+	m_work_buffer.resize_and_clear(hunk_bytes() * (WORK_BUFFER_HUNKS + 1));
 	m_compressed_buffer.resize(hunk_bytes() * WORK_BUFFER_HUNKS);
 	for (int itemnum = 0; itemnum < WORK_BUFFER_HUNKS; itemnum++)
 	{

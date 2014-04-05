@@ -55,6 +55,7 @@ public:
 	TIMER_CALLBACK_MEMBER(capbowl_update);
 	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
 	DECLARE_WRITE_LINE_MEMBER(firqhandler);
+	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

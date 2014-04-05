@@ -941,22 +941,6 @@ WRITE_LINE_MEMBER( systeme_state::int_callback )
 }
 
 
-static const sega315_5124_interface _315_5124_1_intf =
-{
-	false,
-	DEVCB_NULL,
-	DEVCB_NULL,
-};
-
-
-static const sega315_5124_interface _315_5124_2_intf =
-{
-	false,
-	DEVCB_DRIVER_LINE_MEMBER(systeme_state, int_callback),
-	DEVCB_NULL,
-};
-
-
 UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
@@ -980,7 +964,6 @@ UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-
 static MACHINE_CONFIG_START( systeme, systeme_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
@@ -992,10 +975,13 @@ static MACHINE_CONFIG_START( systeme, systeme_state )
 		SEGA315_5124_HEIGHT_NTSC, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT, SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_192_TBORDER_HEIGHT + 192)
 	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update_systeme)
 
-	MCFG_SEGA315_5124_ADD("vdp1", _315_5124_1_intf)
+	MCFG_DEVICE_ADD("vdp1", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_IS_PAL(false)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp1_map)
 
-	MCFG_SEGA315_5124_ADD("vdp2", _315_5124_2_intf)
+	MCFG_DEVICE_ADD("vdp2", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_IS_PAL(false)
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(systeme_state, int_callback))
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vdp2_map)
 
 	/* sound hardware */

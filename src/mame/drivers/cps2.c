@@ -125,13 +125,18 @@ Notes:
       PAL4      - MMI PAL16L8 (DIP20, stamped 'BGSA1')
       PAL5      - MMI PAL16L8 (DIP20, stamped 'BGSA2')
       VSync     - 59.6388Hz
+      HSync     - 15,444.5kHz
 
       Custom IC's -
                    DL-030P - KABUKI Custom encrypted Z80, running at 8.000MHz, manufactured by VLSI
-                             Technology (DIP40)
+                             Technology (DIP40), INT frequency ~249.932Hz-250.070Hz.
                              On most PCB's this is a regular Zilog Z80 (Z0840008PSC)
-                   DL-1425 - CAPCOM-Q1 QSound Processor, DSP-16A (C) 92 AT&T, clock input of
-                             60.000MHz (PLCC84)
+                   DL-1425 - CAPCOM-Q1 QSound Processor, DSP-16A (C) 92 AT&T (PLCC84)
+                             * pin 33 - CKO (O): moving very fast, connected to a logic chip on the A board
+                             * pin 58 - ICK (I/O): 60MHz
+                             * pin 59 - OCK (I/O): 60MHz
+                             * pin 67 - CKI (I): 60MHz
+                             * pin 71 - INT (I): erratic, active during qsound writes
                    DL-0921 \
                    DL-0311 / CPS-A/B Graphics Processors (QFP160)
                    DL-1625 - Custom 68000 CPU, running at 16.000MHz (QFP128)
@@ -596,9 +601,9 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "machine/eepromser.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
-#include "sound/okim6295.h" // gigaman2 bootleg
+#include "sound/okim6295.h"
 
-#include "includes/cps1.h"       /* External CPS1 definitions */
+#include "includes/cps1.h" // External CPS1 definitions
 
 
 /*************************************
@@ -1166,65 +1171,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics layouts
- *
- *************************************/
-
-static const gfx_layout cps1_layout8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
-};
-
-static const gfx_layout cps1_layout8x8_2 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
-};
-
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4 },
-	{ STEP16(0,4*16) },
-	4*16*16
-};
-
-static const gfx_layout layout32x32 =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4, 9*4, 8*4, 11*4, 10*4, 13*4, 12*4, 15*4, 14*4,
-		17*4, 16*4, 19*4, 18*4, 21*4, 20*4, 23*4, 22*4, 25*4, 24*4, 27*4, 26*4, 29*4, 28*4, 31*4, 30*4 },
-	{ STEP32(0,4*32) },
-	4*32*32
-};
-
-static GFXDECODE_START( cps2 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, layout16x16, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, layout32x32, 0, 0x100 )
-GFXDECODE_END
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -1243,36 +1189,26 @@ static MACHINE_CONFIG_START( cps2, cps_state )
 	MCFG_CPU_PROGRAM_MAP(cps2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, cps2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 251)    /* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured
 
-	MCFG_MACHINE_START_OVERRIDE(cps_state,cps2)
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cps2)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_SCREEN_PALETTE("palette")
-/*
-    Measured clocks:
-        V = 59.6376Hz
-        H = 15.4445kHz
-        H/V = 258.973 ~ 259 lines
 
-    Possible video clocks:
-        60MHz / 15.4445kHz = 3884.878 / 8 = 485.610 -> unlikely
-         8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
-        16MHz -> same as 8 but with a /2 divider; also a possibility
-*/
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps2)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 
-	MCFG_VIDEO_START_OVERRIDE(cps_state,cps2)
+	MCFG_VIDEO_START_OVERRIDE(cps_state, cps2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1395,7 +1331,7 @@ ROM_START( 19xxj )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
 	ROMX_LOAD( "19x-69.4j",   0x0000000, 0x080000, CRC(427aeb18) SHA1(901029b5423e4bda85f592735036c06b7d426680) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "19x-59.4d ",  0x0000002, 0x080000, CRC(63bdbf54) SHA1(9beb64ef0a8c92490848599d5d979bf42532609d) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "19x-59.4d",   0x0000002, 0x080000, CRC(63bdbf54) SHA1(9beb64ef0a8c92490848599d5d979bf42532609d) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "19x-79.4m",   0x0000004, 0x080000, CRC(2dfe18b5) SHA1(8a44364d9af6b9e1664b44b9235dc172182c9eb8) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "19x-89.4p",   0x0000006, 0x080000, CRC(cbef9579) SHA1(172413f220b242411218c7865e04014ec6417537) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "19x-73.8j",   0x0800000, 0x080000, CRC(8e81f595) SHA1(221016c97300b253301ad4da568ed912e3da6c24) , ROM_GROUPWORD | ROM_SKIP(6) )

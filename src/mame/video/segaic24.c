@@ -55,15 +55,13 @@ void segas24_tile::static_set_tile_mask(device_t &device, UINT16 _tile_mask)
 	dev.tile_mask = _tile_mask;
 }
 
-#define XOR(a) WORD_XOR_BE(a)
-
 const gfx_layout segas24_tile::char_layout = {
 	8, 8,
 	SYS24_TILES,
 	4,
 	{ 0, 1, 2, 3 },
-	{ XOR(0)*4, XOR(1)*4, XOR(2)*4, XOR(3)*4, XOR(4)*4, XOR(5)*4, XOR(6)*4, XOR(7)*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0, 4) },
+	{ STEP8(0, 32) },
 	8*32
 };
 
@@ -120,7 +118,7 @@ void segas24_tile::device_start()
 	memset(char_ram, 0, 0x80000);
 	memset(tile_ram, 0, 0x10000);
 
-	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram, m_palette->entries() / 16, 0)));
+	m_gfxdecode->set_gfx(char_gfx_index, global_alloc(gfx_element(m_palette, char_layout, (UINT8 *)char_ram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
 
 	save_pointer(NAME(tile_ram), 0x10000/2);
 	save_pointer(NAME(char_ram), 0x80000/2);

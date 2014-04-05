@@ -132,9 +132,9 @@ inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pm
 {
 	UINT8 data = 0;
 
-	if (m_in_char_ram_func != NULL)
+	if (!m_in_char_ram_func.isnull())
 	{
-		data = m_in_char_ram_func(this, pma, cma, pmd);
+		data = m_in_char_ram_func(pma, cma, pmd);
 	}
 
 	return data;
@@ -148,9 +148,9 @@ inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pm
 
 inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd, UINT8 data)
 {
-	if (m_out_char_ram_func != NULL)
+	if (!m_out_char_ram_func.isnull())
 	{
-		m_out_char_ram_func(this, pma, cma, pmd, data);
+		m_out_char_ram_func(pma, cma, pmd, data);
 	}
 }
 
@@ -163,9 +163,9 @@ inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, UINT8 pmd)
 {
 	int pcb = 0;
 
-	if (m_in_pcb_func != NULL)
+	if (!m_in_pcb_func.isnull())
 	{
-		pcb = m_in_pcb_func(this, pma, cma, pmd);
+		pcb = m_in_pcb_func(pma, cma, pmd);
 	}
 
 	return pcb;
@@ -350,6 +350,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	m_read_pal_ntsc(*this),
 	m_write_prd(*this),
+	m_color_clock(0),
 	m_stream(NULL),
 	m_palette(*this, "palette"),
 	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
@@ -368,29 +369,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor cdp1869_device::device_mconfig_additions() const
 {
-        return MACHINE_CONFIG_NAME( cdp1869 );
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1869_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1869_interface *intf = reinterpret_cast<const cdp1869_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1869_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		in_pcb_cb = NULL;
-		in_char_ram_cb = NULL;
-		out_char_ram_cb = NULL;
-	}
+    return MACHINE_CONFIG_NAME( cdp1869 );
 }
 
 
@@ -403,9 +382,9 @@ void cdp1869_device::device_start()
 	// resolve callbacks
 	m_read_pal_ntsc.resolve_safe(0);
 	m_write_prd.resolve_safe();
-	m_in_pcb_func = in_pcb_cb;
-	m_in_char_ram_func = in_char_ram_cb;
-	m_out_char_ram_func = out_char_ram_cb;
+	m_in_pcb_func.bind_relative_to(*owner());
+	m_in_char_ram_func.bind_relative_to(*owner());
+	m_out_char_ram_func.bind_relative_to(*owner());
 
 	// allocate timers
 	m_prd_timer = timer_alloc();

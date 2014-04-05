@@ -753,6 +753,15 @@ void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32
 	}
 }
 
+void floppy_image_device::set_write_splice(attotime when)
+{
+	image_dirty = true;
+	attotime base;
+	int splice_pos = find_position(base, when);
+	image->set_write_splice_position(cyl, ss, splice_pos);
+	logerror("%s: Track %d head %d set splice pos %d\n", tag(), cyl, ss, splice_pos);
+}
+
 UINT32 floppy_image_device::get_form_factor() const
 {
 	return form_factor;

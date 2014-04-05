@@ -187,7 +187,7 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
  ************************************************/
 int vtech2_state::mra_bank(int bank, int offs)
 {
-	int level, data = 0xff;
+	UINT8 data = 0x7f;
 
 	/* Laser 500/700 only: keyboard rows A through D */
 	if( (offs & 0x00ff) == 0x00ff )
@@ -246,16 +246,9 @@ int vtech2_state::mra_bank(int bank, int offs)
 			data &= ioport("ROW7")->read();
 	}
 
-	/* what's bit 7 good for? tape input maybe? */
-	level = m_cassette->input() * 65536.0;
-	if( level < m_level_old - 511 )
-		m_cassette_bit = 0x00;
-	if( level > m_level_old + 511 )
-		m_cassette_bit = 0x80;
-	m_level_old = level;
+	/* BIT 7 - tape input */
 
-	data &= ~m_cassette_bit;
-	// logerror("bank #%d keyboard_r [$%04X] $%02X\n", bank, offs, data);
+	data |= (m_cassette->input() > +0.02) ? 0x80 : 0;
 
 	return data;
 }
@@ -289,6 +282,7 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 				m_speaker->level_w(data & 1);
 			m_laser_latch = data;
 		}
+		m_cassette->output( BIT(data, 2) ? -1.0 : +1.0);
 		break;
 	case 12:    /* ext. ROM #1 */
 	case 13:    /* ext. ROM #2 */

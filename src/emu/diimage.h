@@ -103,8 +103,6 @@ class software_info;
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
-typedef int (*device_image_load_func)(device_image_interface &image);
-typedef void (*device_image_unload_func)(device_image_interface &image);
 typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
 typedef void (*device_image_display_info_func)(device_image_interface &image);
 
@@ -117,13 +115,8 @@ typedef void (*device_image_display_info_func)(device_image_interface &image);
 #define IMAGE_VERIFY_PASS   FALSE
 #define IMAGE_VERIFY_FAIL   TRUE
 
-#define DEVICE_IMAGE_LOAD_NAME_LEGACY(name)        device_load_##name
-#define DEVICE_IMAGE_LOAD_LEGACY(name)             int DEVICE_IMAGE_LOAD_NAME_LEGACY(name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_NAME_LEGACY(name)      device_unload_##name
-#define DEVICE_IMAGE_UNLOAD_LEGACY(name)           void DEVICE_IMAGE_UNLOAD_NAME_LEGACY(name)(device_image_interface &image)
 #define DEVICE_IMAGE_DISPLAY_INFO_NAME(name)       device_image_display_info_func##name
 #define DEVICE_IMAGE_DISPLAY_INFO(name)            void DEVICE_IMAGE_DISPLAY_INFO_NAME(name)(device_image_interface &image)
-
 
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)

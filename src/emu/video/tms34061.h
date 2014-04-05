@@ -11,6 +11,17 @@
 #ifndef __TMS34061_H__
 #define __TMS34061_H__
 
+
+#define MCFG_TMS34061_ROWSHIFT(_shift) \
+	tms34061_device::set_rowshift(*device, _shift);
+
+#define MCFG_TMS34061_VRAM_SIZE(_size) \
+	tms34061_device::set_vram_size(*device, _size);
+
+#define MCFG_TMS34061_INTERRUPT_CB(_devcb) \
+	devcb = &tms34061_device::set_interrupt_callback(*device, DEVCB2_##_devcb);
+	
+
 /* register constants */
 enum
 {
@@ -35,14 +46,6 @@ enum
 	TMS34061_REGCOUNT
 };
 
-/* interface structure */
-struct tms34061_interface
-{
-	UINT8       m_rowshift;       /* VRAM address is (row << rowshift) | col */
-	UINT32      m_vramsize;       /* size of video RAM */
-	void        (*m_interrupt)(running_machine &machine, int state);  /* interrupt gen callback */
-};
-
 /* display state structure */
 struct tms34061_display
 {
@@ -59,12 +62,15 @@ struct tms34061_display
 // ======================> tms34061_device
 
 class tms34061_device :  public device_t,
-						public device_video_interface,
-						public tms34061_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
 	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	static void set_rowshift(device_t &device, UINT8 rowshift) { downcast<tms34061_device &>(device).m_rowshift = rowshift; }
+	static void set_vram_size(device_t &device, UINT32 vramsize) { downcast<tms34061_device &>(device).m_vramsize = vramsize; }
+	template<class _Object> static devcb2_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<tms34061_device &>(device).m_interrupt_cb.set_callback(object); }
 
 	/* reads/writes to the 34061 */
 	UINT8 read(address_space &space, int col, int row, int func);
@@ -81,11 +87,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
+	UINT8       		m_rowshift;			/* VRAM address is (row << rowshift) | col */
+	UINT32      		m_vramsize;			/* size of video RAM */
+	devcb2_write_line 	m_interrupt_cb;		/* interrupt gen callback */
+	
 	UINT16              m_regs[TMS34061_REGCOUNT];
 	UINT16              m_xmask;
 	UINT8               m_yshift;
@@ -107,9 +116,5 @@ private:
 
 // device type definition
 extern const device_type TMS34061;
-
-#define MCFG_TMS34061_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, TMS34061, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 
 #endif

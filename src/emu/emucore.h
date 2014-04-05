@@ -227,13 +227,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #endif
 
 
-// map mame_* helpers to core_* helpers */
-#define mame_stricmp        core_stricmp
-#define mame_strnicmp       core_strnicmp
-#define mame_strdup         core_strdup
-#define mame_strwildcmp     core_strwildcmp
-
-
 // macros to convert radians to degrees and degrees to radians
 #define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))

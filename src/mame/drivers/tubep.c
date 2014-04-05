@@ -884,13 +884,6 @@ static const ay8910_interface ay8910_interface_3 =
 	DEVCB_DRIVER_MEMBER(tubep_state,ay8910_portB_2_w)  /* write port B */
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tubep_state,rjammer_adpcm_vck),          /* VCK function */
-	MSM5205_S48_4B              /* 8 KHz (changes at run time) */
-};
-
-
 
 /*************************************
  *
@@ -1012,7 +1005,8 @@ static MACHINE_CONFIG_START( rjammer, tubep_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tubep_state, rjammer_adpcm_vck))          /* VCK function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz (changes at run time) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

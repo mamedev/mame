@@ -822,18 +822,10 @@ static ADDRESS_MAP_START( tm990_189_cru_map, AS_IO, 8, tm990189_state )
 	AM_RANGE(0x0400, 0x05ff) AM_DEVWRITE("tms9902", tms9902_device, cruwrite)   /* optional tms9902 */
 ADDRESS_MAP_END
 
-static TMS9980A_CONFIG( cpuconf )
-{
-	DEVCB_DRIVER_MEMBER(tm990189_state, external_operation),
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,      // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
 static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
@@ -888,7 +880,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map, cpuconf)
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )

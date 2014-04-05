@@ -58,6 +58,14 @@ READ8_MEMBER(sms_gender_adapter_device::read_ram)
 	return m_subslot->read_ram(space, offset);
 }
 
+int sms_gender_adapter_device::get_lphaser_xoffs()
+{
+	if (m_subslot->m_cart)
+		return m_subslot->m_cart->get_lphaser_xoffs();
+	else
+		return 0;
+}
+
 
 //-------------------------------------------------
 // write

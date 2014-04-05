@@ -53,6 +53,7 @@ public:
 	UINT8 m_a0_data_out;
 	UINT8 m_a1_data_out;
 	UINT8 m_a2_data_out;
+	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	DECLARE_WRITE16_MEMBER(sys5_tms34061_w);
 	DECLARE_READ16_MEMBER(sys5_tms34061_r);
 	DECLARE_WRITE16_MEMBER(ramdac_w);

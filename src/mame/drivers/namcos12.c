@@ -1039,11 +1039,12 @@ Notes:
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83002.h"
 #include "video/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
 #include "machine/rtc4543.h"
+#include "machine/namco_settings.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1053,13 +1054,17 @@ public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
+		m_settings(*this, "namco_settings"),
 		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "maincpu:ram")
+		m_ram(*this, "maincpu:ram"),
+		m_sub(*this, "sub"),
+		m_adc(*this, "sub:adc")
 	{
 	}
 
 	required_device<rtc4543_device> m_rtc;
+	required_device<namco_settings_device> m_settings;
 	required_shared_ptr<UINT16> m_sharedram;
 	UINT16 m_n_bankoffset;
 
@@ -1071,11 +1076,7 @@ public:
 	UINT32 m_ttt_val[2];
 
 	int m_s12_porta;
-	int m_s12_rtcstate;
 	int m_s12_lastpB;
-	int m_s12_setstate;
-	int m_s12_setnum;
-	int m_s12_settings[8];
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(bankoffset_w);
@@ -1087,15 +1088,14 @@ public:
 	DECLARE_WRITE16_MEMBER(tektagt_protection_2_w);
 	DECLARE_READ16_MEMBER(tektagt_protection_2_r);
 	DECLARE_READ16_MEMBER(tektagt_protection_3_r);
-	DECLARE_READ8_MEMBER(s12_mcu_p8_r);
-	DECLARE_READ8_MEMBER(s12_mcu_pa_r);
-	DECLARE_WRITE8_MEMBER(s12_mcu_pa_w);
-	DECLARE_READ8_MEMBER(s12_mcu_rtc_r);
-	DECLARE_READ8_MEMBER(s12_mcu_portB_r);
-	DECLARE_WRITE8_MEMBER(s12_mcu_portB_w);
-	DECLARE_WRITE8_MEMBER(s12_mcu_settings_w);
-	DECLARE_READ8_MEMBER(s12_mcu_gun_h_r);
-	DECLARE_READ8_MEMBER(s12_mcu_gun_v_r);
+	DECLARE_READ16_MEMBER(s12_mcu_p8_r);
+	DECLARE_READ16_MEMBER(s12_mcu_pa_r);
+	DECLARE_WRITE16_MEMBER(s12_mcu_pa_w);
+	DECLARE_READ16_MEMBER(s12_mcu_rtc_r);
+	DECLARE_READ16_MEMBER(s12_mcu_portB_r);
+	DECLARE_WRITE16_MEMBER(s12_mcu_portB_w);
+	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
+	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
 	DECLARE_DRIVER_INIT(namcos12);
 	DECLARE_DRIVER_INIT(ptblank2);
 	DECLARE_MACHINE_RESET(namcos12);
@@ -1104,6 +1104,8 @@ public:
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<h83002_device> m_sub;
+	required_device<h8_adc_device> m_adc;
 };
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1229,7 +1231,9 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 
 void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state )
 {
-	irq1_line_pulse( *machine().device( "sub" ) );
+	m_sub->set_input_line(1, vblank_state);
+	m_adc->adtrg_w(vblank_state);
+	m_s12_lastpB = (m_s12_lastpB & 0x7f) | (vblank_state << 7);
 }
 
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
@@ -1451,83 +1455,38 @@ static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
 
-READ8_MEMBER(namcos12_state::s12_mcu_p8_r)
+READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 {
 	return 0x02;
 }
 
 // emulation of the Epson R4543 real time clock
-// in System 12, bit 0 of H8/3002 port A is connected to it's chip enable
+// in System 12, bit 0 of H8/3002 port A is connected to its chip enable
 // the actual I/O takes place through the H8/3002's serial port B.
 
-READ8_MEMBER(namcos12_state::s12_mcu_pa_r)
+READ16_MEMBER(namcos12_state::s12_mcu_pa_r)
 {
 	return m_s12_porta;
 }
 
-WRITE8_MEMBER(namcos12_state::s12_mcu_pa_w)
+WRITE16_MEMBER(namcos12_state::s12_mcu_pa_w)
 {
-	m_rtc->ce_w(data & 1);
+	logerror("pa_w %02x\n", data);
 	m_s12_porta = data;
+	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
+	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
 }
 
-READ8_MEMBER(namcos12_state::s12_mcu_rtc_r)
+READ16_MEMBER(namcos12_state::s12_mcu_portB_r)
 {
-	UINT8 ret = 0;
-
-	for (int i = 0; i < 8; i++)
-	{
-		m_rtc->clk_w(0);
-		m_rtc->clk_w(1);
-		ret <<= 1;
-		ret |= m_rtc->data_r();
-	}
-
-	return ret;
-}
-
-READ8_MEMBER(namcos12_state::s12_mcu_portB_r)
-{
-	// golgo13 won't boot if this doesn't toggle every read
-	m_s12_lastpB ^= 0x80;
 	return m_s12_lastpB;
 }
 
-WRITE8_MEMBER(namcos12_state::s12_mcu_portB_w)
+WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 {
-	// bit 7 = chip enable for the video settings controller
-	if (data & 0x80)
-	{
-		m_s12_setstate = 0;
-	}
-
 	m_s12_lastpB = data;
-}
-
-WRITE8_MEMBER(namcos12_state::s12_mcu_settings_w)
-{
-	int *s12_settings = m_s12_settings;
-
-	if (m_s12_setstate)
-	{
-		// data
-		s12_settings[m_s12_setnum] = data;
-
-		if (m_s12_setnum == 7)
-		{
-			logerror("S12 video settings: Contrast: %02x  R: %02x  G: %02x  B: %02x\n",
-				BITSWAP8(s12_settings[0], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s12_settings[1], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s12_settings[2], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s12_settings[3], 0, 1, 2, 3, 4, 5, 6, 7));
-		}
-	}
-	else
-	{   // setting number
-		m_s12_setnum = (data >> 4)-1;
-	}
-
-	m_s12_setstate ^= 1;
+	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
+	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
 }
 
 /* Golgo 13 lightgun inputs
@@ -1537,54 +1496,35 @@ WRITE8_MEMBER(namcos12_state::s12_mcu_settings_w)
  * within the 16-bit word.
  */
 
-READ8_MEMBER(namcos12_state::s12_mcu_gun_h_r)
+READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
 	ioport_port *port = ioport("LIGHT0_X");
 	if( port != NULL )
-	{
-		int rv = port->read() << 6;
-
-		if( ( offset & 1 ) != 0 )
-		{
-			return rv;
-		}
-
-		return rv >> 8;
-	}
+		return port->read() << 2;
 
 	// if game has no lightgun ports, return 0
 	return 0;
 }
 
-READ8_MEMBER(namcos12_state::s12_mcu_gun_v_r)
+READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
 	ioport_port *port = ioport("LIGHT0_Y");
 	if( port != NULL )
-	{
-		int rv = port->read() << 6;
-
-		if( ( offset & 1 ) != 0 )
-		{
-			return rv;
-		}
-
-		return rv >> 8;
-	}
+		return port->read() << 2;
 
 	// if game has no lightgun ports, return 0
 	return 0;
 }
 
-static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8, namcos12_state )
-	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ(s12_mcu_rtc_r ) AM_WRITE(s12_mcu_settings_w )
-	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
-	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ(s12_mcu_gun_h_r )  // golgo 13 gun X-axis
-	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ(s12_mcu_gun_v_r )  // golgo 13 gun Y-axis
-	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
+static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
+	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
+	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
+	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r )  // golgo 13 gun X-axis
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r )  // golgo 13 gun Y-axis
+	AM_RANGE(h8_device::ADC_3, h8_device::ADC_3) AM_NOP
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(namcos12_state,namcos12)
@@ -1592,11 +1532,7 @@ DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
 	m_s12_porta = 0;
-	m_s12_rtcstate = 0;
 	m_s12_lastpB = 0x50;
-	m_s12_setstate = 0;
-	m_s12_setnum = 0;
-	memset(m_s12_settings, 0, sizeof(m_s12_settings));
 
 	m_n_tektagdmaoffset = 0;
 	m_n_dmaoffset = 0;
@@ -1626,12 +1562,25 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 
 	MCFG_CPU_ADD("sub", H83002, 16737350 )
-	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)
-	MCFG_CPU_IO_MAP( s12h8iomap)
+	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
+	MCFG_CPU_IO_MAP(s12h8iomap)
 
-	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos12_state, namcos12)
+
+	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
 	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("sub:sci1", h8_sci_device, rx_w))
+
+	MCFG_LINE_DISPATCH_ADD("clk_dispatch", 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	
+	MCFG_DEVICE_MODIFY("sub:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":clk_dispatch", devcb2_line_dispatch_device<2>, in_w))
+	
+	MCFG_AT28C16_ADD("at28c16", NULL)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -1645,8 +1594,6 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
-
-	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ptblank2, coh700 )
@@ -2637,7 +2584,7 @@ ROM_START( tektagtjc1 )
 	ROM_LOAD32_BYTE( "flou.ic7",        0x3000003, 0x200000, CRC(75894a07) SHA1(ee36dded4c78b0bddd4904eceabc0f0f2ca5cf07) ) //
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
-	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, BAD_DUMP CRC(0a6e5d6c) SHA1(fd37c190ac99dc9ab2373a43dc39ccf6eca6c178) ) // There is a single bit difference @ 0x1805
+	ROM_LOAD16_WORD_SWAP( "teg1verb.11s", 0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "teg1_wave0.ic1",      0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )

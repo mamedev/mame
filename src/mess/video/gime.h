@@ -21,11 +21,9 @@
 //  GIME CONFIG/INTERFACE
 //**************************************************************************
 
-#define MCFG_GIME_HSYNC_CALLBACK(_write) \
-	devcb = &gime_base_device::set_hsync_wr_callback(*device, DEVCB2_##_write);
+#define MCFG_GIME_HSYNC_CALLBACK	MCFG_MC6847_HSYNC_CALLBACK
 
-#define MCFG_GIME_FSYNC_CALLBACK(_write) \
-	devcb = &gime_base_device::set_fsync_wr_callback(*device, DEVCB2_##_write);
+#define MCFG_GIME_FSYNC_CALLBACK	MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
 	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);
@@ -56,8 +54,6 @@ class cococart_slot_device;
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
-	template<class _Object> static devcb2_base &set_hsync_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_hsync.set_callback(object); }
-	template<class _Object> static devcb2_base &set_fsync_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_fsync.set_callback(object); }
 	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb2_base &set_firq_wr_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_write_firq.set_callback(object); }
 	template<class _Object> static devcb2_base &set_floating_bus_rd_callback(device_t &device, _Object object) { return downcast<gime_base_device &>(device).m_read_floating_bus.set_callback(object); }
@@ -162,8 +158,6 @@ private:
 	static const UINT8 hires_font[128][12];
 
 	// callbacks
-	devcb2_write_line   m_write_hsync;
-	devcb2_write_line   m_write_fsync;
 	devcb2_write_line   m_write_irq;
 	devcb2_write_line   m_write_firq;
 	devcb2_read8        m_read_floating_bus;

@@ -563,6 +563,8 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 	// append the internal device map (first so it takes priority) */
 	if (spaceconfig->m_internal_map != NULL)
 		(*spaceconfig->m_internal_map)(*this, device);
+	if (!spaceconfig->m_internal_map_delegate.isnull())
+		spaceconfig->m_internal_map_delegate(*this, device);
 
 	// construct the standard map */
 	if (memintf->address_map(spacenum) != NULL)
@@ -571,6 +573,8 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 	// append the default device map (last so it can be overridden) */
 	if (spaceconfig->m_default_map != NULL)
 		(*spaceconfig->m_default_map)(*this, device);
+	if (!spaceconfig->m_default_map_delegate.isnull())
+		spaceconfig->m_default_map_delegate(*this, device);
 }
 
 

@@ -388,7 +388,6 @@ ADDRESS_MAP_END
 
 void m20_state::install_memory()
 {
-	m20_state *state = machine().driver_data<m20_state>();
 
 	m_memsize = m_ram->size();
 	UINT8 *memptr = m_ram->pointer();
@@ -468,14 +467,14 @@ void m20_state::install_memory()
 	pspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
 	dspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
 
-	//state->membank("dram0_0000")->set_base(memptr);
-	state->membank("dram0_4000")->set_base(memptr + 0x4000);
-	state->membank("dram0_8000")->set_base(memptr + 0x8000);
-	state->membank("dram0_c000")->set_base(memptr + 0xc000);
-	state->membank("dram0_10000")->set_base(memptr + 0x10000);
-	state->membank("dram0_14000")->set_base(memptr + 0x14000);
-	state->membank("dram0_18000")->set_base(memptr + 0x18000);
-	state->membank("dram0_1c000")->set_base(memptr + 0x1c000);
+	//membank("dram0_0000")->set_base(memptr);
+	membank("dram0_4000")->set_base(memptr + 0x4000);
+	membank("dram0_8000")->set_base(memptr + 0x8000);
+	membank("dram0_c000")->set_base(memptr + 0xc000);
+	membank("dram0_10000")->set_base(memptr + 0x10000);
+	membank("dram0_14000")->set_base(memptr + 0x14000);
+	membank("dram0_18000")->set_base(memptr + 0x18000);
+	membank("dram0_1c000")->set_base(memptr + 0x1c000);
 
 	if (m_memsize > 128 * 1024) {
 		/* install memory expansions (DRAM1..DRAM3) */
@@ -506,8 +505,8 @@ void m20_state::install_memory()
 			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
 			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
 
-			state->membank("dram1_0000")->set_base(memptr + 0x20000);
-			state->membank("dram1_4000")->set_base(memptr + 0x24000);
+			membank("dram1_0000")->set_base(memptr + 0x20000);
+			membank("dram1_4000")->set_base(memptr + 0x24000);
 
 			if (m_memsize > 128 * 1024 + 32768) {
 				/* DRAM2, 32K */
@@ -534,8 +533,8 @@ void m20_state::install_memory()
 				dspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram2_4000");
 				dspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram2_0000");
 
-				state->membank("dram2_0000")->set_base(memptr + 0x28000);
-				state->membank("dram2_4000")->set_base(memptr + 0x2c000);
+				membank("dram2_0000")->set_base(memptr + 0x28000);
+				membank("dram2_4000")->set_base(memptr + 0x2c000);
 			}
 			if (m_memsize > 128 * 1024 + 2 * 32768) {
 				/* DRAM3, 32K */
@@ -562,8 +561,8 @@ void m20_state::install_memory()
 				dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram3_4000");
 				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram3_4000");
 
-				state->membank("dram3_0000")->set_base(memptr + 0x30000);
-				state->membank("dram3_4000")->set_base(memptr + 0x34000);
+				membank("dram3_0000")->set_base(memptr + 0x30000);
+				membank("dram3_4000")->set_base(memptr + 0x34000);
 			}
 		}
 		else {
@@ -621,14 +620,14 @@ void m20_state::install_memory()
 			dspace.install_readwrite_bank(0xb4000, 0xb7fff, 0x3fff, 0, "dram1_18000");
 			dspace.install_readwrite_bank(0xb8000, 0xbbfff, 0x3fff, 0, "dram1_1c000");
 
-			state->membank("dram1_0000")->set_base(memptr + 0x20000);
-			state->membank("dram1_4000")->set_base(memptr + 0x24000);
-			state->membank("dram1_8000")->set_base(memptr + 0x28000);
-			state->membank("dram1_c000")->set_base(memptr + 0x2c000);
-			state->membank("dram1_10000")->set_base(memptr + 0x30000);
-			state->membank("dram1_14000")->set_base(memptr + 0x34000);
-			state->membank("dram1_18000")->set_base(memptr + 0x38000);
-			state->membank("dram1_1c000")->set_base(memptr + 0x3c000);
+			membank("dram1_0000")->set_base(memptr + 0x20000);
+			membank("dram1_4000")->set_base(memptr + 0x24000);
+			membank("dram1_8000")->set_base(memptr + 0x28000);
+			membank("dram1_c000")->set_base(memptr + 0x2c000);
+			membank("dram1_10000")->set_base(memptr + 0x30000);
+			membank("dram1_14000")->set_base(memptr + 0x34000);
+			membank("dram1_18000")->set_base(memptr + 0x38000);
+			membank("dram1_1c000")->set_base(memptr + 0x3c000);
 
 			if (m_memsize > 256 * 1024) {
 				/* DRAM2, 128K */
@@ -680,14 +679,14 @@ void m20_state::install_memory()
 				dspace.install_readwrite_bank(0xd4000, 0xd7fff, 0x3fff, 0, "dram2_18000");
 				dspace.install_readwrite_bank(0xd8000, 0xdbfff, 0x3fff, 0, "dram2_1c000");
 
-				state->membank("dram2_0000")->set_base(memptr + 0x40000);
-				state->membank("dram2_4000")->set_base(memptr + 0x44000);
-				state->membank("dram2_8000")->set_base(memptr + 0x48000);
-				state->membank("dram2_c000")->set_base(memptr + 0x4c000);
-				state->membank("dram2_10000")->set_base(memptr + 0x50000);
-				state->membank("dram2_14000")->set_base(memptr + 0x54000);
-				state->membank("dram2_18000")->set_base(memptr + 0x58000);
-				state->membank("dram2_1c000")->set_base(memptr + 0x5c000);
+				membank("dram2_0000")->set_base(memptr + 0x40000);
+				membank("dram2_4000")->set_base(memptr + 0x44000);
+				membank("dram2_8000")->set_base(memptr + 0x48000);
+				membank("dram2_c000")->set_base(memptr + 0x4c000);
+				membank("dram2_10000")->set_base(memptr + 0x50000);
+				membank("dram2_14000")->set_base(memptr + 0x54000);
+				membank("dram2_18000")->set_base(memptr + 0x58000);
+				membank("dram2_1c000")->set_base(memptr + 0x5c000);
 			}
 			if (m_memsize > 384 * 1024) {
 				/* DRAM3, 128K */
@@ -742,14 +741,14 @@ void m20_state::install_memory()
 				dspace.install_readwrite_bank(0xf8000, 0xfbfff, 0x3fff, 0, "dram3_1c000");
 				dspace.install_readwrite_bank(0xfc000, 0xfffff, 0x3fff, 0, "dram3_0000");
 
-				state->membank("dram3_0000")->set_base(memptr + 0x60000);
-				state->membank("dram3_4000")->set_base(memptr + 0x64000);
-				state->membank("dram3_8000")->set_base(memptr + 0x68000);
-				state->membank("dram3_c000")->set_base(memptr + 0x6c000);
-				state->membank("dram3_10000")->set_base(memptr + 0x70000);
-				state->membank("dram3_14000")->set_base(memptr + 0x74000);
-				state->membank("dram3_18000")->set_base(memptr + 0x78000);
-				state->membank("dram3_1c000")->set_base(memptr + 0x7c000);
+				membank("dram3_0000")->set_base(memptr + 0x60000);
+				membank("dram3_4000")->set_base(memptr + 0x64000);
+				membank("dram3_8000")->set_base(memptr + 0x68000);
+				membank("dram3_c000")->set_base(memptr + 0x6c000);
+				membank("dram3_10000")->set_base(memptr + 0x70000);
+				membank("dram3_14000")->set_base(memptr + 0x74000);
+				membank("dram3_18000")->set_base(memptr + 0x78000);
+				membank("dram3_1c000")->set_base(memptr + 0x7c000);
 			}
 		}
 	}

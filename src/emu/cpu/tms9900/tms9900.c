@@ -135,6 +135,9 @@ enum
 // Memory operation
 #define TRACE_MEM 0
 
+// Address bus operation
+#define TRACE_ADDRESSBUS 0
+
 // Cycle count
 #define TRACE_CYCLES 0
 
@@ -172,7 +175,14 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 		m_prgspace(NULL),
 		m_cru(NULL),
 		m_prgaddr_mask((1<<prg_addr_bits)-1),
-		m_cruaddr_mask((1<<cru_addr_bits)-1)
+		m_cruaddr_mask((1<<cru_addr_bits)-1),
+		m_clock_out_line(*this),
+		m_wait_line(*this),
+		m_holda_line(*this),
+		m_iaq_line(*this),
+		m_get_intlevel(*this),
+		m_dbin_line(*this),
+		m_external_operation(*this)
 {
 }
 
@@ -238,17 +248,14 @@ void tms99xx_device::device_stop()
 */
 void tms99xx_device::resolve_lines()
 {
-	const tms99xx_config *conf = reinterpret_cast<const tms99xx_config *>(static_config());
-	assert (conf != NULL);
-
 	// Resolve our external connections
-	m_external_operation.resolve(conf->external_callback, *this);
-	m_get_intlevel.resolve(conf->irq_level, *this);
-	m_iaq_line.resolve(conf->instruction_acquisition, *this);
-	m_clock_out_line.resolve(conf->clock_out, *this);
-	m_wait_line.resolve(conf->wait_line, *this);
-	m_holda_line.resolve(conf->holda_line, *this);
-	m_dbin_line.resolve(conf->dbin_line, *this);        // we need this for the set_address operation
+	m_external_operation.resolve();
+	m_get_intlevel.resolve();
+	m_iaq_line.resolve();
+	m_clock_out_line.resolve();
+	m_wait_line.resolve();
+	m_holda_line.resolve();
+	m_dbin_line.resolve();        // we need this for the set_address operation
 }
 
 /*
@@ -1171,8 +1178,11 @@ void tms99xx_device::execute_run()
 		{
 			if (TRACE_WAIT) logerror("tms99xx: idle state\n");
 			pulse_clock(1);
-			m_external_operation(IDLE_OP, 0);
-			m_external_operation(IDLE_OP, 1);
+			if (!m_external_operation.isnull())
+			{
+				m_external_operation(IDLE_OP, 0, 0xff);
+				m_external_operation(IDLE_OP, 1, 0xff);
+			}
 		}
 		else
 		{
@@ -1221,7 +1231,7 @@ void tms99xx_device::execute_run()
 						m_pass = 1;
 						MPC++;
 						m_mem_phase = 1;
-						m_iaq_line(CLEAR_LINE);
+						if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
 					}
 				}
 			}
@@ -1270,7 +1280,8 @@ void tms99xx_device::execute_set_input(int irqline, int state)
 */
 int tms99xx_device::get_intlevel(int state)
 {
-	return m_get_intlevel(0);
+	if (!m_get_intlevel.isnull()) return m_get_intlevel(0);
+	return 0;
 }
 
 void tms99xx_device::service_interrupt()
@@ -1278,11 +1289,11 @@ void tms99xx_device::service_interrupt()
 	m_program = int_mp;
 	m_command = INTR;
 	m_idle_state = false;
-	m_external_operation(IDLE_OP, 0);
+	if (!m_external_operation.isnull()) m_external_operation(IDLE_OP, 0, 0xff);
 
 	m_state = 0;
 
-	m_dbin_line(ASSERT_LINE);
+	if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 
 	// If reset, we just start with execution, otherwise we put the MPC
 	// on the first microinstruction, which also means that the main loop shall
@@ -1326,9 +1337,9 @@ void tms99xx_device::pulse_clock(int count)
 {
 	for (int i=0; i < count; i++)
 	{
-		m_clock_out_line(ASSERT_LINE);
+		if (!m_clock_out_line.isnull()) m_clock_out_line(ASSERT_LINE);
 		m_ready = m_ready_bufd;              // get the latched READY state
-		m_clock_out_line(CLEAR_LINE);
+		if (!m_clock_out_line.isnull()) m_clock_out_line(CLEAR_LINE);
 		m_icount--;                         // This is the only location where we count down the cycles.
 		if (TRACE_CLOCK)
 		{
@@ -1347,7 +1358,7 @@ void tms99xx_device::set_hold(int state)
 	if (!m_hold_state)
 	{
 		m_hold_acknowledged = false;
-		m_holda_line(CLEAR_LINE);
+		if (!m_holda_line.isnull()) m_holda_line(CLEAR_LINE);
 	}
 }
 
@@ -1357,7 +1368,7 @@ void tms99xx_device::set_hold(int state)
 inline void tms99xx_device::acknowledge_hold()
 {
 	m_hold_acknowledged = true;
-	m_holda_line(ASSERT_LINE);
+	if (!m_holda_line.isnull()) m_holda_line(ASSERT_LINE);
 }
 
 /*
@@ -1379,7 +1390,8 @@ void tms99xx_device::abort_operation()
 */
 inline void tms99xx_device::set_wait_state(bool state)
 {
-	if (m_wait_state != state) m_wait_line(state? ASSERT_LINE : CLEAR_LINE);
+	if (m_wait_state != state)
+		if (!m_wait_line.isnull()) m_wait_line(state? ASSERT_LINE : CLEAR_LINE);
 	m_wait_state = state;
 }
 
@@ -1444,7 +1456,7 @@ void tms99xx_device::acquire_instruction()
 {
 	if (m_mem_phase == 1)
 	{
-		m_iaq_line(ASSERT_LINE);
+		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
 		m_address = PC;
 		m_first_cycle = m_icount;
 	}
@@ -1473,12 +1485,12 @@ void tms99xx_device::mem_read()
 	// set_address and read_word should pass the same address as argument
 	if (m_mem_phase==1)
 	{
-		m_dbin_line(ASSERT_LINE);
+		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
-		if (TRACE_MEM) logerror("tms99xx: set address (r) %04x\n", m_address);
+		if (TRACE_ADDRESSBUS) logerror("tms99xx: set address (r) %04x\n", m_address);
 
 		pulse_clock(1); // Concludes the first cycle
 		// If READY has been found to be low, the CPU will now stay in the wait state loop
@@ -1488,7 +1500,7 @@ void tms99xx_device::mem_read()
 		// Second phase (after READY was raised again)
 		m_current_value = m_prgspace->read_word(m_address & m_prgaddr_mask & 0xfffe);
 		pulse_clock(1);
-		m_dbin_line(CLEAR_LINE);
+		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		m_mem_phase = 1;        // reset to phase 1
 		if (TRACE_MEM) logerror("tms99xx: mem r %04x -> %04x\n", m_address, m_current_value);
 	}
@@ -1498,9 +1510,9 @@ void tms99xx_device::mem_write()
 {
 	if (m_mem_phase==1)
 	{
-		m_dbin_line(CLEAR_LINE);
+		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
-		if (TRACE_MEM) logerror("tms99xx: set address (w) %04x\n", m_address);
+		if (TRACE_ADDRESSBUS) logerror("tms99xx: set address (w) %04x\n", m_address);
 		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
 		if (TRACE_MEM) logerror("tms99xx: mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
@@ -2601,7 +2613,7 @@ void tms99xx_device::alu_external()
 	if (m_command == IDLE)
 		m_idle_state = true;
 
-	m_external_operation((IR >> 5) & 0x07, 1);
+	if (!m_external_operation.isnull()) m_external_operation((IR >> 5) & 0x07, 1, 0xff);
 	pulse_clock(2);
 }
 

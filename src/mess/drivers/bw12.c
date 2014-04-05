@@ -344,9 +344,9 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 		for (bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7);
+			int color = BIT(data, 7) && de;
 
-			bitmap.pix32(y, x) = pen[color];
+			bitmap.pix32(vbp + y, hbp + x) = pen[color];
 
 			data <<= 1;
 		}
@@ -356,7 +356,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 
 static MC6845_INTERFACE( bw12_mc6845_interface )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

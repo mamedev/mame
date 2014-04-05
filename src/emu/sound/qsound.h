@@ -11,7 +11,7 @@
 
 #include "cpu/dsp16/dsp16.h"
 
-#define QSOUND_CLOCK 4000000    /* default 4MHz clock */
+#define QSOUND_CLOCK 4000000    /* default 4MHz clock (60MHz/15?) */
 
 
 //**************************************************************************
@@ -59,7 +59,6 @@ private:
 		bool enabled;       // key on / key off
 		int lvol;           // left volume
 		int rvol;           // right volume
-		INT8 sample;        // last sample value
 		UINT32 step_ptr;    // current offset counter
 	} m_channel[16];
 

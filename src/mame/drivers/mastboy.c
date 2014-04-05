@@ -682,12 +682,6 @@ WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
 }
 
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mastboy_state,mastboy_adpcm_int),  /* interrupt function */
-	MSM5205_SEX_4B      /* 4KHz 4-bit */
-};
-
 /* Interrupt Handling */
 
 WRITE8_MEMBER(mastboy_state::mastboy_irq0_ack_w)
@@ -915,7 +909,8 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(mastboy_state, mastboy_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

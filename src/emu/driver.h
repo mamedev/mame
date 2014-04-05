@@ -79,7 +79,6 @@
 #define VIDEO_START_NAME(name)      video_start_##name
 #define VIDEO_START(name)           void VIDEO_START_NAME(name)(running_machine &machine) // legacy
 #define VIDEO_START_CALL_MEMBER(name)       VIDEO_START_NAME(name)()
-#define VIDEO_START_CALL_LEGACY(name)       VIDEO_START_NAME(name)(machine())
 #define DECLARE_VIDEO_START(name)   void VIDEO_START_NAME(name)()
 #define VIDEO_START_MEMBER(cls,name) void cls::VIDEO_START_NAME(name)()
 

@@ -25,11 +25,10 @@ public:
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
-	static void drq_w(device_t *device, int level);
+	DECLARE_WRITE_LINE_MEMBER(drq_w);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides

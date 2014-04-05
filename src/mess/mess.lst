@@ -94,7 +94,9 @@ sms1pal   // Sega Master System I (PAL)
 smspal  // Sega Master System II (PAL)
 smsj      // Sega Master System (Japan) with FM Chip
 sg1000m3  // Sega SG-1000 Mark III (Japan)
-sms2kr  // Samsung Gam*Boy II (Korea)
+sms1krfm  // Samsung Gam*Boy I (Korea) with FM Chip
+sms1kr  // Samsung Gam*Boy I (Korea)
+smskr  // Samsung Gam*Boy II (Korea)
 smssdisp  // Sega Master System Store Display Unit
 
 megadrij  // 1988 Sega Mega Drive (Japan)
@@ -347,6 +349,7 @@ cdimono1  // Philips CD-i (Mono-I board)
 
 // Yamaha
 mu100   // 1997 MU-100
+mu100r  // 1997 MU-100 Rackable version
 
 // Roland
 mt32
@@ -608,8 +611,10 @@ pet2001b32
 cbm3032b
 pet4016
 pet4032
+pet4032f
 cbm4016
 cbm4032
+cbm4032f
 pet4032b
 cbm4032b
 pet8032
@@ -1876,6 +1881,13 @@ prof80
 prof180x
 prof181x
 
+// SWTPC S/09
+swtpc09   // S09, DMF2 Floppy SBUG rom - FLEX
+swtpc09i  // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
+swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX 
+swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
+
+
 //***************Games******************************************************
 // Computer Electronic
 ccmk1      // Chess Champion MK I
@@ -1942,6 +1954,7 @@ batmantv    // The Batman, 2004
 harriet // 1990
 
 // Fanuc
+fanucspg	// 1983
 fanucs15    // 1990
 
 //********** Misc **********************************************************

@@ -145,39 +145,78 @@ static void code_compile_block(rsp_state *rsp, offs_t pc);
 static void cfunc_unimplemented(void *param);
 static void cfunc_set_cop0_reg(void *param);
 static void cfunc_get_cop0_reg(void *param);
-static void cfunc_mfc2(void *param);
-static void cfunc_cfc2(void *param);
-static void cfunc_mtc2(void *param);
-static void cfunc_ctc2(void *param);
+#if USE_SIMD
+static void cfunc_mfc2_simd(void *param);
+static void cfunc_cfc2_simd(void *param);
+static void cfunc_mtc2_simd(void *param);
+static void cfunc_ctc2_simd(void *param);
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_mfc2_scalar(void *param);
+static void cfunc_cfc2_scalar(void *param);
+static void cfunc_mtc2_scalar(void *param);
+static void cfunc_ctc2_scalar(void *param);
+#endif
 //static void cfunc_swc2(void *param);
 //static void cfunc_lwc2(void *param);
 static void cfunc_sp_set_status_cb(void *param);
 
-static void cfunc_rsp_lbv(void *param);
-static void cfunc_rsp_lsv(void *param);
-static void cfunc_rsp_llv(void *param);
-static void cfunc_rsp_ldv(void *param);
-static void cfunc_rsp_lqv(void *param);
-static void cfunc_rsp_lrv(void *param);
-static void cfunc_rsp_lpv(void *param);
-static void cfunc_rsp_luv(void *param);
-static void cfunc_rsp_lhv(void *param);
-static void cfunc_rsp_lfv(void *param);
-static void cfunc_rsp_lwv(void *param);
-static void cfunc_rsp_ltv(void *param);
+#if USE_SIMD
+static void cfunc_rsp_lbv_simd(void *param);
+static void cfunc_rsp_lsv_simd(void *param);
+static void cfunc_rsp_llv_simd(void *param);
+static void cfunc_rsp_ldv_simd(void *param);
+static void cfunc_rsp_lqv_simd(void *param);
+static void cfunc_rsp_lrv_simd(void *param);
+static void cfunc_rsp_lpv_simd(void *param);
+static void cfunc_rsp_luv_simd(void *param);
+static void cfunc_rsp_lhv_simd(void *param);
+static void cfunc_rsp_lfv_simd(void *param);
+static void cfunc_rsp_lwv_simd(void *param);
+static void cfunc_rsp_ltv_simd(void *param);
 
-static void cfunc_rsp_sbv(void *param);
-static void cfunc_rsp_ssv(void *param);
-static void cfunc_rsp_slv(void *param);
-static void cfunc_rsp_sdv(void *param);
-static void cfunc_rsp_sqv(void *param);
-static void cfunc_rsp_srv(void *param);
-static void cfunc_rsp_spv(void *param);
-static void cfunc_rsp_suv(void *param);
-static void cfunc_rsp_shv(void *param);
-static void cfunc_rsp_sfv(void *param);
-static void cfunc_rsp_swv(void *param);
-static void cfunc_rsp_stv(void *param);
+static void cfunc_rsp_sbv_simd(void *param);
+static void cfunc_rsp_ssv_simd(void *param);
+static void cfunc_rsp_slv_simd(void *param);
+static void cfunc_rsp_sdv_simd(void *param);
+static void cfunc_rsp_sqv_simd(void *param);
+static void cfunc_rsp_srv_simd(void *param);
+static void cfunc_rsp_spv_simd(void *param);
+static void cfunc_rsp_suv_simd(void *param);
+static void cfunc_rsp_shv_simd(void *param);
+static void cfunc_rsp_sfv_simd(void *param);
+static void cfunc_rsp_swv_simd(void *param);
+static void cfunc_rsp_stv_simd(void *param);
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_rsp_lbv_scalar(void *param);
+static void cfunc_rsp_lsv_scalar(void *param);
+static void cfunc_rsp_llv_scalar(void *param);
+static void cfunc_rsp_ldv_scalar(void *param);
+static void cfunc_rsp_lqv_scalar(void *param);
+static void cfunc_rsp_lrv_scalar(void *param);
+static void cfunc_rsp_lpv_scalar(void *param);
+static void cfunc_rsp_luv_scalar(void *param);
+static void cfunc_rsp_lhv_scalar(void *param);
+static void cfunc_rsp_lfv_scalar(void *param);
+static void cfunc_rsp_lwv_scalar(void *param);
+static void cfunc_rsp_ltv_scalar(void *param);
+
+static void cfunc_rsp_sbv_scalar(void *param);
+static void cfunc_rsp_ssv_scalar(void *param);
+static void cfunc_rsp_slv_scalar(void *param);
+static void cfunc_rsp_sdv_scalar(void *param);
+static void cfunc_rsp_sqv_scalar(void *param);
+static void cfunc_rsp_srv_scalar(void *param);
+static void cfunc_rsp_spv_scalar(void *param);
+static void cfunc_rsp_suv_scalar(void *param);
+static void cfunc_rsp_shv_scalar(void *param);
+static void cfunc_rsp_sfv_scalar(void *param);
+static void cfunc_rsp_swv_scalar(void *param);
+static void cfunc_rsp_stv_scalar(void *param);
+#endif
 
 static void static_generate_entry_point(rsp_state *rsp);
 static void static_generate_nocode_handler(rsp_state *rsp);
@@ -245,49 +284,6 @@ static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 p
 #define VEC_EL_2(x,z)               (vector_elements_2[(x)][(z)])
 
 #define ACCUM(x)        rsp->accum[x].q
-#if USE_SIMD
-INLINE UINT16 ACCUM_H(const rsp_state *rsp, int x)
-{
-	UINT16 out;
-	SIMD_EXTRACT16(rsp->accum_h, out, x);
-	return out;
-}
-
-INLINE UINT16 ACCUM_M(const rsp_state *rsp, int x)
-{
-	UINT16 out;
-	SIMD_EXTRACT16(rsp->accum_m, out, x);
-	return out;
-}
-
-INLINE UINT16 ACCUM_L(const rsp_state *rsp, int x)
-{
-	UINT16 out;
-	SIMD_EXTRACT16(rsp->accum_l, out, x);
-	return out;
-}
-
-#define SET_ACCUM_H(v, x)       SIMD_INSERT16(rsp->accum_h, v, x);
-#define SET_ACCUM_M(v, x)       SIMD_INSERT16(rsp->accum_m, v, x);
-#define SET_ACCUM_L(v, x)       SIMD_INSERT16(rsp->accum_l, v, x);
-
-#define SCALAR_GET_VS1(out, i)  SIMD_EXTRACT16(rsp->xv[VS1REG], out, i)
-#define SCALAR_GET_VS2(out, i)  SIMD_EXTRACT16(rsp->xv[VS2REG], out, VEC_EL_2(EL, i))
-
-#else
-
-#define ACCUM_H(v, x)           (UINT16)rsp->accum[x].w[3]
-#define ACCUM_M(v, x)           (UINT16)rsp->accum[x].w[2]
-#define ACCUM_L(v, x)           (UINT16)rsp->accum[x].w[1]
-
-#define SET_ACCUM_H(v, x)       rsp->accum[x].w[3] = v;
-#define SET_ACCUM_M(v, x)       rsp->accum[x].w[2] = v;
-#define SET_ACCUM_L(v, x)       rsp->accum[x].w[1] = v;
-
-#define SCALAR_GET_VS1(out, i)  out = VREG_S(VS1REG, i)
-#define SCALAR_GET_VS2(out, i)  out = VREG_S(VS2REG, VEC_EL_2(EL, i))
-
-#endif // USE_SIMD
 
 #define CARRY       0
 #define COMPARE     1
@@ -296,84 +292,133 @@ INLINE UINT16 ACCUM_L(const rsp_state *rsp, int x)
 #define CLIP2       4
 
 #if USE_SIMD
-INLINE UINT16 CARRY_FLAG(rsp_state *rsp, const int x)
+INLINE UINT16 VEC_ACCUM_H(const rsp_state *rsp, int x)
+{
+	UINT16 out;
+	SIMD_EXTRACT16(rsp->accum_h, out, x);
+	return out;
+}
+
+INLINE UINT16 VEC_ACCUM_M(const rsp_state *rsp, int x)
+{
+	UINT16 out;
+	SIMD_EXTRACT16(rsp->accum_m, out, x);
+	return out;
+}
+
+INLINE UINT16 VEC_ACCUM_L(const rsp_state *rsp, int x)
+{
+	UINT16 out;
+	SIMD_EXTRACT16(rsp->accum_l, out, x);
+	return out;
+}
+
+INLINE UINT16 VEC_ACCUM_LL(const rsp_state *rsp, int x)
+{
+	UINT16 out;
+	SIMD_EXTRACT16(rsp->accum_ll, out, x);
+	return out;
+}
+
+#define VEC_SET_ACCUM_H(v, x) SIMD_INSERT16(rsp->accum_h, v, x);
+#define VEC_SET_ACCUM_M(v, x) SIMD_INSERT16(rsp->accum_m, v, x);
+#define VEC_SET_ACCUM_L(v, x) SIMD_INSERT16(rsp->accum_l, v, x);
+#define VEC_SET_ACCUM_LL(v, x) SIMD_INSERT16(rsp->accum_ll, v, x);
+
+#define VEC_GET_SCALAR_VS1(out, i) SIMD_EXTRACT16(rsp->xv[VS1REG], out, i);
+#define VEC_GET_SCALAR_VS2(out, i) SIMD_EXTRACT16(rsp->xv[VS2REG], out, VEC_EL_2(EL, i));
+
+INLINE UINT16 VEC_CARRY_FLAG(rsp_state *rsp, const int x)
 {
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xvflag[CARRY], out, x);
 	return out;
 }
 
-INLINE UINT16 COMPARE_FLAG(rsp_state *rsp, const int x)
+INLINE UINT16 VEC_COMPARE_FLAG(rsp_state *rsp, const int x)
 {
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xvflag[COMPARE], out, x);
 	return out;
 }
 
-INLINE UINT16 CLIP1_FLAG(rsp_state *rsp, const int x)
+INLINE UINT16 VEC_CLIP1_FLAG(rsp_state *rsp, const int x)
 {
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xvflag[CLIP1], out, x);
 	return out;
 }
 
-INLINE UINT16 ZERO_FLAG(rsp_state *rsp, const int x)
+INLINE UINT16 VEC_ZERO_FLAG(rsp_state *rsp, const int x)
 {
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xvflag[ZERO], out, x);
 	return out;
 }
 
-INLINE UINT16 CLIP2_FLAG(rsp_state *rsp, const int x)
+INLINE UINT16 VEC_CLIP2_FLAG(rsp_state *rsp, const int x)
 {
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xvflag[CLIP2], out, x);
 	return out;
 }
 
-#define CLEAR_CARRY_FLAGS()     { rsp->xvflag[CARRY] = _mm_setzero_si128(); }
-#define CLEAR_COMPARE_FLAGS()   { rsp->xvflag[COMPARE] = _mm_setzero_si128(); }
-#define CLEAR_CLIP1_FLAGS()     { rsp->xvflag[CLIP1] = _mm_setzero_si128(); }
-#define CLEAR_ZERO_FLAGS()      { rsp->xvflag[ZERO] = _mm_setzero_si128(); }
-#define CLEAR_CLIP2_FLAGS()     { rsp->xvflag[CLIP2] = _mm_setzero_si128(); }
+#define VEC_CLEAR_CARRY_FLAGS()     { rsp->xvflag[CARRY] = _mm_setzero_si128(); }
+#define VEC_CLEAR_COMPARE_FLAGS()   { rsp->xvflag[COMPARE] = _mm_setzero_si128(); }
+#define VEC_CLEAR_CLIP1_FLAGS()     { rsp->xvflag[CLIP1] = _mm_setzero_si128(); }
+#define VEC_CLEAR_ZERO_FLAGS()      { rsp->xvflag[ZERO] = _mm_setzero_si128(); }
+#define VEC_CLEAR_CLIP2_FLAGS()     { rsp->xvflag[CLIP2] = _mm_setzero_si128(); }
 
-#define SET_CARRY_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CARRY], 0xffff, x); }
-#define SET_COMPARE_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[COMPARE], 0xffff, x); }
-#define SET_CLIP1_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CLIP1], 0xffff, x); }
-#define SET_ZERO_FLAG(x)        { SIMD_INSERT16(rsp->xvflag[ZERO], 0xffff, x); }
-#define SET_CLIP2_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CLIP2], 0xffff, x); }
+#define VEC_SET_CARRY_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CARRY], 0xffff, x); }
+#define VEC_SET_COMPARE_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[COMPARE], 0xffff, x); }
+#define VEC_SET_CLIP1_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CLIP1], 0xffff, x); }
+#define VEC_SET_ZERO_FLAG(x)        { SIMD_INSERT16(rsp->xvflag[ZERO], 0xffff, x); }
+#define VEC_SET_CLIP2_FLAG(x)       { SIMD_INSERT16(rsp->xvflag[CLIP2], 0xffff, x); }
 
-#define CLEAR_CARRY_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CARRY], 0, x); }
-#define CLEAR_COMPARE_FLAG(x)   { SIMD_INSERT16(rsp->xvflag[COMPARE], 0, x); }
-#define CLEAR_CLIP1_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CLIP1], 0, x); }
-#define CLEAR_ZERO_FLAG(x)      { SIMD_INSERT16(rsp->xvflag[ZERO], 0, x); }
-#define CLEAR_CLIP2_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CLIP2], 0, x); }
+#define VEC_CLEAR_CARRY_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CARRY], 0, x); }
+#define VEC_CLEAR_COMPARE_FLAG(x)   { SIMD_INSERT16(rsp->xvflag[COMPARE], 0, x); }
+#define VEC_CLEAR_CLIP1_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CLIP1], 0, x); }
+#define VEC_CLEAR_ZERO_FLAG(x)      { SIMD_INSERT16(rsp->xvflag[ZERO], 0, x); }
+#define VEC_CLEAR_CLIP2_FLAG(x)     { SIMD_INSERT16(rsp->xvflag[CLIP2], 0, x); }
 
-#else
+#endif
+
+#define ACCUM_H(v, x)           (UINT16)rsp->accum[x].w[3]
+#define ACCUM_M(v, x)           (UINT16)rsp->accum[x].w[2]
+#define ACCUM_L(v, x)           (UINT16)rsp->accum[x].w[1]
+#define ACCUM_LL(v, x)          (UINT16)rsp->accum[x].w[0]
+
+#define SET_ACCUM_H(v, x)       rsp->accum[x].w[3] = v;
+#define SET_ACCUM_M(v, x)       rsp->accum[x].w[2] = v;
+#define SET_ACCUM_L(v, x)       rsp->accum[x].w[1] = v;
+#define SET_ACCUM_LL(v, x)      rsp->accum[x].w[0] = v;
+
+#define SCALAR_GET_VS1(out, i)  out = VREG_S(VS1REG, i)
+#define SCALAR_GET_VS2(out, i)  out = VREG_S(VS2REG, VEC_EL_2(EL, i))
+
 #define CARRY_FLAG(rsp, x)          (rsp->vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
 #define COMPARE_FLAG(rsp, x)        (rsp->vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
 #define CLIP1_FLAG(rsp, x)          (rsp->vflag[CLIP1][x & 7] != 0 ? 0xffff : 0)
 #define ZERO_FLAG(rsp, x)           (rsp->vflag[ZERO][x & 7] != 0 ? 0xffff : 0)
 #define CLIP2_FLAG(rsp, x)          (rsp->vflag[CLIP2][x & 7] != 0 ? 0xffff : 0)
 
-#define CLEAR_CARRY_FLAGS()         { memset(rsp->vflag[0], 0, 16); }
-#define CLEAR_COMPARE_FLAGS()       { memset(rsp->vflag[1], 0, 16); }
-#define CLEAR_CLIP1_FLAGS()         { memset(rsp->vflag[2], 0, 16); }
-#define CLEAR_ZERO_FLAGS()          { memset(rsp->vflag[3], 0, 16); }
-#define CLEAR_CLIP2_FLAGS()         { memset(rsp->vflag[4], 0, 16); }
+#define CLEAR_CARRY_FLAGS()         { memset(rsp->vflag[CARRY], 0, 16); }
+#define CLEAR_COMPARE_FLAGS()       { memset(rsp->vflag[COMPARE], 0, 16); }
+#define CLEAR_CLIP1_FLAGS()         { memset(rsp->vflag[CLIP1], 0, 16); }
+#define CLEAR_ZERO_FLAGS()          { memset(rsp->vflag[ZERO], 0, 16); }
+#define CLEAR_CLIP2_FLAGS()         { memset(rsp->vflag[CLIP2], 0, 16); }
 
-#define SET_CARRY_FLAG(x)           { rsp->vflag[0][x & 7] = 0xffff; }
-#define SET_COMPARE_FLAG(x)         { rsp->vflag[1][x & 7] = 0xffff; }
-#define SET_CLIP1_FLAG(x)           { rsp->vflag[2][x & 7] = 0xffff; }
-#define SET_ZERO_FLAG(x)            { rsp->vflag[3][x & 7] = 0xffff; }
-#define SET_CLIP2_FLAG(x)           { rsp->vflag[4][x & 7] = 0xffff; }
+#define SET_CARRY_FLAG(x)           { rsp->vflag[CARRY][x & 7] = 0xffff; }
+#define SET_COMPARE_FLAG(x)         { rsp->vflag[COMPARE][x & 7] = 0xffff; }
+#define SET_CLIP1_FLAG(x)           { rsp->vflag[CLIP1][x & 7] = 0xffff; }
+#define SET_ZERO_FLAG(x)            { rsp->vflag[ZERO][x & 7] = 0xffff; }
+#define SET_CLIP2_FLAG(x)           { rsp->vflag[CLIP2][x & 7] = 0xffff; }
 
-#define CLEAR_CARRY_FLAG(x)         { rsp->vflag[0][x & 7] = 0; }
-#define CLEAR_COMPARE_FLAG(x)       { rsp->vflag[1][x & 7] = 0; }
-#define CLEAR_CLIP1_FLAG(x)         { rsp->vflag[2][x & 7] = 0; }
-#define CLEAR_ZERO_FLAG(x)          { rsp->vflag[3][x & 7] = 0; }
-#define CLEAR_CLIP2_FLAG(x)         { rsp->vflag[4][x & 7] = 0; }
-#endif
+#define CLEAR_CARRY_FLAG(x)         { rsp->vflag[CARRY][x & 7] = 0; }
+#define CLEAR_COMPARE_FLAG(x)       { rsp->vflag[COMPARE][x & 7] = 0; }
+#define CLEAR_CLIP1_FLAG(x)         { rsp->vflag[CLIP1][x & 7] = 0; }
+#define CLEAR_ZERO_FLAG(x)          { rsp->vflag[ZERO][x & 7] = 0; }
+#define CLEAR_CLIP2_FLAG(x)         { rsp->vflag[CLIP2][x & 7] = 0; }
 
 INLINE rsp_state *get_safe_token(device_t *device)
 {
@@ -707,6 +752,7 @@ static __m128i vec_shiftmask2;
 static __m128i vec_shiftmask4;
 static __m128i vec_flag_reverse;
 static __m128i vec_neg1;
+static __m128i vec_zero;
 static __m128i vec_shuf[16];
 static __m128i vec_shuf_inverse[16];
 #endif
@@ -731,7 +777,6 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 	rsp->program = &device->space(AS_PROGRAM);
 	rsp->direct = &rsp->program->direct();
 
-#if 1
 	// Inaccurate.  RSP registers power on to a random state...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
 	{
@@ -739,14 +784,24 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 		rsp->v[regIdx].d[0] = 0;
 		rsp->v[regIdx].d[1] = 0;
 	}
+
+#if USE_SIMD
+	VEC_CLEAR_CARRY_FLAGS();
+	VEC_CLEAR_COMPARE_FLAGS();
+	VEC_CLEAR_CLIP1_FLAGS();
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CLIP2_FLAGS();
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
 	CLEAR_CARRY_FLAGS();
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP1_FLAGS();
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CLIP2_FLAGS();
+#endif
 	rsp->reciprocal_res = 0;
 	rsp->reciprocal_high = 0;
-#endif
 
 	// ...except for the accumulators.
 	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
@@ -794,7 +849,9 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ac
 	rsp->accum_h = _mm_setzero_si128();
 	rsp->accum_m = _mm_setzero_si128();
 	rsp->accum_l = _mm_setzero_si128();
+	rsp->accum_ll = _mm_setzero_si128();
 	vec_neg1 = _mm_set_epi64x(0xffffffffffffffffL, 0xffffffffffffffffL);
+	vec_zero = _mm_setzero_si128();
 	vec_himask = _mm_set_epi64x(0xffff0000ffff0000L, 0xffff0000ffff0000L);
 	vec_lomask = _mm_set_epi64x(0x0000ffff0000ffffL, 0x0000ffff0000ffffL);
 	vec_hibit = _mm_set_epi64x(0x0001000000010000L, 0x0001000000010000L);
@@ -909,7 +966,17 @@ static CPU_RESET( rsp )
 	rsp->nextpc = ~0;
 }
 
-static void cfunc_rsp_lbv(void *param)
+#if USE_SIMD
+// LBV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00000 | IIII | Offset |
+// --------------------------------------------------
+//
+// Load 1 byte to vector byte index
+
+static void cfunc_rsp_lbv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -923,27 +990,49 @@ static void cfunc_rsp_lbv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00000 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Load 1 byte to vector byte index
 
 	ea = (base) ? rsp->r[base] + offset : offset;
 
-#if USE_SIMD
 	UINT16 element;
 	SIMD_EXTRACT16(rsp->xv[dest], element, (index >> 1));
 	element &= 0xff00 >> ((1-(index & 1)) * 8);
 	element |= READ8(rsp, ea) << ((1-(index & 1)) * 8);
 	SIMD_INSERT16(rsp->xv[dest], element, (index >> 1));
-#else
-	VREG_B(dest, index) = READ8(rsp, ea);
-#endif
 }
+#endif
 
-static void cfunc_rsp_lsv(void *param)
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_rsp_lbv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	ea = (base) ? rsp->r[base] + offset : offset;
+	VREG_B(dest, index) = READ8(rsp, ea);
+}
+#endif
+
+#if USE_SIMD
+// LSV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00001 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads 2 bytes starting from vector byte index
+
+static void cfunc_rsp_lsv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -955,31 +1044,56 @@ static void cfunc_rsp_lsv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00001 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads 2 bytes starting from vector byte index
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
 	int end = index + 2;
 	for (int i = index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 element;
 		SIMD_EXTRACT16(rsp->xv[dest], element, (i >> 1));
 		element &= 0xff00 >> ((1 - (i & 1)) * 8);
 		element |= READ8(rsp, ea) << ((1 - (i & 1)) * 8);
 		SIMD_INSERT16(rsp->xv[dest], element, (i >> 1));
-#else
-		VREG_B(dest, i) = READ8(rsp, ea);
-#endif
 		ea++;
 	}
 }
+#endif
 
-static void cfunc_rsp_llv(void *param)
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_rsp_lsv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xe;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
+	int end = index + 2;
+	for (int i = index; i < end; i++)
+	{
+		VREG_B(dest, i) = READ8(rsp, ea);
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LLV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00010 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads 4 bytes starting from vector byte index
+
+static void cfunc_rsp_llv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -992,12 +1106,6 @@ static void cfunc_rsp_llv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00010 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads 4 bytes starting from vector byte index
 
 	ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
 
@@ -1005,20 +1113,56 @@ static void cfunc_rsp_llv(void *param)
 
 	for (int i = index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 element;
 		SIMD_EXTRACT16(rsp->xv[dest], element, (i >> 1));
 		element &= 0xff00 >> ((1 - (i & 1)) * 8);
 		element |= READ8(rsp, ea) << ((1 - (i & 1)) * 8);
 		SIMD_INSERT16(rsp->xv[dest], element, (i >> 1));
-#else
-		VREG_B(dest, i) = READ8(rsp, ea);
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_ldv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_llv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xc;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
+
+	int end = index + 4;
+
+	for (int i = index; i < end; i++)
+	{
+		VREG_B(dest, i) = READ8(rsp, ea);
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LDV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00011 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads 8 bytes starting from vector byte index
+
+static void cfunc_rsp_ldv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1031,12 +1175,6 @@ static void cfunc_rsp_ldv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00011 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads 8 bytes starting from vector byte index
 
 	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
@@ -1044,37 +1182,66 @@ static void cfunc_rsp_ldv(void *param)
 
 	for (int i = index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 element;
 		SIMD_EXTRACT16(rsp->xv[dest], element, (i >> 1));
 		element &= 0xff00 >> ((1 - (i & 1)) * 8);
 		element |= READ8(rsp, ea) << ((1 - (i & 1)) * 8);
 		SIMD_INSERT16(rsp->xv[dest], element, (i >> 1));
-#else
-		VREG_B(dest, i) = READ8(rsp, ea);
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_lqv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_ldv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
+	UINT32 ea = 0;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	//int index = 0; // Just a test, it goes right back the way it was if something breaks //(op >> 7) & 0xf;
+	int index = (op >> 7) & 0x8;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00100 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads up to 16 bytes starting from vector byte index
+
+	ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	int end = index + 8;
+
+	for (int i = index; i < end; i++)
+	{
+		VREG_B(dest, i) = READ8(rsp, ea);
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LQV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00100 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads up to 16 bytes starting from vector byte index
+
+static void cfunc_rsp_lqv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
@@ -1083,20 +1250,55 @@ static void cfunc_rsp_lqv(void *param)
 
 	for (int i = 0; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 element;
 		SIMD_EXTRACT16(rsp->xv[dest], element, (i >> 1));
 		element &= 0xff00 >> ((1 - (i & 1)) * 8);
 		element |= READ8(rsp, ea) << ((1 - (i & 1)) * 8);
 		SIMD_INSERT16(rsp->xv[dest], element, (i >> 1));
-#else
-		VREG_B(dest, i) = READ8(rsp, ea);
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_lrv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lqv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	int end = 16 - (ea & 0xf);
+	if (end > 16) end = 16;
+
+	for (int i = 0; i < end; i++)
+	{
+		VREG_B(dest, i) = READ8(rsp, ea);
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LRV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00101 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores up to 16 bytes starting from right side until 16-byte boundary
+
+static void cfunc_rsp_lrv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1108,12 +1310,6 @@ static void cfunc_rsp_lrv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00101 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores up to 16 bytes starting from right side until 16-byte boundary
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
@@ -1122,20 +1318,20 @@ static void cfunc_rsp_lrv(void *param)
 
 	for (int i = index; i < 16; i++)
 	{
-#if USE_SIMD
 		UINT16 element;
 		SIMD_EXTRACT16(rsp->xv[dest], element, (i >> 1));
 		element &= 0xff00 >> ((1-(i & 1)) * 8);
 		element |= READ8(rsp, ea) << ((1-(i & 1)) * 8);
 		SIMD_INSERT16(rsp->xv[dest], element, (i >> 1));
-#else
-		VREG_B(dest, i) = READ8(rsp, ea);
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_lpv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lrv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1147,26 +1343,56 @@ static void cfunc_rsp_lpv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00110 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads a byte as the upper 8 bits of each element
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	index = 16 - ((ea & 0xf) - index);
+	ea &= ~0xf;
+
+	for (int i = index; i < 16; i++)
+	{
+		VREG_B(dest, i) = READ8(rsp, ea);
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LPV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00110 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads a byte as the upper 8 bits of each element
+
+static void cfunc_rsp_lpv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	for (int i = 0; i < 8; i++)
 	{
-#if USE_SIMD
 		SIMD_INSERT16(rsp->xv[dest], READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8, i);
-#else
-		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
-#endif
 	}
 }
 
-static void cfunc_rsp_luv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lpv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1178,26 +1404,27 @@ static void cfunc_rsp_luv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 00111 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads a byte as the bits 14-7 of each element
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
 	for (int i = 0; i < 8; i++)
 	{
-#if USE_SIMD
-		SIMD_INSERT16(rsp->xv[dest], READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7, i);
-#else
-		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
-#endif
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 8;
 	}
 }
+#endif
 
-static void cfunc_rsp_lhv(void *param)
+#if USE_SIMD
+// LUV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 00111 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads a byte as the bits 14-7 of each element
+
+static void cfunc_rsp_luv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1209,26 +1436,77 @@ static void cfunc_rsp_lhv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 01000 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads a byte as the bits 14-7 of each element, with 2-byte stride
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	for (int i = 0; i < 8; i++)
+	{
+		SIMD_INSERT16(rsp->xv[dest], READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7, i);
+	}
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_luv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
+	for (int i = 0; i < 8; i++)
+	{
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + i) & 0xf)) << 7;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LHV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 01000 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads a byte as the bits 14-7 of each element, with 2-byte stride
+
+static void cfunc_rsp_lhv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
 	for (int i = 0; i < 8; i++)
 	{
-#if USE_SIMD
 		SIMD_INSERT16(rsp->xv[dest], READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7, i);
-#else
-		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
-#endif
 	}
 }
 
-static void cfunc_rsp_lfv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lhv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1240,12 +1518,37 @@ static void cfunc_rsp_lfv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 01001 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	for (int i = 0; i < 8; i++)
+	{
+		W_VREG_S(dest, i) = READ8(rsp, ea + (((16-index) + (i<<1)) & 0xf)) << 7;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LFV
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 01001 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads a byte as the bits 14-7 of upper or lower quad, with 4-byte stride
+
+static void cfunc_rsp_lfv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
@@ -1255,16 +1558,16 @@ static void cfunc_rsp_lfv(void *param)
 
 	for (int i = index >> 1; i < end; i++)
 	{
-#if USE_SIMD
 		SIMD_INSERT16(rsp->xv[dest], READ8(rsp, ea) << 7, i);
-#else
-		W_VREG_S(dest, i) = READ8(rsp, ea) << 7;
-#endif
 		ea += 4;
 	}
 }
 
-static void cfunc_rsp_lwv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lfv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1276,37 +1579,33 @@ static void cfunc_rsp_lwv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 01010 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
-	// after byte index 15
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
-	int end = (16 - index) + 16;
 
-#if USE_SIMD
-	UINT8 val[16];
-#endif
-	for (int i = (16 - index); i < end; i++)
+	// not sure what happens if 16-byte boundary is crossed...
+
+	int end = (index >> 1) + 4;
+
+	for (int i = index >> 1; i < end; i++)
 	{
-#if USE_SIMD
-		val[i & 0xf] = READ8(rsp, ea);
-#else
-		VREG_B(dest, i & 0xf) = READ8(rsp, ea);
-#endif
+		W_VREG_S(dest, i) = READ8(rsp, ea) << 7;
 		ea += 4;
 	}
+}
+#endif
 
 #if USE_SIMD
-	rsp->xv[dest] = _mm_set_epi8(val[15], val[14], val[13], val[12], val[11], val[10], val[ 9], val[ 8],
-									val[ 7], val[ 6], val[ 5], val[ 4], val[ 3], val[ 2], val[ 1], val[ 0]);
-#endif
-}
+// LWV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 01010 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads the full 128-bit vector starting from vector byte index and wrapping to index 0
+// after byte index 15
 
-static void cfunc_rsp_ltv(void *param)
+static void cfunc_rsp_lwv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1314,13 +1613,71 @@ static void cfunc_rsp_ltv(void *param)
 	int base = (op >> 21) & 0x1f;
 	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 110010 | BBBBB | TTTTT | 01011 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Loads one element to maximum of 8 vectors, while incrementing element index
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int end = (16 - index) + 16;
+
+	UINT8 val[16];
+	for (int i = (16 - index); i < end; i++)
+	{
+		val[i & 0xf] = READ8(rsp, ea);
+		ea += 4;
+	}
+
+	rsp->xv[dest] = _mm_set_epi8(val[15], val[14], val[13], val[12], val[11], val[10], val[ 9], val[ 8],
+									val[ 7], val[ 6], val[ 5], val[ 4], val[ 3], val[ 2], val[ 1], val[ 0]);
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_lwv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int end = (16 - index) + 16;
+
+	for (int i = (16 - index); i < end; i++)
+	{
+		VREG_B(dest, i & 0xf) = READ8(rsp, ea);
+		ea += 4;
+	}
+}
+#endif
+
+#if USE_SIMD
+// LTV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 110010 | BBBBB | TTTTT | 01011 | IIII | Offset |
+// --------------------------------------------------
+//
+// Loads one element to maximum of 8 vectors, while incrementing element index
+
+static void cfunc_rsp_ltv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
 
 	// FIXME: has a small problem with odd indices
 
@@ -1338,18 +1695,282 @@ static void cfunc_rsp_ltv(void *param)
 	ea = ((ea + 8) & ~0xf) + (index & 1);
 	for (int i = vs; i < ve; i++)
 	{
-		element = ((8 - (index >> 1) + (i - vs)) << 1);
-#if USE_SIMD
+		element = (8 - (index >> 1) + (i - vs)) << 1;
 		UINT16 value = (READ8(rsp, ea) << 8) | READ8(rsp, ea + 1);
 		SIMD_INSERT16(rsp->xv[i], value, (element >> 1));
-#else
-		VREG_B(i, (element & 0xf)) = READ8(rsp, ea);
-		VREG_B(i, ((element + 1) & 0xf)) = READ8(rsp, ea + 1);
-#endif
-
 		ea += 2;
 	}
 }
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_ltv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+
+	// FIXME: has a small problem with odd indices
+
+	int vs = dest;
+	int ve = dest + 8;
+	if (ve > 32)
+	{
+		ve = 32;
+	}
+
+	int element = 7 - (index >> 1);
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	ea = ((ea + 8) & ~0xf) + (index & 1);
+	for (int i = vs; i < ve; i++)
+	{
+		element = (8 - (index >> 1) + (i - vs)) << 1;
+		VREG_B(i, (element & 0xf)) = READ8(rsp, ea);
+		VREG_B(i, ((element + 1) & 0xf)) = READ8(rsp, ea + 1);
+		ea += 2;
+	}
+}
+#endif
+
+#if USE_SIMD && SIMUL_SIMD
+INLINE void cfunc_backup_regs(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	memcpy(rsp->old_dmem, rsp->dmem8, sizeof(rsp->old_dmem));
+	memcpy(rsp->old_r, rsp->r, sizeof(rsp->r));
+
+	rsp->simd_reciprocal_res = rsp->reciprocal_res;
+	rsp->simd_reciprocal_high = rsp->reciprocal_high;
+	rsp->simd_dp_allowed = rsp->dp_allowed;
+
+	rsp->reciprocal_res = rsp->old_reciprocal_res;
+	rsp->reciprocal_high = rsp->old_reciprocal_high;
+	rsp->dp_allowed = rsp->old_dp_allowed;
+}
+
+INLINE void cfunc_restore_regs(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	memcpy(rsp->scalar_r, rsp->r, sizeof(rsp->r));
+	memcpy(rsp->r, rsp->old_r, sizeof(rsp->r));
+	memcpy(rsp->scalar_dmem, rsp->dmem8, sizeof(rsp->scalar_dmem));
+	memcpy(rsp->dmem8, rsp->old_dmem, sizeof(rsp->old_dmem));
+
+	rsp->scalar_reciprocal_res = rsp->reciprocal_res;
+	rsp->scalar_reciprocal_high = rsp->reciprocal_high;
+	rsp->scalar_dp_allowed = rsp->dp_allowed;
+
+	rsp->reciprocal_res = rsp->simd_reciprocal_res;
+	rsp->reciprocal_high = rsp->simd_reciprocal_high;
+	rsp->dp_allowed = rsp->simd_dp_allowed;
+}
+
+INLINE void cfunc_verify_regs(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	if (VEC_ACCUM_H(rsp, 0) != ACCUM_H(rsp, 0)) fatalerror("ACCUM_H element 0 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 0), ACCUM_H(rsp, 0), op);
+	if (VEC_ACCUM_H(rsp, 1) != ACCUM_H(rsp, 1)) fatalerror("ACCUM_H element 1 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 1), ACCUM_H(rsp, 1), op);
+	if (VEC_ACCUM_H(rsp, 2) != ACCUM_H(rsp, 2)) fatalerror("ACCUM_H element 2 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 2), ACCUM_H(rsp, 2), op);
+	if (VEC_ACCUM_H(rsp, 3) != ACCUM_H(rsp, 3)) fatalerror("ACCUM_H element 3 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 3), ACCUM_H(rsp, 3), op);
+	if (VEC_ACCUM_H(rsp, 4) != ACCUM_H(rsp, 4)) fatalerror("ACCUM_H element 4 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 4), ACCUM_H(rsp, 4), op);
+	if (VEC_ACCUM_H(rsp, 5) != ACCUM_H(rsp, 5)) fatalerror("ACCUM_H element 5 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 5), ACCUM_H(rsp, 5), op);
+	if (VEC_ACCUM_H(rsp, 6) != ACCUM_H(rsp, 6)) fatalerror("ACCUM_H element 6 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 6), ACCUM_H(rsp, 6), op);
+	if (VEC_ACCUM_H(rsp, 7) != ACCUM_H(rsp, 7)) fatalerror("ACCUM_H element 7 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_H(rsp, 7), ACCUM_H(rsp, 7), op);
+	if (VEC_ACCUM_M(rsp, 0) != ACCUM_M(rsp, 0)) fatalerror("ACCUM_M element 0 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 0), ACCUM_M(rsp, 0), op);
+	if (VEC_ACCUM_M(rsp, 1) != ACCUM_M(rsp, 1)) fatalerror("ACCUM_M element 1 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 1), ACCUM_M(rsp, 1), op);
+	if (VEC_ACCUM_M(rsp, 2) != ACCUM_M(rsp, 2)) fatalerror("ACCUM_M element 2 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 2), ACCUM_M(rsp, 2), op);
+	if (VEC_ACCUM_M(rsp, 3) != ACCUM_M(rsp, 3)) fatalerror("ACCUM_M element 3 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 3), ACCUM_M(rsp, 3), op);
+	if (VEC_ACCUM_M(rsp, 4) != ACCUM_M(rsp, 4)) fatalerror("ACCUM_M element 4 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 4), ACCUM_M(rsp, 4), op);
+	if (VEC_ACCUM_M(rsp, 5) != ACCUM_M(rsp, 5)) fatalerror("ACCUM_M element 5 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 5), ACCUM_M(rsp, 5), op);
+	if (VEC_ACCUM_M(rsp, 6) != ACCUM_M(rsp, 6)) fatalerror("ACCUM_M element 6 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 6), ACCUM_M(rsp, 6), op);
+	if (VEC_ACCUM_M(rsp, 7) != ACCUM_M(rsp, 7)) fatalerror("ACCUM_M element 7 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_M(rsp, 7), ACCUM_M(rsp, 7), op);
+	if (VEC_ACCUM_L(rsp, 0) != ACCUM_L(rsp, 0)) fatalerror("ACCUM_L element 0 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 0), ACCUM_L(rsp, 0), op);
+	if (VEC_ACCUM_L(rsp, 1) != ACCUM_L(rsp, 1)) fatalerror("ACCUM_L element 1 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 1), ACCUM_L(rsp, 1), op);
+	if (VEC_ACCUM_L(rsp, 2) != ACCUM_L(rsp, 2)) fatalerror("ACCUM_L element 2 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 2), ACCUM_L(rsp, 2), op);
+	if (VEC_ACCUM_L(rsp, 3) != ACCUM_L(rsp, 3)) fatalerror("ACCUM_L element 3 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 3), ACCUM_L(rsp, 3), op);
+	if (VEC_ACCUM_L(rsp, 4) != ACCUM_L(rsp, 4)) fatalerror("ACCUM_L element 4 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 4), ACCUM_L(rsp, 4), op);
+	if (VEC_ACCUM_L(rsp, 5) != ACCUM_L(rsp, 5)) fatalerror("ACCUM_L element 5 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 5), ACCUM_L(rsp, 5), op);
+	if (VEC_ACCUM_L(rsp, 6) != ACCUM_L(rsp, 6)) fatalerror("ACCUM_L element 6 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 6), ACCUM_L(rsp, 6), op);
+	if (VEC_ACCUM_L(rsp, 7) != ACCUM_L(rsp, 7)) fatalerror("ACCUM_L element 7 mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", VEC_ACCUM_L(rsp, 7), ACCUM_L(rsp, 7), op);
+	for (int i = 0; i < 32; i++)
+	{
+		if (rsp->r[i] != rsp->scalar_r[i]) fatalerror("r[%d] mismatch (SIMD %08x vs. Scalar %08x) after op: %08x\n", i, rsp->r[i], rsp->scalar_r[i], op);
+		for (int el = 0; el < 8; el++)
+		{
+			UINT16 out;
+			SIMD_EXTRACT16(rsp->xv[i], out, el);
+			if ((UINT16)VREG_S(i, el) != out) fatalerror("Vector %d element %d mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", i, el, out, (UINT16)VREG_S(i, el), op);
+		}
+	}
+	for (int i = 0; i < 4096; i++)
+	{
+		if (rsp->dmem8[i] != rsp->scalar_dmem[i]) fatalerror("dmem[%d] mismatch (SIMD %02x vs. Scalar %02x) after op: %08x\n", i, rsp->dmem8[i], rsp->scalar_dmem[i], op);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		for (int el = 0; el < 8; el++)
+		{
+			UINT16 out;
+			SIMD_EXTRACT16(rsp->xvflag[i], out, el);
+			if (rsp->vflag[i][el] != out) fatalerror("flag[%d][%d] mismatch (SIMD %04x vs. Scalar %04x) after op: %08x\n", i, el, out, rsp->vflag[i][el], op);
+		}
+	}
+}
+#endif
+
+#if USE_SIMD
+static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	//int loopdest;
+	UINT32 op = desc->opptr.l[0];
+	//int dest = (op >> 16) & 0x1f;
+	//int base = (op >> 21) & 0x1f;
+	//int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	//int skip;
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	switch ((op >> 11) & 0x1f)
+	{
+		case 0x00:      /* LBV */
+			//UML_ADD(block, I0, R32(RSREG), offset);
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lbv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lbv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x01:      /* LSV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lsv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lsv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x02:      /* LLV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_llv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_llv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x03:      /* LDV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ldv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_ldv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x04:      /* LQV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lqv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lqv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x05:      /* LRV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lrv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lrv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x06:      /* LPV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lpv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lpv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x07:      /* LUV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_luv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_luv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x08:      /* LHV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lhv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lhv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x09:      /* LFV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lfv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lfv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x0a:      /* LWV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_lwv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_lwv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x0b:      /* LTV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ltv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_ltv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+
+		default:
+			return FALSE;
+	}
+}
+
+#else
 
 static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
@@ -1370,59 +1991,70 @@ static int generate_lwc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x00:      /* LBV */
 			//UML_ADD(block, I0, R32(RSREG), offset);
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lbv, rsp);
+			UML_CALLC(block, cfunc_rsp_lbv_scalar, rsp);
 			return TRUE;
 		case 0x01:      /* LSV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lsv, rsp);
+			UML_CALLC(block, cfunc_rsp_lsv_scalar, rsp);
 			return TRUE;
 		case 0x02:      /* LLV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_llv, rsp);
+			UML_CALLC(block, cfunc_rsp_llv_scalar, rsp);
 			return TRUE;
 		case 0x03:      /* LDV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_ldv, rsp);
+			UML_CALLC(block, cfunc_rsp_ldv_scalar, rsp);
 			return TRUE;
 		case 0x04:      /* LQV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lqv, rsp);
+			UML_CALLC(block, cfunc_rsp_lqv_scalar, rsp);
 			return TRUE;
 		case 0x05:      /* LRV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lrv, rsp);
+			UML_CALLC(block, cfunc_rsp_lrv_scalar, rsp);
 			return TRUE;
 		case 0x06:      /* LPV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lpv, rsp);
+			UML_CALLC(block, cfunc_rsp_lpv_scalar, rsp);
 			return TRUE;
 		case 0x07:      /* LUV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_luv, rsp);
+			UML_CALLC(block, cfunc_rsp_luv_scalar, rsp);
 			return TRUE;
 		case 0x08:      /* LHV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lhv, rsp);
+			UML_CALLC(block, cfunc_rsp_lhv_scalar, rsp);
 			return TRUE;
 		case 0x09:      /* LFV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lfv, rsp);
+			UML_CALLC(block, cfunc_rsp_lfv_scalar, rsp);
 			return TRUE;
 		case 0x0a:      /* LWV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_lwv, rsp);
+			UML_CALLC(block, cfunc_rsp_lwv_scalar, rsp);
 			return TRUE;
 		case 0x0b:      /* LTV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_ltv, rsp);
+			UML_CALLC(block, cfunc_rsp_ltv_scalar, rsp);
 			return TRUE;
 
 		default:
 			return FALSE;
 	}
 }
+#endif
 
-static void cfunc_rsp_sbv(void *param)
+#if USE_SIMD
+// SBV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00000 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores 1 byte from vector byte index
+
+static void cfunc_rsp_sbv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1435,25 +2067,18 @@ static void cfunc_rsp_sbv(void *param)
 		offset |= 0xffffffc0;
 	}
 
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00000 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores 1 byte from vector byte index
-
 	UINT32 ea = (base) ? rsp->r[base] + offset : offset;
-#if USE_SIMD
 	UINT16 value;
 	SIMD_EXTRACT16(rsp->xv[dest], value, (index >> 1));
 	value >>= (1-(index & 1)) * 8;
 	WRITE8(rsp, ea, (UINT8)value);
-#else
-	WRITE8(rsp, ea, VREG_B(dest, index));
-#endif
 }
 
-static void cfunc_rsp_ssv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_sbv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1466,31 +2091,86 @@ static void cfunc_rsp_ssv(void *param)
 		offset |= 0xffffffc0;
 	}
 
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00001 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores 2 bytes starting from vector byte index
+	UINT32 ea = (base) ? rsp->r[base] + offset : offset;
+	WRITE8(rsp, ea, VREG_B(dest, index));
+}
+#endif
+
+#if USE_SIMD
+// SSV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00001 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores 2 bytes starting from vector byte index
+
+static void cfunc_rsp_ssv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
 
-#if USE_SIMD
-	UINT16 value;
-	SIMD_EXTRACT16(rsp->xv[dest], value, (index >> 1));
-	WRITE8(rsp, ea, (UINT8)(value >> 8));
-	WRITE8(rsp, ea+1, (UINT8)(value & 0x00ff));
-#else
+	int end = index + 2;
+	for (int i = index; i < end; i++)
+	{
+		UINT16 value;
+		SIMD_EXTRACT16(rsp->xv[dest], value, (i >> 1));
+		value >>= (1 - (i & 1)) * 8;
+		WRITE8(rsp, ea, (UINT8)value);
+		ea++;
+	}
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_ssv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 2) : (offset * 2);
+
 	int end = index + 2;
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
 		ea++;
 	}
-#endif
 }
+#endif
 
-static void cfunc_rsp_slv(void *param)
+#if USE_SIMD
+// SLV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00010 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores 4 bytes starting from vector byte index
+
+static void cfunc_rsp_slv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1502,35 +2182,59 @@ static void cfunc_rsp_slv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00010 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores 4 bytes starting from vector byte index
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
 
-#if USE_SIMD
-	UINT16 value0, value1;
-	index >>= 1;
-	SIMD_EXTRACT16(rsp->xv[dest], value0, index);
-	SIMD_EXTRACT16(rsp->xv[dest], value1, index+1);
-	WRITE8(rsp, ea, (UINT8)(value0 >> 8));
-	WRITE8(rsp, ea+1, (UINT8)(value0 & 0x00ff));
-	WRITE8(rsp, ea+2, (UINT8)(value1 >> 8));
-	WRITE8(rsp, ea+3, (UINT8)(value1 & 0x00ff));
-#else
+	int end = index + 4;
+	for (int i = index; i < end; i++)
+	{
+		UINT16 value;
+		SIMD_EXTRACT16(rsp->xv[dest], value, (i >> 1));
+		value >>= (1 - (i & 1)) * 8;
+		WRITE8(rsp, ea, (UINT8)value);
+		ea++;
+	}
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_slv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 4) : (offset * 4);
+
 	int end = index + 4;
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
 		ea++;
 	}
-#endif
 }
+#endif
 
-static void cfunc_rsp_sdv(void *param)
+#if USE_SIMD
+// SDV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00011 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores 8 bytes starting from vector byte index
+
+static void cfunc_rsp_sdv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1542,40 +2246,57 @@ static void cfunc_rsp_sdv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00011 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores 8 bytes starting from vector byte index
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 
-#if USE_SIMD
-	UINT16 value0, value1, value2, value3;
-	index >>= 1;
-	SIMD_EXTRACT16(rsp->xv[dest], value0, index);
-	SIMD_EXTRACT16(rsp->xv[dest], value1, index+1);
-	SIMD_EXTRACT16(rsp->xv[dest], value2, index+2);
-	SIMD_EXTRACT16(rsp->xv[dest], value3, index+3);
-	WRITE8(rsp, ea, (UINT8)(value0 >> 8));
-	WRITE8(rsp, ea+1, (UINT8)(value0 & 0x00ff));
-	WRITE8(rsp, ea+2, (UINT8)(value1 >> 8));
-	WRITE8(rsp, ea+3, (UINT8)(value1 & 0x00ff));
-	WRITE8(rsp, ea+4, (UINT8)(value2 >> 8));
-	WRITE8(rsp, ea+5, (UINT8)(value2 & 0x00ff));
-	WRITE8(rsp, ea+6, (UINT8)(value3 >> 8));
-	WRITE8(rsp, ea+7, (UINT8)(value3 & 0x00ff));
-#else
+	int end = index + 8;
+	for (int i = index; i < end; i++)
+	{
+		UINT16 value;
+		SIMD_EXTRACT16(rsp->xv[dest], value, (i >> 1));
+		value >>= (1 - (i & 1)) * 8;
+		WRITE8(rsp, ea, (UINT8)value);
+		ea++;
+	}
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_sdv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0x8;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+
 	int end = index + 8;
 	for (int i = index; i < end; i++)
 	{
 		WRITE8(rsp, ea, VREG_B(dest, i));
 		ea++;
 	}
-#endif
 }
+#endif
 
-static void cfunc_rsp_sqv(void *param)
+#if USE_SIMD
+// SQV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00100 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
+
+static void cfunc_rsp_sqv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1587,30 +2308,24 @@ static void cfunc_rsp_sqv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00100 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores up to 16 bytes starting from vector byte index until 16-byte boundary
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 	int end = index + (16 - (ea & 0xf));
 	for (int i=index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 value;
 		SIMD_EXTRACT16(rsp->xv[dest], value, (i >> 1));
 		value >>= (1-(i & 1)) * 8;
 		WRITE8(rsp, ea, (UINT8)value);
-#else
-		WRITE8(rsp, ea, VREG_B(dest, i & 0xf));
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_srv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_sqv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1622,12 +2337,39 @@ static void cfunc_rsp_srv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00101 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores up to 16 bytes starting from right side until 16-byte boundary
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int end = index + (16 - (ea & 0xf));
+	for (int i=index; i < end; i++)
+	{
+		WRITE8(rsp, ea, VREG_B(dest, i & 0xf));
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// SRV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00101 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores up to 16 bytes starting from right side until 16-byte boundary
+
+static void cfunc_rsp_srv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 
@@ -1637,20 +2379,20 @@ static void cfunc_rsp_srv(void *param)
 
 	for (int i = index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT32 bi = (i + o) & 0xf;
 		UINT16 value;
 		SIMD_EXTRACT16(rsp->xv[dest], value, (bi >> 1));
 		value >>= (1-(bi & 1)) * 8;
 		WRITE8(rsp, ea, (UINT8)value);
-#else
-		WRITE8(rsp, ea, VREG_B(dest, ((i + o) & 0xf)));
-#endif
 		ea++;
 	}
 }
 
-static void cfunc_rsp_spv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_srv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1662,12 +2404,43 @@ static void cfunc_rsp_spv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00110 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores upper 8 bits of each element
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+
+	int end = index + (ea & 0xf);
+	int o = (16 - (ea & 0xf)) & 0xf;
+	ea &= ~0xf;
+
+	for (int i = index; i < end; i++)
+	{
+		WRITE8(rsp, ea, VREG_B(dest, ((i + o) & 0xf)));
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// SPV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00110 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores upper 8 bits of each element
+
+static void cfunc_rsp_spv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 	int end = index + 8;
@@ -1675,30 +2448,25 @@ static void cfunc_rsp_spv(void *param)
 	{
 		if ((i & 0xf) < 8)
 		{
-#if USE_SIMD
 			UINT16 value;
 			SIMD_EXTRACT16(rsp->xv[dest], value, i);
 			WRITE8(rsp, ea, (UINT8)(value >> 8));
-#else
-			WRITE8(rsp, ea, VREG_B(dest, (i & 0xf) << 1));
-#endif
 		}
 		else
 		{
-#if USE_SIMD
 			UINT16 value;
 			SIMD_EXTRACT16(rsp->xv[dest], value, i);
-			value >>= 7;
-			WRITE8(rsp, ea, (UINT8)value);
-#else
-			WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
-#endif
+			WRITE8(rsp, ea, (UINT8)(value >> 7));
 		}
 		ea++;
 	}
 }
 
-static void cfunc_rsp_suv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_spv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1710,12 +2478,6 @@ static void cfunc_rsp_suv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 00111 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores bits 14-7 of each element
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
 	int end = index + 8;
@@ -1723,30 +2485,28 @@ static void cfunc_rsp_suv(void *param)
 	{
 		if ((i & 0xf) < 8)
 		{
-#if USE_SIMD
-			UINT16 value;
-			SIMD_EXTRACT16(rsp->xv[dest], value, i);
-			value >>= 7;
-			WRITE8(rsp, ea, (UINT8)value);
-#else
-			WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
-#endif
+			WRITE8(rsp, ea, VREG_B(dest, (i & 0xf) << 1));
 		}
 		else
 		{
-#if USE_SIMD
-			UINT16 value;
-			SIMD_EXTRACT16(rsp->xv[dest], value, i);
-			WRITE8(rsp, ea, (UINT8)value >> 8);
-#else
-			WRITE8(rsp, ea, VREG_B(dest, ((i & 0x7) << 1)));
-#endif
+			WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
 		}
 		ea++;
 	}
 }
+#endif
 
-static void cfunc_rsp_shv(void *param)
+#if USE_SIMD
+// SUV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 00111 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores bits 14-7 of each element
+
+static void cfunc_rsp_suv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1758,31 +2518,100 @@ static void cfunc_rsp_shv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 01000 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores bits 14-7 of each element, with 2-byte stride
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+	int end = index + 8;
+	for (int i=index; i < end; i++)
+	{
+		if ((i & 0xf) < 8)
+		{
+			UINT16 value;
+			SIMD_EXTRACT16(rsp->xv[dest], value, i);
+			WRITE8(rsp, ea, (UINT8)(value >> 7));
+		}
+		else
+		{
+			UINT16 value;
+			SIMD_EXTRACT16(rsp->xv[dest], value, i);
+			WRITE8(rsp, ea, (UINT8)(value >> 8));
+		}
+		ea++;
+	}
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_suv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 8) : (offset * 8);
+	int end = index + 8;
+	for (int i=index; i < end; i++)
+	{
+		if ((i & 0xf) < 8)
+		{
+			WRITE8(rsp, ea, VREG_S(dest, (i & 0x7)) >> 7);
+		}
+		else
+		{
+			WRITE8(rsp, ea, VREG_B(dest, ((i & 0x7) << 1)));
+		}
+		ea++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// SHV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 01000 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores bits 14-7 of each element, with 2-byte stride
+
+static void cfunc_rsp_shv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 	for (int i=0; i < 8; i++)
 	{
 		int element = index + (i << 1);
-#if USE_SIMD
 		UINT16 value;
 		SIMD_EXTRACT16(rsp->xv[dest], value, element >> 1);
 		WRITE8(rsp, ea, (value >> 7) & 0x00ff);
-#else
-		UINT8 d = (VREG_B(dest, (element & 0xf)) << 1) |
-					(VREG_B(dest, ((element + 1) & 0xf)) >> 7);
-		WRITE8(rsp, ea, d);
-#endif
 		ea += 2;
 	}
 }
 
-static void cfunc_rsp_sfv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_shv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1794,14 +2623,41 @@ static void cfunc_rsp_sfv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 01001 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores bits 14-7 of upper or lower quad, with 4-byte stride
 
-	if (index & 0x7)    printf("RSP: SFV: index = %d at %08X\n", index, rsp->ppc);
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	for (int i=0; i < 8; i++)
+	{
+		int element = index + (i << 1);
+		UINT8 d = (VREG_B(dest, (element & 0xf)) << 1) |
+					(VREG_B(dest, ((element + 1) & 0xf)) >> 7);
+		WRITE8(rsp, ea, d);
+		ea += 2;
+	}
+}
+#endif
+
+#if USE_SIMD
+// SFV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 01001 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores bits 14-7 of upper or lower quad, with 4-byte stride
+
+static void cfunc_rsp_sfv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 	int eaoffset = ea & 0xf;
@@ -1811,18 +2667,18 @@ static void cfunc_rsp_sfv(void *param)
 
 	for (int i = index>>1; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 value;
 		SIMD_EXTRACT16(rsp->xv[dest], value, i);
 		WRITE8(rsp, ea + (eaoffset & 0xf), (value >> 7) & 0x00ff);
-#else
-		WRITE8(rsp, ea + (eaoffset & 0xf), VREG_S(dest, i) >> 7);
-#endif
 		eaoffset += 4;
 	}
 }
 
-static void cfunc_rsp_swv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_sfv_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1834,13 +2690,44 @@ static void cfunc_rsp_swv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 01010 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
-	// after byte index 15
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int eaoffset = ea & 0xf;
+	ea &= ~0xf;
+
+	int end = (index >> 1) + 4;
+
+	for (int i = index>>1; i < end; i++)
+	{
+		WRITE8(rsp, ea + (eaoffset & 0xf), VREG_S(dest, i) >> 7);
+		eaoffset += 4;
+	}
+}
+#endif
+
+#if USE_SIMD
+// SWV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 01010 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores the full 128-bit vector starting from vector byte index and wrapping to index 0
+// after byte index 15
+
+static void cfunc_rsp_swv_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
 
 	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
 	int eaoffset = ea & 0xf;
@@ -1849,18 +2736,54 @@ static void cfunc_rsp_swv(void *param)
 	int end = index + 16;
 	for (int i = index; i < end; i++)
 	{
-#if USE_SIMD
 		UINT16 value;
 		SIMD_EXTRACT16(rsp->xv[dest], value, i >> 1);
 		WRITE8(rsp, ea + (eaoffset & 0xf), (value >> ((1-(i & 1)) * 8)) & 0xff);
-#else
-		WRITE8(rsp, ea + (eaoffset & 0xf), VREG_B(dest, i & 0xf));
-#endif
 		eaoffset++;
 	}
 }
 
-static void cfunc_rsp_stv(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_swv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int eaoffset = ea & 0xf;
+	ea &= ~0xf;
+
+	int end = index + 16;
+	for (int i = index; i < end; i++)
+	{
+		WRITE8(rsp, ea + (eaoffset & 0xf), VREG_B(dest, i & 0xf));
+		eaoffset++;
+	}
+}
+#endif
+
+#if USE_SIMD
+// STV
+//
+// 31       25      20      15      10     6        0
+// --------------------------------------------------
+// | 111010 | BBBBB | TTTTT | 01011 | IIII | Offset |
+// --------------------------------------------------
+//
+// Stores one element from maximum of 8 vectors, while incrementing element index
+
+static void cfunc_rsp_stv_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -1873,12 +2796,6 @@ static void cfunc_rsp_stv(void *param)
 	{
 		offset |= 0xffffffc0;
 	}
-	// 31       25      20      15      10     6        0
-	// --------------------------------------------------
-	// | 111010 | BBBBB | TTTTT | 01011 | IIII | Offset |
-	// --------------------------------------------------
-	//
-	// Stores one element from maximum of 8 vectors, while incrementing element index
 
 	int vs = dest;
 	int ve = dest + 8;
@@ -1895,17 +2812,202 @@ static void cfunc_rsp_stv(void *param)
 
 	for (int i = vs; i < ve; i++)
 	{
-#if USE_SIMD
 		UINT16 value;
-		SIMD_EXTRACT16(rsp->xv[dest], value, element);
+		SIMD_EXTRACT16(rsp->xv[i], value, element);
 		WRITE16(rsp, ea + (eaoffset & 0xf), value);
-#else
-		WRITE16(rsp, ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
-#endif
 		eaoffset += 2;
 		element++;
 	}
 }
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+static void cfunc_rsp_stv_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int dest = (op >> 16) & 0x1f;
+	int base = (op >> 21) & 0x1f;
+	int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	int vs = dest;
+	int ve = dest + 8;
+	if (ve > 32)
+	{
+		ve = 32;
+	}
+
+	int element = 8 - (index >> 1);
+
+	UINT32 ea = (base) ? rsp->r[base] + (offset * 16) : (offset * 16);
+	int eaoffset = (ea & 0xf) + (element * 2);
+	ea &= ~0xf;
+
+	for (int i = vs; i < ve; i++)
+	{
+		WRITE16(rsp, ea + (eaoffset & 0xf), VREG_S(i, element & 0x7));
+		eaoffset += 2;
+		element++;
+	}
+}
+
+#endif
+
+#if USE_SIMD
+static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+//  int loopdest;
+	UINT32 op = desc->opptr.l[0];
+	//int dest = (op >> 16) & 0x1f;
+	//int base = (op >> 21) & 0x1f;
+	//int index = (op >> 7) & 0xf;
+	int offset = (op & 0x7f);
+	//int skip;
+	if (offset & 0x40)
+	{
+		offset |= 0xffffffc0;
+	}
+
+	switch ((op >> 11) & 0x1f)
+	{
+		case 0x00:      /* SBV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sbv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_sbv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x01:      /* SSV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_ssv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_ssv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x02:      /* SLV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_slv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_slv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x03:      /* SDV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sdv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_sdv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x04:      /* SQV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sqv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_sqv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x05:      /* SRV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_srv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_srv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x06:      /* SPV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_spv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_spv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x07:      /* SUV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_suv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_suv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x08:      /* SHV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_shv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_shv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x09:      /* SFV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_sfv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_sfv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x0a:      /* SWV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_swv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_swv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+		case 0x0b:      /* STV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_stv_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_stv_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+			return TRUE;
+
+		default:
+			unimplemented_opcode(rsp, op);
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+#else
 
 static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
@@ -1925,51 +3027,51 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	{
 		case 0x00:      /* SBV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_sbv, rsp);
+			UML_CALLC(block, cfunc_rsp_sbv_scalar, rsp);
 			return TRUE;
 		case 0x01:      /* SSV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_ssv, rsp);
+			UML_CALLC(block, cfunc_rsp_ssv_scalar, rsp);
 			return TRUE;
 		case 0x02:      /* SLV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_slv, rsp);
+			UML_CALLC(block, cfunc_rsp_slv_scalar, rsp);
 			return TRUE;
 		case 0x03:      /* SDV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_sdv, rsp);
+			UML_CALLC(block, cfunc_rsp_sdv_scalar, rsp);
 			return TRUE;
 		case 0x04:      /* SQV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_sqv, rsp);
+			UML_CALLC(block, cfunc_rsp_sqv_scalar, rsp);
 			return TRUE;
 		case 0x05:      /* SRV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_srv, rsp);
+			UML_CALLC(block, cfunc_rsp_srv_scalar, rsp);
 			return TRUE;
 		case 0x06:      /* SPV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_spv, rsp);
+			UML_CALLC(block, cfunc_rsp_spv_scalar, rsp);
 			return TRUE;
 		case 0x07:      /* SUV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_suv, rsp);
+			UML_CALLC(block, cfunc_rsp_suv_scalar, rsp);
 			return TRUE;
 		case 0x08:      /* SHV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_shv, rsp);
+			UML_CALLC(block, cfunc_rsp_shv_scalar, rsp);
 			return TRUE;
 		case 0x09:      /* SFV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_sfv, rsp);
+			UML_CALLC(block, cfunc_rsp_sfv_scalar, rsp);
 			return TRUE;
 		case 0x0a:      /* SWV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_swv, rsp);
+			UML_CALLC(block, cfunc_rsp_swv_scalar, rsp);
 			return TRUE;
 		case 0x0b:      /* STV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_stv, rsp);
+			UML_CALLC(block, cfunc_rsp_stv_scalar, rsp);
 			return TRUE;
 
 		default:
@@ -1979,7 +3081,66 @@ static int generate_swc2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 
 	return TRUE;
 }
+#endif
 
+#if USE_SIMD
+INLINE UINT16 VEC_SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negative, UINT16 positive)
+{
+	if ((INT16)VEC_ACCUM_H(rsp, accum) < 0)
+	{
+		if ((UINT16)(VEC_ACCUM_H(rsp, accum)) != 0xffff)
+		{
+			return negative;
+		}
+		else
+		{
+			if ((INT16)VEC_ACCUM_M(rsp, accum) >= 0)
+			{
+				return negative;
+			}
+			else
+			{
+				if (slice == 0)
+				{
+					return VEC_ACCUM_L(rsp, accum);
+				}
+				else if (slice == 1)
+				{
+					return VEC_ACCUM_M(rsp, accum);
+				}
+			}
+		}
+	}
+	else
+	{
+		if ((UINT16)(VEC_ACCUM_H(rsp, accum)) != 0)
+		{
+			return positive;
+		}
+		else
+		{
+			if ((INT16)VEC_ACCUM_M(rsp, accum) < 0)
+			{
+				return positive;
+			}
+			else
+			{
+				if (slice == 0)
+				{
+					return VEC_ACCUM_L(rsp, accum);
+				}
+				else
+				{
+					return VEC_ACCUM_M(rsp, accum);
+				}
+			}
+		}
+	}
+	return 0;
+}
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
 INLINE UINT16 SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negative, UINT16 positive)
 {
 	if ((INT16)ACCUM_H(rsp, accum) < 0)
@@ -2032,41 +3193,7 @@ INLINE UINT16 SATURATE_ACCUM(rsp_state *rsp, int accum, int slice, UINT16 negati
 			}
 		}
 	}
-
 	return 0;
-}
-
-#if USE_SIMD
-__m128i SATURATE_ACCUM1(__m128i accum_h, __m128i accum_m, UINT16 negative, UINT16 positive)
-{
-	__m128i vnegative = _mm_set_epi16(negative, negative, negative, negative, negative, negative, negative, negative);
-	__m128i vpositive = _mm_set_epi16(positive, positive, positive, positive, positive, positive, positive, positive);
-
-	// conditional masks
-	__m128i accum_hlz = _mm_cmplt_epi16(accum_h, _mm_setzero_si128());
-	__m128i accum_hgz = _mm_cmpgt_epi16(accum_h, _mm_setzero_si128());
-	__m128i accum_hz = _mm_cmpeq_epi16(accum_h, _mm_setzero_si128());
-	__m128i accum_hn1 = _mm_cmpeq_epi16(accum_h, vec_neg1);
-	__m128i accum_hnn1 = _mm_xor_si128(accum_hn1, vec_neg1);
-
-	__m128i accum_mlz = _mm_cmplt_epi16(accum_m, _mm_setzero_si128());
-	__m128i accum_mgz = _mm_cmpgt_epi16(accum_m, _mm_setzero_si128());
-	__m128i accum_mz = _mm_cmpeq_epi16(accum_m, _mm_setzero_si128());
-	__m128i accum_mgez = _mm_or_si128(accum_mz, accum_mgz);
-
-	// Return negative if H<0 && (H!=0xffff || M >= 0)
-	// Return positive if H>0 || (H==0 && M<0)
-	// Return medium slice if H==0xffff && M<0
-	// Return medium slice if H==0 && M>=0
-
-	__m128i negative_mask = _mm_and_si128(accum_hlz, _mm_or_si128(accum_hnn1, accum_mgez));
-	__m128i positive_mask = _mm_or_si128(accum_hgz, _mm_and_si128(accum_hz, accum_mlz));
-	__m128i accumm_mask = _mm_or_si128(_mm_and_si128(accum_hz, accum_mgez), _mm_and_si128(accum_hn1, accum_mlz));
-
-	__m128i output = _mm_and_si128(accum_m, accumm_mask);
-	output = _mm_or_si128(output, _mm_and_si128(vnegative, negative_mask));
-	output = _mm_or_si128(output, _mm_and_si128(vpositive, positive_mask));
-	return output;
 }
 #endif
 
@@ -2112,60 +3239,11 @@ INLINE UINT16 SATURATE_ACCUM1(rsp_state *rsp, int accum, UINT16 negative, UINT16
 			}
 		}
 	}
-
 	return 0;
 }
-
-#if 0
-INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative, UINT16 positive)
-{
-	// Return negative if H<0 && (H!=0xffff || M >= 0)
-	// Return positive if H>0 || (H==0 && M<0)
-	// Return medium slice if H==0xffff && M<0
-	// Return medium slice if H==0 && M>=0
-	if ((INT16)h[accum] < 0)
-	{
-		if ((UINT16)h[accum] != 0xffff)
-		{
-			return negative;
-		}
-		else
-		{
-			if ((INT16)m[accum] >= 0)
-			{
-				return negative;
-			}
-			else
-			{
-				return m[accum];
-			}
-		}
-	}
-	else
-	{
-		if ((UINT16)h[accum] != 0)
-		{
-			return positive;
-		}
-		else
-		{
-			if ((INT16)m[accum] < 0)
-			{
-				return positive;
-			}
-			else
-			{
-				return m[accum];
-			}
-		}
-	}
-
-	return 0;
-}
-#endif
 
 #if USE_SIMD
-#define WRITEBACK_RESULT() { \
+#define VEC_WRITEBACK_RESULT() { \
 		SIMD_INSERT16(rsp->xv[VDREG], vres[0], 0); \
 		SIMD_INSERT16(rsp->xv[VDREG], vres[1], 1); \
 		SIMD_INSERT16(rsp->xv[VDREG], vres[2], 2); \
@@ -2175,7 +3253,8 @@ INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative
 		SIMD_INSERT16(rsp->xv[VDREG], vres[6], 6); \
 		SIMD_INSERT16(rsp->xv[VDREG], vres[7], 7); \
 }
-#else
+#endif
+
 #define WRITEBACK_RESULT() { \
 		W_VREG_S(VDREG, 0) = vres[0];   \
 		W_VREG_S(VDREG, 1) = vres[1];   \
@@ -2186,7 +3265,6 @@ INLINE UINT16 C_SATURATE_ACCUM1(UINT16 *h, UINT16 *m, int accum, UINT16 negative
 		W_VREG_S(VDREG, 6) = vres[6];   \
 		W_VREG_S(VDREG, 7) = vres[7];   \
 }
-#endif
 
 #if USE_SIMD
 /* ============================================================================
@@ -2276,17 +3354,60 @@ INLINE __m128i RSPClampLowToVal(__m128i vaccLow, __m128i vaccMid, __m128i vaccHi
 	return _mm_or_si128(negVal, posVal);
 }
 #endif
-INLINE void cfunc_rsp_vmulf(void *param)
+
+#if USE_SIMD
+// VMULF
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000000 |
+// ------------------------------------------------------
+//
+// Multiplies signed integer by signed integer * 2
+
+INLINE void cfunc_rsp_vmulf_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-	//int i;
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000000 |
-	// ------------------------------------------------------
-	//
-	// Multiplies signed integer by signed integer * 2
+
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		VEC_GET_SCALAR_VS1(w1, i);
+		VEC_GET_SCALAR_VS2(w2, i);
+		INT32 s1 = (INT32)(INT16)w1;
+		INT32 s2 = (INT32)(INT16)w2;
+
+		if (s1 == -32768 && s2 == -32768)
+		{
+			// overflow
+			VEC_SET_ACCUM_H(0, i);
+			VEC_SET_ACCUM_M(-32768, i);
+			VEC_SET_ACCUM_L(-32768, i);
+			vres[i] = 0x7fff;
+		}
+		else
+		{
+			INT64 r =  s1 * s2 * 2;
+			r += 0x8000;    // rounding ?
+			VEC_SET_ACCUM_H((r < 0) ? 0xffff : 0, i);
+			VEC_SET_ACCUM_M((INT16)(r >> 16), i);
+			VEC_SET_ACCUM_L((UINT16)(r), i);
+			vres[i] = VEC_ACCUM_M(rsp, i);
+		}
+	}
+	VEC_WRITEBACK_RESULT();
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmulf_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2317,16 +3438,62 @@ INLINE void cfunc_rsp_vmulf(void *param)
 	}
 	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void cfunc_rsp_vmulu(void *param)
+#if USE_SIMD
+// VMULU
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000001 |
+// ------------------------------------------------------
+//
+
+INLINE void cfunc_rsp_vmulu_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000001 |
-	// ------------------------------------------------------
-	//
+
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		VEC_GET_SCALAR_VS1(w1, i);
+		VEC_GET_SCALAR_VS2(w2, i);
+		INT32 s1 = (INT32)(INT16)w1;
+		INT32 s2 = (INT32)(INT16)w2;
+
+		INT64 r = s1 * s2 * 2;
+		r += 0x8000;    // rounding ?
+
+		VEC_SET_ACCUM_H((UINT16)(r >> 32), i);
+		VEC_SET_ACCUM_M((UINT16)(r >> 16), i);
+		VEC_SET_ACCUM_L((UINT16)(r), i);
+
+		if (r < 0)
+		{
+			vres[i] = 0;
+		}
+		else if (((INT16)(VEC_ACCUM_H(rsp, i)) ^ (INT16)(VEC_ACCUM_M(rsp, i))) < 0)
+		{
+			vres[i] = -1;
+		}
+		else
+		{
+			vres[i] = VEC_ACCUM_M(rsp, i);
+		}
+	}
+	VEC_WRITEBACK_RESULT();
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmulu_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2359,22 +3526,24 @@ INLINE void cfunc_rsp_vmulu(void *param)
 	}
 	WRITEBACK_RESULT();
 }
+#endif
 
-INLINE void cfunc_rsp_vmudl(void *param)
+#if USE_SIMD
+// VMUDL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001101 |
+// ------------------------------------------------------
+//
+// Multiplies signed integer by unsigned fraction
+// The result is added into accumulator
+// The middle slice of accumulator is stored into destination element
+
+INLINE void cfunc_rsp_vmudl_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001101 |
-	// ------------------------------------------------------
-	//
-	// Multiplies signed integer by unsigned fraction
-	// The result is added into accumulator
-	// The middle slice of accumulator is stored into destination element
-
-#if USE_SIMD
 
 	__m128i vsReg = rsp->xv[VS1REG];
 	__m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
@@ -2389,8 +3558,16 @@ INLINE void cfunc_rsp_vmudl(void *param)
 
 	rsp->accum_m = _mm_setzero_si128();
 	rsp->accum_h = _mm_setzero_si128();
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmudl_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2410,24 +3587,25 @@ INLINE void cfunc_rsp_vmudl(void *param)
 		vres[i] = ACCUM_L(rsp, i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmudm(void *param)
+#if USE_SIMD
+// VMUDM
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000101 |
+// ------------------------------------------------------
+//
+// Multiplies signed integer by unsigned fraction
+// The result is stored into accumulator
+// The middle slice of accumulator is stored into destination element
+
+INLINE void cfunc_rsp_vmudm_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000101 |
-	// ------------------------------------------------------
-	//
-	// Multiplies signed integer by unsigned fraction
-	// The result is stored into accumulator
-	// The middle slice of accumulator is stored into destination element
-
-#if USE_SIMD
 
 	__m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi;
 
@@ -2447,8 +3625,16 @@ INLINE void cfunc_rsp_vmudm(void *param)
 	loProduct = _mm_cmplt_epi32(loProduct, _mm_setzero_si128());
 	hiProduct = _mm_cmplt_epi32(hiProduct, _mm_setzero_si128());
 	rsp->accum_h = _mm_packs_epi32(loProduct, hiProduct);
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmudm_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2468,24 +3654,25 @@ INLINE void cfunc_rsp_vmudm(void *param)
 		vres[i] = ACCUM_M(rsp, i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmudn(void *param)
+#if USE_SIMD
+// VMUDN
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000110 |
+// ------------------------------------------------------
+//
+// Multiplies unsigned fraction by signed integer
+// The result is stored into accumulator
+// The low slice of accumulator is stored into destination element
+
+INLINE void cfunc_rsp_vmudn_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000110 |
-	// ------------------------------------------------------
-	//
-	// Multiplies unsigned fraction by signed integer
-	// The result is stored into accumulator
-	// The low slice of accumulator is stored into destination element
-
-#if USE_SIMD
 
 	__m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi;
 
@@ -2502,8 +3689,16 @@ INLINE void cfunc_rsp_vmudn(void *param)
 	rsp->xv[VDREG] = rsp->accum_l = RSPPackLo32to16(loProduct, hiProduct);
 	rsp->accum_m = RSPPackHi32to16(loProduct, hiProduct);
 	rsp->accum_h = _mm_cmplt_epi16(rsp->accum_m, _mm_setzero_si128());
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmudn_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8] = { 0 };
 	for (int i = 0; i < 8; i++)
@@ -2523,24 +3718,25 @@ INLINE void cfunc_rsp_vmudn(void *param)
 		vres[i] = (UINT16)(r);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmudh(void *param)
+#if USE_SIMD
+// VMUDH
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000111 |
+// ------------------------------------------------------
+//
+// Multiplies signed integer by signed integer
+// The result is stored into highest 32 bits of accumulator, the low slice is zero
+// The highest 32 bits of accumulator is saturated into destination element
+
+INLINE void cfunc_rsp_vmudh_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 000111 |
-	// ------------------------------------------------------
-	//
-	// Multiplies signed integer by signed integer
-	// The result is stored into highest 32 bits of accumulator, the low slice is zero
-	// The highest 32 bits of accumulator is saturated into destination element
-
-#if USE_SIMD
 
 	__m128i vaccLow, vaccHigh;
 	__m128i unpackLo, unpackHi;
@@ -2559,8 +3755,16 @@ INLINE void cfunc_rsp_vmudh(void *param)
 	rsp->accum_l = _mm_setzero_si128();
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmudh_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2582,16 +3786,49 @@ INLINE void cfunc_rsp_vmudh(void *param)
 		vres[i] = (INT16)(r);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmacf(void *param)
+#if USE_SIMD
+// VMACF
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001000 |
+// ------------------------------------------------------
+//
+
+INLINE void cfunc_rsp_vmacf_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-#if USE_SIMD
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		VEC_GET_SCALAR_VS1(w1, i);
+		VEC_GET_SCALAR_VS2(w2, i);
+		INT32 s1 = (INT32)(INT16)w1;
+		INT32 s2 = (INT32)(INT16)w2;
 
+		INT32 r = s1 * s2;
+
+		UINT64 q = (UINT64)(UINT16)VEC_ACCUM_LL(rsp, i);
+		q |= (((UINT64)(UINT16)VEC_ACCUM_L(rsp, i)) << 16);
+		q |= (((UINT64)(UINT16)VEC_ACCUM_M(rsp, i)) << 32);
+		q |= (((UINT64)(UINT16)VEC_ACCUM_H(rsp, i)) << 48);
+
+		q += (INT64)(r) << 17;
+		VEC_SET_ACCUM_LL((UINT16)q, i);
+		VEC_SET_ACCUM_L((UINT16)(q >> 16), i);
+		VEC_SET_ACCUM_M((UINT16)(q >> 32), i);
+		VEC_SET_ACCUM_H((UINT16)(q >> 48), i);
+
+		vres[i] = VEC_SATURATE_ACCUM(rsp, i, 1, 0x8000, 0x7fff);
+	}
+	VEC_WRITEBACK_RESULT();
+/*
 	__m128i loProduct, hiProduct, unpackLo, unpackHi;
 	__m128i vaccHigh;
 	__m128i vdReg, vdRegLo, vdRegHi;
@@ -2601,10 +3838,10 @@ INLINE void cfunc_rsp_vmacf(void *param)
 
 	__m128i vaccLow = rsp->accum_l;
 
-	/* Unpack to obtain for 32-bit precision. */
+	// Unpack to obtain for 32-bit precision.
 	RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
 
-	/* Begin accumulating the products. */
+	// Begin accumulating the products.
 	unpackLo = _mm_mullo_epi16(vsReg, vtReg);
 	unpackHi = _mm_mulhi_epi16(vsReg, vtReg);
 	loProduct = _mm_unpacklo_epi16(unpackLo, unpackHi);
@@ -2624,7 +3861,7 @@ INLINE void cfunc_rsp_vmacf(void *param)
 
 	rsp->accum_l = vdReg = RSPPackLo32to16(vaccLow, vaccHigh);
 
-	/* Multiply the MSB of sources, accumulate the product. */
+	// Multiply the MSB of sources, accumulate the product.
 	vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
 	vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
 
@@ -2638,12 +3875,21 @@ INLINE void cfunc_rsp_vmacf(void *param)
 	vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
 	vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
 
-	/* Clamp the accumulator and write it all out. */
+	// Clamp the accumulator and write it all out.
 	rsp->xv[VDREG] = _mm_packs_epi32(vaccLow, vaccHigh);
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+*/
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmacf_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2656,14 +3902,13 @@ INLINE void cfunc_rsp_vmacf(void *param)
 
 		INT32 r = s1 * s2;
 
-		UINT64 q = ACCUM(i) & 0x000000000000ffffL;
+		UINT64 q = (UINT64)(UINT16)ACCUM_LL(rsp, i);
 		q |= (((UINT64)(UINT16)ACCUM_L(rsp, i)) << 16);
 		q |= (((UINT64)(UINT16)ACCUM_M(rsp, i)) << 32);
 		q |= (((UINT64)(UINT16)ACCUM_H(rsp, i)) << 48);
 
 		q += (INT64)(r) << 17;
-		ACCUM(i) = q & 0x000000000000ffffL;
-
+		SET_ACCUM_LL((UINT16)q, i);
 		SET_ACCUM_L((UINT16)(q >> 16), i);
 		SET_ACCUM_M((UINT16)(q >> 32), i);
 		SET_ACCUM_H((UINT16)(q >> 48), i);
@@ -2671,21 +3916,22 @@ INLINE void cfunc_rsp_vmacf(void *param)
 		vres[i] = SATURATE_ACCUM(rsp, i, 1, 0x8000, 0x7fff);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmacu(void *param)
+#if USE_SIMD
+// VMACU
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001001 |
+// ------------------------------------------------------
+//
+
+INLINE void cfunc_rsp_vmacu_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001001 |
-	// ------------------------------------------------------
-	//
-
-#if USE_SIMD
 
 	__m128i loProduct, hiProduct, unpackLo, unpackHi;
 	__m128i vaccHigh;
@@ -2736,7 +3982,16 @@ INLINE void cfunc_rsp_vmacu(void *param)
 	/* Clamp the accumulator and write it all out. */
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmacu_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
 
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
@@ -2755,7 +4010,6 @@ INLINE void cfunc_rsp_vmacu(void *param)
 		SET_ACCUM_M((UINT16)(r3), i);
 		SET_ACCUM_H(ACCUM_H(rsp, i) + (UINT16)(r3 >> 16) + (UINT16)(r1 >> 31), i);
 
-		//res = SATURATE_ACCUM(i, 1, 0x0000, 0xffff);
 		if ((INT16)ACCUM_H(rsp, i) < 0)
 		{
 			vres[i] = 0;
@@ -2780,26 +4034,48 @@ INLINE void cfunc_rsp_vmacu(void *param)
 		}
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmadl(void *param)
+#if USE_SIMD
+// VMADL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001100 |
+// ------------------------------------------------------
+//
+// Multiplies unsigned fraction by unsigned fraction
+// Adds the higher 16 bits of the 32-bit result to accumulator
+// The low slice of accumulator is stored into destination element
+
+INLINE void cfunc_rsp_vmadl_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001100 |
-	// ------------------------------------------------------
-	//
-	// Multiplies unsigned fraction by unsigned fraction
-	// Adds the higher 16 bits of the 32-bit result to accumulator
-	// The low slice of accumulator is stored into destination element
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		VEC_GET_SCALAR_VS1(w1, i);
+		VEC_GET_SCALAR_VS2(w2, i);
+		UINT32 s1 = w1;
+		UINT32 s2 = w2;
 
-#if USE_SIMD
+		UINT32 r1 = s1 * s2;
+		UINT32 r2 = (UINT16)VEC_ACCUM_L(rsp, i) + (r1 >> 16);
+		UINT32 r3 = (UINT16)VEC_ACCUM_M(rsp, i) + (r2 >> 16);
 
-	__m128i vaccHigh;
+		VEC_SET_ACCUM_L((UINT16)r2, i);
+		VEC_SET_ACCUM_M((UINT16)r3, i);
+		VEC_SET_ACCUM_H(VEC_ACCUM_H(rsp, i) + (INT16)(r3 >> 16), i);
+
+		vres[i] = VEC_SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
+	}
+	VEC_WRITEBACK_RESULT();
+
+	/*__m128i vaccHigh;
 	__m128i unpackHi, loProduct, hiProduct;
 	__m128i vdReg, vdRegLo, vdRegHi;
 
@@ -2808,10 +4084,10 @@ INLINE void cfunc_rsp_vmadl(void *param)
 
 	__m128i vaccLow = rsp->accum_l;
 
-	/* Unpack to obtain for 32-bit precision. */
+	// Unpack to obtain for 32-bit precision.
 	RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
 
-	/* Begin accumulating the products. */
+	// Begin accumulating the products.
 	unpackHi = _mm_mulhi_epu16(vsReg, vtReg);
 	loProduct = _mm_unpacklo_epi16(unpackHi, _mm_setzero_si128());
 	hiProduct = _mm_unpackhi_epi16(unpackHi, _mm_setzero_si128());
@@ -2820,7 +4096,7 @@ INLINE void cfunc_rsp_vmadl(void *param)
 	vaccHigh = _mm_add_epi32(vaccHigh, hiProduct);
 	rsp->accum_l = vdReg = RSPPackLo32to16(vaccLow, vaccHigh);
 
-	/* Finish accumulating whatever is left. */
+	// Finish accumulating whatever is left.
 	vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
 	vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
 
@@ -2829,12 +4105,21 @@ INLINE void cfunc_rsp_vmadl(void *param)
 	vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
 	vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
 
-	/* Clamp the accumulator and write it all out. */
+	// Clamp the accumulator and write it all out.
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
-	rsp->xv[VDREG] = RSPClampLowToVal(vdReg, rsp->accum_m, rsp->accum_h);
+	rsp->xv[VDREG] = RSPClampLowToVal(vdReg, rsp->accum_m, rsp->accum_h);*/
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmadl_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -2855,15 +4140,18 @@ INLINE void cfunc_rsp_vmadl(void *param)
 		vres[i] = SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmadm(void *param)
+#if USE_SIMD
+// VMADM
+//
+
+INLINE void cfunc_rsp_vmadm_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-#if USE_SIMD
 	__m128i vaccLow, vaccHigh, loProduct, hiProduct;
 	__m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi, vdRegLo, vdRegHi;
 
@@ -2908,8 +4196,17 @@ INLINE void cfunc_rsp_vmadm(void *param)
 	rsp->xv[VDREG] = _mm_packs_epi32(vaccLow, vaccHigh);
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmadm_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -2934,15 +4231,47 @@ INLINE void cfunc_rsp_vmadm(void *param)
 		vres[i] = SATURATE_ACCUM(rsp, i, 1, 0x8000, 0x7fff);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmadn(void *param)
+#if USE_SIMD
+// VMADN
+//
+
+INLINE void cfunc_rsp_vmadn_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-#if USE_SIMD
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		UINT16 w1, w2;
+		VEC_GET_SCALAR_VS1(w1, i);
+		VEC_GET_SCALAR_VS2(w2, i);
+		INT32 s1 = (UINT16)w1;
+		INT32 s2 = (INT32)(INT16)w2;
+
+		UINT64 q = (UINT64)VEC_ACCUM_LL(rsp, i);
+		q |= (((UINT64)VEC_ACCUM_L(rsp, i)) << 16);
+		q |= (((UINT64)VEC_ACCUM_M(rsp, i)) << 32);
+		q |= (((UINT64)VEC_ACCUM_H(rsp, i)) << 48);
+		q += (INT64)(s1*s2) << 16;
+
+		VEC_SET_ACCUM_LL((UINT16)q, i);
+		VEC_SET_ACCUM_L((UINT16)(q >> 16), i);
+		VEC_SET_ACCUM_M((UINT16)(q >> 32), i);
+		VEC_SET_ACCUM_H((UINT16)(q >> 48), i);
+
+		vres[i] = VEC_SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
+	}
+	VEC_WRITEBACK_RESULT();
+}
+/*INLINE void cfunc_rsp_vmadn_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	__m128i vaccLow, vaccHigh, loProduct, hiProduct;
 	__m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi, vdRegLo, vdRegHi;
 
@@ -2955,7 +4284,7 @@ INLINE void cfunc_rsp_vmadn(void *param)
 	RSPSignExtend16to32(vtReg, &vtRegLo, &vtRegHi);
 	RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
 
-	/* Begin accumulating the products. */
+	// Begin accumulating the products.
 	loProduct = _mm_mullo_epi32(vsRegLo, vtRegLo);
 	hiProduct = _mm_mullo_epi32(vsRegHi, vtRegHi);
 
@@ -2971,7 +4300,7 @@ INLINE void cfunc_rsp_vmadn(void *param)
 
 	rsp->accum_l = RSPPackLo32to16(vaccLow, vaccHigh);
 
-	/* Multiply the MSB of sources, accumulate the product. */
+	// Multiply the MSB of sources, accumulate the product.
 	vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
 	vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
 
@@ -2985,11 +4314,21 @@ INLINE void cfunc_rsp_vmadn(void *param)
 	vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
 	vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
 
-	/* Clamp the accumulator and write it all out. */
+	// Clamp the accumulator and write it all out.
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
 	rsp->xv[VDREG] = RSPClampLowToVal(rsp->accum_l, rsp->accum_m, rsp->accum_h);
-#else
+}*/
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmadn_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -2999,13 +4338,13 @@ INLINE void cfunc_rsp_vmadn(void *param)
 		INT32 s1 = (UINT16)w1;
 		INT32 s2 = (INT32)(INT16)w2;
 
-		UINT64 q = (UINT64)ACCUM(i) & 0x000000000000ffffL;
+		UINT64 q = (UINT64)ACCUM_LL(rsp, i);
 		q |= (((UINT64)ACCUM_L(rsp, i)) << 16);
 		q |= (((UINT64)ACCUM_M(rsp, i)) << 32);
 		q |= (((UINT64)ACCUM_H(rsp, i)) << 48);
 		q += (INT64)(s1*s2) << 16;
 
-		ACCUM(i) = q & 0x000000000000ffffL;
+		SET_ACCUM_LL((UINT16)q, i);
 		SET_ACCUM_L((UINT16)(q >> 16), i);
 		SET_ACCUM_M((UINT16)(q >> 32), i);
 		SET_ACCUM_H((UINT16)(q >> 48), i);
@@ -3013,24 +4352,25 @@ INLINE void cfunc_rsp_vmadn(void *param)
 		vres[i] = SATURATE_ACCUM(rsp, i, 0, 0x0000, 0xffff);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmadh(void *param)
+#if USE_SIMD
+// VMADH
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001111 |
+// ------------------------------------------------------
+//
+// Multiplies signed integer by signed integer
+// The result is added into highest 32 bits of accumulator, the low slice is zero
+// The highest 32 bits of accumulator is saturated into destination element
+
+INLINE void cfunc_rsp_vmadh_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 001111 |
-	// ------------------------------------------------------
-	//
-	// Multiplies signed integer by signed integer
-	// The result is added into highest 32 bits of accumulator, the low slice is zero
-	// The highest 32 bits of accumulator is saturated into destination element
-
-#if USE_SIMD
 
 	__m128i vsReg = rsp->xv[VS1REG];
 	__m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
@@ -3051,8 +4391,17 @@ INLINE void cfunc_rsp_vmadh(void *param)
 	rsp->xv[VDREG] = _mm_packs_epi32(vaccLow, vaccHigh);
 	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
 	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+}
 
-#else
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmadh_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -3072,22 +4421,22 @@ INLINE void cfunc_rsp_vmadh(void *param)
 		vres[i] = SATURATE_ACCUM1(rsp, i, 0x8000, 0x7fff);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vadd(void *param)
+#if USE_SIMD
+// VADD
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010000 |
+// ------------------------------------------------------
+//
+// Adds two vector registers and carry flag, the result is saturated to 32767
+
+INLINE void cfunc_rsp_vadd_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010000 |
-	// ------------------------------------------------------
-	//
-	// Adds two vector registers and carry flag, the result is saturated to 32767
-
-#if USE_SIMD
 
 	__m128i shuffled = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i carry = _mm_and_si128(rsp->xvflag[CARRY], vec_flagmask);
@@ -3100,9 +4449,19 @@ INLINE void cfunc_rsp_vadd(void *param)
 
 	rsp->xv[VDREG] = _mm_add_epi16(addvec, carry);
 
-	rsp->xvflag[ZERO] = _mm_setzero_si128();
-	rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+	rsp->xvflag[ZERO] = vec_zero;
+	rsp->xvflag[CARRY] = vec_zero;
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vadd_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8] = { 0 };
 	for (int i = 0; i < 8; i++)
 	{
@@ -3122,39 +4481,56 @@ INLINE void cfunc_rsp_vadd(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vsub(void *param)
+#if USE_SIMD
+// VSUB
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010001 |
+// ------------------------------------------------------
+//
+// Subtracts two vector registers and carry flag, the result is saturated to -32768
+// TODO: check VS2REG == VDREG
+
+INLINE void cfunc_rsp_vsub_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010001 |
-	// ------------------------------------------------------
-	//
-	// Subtracts two vector registers and carry flag, the result is saturated to -32768
-
-	// TODO: check VS2REG == VDREG
-
-#if USE_SIMD
 	__m128i shuffled = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i carry = _mm_and_si128(rsp->xvflag[CARRY], vec_flagmask);
-	__m128i unsat = _mm_sub_epi16(_mm_sub_epi16(rsp->xv[VS1REG], shuffled), carry);
+	__m128i unsat = _mm_sub_epi16(rsp->xv[VS1REG], shuffled);
 
-	__m128i subvec = _mm_subs_epi16(rsp->xv[VS1REG], shuffled);
+	__m128i vs2neg = _mm_cmplt_epi16(shuffled, vec_zero);
+	__m128i vs2pos = _mm_cmpeq_epi16(vs2neg, vec_zero);
 
-	carry = _mm_and_si128(carry, _mm_xor_si128(_mm_cmpeq_epi16(subvec, vec_n32768), vec_neg1));
+	__m128i saturated = _mm_subs_epi16(rsp->xv[VS1REG], shuffled);
+	__m128i carry_mask = _mm_cmpeq_epi16(unsat, saturated);
+	carry_mask = _mm_and_si128(vs2neg, carry_mask);
 
-	rsp->xv[VDREG] = _mm_sub_epi16(subvec, carry);
+	vs2neg = _mm_and_si128(carry_mask, carry);
+	vs2pos = _mm_and_si128(vs2pos, carry);
+	__m128i dest_carry = _mm_or_si128(vs2neg, vs2pos);
+	rsp->xv[VDREG] = _mm_subs_epi16(saturated, dest_carry);
 
-	rsp->accum_l = unsat;
+	rsp->accum_l = _mm_sub_epi16(unsat, carry);
 
 	rsp->xvflag[ZERO] = _mm_setzero_si128();
 	rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vsub_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -3175,23 +4551,24 @@ INLINE void cfunc_rsp_vsub(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vabs(void *param)
+#if USE_SIMD
+// VABS
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010011 |
+// ------------------------------------------------------
+//
+// Changes the sign of source register 2 if source register 1 is negative and stores the result to destination register
+
+INLINE void cfunc_rsp_vabs_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010011 |
-	// ------------------------------------------------------
-	//
-	// Changes the sign of source register 2 if source register 1 is negative and stores
-	// the result to destination register
-
-#if USE_SIMD
 	__m128i shuf2 = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i negs2 = _mm_sub_epi16(_mm_setzero_si128(), shuf2);
 	__m128i s2_n32768 = _mm_cmpeq_epi16(shuf2, vec_n32768);
@@ -3201,7 +4578,17 @@ INLINE void cfunc_rsp_vabs(void *param)
 	__m128i result_n32768 = _mm_and_si128(s1_lz, _mm_and_si128(vec_32767, s2_n32768));
 	__m128i result_negs2 = _mm_and_si128(s1_lz, _mm_and_si128(negs2, _mm_xor_si128(s2_n32768, vec_neg1)));
 	rsp->xv[VDREG] = rsp->accum_l = _mm_or_si128(result_gz, _mm_or_si128(result_n32768, result_negs2));
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vabs_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -3232,27 +4619,28 @@ INLINE void cfunc_rsp_vabs(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vaddc(void *param)
+#if USE_SIMD
+// VADDC
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010100 |
+// ------------------------------------------------------
+//
+// Adds two vector registers, the carry out is stored into carry register
+// TODO: check VS2REG = VDREG
+
+INLINE void cfunc_rsp_vaddc_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010100 |
-	// ------------------------------------------------------
-	//
-	// Adds two vector registers, the carry out is stored into carry register
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CARRY_FLAGS();
 
-	// TODO: check VS2REG = VDREG
-
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
-
-#if USE_SIMD
 	__m128i shuf2 = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i vec7531 = _mm_and_si128(rsp->xv[VS1REG], vec_lomask);
 	__m128i vec6420 = _mm_srli_epi32(rsp->xv[VS1REG], 16);
@@ -3264,9 +4652,25 @@ INLINE void cfunc_rsp_vaddc(void *param)
 	__m128i over7531 = _mm_and_si128(_mm_xor_si128(_mm_cmpeq_epi16(sum7531, _mm_setzero_si128()), vec_neg1), vec_himask);
 	__m128i over6420 = _mm_and_si128(_mm_xor_si128(_mm_cmpeq_epi16(sum6420, _mm_setzero_si128()), vec_neg1), vec_himask);
 
+	sum7531 = _mm_and_si128(sum7531, vec_lomask);
+	sum6420 = _mm_and_si128(sum6420, vec_lomask);
+
 	rsp->xvflag[CARRY] = _mm_or_si128(over6420, _mm_srli_epi32(over7531, 16));
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(_mm_slli_epi32(sum6420, 16), sum7531);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vaddc_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+	CLEAR_ZERO_FLAGS();
+	CLEAR_CARRY_FLAGS();
+
 	INT16 vres[8] = { 0 };
 	for (int i = 0; i < 8; i++)
 	{
@@ -3286,27 +4690,28 @@ INLINE void cfunc_rsp_vaddc(void *param)
 		}
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vsubc(void *param)
+#if USE_SIMD
+// VSUBC
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010101 |
+// ------------------------------------------------------
+//
+// Subtracts two vector registers, the carry out is stored into carry register
+// TODO: check VS2REG = VDREG
+
+INLINE void cfunc_rsp_vsubc_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 010101 |
-	// ------------------------------------------------------
-	//
-	// Subtracts two vector registers, the carry out is stored into carry register
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CARRY_FLAGS();
 
-	// TODO: check VS2REG = VDREG
-
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CARRY_FLAGS();
-
-#if USE_SIMD
 	__m128i shuf2 = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i vec7531 = _mm_and_si128(rsp->xv[VS1REG], vec_lomask);
 	__m128i vec6420 = _mm_srli_epi32(rsp->xv[VS1REG], 16);
@@ -3323,10 +4728,24 @@ INLINE void cfunc_rsp_vsubc(void *param)
 	__m128i zero6420 = _mm_and_si128(_mm_xor_si128(_mm_cmpeq_epi16(sum6420, _mm_setzero_si128()), vec_neg1), vec_lomask);
 
 	rsp->xvflag[CARRY] = _mm_or_si128(over6420, _mm_srli_epi32(over7531, 16));
-	rsp->xvflag[ZERO] = _mm_or_si128(zero6420, _mm_srli_epi32(zero7531, 16));
+	rsp->xvflag[ZERO] = _mm_or_si128(_mm_slli_epi32(zero6420, 16), zero7531);
 
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(_mm_slli_epi32(sum6420, 16), sum7531);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vsubc_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+
+	CLEAR_ZERO_FLAGS();
+	CLEAR_CARRY_FLAGS();
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -3350,78 +4769,101 @@ INLINE void cfunc_rsp_vsubc(void *param)
 		}
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vsaw(void *param)
+#if USE_SIMD
+// VSAW
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 011101 |
+// ------------------------------------------------------
+//
+// Stores high, middle or low slice of accumulator to destination vector
+
+INLINE void cfunc_rsp_vsaw_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
-
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 011101 |
-	// ------------------------------------------------------
-	//
-	// Stores high, middle or low slice of accumulator to destination vector
 
 	switch (EL)
 	{
 		case 0x08:      // VSAWH
 		{
-#if USE_SIMD
 			rsp->xv[VDREG] = rsp->accum_h;
-#else
-			for (int i = 0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i) = ACCUM_H(rsp, i);
-			}
-#endif
 			break;
 		}
 		case 0x09:      // VSAWM
 		{
-#if USE_SIMD
 			rsp->xv[VDREG] = rsp->accum_m;
-#else
-			for (int i = 0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i) = ACCUM_M(rsp, i);
-			}
-#endif
 			break;
 		}
 		case 0x0a:      // VSAWL
 		{
-#if USE_SIMD
 			rsp->xv[VDREG] = rsp->accum_l;
-#else
-			for (int i = 0; i < 8; i++)
-			{
-				W_VREG_S(VDREG, i) = ACCUM_L(rsp, i);
-			}
-#endif
 			break;
 		}
 		default:    fatalerror("RSP: VSAW: el = %d\n", EL);
 	}
 }
 
-INLINE void cfunc_rsp_vlt(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vsaw_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	//int i;
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100000 |
-	// ------------------------------------------------------
-	//
-	// Sets compare flags if elements in VS1 are less than VS2
-	// Moves the element in VS2 to destination vector
+	switch (EL)
+	{
+		case 0x08:      // VSAWH
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				W_VREG_S(VDREG, i) = ACCUM_H(rsp, i);
+			}
+			break;
+		}
+		case 0x09:      // VSAWM
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				W_VREG_S(VDREG, i) = ACCUM_M(rsp, i);
+			}
+			break;
+		}
+		case 0x0a:      // VSAWL
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				W_VREG_S(VDREG, i) = ACCUM_L(rsp, i);
+			}
+			break;
+		}
+		default:    fatalerror("RSP: VSAW: el = %d\n", EL);
+	}
+}
+#endif
 
 #if USE_SIMD
+// VLT
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100000 |
+// ------------------------------------------------------
+//
+// Sets compare flags if elements in VS1 are less than VS2
+// Moves the element in VS2 to destination vector
+
+INLINE void cfunc_rsp_vlt_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	rsp->xvflag[COMPARE] = rsp->xvflag[CLIP2] = _mm_setzero_si128();
 
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
@@ -3435,7 +4877,17 @@ INLINE void cfunc_rsp_vlt(void *param)
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(result, _mm_and_si128(shuf, _mm_xor_si128(rsp->xvflag[COMPARE], vec_neg1)));
 
 	rsp->xvflag[ZERO] = rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vlt_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
@@ -3473,23 +4925,25 @@ INLINE void cfunc_rsp_vlt(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_veq(void *param)
+#if USE_SIMD
+// VEQ
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100001 |
+// ------------------------------------------------------
+//
+// Sets compare flags if elements in VS1 are equal with VS2
+// Moves the element in VS2 to destination vector
+
+INLINE void cfunc_rsp_veq_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100001 |
-	// ------------------------------------------------------
-	//
-	// Sets compare flags if elements in VS1 are equal with VS2
-	// Moves the element in VS2 to destination vector
-
-#if USE_SIMD
 	rsp->xvflag[COMPARE] = rsp->xvflag[CLIP2] = _mm_setzero_si128();
 
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
@@ -3502,7 +4956,17 @@ INLINE void cfunc_rsp_veq(void *param)
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(result, _mm_and_si128(shuf, _mm_xor_si128(rsp->xvflag[COMPARE], vec_neg1)));
 
 	rsp->xvflag[ZERO] = rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_veq_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
@@ -3529,23 +4993,25 @@ INLINE void cfunc_rsp_veq(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vne(void *param)
+#if USE_SIMD
+// VNE
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100010 |
+// ------------------------------------------------------
+//
+// Sets compare flags if elements in VS1 are not equal with VS2
+// Moves the element in VS2 to destination vector
+
+INLINE void cfunc_rsp_vne_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100010 |
-	// ------------------------------------------------------
-	//
-	// Sets compare flags if elements in VS1 are not equal with VS2
-	// Moves the element in VS2 to destination vector
-
-#if USE_SIMD
 	rsp->xvflag[COMPARE] = rsp->xvflag[CLIP2] = _mm_setzero_si128();
 
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
@@ -3557,7 +5023,17 @@ INLINE void cfunc_rsp_vne(void *param)
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(result, _mm_and_si128(shuf, _mm_xor_si128(rsp->xvflag[COMPARE], vec_neg1)));
 
 	rsp->xvflag[ZERO] = rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vne_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
@@ -3584,28 +5060,31 @@ INLINE void cfunc_rsp_vne(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vge(void *param)
+#if USE_SIMD
+// VGE
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100011 |
+// ------------------------------------------------------
+//
+// Sets compare flags if elements in VS1 are greater or equal with VS2
+// Moves the element in VS2 to destination vector
+
+INLINE void cfunc_rsp_vge_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	//int i;
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100011 |
-	// ------------------------------------------------------
-	//
-	// Sets compare flags if elements in VS1 are greater or equal with VS2
-	// Moves the element in VS2 to destination vector
-
-#if USE_SIMD
 	rsp->xvflag[COMPARE] = rsp->xvflag[CLIP2] = _mm_setzero_si128();
 
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-	__m128i flag_mask = _mm_cmpeq_epi16(_mm_or_si128(rsp->xvflag[ZERO], rsp->xvflag[CARRY]), _mm_setzero_si128());
+	__m128i zero_mask = _mm_cmpeq_epi16(rsp->xvflag[ZERO], _mm_setzero_si128());
+	__m128i carry_mask = _mm_cmpeq_epi16(rsp->xvflag[CARRY], _mm_setzero_si128());
+	__m128i flag_mask = _mm_or_si128(zero_mask, carry_mask);
 	__m128i eq_mask = _mm_and_si128(_mm_cmpeq_epi16(rsp->xv[VS1REG], shuf), flag_mask);
 	__m128i gt_mask = _mm_cmpgt_epi16(rsp->xv[VS1REG], shuf);
 	rsp->xvflag[COMPARE] = _mm_or_si128(eq_mask, gt_mask);
@@ -3614,7 +5093,17 @@ INLINE void cfunc_rsp_vge(void *param)
 	rsp->accum_l = rsp->xv[VDREG] = _mm_or_si128(result, _mm_and_si128(shuf, _mm_xor_si128(rsp->xvflag[COMPARE], vec_neg1)));
 
 	rsp->xvflag[ZERO] = rsp->xvflag[CARRY] = _mm_setzero_si128();
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vge_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	CLEAR_COMPARE_FLAGS();
 	CLEAR_CLIP2_FLAGS();
 
@@ -3640,218 +5129,119 @@ INLINE void cfunc_rsp_vge(void *param)
 	CLEAR_ZERO_FLAGS();
 	CLEAR_CARRY_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vcl(void *param)
+#if USE_SIMD
+// VCL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100100 |
+// ------------------------------------------------------
+//
+// Vector clip low
+
+INLINE void cfunc_rsp_vcl_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 	INT16 vres[8];
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100100 |
-	// ------------------------------------------------------
-	//
-	// Vector clip low
+	for (int i = 0; i < 8; i++)
+	{
+		INT16 s1, s2;
+		VEC_GET_SCALAR_VS1(s1, i);
+		VEC_GET_SCALAR_VS2(s2, i);
 
-#if 0//USE_SIMD
-	__m128i flag0_07 = _mm_set_epi16(CARRY_FLAG(0), CARRY_FLAG(1), CARRY_FLAG(2), CARRY_FLAG(3),
-										CARRY_FLAG(4), CARRY_FLAG(5), CARRY_FLAG(6), CARRY_FLAG(7));
-	__m128i flag0_815 = _mm_set_epi16(ZERO_FLAG(0), ZERO_FLAG(1), ZERO_FLAG(2), ZERO_FLAG(3),
-										ZERO_FLAG(4), ZERO_FLAG(5), ZERO_FLAG(6), ZERO_FLAG(7));
-	__m128i flag1_07 = _mm_set_epi16(COMPARE_FLAG(0), COMPARE_FLAG(1), COMPARE_FLAG(2), COMPARE_FLAG(3),
-										COMPARE_FLAG(4), COMPARE_FLAG(5), COMPARE_FLAG(6), COMPARE_FLAG(7));
-	__m128i flag1_815 = _mm_set_epi16((rsp->flag[1] >>  8) & 1, (rsp->flag[1] >>  9) & 1, (rsp->flag[1] >> 10) & 1, (rsp->flag[1] >> 11) & 1,
-										(rsp->flag[1] >> 12) & 1, (rsp->flag[1] >> 13) & 1, (rsp->flag[1] >> 14) & 1, (rsp->flag[1] >> 15) & 1);
-	__m128i flag2_07 = _mm_set_epi16(rsp->flag[2][0], rsp->flag[2][1], rsp->flag[2][2], rsp->flag[2][3],
-										rsp->flag[2][4], rsp->flag[2][5], rsp->flag[2][6], rsp->flag[2][7]);
-	__m128i n0_07 = _mm_xor_si128(flag0_07, vec_neg1);
-	__m128i n0_815 = _mm_xor_si128(flag0_815, vec_neg1);
-	__m128i n1_07 = _mm_xor_si128(flag1_07, vec_neg1);
-	__m128i n1_815 = _mm_xor_si128(flag1_815, vec_neg1);
-	__m128i n2_07 = _mm_xor_si128(flag2_07, vec_neg1);
+		if (VEC_CARRY_FLAG(rsp, i) != 0)
+		{
+			if (VEC_ZERO_FLAG(rsp, i) != 0)
+			{
+				if (VEC_COMPARE_FLAG(rsp, i) != 0)
+				{
+					VEC_SET_ACCUM_L(-(UINT16)s2, i);
+				}
+				else
+				{
+					VEC_SET_ACCUM_L(s1, i);
+				}
+			}
+			else//VEC_ZERO_FLAG(rsp, i)==0
+			{
+				if (VEC_CLIP1_FLAG(rsp, i) != 0)
+				{
+					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
+					{//proper fix for Harvest Moon 64, r4
+						VEC_SET_ACCUM_L(s1, i);
+						VEC_CLEAR_COMPARE_FLAG(i);
+					}
+					else
+					{
+						VEC_SET_ACCUM_L(-((UINT16)s2), i);
+						VEC_SET_COMPARE_FLAG(i);
+					}
+				}
+				else
+				{
+					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) != 0)
+					{
+						VEC_SET_ACCUM_L(s1, i);
+						VEC_CLEAR_COMPARE_FLAG(i);
+					}
+					else
+					{
+						VEC_SET_ACCUM_L(-((UINT16)s2), i);
+						VEC_SET_COMPARE_FLAG(i);
+					}
+				}
+			}
+		}
+		else//VEC_CARRY_FLAG(rsp, i)==0
+		{
+			if (VEC_ZERO_FLAG(rsp, i) != 0)
+			{
+				if (VEC_CLIP2_FLAG(rsp, i) != 0)
+				{
+					VEC_SET_ACCUM_L(s2, i);
+				}
+				else
+				{
+					VEC_SET_ACCUM_L(s1, i);
+				}
+			}
+			else
+			{
+				if (((INT32)(UINT16)s1 - (INT32)(UINT16)s2) >= 0)
+				{
+					VEC_SET_ACCUM_L(s2, i);
+					VEC_SET_CLIP2_FLAG(i);
+				}
+				else
+				{
+					VEC_SET_ACCUM_L(s1, i);
+					VEC_CLEAR_CLIP2_FLAG(i);
+				}
+			}
+		}
+		vres[i] = VEC_ACCUM_L(rsp, i);
+	}
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CARRY_FLAGS();
+	VEC_CLEAR_CLIP1_FLAGS();
+	VEC_WRITEBACK_RESULT();
+}
 
-	__m128i shuf2 = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-	__m128i vec7531 = _mm_and_si128(rsp->xv[VS1REG], vec_lomask);
-	__m128i vec6420 = _mm_srli_epi32(rsp->xv[VS1REG], 16);
-	__m128i shuf7531 = _mm_and_si128(shuf2, vec_lomask);
-	__m128i shuf6420 = _mm_srli_epi32(shuf2, 16);
-	__m128i sub7531 = _mm_sub_epi32(vec7531, shuf7531);
-	__m128i sub6420 = _mm_sub_epi32(vec6420, shuf6420);
-	__m128i subh7531 = _mm_and_si128(sub7531, vec_himask);
-	__m128i subh6420 = _mm_and_si128(sub6420, vec_himask);
-	__m128i sub_gez = _mm_or_si128(_mm_slli_epi32(_mm_cmpeq_epi16(subh6420, _mm_setzero_si128()), 16), _mm_cmpeq_epi16(subh7531, _mm_setzero_si128()));
-	__m128i sub_lz  = _mm_xor_si128(sub_gez, vec_neg1);
+#endif
 
-	__m128i sum7531 = _mm_add_epi32(vec7531, shuf7531);
-	__m128i sum6420 = _mm_add_epi32(vec6420, shuf6420);
-	__m128i suml7531 = _mm_and_si128(sum7531, vec_lomask);
-	__m128i suml6420 = _mm_and_si128(sum6420, vec_lomask);
-	__m128i sumh7531 = _mm_and_si128(sum7531, vec_himask);
-	__m128i sumh6420 = _mm_and_si128(sum6420, vec_himask);
-	__m128i suml_z = _mm_or_si128(_mm_slli_epi32(_mm_cmpeq_epi16(suml6420, _mm_setzero_si128()), 16), _mm_cmpeq_epi16(suml7531, _mm_setzero_si128()));
-	__m128i sumh_1 = _mm_or_si128(_mm_slli_epi32(_mm_cmpeq_epi16(sumh6420, vec_hibit), 16), _mm_cmpeq_epi16(sumh7531, vec_hibit));
-	__m128i sumh_z = _mm_or_si128(_mm_slli_epi32(_mm_cmpeq_epi16(sumh6420, _mm_setzero_si128()), 16), _mm_cmpeq_epi16(sumh7531, _mm_setzero_si128()));
-	__m128i sum_z = _mm_and_si128(suml_z, sumh_z);
-	__m128i sum_nz = _mm_xor_si128(sum_z, vec_neg1);
-	__m128i sum_le0x10000 = _mm_or_si128(_mm_and_si128(suml_z, sumh_1), sumh_z);
-	__m128i sum_g0x10000 = _mm_xor_si128(sum_le0x10000, vec_neg1);
+#if (!USE_SIMD || SIMUL_SIMD)
 
-	__m128i  f0a_and_nf0b = _mm_and_si128(flag0_07, n0_815);
-	__m128i nf0a_and_nf0b = _mm_and_si128(   n0_07, n0_815);
+INLINE void cfunc_rsp_vcl_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+	INT16 vres[8];
 
-	// accum set to -s2 if  flag0[0-7] &&  flag0[8-15] &&  flag1[0-7]
-	// accum set to -s2 if  flag0[0-7] && !flag0[8-15] &&  flag2[0-7] && (s1 + s2) >  0x10000
-	// accum set to -s2 if  flag0[0-7] && !flag0[8-15] && !flag2[0-7] && (s1 + s2) == 0
-	__m128i accum_ns2 = _mm_and_si128(_mm_and_si128(flag0_07, flag0_815), flag1_07);
-	accum_ns2 = _mm_or_si128(accum_ns2, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, flag2_07), sum_g0x10000));
-	accum_ns2 = _mm_or_si128(accum_ns2, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, n2_07), sum_z));
-
-	// accum set to  s2 if !flag0[0-7] &&  flag0[8-15] &&  flag1[8-15]
-	// accum set to  s2 if !flag0[0-7] && !flag0[8-15] && (s1 - s2) >= 0
-	__m128i accum_s2 = _mm_and_si128(n0_07, _mm_and_si128(flag0_815, flag1_815));
-	accum_s2 = _mm_or_si128(accum_s2, _mm_and_si128(_mm_and_si128(n0_07, n0_815), sub_gez));
-
-	// flag1[8-15]  set if !flag0[0-7] && !flag0[8-15] && (s1 - s2) >= 0
-	__m128i new_f1b_s = _mm_and_si128(_mm_and_si128(nf0a_and_nf0b, sub_gez), vec_flagmask);
-	UINT16 flag1_set = 0;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 0) << 8;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 1) << 9;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 2) << 10;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 3) << 11;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 4) << 12;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 5) << 13;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 6) << 14;
-	flag1_set |= _mm_extract_epi16(new_f1b_s, 7) << 15;
-
-	// flag1[8-15]unset if !flag0[0-7] && !flag0[8-15] && (s1 - s2) < 0
-	__m128i new_f1b_u = _mm_xor_si128(vec_neg1, _mm_and_si128(nf0a_and_nf0b, sub_lz));
-	new_f1b_u = _mm_and_si128(new_f1b_u, vec_flagmask);
-	UINT16 flag1_unset = 0;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 0) << 8;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 1) << 9;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 2) << 10;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 3) << 11;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 4) << 12;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 5) << 13;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 6) << 14;
-	flag1_unset |= _mm_extract_epi16(new_f1b_u, 7) << 15;
-
-	// flag1[0-7]   set if  flag0[0-7] && !flag0[8-15] &&  flag2[0-7] && (s1 + s2) <= 0x10000
-	// flag1[0-7]   set if  flag0[0-7] && !flag0[8-15] && !flag2[0-7] && (s1 + s2) == 0
-	__m128i new_f1a_s = _mm_and_si128(_mm_and_si128(f0a_and_nf0b, flag2_07), sum_le0x10000);
-	new_f1a_s = _mm_or_si128(new_f1a_u, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, n2_07), sum_z));
-	new_f1a_s = _mm_and_si128(new_f1a_s, vec_flagmask);
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 0) << 0;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 1) << 1;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 2) << 2;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 3) << 3;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 4) << 4;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 5) << 5;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 6) << 6;
-	flag1_set |= _mm_extract_epi16(new_f1a_s, 7) << 7;
-
-	// flag1[0-7] unset if  flag0[0-7] && !flag0[8-15] &&  flag2[0-7] && (s1 + s2) >  0x10000
-	// flag1[0-7] unset if  flag0[0-7] && !flag0[8-15] && !flag2[0-7] && (s1 + s2) != 0
-	__m128i new_f1a_u = _mm_and_si128(_mm_and_si128(f0a_and_nf0b, flag2_07), sum_g0x10000);
-	new_f1a_u = _mm_or_si128(new_f1a_u, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, n2_07), sum_nz));
-	new_f1a_u = _mm_and_si128(new_f1a_u, vec_flagmask);
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 0) << 0;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 1) << 1;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 2) << 2;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 3) << 3;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 4) << 4;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 5) << 5;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 6) << 6;
-	flag1_unset |= _mm_extract_epi16(new_f1a_u, 7) << 7;
-
-	rsp->flag[1] &= ~flag1_unset;
-	rsp->flag[1] |= flag1_set;
-
-	// accum set to  s1 if  flag0[0-7] &&  flag0[8-15] && !flag1[0-7]
-	// accum set to  s1 if  flag0[0-7] && !flag0[8-15] &&  flag2[0-7] && (s1 + s2) <= 0x10000
-	// accum set to  s1 if  flag0[0-7] && !flag0[8-15] && !flag2[0-7] && (s1 + s2) != 0
-	// accum set to  s1 if !flag0[0-7] &&  flag0[8-15] && !flag1[8-15]
-	// accum set to  s1 if !flag0[0-7] && !flag0[8-15] && (s1 - s2) < 0
-	__m128i accum_s1 = _mm_and_si128(flag0_07, _mm_and_si128(flag0_815, n1_07));
-	accum_s1 = _mm_or_si128(accum_s1, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, flag2_07), sum_le0x10000));
-	accum_s1 = _mm_or_si128(accum_s1, _mm_and_si128(_mm_and_si128(f0a_and_nf0b, n2_07), sum_nz));
-	accum_s1 = _mm_or_si128(accum_s1, _mm_and_si128(_mm_and_si128(n0_07, flag0_815), n1_815));
-	accum_s1 = _mm_or_si128(accum_s1, _mm_and_si128(nf0a_and_nf0b, sub_lz));
-	//__m128i zms2 = _mm_sub_epi16(_mm_setzero_si128(), shuf2);
-
-	/*
-	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-	__m128i s1_xor_s2 = _mm_xor_si128(rsp->xv[VS1REG], shuf);
-	__m128i s1_plus_s2 = _mm_add_epi16(rsp->xv[VS1REG], shuf);
-	__m128i s1_sub_s2 = _mm_sub_epi16(rsp->xv[VS1REG], shuf);
-	__m128i s2_neg = _mm_xor_si128(shuf, vec_neg1);
-
-	__m128i s2_lz = _mm_cmplt_epi16(shuf, _mm_setzero_si128());
-	__m128i s1s2_xor_lz = _mm_cmplt_epi16(s1_xor_s2, _mm_setzero_si128());
-	__m128i s1s2_xor_gez = _mm_xor_si128(s1s2_xor_lz, vec_neg1);
-	__m128i s1s2_plus_nz = _mm_xor_si128(_mm_cmpeq_epi16(s1_plus_s2, _mm_setzero_si128()), vec_neg1);
-	__m128i s1s2_plus_gz = _mm_cmpgt_epi16(s1_plus_s2, _mm_setzero_si128());
-	__m128i s1s2_plus_lez = _mm_xor_si128(s1s2_plus_gz, vec_neg1);
-	__m128i s1s2_plus_n1 = _mm_cmpeq_epi16(s1_plus_s2, vec_neg1);
-	__m128i s1s2_sub_nz = _mm_xor_si128(_mm_cmpeq_epi16(s1_sub_s2, _mm_setzero_si128()), vec_neg1);
-	__m128i s1s2_sub_lz = _mm_cmplt_epi16(s1_sub_s2, _mm_setzero_si128());
-	__m128i s1s2_sub_gez = _mm_xor_si128(s1s2_sub_lz, vec_neg1);
-	__m128i s1_nens2 = _mm_xor_si128(_mm_cmpeq_epi16(rsp->xv[VS1REG], s2_neg), vec_neg1);
-
-	__m128i ext_mask = _mm_and_si128(_mm_and_si128(s1s2_xor_lz, s1s2_plus_n1), vec_flagmask);
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 0) << 0;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 1) << 1;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 2) << 2;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 3) << 3;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 4) << 4;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 5) << 5;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 6) << 6;
-	rsp->flag[2] |= _mm_extract_epi16(ext_mask, 7) << 7;
-
-	__m128i carry_mask = _mm_and_si128(s1s2_xor_lz, vec_flagmask);
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 0) << 0;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 1) << 1;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 2) << 2;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 3) << 3;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 4) << 4;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 5) << 5;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 6) << 6;
-	rsp->flag[0] |= _mm_extract_epi16(carry_mask, 7) << 7;
-
-	__m128i z0_mask = _mm_and_si128(_mm_and_si128(s1s2_xor_gez, s1s2_sub_nz), s1_nens2);
-	__m128i z1_mask = _mm_and_si128(_mm_and_si128(s1s2_xor_lz, s1s2_plus_nz), s1_nens2);
-	__m128i z_mask = _mm_and_si128(_mm_or_si128(z0_mask, z1_mask), vec_flagmask);
-	z_mask = _mm_and_si128(_mm_or_si128(z_mask, _mm_srli_epi32(z_mask, 15)), vec_shiftmask2);
-	z_mask = _mm_and_si128(_mm_or_si128(z_mask, _mm_srli_epi64(z_mask, 30)), vec_shiftmask4);
-	z_mask = _mm_or_si128(z_mask, _mm_srli_si128(z_mask, 7));
-	z_mask = _mm_or_si128(z_mask, _mm_srli_epi16(z_mask, 4));
-	rsp->flag[0] |= (_mm_extract_epi16(z_mask, 0) << 8) & 0x00ff00;
-
-	__m128i f0_mask = _mm_and_si128(_mm_or_si128(_mm_and_si128(s1s2_xor_gez, s2_lz),         _mm_and_si128(s1s2_xor_lz, s1s2_plus_lez)), vec_flagmask);
-	__m128i f8_mask = _mm_and_si128(_mm_or_si128(_mm_and_si128(s1s2_xor_gez, s1s2_sub_gez),  _mm_and_si128(s1s2_xor_lz, s2_lz)), vec_flagmask);
-	f0_mask = _mm_and_si128(f0_mask, vec_flagmask);
-	f8_mask = _mm_and_si128(f8_mask, vec_flagmask);
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 0) << 0;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 1) << 1;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 2) << 2;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 3) << 3;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 4) << 4;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 5) << 5;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 6) << 6;
-	rsp->flag[1] |= _mm_extract_epi16(f0_mask, 7) << 7;
-
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 0) << 8;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 1) << 9;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 2) << 10;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 3) << 11;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 4) << 12;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 5) << 13;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 6) << 14;
-	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 7) << 15;*/
-#else
 	for (int i = 0; i < 8; i++)
 	{
 		INT16 s1, s2;
@@ -3934,28 +5324,31 @@ INLINE void cfunc_rsp_vcl(void *param)
 	CLEAR_CARRY_FLAGS();
 	CLEAR_CLIP1_FLAGS();
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vch(void *param)
+#if USE_SIMD
+// VCH
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100101 |
+// ------------------------------------------------------
+//
+// Vector clip high
+
+INLINE void cfunc_rsp_vch_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100101 |
-	// ------------------------------------------------------
-	//
-	// Vector clip high
+	VEC_CLEAR_CARRY_FLAGS();
+	VEC_CLEAR_COMPARE_FLAGS();
+	VEC_CLEAR_CLIP1_FLAGS();
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CLIP2_FLAGS();
 
-	CLEAR_CARRY_FLAGS();
-	CLEAR_COMPARE_FLAGS();
-	CLEAR_CLIP1_FLAGS();
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CLIP2_FLAGS();
-
-#if 0//USE_SIMD
+#if 0
 	// Compare flag
 	// flag[1] bit [0- 7] set if (s1 ^ s2) < 0 && (s1 + s2) <= 0)
 	// flag[1] bit [0- 7] set if (s1 ^ s2) >= 0 && (s2 < 0)
@@ -4046,7 +5439,84 @@ INLINE void cfunc_rsp_vch(void *param)
 	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 5) << 13;
 	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 6) << 14;
 	rsp->flag[1] |= _mm_extract_epi16(f8_mask, 7) << 15;
-#else
+#endif
+	INT16 vres[8];
+	UINT32 vce = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		INT16 s1, s2;
+		VEC_GET_SCALAR_VS1(s1, i);
+		VEC_GET_SCALAR_VS2(s2, i);
+
+		if ((s1 ^ s2) < 0)
+		{
+			vce = (s1 + s2 == -1);
+			VEC_SET_CARRY_FLAG(i);
+			if (s2 < 0)
+			{
+				VEC_SET_CLIP2_FLAG(i);
+			}
+
+			if ((s1 + s2) <= 0)
+			{
+				VEC_SET_COMPARE_FLAG(i);
+				vres[i] = -((UINT16)s2);
+			}
+			else
+			{
+				vres[i] = s1;
+			}
+
+			if ((s1 + s2) != 0 && s1 != ~s2)
+			{
+				VEC_SET_ZERO_FLAG(i);
+			}
+		}//sign
+		else
+		{
+			vce = 0;
+			if (s2 < 0)
+			{
+				VEC_SET_COMPARE_FLAG(i);
+			}
+			if ((s1 - s2) >= 0)
+			{
+				VEC_SET_CLIP2_FLAG(i);
+				vres[i] = s2;
+			}
+			else
+			{
+				vres[i] = s1;
+			}
+
+			if ((s1 - s2) != 0 && s1 != ~s2)
+			{
+				VEC_SET_ZERO_FLAG(i);
+			}
+		}
+		if (vce)
+		{
+			VEC_SET_CLIP1_FLAG(i);
+		}
+		VEC_SET_ACCUM_L(vres[i], i);
+	}
+	VEC_WRITEBACK_RESULT();
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vch_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+	CLEAR_CARRY_FLAGS();
+	CLEAR_COMPARE_FLAGS();
+	CLEAR_CLIP1_FLAGS();
+	CLEAR_ZERO_FLAGS();
+	CLEAR_CLIP2_FLAGS();
 
 	INT16 vres[8];
 	UINT32 vce = 0;
@@ -4109,28 +5579,31 @@ INLINE void cfunc_rsp_vch(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vcr(void *param)
+#if USE_SIMD
+// VCR
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100110 |
+// ------------------------------------------------------
+//
+// Vector clip reverse
+
+INLINE void cfunc_rsp_vcr_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100110 |
-	// ------------------------------------------------------
-	//
-	// Vector clip reverse
+	VEC_CLEAR_CARRY_FLAGS();
+	VEC_CLEAR_COMPARE_FLAGS();
+	VEC_CLEAR_CLIP1_FLAGS();
+	VEC_CLEAR_ZERO_FLAGS();
+	VEC_CLEAR_CLIP2_FLAGS();
 
-	CLEAR_CARRY_FLAGS();
-	CLEAR_COMPARE_FLAGS();
-	CLEAR_CLIP1_FLAGS();
-	CLEAR_ZERO_FLAGS();
-	CLEAR_CLIP2_FLAGS();
-
-#if 0//USE_SIMD
+#if 0
 	// flag[1] bit [0- 7] set if (s1 ^ s2) < 0 && (s1 + s2) <= 0)
 	// flag[1] bit [0- 7] set if (s1 ^ s2) >= 0 && (s2 < 0)
 
@@ -4163,7 +5636,67 @@ INLINE void cfunc_rsp_vcr(void *param)
 
 	rsp->xvflag[COMPARE] = _mm_or_si128(_mm_and_si128(s1s2_xor_gez, s2_lz),         _mm_and_si128(s1s2_xor_lz, s1s2_plus_lez));
 	rsp->xvflag[CLIP2] = _mm_or_si128(_mm_and_si128(s1s2_xor_gez, s1s2_sub_gez),  _mm_and_si128(s1s2_xor_lz, s2_lz));
-#else
+#endif
+	INT16 vres[8];
+	for (int i = 0; i < 8; i++)
+	{
+		INT16 s1, s2;
+		VEC_GET_SCALAR_VS1(s1, i);
+		VEC_GET_SCALAR_VS2(s2, i);
+
+		if ((INT16)(s1 ^ s2) < 0)
+		{
+			if (s2 < 0)
+			{
+				VEC_SET_CLIP2_FLAG(i);
+			}
+			if ((s1 + s2) <= 0)
+			{
+				VEC_SET_ACCUM_L(~((UINT16)s2), i);
+				VEC_SET_COMPARE_FLAG(i);
+			}
+			else
+			{
+				VEC_SET_ACCUM_L(s1, i);
+			}
+		}
+		else
+		{
+			if (s2 < 0)
+			{
+				VEC_SET_COMPARE_FLAG(i);
+			}
+			if ((s1 - s2) >= 0)
+			{
+				VEC_SET_ACCUM_L(s2, i);
+				VEC_SET_CLIP2_FLAG(i);
+			}
+			else
+			{
+				VEC_SET_ACCUM_L(s1, i);
+			}
+		}
+
+		vres[i] = VEC_ACCUM_L(rsp, i);
+	}
+	VEC_WRITEBACK_RESULT();
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vcr_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+	CLEAR_CARRY_FLAGS();
+	CLEAR_COMPARE_FLAGS();
+	CLEAR_CLIP1_FLAGS();
+	CLEAR_ZERO_FLAGS();
+	CLEAR_CLIP2_FLAGS();
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4207,29 +5740,41 @@ INLINE void cfunc_rsp_vcr(void *param)
 		vres[i] = ACCUM_L(rsp, i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmrg(void *param)
+#if USE_SIMD
+// VMRG
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100111 |
+// ------------------------------------------------------
+//
+// Merges two vectors according to compare flags
+
+INLINE void cfunc_rsp_vmrg_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 100111 |
-	// ------------------------------------------------------
-	//
-	// Merges two vectors according to compare flags
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	__m128i s2mask = _mm_cmpeq_epi16(rsp->xvflag[COMPARE], _mm_setzero_si128());
 	__m128i s1mask = _mm_xor_si128(s2mask, vec_neg1);
 	__m128i result = _mm_and_si128(rsp->xv[VS1REG], s1mask);
 	rsp->xv[VDREG] = _mm_or_si128(result, _mm_and_si128(shuf, s2mask));
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmrg_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4248,26 +5793,38 @@ INLINE void cfunc_rsp_vmrg(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vand(void *param)
+#if USE_SIMD
+// VAND
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
+// ------------------------------------------------------
+//
+// Bitwise AND of two vector registers
+
+INLINE void cfunc_rsp_vand_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101000 |
-	// ------------------------------------------------------
-	//
-	// Bitwise AND of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_and_si128(rsp->xv[VS1REG], shuf);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vand_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4278,26 +5835,38 @@ INLINE void cfunc_rsp_vand(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vnand(void *param)
+#if USE_SIMD
+// VNAND
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101001 |
+// ------------------------------------------------------
+//
+// Bitwise NOT AND of two vector registers
+
+INLINE void cfunc_rsp_vnand_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101001 |
-	// ------------------------------------------------------
-	//
-	// Bitwise NOT AND of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_xor_si128(_mm_and_si128(rsp->xv[VS1REG], shuf), vec_neg1);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vnand_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4308,26 +5877,38 @@ INLINE void cfunc_rsp_vnand(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vor(void *param)
+#if USE_SIMD
+// VOR
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101010 |
+// ------------------------------------------------------
+//
+// Bitwise OR of two vector registers
+
+INLINE void cfunc_rsp_vor_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101010 |
-	// ------------------------------------------------------
-	//
-	// Bitwise OR of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_or_si128(rsp->xv[VS1REG], shuf);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vor_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4338,26 +5919,38 @@ INLINE void cfunc_rsp_vor(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vnor(void *param)
+#if USE_SIMD
+// VNOR
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101011 |
+// ------------------------------------------------------
+//
+// Bitwise NOT OR of two vector registers
+
+INLINE void cfunc_rsp_vnor_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101011 |
-	// ------------------------------------------------------
-	//
-	// Bitwise NOT OR of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_xor_si128(_mm_or_si128(rsp->xv[VS1REG], shuf), vec_neg1);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vnor_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4368,26 +5961,38 @@ INLINE void cfunc_rsp_vnor(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vxor(void *param)
+#if USE_SIMD
+// VXOR
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101100 |
+// ------------------------------------------------------
+//
+// Bitwise XOR of two vector registers
+
+INLINE void cfunc_rsp_vxor_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101100 |
-	// ------------------------------------------------------
-	//
-	// Bitwise XOR of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_xor_si128(rsp->xv[VS1REG], shuf);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vxor_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4398,26 +6003,38 @@ INLINE void cfunc_rsp_vxor(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vnxor(void *param)
+#if USE_SIMD
+// VNXOR
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
+// ------------------------------------------------------
+//
+// Bitwise NOT XOR of two vector registers
+
+INLINE void cfunc_rsp_vnxor_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | TTTTT | DDDDD | 101101 |
-	// ------------------------------------------------------
-	//
-	// Bitwise NOT XOR of two vector registers
-
-#if USE_SIMD
 	__m128i shuf = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 	rsp->xv[VDREG] = _mm_xor_si128(_mm_xor_si128(rsp->xv[VS1REG], shuf), vec_neg1);
 	rsp->accum_l = rsp->xv[VDREG];
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vnxor_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	INT16 vres[8];
 	for (int i = 0; i < 8; i++)
 	{
@@ -4428,30 +6045,29 @@ INLINE void cfunc_rsp_vnxor(void *param)
 		SET_ACCUM_L(vres[i], i);
 	}
 	WRITEBACK_RESULT();
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vrcp(void *param)
+#if USE_SIMD
+// VRCP
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110000 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal
+
+INLINE void cfunc_rsp_vrcp_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110000 |
-	// ------------------------------------------------------
-	//
-	// Calculates reciprocal
-
 	INT32 shifter = 0;
-#if USE_SIMD
 	UINT16 urec;
 	INT32 rec;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], urec, EL);
 	rec = (INT16)urec;
-#else
-	INT32 rec = (INT16)(VREG_S(VS2REG, EL & 7));
-#endif
 	INT32 datainput = (rec < 0) ? (-rec) : rec;
 	if (datainput)
 	{
@@ -4489,39 +6105,92 @@ INLINE void cfunc_rsp_vrcp(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-#if USE_SIMD
 	SIMD_INSERT16(rsp->xv[VDREG], (UINT16)rec, VS1REG);
 	rsp->accum_l = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vrcp_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+	INT32 shifter = 0;
+	INT32 rec = (INT16)(VREG_S(VS2REG, EL & 7));
+	INT32 datainput = (rec < 0) ? (-rec) : rec;
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		shifter = 0x10;
+	}
+
+	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	INT32 fetchval = rsp_divtable[address];
+	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fffffff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0xffff0000;
+	}
+	rec = temp;
+
+	rsp->reciprocal_res = rec;
+	rsp->dp_allowed = 0;
+
 	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)rec;
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 	}
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vrcpl(void *param)
+#if USE_SIMD
+// VRCPL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110001 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal low part
+
+INLINE void cfunc_rsp_vrcpl_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110001 |
-	// ------------------------------------------------------
-	//
-	// Calculates reciprocal low part
+#if SIMUL_SIMD
+	rsp->old_reciprocal_res = rsp->reciprocal_res;
+	rsp->old_reciprocal_high = rsp->reciprocal_high;
+	rsp->old_dp_allowed = rsp->dp_allowed;
+#endif
 
 	INT32 shifter = 0;
 
-#if USE_SIMD
 	UINT16 urec;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], urec, EL);
 	INT32 rec = (urec | rsp->reciprocal_high);
-#else
-	INT32 rec = ((UINT16)(VREG_S(VS2REG, EL & 7)) | rsp->reciprocal_high);
-#endif
 
 	INT32 datainput = rec;
 
@@ -4588,37 +6257,122 @@ INLINE void cfunc_rsp_vrcpl(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-#if USE_SIMD
 	SIMD_INSERT16(rsp->xv[VDREG], (UINT16)rec, VS1REG);
-#else
-	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)rec;
-#endif
 
 	for (int i = 0; i < 8; i++)
 	{
-#if USE_SIMD
 		INT16 val;
 		SIMD_EXTRACT16(rsp->xv[VS2REG], val, VEC_EL_2(EL, i));
-#else
-		INT16 val = VREG_S(VS2REG, VEC_EL_2(EL, i));
-#endif
-		SET_ACCUM_L(val, i);
+		VEC_SET_ACCUM_L(val, i);
 	}
 }
 
-INLINE void cfunc_rsp_vrcph(void *param)
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vrcpl_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110010 |
-	// ------------------------------------------------------
-	//
-	// Calculates reciprocal high part
+	INT32 shifter = 0;
+	INT32 rec = ((UINT16)(VREG_S(VS2REG, EL & 7)) | rsp->reciprocal_high);
+	INT32 datainput = rec;
+
+	if (rec < 0)
+	{
+		if (rsp->dp_allowed)
+		{
+			if (rec < -32768)
+			{
+				datainput = ~datainput;
+			}
+			else
+			{
+				datainput = -datainput;
+			}
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		if (rsp->dp_allowed)
+		{
+			shifter = 0;
+		}
+		else
+		{
+			shifter = 0x10;
+		}
+	}
+
+	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	INT32 fetchval = rsp_divtable[address];
+	INT32 temp = (0x40000000 | (fetchval << 14)) >> ((~shifter) & 0x1f);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fffffff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0xffff0000;
+	}
+	rec = temp;
+
+	rsp->reciprocal_res = rec;
+	rsp->dp_allowed = 0;
+
+	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)rec;
+
+	for (int i = 0; i < 8; i++)
+	{
+		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
+	}
+}
+#endif
 
 #if USE_SIMD
+// VRCPH
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110010 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal high part
+
+INLINE void cfunc_rsp_vrcph_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+#if SIMUL_SIMD
+	rsp->old_reciprocal_res = rsp->reciprocal_res;
+	rsp->old_reciprocal_high = rsp->reciprocal_high;
+	rsp->old_dp_allowed = rsp->dp_allowed;
+#endif
+
 	UINT16 rcph;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], rcph, EL);
 	rsp->reciprocal_high = rcph << 16;
@@ -4627,7 +6381,17 @@ INLINE void cfunc_rsp_vrcph(void *param)
 	rsp->accum_l = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 
 	SIMD_INSERT16(rsp->xv[VDREG], (INT16)(rsp->reciprocal_res >> 16), VS1REG);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vrcph_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	rsp->reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 	rsp->dp_allowed = 1;
 
@@ -4637,55 +6401,73 @@ INLINE void cfunc_rsp_vrcph(void *param)
 	}
 
 	W_VREG_S(VDREG, VS1REG & 7) = (INT16)(rsp->reciprocal_res >> 16);
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vmov(void *param)
+#if USE_SIMD
+// VMOV
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110011 |
+// ------------------------------------------------------
+//
+// Moves element from vector to destination vector
+
+INLINE void cfunc_rsp_vmov_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110011 |
-	// ------------------------------------------------------
-	//
-	// Moves element from vector to destination vector
-
-#if USE_SIMD
 	INT16 val;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], val, EL);
 	SIMD_INSERT16(rsp->xv[VDREG], val, VS1REG);
 	rsp->accum_l = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vmov_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	W_VREG_S(VDREG, VS1REG & 7) = VREG_S(VS2REG, EL & 7);
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 	}
-#endif
 }
 
-INLINE void cfunc_rsp_vrsql(void *param)
+#endif
+
+#if USE_SIMD
+// VRSQL
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110101 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal square-root low part
+
+INLINE void cfunc_rsp_vrsql_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110101 |
-	// ------------------------------------------------------
-	//
-	// Calculates reciprocal square-root low part
+#if SIMUL_SIMD
+	rsp->old_reciprocal_res = rsp->reciprocal_res;
+	rsp->old_reciprocal_high = rsp->reciprocal_high;
+	rsp->old_dp_allowed = rsp->dp_allowed;
+#endif
 
 	INT32 shifter = 0;
-#if USE_SIMD
 	UINT16 val;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], val, EL);
 	INT32 rec = rsp->reciprocal_high | val;
-#else
-	INT32 rec = rsp->reciprocal_high | (UINT16)VREG_S(VS2REG, EL & 7);
-#endif
 	INT32 datainput = rec;
 
 	if (rec < 0)
@@ -4752,31 +6534,116 @@ INLINE void cfunc_rsp_vrsql(void *param)
 	rsp->reciprocal_res = rec;
 	rsp->dp_allowed = 0;
 
-#if USE_SIMD
 	SIMD_INSERT16(rsp->xv[VDREG], (UINT16)rec, VS1REG);
 	rsp->accum_l = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vrsql_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
+	INT32 shifter = 0;
+	INT32 rec = rsp->reciprocal_high | (UINT16)VREG_S(VS2REG, EL & 7);
+	INT32 datainput = rec;
+
+	if (rec < 0)
+	{
+		if (rsp->dp_allowed)
+		{
+			if (rec < -32768)
+			{
+				datainput = ~datainput;
+			}
+			else
+			{
+				datainput = -datainput;
+			}
+		}
+		else
+		{
+			datainput = -datainput;
+		}
+	}
+
+	if (datainput)
+	{
+		for (int i = 0; i < 32; i++)
+		{
+			if (datainput & (1 << ((~i) & 0x1f)))
+			{
+				shifter = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		if (rsp->dp_allowed)
+		{
+			shifter = 0;
+		}
+		else
+		{
+			shifter = 0x10;
+		}
+	}
+
+	INT32 address = ((datainput << shifter) & 0x7fc00000) >> 22;
+	address = ((address | 0x200) & 0x3fe) | (shifter & 1);
+
+	INT32 fetchval = rsp_divtable[address];
+	INT32 temp = (0x40000000 | (fetchval << 14)) >> (((~shifter) & 0x1f) >> 1);
+	if (rec < 0)
+	{
+		temp = ~temp;
+	}
+	if (!rec)
+	{
+		temp = 0x7fffffff;
+	}
+	else if (rec == 0xffff8000)
+	{
+		temp = 0xffff0000;
+	}
+	rec = temp;
+
+	rsp->reciprocal_res = rec;
+	rsp->dp_allowed = 0;
+
 	W_VREG_S(VDREG, VS1REG & 7) = (UINT16)(rec & 0xffff);
 	for (int i = 0; i < 8; i++)
 	{
 		SET_ACCUM_L(VREG_S(VS2REG, VEC_EL_2(EL, i)), i);
 	}
-#endif
 }
+#endif
 
-INLINE void cfunc_rsp_vrsqh(void *param)
+#if USE_SIMD
+// VRSQH
+//
+// 31       25  24     20      15      10      5        0
+// ------------------------------------------------------
+// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110110 |
+// ------------------------------------------------------
+//
+// Calculates reciprocal square-root high part
+
+INLINE void cfunc_rsp_vrsqh_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	int op = rsp->impstate->arg0;
 
-	// 31       25  24     20      15      10      5        0
-	// ------------------------------------------------------
-	// | 010010 | 1 | EEEE | SSSSS | ?FFFF | DDDDD | 110110 |
-	// ------------------------------------------------------
-	//
-	// Calculates reciprocal square-root high part
+#if SIMUL_SIMD
+	rsp->old_reciprocal_res = rsp->reciprocal_res;
+	rsp->old_reciprocal_high = rsp->reciprocal_high;
+	rsp->old_dp_allowed = rsp->dp_allowed;
+#endif
 
-#if USE_SIMD
 	UINT16 val;
 	SIMD_EXTRACT16(rsp->xv[VS2REG], val, EL);
 	rsp->reciprocal_high = val << 16;
@@ -4785,7 +6652,17 @@ INLINE void cfunc_rsp_vrsqh(void *param)
 	rsp->accum_l = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 
 	SIMD_INSERT16(rsp->xv[VDREG], (INT16)(rsp->reciprocal_res >> 16), VS1REG); // store high part
-#else
+}
+
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+
+INLINE void cfunc_rsp_vrsqh_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	int op = rsp->impstate->arg0;
+
 	rsp->reciprocal_high = (VREG_S(VS2REG, EL & 7)) << 16;
 	rsp->dp_allowed = 1;
 
@@ -4795,8 +6672,9 @@ INLINE void cfunc_rsp_vrsqh(void *param)
 	}
 
 	W_VREG_S(VDREG, VS1REG & 7) = (INT16)(rsp->reciprocal_res >> 16);  // store high part
-#endif
 }
+#endif
+
 
 static void cfunc_sp_set_status_cb(void *param)
 {
@@ -5368,9 +7246,11 @@ static void generate_delay_slot_and_branch(rsp_state *rsp, drcuml_block *block, 
 
 
 /*-------------------------------------------------
-    generate_opcode - generate code for a specific
-    opcode
+    generate_vector_opcode - generate code for a
+    vector opcode
 -------------------------------------------------*/
+
+#if USE_SIMD
 
 static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
@@ -5385,192 +7265,420 @@ static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_
 	{
 		case 0x00:      /* VMULF */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmulf, rsp);
+			UML_CALLC(block, cfunc_rsp_vmulf_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmulf_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x01:      /* VMULU */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmulu, rsp);
+			UML_CALLC(block, cfunc_rsp_vmulu_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmulu_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x04:      /* VMUDL */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmudl, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudl_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudl_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x05:      /* VMUDM */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmudm, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudm_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudm_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x06:      /* VMUDN */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmudn, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudn_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudn_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x07:      /* VMUDH */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmudh, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudh_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmudh_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x08:      /* VMACF */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmacf, rsp);
+			UML_CALLC(block, cfunc_rsp_vmacf_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmacf_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x09:      /* VMACU */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmacu, rsp);
+			UML_CALLC(block, cfunc_rsp_vmacu_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmacu_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x0c:      /* VMADL */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmadl, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadl_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadl_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x0d:      /* VMADM */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmadm, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadm_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadm_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x0e:      /* VMADN */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmadn, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadn_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadn_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x0f:      /* VMADH */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmadh, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadh_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmadh_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x10:      /* VADD */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vadd, rsp);
+			UML_CALLC(block, cfunc_rsp_vadd_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vadd_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x11:      /* VSUB */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vsub, rsp);
+			UML_CALLC(block, cfunc_rsp_vsub_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vsub_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x13:      /* VABS */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vabs, rsp);
+			UML_CALLC(block, cfunc_rsp_vabs_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vabs_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x14:      /* VADDC */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vaddc, rsp);
+			UML_CALLC(block, cfunc_rsp_vaddc_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vaddc_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x15:      /* VSUBC */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vsubc, rsp);
+			UML_CALLC(block, cfunc_rsp_vsubc_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vsubc_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x1d:      /* VSAW */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vsaw, rsp);
+			UML_CALLC(block, cfunc_rsp_vsaw_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vsaw_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x20:      /* VLT */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vlt, rsp);
+			UML_CALLC(block, cfunc_rsp_vlt_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vlt_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x21:      /* VEQ */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_veq, rsp);
+			UML_CALLC(block, cfunc_rsp_veq_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_veq_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x22:      /* VNE */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vne, rsp);
+			UML_CALLC(block, cfunc_rsp_vne_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vne_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x23:      /* VGE */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vge, rsp);
+			UML_CALLC(block, cfunc_rsp_vge_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vge_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x24:      /* VCL */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vcl, rsp);
+			UML_CALLC(block, cfunc_rsp_vcl_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vcl_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x25:      /* VCH */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vch, rsp);
+			UML_CALLC(block, cfunc_rsp_vch_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vch_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x26:      /* VCR */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vcr, rsp);
+			UML_CALLC(block, cfunc_rsp_vcr_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vcr_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x27:      /* VMRG */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmrg, rsp);
+			UML_CALLC(block, cfunc_rsp_vmrg_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmrg_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x28:      /* VAND */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vand, rsp);
+			UML_CALLC(block, cfunc_rsp_vand_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vand_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x29:      /* VNAND */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vnand, rsp);
+			UML_CALLC(block, cfunc_rsp_vnand_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vnand_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x2a:      /* VOR */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vor, rsp);
+			UML_CALLC(block, cfunc_rsp_vor_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vor_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x2b:      /* VNOR */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vnor, rsp);
+			UML_CALLC(block, cfunc_rsp_vnor_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vnor_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x2c:      /* VXOR */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vxor, rsp);
+			UML_CALLC(block, cfunc_rsp_vxor_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vxor_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x2d:      /* VNXOR */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vnxor, rsp);
+			UML_CALLC(block, cfunc_rsp_vnxor_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vnxor_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x30:      /* VRCP */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vrcp, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcp_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcp_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x31:      /* VRCPL */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vrcpl, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcpl_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcpl_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x32:      /* VRCPH */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vrcph, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcph_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vrcph_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x33:      /* VMOV */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vmov, rsp);
+			UML_CALLC(block, cfunc_rsp_vmov_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vmov_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x35:      /* VRSQL */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vrsql, rsp);
+			UML_CALLC(block, cfunc_rsp_vrsql_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vrsql_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		case 0x36:      /* VRSQH */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_rsp_vrsqh, rsp);
+			UML_CALLC(block, cfunc_rsp_vrsqh_simd, rsp);
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_rsp_vrsqh_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
 			return TRUE;
 
 		default:
@@ -5579,6 +7687,217 @@ static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_
 			return FALSE;
 	}
 }
+
+#else
+
+static int generate_vector_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	UINT32 op = desc->opptr.l[0];
+	// Opcode legend:
+	//    E = VS2 element type
+	//    S = VS1, Source vector 1
+	//    T = VS2, Source vector 2
+	//    D = Destination vector
+
+	switch (op & 0x3f)
+	{
+		case 0x00:      /* VMULF */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmulf_scalar, rsp);
+			return TRUE;
+
+		case 0x01:      /* VMULU */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmulu_scalar, rsp);
+			return TRUE;
+
+		case 0x04:      /* VMUDL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudl_scalar, rsp);
+			return TRUE;
+
+		case 0x05:      /* VMUDM */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudm_scalar, rsp);
+			return TRUE;
+
+		case 0x06:      /* VMUDN */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudn_scalar, rsp);
+			return TRUE;
+
+		case 0x07:      /* VMUDH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmudh_scalar, rsp);
+			return TRUE;
+
+		case 0x08:      /* VMACF */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmacf_scalar, rsp);
+			return TRUE;
+
+		case 0x09:      /* VMACU */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmacu_scalar, rsp);
+			return TRUE;
+
+		case 0x0c:      /* VMADL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadl_scalar, rsp);
+			return TRUE;
+
+		case 0x0d:      /* VMADM */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadm_scalar, rsp);
+			return TRUE;
+
+		case 0x0e:      /* VMADN */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadn_scalar, rsp);
+			return TRUE;
+
+		case 0x0f:      /* VMADH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmadh_scalar, rsp);
+			return TRUE;
+
+		case 0x10:      /* VADD */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vadd_scalar, rsp);
+			return TRUE;
+
+		case 0x11:      /* VSUB */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsub_scalar, rsp);
+			return TRUE;
+
+		case 0x13:      /* VABS */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vabs_scalar, rsp);
+			return TRUE;
+
+		case 0x14:      /* VADDC */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vaddc_scalar, rsp);
+			return TRUE;
+
+		case 0x15:      /* VSUBC */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsubc_scalar, rsp);
+			return TRUE;
+
+		case 0x1d:      /* VSAW */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vsaw_scalar, rsp);
+			return TRUE;
+
+		case 0x20:      /* VLT */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vlt_scalar, rsp);
+			return TRUE;
+
+		case 0x21:      /* VEQ */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_veq_scalar, rsp);
+			return TRUE;
+
+		case 0x22:      /* VNE */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vne_scalar, rsp);
+			return TRUE;
+
+		case 0x23:      /* VGE */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vge_scalar, rsp);
+			return TRUE;
+
+		case 0x24:      /* VCL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vcl_scalar, rsp);
+			return TRUE;
+
+		case 0x25:      /* VCH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vch_scalar, rsp);
+			return TRUE;
+
+		case 0x26:      /* VCR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vcr_scalar, rsp);
+			return TRUE;
+
+		case 0x27:      /* VMRG */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmrg_scalar, rsp);
+			return TRUE;
+
+		case 0x28:      /* VAND */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vand_scalar, rsp);
+			return TRUE;
+
+		case 0x29:      /* VNAND */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnand_scalar, rsp);
+			return TRUE;
+
+		case 0x2a:      /* VOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vor_scalar, rsp);
+			return TRUE;
+
+		case 0x2b:      /* VNOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnor_scalar, rsp);
+			return TRUE;
+
+		case 0x2c:      /* VXOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vxor_scalar, rsp);
+			return TRUE;
+
+		case 0x2d:      /* VNXOR */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vnxor_scalar, rsp);
+			return TRUE;
+
+		case 0x30:      /* VRCP */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcp_scalar, rsp);
+			return TRUE;
+
+		case 0x31:      /* VRCPL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcpl_scalar, rsp);
+			return TRUE;
+
+		case 0x32:      /* VRCPH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrcph_scalar, rsp);
+			return TRUE;
+
+		case 0x33:      /* VMOV */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vmov_scalar, rsp);
+			return TRUE;
+
+		case 0x35:      /* VRSQL */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsql_scalar, rsp);
+			return TRUE;
+
+		case 0x36:      /* VRSQH */
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_rsp_vrsqh_scalar, rsp);
+			return TRUE;
+
+		default:
+			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented_opcode, rsp);
+			return FALSE;
+	}
+}
+#endif
 
 static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
@@ -6002,7 +8321,17 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			if (RTREG != 0)
 			{
 				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);    // mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_mfc2, rsp);                                  // callc   cfunc_mfc2
+#if USE_SIMD
+			UML_CALLC(block, cfunc_mfc2_simd, rsp);                                      // callc   cfunc_ctc2
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_mfc2_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+#else
+			UML_CALLC(block, cfunc_mfc2_scalar, rsp);
+#endif
 				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
@@ -6011,19 +8340,49 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			if (RTREG != 0)
 			{
 				UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);    // mov     [arg0],desc->opptr.l
-				UML_CALLC(block, cfunc_cfc2, rsp);                                  // callc   cfunc_cfc2
+#if USE_SIMD
+			UML_CALLC(block, cfunc_cfc2_simd, rsp);                                      // callc   cfunc_ctc2
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_cfc2_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+#else
+			UML_CALLC(block, cfunc_cfc2_scalar, rsp);
+#endif
 				//UML_SEXT(block, R32(RTREG), I0, DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
 		case 0x04:  /* MTCz */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_mtc2, rsp);                                      // callc   cfunc_mtc2
+#if USE_SIMD
+			UML_CALLC(block, cfunc_mtc2_simd, rsp);                                      // callc   cfunc_ctc2
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_mtc2_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+#else
+			UML_CALLC(block, cfunc_mtc2_scalar, rsp);
+#endif
 			return TRUE;
 
 		case 0x06:  /* CTCz */
 			UML_MOV(block, mem(&rsp->impstate->arg0), desc->opptr.l[0]);        // mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_ctc2, rsp);                                      // callc   cfunc_ctc2
+#if USE_SIMD
+			UML_CALLC(block, cfunc_ctc2_simd, rsp);                                      // callc   cfunc_ctc2
+#if SIMUL_SIMD
+			UML_CALLC(block, cfunc_backup_regs, rsp);
+			UML_CALLC(block, cfunc_ctc2_scalar, rsp);
+			UML_CALLC(block, cfunc_restore_regs, rsp);
+			UML_CALLC(block, cfunc_verify_regs, rsp);
+#endif
+#else
+			UML_CALLC(block, cfunc_ctc2_scalar, rsp);
+#endif
 			return TRUE;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
@@ -6068,12 +8427,13 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 	return FALSE;
 }
 
-static void cfunc_mfc2(void *param)
+#if USE_SIMD
+static void cfunc_mfc2_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
 	int el = (op >> 7) & 0xf;
-#if USE_SIMD
+
 	UINT16 out;
 	SIMD_EXTRACT16(rsp->xv[VS1REG], out, (el >> 1));
 	out >>= (1 - (el & 1)) * 8;
@@ -6087,14 +8447,86 @@ static void cfunc_mfc2(void *param)
 	temp &= 0x00ff;
 
 	rsp->r[RTREG] = (INT32)(INT16)((out << 8) | temp);
-#else
+}
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_mfc2_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int el = (op >> 7) & 0xf;
+
 	UINT16 b1 = VREG_B(VS1REG, (el+0) & 0xf);
 	UINT16 b2 = VREG_B(VS1REG, (el+1) & 0xf);
 	if (RTREG) RTVAL = (INT32)(INT16)((b1 << 8) | (b2));
-#endif
 }
+#endif
 
-static void cfunc_cfc2(void *param)
+#if USE_SIMD
+static void cfunc_cfc2_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	if (RTREG)
+	{
+		switch(RDREG)
+		{
+			case 0:
+				RTVAL = ((VEC_CARRY_FLAG(rsp, 0) & 1) << 0) |
+						((VEC_CARRY_FLAG(rsp, 1) & 1) << 1) |
+						((VEC_CARRY_FLAG(rsp, 2) & 1) << 2) |
+						((VEC_CARRY_FLAG(rsp, 3) & 1) << 3) |
+						((VEC_CARRY_FLAG(rsp, 4) & 1) << 4) |
+						((VEC_CARRY_FLAG(rsp, 5) & 1) << 5) |
+						((VEC_CARRY_FLAG(rsp, 6) & 1) << 6) |
+						((VEC_CARRY_FLAG(rsp, 7) & 1) << 7) |
+						((VEC_ZERO_FLAG(rsp, 0) & 1) << 8) |
+						((VEC_ZERO_FLAG(rsp, 1) & 1) << 9) |
+						((VEC_ZERO_FLAG(rsp, 2) & 1) << 10) |
+						((VEC_ZERO_FLAG(rsp, 3) & 1) << 11) |
+						((VEC_ZERO_FLAG(rsp, 4) & 1) << 12) |
+						((VEC_ZERO_FLAG(rsp, 5) & 1) << 13) |
+						((VEC_ZERO_FLAG(rsp, 6) & 1) << 14) |
+						((VEC_ZERO_FLAG(rsp, 7) & 1) << 15);
+				if (RTVAL & 0x8000) RTVAL |= 0xffff0000;
+				break;
+			case 1:
+				RTVAL = ((VEC_COMPARE_FLAG(rsp, 0) & 1) << 0) |
+						((VEC_COMPARE_FLAG(rsp, 1) & 1) << 1) |
+						((VEC_COMPARE_FLAG(rsp, 2) & 1) << 2) |
+						((VEC_COMPARE_FLAG(rsp, 3) & 1) << 3) |
+						((VEC_COMPARE_FLAG(rsp, 4) & 1) << 4) |
+						((VEC_COMPARE_FLAG(rsp, 5) & 1) << 5) |
+						((VEC_COMPARE_FLAG(rsp, 6) & 1) << 6) |
+						((VEC_COMPARE_FLAG(rsp, 7) & 1) << 7) |
+						((VEC_CLIP2_FLAG(rsp, 0) & 1) << 8) |
+						((VEC_CLIP2_FLAG(rsp, 1) & 1) << 9) |
+						((VEC_CLIP2_FLAG(rsp, 2) & 1) << 10) |
+						((VEC_CLIP2_FLAG(rsp, 3) & 1) << 11) |
+						((VEC_CLIP2_FLAG(rsp, 4) & 1) << 12) |
+						((VEC_CLIP2_FLAG(rsp, 5) & 1) << 13) |
+						((VEC_CLIP2_FLAG(rsp, 6) & 1) << 14) |
+						((VEC_CLIP2_FLAG(rsp, 7) & 1) << 15);
+				if (RTVAL & 0x8000) RTVAL |= 0xffff0000;
+				break;
+			case 2:
+				RTVAL = ((VEC_CLIP1_FLAG(rsp, 0) & 1) << 0) |
+						((VEC_CLIP1_FLAG(rsp, 1) & 1) << 1) |
+						((VEC_CLIP1_FLAG(rsp, 2) & 1) << 2) |
+						((VEC_CLIP1_FLAG(rsp, 3) & 1) << 3) |
+						((VEC_CLIP1_FLAG(rsp, 4) & 1) << 4) |
+						((VEC_CLIP1_FLAG(rsp, 5) & 1) << 5) |
+						((VEC_CLIP1_FLAG(rsp, 6) & 1) << 6) |
+						((VEC_CLIP1_FLAG(rsp, 7) & 1) << 7);
+				break;
+		}
+	}
+}
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_cfc2_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -6153,21 +8585,133 @@ static void cfunc_cfc2(void *param)
 		}
 	}
 }
+#endif
 
-static void cfunc_mtc2(void *param)
+#if USE_SIMD
+static void cfunc_mtc2_simd(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
 	int el = (op >> 7) & 0xf;
-#if USE_SIMD
 	SIMD_INSERT16(rsp->xv[VS1REG], RTVAL, el >> 1);
-#else
+}
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_mtc2_scalar(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	int el = (op >> 7) & 0xf;
 	VREG_B(VS1REG, (el+0) & 0xf) = (RTVAL >> 8) & 0xff;
 	VREG_B(VS1REG, (el+1) & 0xf) = (RTVAL >> 0) & 0xff;
-#endif
 }
+#endif
 
-static void cfunc_ctc2(void *param)
+#if USE_SIMD
+static void cfunc_ctc2_simd(void *param)
+{
+	rsp_state *rsp = (rsp_state*)param;
+	UINT32 op = rsp->impstate->arg0;
+	switch(RDREG)
+	{
+		case 0:
+			VEC_CLEAR_CARRY_FLAGS();
+			VEC_CLEAR_ZERO_FLAGS();
+			rsp->vflag[0][0] = ((RTVAL >> 0) & 1) ? 0xffff : 0;
+			rsp->vflag[0][1] = ((RTVAL >> 1) & 1) ? 0xffff : 0;
+			rsp->vflag[0][2] = ((RTVAL >> 2) & 1) ? 0xffff : 0;
+			rsp->vflag[0][3] = ((RTVAL >> 3) & 1) ? 0xffff : 0;
+			rsp->vflag[0][4] = ((RTVAL >> 4) & 1) ? 0xffff : 0;
+			rsp->vflag[0][5] = ((RTVAL >> 5) & 1) ? 0xffff : 0;
+			rsp->vflag[0][6] = ((RTVAL >> 6) & 1) ? 0xffff : 0;
+			rsp->vflag[0][7] = ((RTVAL >> 7) & 1) ? 0xffff : 0;
+			if (RTVAL & (1 << 0))  { VEC_SET_CARRY_FLAG(0); }
+			if (RTVAL & (1 << 1))  { VEC_SET_CARRY_FLAG(1); }
+			if (RTVAL & (1 << 2))  { VEC_SET_CARRY_FLAG(2); }
+			if (RTVAL & (1 << 3))  { VEC_SET_CARRY_FLAG(3); }
+			if (RTVAL & (1 << 4))  { VEC_SET_CARRY_FLAG(4); }
+			if (RTVAL & (1 << 5))  { VEC_SET_CARRY_FLAG(5); }
+			if (RTVAL & (1 << 6))  { VEC_SET_CARRY_FLAG(6); }
+			if (RTVAL & (1 << 7))  { VEC_SET_CARRY_FLAG(7); }
+			rsp->vflag[3][0] = ((RTVAL >> 8) & 1) ? 0xffff : 0;
+			rsp->vflag[3][1] = ((RTVAL >> 9) & 1) ? 0xffff : 0;
+			rsp->vflag[3][2] = ((RTVAL >> 10) & 1) ? 0xffff : 0;
+			rsp->vflag[3][3] = ((RTVAL >> 11) & 1) ? 0xffff : 0;
+			rsp->vflag[3][4] = ((RTVAL >> 12) & 1) ? 0xffff : 0;
+			rsp->vflag[3][5] = ((RTVAL >> 13) & 1) ? 0xffff : 0;
+			rsp->vflag[3][6] = ((RTVAL >> 14) & 1) ? 0xffff : 0;
+			rsp->vflag[3][7] = ((RTVAL >> 15) & 1) ? 0xffff : 0;
+			if (RTVAL & (1 << 8))  { VEC_SET_ZERO_FLAG(0); }
+			if (RTVAL & (1 << 9))  { VEC_SET_ZERO_FLAG(1); }
+			if (RTVAL & (1 << 10)) { VEC_SET_ZERO_FLAG(2); }
+			if (RTVAL & (1 << 11)) { VEC_SET_ZERO_FLAG(3); }
+			if (RTVAL & (1 << 12)) { VEC_SET_ZERO_FLAG(4); }
+			if (RTVAL & (1 << 13)) { VEC_SET_ZERO_FLAG(5); }
+			if (RTVAL & (1 << 14)) { VEC_SET_ZERO_FLAG(6); }
+			if (RTVAL & (1 << 15)) { VEC_SET_ZERO_FLAG(7); }
+			break;
+		case 1:
+			VEC_CLEAR_COMPARE_FLAGS();
+			VEC_CLEAR_CLIP2_FLAGS();
+			rsp->vflag[1][0] = ((RTVAL >> 0) & 1) ? 0xffff : 0;
+			rsp->vflag[1][1] = ((RTVAL >> 1) & 1) ? 0xffff : 0;
+			rsp->vflag[1][2] = ((RTVAL >> 2) & 1) ? 0xffff : 0;
+			rsp->vflag[1][3] = ((RTVAL >> 3) & 1) ? 0xffff : 0;
+			rsp->vflag[1][4] = ((RTVAL >> 4) & 1) ? 0xffff : 0;
+			rsp->vflag[1][5] = ((RTVAL >> 5) & 1) ? 0xffff : 0;
+			rsp->vflag[1][6] = ((RTVAL >> 6) & 1) ? 0xffff : 0;
+			rsp->vflag[1][7] = ((RTVAL >> 7) & 1) ? 0xffff : 0;
+			if (RTVAL & (1 << 0)) { VEC_SET_COMPARE_FLAG(0); }
+			if (RTVAL & (1 << 1)) { VEC_SET_COMPARE_FLAG(1); }
+			if (RTVAL & (1 << 2)) { VEC_SET_COMPARE_FLAG(2); }
+			if (RTVAL & (1 << 3)) { VEC_SET_COMPARE_FLAG(3); }
+			if (RTVAL & (1 << 4)) { VEC_SET_COMPARE_FLAG(4); }
+			if (RTVAL & (1 << 5)) { VEC_SET_COMPARE_FLAG(5); }
+			if (RTVAL & (1 << 6)) { VEC_SET_COMPARE_FLAG(6); }
+			if (RTVAL & (1 << 7)) { VEC_SET_COMPARE_FLAG(7); }
+			rsp->vflag[4][0] = ((RTVAL >> 8) & 1) ? 0xffff : 0;
+			rsp->vflag[4][1] = ((RTVAL >> 9) & 1) ? 0xffff : 0;
+			rsp->vflag[4][2] = ((RTVAL >> 10) & 1) ? 0xffff : 0;
+			rsp->vflag[4][3] = ((RTVAL >> 11) & 1) ? 0xffff : 0;
+			rsp->vflag[4][4] = ((RTVAL >> 12) & 1) ? 0xffff : 0;
+			rsp->vflag[4][5] = ((RTVAL >> 13) & 1) ? 0xffff : 0;
+			rsp->vflag[4][6] = ((RTVAL >> 14) & 1) ? 0xffff : 0;
+			rsp->vflag[4][7] = ((RTVAL >> 15) & 1) ? 0xffff : 0;
+			if (RTVAL & (1 << 8))  { VEC_SET_CLIP2_FLAG(0); }
+			if (RTVAL & (1 << 9))  { VEC_SET_CLIP2_FLAG(1); }
+			if (RTVAL & (1 << 10)) { VEC_SET_CLIP2_FLAG(2); }
+			if (RTVAL & (1 << 11)) { VEC_SET_CLIP2_FLAG(3); }
+			if (RTVAL & (1 << 12)) { VEC_SET_CLIP2_FLAG(4); }
+			if (RTVAL & (1 << 13)) { VEC_SET_CLIP2_FLAG(5); }
+			if (RTVAL & (1 << 14)) { VEC_SET_CLIP2_FLAG(6); }
+			if (RTVAL & (1 << 15)) { VEC_SET_CLIP2_FLAG(7); }
+			break;
+		case 2:
+			VEC_CLEAR_CLIP1_FLAGS();
+			rsp->vflag[2][0] = ((RTVAL >> 0) & 1) ? 0xffff : 0;
+			rsp->vflag[2][1] = ((RTVAL >> 1) & 1) ? 0xffff : 0;
+			rsp->vflag[2][2] = ((RTVAL >> 2) & 1) ? 0xffff : 0;
+			rsp->vflag[2][3] = ((RTVAL >> 3) & 1) ? 0xffff : 0;
+			rsp->vflag[2][4] = ((RTVAL >> 4) & 1) ? 0xffff : 0;
+			rsp->vflag[2][5] = ((RTVAL >> 5) & 1) ? 0xffff : 0;
+			rsp->vflag[2][6] = ((RTVAL >> 6) & 1) ? 0xffff : 0;
+			rsp->vflag[2][7] = ((RTVAL >> 7) & 1) ? 0xffff : 0;
+			if (RTVAL & (1 << 0)) { VEC_SET_CLIP1_FLAG(0); }
+			if (RTVAL & (1 << 1)) { VEC_SET_CLIP1_FLAG(1); }
+			if (RTVAL & (1 << 2)) { VEC_SET_CLIP1_FLAG(2); }
+			if (RTVAL & (1 << 3)) { VEC_SET_CLIP1_FLAG(3); }
+			if (RTVAL & (1 << 4)) { VEC_SET_CLIP1_FLAG(4); }
+			if (RTVAL & (1 << 5)) { VEC_SET_CLIP1_FLAG(5); }
+			if (RTVAL & (1 << 6)) { VEC_SET_CLIP1_FLAG(6); }
+			if (RTVAL & (1 << 7)) { VEC_SET_CLIP1_FLAG(7); }
+			break;
+	}
+}
+#endif
+
+#if (!USE_SIMD || SIMUL_SIMD)
+static void cfunc_ctc2_scalar(void *param)
 {
 	rsp_state *rsp = (rsp_state*)param;
 	UINT32 op = rsp->impstate->arg0;
@@ -6266,6 +8810,7 @@ static void cfunc_ctc2(void *param)
 			break;
 	}
 }
+#endif
 
 /***************************************************************************
     CODE LOGGING HELPERS

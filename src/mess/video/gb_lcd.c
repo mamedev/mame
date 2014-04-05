@@ -1168,9 +1168,8 @@ void cgb_lcd_device::update_sprites()
 			{
 				data = *((UINT16 *) &m_vram[((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
 			}
-#ifndef LSB_FIRST
-			data = (data << 8) | (data >> 8);
-#endif
+			
+			data = LITTLE_ENDIANIZE_INT16(data);
 
 			switch (oam[3] & 0xA0)
 			{

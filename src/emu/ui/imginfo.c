@@ -156,7 +156,7 @@ void ui_menu_image_info::image_info_astring(running_machine &machine, astring &s
 
 			// display long filename, if present and doesn't correspond to name
 			info = image->longname();
-			if (info && (!base_filename_noextension || mame_stricmp(info, base_filename_noextension)))
+			if (info && (!base_filename_noextension || core_stricmp(info, base_filename_noextension)))
 				string.catprintf("%s\n", info);
 
 			// display manufacturer, if available

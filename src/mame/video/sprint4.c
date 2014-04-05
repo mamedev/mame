@@ -133,10 +133,10 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 		/* update sound status */
 
 		address_space &space = machine().driver_data()->generic_space();
-		discrete_sound_w(m_discrete, space, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
-		discrete_sound_w(m_discrete, space, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
-		discrete_sound_w(m_discrete, space, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
-		discrete_sound_w(m_discrete, space, SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
+		m_discrete->write(space, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
+		m_discrete->write(space, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
+		m_discrete->write(space, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
+		m_discrete->write(space, SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
 	}
 }
 

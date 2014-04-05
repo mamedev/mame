@@ -226,7 +226,7 @@ static int gb_get_pcb_id(const char *slot)
 {
 	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
 	{
-		if (!mame_stricmp(slot_list[i].slot_option, slot))
+		if (!core_stricmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
 
@@ -312,13 +312,13 @@ bool base_gb_cart_slot_device::call_load()
 
 			if (get_feature("rumble"))
 			{
-				if (!mame_stricmp(get_feature("rumble"), "yes"))
+				if (!core_stricmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(true);
 			}
 
 			if (get_feature("rtc"))
 			{
-				if (!mame_stricmp(get_feature("rtc"), "yes"))
+				if (!core_stricmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_timer(true);
 			}
 		}

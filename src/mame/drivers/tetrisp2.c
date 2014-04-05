@@ -560,9 +560,7 @@ READ16_MEMBER(stepstag_state::unk_a42000_r)
 
 WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 {
-	stepstag_state *state = machine().driver_data<stepstag_state>();
-
-	state->soundlatch_word_w(space, offset, data, mem_mask);
+	soundlatch_word_w(space, offset, data, mem_mask);
 
 	m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 

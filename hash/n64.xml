@@ -683,7 +683,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nkte-0 02.u1" size="8388608" crc="895652e1" sha1="beb07f9d9909a22d273925a29c97ef7adc3c0b5d" offset="000000" />
-				<rom name="nus-nkte-0 12.u2" size="4194304" crc="673e021a" sha1="41a6f35a8a334b41b4346478b8043c2153f1d93e" offset="400000" />
+				<rom name="nus-nkte-0 12.u2" size="4194304" crc="673e021a" sha1="41a6f35a8a334b41b4346478b8043c2153f1d93e" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -774,7 +774,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nmke-1 02.u1" size="8388608" crc="da3aae5d" sha1="d13322ee9998426cad9324c16c46191a360d1b92" offset="000000" />
-				<rom name="nus-nmke-1 12.u2" size="4194304" crc="822f4ccd" sha1="ca842ce91ea9bbc8f4ee6a31bea2a99a7e633543" offset="800000" />
+				<rom name="nus-nmke-1 12.u2" size="4194304" crc="822f4ccd" sha1="ca842ce91ea9bbc8f4ee6a31bea2a99a7e633543" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -935,7 +935,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="67108864">
 				<rom name="nus-nree-1 02.u1" size="33554432" crc="e6f9f955" sha1="e44abf4c2ef0640369ec0a25648b2c151a5a8c5a" offset="0000000" />
-				<rom name="nus-nree-1 12.u2" size="33554432" crc="622ed12d" sha1="f226fd097c594c3d3171b81934c8e2931b5561c7" offset="2000000" />
+				<rom name="nus-nree-1 12.u2" size="33554432" crc="622ed12d" sha1="f226fd097c594c3d3171b81934c8e2931b5561c7" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -957,7 +957,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="67108864">
 				<rom name="nus-nree-0 02.u1" size="33554432" crc="66495606" sha1="125ded805b134633b6778bc1d4c4e7955a4c9e93" offset="0000000" />
-				<rom name="nus-nree-0 12.u2" size="33554432" crc="7e2efb88" sha1="03bb6eb43b1ec888300250d45011d89ca1ec4e57" offset="2000000" />
+				<rom name="nus-nree-0 12.u2" size="33554432" crc="7e2efb88" sha1="03bb6eb43b1ec888300250d45011d89ca1ec4e57" offset="0x2000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1067,7 +1067,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nswe-1 02.u1" size="8388608" crc="170180b2" sha1="1c7b0e71a908c77d5c516c94ca88e85a3584fa55" offset="000000" />
-				<rom name="nus-nswe-1 12.u2" size="4194304" crc="c3b0b9a3" sha1="d1acc51a79a04b0a48f7e5e02d3df12a287964d1" offset="800000" />
+				<rom name="nus-nswe-1 12.u2" size="4194304" crc="c3b0b9a3" sha1="d1acc51a79a04b0a48f7e5e02d3df12a287964d1" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1085,7 +1085,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="u4" value="CIC-NUS-6102" />
 			<dataarea name="rom" size="12582912">
 				<rom name="nus-nswe-0 02.u1" size="8388608" crc="cfd53ca8" sha1="00191182504a864828910cb76e7652635d2f18b0" offset="000000" />
-				<rom name="nus-nswe-0 12.u2" size="4194304" crc="b509d2cb" sha1="bde74d9a98a9a89fab73ccbb32705e75421ff590" offset="800000" />
+				<rom name="nus-nswe-0 12.u2" size="4194304" crc="b509d2cb" sha1="bde74d9a98a9a89fab73ccbb32705e75421ff590" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>

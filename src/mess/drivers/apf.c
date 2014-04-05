@@ -513,8 +513,6 @@ static const mc6847_interface apf_mc6847_intf =
 {
 	"screen",
 	DEVCB_DRIVER_MEMBER(apf_state, videoram_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w),
 
 	DEVCB_NULL,                 /* AG */
 	DEVCB_LINE_VCC,             /* GM2 */
@@ -535,6 +533,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 	MCFG_MC6847_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz, apf_mc6847_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

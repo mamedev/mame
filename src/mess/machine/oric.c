@@ -55,9 +55,9 @@ void oric_state::oric_refresh_ints()
 	if (m_is_telestrat==0)
 	{
 		/* oric 1 or oric atmos */
-
+		
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
-		if ((m_io_floppy->read() & 0x07) == ORIC_FLOPPY_INTERFACE_NONE)
+		if ((m_io_floppy->manager().safe_to_read()) && ((m_io_floppy->read() & 0x07) == ORIC_FLOPPY_INTERFACE_NONE))
 		{
 			m_irqs &=~(1<<1);
 		}
@@ -1296,20 +1296,18 @@ WRITE_LINE_MEMBER(oric_state::telestrat_via2_irq_func)
 	oric_refresh_ints();
 }
 
-#if 0
 /* interrupt state from acia6551 */
-void oric_state::telestrat_acia_callback(int irq_state)
+WRITE_LINE_MEMBER(oric_state::telestrat_acia_callback)
 {
 	m_irqs&=~(1<<3);
 
-	if (irq_state)
+	if (state)
 	{
 		m_irqs |= (1<<3);
 	}
 
 	oric_refresh_ints();
 }
-#endif
 
 MACHINE_START_MEMBER(oric_state,telestrat)
 {

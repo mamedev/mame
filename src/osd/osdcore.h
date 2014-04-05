@@ -847,7 +847,8 @@ char *osd_get_clipboard_text(void);
     Return value:
 
         an allocated pointer to an osd_directory_entry representing
-        info on the path; even if the file does not exist
+        info on the path; even if the file does not exist.
+		free with osd_free()
 
 -----------------------------------------------------------------------------*/
 osd_directory_entry *osd_stat(const char *path);
@@ -880,7 +881,9 @@ struct osd_midi_device;
 void osd_init_midi(void);
 void osd_shutdown_midi(void);
 void osd_list_midi_devices(void);
+// free result with osd_close_midi_channel()
 osd_midi_device *osd_open_midi_input(const char *devname);
+// free result with osd_close_midi_channel()
 osd_midi_device *osd_open_midi_output(const char *devname);
 void osd_close_midi_channel(osd_midi_device *dev);
 bool osd_poll_midi_channel(osd_midi_device *dev);

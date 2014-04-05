@@ -606,13 +606,6 @@ WRITE_LINE_MEMBER(tecmo_state::irqhandler)
 	m_soundcpu->set_input_line(0, state);
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tecmo_state,tecmo_adpcm_int),    /* interrupt function */
-	MSM5205_S48_4B      /* 8KHz               */
-};
-
-
 MACHINE_RESET_MEMBER(tecmo_state,rygar)
 {
 	m_adpcm_pos = 0;
@@ -656,7 +649,8 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, tecmo_adpcm_int))    /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

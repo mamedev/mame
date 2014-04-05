@@ -302,9 +302,6 @@ static const mc6847_interface ntsc_vdg_intf =
 	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
-	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
-
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_LINE_VCC,                                     /* GM2 */
 	DEVCB_LINE_VCC,                                     /* GM1 */
@@ -321,9 +318,6 @@ static const mc6847_interface pal_vdg_intf =
 {
 	SCREEN_TAG,
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
-
-	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_LINE_VCC,                                     /* GM2 */
@@ -400,12 +394,14 @@ static MACHINE_CONFIG_DERIVED( pal, phc25 )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, pal_vdg_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ntsc, phc25 )
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
 	MCFG_MC6847_ADD(MC6847_TAG, MC6847_NTSC, XTAL_3_579545MHz, ntsc_vdg_intf)
+	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(phc25_state, irq_w))
 MACHINE_CONFIG_END
 
 /* ROMs */

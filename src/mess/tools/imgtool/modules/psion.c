@@ -286,14 +286,12 @@ UINT16 put_odb(imgtool_stream *instream, imgtool_stream *outstream, UINT8 file_i
 UINT16 put_ob3(imgtool_stream *instream, imgtool_stream *outstream)
 {
 	UINT16 size = stream_size(instream) - 6;
-	UINT8 *buffer = (UINT8*)malloc(size);
+	dynamic_buffer buffer(size);
 
 	stream_seek(instream, 6, SEEK_SET);
 	stream_read(instream, buffer, size);
 
 	stream_write(outstream, buffer, size);
-
-	free(buffer);
 
 	// end of pack
 	stream_fill(outstream, 0xff, 2);

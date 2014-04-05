@@ -121,8 +121,6 @@
     * Dump the internal ROM
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
 #include "qs1000.h"
 

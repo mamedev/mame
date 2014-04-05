@@ -98,21 +98,11 @@ void evmbug_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
 }
 
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
 static MACHINE_CONFIG_START( evmbug, evmbug_state )
-	/* basic machine hardware */
-	/* TMS9995 CPU @ 12.0 MHz */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, evmbug_mem, evmbug_io, cpuconf95)
+	// basic machine hardware
+	// TMS9995 CPU @ 12.0 MHz
+	// We have no lines connected yet
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, evmbug_mem, evmbug_io )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)

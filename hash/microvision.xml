@@ -78,7 +78,7 @@ The "rc" feature is used to indicate the source of the clock signal
 	</software>
 
 	<software name="connect4">
-		<description>Connect Four</description>
+		<description>Connect Four (8021)</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="MP3481" />
@@ -88,6 +88,21 @@ The "rc" feature is used to indicate the source of the clock signal
 			<dataarea name="rom" size="1024">
 				<!-- 8021 on cart has no label -->
 				<rom name="connect4.bin" size="1024" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="connect4t" cloneof="connect4">
+		<description>Connect Four (TMS1100)</description>
+		<year>1979</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="serial" value="MP3481" />
+		<part name="cart" interface="microvision_cart">
+			<feature name="pla" value="1" />  <!-- correct? -->
+			<feature name="pcb" value="4952-79 REV-B" />  <!-- correct? -->
+			<feature name="paddle" value="yes" />
+			<dataarea name="rom" size="2048">
+				<rom name="connect4t.bin" size="2048" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -103,7 +118,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="m34017-n1" size="2048" crc="321a33ed" sha1="0c70e0f7cdbaa0085865a492f7ab56566f074a8a" offset="0" />
+				<rom name="m34017-n1" size="2048" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +195,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="m34047-n2ll_4241" size="2048" crc="fcf87b73" sha1="9dd018f710cd65aebc897624f6350594669717e1" offset="0" />
+				<rom name="m34047-n2ll_4241" size="2048" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377" offset="0" />
 			</dataarea>
 		</part>
 	</software>

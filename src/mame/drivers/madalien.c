@@ -68,11 +68,11 @@ READ8_MEMBER(madalien_state::madalien_sound_command_r)
 
 WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
-	discrete_sound_w(m_discrete, space, MADALIEN_8910_PORTA, data);
+	m_discrete->write(space, MADALIEN_8910_PORTA, data);
 }
 WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
-	discrete_sound_w(m_discrete, space, MADALIEN_8910_PORTB, data);
+	m_discrete->write(space, MADALIEN_8910_PORTB, data);
 }
 
 

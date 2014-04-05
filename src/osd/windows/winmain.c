@@ -795,7 +795,7 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 
 	// if it doesn't match our request, fail
 	char *utf = utf8_from_tstring(realname);
-	int result = mame_stricmp(utf, name);
+	int result = core_stricmp(utf, name);
 	osd_free(utf);
 
 	// if we didn't match, nuke our font and fall back

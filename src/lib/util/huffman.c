@@ -315,7 +315,7 @@ huffman_error huffman_context_base::import_tree_huffman(bitstream_in &bitbuf)
 huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 {
 	// first RLE compress the lengths of all the nodes
-	dynamic_array<UINT8> rle_data(m_numcodes);
+	dynamic_buffer rle_data(m_numcodes);
 	UINT8 *dest = rle_data;
 	dynamic_array<UINT16> rle_lengths(m_numcodes/3);
 	UINT16 *lengths = rle_lengths;

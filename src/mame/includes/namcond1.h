@@ -23,9 +23,9 @@ public:
 	int m_p8;
 	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
 	DECLARE_READ16_MEMBER(sharedram_sub_r);
-	DECLARE_READ8_MEMBER(mcu_p7_read);
-	DECLARE_READ8_MEMBER(mcu_pa_read);
-	DECLARE_WRITE8_MEMBER(mcu_pa_write);
+	DECLARE_READ16_MEMBER(mcu_p7_read);
+	DECLARE_READ16_MEMBER(mcu_pa_read);
+	DECLARE_WRITE16_MEMBER(mcu_pa_write);
 	DECLARE_READ16_MEMBER(namcond1_shared_ram_r);
 	DECLARE_READ16_MEMBER(namcond1_cuskey_r);
 	DECLARE_WRITE16_MEMBER(namcond1_shared_ram_w);

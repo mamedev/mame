@@ -80,12 +80,9 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "unzip.h"
-#include "debug/debugcon.h"
-<<<<<<< HEAD
 #include "ui/selgame.h"
-=======
+#include "debug/debugcon.h"
 #include "debug/debugvw.h"
->>>>>>> b18d20e0f43d53a3c4e5aa4ee6a3a0982ff498bf
 
 #include <time.h>
 

@@ -53,12 +53,12 @@ typedef void * (*mc6845_begin_update_func)(mc6845_device *device, bitmap_rgb32 &
 
 typedef void (*mc6845_update_row_func)(mc6845_device *device, bitmap_rgb32 &bitmap,
 										const rectangle &cliprect, UINT16 ma, UINT8 ra,
-										UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+										UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
 
 
 #define MC6845_UPDATE_ROW(name)     void name(mc6845_device *device, bitmap_rgb32 &bitmap,  \
 												const rectangle &cliprect, UINT16 ma, UINT8 ra, \
-												UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+												UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 
 
 typedef void (*mc6845_end_update_func)(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, void *param);
@@ -403,7 +403,7 @@ public:
 	inline UINT8 read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, UINT8 data);
 
-	void update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+	void update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param);
 	static MC6845_UPDATE_ROW( vdc_update_row );
 
 protected:

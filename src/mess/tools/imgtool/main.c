@@ -625,7 +625,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	imgtool_image *img;
 	imgtool_stream *stream = NULL;
-	void *buffer = NULL;
+	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
 	/* attempt to open image */
@@ -641,12 +641,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	buffer = malloc(size);
-	if (!buffer)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	buffer.resize(size);
 
 	err = imgtool_image_read_sector(img, track, head, sector, buffer, size);
 	if (err)
@@ -663,8 +658,6 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	stream_write(stream, buffer, size);
 
 done:
-	if (buffer)
-		free(buffer);
 	if (stream)
 		stream_close(stream);
 	if (err)
@@ -679,7 +672,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	imgtool_image *img;
 	imgtool_stream *stream = NULL;
-	void *buffer = NULL;
+	dynamic_buffer buffer;
 	UINT32 size, track, head, sector;
 
 	/* attempt to open image */
@@ -700,12 +693,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 
 	size = (UINT32) stream_size(stream);
 
-	buffer = malloc(size);
-	if (!buffer)
-	{
-		err = (imgtoolerr_t)(IMGTOOLERR_OUTOFMEMORY);
-		goto done;
-	}
+	buffer.resize(size);
 
 	stream_read(stream, buffer, size);
 
@@ -714,8 +702,6 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 		goto done;
 
 done:
-	if (buffer)
-		free(buffer);
 	if (stream)
 		stream_close(stream);
 	if (err)

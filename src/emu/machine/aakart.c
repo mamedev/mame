@@ -209,6 +209,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 						m_rx_latch = 0; // mouse Y
 						m_status = STATUS_NORMAL;
 						break;
+					default:
 					case HRST:
 						m_rx_latch = HRST;
 						m_status = STATUS_HRST;

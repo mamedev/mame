@@ -402,15 +402,15 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 #if 1
         /* connect all existing terminals to new net */
 
-        netlist_core_terminal_t *p = out.net().m_head;
+        netlist_core_terminal_t *p = out.net().m_list.first();
         while (p != NULL)
         {
-            netlist_core_terminal_t *np = p->m_update_list_next;
+            netlist_core_terminal_t *np = out.net().m_list.next(p);
             p->clear_net(); // de-link from all nets ...
             connect(proxy->out(), *p);
             p = np;
         }
-        out.net().m_head = NULL; // clear the list
+        out.net().m_list.clear(); // clear the list
         out.net().m_num_cons = 0;
 #endif
         out.net().register_con(proxy->m_I);
@@ -620,7 +620,7 @@ void netlist_setup_t::resolve_inputs()
 
 	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-		if ((*pn)->m_head == NULL)
+		if ((*pn)->m_list.is_empty())
 		{
 		    todelete.add(*pn);
 		}

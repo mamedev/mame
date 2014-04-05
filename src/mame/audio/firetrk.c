@@ -15,50 +15,50 @@ WRITE8_MEMBER(firetrk_state::firetrk_skid_reset_w)
 	m_skid[1] = 0;
 
 	// also SUPERBUG_SKID_EN
-	discrete_sound_w(m_discrete, space, FIRETRUCK_SKID_EN, 1);
+	m_discrete->write(space, FIRETRUCK_SKID_EN, 1);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_skid_reset_w)
 {
-	discrete_sound_w(m_discrete, space, MONTECAR_SKID_EN, 1);
+	m_discrete->write(space, MONTECAR_SKID_EN, 1);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_crash_snd_w)
 {
 	// also SUPERBUG_CRASH_DATA and MONTECAR_CRASH_DATA
-	discrete_sound_w(m_discrete, space, FIRETRUCK_CRASH_DATA, data >> 4);
+	m_discrete->write(space, FIRETRUCK_CRASH_DATA, data >> 4);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_skid_snd_w)
 {
 	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
-	discrete_sound_w(m_discrete, space, FIRETRUCK_SKID_EN, 0);
+	m_discrete->write(space, FIRETRUCK_SKID_EN, 0);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_motor_snd_w)
 {
 	// also MONTECAR_DRONE_MOTOR_DATA
-	discrete_sound_w(m_discrete, space, FIRETRUCK_SIREN_DATA, data >> 4);
+	m_discrete->write(space, FIRETRUCK_SIREN_DATA, data >> 4);
 
 	// also MONTECAR_MOTOR_DATA
-	discrete_sound_w(m_discrete, space, FIRETRUCK_MOTOR_DATA, data & 0x0f);
+	m_discrete->write(space, FIRETRUCK_MOTOR_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(firetrk_state::superbug_motor_snd_w)
 {
-	discrete_sound_w(m_discrete, space, SUPERBUG_SPEED_DATA, data & 0x0f);
+	m_discrete->write(space, SUPERBUG_SPEED_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_xtndply_w)
 {
 	// also SUPERBUG_ASR_EN (extended play)
-	discrete_sound_w(m_discrete, space, FIRETRUCK_XTNDPLY_EN, data);
+	m_discrete->write(space, FIRETRUCK_XTNDPLY_EN, data);
 }
 
 

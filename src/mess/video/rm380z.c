@@ -126,8 +126,6 @@ void rm380z_state::decode_videoram_char(int pos,UINT8& chr,UINT8& attrib)
 
 void rm380z_state::scroll_videoram()
 {
-	rm380z_state *state = machine().driver_data<rm380z_state>();
-
 	int lineWidth=0x80;
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)
 	{
@@ -143,9 +141,9 @@ void rm380z_state::scroll_videoram()
 			int sourceaddr=(row*lineWidth)+c;
 			int destaddr=((row-1)*lineWidth)+c;
 
-			state->m_vram[destaddr]=state->m_vram[sourceaddr];
-			state->m_vramchars[destaddr]=state->m_vramchars[sourceaddr];
-			state->m_vramattribs[destaddr]=state->m_vramattribs[sourceaddr];
+			m_vram[destaddr]=m_vram[sourceaddr];
+			m_vramchars[destaddr]=m_vramchars[sourceaddr];
+			m_vramattribs[destaddr]=m_vramattribs[sourceaddr];
 		}
 	}
 
@@ -153,9 +151,9 @@ void rm380z_state::scroll_videoram()
 
 	for (int c=0;c<lineWidth;c++)
 	{
-		state->m_vram[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		state->m_vramchars[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
-		state->m_vramattribs[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x00;
+		m_vram[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
+		m_vramchars[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x20;
+		m_vramattribs[((RM380Z_SCREENROWS-1)*lineWidth)+c]=0x00;
 	}
 }
 
@@ -194,9 +192,7 @@ void rm380z_state::check_scroll_register()
 
 WRITE8_MEMBER( rm380z_state::videoram_write )
 {
-	rm380z_state *state = machine().driver_data<rm380z_state>();
-
-	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,state->m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
+	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
 
 	int lineWidth=0x80;
 	if (m_videomode==RM380Z_VIDEOMODE_40COL)
@@ -213,7 +209,7 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 	// we suppose videoram is being written as character/attribute couple
 	// fbfc 6th bit set=attribute, unset=char
 
-	if (!(state->m_port0&0x40))
+	if (!(m_port0&0x40))
 	{
 		m_vramchars[realA%RM380Z_SCREENSIZE]=data;
 	}
@@ -224,13 +220,12 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 
 	//
 
-	state->m_mainVideoram[offset]=data;
+	m_mainVideoram[offset]=data;
 }
 
 READ8_MEMBER( rm380z_state::videoram_read )
 {
-	rm380z_state *state = machine().driver_data<rm380z_state>();
-	return state->m_mainVideoram[offset];
+	return m_mainVideoram[offset];
 }
 
 void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bitmap,unsigned char* chsb,int vmode)

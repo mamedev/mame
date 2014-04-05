@@ -1591,4 +1591,4 @@ GAME( 1993, swa,      0,       swa,       swa, driver_device,      0, ROT0, "Seg
 GAME( 1994, wingwar,  0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", GAME_NOT_WORKING )
 GAME( 1994, wingwaru, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", GAME_NOT_WORKING )
 GAME( 1994, wingwarj, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", GAME_NOT_WORKING )
-GAME( 1993, netmerc,  0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, netmerc,  0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", GAME_NOT_WORKING )

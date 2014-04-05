@@ -403,16 +403,16 @@ WRITE8_MEMBER( at29040a_device::write )
 
 void at29040a_device::device_start(void)
 {
-	m_programming_buffer = (UINT8*)malloc(SECTOR_SIZE);
+	m_programming_buffer = global_alloc_array(UINT8, SECTOR_SIZE);
 	m_programming_timer = timer_alloc(PRG_TIMER);
 
-	m_eememory = (UINT8*)malloc(FEEPROM_SIZE+2);
+	m_eememory = global_alloc_array(UINT8, FEEPROM_SIZE+2);
 }
 
 void at29040a_device::device_stop(void)
 {
-	free(m_programming_buffer);
-	free(m_eememory);
+	global_free_array(m_programming_buffer);
+	global_free_array(m_eememory);
 }
 
 void at29040a_device::device_reset(void)

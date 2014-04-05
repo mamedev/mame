@@ -118,7 +118,7 @@ iodevice_t device_image_interface::device_typeid(const char *name)
 	int i;
 	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
 	{
-		if (!mame_stricmp(name, m_device_info_array[i].m_name) || !mame_stricmp(name, m_device_info_array[i].m_shortname))
+		if (!core_stricmp(name, m_device_info_array[i].m_name) || !core_stricmp(name, m_device_info_array[i].m_shortname))
 			return m_device_info_array[i].m_type;
 	}
 	return (iodevice_t)-1;
@@ -299,7 +299,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	{
 		while(!done && (entry = osd_readdir(directory)) != NULL)
 		{
-			if (!mame_stricmp(subdir, entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = TRUE;
 				success = entry->type == ENTTYPE_DIR;
@@ -425,13 +425,12 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 	hash_collection &hashes, const char *types)
 {
 	UINT32 size;
-	UINT8 *buf = NULL;
+	dynamic_buffer buf;
 
 	hashes.reset();
 	size = (UINT32) length();
 
-	buf = (UINT8*)malloc(size);
-	memset(buf,0,size);
+	buf.resize_and_clear(size);
 
 	/* read the file */
 	fseek(0, SEEK_SET);
@@ -443,7 +442,6 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 		hashes.compute(buf, size, types);
 
 	/* cleanup */
-	free(buf);
 	fseek(0, SEEK_SET);
 }
 
@@ -535,7 +533,7 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 	char *ext = strtok((char*)extensions.cstr(),",");
 	while (ext != NULL)
 	{
-		if (!mame_stricmp(ext, file_extension))
+		if (!core_stricmp(ext, file_extension))
 		{
 			result = TRUE;
 			break;
@@ -1327,7 +1325,7 @@ void device_image_interface::software_get_default_slot(astring &result, const ch
 
 ui_menu *device_image_interface::get_selection_menu(running_machine &machine, render_container *container)
 {
-	return global_alloc_clear(ui_menu_control_device_image(machine, container, this));
+	return auto_alloc_clear(machine, ui_menu_control_device_image(machine, container, this));
 }
 
 ui_menu_control_device_image::ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *_image) : ui_menu(machine, container)
@@ -1419,6 +1417,9 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 			need_confirm = false;
 			break;
 	}
+	
+	if (entry != NULL)
+		osd_free(entry);
 }
 
 void ui_menu_control_device_image::load_software_part()
@@ -1450,7 +1451,7 @@ void ui_menu_control_device_image::handle()
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(machine(), auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, can_create, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}
@@ -1501,7 +1502,7 @@ void ui_menu_control_device_image::handle()
 			break;
 
 		case ui_menu_file_selector::R_CREATE:
-			ui_menu::stack_push(global_alloc_clear(ui_menu_file_create(machine(), container, image, current_directory, current_file)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
 			state = CREATE_FILE;
 			break;
 
@@ -1516,7 +1517,7 @@ void ui_menu_control_device_image::handle()
 		test_create(can_create, need_confirm);
 		if(can_create) {
 			if(need_confirm) {
-				ui_menu::stack_push(global_alloc_clear(ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
+				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_confirm_save_as(machine(), container, &create_confirmed)));
 				state = CREATE_CONFIRM;
 			} else {
 				state = DO_CREATE;

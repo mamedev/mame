@@ -115,7 +115,6 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	static const cdrom_interface cdrom_intf;
-	static const harddisk_interface harddisk_intf;
 
 protected:
 	struct dma_slot {

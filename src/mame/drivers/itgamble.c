@@ -55,7 +55,7 @@
 
 
 #include "emu.h"
-#include "cpu/h83002/h8.h"
+#include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
 
 
@@ -207,7 +207,7 @@ void itgamble_state::machine_reset()
 static MACHINE_CONFIG_START( itgamble, itgamble_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK/2)   /* probably the wrong CPU */
+	MCFG_CPU_ADD("maincpu", H83048, MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(itgamble_map)
 
 	/* video hardware */

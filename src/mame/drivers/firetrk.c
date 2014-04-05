@@ -35,7 +35,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
 
 INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
 {
-	discrete_sound_w(m_discrete, generic_space(), FIRETRUCK_HORN_EN, newval);
+	m_discrete->write(generic_space(), FIRETRUCK_HORN_EN, newval);
 }
 
 
@@ -76,7 +76,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	set_led_status(machine(), 3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
-	discrete_sound_w(m_discrete, space, FIRETRUCK_ATTRACT_EN, data & 0x10);
+	m_discrete->write(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
 	coin_lockout_w(machine(), 0, !(data & 0x10));
 	coin_lockout_w(machine(), 1, !(data & 0x10));
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER(firetrk_state::firetrk_output_w)
 	/* BIT6 => UNUSED      */
 
 	/* BIT7 => BELL OUT    */
-	discrete_sound_w(m_discrete, space, FIRETRUCK_BELL_EN, data & 0x80);
+	m_discrete->write(space, FIRETRUCK_BELL_EN, data & 0x80);
 }
 
 
@@ -96,7 +96,7 @@ WRITE8_MEMBER(firetrk_state::superbug_output_w)
 	set_led_status(machine(), 0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
-	discrete_sound_w(m_discrete, space, SUPERBUG_ATTRACT_EN, offset & 0x02);
+	m_discrete->write(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
 	coin_lockout_w(machine(), 0, !(offset & 0x02));
 	coin_lockout_w(machine(), 1, !(offset & 0x02));
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_1_w)
 	set_led_status(machine(), 1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
-	discrete_sound_w(m_discrete, space, MONTECAR_ATTRACT_INV, data & 0x04);
+	m_discrete->write(space, MONTECAR_ATTRACT_INV, data & 0x04);
 
 	/* BIT3 => UNUSED        */
 	/* BIT4 => UNUSED        */
@@ -137,8 +137,8 @@ WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
 {
 	m_flash = data & 0x80;
 
-	discrete_sound_w(m_discrete, space, MONTECAR_BEEPER_EN, data & 0x10);
-	discrete_sound_w(m_discrete, space, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
+	m_discrete->write(space, MONTECAR_BEEPER_EN, data & 0x10);
+	m_discrete->write(space, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
 }
 
 

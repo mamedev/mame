@@ -16,9 +16,9 @@
 
 #include "emu.h"
 #include "abcbus.h"
+#include "bus/scsi/s1410.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/s1410.h"
 #include "machine/scsibus.h"
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"

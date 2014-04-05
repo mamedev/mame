@@ -8,6 +8,15 @@
 **********************************************************************/
 
 /*
+
+To do:
+
+  - Display mode 1 (text)
+  - Display mode 3 (multicolor)
+
+
+SMS Display Timing
+------------------
     For more information, please see:
     - http://cgfm2.emuviews.com/txt/msvdp.txt
     - http://www.smspower.org/forums/viewtopic.php?p=44198
@@ -60,10 +69,14 @@ PAL frame timing
 #define VCOUNT_CHANGE_HPOS    23
 #define SPROVR_HPOS           23
 #define SPRCOL_BASEHPOS       59
-#define DISPLAY_CB_HPOS       6  /* fix X-Scroll latchtime (Flubba's VDPTest) */
+#define X_SCROLL_HPOS         21
 
-#define DRAW_TIME_GG        86      /* 1 + 2 + 14 +8 + 96/2 */
-#define DRAW_TIME_SMS       0
+/* Display callback delay that fixes a flicker issue at top of screen when
+   playing 'fantdizzy' (SMS PAL game), due to time when display is disabled. */
+#define DISPLAY_CB_HPOS       6
+
+#define DRAW_TIME_GG        86      /* 1 + 2 + 14 + 8 + 96/2 */
+#define DRAW_TIME_SMS       25      /* 1 + 2 + 14 + 8 */
 
 #define PRIORITY_BIT          0x1000
 #define BACKDROP_COLOR        ((m_vdp_mode == 4 ? 0x10 : 0x00) + (m_reg[0x07] & 0x0f))
@@ -145,6 +158,9 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const ch
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
 	, m_palette_offset( 0 )
 	, m_supports_224_240( false )
+	, m_is_pal(false)
+	, m_int_cb(*this)
+	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
@@ -158,6 +174,9 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, m_cram_size( cram_size )
 	, m_palette_offset( palette_offset )
 	, m_supports_224_240( supports_224_240 )
+	, m_is_pal(false)
+	, m_int_cb(*this)
+	, m_pause_cb(*this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(sega315_5124))
 	, m_palette(*this, "palette")
 {
@@ -211,21 +230,24 @@ void sega315_5124_device::set_display_settings()
 		{
 			m_vdp_mode = 0;
 		}
-		else
-//      if (M1 && !M2 && !M3)
-//      {
-//          m_vdp_mode = 1;
-//      }
-//      else
-		if (!M1 && M2 && !M3)
+#if 0
+		/* Mode 1, not implemented */
+		else if (M1 && !M2 && !M3)
+		{
+			m_vdp_mode = 1;
+		}
+#endif
+		else if (!M1 && M2 && !M3)
 		{
 			m_vdp_mode = 2;
-//      }
-//      else
-//      if (!M1 && !M2 && M3)
-//      {
-//          m_vdp_mode = 3;
 		}
+#if 0
+		/* Mode 3, not implemented */
+		else if (!M1 && !M2 && M3)
+		{
+			m_vdp_mode = 3;
+		}
+#endif
 		else
 		{
 			logerror("Unknown video mode detected (M1 = %c, M2 = %c, M3 = %c, M4 = %c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
@@ -279,7 +301,7 @@ void sega315_5124_device::hcount_latch_at_hpos( int hpos )
 	if (hclock < 0)
 		hclock += m_screen->width();
 
-	/* Calculate and write the new hcount. */
+	/* Calculate and store the new hcount. */
 	m_hcounter = ((hclock - 46) >> 1) & 0xff;
 }
 
@@ -312,8 +334,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			{
 				m_irq_state = 1;
 
-				if ( !m_cb_int.isnull() )
-					m_cb_int(ASSERT_LINE);
+				if ( !m_int_cb.isnull() )
+					m_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -325,8 +347,8 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 			{
 				m_irq_state = 1;
 
-				if ( !m_cb_int.isnull() )
-					m_cb_int(ASSERT_LINE);
+				if ( !m_int_cb.isnull() )
+					m_int_cb(ASSERT_LINE);
 			}
 		}
 		break;
@@ -344,6 +366,8 @@ void sega315_5124_device::process_line_timer()
 
 	rec.min_y = rec.max_y = vpos;
 
+	m_display_disabled = !(m_reg[0x01] & 0x40);
+
 	/* Activate flags that were pending until the end of previous line. */
 	check_pending_flags(m_screen->width());
 
@@ -351,8 +375,8 @@ void sega315_5124_device::process_line_timer()
 	if (vpos == vpos_limit - 1)
 	{
 		m_line_counter = m_reg[0x0a];
-		if ( !m_cb_pause.isnull() )
-			m_cb_pause(0);
+		if ( !m_pause_cb.isnull() )
+			m_pause_cb(0);
 
 		return;
 	}
@@ -425,6 +449,7 @@ void sega315_5124_device::process_line_timer()
 		{
 			m_reg9copy = m_reg[0x09];
 		}
+		m_reg8copy = m_reg[0x08];
 
 		if (m_line_counter == 0x00)
 		{
@@ -514,7 +539,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 		/* Load read buffer */
 		m_buffer = this->space().read_byte(m_addr & 0x3fff);
 
-		/* Bump internal addthis->ress register */
+		/* Bump internal address register */
 		m_addr += 1;
 	}
 	return temp;
@@ -565,8 +590,8 @@ READ8_MEMBER( sega315_5124_device::register_read )
 		{
 			m_irq_state = 0;
 
-			if ( !m_cb_int.isnull() )
-				m_cb_int(CLEAR_LINE);
+			if ( !m_int_cb.isnull() )
+				m_int_cb(CLEAR_LINE);
 		}
 	}
 
@@ -611,8 +636,9 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 WRITE8_MEMBER( sega315_5124_device::register_write )
 {
 	int reg_num;
+	int hpos = m_screen->hpos();
 
-	check_pending_flags(m_screen->hpos());
+	check_pending_flags(hpos);
 
 	if (m_pending_reg_write == 0)
 	{
@@ -646,6 +672,9 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			if (reg_num == 0 || reg_num == 1)
 				set_display_settings();
 
+			if (reg_num == 8 && hpos <= X_SCROLL_HPOS)
+				m_reg8copy = m_reg[0x08];
+
 			if ( ( reg_num == 0 && (m_status & STATUS_HINT) ) ||
 					( reg_num == 1 && (m_status & STATUS_VINT) ) )
 			{
@@ -667,9 +696,9 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 					{
 						m_irq_state = 0;
 
-						if ( !m_cb_int.isnull() )
+						if ( !m_int_cb.isnull() )
 						{
-							m_cb_int(CLEAR_LINE);
+							m_int_cb(CLEAR_LINE);
 						}
 					}
 				}
@@ -683,8 +712,8 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 					//
 					m_irq_state = 1;
 
-					if ( !m_cb_int.isnull() )
-						m_cb_int(ASSERT_LINE);
+					if ( !m_int_cb.isnull() )
+						m_int_cb(ASSERT_LINE);
 				}
 			}
 			m_addrmode = 0;
@@ -758,8 +787,8 @@ void sega315_5124_device::draw_scanline_mode4( int *line_buffer, int *priority_s
 	UINT16 name_table_address = get_name_table_address();
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then x_scroll = 0 */
-	/* else x_scroll = m_reg[0x08]                                                       */
-	x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg[0x08]);
+	/* else x_scroll = m_reg8copy                                                      */
+	x_scroll = (((m_reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - m_reg8copy);
 
 	x_scroll_start_column = (x_scroll >> 3);             /* x starting column tile */
 
@@ -926,7 +955,7 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 	/* Draw sprite layer */
 
 	/* Check if display is disabled */
-	if (!(m_reg[0x01] & 0x40))
+	if (m_display_disabled)
 		return;
 
 	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
@@ -1085,7 +1114,7 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int line 
 	/* Draw sprite layer */
 
 	/* Check if display is disabled */
-	if (!(m_reg[0x01] & 0x40))
+	if (m_display_disabled)
 		return;
 
 	memset(m_collision_buffer, 0, SEGA315_5124_WIDTH);
@@ -1430,7 +1459,7 @@ void sega315_5124_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	UINT8  *p_y1 = &m_y1_bitmap.pix8(pixel_plot_y + line, pixel_offset_x);
 
 	/* Check if display is disabled or we're below/above active area */
-	if (!(m_reg[0x01] & 0x40) || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
+	if (m_display_disabled || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
 	{
 		for (x = 0; x < 256; x++)
 		{
@@ -1520,7 +1549,7 @@ void sega315_5378_device::draw_scanline( int pixel_offset_x, int pixel_plot_y, i
 	}
 
 	/* Check if display is disabled or we're below/above active area */
-	if (!(m_reg[0x01] & 0x40) || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
+	if (m_display_disabled || line < 0 || line >= m_frame_timing[ACTIVE_DISPLAY_V])
 	{
 		for (x = 0; x < 256; x++)
 		{
@@ -1675,23 +1704,24 @@ UINT32 sega315_5124_device::screen_update( screen_device &screen, bitmap_rgb32 &
 }
 
 
+// MegaDrive/Genesis VDP (315-5313) is currently coded as superset of the 315-5124
+// To support properly SMS VDP in MegaTech and MegaPlay, we start the 315-5124
+// in all systems using MegaDrive/Genesis VDP, but this affects the performance
+// of the emulator hence we stop it in systems that don't need it
+// Proper way to handle this would be implement the 315-5124 modes in the 315-5313
+// device instead of running the two chips separately...
+void sega315_5124_device::stop_timers()
+{
+	m_display_timer->adjust(attotime::never);
+	m_check_hint_timer->adjust(attotime::never);
+	m_check_vint_timer->adjust(attotime::never);
+	m_draw_timer->adjust(attotime::never);
+}
+
+
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
-
-void sega315_5124_device::device_config_complete()
-{
-	const sega315_5124_interface *intf = reinterpret_cast<const sega315_5124_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<sega315_5124_interface *>(this) = *intf;
-	}
-	else
-	{
-		fatalerror("No sega315_5124_interface supplied\n");
-	}
-}
 
 void sega315_5124_device::vdp_postload()
 {
@@ -1714,8 +1744,8 @@ void sega315_5124_device::vdp_postload()
 void sega315_5124_device::device_start()
 {
 	/* Resolve callbacks */
-	m_cb_int.resolve( m_int_callback, *this );
-	m_cb_pause.resolve( m_pause_callback, *this );
+	m_int_cb.resolve();
+	m_pause_cb.resolve();
 
 	/* Allocate video RAM */
 	astring tempstring;
@@ -1737,6 +1767,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_pending_status));
 	save_item(NAME(m_pending_sprcol_x));
+	save_item(NAME(m_reg8copy));
 	save_item(NAME(m_reg9copy));
 	save_item(NAME(m_addrmode));
 	save_item(NAME(m_addr));
@@ -1745,6 +1776,7 @@ void sega315_5124_device::device_start()
 	save_item(NAME(m_pending_reg_write));
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_sega315_5124_compatibility_mode));
+	save_item(NAME(m_display_disabled));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_vdp_mode));
 	save_item(NAME(m_y_pixels));
@@ -1782,10 +1814,12 @@ void sega315_5124_device::device_reset()
 	m_pending_status = 0;
 	m_pending_sprcol_x = 0;
 	m_pending_reg_write = 0;
+	m_reg8copy = 0;
 	m_reg9copy = 0;
 	m_addrmode = 0;
 	m_addr = 0;
 	m_sega315_5124_compatibility_mode = false;
+	m_display_disabled = false;
 	m_cram_mask = m_cram_size - 1;
 	m_cram_dirty = 1;
 	m_buffer = 0;

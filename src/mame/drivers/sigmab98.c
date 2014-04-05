@@ -2149,9 +2149,8 @@ DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 	m_rombank = 0x0f;
 
 	// RAM banks
-	m_paletteram.resize(0x3000);
+	m_paletteram.resize_and_clear(0x3000);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);	
-	memset(m_paletteram, 0, 0x3000);
 	membank("palbank")->set_base(m_paletteram);
 	m_rambank = 0x64;
 
@@ -2262,8 +2261,7 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 {
 	// RAM banks
-	m_paletteram.resize(0x200);
-	memset(m_paletteram, 0, 0x200);
+	m_paletteram.resize_and_clear(0x200);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 
 	m_spriteram.allocate(0x1000);

@@ -636,43 +636,18 @@ static const ay8910_interface ay8910_config =
 
 /*************************************
  *
- *  CPU configs
- *
- *************************************/
-
-static TMS9980A_CONFIG( cpuconf80 )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,     // Instruction acquisition
-	DEVCB_NULL,     // Clock out
-	DEVCB_NULL,      // Hold acknowledge
-	DEVCB_NULL      // DBIN
-};
-
-static TMS9995_CONFIG( cpuconf95 )
-{
-	DEVCB_NULL,         // external op
-	DEVCB_NULL,        // Instruction acquisition
-	DEVCB_NULL,         // clock out
-	DEVCB_NULL,        // HOLDA
-	DEVCB_NULL,         // DBIN
-	INTERNAL_RAM,      // use internal RAM
-	NO_OVERFLOW_INT    // The generally available versions of TMS9995 have a deactivated overflow interrupt
-};
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
 
 static MACHINE_CONFIG_START( looping, looping_state )
 
-	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map, cpuconf95)
+	// CPU TMS9995, standard variant; no line connections
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK, looping_map, looping_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", looping_state,  looping_interrupt)
 
-	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map, cpuconf80)
+	// CPU TMS9980A for audio subsystem; no line connections
+	MCFG_TMS99xx_ADD("audiocpu", TMS9980A,  SOUND_CLOCK/4, looping_sound_map, looping_sound_io_map)
 
 	MCFG_CPU_ADD("mcu", COP420, COP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(looping_cop_map)

@@ -645,13 +645,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 };
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_NULL,              /* interrupt function */
-	MSM5205_SEX_4B  /* vclk input mode    */
-};
-
-
 
 static MACHINE_CONFIG_START( ppking, gladiatr_state )
 
@@ -699,7 +692,7 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -749,7 +742,7 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

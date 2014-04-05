@@ -198,36 +198,36 @@ WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_1_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_SCREECH_EN_1, offset & 1);
+	m_discrete->write(space, SPRINT4_SCREECH_EN_1, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_2_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_SCREECH_EN_2, offset & 1);
+	m_discrete->write(space, SPRINT4_SCREECH_EN_2, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_3_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_SCREECH_EN_3, offset & 1);
+	m_discrete->write(space, SPRINT4_SCREECH_EN_3, offset & 1);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_screech_4_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_SCREECH_EN_4, offset & 1);
+	m_discrete->write(space, SPRINT4_SCREECH_EN_4, offset & 1);
 }
 
 WRITE8_MEMBER(sprint4_state::sprint4_bang_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_BANG_DATA, data & 0x0f);
+	m_discrete->write(space, SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(sprint4_state::sprint4_attract_w)
 {
-	discrete_sound_w(m_discrete, space, SPRINT4_ATTRACT_EN, data & 1);
+	m_discrete->write(space, SPRINT4_ATTRACT_EN, data & 1);
 }
 
 

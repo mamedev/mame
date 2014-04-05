@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE32_MEMBER(igs_tx_videoram_w);
 	DECLARE_WRITE32_MEMBER(igs_bg_videoram_w);
 	DECLARE_WRITE32_MEMBER(igs_palette32_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(sdwx);
 	DECLARE_DRIVER_INIT(chessc2);
 	DECLARE_DRIVER_INIT(lhzb4);
@@ -424,7 +425,7 @@ static MACHINE_CONFIG_START( igs_majhong, igs_m027_state )
 MACHINE_CONFIG_END
 
 
-static void sound_irq( device_t *device, int level )
+WRITE_LINE_MEMBER(igs_m027_state::sound_irq)
 {
 }
 
@@ -449,7 +450,8 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ICS2115_ADD("ics", 0, sound_irq)
+	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_IRQ_CB(WRITELINE(igs_m027_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 
 MACHINE_CONFIG_END

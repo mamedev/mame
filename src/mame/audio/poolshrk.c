@@ -157,20 +157,20 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(poolshrk_state::poolshrk_scratch_sound_w)
 {
-	discrete_sound_w(m_discrete, space, POOLSHRK_SCRATCH_SND, offset & 1);
+	m_discrete->write(space, POOLSHRK_SCRATCH_SND, offset & 1);
 }
 
 WRITE8_MEMBER(poolshrk_state::poolshrk_score_sound_w)
 {
-	discrete_sound_w(m_discrete, space, POOLSHRK_SCORE_EN, 1); /* this will trigger the sound code for 1 sample */
+	m_discrete->write(space, POOLSHRK_SCORE_EN, 1); /* this will trigger the sound code for 1 sample */
 }
 
 WRITE8_MEMBER(poolshrk_state::poolshrk_click_sound_w)
 {
-	discrete_sound_w(m_discrete, space, POOLSHRK_CLICK_EN, 1); /* this will trigger the sound code for 1 sample */
+	m_discrete->write(space, POOLSHRK_CLICK_EN, 1); /* this will trigger the sound code for 1 sample */
 }
 
 WRITE8_MEMBER(poolshrk_state::poolshrk_bump_sound_w)
 {
-	discrete_sound_w(m_discrete, space, POOLSHRK_BUMP_EN, offset & 1);
+	m_discrete->write(space, POOLSHRK_BUMP_EN, offset & 1);
 }

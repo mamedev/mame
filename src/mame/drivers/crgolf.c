@@ -367,20 +367,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const msm5205_interface msm5205_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(crgolf_state,vck_callback),
-	MSM5205_S64_4B
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -411,7 +397,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_intf)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

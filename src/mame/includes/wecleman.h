@@ -100,6 +100,13 @@ public:
 	void wecleman_unpack_sprites();
 	void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
+	void get_sprite_info();
+	void sortsprite(int *idx_array, int *key_array, int size);
+	template<class _BitmapClass> void do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite);
+	template<class _BitmapClass> void sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect);
+	void wecleman_draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
+	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;

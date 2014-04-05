@@ -171,7 +171,10 @@ void mecmouse_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void mecmouse_device::device_start(void)
 {
 	m_poll_timer = timer_alloc(POLL_TIMER);
-	m_poll_timer->adjust(attotime::from_hz(m_joyport->clock()), 0, attotime::from_hz(m_joyport->clock()));
+	// The poll time cannot depend on the console settings, since the TI-99/4A
+	// has no clock line on the joystick port. The rate is not mentioned in
+	// the specs; however, if it is too low, the mouse pointer will do jumps
+	m_poll_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 }
 
 void mecmouse_device::device_reset(void)

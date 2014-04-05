@@ -114,7 +114,6 @@ Notes (couriersud)
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
-#include "machine/74123.h"
 #include "includes/m10.h"
 
 
@@ -138,8 +137,8 @@ WRITE8_MEMBER(m10_state::ic8j2_output_changed)
 {
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
-	ttl74123_a_w(m_ic8j2, space, 0, data);
-	ttl74123_a_w(m_ic8j1, space, 0, data);
+	m_ic8j2->a_w(space, 0, data);
+	m_ic8j1->a_w(space, 0, data);
 }
 
 static const ttl74123_interface ic8j1_intf =
@@ -191,9 +190,6 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 
 MACHINE_START_MEMBER(m10_state,m10)
 {
-	m_ic8j1 = machine().device("ic8j1");
-	m_ic8j2 = machine().device("ic8j2");
-
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
@@ -466,8 +462,8 @@ READ8_MEMBER(m10_state::m10_a700_r)
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
-	ttl74123_clear_w(m_ic8j1, space, 0, 0);
-	ttl74123_clear_w(m_ic8j1, space, 0, 1);
+	m_ic8j1->clear_w(space, 0, 0);
+	m_ic8j1->clear_w(space, 0, 1);
 	return 0x00;
 }
 
@@ -476,8 +472,8 @@ READ8_MEMBER(m10_state::m11_a700_r)
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOG(("clear\n"));
-	ttl74123_clear_w(m_ic8j1, space, 0, 0);
-	ttl74123_clear_w(m_ic8j1, space, 0, 1);
+	m_ic8j1->clear_w(space, 0, 0);
+	m_ic8j1->clear_w(space, 0, 1);
 	return 0x00;
 }
 

@@ -42,27 +42,23 @@ static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, driver_device )
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 
-static CDP1869_CHAR_RAM_READ( comx35_charram_r )
+CDP1869_CHAR_RAM_READ_MEMBER( comx35_state::comx35_charram_r )
 {
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	return state->m_char_ram[charaddr];
+	return m_char_ram[charaddr];
 }
 
-static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
+CDP1869_CHAR_RAM_WRITE_MEMBER( comx35_state::comx35_charram_w )
 {
-	comx35_state *state = device->machine().driver_data<comx35_state>();
-
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	state->m_char_ram[charaddr] = data;
+	m_char_ram[charaddr] = data;
 }
 
-static CDP1869_PCB_READ( comx35_pcb_r )
+CDP1869_PCB_READ_MEMBER( comx35_state::comx35_pcb_r )
 {
 	return BIT(pmd, 7);
 }
@@ -80,21 +76,6 @@ WRITE_LINE_MEMBER( comx35_state::prd_w )
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);
 }
 
-static CDP1869_INTERFACE( pal_cdp1869_intf )
-{
-	CDP1869_COLOR_CLK_PAL,
-	comx35_pcb_r,
-	comx35_charram_r,
-	comx35_charram_w
-};
-
-static CDP1869_INTERFACE( ntsc_cdp1869_intf )
-{
-	CDP1869_COLOR_CLK_NTSC,
-	comx35_pcb_r,
-	comx35_charram_r,
-	comx35_charram_w
-};
 
 void comx35_state::video_start()
 {
@@ -110,7 +91,11 @@ MACHINE_CONFIG_FRAGMENT( comx35_pal_video )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, pal_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_PAL, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_PAL)
+	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
+	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
+	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
 	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
@@ -126,7 +111,11 @@ MACHINE_CONFIG_FRAGMENT( comx35_ntsc_video )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, ntsc_cdp1869_intf, cdp1869_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, CDP1869_DOT_CLK_NTSC, cdp1869_page_ram)
+	MCFG_CDP1869_COLOR_CLOCK(CDP1869_COLOR_CLK_NTSC)
+	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
+	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
+	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
 	MCFG_CDP1869_PAL_NTSC_CALLBACK(GND)
 	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(comx35_state, prd_w))
 	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)

@@ -84,7 +84,7 @@ extern const device_type TISOUND_76496;
 class ti_sound_system_device : public bus8z_device
 {
 public:
-	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *tag, const char *name, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	ti_sound_system_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_console_ready(*this) { };
 

@@ -86,22 +86,36 @@ int saturn_device::READ_NIBBLE(UINT32 adr)
 
 int saturn_device::READ_8(UINT32 adr)
 {
-	return READ_NIBBLE(adr)|(READ_NIBBLE(adr+1)<<4);
+	int n0=READ_NIBBLE(adr);
+	int n1=READ_NIBBLE(adr+1);
+	return n0|(n1<<4);
 }
 
 int saturn_device::READ_12(UINT32 adr)
 {
-	return READ_NIBBLE(adr)|(READ_NIBBLE(adr+1)<<4)|(READ_NIBBLE(adr+2)<<8);
+	int n0=READ_NIBBLE(adr);
+	int n1=READ_NIBBLE(adr+1);
+	int n2=READ_NIBBLE(adr+2);
+	return n0|(n1<<4)|(n2<<8);
 }
 
 int saturn_device::READ_16(UINT32 adr)
 {
-	return READ_NIBBLE(adr)|(READ_NIBBLE(adr+1)<<4)|(READ_NIBBLE(adr+2)<<8)|(READ_NIBBLE(adr+3)<<12);
+	int n0=READ_NIBBLE(adr);
+	int n1=READ_NIBBLE(adr+1);
+	int n2=READ_NIBBLE(adr+2);
+	int n3=READ_NIBBLE(adr+3);
+	return n0|(n1<<4)|(n2<<8)|(n3<<12);
 }
 
 int saturn_device::READ_20(UINT32 adr)
 {
-	return READ_NIBBLE(adr)|(READ_NIBBLE(adr+1)<<4)|(READ_NIBBLE(adr+2)<<8)|(READ_NIBBLE(adr+3)<<12)|(READ_NIBBLE(adr+4)<<16);
+	int n0=READ_NIBBLE(adr);
+	int n1=READ_NIBBLE(adr+1);
+	int n2=READ_NIBBLE(adr+2);
+	int n3=READ_NIBBLE(adr+3);
+	int n4=READ_NIBBLE(adr+4);
+	return n0|(n1<<4)|(n2<<8)|(n3<<12)|(n4<<16);
 }
 
 void saturn_device::WRITE_NIBBLE(UINT32 adr, UINT8 nib)
@@ -490,7 +504,7 @@ void saturn_device::saturn_equals_zero(int reg, int begin, int count)
 {
 	int i, t;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -505,7 +519,7 @@ void saturn_device::saturn_equals(int reg, int begin, int count, int right)
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -520,7 +534,7 @@ void saturn_device::saturn_not_equals_zero(int reg, int begin, int count)
 {
 	int i, t;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -535,7 +549,7 @@ void saturn_device::saturn_not_equals(int reg, int begin, int count, int right)
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -551,7 +565,7 @@ void saturn_device::saturn_greater(int reg, int begin, int count, int right)
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=count-1; i>=0; i--) {
 		t=m_reg[reg][begin+i];
@@ -568,7 +582,7 @@ void saturn_device::saturn_greater_equals(int reg, int begin, int count, int rig
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=count-1; i>=0; i--) {
 		t=m_reg[reg][begin+i];
@@ -585,7 +599,7 @@ void saturn_device::saturn_smaller_equals(int reg, int begin, int count, int rig
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=1;
 	for (i=count-1; i>=0; i--) {
 		t=m_reg[reg][begin+i];
@@ -602,7 +616,7 @@ void saturn_device::saturn_smaller(int reg, int begin, int count, int right)
 	int i, t,t2;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=count-1; i>=0; i--) {
 		t=m_reg[reg][begin+i];
@@ -737,7 +751,7 @@ void saturn_device::saturn_load_nibbles(int reg, int begin, int count, int adr)
 	int i;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(adr>=0 && adr<2);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_reg[reg][begin+i]=READ_NIBBLE(m_d[adr]+i);
 		m_icount-=2;
@@ -749,7 +763,7 @@ void saturn_device::saturn_store_nibbles(int reg, int begin, int count, int adr)
 	int i;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(adr>=0 && adr<2);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		WRITE_NIBBLE((m_d[adr]+i)&0xfffff,m_reg[reg][begin+i]);
 		m_icount-=2;
@@ -777,7 +791,7 @@ void saturn_device::saturn_clear(int reg, int begin, int count)
 {
 	int i;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_reg[reg][begin+i]=0;
 		m_icount-=2;
@@ -793,7 +807,7 @@ void saturn_device::saturn_exchange(int left, int begin, int count, int right)
 	UINT8 temp;
 	saturn_assert(left>=0 && left<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		temp=m_reg[left][begin+i];
 		m_reg[left][begin+i]=m_reg[right][begin+i];
@@ -810,7 +824,7 @@ void saturn_device::saturn_copy(int dest, int begin, int count, int src)
 	int i;
 	saturn_assert(dest>=0 && dest<9);
 	saturn_assert(src>=0 && src<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_reg[dest][begin+i]=m_reg[src][begin+i];
 		m_icount-=2;
@@ -826,7 +840,7 @@ void saturn_device::saturn_add(int reg, int begin, int count, int right)
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -848,7 +862,7 @@ void saturn_device::saturn_add_const(int reg, int begin, int count, UINT8 right)
 	int i, t;
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	saturn_assert(count>1 || !m_decimal); /* SATURN bug */
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -875,7 +889,7 @@ void saturn_device::saturn_sub(int reg, int begin, int count, int right)
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -897,7 +911,7 @@ void saturn_device::saturn_sub_const(int reg, int begin, int count, int right)
 	int i, t;
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	saturn_assert(count>1 || !m_decimal); /* SATURN bug */
 	for (i=0; i<count; i++) {
 		t=m_reg[reg][begin+i];
@@ -924,7 +938,7 @@ void saturn_device::saturn_sub2(int reg, int begin, int count, int right)
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
 	saturn_assert(right>=0 && right<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		t=m_reg[right][begin+i];
@@ -949,7 +963,7 @@ void saturn_device::saturn_increment(int reg, int begin, int count)
 	int i, t=0;
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_icount-=2;
 		t=m_reg[reg][begin+i];
@@ -968,7 +982,7 @@ void saturn_device::saturn_decrement(int reg, int begin, int count)
 	int i, t=0;
 	int base=m_decimal?10:16;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_icount-=2;
 		t=m_reg[reg][begin+i];
@@ -987,7 +1001,7 @@ void saturn_device::saturn_invert(int reg, int begin, int count)
 	int i;
 	int max=m_decimal?9:15;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	m_carry=0;
 	for (i=0; i<count; i++) {
 		m_reg[reg][begin+i]=(max-m_reg[reg][begin+i])&0xf;
@@ -1003,7 +1017,7 @@ void saturn_device::saturn_negate(int reg, int begin, int count)
 	int i, n, c;
 	int max=m_decimal?9:15;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	c=1;
 	m_carry=0;
 	for (i=0; i<count; i++) {
@@ -1026,7 +1040,7 @@ void saturn_device::saturn_or(int dest, int begin, int count, int src)
 	int i;
 	saturn_assert(dest>=0 && dest<9);
 	saturn_assert(src>=0 && src<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_reg[dest][begin+i]|=m_reg[src][begin+i];
 		m_icount-=2;
@@ -1041,7 +1055,7 @@ void saturn_device::saturn_and(int dest, int begin, int count, int src)
 	int i;
 	saturn_assert(dest>=0 && dest<9);
 	saturn_assert(src>=0 && src<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=0; i<count; i++) {
 		m_reg[dest][begin+i]&=m_reg[src][begin+i];
 		m_icount-=2;
@@ -1055,7 +1069,7 @@ void saturn_device::saturn_shift_nibble_left(int reg, int begin, int count)
 {
 	int i;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	if (m_reg[reg][begin+count-1]) m_hst|=SB;
 	for (i=count-1; i>=1; i--) {
 		m_reg[reg][begin+i]=m_reg[reg][begin+i-1];
@@ -1072,7 +1086,7 @@ void saturn_device::saturn_shift_nibble_right(int reg, int begin, int count)
 {
 	int i;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	if (m_reg[reg][begin]) m_hst|=SB;
 	for (i=1; i<count; i++) {
 		m_reg[reg][begin+i-1]=m_reg[reg][begin+i];
@@ -1122,7 +1136,7 @@ void saturn_device::saturn_shift_right(int reg, int begin, int count)
 {
 	int i, t, c=0;
 	saturn_assert(reg>=0 && reg<9);
-	saturn_assert(begin>=0 && count>=0 && begin+count<=16);
+	saturn_assert(begin>=0 && count>0 && begin+count<=16);
 	for (i=count-1; i>=0; i--) {
 		t=m_reg[reg][begin+i];
 		t|=(c<<4);

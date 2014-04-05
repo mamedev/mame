@@ -477,7 +477,7 @@ READ_LINE_MEMBER( vip_state::ef4_r )
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
-	discrete_sound_w(m_beeper, machine().driver_data()->generic_space(), NODE_01, state);
+	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, state);
 
 	// Q led
 	set_led_status(machine(), LED_Q, state);
@@ -634,7 +634,7 @@ void vip_state::machine_start()
 	set_led_status(machine(), LED_POWER, 1);
 
 	// reset sound
-	discrete_sound_w(m_beeper, machine().driver_data()->generic_space(), NODE_01, 0);
+	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, 0);
 
 	// state saving
 	save_item(NAME(m_8000));
@@ -738,9 +738,12 @@ static MACHINE_CONFIG_START( vip, vip_state )
     MCFG_COSMAC_SC_CALLBACK(WRITE8(vip_state, sc_w))
 
 	// video hardware
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)
-	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
-	MCFG_CDP1861_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2, WRITELINE(vip_state, vdc_int_w), WRITELINE(vip_state, vdc_dma_out_w), WRITELINE(vip_state, vdc_ef1_w))
+    MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL_3_52128MHz/2)
+    MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(vip_state, vdc_int_w))
+    MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(vip_state, vdc_dma_out_w))
+    MCFG_CDP1861_EFX_CALLBACK(WRITELINE(vip_state, vdc_ef1_w))
+    MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL_3_52128MHz/2)
+    MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

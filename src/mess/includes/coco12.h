@@ -50,6 +50,8 @@ public:
 
 	DECLARE_READ8_MEMBER( sam_read );
 
+	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
+	DECLARE_WRITE_LINE_MEMBER( field_sync );
 protected:
 	virtual void device_start();
 	virtual void update_cart_base(UINT8 *cart_base);
@@ -58,8 +60,6 @@ protected:
 	virtual void pia1_pb_changed(void);
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
-	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
 	void configure_sam(void);
 };

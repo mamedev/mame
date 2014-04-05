@@ -452,7 +452,7 @@ static MC6845_UPDATE_ROW( t1000_update_row )
 	pc_t1t_device    *t1t  = downcast<pc_t1t_device *>(device->owner());
 	if ( t1t->m_update_row )
 	{
-		t1t->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
+		t1t->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp, param );
 	}
 }
 

@@ -1893,50 +1893,18 @@ static const ay8910_interface ay8910_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed( running_machine &machine, int channel, int percent )
+WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
 {
-	taitob_state *state = machine.driver_data<taitob_state>();
-
-	if (channel == 1)
+	if (offset == 1)
 	{
 		device_sound_interface *sound;
-		state->m_ym->interface(sound);
-		sound->set_output_gain(0, percent / 100.0);
-		sound->set_output_gain(1, percent / 100.0);
-		sound->set_output_gain(2, percent / 100.0);
-		//popmessage("MB87078 gain ch#%i percent=%i", channel, percent);
+		m_ym->interface(sound);
+		sound->set_output_gain(0, data / 100.0);
+		sound->set_output_gain(1, data / 100.0);
+		sound->set_output_gain(2, data / 100.0);
+		//popmessage("MB87078 gain ch#%i percent=%i", offset, data);
 	}
 }
-
-static const mb87078_interface taitob_mb87078_intf =
-{
-	mb87078_gain_changed    /*callback function for gain change*/
-};
-
-static const tc0220ioc_interface taitob_io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
-static const tc0640fio_interface pbobble_io_intf =
-{
-	DEVCB_INPUT_PORT("SERVICE"), DEVCB_INPUT_PORT("COIN"),
-	DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("P1_P2_A"), DEVCB_INPUT_PORT("P1_P2_B") /* port read handlers */
-};
-
-static const tc0510nio_interface sbm_io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("JOY"), DEVCB_INPUT_PORT("START"), DEVCB_INPUT_PORT("PHOTOSENSOR") /* port read handlers */
-};
-
-static const tc0510nio_interface realpunc_io_intf =
-{
-	DEVCB_INPUT_PORT("DSWA"), DEVCB_INPUT_PORT("DSWB"),
-	DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_INPUT_PORT("IN2")   /* port read handlers */
-};
-
 
 /* this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris */
 static const tc0180vcu_interface color0_tc0180vcu_intf =
@@ -1995,8 +1963,12 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2042,8 +2014,12 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2108,8 +2084,12 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2155,8 +2135,12 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2202,8 +2186,12 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2255,8 +2243,12 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2302,8 +2294,12 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2352,9 +2348,15 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
-
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
+	
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2403,9 +2405,15 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
 
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2451,8 +2459,12 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2501,9 +2513,15 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_TC0640FIO_ADD("tc0640fio", pbobble_io_intf)
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COIN"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("P1_P2_A"))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("P1_P2_B"))
 
-	MCFG_MB87078_ADD("mb87078", taitob_mb87078_intf)
+	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
+	MCFG_MB87078_GAIN_CHANGED_CB(WRITE8(taitob_state, mb87078_gain_changed))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2549,8 +2567,12 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2601,8 +2623,12 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2648,8 +2674,12 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2704,8 +2734,12 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0220IOC_ADD("tc0220ioc", taitob_io_intf)
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2758,9 +2792,13 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0510NIO_ADD("tc0510nio", sbm_io_intf)
-
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("JOY"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("START"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("PHOTOSENSOR"))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2810,9 +2848,13 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
-	MCFG_TC0510NIO_ADD("tc0510nio", realpunc_io_intf)
-
+	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
+	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

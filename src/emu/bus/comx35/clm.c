@@ -100,7 +100,7 @@ const rom_entry *comx_clm_device::device_rom_region() const
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, int de, int hbp, int vbp, void *param)
 {
 	for (int column = 0; column < x_count; column++)
 	{
@@ -117,7 +117,7 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 		{
 			int x = (column * 8) + bit;
 
-			bitmap.pix32(y, x) = m_palette->pen(BIT(data, 7));
+			bitmap.pix32(vbp + y, hbp + x) = m_palette->pen(BIT(data, 7) && de);
 
 			data <<= 1;
 		}
@@ -127,12 +127,12 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 static MC6845_UPDATE_ROW( comx_clm_update_row )
 {
 	comx_clm_device *clm = downcast<comx_clm_device *>(device->owner());
-	clm->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
+	clm->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,de,hbp,vbp,param);
 }
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

@@ -564,6 +564,7 @@ public:
 	DECLARE_READ32_MEMBER( ethernet_r );
 	DECLARE_WRITE32_MEMBER( ethernet_w );
 	DECLARE_WRITE32_MEMBER( dcs3_fifo_full_w );
+	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 };
 
 
@@ -1323,14 +1324,13 @@ static void ioasic_irq(running_machine &machine, int state)
 }
 
 
-static void ethernet_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 {
-	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
 	if (state)
-		drvstate->m_sio_irq_state |= 0x10;
+		m_sio_irq_state |= 0x10;
 	else
-		drvstate->m_sio_irq_state &= ~0x10;
-	drvstate->update_sio_irqs();
+		m_sio_irq_state &= ~0x10;
+	update_sio_irqs();
 }
 
 
@@ -2279,11 +2279,6 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK    /* system clock rate */
 };
 
-static const smc91c9x_interface ethernet_intf =
-{
-	ethernet_interrupt
-};
-
 static const voodoo_config voodoo_intf =
 {
 	2, //               fbmem;
@@ -2308,7 +2303,8 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(vegas_state, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
 
-	MCFG_SMC91C94_ADD("ethernet", ethernet_intf)
+	MCFG_SMC91C94_ADD("ethernet")
+	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(vegas_state, ethernet_interrupt))
 
 	MCFG_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, voodoo_intf)
 

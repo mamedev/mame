@@ -314,13 +314,6 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 	m_msm5205_vclk_toggle ^= 1;
 }
 
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ashnojoe_state,ashnojoe_vclk_cb),
-	MSM5205_S48_4B
-};
-
-
 void ashnojoe_state::machine_start()
 {
 	save_item(NAME(m_adpcm_byte));
@@ -370,7 +363,8 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(ashnojoe_state, ashnojoe_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

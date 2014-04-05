@@ -412,8 +412,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 {
-	address_space &space = generic_space();
-	ttl74123_a_w(machine().device("ic60"), space, 0, state);
+	machine().device<ttl74123_device>("ic60")->a_w(generic_space(), 0, state);
 }
 
 

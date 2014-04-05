@@ -44,13 +44,16 @@ public:
 		m_port_persist(*this, "PERSISTENCE"),
 		m_mainram(NULL),
 		m_is_gamegear(0),
-		m_is_region_japan(0),
+		m_is_gg_region_japan(0),
+		m_is_smsj(0),
 		m_is_mark_iii(0),
 		m_is_sdisp(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
 		m_has_bios_full(0),
-		m_has_fm(0) { }
+		m_has_fm(0),
+		m_has_jpn_sms_cart_slot(0),
+		m_store_cart_selection_data(0) { }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -96,13 +99,15 @@ public:
 
 	// model identifiers
 	UINT8 m_is_gamegear;
-	UINT8 m_is_region_japan;
+	UINT8 m_is_gg_region_japan;
+	UINT8 m_is_smsj;
 	UINT8 m_is_mark_iii;
 	UINT8 m_is_sdisp;
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
 	UINT8 m_has_bios_full;
 	UINT8 m_has_fm;
+	UINT8 m_has_jpn_sms_cart_slot;
 
 	// Data needed for Light Phaser
 	UINT8 m_ctrl1_th_state;
@@ -121,9 +126,10 @@ public:
 
 	// these are only used by the Store Display unit, but we keep them here temporarily to avoid the need of separate start/reset
 	UINT8 m_store_control;
-	int m_current_cartridge;
+	UINT8 m_store_cart_selection_data;
 	sega8_cart_slot_device *m_slots[16];
 	sega8_card_slot_device *m_cards[16];
+	void store_select_cart(UINT8 data);
 
 	/* Cartridge slot info */
 	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
@@ -153,7 +159,9 @@ public:
 	DECLARE_DRIVER_INIT(sg1000m3);
 	DECLARE_DRIVER_INIT(gamegear);
 	DECLARE_DRIVER_INIT(gamegeaj);
-	DECLARE_DRIVER_INIT(sms2kr);
+	DECLARE_DRIVER_INIT(sms1krfm);
+	DECLARE_DRIVER_INIT(sms1kr);
+	DECLARE_DRIVER_INIT(smskr);
 	DECLARE_DRIVER_INIT(smsj);
 	DECLARE_DRIVER_INIT(sms1);
 	DECLARE_MACHINE_START(sms);
@@ -198,11 +206,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 	DECLARE_DRIVER_INIT(smssdisp);
 
-	DECLARE_READ8_MEMBER(store_read_0000);
-	DECLARE_READ8_MEMBER(store_read_4000);
-	DECLARE_READ8_MEMBER(store_read_8000);
 	DECLARE_READ8_MEMBER(store_cart_peek);
-	DECLARE_WRITE8_MEMBER(store_write_cart);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };

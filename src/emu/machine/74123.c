@@ -66,7 +66,7 @@ void ttl74123_device::device_start()
 {
 	m_output_changed.resolve(m_output_changed_cb, *this);
 
-	m_timer = machine().scheduler().timer_alloc(FUNC(clear_callback), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::clear_callback),this));
 
 	/* register for state saving */
 	save_item(NAME(m_a));
@@ -137,13 +137,7 @@ int ttl74123_device::timer_running()
     TIMER_CALLBACK( output_callback )
 -------------------------------------------------*/
 
-TIMER_CALLBACK( ttl74123_device::output_callback )
-{
-	ttl74123_device *dev = reinterpret_cast<ttl74123_device*>(ptr);
-	dev->output(param);
-}
-
-void ttl74123_device::output(INT32 param)
+TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
 {
 	m_output_changed(0, param);
 }
@@ -157,7 +151,7 @@ void ttl74123_device::set_output()
 {
 	int output = timer_running();
 
-	machine().scheduler().timer_set( attotime::zero, FUNC(output_callback ), output, (void *)this);
+	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(ttl74123_device::output_callback ),this), output);
 
 	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
 }
@@ -167,19 +161,12 @@ void ttl74123_device::set_output()
     TIMER_CALLBACK( clear_callback )
 -------------------------------------------------*/
 
-TIMER_CALLBACK( ttl74123_device::clear_callback )
-{
-	ttl74123_device *dev = reinterpret_cast<ttl74123_device*>(ptr);
-	dev->clear();
-}
-
-void ttl74123_device::clear()
+TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )
 {
 	int output = timer_running();
 
 	m_output_changed(0, output);
 }
-
 
 //-------------------------------------------------
 //  start_pulse - begin timing
@@ -221,13 +208,7 @@ void ttl74123_device::start_pulse()
 //  a_w - write register a data
 //-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( ttl74123_a_w )
-{
-	ttl74123_device *dev = downcast<ttl74123_device *>(device);
-	dev->a_w(data);
-}
-
-void ttl74123_device::a_w(UINT8 data)
+WRITE8_MEMBER( ttl74123_device::a_w )
 {
 	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
 	if (!data && m_a && m_b && m_clear)
@@ -243,13 +224,7 @@ void ttl74123_device::a_w(UINT8 data)
 //  b_w - write register b data
 //-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( ttl74123_b_w )
-{
-	ttl74123_device *dev = downcast<ttl74123_device *>(device);
-	dev->b_w(data);
-}
-
-void ttl74123_device::b_w(UINT8 data)
+WRITE8_MEMBER( ttl74123_device::b_w)
 {
 	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
 	if (data && !m_b && !m_a && m_clear)
@@ -265,13 +240,7 @@ void ttl74123_device::b_w(UINT8 data)
 //  clear_w - write register clear data
 //-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( ttl74123_clear_w )
-{
-	ttl74123_device *dev = downcast<ttl74123_device *>(device);
-	dev->clear_w(data);
-}
-
-void ttl74123_device::clear_w(UINT8 data)
+WRITE8_MEMBER( ttl74123_device::clear_w)
 {
 	/* start/regtrigger pulse if B=HI and A=LO and rising edge on clear */
 	if (data && !m_a && m_b && !m_clear)
@@ -292,13 +261,7 @@ void ttl74123_device::clear_w(UINT8 data)
 //  reset_w - reset device
 //-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( ttl74123_reset_w )
-{
-	ttl74123_device *dev = downcast<ttl74123_device *>(device);
-	dev->reset_w();
-}
-
-void ttl74123_device::reset_w()
+WRITE8_MEMBER( ttl74123_device::reset_w)
 {
 	set_output();
 }

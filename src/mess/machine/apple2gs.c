@@ -275,16 +275,15 @@ void apple2gs_state::apple2gs_remove_irq(UINT16 irq_mask)
 	}
 }
 
-void apple2gs_doc_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(apple2gs_state::apple2gs_doc_irq)
 {
-	apple2gs_state *drvstate = device->machine().driver_data<apple2gs_state>();
 	if (state)
 	{
-		drvstate->apple2gs_add_irq(IRQ_DOC);
+		apple2gs_add_irq(IRQ_DOC);
 	}
 	else
 	{
-		drvstate->apple2gs_remove_irq(IRQ_DOC);
+		apple2gs_remove_irq(IRQ_DOC);
 	}
 }
 

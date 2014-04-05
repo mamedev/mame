@@ -53,6 +53,10 @@
 #define end_timing(v)           do { } while (0)
 #endif
 
+#if __GNUC__ && defined(__i386__) && !defined(__x86_64)
+#undef YieldProcessor
+#endif
+
 #ifndef YieldProcessor
 #ifdef __GNUC__
 INLINE void YieldProcessor(void)

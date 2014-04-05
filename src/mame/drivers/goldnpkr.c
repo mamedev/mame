@@ -1452,8 +1452,8 @@ WRITE8_MEMBER(goldnpkr_state::sound_w)
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(m_discrete, space, NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(m_discrete, space, NODE_10, data & 0x07);
+	m_discrete->write(space, NODE_01, data >> 3 & 0x01);
+	m_discrete->write(space, NODE_10, data & 0x07);
 }
 
 WRITE8_MEMBER(goldnpkr_state::pia0_a_w)

@@ -482,57 +482,167 @@ $(CPUOBJ)/g65816/g65816o4.o:    $(CPUSRC)/g65816/g65816o4.c \
 
 
 #-------------------------------------------------
-# Hitachi H8/30xx (16/32-bit H8/3xx series)
-#@src/emu/cpu/h83002/h8.h,CPUS += H83002
+# Hitachi H8 (16/32-bit H8/300, H8/300H, H8S2000 and H8S2600 series)
+#@src/emu/cpu/h8/h8.h,CPUS += H8
 #-------------------------------------------------
 
-ifneq ($(filter H83002,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/h83002
-CPUOBJS += $(CPUOBJ)/h83002/h8_16.o $(CPUOBJ)/h83002/h8periph.o $(CPUOBJ)/h83002/h8speriph.o
-DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
+ifneq ($(filter H8,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/h8
+CPUOBJS += $(CPUOBJ)/h8/h8.o $(CPUOBJ)/h8/h8h.o $(CPUOBJ)/h8/h8s2000.o $(CPUOBJ)/h8/h8s2600.o \
+           $(CPUOBJ)/h8/h83337.o \
+           $(CPUOBJ)/h8/h83002.o $(CPUOBJ)/h8/h83006.o $(CPUOBJ)/h8/h83048.o \
+           $(CPUOBJ)/h8/h8s2245.o $(CPUOBJ)/h8/h8s2320.o $(CPUOBJ)/h8/h8s2357.o \
+           $(CPUOBJ)/h8/h8s2655.o \
+           $(CPUOBJ)/h8/h8_adc.o $(CPUOBJ)/h8/h8_port.o $(CPUOBJ)/h8/h8_intc.o \
+           $(CPUOBJ)/h8/h8_timer16.o $(CPUOBJ)/h8/h8_sci.o
+DASMOBJS +=
 endif
 
-$(CPUOBJ)/h83002/h8_16.o:       $(CPUSRC)/h83002/h8_16.c \
-								$(CPUSRC)/h83002/h8.h \
-								$(CPUSRC)/h83002/h8ops.h \
-								$(CPUSRC)/h83002/h8priv.h
+$(CPUOBJ)/h8/h8.o:				$(CPUSRC)/h8/h8.c \
+								$(CPUOBJ)/h8/h8.inc \
+								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h83002/h8disasm.o:    $(CPUSRC)/h83002/h8disasm.c
+$(CPUOBJ)/h8/h8h.o:				$(CPUSRC)/h8/h8h.c \
+								$(CPUOBJ)/h8/h8h.inc \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h83002/h8periph.o:    $(CPUSRC)/h83002/h8periph.c \
-								$(CPUSRC)/h83002/h8priv.h \
-								$(CPUSRC)/h83002/h8.h
+$(CPUOBJ)/h8/h8s2000.o:			$(CPUSRC)/h8/h8s2000.c \
+								$(CPUOBJ)/h8/h8s2000.inc \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h83002/h8speriph.o:   $(CPUSRC)/h83002/h8speriph.c \
-								$(CPUSRC)/h83002/h8priv.h \
-								$(CPUSRC)/h83002/h8.h
+$(CPUOBJ)/h8/h8s2600.o:			$(CPUSRC)/h8/h8s2600.c \
+								$(CPUOBJ)/h8/h8s2600.inc \
+								$(CPUSRC)/h8/h8s2600.h \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h
 
+$(CPUOBJ)/h8/h83337.o:			$(CPUSRC)/h8/h83337.c \
+								$(CPUSRC)/h8/h83337.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-#-------------------------------------------------
-# Hitachi H8/3334 (8/16-bit H8/3xx series)
-#@src/emu/cpu/h83002/h8.h,CPUS += H83334
-#-------------------------------------------------
+$(CPUOBJ)/h8/h83002.o:			$(CPUSRC)/h8/h83002.c \
+								$(CPUSRC)/h8/h83002.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-ifneq ($(filter H83334,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/h83002
-CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o $(CPUOBJ)/h83002/h8speriph.o
-DASMOBJS += $(CPUOBJ)/h83002/h8disasm.o
-endif
+$(CPUOBJ)/h8/h83006.o:			$(CPUSRC)/h8/h83006.c \
+								$(CPUSRC)/h8/h83006.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h83002/h8_8.o:        $(CPUSRC)/h83002/h8_8.c \
-								$(CPUSRC)/h83002/h8.h \
-								$(CPUSRC)/h83002/h8ops.h \
-								$(CPUSRC)/h83002/h8priv.h
+$(CPUOBJ)/h8/h83048.o:			$(CPUSRC)/h8/h83048.c \
+								$(CPUSRC)/h8/h83048.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h83002/h8disasm.o:    $(CPUSRC)/h83002/h8disasm.c
+$(CPUOBJ)/h8/h8s2245.o:			$(CPUSRC)/h8/h8s2245.c \
+								$(CPUSRC)/h8/h8s2245.h \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h83002/h8periph.o:    $(CPUSRC)/h83002/h8periph.c \
-								$(CPUSRC)/h83002/h8priv.h \
-								$(CPUSRC)/h83002/h8.h
+$(CPUOBJ)/h8/h8s2320.o:			$(CPUSRC)/h8/h8s2320.c \
+								$(CPUSRC)/h8/h8s2320.h \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h83002/h8speriph.o:   $(CPUSRC)/h83002/h8speriph.c \
-								$(CPUSRC)/h83002/h8priv.h \
-								$(CPUSRC)/h83002/h8.h
+$(CPUOBJ)/h8/h8s2357.o:			$(CPUSRC)/h8/h8s2357.c \
+								$(CPUSRC)/h8/h8s2357.h \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
+
+$(CPUOBJ)/h8/h8s2655.o:			$(CPUSRC)/h8/h8s2655.c \
+								$(CPUSRC)/h8/h8s2655.h \
+								$(CPUSRC)/h8/h8s2600.h \
+								$(CPUSRC)/h8/h8s2000.h \
+								$(CPUSRC)/h8/h8h.h \
+								$(CPUSRC)/h8/h8.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_sci.h
+
+$(CPUOBJ)/h8/h8_intc.o:			$(CPUSRC)/h8/h8_intc.c \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8.h
+
+$(CPUOBJ)/h8/h8_adc.o:			$(CPUSRC)/h8/h8_adc.c \
+								$(CPUSRC)/h8/h8_adc.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8.h
+
+$(CPUOBJ)/h8/h8_port.o:			$(CPUSRC)/h8/h8_port.c \
+								$(CPUSRC)/h8/h8_port.h \
+								$(CPUSRC)/h8/h8.h
+
+$(CPUOBJ)/h8/h8_timer16.o:		$(CPUSRC)/h8/h8_timer16.c \
+								$(CPUSRC)/h8/h8_timer16.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8.h
+
+$(CPUOBJ)/h8/h8_sci.o:			$(CPUSRC)/h8/h8_sci.c \
+								$(CPUSRC)/h8/h8_sci.h \
+								$(CPUSRC)/h8/h8_intc.h \
+								$(CPUSRC)/h8/h8.h
+
+# rule to generate the C files
+$(CPUOBJ)/h8/h8.inc: $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst
+	@echo Generating H8-300 source file...
+	$(PYTHON) $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst o $@
+
+$(CPUOBJ)/h8/h8h.inc: $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst
+	@echo Generating H8-300H source file...
+	$(PYTHON) $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst h $@
+
+$(CPUOBJ)/h8/h8s2000.inc: $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst
+	@echo Generating H8S/2000 source file...
+	$(PYTHON) $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst s20 $@
+
+$(CPUOBJ)/h8/h8s2600.inc: $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst
+	@echo Generating H8S/2600 source file...
+	$(PYTHON) $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst s26 $@
 
 #-------------------------------------------------
 # Hitachi HCD62121

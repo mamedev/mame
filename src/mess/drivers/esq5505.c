@@ -222,6 +222,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+	
+	//dmac
+	DECLARE_WRITE8_MEMBER(dma_end);
+	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_READ8_MEMBER(fdc_read_byte);
+	DECLARE_WRITE8_MEMBER(fdc_write_byte);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -287,7 +293,7 @@ void esq5505_state::machine_reset()
 
 	// on VFX, bit 0 is 1 for 'cartridge present'.
 	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
-	if (mame_stricmp(machine().system().name, "vfx") == 0)
+	if (core_stricmp(machine().system().name, "vfx") == 0)
 	{
 		// todo: handle VFX cart-in when we support cartridges
 		m_duart->ip0_w(ASSERT_LINE);
@@ -393,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
+	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
@@ -505,55 +511,46 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-static void esq_dma_end(running_machine &machine, int channel, int irq)
+WRITE8_MEMBER(esq5505_state::dma_end)
 {
-	device_t *device = machine.device("mc68450");
-	esq5505_state *state = machine.driver_data<esq5505_state>();
-
-	if (irq != 0)
+	if (data != 0)
 	{
-		printf("DMAC IRQ, vector = %x\n", hd63450_get_vector(device, channel));
-		state->dmac_irq_state = 1;
-		state->dmac_irq_vector = hd63450_get_vector(device, channel);
+		printf("DMAC IRQ, vector = %x\n", m_dmac->get_vector(offset));
+		dmac_irq_state = 1;
+		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
-		state->dmac_irq_state = 0;
+		dmac_irq_state = 0;
 	}
 
-	state->update_irq_to_maincpu();
+	update_irq_to_maincpu();
 }
 
-static void esq_dma_error(running_machine &machine, int channel, int irq)
+WRITE8_MEMBER(esq5505_state::dma_error)
 {
-	device_t *device = machine.device("mc68450");
-	esq5505_state *state = machine.driver_data<esq5505_state>();
-
-	if(irq != 0)
+	if(data != 0)
 	{
-		printf("DMAC error, vector = %x\n", hd63450_get_error_vector(device, channel));
-		state->dmac_irq_state = 1;
-		state->dmac_irq_vector = hd63450_get_vector(device, channel);
+		printf("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
+		dmac_irq_state = 1;
+		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
-		state->dmac_irq_state = 0;
+		dmac_irq_state = 0;
 	}
 
-	state->update_irq_to_maincpu();
+	update_irq_to_maincpu();
 }
 
-static int esq_fdc_read_byte(running_machine &machine, int addr)
+READ8_MEMBER(esq5505_state::fdc_read_byte)
 {
-	esq5505_state *state = machine.driver_data<esq5505_state>();
-
-	return state->m_fdc->data_r();
+	return m_fdc->data_r();
 }
 
-static void esq_fdc_write_byte(running_machine &machine, int addr, int data)
+WRITE8_MEMBER(esq5505_state::fdc_write_byte)
 {
-	esq5505_state *state = machine.driver_data<esq5505_state>();
-	state->m_fdc->data_w(data & 0xff);
+	m_fdc->data_w(data & 0xff);
 }
 
 #if KEYBOARD_HACK
@@ -604,15 +601,11 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static const hd63450_intf dmac_interface =
+static const hd63450_interface dmac_interface =
 {
 	"maincpu",  // CPU - 68000
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_usec(4),attotime::from_hz(15625/2)},  // Cycle steal mode timing (guesstimate)
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
-	esq_dma_end,
-	esq_dma_error,
-	{ esq_fdc_read_byte, 0, 0, 0 },     // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	{ esq_fdc_write_byte, 0, 0, 0 }
 };
 
 static const es5505_interface es5505_config =
@@ -677,7 +670,12 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 
-	MCFG_HD63450_ADD( "mc68450", dmac_interface )   // MC68450 compatible
+	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
+	MCFG_DEVICE_CONFIG(dmac_interface)
+	MCFG_HD63450_DMA_END_CB(WRITE8(esq5505_state, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(esq5505_state, dma_error))
+	MCFG_HD63450_DMA_READ_0_CB(READ8(esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(vfxsd, vfx)

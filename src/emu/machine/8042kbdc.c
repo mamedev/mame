@@ -173,9 +173,6 @@
 *********************************************************************/
 
 
-#include "emu.h"
-
-#include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
 
 
@@ -199,7 +196,17 @@ const device_type KBDC8042 = &device_creator<kbdc8042_device>;
 
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KBDC8042, "Keyboard Controller 8042", tag, owner, clock, "kbdc8042", __FILE__)
+	, m_keyboard_dev(*this, "at_keyboard")
 {
+}
+
+static MACHINE_CONFIG_FRAGMENT( keyboard )
+	MCFG_AT_KEYB_ADD("at_keyboard", 1, WRITELINE(kbdc8042_device, keyboard_w))
+MACHINE_CONFIG_END
+
+machine_config_constructor kbdc8042_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( keyboard );
 }
 
 //-------------------------------------------------
@@ -241,9 +248,6 @@ void kbdc8042_device::device_start()
 	m_input_buffer_full_func.resolve(m_input_buffer_full_cb, *this);
 	m_output_buffer_empty_func.resolve(m_output_buffer_empty_cb, *this);
 	m_speaker_func.resolve(m_speaker_cb, *this);
-	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_time),this));
-	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
-	at_keyboard_set_scan_code_set(1);
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 }
 
@@ -272,10 +276,10 @@ void kbdc8042_device::at_8042_set_outport(UINT8 data, int initial)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( kbdc8042_device::kbdc8042_time )
+WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 {
-	at_keyboard_polling();
-	at_8042_check_keyboard();
+	if(state)
+		at_8042_check_keyboard();
 }
 
 TIMER_CALLBACK_MEMBER( kbdc8042_device::kbdc8042_clr_int )
@@ -308,7 +312,7 @@ void kbdc8042_device::at_8042_check_keyboard()
 
 	if (!m_keyboard.received && !m_mouse.received)
 	{
-		if ( (data = at_keyboard_read())!=-1)
+		if((data = m_keyboard_dev->read(machine().driver_data()->generic_space(), 0)))
 			at_8042_receive(data);
 	}
 }
@@ -467,7 +471,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			/* normal case */
 			m_data = data;
 			m_sending=1;
-			at_keyboard_write(space.machine(), data);
+			m_keyboard_dev->write(space, 0, data);
 			break;
 
 		case 1:
@@ -488,7 +492,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			/* preceded by writing 0xD2 to port 60h */
 			m_data = data;
 			m_sending=1;
-			at_keyboard_write(machine(), data);
+			m_keyboard_dev->write(space, 0, data);
 			break;
 
 		case 3:

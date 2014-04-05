@@ -104,31 +104,12 @@ const device_type MB87078 = &device_creator<mb87078_device>;
 
 mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB87078, "Fujitsu MB87078", tag, owner, clock, "mb87078", __FILE__),
-	//m_gain[4],
 	m_channel_latch(0),
-	//m_latch[2][4],
-	m_reset_comp(0)
+	m_reset_comp(0),
+	m_gain_changed_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mb87078_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mb87078_interface *intf = reinterpret_cast<const mb87078_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mb87078_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gain_changed_cb = NULL;
-	}
+	m_gain[0] = m_gain[1] = m_gain[2] = m_gain[3] = 0;
+	memset(m_latch, 0, sizeof(m_latch));
 }
 
 //-------------------------------------------------
@@ -137,6 +118,8 @@ void mb87078_device::device_config_complete()
 
 void mb87078_device::device_start()
 {
+	m_gain_changed_cb.resolve_safe();
+	
 	save_item(NAME(m_channel_latch));
 	save_item(NAME(m_reset_comp));
 	save_item(NAME(m_latch[0]));
@@ -205,7 +188,7 @@ void mb87078_device::gain_recalc()
 		int old_index = m_gain[i];
 		m_gain[i] = calc_gain_index(m_latch[0][i], m_latch[1][i]);
 		if (old_index != m_gain[i])
-			m_gain_changed_cb(machine(), i, mb87078_gain_percent[m_gain[i]]);
+			m_gain_changed_cb((offs_t)i, mb87078_gain_percent[m_gain[i]]);
 	}
 }
 

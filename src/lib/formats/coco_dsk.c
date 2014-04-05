@@ -13,6 +13,7 @@
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
 #include "imageutl.h"
+#include "coretmpl.h"
 
 /* -----------------------------------------------------------------------
  * JVC (Jeff Vavasour CoCo) format
@@ -719,7 +720,7 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	UINT8 *track_data;
 	void *track_data_v;
 	UINT32 max_track_size;
-	int *sector_map = NULL;
+	dynamic_array<int> sector_map;
 
 	sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
 	sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
@@ -746,13 +747,7 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map = (int*)malloc(sectors * sizeof(*sector_map));
-	if (!sector_map)
-	{
-		err = FLOPPY_ERROR_OUTOFMEMORY;
-		goto done;
-	}
-	memset(sector_map, 0xFF, sectors * sizeof(*sector_map));
+	sector_map.resize_and_clear(sectors, 0xFF);
 
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)
@@ -837,8 +832,6 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	memset(&track_data[track_position], 0x4e, max_track_size - track_position);
 
 done:
-	if (sector_map)
-		free(sector_map);
 	return err;
 }
 

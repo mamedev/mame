@@ -1569,7 +1569,7 @@ GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, venture,  0,       venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, venture2, venture, venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", GAME_SUPPORTS_SAVE )

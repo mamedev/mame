@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-/****************************************************f***********************
+/***************************************************************************
 
     Amiga floppy disk controller emulation
 
@@ -11,7 +11,6 @@
 #include "includes/amiga.h"
 #include "formats/ami_dsk.h"
 #include "amigafdc.h"
-#include "machine/6526cia.h"
 
 const device_type AMIGA_FDC = &device_creator<amiga_fdc>;
 
@@ -20,12 +19,15 @@ FLOPPY_FORMATS_MEMBER( amiga_fdc::floppy_formats )
 FLOPPY_FORMATS_END
 
 amiga_fdc::amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__)
+	device_t(mconfig, AMIGA_FDC, "Amiga FDC", tag, owner, clock, "amiga_fdc", __FILE__),
+	m_write_index(*this)
 {
 }
 
 void amiga_fdc::device_start()
 {
+	m_write_index.resolve_safe();
+
 	static const char *names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
 		floppy_connector *con = subdevice<floppy_connector>(names[i]);
@@ -416,8 +418,7 @@ UINT8 amiga_fdc::ciaapra_r()
 void amiga_fdc::index_callback(floppy_image_device *floppy, int state)
 {
 	/* Issue a index pulse when a disk revolution completes */
-	legacy_mos6526_device *cia = machine().device<legacy_mos6526_device>("cia_1");
-	cia->flag_w(!state);
+	m_write_index(!state);
 }
 
 void amiga_fdc::pll_t::set_clock(attotime period)

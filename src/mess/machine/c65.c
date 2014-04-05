@@ -10,7 +10,7 @@
 #include "includes/c65.h"
 #include "cpu/m6502/m4510.h"
 #include "sound/mos6581.h"
-#include "machine/6526cia.h"
+#include "machine/mos6526.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "machine/ram.h"
 #include "video/vic4567.h"
@@ -1003,16 +1003,13 @@ WRITE8_MEMBER( c65_state::c65_write_io )
 
 WRITE8_MEMBER( c65_state::c65_write_io_dc00 )
 {
-	device_t *cia_0 = machine().device("cia_0");
-	device_t *cia_1 = machine().device("cia_1");
-
 	switch (offset & 0xf00)
 	{
 	case 0x000:
-		mos6526_w(cia_0, space, offset, data);
+		m_cia0->write(space, offset, data);
 		break;
 	case 0x100:
-		mos6526_w(cia_1, space, offset, data);
+		m_cia1->write(space, offset, data);
 		break;
 	case 0x200:
 	case 0x300:
@@ -1066,15 +1063,12 @@ READ8_MEMBER( c65_state::c65_read_io )
 
 READ8_MEMBER( c65_state::c65_read_io_dc00 )
 {
-	device_t *cia_0 = machine().device("cia_0");
-	device_t *cia_1 = machine().device("cia_1");
-
 	switch (offset & 0x300)
 	{
 	case 0x000:
-		return mos6526_r(cia_0, space, offset);
+		return m_cia0->read(space, offset);
 	case 0x100:
-		return mos6526_r(cia_1, space, offset);
+		return m_cia1->read(space, offset);
 	case 0x200:
 	case 0x300:
 		DBG_LOG(machine(), 1, "io read", ("%.3x\n", offset+0xc00));

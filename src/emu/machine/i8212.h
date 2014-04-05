@@ -49,12 +49,14 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_I8212_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD((_tag), I8212, 0)   \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_I8212_IRQ_CALLBACK(_write) \
+	devcb = &i8212_device::set_irq_wr_callback(*device, DEVCB2_##_write);
 
-#define I8212_INTERFACE(name) \
-	const i8212_interface (name) =
+#define MCFG_I8212_DI_CALLBACK(_read) \
+	devcb = &i8212_device::set_di_rd_callback(*device, DEVCB2_##_read);
+
+#define MCFG_I8212_DO_CALLBACK(_write) \
+	devcb = &i8212_device::set_do_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -62,42 +64,33 @@ enum
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> i8212_interface
-
-struct i8212_interface
-{
-	devcb_write_line    m_out_int_cb;
-
-	devcb_read8         m_in_di_cb;
-	devcb_write8        m_out_do_cb;
-};
-
-
-
 // ======================> i8212_device
 
-class i8212_device :    public device_t, public i8212_interface
+class i8212_device :    public device_t
 {
 public:
 	// construction/destruction
 	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_di_rd_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_read_di.set_callback(object); }
+	template<class _Object> static devcb2_base &set_do_wr_callback(device_t &device, _Object object) { return downcast<i8212_device &>(device).m_write_do.set_callback(object); }
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE_LINE_MEMBER( md_w );
 	DECLARE_WRITE_LINE_MEMBER( stb_w );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
-	devcb_resolved_write_line   m_out_int_func;
-	devcb_resolved_read8        m_in_di_func;
-	devcb_resolved_write8       m_out_do_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_read8        m_read_di;
+	devcb2_write8       m_write_do;
 
 	int m_md;                   // mode
 	int m_stb;                  // strobe

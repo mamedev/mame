@@ -452,13 +452,6 @@ WRITE_LINE_MEMBER(yunsung8_state::yunsung8_adpcm_int)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const msm5205_interface yunsung8_msm5205_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(yunsung8_state,yunsung8_adpcm_int), /* interrupt function */
-	MSM5205_S96_4B      /* 4KHz, 4 Bits */
-};
-
-
 void yunsung8_state::machine_start()
 {
 	UINT8 *MAIN = memregion("maincpu")->base();
@@ -520,7 +513,8 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(yunsung8_msm5205_interface)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(yunsung8_state, yunsung8_adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END

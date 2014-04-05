@@ -840,7 +840,7 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 	int rc;
 
 	snapshot_size = 8263;   /* magic size */
-	snapshot_buff = (UINT8*)malloc(snapshot_size);
+	snapshot_buff = global_alloc_array(UINT8, snapshot_size);
 	if (!snapshot_buff)
 	{
 		logerror("microtan_hexfile_load: could not allocate %d bytes of buffer\n", snapshot_size);
@@ -848,10 +848,10 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 	}
 	memset(snapshot_buff, 0, snapshot_size);
 
-	buff = (char*)malloc(quickload_size + 1);
+	buff = global_alloc_array(char, quickload_size + 1);
 	if (!buff)
 	{
-		free(snapshot_buff);
+		global_free_array(snapshot_buff);
 		logerror("microtan_hexfile_load: could not allocate %d bytes of buffer\n", quickload_size);
 		return IMAGE_INIT_FAIL;
 	}
@@ -865,6 +865,7 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 		rc = parse_zillion_hex(snapshot_buff, buff);
 	if (rc == IMAGE_INIT_PASS)
 		microtan_snapshot_copy(snapshot_buff, snapshot_size);
-	free(snapshot_buff);
+	global_free_array(buff);
+	global_free_array(snapshot_buff);
 	return rc;
 }

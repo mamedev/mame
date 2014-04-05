@@ -1163,17 +1163,17 @@
 
 #define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
 
-#define PIXEL_CLOCK         ((SS22_MASTER_CLOCK*2)/4) /* x 2 is due of the interlaced screen ... */
+#define PIXEL_CLOCK         (SS22_MASTER_CLOCK/2)
 
 // VSync - 59.9042 Hz
-// HSync - 15.7248 kHz
-#define HTOTAL              (781)
+// HSync - 15.7248 kHz (may be inaccurate)
+#define HTOTAL              (800)
 #define HBEND               (0)
 #define HBSTART             (640)
 
-#define VTOTAL              (262*2+1)
+#define VTOTAL              (512)
 #define VBEND               (0)
-#define VBSTART             (240*2)
+#define VBSTART             (480)
 
 
 #define MCU_SPEEDUP         1                   /* mcu idle skipping */

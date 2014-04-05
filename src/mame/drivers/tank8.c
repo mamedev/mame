@@ -45,17 +45,17 @@ WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
 
 WRITE8_MEMBER(tank8_state::tank8_crash_w)
 {
-	discrete_sound_w(m_discrete, space, TANK8_CRASH_EN, data);
+	m_discrete->write(space, TANK8_CRASH_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::tank8_explosion_w)
 {
-	discrete_sound_w(m_discrete, space, TANK8_EXPLOSION_EN, data);
+	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::tank8_bugle_w)
 {
-	discrete_sound_w(m_discrete, space, TANK8_BUGLE_EN, data);
+	m_discrete->write(space, TANK8_BUGLE_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::tank8_bug_w)
@@ -63,20 +63,20 @@ WRITE8_MEMBER(tank8_state::tank8_bug_w)
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA2,7.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA2,2.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA1,16.0);
-			discrete_sound_w(m_discrete, space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA1,16.0);
+			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -84,12 +84,12 @@ WRITE8_MEMBER(tank8_state::tank8_bug_w)
 
 WRITE8_MEMBER(tank8_state::tank8_attract_w)
 {
-	discrete_sound_w(m_discrete, space, TANK8_ATTRACT_EN, data);
+	m_discrete->write(space, TANK8_ATTRACT_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::tank8_motor_w)
 {
-	discrete_sound_w(m_discrete, space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
+	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )

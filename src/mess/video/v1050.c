@@ -81,7 +81,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix32(y, x) = state->m_palette->pen(color);
+			bitmap.pix32(vbp + y, hbp + x) = state->m_palette->pen(de ? color : 0);
 
 			data <<= 1;
 		}
@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 
 static MC6845_INTERFACE( crtc_intf )
 {
-	false,
+	true,
 	0,0,0,0,
 	8,
 	NULL,

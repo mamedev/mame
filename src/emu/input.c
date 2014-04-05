@@ -2116,6 +2116,15 @@ input_device_item::input_device_item(input_device &device, const char *name, voi
 }
 
 
+//-------------------------------------------------
+//  input_device_item - destructor
+//-------------------------------------------------
+
+input_device_item::~input_device_item()
+{
+}
+
+
 
 //**************************************************************************
 //  INPUT DEVICE SWITCH ITEM

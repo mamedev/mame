@@ -96,10 +96,10 @@ public:
 	// construction/destruction
 	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void a_w(UINT8 data);
-	void b_w(UINT8 data);
-	void clear_w(UINT8 data);
-	void reset_w();
+	DECLARE_WRITE8_MEMBER(a_w);
+	DECLARE_WRITE8_MEMBER(b_w);
+	DECLARE_WRITE8_MEMBER(clear_w);
+	DECLARE_WRITE8_MEMBER(reset_w);
 
 protected:
 	// device-level overrides
@@ -109,8 +109,8 @@ protected:
 	virtual void device_post_load() { }
 	virtual void device_clock_changed() { }
 
-	static TIMER_CALLBACK( output_callback );
-	static TIMER_CALLBACK( clear_callback );
+	TIMER_CALLBACK_MEMBER( output_callback );
+	TIMER_CALLBACK_MEMBER( clear_callback );
 
 private:
 
@@ -128,16 +128,5 @@ private:
 
 // device type definition
 extern const device_type TTL74123;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_a_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_b_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_clear_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ttl74123_reset_w ); /* reset the latch */
 
 #endif

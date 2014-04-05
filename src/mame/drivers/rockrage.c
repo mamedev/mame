@@ -220,12 +220,6 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static const k007420_interface rockrage_k007420_intf =
-{
-	0x3ff, rockrage_sprite_callback
-};
-
-
 void rockrage_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -268,7 +262,9 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_K007342_CALLBACK_OWNER(rockrage_state, rockrage_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
 	
-	MCFG_K007420_ADD("k007420", rockrage_k007420_intf)
+	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_BANK_LIMIT(0x3ff)
+	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)	
 	MCFG_K007420_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)

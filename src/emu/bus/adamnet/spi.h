@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Coleco Adam floppy disk controller emulation
+    Coleco Adam Serial/Parallel Interface emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -16,7 +16,10 @@
 
 #include "emu.h"
 #include "adamnet.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/mc2661.h"
 
 
 
@@ -27,7 +30,7 @@
 // ======================> adam_spi_device
 
 class adam_spi_device :  public device_t,
-							public device_adamnet_card_interface
+						 public device_adamnet_card_interface
 {
 public:
 	// construction/destruction

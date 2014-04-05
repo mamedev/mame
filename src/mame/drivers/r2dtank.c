@@ -357,8 +357,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 {
-	address_space &space = generic_space();
-	ttl74123_a_w(machine().device("74123"), space, 0, state);
+	machine().device<ttl74123_device>("74123")->a_w(generic_space(), 0, state);
 }
 
 

@@ -418,14 +418,6 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 }
 
-
-static const msm5205_interface msm5205_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mermaid_state,rougien_adpcm_int),  /* interrupt function */
-	MSM5205_S96_4B
-};
-
-
 INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 {
 	if(m_nmi_mask)
@@ -475,7 +467,8 @@ static MACHINE_CONFIG_DERIVED( rougien, mermaid )
 	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(mermaid_state, rougien_adpcm_int))  /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

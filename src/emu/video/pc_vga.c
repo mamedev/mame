@@ -635,7 +635,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				addr %= vga.svga_intf.vram_size;
 				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos+=0x8)
 				{
-					if(pos + 0x08 > 0x100000)
+					if(pos + 0x08 >= vga.svga_intf.vram_size)
 						return;
 
 					for(xi=0;xi<8;xi++)
@@ -673,7 +673,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
-			if(pos + 0x10 > 0x100000)
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
@@ -717,7 +717,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
-			if(pos + 0x10 > 0x100000)
+			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=2)
 			{
@@ -761,7 +761,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
 		{
-			if(pos + 24 > 0x100000)
+			if(pos + 24 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=3)
 			{
@@ -802,7 +802,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		addr %= vga.svga_intf.vram_size;
 		for (pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x20)
 		{
-			if(pos + 0x20 > 0x100000)
+			if(pos + 0x20 >= vga.svga_intf.vram_size)
 				return;
 			for(xi=0,xm=0;xi<8;xi++,xm+=4)
 			{
@@ -2758,6 +2758,22 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x35:
 				res = s3.crt_reg_lock;
 				break;
+			case 0x36:  // Configuration register 1
+				res = 0x1e;  // PCI (not really), Fast Page Mode DRAM
+				if(vga.svga_intf.vram_size == 0x80000)
+					res |= 0xe0;
+				else if(vga.svga_intf.vram_size == 0x100000)
+					res |= 0xc0;
+				else if(vga.svga_intf.vram_size == 0x200000)
+					res |= 0x80;
+				else if(vga.svga_intf.vram_size == 0x400000)
+					res |= 0x00;
+				else
+					res |= 0xe0;  // shouldn't get here...
+				break;
+			case 0x37:  // Configuration register 2
+				res = 0x09;  // enable chipset, 64k BIOS size, internal DCLK/MCLK
+				break;
 			case 0x38:
 				res = s3.reg_lock1;
 				break;
@@ -2823,11 +2839,17 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x67:
 				res = s3.ext_misc_ctrl_2;
 				break;
+			case 0x68:  // Configuration register 3
+				res = 0x03;  // no /CAS,/OE stretch time, 32-bit data bus size
+				break;
 			case 0x69:
 				res = vga.crtc.start_addr_latch >> 16;
 				break;
 			case 0x6a:
 				res = svga.bank_r & 0x7f;
+				break;
+			case 0x6f: // Configuration register 4
+				res = 0x18;  // LPB(?) mode, Serial port I/O at port 0xe8, Serial port I/O disabled (MMIO only), no WE delay
 				break;
 			default:
 				res = vga.crtc.data[index];
@@ -2861,10 +2883,11 @@ void s3_vga_device::s3_define_video_mode()
 		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
+			case 0x01: svga.rgb8_en = 1; break;
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
-			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
-			default: fatalerror("TODO: s3 video mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
+			case 0x0d: svga.rgb32_en = 1; divisor = 1; break;
+			default: fatalerror("TODO: S3 colour mode not implemented %02x\n",((s3.ext_misc_ctrl_2) >> 4)); break;
 		}
 	}
 	else
@@ -4789,7 +4812,7 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			return 0;
 		data = 0;
 		if(vga.sequencer.data[4] & 0x8)
-			data = vga.memory[offset + (svga.bank_r*0x10000)];
+			data = vga.memory[(offset + (svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
 		else
 		{
 			int i;
@@ -4797,7 +4820,7 @@ READ8_MEMBER(s3_vga_device::mem_r)
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					data |= vga.memory[offset*4+i+(svga.bank_r*0x10000)];
+					data |= vga.memory[(offset*4+i+(svga.bank_r*0x10000)) % vga.svga_intf.vram_size];
 			}
 		}
 		return data;

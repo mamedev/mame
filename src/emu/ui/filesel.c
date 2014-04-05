@@ -398,7 +398,7 @@ int ui_menu_file_selector::compare_entries(const file_selector_entry *e1, const 
 	}
 	else
 	{
-		result = mame_stricmp(e1_basename, e2_basename);
+		result = core_stricmp(e1_basename, e2_basename);
 		if (result == 0)
 		{
 			result = strcmp(e1_basename, e2_basename);
@@ -581,7 +581,7 @@ void ui_menu_file_selector::populate()
 				selected_entry = entry;
 
 			// do we have to select this file?
-			if (!mame_stricmp(m_current_file, dirent->name))
+			if (!core_stricmp(m_current_file, dirent->name))
 				selected_entry = entry;
 		}
 	}
@@ -700,7 +700,7 @@ void ui_menu_file_selector::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(entry->basename, m_filename_buffer, i) == 0)
+							if (core_strnicmp(entry->basename, m_filename_buffer, i) == 0)
 								match = i;
 						}
 
@@ -719,7 +719,7 @@ void ui_menu_file_selector::handle()
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(m_filename_buffer); i++)
 						{
-							if (mame_strnicmp(entry->basename, m_filename_buffer, i) == 0)
+							if (core_strnicmp(entry->basename, m_filename_buffer, i) == 0)
 								match = i;
 						}
 

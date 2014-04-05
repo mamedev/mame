@@ -494,7 +494,7 @@ protected:
 	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
 
 public:
-	virtual ~input_device_item() { }
+	virtual ~input_device_item();
 
 	// getters
 	input_device &device() const { return m_device; }

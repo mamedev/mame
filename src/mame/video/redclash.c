@@ -97,13 +97,13 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_videoram_w )
+WRITE8_MEMBER( ladybug_state::redclash_videoram_w )
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_gfxbank_w )
+WRITE8_MEMBER( ladybug_state::redclash_gfxbank_w )
 {
 	if (m_gfxbank != (data & 0x01))
 	{
@@ -112,7 +112,7 @@ WRITE8_HANDLER( ladybug_state::redclash_gfxbank_w )
 	}
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_flipscreen_w )
+WRITE8_MEMBER( ladybug_state::redclash_flipscreen_w )
 {
 	flip_screen_set(data & 0x01);
 }
@@ -128,25 +128,25 @@ star_speed:
 6 = backwards medium
 7 = backwards fast
 */
-WRITE8_HANDLER( ladybug_state::redclash_star0_w )
+WRITE8_MEMBER( ladybug_state::redclash_star0_w )
 {
 	m_star_speed = (m_star_speed & ~1) | ((data & 1) << 0);
 	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_star1_w )
+WRITE8_MEMBER( ladybug_state::redclash_star1_w )
 {
 	m_star_speed = (m_star_speed & ~2) | ((data & 1) << 1);
 	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_star2_w )
+WRITE8_MEMBER( ladybug_state::redclash_star2_w )
 {
 	m_star_speed = (m_star_speed & ~4) | ((data & 1) << 2);
 	redclash_set_stars_speed( m_star_speed);
 }
 
-WRITE8_HANDLER( ladybug_state::redclash_star_reset_w )
+WRITE8_MEMBER( ladybug_state::redclash_star_reset_w )
 {
 	redclash_set_stars_enable(1);
 }

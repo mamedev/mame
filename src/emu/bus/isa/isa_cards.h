@@ -17,6 +17,7 @@
 // video
 #include "mda.h"
 #include "cga.h"
+#include "aga.h"
 #include "ega.h"
 #include "vga.h"
 #include "vga_ati.h"

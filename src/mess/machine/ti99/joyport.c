@@ -64,6 +64,14 @@ void joyport_device::write_port(int data)
 }
 
 /*
+    This is only used for the handset device of the TI-99/4. It is driven by the VDP interrupt.
+*/
+void joyport_device::pulse_clock()
+{
+	m_connected->pulse_clock();
+}
+
+/*
     Propagate the interrupt to the defined target. Only used for the handset
     at the prototype 99/4.
 */
@@ -75,7 +83,6 @@ WRITE_LINE_MEMBER( joyport_device::set_interrupt )
 void joyport_device::device_start()
 {
 	m_interrupt.resolve();
-	logerror("joyport: Set clock to %d\n", m_clock);
 }
 
 void joyport_device::device_config_complete()

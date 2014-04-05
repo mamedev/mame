@@ -22,6 +22,7 @@
 //  MACROS
 //**************************************************************************
 
+// legacy
 #define STREAM_UPDATE(name) void name(device_t *device, sound_stream *stream, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 
 

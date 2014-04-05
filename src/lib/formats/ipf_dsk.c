@@ -86,6 +86,7 @@ bool ipf_format::parse(UINT8 *data, UINT32 size, floppy_image *image)
 	if(res)
 		res = generate_tracks(image);
 	global_free_array(tinfos);
+	tinfos = NULL;
 	return res;
 }
 

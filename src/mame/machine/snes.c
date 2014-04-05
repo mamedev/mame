@@ -331,7 +331,7 @@ READ8_MEMBER( snes_state::snes_io_dma_r )
 	return snes_open_bus_r(space, 0);
 }
 
-WRITE8_HANDLER( snes_state::snes_io_dma_w )
+WRITE8_MEMBER( snes_state::snes_io_dma_w )
 {
 	switch (offset)
 	{

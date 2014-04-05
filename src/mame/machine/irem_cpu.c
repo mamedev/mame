@@ -7,17 +7,18 @@
     to be able to run code in emulation (non-encrypted) mode for some subroutines..
 
     Hasamu                             Nanao   08J27261A1 011 9102KK700
-    Gunforce                           Nanao   08J27261A1 011 9106KK701
     Ken-Go                             Nanao   08J27261A1 011 9102KK701
+    Air Assault                        Nanao   08J27261A1 011 9106KK440
+    Gunforce                           Nanao   08J27261A1 011 9106KK701
     Bomberman                          Nanao   08J27261A1 012 9123KK200
     Atomic Punk                        Nanao   08J27291A1 012 9128KK440
     Blade Master / Cross Blades!       Nanao   08J27291A1 012 9123KK740
     Quiz F-1 1,2 Finish                Nanao   08J27291A4 014 9147KK700
-    Gunforce 2                         Nanao   08J27291A4 014 9247KK700
     Lethal Thunder                     Nanao   08J27291A4 014 9147KK700
+    Gun Force II / Geo Storm           Nanao   08J27291A4 014 9247KK700
     Bomberman World / New Atomic Punk  Nanao   08J27291A5 015 9219KK700
     Undercover Cops                    Nanao   08J27291A5 015 9219KK700
-    Gun Hohki                          Nanao   08J27291A6 016 9217NK700
+    Mystic Riders / Gun Hohki          Nanao   08J27291A6 016 9217NK700
     Skins Game                         Nanao   08J27291A7 017
     Hook                               Nanao   08J27291A8 018 9237NK700
 
@@ -26,9 +27,9 @@
     In The Hunt                        Irem    D8000011A1 020
     Risky Challenge/Gussun Oyoyo       Irem    D8000019A1 022 9331NK700
     Match It II/Shisensho II           Irem    D8000020A1 023 9320NK700
-    World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
     Ninja Baseball Batman              Irem    D8000021A1 024 9335NK700
-    Perfect Soldiers                   Irem    D8000022A1
+    World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
+    Superior Soldiers/Perfect Soldiers Irem    D8000022A1
     Dream Soccer '94                   Irem    D8000023A1 026 9433NK700
 
     Please let me know if you can fill in any of the blanks.
@@ -60,12 +61,12 @@ const UINT8 gunforce_decryption_table[256] = {
 	0x8a,xxxx,xxxx,xxxx,0x3a,0x3c,0x5a,0x38, 0x99,xxxx,0xf8,0x89,xxxx,0x91,xxxx,0x55, /* 20 */
 	0xac,0x40,0x73,xxxx,0x59,xxxx,0xfc,xxxx, 0x50,0xfa,xxxx,0x25,xxxx,0x34,0x47,0xb7, /* 30 */
 	xxxx,xxxx,xxxx,0x49,xxxx,0x0f,0x8b,0x05, 0xc3,0xa5,0xbf,0x83,0x86,0xc5,xxxx,xxxx, /* 40 */
-	0x28,0x77,0x24,0xb4,xxxx,0x92,xxxx,0x3b, 0x5e,0xb6,0x80,0x0d,0x2e,0xab,0xe7,xxxx, /* 50 */
+	0x08,0x77,0x24,0xb4,xxxx,0x92,xxxx,0x3b, 0x5e,0xb6,0x80,0x0d,0x2e,0xab,0xe7,xxxx, /* 50 */
 	0x48,xxxx,0xad,0xc0,xxxx,0x1b,0xc6,0xa3, 0x04,xxxx,xxxx,xxxx,0x16,0xb0,0x7d,0x98, /* 60 */
 	0x87,0x46,0x8c,xxxx,xxxx,0xfe,xxxx,0xcf, xxxx,0x68,0x84,xxxx,0xd2,xxxx,0x18,0x51, /* 70 */
 	0x76,0xa4,0x36,0x52,0xfb,xxxx,0xb9,xxxx, xxxx,0xb1,0x1c,0x21,0xe6,0xb5,0x17,0x27, /* 80 */
 	0x3d,0x45,0xbe,0xae,xxxx,0x4a,0x0e,0xe5, xxxx,0x58,0x1f,0x61,0xf3,0x02,xxxx,0xe8, /* 90 */
-	xxxx,xxxx,xxxx,0xf7,0x56,0x96,xxxx,0xbc, 0x4f,xxxx,xxxx,0x79,0xd0,xxxx,0x2a,0x12, /* A0 */
+	xxxx,xxxx,xxxx,0xf7,0x56,0x96,0xaa,0xbc, 0x4f,xxxx,xxxx,0x79,0xd0,xxxx,0x2a,0x12, /* A0 */
 	0x4e,0xb8,xxxx,0x41,xxxx,0x90,0xd3,xxxx, 0x2d,0x33,0xf6,xxxx,xxxx,0x14,xxxx,0x32, /* B0 */
 	0x5d,0xa8,0x53,0x26,0x2b,0x20,0x81,0x75, 0x7f,0x3e,xxxx,xxxx,0x00,0x93,xxxx,0xb2, /* C0 */
 	0x57,xxxx,0xa0,xxxx,0x39,xxxx,xxxx,0x72, xxxx,0x01,0x42,0x74,0x9c,0x1e,xxxx,0x5b, /* D0 */
@@ -74,7 +75,7 @@ const UINT8 gunforce_decryption_table[256] = {
 };
 // 0x13 (0x29) guess
 // 0x18 (0xa9) guess
-// 0x50 (0x28) guess
+// 0x50 (0x08) guess - changed based on airass
 // 0x63 (0xc0) guess
 // 0x7e (0x18) opcode is right but arguments could be swapped
 // 0xcc (0x00) guess

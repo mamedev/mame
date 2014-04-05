@@ -78,10 +78,10 @@ public:
 	UINT32 screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_HANDLER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
-	DECLARE_READ16_HANDLER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
-	DECLARE_WRITE16_HANDLER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_MEMBER( sega_tileram_0_w ) { m_segaic16vid->segaic16_tileram_0_w(space,offset,data,mem_mask); };
+	DECLARE_WRITE16_MEMBER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
+	DECLARE_READ16_MEMBER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
+	DECLARE_WRITE16_MEMBER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);

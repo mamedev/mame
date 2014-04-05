@@ -55,8 +55,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_spacefb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	inline void shift_star_generator(spacefb_state *state);
-	void get_starfield_pens(spacefb_state *state, pen_t *pens);
+	inline void shift_star_generator();
+	void get_starfield_pens(pen_t *pens);
 	void draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void get_sprite_pens(pen_t *pens);
 	void draw_bullet(offs_t offs, pen_t pen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
