@@ -191,6 +191,7 @@ void gime_base_device::device_start(void)
 	save_item(NAME(m_firq));
 	save_item(NAME(m_timer_value));
 	save_item(NAME(m_is_blinking));
+	save_pointer(NAME(m_palette_rotated[0]), 16);
 }
 
 
@@ -378,6 +379,20 @@ void gime_base_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 
 //-------------------------------------------------
+//  device_pre_save - device-specific pre save
+//-------------------------------------------------
+
+void gime_base_device::device_pre_save()
+{
+	super::device_pre_save();
+
+	// copy to palette rotation position zero
+	for (offs_t i = 0; i < 16; i++)
+		m_palette_rotated[0][i] = m_palette_rotated[m_palette_rotated_position][i];
+}
+
+
+//-------------------------------------------------
 //  device_post_load - device-specific post load
 //-------------------------------------------------
 
@@ -387,12 +402,9 @@ void gime_base_device::device_post_load()
 	update_memory();
 	update_cpu_clock();
 
-	// force the palette to update
-	for (offs_t i = 0; i <= 15; i++)
-	{
-		UINT8 value = read_palette_register(i);
-		write_palette_register(i, value);
-	}
+	// we update to position zero
+	m_palette_rotated_position = 0;
+	m_palette_rotated_position_used = false;
 }
 
 
