@@ -53,6 +53,7 @@ private:
 	void load(device_image_interface *image);
 	bool has_images();
 	void set_throttle_rate(float throttle_rate);
+	void start_menu(ui_menu *menu);
 
 	// template methods
 	template<class _Menu>

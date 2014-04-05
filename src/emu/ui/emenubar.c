@@ -79,11 +79,21 @@ void ui_emu_menubar::handle(render_container *container)
 //  start_menu
 //-------------------------------------------------
 
+void ui_emu_menubar::start_menu(ui_menu *menu)
+{
+	machine().ui().set_handler(ui_menu::ui_handler, 0);
+	ui_menu::stack_push(menu);
+}
+
+
+//-------------------------------------------------
+//  start_menu
+//-------------------------------------------------
+
 template<class _Menu>
 void ui_emu_menubar::start_menu()
 {
-	machine().ui().set_handler(ui_menu::ui_handler, 0);
-	ui_menu::stack_push(auto_alloc_clear(machine(), _Menu(machine(), container())));
+	start_menu(auto_alloc_clear(machine(), _Menu(machine(), container())));
 }
 
 
@@ -570,7 +580,7 @@ void ui_emu_menubar::set_ui_handler(ui_callback callback, UINT32 param)
 
 void ui_emu_menubar::select_new_game()
 {
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container(), machine().system().name)));
+	start_menu(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container(), machine().system().name)));
 }
 
 
@@ -581,8 +591,7 @@ void ui_emu_menubar::select_new_game()
 void ui_emu_menubar::select_from_software_list(device_image_interface *image, software_list_device *swlist)
 {
 	s_softlist_image = image;
-	machine().ui().set_handler(ui_menu::ui_handler, 0);
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), swlist, image->image_interface(), s_softlist_result)));
+	start_menu(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container(), swlist, image->image_interface(), s_softlist_result)));
 }
 
 
@@ -592,7 +601,7 @@ void ui_emu_menubar::select_from_software_list(device_image_interface *image, so
 
 void ui_emu_menubar::tape_control(cassette_image_device *image)
 {
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container(), image)));
+	start_menu(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container(), image)));
 }
 
 
@@ -602,7 +611,7 @@ void ui_emu_menubar::tape_control(cassette_image_device *image)
 
 void ui_emu_menubar::bitbanger_control(bitbanger_device *image)
 {
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container(), image)));
+	start_menu(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container(), image)));
 }
 
 
@@ -612,7 +621,7 @@ void ui_emu_menubar::bitbanger_control(bitbanger_device *image)
 
 void ui_emu_menubar::load(device_image_interface *image)
 {
-	ui_menu::stack_push(image->get_selection_menu(machine(), container()));
+	start_menu(image->get_selection_menu(machine(), container()));
 }
 
 
