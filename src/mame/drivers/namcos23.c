@@ -1497,7 +1497,7 @@ public:
 	DECLARE_WRITE16_MEMBER(iob_p4_w);
 	DECLARE_READ16_MEMBER(iob_p6_r);
 	DECLARE_WRITE16_MEMBER(iob_p6_w);
-	DECLARE_READ16_MEMBER(iob_gun_r);
+	DECLARE_READ8_MEMBER(iob_gun_r);
 	DECLARE_READ16_MEMBER(iob_analog_r);
 	DECLARE_DRIVER_INIT(s23);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
@@ -2985,7 +2985,7 @@ ADDRESS_MAP_END
 
 // Time Crisis lightgun
 
-READ16_MEMBER(namcos23_state::iob_gun_r)
+READ8_MEMBER(namcos23_state::iob_gun_r)
 {
 	UINT16 xpos = m_lightx->read();
 	UINT16 ypos = m_lighty->read();
@@ -2993,17 +2993,19 @@ READ16_MEMBER(namcos23_state::iob_gun_r)
 
 	switch(offset)
 	{
-		case 0: return xpos;
-		case 1: return ypos;
-		case 2: return ypos;
-		default: break;
+		case 0: return xpos&0xff;
+		case 1: return ypos&0xff;
+		case 2: return ypos&0xff;
+		case 3: return xpos>>8;
+		case 4: return ypos>>8;
+		case 5: return ypos>>8;
 	}
 
 	return 0;
 }
 
 static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 16, namcos23_state )
-	AM_RANGE(0x7000, 0x700f) AM_READ(iob_gun_r)
+	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
 	AM_IMPORT_FROM( s23iobrdmap )
 ADDRESS_MAP_END
 
@@ -3034,7 +3036,7 @@ static INPUT_PORTS_START( rapidrvr )
 
 	PORT_START("IN23")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0xf700, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf7ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )

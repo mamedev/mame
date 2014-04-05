@@ -47,6 +47,7 @@
 #include "h8_adc.h"
 #include "h8_port.h"
 #include "h8_intc.h"
+#include "h8_timer8.h"
 #include "h8_timer16.h"
 #include "h8_sci.h"
 
@@ -74,6 +75,8 @@ protected:
 	required_device<h8_port_device> porte;
 	required_device<h8_port_device> portf;
 	required_device<h8_port_device> portg;
+	required_device<h8h_timer8_channel_device> timer8_0;
+	required_device<h8h_timer8_channel_device> timer8_1;
 	required_device<h8_timer16_device> timer16;
 	required_device<h8s_timer16_channel_device> timer16_0;
 	required_device<h8s_timer16_channel_device> timer16_1;

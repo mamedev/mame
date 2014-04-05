@@ -385,6 +385,7 @@ void gime_base_device::device_post_load()
 {
 	super::device_post_load();
 	update_memory();
+	update_cpu_clock();
 }
 
 

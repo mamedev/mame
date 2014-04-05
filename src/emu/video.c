@@ -1228,8 +1228,9 @@ void video_manager::record_frame()
 			}
 
 			// write the next frame
-			const rgb_t *palette = (machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : NULL;
-			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, machine().first_screen()->palette()->entries(), palette);
+			const rgb_t *palette = (machine().first_screen() !=NULL && machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->palette()->entry_list_adjusted() : NULL;
+			int entries = (machine().first_screen() !=NULL && machine().first_screen()->palette() != NULL) ? machine().first_screen()->palette()->entries() : 0;
+			png_error error = mng_capture_frame(*m_mngfile, &pnginfo, m_snap_bitmap, entries, palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{

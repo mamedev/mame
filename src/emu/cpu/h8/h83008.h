@@ -47,6 +47,7 @@
 #include "h8_port.h"
 #include "h8_intc.h"
 #include "h8_sci.h"
+#include "h8_timer8.h"
 #include "h8_timer16.h"
 
 class h83008_device : public h8h_device {
@@ -67,6 +68,10 @@ protected:
 	required_device<h8_port_device> port9;
 	required_device<h8_port_device> porta;
 	required_device<h8_port_device> portb;
+	required_device<h8h_timer8_channel_device> timer8_0;
+	required_device<h8h_timer8_channel_device> timer8_1;
+	required_device<h8h_timer8_channel_device> timer8_2;
+	required_device<h8h_timer8_channel_device> timer8_3;
 	required_device<h8_timer16_device> timer16;
 	required_device<h8h_timer16_channel_device> timer16_0;
 	required_device<h8h_timer16_channel_device> timer16_1;
