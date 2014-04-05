@@ -65,6 +65,7 @@ EMUOBJS = \
 	$(EMUOBJ)/device.o \
 	$(EMUOBJ)/didisasm.o \
 	$(EMUOBJ)/diexec.o \
+	$(EMUOBJ)/digfx.o \
 	$(EMUOBJ)/diimage.o \
 	$(EMUOBJ)/dimemory.o \
 	$(EMUOBJ)/dinetwork.o \

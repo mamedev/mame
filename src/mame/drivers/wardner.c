@@ -336,18 +336,6 @@ static const gfx_layout tilelayout =
 	8*8     /* every tile takes 8 consecutive bytes */
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,  /* 16*16 sprites */
-	2048,   /* 2048 sprites */
-	4,      /* 4 bits per pixel */
-	{ 0*2048*32*8, 1*2048*32*8, 2*2048*32*8, 3*2048*32*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(wardner_state::irqhandler)
@@ -360,7 +348,6 @@ static GFXDECODE_START( wardner )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   1536, 32 )  /* colors 1536-1791 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, tilelayout,   1280, 16 )  /* colors 1280-1535 */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,   1024, 16 )  /* colors 1024-1079 */
-	GFXDECODE_ENTRY( "gfx4", 0x00000, spritelayout,    0, 64 )  /* colors    0-1023 */
 GFXDECODE_END
 
 
@@ -409,8 +396,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_14MHz/4, twincobr_mc6845_intf) /* 3.5MHz measured on CLKin */
 
-	MCFG_TOAPLAN_SCU_ADD("toaplan_scu")
-	MCFG_TOAPLAN_SCU_GFXDECODE("gfxdecode")
+	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 32, 14)
 
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram8")
 
@@ -480,7 +466,7 @@ ROM_START( wardner )
 	ROM_LOAD( "b25-10.rom",  0x10000, 0x08000, CRC(b9a61e81) SHA1(541e579664d583fbbf81111046115018fdaff073) )
 	ROM_LOAD( "b25-09.rom",  0x18000, 0x08000, CRC(585411b7) SHA1(67c0f4b7ab303341d5481c4024dc4199acb7c279) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )    /* sprites */
+	ROM_REGION( 0x40000, "scu", 0 )    /* sprites */
 	ROM_LOAD( "b25-01.rom",  0x00000, 0x10000, CRC(42ec01fb) SHA1(646192a2e89f795ed016860cdcdc0b5ef645fca2) )
 	ROM_LOAD( "b25-02.rom",  0x10000, 0x10000, CRC(6c0130b7) SHA1(8b6ad72848d03c3d4ee3acd35abbb3a0e678122c) )
 	ROM_LOAD( "b25-03.rom",  0x20000, 0x10000, CRC(b923db99) SHA1(2f4be81afdf200586bc44b1e94553d84d16d0b62) )
@@ -531,7 +517,7 @@ ROM_START( pyros )
 	ROM_LOAD( "b25-10.rom",  0x10000, 0x08000, CRC(b9a61e81) SHA1(541e579664d583fbbf81111046115018fdaff073) )
 	ROM_LOAD( "b25-09.rom",  0x18000, 0x08000, CRC(585411b7) SHA1(67c0f4b7ab303341d5481c4024dc4199acb7c279) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )    /* sprites */
+	ROM_REGION( 0x40000, "scu", 0 )    /* sprites */
 	ROM_LOAD( "b25-01.rom",  0x00000, 0x10000, CRC(42ec01fb) SHA1(646192a2e89f795ed016860cdcdc0b5ef645fca2) )
 	ROM_LOAD( "b25-02.rom",  0x10000, 0x10000, CRC(6c0130b7) SHA1(8b6ad72848d03c3d4ee3acd35abbb3a0e678122c) )
 	ROM_LOAD( "b25-03.rom",  0x20000, 0x10000, CRC(b923db99) SHA1(2f4be81afdf200586bc44b1e94553d84d16d0b62) )
@@ -582,7 +568,7 @@ ROM_START( wardnerj )
 	ROM_LOAD( "b25-10.rom",  0x10000, 0x08000, CRC(b9a61e81) SHA1(541e579664d583fbbf81111046115018fdaff073) )
 	ROM_LOAD( "b25-09.rom",  0x18000, 0x08000, CRC(585411b7) SHA1(67c0f4b7ab303341d5481c4024dc4199acb7c279) )
 
-	ROM_REGION( 0x40000, "gfx4", 0 )    /* sprites */
+	ROM_REGION( 0x40000, "scu", 0 )    /* sprites */
 	ROM_LOAD( "b25-01.rom",  0x00000, 0x10000, CRC(42ec01fb) SHA1(646192a2e89f795ed016860cdcdc0b5ef645fca2) )
 	ROM_LOAD( "b25-02.rom",  0x10000, 0x10000, CRC(6c0130b7) SHA1(8b6ad72848d03c3d4ee3acd35abbb3a0e678122c) )
 	ROM_LOAD( "b25-03.rom",  0x20000, 0x10000, CRC(b923db99) SHA1(2f4be81afdf200586bc44b1e94553d84d16d0b62) )

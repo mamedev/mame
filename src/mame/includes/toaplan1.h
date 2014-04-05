@@ -164,7 +164,7 @@ class toaplan1_rallybik_state : public toaplan1_state
 public:
 	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
 		: toaplan1_state(mconfig, type, tag),
-		m_spritegen(*this, "toaplan_scu")
+		m_spritegen(*this, "scu")
 	{
 	}
 

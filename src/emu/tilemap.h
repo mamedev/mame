@@ -429,7 +429,7 @@ typedef UINT32 tilemap_memory_index;
 // tile_data is filled in by the get_tile_info callback
 struct tile_data
 {
-	gfxdecode_device *decoder;      // set in tilemap_t::init()
+	device_gfx_interface *decoder;  // set in tilemap_t::init()
 	const UINT8 *   pen_data;       // required
 	const UINT8 *   mask_data;      // required
 	pen_t           palette_base;   // defaults to 0
@@ -485,7 +485,7 @@ protected:
 	tilemap_t();
 	virtual ~tilemap_t();
 
-	tilemap_t &init(tilemap_manager &manager, gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
+	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows);
 
 public:
 	// getters
@@ -684,8 +684,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
-	tilemap_t &create(gfxdecode_device &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, int tilewidth, int tileheight, int cols, int rows, tilemap_t *allocated = NULL);
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }

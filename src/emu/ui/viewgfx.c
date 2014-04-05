@@ -41,7 +41,7 @@ const int MAX_GFX_DECODERS = 8;
 // information about a single gfx device
 struct ui_gfx_info
 {
-	gfxdecode_device *device;			// pointer to device
+	device_gfx_interface *interface;	// pointer to device's gfx interface
 	UINT8 setcount;						// how many gfx sets device has
 	UINT8 rotate[MAX_GFX_ELEMENTS];		// current rotation (orientation) value
 	UINT8 columns[MAX_GFX_ELEMENTS];	// number of items per row
@@ -169,36 +169,36 @@ void ui_gfx_init(running_machine &machine)
 
 static void ui_gfx_count_devices(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device_iterator pal_deviter(machine.root_device());
-	gfxdecode_device_iterator gfx_deviter(machine.root_device());
+	palette_device_iterator pal_iter(machine.root_device());
+	gfx_interface_iterator gfx_iter(machine.root_device());
 
 	// count the palette devices
-	state.palette.devcount = pal_deviter.count();
+	state.palette.devcount = pal_iter.count();
 
 	// set the pointer to the first palette
 	if (state.palette.devcount > 0)
 		palette_set_device(machine, state);
 
-	// count the gfx decoders
+	// count the gfx devices
 	state.gfxset.devcount = 0;
-	int tempcount = gfx_deviter.count();
+	int tempcount = gfx_iter.count();
 
-	// count the gfx sets in each decoder
+	// count the gfx sets in each device, skipping devices with none
 	if (tempcount > 0)
 	{
-		gfxdecode_device *m_gfxdecode;
+		device_gfx_interface *interface;
 		int i, count;
 
-		for (i = 0, m_gfxdecode = gfx_deviter.first();
+		for (i = 0, interface = gfx_iter.first();
 				i < tempcount && state.gfxset.devcount < MAX_GFX_DECODERS;
-				i++, m_gfxdecode = gfx_deviter.next())
+				i++, interface = gfx_iter.next())
 		{
-			for (count = 0; count < MAX_GFX_ELEMENTS && m_gfxdecode->gfx(count) != NULL; count++);
+			for (count = 0; count < MAX_GFX_ELEMENTS && interface->gfx(count) != NULL; count++);
 
 			// count = index of first NULL
 			if (count > 0)
 			{
-				state.gfxdev[state.gfxset.devcount].device = m_gfxdecode;
+				state.gfxdev[state.gfxset.devcount].interface = interface;
 				state.gfxdev[state.gfxset.devcount].setcount = count;
 				state.gfxset.devcount++;
 			}
@@ -341,8 +341,8 @@ cancel:
 
 static void palette_set_device(running_machine &machine, ui_gfx_state &state)
 {
-	palette_device_iterator pal_deviter(machine.root_device());
-	state.palette.device = pal_deviter.byindex(state.palette.devindex);
+	palette_device_iterator pal_iter(machine.root_device());
+	state.palette.device = pal_iter.byindex(state.palette.devindex);
 }
 
 
@@ -564,8 +564,8 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	int dev = state.gfxset.devindex;
 	int set = state.gfxset.set;
 	ui_gfx_info &info = state.gfxdev[dev];
-	gfxdecode_device &m_gfxdecode = *info.device;
-	gfx_element &gfx = *m_gfxdecode.gfx(set);
+	device_gfx_interface &interface = *info.interface;
+	gfx_element &gfx = *interface.gfx(set);
 	float fullwidth, fullheight;
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -649,7 +649,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 
 	// figure out the title and expand the outer box to fit
 	sprintf(title, "'%s' %d/%d %dx%d COLOR %X",
-					m_gfxdecode.tag(),
+					interface.device().tag(),
 					set, info.setcount - 1,
 					gfx.width(), gfx.height(),
 					info.color[set]);
@@ -758,7 +758,7 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	int dev = state.gfxset.devindex;
 	int set = state.gfxset.set;
 	ui_gfx_info &info = state.gfxdev[dev];
-	gfx_element &gfx = *info.device->gfx(set);
+	gfx_element &gfx = *info.interface->gfx(set);
 
 	// handle cells per line (minus,plus)
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))

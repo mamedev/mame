@@ -4,14 +4,9 @@ const device_type K053250 = &device_creator<k053250_device>;
 
 k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053250, "K053250", tag, owner, clock, "k053250", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_palette(*this)
+		device_gfx_interface(mconfig, *this),
+		device_video_interface(mconfig, *this)
 {
-}
-
-void k053250_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-        downcast<k053250_device &>(device).m_palette.set_tag(tag);
 }
 
 void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
@@ -60,7 +55,7 @@ void k053250_device::device_reset()
 }
 
 // utility function to render a clipped scanline vertically or horizontally
-inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
+inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, UINT8 *source,
 										const rectangle &cliprect, int linepos, int scroll, int zoom,
 										UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri)
 {
@@ -74,7 +69,6 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 	UINT8  *src_base;
 	int src_fx, src_fdx;
 	int pix_data, dst_offset;
-	const pen_t *pal_base;
 	UINT8  *pri_base;
 	UINT32 *dst_base;
 	int dst_adv;
@@ -183,7 +177,6 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 	// so we set all bits of the wrapmask to one
 	src_wrapmask = (clipmask) ? ~0 : wrapmask;
 
-	pal_base = palette;
 	dst_offset = -dst_offset; // negate target offset in order to terminated draw loop at 0 condition
 
 	if (pri)
@@ -358,7 +351,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 	linedata_offs += line_start * linedata_adv;     // pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = m_palette->pens() + (colorbase << 4) % m_palette->entries();
+	pal_base = palette()->pens() + (colorbase << 4) % palette()->entries();
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos <= line_end; linedata_offs += linedata_adv, line_pos++)
