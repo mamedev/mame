@@ -9674,6 +9674,17 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
+	<software name="contradvp" cloneof="contradv">
+		<description>Contra Advance (Prototype)</description>
+		<year>2003</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="contra advance (proto).bin" size="33554432" crc="dd1499a0" sha1="86f25c0f0b0814b99a12c44c43855e380722c9e9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="corvette">
 		<description>Corvette (USA)</description>
 		<year>2003</year>
@@ -9809,6 +9820,20 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="crashfsnu" cloneof="crashfsn">
+		<description>Crash Bandicoot Purple - Ripto's Rampage (USA, Rev. A)</description>
+		<year>2004</year>
+		<publisher>Vivendi Universal</publisher>
+		<info name="serial" value="AGB-BD4E-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="16777216">
+				<rom name="crash bandicoot purple - ripto's rampage (u) (v1.1).bin" size="16777216" crc="3ddf07a1" sha1="b14da39b82d9c69f60deda179c073a14d07d5ce7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crashfsnua" cloneof="crashfsn">
 		<description>Crash Bandicoot Purple - Ripto's Rampage (USA)</description>
 		<year>2004</year>
 		<publisher>Vivendi Universal</publisher>
@@ -15409,7 +15434,21 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="franklin1" cloneof="franklin">
+	<software name="franklina" cloneof="franklin">
+		<description>Franklin the Turtle (Euro, Rev. 1)</description>
+		<year>2006</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-BFKP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="franklin the turtle (europe) (rev 1).bin" size="4194304" crc="1a2f7ee6" sha1="5211fb864a60461f7ae20c42e2bf60e08a9f96ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="franklinb" cloneof="franklin">
 		<description>Franklin the Turtle (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
@@ -16468,6 +16507,19 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="garfldsp">
+		<description>Garfield - The Search for Pooky (Euro, Rev. 2)</description>
+		<year>2004</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-BGOP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="16777216">
+			<!-- 2nd half (8MB) filled with 0xff, verified on the real cart -->
+				<rom name="garfieldtsfp.bgop.bin" size="16777216" crc="f7cd830c" sha1="c3ab25e65f59c5d80d45b605a2c55ba666362be5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfldspa" cloneof="garfldsp">
 		<description>Garfield - The Search for Pooky (Euro)</description>
 		<year>2004</year>
 		<publisher>The Game Factory</publisher>
@@ -25254,6 +25306,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="tetrisad" supported="partial">
+		<description>Minna no Soft Series - Tetris Advance (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Success</publisher>
+		<info name="serial" value="AGB-BTTJ-JPN"/>
+		<info name="release" value="20031128"/>
+		<info name="alt_title" value="みんなのソフトシリーズ テトリス アドバンス"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="minna no soft series - tetris advance (japan) (rev 1).bin" size="4194304" crc="524d0749" sha1="379f524b1772ad41355b68884df1f8be75e388e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisada" cloneof="tetrisad" supported="partial">
 		<description>Minna no Soft Series - Tetris Advance (Jpn)</description>
 		<year>2003</year>
 		<publisher>Success</publisher>
@@ -26610,6 +26678,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="narutoncj" cloneof="narutonc">
+		<description>Naruto - Ninjutsu Zenkai! Saikyou Ninja Daikesshuu (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="serial" value="AGB-A7AJ-JPN"/>
+		<info name="release" value="20030501"/>
+		<info name="alt_title" value="NARUTO-ナルト- 忍術全開!最強忍者 大結集"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="naruto - ninjutsu zenkai! saikyou ninja daikesshuu (japan) (rev 1).bin" size="8388608" crc="f5f8ecb4" sha1="7fca2cff63cf5aa2f2ad301ca254f979f723b072" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="narutoncja" cloneof="narutonc">
 		<description>Naruto - Ninjutsu Zenkai! Saikyou Ninja Daikesshuu (Jpn)</description>
 		<year>2003</year>
 		<publisher>Tomy</publisher>
@@ -34692,6 +34776,20 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="spyrorng" cloneof="spyrofsn">
+		<description>Spyro Orange - The Cortex Conspiracy (USA, Rev. A)</description>
+		<year>2004</year>
+		<publisher>Vivendi Universal</publisher>
+		<info name="serial" value="AGB-BSTE-USA"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="16777216">
+				<rom name="spyro orange - the cortex conspiracy (u) (v1.1).bin" size="16777216" crc="bbf2549d" sha1="eed93ebe63a99de8490d05ae1bc122dbfe5f8596" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spyrornga" cloneof="spyrofsn">
 		<description>Spyro Orange - The Cortex Conspiracy (USA)</description>
 		<year>2004</year>
 		<publisher>Vivendi Universal</publisher>
@@ -36874,6 +36972,20 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="tetrswldj" cloneof="tetrswld">
+		<description>Tetris Worlds (Jpn, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Success</publisher>
+		<info name="serial" value="AGB-ATWJ-JPN"/>
+		<info name="release" value="20020426"/>
+		<info name="alt_title" value="テトリスワールド"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="tetris worlds (japan) (rev 1).bin" size="4194304" crc="fcf2d471" sha1="be44036e39f95fb9feb93630720d46570ba1a42f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrswldja" cloneof="tetrswld">
 		<description>Tetris Worlds (Jpn)</description>
 		<year>2002</year>
 		<publisher>Success</publisher>
@@ -36975,6 +37087,18 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="3table6">
+		<description>Three-in-One Pack - Risk + Battleship + Clue (USA, Rev. A)</description>
+		<year>2005</year>
+		<publisher>DSI Games</publisher>
+		<info name="serial" value="AGB-B66E-USA"/>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="three-in-one pack - risk + battleship + clue (u) (v1.1).bin" size="4194304" crc="15c24091" sha1="06f95762bc56e11c984af71e197d146f95ea4f70" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3table6a" cloneof="3table6">
 		<description>Three-in-One Pack - Risk + Battleship + Clue (USA)</description>
 		<year>2005</year>
 		<publisher>DSI Games</publisher>

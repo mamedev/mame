@@ -7,12 +7,7 @@ To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
 
 Undumped:
-- Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
-- Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
-
-nointro guys also list the following
-- The New Adventures of Mary-Kate &amp; Ashley (Euro)
 
 Undumped GBC protos:
   - Jet Force Gemini
@@ -9029,7 +9024,8 @@ List of unconfirmed retail cartridge roms
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
-				<rom name="game boy wars 2 (japan).bin" size="1048576" crc="e3b0319e" sha1="5da1bf00291dee9b478b739b73855bf4b49d63c7" offset="000000" />
+			<!-- 2nd half is filled with 0xff, confirmed with the real cart -->
+				<rom name="game boy wars 2 (japan).bin" size="1048576" crc="c69dc37b" sha1="db511650fdc9a6c130add7eada9562b6443b565d" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -13623,10 +13619,10 @@ List of unconfirmed retail cartridge roms
 
 	<software name="mnacrush">
 		<!-- Notes: GBC only -->
-		<description>Mary-Kate and Ashley - Crush Course (USA)</description>
+		<description>Mary-Kate and Ashley - Crush Course (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="CGB-BCVE-USA"/>
+		<info name="serial" value="CGB-BCVE-USA, CGB-BCVP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -13636,10 +13632,10 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="mnaplann">
-		<description>Mary-Kate and Ashley - Pocket Planner (USA)</description>
+		<description>Mary-Kate and Ashley - Pocket Planner (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-BMAE-USA"/>
+		<info name="serial" value="DMG-BMAE-USA, DMG-BMAP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc3" />
 			<feature name="rtc" value="yes" />
@@ -15435,10 +15431,10 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="newmna">
-		<description>The New Adventures of Mary-Kate &amp; Ashley (USA)</description>
+		<description>The New Adventures of Mary-Kate &amp; Ashley (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-AXFE-USA"/>
+		<info name="serial" value="DMG-AXFE-USA, DMG-AXFP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
