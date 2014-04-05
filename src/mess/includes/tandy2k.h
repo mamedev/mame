@@ -95,6 +95,10 @@ public:
 		m_centronics_perror(0),
 		m_centronics_busy(0)
 	{
+		for (int i = 0; i < 4; i++)
+		{
+			m_busdmarq[i] = CLEAR_LINE;
+		}
 	}
 
 	required_device<i80186_cpu_device> m_maincpu;
@@ -122,8 +126,9 @@ public:
 
 	virtual void machine_start();
 
-	void speaker_update();
+	void update_drq();
 	void dma_request(int line, int state);
+	void speaker_update();
 
 	DECLARE_READ8_MEMBER( char_ram_r );
 	DECLARE_WRITE8_MEMBER( char_ram_w );
@@ -173,6 +178,7 @@ public:
 
 	/* DMA state */
 	UINT8 m_dma_mux;
+	int m_busdmarq[4];
 
 	/* keyboard state */
 	int m_kbdclk;

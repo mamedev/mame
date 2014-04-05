@@ -13809,6 +13809,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="f15se2upa" cloneof="f15se2">
+		<description>F-15 Strike Eagle II (USA, Prototype, Alt)</description>
+		<year>1993</year>
+		<publisher>Microprose</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="f-15strikeeagleii.0f82.bin" size="2097152" crc="dc5f07ba" sha1="6900219ec9057ce2ef5bd1304c2c26aa678a1daa" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="f22">
 		<description>F-22 Interceptor (Euro, USA, 199206)</description>
 		<year>1991</year>
@@ -16565,6 +16576,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="lethalenup" cloneof="lethalen">
+		<description>Lethal Enforcers (USA, Prototype)</description>
+		<year>1993</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="lethalenforcers00.eadd.bin" size="2097152" crc="f4010503" sha1="01a445cf8ed57db1be4bd2aef1107d9e2fbcdb77" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="le2">
 		<description>Lethal Enforcers II - Gun Fighters (Euro)</description>
 		<year>1994</year>
@@ -16767,6 +16789,22 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="lotus ii (usa) (beta).bin" size="1048576" crc="2997b7d4" sha1="e108d612735dcc768bed68a58d6fd45d71de565d" offset="0x000000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These were recovered from a preview floppy disk. The composite ROM has CRC 2b4c3ec1 -->
+	<software name="lufia">
+		<description>Lufia &amp; The Fortress of Doom (USA, Early Prototype)</description>
+		<year>1993</year>
+		<publisher>Taito</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lufia01.bin" size="262144" crc="0193c049" sha1="d9effc085e8f9a6ed09769774e4d7179d5a73369" offset="0x000000" loadflag="load16_byte"/>
+				<rom name="lufia02.bin" size="262144" crc="6908532d" sha1="b0ab16d0ad1fb679b1c85b0c5d9d8fb55b42a589" offset="0x000001" loadflag="load16_byte"/>
+				<!-- second half contains no data, it was like this in the original backup -->
+				<rom name="lufia03.bin" size="262144" crc="b7094978" sha1="1e4903cd5f594c13dad2fd74666ba35c62550044" offset="0x080000" loadflag="load16_byte"/>
+				<rom name="lufia04.bin" size="262144" crc="b7094978" sha1="1e4903cd5f594c13dad2fd74666ba35c62550044" offset="0x080001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20168,6 +20206,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" size="1048576">
 				<rom name="mdstee_13.bin" size="1048576" crc="aa8b19bc" sha1="3f73dcabcdf0d781834fcc673533301b82f0e91b" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
@@ -20179,6 +20218,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" size="1048576">
 				<rom name="pete sampras tennis (euro, usa) (j-cart).bin" size="1048576" crc="9ef5bbd1" sha1="222a66cdb8865a7f89e5a72418413888bb400176" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>
@@ -22199,6 +22239,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_jcart"/>
 			<dataarea name="rom" size="2097152">
 				<rom name="sampras tennis 96 (euro) (j-cart).bin" size="2097152" crc="14e3fb7b" sha1="139b9cea418c7c932033ddff87bf10466828cbfa" offset="0x000000" loadflag="load16_word_swap"/>
 			</dataarea>

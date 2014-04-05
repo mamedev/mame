@@ -184,7 +184,7 @@
 	</software>
 
 	<software name="advpinoc">
-		<description>The Adventures of Pinocchio (USA, Prototype)</description>
+		<description>The Adventures of Pinocchio (Prototype)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -3861,10 +3861,10 @@
 <!-- This dump has been verified from an European cart by NoIntro guys, the duffy set is still unverified (maybe a Rev.1?) -->
 	<software name="daffya" cloneof="daffy">
 		<!-- Notes: SGB enhanced -->
-		<description>Daffy Duck - The Marvin Missions (Euro, USA, Alt)</description>
+		<description>Daffy Duck - The Marvin Missions (Euro, Alt)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-YS-USA, DMG-YS-NOE"/>
+		<info name="serial" value="DMG-YS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -15926,14 +15926,27 @@
 	</software>
 
 	<software name="powrace">
-		<description>Power Racer (Euro, USA)</description>
+		<description>Power Racer (Euro)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
-		<info name="serial" value="DMG-PQ-USA, DMG-PQ-NOE"/>
+		<info name="serial" value="DMG-PQ-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
 				<rom name="power racer (usa, europe).bin" size="65536" crc="cf8aeee8" sha1="6e10f59bb4090c0d0e79b57a2e39d9577ce0282e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powraceu" cloneof="powrace">
+		<description>Power Racer (USA)</description>
+		<year>1990</year>
+		<publisher>Tecmo</publisher>
+		<info name="serial" value="DMG-PQ-USA"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="65536">
+				<rom name="power racer (usa, europe).bin" size="65536" crc="afc6a949" sha1="c0c8f28a9b66b6c08a0ed4d31a186c3382160c3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -19014,7 +19027,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
-				<rom name="spot - the cool adventure (usa).bin" size="131072" crc="0e08f59b" sha1="7e80ddc835ecde69ea11c4702a6cfb93575e917a" offset="000000" />
+				<rom name="spot - the cool adventure (usa).bin" size="131072" crc="76f67428" sha1="bcc923e6e73efe7e865625bb6ecf2ef08e380826" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23040,7 +23053,7 @@
 	</software>
 
 	<software name="yuyu3">
-		<description>Yu Yu Hakusho Dai-3-dan - Makai no Tobira (Jpn)</description>
+		<description>Yu Yu Hakusho Dai-3-dan - Makai no Tobira Hen (Jpn)</description>
 		<year>1994</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-UGJ"/>

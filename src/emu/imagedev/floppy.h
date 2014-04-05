@@ -15,6 +15,7 @@
 #include "formats/ipf_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "formats/td0_dsk.h"
+#include "ui/imgcntrl.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _formats)  \
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
