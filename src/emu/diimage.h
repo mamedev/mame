@@ -322,34 +322,4 @@ protected:
 // iterator
 typedef device_interface_iterator<device_image_interface> image_interface_iterator;
 
-class ui_menu_control_device_image : public ui_menu {
-public:
-	ui_menu_control_device_image(running_machine &machine, render_container *container, device_image_interface *image);
-	virtual ~ui_menu_control_device_image();
-	virtual void populate();
-	virtual void handle();
-
-protected:
-	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, DO_CREATE, SELECT_SOFTLIST,
-		LAST_ID
-	};
-	int state;
-
-	device_image_interface *image;
-	astring current_directory;
-	astring current_file;
-	int submenu_result;
-	bool create_confirmed;
-	bool softlist_done;
-	const software_info *swi;
-	const software_part *swp;
-	class software_list_device *sld;
-	astring software_info_name;
-
-	void test_create(bool &can_create, bool &need_confirm);
-	void load_software_part();
-	virtual void hook_load(astring filename, bool softlist);
-};
-
 #endif  /* __DIIMAGE_H__ */
