@@ -1233,9 +1233,9 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 
 void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state )
 {
-	m_sub->set_input_line(1, vblank_state);
+	m_sub->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(vblank_state);
-	m_s12_lastpB = (m_s12_lastpB & 0x7f) | (vblank_state << 7);
+	m_s12_lastpB = (m_s12_lastpB & 0x7f) | (vblank_state ? 0x80 : 0);
 }
 
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
