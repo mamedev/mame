@@ -31,52 +31,33 @@ const device_type MC68328 = &device_creator<mc68328_device>;
 
 
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__)
+				: device_t(mconfig, MC68328, "Motorola MC68328 (DragonBall) Integrated Processor", tag, owner, clock, "mc68328", __FILE__),
+				m_out_port_a_cb(*this),
+				m_out_port_b_cb(*this),
+				m_out_port_c_cb(*this),
+				m_out_port_d_cb(*this),
+				m_out_port_e_cb(*this),
+				m_out_port_f_cb(*this),
+				m_out_port_g_cb(*this),
+				m_out_port_j_cb(*this),
+				m_out_port_k_cb(*this),
+				m_out_port_m_cb(*this),
+				m_in_port_a_cb(*this),
+				m_in_port_b_cb(*this),
+				m_in_port_c_cb(*this),
+				m_in_port_d_cb(*this),
+				m_in_port_e_cb(*this),
+				m_in_port_f_cb(*this),
+				m_in_port_g_cb(*this),
+				m_in_port_j_cb(*this),
+				m_in_port_k_cb(*this),
+				m_in_port_m_cb(*this),
+				m_out_pwm_cb(*this),
+				m_out_spim_cb(*this),
+				m_in_spim_cb(*this),
+				m_spim_xch_trigger_cb(*this),
+				m_cpu(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc68328_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc68328_interface *intf = reinterpret_cast<const mc68328_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc68328_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_port_a_func, 0, sizeof(m_out_port_a_func));
-		memset(&m_out_port_b_func, 0, sizeof(m_out_port_b_func));
-		memset(&m_out_port_c_func, 0, sizeof(m_out_port_c_func));
-		memset(&m_out_port_d_func, 0, sizeof(m_out_port_d_func));
-		memset(&m_out_port_e_func, 0, sizeof(m_out_port_e_func));
-		memset(&m_out_port_f_func, 0, sizeof(m_out_port_f_func));
-		memset(&m_out_port_g_func, 0, sizeof(m_out_port_g_func));
-		memset(&m_out_port_j_func, 0, sizeof(m_out_port_j_func));
-		memset(&m_out_port_k_func, 0, sizeof(m_out_port_k_func));
-		memset(&m_out_port_m_func, 0, sizeof(m_out_port_m_func));
-		memset(&m_in_port_a_func, 0, sizeof(m_in_port_a_func));
-		memset(&m_in_port_b_func, 0, sizeof(m_in_port_b_func));
-		memset(&m_in_port_c_func, 0, sizeof(m_in_port_c_func));
-		memset(&m_in_port_d_func, 0, sizeof(m_in_port_d_func));
-		memset(&m_in_port_e_func, 0, sizeof(m_in_port_e_func));
-		memset(&m_in_port_f_func, 0, sizeof(m_in_port_f_func));
-		memset(&m_in_port_g_func, 0, sizeof(m_in_port_g_func));
-		memset(&m_in_port_j_func, 0, sizeof(m_in_port_j_func));
-		memset(&m_in_port_k_func, 0, sizeof(m_in_port_k_func));
-		memset(&m_in_port_m_func, 0, sizeof(m_in_port_m_func));
-		memset(&m_out_pwm_func, 0, sizeof(m_out_pwm_func));
-		memset(&m_out_spim_func, 0, sizeof(m_out_spim_func));
-		memset(&m_in_spim_func, 0, sizeof(m_in_spim_func));
-		memset(&m_spim_xch_trigger_func, 0, sizeof(m_spim_xch_trigger_func));
-		m68k_cpu_tag = "";
-	}
 }
 
 //-------------------------------------------------
@@ -85,36 +66,34 @@ void mc68328_device::device_config_complete()
 
 void mc68328_device::device_start()
 {
-	m_out_port_a.resolve(m_out_port_a_func, *this);
-	m_out_port_b.resolve(m_out_port_b_func, *this);
-	m_out_port_c.resolve(m_out_port_c_func, *this);
-	m_out_port_d.resolve(m_out_port_d_func, *this);
-	m_out_port_e.resolve(m_out_port_e_func, *this);
-	m_out_port_f.resolve(m_out_port_f_func, *this);
-	m_out_port_g.resolve(m_out_port_g_func, *this);
-	m_out_port_j.resolve(m_out_port_j_func, *this);
-	m_out_port_k.resolve(m_out_port_k_func, *this);
-	m_out_port_m.resolve(m_out_port_m_func, *this);
+	m_out_port_a_cb.resolve();
+	m_out_port_b_cb.resolve();
+	m_out_port_c_cb.resolve();
+	m_out_port_d_cb.resolve();
+	m_out_port_e_cb.resolve();
+	m_out_port_f_cb.resolve();
+	m_out_port_g_cb.resolve();
+	m_out_port_j_cb.resolve();
+	m_out_port_k_cb.resolve();
+	m_out_port_m_cb.resolve();
 
-	m_in_port_a.resolve(m_in_port_a_func, *this);
-	m_in_port_b.resolve(m_in_port_b_func, *this);
-	m_in_port_c.resolve(m_in_port_c_func, *this);
-	m_in_port_d.resolve(m_in_port_d_func, *this);
-	m_in_port_e.resolve(m_in_port_e_func, *this);
-	m_in_port_f.resolve(m_in_port_f_func, *this);
-	m_in_port_g.resolve(m_in_port_g_func, *this);
-	m_in_port_j.resolve(m_in_port_j_func, *this);
-	m_in_port_k.resolve(m_in_port_k_func, *this);
-	m_in_port_m.resolve(m_in_port_m_func, *this);
+	m_in_port_a_cb.resolve();
+	m_in_port_b_cb.resolve();
+	m_in_port_c_cb.resolve();
+	m_in_port_d_cb.resolve();
+	m_in_port_e_cb.resolve();
+	m_in_port_f_cb.resolve();
+	m_in_port_g_cb.resolve();
+	m_in_port_j_cb.resolve();
+	m_in_port_k_cb.resolve();
+	m_in_port_m_cb.resolve();
 
-	m_out_pwm.resolve(m_out_pwm_func, *this);
+	m_out_pwm_cb.resolve();
 
-	m_out_spim.resolve(m_out_spim_func, *this);
-	m_in_spim.resolve(m_in_spim_func, *this);
+	m_out_spim_cb.resolve();
+	m_in_spim_cb.resolve();
 
-	m_spim_xch_trigger.resolve(m_spim_xch_trigger_func, *this);
-
-	m_cpu = machine().device<cpu_device>(m68k_cpu_tag);
+	m_spim_xch_trigger_cb.resolve();
 
 	m_gptimer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer1_hit),this));
 	m_gptimer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer2_hit),this));
@@ -534,9 +513,9 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 
 	m_regs.pwmc ^= PWMC_PIN;
 
-	if (!m_out_pwm.isnull())
+	if (!m_out_pwm_cb.isnull())
 	{
-		m_out_pwm(0, (m_regs.pwmc & PWMC_PIN) ? 1 : 0);
+		m_out_pwm_cb((offs_t)0, (m_regs.pwmc & PWMC_PIN) ? 1 : 0);
 	}
 }
 
@@ -990,9 +969,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PADATA = %02x\n", data & 0x00ff);
 				m_regs.padata = data & 0x00ff;
-				if (!m_out_port_a.isnull())
+				if (!m_out_port_a_cb.isnull())
 				{
-					m_out_port_a(0, data & 0x00ff);
+					m_out_port_a_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1019,9 +998,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PBDATA = %02x\n", data & 0x00ff);
 				m_regs.pbdata = data & 0x00ff;
-				if (!m_out_port_b.isnull())
+				if (!m_out_port_b_cb.isnull())
 				{
-					m_out_port_b(0, data & 0x00ff);
+					m_out_port_b_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1048,9 +1027,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PCDATA = %02x\n", data & 0x00ff);
 				m_regs.pcdata = data & 0x00ff;
-				if (!m_out_port_c.isnull())
+				if (!m_out_port_c_cb.isnull())
 				{
-					m_out_port_c(0, data & 0x00ff);
+					m_out_port_c_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1131,9 +1110,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PEDATA = %02x\n", data & 0x00ff);
 				m_regs.pedata = data & 0x00ff;
-				if (!m_out_port_e.isnull())
+				if (!m_out_port_e_cb.isnull())
 				{
-					m_out_port_e(0, data & 0x00ff);
+					m_out_port_e_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1162,9 +1141,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PFDATA = %02x\n", data & 0x00ff);
 				m_regs.pfdata = data & 0x00ff;
-				if (!m_out_port_f.isnull())
+				if (!m_out_port_f_cb.isnull())
 				{
-					m_out_port_f(0, data & 0x00ff);
+					m_out_port_f_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1192,9 +1171,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PGDATA = %02x\n", data & 0x00ff);
 				m_regs.pgdata = data & 0x00ff;
-				if (!m_out_port_g.isnull())
+				if (!m_out_port_g_cb.isnull())
 				{
-					m_out_port_g(0, data & 0x00ff);
+					m_out_port_g_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1222,9 +1201,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PJDATA = %02x\n", data & 0x00ff);
 				m_regs.pjdata = data & 0x00ff;
-				if (!m_out_port_j.isnull())
+				if (!m_out_port_j_cb.isnull())
 				{
-					m_out_port_j(0, data & 0x00ff);
+					m_out_port_j_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1251,9 +1230,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PKDATA = %02x\n", data & 0x00ff);
 				m_regs.pkdata = data & 0x00ff;
-				if (!m_out_port_k.isnull())
+				if (!m_out_port_k_cb.isnull())
 				{
-					m_out_port_k(0, data & 0x00ff);
+					m_out_port_k_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1281,9 +1260,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			{
 				verboselog(machine(), 2, "mc68328_w: PMDATA = %02x\n", data & 0x00ff);
 				m_regs.pmdata = data & 0x00ff;
-				if (!m_out_port_m.isnull())
+				if (!m_out_port_m_cb.isnull())
 				{
-					m_out_port_m(0, data & 0x00ff);
+					m_out_port_m_cb((offs_t)0, data & 0x00ff);
 				}
 			}
 			else
@@ -1460,9 +1439,9 @@ WRITE16_MEMBER( mc68328_device::write )
 
 		case 0x800:
 			verboselog(machine(), 2, "mc68328_w: SPIMDATA = %04x\n", data);
-			if (!m_out_spim.isnull())
+			if (!m_out_spim_cb.isnull())
 			{
-				m_out_spim(0, data, 0xffff);
+				m_out_spim_cb(0, data, 0xffff);
 			}
 			else
 			{
@@ -1485,9 +1464,9 @@ WRITE16_MEMBER( mc68328_device::write )
 			if (data & SPIM_XCH)
 			{
 				m_regs.spimcont &= ~SPIM_XCH;
-				if (!m_spim_xch_trigger.isnull())
+				if (!m_spim_xch_trigger_cb.isnull())
 				{
-					m_spim_xch_trigger(0);
+					m_spim_xch_trigger_cb(0);
 				}
 				if (data & SPIM_IRQEN)
 				{
@@ -2064,9 +2043,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PADATA = %02x\n", mem_mask, m_regs.padata);
-				if (!m_in_port_a.isnull())
+				if (!m_in_port_a_cb.isnull())
 				{
-					return m_in_port_a(0);
+					return m_in_port_a_cb(0);
 				}
 				else
 				{
@@ -2096,9 +2075,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PBDATA = %02x\n", mem_mask, m_regs.pbdata);
-				if (!m_in_port_b.isnull())
+				if (!m_in_port_b_cb.isnull())
 				{
-					return m_in_port_b(0);
+					return m_in_port_b_cb(0);
 				}
 				else
 				{
@@ -2128,9 +2107,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PCDATA = %02x\n", mem_mask, m_regs.pcdata);
-				if (!m_in_port_c.isnull())
+				if (!m_in_port_c_cb.isnull())
 				{
-					return m_in_port_c(0);
+					return m_in_port_c_cb(0);
 				}
 				else
 				{
@@ -2160,9 +2139,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PDDATA = %02x\n", mem_mask, m_regs.pddata);
-				if (!m_in_port_d.isnull())
+				if (!m_in_port_d_cb.isnull())
 				{
-					return m_in_port_d(0);
+					return m_in_port_d_cb(0);
 				}
 				else
 				{
@@ -2217,9 +2196,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PEDATA = %02x\n", mem_mask, m_regs.pedata);
-				if (!m_in_port_e.isnull())
+				if (!m_in_port_e_cb.isnull())
 				{
-					return m_in_port_e(0);
+					return m_in_port_e_cb(0);
 				}
 				else
 				{
@@ -2250,9 +2229,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PFDATA = %02x\n", mem_mask, m_regs.pfdata);
-				if (!m_in_port_f.isnull())
+				if (!m_in_port_f_cb.isnull())
 				{
-					return m_in_port_f(0);
+					return m_in_port_f_cb(0);
 				}
 				else
 				{
@@ -2283,9 +2262,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PGDATA = %02x\n", mem_mask, m_regs.pgdata);
-				if (!m_in_port_g.isnull())
+				if (!m_in_port_g_cb.isnull())
 				{
-					return m_in_port_g(0);
+					return m_in_port_g_cb(0);
 				}
 				else
 				{
@@ -2316,9 +2295,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PJDATA = %02x\n", mem_mask, m_regs.pjdata);
-				if (!m_in_port_j.isnull())
+				if (!m_in_port_j_cb.isnull())
 				{
-					return m_in_port_j(0);
+					return m_in_port_j_cb(0);
 				}
 				else
 				{
@@ -2348,9 +2327,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PKDATA = %02x\n", mem_mask, m_regs.pkdata);
-				if (!m_in_port_k.isnull())
+				if (!m_in_port_k_cb.isnull())
 				{
-					return m_in_port_k(0);
+					return m_in_port_k_cb(0);
 				}
 				else
 				{
@@ -2381,9 +2360,9 @@ READ16_MEMBER( mc68328_device::read )
 			if (mem_mask & 0x00ff)
 			{
 				verboselog(machine(), 2, "mc68328_r (%04x): PMDATA = %02x\n", mem_mask, m_regs.pmdata);
-				if (!m_in_port_m.isnull())
+				if (!m_in_port_m_cb.isnull())
 				{
-					return m_in_port_m(0);
+					return m_in_port_m_cb(0);
 				}
 				else
 				{
@@ -2500,9 +2479,9 @@ READ16_MEMBER( mc68328_device::read )
 
 		case 0x800:
 			verboselog(machine(), 2, "mc68328_r (%04x): SPIMDATA = %04x\n", mem_mask, m_regs.spimdata);
-			if (!m_in_spim.isnull())
+			if (!m_in_spim_cb.isnull())
 			{
-				return m_in_spim(0, 0xffff);
+				return m_in_spim_cb(0, 0xffff);
 			}
 			return m_regs.spimdata;
 
