@@ -51,6 +51,10 @@ crt9212_t::crt9212_t(const machine_config &mconfig, const char *tag, device_t *o
 	m_oe(0),
 	m_rclk(0),
 	m_wclk(0),
+	m_clrcnt_edge(false),
+	m_data_latch(0),
+	m_ren_int(0),
+	m_wen_int(0),
 	m_buffer(0),
 	m_rac(0),
 	m_wac(0)
@@ -79,6 +83,10 @@ void crt9212_t::device_start()
 	save_item(NAME(m_oe));
 	save_item(NAME(m_rclk));
 	save_item(NAME(m_wclk));
+	save_item(NAME(m_clrcnt_edge));
+	save_item(NAME(m_data_latch));
+	save_item(NAME(m_ren_int));
+	save_item(NAME(m_wen_int));
 	save_item(NAME(m_ram[0]));
 	save_item(NAME(m_ram[1]));
 	save_item(NAME(m_buffer));
@@ -88,48 +96,67 @@ void crt9212_t::device_start()
 
 
 //-------------------------------------------------
+//  clrcnt_w - clear counter
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( crt9212_t::clrcnt_w )
+{
+	if (m_clrcnt && !state)
+	{
+		m_clrcnt_edge = true;
+	}
+
+	m_clrcnt = state;
+}
+
+
+//-------------------------------------------------
 //  rclk_w - read clock
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( crt9212_t::rclk_w )
 {
-	if (m_rclk && !state)
+	if (!m_rclk && state)
 	{
-		if (!m_clrcnt)
+		if (m_clrcnt_edge)
 		{
+			// reset read address counter
+			m_rac = 0;
+
+			// reset read overflow
+			m_write_rof(0);
+
 			if (!m_tog)
 			{
-				// switch buffer
+				// switch buffers
 				m_buffer = !m_buffer;
 
-				// clear write address counter
+				// reset write address counter
 				m_wac = 0;
+
+				// reset write overflow
 				m_write_wof(0);
 			}
-			else
-			{
-				// clear read address counter
-				m_rac = 0;
-				m_write_rof(0);
-			}
+
+			m_clrcnt_edge = false;
 		}
-		else
+
+		if (m_ren_int && (m_rac < CRT9212_RAM_SIZE))
 		{
-			if (m_ren && (m_rac < CRT9212_RAM_SIZE))
+			// output data
+			m_write_dout(m_ram[m_rac][!m_buffer]);
+
+			// increment read address counter
+			m_rac++;
+
+			if (m_rac == CRT9212_RAM_SIZE - 1)
 			{
-				//
-				m_write_dout(m_ram[m_rac][!m_buffer]);
-
-				// increment read address counter
-				m_rac++;
-
-				if (m_rac == CRT9212_RAM_SIZE)
-				{
-					// set read overflow
-					m_write_rof(1);
-				}
+				// set read overflow
+				m_write_rof(1);
 			}
 		}
+
+		m_ren_int = m_ren;
 	}
 
 	m_rclk = state;
@@ -144,20 +171,27 @@ WRITE_LINE_MEMBER( crt9212_t::wclk_w )
 {
 	if (!m_wclk && state)
 	{
-		if (m_wen1 && m_wen2 && (m_wac < CRT9212_RAM_SIZE))
+		if (m_wen_int && (m_wac < CRT9212_RAM_SIZE))
 		{
-			//
-			m_ram[m_rac][m_buffer] = m_data;
+			// input data
+			m_ram[m_rac][m_buffer] = m_data_latch;
 
-			// increment read address counter
+			// increment write address counter
 			m_wac++;
 
-			if (m_wac == CRT9212_RAM_SIZE)
+			if (m_wac == CRT9212_RAM_SIZE - 1)
 			{
 				// set write overflow
 				m_write_wof(1);
 			}
 		}
+
+		if (m_wen1 && m_wen2)
+		{
+			m_data_latch = m_data;
+		}
+
+		m_wen_int = m_wen1 && m_wen2;
 	}
 
 	m_wclk = state;

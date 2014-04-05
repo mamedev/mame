@@ -64,7 +64,8 @@ public:
 	
 	static void static_set_display_callback(device_t &device, crt9021_draw_character_delegate callback) { downcast<crt9021_t &>(device).m_display_cb = callback; }
 
-	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
+	void write(UINT8 data) { m_data = data; }
+	DECLARE_WRITE8_MEMBER( write ) { write(data); }
 	DECLARE_WRITE_LINE_MEMBER( ms0_w ) { m_ms0 = state; }
 	DECLARE_WRITE_LINE_MEMBER( ms1_w ) { m_ms1 = state; }
 	DECLARE_WRITE_LINE_MEMBER( revid_w ) { m_revid = state; }
