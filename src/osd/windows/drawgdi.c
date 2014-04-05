@@ -27,7 +27,6 @@
 struct gdi_info
 {
 	BITMAPINFO              bminfo;
-	RGBQUAD                 colors[256];
 	UINT8 *                 bmdata;
 	size_t                  bmsize;
 };
@@ -88,21 +87,13 @@ static int drawgdi_window_init(win_window_info *window)
 	// fill in the bitmap info header
 	gdi->bminfo.bmiHeader.biSize            = sizeof(gdi->bminfo.bmiHeader);
 	gdi->bminfo.bmiHeader.biPlanes          = 1;
+	gdi->bminfo.bmiHeader.biBitCount        = 32;
 	gdi->bminfo.bmiHeader.biCompression     = BI_RGB;
 	gdi->bminfo.bmiHeader.biSizeImage       = 0;
 	gdi->bminfo.bmiHeader.biXPelsPerMeter   = 0;
 	gdi->bminfo.bmiHeader.biYPelsPerMeter   = 0;
 	gdi->bminfo.bmiHeader.biClrUsed         = 0;
 	gdi->bminfo.bmiHeader.biClrImportant    = 0;
-
-	// initialize the palette to a gray ramp
-	for (int i = 0; i < 256; i++)
-	{
-		gdi->colors[i].rgbRed               = i;
-		gdi->colors[i].rgbGreen             = i;
-		gdi->colors[i].rgbBlue              = i;
-		gdi->colors[i].rgbReserved          = i;
-	}
 
 	return 0;
 }
@@ -182,7 +173,6 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	// fill in bitmap-specific info
 	gdi->bminfo.bmiHeader.biWidth = pitch;
 	gdi->bminfo.bmiHeader.biHeight = -height;
-	gdi->bminfo.bmiHeader.biBitCount = 32;
 
 	// blit to the screen
 	StretchDIBits(dc, 0, 0, width, height,
