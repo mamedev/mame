@@ -13,28 +13,9 @@ const device_type MSM5232 = &device_creator<msm5232_device>;
 
 msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MSM5232, "MSM5232", tag, owner, clock, "msm5232", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_gate_handler_cb(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm5232_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const msm5232_interface *intf = reinterpret_cast<const msm5232_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<msm5232_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	memset(&m_gate_handler_cb, 0, sizeof(m_gate_handler_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -45,6 +26,8 @@ void msm5232_device::device_start()
 {
 	int rate = clock()/CLOCK_RATE_DIVIDER;
 	int voicenum;
+	
+	m_gate_handler_cb.resolve();
 
 	init(clock(), rate);
 
@@ -142,6 +125,18 @@ void msm5232_device::device_stop()
 #endif
 }
 
+void msm5232_device::static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
+{
+	msm5232_device &msm = downcast<msm5232_device &>(device);
+	msm.m_external_capacity[0] = cap1;
+	msm.m_external_capacity[1] = cap2;
+	msm.m_external_capacity[2] = cap3;
+	msm.m_external_capacity[3] = cap4;
+	msm.m_external_capacity[4] = cap5;
+	msm.m_external_capacity[5] = cap6;
+	msm.m_external_capacity[6] = cap7;
+	msm.m_external_capacity[7] = cap8;
+}
 
 /* Default chip clock is 2119040 Hz */
 /* At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21 */
@@ -321,10 +316,10 @@ void msm5232_device::gate_update()
 {
 	int new_state = (m_control2 & 0x20) ? m_voi[7].GF : 0;
 
-	if (m_gate != new_state && !m_gate_handler_func.isnull())
+	if (m_gate != new_state && !m_gate_handler_cb.isnull())
 	{
 		m_gate = new_state;
-		m_gate_handler_func(new_state);
+		m_gate_handler_cb(new_state);
 	}
 }
 
@@ -334,13 +329,6 @@ void msm5232_device::init(int clock, int rate)
 
 	m_chip_clock = clock;
 	m_rate  = rate ? rate : 44100;  /* avoid division by 0 */
-
-	for (j=0; j<8; j++)
-	{
-		m_external_capacity[j] = m_capacity[j];
-	}
-
-	m_gate_handler_func.resolve(m_gate_handler_cb, *this);
 
 	init_tables();
 

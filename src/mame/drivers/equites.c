@@ -1089,13 +1089,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const msm5232_interface equites_5232intf =
-{
-	{ 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6 }, // verified
-	DEVCB_DRIVER_LINE_MEMBER(equites_state,equites_msm5232_gate)
-};
-
-
 static const ay8910_interface equites_8910intf =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1136,7 +1129,8 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)   // will be adjusted at runtime through PORT_ADJUSTER
-	MCFG_SOUND_CONFIG(equites_5232intf)
+	MCFG_MSM5232_SET_CAPACITORS(0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6) // verified
+	MCFG_MSM5232_GATE_HANDLER_CB(WRITELINE(equites_state, equites_msm5232_gate))
 	MCFG_SOUND_ROUTE(0, "mono", MSM5232_BASE_VOLUME/2.2)    // pin 28  2'-1 : 22k resistor
 	MCFG_SOUND_ROUTE(1, "mono", MSM5232_BASE_VOLUME/1.5)    // pin 29  4'-1 : 15k resistor
 	MCFG_SOUND_ROUTE(2, "mono", MSM5232_BASE_VOLUME)        // pin 30  8'-1 : 10k resistor
