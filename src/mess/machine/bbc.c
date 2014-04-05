@@ -2020,7 +2020,6 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbc_exp_rom )
 DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
 {
 	UINT8 *RAM = m_region_user1->base();
-	UINT32 size;
 	int addr = 0, index = 0;
 
 	if (strcmp(image.device().tag(),":cart1") == 0)
@@ -2031,7 +2030,7 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
 
 	if (image.software_entry() == NULL)
 	{
-		size = image.length();
+		UINT32 size = image.length();
 		logerror("loading rom %s, size:%.4x\n", image.filename(), size);
 
 		if (size != 0x8000)
@@ -2044,10 +2043,18 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
 	}
 	else
 	{
-		size = image.get_software_region_length("rom");
-		logerror("loading rom %s, size:%.4x\n", image.filename(), size);
+		UINT32 size_lo = image.get_software_region_length("lorom");
+		UINT32 size_hi = image.get_software_region_length("uprom");
+		logerror("loading rom %s, size:%.4x\n", image.filename(), size_lo + size_hi);
 
-		memcpy(RAM + addr, image.get_software_region("rom"), size);
+		if (size_lo + size_hi != 0x8000)
+		{
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size");
+			return IMAGE_INIT_FAIL;
+		}
+
+		memcpy(RAM + addr + 0,       image.get_software_region("uprom"), size_hi);
+		memcpy(RAM + addr + size_hi, image.get_software_region("lorom"), size_lo);
 	}
 
 	return IMAGE_INIT_PASS;
