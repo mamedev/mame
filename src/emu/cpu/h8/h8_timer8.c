@@ -217,7 +217,6 @@ void h8_timer8_channel_device::update_counter(UINT64 cur_time)
 	UINT64 base_time = (last_clock_update + clock_divider/2) / clock_divider;
 	UINT64 new_time = (cur_time + clock_divider/2) / clock_divider;
 
-	int ott = tcnt;
 	int tt = tcnt + new_time - base_time;
 	tcnt = tt % counter_cycle;
 
