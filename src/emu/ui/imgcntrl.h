@@ -42,7 +42,7 @@ protected:
 private:
 	// instance variables
 	bool create_confirmed;
-	bool softlist_done;
+	//bool softlist_done;
 	const software_info *swi;
 	const software_part *swp;
 	class software_list_device *sld;
