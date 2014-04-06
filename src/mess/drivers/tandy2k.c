@@ -346,10 +346,9 @@ UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			offs_t addr = 0x1ec00 + (((y / 16) * 80) + sx) * 2;
+			offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
 			UINT8 vidla = program.read_word(addr);
 			UINT8 data = m_char_ram[(vidla << 4) | cgra];
-			logerror("y %u sx %u addr %06x vidla %02x data %02x\n",y,sx,addr,vidla,data);
 
 			for (int x = 0; x < 8; x++)
 			{
