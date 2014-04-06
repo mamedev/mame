@@ -262,7 +262,10 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
 
 	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
-	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	// default 600 baud?
+
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "fdcv11")
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
