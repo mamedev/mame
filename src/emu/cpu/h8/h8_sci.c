@@ -125,6 +125,9 @@ WRITE8_MEMBER(h8_sci_device::ssr_w)
 
 	if(tx_state == ST_IDLE && !(ssr & SSR_TDRE))
 		tx_start();
+
+	if((scr & SCR_RE) && rx_state == ST_IDLE && !(ssr & (SSR_ORER|SSR_PER|SSR_FER)))
+		rx_start();
 }
 
 READ8_MEMBER(h8_sci_device::ssr_r)
@@ -261,6 +264,7 @@ void h8_sci_device::device_reset()
 	ext_clock_counter = 0;
 	rx_value = true;
 	clk_cb(clock_value);
+	tx_cb(1);
 	cur_sync_time = attotime::never;
 }
 
@@ -558,6 +562,7 @@ void h8_sci_device::tx_dropped_edge()
 		tx_state = ST_IDLE;
 		tx_bit = 0;
 		clock_stop(CLK_TX);
+		tx_cb(1);
 		ssr |= SSR_TEND;
 		if(scr & SCR_TEIE)
 			intc->internal_interrupt(tei_int);
