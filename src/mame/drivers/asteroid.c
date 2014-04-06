@@ -200,7 +200,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "astdelux.lh"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
+#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
 
 /*************************************
  *
@@ -633,13 +633,12 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(asteroid_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt,  (double)MASTER_CLOCK/4096/12)
-
+	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/4)
 	MCFG_SCREEN_SIZE(400,300)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
@@ -659,7 +658,7 @@ static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt,  (double)MASTER_CLOCK/4096/12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt, CLOCK_3KHZ/12)
 MACHINE_CONFIG_END
 
 
@@ -693,7 +692,7 @@ static MACHINE_CONFIG_DERIVED( llander, asteroid )
 	MCFG_MACHINE_RESET_OVERRIDE(asteroid_state, llander)
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 

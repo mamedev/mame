@@ -69,8 +69,8 @@ public:
 };
 
 
-#define MASTER_CLOCK (12096000)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL_12_096MHz)
+#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
 
 
 /*************************************
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( quantum, quantum_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold,  (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

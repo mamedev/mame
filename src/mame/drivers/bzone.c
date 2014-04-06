@@ -550,13 +550,12 @@ static MACHINE_CONFIG_START( bzone_base, bzone_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  (double)BZONE_MASTER_CLOCK / 4096 / 12)
-
+	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 6)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
@@ -583,7 +582,6 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(redbaron_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
 	MCFG_MACHINE_START_OVERRIDE(bzone_state,redbaron)
 
@@ -591,7 +589,7 @@ static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
 
