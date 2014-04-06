@@ -703,6 +703,7 @@ endif
 ifneq ($(filter RS232,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/rs232
 BUSOBJS += $(BUSOBJ)/rs232/keyboard.o
+BUSOBJS += $(BUSOBJ)/rs232/loopback.o
 BUSOBJS += $(BUSOBJ)/rs232/null_modem.o
 BUSOBJS += $(BUSOBJ)/rs232/rs232.o
 BUSOBJS += $(BUSOBJ)/rs232/ser_mouse.o

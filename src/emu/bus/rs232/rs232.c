@@ -96,10 +96,12 @@ device_rs232_port_interface::~device_rs232_port_interface()
 {
 }
 
+#include "loopback.h"
 #include "null_modem.h"
 #include "terminal.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
-	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
+	SLOT_INTERFACE("loopback", SERIAL_LOOPBACK)
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
+	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
 SLOT_INTERFACE_END
