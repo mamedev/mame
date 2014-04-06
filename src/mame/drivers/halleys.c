@@ -253,7 +253,8 @@ public:
 	DECLARE_READ8_MEMBER(blitter_r);
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_READ8_MEMBER(collision_id_r);
-	DECLARE_WRITE8_MEMBER(halleys_paletteram_IIRRGGBB_w);
+	DECLARE_READ8_MEMBER(paletteram_r);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_READ8_MEMBER(zero_r);
 	DECLARE_READ8_MEMBER(debug_r);
 	DECLARE_READ8_MEMBER(vector_r);
@@ -1221,7 +1222,12 @@ void halleys_state::halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr
 	*b = prom_6330[0x40 + (bit0|bit1|bit2|bit3|bit4)];
 }
 
-WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
+READ8_MEMBER(halleys_state::paletteram_r)
+{
+	return m_paletteram[offset];
+}
+
+WRITE8_MEMBER(halleys_state::paletteram_w)
 {
 	UINT32 d, r, g, b, i, j;
 	UINT32 *pal_ptr = m_internal_palette;
@@ -1691,7 +1697,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")  // I/O write fall-through
 
-	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w)
+	AM_RANGE(0xffc0, 0xffdf) AM_READWRITE(paletteram_r, paletteram_w)
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 
