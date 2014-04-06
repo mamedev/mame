@@ -40,7 +40,7 @@ static GFXDECODE_START( video64 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( video64 )
-	MCFG_GFXDECODE_ADD("gfxdecode", ":palette", video64)
+	MCFG_GFXDECODE_ADD("gfxdecode", "^^palette", video64)
 MACHINE_CONFIG_END
 
 //**************************************************************************

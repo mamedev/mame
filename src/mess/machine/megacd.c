@@ -312,7 +312,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, segacd_gfx_conversion_timer_callback)
 	MCFG_TIMER_DRIVER_ADD("scd_dma_timer", sega_segacd_device, scd_dma_timer_callback)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", ":gen_vdp:palette", segacd) // FIXME
+	MCFG_GFXDECODE_ADD("gfxdecode", "^gen_vdp:palette", segacd) // FIXME
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
