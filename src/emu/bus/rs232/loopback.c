@@ -14,3 +14,29 @@ rs232_loopback_device::rs232_loopback_device(const machine_config &mconfig, cons
 void rs232_loopback_device::device_start()
 {
 }
+
+WRITE_LINE_MEMBER( rs232_loopback_device::input_txd )
+{
+	if (started())
+	{
+		output_rxd(state);
+	}
+}
+
+WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
+{
+	if (started())
+	{
+		output_ri(state);
+		output_cts(state);
+	}
+}
+
+WRITE_LINE_MEMBER( rs232_loopback_device::input_dtr )
+{
+	if (started())
+	{
+		output_dsr(state);
+		output_dcd(state);
+	}
+}

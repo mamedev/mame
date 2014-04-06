@@ -12,9 +12,9 @@ class rs232_loopback_device : public device_t,
 public:
 	rs232_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual WRITE_LINE_MEMBER( input_txd ) { output_rxd(state); }
-	virtual WRITE_LINE_MEMBER( input_rts ) { output_ri(state); output_cts(state); }
-	virtual WRITE_LINE_MEMBER( input_dtr ) { output_dsr(state); output_dcd(state); }
+	virtual WRITE_LINE_MEMBER( input_txd );
+	virtual WRITE_LINE_MEMBER( input_rts );
+	virtual WRITE_LINE_MEMBER( input_dtr );
 
 protected:
 	virtual void device_start();
