@@ -18,6 +18,71 @@
     0x280000-0x2801FF   ES5510
     0x300000-0x30000F   68681 DUART
     0xFF0000-0xFFFFFF   OS RAM
+ 
+    Ensoniq KT-76
+	Ensoniq 1994
+
+	This is a wavetable-based synth keyboard made by Ensoniq in 1994
+
+	PCB Layout
+	----------
+
+	KT-76
+	|---------------------------------------------|
+	|J12 J3      J11                         J10  |
+	|                                  LM393 LM358|
+	|                                     74HC4051|
+	|ADM691                                       |
+	|              62256                          |
+	|                                             |
+	|3V_BATTERY  KT76_0590_LO.U5          ROM0    |
+	|                                             |
+	|   68EC020    62256       OTTOR2     ROM1    |
+	|                                             |
+	|            KT76_690B_HI.U6          ROM2    |
+	| PAL1                                        |
+	|       HP_6N138                              |
+	| PAL2                     OTTOR2           J6|
+	|      7407                                   |
+	|                                             |
+	|          D41464 D41464                      |
+	|                                             |
+	| SCN2681  D41464 D41464                      |
+	|                         137000402           |
+	|                                             |
+	|                                18.432MHz    |
+	|       ESPR6                    16MHz        |
+	|    POT                                      |
+	|                                  R1136-11   |
+	|                                             |
+	|                                LM339 LM339  |
+	|    J13             J5  J1            J2  J4 |
+	|---------------------------------------------|
+	Notes:
+		  J1         - connector for digital jacks
+		  J2         - connector for keyboard
+		  J3         - connector for LCD display
+		  J4         - connector for keyboard
+		  J5         - connector for power input
+		  J6         - connector for wave expansion
+		  J10        - connector for wheels/pressure
+		  J11        - connector for memory card
+		  J12        - connector for headphones
+		  J13        - connector for analog jacks
+		  68EC020    - Motorola MC68EC020FG16 CPU. Clock input 16MHz
+		  1370000402 - Unknown PLCC44 IC stamped with the Ensoniq logo. Likely CPLD or gate array.
+		  ESPR6      - Ensoniq ESPR6 (ES5510) sound chip
+		  OTTOR2     - Ensoniq OTTOR2 (ES5506) sound chip
+		  POT        - ESP adjustment pot
+		  KT76*      - 27C2048/27C210 EPROM
+		  ROM*       - 2M x8-bit SOP44 mask ROM
+		  R1136-11   - DIP40 IC manufactured by Rockwell - believed to be some type of MCU.
+		  D41464     - NEC D41464 64k x4-bit DRAM
+		  62256      - 32k x8-bit SRAM
+		  SCN2681    - Philips SCN2681 Dual Universal Asynchronous Receiver/Transmitter (DUART)
+		  HP_6N138   - HP/Agilent HP 6N138 Low Input Current High Gain Optocoupler
+		  PAL1       - MMI PAL20L8ACN stamped 'KT-76 MMU 6A0A'. Printing is faint so 0 could be a B or a D.
+		  PAL2       - MMI PAL20L8ACN stamped 'KT-76 BCU 73D6'
 
 ***************************************************************************/
 
@@ -48,9 +113,6 @@ public:
 
 	virtual void machine_reset();
 
-	DECLARE_READ32_MEMBER(lower_r);
-	DECLARE_WRITE32_MEMBER(lower_w);
-
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
@@ -72,55 +134,6 @@ public:
 void esqkt_state::machine_reset()
 {
 	m_bCalibSecondByte = false;
-}
-
-READ32_MEMBER(esqkt_state::lower_r)
-{
-	offset &= 0x3fff;
-
-	// get pointers when 68k resets
-	if (!m_rom)
-	{
-		m_rom = (UINT32 *)memregion("osrom")->base();
-		m_ram = (UINT32 *)memshare("osram")->ptr();
-	}
-
-	if (offset < 0x2000)
-	{
-		if (m68k_get_fc(m_maincpu) == 0x6)  // supervisor mode = ROM
-		{
-			return m_rom[offset];
-		}
-		else
-		{
-			return m_ram[offset];
-		}
-	}
-	else
-	{
-		return m_ram[offset];
-	}
-}
-
-WRITE32_MEMBER(esqkt_state::lower_w)
-{
-	offset &= 0x3fff;
-
-	if (offset < 0x2000)
-	{
-		if (m68k_get_fc(m_maincpu) != 0x6)  // if not supervisor mode, RAM
-		{
-			COMBINE_DATA(&m_ram[offset]);
-		}
-		else
-		{
-			logerror("Write to ROM: %x @ %x (fc=%x)\n", data, offset, m68k_get_fc(m_maincpu));
-		}
-	}
-	else
-	{
-		COMBINE_DATA(&m_ram[offset]);
-	}
 }
 
 static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
@@ -233,12 +246,12 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)
 	MCFG_SOUND_CONFIG(es5506_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL_16MHz)
 	MCFG_SOUND_CONFIG(es5506_2_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kt )
@@ -249,9 +262,15 @@ ROM_START( kt76 )
 	ROM_LOAD32_WORD( "kt76_162_lo.bin", 0x000000, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
 	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
 
-	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
-	ROM_REGION(0x200000, "waverom3", ROMREGION_ERASE00)
+	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE( "1351000401_rom0.u103", 0x000001, 0x200000, CRC(425047af) SHA1(9680d1fc222b29ba24f0fbf6136982bee87a60ef) ) 
+
+	ROM_REGION(0x400000, "waverom2", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE( "1351000402_rom1.u102", 0x000001, 0x200000, CRC(64459185) SHA1(0fa20b16847fc02a384057fc3d385226eb3e7527) ) 
+
+	ROM_REGION(0x400000, "waverom3", ROMREGION_ERASE00)
+	ROM_LOAD16_BYTE( "1351000403_rom2.u104", 0x000001, 0x200000, CRC(c2aacc5d) SHA1(7fab518ba92ddb23cdc4dcb04751b26d25c298c0) ) 
+
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
@@ -260,4 +279,4 @@ DRIVER_INIT_MEMBER(esqkt_state, kt)
 	m_duart_io = 0;
 }
 
-CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, kt, "Ensoniq", "KT-76", GAME_NOT_WORKING )
+CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, kt, "Ensoniq", "KT-76", GAME_IMPERFECT_SOUND )

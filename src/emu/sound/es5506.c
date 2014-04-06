@@ -230,6 +230,11 @@ void es5506_device::device_start()
 	m_irqv = 0x80;
 	m_channels = channels;
 
+	/* KT-76 assumes all voices are active on an ES5506 without setting them! */
+	m_active_voices = 31;
+	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+	m_stream->set_sample_rate(m_sample_rate);
+
 	/* compute the tables */
 	compute_tables();
 
