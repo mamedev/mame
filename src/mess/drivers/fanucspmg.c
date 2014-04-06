@@ -2,397 +2,452 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	Fanuc System P Model G
+Fanuc System P Model G
+Fanuc 1983
 
-	2014-03-22 Skeleton driver.
+2014-03-22 Skeleton driver.
+This is a machine from 1983 in a single case
+with a lot of ports and a unique keyboard.
 
-    This is a machine from 1983 in a single case with a
-    lot of ports and a unique keyboard.
- 
-	Also known as Fanuc P-G System, this is a dedicated 8085+8086+8087-based computer
-	system running software for CNC Programming.
-	The system boots up from ROM and then application software is loaded from floppies.
-	The softwares are not point and click auto-generation type conversational CAD/CAM
-	applications.
-	The earlier 'non-Symbolic' software requires knowledge of programming in APT and other
-	languages of the era. The 'Symbolic' software has menus and asks questions and the blanks
-	must be filled in correctly. The graphics are mostly made of lines but are
-	sufficient to complete the task easily. Efficient and effective use of this system
-	requires deep knowledge of CNC Machining techniques (Turning/Milling etc) and a
-	good understanding of machining processes and procedures. With correct usage this system
-	can be used to create CNC G-Code programs for any part that can be manufactured on a
-	CNC Machine. Because the system is made in Japan in the early 80's and the manuals are
-	very technical it also requires some skill in deciphering Japanese-English translated
-	technical texts to understand how to use it properly.
+Also known as Fanuc P-G System, this is a dedicated 8085+8086+8087-based computer
+system running software for CNC Programming.
+The system boots up from on-board EPROM and shows a big ASCII-art boot screen
+FANUC SYSTEM P MODEL G and the ROM software version in the lower right corner.
+To initiate booting from the floppy drive hold down the LOAD key for 3-5 seconds.
+The system checks for a long LOAD key press so that it doesn't load software
+if the LOAD key is accidentally pressed quickly while using the system, which would
+erase everything in memory and all data up to that point and re-load the software from
+scratch. When loading is activated application software is read from floppies.
 
-	The box housing everything is 20" wide by 20" deep by 12" high and weighs
-	approximately 40 pounds. Power input is 85VAC to 110VAC. For the non-US and
-	non-Japanese markets a separate dedicated power supply is provided and is 12"
-	wide by 8" deep by 10" high and weighs approximately 20 pounds.
+The softwares are not point and click auto-generation type conversational CAD/CAM
+applications. The earlier 'non-Symbolic' software requires knowledge of programming in APT
+and other languages of the era. The 'Symbolic' software has menus and asks questions and
+the blanks must be filled in correctly. The graphics are mostly made of lines but are
+sufficient to complete the task easily. Efficient and effective use of this system
+requires deep knowledge of CNC Machining techniques (Turning/Milling etc) and a
+good understanding of machining processes and procedures. With correct usage this system
+can be used to create CNC G-Code programs for any part that can be manufactured on a
+CNC Machine. Because the system is made in Japan in the early 80's and the manuals are
+very technical it also requires some skill in deciphering Japanese-English translated
+technical texts to understand how to use it properly.
 
-	A number of optional peripherals can connect to it including a Fanuc Printer,
-	Fanuc PPR Unit (Paper tape Puncher/Reader with built-in printer), Fanuc Program
-	File (containing a 20MB HDD, two 8" floppy drives and two RS232 ports), Fanuc Cassette
-	Adapter, XY Plotter (A3 or A1), Fanuc Digitizing Tablet (A3 or A0) and Fanuc I/O Selector Box.
+The box housing everything is 20" wide by 20" deep by 12" high and weighs
+approximately 40 pounds. Power input is 85VAC to 110VAC. For the non-US and
+non-Japanese markets a separate dedicated power supply is provided and is 12"
+wide by 8" deep by 10" high and weighs approximately 20 pounds.
 
-	The P-G System has an internal 12" color monitor and dual 5 1/4" floppy drives.
-	A later model was released in 1986 called the Mark II using dual 3 1/2" floppy
-	drives. The previous version was SYSTEM P MODEL D. It had a 12" green monochrome
-	monitor and booted from, and stored to, a cassette tape or floppy disk.
+A number of optional peripherals can connect to it including a Fanuc Printer,
+Fanuc PPR Unit (Paper tape Puncher/Reader with built-in printer), Fanuc Program
+File (containing a 20MB HDD, two 8" floppy drives and two RS232 ports), Fanuc Cassette
+Adapter, XY Plotter (A3 or A1), Fanuc Digitizing Tablet (A3 or A0) and Fanuc I/O Selector Box.
 
-	The screen resolution is 512 x 384 pixels.
-	It can display 64 characters x 24 lines.
+The P-G System has an internal 12" color monitor and dual 5 1/4" floppy drives.
+A later model was released in 1986 called the Mark II using dual 3 1/2" floppy
+drives. The previous version was SYSTEM P MODEL D. It had a 12" green monochrome
+monitor and booted from, and stored to, a cassette tape or floppy disk.
 
-	The floppy format is custom. Floppies are double sided double density and
-	regular PC DSDD 360k floppies can be used after they are formatted using the
-	P-G System.
-	The floppy geometry is 40 tracks, 16 sectors per track, 256 bytes per sector
-	and 2 sides for a total storage capacity of 327680 bytes.
-	The floppy drives are typical PC-type 5 1/4" 360k drives and were manufactured
-	by Y-E DATA, model YD-580.
+The screen resolution is 512 x 384 pixels.
+It can display 64 characters x 24 lines.
 
-	The floppy disks can be backed-up and imaged using a DOS program called ImageDisk
-	which is available here.....
-	http://www.classiccmp.org/dunfield/img/index.htm
-	With a 5 1/4" HD floppy drive, in the GUI in settings change the number of
-	cylinders to 40, translate speed 300 -> 250 (to read a DD disk on a HD drive).
-	On the main menu press R to Read, type a file-name and press enter, press enter
-	again to skip the comment. Press enter again and it will read the disk and save
-	it to the HDD.
+The floppy format is custom. Floppies are double sided double density and
+regular PC DSDD 360k floppies can be used after they are formatted using the
+P-G System.
+The floppy geometry is 40 tracks, 16 sectors per track, 256 bytes per sector
+and 2 sides for a total storage capacity of 327680 bytes.
+The floppy drives are typical PC-type 5 1/4" 360k drives and were manufactured
+by Y-E DATA, model YD-580.
 
-	The following is a complete list of software titles available.
-	The info is taken from a glossy sales brochure printed in July 1985.
-	Other versions did exist so this list is not final.
-	* denotes it is dumped. All other titles are not dumped and are needed.
+The floppy disks can be backed-up and imaged using a DOS program called ImageDisk
+which is available here.....
+http://www.classiccmp.org/dunfield/img/index.htm
+With a 5 1/4" HD floppy drive, in the GUI in settings change the number of
+cylinders to 40, translate speed 300 -> 250 (to read a DD disk on a HD drive).
+On the main menu press R to Read, type a file-name and press enter, press enter
+again to skip the comment. Press enter again and it will read the disk and save
+it to the HDD.
 
-	Language Input -
+The following is a complete list of software titles available.
+The info is taken from a glossy sales brochure printed in July 1985.
+Other versions did exist so this list is not final.
+* denotes it is dumped. All other titles are not dumped and are needed.
 
-					 Title           Part Number
-					 --------------------------------
-					 FAPT TURN       A08B-0033-J600#E
-					 FAPT CUT        A08B-0033-J620#E
-					 FAPT MILL       A08B-0033-J640#E
-					 FAPT DIE-II     A08B-0033-J660#E
-					 FAPT PUNCH-I    A08B-0033-J520#E
-					 FAPT PUNCH-II   A08B-0033-J700#E
-					 FAPT HELICAL    A08B-0033-J642#E
-					 FAPT POST       A08B-0033-H642#E
-					*FAPT POST       A08B-0031-H630   Edition C 85/1/31
+Language Input -
 
-
-	Graphic Input -
-
-					 Title                 Part Number
-					 --------------------------------------
-					*Symbolic FAPT TURN    A08B-0033-J800#E +English
-					 Symbolic FAPT MILL    A08B-0033-J840#E
-					 Symbolic FAPT DRILL   A08B-0033-J860#E
-					 Symbolic FAPT CUT     A08B-0033-J820#E
-					 FAPT DIGITIZER        A08B-0033-J510#E
-
-	+ Symbolic FAPT TURN was available in English, German, French, Dutch, Finnish,
-	and Swedish versions.
+                 Title           Part Number
+                 --------------------------------
+                 FAPT TURN       A08B-0033-J600#E
+                 FAPT CUT        A08B-0033-J620#E
+                 FAPT MILL       A08B-0033-J640#E
+                 FAPT DIE-II     A08B-0033-J660#E
+                 FAPT PUNCH-I    A08B-0033-J520#E
+                 FAPT PUNCH-II   A08B-0033-J700#E
+                 FAPT HELICAL    A08B-0033-J642#E
+                 FAPT POST       A08B-0033-H642#E
+                *FAPT POST       A08B-0031-H630   Edition C 85/1/31
 
 
-	Support System -
+Graphic Input -
 
-					 Title          Part Number
-					 -------------------------------
-					*FAPT TRACER    A08B-0033-H620#E  Edition B 85/1/16
-					*FAPT TEACHER   A08B-0033-J610#E  Edition B 85/1/12
-					*FAPT DOCTOR    A08B-0033-J600#E  Edition B 84/12/21
+                 Title                 Part Number
+                 --------------------------------------
+                *Symbolic FAPT TURN    A08B-0033-J800#E +English
+                 Symbolic FAPT MILL    A08B-0033-J840#E
+                 Symbolic FAPT DRILL   A08B-0033-J860#E
+                 Symbolic FAPT CUT     A08B-0033-J820#E
+                 FAPT DIGITIZER        A08B-0033-J510#E
 
-
-	The software for the Fanuc System P Model G is extremely rare now and very
-	difficult to find. If you do have any of these wanted software titles or any manuals
-	listed below and want to help please contact me (Guru) via http://mamedev.org/contact.html
-
-	The following is a complete list of manuals available for the first edition of the
-	Fanuc System P Model G released in 1983. The info is taken from a glossy sales brochure
-	printed in July 1985. There were other manuals released later for the Mark II and
-	updated manuals (each with a different part number).
-	The manuals were available in Japanese and English. The part numbers listed here
-	are English versions, denoted by the E at the end of the part number.
-	* denotes these manuals are secured and available in PDF format.
-
-	Description -
-
-					 Title                        Part Number
-					 ---------------------------------------
-					 FAPT TURN/MILL Description   B-54102E
-					 FAPT CUT Description         B-54103E
-					 FAPT PUNCH-I Description     B-54104E
-					 FAPT TRACER Description      B-54106E
-					 FAPT DIGITIZER Description   B-54107E
-					 Symbolic FAPT Description    B-54131E
-					 FAPT DIE-II Description      B-54121E
++ Symbolic FAPT TURN was available in English, German, French, Dutch, Finnish,
+and Swedish versions.
 
 
-	Operator's Manual -
+Support System -
 
-					 Title                                          Part Number
-					 ----------------------------------------------------------
-					 System P-Model G Operator's Manual             B-54111E
-					 System P-Model G Mark II Operator's Manual     B-66014E
-					*System P-Model G Operator's Manual Supplement  B-54112E/03-1
-					 FAPT TURN/MILL Operator's Manual               B-54112E
-					 FAPT CUT Operator's Manual                     B-54113E
-					 FAPT PUNCH-I Operator's Manual                 B-54114E
-					 FAPT PUNCH-II Operator's Manual                B-54115E
-					*Symbolic FAPT TURN Operator's Manual           B-54132E
-					*Symbolic FAPT TURN Operator's Manual           B-66025E (for System P Mark II)
-					 Symbolic FAPT MILL Operator's Manual           B-54134E
-					 Symbolic FAPT DRILL Operator's Manual          B-54138E
-					 Symbolic FAPT CUT Operator's Manual            B-54136E
-					 FAPT DIE-II Operator's Manual                  B-54122E (Two Volumes)
-					 FAPT TRACER Operator's Manual                  B-54116E
-					 FAPT DIGITIZER Operator's Manual               B-54117E
-					 FAPT TEACHER Operator's Manual                 B-54126E
+                 Title          Part Number
+                 -------------------------------
+                *FAPT TRACER    A08B-0033-H620#E  Edition B 85/1/16
+                *FAPT TEACHER   A08B-0033-J610#E  Edition B 85/1/12
+                *FAPT DOCTOR    A08B-0033-J600#E  Edition B 84/12/21
 
 
-	Others -
+Note: To initiate booting from the floppy drive hold down the LOAD key for 3-5 seconds.
 
-					 Title                                     Part Number
-					 -----------------------------------------------------
-					 System P-Model G Operator's Handbook      B-54158E
-					*System P-Model G Maintenance Manual       B-54159E
-					 FAPT TURN/MILL/CUT Part program examples  B-54128E
-					 FANUC CASSETTE Operator's Manual          B-53484E
-					*Symbolic FAPT TURN Operator's Handbook    B-53034E (for System P Model D)
-					 Symbolic FAPT TURN Operator's Handbook    B-54133E
-					 FAPT DIE-II Part program examples         B-54123E
-					 FANUC PPR Operator's Manual               B-54584E
+The software for the Fanuc System P Model G is extremely rare now and very
+difficult to find. If you do have any of these wanted software titles or any manuals
+listed below and want to help please contact me (Guru) via http://mamedev.org/contact.html
 
-	Note the handbooks were pocket-sized 8" long by 3 1/2" wide and approximately 50 pages.
+The following is a complete list of manuals available for the first edition of the
+Fanuc System P Model G released in 1983. The info is taken from a glossy sales brochure
+printed in July 1985. There were other manuals released later for the Mark II and
+updated manuals (each with a different part number).
+The manuals were available in Japanese and English. The part numbers listed here
+are English versions, denoted by the E at the end of the part number.
+* denotes these manuals are secured and available in PDF format.
 
+Description -
 
-	The unit has it's own dedicated keyboard with many special keys.
-	The keyboard layout is shown below.
-
-	|------------------------------------------------------------------------------|
-	|                                                                              |
-	| LOAD F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15      R0 R1 R2 R3  |
-	|                                                                              |
-	|                                                                              |
-	|          !  "  #  $  %  &  '  (  )     =                                     |
-	|  K0      1  2  3  4  5  6  7  8  9  0  -   ^   Y   DEL          7  8  9  +   | (Y is Japanese Yen sign)
-	|                                                                              |
-	|                                                                              |
-	|  K1   CAN Q  W  E  R  T  Y  U  I  O  P   @   [   NL   BS        4  5  6  -   | (NL means NEXT LINE, BS is backspace)
-	|                                                                              | (NL is equivalent to return or enter and)
-	|                                        +   *                                 | (forces the cursor to move to the next data entry point)
-	|  K2     UC  A  S  D  F  G  H  J  K  L  ;   :   ]   UC           1  2  3  x   | (UC is uppercase)
-	|                                                                              |
-	|                                   <  >   ?                                   |
-	|  K3      LC  Z  X  C  V  B  N  M  ,  .   /   -   LC             0  ,  .  /   | (LC is lowercase)
-	|                                                                              |
-	|                                                                              |
-	|                  _S__P__A__C__E__B__A__R_                         _N__L_     |
-	|                                                                              |
-	|------------------------------------------------------------------------------|
-
-	On the numeric keypad there are directional arrows on numbers 1 2 3 4 6 7 8 9
-	1 3 7 9 have arrows pointing South West, South East, North West, North East.
-	2 4 6 8 have arrows pointing down, left, right and up.
-	5 is the center and has no additional markings on it.
-	Number 0 has an anti-clockwise 180 degrees arc with an arrow at the end and . has
-	a clockwise 180 degrees arc with an arrow at the end.
-	These keys are the 'Symbolic' keys.
-
-	The F-keys and R-keys are programmed by the software that is running on the system.
-	The F-keys are SPDT type keys so they can be either up or locked in the down position.
-	For Symbolic FAPT TURN these keys are pre-programmed as follows.....
-
-	F0 - ON:  Sets the backwards direction when using the R1 key.
-		 OFF: Sets the forwards direction when using the R1 key. Default is OFF.
-	F1 - ON:  Makes the whole screen the graphic area.
-		 OFF: Auto-calc the graphic area so the graphic does not overlap the text. Default is OFF.
-	F2 - ON:  Shows the parts figure (graphics). Default is ON.
-		 OFF: Does not show the parts figure.
-	F3 - ON:  Display the NC G-Code data on screen. Default is ON.
-		 OFF: Does not display the NC G-Code data on screen.
-	F4 - ON:  Printer ON.
-		 OFF: Printer OFF. Default is OFF. The printer can be switched on or off any time. When enabled
-			  everything displayed on the screen will also print on the printer.
-	F5 - ON:  Stops execution of the NC G-Code data before each process begins. Keyboard input additions
-			  can also be done at this time.
-		 OFF: Program execution continues to the end. Default is OFF.
-	F6 - ON:  Outputs the NC G-Code data to a separately selected medium (floppy/cassette or paper tape)
-		 OFF: No output to additional medium. Default is OFF.
-	F7 - ON:  Stops each time a line of NC G-Code data is output. This is equivalent to Single Block on a CNC Machine.
-		 OFF: Program execution continues to the end. Default is OFF.
-	F8 -
-	F9 -
-	F10- ON:  Sends the part figure graphic and NC G-Code data to the XY plotter
-		 OFF: No output to XY plotter
-	F11-
-	F12-
-	F13-
-	F14-
-	F15-
-
-	The function of the R-keys changes depending on the application and the menu shown on the screen.
-	The initial Symbolic FAPT TURN settings for the R-keys are....
-	R0 - FAPT Execution
-	R1 - Family Program
-	R2 - Setting
-	R3 - Auxiliary Work
+                 Title                        Part Number
+                 ---------------------------------------
+                 FAPT TURN/MILL Description   B-54102E
+                 FAPT CUT Description         B-54103E
+                 FAPT PUNCH-I Description     B-54104E
+                 FAPT TRACER Description      B-54106E
+                 FAPT DIGITIZER Description   B-54107E
+                 FAPT DIE-II Description      B-54121E
+                 Symbolic FAPT Description    B-54131E
 
 
+Operator's Manual -
 
-	Box Layout (top view)
-	----------
-
-	A08B-0033-B001
-	|--------------------------------------------|
-	| ------------MAIN PCB---------------------- |
-	|   -----------SUB-PCB-----------         |  |
-	|                                         |  |
-	| |-----------------------|               |  |
-	| |                       |               |  |
-	| |                       |               P  |
-	| |       CRT UNIT        |               O  |
-	| |                       |               W  |
-	| |                       |               E  |
-	| |      12" COLOR        |  |---------|  R  |
-	| |                       |  |FDD UNIT |  |  |
-	| |        SCREEN         |  |A87L-0001|  P  |
-	| |                       |  |-0026    |  C  |
-	| |                       |  |         |  B  |
-	| |                       |  |         |  |  |
-	| |                       |  |5 1/4"   |  |  |
-	| |                       |  |FLOPPY   |     |
-	| |                       |  |DRIVES   |     |
-	| |                       |  |x2       |     |
-	| |-----------------------|  |---------|     |
-	|--------------------------------------------|
+                 Title                                          Part Number
+                 ----------------------------------------------------------
+                *System P-Model G Operator's Manual             B-54111E/03
+                 System P-Model G Mark II Operator's Manual     B-66014E
+                *System P-Model G Operator's Manual Supplement  B-54112E/03-1
+                 FAPT TURN/MILL Operator's Manual               B-54112E
+                 FAPT CUT Operator's Manual                     B-54113E
+                 FAPT PUNCH-I Operator's Manual                 B-54114E
+                 FAPT PUNCH-II Operator's Manual                B-54115E
+                *FAPT TRACER Operator's Manual                  B-54116E/03
+                 FAPT DIGITIZER Operator's Manual               B-54117E
+                *FAPT Universal POST Operator's Manual          B-54118E/02
+                 FAPT DIE-II Operator's Manual (Volume 1)       B-54122E
+                 FAPT DIE-II Operator's Manual (Volume 2)       B-54122E-1
+                *FAPT TEACHER Operator's Manual                 B-54126E/01
+                 220S FAPT MILL Operator's Manual               B-54127E
+                *Symbolic FAPT TURN Operator's Manual           B-54132E/01
+                 Symbolic FAPT MILL Operator's Manual           B-54134E
+                 Symbolic FAPT CUT Operator's Manual            B-54136E
+                 Symbolic FAPT DRILL Operator's Manual          B-54138E
+                *Symbolic FAPT TURN Operator's Manual           B-66025E/01 (for System P Mark II)
 
 
-	Main PCB Layout
-	---------------
+Others -
 
-	A20B-1000-0710/03B
-	|-------------------------------------------|
-	| CNF CNE     CND  CNC        CNB      CNA  |
-	|   VR1     ^                               |
-	|                JUMPERS           XXXXXXXXX|
-	|       % MB15541         XXXXXXXXXXXXXXXXXX|
-	|                         XXXXXXXXXXXXXXXXXX|
-	| 8087-3           D8253  XXXXXXXXXXXXXXXXXX|
-	|   8086-2   D765  D8253           XXXXXXXXX|
-	|             D8257                         |
-	|15MHz   D8259 D8259     D8251 D8251        |
-	|D8284  040_001A.13A     D8251 D8251        |
-	|       040_002A.15A  VR2         CN2   CN1 |
-	|       CN7     CN6      CN5      CN4   CN3 |
-	|-------------------------------------------|
-	Notes:
-		  D8086   - Intel 8086 CPU
-		  D8087   - Intel 8087 x87 Floating-Point Co-Processor
-		  XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (72 chips total)
-		  MB15541 - Fujitsu MB15541 Custom Chip
-		  D765    - NEC D765 Single/Double Density Floppy-Disk Controller
-		  D8251   - Intel D8251 Programmable Communications Interface (USART)
-		  D8253   - NEC D8253 Programmable Interval Timer
-		  D8257   - NEC D8257 Programmable DMA Controller
-		  D8259   - NEC D8259 Programmable Interrupt Controller
-		  D8284   - Intel D8284 Clock Generator and Driver for 8086/8088 Processors
-		  A40_00* - Fujitsu MBM2764 8k x8-bit EPROM
-		  VR1/VR2 - Potentiometer
-		  ^       - 3 chips marked Y-E Data Fujitsu
-					MB4393
-					MB14324
-					MB14323
-		  %       - Unknown 20-pin DIP chip with heat-sink
-		  CNA     - 50-pin flat cable joining to Sub PCB
-		  CNB     - 50-pin flat cable joining to Sub PCB
-		  CNC     - 6-pin power cable joining to Sub PCB
-		  CND     - 34-pin flat cable joining to FDD Unit
-		  CNE     - Fanuc Honda MR-50 50-pin female connector for expansion (not used)
-		  CNF     - Power input connector
-		  CN1     - 25-pin Female D-type connector. Generally this is connected to the CNC Machine serial port)
-		  CN2     - 25-pin Female D-type connector (for RS232 external peripherals)
-		  CN3     - 25-pin Female D-type connector (for RS232 external peripherals)
-		  CN4     - 25-pin Female D-type connector (for RS232 external peripherals)
-		  CN5     - Fanuc Honda MR-50 50-pin female connector (probably for external connection of the Fanuc Program File Unit)
-		  CN6     - Fanuc Honda MR-20 20-pin female connector for connection of the keyboard
-		  CN7     - Fanuc Honda MR-20 20-pin male Facit 4070 Parallel Reader/Puncher connector (PPR Unit)
-					Pinout: (pin 1 is top left, location key is on the opposite side)
-						   |---------------------------------------------------|
-						   |                                                   |
-						   | 1_PR   2_TE  3_ERR  4_TTY3  5_+6V  6_TTY2  7_TTY1 |
-						   |                                                   |
-						   |    8_SG   9_SD   10_0V  11_CH1  12_CH2  13_CH3    O
-						   |                                                   |
-						   | 14_CH4 15_CH5 16_CH6 17_CH7  18_CH8 19_CH9  20_PI |
-						   |                                                   |
-						   |---------------------------------------------------|
-		JUMPERS   - 15 2-pin jumpers labelled S1 to S15. S2, S3 & S4 are not shorted. All others are shorted.
+                 Title                                     Part Number
+                 -----------------------------------------------------
+                *Symbolic FAPT TURN Operator's Handbook    B-53034E (for System P Model D)
+                 FANUC CASSETTE Operator's Manual          B-53484E
+                 FAPT DIE-II Part program examples         B-54123E
+                 FAPT TURN/MILL/CUT Part program examples  B-54128E
+                 Symbolic FAPT TURN Operator's Handbook    B-54133E
+                 System P-Model G Operator's Handbook      B-54158E
+                *System P-Model G Maintenance Manual       B-54159E/01
+                *FANUC PPR Operator's Manual               B-54584E/01
+
+Note the handbooks are pocket-sized 8" long by 3 1/2" wide and approximately 50 pages.
 
 
-	Sub PCB Layout
-	--------------
+The unit has it's own dedicated keyboard with many special keys.
+The keyboard layout is shown below.
 
-	A20B-1000-0720/02B
-	|--------------------------------|
-	| CNA     CNB      CNC   CND     |
-	|                                |
-	|                  MB15542    CNE|
-	|                                |
-	|                  HD6845S  D8085|
-	|            16MHz               |
-	|                                |
-	|   X                            |
-	| XXXXXXXX                       |
-	| XXXXXXXX                       |
-	| XXXXXXXX      6264 A41_010B.28B|
-	|               6264 A41_020A.30B|
-	|--------------------------------|
-	Notes:
-		  D8085   - NEC D8085A-2 CPU
-		  HD6845S - Hitachi HD6845S / HD46505S CRT Controller
-		  6264    - Hitachi HM6264P-15 8k x 8-bit SRAM
-		  XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (25 chips total)
-		  MB15542 - Fujitsu MB15542 Custom Chip
-		  A41_010B- Intel D27128 16k x8-bit EPROM
-		  A42_020A- Hitachi 27256G 32k x8-bit EPROM
-		  CNA     - 50-pin flat cable joining to Main PCB
-		  CNB     - 50-pin flat cable joining to Main PCB
-		  CNC     - 6-pin power cable joining to Main PCB
-		  CND     - 20-pin flat cable joining to CRT Unit (video output)
-		  CNE     - Fanuc Honda MR-50 50-pin male connector for expansion (not used)
- 
- 
-  Tech notes:
-    - Once the big ASCII-art boot screen appears, you must press the "LOAD" key
-      a few times to initiate booting from the floppy drive.
- 
- 
-  The block diagram in the Maintenance Manual looks like this:
- 
-         |sub CPU|                                                         |main CPU|---|math coprocessor|
-             |                                                                  |               |
-  |EPROM|----|                                                                  |---------------/
-             |-------------| Common memory / graphic memory | ------------------|
-             |   					   |                                        |--------|RS232C interface|---CN1
-             |   					   |                            |EPROM|-----|--------|RS232C interface|---CN2 
-             |----|character memory|   |                                        |--------|RS232C interface|---CN3 
-             |   				|      |                            |main RAM|--|--------|RS232C interface|---CN4 
-             |  				|      |                                        |
-             |----| CRTC and video circuits |---CN8                   | floppy controller |----CN9
-             |
-    |keyboard interface|---CN6
+|------------------------------------------------------------------------------|
+|                                                                              |
+| LOAD F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15      R0 R1 R2 R3  |
+|                                                                              |
+|                                                                              |
+|          !  "  #  $  %  &  '  (  )     =                                     |
+|  K0      1  2  3  4  5  6  7  8  9  0  -   ^   Y   DEL          7  8  9  +   | (Y is Japanese Yen sign)
+|                                                                              |
+|                                                                              |
+|  K1   CAN Q  W  E  R  T  Y  U  I  O  P   @   [   NL   BS        4  5  6  -   | (NL means NEXT LINE, BS is backspace)
+|                                                                              | (NL is equivalent to return or enter and)
+|                                        +   *                                 | (forces the cursor to move to the next data entry point)
+|  K2     UC  A  S  D  F  G  H  J  K  L  ;   :   ]   UC           1  2  3  x   | (UC is uppercase)
+|                                                                              |
+|                                   <  >   ?                                   |
+|  K3      LC  Z  X  C  V  B  N  M  ,  .   /   -   LC             0  ,  .  /   | (LC is lowercase)
+|                                                                              |
+|                                                                              |
+|                  _S__P__A__C__E__B__A__R_                         _N__L_     |
+|                                                                              |
+|------------------------------------------------------------------------------|
+
+On the numeric keypad there are directional arrows on numbers 1 2 3 4 6 7 8 9
+1 3 7 9 have arrows pointing South West, South East, North West, North East.
+2 4 6 8 have arrows pointing down, left, right and up.
+5 is the center and has no additional markings on it.
+Number 0 has an anti-clockwise 180 degrees arc with an arrow at the end and . has
+a clockwise 180 degrees arc with an arrow at the end.
+These keys are the 'Symbolic' keys.
+
+The F-keys and R-keys are programmed by the software that is running on the system.
+The F-keys act like SPDT switches and can be toggled either off or on.
+When they are on, a LED in the center of the key lights.
+For Symbolic FAPT TURN these keys are pre-programmed as follows.....
+
+F0 - ON:  Sets the backwards direction when using the R1 key.
+     OFF: Sets the forwards direction when using the R1 key. Default is OFF.
+F1 - ON:  Makes the whole screen the graphic area.
+     OFF: Auto-calc the graphic area so the graphic does not overlap the text. Default is OFF.
+F2 - ON:  Shows the parts figure (graphics). Default is ON.
+     OFF: Does not show the parts figure.
+F3 - ON:  Display the NC G-Code data on screen. Default is ON.
+     OFF: Does not display the NC G-Code data on screen.
+F4 - ON:  Printer ON.
+     OFF: Printer OFF. The printer can be switched on or off any time. When enabled
+          everything displayed on the screen will also print on the printer. Default is OFF.
+F5 - ON:  Stops execution of the NC G-Code data before each process begins. Keyboard input additions
+          can also be done at this time. To continue press NL.
+     OFF: Program execution continues to the end. Default is OFF.
+F6 - ON:  Outputs the NC G-Code data to a separately selected medium (floppy/cassette or paper tape)
+     OFF: No output to additional medium. Default is OFF.
+F7 - ON:  Stops each time a line of NC G-Code data is output. This is equivalent to Single Block on a CNC Machine.
+          To continue press NL.
+     OFF: Program execution continues to the end. Default is OFF.
+F8 -
+F9 -
+F10- ON:  Sends the part figure graphic and NC G-Code data to the XY plotter
+     OFF: No output to XY plotter
+F11-
+F12-
+F13-
+F14-
+F15-
+
+The function of the R-keys changes depending on the application and the menu shown on the screen.
+The R-keys are used for tasks within the current screen so the function of the R-keys is always
+displayed on screen at all times.
+The initial Symbolic FAPT TURN settings for the R-keys are....
+R0 - FAPT Execution
+R1 - Family Program
+R2 - Setting
+R3 - Auxiliary Work
+
+
+Box Layout (top view)
+----------
+
+A08B-0033-B001
+|--------------------------------------------|
+| ------------MAIN PCB---------------------- |
+|   -----------SUB-PCB-----------         |  |
+|                                         |  |
+| |-----------------------|               |  |
+| |                       |               |  |
+| |                       |               P  |
+| |       CRT UNIT        |               O  |
+| |                       |               W  |
+| |                       |               E  |
+| |      12" COLOR        |  |---------|  R  |
+| |                       |  |FDD UNIT |  |  |
+| |        SCREEN         |  |A87L-0001|  P  |
+| |                       |  |-0026    |  C  |
+| |                       |  |         |  B  |
+| |                       |  |         |  |  |
+| |                       |  |5 1/4"   |  |  |
+| |                       |  |FLOPPY   |     |
+| |                       |  |DRIVES   |     |
+| |                       |  |x2       |     |
+| |-----------------------|  |---------|     |
+|--------------------------------------------|
+
+
+Main PCB Layout
+---------------
+
+A20B-1000-0710/03B
+|-------------------------------------------|
+| CNF CNE     CND  CNC        CNB      CNA  |
+|   VR1     ^                               |
+|                JUMPERS           XXXXXXXXX|
+|       % MB15541         XXXXXXXXXXXXXXXXXX|
+|                         XXXXXXXXXXXXXXXXXX|
+| 8087-3           D8253  XXXXXXXXXXXXXXXXXX|
+|   8086-2   D765  D8253           XXXXXXXXX|
+|             D8257                         |
+|15MHz   D8259 D8259     D8251 D8251        |
+|D8284  040_001A.13A     D8251 D8251        |
+|       040_002A.15A  VR2         CN2   CN1 |
+|       CN7     CN6      CN5      CN4   CN3 |
+|-------------------------------------------|
+Notes:
+      D8086   - Intel 8086 CPU. Clock input 5.000MHz [15/3]
+      D8087   - Intel 8087 x87 Floating-Point Co-Processor. Clock input 5.000MHz [15/3]
+      XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (72 chips total)
+      MB15541 - Fujitsu MB15541 Custom Chip
+      D765    - NEC D765 Single/Double Density Floppy-Disk Controller. Clock input 4.000MHz [16/4]
+      D8251   - Intel D8251 Programmable Communications Interface (USART)
+      D8253   - NEC D8253 Programmable Interval Timer. Clock input 1.25MHz [15/12]
+      D8257   - NEC D8257 Programmable DMA Controller. Clock input 3.000MHz [15/5]
+      D8259   - NEC D8259 Programmable Interrupt Controller
+      D8284   - Intel D8284 Clock Generator and Driver for 8086/8088 Processors
+      A40_00* - Fujitsu MBM2764 8k x8-bit EPROM
+      VR1/VR2 - Potentiometer
+      ^       - 3 chips marked Y-E Data Fujitsu
+                MB4393
+                MB14324
+                MB14323
+      %       - Unknown 20-pin Ceramic DIP chip with heat-sink
+      CNA     - 50-pin flat cable joining to Sub PCB
+      CNB     - 50-pin flat cable joining to Sub PCB
+      CNC     - 6-pin power cable joining to Sub PCB
+      CND     - 34-pin flat cable joining to FDD Unit
+      CNE     - Fanuc Honda MR-50 50-pin female connector for expansion (not used)
+      CNF     - Power input connector
+      CN1     - 25-pin Female D-type connector. (for RS232 external peripherals \  CNC Machine,
+      CN2     - 25-pin Female D-type connector. (for RS232 external peripherals  | PPR Unit, X-Y Plotter,
+      CN3     - 25-pin Female D-type connector. (for RS232 external peripherals  | Tablet,
+      CN4     - 25-pin Female D-type connector. (for RS232 external peripherals /  Cassette Adapter etc (connections in any order)
+      CN5     - Fanuc Honda MR-50 50-pin female connector (probably for external connection of the Fanuc Program File Unit)
+      CN6     - Fanuc Honda MR-20 20-pin female connector for the keyboard
+      CN7     - Fanuc Honda MR-20 20-pin male. Specification says 'not used' but this appears to be a
+                Facit 4070 Parallel Reader/Puncher connector
+                Pinout: (pin 1 is top left, location key is on the opposite side)
+                       |---------------------------------------------------|
+                       |                                                   |
+                       | 1_PR   2_TE  3_ERR  4_TTY3  5_+6V  6_TTY2  7_TTY1 |
+                       |                                                   |
+                       |    8_SG   9_SD   10_0V  11_CH1  12_CH2  13_CH3    O
+                       |                                                   |
+                       | 14_CH4 15_CH5 16_CH6 17_CH7  18_CH8 19_CH9  20_PI |
+                       |                                                   |
+                       |---------------------------------------------------|
+      JUMPERS - 15 2-pin jumpers labelled S1 to S15. S2, S3 & S4 are not shorted. All others are shorted.
+
+
+Sub PCB Layout
+--------------
+
+A20B-1000-0720/02B
+|--------------------------------|
+| CNA     CNB      CNC   CND     |
+|                                |
+|                  MB15542    CNE|
+|                                |
+|                  HD6845S  D8085|
+|            16MHz               |
+|                                |
+|   X                            |
+| XXXXXXXX                       |
+| XXXXXXXX                       |
+| XXXXXXXX      6264 A41_010B.28B|
+|               6264 A41_020A.30B|
+|--------------------------------|
+Notes:
+      D8085   - NEC D8085A-2 CPU. Clock input 8.000MHz [16/2].
+                Note 8085 has internal /2 divider so actual clock speed is 4.000MHz
+      HD6845S - Hitachi HD6845S / HD46505S CRT Controller. Clock input 2.000MHz [8/2]
+      6264    - Hitachi HM6264P-15 8k x 8-bit SRAM
+      XXXXXXX - Fujitsu MB8265-15 65536 x1-bit DRAM (25 chips total)
+      MB15542 - Fujitsu MB15542 Custom Chip
+      A41_010B- Intel D27128 16k x8-bit EPROM
+      A42_020A- Hitachi 27256G 32k x8-bit EPROM
+      CNA     - 50-pin flat cable joining to Main PCB
+      CNB     - 50-pin flat cable joining to Main PCB
+      CNC     - 6-pin power cable joining to Main PCB
+      CND     - 20-pin flat cable joining to CRT Unit (video output)
+      CNE     - Fanuc Honda MR-50 50-pin male connector for expansion (not used)
+      HSync   - 22.7273kHz
+      VSync   - 54.6330Hz
+
+
+Block Diagram
+-------------
+Below is the block diagram shown in the Maintenance Manual.
+The arrows denote direction of data flow.
+
+          |-------|                                             |--------|      |----------------|
+          |Sub CPU|                                             |Main CPU|<---->|Math Coprocessor|
+          |-------|                                             |--------|      |----------------|
+              /\                                                     /\                 /\
+              |                                                      |                  |
+              |                                                      \/                 \/
+  |-----|     |                                                      |------------------|
+  |EPROM|<--->|                                                               /\
+  |-----|     |          |---------------|                                    |     |----------------|
+              |          | Common memory |<---------------------------------->|<--->|RS232C interface|---CN1
+              |<-------->|===============|                                    |     |----------------|
+              |      /-->| Graphic memory|------|                             |
+              |      |   |---------------|      |                             |     |----------------|
+              |      |                          |         |--------|          |<--->|RS232C interface|---CN2
+              |   	 |		                      |         | BOOT   |<-------->|     |----------------|
+              |      |                          |         | EPROM  |          |
+              |      |   |----------------|     |         |--------|          |     |----------------|
+              |<-----|-->|Character memory|--|  |                             |<--->|RS232C interface|---CN3
+              |      |-->|----------------|  |  |         |--------|          |     |----------------|
+              |      |                       |  |         |Main RAM|<-------->|
+              |      |                       |  |         |--------|          |     |----------------|
+              |      |	                     |  |                             |<--->|RS232C interface|---CN4
+              |      |                       |  |                             |     |----------------|
+|---------|   |      |                       \/ \/                            |
+|Keyboard |   \/     \---|---------------------------|                        |     |-----------------|  CN9  |--------|
+|interface|<->|<-------->|    CRT control circuit    |                        |<--->|Floppy controller|---O---|FDD UNIT|
+|----|----|              |-------------|-------------|                        |     |-----------------|       |--------|
+     |                                 |                                      |
+     |                                 |                                      \/
+     O CN6                             O CN8                                  O CN5
+     |                                 |
+     |                                 |
+ |---|----|                       |----|----|
+ |Keyboard|                       | Screen  |
+ |--------|                       |---------|
  
  
   TODO:
-    - Find char gen data.  Is it inside the MB15542 custom? :-(
-    - What's the a42_020a.30b ROM do?  Both CPUs are currently happy without it,
-      and it doesn't appear to contain valid 8086 or 8085 code.
     - Is the VRAM hookup anything like correct?
     - Hookup enough keyboard to get it to boot a floppy, the FAPT DOCTOR
       program will be invaluable to answering many questions.
     - Shared RAM is 8k, but there are 2 6264s on the sub board.  Is shared RAM
        banked?
+    - I/O is at F00xx:
+		':maincpu' (FC15A): unmapped program memory write to F0012 = 00CE & 00FF
+		':maincpu' (FC15D): unmapped program memory write to F0016 = 00CE & 00FF
+		':maincpu' (FC160): unmapped program memory write to F001A = 00CE & 00FF
+		':maincpu' (FC163): unmapped program memory write to F001E = 00CE & 00FF
+		':maincpu' (FC16D): unmapped program memory write to F000E = 0034 & 00FF
+		':maincpu' (FC172): unmapped program memory write to F0008 = 00D4 & 00FF
+		':maincpu' (FC177): unmapped program memory write to F0008 = 0030 & 00FF
+		':maincpu' (FC17C): unmapped program memory write to F000E = 0056 & 00FF
+		':maincpu' (FC181): unmapped program memory write to F000A = 0010 & 00FF
+		':maincpu' (FC186): unmapped program memory write to F000E = 0096 & 00FF
+		':maincpu' (FC18B): unmapped program memory write to F000C = 0010 & 00FF
+		':maincpu' (FC190): unmapped program memory write to F004E = 0034 & 00FF
+		':maincpu' (FC195): unmapped program memory write to F0048 = 0020 & 00FF
+		':maincpu' (FC19A): unmapped program memory write to F0048 = 004E & 00FF
+		':maincpu' (FC19F): unmapped program memory write to F004E = 0056 & 00FF
+		':maincpu' (FC1A4): unmapped program memory write to F004A = 0010 & 00FF
+		':maincpu' (FC1A9): unmapped program memory write to F004E = 0096 & 00FF
+		':maincpu' (FC1AE): unmapped program memory write to F004C = 0010 & 00FF
  
 ****************************************************************************/
 
@@ -481,6 +536,9 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 
+	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(vbl_r);
+
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
 
 	DECLARE_DRIVER_INIT(fanucspmg);
@@ -493,6 +551,7 @@ private:
 	INT32 m_vram_bank;
 	UINT8 m_vbl_ctrl;
 	UINT8 m_keyboard_row;
+	UINT8 m_vbl_stat;
 };
 
 DRIVER_INIT_MEMBER(fanucspmg_state, fanucspmg)
@@ -516,13 +575,24 @@ WRITE8_MEMBER(fanucspmg_state::shared_w)
 	m_shared[offset] = data;
 }
 
+READ8_MEMBER(fanucspmg_state::test_r)
+{
+	return 0x00;	// 0x80 to start weird not-sure-what process which may be FDC related
+}
+
+READ8_MEMBER(fanucspmg_state::vbl_r)
+{
+	return m_vbl_stat;
+}
+
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM	// main RAM
 
-	AM_RANGE(0xf0000, 0xf00ff) AM_RAM	// not sure if this is RAM or I/O
+	AM_RANGE(0x88000, 0x88001) AM_READ8(vbl_r, 0xffff)
+
+	AM_RANGE(0xf0004, 0xf0005) AM_READ8(test_r, 0xffff)
 
 	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
-
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0) 
 ADDRESS_MAP_END
 
@@ -538,6 +608,8 @@ WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
 			m_subcpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		}
 	}
+
+	m_vbl_stat = (state == ASSERT_LINE) ? 1 : 0;
 }
 
 READ8_MEMBER(fanucspmg_state::vram1_r)
@@ -572,6 +644,7 @@ READ8_MEMBER(fanucspmg_state::vblank_ack_r)
 	return 0xff;
 }
 
+// bit 1 seems to route to bit 7 of f0004 on the 8086 (signals the "LOAD" key pressed?)
 // bit 3 appears to enable vblank IRQs
 WRITE8_MEMBER(fanucspmg_state::vbl_ctrl_w)
 {
@@ -725,11 +798,11 @@ FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/4)	// guess - 3.75 MHz
+	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_CPU_IO_MAP(maincpu_io)
 
-	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/8)	// part is -2 rated
+	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/2/2)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
 
 	MCFG_DEVICE_ADD(USART0_TAG, I8251, 0)
@@ -738,15 +811,15 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_DEVICE_ADD(USART3_TAG, I8251, 0)
 
 	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/4)
-	MCFG_PIT8253_CLK1(XTAL_15MHz/4)
-	MCFG_PIT8253_CLK2(XTAL_15MHz/4)
+	MCFG_PIT8253_CLK0(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
 	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15MHz/4)
-	MCFG_PIT8253_CLK1(XTAL_15MHz/4)
-	MCFG_PIT8253_CLK2(XTAL_15MHz/4)
+	MCFG_PIT8253_CLK0(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
+	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
 
-	MCFG_I8257_ADD(DMAC_TAG, XTAL_15MHz / 4, fanucspmg_dma)
+	MCFG_I8257_ADD(DMAC_TAG, XTAL_15MHz / 5, fanucspmg_dma)
 
 	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, NULL)
 	MCFG_PIC8259_ADD(PIC1_TAG, INPUTLINE("maincpu", 0), VCC, NULL)
@@ -759,7 +832,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz, 640, 0, 512, 390, 0, 384 )
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_15MHz/3, mc6845_fanuc_intf)
+	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2, mc6845_fanuc_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
