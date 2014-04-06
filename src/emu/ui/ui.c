@@ -946,7 +946,8 @@ void ui_manager::show_mouse(bool status)
 
 bool ui_manager::is_menu_active(void)
 {
-	return (m_handler_callback == ui_menu::ui_handler);
+	return (m_handler_callback == ui_menu::ui_handler)
+		|| (m_handler_callback == handler_ingame && m_menubar != NULL && m_menubar->has_selection());
 }
 
 
