@@ -259,7 +259,7 @@ VIDEO_START_MEMBER(mystwarr_state,metamrph)
 
 	mystwarr_decode_tiles(machine());
 
-	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -51, -22, metamrph_sprite_callback);
+	m_k055673->alt_k055673_vh_start(machine(), "gfx2", 1, -51, -24, metamrph_sprite_callback);
 
 	konamigx_mixer_init(*m_screen, 0);
 
