@@ -192,6 +192,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/st_dsk.o      \
 	$(LIBOBJ)/formats/svi_cas.o     \
 	$(LIBOBJ)/formats/svi_dsk.o     \
+	$(LIBOBJ)/formats/tandy2k_dsk.o \
 	$(LIBOBJ)/formats/td0_dsk.o     \
 	$(LIBOBJ)/formats/thom_cas.o    \
 	$(LIBOBJ)/formats/thom_dsk.o    \

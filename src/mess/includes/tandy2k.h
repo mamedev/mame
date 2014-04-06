@@ -8,6 +8,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
+#include "formats/tandy2k_dsk.h"
 #include "imagedev/harddriv.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
@@ -161,7 +162,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kbdclk_w );
 	DECLARE_WRITE_LINE_MEMBER( kbddat_w );
 	DECLARE_READ8_MEMBER( irq_callback );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_hdl_w );
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
@@ -169,6 +171,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	enum
 	{

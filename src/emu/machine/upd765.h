@@ -61,6 +61,9 @@
 #define MCFG_UPD765_DRQ_CALLBACK(_write) \
 	devcb = &upd765_family_device::set_drq_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_UPD765_HDL_CALLBACK(_write) \
+	devcb = &upd765_family_device::set_hdl_wr_callback(*device, DEVCB2_##_write);
+
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
 public:
@@ -91,6 +94,7 @@ public:
 
 	template<class _Object> static devcb2_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).intrq_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_drq_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<upd765_family_device &>(device).hdl_cb.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
 
@@ -304,7 +308,7 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	devcb2_write_line intrq_cb, drq_cb;
+	devcb2_write_line intrq_cb, drq_cb, hdl_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
 	floppy_info flopi[4];
 

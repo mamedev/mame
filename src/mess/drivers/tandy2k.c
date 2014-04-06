@@ -4,17 +4,17 @@
 
     Tandy 2000
 
-    Skeleton driver.
-
 ****************************************************************************/
 
 /*
 
     TODO:
 
-	- video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
-    - DMA
     - floppy
+    	- HDL is also connected to WP/TS input where TS is used to detect motor status
+    	- 3 second motor off delay timer
+    - DMA
+	- video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
     - keyboard ROM
     - hires graphics board
     - WD1010
@@ -146,7 +146,7 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
-	if(BIT(data, 5))
+	if(!BIT(data, 5))
 		m_fdc->reset();
 
 	// timer 0 enable
@@ -665,10 +665,20 @@ static I8255A_INTERFACE( ppi_intf )
 
 // Intel 8272 Interface
 
-WRITE_LINE_MEMBER( tandy2k_state::fdc_drq )
+WRITE_LINE_MEMBER( tandy2k_state::fdc_drq_w )
 {
 	dma_request(0, state);
 }
+
+WRITE_LINE_MEMBER( tandy2k_state::fdc_hdl_w )
+{
+	m_floppy0->mon_w(!state);
+	m_floppy1->mon_w(!state);
+}
+
+FLOPPY_FORMATS_MEMBER( tandy2k_state::floppy_formats )
+	FLOPPY_TANDY_2000_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( tandy2k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
@@ -714,10 +724,6 @@ void tandy2k_state::machine_start()
 	program.install_ram(0x00000, ram_size - 1, ram);
 
 	m_char_ram.allocate(0x1000);
-
-	// HACK these should be connected to FDC HLD output
-	m_floppy0->mon_w(0);
-	m_floppy1->mon_w(0);
 
 	// register for state saving
 	save_item(NAME(m_dma_mux));
@@ -810,13 +816,16 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
 
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
+	
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
+	
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(tandy2k_state, fdc_drq_w))
+	MCFG_UPD765_HDL_CALLBACK(WRITELINE(tandy2k_state, fdc_hdl_w))
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(tandy2k_state, write_centronics_ack))
