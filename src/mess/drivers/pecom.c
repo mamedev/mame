@@ -220,5 +220,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT       MACHINE     INPUT   INIT   COMPANY  FULLNAME      FLAGS */
-COMP( 1987, pecom32,       0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 32",    0)
+COMP( 1986, pecom32,       0,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 32",    0)
 COMP( 1987, pecom64, pecom32,      0,     pecom64,    pecom, driver_device,   0,     "Ei Nis", "Pecom 64",    0)
