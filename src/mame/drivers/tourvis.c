@@ -588,7 +588,7 @@ ROM_START(tvjchan)
 ROM_END
 
 
-ROM_START(tvpckid2)
+ROM_START(tvpcgen2)
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tourv_pckid2.bin", 0x00000, 0x100000, CRC(57fab9ee) SHA1(07c8b18905fceac73c3e18b747e8cf92d8a5f515) )
 
