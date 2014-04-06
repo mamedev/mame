@@ -107,6 +107,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	ready_connected = true;
 	select_connected = true;
 	external_ready = false;
+	no_poll_irq = false;
 	dor_reset = 0x00;
 	mode = MODE_AT;
 }
@@ -2018,7 +2019,8 @@ void upd765_family_device::run_drive_ready_polling()
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
-				other_irq = true;
+				if(!no_poll_irq)
+					other_irq = true;
 			}
 		}
 	}
@@ -2225,6 +2227,7 @@ i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, dev
 upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock, "upd72065", __FILE__)
 {
 	dor_reset = 0x0c;
+	no_poll_irq = true;
 }
 
 smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock, "smc37c78", __FILE__)

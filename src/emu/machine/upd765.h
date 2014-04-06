@@ -298,7 +298,7 @@ protected:
 
 	bool ready_connected, ready_polled, select_connected;
 
-	bool external_ready;
+	bool external_ready, no_poll_irq;
 
 	int mode;
 	int main_phase;
