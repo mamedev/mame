@@ -18,6 +18,9 @@
                             added F18 Hornet bank select type
                             added Activision bank select type
     19-Feb-2010 DanB        Added return values for TIA collision registers
+
+    04-Apr-2014 Mike Saarna Fix to controller button RIOT behavior and  
+				expanded cart handling (bit 05).
 ***************************************************************************/
 
 #include "emu.h"
@@ -46,8 +49,10 @@ READ8_MEMBER(a7800_state::riot_console_button_r)
 
 WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
 {
-	m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
-	m_p2_one_button = data & 0x10;
+	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x04)
+		m_p1_one_button = data & 0x04; // pin 6 of the controller port is held high by the riot chip when reading two-button controllers (from schematic)
+	if(m_maincpu->space(AS_PROGRAM).read_byte(0x283) & 0x10)
+		m_p2_one_button = data & 0x10;
 }
 
 const riot6532_interface a7800_r6532_interface =

@@ -127,9 +127,9 @@ void a7800_state::maria_draw_scanline()
 	int maria_cycles;
 
      if ( m_maria_offset == 0 )
-             maria_cycles = 5+19; // DMA startup + last line shutdown
+	     maria_cycles = 5+21; // DMA startup + last line shutdown
 	 else
-             maria_cycles = 5+13; // DMA startup + other line shutdown
+ 	     maria_cycles = 5+16; // DMA startup + other line shutdown
 		
 	cells = 0;
 
@@ -286,10 +286,11 @@ TIMER_CALLBACK_MEMBER(a7800_state::a7800_maria_startdma)
 		m_maria_holey = (READ_MEM(m_maria_dll) & 0x60) >> 5;
 		m_maria_nmi = READ_MEM(m_maria_dll) & 0x80;
 		/*  logerror("DLL=%x\n",m_maria_dll); */
+		maria_draw_scanline();
 	}
 
 
-	if( ( frame_scanline > 15 ) && (frame_scanline < (m_lines - 5)) && m_maria_dmaon )
+	if( ( frame_scanline > 16 ) && (frame_scanline < (m_lines - 5)) && m_maria_dmaon )
 	{
 		maria_draw_scanline();
 
