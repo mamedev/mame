@@ -14,35 +14,38 @@
 
     Known games:
 
-    Aero Blaster (label shows "Vol. 33")
+    Aero Blaster (label shows "Vol. 33") [dumped]
     After Burner
     Bonk
-    Columns
+    Columns [dumped]
     Cyber Core
     Dead Moon
     Doraemon Meikyuu Daisakusen
     Down Load
-    Dungeon Explorer
-    Final Lap
+    Dungeon Explorer [dumped]
+    Final Lap Twin [dumped]
     Final Match Tennis
-    Formation Soccer
-    Legendary Axe
+    Formation Soccer [dumped]
+    Gomola Speed [dumped]
+    Jackie Chan [dumped]
+    Legendary Axe [dumped]
     Mr. Heli
     Out Run
-    Power Eleven
-    Power League IV
+    PC Genjin 2 [dumped]
+    Power Eleven [dumped]
+    Power League IV [dumped]
     Power Sports
     Puzzle Boy
-    Rastan Saga II
+    Rastan Saga II [dumped]
     Saigo no Nindou
     Son Son II
-    Special Criminal Investigation
-    Super Star Soldier (label shows "Vol. 30")
-    Super Volley ball
-    Thunder Blade
-    USA Pro Basketball
+    Special Criminal Investigation [dumped]
+    Super Star Soldier (label shows "Vol. 30") [dumped]
+    Super Volley ball [dumped]
+    Thunder Blade [dumped]
+    USA Pro Basketball [dumped]
     Vigilante
-    Volfied
+    Volfied [dumped]
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -536,12 +539,103 @@ ROM_START(tvsvball)
 	TOURVISION_BIOS
 ROM_END
 
+
+ROM_START(tvablast)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_ablast.bin", 0x00000, 0x100000, CRC(9302f6d0) SHA1(76ef27a6d639514ed261b9d65f37217f2989d1c0) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvcolumn)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_column.bin", 0x00000, 0x100000, CRC(bb01dea8) SHA1(24e00aee5117e996becb56b59851e54e3f2fa11f) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvflaptw)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_flaptw.bin", 0x00000, 0x100000, CRC(3ca56272) SHA1(9b5417ae9a9400fead170e882d3dae19edfd7157) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvfsoc90)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_fsoc90.bin", 0x00000, 0x100000, CRC(428ffeb1) SHA1(5d12f3ed7f42b2b6da4d8eba95a16e2d34616846) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvgomola)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_gomola.bin", 0x00000, 0x100000, CRC(41e8e18f) SHA1(210e511b85056bf216fc0d2540ed379a9dc7c18f) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvjchan)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_jchan.bin", 0x00000, 0x100000, CRC(7fe2b77c) SHA1(f27251451301dfb800e454c09fbb82d43b518592) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvpckid2)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_pckid2.bin", 0x00000, 0x100000, CRC(57fab9ee) SHA1(07c8b18905fceac73c3e18b747e8cf92d8a5f515) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvpow11)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_pow11.bin", 0x00000, 0x100000, CRC(375114a3) SHA1(845633345886b335e6c82b3f56ef012d9820e64d) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvsssold)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_sssold.bin", 0x00000, 0x100000, CRC(bb2a0b14) SHA1(5380d25b4d5bb3e0048ed857fd36a8206e81a234) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvvolfd)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_volfd.bin", 0x00000, 0x100000, BAD_DUMP CRC(c33efba5) SHA1(41ad4f85e551321487be61e2adbeae67e65c47de) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
 GAME( 19??, tourvis,  0,       tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
 GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1989, tvflaptw, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Namco", "Final Lap Twin (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1989, tvvolfd,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito", "Volfied (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvablast, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Kaneko", "Aero Blasters (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvfsoc90, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Human", "Formation Soccer - Human Cup '90 (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvgomola, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Human", "Gomola Speed (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvsssold, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson / Kaneko", "Super Star Soldier (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvsvball, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Video System", "Super Volley ball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvcolumn, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Telenet Japan", "Columns (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvjchan,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson", "Jackie Chan (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvpcgen2, tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson", "PC Genjin 2 - Pithecanthropus Computerurus (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, tvpow11,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson", "Power Eleven (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvsci,    tourvis, tourvision, tourvision, pce_common_state, pce_common, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
