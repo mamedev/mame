@@ -13,11 +13,11 @@
  * -------------------------------------------------------------------- */
 
 //#define CHIP(_n, _t) netlist.register_dev(NET_NEW(_t ## _dip), _n);
-#define CHIP(_n, _t) netlist.register_dev( new nld_ ## _t ## _dip(), _n);
+#define CHIP(_n, _t) setup.register_dev( new nld_ ## _t ## _dip(), _n);
 
 #define CONNECTION( a... ) CONNECTIONX( a )
-#define CONNECTIONX(_a, _b, _c, _d) netlist.register_link(_a "." # _b, _c "." # _d);
-#define NET_CSTR(_a, _b) netlist.register_link( _a, _b);
+#define CONNECTIONX(_a, _b, _c, _d) setup.register_link(_a "." # _b, _c "." # _d);
+#define NET_CSTR(_a, _b) setup.register_link( _a, _b);
 
 #define CIRCUIT_LAYOUT(x) NETLIST_START(x)
 #define CIRCUIT_LAYOUT_END NETLIST_END()

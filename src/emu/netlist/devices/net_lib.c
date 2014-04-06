@@ -78,7 +78,7 @@ netlist_factory_t::~netlist_factory_t()
 		net_device_t_base_factory *p = *e;
 		delete p;
 	}
-	m_list.reset();
+	m_list.clear();
 }
 
 void netlist_factory_t::initialize()

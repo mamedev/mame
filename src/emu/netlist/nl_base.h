@@ -625,7 +625,10 @@ public:
 
     ATTR_HOT void solve();
 
+    netlist_list_t<netlist_core_terminal_t *> m_registered; // save post-start m_list ...
     plinked_list<netlist_core_terminal_t> m_list;
+
+    ATTR_COLD void rebuild_list();     /* rebuild m_list after a load */
 
 protected:  //FIXME: needed by current solver code
 
@@ -1028,6 +1031,8 @@ public:
 
     ATTR_HOT void process_queue(const netlist_time delta);
     ATTR_HOT inline void abort_current_queue_slice() { m_stop = netlist_time::zero; }
+
+    ATTR_COLD void rebuild_lists(); /* must be called after post_load ! */
 
     ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
     ATTR_COLD netlist_setup_t &setup() { return *m_setup; }

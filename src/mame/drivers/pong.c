@@ -58,12 +58,20 @@ TODO:
 
 #define HRES_MULT                   (1)
 
-fixedfreq_interface fixedfreq_mode_pong = {
+fixedfreq_interface fixedfreq_mode_pongd = {
 	MASTER_CLOCK,
-	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
+	H_TOTAL-67,H_TOTAL-52,H_TOTAL-8,H_TOTAL,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
 	1,  /* non-interlaced */
 	0.31
+};
+
+fixedfreq_interface fixedfreq_mode_pong = {
+    MASTER_CLOCK,
+    H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
+    V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
+    1,  /* non-interlaced */
+    0.31
 };
 
 fixedfreq_interface fixedfreq_mode_pongX2 = {
@@ -105,16 +113,13 @@ static NETLIST_START(pong_schematics)
 #if 1
 #if 0
 	/* this is the clock circuit in schematics. */
-	MAINCLOCK(xclk)
-	//CLOCK(clk)
-	PARAM(xclk.FREQ, 7159000.0*2)
+	MAINCLOCK(xclk, 7159000.0*2)
 	TTL_74107(ic_f6a, xclk, high, high, high)
 	ALIAS(clk, ic_f6a.Q)
 #else
-	/* abstracting this, performance increases by 40%
+	/* abstracting this, performance increases by 60%
 	 * No surprise, the clock is extremely expensive */
 	MAINCLOCK(clk, 7159000.0)
-	//CLOCK(clk, 7159000.0)
 #endif
 #else
 	// benchmarking ...
@@ -728,7 +733,7 @@ NETLIST_END()
 
 static NETLIST_START(pongd)
 
-    NETLIST_INCLUDE(pongdoubles)
+    INCLUDE(pongdoubles)
 
     //NETDEV_ANALOG_CALLBACK(sound_cb, AUDIO, pong_state, sound_cb, "")
     //NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
@@ -946,7 +951,7 @@ static MACHINE_CONFIG_START( pongd, pong_state )
 
     //MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_ntsc720)
     //MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pongX2)
-    MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pong)
+    MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pongd)
 
     /* sound hardware */
     MCFG_SPEAKER_STANDARD_MONO("mono")

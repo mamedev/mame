@@ -130,16 +130,16 @@ public:
     ATTR_HOT inline const _ListClass *last() const { return &m_list[m_count -1]; }
     ATTR_HOT inline int count() const { return m_count; }
     ATTR_HOT inline bool empty() const { return (m_count == 0); }
-    ATTR_HOT inline void reset() { m_count = 0; }
+    ATTR_HOT inline void clear() { m_count = 0; }
     ATTR_HOT inline int capacity() const { return m_num_elements; }
 
-    ATTR_COLD void reset_and_free()
+    ATTR_COLD void clear_and_free()
     {
         for (_ListClass *i = m_list; i < m_list + m_count; i++)
         {
             delete *i;
         }
-        reset();
+        clear();
     }
 
     ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index]; }
