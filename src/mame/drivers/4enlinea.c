@@ -137,11 +137,11 @@
   8952 (PIN 04) --|02   19|-- GAL (PIN 17)      8952 (PIN 08) --|02   19|-- GAL (PIN 16)
   MAIN Z80 (D7) --|03   18|-- MAIN Z80 (D0)     MAIN Z80 (D7) --|03   18|-- MAIN Z80 (D0)
   8952 (PIN 03) --|04   17|-- 8952 (PIN 40)     8952 (PIN 07) --|04   17|-- 8952 (PIN 36)
-  MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1)     MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1) 
+  MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1)     MAIN Z80 (D6) --|05   16|-- MAIN Z80 (D1)
   8952 (PIN 02) --|06   15|-- 8952 (PIN 39)     8952 (PIN 06) --|06   15|-- 8952 (PIN 35)
   MAIN Z80 (D5) --|07   14|-- MAIN Z80 (D2)     MAIN Z80 (D5) --|07   14|-- MAIN Z80 (D2)
   8952 (PIN 01) --|08   13|-- 8952 (PIN 38)     8952 (PIN 05) --|08   13|-- 8952 (PIN 34)
-  MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3)     MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3) 
+  MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3)     MAIN Z80 (D4) --|09   12|-- MAIN Z80 (D3)
             GND --|10   11|-- 8952 (PIN 37)               GND --|10   11|-- 8952 (PIN 33)
                   '-------'                                     '-------'
 
@@ -198,6 +198,9 @@
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
+#include "bus/isa/isa.h"
+#include "bus/isa/cga.h"
+#include "video/cgapal.h"
 
 class _4enlinea_state : public driver_device
 {
@@ -205,38 +208,20 @@ public:
 	_4enlinea_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ay(*this, "aysnd"),
-		m_videoram(*this, "videoram"),
-		m_videoram2(*this, "videoram2"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")  { }
+		m_maincpu(*this, "maincpu")
+		{ }
 
 
 	required_device<ay8910_device> m_ay;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
 
-	DECLARE_WRITE8_MEMBER(crtc_config_w);
-	DECLARE_WRITE8_MEMBER(crtc_mode_ctrl_w);
-	DECLARE_WRITE8_MEMBER(crtc_colormode_w);
-	DECLARE_READ8_MEMBER(crtc_status_r);
 	DECLARE_READ8_MEMBER(unk_e000_r);
 	DECLARE_READ8_MEMBER(unk_e001_r);
+	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
+	UINT8 m_irq_count;
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(_4enlinea);
-	UINT32 screen_update_4enlinea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-
 };
 
 
@@ -244,97 +229,69 @@ public:
 *          Video Hardware          *
 ***********************************/
 
-void _4enlinea_state::video_start()
+class isa8_cga_4enlinea_device : public isa8_cga_device
 {
-	m_gfxdecode->gfx(0)->set_source(m_videoram);
+public:
+	// construction/destruction
+	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void device_start();
+	virtual const rom_entry *device_rom_region() const;
+};
+
+const rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
+{
+	return NULL;
 }
 
-UINT32 _4enlinea_state::screen_update_4enlinea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+const device_type ISA8_CGA_4ENLINEA = &device_creator<isa8_cga_4enlinea_device>;
+
+isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_4ENLINEA, "ISA8_CGA_4ENLINEA", tag, owner, clock, "4enlinea_cga", __FILE__)
 {
-/* note: chars are 16*12 pixels */
+}
 
-	int offset = 0;
-	int offset2 = 0;
 
-	for (int y = 0; y < 200; y++)
+
+void isa8_cga_4enlinea_device::device_start()
+{
+	if (m_palette != NULL && !m_palette->started())
+		throw device_missing_dependencies();
+
+	set_isa_device();
+	m_vram_size = 0x4000;
+	m_vram.resize(m_vram_size);
+
+	m_update_row = NULL;
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	m_isa->install_bank(0x8000, 0xbfff, 0, 0, "bank1", m_vram);
+
+	/* Initialise the cga palette */
+	int i;
+
+	for ( i = 0; i < CGA_PALETTE_SETS * 16; i++ )
 	{
-		UINT16* dstptr_bitmap = &bitmap.pix16(y);
+		m_palette->set_pen_color( i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2] );
+	}
 
-		for (int x = 0; x < 320; x += 4)
+	i = 0x8000;
+	for ( int r = 0; r < 32; r++ )
+	{
+		for ( int g = 0; g < 32; g++ )
 		{
-			UINT8 pix;
-
-			if (y & 1) pix = m_videoram2[offset2++];
-			else pix = m_videoram[offset++];
-
-			dstptr_bitmap[x + 3] = (pix >> 0) & 0x3;
-			dstptr_bitmap[x + 2] = (pix >> 2) & 0x3;
-			dstptr_bitmap[x + 1] = (pix >> 4) & 0x3;
-			dstptr_bitmap[x + 0] = (pix >> 6) & 0x3;
+			for ( int b = 0; b < 32; b++ )
+			{
+				m_palette->set_pen_color( i, r << 3, g << 3, b << 3 );
+				i++;
+			}
 		}
 	}
 
-	return 0;
+//	astring tempstring;
+//	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
+//	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 }
 
-
-WRITE8_MEMBER(_4enlinea_state::vram_w)
-{
-	m_videoram[offset] = data;
-//	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
-}
-
-WRITE8_MEMBER(_4enlinea_state::vram2_w)
-{
-	m_videoram2[offset] = data;
-//	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
-}
-
-WRITE8_MEMBER(_4enlinea_state::crtc_config_w)
-{
-/* Bit 6 enables the CGA mode, otherwise is MGA */
-	if(data & 0x40)
-	{
-		logerror("CRTC config mode (3BFh): CGA\n");
-	}
-	else
-	{
-		logerror("CRTC config mode (3BFh): MGA\n");
-	}
-}
-
-WRITE8_MEMBER(_4enlinea_state::crtc_mode_ctrl_w)
-{
-/* Bit 3 enables/disables the video (see the notes above) */
-	logerror("CRTC mode control (3D8h): %02x\n", data);
-}
-
-WRITE8_MEMBER(_4enlinea_state::crtc_colormode_w)
-{
-	logerror("CRTC color mode (3D9h): %02x\n", data);
-}
-
-READ8_MEMBER(_4enlinea_state::crtc_status_r)
-{
-/*----- bits -----
-  7 6 5 4  3 2 1 0   For CGA Mode.
-  x x x x  - - - -  (bits 4-5-6-7 are unused)
-           | | | |
-           | | | '-- 0: Display active period.
-           | | |     1: Non-display period.
-           | | |
-           | | '---- 0: Light pen reset.
-           | |       1: Light pen set.
-           | |
-           | '------ 0: Light pen switch off.
-           |         1: Light pen switch on.
-           |
-           '-------- 0: Non-vertical sync period.
-                     1: Vertical sync period.
-
-*/
-	return (m_screen->vpos() >= 200) ? 0x80 : 0x00;    // bit 7 is suppossed to be unused in CGA mode
-}
 
 READ8_MEMBER(_4enlinea_state::unk_e000_r)
 {
@@ -350,15 +307,13 @@ READ8_MEMBER(_4enlinea_state::unk_e001_r)
 //	return (machine().rand() & 0x0f);	// after 30 seconds, random gfx appear on the screen.
 }
 
-
 /***********************************
 *      Memory Map Information      *
 ***********************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")		// even lines
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(vram2_w) AM_SHARE("videoram2")	// odd lines
+//	AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe000) AM_READ(unk_e000_r)
@@ -372,13 +327,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
-	AM_RANGE(0x3d4, 0x3d4) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3d5, 0x3d5) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x3d8, 0x3d8) AM_WRITE(crtc_mode_ctrl_w)
-	AM_RANGE(0x3d9, 0x3d9) AM_WRITE(crtc_colormode_w)
-	AM_RANGE(0x3da, 0x3da) AM_READ(crtc_status_r)
-	AM_RANGE(0x3bf, 0x3bf) AM_WRITE(crtc_config_w)
-
+//	AM_RANGE(0x3d4, 0x3df) CGA regs
 ADDRESS_MAP_END
 
 
@@ -423,6 +372,10 @@ static INPUT_PORTS_START( 4enlinea )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                   PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                   PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+
+	PORT_START( "pcvideo_cga_config" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -430,23 +383,13 @@ INPUT_PORTS_END
 *         Graphics Layouts         *
 ***********************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	0x4000/16,
-	2,
-	{ 0, 1 },
-	{ 0, 2, 4, 6, 8, 10, 12, 14 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*16
-};
+
 
 /****************************************
 *      Graphics Decode Information      *
 ****************************************/
 
 static GFXDECODE_START( 4enlinea )
-	GFXDECODE_ENTRY( NULL, 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -469,25 +412,6 @@ void _4enlinea_state::machine_reset()
 *         CRTC Interface          *
 **********************************/
 
-static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
-{
-
-}
-
-static MC6845_INTERFACE( mc6845_intf )
-{
-	false,           /* show border area */
-	0,0,0,0,         /* visarea adjustment */
-	8,               /* number of pixels per video memory address */
-	NULL,            /* before pixel update callback */
-	NULL,            /* row update callback */
-	NULL,            /* after pixel update callback */
-	DEVCB_NULL,      /* callback for display state changes */
-	DEVCB_NULL,      /* callback for cursor state changes */
-	DEVCB_NULL,      /* HSYNC callback */
-	DEVCB_NULL,      /* VSYNC callback */
-	crtc_addr        /* update address callback */
-};
 
 
 /***********************************
@@ -509,30 +433,54 @@ static const ay8910_interface ay8910_intf =
 *         Machine Drivers          *
 ***********************************/
 
+SLOT_INTERFACE_START( 4enlinea_isa8_cards )
+	SLOT_INTERFACE_INTERNAL("4enlinea",  ISA8_CGA_4ENLINEA)
+SLOT_INTERFACE_END
+
+static const isa8bus_interface _4enlinea_isabus_intf =
+{
+	// interrupts
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	// dma request
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+/* TODO: irq sources are unknown */
+INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
+{
+	if(m_irq_count == 0)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	else
+		device.execute().set_input_line(0, HOLD_LINE);
+
+	m_irq_count++;
+	m_irq_count&=3;
+}
+
 static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PRG_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4enlinea_state, nmi_line_pulse)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_irq, 60) //TODO
+//	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SND_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_portmap)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_4enlinea_state, screen_update_4enlinea)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", _4enlinea_isabus_intf)
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", 4enlinea_isa8_cards, "4enlinea", true)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4enlinea)
-	MCFG_PALETTE_ADD("palette", 256)
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.
     CRTC_CLOCK is 8MHz, entering for pin 1 of UM487F. This clock is used
@@ -542,8 +490,6 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	CRTC_CLOCK / 4.5 = 59.521093 Hz.
     CRTC_CLOCK / 5.0 = 53.569037 Hz.
 */
-//	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK / 2, mc6845_intf)	// seems that MC6845 doesn't support the game mode
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK / 4.5, mc6845_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
