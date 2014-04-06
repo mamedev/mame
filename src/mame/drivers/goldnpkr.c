@@ -1414,36 +1414,38 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
   7654 3210
   ---- ---x  Bet Lamp.
   ---- --x-  Deal Lamp.
-  ---- -x--  Holds+Cancel Lamps.
+  ---- -x--  Holds + Cancel Lamps.
   ---- x---  Take Lamp.
 
 */
-
 WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 {
-	output_set_lamp_value(0, 1 - ((data) & 1));         /* Lamp 0 */
-	output_set_lamp_value(1, 1 - ((data >> 1) & 1));    /* Lamp 1 */
-	output_set_lamp_value(2, 1 - ((data >> 2) & 1));    /* Lamp 2 */
-	output_set_lamp_value(3, 1 - ((data >> 3) & 1));    /* Lamp 3 */
-	output_set_lamp_value(4, 1 - ((data >> 4) & 1));    /* Lamp 4 */
+/***** General Lamps and Counters wiring *****
+
+  7654 3210
+  ---- ---x  Bet lamp.
+  ---- --x-  Deal lamp.
+  ---- -x--  Holds + Cancel lamps.
+  ---- x---  Double Up & Take lamps. (Coin In counter (inverted) for witchcrd, bsuerte and sloco93 sets)
+  ---x ----  Big & Small lamps.
+  --x- ----  Coin Out counter. Inverted for witchcrd, bsuerte and sloco93 sets.
+  -x-- ----  Coin In counter.
+  x--- ----  Note In counter (only goldnpkr).
+
+*/
+	data = data ^ 0xff;
+
+	output_set_lamp_value(0, (data) & 1);         /* Lamp 0 */
+	output_set_lamp_value(1, (data >> 1) & 1);    /* Lamp 1 */
+	output_set_lamp_value(2, (data >> 2) & 1);    /* Lamp 2 */
+	output_set_lamp_value(3, (data >> 3) & 1);    /* Lamp 3 */
+	output_set_lamp_value(4, (data >> 4) & 1);    /* Lamp 4 */
 
 	coin_counter_w(machine(), 0, data & 0x40);  /* counter1 */
 	coin_counter_w(machine(), 1, data & 0x80);  /* counter2 */
 	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 */
 
-//  popmessage("written : %02X", (0xff - data));
-
-/*  Counters:
-
-    bit 5 = Coin out
-    bit 6 = Coin counter
-    bit 7 = Note counter (only goldnpkr use it)
-
-    ONLY for witchcrd, bsuerte and sloco93 sets:
-
-    bit3 = Coin counter (inverted).
-    bit5 = Coin out (inverted).
-*/
+	popmessage("written : %02X", (data));
 }
 
 WRITE8_MEMBER(goldnpkr_state::sound_w)
