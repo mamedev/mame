@@ -1444,8 +1444,6 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 	coin_counter_w(machine(), 0, data & 0x40);  /* counter1 */
 	coin_counter_w(machine(), 1, data & 0x80);  /* counter2 */
 	coin_counter_w(machine(), 2, data & 0x20);  /* counter3 */
-
-	popmessage("written : %02X", (data));
 }
 
 WRITE8_MEMBER(goldnpkr_state::sound_w)
