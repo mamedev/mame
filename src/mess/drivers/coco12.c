@@ -293,10 +293,7 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_3_579545MHz, coco12_state::sam6883_config)
 	MCFG_SAM6883_RES_CALLBACK(READ8(coco12_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
-
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	// default 600 baud?
-
+	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "pak")
 
 	// video hardware

@@ -88,7 +88,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
-	m_rs232(*this, RS232_TAG),
+	m_bitbanger(*this, BITBANGER_TAG),
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG)
 {
@@ -479,7 +479,7 @@ READ8_MEMBER( coco_state::pia1_pb_r )
 		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x80));
 
 	// serial in (PB0)
-	bool serial_in = (m_rs232 != NULL) && (m_rs232->rxd_r() ? true : false);
+	bool serial_in = (m_bitbanger != NULL) && (m_bitbanger->input() ? true : false);
 
 	// composite the results
 	return (memory_sense ? 0x04 : 0x00)
@@ -963,9 +963,9 @@ void coco_state::update_prinout(bool prinout)
 	else
 	{
 		/* output bitbanger if present (only on CoCos) */
-		if (m_rs232 != NULL)
+		if (m_bitbanger != NULL)
 		{
-			m_rs232->write_txd(prinout ? 1 : 0);
+			m_bitbanger->output(prinout ? 1 : 0);
 		}
 	}
 }
@@ -1016,6 +1016,42 @@ INPUT_CHANGED_MEMBER(coco_state::joystick_mode_changed)
 {
 	poll_keyboard();
 }
+
+
+
+//-------------------------------------------------
+//  bitbanger_changed
+//-------------------------------------------------
+
+void coco_state::bitbanger_changed(bool newvalue)
+{
+	// do nothing
+}
+
+
+
+//-------------------------------------------------
+//  bitbanger_callback
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( coco_state::bitbanger_callback )
+{
+	bitbanger_changed(state ? true : false);
+}
+
+
+
+//-------------------------------------------------
+//  bitbanger_config
+//-------------------------------------------------
+
+const bitbanger_config coco_state::coco_bitbanger_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(coco_state, bitbanger_callback),   /* callback */
+	BITBANGER_PRINTER,                                          /* default mode */
+	BITBANGER_600,                                              /* default output baud */
+	BITBANGER_0PERCENT                                          /* default fine tune adjustment */
+};
 
 
 
