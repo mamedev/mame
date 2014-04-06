@@ -398,6 +398,7 @@ inline void crt9007_t::update_dma_timer()
 
 inline void crt9007_t::recompute_parameters()
 {
+#ifdef UNUSED_FOR_NOW
 	// check that necessary registers have been loaded
 	if (!HAS_VALID_PARAMETERS) return;
 
@@ -441,6 +442,7 @@ inline void crt9007_t::recompute_parameters()
 	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
 	m_vlt_timer->adjust(m_screen->time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(m_screen->time_until_pos(0, 0));
+#endif
 }
 
 

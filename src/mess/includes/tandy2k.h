@@ -125,6 +125,7 @@ public:
 	optional_shared_ptr<UINT8> m_char_ram;
 
 	virtual void machine_start();
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_drq();
 	void dma_request(int line, int state);

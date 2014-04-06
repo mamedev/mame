@@ -335,6 +335,34 @@ INPUT_PORTS_END
 
 // Video
 
+UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const pen_t *pen = m_palette->pens();
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	
+	for (int y = 0; y < 400; y++)
+	{
+		UINT8 cgra = y % 16;
+
+		for (int sx = 0; sx < 80; sx++)
+		{
+			offs_t addr = 0x1ec00 + (((y / 16) * 80) + sx) * 2;
+			UINT8 vidla = program.read_word(addr);
+			UINT8 data = m_char_ram[(vidla << 4) | cgra];
+			logerror("y %u sx %u addr %06x vidla %02x data %02x\n",y,sx,addr,vidla,data);
+
+			for (int x = 0; x < 8; x++)
+			{
+				int color = BIT(data, 7);
+				bitmap.pix32(y, (sx * 8) + x) = pen[color];
+				data <<= 1;
+			}			
+		}
+	}
+
+	return 0;
+}
+
 WRITE_LINE_MEMBER( tandy2k_state::vpac_vlt_w )
 {
 	m_drb0->ren_w(state);
@@ -721,15 +749,16 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
 	
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/16/10)
+	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/20/8)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
-	MCFG_CRT9007_CHARACTER_WIDTH(10)
+	MCFG_CRT9007_CHARACTER_WIDTH(8)
 	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
 	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, vsync_w))
 	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
@@ -749,10 +778,10 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_CRT9212_WEN2_VCC()
 	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(tandy2k_state, drb_attr_w))
 
-	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/16)
+	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/20)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vidldsh", tandy2k_state, vidldsh_tick, attotime::from_hz(XTAL_16MHz*28/16))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("vidldsh", tandy2k_state, vidldsh_tick, attotime::from_hz(XTAL_16MHz*28/20/8))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
