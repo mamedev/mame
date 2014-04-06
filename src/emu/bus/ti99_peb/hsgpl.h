@@ -59,7 +59,7 @@ private:
 
 	bool            m_dsr_enabled;
 	bool            m_gram_enabled;
-	bool            m_bank_enabled;
+	bool            m_bank_inhibit;
 	int             m_dsr_page;
 	bool            m_card_enabled;
 	bool            m_write_enabled;
@@ -71,6 +71,8 @@ private:
 
 	int             m_current_grom_port;
 	int             m_current_bank;
+
+	int             m_module_bank;
 
 	// GROM emulation
 	bool            m_waddr_LSB;
