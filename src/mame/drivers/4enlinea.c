@@ -229,12 +229,14 @@ public:
 *          Video Hardware          *
 ***********************************/
 
+// TODO: this is actually UM487F
 class isa8_cga_4enlinea_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
 	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER( _4enlinea_io_read );
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -252,6 +254,24 @@ isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig
 }
 
 
+READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
+{
+	UINT8 data;
+
+	switch (offset)
+	{
+	case 0xa:
+		data = isa8_cga_device::io_read(space, offset);
+		data|= (data & 8) << 4;
+		break;
+
+	default:
+		data = isa8_cga_device::io_read(space, offset);
+		break;
+	}
+	return data;
+}
+
 
 void isa8_cga_4enlinea_device::device_start()
 {
@@ -263,7 +283,7 @@ void isa8_cga_4enlinea_device::device_start()
 	m_vram.resize(m_vram_size);
 
 	m_update_row = NULL;
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
 	m_isa->install_bank(0x8000, 0xbfff, 0, 0, "bank1", m_vram);
 
 	/* Initialise the cga palette */
