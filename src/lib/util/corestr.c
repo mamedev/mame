@@ -58,12 +58,17 @@ int core_strnicmp(const char *s1, const char *s2, size_t n)
 int core_strwildcmp(const char *sp1, const char *sp2)
 {
 	char s1[17], s2[17];
-	int i, l1, l2;
+	size_t i, l1, l2;
 	char *p;
 
-	strncpy(s1, sp1, 16); s1[16] = 0; if (s1[0] == 0) strcpy(s1, "*");
+	//assert(strlen(sp1) < 16);
+	//assert(strlen(sp2) < 16);
 
-	strncpy(s2, sp2, 16); s2[16] = 0; if (s2[0] == 0) strcpy(s2, "*");
+	if (sp1[0] == 0) strcpy(s1, "*");
+	else { strncpy(s1, sp1, 16); s1[16] = 0; }
+
+	if (sp2[0] == 0) strcpy(s2, "*");
+	else { strncpy(s2, sp2, 16); s2[16] = 0; }
 
 	p = strchr(s1, '*');
 	if (p)
@@ -79,14 +84,14 @@ int core_strwildcmp(const char *sp1, const char *sp2)
 		s2[16] = 0;
 	}
 
-	l1 = (int)strlen(s1);
+	l1 = strlen(s1);
 	if (l1 < 16)
 	{
 		for (i = l1 + 1; i < 16; i++) s1[i] = ' ';
 		s1[16] = 0;
 	}
 
-	l2 = (int)strlen(s2);
+	l2 = strlen(s2);
 	if (l2 < 16)
 	{
 		for (i = l2 + 1; i < 16; i++) s2[i] = ' ';
