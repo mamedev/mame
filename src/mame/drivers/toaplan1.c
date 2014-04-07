@@ -448,10 +448,9 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
   - Spelling error on the Sound Check screen: "BUTTAN" instead of "BUTTON".
   - This set and 'outzonec' have a hidden use for the two "Unused" Dip Switches.
     If DSWA bit 0 ("Unused") and DSWB bit 7 (also "Unused") are both set to ON and
-    P2 joystick is held DOWN during startup, video registers 0x300008 and 0x340000
-    are loaded with different values than usual (code at 0x013868 and 0x013904).
-    Unfortunately, whatever difference this is supposed to make to the display is
-    not currently known nor emulated by MAME :(
+    P2 joystick is held DOWN during startup, the CRTC registers are programmed for a
+    smaller VTOTAL than usual, giving a higher frame rate but cutting off the edges
+    of the screen (the effect of this isn't correctly emulated yet)
   - Likewise, if DSWA bit 0 is ON and DSWB bit 7 is OFF, the game never starts up
     (it seems to infinitely repeat one of the RAM tests)
 
@@ -619,27 +618,6 @@ To Do:
 #include "includes/toaplipt.h"
 #include "includes/toaplan1.h"
 #include "sound/3812intf.h"
-
-#define PIXEL_CLOCK         (XTAL_28MHz/4)
-
-/* freq      V Hz       H kHz
-Fire Shark   57.6132    14.82  -->  472.33 * 257.23 *note: H may be inaccurate
-Vimana       57.6125    14.78  -->  473.61 * 256.54 *note: H may be inaccurate
-
-** earlier measurements from another pcb owner, why are some of these off by 2Hz???
-Hellfire     57.59      ?
-Truxton      57.59      ?
-Rally Bike   55.14      ?
-Vimana       55.14      ?
-
-*/
-#define HTOTAL              (464)
-#define HBEND               (0)
-#define HBSTART             (320)
-
-#define VTOTAL              (262)
-#define VBEND               (0)
-#define VBSTART             (240)
 
 
 /***************************** 68000 Memory Map *****************************/
@@ -1787,6 +1765,20 @@ WRITE_LINE_MEMBER(toaplan1_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
+#define PIXEL_CLOCK         (XTAL_28MHz/4)
+
+// HTOTAL and VTOTAL taken from CRTC registers (toaplan1_bcu_control_w)
+// rallybik, demonwld and outzone program a larger VTOTAL than the other
+// games, giving them a lower frame rate
+
+#define HTOTAL              ((224+1)*2)
+#define HBEND               (0)
+#define HBSTART             (320)
+
+#define VTOTAL              ((134+1)*2)
+#define VTOTAL55            ((140+1)*2)
+#define VBEND               (0)
+#define VBSTART             (240)
 
 
 static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
@@ -1807,7 +1799,7 @@ static MACHINE_CONFIG_START( rallybik, toaplan1_rallybik_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_rallybik_state, screen_eof_rallybik)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1965,7 +1957,7 @@ static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -2039,7 +2031,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 	MCFG_SCREEN_PALETTE("palette")
