@@ -214,14 +214,22 @@ public:
 
 	required_device<ay8910_device> m_ay;
 
-	DECLARE_READ8_MEMBER(unk_e000_r);
-	DECLARE_READ8_MEMBER(unk_e001_r);
+	DECLARE_READ8_MEMBER(serial_r);
+	DECLARE_READ8_MEMBER(serial_status_r);
+	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_WRITE8_MEMBER(serial_status_w);
+	DECLARE_READ8_MEMBER(hack_r);
 	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
+	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
+
 	UINT8 m_irq_count;
+	UINT8 m_serial_flags;
+	UINT8 m_serial_data[2];
 
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+
 };
 
 
@@ -237,6 +245,7 @@ public:
 	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER( _4enlinea_io_read );
+	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -272,6 +281,10 @@ READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
 	return data;
 }
 
+WRITE8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_mode_control_w )
+{
+	// TODO
+}
 
 void isa8_cga_4enlinea_device::device_start()
 {
@@ -283,6 +296,7 @@ void isa8_cga_4enlinea_device::device_start()
 	m_vram.resize(m_vram_size);
 
 	m_update_row = NULL;
+	//m_isa->install_device(0x3bf, 0x3bf, 0, 0, NULL, write8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_mode_control_w), this ) );
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_4enlinea_device::_4enlinea_io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
 	m_isa->install_bank(0x8000, 0xbfff, 0, 0, "bank1", m_vram);
 
@@ -313,19 +327,18 @@ void isa8_cga_4enlinea_device::device_start()
 }
 
 
-READ8_MEMBER(_4enlinea_state::unk_e000_r)
+READ8_MEMBER(_4enlinea_state::serial_r)
 {
-	logerror("read e000\n");
-//	return (machine().rand() & 0xff);
-	return 0xff;
+	if(offset == 0)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
+		m_serial_flags |= 0x20;
+	}
+
+	return m_serial_data[offset];
 }
 
-READ8_MEMBER(_4enlinea_state::unk_e001_r)
-{
-	logerror("read e001\n");
-	return (machine().rand() & 0xff);	// after 30 seconds, random strings and gfx appear on the screen.
-//	return (machine().rand() & 0x0f);	// after 30 seconds, random gfx appear on the screen.
-}
+
 
 /***********************************
 *      Memory Map Information      *
@@ -336,25 +349,48 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 //	AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe000) AM_READ(unk_e000_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(unk_e001_r)
-
-	AM_RANGE(0xe002, 0xe3ff) AM_RAM	// bad... just temporary to allow writes for debug purposes.
-
+	AM_RANGE(0xe000, 0xe001) AM_READ(serial_r)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
 //	AM_RANGE(0x3d4, 0x3df) CGA regs
+	AM_RANGE(0x3bf, 0x3bf) AM_WRITENOP // CGA mode control, TODO
 ADDRESS_MAP_END
 
+READ8_MEMBER(_4enlinea_state::serial_status_r)
+{
+	return m_serial_flags;
+}
 
+WRITE8_MEMBER(_4enlinea_state::serial_status_w)
+{
+	m_serial_flags = data; // probably just clears
+}
+
+/* TODO: do this really routes to 0xe000-0xe001 of Main CPU? */
+WRITE8_MEMBER(_4enlinea_state::serial_w)
+{
+	m_serial_data[offset] = data;
+	if(offset == 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
+}
+
+READ8_MEMBER(_4enlinea_state::hack_r)
+{
+	return machine().rand();
+}
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
+	AM_RANGE(0xf800, 0xfbff) AM_RAM
+	AM_RANGE(0xfc24, 0xfc24) AM_READ(hack_r)
+	AM_RANGE(0xfc28, 0xfc28) AM_READ(hack_r)
+	AM_RANGE(0xfc30, 0xfc31) AM_WRITE(serial_w)
+	AM_RANGE(0xfc32, 0xfc32) AM_READWRITE(serial_status_r,serial_status_w)
+	AM_RANGE(0xfc48, 0xfc49) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_data_w)
+
 ADDRESS_MAP_END
 
 
@@ -477,12 +513,19 @@ static const isa8bus_interface _4enlinea_isabus_intf =
 INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
 	if(m_irq_count == 0)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	{
+		//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
 
 	m_irq_count++;
 	m_irq_count&=3;
+}
+
+INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
+{
+	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
@@ -497,6 +540,7 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	MCFG_CPU_ADD("audiocpu", Z80, SND_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_portmap)
+	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
 	MCFG_ISA8_BUS_ADD("isa", ":maincpu", _4enlinea_isabus_intf)
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", 4enlinea_isa8_cards, "4enlinea", true)
