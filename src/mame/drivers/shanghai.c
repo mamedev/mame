@@ -4,9 +4,6 @@ Shanghai
 
 driver by Nicola Salmoria
 
-The HD63484 emulation is incomplete, it implements the bare minimum required
-to run these games.
-
 The end of round animation in Shanghai is wrong; change the opcode at 0xfb1f2
 to a NOP to jump to it immediately at the beginning of a round.
 
