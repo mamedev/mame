@@ -49,7 +49,13 @@ ROM_END
 
 at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, "AT Keyboard Controller", tag, owner, clock, "at_keybc", __FILE__),
-		m_cpu(NULL)
+		m_cpu(NULL),
+		m_system_reset_cb(*this),
+		m_gate_a20_cb(*this),
+		m_input_buffer_full_cb(*this),
+		m_output_buffer_empty_cb(*this),
+		m_keyboard_clock_cb(*this),
+		m_keyboard_data_cb(*this)
 {
 }
 
@@ -73,34 +79,6 @@ machine_config_constructor at_keyboard_controller_device::device_mconfig_additio
 	return MACHINE_CONFIG_NAME(at_keybc);
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void at_keyboard_controller_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const at_keyboard_controller_interface *intf = reinterpret_cast<const at_keyboard_controller_interface *>(static_config());
-
-	if (intf != NULL)
-	{
-		*static_cast<at_keyboard_controller_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_system_reset_cb, 0, sizeof(m_system_reset_cb));
-		memset(&m_gate_a20_cb, 0, sizeof(m_gate_a20_cb));
-		memset(&m_input_buffer_full_cb, 0, sizeof(m_input_buffer_full_cb));
-		memset(&m_output_buffer_empty_cb, 0, sizeof(m_output_buffer_empty_cb));
-		memset(&m_keyboard_clock_cb, 0, sizeof(m_keyboard_clock_cb));
-		memset(&m_keyboard_data_cb, 0, sizeof(m_keyboard_data_cb));
-	}
-}
-
 /*-------------------------------------------------
     device_start - device-specific startup
 -------------------------------------------------*/
@@ -111,12 +89,12 @@ void at_keyboard_controller_device::device_start()
 	m_cpu = downcast<upi41_cpu_device *>(subdevice("at_keybc"));
 
 	// resolve callbacks
-	m_system_reset_func.resolve(m_system_reset_cb, *this);
-	m_gate_a20_func.resolve(m_gate_a20_cb, *this);
-	m_input_buffer_full_func.resolve(m_input_buffer_full_cb, *this);
-	m_output_buffer_empty_func.resolve(m_output_buffer_empty_cb, *this);
-	m_keyboard_clock_func.resolve(m_keyboard_clock_cb, *this);
-	m_keyboard_data_func.resolve(m_keyboard_data_cb, *this);
+	m_system_reset_cb.resolve_safe();
+	m_gate_a20_cb.resolve_safe();
+	m_input_buffer_full_cb.resolve_safe();
+	m_output_buffer_empty_cb.resolve_safe();
+	m_keyboard_clock_cb.resolve_safe();
+	m_keyboard_data_cb.resolve_safe();
 
 	// register for save states
 	save_item(NAME(m_clock_signal));
@@ -180,16 +158,16 @@ READ8_MEMBER( at_keyboard_controller_device::p2_r )
 */
 WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 {
-	m_system_reset_func(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	m_gate_a20_func(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-	m_input_buffer_full_func(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
-	m_output_buffer_empty_func(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	m_system_reset_cb(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_gate_a20_cb(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_input_buffer_full_cb(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_output_buffer_empty_cb(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_clock_signal = !BIT(data, 6);
 	m_data_signal = BIT(data, 7);
 
-	m_keyboard_data_func(m_data_signal);
-	m_keyboard_clock_func(m_clock_signal);
+	m_keyboard_data_cb(m_data_signal);
+	m_keyboard_clock_cb(m_clock_signal);
 }
 
 
