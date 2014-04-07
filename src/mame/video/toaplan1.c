@@ -295,14 +295,14 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes()/2);
 	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
 
-	m_pf1_tilemap->set_scrolldx(-0x00d-6, -0x1c0+6);
-	m_pf2_tilemap->set_scrolldx(-0x00d-4, -0x1c0+4);
-	m_pf3_tilemap->set_scrolldx(-0x00d-2, -0x1c0+2);
-	m_pf4_tilemap->set_scrolldx(-0x00d-0, -0x1c0+0);
-	m_pf1_tilemap->set_scrolldy(-0x111, -0x0e8);
-	m_pf2_tilemap->set_scrolldy(-0x111, -0x0e8);
-	m_pf3_tilemap->set_scrolldy(-0x111, -0x0e8);
-	m_pf4_tilemap->set_scrolldy(-0x111, -0x0e8);
+	m_pf1_tilemap->set_scrolldx(-0x00d-6, -0x80+6);
+	m_pf2_tilemap->set_scrolldx(-0x00d-4, -0x80+4);
+	m_pf3_tilemap->set_scrolldx(-0x00d-2, -0x80+2);
+	m_pf4_tilemap->set_scrolldx(-0x00d-0, -0x80+0);
+	m_pf1_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf2_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf3_tilemap->set_scrolldy(-0x111, 0x8);
+	m_pf4_tilemap->set_scrolldy(-0x111, 0x8);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
@@ -316,14 +316,14 @@ VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 	toaplan1_vram_alloc();
 	toaplan1_spritevram_alloc();
 
-	m_pf1_tilemap->set_scrolldx(-0x1ef-6, -0x151+6);
-	m_pf2_tilemap->set_scrolldx(-0x1ef-4, -0x151+4);
-	m_pf3_tilemap->set_scrolldx(-0x1ef-2, -0x151+2);
-	m_pf4_tilemap->set_scrolldx(-0x1ef-0, -0x151+0);
-	m_pf1_tilemap->set_scrolldy(-0x101, -0x1ef);
-	m_pf2_tilemap->set_scrolldy(-0x101, -0x1ef);
-	m_pf3_tilemap->set_scrolldy(-0x101, -0x1ef);
-	m_pf4_tilemap->set_scrolldy(-0x101, -0x1ef);
+	m_pf1_tilemap->set_scrolldx(-0x1ef-6, -0x11+6);
+	m_pf2_tilemap->set_scrolldx(-0x1ef-4, -0x11+4);
+	m_pf3_tilemap->set_scrolldx(-0x1ef-2, -0x11+2);
+	m_pf4_tilemap->set_scrolldx(-0x1ef-0, -0x11+0);
+	m_pf1_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf2_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf3_tilemap->set_scrolldy(-0x101, -0xff);
+	m_pf4_tilemap->set_scrolldy(-0x101, -0xff);
 
 	m_bcu_flipscreen = -1;
 	m_fcu_flipscreen = 0;
