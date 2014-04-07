@@ -539,9 +539,11 @@ software_info *software_list_device::find(const char *look_for, software_info *p
 	if (look_for == NULL)
 		return NULL;
 
+	bool iswild = strchr(look_for, '*') != NULL || strchr(look_for, '?');
+
 	// find a match (will cause a parse if needed when calling first_software_info)
 	for (prev = (prev != NULL) ? prev->next() : first_software_info(); prev != NULL; prev = prev->next())
-		if (core_strwildcmp(look_for, prev->shortname()) == 0)
+		if ((iswild && core_strwildcmp(look_for, prev->shortname()) == 0) || core_stricmp(look_for, prev->shortname()) == 0)
 			break;
 
 	return prev;
