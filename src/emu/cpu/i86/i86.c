@@ -1354,8 +1354,7 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 
 		case 0x8c: // i_mov_wsreg
 			m_modrm = fetch();
-			PutRMWord(m_sregs[(m_modrm & 0x18) >> 3]); // guess: ignore bit 5
-			if(m_modrm & 0x20) logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
+			PutRMWord(m_sregs[(m_modrm & 0x18) >> 3]); // confirmed on hw: modrm bit 5 ignored
 			CLKM(MOV_RS,MOV_MS);
 			break;
 
@@ -1369,25 +1368,8 @@ bool i8086_common_cpu_device::common_op(UINT8 op)
 		case 0x8e: // i_mov_sregw
 			m_modrm = fetch();
 			m_src = GetRMWord();
+			m_sregs[(m_modrm & 0x18) >> 3] = m_src; // confirmed on hw: modrm bit 5 ignored
 			CLKM(MOV_SR,MOV_SM);
-			switch (m_modrm & 0x38)
-			{
-			case 0x00:  /* mov es,ew */
-				m_sregs[ES] = m_src;
-				break;
-			case 0x08:  /* mov cs,ew */
-				m_sregs[CS] = m_src;
-				break;
-			case 0x10:  /* mov ss,ew */
-				m_sregs[SS] = m_src;
-				m_no_interrupt = 1;
-				break;
-			case 0x18:  /* mov ds,ew */
-				m_sregs[DS] = m_src;
-				break;
-			default:
-				logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
-			}
 			break;
 
 		case 0x8f: // i_popw
