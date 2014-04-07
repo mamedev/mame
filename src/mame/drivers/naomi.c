@@ -5627,6 +5627,26 @@ ROM_START( ausfache )
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x04))
 ROM_END
 
+ROM_START( manicpnc )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x14000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24408.ic8",  0x00000000, 0x4000000, CRC(cc6c722d) SHA1(5a3deb5c4e3e0c518f71fe76d8c1f9ffdf6c527d) )
+	ROM_LOAD( "fpr-24372.ic9",  0x04000000, 0x4000000, CRC(869eb096) SHA1(60135ecc2b48c748ba98c26a3a266e7f5622971a) ) 
+	ROM_LOAD( "fpr-24373.ic10", 0x08000000, 0x4000000, CRC(60a1cf35) SHA1(35d0f6cc7f8d3c0330e3ee0e23a24c7f94c1b607) ) 
+	ROM_LOAD( "fpr-24374.ic11", 0x0c000000, 0x4000000, CRC(57023e31) SHA1(5191728a9c717150d694e6709fe84ec800b0eac9) ) 
+	ROM_LOAD( "fpr-24375.ic12", 0x10000000, 0x4000000, CRC(959c5396) SHA1(d0f5b96c0e20a7d91fcf6961a5eb9f36f143a590) ) 
+
+	ROM_REGION( 0x200000, "ioboard", 0) // touch screen I/O board, program disassembles as little-endian SH-4
+	ROM_LOAD( "fpr24351.ic14", 0x000000, 0x200000, CRC(4d1b7b89) SHA1(965b8c6b5a2e7b3f1b1e2eac19c86000c3b66754) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "pokasuka-key.bin", 0, 4, CRC(f00bcd61) SHA1(b8315b851656c2e0b7853979988d1c44eab0886b) )
+	
+	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x05))
+ROM_END
+
 ROM_START( pokasuka )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -6784,7 +6804,7 @@ ROM_START( cfield )
 	ROM_LOAD("cfield-default-eeprom.bin", 0, 0x80, CRC(a7acb6bf) SHA1(5aae6366bfb3ee3120da405abb93e2007cd94683))
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0025", 0, BAD_DUMP SHA1(be0d88eb4f48403a2ceaa7ef588ed60b96ba93bf) )
+	DISK_IMAGE_READONLY( "gdl-0025", 0, SHA1(a57ad350fd0b7a18f204629aa9418ed7533f8057) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16C621A (317-5102-COM)
@@ -7466,9 +7486,10 @@ ROM_START( ngdup23e )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0023e", 0, SHA1(cc592e5b32273f93866c4447e1fb56751911992c))
 
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	// PIC and sticker unknown
-	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF) // uses the vf4 final tuned pic
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.pic", 0x00, 0x4000, CRC(8728aeaa) SHA1(07983ab41d143f845c3150dfc9b7301968708e18) )
 ROM_END
 
 /*
@@ -8717,6 +8738,7 @@ ROM_END
 /* 0164 */ GAME( 2005, mushik2e, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 1.001)", GAME_FLAGS )
 /* 0164 */ GAME( 2005, mushi2ea, mushik2e, naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "MushiKing II - The King Of Beetle II ENG (Ver. 2.001)", GAME_FLAGS )
 /* 0166 */ GAME( 2006, zunou,    naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch De Zunou (Rev A)", GAME_FLAGS )
+/* 0170 */ GAME( 2007, manicpnc, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Manic Panic Ghosts!", GAME_FLAGS )
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
 // 0177 Rythm Tengoku (Japan)

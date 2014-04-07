@@ -5371,6 +5371,7 @@ ngdup23e        // DIMM Firmware Updater (Rev E)
 ndcfboxa        // DIMM Firmware Updater for CF-BOX (Rev A)
 
 // Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced.
+manicpnc        // 2007.07 Manic Panic Ghosts!
 pokasuka        // 2007.07 Pokasuka Ghost!
 sl2007          // 2007.07 Shooting Love
 asndynmt        // 2007.07 Dynamite Deka EX - Asian dynamite
