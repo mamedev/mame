@@ -714,20 +714,6 @@ static const k033906_interface nwktr_k033906_interface =
 	"voodoo"
 };
 
-static const k001604_interface racingj_k001604_intf =
-{
-	0, 1,   /* gfx index 1 & 2 */
-	0, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
-};
-
-static const k001604_interface thrilld_k001604_intf =
-{
-	0, 1,   /* gfx index 1 & 2 */
-	1, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
-};
-
 void nwktr_state::machine_reset()
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -776,7 +762,13 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
+	MCFG_DEVICE_ADD("k001604", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(0)
+	MCFG_K001604_GFX_INDEX2(1)
+	MCFG_K001604_LAYER_SIZE(0)
+	MCFG_K001604_ROZ_SIZE(1)
+	MCFG_K001604_TXT_OFFSET(0)	// correct?
+	MCFG_K001604_ROZ_OFFSET(0)	// correct?
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
@@ -793,7 +785,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 
 	MCFG_DEVICE_REMOVE("k001604")
-	MCFG_K001604_ADD("k001604", thrilld_k001604_intf)
+	MCFG_DEVICE_ADD("k001604", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(0)
+	MCFG_K001604_GFX_INDEX2(1)
+	MCFG_K001604_LAYER_SIZE(1)
+	MCFG_K001604_ROZ_SIZE(1)
+	MCFG_K001604_TXT_OFFSET(0)	// correct?
+	MCFG_K001604_ROZ_OFFSET(0)	// correct?
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 MACHINE_CONFIG_END

@@ -792,38 +792,6 @@ static const k056230_interface thunderh_k056230_intf =
 	1
 };
 
-static const k001604_interface gticlub_k001604_intf =
-{
-	1, 2,   /* gfx index 1 & 2 */
-	1, 1,       /* layer_size, roz_size */
-	0,      /* text layer mem offset */
-	0,      /* roz layer mem offset */
-};
-
-static const k001604_interface slrasslt_k001604_intf =
-{
-	1, 2,   /* gfx index 1 & 2 */
-	0, 0,       /* layer_size, roz_size */
-	16384,  /* text layer mem offset */
-	0,      /* roz layer mem offset */
-};
-
-static const k001604_interface hangplt_k001604_intf_l =
-{
-	1, 2,   /* gfx index 1 & 2 */
-	0, 1,       /* layer_size, roz_size */
-	0,      /* text layer mem offset */
-	16384,  /* roz layer mem offset */
-};
-
-static const k001604_interface hangplt_k001604_intf_r =
-{
-	3, 4,   /* gfx index 1 & 2 */
-	0, 1,       /* layer_size, roz_size */
-	0,      /* text layer mem offset */
-	16384,  /* roz layer mem offset */
-};
-
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
@@ -986,7 +954,13 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
+	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(1)
+	MCFG_K001604_GFX_INDEX2(2)
+	MCFG_K001604_LAYER_SIZE(1)
+	MCFG_K001604_ROZ_SIZE(1)
+	MCFG_K001604_TXT_OFFSET(0)
+	MCFG_K001604_ROZ_OFFSET(0)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
@@ -1015,7 +989,13 @@ static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 
 	MCFG_DEVICE_REMOVE("k001604_1")
-	MCFG_K001604_ADD("k001604_1", slrasslt_k001604_intf)
+	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(1)
+	MCFG_K001604_GFX_INDEX2(2)
+	MCFG_K001604_LAYER_SIZE(0)
+	MCFG_K001604_ROZ_SIZE(0)
+	MCFG_K001604_TXT_OFFSET(16384)
+	MCFG_K001604_ROZ_OFFSET(0)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -1109,11 +1089,23 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
+	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(1)
+	MCFG_K001604_GFX_INDEX2(2)
+	MCFG_K001604_LAYER_SIZE(0)
+	MCFG_K001604_ROZ_SIZE(1)
+	MCFG_K001604_TXT_OFFSET(0)
+	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
+	MCFG_DEVICE_ADD("k001604_2", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(3)
+	MCFG_K001604_GFX_INDEX2(4)
+	MCFG_K001604_LAYER_SIZE(0)
+	MCFG_K001604_ROZ_SIZE(1)
+	MCFG_K001604_TXT_OFFSET(0)
+	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
