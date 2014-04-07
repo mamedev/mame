@@ -374,7 +374,7 @@ INLINE void rgbaint_scale_channel_and_clamp(rgbaint *color, const rgbaint *color
     code provided by Michael Herf
 -------------------------------------------------*/
 
-INLINE rgb_t rgb_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+INLINE UINT32 rgb_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	UINT32 ag0, ag1, rb0, rb1;
 
@@ -396,7 +396,7 @@ INLINE rgb_t rgb_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT3
     code provided by Michael Herf
 -------------------------------------------------*/
 
-INLINE rgb_t rgba_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
+INLINE UINT32 rgba_bilinear_filter(UINT32 rgb00, UINT32 rgb01, UINT32 rgb10, UINT32 rgb11, UINT8 u, UINT8 v)
 {
 	UINT32 ag0, ag1, rb0, rb1;
 

@@ -144,10 +144,10 @@ private:
 			const UINT16 *texbase = reinterpret_cast<const UINT16 *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
-			rgb_t pix00 = texture.palette[texbase[0]];
-			rgb_t pix01 = texture.palette[texbase[u1]];
-			rgb_t pix10 = texture.palette[texbase[v1]];
-			rgb_t pix11 = texture.palette[texbase[u1 + v1]];
+			UINT32 pix00 = texture.palette[texbase[0]];
+			UINT32 pix01 = texture.palette[texbase[u1]];
+			UINT32 pix10 = texture.palette[texbase[v1]];
+			UINT32 pix11 = texture.palette[texbase[u1 + v1]];
 			return rgb_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
 		}
 		else
@@ -214,10 +214,10 @@ private:
 			const UINT16 *texbase = reinterpret_cast<const UINT16 *>(texture.base);
 			texbase += v0 * texture.rowpixels + (u0 & ~1);
 
-			rgb_t pix00, pix01, pix10, pix11;
+			UINT32 pix00, pix01, pix10, pix11;
 			if ((curu & 0x10000) == 0)
 			{
-				rgb_t cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
+				UINT32 cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 				pix00 = (texbase[0] >> 8) | cbcr;
 				pix01 = (texbase[u1] >> 8) | cbcr;
 				cbcr = ((texbase[v1 + 0] & 0xff) << 8) | ((texbase[v1 + 1] & 0xff) << 16);
@@ -226,7 +226,7 @@ private:
 			}
 			else
 			{
-				rgb_t cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
+				UINT32 cbcr = ((texbase[0] & 0xff) << 8) | ((texbase[1] & 0xff) << 16);
 				pix00 = (texbase[1] >> 8) | cbcr;
 				if (u1 != 0)
 				{
@@ -276,10 +276,10 @@ private:
 			const UINT32 *texbase = reinterpret_cast<const UINT32 *>(texture.base);
 			texbase += v0 * texture.rowpixels + u0;
 
-			rgb_t pix00 = texbase[0];
-			rgb_t pix01 = texbase[u1];
-			rgb_t pix10 = texbase[v1];
-			rgb_t pix11 = texbase[u1 + v1];
+			UINT32 pix00 = texbase[0];
+			UINT32 pix01 = texbase[u1];
+			UINT32 pix10 = texbase[v1];
+			UINT32 pix11 = texbase[u1 + v1];
 			return rgb_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
 		}
 		else
