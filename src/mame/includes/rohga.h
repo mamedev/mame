@@ -17,17 +17,17 @@ class rohga_state : public driver_device
 public:
 	rohga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_deco146(*this, "ioprot"),
-			m_deco104(*this, "ioprot104"),
-			m_decocomn(*this, "deco_common"),
-			m_deco_tilegen1(*this, "tilegen1"),
-			m_deco_tilegen2(*this, "tilegen2"),
-			m_oki1(*this, "oki1"),
-			m_oki2(*this, "oki2"),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram2(*this, "spriteram2") ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_deco146(*this, "ioprot"),
+		m_deco104(*this, "ioprot104"),
+		m_decocomn(*this, "deco_common"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen2(*this, "tilegen2"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
@@ -76,6 +76,7 @@ public:
 	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask);
+	int bank_callback(int bank);
 
 	READ16_MEMBER( nb_protection_region_0_146_r );
 	WRITE16_MEMBER( nb_protection_region_0_146_w );

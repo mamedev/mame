@@ -296,12 +296,12 @@ WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 }
 
 
-static int boogwing_bank_callback( const int bank )
+int boogwing_state::bank_callback( int bank )
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static int boogwing_bank_callback2( const int bank )
+int boogwing_state::bank_callback2( int bank )
 {
 	int offset = ((bank >> 4) & 0x7) * 0x1000;
 	if ((bank & 0xf) == 0xa)
@@ -309,29 +309,6 @@ static int boogwing_bank_callback2( const int bank )
 
 	return offset;
 }
-
-static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x1f, /* trans masks (pf2 has 5bpp graphics) */
-	0, 0,  /* color base (pf2 is non default) */
-	0x0f, 0x0f, /* color masks (default values) */
-	NULL,
-	boogwing_bank_callback,
-	0, 1
-};
-
-static const deco16ic_interface boogwing_deco16ic_tilegen2_intf =
-{
-	0, 1,
-	0x0f, 0x0f,
-	0, 16,
-	0x0f, 0x0f,
-	boogwing_bank_callback2,
-	boogwing_bank_callback2,
-	0, 2
-};
-
 
 static MACHINE_CONFIG_START( boogwing, boogwing_state )
 
@@ -361,11 +338,35 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x1f)	// pf2 has 5bpp graphics
+	MCFG_DECO16IC_PF1_COL_BANK(0)
+	MCFG_DECO16IC_PF2_COL_BANK(0)	// pf2 is non default
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	// no bank1 callback
+	MCFG_DECO16IC_BANK2_CB(boogwing_state, bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0)
+	MCFG_DECO16IC_PF2_COL_BANK(16)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(boogwing_state, bank_callback2)
+	MCFG_DECO16IC_BANK2_CB(boogwing_state, bank_callback2)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 

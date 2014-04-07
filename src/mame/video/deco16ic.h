@@ -17,24 +17,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*deco16_bank_cb)( const int bank );
-
-
-struct deco16ic_interface
-{
-	int                m_split;
-	int                m_full_width12;
-
-	int                m_pf1_trans_mask, m_pf2_trans_mask;
-	int                m_pf1_colour_bank, m_pf2_colour_bank;
-	int                m_pf1_colourmask, m_pf2_colourmask;
-	deco16_bank_cb     m_bank_cb0, m_bank_cb1;
-	int                m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
-};
+typedef device_delegate<int (int bank)> deco16_bank_cb_delegate;
 
 class deco16ic_device : public device_t,
-						public device_video_interface,
-						public deco16ic_interface
+						public device_video_interface
 {
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -43,7 +29,19 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-
+	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
+	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
+	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
+	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_full_width12 = width; }
+	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
+	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
+	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
+	static void set_pf2_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_colourmask = mask; }
+	static void set_pf1_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf1_colour_bank = bank; }
+	static void set_pf2_col_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf2_colour_bank = bank; }
+	static void set_pf12_8x8_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_8x8_gfx_bank = bank; }
+	static void set_pf12_16x16_bank(device_t &device, int bank) { downcast<deco16ic_device &>(device).m_pf12_16x16_gfx_bank = bank; }
+	
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
 	DECLARE_WRITE16_MEMBER( pf2_data_w );
@@ -119,7 +117,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -133,16 +130,21 @@ private:
 	tilemap_t *m_pf1_tilemap_16x16, *m_pf2_tilemap_16x16;
 	tilemap_t *m_pf1_tilemap_8x8, *m_pf2_tilemap_8x8;
 
-	deco16_bank_cb  m_bank_cb_func[2];
+	deco16_bank_cb_delegate m_bank1_cb;
+	deco16_bank_cb_delegate m_bank2_cb;
 
 	int m_use_custom_pf1, m_use_custom_pf2;
-
 	int m_pf1_bank, m_pf2_bank;
-
 	int m_pf12_last_small, m_pf12_last_big;
-
 	int m_pf1_8bpp_mode;
 
+	int m_split;
+	int m_full_width12;
+	int m_pf1_trans_mask, m_pf2_trans_mask;
+	int m_pf1_colour_bank, m_pf2_colour_bank;
+	int m_pf1_colourmask, m_pf2_colourmask;
+	int m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
+	
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
@@ -165,6 +167,42 @@ extern const device_type DECO16IC;
 	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_DECO16IC_BANK1_CB(_class, _method) \
+	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_DECO16IC_BANK2_CB(_class, _method) \
+	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_DECO16IC_SPLIT(_split) \
+	deco16ic_device::set_split(*device, _split);
+
+#define MCFG_DECO16IC_WIDTH12(_width) \
+	deco16ic_device::set_full_width(*device, _width);
+
+#define MCFG_DECO16IC_PF1_TRANS_MASK(_mask) \
+	deco16ic_device::set_pf1_trans_mask(*device, _mask);
+
+#define MCFG_DECO16IC_PF2_TRANS_MASK(_mask) \
+	deco16ic_device::set_pf2_trans_mask(*device, _mask);
+
+#define MCFG_DECO16IC_PF1_COL_MASK(_mask) \
+	deco16ic_device::set_pf1_col_mask(*device, _mask);
+
+#define MCFG_DECO16IC_PF2_COL_MASK(_mask) \
+	deco16ic_device::set_pf2_col_mask(*device, _mask);
+
+#define MCFG_DECO16IC_PF1_COL_BANK(_bank) \
+	deco16ic_device::set_pf1_col_bank(*device, _bank);
+
+#define MCFG_DECO16IC_PF2_COL_BANK(_bank) \
+	deco16ic_device::set_pf2_col_bank(*device, _bank);
+
+#define MCFG_DECO16IC_PF12_8X8_BANK(_bank) \
+	deco16ic_device::set_pf12_8x8_bank(*device, _bank);
+
+#define MCFG_DECO16IC_PF12_16X16_BANK(_bank) \
+	deco16ic_device::set_pf12_16x16_bank(*device, _bank);
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
 	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

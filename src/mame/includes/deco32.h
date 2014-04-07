@@ -168,6 +168,9 @@ public:
 	UINT16 port_b_tattass(int unused);
 	void tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 
+	int fghthist_bank_callback( int bank );
+	int captaven_bank_callback( int bank );
+	int tattass_bank_callback( int bank );
 };
 
 class dragngun_state : public deco32_state
@@ -202,4 +205,7 @@ public:
 	void screen_eof_dragngun(screen_device &screen, bool state);
 	void dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata);
 	READ32_MEMBER( dragngun_unk_video_r );
+	
+	int bank_1_callback( int bank );
+	int bank_2_callback( int bank );
 };

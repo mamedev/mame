@@ -17,17 +17,17 @@ class cninja_state : public driver_device
 public:
 	cninja_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_deco146(*this, "ioprot"),
-			m_deco104(*this, "ioprot104"),
-			m_decocomn(*this, "deco_common"),
-			m_deco_tilegen1(*this, "tilegen1"),
-			m_deco_tilegen2(*this, "tilegen2"),
-			m_raster_irq_timer(*this, "raster_timer"),
-			m_oki2(*this, "oki2"),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram2(*this, "spriteram2") ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_deco146(*this, "ioprot"),
+		m_deco104(*this, "ioprot104"),
+		m_decocomn(*this, "deco_common"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen2(*this, "tilegen2"),
+		m_raster_irq_timer(*this, "raster_timer"),
+		m_oki2(*this, "oki2"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
@@ -91,6 +91,11 @@ public:
 	UINT32 screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+	int cninja_bank_callback(int bank);
+	int robocop2_bank_callback(int bank);
+	int mutantf_1_bank_callback(int bank);
+	int mutantf_2_bank_callback(int bank);
 
 	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );

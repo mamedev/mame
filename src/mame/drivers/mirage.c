@@ -46,11 +46,11 @@ class miragemi_state : public driver_device
 public:
 	miragemi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_deco_tilegen1(*this, "tilegen1"),
-			m_oki_sfx(*this, "oki_sfx"),
-			m_oki_bgm(*this, "oki_bgm"),
-			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_oki_sfx(*this, "oki_sfx"),
+		m_oki_bgm(*this, "oki_bgm"),
+		m_spriteram(*this, "spriteram") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_sprgen(*this, "spritegen")
@@ -80,6 +80,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int bank_callback(int bank);
 };
 
 void miragemi_state::video_start()
@@ -286,22 +287,10 @@ static GFXDECODE_START( mirage )
 GFXDECODE_END
 
 
-static int mirage_bank_callback( const int bank )
+int miragemi_state::bank_callback( int bank )
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
-
-static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 16, /* color base (default values) */
-	0x0f, 0x0f, /* color masks (default values) */
-	mirage_bank_callback,
-	mirage_bank_callback,
-	0,1,
-};
-
 
 void miragemi_state::machine_start()
 {
@@ -337,7 +326,19 @@ static MACHINE_CONFIG_START( mirage, miragemi_state )
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(miragemi_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(miragemi_state, bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
