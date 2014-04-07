@@ -83,8 +83,6 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-	static const int m_divide = 16;
-
 	enum
 	{
 		SR_PARITY_ERROR = 0x01,
@@ -136,6 +134,7 @@ private:
 	void output_dtr(int dtr);
 
 	void update_irq();
+	void update_divider();
 
 	UINT8 read_rdr();
 	UINT8 read_status();
@@ -177,6 +176,7 @@ private:
 	int m_dtr;
 
 	UINT32 m_xtal;
+	int m_divide;
 	int m_cts;
 	int m_dsr;
 	int m_dcd;

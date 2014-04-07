@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL_1_8432MHz) // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(apple3_state, apple3_acia_irq_func))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
