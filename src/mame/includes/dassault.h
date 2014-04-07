@@ -70,4 +70,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, UINT16 pri, UINT16 primask, UINT16 penbase, UINT8 alpha);
+	int dassault_bank_callback( const int bank );
 };

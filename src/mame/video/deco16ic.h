@@ -162,10 +162,6 @@ extern const device_type DECO16IC;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_DECO16IC_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, DECO16IC, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_DECO16IC_BANK1_CB(_class, _method) \
