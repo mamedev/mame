@@ -35,7 +35,7 @@ inline void ATTR_PRINTF( 3, 4 ) x76f041_device::verboselog( int n_level, const c
 const device_type X76F041 = &device_creator<x76f041_device>;
 
 x76f041_device::x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t( mconfig, X76F041, "X76F041", tag, owner, clock, "x76f041", __FILE__ ),
+	: device_t( mconfig, X76F041, "X76F041 Flash", tag, owner, clock, "x76f041", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_cs( 0 ),
 	m_rst( 0 ),

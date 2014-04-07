@@ -144,17 +144,17 @@ svga_device::svga_device(const machine_config &mconfig, device_type type, const 
 }
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, TSENG_VGA, "TSENG_VGA", tag, owner, clock, "tseng_vga", __FILE__)
+	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
 {
 }
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, TRIDENT_VGA, "TRIDENT_VGA", tag, owner, clock, "trident_vga", __FILE__)
+	: svga_device(mconfig, TRIDENT_VGA, "Trident VGA", tag, owner, clock, "trident_vga", __FILE__)
 {
 }
 
 s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ati_vga_device(mconfig, S3_VGA, "S3_VGA", tag, owner, clock, "s3_vga", __FILE__)
+	: ati_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
 {
 }
 
@@ -169,7 +169,7 @@ gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *
 }
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, ATI_VGA, "ATI_VGA", tag, owner, clock, "ati_vga", __FILE__)
+	: svga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
 {
 }
 

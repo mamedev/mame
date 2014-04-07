@@ -28,7 +28,7 @@
 const device_type TMS34061 = &device_creator<tms34061_device>;
 
 tms34061_device::tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS34061, "tms34061", tag, owner, clock, "tms34061", __FILE__),
+	: device_t(mconfig, TMS34061, "TMS34061 VSC", tag, owner, clock, "tms34061", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_rowshift(0),
 	m_vramsize(0),

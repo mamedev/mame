@@ -88,7 +88,7 @@ const device_type I8279 = &device_creator<i8279_device>;
 //-------------------------------------------------
 
 i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8279, "Intel 8279", tag, owner, clock, "i8279", __FILE__)
+	: device_t(mconfig, I8279, "8279 KDC", tag, owner, clock, "i8279", __FILE__)
 {
 }
 

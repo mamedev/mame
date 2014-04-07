@@ -262,7 +262,7 @@ inline int i8255_device::port_c_upper_mode()
 //-------------------------------------------------
 
 i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8255, "Intel 8255", tag, owner, clock, "i8255", __FILE__)
+	: device_t(mconfig, I8255, "8255 PPI", tag, owner, clock, "i8255", __FILE__)
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
 	m_control = 0;

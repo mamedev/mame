@@ -61,7 +61,7 @@ enum
     Constructor
 */
 tms9902_device::tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TMS9902, "TMS9902 Asynchronous Communication Controller", tag, owner, clock, "tms9902", __FILE__)
+: device_t(mconfig, TMS9902, "TMS9902 ACC", tag, owner, clock, "tms9902", __FILE__)
 {
 }
 
