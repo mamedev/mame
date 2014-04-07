@@ -645,7 +645,7 @@ static MACHINE_CONFIG_START( asteroid, asteroid_state )
 
 	MCFG_DEVICE_ADD("dvg", DVG, 0)
 	MCFG_AVGDVG_VECTOR("vector")
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

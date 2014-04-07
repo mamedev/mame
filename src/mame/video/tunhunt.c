@@ -333,7 +333,6 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 		{
 			for( sy=0; sy<256; sy+=16 )
 			{
-				
 					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 					picture_code,
 					0, /* color */
@@ -358,7 +357,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 	        vstop       = 0x00
 
 	*/
-	
+
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			picture_code,
 			0, /* color */

@@ -41,54 +41,54 @@ const int MAX_GFX_DECODERS = 8;
 // information about a single gfx device
 struct ui_gfx_info
 {
-	device_gfx_interface *interface;	// pointer to device's gfx interface
-	UINT8 setcount;						// how many gfx sets device has
-	UINT8 rotate[MAX_GFX_ELEMENTS];		// current rotation (orientation) value
-	UINT8 columns[MAX_GFX_ELEMENTS];	// number of items per row
-	int   offset[MAX_GFX_ELEMENTS];		// current offset of top,left item
-	int   color[MAX_GFX_ELEMENTS];		// current color selected
+	device_gfx_interface *interface;    // pointer to device's gfx interface
+	UINT8 setcount;                     // how many gfx sets device has
+	UINT8 rotate[MAX_GFX_ELEMENTS];     // current rotation (orientation) value
+	UINT8 columns[MAX_GFX_ELEMENTS];    // number of items per row
+	int   offset[MAX_GFX_ELEMENTS];     // current offset of top,left item
+	int   color[MAX_GFX_ELEMENTS];      // current color selected
 };
 
 struct ui_gfx_state
 {
-	bool            started;		// have we called ui_gfx_count_devices() yet?
-	UINT8           mode;			// which mode are we in?
+	bool            started;        // have we called ui_gfx_count_devices() yet?
+	UINT8           mode;           // which mode are we in?
 
 	// intermediate bitmaps
-	bool            bitmap_dirty;	// is the bitmap dirty?
-	bitmap_rgb32 *  bitmap;			// bitmap for drawing gfx and tilemaps
-	render_texture *texture;		// texture for rendering the above bitmap
+	bool            bitmap_dirty;   // is the bitmap dirty?
+	bitmap_rgb32 *  bitmap;         // bitmap for drawing gfx and tilemaps
+	render_texture *texture;        // texture for rendering the above bitmap
 
 	// palette-specific data
 	struct
 	{
-		palette_device *device;		// pointer to current device
-		int   devcount;				// how many palette devices exist
-		int   devindex;				// which palette device is visible
-		UINT8 which;				// which subset (pens or indirect colors)?
-		UINT8 columns;				// number of items per row
-		int   offset;				// current offset of top left item
+		palette_device *device;     // pointer to current device
+		int   devcount;             // how many palette devices exist
+		int   devindex;             // which palette device is visible
+		UINT8 which;                // which subset (pens or indirect colors)?
+		UINT8 columns;              // number of items per row
+		int   offset;               // current offset of top left item
 	} palette;
 
 	// graphics-specific data
 	struct
 	{
-		UINT8   devcount;	// how many gfx devices exist
-		UINT8   devindex;	// which device is visible
-		UINT8   set;		// which set is visible
+		UINT8   devcount;   // how many gfx devices exist
+		UINT8   devindex;   // which device is visible
+		UINT8   set;        // which set is visible
 	} gfxset;
-	
+
 	// information about each gfx device
 	ui_gfx_info gfxdev[MAX_GFX_DECODERS];
 
 	// tilemap-specific data
 	struct
 	{
-		int   which;				// which tilemap are we viewing?
-		int   xoffs;				// current X offset
-		int   yoffs;				// current Y offset
-		int   zoom;					// zoom factor
-		UINT8 rotate;				// current rotation (orientation) value
+		int   which;                // which tilemap are we viewing?
+		int   xoffs;                // current X offset
+		int   yoffs;                // current Y offset
+		int   zoom;                 // zoom factor
+		UINT8 rotate;               // current rotation (orientation) value
 	} tilemap;
 };
 
@@ -254,7 +254,7 @@ bool ui_gfx_is_relevant(running_machine &machine)
 UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 uistate)
 {
 	ui_gfx_state &state = ui_gfx;
-	
+
 	// if we have nothing, implicitly cancel
 	if (!ui_gfx_is_relevant(machine))
 		goto cancel;

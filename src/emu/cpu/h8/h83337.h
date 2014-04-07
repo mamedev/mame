@@ -63,13 +63,13 @@ public:
 	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(wscr_r);
-	DECLARE_WRITE8_MEMBER(wscr_w);	
+	DECLARE_WRITE8_MEMBER(wscr_w);
 	DECLARE_READ8_MEMBER(stcr_r);
-	DECLARE_WRITE8_MEMBER(stcr_w);	
+	DECLARE_WRITE8_MEMBER(stcr_w);
 	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);	
+	DECLARE_WRITE8_MEMBER(syscr_w);
 	DECLARE_READ8_MEMBER(mdcr_r);
-	DECLARE_WRITE8_MEMBER(mdcr_w);	
+	DECLARE_WRITE8_MEMBER(mdcr_w);
 
 protected:
 	required_device<h8_intc_device> intc;

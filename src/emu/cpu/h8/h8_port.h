@@ -42,7 +42,7 @@
 
 #include "h8.h"
 
-#define MCFG_H8_PORT_ADD( _tag, address, ddr, mask )	\
+#define MCFG_H8_PORT_ADD( _tag, address, ddr, mask )    \
 	MCFG_DEVICE_ADD( _tag, H8_PORT, 0 ) \
 	downcast<h8_port_device *>(device)->set_info(address, ddr, mask);
 

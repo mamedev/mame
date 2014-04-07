@@ -261,7 +261,7 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
-	optional_device<palette_device> m_palette;		// our palette
+	optional_device<palette_device> m_palette;      // our palette
 	UINT32              m_video_attributes;         // flags describing the video system
 
 	// internal state

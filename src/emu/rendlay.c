@@ -667,7 +667,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_numsymbolsvisible = xml_get_attribute_int_with_subst(machine, compnode, "numsymbolsvisible", 3);
 		m_reelreversed = xml_get_attribute_int_with_subst(machine, compnode, "reelreversed", 0);
 		m_beltreel = xml_get_attribute_int_with_subst(machine, compnode, "beltreel", 0);
-		
+
 	}
 
 	// led7seg nodes
@@ -1004,7 +1004,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 		render_font *font = machine.render().font_alloc("default");
 		float aspect = 1.0f;
 		INT32 width;
-		
+
 
 		int curry = 0;
 		int num_shown = m_numsymbolsvisible;
@@ -1109,7 +1109,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 									int effx = curx + x + chbounds.min_x;
 									if (effx >= bounds.min_x && effx <= bounds.max_x)
 									{
-										UINT32 spix = rgb_t(src[x]).a(); 
+										UINT32 spix = rgb_t(src[x]).a();
 										if (spix != 0)
 										{
 											rgb_t dpix = d[effx];
@@ -1259,7 +1259,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 								int effx = basex + curx + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									UINT32 spix = rgb_t(src[x]).a(); 
+									UINT32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
@@ -2309,9 +2309,9 @@ layout_view::item::~item()
 //-------------------------------------------------
 
 
-render_container *layout_view::item::screen_container(running_machine &machine) const 
-{ 
-	return (m_screen != NULL) ? &m_screen->container() : NULL; 
+render_container *layout_view::item::screen_container(running_machine &machine) const
+{
+	return (m_screen != NULL) ? &m_screen->container() : NULL;
 }
 
 //-------------------------------------------------

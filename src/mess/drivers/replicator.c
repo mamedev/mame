@@ -179,7 +179,7 @@ public:
 	UINT8 m_port_k;
 	UINT8 m_port_l;
 
-  UINT8 shift_register_value;
+	UINT8 shift_register_value;
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -201,93 +201,93 @@ READ8_MEMBER(replicator_state::port_r)
 	switch( offset )
 	{
 		case AVR8_IO_PORTA:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port A READ (A-axis signals + B-axis STEP&DIR)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port A READ (A-axis signals + B-axis STEP&DIR)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTB:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port B READ (SD-CS; 1280-MISO/MOSI/SCK; EX2-FAN/HEAT/PWR-CHECK; BLINK)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port B READ (SD-CS; 1280-MISO/MOSI/SCK; EX2-FAN/HEAT/PWR-CHECK; BLINK)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTC:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port C READ (1280-EX1/EX2; LCD-signals; R&G-LED; DETECT)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port C READ (1280-EX1/EX2; LCD-signals; R&G-LED; DETECT)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return DETECT; //indicated that the Interface board is present.
-      break;
-    }
+		return DETECT; //indicated that the Interface board is present.
+		break;
+	}
 		case AVR8_IO_PORTD:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port D READ (SDA/SCL; 1280-EX-TX/RX)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port D READ (SDA/SCL; 1280-EX-TX/RX)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTE:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port E READ (1280-TX/RX; THERMO-signals)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port E READ (1280-TX/RX; THERMO-signals)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTF:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port F READ (X-axis & Y-axis signals)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port F READ (X-axis & Y-axis signals)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTG:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port G READ (BUZZ; Cutoff-sr-check; B-axis EN; 1280-EX3/EX4)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port G READ (BUZZ; Cutoff-sr-check; B-axis EN; 1280-EX3/EX4)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTH:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port H READ (cuttoff-text/reset; EX1-FAN/HEAT/PWR-CHECK; SD-CD/SD-WP)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port H READ (cuttoff-text/reset; EX1-FAN/HEAT/PWR-CHECK; SD-CD/SD-WP)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTJ:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port J READ (Interface buttons; POTS-SCL; B-axis-POT)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port J READ (Interface buttons; POTS-SCL; B-axis-POT)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return ioport("keypad")->read();
-      break;
-    }
+		return ioport("keypad")->read();
+		break;
+	}
 		case AVR8_IO_PORTK:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port K READ (Z-axis signals; HBP-THERM; 1280-EX5/6/7)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port K READ (Z-axis signals; HBP-THERM; 1280-EX5/6/7)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 		case AVR8_IO_PORTL:
-    {
+	{
 #if LOG_PORTS
-      printf("[%08X] Port L READ (HBP; EXTRA-FET; X-MIN/MAX; Y-MIN/MAX; Z-MIN/MAX)\n", m_maincpu->m_shifted_pc);
+		printf("[%08X] Port L READ (HBP; EXTRA-FET; X-MIN/MAX; Y-MIN/MAX; Z-MIN/MAX)\n", m_maincpu->m_shifted_pc);
 #endif
-    	return 0x00;
-      break;
-    }
+		return 0x00;
+		break;
+	}
 	}
 	return 0;
 }
@@ -297,14 +297,14 @@ WRITE8_MEMBER(replicator_state::port_w)
 	switch( offset )
 	{
 		case AVR8_IO_PORTA:
-    {
-      if (data == m_port_a) break;
+	{
+		if (data == m_port_a) break;
 
 #if LOG_PORTS
 			UINT8 old_port_a = m_port_a;
 			UINT8 changed = data ^ old_port_a;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & A_AXIS_DIR) printf("[A] A_AXIS_DIR: %s\n", data & A_AXIS_DIR ? "HIGH" : "LOW");
 			if(changed & A_AXIS_STEP) printf("[A] A_AXIS_STEP: %s\n", data & A_AXIS_STEP ? "HIGH" : "LOW");
 			if(changed & A_AXIS_EN) printf("[A] A_AXIS_EN: %s\n", data & A_AXIS_EN ? "HIGH" : "LOW");
@@ -313,18 +313,18 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & B_AXIS_STEP) printf("[A] B_AXIS_STEP: %s\n", data & B_AXIS_STEP ? "HIGH" : "LOW");
 #endif
 
-      m_port_a = data;
-      break;
-    }
+		m_port_a = data;
+		break;
+	}
 		case AVR8_IO_PORTB:
-    {
-      if (data == m_port_b) break;
+	{
+		if (data == m_port_b) break;
 
 #if LOG_PORTS
 			UINT8 old_port_b = m_port_b;
 			UINT8 changed = data ^ old_port_b;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & SD_CS) printf("[B] SD Card Chip Select: %s\n", data & SD_CS ? "HIGH" : "LOW");
 			if(changed & SCK_1280) printf("[B] 1280-SCK: %s\n", data & SCK_1280 ? "HIGH" : "LOW");
 			if(changed & MOSI_1280) printf("[B] 1280-MOSI: %s\n", data & MOSI_1280 ? "HIGH" : "LOW");
@@ -335,17 +335,17 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & BLINK) printf("[B] BLINK: %s\n", data & BLINK ? "HIGH" : "LOW");
 #endif
 
-      m_port_b = data;
-      break;
-    }
+		m_port_b = data;
+		break;
+	}
 		case AVR8_IO_PORTC:
-    {
-      if (data == m_port_c) break;
+	{
+		if (data == m_port_c) break;
 
 			UINT8 old_port_c = m_port_c;
 			UINT8 changed = data ^ old_port_c;
 #if LOG_PORTS
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & EX2_1280) printf("[C] EX2_1280: %s\n", data & EX2_1280 ? "HIGH" : "LOW");
 			if(changed & EX1_1280) printf("[C] EX1_1280: %s\n", data & EX1_1280 ? "HIGH" : "LOW");
 			if(changed & LCD_CLK) printf("[C] LCD_CLK: %s\n", data & LCD_CLK ? "HIGH" : "LOW");
@@ -357,43 +357,43 @@ WRITE8_MEMBER(replicator_state::port_w)
 #endif
 
 			if (changed & LCD_CLK){
-        /* The LCD is interfaced by an 8-bit shift register (74HC4094). */
-        if (data & LCD_CLK){//CLK positive edge
-          shift_register_value = (shift_register_value << 1) | ((data & LCD_DATA) >> 3);
-          //printf("[%08X] ", m_maincpu->m_shifted_pc);
-          //printf("[C] LCD CLK positive edge. shift_register=0x%02X\n", shift_register_value);
-			  }
-      }
+		/* The LCD is interfaced by an 8-bit shift register (74HC4094). */
+		if (data & LCD_CLK){//CLK positive edge
+			shift_register_value = (shift_register_value << 1) | ((data & LCD_DATA) >> 3);
+			//printf("[%08X] ", m_maincpu->m_shifted_pc);
+			//printf("[C] LCD CLK positive edge. shift_register=0x%02X\n", shift_register_value);
+				}
+		}
 
 			if(changed & LCD_STROBE){
-        if (data & LCD_STROBE){ //STROBE positive edge
-          bool RS = (shift_register_value >> 1) & 1;
-          bool RW = (shift_register_value >> 2) & 1;
-          bool enable = (shift_register_value >> 3) & 1;
-          UINT8 lcd_data = shift_register_value & 0xF0;
+		if (data & LCD_STROBE){ //STROBE positive edge
+			bool RS = (shift_register_value >> 1) & 1;
+			bool RW = (shift_register_value >> 2) & 1;
+			bool enable = (shift_register_value >> 3) & 1;
+			UINT8 lcd_data = shift_register_value & 0xF0;
 
-          if (enable && RW==0){
-            if (RS==0){
-        			m_lcdc->control_write(space, 0, lcd_data);
-            } else {
-        			m_lcdc->data_write(space, 0, lcd_data);
-            }
-          }
-			  }
-      }
+			if (enable && RW==0){
+			if (RS==0){
+					m_lcdc->control_write(space, 0, lcd_data);
+			} else {
+					m_lcdc->data_write(space, 0, lcd_data);
+			}
+			}
+				}
+		}
 			m_port_c = data;
 
 			break;
 		}
 		case AVR8_IO_PORTD:
-    {
-      if (data == m_port_d) break;
+	{
+		if (data == m_port_d) break;
 
 #if LOG_PORTS
 			UINT8 old_port_d = m_port_d;
 			UINT8 changed = data ^ old_port_d;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & PORTD_SCL) printf("[D] PORTD_SCL: %s\n", data & PORTD_SCL ? "HIGH" : "LOW");
 			if(changed & PORTD_SDA) printf("[D] PORTD_SDA: %s\n", data & PORTD_SDA ? "HIGH" : "LOW");
 			if(changed & EX_RX_1280) printf("[D] EX_RX_1280: %s\n", data & EX_RX_1280 ? "HIGH" : "LOW");
@@ -401,17 +401,17 @@ WRITE8_MEMBER(replicator_state::port_w)
 #endif
 
 			m_port_d = data;
-      break;
-    }
+		break;
+	}
 		case AVR8_IO_PORTE:
-    {
-      if (data == m_port_e) break;
+	{
+		if (data == m_port_e) break;
 
 #if LOG_PORTS
 			UINT8 old_port_e = m_port_e;
 			UINT8 changed = data ^ old_port_e;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & RX_1280) printf("[E] 1280-RX: %s\n", data & RX_1280 ? "HIGH" : "LOW");
 			if(changed & TX_1280) printf("[E] 1280-TX: %s\n", data & TX_1280 ? "HIGH" : "LOW");
 			if(changed & THERMO_SCK) printf("[E] THERMO-SCK: %s\n", data & THERMO_SCK ? "HIGH" : "LOW");
@@ -421,17 +421,17 @@ WRITE8_MEMBER(replicator_state::port_w)
 #endif
 
 			m_port_e = data;
-      break;
-    }
+		break;
+	}
 		case AVR8_IO_PORTF:
-    {
-      if (data == m_port_f) break;
+	{
+		if (data == m_port_f) break;
 
 #if LOG_PORTS
 			UINT8 old_port_f = m_port_f;
 			UINT8 changed = data ^ old_port_f;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & X_AXIS_DIR) printf("[F] X_AXIS_DIR: %s\n", data & X_AXIS_DIR ? "HIGH" : "LOW");
 			if(changed & X_AXIS_STEP) printf("[F] X_AXIS_STEP: %s\n", data & X_AXIS_STEP ? "HIGH" : "LOW");
 			if(changed & X_AXIS_EN) printf("[F] X_AXIS_EN: %s\n", data & X_AXIS_EN ? "HIGH" : "LOW");
@@ -443,17 +443,17 @@ WRITE8_MEMBER(replicator_state::port_w)
 #endif
 
 			m_port_f = data;
-      break;
-    }
+		break;
+	}
 		case AVR8_IO_PORTG:
-    {
-      if (data == m_port_g) break;
+	{
+		if (data == m_port_g) break;
 
 			UINT8 old_port_g = m_port_g;
 			UINT8 changed = data ^ old_port_g;
 
 #if LOG_PORTS
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & EX4_1280) printf("[G] EX4_1280: %s\n", data & EX4_1280 ? "HIGH" : "LOW");
 			if(changed & EX3_1280) printf("[G] EX3_1280: %s\n", data & EX3_1280 ? "HIGH" : "LOW");
 			if(changed & B_AXIS_EN) printf("[G] B_AXIS_EN: %s\n", data & B_AXIS_EN ? "HIGH" : "LOW");
@@ -462,27 +462,27 @@ WRITE8_MEMBER(replicator_state::port_w)
 #endif
 
 			if(changed & BUZZ){
-      /* FIX-ME: What is the largest sample value allowed?
-         I'm using 0x3F based on what I see in src/mess/drivers/craft.c
-         But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
-         Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
-      */
-			  UINT8 audio_sample = (data & BUZZ) ? 0x3F : 0;
-			  m_dac->write_unsigned8(audio_sample << 1);
-      }
+		/* FIX-ME: What is the largest sample value allowed?
+		 I'm using 0x3F based on what I see in src/mess/drivers/craft.c
+		 But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
+		 Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
+		*/
+				UINT8 audio_sample = (data & BUZZ) ? 0x3F : 0;
+				m_dac->write_unsigned8(audio_sample << 1);
+		}
 
 			m_port_g = data;
-      break;
-    }
+		break;
+	}
 		case AVR8_IO_PORTH:
-    {
-      if (data == m_port_h) break;
+	{
+		if (data == m_port_h) break;
 
 #if LOG_PORTS
 			UINT8 old_port_h = m_port_h;
 			UINT8 changed = data ^ old_port_h;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & CUTOFF_TEST) printf("[H] CUTOFF_TEST: %s\n", data & CUTOFF_TEST ? "HIGH" : "LOW");
 			if(changed & CUTOFF_RESET) printf("[H] CUTOFF_RESET: %s\n", data & CUTOFF_RESET ? "HIGH" : "LOW");
 			if(changed & EX1_PWR_CHECK) printf("[H] EX1_PWR_CHECK: %s\n", data & EX1_PWR_CHECK ? "HIGH" : "LOW");
@@ -492,18 +492,18 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & SD_CD) printf("[H] SD_CD: %s\n", data & SD_CD ? "HIGH" : "LOW");
 #endif
 
-      m_port_h = data;
-      break;
-    }
+		m_port_h = data;
+		break;
+	}
 		case AVR8_IO_PORTJ:
-    {
-      if (data == m_port_j) break;
+	{
+		if (data == m_port_j) break;
 
 #if LOG_PORTS
 			UINT8 old_port_j = m_port_j;
 			UINT8 changed = data ^ old_port_j;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 
 			if(changed & BUTTON_CENTER) printf("[J] BUTTON_CENTER: %s\n", data & BUTTON_CENTER ? "HIGH" : "LOW");
 			if(changed & BUTTON_RIGHT) printf("[J] BUTTON_RIGHT: %s\n", data & BUTTON_RIGHT ? "HIGH" : "LOW");
@@ -514,18 +514,18 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & B_AXIS_POT) printf("[J] B_AXIS_POT: %s\n", data & B_AXIS_POT ? "HIGH" : "LOW");
 #endif
 
-      m_port_j = data;
-      break;
-    }
+		m_port_j = data;
+		break;
+	}
 		case AVR8_IO_PORTK:
-    {
-      if (data == m_port_k) break;
+	{
+		if (data == m_port_k) break;
 
 #if LOG_PORTS
 			UINT8 old_port_k = m_port_k;
 			UINT8 changed = data ^ old_port_k;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 
 			if(changed & Z_AXIS_DIR) printf("[K] Z_AXIS_DIR: %s\n", data & Z_AXIS_DIR ? "HIGH" : "LOW");
 			if(changed & Z_AXIS_STEP) printf("[K] Z_AXIS_STEP: %s\n", data & Z_AXIS_STEP ? "HIGH" : "LOW");
@@ -537,18 +537,18 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & HBP_THERM) printf("[K] HBP_THERM: %s\n", data & HBP_THERM ? "HIGH" : "LOW");
 #endif
 
-      m_port_k = data;
-      break;
-    }
+		m_port_k = data;
+		break;
+	}
 		case AVR8_IO_PORTL:
-    {
-      if (data == m_port_l) break;
+	{
+		if (data == m_port_l) break;
 
 #if LOG_PORTS
 			UINT8 old_port_l = m_port_l;
 			UINT8 changed = data ^ old_port_l;
 
-      printf("[%08X] ", m_maincpu->m_shifted_pc);
+		printf("[%08X] ", m_maincpu->m_shifted_pc);
 
 			if(changed & X_MIN) printf("[L] X_MIN: %s\n", data & X_MIN ? "HIGH" : "LOW");
 			if(changed & X_MAX) printf("[L] X_MAX: %s\n", data & X_MAX ? "HIGH" : "LOW");
@@ -560,9 +560,9 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & Z_MAX) printf("[L] Z_MAX: %s\n", data & Z_MAX ? "HIGH" : "LOW");
 #endif
 
-      m_port_l = data;
-      break;
-    }
+		m_port_l = data;
+		break;
+	}
 	}
 }
 
@@ -605,18 +605,18 @@ DRIVER_INIT_MEMBER(replicator_state, replicator)
 
 void replicator_state::machine_reset()
 {
-  shift_register_value = 0;
-  m_port_a = 0;
-  m_port_b = 0;
-  m_port_c = 0;
-  m_port_d = 0;
-  m_port_e = 0;
-  m_port_f = 0;
-  m_port_g = 0;
-  m_port_h = 0;
-  m_port_j = 0;
-  m_port_k = 0;
-  m_port_l = 0;
+	shift_register_value = 0;
+	m_port_a = 0;
+	m_port_b = 0;
+	m_port_c = 0;
+	m_port_d = 0;
+	m_port_e = 0;
+	m_port_f = 0;
+	m_port_g = 0;
+	m_port_h = 0;
+	m_port_j = 0;
+	m_port_k = 0;
+	m_port_l = 0;
 }
 
 const avr8_config atmega1280_config =
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_CPU_AVR8_EFUSE(0xF4)
 	MCFG_CPU_AVR8_LOCK(0x0F)
 
-  /*TODO: Add an ATMEGA8U2 for USB-Serial communications */
+	/*TODO: Add an ATMEGA8U2 for USB-Serial communications */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_HD44780_LCD_SIZE(4, 20)
 
 	/* sound hardware */
-  /* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
+	/* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
 	MCFG_SPEAKER_STANDARD_MONO("buzzer")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(0, "buzzer", 1.00)

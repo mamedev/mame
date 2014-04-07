@@ -74,7 +74,6 @@ struct sprite
 
 void wecleman_state::get_sprite_info()
 {
-
 	const pen_t *base_pal = m_palette->pens();
 	UINT8 *base_gfx = memregion("gfx1")->base();
 	int gfx_max     = memregion("gfx1")->bytes();

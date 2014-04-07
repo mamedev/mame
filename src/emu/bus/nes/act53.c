@@ -7,7 +7,7 @@
  Visit http://mamedev.org for licensing and usage restrictions.
 
 
- Here we emulate the Multi-Discrete PCB designed by Tepples for 
+ Here we emulate the Multi-Discrete PCB designed by Tepples for
  this homebew multicart [mapper 28]
 
  ***********************************************************************************************************/
@@ -67,23 +67,23 @@ void nes_action53_device::pcb_reset()
 
  Board ACTION 53
 
- In MESS: *VERY* preliminary support. 
- 
+ In MESS: *VERY* preliminary support.
+
  This board uses 4 registers (reg is selected by writes to 0x5xxx)
  Info from nesdev wiki
- 
+
  R:$00:  [...M ..CC]
      C = CHR Reg
      M = Mirroring
          This bit overwrites bit 0 of R:$80, but only if bit 1 of
          R:$80 is clear
- 
+
  R:$01:  [...M PPPP]
      P = PRG Reg
      M = Mirroring
          This bit overwrites bit 0 of R:$80, but only if bit 1 of
          R:$80 is clear
- 
+
  R:$80:  [..GG PSMM]
      G = Game Size (0=32K, 1=64K, 2=128K, 3=256K)
      P = PRG Size (0=32k mode, 1=16k mode)
@@ -106,9 +106,9 @@ void nes_action53_device::pcb_reset()
 void nes_action53_device::update_prg()
 {
 	UINT8 prg_lo = 0, prg_hi = 0, helper = 0;
-	UINT8 out = (m_reg[3] & 0x3f) << 1;		// Outer PRG reg
-	UINT8 size = (m_reg[2] & 0x30) >> 4;	// Game size
-	UINT8 mask = (1 << (size + 1)) - 1;		// Bits to be taken from PRG reg
+	UINT8 out = (m_reg[3] & 0x3f) << 1;     // Outer PRG reg
+	UINT8 size = (m_reg[2] & 0x30) >> 4;    // Game size
+	UINT8 mask = (1 << (size + 1)) - 1;     // Bits to be taken from PRG reg
 
 	if (!BIT(m_reg[2], 3))
 	{
@@ -134,7 +134,7 @@ void nes_action53_device::update_prg()
 		}
 	}
 
-//	printf("banks : 0x%2X - 0x%2X\n", prg_lo, prg_hi);
+//  printf("banks : 0x%2X - 0x%2X\n", prg_lo, prg_hi);
 	prg16_89ab(prg_lo);
 	prg16_cdef(prg_hi);
 }

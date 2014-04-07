@@ -31,7 +31,7 @@ public:
 	optional_shared_ptr<UINT8> m_imago_fg_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	UINT16 m_charbank;
 	UINT8 m_colorbank;
 	tilemap_t *m_bg_tilemap;

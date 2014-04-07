@@ -1048,8 +1048,8 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-	
-	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
+
+	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
 }
 
 
@@ -1064,7 +1064,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadriv)
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
-	m_version_hi_nibble = 0xa0;	// Export NTSC no-SCD
+	m_version_hi_nibble = 0xa0; // Export NTSC no-SCD
 }
 
 DRIVER_INIT_MEMBER(md_base_state, megadrij)
@@ -1076,8 +1076,8 @@ DRIVER_INIT_MEMBER(md_base_state, megadrij)
 	m_vdp->set_vdp_pal(FALSE);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
-	
-	m_version_hi_nibble = 0x20;	// JPN NTSC no-SCD
+
+	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
 }
 
 DRIVER_INIT_MEMBER(md_base_state, megadrie)
@@ -1090,7 +1090,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 	m_vdp->set_framerate(50);
 	m_vdp->set_total_scanlines(313);
 
-	m_version_hi_nibble = 0xe0;	// Export PAL no-SCD
+	m_version_hi_nibble = 0xe0; // Export PAL no-SCD
 }
 
 void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)

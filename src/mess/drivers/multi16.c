@@ -18,7 +18,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_pic(*this, "pic8259"),
 	m_crtc(*this, "crtc"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	,
 		m_p_vram(*this, "p_vram"){ }
 
@@ -171,7 +171,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(multi16_state, screen_update_multi16)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */

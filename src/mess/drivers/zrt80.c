@@ -60,7 +60,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_8250;
 	required_device<beep_device> m_beep;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

@@ -111,22 +111,22 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				m_delta -= 8;
 			if (m_delta <= 0)
 				m_delta = 1;
-			
+
 			// determine direction
 			if (bit)
 				m_output += m_delta;
 			else
 				m_output -= m_delta;
-			
+
 			if (m_output > 32767)
 				m_output = 32767;
 			else if (m_output < -32768)
 				m_output = -32768;
-			
+
 			m_prevbits = m_prevbits << 1 | bit;
 			mix = m_output;
 		}
-		
+
 		outputs[0][i] = mix;
 	}
 }

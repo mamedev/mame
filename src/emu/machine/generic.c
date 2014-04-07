@@ -433,4 +433,3 @@ CUSTOM_INPUT_MEMBER( driver_device::custom_port_read )
 	const char *tag = (const char *)param;
 	return ioport(tag)->read();
 }
-

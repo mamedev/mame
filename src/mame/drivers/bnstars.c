@@ -1259,7 +1259,7 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w)
-	
+
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ(bnstars1_r )
 	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ_PORT("IN4")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("IN5")
@@ -1282,7 +1282,7 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
 
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	
+
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM

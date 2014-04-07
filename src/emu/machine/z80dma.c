@@ -897,4 +897,3 @@ WRITE_LINE_MEMBER(z80dma_device::wait_w)
 WRITE_LINE_MEMBER(z80dma_device::bai_w)
 {
 }
-

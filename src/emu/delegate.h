@@ -93,14 +93,14 @@
 
 // select which one we will be using
 #if defined(__GNUC__)
-	/* does not work in versions over 4.7.x of 32bit MINGW  */	
+	/* does not work in versions over 4.7.x of 32bit MINGW  */
 	#if ((defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && (__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(SDLMAME_EMSCRIPTEN)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
-	#else 
+	#else
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
-	#endif	
+	#endif
 #else
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 #endif
@@ -459,7 +459,7 @@ private:
 		return reinterpret_cast<delegate_generic_function>(funcptr);
 	}
 
-	
+
 	struct raw_mfp_data
 	{
 #if defined (__INTEL_COMPILER) && defined (PTR64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least

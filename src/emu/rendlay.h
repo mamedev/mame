@@ -149,7 +149,7 @@ private:
 		int                 m_stateoffset;
 		int                 m_reelreversed;
 		int                 m_numsymbolsvisible;
-		int					m_beltreel;
+		int                 m_beltreel;
 	};
 
 	// a texture encapsulates a texture for a given element in a given state

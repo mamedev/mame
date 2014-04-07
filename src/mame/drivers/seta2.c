@@ -518,7 +518,7 @@ ADDRESS_MAP_END
 	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB2_##_devcb);
 
 class funcube_touchscreen_device : public device_t,
-								   public device_serial_interface
+									public device_serial_interface
 {
 public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -539,7 +539,7 @@ private:
 	required_ioport m_x;
 	required_ioport m_y;
 	required_ioport m_btn;
-	
+
 	UINT8 m_button_state;
 	int m_serial_pos;
 	UINT8 m_serial[4];

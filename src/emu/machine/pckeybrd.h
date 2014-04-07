@@ -73,7 +73,7 @@ private:
 	optional_ioport m_ioport_5;
 	optional_ioport m_ioport_6;
 	optional_ioport m_ioport_7;
-	
+
 	devcb2_write_line m_out_keypress_func;
 	emu_timer *m_keyboard_timer;
 };
@@ -85,9 +85,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 
-	static void static_set_type(device_t &device, KEYBOARD_TYPE type, int default_set) 
+	static void static_set_type(device_t &device, KEYBOARD_TYPE type, int default_set)
 		{ downcast<at_keyboard_device &>(device).m_scan_code_set = default_set; downcast<at_keyboard_device &>(device).m_type = type; }
-		
+
 protected:
 	virtual void device_reset();
 	virtual void device_start();

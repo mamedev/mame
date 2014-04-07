@@ -170,7 +170,7 @@ WRITE8_MEMBER(pecom_state::sc_w )
 		// DMA acknowledge clears the DMAOUT request
 		m_cdp1802->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
 		break;
-		
+
 	case COSMAC_STATE_CODE_S3_INTERRUPT:
 		break;
 	}

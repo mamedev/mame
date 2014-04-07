@@ -67,7 +67,7 @@ public:
 	optional_device<sn76477_device> m_ic79;
 	optional_device<sn76477_device> m_ic80;
 	optional_device<sn76477_device> m_ic81;
-	
+
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
 	int         m_dai3wksi_flipscreen;
@@ -83,10 +83,10 @@ public:
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_1_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_2_w);
 	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
-	
+
 	/* i/o ports */
 	required_ioport m_in2;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 };

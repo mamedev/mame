@@ -73,7 +73,7 @@ static Z80CTC_INTERFACE( external_ctc_intf )
 static const z80sio_interface external_sio_intf =
 {
 	DEVCB_NULL, /* interrupt handler */
-  DEVCB_NULL, /* DTR changed handler */
+	DEVCB_NULL, /* DTR changed handler */
 	DEVCB_NULL, /* RTS changed handler */
 	DEVCB_NULL, /* BREAK changed handler */
 	DEVCB_NULL, /* transmit handler */
@@ -151,7 +151,7 @@ WRITE8_MEMBER(pve500_state::dualport_ram_right_w)
 {
 	//printf("dualport_ram: Right WRITE\n");
 	dualport_7FE_data = data;
-	m_maincpu->ctc_trg1(0);	//(INT_Left)
+	m_maincpu->ctc_trg1(0); //(INT_Left)
 }
 
 READ8_MEMBER(pve500_state::io_expander_r)
@@ -203,7 +203,7 @@ WRITE8_MEMBER(pve500_state::io_expander_w)
 						case 128: output_set_digit_value(8*i + 7, io_LD & 0x7F); break;
 						default:
 							/*software should not do it.
-		            any idea how to emulate that in case it does? */ break;
+					any idea how to emulate that in case it does? */ break;
 					}
 				}
 			}

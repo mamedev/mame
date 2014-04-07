@@ -57,7 +57,7 @@ public:
 	required_ioport m_y7;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 
 	UINT8 m_scrambler;
 	tilemap_t *m_tilemap;

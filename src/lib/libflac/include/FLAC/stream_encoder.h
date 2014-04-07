@@ -238,7 +238,6 @@ extern "C" {
  * must be deleted with FLAC__stream_encoder_delete().
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_OK = 0,
 	/**< The encoder is in the normal OK state and samples can be processed. */
 
@@ -290,7 +289,6 @@ extern FLAC_API const char * const FLAC__StreamEncoderStateString[];
 /** Possible return values for the FLAC__stream_encoder_init_*() functions.
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_INIT_STATUS_OK = 0,
 	/**< Initialization was successful. */
 
@@ -360,7 +358,6 @@ extern FLAC_API const char * const FLAC__StreamEncoderInitStatusString[];
 /** Return values for the FLAC__StreamEncoder read callback.
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_READ_STATUS_CONTINUE,
 	/**< The read was OK and decoding can continue. */
 
@@ -386,7 +383,6 @@ extern FLAC_API const char * const FLAC__StreamEncoderReadStatusString[];
 /** Return values for the FLAC__StreamEncoder write callback.
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_WRITE_STATUS_OK = 0,
 	/**< The write was OK and encoding can continue. */
 
@@ -406,7 +402,6 @@ extern FLAC_API const char * const FLAC__StreamEncoderWriteStatusString[];
 /** Return values for the FLAC__StreamEncoder seek callback.
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_SEEK_STATUS_OK,
 	/**< The seek was OK and encoding can continue. */
 
@@ -429,7 +424,6 @@ extern FLAC_API const char * const FLAC__StreamEncoderSeekStatusString[];
 /** Return values for the FLAC__StreamEncoder tell callback.
  */
 typedef enum {
-
 	FLAC__STREAM_ENCODER_TELL_STATUS_OK,
 	/**< The tell was OK and encoding can continue. */
 

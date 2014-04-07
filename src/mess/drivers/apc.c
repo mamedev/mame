@@ -83,7 +83,7 @@ public:
 		m_pit(*this, "pit8253"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -101,7 +101,7 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
-	
+
 	required_device<palette_device> m_palette;
 
 	// screen updates
@@ -151,7 +151,7 @@ public:
 	UINT8 m_dma_offset[4];
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	
+
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -984,11 +984,11 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)	
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
 
 	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)	
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(apc_state,apc)

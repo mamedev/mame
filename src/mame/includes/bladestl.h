@@ -55,4 +55,3 @@ public:
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
 };
-

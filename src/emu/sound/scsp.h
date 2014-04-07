@@ -21,10 +21,10 @@
 
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
 	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB2_##_devcb);
-	
+
 
 enum SCSP_STATE {SCSP_ATTACK,SCSP_DECAY1,SCSP_DECAY2,SCSP_RELEASE};
-	
+
 struct SCSP_EG_t
 {
 	int volume; //
@@ -56,7 +56,7 @@ struct SCSP_SLOT
 		UINT16 data[0x10];  //only 0x1a bytes used
 		UINT8 datab[0x20];
 	} udata;
-	
+
 	UINT8 Backwards;    //the wave is playing backwards
 	UINT8 active;   //this slot is currently playing
 	UINT8 *base;        //samples base address
@@ -76,7 +76,7 @@ class scsp_device : public device_t,
 {
 public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
 	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(object); }
@@ -88,7 +88,7 @@ public:
 	// MIDI I/O access (used for comms on Model 2/3)
 	DECLARE_WRITE16_MEMBER( midi_in );
 	DECLARE_READ16_MEMBER( midi_out_r );
-	
+
 	void set_ram_base(void *base);
 
 protected:
@@ -97,18 +97,18 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	int m_roffset;                /* offset in the region */
-	devcb2_write8   	m_irq_cb;  /* irq callback */
+	devcb2_write8       m_irq_cb;  /* irq callback */
 	devcb2_write_line   m_main_irq_cb;
-	
+
 	union
 	{
 		UINT16 data[0x30/2];
 		UINT8 datab[0x30];
 	} m_udata;
-	
+
 	SCSP_SLOT m_Slots[32];
 	signed short m_RINGBUF[128];
 	unsigned char m_BUFPTR;
@@ -130,7 +130,7 @@ private:
 	UINT8 m_MidiOutW, m_MidiOutR;
 	UINT8 m_MidiStack[32];
 	UINT8 m_MidiW, m_MidiR;
-	
+
 	INT32 m_EG_TABLE[0x400];
 
 	int m_LPANTABLE[0x10000];
@@ -158,20 +158,20 @@ private:
 	int m_ARTABLE[64], m_DRTABLE[64];
 
 	SCSPDSP m_DSP;
-	
+
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
 
 	int m_length;
 
 	signed short *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
-	
+
 	//LFO
 	int m_PLFO_TRI[256], m_PLFO_SQR[256], m_PLFO_SAW[256], m_PLFO_NOI[256];
 	int m_ALFO_TRI[256], m_ALFO_SQR[256], m_ALFO_SAW[256], m_ALFO_NOI[256];
 	int m_PSCALES[8][256];
 	int m_ASCALES[8][256];
-	
+
 	void exec_dma(address_space &space);       /*state DMA transfer function*/
 	unsigned char DecodeSCI(unsigned char irq);
 	void CheckPendingIRQ();
@@ -198,7 +198,7 @@ private:
 	unsigned short r16(address_space &space, unsigned int addr);
 	inline INT32 UpdateSlot(SCSP_SLOT *slot);
 	void DoMasterSamples(int nsamples);
-	
+
 	//LFO
 	void LFO_Init();
 	signed int PLFO_Step(SCSP_LFO_t *LFO);

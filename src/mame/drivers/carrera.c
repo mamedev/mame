@@ -352,7 +352,7 @@ static MACHINE_CONFIG_START( carrera, carrera_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -153,8 +153,8 @@ private:
 	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd);
 	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
-	upd7220_display_pixels_delegate		m_display_cb;
-	upd7220_draw_text_delegate			m_draw_text_cb;
+	upd7220_display_pixels_delegate     m_display_cb;
+	upd7220_draw_text_delegate          m_draw_text_cb;
 
 	devcb2_write_line   m_write_drq;
 	devcb2_write_line   m_write_hsync;

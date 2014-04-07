@@ -73,7 +73,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);

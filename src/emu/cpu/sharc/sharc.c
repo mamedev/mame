@@ -659,11 +659,11 @@ void adsp21062_device::execute_set_input(int irqline, int state)
 		{
 			m_irq_active &= ~(1 << (8-irqline));
 		}
-    }
+	}
 	else if (irqline >= SHARC_INPUT_FLAG0 && irqline <= SHARC_INPUT_FLAG3)
-    {
-        set_flag_input(irqline - SHARC_INPUT_FLAG0, state);
-    }
+	{
+		set_flag_input(irqline - SHARC_INPUT_FLAG0, state);
+	}
 }
 
 void adsp21062_device::set_flag_input(int flag_num, int state)
@@ -917,4 +917,3 @@ bool adsp21062_device::memory_readop(offs_t offset, int size, UINT64 &value)
 
 	return false;
 }
-

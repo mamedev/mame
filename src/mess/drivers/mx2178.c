@@ -52,7 +52,7 @@ private:
 	UINT8 m_term_data;
 	required_device<z80_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

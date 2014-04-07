@@ -25,7 +25,7 @@ public:
 		m_fixvideoram(*this, "fixvideoram"),
 		m_fixcolorram(*this, "fixcolorram")
 	{ }
-	
+
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -137,7 +137,7 @@ public:
 	DECLARE_DRIVER_INIT(getstarb1);
 	DECLARE_DRIVER_INIT(slapfigh);
 	DECLARE_DRIVER_INIT(getstarb2);
-	
+
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);

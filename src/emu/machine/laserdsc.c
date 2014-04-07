@@ -314,7 +314,7 @@ void laserdisc_device::device_start()
 	// if we have a palette and it's not started, wait for it
 	if (m_overlay_palette != NULL && !m_overlay_palette->started())
 		throw device_missing_dependencies();
-	
+
 	// initialize the various pieces
 	init_disc();
 	init_video();
@@ -373,7 +373,7 @@ void laserdisc_device::device_validity_check(validity_checker &valid) const
 {
 	texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_overlay_palette == NULL && texformat == TEXFORMAT_PALETTE16)
-		mame_printf_error("Overlay screen does not have palette defined\n");		
+		mame_printf_error("Overlay screen does not have palette defined\n");
 }
 
 //-------------------------------------------------

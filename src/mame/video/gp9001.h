@@ -141,4 +141,3 @@ extern const device_type GP9001_VDP;
 
 #define MCFG_GP9001_VDP_PALETTE(_palette_tag) \
 	gp9001vdp_device::static_set_palette_tag(*device, "^" _palette_tag);
-

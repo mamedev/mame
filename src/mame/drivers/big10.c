@@ -159,12 +159,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( big10 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE	/* Service Mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE    /* Service Mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )					// in test mode, go to the game whilst keep pressed.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )					// in test mode, go to the game whilst keep pressed.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )                    // in test mode, go to the game whilst keep pressed.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
 

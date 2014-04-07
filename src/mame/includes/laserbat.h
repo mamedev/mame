@@ -23,7 +23,7 @@ public:
 		m_s2636_3(*this, "s2636_3"),
 		m_sn(*this, "snsnd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 

@@ -30,10 +30,10 @@ public:
 	required_shared_ptr<UINT16> m_scroll1;
 	required_shared_ptr<UINT16> m_scroll2;
 	required_shared_ptr<UINT16> m_paletteram;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;

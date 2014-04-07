@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_TAITO8741_MODES(TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT)
 	MCFG_TAITO8741_CONNECT(1,0,0,0)
 	MCFG_TAITO8741_PORT_HANDLERS(READ8(gladiatr_state,gladiator_dsw1_r),READ8(gladiatr_state,gladiator_dsw2_r),READ8(gladiatr_state,gladiator_button3_r),READ8(gladiatr_state,gladiator_controls_r))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

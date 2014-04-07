@@ -68,7 +68,7 @@ public:
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);

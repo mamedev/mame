@@ -1081,7 +1081,7 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_INTEL_E28F008SA_ADD("flash0")
 	MCFG_INTEL_E28F008SA_ADD("flash1")
-	
+
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */

@@ -11,10 +11,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- writing starts in the middle of a byte
-	- 8050 PLL
+    - writing starts in the middle of a byte
+    - 8050 PLL
 
 */
 
@@ -67,7 +67,7 @@ const rom_entry *c2040_fdc_t::device_rom_region() const
 //  c2040_fdc_t - constructor
 //-------------------------------------------------
 
-c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : 
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
@@ -92,7 +92,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, device_type type, const 
 	cur_live.write_start_time = attotime::never;
 }
 
-c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
@@ -117,7 +117,7 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	cur_live.write_start_time = attotime::never;
 }
 
-c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : 
+c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	c2040_fdc_t(mconfig, C2040_FDC, "C2040 FDC", tag, owner, clock, "c2040fdc", __FILE__) { }
 
 
@@ -242,7 +242,7 @@ void c2040_fdc_t::commit(attotime tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
-	
+
 	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
 
 	if(get_floppy())
@@ -336,14 +336,14 @@ void c2040_fdc_t::live_run(attotime limit)
 				cur_live.cell_counter++;
 				cur_live.cell_counter &= 0xf;
 			}
-			
+
 			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
 				// read bit
 				cur_live.shift_reg <<= 1;
 				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
 				cur_live.shift_reg &= 0x3ff;
-	
-				if (LOG) logerror("%s read bit %u (%u) >> %03x, rw=%u mode=%u\n", cur_live.tm.as_string(), cur_live.bit_counter, 
+
+				if (LOG) logerror("%s read bit %u (%u) >> %03x, rw=%u mode=%u\n", cur_live.tm.as_string(), cur_live.bit_counter,
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.rw_sel, cur_live.mode_sel);
 
 				// write bit
@@ -375,7 +375,7 @@ void c2040_fdc_t::live_run(attotime limit)
 			cur_live.e = m_gcr_rom->base()[cur_live.i];
 
 			int ready = !(BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && (cur_live.bit_counter == 9));
-	
+
 			if (!ready) {
 				// load write shift register
 				// E7 E6 I7 E5 E4 E3 E2 I2 E1 E0
@@ -383,13 +383,13 @@ void c2040_fdc_t::live_run(attotime limit)
 				offs_t i = cur_live.i;
 
 				cur_live.shift_reg_write = BIT(e,7)<<9 | BIT(e,6)<<8 | BIT(i,7)<<7 | BIT(e,5)<<6 | BIT(e,4)<<5 | BIT(e,3)<<4 | BIT(e,2)<<3 | BIT(i,2)<<2 | (e & 0x03);
-			
+
 				if (LOG) logerror("%s load write shift register %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			} else if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1)) {
 				// clock write shift register
 				cur_live.shift_reg_write <<= 1;
 				cur_live.shift_reg_write &= 0x3ff;
-				
+
 				if (LOG) logerror("%s write shift << %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			}
 
@@ -463,9 +463,9 @@ READ8_MEMBER( c2040_fdc_t::read )
 	offs_t i = checkpoint_live.i;
 
 	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
-	
+
 	if (LOG) logerror("%s VIA reads data %02x (%03x)\n", machine().time().as_string(), data, checkpoint_live.shift_reg);
-	
+
 	return data;
 }
 

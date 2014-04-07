@@ -94,7 +94,7 @@ void twincobr_state::twincobr_create_tilemaps()
 	m_bg_tilemap->set_scrolldy(-30, -243 );
 	m_fg_tilemap->set_scrolldy(-30, -243 );
 	m_tx_tilemap->set_scrolldy(-30, -243 );
-	
+
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
 }

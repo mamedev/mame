@@ -120,7 +120,7 @@ int spbactn_draw_sprites(screen_device &screen, gfxdecode_device *gfxdecode, bit
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					 gfxdecode->gfx(2)->transpen_raw(bitmap,cliprect,
+						gfxdecode->gfx(2)->transpen_raw(bitmap,cliprect,
 						code + layout[row][col],
 						gfxdecode->gfx(2)->colorbase() + color * gfxdecode->gfx(2)->granularity(),
 						flipx, flipy,

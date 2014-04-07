@@ -170,9 +170,9 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 
 WRITE8_MEMBER( apricot_state::i8255_portc_w )
 {
-//	schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
+//  schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
 	m_centronics->write_strobe(BIT(data, 5));
-//	schematic page 294 says pc6 outputs to centronics pin 15, which is unused
+//  schematic page 294 says pc6 outputs to centronics pin 15, which is unused
 }
 
 static const i8255_interface apricot_i8255a_intf =

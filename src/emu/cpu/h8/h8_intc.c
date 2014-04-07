@@ -280,10 +280,10 @@ void h8h_intc_device::update_irq_types()
 const int h8h_intc_device::vector_to_slot[64] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1,  0,  1,  2,  2, // IRQ 0-3
-	 3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
-	 5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
-	 7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
-	 9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
+		3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
+		5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
+		7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
+		9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
 	11, 11, 11, 11, 12, 12, 12, 12, // (reservedx4), ERI0, RXI0, TXI0, TEI0
 	13, 13, 13, 13, 14, 14, 14, 14  // ERI1, RXI1, TXI1, TEI1, ERI2, RXI2, TXI2, TEI2
 };
@@ -342,8 +342,8 @@ WRITE8_MEMBER(h8s_intc_device::iprk_w)
 const int h8s_intc_device::vector_to_slot[92] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1, -1, -1, -1, -1,
-	 0,  1,  2,  2,  3,  3,  4,  4, // IRQ 0-7
-	 5,  6,  7,  8,  9,  9,  9,  9, // SWDTEND, WOVI, CMI, (reserved), ADI
+		0,  1,  2,  2,  3,  3,  4,  4, // IRQ 0-7
+		5,  6,  7,  8,  9,  9,  9,  9, // SWDTEND, WOVI, CMI, (reserved), ADI
 	10, 10, 10, 10, 10, 10, 10, 10, // TGI0A, TGI0B, TGI0C, TGI0D, TGI0V
 	11, 11, 11, 11, 12, 12, 12, 12, // TGI1A, TGI1B, TGI1V, TGI1U, TGI2A, TGI2B, TGI2V, TGI2U
 	13, 13, 13, 13, 13, 13, 13, 13, // TGI3A, TGI3B, TGI3C, TGI3D, TGI3V

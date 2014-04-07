@@ -108,8 +108,8 @@ protected:
 // ======================> videobrain_expansion_slot_device
 
 class videobrain_expansion_slot_device : public device_t,
-										 public device_slot_interface,
-										 public device_image_interface
+											public device_slot_interface,
+											public device_image_interface
 {
 public:
 	// construction/destruction

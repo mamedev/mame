@@ -165,7 +165,7 @@ galaxianmo      // (c) Midway
 galaxiant       // (c) Taito
 galaxiani       // (c) Irem
 galaxrf         // bootleg (Recreativos Franco)
-galaxrfgg		// bootleg (Recreativos Franco)
+galaxrfgg       // bootleg (Recreativos Franco)
 superg          // hack
 galapx          // hack
 moonaln         // [Nichibutsu] (Karateco license) or hack
@@ -177,7 +177,7 @@ zerotime        // hack
 starfght        // hack
 galaxbsf        // hack
 galaxianbl      // bootleg
-galaxbsf2		// bootleg
+galaxbsf2       // bootleg
 kamakazi3       // Video Games (UK) Ltd., hack or bootleg?
 tst_galx        // Galaxian Test ROM
 gmgalax         // bootleg
@@ -338,7 +338,7 @@ hotshock        // (c) 1982 E.G. Felaco (Domino license)
 hotshockb       // bootleg
 conquer         // (c) 1982 ????
 hunchbks        // (c) 1983 Century
-hunchbks2		// bootleg
+hunchbks2       // bootleg
 hncholms        // (c) 1984 Century
 cavelon         // (c) 1983 Jetsoft
 sfx             // (c) 1983 Nichibutsu
@@ -380,7 +380,7 @@ billiard        // bootleg
 hustlerb        // bootleg
 hustlerb2       // bootleg
 hustlerb3       // bootleg
-hustlerb4		// bootleg
+hustlerb4       // bootleg
 frogger         // GX392 (c) 1981 Konami
 froggers1       // (c) 1981 Sega
 froggers2       // 834-0068 (c) 1981 Sega
@@ -1654,7 +1654,7 @@ intlaser        // (c) 1987
 blasted         // (c) 1988
 archrivl        // (c) 1989
 archrivla       // (c) 1989
-archrivlb		// bootleg
+archrivlb       // bootleg
 trisport        // (c) 1989
 pigskin         // (c) 1990
 pigskina        // (c) 1990
@@ -1866,7 +1866,7 @@ dsoccr94j       // (c) 1994 Irem (Japan)
 gunforc2        // (c) 1994 Irem
 geostorm        // (c) 1994 Irem (Japan)
 // M107
-airass			// (c) 1993 Irem (World)
+airass          // (c) 1993 Irem (World)
 firebarr        // (c) 1993 Irem (Japan)
 dsoccr94        // (c) 1994 Irem (Data East Corporation license)
 kftgoal         // (c) 1994 Jaleco
@@ -2246,7 +2246,7 @@ tetristh        // C26 (c) 1988 Sega Enterprises,Ltd. (Japan)
 masterw         // B72 (c) 1989 Taito Corporation Japan (World)
 masterwu        // B72 (c) 1989 Taito America Corporation (US)
 masterwj        // B72 (c) 1989 Taito Corporation (Japan)
-yukiwo			// prototype
+yukiwo          // prototype
 nastar          // B81 (c) 1988 Taito Corporation Japan (World)
 nastarw         // B81 (c) 1988 Taito America Corporation (US)
 rastsag2        // B81 (c) 1988 Taito Corporation (Japan)
@@ -2286,7 +2286,7 @@ contcircua      // B33 (c) 1987 Taito America Corporation (US)
 contcircj       // B33 (c) 1987 Taito Corporation (Japan)
 chasehq         // B52 (c) 1988 Taito Corporation Japan (World)
 chasehqj        // B52 (c) 1988 Taito Corporation (Japan)
-chasehqju		// B52 (c) 1988 Taito Corporation (Japan)
+chasehqju       // B52 (c) 1988 Taito Corporation (Japan)
 chasehqu        // B52 (c) 1988 Taito America Corporation (US)
 enforce         // B58 (c) 1988 Taito Corporation Japan (World)
 enforcej        // B58 (c) 1988 Taito Corporation (Japan)
@@ -2581,7 +2581,7 @@ twincobr        // B30 / TP-011 (c) 1987 Taito Corporation (World)
 twincobru       // B30 / TP-011 (c) 1987 Taito America Corporation + Romstar license (US)
 ktiger          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 gulfwar2        // (c) 1991 Comad
-gulfwar2a		//
+gulfwar2a       //
 rallybik        // B45 / TP-O12 (c) 1988 Taito
 truxton         // B65 / TP-O13B (c) 1988 Taito
 hellfire        // B90 / TP-??? (c) 1989 Toaplan + Taito license
@@ -2674,7 +2674,7 @@ batsugun        // TP-030 (c) 1993 Toaplan
 batsuguna       // TP-030 (c) 1993 Toaplan
 batsugunsp      // TP-030 (c) 1993 Toaplan
 snowbro2        // TP-033 (c) 1994 Hanafram
-snowbro2b		//
+snowbro2b       //
 pwrkick         // (c) 1994 Sunwise
 othldrby        // (c) 1995 Sunwise
 sstriker        // (c) 1993 Raizing
@@ -2796,25 +2796,25 @@ korokoro        // (c) 1999 Takumi
 crusherm        // (c) 1999 Takumi
 tjumpman        // (c) 1999 Namco
 
-mushisam 
+mushisam
 mushisama
 mushisamb
-espgal2 
-ibara    
-ibarablk 
-ibarablka 
-mushitam 
+espgal2
+ibara
+ibarablk
+ibarablka
+mushitam
 mushitama
-futari15 
-futari15a  
-futari10 
-futaribl 
-pinkswts 
-pinkswtsa 
+futari15
+futari15a
+futari10
+futaribl
+pinkswts
+pinkswtsa
 pinkswtsb
-pinkswtsx 
-deathsml  
-mmpork    
+pinkswtsx
+deathsml
+mmpork
 mmmbanc
 ddpdfk
 ddpdfk10
@@ -2943,7 +2943,7 @@ trojan          //  4/1986 (c) 1986 (US)
 trojana         //  4/1986 (c) 1986 (US)
 trojanr         //  4/1986 (c) 1986 + Romstar
 trojanj         //  4/1986 (c) 1986 (Japan)
-trojanb			// bootleg
+trojanb         // bootleg
 srumbler        //  9/1986 (c) 1986
 srumbler2       //  9/1986 (c) 1986
 srumbler3       //  9/1986 (c) 1986 + Tecfri
@@ -3133,10 +3133,10 @@ sf2red          // hack
 sf2v004         // hack
 sf2acc          // hack
 sf2acca         // hack
-sf2ceblp			// hack
+sf2ceblp            // hack
 sf2accp2        // hack
 sf2amf          // bootleg
-sf2amf2			// bootleg
+sf2amf2         // bootleg
 sf2dkot2        // hack
 sf2m1           // hack
 sf2m2           // hack
@@ -3151,7 +3151,7 @@ sf2koryu        // hack
 sf2dongb        // hack
 sf2mdt          // bootleg
 sf2mdta         // bootleg
-sf2mdtb			// bootleg
+sf2mdtb         // bootleg
 cworld2j        // 11/06/1992 (c) 1992 (Japan)
 varth           // 14/07/1992 (c) 1992 (World)
 varthr1         // 12/06/1992 (c) 1992 (World)
@@ -3315,7 +3315,7 @@ msha            // 24/10/1995 (c) 1995 (Asia)
 mshh            // 17/11/1995 (c) 1995 (Hispanic)
 mshb            // 17/11/1995 (c) 1995 (Brazil)
 19xx            // 07/12/1995 (c) 1996 (USA)
-19xxj			// 04/01/1996 (c) 1996 (Japan)
+19xxj           // 04/01/1996 (c) 1996 (Japan)
 19xxjr1         // 25/12/1995 (c) 1996 (Japan)
 19xxjr2         // 07/12/1995 (c) 1996 (Japan)
 19xxa           // 07/12/1995 (c) 1996 (Asia)
@@ -3503,7 +3503,7 @@ warzard         // 21/11/1996 (c) 1996 (Japan)
 warzardr1       // 23/10/1996 (c) 1996 (Japan)
 sfiii           // 04/02/1997 (c) 1997 (Euro)
 sfiiiu          // 04/02/1997 (c) 1997 (USA)
-sfiiia			// 04/02/1997 (c) 1997 (Asia)
+sfiiia          // 04/02/1997 (c) 1997 (Asia)
 sfiiij          // 04/02/1997 (c) 1997 (Japan)
 sfiiih          // 04/02/1997 (c) 1997 (Hispanic)
 sfiii2          // 30/09/1997 (c) 1997 (USA)
@@ -3521,7 +3521,7 @@ sfiii3ur1       // 12/05/1999 (c) 1999 (USA)
 jojoba          // 27/09/1999 (c) 1999 (Japan)
 jojobar1        // 13/09/1999 (c) 1999 (Japan)
 sfiiin          // 04/02/1997 (c) 1997 (Asia)
-sfiiina			// 04/02/1997 (c) 1997 (Asia)
+sfiiina         // 04/02/1997 (c) 1997 (Asia)
 sfiii2n         // 30/09/1997 (c) 1997 (Asia)
 jojon           // 28/01/1999 (c) 1998 (Asia)
 jojonr1         // 08/01/1999 (c) 1998 (Asia)
@@ -3534,8 +3534,8 @@ jojobane        // 27/09/1999 (c) 1999 (Euro)
 jojobaner1      // 13/09/1999 (c) 1999 (Euro)
 cps3boot        // bootleg
 cps3boota       // bootleg
-cps3bs32		//
-cps3bs32a		//
+cps3bs32        //
+cps3bs32a       //
 
 // Capcom ZN1
 cpzn1
@@ -3774,7 +3774,7 @@ aquarush        // 2000.02 Aqua Rush (AQ1/VER.A1, Japan)
 golgo13         // 2000.03 Golgo 13 (GLG1/VER.A, Japan)
 sws2000         // 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan)
 truckk          // 2000.06 Truck Kyousoukyoku (Metro)
-kartduel		// 2000.07 Kart Duel
+kartduel        // 2000.07 Kart Duel
 				// 2000.08 Teknowerk
 g13knd          // 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan)
 sws2001         // 2001.04 Super World Stadium 2001 (SS11/VER.A, Japan)
@@ -4465,7 +4465,7 @@ alexkidd1       // (c) 1986 (FD1089A, decrypted)
 fantzone        // (c) 1986 (Unprotected Rev A)
 fantzone1       // (c) 1986 (Unprotected)
 fantzonep       // (c) 1986 (NEC 0317-5000, encrypted)
-fantzonepr		//
+fantzonepr      //
 sdi             // (c) 1987 (FD1089B, decrypted)
 shinobi         // (c) 1987 (Unprotected)
 shinobi1        // (c) 1987 (FD1094, decrypted)
@@ -4741,7 +4741,7 @@ radru           // 1991.09 Rad Rally (US)
 radrj           // 1991.07 Rad Rally (Japan)
 spidman         // 1991.?? Spiderman (World)
 spidmanu        // 1991.09 Spiderman (US)
-spidmanj	// 1991.09 Spiderman (Japan)
+spidmanj    // 1991.09 Spiderman (Japan)
 f1en            // 1991.?? F-1 Exhaust Note (World)
 				// 1992.01 F-1 Exhaust Note (US)
 				// 1991.11 F-1 Exhaust Note (Japan)
@@ -5419,7 +5419,7 @@ initdv2j        // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
 initdv2jo       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv2e        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 vf4evo          // 2002.12 Virtua Fighter 4 Evolution Ver.B
-clubk2k3	// 2003.?? Club Kart: European Session 2003
+clubk2k3    // 2003.?? Club Kart: European Session 2003
 clubk2kf
 initdexp        // 2002.?? Initial D Arcade Stage (Export)
 				// 2002.?? Sega Driving Simulator
@@ -5706,7 +5706,7 @@ abattle2        // Sidam
 afire           // Rene Pierre
 acombat         // bootleg
 acombato        // bootleg
-acombat3		// bootleg
+acombat3        // bootleg
 sstarbtl        // bootleg
 spfghmk2        // (c) [1979] Data East Corporation
 spfghmk22       // (c) [1979] Data East Corporation
@@ -5770,7 +5770,7 @@ pcktgalb        // bootleg
 pcktgal2        // (c) 1989 Data East Corporation (World?)
 pcktgal2j       // (c) 1989 Data East Corporation (World?)
 pokechmp        // Korean hack of Pocket Gal
-billlist		//
+billlist        //
 spool3          // (c) 1989 Data East Corporation (World?)
 spool3i         // (c) 1990 Data East Corporation + I-Vics license
 battlera        // (c) 1988 Data East Corporation (World)
@@ -6199,7 +6199,7 @@ rockragea       // GX620 (c) 1986 (Prototype?)
 rockragej       // GX620 (c) 1986 (Japan)
 mx5000          // GX669 (c) 1987
 flkatck         // GX669 (c) 1987 (Japan)
-flkatcka		// GX669 (c) 1987 (Japan)
+flkatcka        // GX669 (c) 1987 (Japan)
 fastlane        // GX752 (c) 1987
 tricktrp        // GX771 (c) 1987
 labyrunr        // GX771 (c) 1987 (Japan)
@@ -6662,7 +6662,7 @@ teetert         // (c) 1981
 mtrap           // (c) 1981
 mtrap3          // (c) 1981
 mtrap4          // (c) 1981
-mtrapb			// bootleg
+mtrapb          // bootleg
 pepper2         // (c) 1982
 pepper27        // (c) 1982
 hardhat         // (c) 1982
@@ -8255,14 +8255,14 @@ raiden2d        // (c) 1993 Seibu Kaihatsu
 raiden2e        // (c) 1993 Seibu Kaihatsu
 raiden2f        // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2g        // (c) 1993 Seibu Kaihatsu
-raiden2nl		// (c) 1993 Seibu Kaihatsu
+raiden2nl       // (c) 1993 Seibu Kaihatsu
 raidendx        // (c) 1994 Seibu Kaihatsu
 raidendxj       // (c) 1994 Seibu Kaihatsu
 raidendxu       // (c) 1994 Seibu Kaihatsu + Fabtek license
 raidendxa1      // (c) 1994 Seibu Kaihatsu + Metrotainment license
 raidendxa2      // (c) 1994 Seibu Kaihatsu + Metrotainment license
 raidendxg       // (c) 1994 Seibu Kaihatsu + Tuning license
-raidendxnl		// (c) 1994 Seibu Kaihatsu
+raidendxnl      // (c) 1994 Seibu Kaihatsu
 zeroteam        // (c) 1993 Seibu Kaihatsu + Fabtek license
 zeroteama       // (c) 1993 Seibu Kaihatsu
 zeroteamb       // (c) 1993 Seibu Kaihatsu
@@ -8287,7 +8287,7 @@ batlballe       // (c) 1995 Seibu Kaihatsu (Metrotainment License)
 batlballu       // (c) 1995 Seibu Kaihatsu (Fabtek license)
 
 viprp1          // (c) 1995 Seibu Kaihatsu
-viprp1k			// (c) 1995 Seibu Kaihatsu (Dream Island license)
+viprp1k         // (c) 1995 Seibu Kaihatsu (Dream Island license)
 viprp1u         // (c) 1995 Seibu Kaihatsu (Fabtek license)
 viprp1ua        // (c) 1995 Seibu Kaihatsu (Fabtek license)
 viprp1j         // (c) 1995 Seibu Kaihatsu
@@ -8724,11 +8724,11 @@ galsnewj        // (c) 1990 Kaneko
 galsnewk        // (c) 1990 Kaneko
 galpani2        // (c) 1993 Kaneko
 galpani2e       // (c) 1993 Kaneko
-galpani2e2		// (c) 1993 Kaneko
+galpani2e2      // (c) 1993 Kaneko
 galpani2g       // (c) 1993 Kaneko
 galpani2t       // (c) 1993 Kaneko
 galpani2i       // (c) 1993 Kaneko
-galpani2gs		// (c) 1993 Kaneko
+galpani2gs      // (c) 1993 Kaneko
 galpani2j       // (c) 1993 Kaneko
 gp2quiz         // (c) 1993 Kaneko
 gp2se           // (c) 1994 Kaneko
@@ -8737,7 +8737,7 @@ jchan2          // (c) 1995 Kaneko
 galpani3        // (c) 1995 Kaneko (World)
 galpani3j       // (c) 1995 Kaneko (Japan)
 galpani3k       // (c) 1995 Kaneko (Korea)
-galpani3hk		// (c) 1995 Kaneko (Hong Kong)
+galpani3hk      // (c) 1995 Kaneko (Hong Kong)
 
 // Kaneko "AX System" games
 berlwall        // (c) 1991 Kaneko
@@ -8838,7 +8838,7 @@ pairlove        // (c) 1991 Athena
 blandia         // (c) 1992 Allumer
 blandiap        // (c) 1992 Allumer
 blockcar        // (c) 1992 Visco
-blockcarb		// bootleg
+blockcarb       // bootleg
 qzkklogy        // (c) 1992 Tecmo
 neobattl        // (c) 1992 Banpresto / Sotsu Agency. Sunrise
 umanclub        // (c) 1992 Tsuburaya Prod. / Banpresto
@@ -9066,13 +9066,13 @@ lastday         // (c) 1990 Dooyong
 lastdaya        // (c) 1990 Dooyong
 gulfstrm        // (c) 1991 Dooyong
 gulfstrma       // (c) 1991 Dooyong
-gulfstrmb		// (c) 1991 Dooyong
+gulfstrmb       // (c) 1991 Dooyong
 gulfstrmm       // (c) 1991 Dooyong + distributed by Media Shoji
 pollux          // (c) 1991 Dooyong
 polluxa         // (c) 1991 Dooyong
 polluxa2        // (c) 1991 Dooyong
 flytiger        // (c) 1992 Dooyong
-flytigera		// (c) 1992 Dooyong
+flytigera       // (c) 1992 Dooyong
 bluehawk        // (c) 1993 Dooyong
 bluehawkn       // (c) 1993 NTC
 sadari          // (c) 1993 NTC
@@ -9117,8 +9117,8 @@ missmw96        // (c) 1996 Comad
 fantsia2        // (c) 1997 Comad
 fantsia2a       // (c) 1997 Comad
 wownfant        // (c) 2002 Comad
-pgalvip			// (c) 1996 ACE International (Afega stickers on ROMs)
-pgalvipa		//
+pgalvip         // (c) 1996 ACE International (Afega stickers on ROMs)
+pgalvipa        //
 galhustl        // (c) 1997 ACE International
 
 // Playmark games
@@ -9245,7 +9245,7 @@ shockingk       // (c) 1997 Yun Sung
 bombkick        // (c) 1998 Yun Sung
 bombkicka       // (c) 1998 Yun Sung
 nmg5            // (c) 1998 Yun Sung
-nmg5a			// (c) 1998 Yun Sung
+nmg5a           // (c) 1998 Yun Sung
 nmg5e           // (c) 1998 Yun Sung
 searchey        // (c) 1999 Yun Sung
 searchp2        // (c) 1999 Yun Sung
@@ -9672,7 +9672,7 @@ kovlsjba        // bootleg
 oldsplus        // (c) 2004 Oriental Legend Super Plus
 killbldp        // (c) 2004 Killing Blade Plus
 happy6          // (c) 2004 Happy 6
-happy6101		//
+happy6101       //
 svg             // (c) 2003 Spectral vs Generation
 svgpcb          //
 ket             // (c) 2002 Ketsui
@@ -9690,8 +9690,8 @@ orleg2          // (c) 2007
 orleg2o         //
 kov2nl          // (c) 2008
 kov2nlo         //
-ddpdojh			//
-kov3			//
+ddpdojh         //
+kov3            //
 
 // IGS PC based HW
 speeddrv        // (c) 2004
@@ -10105,7 +10105,7 @@ nostj           // (c) 1993 Face
 nostk           // (c) 1993 Face
 4enraya         // (c) 1990 IDSA
 4enrayaa        //
-4enlinea		// (c) 1991 System Compumatic
+4enlinea        // (c) 1991 System Compumatic
 unkpacg         // (c) 19?? ???
 oneshot         // no copyright notice
 maddonna        // (c) 1995 Tuning
@@ -10123,7 +10123,7 @@ coolpool        // (c) 1992 Catalina Games
 9ballsht2       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 9ballsht3       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
 9ballshtc       // (c) 1993 E-Scape EnterMedia + "marketed by Bundra Games"
-megaphx			// (c) 1991 Dinamic / Inder
+megaphx         // (c) 1991 Dinamic / Inder
 gumbo           // (c) 1994 Min Corp.
 mspuzzleg       // (c) 1994 Min Corp.
 mspuzzle        // (c) 1994 Min Corp.
@@ -11081,7 +11081,7 @@ sstar97         // (c) 199? Bordun International
 livequiz        // (c) 1999 Andamiro
 hammer          // (c) 2000 Andamiro
 discoboy        // (c) 1993 Soft Art Co.
-discoboyp		// (c) 1993 Soft Art Co. (Promat license?)
+discoboyp       // (c) 1993 Soft Art Co. (Promat license?)
 pangofun        // (c) 1995 InfoCube
 koikoi          // (c) 1983 Kiwako
 good            // (c) 1998
@@ -11089,8 +11089,8 @@ filetto         // (c) 1990 Novamatic
 quizo           // (c) 1985 Seoul Coin Corp.
 quizoa          // (c) 1985 Seoul Coin Corp.
 gstream         // (c) 2002, Oriental Soft Japan
-x2222			// (c) 2000, Oriental Soft
-x2222o			// (c) 2000, Oriental Soft
+x2222           // (c) 2000, Oriental Soft
+x2222o          // (c) 2000, Oriental Soft
 miniboy7        // (c) 1983, Bonanza Enterprises
 miniboy7a       // (c) 1983, Bonanza Enterprises
 miniboy7b       // (c) 1983, Bonanza Enterprises
@@ -11252,8 +11252,8 @@ ejollyx5        // (c) 200? Solar Games
 grandprx        // (c) 200? 4fun
 supjolly        // (c) 200? unknown
 x5jokers        // (c) 200? Electronic Projects
-queenotg		//
-ejollyx9		//
+queenotg        //
+ejollyx9        //
 
 // Astro Corp.
 showhand        // (c) 2000  Astro Corp.
@@ -29477,7 +29477,7 @@ ec_multb    // Multi Bar (Concept - Electrocoin)
 ec_casmb    // Casino Multi Bar (Concept - Electrocoin)
 ec_supmb    // Super Multi Bar (Concept - Electrocoin)
 ec_stkex    // Stake X (Concept - Electrocoin)
-ec_bar7		// Bar 7 (Concept)
+ec_bar7     // Bar 7 (Concept)
 ec_fltr     // Flutter (Concept)
 ec_gold7    // Golden 7 (Concept)
 ec_mgbel    // Megabell (Concept)

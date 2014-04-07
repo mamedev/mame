@@ -134,5 +134,3 @@ void ui_menu_file_manager::handle()
 		}
 	}
 }
-
-

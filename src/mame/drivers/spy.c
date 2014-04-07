@@ -488,7 +488,7 @@ void spy_state::machine_start()
 
 	m_paletteram.resize(0x800);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	
+
 	memset(m_pmcram, 0, sizeof(m_pmcram));
 
 	save_item(NAME(m_paletteram));

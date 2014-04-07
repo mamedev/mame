@@ -34,7 +34,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	int m_dac0_value;
 	int m_dac1_value;
 	int m_dac0_gain;

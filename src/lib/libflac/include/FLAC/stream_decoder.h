@@ -199,7 +199,6 @@ extern "C" {
  * The decoder's state can be obtained by calling FLAC__stream_decoder_get_state().
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_SEARCH_FOR_METADATA = 0,
 	/**< The decoder is ready to search for metadata. */
 
@@ -253,7 +252,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderStateString[];
 /** Possible return values for the FLAC__stream_decoder_init_*() functions.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_INIT_STATUS_OK = 0,
 	/**< Initialization was successful. */
 
@@ -291,7 +289,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderInitStatusString[];
 /** Return values for the FLAC__StreamDecoder read callback.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_READ_STATUS_CONTINUE,
 	/**< The read was OK and decoding can continue. */
 
@@ -322,7 +319,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderReadStatusString[];
 /** Return values for the FLAC__StreamDecoder seek callback.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_SEEK_STATUS_OK,
 	/**< The seek was OK and decoding can continue. */
 
@@ -345,7 +341,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderSeekStatusString[];
 /** Return values for the FLAC__StreamDecoder tell callback.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_TELL_STATUS_OK,
 	/**< The tell was OK and decoding can continue. */
 
@@ -368,7 +363,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderTellStatusString[];
 /** Return values for the FLAC__StreamDecoder length callback.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_LENGTH_STATUS_OK,
 	/**< The length call was OK and decoding can continue. */
 
@@ -391,7 +385,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderLengthStatusString[];
 /** Return values for the FLAC__StreamDecoder write callback.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE,
 	/**< The write was OK and decoding can continue. */
 
@@ -424,7 +417,6 @@ extern FLAC_API const char * const FLAC__StreamDecoderWriteStatusString[];
  *  a future encoder.
  */
 typedef enum {
-
 	FLAC__STREAM_DECODER_ERROR_STATUS_LOST_SYNC,
 	/**< An error in the stream caused the decoder to lose synchronization. */
 

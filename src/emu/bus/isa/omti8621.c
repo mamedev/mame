@@ -3,9 +3,9 @@
  *
  *  Created on: August 30, 2010
  *      Author: Hans Ostermeyer
- * 
+ *
  *  Converted to ISA device by R. Belmont
- * 
+ *
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
  *
@@ -72,7 +72,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	void omti_disk_config(UINT16 disk_type);
 public:
 	UINT16 m_type;
@@ -288,7 +288,7 @@ void omti8621_device::device_start()
 	sector_buffer.resize(OMTI_DISK_SECTOR_SIZE*OMTI_MAX_BLOCK_COUNT);
 
 	m_timer = timer_alloc(0, NULL);
-	
+
 	our_disks[0] = subdevice<omti_disk_image_device>(OMTI_DISK0_TAG);
 	our_disks[1] = subdevice<omti_disk_image_device>(OMTI_DISK1_TAG);
 }
@@ -388,7 +388,7 @@ void omti8621_device::device_config_complete()
  set_interrupt - update the IRQ state
  -------------------------------------------------*/
 
-void omti8621_device::set_interrupt(enum line_state line_state) 
+void omti8621_device::set_interrupt(enum line_state line_state)
 {
 	LOG2(("set_interrupt: status_port=%x, line_state %d", status_port, line_state));
 	m_isa->irq14_w(line_state);
@@ -396,7 +396,7 @@ void omti8621_device::set_interrupt(enum line_state line_state)
 
 void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	set_interrupt(ASSERT_LINE); 
+	set_interrupt(ASSERT_LINE);
 }
 
 /***************************************************************************
@@ -525,7 +525,7 @@ UINT32 omti8621_device::get_disk_address(const UINT8 * cdb) {
  set_data_transfer - setup for data transfer from/to data
  ***************************************************************************/
 
-void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length) 
+void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length)
 {
 	// set controller for read data transfer
 	omti_state = OMTI_STATE_DATA;
@@ -541,7 +541,7 @@ void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length)
  read_sectors_from_disk - read sectors starting at diskaddr into sector_buffer
  ***************************************************************************/
 
-void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
+void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 lun)
 {
 	UINT8 *data_buffer = sector_buffer;
 	device_image_interface *image = our_disks[lun]->m_image;
@@ -561,7 +561,7 @@ void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 
  write_sectors_to_disk - write sectors starting at diskaddr from sector_buffer
  ***************************************************************************/
 
-void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 lun) 
+void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 lun)
 {
 	UINT8 *data_buffer = sector_buffer;
 	device_image_interface *image = our_disks[lun]->m_image;
@@ -586,7 +586,7 @@ void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 l
  copy_sectors - copy sectors
  ***************************************************************************/
 
-void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun) 
+void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, UINT8 lun)
 {
 	device_image_interface *image = our_disks[lun]->m_image;
 
@@ -613,7 +613,7 @@ void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, 
  format track - format a track
  ***************************************************************************/
 
-void omti8621_device::format_track(const UINT8 * cdb) 
+void omti8621_device::format_track(const UINT8 * cdb)
 {
 	UINT8 lun = get_lun(cdb);
 	UINT32 disk_addr = get_disk_address(cdb);
@@ -668,7 +668,7 @@ void omti8621_device::set_esdi_defect_list(UINT8 lun, UINT8 head)
  log_command - log command from a command descriptor block
  ***************************************************************************/
 
-void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length) 
+void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
 {
 	if (verbose > 0) {
 		int i;
@@ -767,7 +767,7 @@ void omti8621_device::log_command(const UINT8 cdb[], const UINT16 cdb_length)
  log_data - log data in the common data buffer
  ***************************************************************************/
 
-void omti8621_device::log_data() 
+void omti8621_device::log_data()
 {
 	if (verbose > 0) {
 		int i;
@@ -788,7 +788,7 @@ void omti8621_device::log_data()
  do_command
  ***************************************************************************/
 
-void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length) 
+void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 {
 	UINT8 lun = get_lun(cdb);
 	omti_disk_image_device *disk = our_disks[lun];
@@ -943,11 +943,11 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 //          LOG(("do_command: UNEXPECTED omti_state %02x",omti_state));
 //      }
 		status_port |= OMTI_STATUS_IREQ;
-		if (command_duration == 0) 
+		if (command_duration == 0)
 		{
 			set_interrupt(ASSERT_LINE);
-		} 
-		else 
+		}
+		else
 		{
 			// FIXME: should delay omti_state and status_port as well
 			m_timer->adjust(attotime::from_msec(command_duration), 0);
@@ -959,7 +959,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
  get_command_length
  ***************************************************************************/
 
-UINT8 omti8621_device::get_command_length(UINT8 command_byte) 
+UINT8 omti8621_device::get_command_length(UINT8 command_byte)
 {
 	return command_byte == OMTI_CMD_COPY ? 10 : 6;
 }
@@ -968,7 +968,7 @@ UINT8 omti8621_device::get_command_length(UINT8 command_byte)
  get_data
  ***************************************************************************/
 
-UINT16 omti8621_device::get_data() 
+UINT16 omti8621_device::get_data()
 {
 	UINT16 data = 0xff;
 	if (data_index < data_length) {
@@ -989,7 +989,7 @@ UINT16 omti8621_device::get_data()
  set_data
  ***************************************************************************/
 
-void omti8621_device::set_data(UINT16 data) 
+void omti8621_device::set_data(UINT16 data)
 {
 	if (data_index < data_length) {
 		data_buffer[data_index++] = data >> 8;
@@ -1008,7 +1008,7 @@ void omti8621_device::set_data(UINT16 data)
 
 WRITE16_MEMBER(omti8621_device::write)
 {
-	switch (mem_mask) 
+	switch (mem_mask)
 	{
 		case 0x00ff:
 			write8(space, offset*2+1, data, mem_mask);
@@ -1026,7 +1026,7 @@ WRITE16_MEMBER(omti8621_device::write)
 
 WRITE8_MEMBER(omti8621_device::write8)
 {
-	switch (offset) 
+	switch (offset)
 	{
 	case OMTI_PORT_DATA_OUT: //  0x00
 		switch (omti_state) {
@@ -1120,7 +1120,7 @@ WRITE8_MEMBER(omti8621_device::write8)
 
 READ16_MEMBER(omti8621_device::read)
 {
-	switch (mem_mask) 
+	switch (mem_mask)
 	{
 		case 0x00ff:
 			return read8(space, offset*2+1, mem_mask);
@@ -1138,10 +1138,10 @@ READ8_MEMBER(omti8621_device::read8)
 
 	switch (offset) {
 	case OMTI_PORT_DATA_IN: // 0x00
-		if (status_port & OMTI_STATUS_CD) 
+		if (status_port & OMTI_STATUS_CD)
 		{
 			data = command_status;
-			switch (omti_state) 
+			switch (omti_state)
 			{
 			case OMTI_STATE_COMMAND:
 				LOG2(("reading OMTI 8621 Data Status Register 1 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
@@ -1155,8 +1155,8 @@ READ8_MEMBER(omti8621_device::read8)
 				LOG(("UNEXPECTED reading OMTI 8621 Data Status Register 3 at offset %02x = %02x (omti state = %02x)", offset, data, omti_state));
 				break;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			LOG(("UNEXPECTED reading OMTI 8621 Data Register 4 at offset %02x = %02x (status bit C/D = 0)", offset, data));
 		}
@@ -1165,7 +1165,7 @@ READ8_MEMBER(omti8621_device::read8)
 	case OMTI_PORT_STATUS: // 0x01
 		data = status_port;
 		// omit excessive logging
-		if (data != last_data) 
+		if (data != last_data)
 		{
 			LOG2(("reading OMTI 8621 Status Register 5 at offset %02x = %02x", offset, data));
 //          last_data = data;
@@ -1342,7 +1342,7 @@ void omti_disk_image_device::device_start()
 -------------------------------------------------*/
 
 void omti_disk_image_device::device_reset()
-{	
+{
 	LOG1(("device_reset_omti_disk"));
 
 	if (exists() && fseek(0, SEEK_END) == 0)
@@ -1379,4 +1379,3 @@ bool omti_disk_image_device::call_create(int format_type, option_resolution *for
 	}
 	return IMAGE_INIT_PASS;
 }
-

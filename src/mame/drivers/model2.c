@@ -1955,7 +1955,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 	MCFG_TIMER_PTR((FPTR)3)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")

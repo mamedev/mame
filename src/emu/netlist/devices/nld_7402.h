@@ -40,17 +40,17 @@
 		NET_CONNECT(_name, B, _I2)
 
 #define TTL_7402_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7402_dip, _name)
+		NET_REGISTER_DEV(7402_dip, _name)
 
 
 NETLIB_SIGNAL(7402, 2, 1, 0);
 
 NETLIB_DEVICE(7402_dip,
 
-    NETLIB_NAME(7402) m_1;
-    NETLIB_NAME(7402) m_2;
-    NETLIB_NAME(7402) m_3;
-    NETLIB_NAME(7402) m_4;
+	NETLIB_NAME(7402) m_1;
+	NETLIB_NAME(7402) m_2;
+	NETLIB_NAME(7402) m_3;
+	NETLIB_NAME(7402) m_4;
 );
 
 #endif /* NLD_7402_H_ */

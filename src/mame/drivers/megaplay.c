@@ -70,7 +70,7 @@ public:
 	m_vdp1(*this, "vdp1"),
 	m_bioscpu(*this, "mtbios")
 	{ }
-	
+
 	DECLARE_READ16_MEMBER(extra_ram_r);
 	DECLARE_WRITE16_MEMBER(extra_ram_w);
 	DECLARE_READ8_MEMBER(bios_banksel_r);
@@ -92,30 +92,30 @@ public:
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp_count_r);
 	DECLARE_WRITE_LINE_MEMBER(bios_int_callback);
-	
+
 	DECLARE_DRIVER_INIT(megaplay);
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
 	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 private:
-	
+
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
-	
+
 	UINT32 m_bios_bank; // ROM bank selection
 	UINT16 m_game_banksel;  // Game bank selection
 	UINT32 m_readpos;  // serial bank selection position (9-bit)
 	UINT32 m_bios_bank_addr;
-	
+
 	UINT32 m_bios_width;  // determines the way the game info ROM is read
 	UINT8 m_bios_ctrl[6];
 	UINT8 m_bios_6600;
 	UINT8 m_bios_6403;
 	UINT8 m_bios_6404;
-	
+
 	UINT16 *m_ic36_ram;
 	UINT8* m_ic37_ram;
-	
+
 	required_shared_ptr<UINT8>           m_ic3_ram;
 	optional_device<sega315_5124_device> m_vdp1;
 	required_device<cpu_device>          m_bioscpu;
@@ -616,22 +616,22 @@ UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &b
 {
 	//printf("megplay vu\n");
 	screen_update_megadriv(screen, bitmap, cliprect);
-//	m_vdp->screen_update(screen, bitmap, cliprect);
+//  m_vdp->screen_update(screen, bitmap, cliprect);
 
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
 	{
 		UINT32* lineptr = &bitmap.pix32(y);
 		UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
-		
+
 		for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 		{
 			UINT32 src = srcptr[x] & 0xffffff;
-			
+
 			if (src)
 				lineptr[x] = src;
 		}
-	}	
+	}
 	return 0;
 }
 
@@ -855,15 +855,15 @@ WRITE16_MEMBER(mplay_state::extra_ram_w )
 
 DRIVER_INIT_MEMBER(mplay_state,megaplay)
 {
-	// copy game instruction rom to main map. maybe this should just be accessed 
+	// copy game instruction rom to main map. maybe this should just be accessed
 	// through a handler instead?
 	UINT8 *instruction_rom = memregion("user1")->base();
 	UINT8 *game_rom = memregion("maincpu")->base();
-	
+
 	for (int offs = 0; offs < 0x8000; offs++)
 	{
 		UINT8 dat = instruction_rom[offs];
-		
+
 		game_rom[0x300000 + offs * 2] = dat;
 		game_rom[0x300001 + offs * 2] = dat;
 	}
@@ -875,7 +875,7 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	DRIVER_INIT_CALL(megadrij);
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
-	
+
 	// for now ...
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
 

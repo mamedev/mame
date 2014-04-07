@@ -74,7 +74,7 @@ public:
 	required_device<msm5232_device> m_msm;
 	required_device<dac_device> m_dac_1;
 	required_device<dac_device> m_dac_2;
-	
+
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);

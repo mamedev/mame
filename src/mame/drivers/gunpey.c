@@ -202,7 +202,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_wram(*this, "wram"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

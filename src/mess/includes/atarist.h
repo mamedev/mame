@@ -118,7 +118,7 @@ public:
 			m_ikbd_mouse_pc(0),
 			m_ikbd_joy(1),
 			m_monochrome(1),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

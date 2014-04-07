@@ -111,7 +111,7 @@ public:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
 	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);

@@ -38,7 +38,7 @@ struct micropolis_interface
 ***************************************************************************/
 
 class micropolis_device : public device_t,
-						  public micropolis_interface
+							public micropolis_interface
 {
 public:
 	micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

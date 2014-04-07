@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(RRRGGGBB)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */

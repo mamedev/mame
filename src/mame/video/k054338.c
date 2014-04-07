@@ -309,7 +309,7 @@ int  k054338_device::register_r( int reg )
 }
 
 void k054338_device::update_all_shadows( int rushingheroes_hack, palette_device *palette )
-{	
+{
 	int i, d;
 	int noclip = m_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
 

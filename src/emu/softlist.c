@@ -40,7 +40,7 @@ private:
 		POS_PART,
 		POS_DATA
 	};
-	
+
 	// internal parsing helpers
 	const char *filename() const { return m_list.filename(); }
 	const char *infoname() const { return (m_current_info != NULL) ? m_current_info->shortname() : "???"; }
@@ -74,15 +74,15 @@ private:
 	void parse_soft_end(const char *name);
 
 	// internal parsing state
-	software_list_device &	m_list;
-	astring &				m_errors;
-	XML_Parser  			m_parser;
-	bool        			m_done;
-	bool					m_data_accum_expected;
-	astring					m_data_accum;
-	software_info *			m_current_info;
-	software_part *			m_current_part;
-	parse_position 			m_pos;
+	software_list_device &  m_list;
+	astring &               m_errors;
+	XML_Parser              m_parser;
+	bool                    m_done;
+	bool                    m_data_accum_expected;
+	astring                 m_data_accum;
+	software_info *         m_current_info;
+	software_part *         m_current_part;
+	parse_position          m_pos;
 };
 
 
@@ -106,9 +106,9 @@ const device_type SOFTWARE_LIST = &device_creator<software_list_device>;
 
 software_part::software_part(software_info &info, const char *name, const char *interface)
 	: m_next(NULL),
-	  m_info(info),
-	  m_name(name),
-	  m_interface(interface)
+		m_info(info),
+		m_name(name),
+		m_interface(interface)
 {
 	// ensure strings we are passed are in the string pool
 	assert(info.list().string_pool_contains(name));
@@ -117,8 +117,8 @@ software_part::software_part(software_info &info, const char *name, const char *
 
 
 //-------------------------------------------------
-//  feature - return the value of the given 
-//	feature, if specified
+//  feature - return the value of the given
+//  feature, if specified
 //-------------------------------------------------
 
 const char *software_part::feature(const char *feature_name) const
@@ -136,7 +136,7 @@ const char *software_part::feature(const char *feature_name) const
 
 //-------------------------------------------------
 //  is_compatible - determine if we are compatible
-//	with the given software_list_device
+//  with the given software_list_device
 //-------------------------------------------------
 
 bool software_part::is_compatible(const software_list_device &swlistdev) const
@@ -150,7 +150,7 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 	// copy the comma-delimited strings and ensure they end with a final comma
 	astring comp(compatibility, ",");
 	astring filt(filter, ",");
-	
+
 	// iterate over filter items and see if they exist in the compatibility list; if so, return true
 	for (int start = 0, end = filt.chr(start, ','); end != -1; start = end + 1, end = filt.chr(start, ','))
 	{
@@ -164,7 +164,7 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 
 //-------------------------------------------------
 //  matches_interface - determine if we match
-//	an interface in the provided list
+//  an interface in the provided list
 //-------------------------------------------------
 
 bool software_part::matches_interface(const char *interface_list) const
@@ -175,7 +175,7 @@ bool software_part::matches_interface(const char *interface_list) const
 
 	// copy the comma-delimited interface list and ensure it ends with a final comma
 	astring interfaces(interface_list, ",");
-	
+
 	// then add a comma to the end of our interface and return true if we find it in the list string
 	astring our_interface(m_interface, ",");
 	return (interfaces.find(0, our_interface) != -1);
@@ -193,10 +193,10 @@ bool software_part::matches_interface(const char *interface_list) const
 
 software_info::software_info(software_list_device &list, const char *name, const char *parent, const char *supported)
 	: m_next(NULL),
-	  m_list(list),
-	  m_supported(SOFTWARE_SUPPORTED_YES),
-	  m_shortname(name),
-	  m_parentname(parent)
+		m_list(list),
+		m_supported(SOFTWARE_SUPPORTED_YES),
+		m_shortname(name),
+		m_parentname(parent)
 {
 	// ensure strings we are passed are in the string pool
 	assert(list.string_pool_contains(name));
@@ -215,7 +215,7 @@ software_info::software_info(software_list_device &list, const char *name, const
 
 //-------------------------------------------------
 //  find_part - find a part by name with an
-//	optional interface match
+//  optional interface match
 //-------------------------------------------------
 
 software_part *software_info::find_part(const char *partname, const char *interface)
@@ -225,14 +225,14 @@ software_part *software_info::find_part(const char *partname, const char *interf
 
 	if (partname == NULL && interface == NULL)
 		return m_partdata.first();
-	
+
 	// look for the part by name and match against the interface if provided
 	for (software_part *part = m_partdata.first(); part != NULL; part = part->next())
 		if (partname != NULL && strcmp(partname, part->name()) == 0)
 		{
 			if (interface == NULL || part->matches_interface(interface))
 				return part;
-		} 
+		}
 		else if (partname == NULL && part->matches_interface(interface))
 				return part;
 	return NULL;
@@ -241,20 +241,20 @@ software_part *software_info::find_part(const char *partname, const char *interf
 
 //-------------------------------------------------
 //  has_multiple_parts - return true if we have
-//	more than one part matching the given
-//	interface
+//  more than one part matching the given
+//  interface
 //-------------------------------------------------
 
 bool software_info::has_multiple_parts(const char *interface) const
 {
 	int count = 0;
-	
+
 	// increment the count for each match and stop if we hit more than 1
 	for (software_part *part = first_part(); part != NULL; part = part->next())
 		if (part->matches_interface(interface))
 			if (++count > 1)
 				return true;
-	
+
 	return false;
 }
 
@@ -290,7 +290,7 @@ const char *const_string_pool::add(const char *string)
 		if (result != NULL)
 			return result;
 	}
-	
+
 	// no space anywhere, create a new pool and prepend it (so it gets used first)
 	const char *result = m_chunklist.prepend(*global_alloc(pool_chunk)).add(string);
 	assert(result != NULL);
@@ -299,7 +299,7 @@ const char *const_string_pool::add(const char *string)
 
 
 //-------------------------------------------------
-//  contains - determine if the given string 
+//  contains - determine if the given string
 //  pointer lives in the pool
 //-------------------------------------------------
 
@@ -313,7 +313,7 @@ bool const_string_pool::contains(const char *string)
 	for (pool_chunk *chunk = m_chunklist.first(); chunk != NULL; chunk = chunk->next())
 		if (chunk->contains(string))
 			return true;
-	
+
 	return false;
 }
 
@@ -323,8 +323,8 @@ bool const_string_pool::contains(const char *string)
 //-------------------------------------------------
 
 const_string_pool::pool_chunk::pool_chunk()
-	: m_next(NULL), 
-	  m_used(0)
+	: m_next(NULL),
+		m_used(0)
 {
 }
 
@@ -338,7 +338,7 @@ const char *const_string_pool::pool_chunk::add(const char *string)
 	// get the length of the string (no string can be longer than a full pool)
 	int bytes = strlen(string) + 1;
 	assert(bytes < POOL_SIZE);
-	
+
 	// if too big, return NULL
 	if (m_used + bytes > POOL_SIZE)
 		return NULL;
@@ -405,8 +405,8 @@ void software_list_device::device_start()
 
 //-------------------------------------------------
 //  find_approx_matches - search ourselves for
-//	a list of possible matches of the given name
-//	and optional interface
+//  a list of possible matches of the given name
+//  and optional interface
 //-------------------------------------------------
 
 void software_list_device::find_approx_matches(const char *name, int matches, software_info **list, const char *interface)
@@ -456,7 +456,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 
 
 //-------------------------------------------------
-//	release - reset to a pre-parsed state
+//  release - reset to a pre-parsed state
 //-------------------------------------------------
 
 void software_list_device::release()
@@ -471,8 +471,8 @@ void software_list_device::release()
 
 
 //-------------------------------------------------
-//	find_by_name - find a software list by name
-//	across all software list devices
+//  find_by_name - find a software list by name
+//  across all software list devices
 //-------------------------------------------------
 
 software_list_device *software_list_device::find_by_name(const machine_config &config, const char *name)
@@ -488,8 +488,8 @@ software_list_device *software_list_device::find_by_name(const machine_config &c
 
 //-------------------------------------------------
 //  software_display_matches - display a list of
-//	possible matches in the system to the given
-//	name, across all software list devices
+//  possible matches in the system to the given
+//  name, across all software list devices
 //-------------------------------------------------
 
 void software_list_device::display_matches(const machine_config &config, const char *interface, const char *name)
@@ -528,9 +528,9 @@ void software_list_device::display_matches(const machine_config &config, const c
 
 
 //-------------------------------------------------
-//	find - find an item by name in the software
+//  find - find an item by name in the software
 //  list, using wildcards and optionally starting
-//	from an intermediate point
+//  from an intermediate point
 //-------------------------------------------------
 
 software_info *software_list_device::find(const char *look_for, software_info *prev)
@@ -566,12 +566,12 @@ void software_list_device::parse()
 	if (filerr == FILERR_NONE)
 	{
 		// parse if no error
-		softlist_parser	parser(*this, m_errors);
+		softlist_parser parser(*this, m_errors);
 		m_file.close();
 	}
 	else
 		m_errors.printf("Error opening file: %s\n", filename());
-	
+
 	// indicate that we've been parsed
 	m_parsed = true;
 }
@@ -579,7 +579,7 @@ void software_list_device::parse()
 
 //-------------------------------------------------
 //  device_validity_check - validate the device
-//	configuration
+//  configuration
 //-------------------------------------------------
 
 void software_list_device::device_validity_check(validity_checker &valid) const
@@ -592,7 +592,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 	// do device validation only in case of validate command
 	if (strcmp(mconfig().options().command(), CLICOMMAND_VALIDATE) != 0)
 		return;
-	
+
 	// actually do the validate
 	const_cast<software_list_device *>(this)->internal_validity_check(valid);
 }
@@ -600,7 +600,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 
 //-------------------------------------------------
 //  internal_validity_check - internal helper to
-//	check the list
+//  check the list
 //-------------------------------------------------
 
 void software_list_device::internal_validity_check(validity_checker &valid)
@@ -734,12 +734,12 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 softlist_parser::softlist_parser(software_list_device &list, astring &errors)
 	: m_list(list),
-	  m_errors(errors),
-	  m_done(false),
-	  m_data_accum_expected(false),
-	  m_current_info(NULL),
-	  m_current_part(NULL),
-	  m_pos(POS_ROOT)
+		m_errors(errors),
+		m_done(false),
+		m_data_accum_expected(false),
+		m_current_info(NULL),
+		m_current_part(NULL),
+		m_pos(POS_ROOT)
 {
 	mame_printf_verbose("Parsing %s\n", m_list.m_file.filename());
 
@@ -805,20 +805,20 @@ void softlist_parser::expat_free(void *ptr)
 
 //-------------------------------------------------
 //  parse_error - append a parsing error with
-//	filename, line and column information
+//  filename, line and column information
 //-------------------------------------------------
 
 void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
 {
-	// always start with filename(line.column): 
+	// always start with filename(line.column):
 	m_errors.catprintf("%s(%d.%d): ", filename(), line(), column());
-	
+
 	// append the remainder of the string
 	va_list va;
 	va_start(va, fmt);
 	m_errors.catvprintf(fmt, va);
 	va_end(va);
-	
+
 	// append a newline at the end
 	m_errors.cat("\n");
 }
@@ -826,7 +826,7 @@ void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
 
 //-------------------------------------------------
 //  parse_attributes - helper to parse a set of
-//	attributes into a list of strings
+//  attributes into a list of strings
 //-------------------------------------------------
 
 void softlist_parser::parse_attributes(const char **attributes, int numattrs, const char *attrlist[], const char *outlist[])
@@ -835,7 +835,7 @@ void softlist_parser::parse_attributes(const char **attributes, int numattrs, co
 	for( ; attributes[0]; attributes += 2)
 	{
 		int index;
-		
+
 		// look for a match among the attributes provided
 		for (index = 0; index < numattrs; index++)
 			if (strcmp(attributes[0], attrlist[index]) == 0)
@@ -844,7 +844,7 @@ void softlist_parser::parse_attributes(const char **attributes, int numattrs, co
 				outlist[index] = attributes[1];
 				break;
 			}
-		
+
 		// if not found, report an unknown attribute
 		if (index == numattrs)
 			unknown_attribute(attributes[0]);
@@ -854,7 +854,7 @@ void softlist_parser::parse_attributes(const char **attributes, int numattrs, co
 
 //-------------------------------------------------
 //  add_rom_entry - append a new ROM entry to the
-//	current part's list
+//  current part's list
 //-------------------------------------------------
 
 void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
@@ -903,16 +903,16 @@ void softlist_parser::start_handler(void *data, const char *tagname, const char 
 		case POS_SOFT:
 			state->parse_soft_start(tagname, attributes);
 			break;
-		
+
 		case POS_PART:
 			state->parse_part_start(tagname, attributes);
 			break;
-		
+
 		case POS_DATA:
 			state->parse_data_start(tagname, attributes);
 			break;
 	}
-	
+
 	// increment the state since this is a tag start
 	state->m_pos = parse_position(state->m_pos + 1);
 }
@@ -949,7 +949,7 @@ void softlist_parser::end_handler(void *data, const char *name)
 		case POS_DATA:
 			break;
 	}
-	
+
 	// stop accumulating
 	state->m_data_accum_expected = false;
 	state->m_data_accum.reset();
@@ -991,7 +991,7 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 		static const char *attrnames[] = { "name", "description" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
-		
+
 		if (attrvalues[1] != NULL)
 			m_list.m_description = m_list.add_string(attrvalues[1]);
 	}
@@ -1002,7 +1002,7 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 
 //-------------------------------------------------
 //  parse_main_start - handle tag start within
-//	a softwarelist tag
+//  a softwarelist tag
 //-------------------------------------------------
 
 void softlist_parser::parse_main_start(const char *tagname, const char **attributes)
@@ -1026,7 +1026,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 
 //-------------------------------------------------
 //  parse_main_start - handle tag start within
-//	a software tag
+//  a software tag
 //-------------------------------------------------
 
 void softlist_parser::parse_soft_start(const char *tagname, const char **attributes)
@@ -1062,20 +1062,20 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 		else
 			parse_error("Incomplete other_info definition");
 	}
-	
+
 	// <sharedfeat name='' value=''>
 	else if (strcmp(tagname, "sharedfeat") == 0)
 	{
 		static const char *attrnames[] = { "name", "value" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
-	
+
 		if (attrvalues[0] != NULL && attrvalues[1] != NULL)
 			m_current_info->m_shared_info.append(*global_alloc(feature_list_item(m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
 		else
 			parse_error("Incomplete sharedfeat definition");
 	}
-	
+
 	// <part name='' interface=''>
 	else if (strcmp(tagname, "part" ) == 0)
 	{
@@ -1095,7 +1095,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 
 //-------------------------------------------------
 //  parse_part_start - handle tag start within
-//	a part tag
+//  a part tag
 //-------------------------------------------------
 
 void softlist_parser::parse_part_start(const char *tagname, const char **attributes)
@@ -1113,13 +1113,13 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		static const char *attrnames[] = { "name", "size" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
-		
+
 		if (attrvalues[0] != NULL && attrvalues[1] != NULL && strcmp(attrvalues[0], "") != 0 && strcmp(attrvalues[1], "") != 0)
 			add_rom_entry(attrvalues[0], NULL, 0, strtol(attrvalues[1], NULL, 0), ROMENTRYTYPE_REGION);
 		else
 			parse_error("Incomplete dataarea definition");
 	}
-	
+
 	// <diskarea name=''>
 	else if (strcmp(tagname, "diskarea") == 0)
 	{
@@ -1132,20 +1132,20 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		else
 			parse_error("Incomplete diskarea definition");
 	}
-	
+
 	// <feature name='' value=''>
 	else if (strcmp(tagname, "feature") == 0)
 	{
 		static const char *attrnames[] = { "name", "value" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
-	
+
 		if (attrvalues[0] != NULL)
 			m_current_part->m_featurelist.append(*global_alloc(feature_list_item(m_list.add_string(attrvalues[0]), m_list.add_string(attrvalues[1]))));
 		else
 			parse_error("Incomplete feature definition");
 	}
-	
+
 	// <dipswitch>
 	else if (strcmp(tagname, "dipswitch") == 0)
 		;
@@ -1156,7 +1156,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 
 //-------------------------------------------------
 //  parse_data_start - handle tag start within a
-//	dataarea or diskarea tag
+//  dataarea or diskarea tag
 //-------------------------------------------------
 
 void softlist_parser::parse_data_start(const char *tagname, const char **attributes)
@@ -1174,7 +1174,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		static const char *attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
 		const char *attrvalues[ARRAY_LENGTH(attrnames)] = { 0 };
 		parse_attributes(attributes, ARRAY_LENGTH(attrnames), attrnames, attrvalues);
-		
+
 		const char *name = attrvalues[0];
 		const char *sizestr = attrvalues[1];
 		const char *crc = attrvalues[2];
@@ -1237,7 +1237,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		else
 			parse_error("Incomplete rom definition");
 	}
-	
+
 	// <rom name='' sha1='' status='' writeable=''>
 	else if (strcmp(tagname, "disk") == 0)
 	{
@@ -1262,7 +1262,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		else if (status == NULL || !strcmp(status, "nodump")) // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
 	}
-	
+
 	// <dipvalue>
 	else if (strcmp(tagname, "dipvalue") == 0)
 		;
@@ -1273,7 +1273,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 
 //-------------------------------------------------
 //  parse_soft_end - handle end-of-tag post-
-//	processing within the <software> tag
+//  processing within the <software> tag
 //-------------------------------------------------
 
 void softlist_parser::parse_soft_end(const char *tagname)
@@ -1299,11 +1299,11 @@ void softlist_parser::parse_soft_end(const char *tagname)
 		assert(m_current_part != NULL);
 		if (m_current_part == NULL)
 			return;
-	
+
 		// was any dataarea/rom information encountered? if so, add a terminator
 		if (m_current_part->romdata() != NULL)
 			add_rom_entry(NULL, NULL, 0, 0, ROMENTRYTYPE_END);
-		
+
 		// get the info; if present, copy shared data (we assume name/value strings live
 		// in the string pool and don't need to be reallocated)
 		if (m_current_info != NULL)

@@ -32,40 +32,40 @@
 #define X3 XTAL_4_436MHz
 #define X4 XTAL_11MHz
 
-#define QL_CONFIG_PORT  		"config"
-#define QIMI_PORT_MASK			0x01
-#define QIMI_NONE				0x00
-#define QIMI_MOUSE				0x01
-#define DISK_TYPE_MASK  		0x06
-#define DISK_TYPE_NONE  		0x00
-#define DISK_TYPE_TRUMP 		0x02
-#define DISK_TYPE_SANDY_SD 		0x04
-#define DISK_TYPE_SANDY_SQB 	0x06
-#define IS_SANDY_DISK(__dtype__)	((__dtype__ == DISK_TYPE_SANDY_SD) || (__dtype__ == DISK_TYPE_SANDY_SQB)) 
+#define QL_CONFIG_PORT          "config"
+#define QIMI_PORT_MASK          0x01
+#define QIMI_NONE               0x00
+#define QIMI_MOUSE              0x01
+#define DISK_TYPE_MASK          0x06
+#define DISK_TYPE_NONE          0x00
+#define DISK_TYPE_TRUMP         0x02
+#define DISK_TYPE_SANDY_SD      0x04
+#define DISK_TYPE_SANDY_SQB     0x06
+#define IS_SANDY_DISK(__dtype__)    ((__dtype__ == DISK_TYPE_SANDY_SD) || (__dtype__ == DISK_TYPE_SANDY_SQB))
 
-#define TRUMP_DRIVE1_MASK   	0x01
-#define TRUMP_DRIVE0_MASK   	0x02
-#define TRUMP_MOTOR_MASK    	0x04
-#define TRUMP_SIDE_SHIFT    	3
-#define TRUMP_SIDE_MASK     	(1 << TRUMP_SIDE_SHIFT)
+#define TRUMP_DRIVE1_MASK       0x01
+#define TRUMP_DRIVE0_MASK       0x02
+#define TRUMP_MOTOR_MASK        0x04
+#define TRUMP_SIDE_SHIFT        3
+#define TRUMP_SIDE_MASK         (1 << TRUMP_SIDE_SHIFT)
 
-#define CART_ROM_BASE   		0x0c000
-#define CART_ROM_END    		0x0ffff
+#define CART_ROM_BASE           0x0c000
+#define CART_ROM_END            0x0ffff
 
-#define TRUMP_ROM_MBASE			0x10000
-#define TRUMP_ROM_BASE  		0x14000
-#define TRUMP_ROM_LEN   		0x08000
-#define TRUMP_ROM_END   		(TRUMP_ROM_MBASE+(TRUMP_ROM_LEN-1))
+#define TRUMP_ROM_MBASE         0x10000
+#define TRUMP_ROM_BASE          0x14000
+#define TRUMP_ROM_LEN           0x08000
+#define TRUMP_ROM_END           (TRUMP_ROM_MBASE+(TRUMP_ROM_LEN-1))
 
-#define TRUMP_IO_BASE   		0x1c000
-#define TRUMP_IO_LEN    		0x04000
-#define TRUMP_IO_END    		(TRUMP_IO_BASE+(TRUMP_IO_LEN-1))
+#define TRUMP_IO_BASE           0x1c000
+#define TRUMP_IO_LEN            0x04000
+#define TRUMP_IO_END            (TRUMP_IO_BASE+(TRUMP_IO_LEN-1))
 
-#define SANDY_ROM_BASE_SD  		0x1c000
-#define SANDY_ROM_BASE_SQB 		0x20000
-#define SANDY_IO_BASE   		0xc3fc0
-#define SANDY_IO_LEN    		0x00040
-#define SANDY_IO_END    		(SANDY_IO_BASE+(SANDY_IO_LEN-1))
+#define SANDY_ROM_BASE_SD       0x1c000
+#define SANDY_ROM_BASE_SQB      0x20000
+#define SANDY_IO_BASE           0xc3fc0
+#define SANDY_IO_LEN            0x00040
+#define SANDY_IO_END            (SANDY_IO_BASE+(SANDY_IO_LEN-1))
 
 #define SANDY_DRIVE0_MASK       0x02
 #define SANDY_DRIVE1_MASK       0x04
@@ -76,33 +76,33 @@
 #define SANDY_DDEN_MASK         (1 << SANDY_DDEN_SHIFT)
 #define SANDY_PRINTER_STROBE    0x20
 #define SANDY_PRINTER_INTMASK   0x40
-#define SANDY_MOUSE_INTMASK		0x80
+#define SANDY_MOUSE_INTMASK     0x80
 
-#define	MOUSEX_TAG				"MOUSEX"
-#define	MOUSEY_TAG				"MOUSEY"
-#define	MOUSEB_TAG				"MOUSEB"
+#define MOUSEX_TAG              "MOUSEX"
+#define MOUSEY_TAG              "MOUSEY"
+#define MOUSEB_TAG              "MOUSEB"
 
 // Mouse bits in Sandy port order
-#define MOUSE_MIDDLE			0x02
-#define MOUSE_RIGHT				0x04
-#define MOUSE_LEFT				0x08
-#define MOUSE_DIRY				0x10
-#define MOUSE_DIRX				0x20
-#define MOUSE_INTY				0x40
-#define MOUSE_INTX				0x80
-#define MOUSE_INT_MASK			(MOUSE_INTX | MOUSE_INTY)
+#define MOUSE_MIDDLE            0x02
+#define MOUSE_RIGHT             0x04
+#define MOUSE_LEFT              0x08
+#define MOUSE_DIRY              0x10
+#define MOUSE_DIRX              0x20
+#define MOUSE_INTY              0x40
+#define MOUSE_INTX              0x80
+#define MOUSE_INT_MASK          (MOUSE_INTX | MOUSE_INTY)
 
-#define QIMI_IO_BASE			0x1bf9c
-#define QIMI_IO_LEN				0x22
-#define QIMI_IO_END				(QIMI_IO_BASE + QIMI_IO_LEN )
+#define QIMI_IO_BASE            0x1bf9c
+#define QIMI_IO_LEN             0x22
+#define QIMI_IO_END             (QIMI_IO_BASE + QIMI_IO_LEN )
 
-#define	QIMI_INTX				0x04
-#define	QIMI_INTY				0x20
-#define QIMI_DIRX				0x10
-#define QIMI_DIRY				0x01
-#define QIMI_LEFT				0x20
-#define QIMI_RIGHT				0x10
-#define QIMI_INT_MASK			(QIMI_INTX | QIMI_INTY)
+#define QIMI_INTX               0x04
+#define QIMI_INTY               0x20
+#define QIMI_DIRX               0x10
+#define QIMI_DIRY               0x01
+#define QIMI_LEFT               0x20
+#define QIMI_RIGHT              0x10
+#define QIMI_INT_MASK           (QIMI_INTX | QIMI_INTY)
 
 
 class ql_state : public driver_device
@@ -206,7 +206,7 @@ public:
 	void trump_card_set_control(UINT8 data);
 	void sandy_set_control(UINT8 data);
 	void sandy_print_char(UINT8 data);
-	
+
 	UINT8   m_disk_type;
 	int     m_disk_io_base;
 	UINT8   m_disk_io_byte;
@@ -214,24 +214,24 @@ public:
 	DECLARE_READ_LINE_MEMBER(disk_io_dden_r);
 	DECLARE_WRITE_LINE_MEMBER(disk_io_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(disk_io_drq_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER( sandy_printer_busy );
 
 	// QIMI or Sandy mouse
 	void mouse_tick();
-	
+
 	DECLARE_READ8_MEMBER( qimi_io_r );
 	DECLARE_WRITE8_MEMBER( qimi_io_w );
-	
-	UINT8	m_mouse_int;
-	
+
+	UINT8   m_mouse_int;
+
 	emu_timer *m_mouse_timer;
-	
+
 	UINT8 m_ql_mouse_x;
 	UINT8 m_ql_mouse_y;
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 };
 

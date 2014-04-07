@@ -741,7 +741,7 @@ READ8_MEMBER(svi318_state::svi318_io_ext_r)
 	{
 		return 0xff;
 	}
-	
+
 	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
 	switch( offset )
@@ -804,7 +804,7 @@ WRITE8_MEMBER(svi318_state::svi318_io_ext_w)
 	{
 		return;
 	}
-	
+
 	fd1793_device *fdc = machine().device<fd1793_device>("wd179x");
 
 	switch( offset )

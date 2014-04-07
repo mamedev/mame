@@ -57,7 +57,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	DECLARE_READ8_MEMBER( key_r );
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_SCREEN_SIZE(192, 184)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rx78)
 

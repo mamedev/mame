@@ -642,7 +642,7 @@ void i80186_cpu_device::device_reset()
 	m_timer[0].control = 0;
 	m_timer[1].control = 0;
 	m_timer[2].control = 0;
-	
+
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback),this));
 }
 

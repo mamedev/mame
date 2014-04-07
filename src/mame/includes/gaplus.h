@@ -49,7 +49,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 	namco58xx_device *m_namco58xx;
 	namco56xx_device *m_namco56xx;
 

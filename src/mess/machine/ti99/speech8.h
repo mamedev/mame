@@ -27,7 +27,7 @@ class ti998_spsyn_device : public bus8z_device
 {
 public:
 	ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb2_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<ti998_spsyn_device &>(device).m_ready.set_callback(object); }
 
 	DECLARE_READ8Z_MEMBER(readz);

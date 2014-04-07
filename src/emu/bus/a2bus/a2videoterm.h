@@ -50,7 +50,7 @@ protected:
 
 private:
 	int m_rambank;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

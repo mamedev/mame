@@ -278,4 +278,3 @@ void atari_common_state::atari_machine_start()
 	machine().save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
 	machine().save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
 }
-

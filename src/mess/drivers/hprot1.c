@@ -158,55 +158,55 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 /*
 WRITE8_MEMBER(hprot1_state::henry_io_w)
 {
-	static UINT8 p0=0, p1=0, p2=0, p3=0;  
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (data != p0)
-			{
-				p0=data;
+    static UINT8 p0=0, p1=0, p2=0, p3=0;
+    switch (offset)
+    {
+        case 0x00:
+        {
+            if (data != p0)
+            {
+                p0=data;
 #if LOG_IO_PORTS
-				printf("Write to P0: %02X\n", data);
+                printf("Write to P0: %02X\n", data);
 #endif
-			}
-			break;
-		}
-		case 0x01:
-		{
-			if (data != p1)
-			{
-				p1=data;
-				if (data != 0xFF && data != 0xEF)
+            }
+            break;
+        }
+        case 0x01:
+        {
+            if (data != p1)
+            {
+                p1=data;
+                if (data != 0xFF && data != 0xEF)
 #if LOG_IO_PORTS
-				printf("Write to P1: %02X\n", data);
+                printf("Write to P1: %02X\n", data);
 #endif
-			}
-			break;
-		}
-		case 0x02:
-		{
-			if (data != p2)
-			{
-				p2=data;
+            }
+            break;
+        }
+        case 0x02:
+        {
+            if (data != p2)
+            {
+                p2=data;
 #if LOG_IO_PORTS
-				printf("Write to P2: %02X\n", data);
+                printf("Write to P2: %02X\n", data);
 #endif
-			}
-			break;
-		}
-		case 0x03:
-		{
-			if (data != p3)
-			{
-				p3=data;
+            }
+            break;
+        }
+        case 0x03:
+        {
+            if (data != p3)
+            {
+                p3=data;
 #if LOG_IO_PORTS
-				printf("Write to P3: %02X\n", data);
+                printf("Write to P3: %02X\n", data);
 #endif
-			}
-			break;
-		}
-	}
+            }
+            break;
+        }
+    }
 }
 */
 
@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)

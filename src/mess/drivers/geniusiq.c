@@ -811,7 +811,7 @@ static MACHINE_CONFIG_START( iq128, geniusiq_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER( geniusiq_state, screen_update )
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(geniusiq_state, geniusiq)
 
@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( gl8008cx, gl8008cx_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( gl8008cx_state, screen_update )	
+	MCFG_SCREEN_UPDATE_DRIVER( gl8008cx_state, screen_update )
 MACHINE_CONFIG_END
 
 /* ROM definition */

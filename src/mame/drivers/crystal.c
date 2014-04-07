@@ -1076,26 +1076,26 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
 	// patches based on analysis of PIC dump
 	UINT16 *Rom = (UINT16*) memregion("user1")->base();
-	/* 
-		PIC Protection data:
-		- RAM ADDR - --PATCH--
-		62 0f 02 02 fc 90 01 90 
-		68 6a 02 02 04 90 01 90
-		2c cf 03 02 e9 df c2 c3 
-		00 e0 03 02 01 90 00 92
+	/*
+	    PIC Protection data:
+	    - RAM ADDR - --PATCH--
+	    62 0f 02 02 fc 90 01 90
+	    68 6a 02 02 04 90 01 90
+	    2c cf 03 02 e9 df c2 c3
+	    00 e0 03 02 01 90 00 92
 	*/
 
-	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC; //PUSH R7-R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001; //PUSH R0
 
-	Rom[WORD_XOR_LE(0x18880/2)]=0x9004;	//PUSH R2
-	Rom[WORD_XOR_LE(0x18882/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x18880/2)]=0x9004; //PUSH R2
+	Rom[WORD_XOR_LE(0x18882/2)]=0x9001; //PUSH R0
 
-	Rom[WORD_XOR_LE(0x2fe18/2)]=0x9001;	//PUSH R0
-	Rom[WORD_XOR_LE(0x2fe1a/2)]=0x9200;	//PUSH SR
+	Rom[WORD_XOR_LE(0x2fe18/2)]=0x9001; //PUSH R0
+	Rom[WORD_XOR_LE(0x2fe1a/2)]=0x9200; //PUSH SR
 
-	Rom[WORD_XOR_LE(0x2ED44/2)]=0xDFE9;	//CALL 0x3cf00
-	Rom[WORD_XOR_LE(0x2ED46/2)]=0xC3C2;	//MOV %SR0,%DR1
+	Rom[WORD_XOR_LE(0x2ED44/2)]=0xDFE9; //CALL 0x3cf00
+	Rom[WORD_XOR_LE(0x2ED46/2)]=0xC3C2; //MOV %SR0,%DR1
 
 }
 
@@ -1105,42 +1105,42 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 
 	/*
-		PIC Protection data:
-		- RAM ADDR - --PATCH--
-		0a 83 01 02 1c 90 01 90 
-		50 85 01 02 7c 90 01 90
-		4c 99 05 02 04 90 01 90 
-		3a c1 01 02 1c 90 01 90
+	    PIC Protection data:
+	    - RAM ADDR - --PATCH--
+	    0a 83 01 02 1c 90 01 90
+	    50 85 01 02 7c 90 01 90
+	    4c 99 05 02 04 90 01 90
+	    3a c1 01 02 1c 90 01 90
 	*/
 
-	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;	//PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;  //PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;  //PUSH R0
 
-	Rom[WORD_XOR_LE(0x9EE4/2)]=0x907C;	//PUSH R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x9EE6/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x9EE4/2)]=0x907C;  //PUSH R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x9EE6/2)]=0x9001;  //PUSH R0
 
-	Rom[WORD_XOR_LE(0x4B2E0/2)]=0x9004;	//PUSH R2
-	Rom[WORD_XOR_LE(0x4B2E2/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x4B2E0/2)]=0x9004; //PUSH R2
+	Rom[WORD_XOR_LE(0x4B2E2/2)]=0x9001; //PUSH R0
 
-	Rom[WORD_XOR_LE(0xDACE/2)]=0x901c;	//PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0xDACE/2)]=0x901c;  //PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;  //PUSH R0
 }
 
 DRIVER_INIT_MEMBER(crystal_state, donghaer)
 {
 	UINT16 *Rom = (UINT16*)memregion("user1")->base();
 
-	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004;	// PUSH	%R2
-	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202;	// LD	(%SP,0x8),%R2
+	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004; // PUSH %R2
+	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
 
-	Rom[WORD_XOR_LE(0x03834 / 2)] = 0x9001;	// PUSH	%R0
-	Rom[WORD_XOR_LE(0x03836 / 2)] = 0x9200;	// PUSH %SR
+	Rom[WORD_XOR_LE(0x03834 / 2)] = 0x9001; // PUSH %R0
+	Rom[WORD_XOR_LE(0x03836 / 2)] = 0x9200; // PUSH %SR
 
-	Rom[WORD_XOR_LE(0x0AC9E / 2)] = 0x9004;	// PUSH	%R2
-	Rom[WORD_XOR_LE(0x0ACA0 / 2)] = 0x4081;	// LERI	0x81
+	Rom[WORD_XOR_LE(0x0AC9E / 2)] = 0x9004; // PUSH %R2
+	Rom[WORD_XOR_LE(0x0ACA0 / 2)] = 0x4081; // LERI 0x81
 
-	Rom[WORD_XOR_LE(0x19C70 / 2)] = 0x900C;	// PUSH	%R2-%R3 
-	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001;	// PUSH %R0
+	Rom[WORD_XOR_LE(0x19C70 / 2)] = 0x900C; // PUSH %R2-%R3
+	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
 
 

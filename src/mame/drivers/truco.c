@@ -83,7 +83,7 @@
   - U15: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
   - U16: 20-pin IC  YES   PLD         PALCE16V8H-25                  EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic.
   - U17: 14-pin IC  YES   TTL         HD74LS00P                      Quadruple 2-Input NAND Gates.
-  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   Quad 2−Input Exclusive OR Gate.
+  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   Quad 2???Input Exclusive OR Gate.
   - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691                   Microprocessor Supervisory Circuits.
   - U20: 16-pin IC  YES   DARLINGTON  ULN2003                        7 NPN Darlington transistor pairs with high voltage and current capability.
 

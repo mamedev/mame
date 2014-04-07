@@ -159,8 +159,7 @@
 
 #define MCFG_PALETTE_ADD(_tag, _entries) \
 	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
-	MCFG_PALETTE_ENTRIES(_entries) \
-
+	MCFG_PALETTE_ENTRIES(_entries)
 #define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
 	MCFG_PALETTE_ADD(_tag, _entries) \
 	palette_device::static_set_init(*device, palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
@@ -262,11 +261,11 @@ public:
 	// constructor
 	raw_to_rgb_converter(int bytes_per_entry = 0, raw_to_rgb_func func = NULL)
 		: m_bytes_per_entry(bytes_per_entry),
-		  m_func(func) { }
-	
+			m_func(func) { }
+
 	// getters
 	int bytes_per_entry() const { return m_bytes_per_entry; }
-	
+
 	// helpers
 	rgb_t operator()(UINT32 raw) const { return (*m_func)(raw); }
 
@@ -297,15 +296,15 @@ public:
 		UINT8 b = pal4bit(((raw >> 4) & 0x0c) | i);
 		return rgb_t(r, g, b);
 	}
-	
+
 	// other standard decoders
-	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);	// bits 3/2/1 are LSb
-	static rgb_t xRGBRRRRGGGGBBBB_decoder(UINT32 raw);	// bits 14/13/12 are LSb
+	static rgb_t RRRRGGGGBBBBRGBx_decoder(UINT32 raw);  // bits 3/2/1 are LSb
+	static rgb_t xRGBRRRRGGGGBBBB_decoder(UINT32 raw);  // bits 14/13/12 are LSb
 
 private:
 	// internal data
-	int					m_bytes_per_entry;
-	raw_to_rgb_func		m_func;
+	int                 m_bytes_per_entry;
+	raw_to_rgb_func     m_func;
 };
 
 
@@ -314,7 +313,7 @@ private:
 // device type definition
 extern const device_type PALETTE;
 
-class palette_device : 	public device_t
+class palette_device :  public device_t
 {
 	static const int MAX_SHADOW_PRESETS = 4;
 
@@ -330,7 +329,7 @@ public:
 	static void static_set_indirect_entries(device_t &device, int entries);
 	static void static_enable_shadows(device_t &device);
 	static void static_enable_hilights(device_t &device);
-	
+
 	// getters
 	int entries() const { return m_entries; }
 	int indirect_entries() const { return m_indirect_entries; }
@@ -339,7 +338,7 @@ public:
 	const pen_t *pens() const { return m_pens; }
 	pen_t *shadow_table() const { return m_shadow_table; }
 	rgb_t pen_color(pen_t pen) { return m_palette->entry_color(pen); }
-	double pen_contrast(pen_t pen) { return m_palette->entry_contrast(pen); } 
+	double pen_contrast(pen_t pen) { return m_palette->entry_contrast(pen); }
 	pen_t black_pen() const { return m_black_pen; }
 	pen_t white_pen() const { return m_white_pen; }
 	memory_array &basemem() { return m_paletteram; }
@@ -365,7 +364,7 @@ public:
 	void set_shadow_factor(double factor) { assert(m_shadow_group != 0); m_palette->group_set_contrast(m_shadow_group, factor); }
 	void set_highlight_factor(double factor) { assert(m_hilight_group != 0); m_palette->group_set_contrast(m_hilight_group, factor); }
 	void set_shadow_mode(int mode) { assert(mode >= 0 && mode < MAX_SHADOW_PRESETS); m_shadow_table = m_shadow_tables[mode].base; }
-	
+
 	// generic read/write handlers
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -388,7 +387,7 @@ public:
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
 	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
-	
+
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }
 protected:
@@ -402,40 +401,40 @@ protected:
 	void allocate_palette();
 	void allocate_color_tables();
 	void allocate_shadow_tables();
-	
+
 	void update_for_write(offs_t byte_offset, int bytes_modified);
-public:	// needed by konamigx
+public: // needed by konamigx
 	void set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip);
 protected:
 	void configure_rgb_shadows(int mode, float factor);
-	
+
 private:
 	// configuration state
-	int					m_entries;				// number of entries in the palette
-	int					m_indirect_entries;		// number of indirect colors in the palette
-	bool				m_enable_shadows;		// are shadows enabled?
-	bool				m_enable_hilights;		// are hilights enabled?
-	endianness_t		m_endianness;			// endianness of palette RAM
-	bool				m_endianness_supplied;	// endianness supplied in static config
+	int                 m_entries;              // number of entries in the palette
+	int                 m_indirect_entries;     // number of indirect colors in the palette
+	bool                m_enable_shadows;       // are shadows enabled?
+	bool                m_enable_hilights;      // are hilights enabled?
+	endianness_t        m_endianness;           // endianness of palette RAM
+	bool                m_endianness_supplied;  // endianness supplied in static config
 
 	// palette RAM
-	raw_to_rgb_converter m_raw_to_rgb;			// format of palette RAM
-	memory_array		m_paletteram;			// base memory
-	memory_array		m_paletteram_ext;		// extended memory
+	raw_to_rgb_converter m_raw_to_rgb;          // format of palette RAM
+	memory_array        m_paletteram;           // base memory
+	memory_array        m_paletteram_ext;       // extended memory
 
 	// internal state
-	palette_t *			m_palette;				// the palette itself
-	const pen_t *       m_pens; 				// remapped palette pen numbers
-	bitmap_format       m_format;				// format assumed for palette data
-	pen_t *             m_shadow_table;			// table for looking up a shadowed pen
-	UINT32              m_shadow_group;			// index of the shadow group, or 0 if none
-	UINT32              m_hilight_group;		// index of the hilight group, or 0 if none
-	pen_t               m_white_pen;			// precomputed white pen value
-	pen_t               m_black_pen;			// precomputed black pen value
-	
+	palette_t *         m_palette;              // the palette itself
+	const pen_t *       m_pens;                 // remapped palette pen numbers
+	bitmap_format       m_format;               // format assumed for palette data
+	pen_t *             m_shadow_table;         // table for looking up a shadowed pen
+	UINT32              m_shadow_group;         // index of the shadow group, or 0 if none
+	UINT32              m_hilight_group;        // index of the hilight group, or 0 if none
+	pen_t               m_white_pen;            // precomputed white pen value
+	pen_t               m_black_pen;            // precomputed black pen value
+
 	// indirection state
-	dynamic_array<rgb_t> m_indirect_colors;		// actual colors set for indirection
-	dynamic_array<UINT16> m_indirect_pens;		// indirection values
+	dynamic_array<rgb_t> m_indirect_colors;     // actual colors set for indirection
+	dynamic_array<UINT16> m_indirect_pens;      // indirection values
 
 	struct shadow_table_data
 	{
@@ -449,7 +448,7 @@ private:
 
 	dynamic_array<pen_t> m_save_pen;           // pens for save/restore
 	dynamic_array<float> m_save_contrast;      // brightness for save/restore
-	
+
 	dynamic_array<pen_t> m_pen_array;
 	dynamic_array<pen_t> m_shadow_array;
 	dynamic_array<pen_t> m_hilight_array;

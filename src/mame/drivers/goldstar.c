@@ -155,7 +155,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
 	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 2 / Big / Bonus */
 	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All / Card 4 */
 
-//	popmessage("lamps: %02X", data);
+//  popmessage("lamps: %02X", data);
 }
 
 WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
@@ -176,7 +176,7 @@ WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
 	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 3 / Small / Info */
 	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All */
 
-//	popmessage("lamps: %02X", data);
+//  popmessage("lamps: %02X", data);
 }
 
 
@@ -244,8 +244,8 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf850, 0xf850) AM_WRITE(cb3_lamps_w)		/* Control Set 1 lamps */
-	AM_RANGE(0xf860, 0xf860) AM_WRITE(cb3_lamps_w)		/* Control Set 2 lamps */
+	AM_RANGE(0xf850, 0xf850) AM_WRITE(cb3_lamps_w)      /* Control Set 1 lamps */
+	AM_RANGE(0xf860, 0xf860) AM_WRITE(cb3_lamps_w)      /* Control Set 2 lamps */
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	
+
 	/* Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w ) AM_SHARE("fg_vidram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w ) AM_SHARE("fg_atrram")
@@ -307,15 +307,15 @@ static ADDRESS_MAP_START( wcherry_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xf0c0, 0xf0ff) AM_RAM AM_SHARE("reel3_scroll")
 
-    /* Not really PPI's... They are emulated/simulated inside the CPLDs */
+	/* Not really PPI's... They are emulated/simulated inside the CPLDs */
 	AM_RANGE(0xf600, 0xf603) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xf610, 0xf613) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xf620, 0xf623) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
 
 	AM_RANGE(0xf630, 0xf630) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf640, 0xf640) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf650, 0xf650) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
-	AM_RANGE(0xf660, 0xf660) AM_WRITENOP	// AM_WRITE(output_w)  // unknown register: 0x3e
+	AM_RANGE(0xf650, 0xf650) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
+	AM_RANGE(0xf660, 0xf660) AM_WRITENOP    // AM_WRITE(output_w)  // unknown register: 0x3e
 	AM_RANGE(0xf670, 0xf670) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -1714,8 +1714,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldstar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	// appear in the input test but seems that lack of functions.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // appear in the input test but seems that lack of functions.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    // appear in the input test but seems that lack of functions.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Bet Red / 2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 3 / Small / 1 / Info")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet Blue / D-UP / 3")
@@ -6507,9 +6507,9 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
-//	MCFG_CPU_PROGRAM_MAP(nfm_map)
+//  MCFG_CPU_PROGRAM_MAP(nfm_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-//	MCFG_CPU_IO_MAP(unkch_portmap)
+//  MCFG_CPU_IO_MAP(unkch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
@@ -7703,27 +7703,27 @@ ROM_START( goldfrui )
 	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 2nd quarter 0xff filled*/
 	ROM_CONTINUE( 0x0000, 0x08000) /* Discarding 3nd quarter 0xff filled*/
 
-	ROM_REGION( 0x40000, "oki", 0 ) // Audio ADPCM 
+	ROM_REGION( 0x40000, "oki", 0 ) // Audio ADPCM
 	ROM_LOAD( "27c1000.u57",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
 
 /*
-	Super Nove by Playmark
-	
-	bp 2db
-	the next call ($0C33) hangs the game
-	since there are ascii strings there
-	instead of code.
-	
+    Super Nove by Playmark
+
+    bp 2db
+    the next call ($0C33) hangs the game
+    since there are ascii strings there
+    instead of code.
+
 */
 ROM_START( super9 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
-	ROM_IGNORE(                          0x10000)	/* Discarding 2nd half */
-//	ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
-//	ROM_CONTINUE(                0x0000, 0x10000)	/* Discarding 1st half */
-		
+	ROM_IGNORE(                          0x10000)   /* Discarding 2nd half */
+//  ROM_LOAD( "27e010.30",       0x0000, 0x10000, CRC(1aaea8d3) SHA1(71395a6d74a7cd55606daa57d17ff4628aa5f577) )
+//  ROM_CONTINUE(                0x0000, 0x10000)   /* Discarding 1st half */
+
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "nearcpu.bin",      0x00000, 0x20000, CRC(643cff6f) SHA1(305ca9182c3f6d69e09be38b854b3d7bdfa75439) )
 
@@ -7732,7 +7732,7 @@ ROM_START( super9 )
 	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 1nd quarter 0xff filled
 	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 2nd quarter 0xff filled
 	ROM_CONTINUE( 0x0000, 0x08000) // Discarding 3nd quarter 0xff filled
-	
+
 	ROM_REGION( 0x40000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "27c1001.27",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
@@ -7872,9 +7872,9 @@ ROM_START( cb3d )
 	ROM_LOAD( "4.5h", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD_NIB_LOW(  "n82s129.13g",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )	// 1st bank colors, low 4 bits.
-	ROM_LOAD_NIB_HIGH( "n82s129.14g",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )	// 1st bank colors, high 4 bits.
-	ROM_LOAD(          "dm74s288.13d", 0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )	// 2nd bank colors
+	ROM_LOAD_NIB_LOW(  "n82s129.13g",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )   // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "n82s129.14g",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )   // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dm74s288.13d", 0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )   // 2nd bank colors
 ROM_END
 
 
@@ -7885,7 +7885,7 @@ ROM_END
   5x 8 DIP switches.
   1x 12 MHz xtal.
 
-  ROM 3v202 is the prg. 
+  ROM 3v202 is the prg.
 */
 ROM_START( cb3e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7899,7 +7899,7 @@ ROM_START( cb3e )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.u1",      0x00000, 0x0100, CRC(d4eaa276) SHA1(b6598ee64ac3d41ca979c8667de8576cfb304451) )
-	ROM_CONTINUE(               0x00000, 0x0100)	// 2nd half has the data.
+	ROM_CONTINUE(               0x00000, 0x0100)    // 2nd half has the data.
 ROM_END
 
 
@@ -11614,7 +11614,7 @@ ROM_START( wcherry )
 	ROM_LOAD( "wincherrya.ic9",  0x00000, 0x08000, CRC(919bd692) SHA1(1aeb66f1e4555b731858833445000593e613f74d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )	// borrowed from other game.
+	ROM_LOAD( "am27c29pc",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )    // borrowed from other game.
 ROM_END
 
 
@@ -12259,17 +12259,17 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 	UINT8 *src = memregion("gfx1")->base();
 	for (i = 0;i < 0x20000;i++)
 	{
-//		src[i] = BITSWAP8(src[i], 7,4,2,1,6,5,3,0);
-//		src[i] = BITSWAP8(src[i], 7,3,2,6,1,5,4,0);
+//      src[i] = BITSWAP8(src[i], 7,4,2,1,6,5,3,0);
+//      src[i] = BITSWAP8(src[i], 7,3,2,6,1,5,4,0);
 		src[i] = BITSWAP8(src[i], 7,3,2,6,5,1,4,0);
 	}
 
 	UINT8 *src2 = memregion("gfx2")->base();
 	for (i = 0;i < 0x8000;i++)
 	{
-//		src2[i] = BITSWAP8(src2[i], 7,4,2,1,6,5,3,0);
-//		src2[i] = BITSWAP8(src2[i], 7,3,2,6,1,5,4,0);
-		src2[i] = BITSWAP8(src2[i], 3,7,6,2,5,1,0,4);	// endianess
+//      src2[i] = BITSWAP8(src2[i], 7,4,2,1,6,5,3,0);
+//      src2[i] = BITSWAP8(src2[i], 7,3,2,6,1,5,4,0);
+		src2[i] = BITSWAP8(src2[i], 3,7,6,2,5,1,0,4);   // endianess
 	}
 
 }
@@ -12289,18 +12289,18 @@ DRIVER_INIT_MEMBER(goldstar_state, cb3e)
 	}
 
 /*  bank 1 graphics */
-//	int i;
+//  int i;
 	UINT8 *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);		// OK
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	UINT8 *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);	// OK
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 }
 
@@ -12311,14 +12311,14 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 	UINT8 *src = memregion("gfx1")->base();
 	for (i = 0; i < 0x20000; i++)
 	{
-		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);		// OK
+		src[i] = BITSWAP8(src[i], 4, 3, 2, 5, 1, 6, 0, 7);      // OK
 	}
 
 /*  bank 2 graphics */
 	UINT8 *src2 = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);	// OK
+		src2[i] = BITSWAP8(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
 }
 
@@ -12333,8 +12333,8 @@ GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,        
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
 GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
 GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
-GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )					// maybe fullname should be 'Gold Fruit (main 40%)'
-GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)	// need to decode gfx and see the program loops/reset... 
+GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
+GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING)    // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING)
 
 

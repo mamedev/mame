@@ -203,7 +203,7 @@ class tagged_list
 	tagged_list &operator=(const tagged_list &);
 
 public:
-	class add_exception 
+	class add_exception
 	{
 	public:
 		add_exception(const char *tag) : m_tag(tag) { }
@@ -211,7 +211,7 @@ public:
 	private:
 		const char *m_tag;
 	};
-	
+
 	// construction
 	tagged_list() { }
 

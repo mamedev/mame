@@ -369,7 +369,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor cdp1869_device::device_mconfig_additions() const
 {
-    return MACHINE_CONFIG_NAME( cdp1869 );
+	return MACHINE_CONFIG_NAME( cdp1869 );
 }
 
 

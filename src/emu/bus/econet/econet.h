@@ -31,8 +31,7 @@
 //**************************************************************************
 
 #define MCFG_ECONET_ADD() \
-	MCFG_DEVICE_ADD(ECONET_TAG, ECONET, 0) \
-
+	MCFG_DEVICE_ADD(ECONET_TAG, ECONET, 0)
 
 #define MCFG_ECONET_SLOT_ADD(_tag, _num, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECONET_SLOT, 0) \

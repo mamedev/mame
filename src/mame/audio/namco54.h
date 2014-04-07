@@ -24,12 +24,12 @@ public:
 
 	static void set_discrete(device_t &device, const char *tag) { downcast<namco_54xx_device &>(device).m_discrete.set_tag(tag); }
 	static void set_basenote(device_t &device, int node) { downcast<namco_54xx_device &>(device).m_basenode = node; }
-	
+
 	DECLARE_READ8_MEMBER( K_r );
 	DECLARE_READ8_MEMBER( R0_r );
 	DECLARE_WRITE8_MEMBER( O_w );
 	DECLARE_WRITE8_MEMBER( R1_w );
-	
+
 	DECLARE_WRITE8_MEMBER( write );
 protected:
 	// device-level overrides
@@ -43,7 +43,7 @@ private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	required_device<discrete_device> m_discrete;
-	
+
 	int m_basenode;
 	UINT8 m_latched_cmd;
 };

@@ -56,7 +56,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
 	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
 	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);

@@ -882,12 +882,12 @@ void tms32010_device::device_start()
 
 void tms32010_device::device_reset()
 {
-    m_PC    = 0;
-    m_ACC.d = 0;
-    m_INTF  = TMS32010_INT_NONE;
-    /* Setup Status Register : 7efe */
-    CLR((OV_FLAG | ARP_REG | DP_REG));
-    SET_FLAG((OVM_FLAG | INTM_FLAG));
+	m_PC    = 0;
+	m_ACC.d = 0;
+	m_INTF  = TMS32010_INT_NONE;
+	/* Setup Status Register : 7efe */
+	CLR((OV_FLAG | ARP_REG | DP_REG));
+	SET_FLAG((OVM_FLAG | INTM_FLAG));
 }
 
 
@@ -981,4 +981,3 @@ void tms32010_device::execute_run()
 		}
 	} while (m_icount > 0);
 }
-

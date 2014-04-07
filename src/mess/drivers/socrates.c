@@ -127,7 +127,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
-	
+
 	rgb_t m_palette_val[256];
 
 	UINT8 m_data[8];
@@ -1459,7 +1459,7 @@ static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
 	MCFG_SCREEN_SIZE(256, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
 

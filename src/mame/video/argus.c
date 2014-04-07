@@ -1002,7 +1002,7 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 			flipx = !flipx;
 			flipy = !flipy;
 		}
-		
+
 		fx = flipx;
 		fy = flipy;
 

@@ -160,7 +160,7 @@ void mpcc68561_t::device_timer(emu_timer &timer, device_timer_id id, int param, 
 void mpcc68561_t::device_start()
 {
 	intrq_cb.resolve_safe();
-	
+
 	memset(channel, 0, sizeof(channel));
 
 	mode = 0;

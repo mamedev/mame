@@ -1212,7 +1212,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 
 				// get visible area
 				rectangle visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR)
-					? rectangle(0, 639, 0, 479)	// use a hard-coded default visible area for vector screens
+					? rectangle(0, 639, 0, 479) // use a hard-coded default visible area for vector screens
 					: screen->visible_area();
 
 				// is our visible area too small?  if so, we need to bump up the size

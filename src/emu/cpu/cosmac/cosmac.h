@@ -374,16 +374,16 @@ protected:
 	const address_space_config      m_io_config;
 
 	// device callbacks
-	devcb2_read_line		m_read_wait;
-	devcb2_read_line		m_read_clear;
-	devcb2_read_line		m_read_ef1;
-	devcb2_read_line		m_read_ef2;
-	devcb2_read_line		m_read_ef3;
-	devcb2_read_line		m_read_ef4;
+	devcb2_read_line        m_read_wait;
+	devcb2_read_line        m_read_clear;
+	devcb2_read_line        m_read_ef1;
+	devcb2_read_line        m_read_ef2;
+	devcb2_read_line        m_read_ef3;
+	devcb2_read_line        m_read_ef4;
 	devcb2_write_line       m_write_q;
-	devcb2_read8			m_read_dma;
-	devcb2_write8			m_write_dma;
-	devcb2_write8			m_write_sc;
+	devcb2_read8            m_read_dma;
+	devcb2_write8           m_write_dma;
+	devcb2_write8           m_write_sc;
 
 	// control modes
 	enum cosmac_mode

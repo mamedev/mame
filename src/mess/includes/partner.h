@@ -31,11 +31,11 @@ public:
 	DECLARE_MACHINE_RESET(partner);
 	DECLARE_WRITE_LINE_MEMBER(partner_wd17xx_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	
+
 	//to remove trampoline once it use new wd17xx core
 	DECLARE_READ8_MEMBER(partner_fdc_r);
 	DECLARE_WRITE8_MEMBER(partner_fdc_w);
-	
+
 	void partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_iomap_bank(UINT8 *rom);

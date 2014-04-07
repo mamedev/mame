@@ -87,7 +87,7 @@ public:
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
-	required_device<nvram_device> m_smpc_nv;	// TODO: move this in the base class saturn_state and add it to stv in MAME
+	required_device<nvram_device> m_smpc_nv;    // TODO: move this in the base class saturn_state and add it to stv in MAME
 };
 
 
@@ -548,12 +548,12 @@ INPUT_PORTS_END
 /* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
 void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[64] = { 
+	static const UINT8 init[64] = {
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't', };
-	
+
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
 }
@@ -894,7 +894,7 @@ ROM_END
 ROM_START(hisaturn)
 	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
 	ROM_SYSTEM_BIOS(0, "102", "v1.02 (950519)")
-	ROMX_LOAD( "mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(1)) 
+	ROMX_LOAD( "mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "101", "v1.01 (950130)")
 	ROMX_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796), ROM_BIOS(2))
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */

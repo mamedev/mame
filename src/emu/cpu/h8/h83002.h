@@ -54,7 +54,7 @@ public:
 	h83002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);	
+	DECLARE_WRITE8_MEMBER(syscr_w);
 
 protected:
 	required_device<h8h_intc_device> intc;

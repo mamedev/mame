@@ -356,7 +356,7 @@ static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(0)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -35,7 +35,7 @@
 
 //--------------------------------
 //
-//	Datach Cartslot implementation
+//  Datach Cartslot implementation
 //
 //--------------------------------
 
@@ -55,7 +55,7 @@ datach_cart_interface::~datach_cart_interface()
 }
 
 READ8_MEMBER(datach_cart_interface::read)
-{ 
+{
 	if (offset < 0x4000)
 		return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
 	else
@@ -113,7 +113,7 @@ bool nes_datach_slot_device::call_load()
 			fread(&temp, length());
 			memcpy(ROM, temp + shift, 0x40000);
 
-			// double check that iNES files are really mapper 157 
+			// double check that iNES files are really mapper 157
 			// (or 16, since some older .nes files marked Datach as mapper 16)
 			if (length() == 0x40010)
 			{
@@ -153,7 +153,7 @@ void nes_datach_slot_device::get_default_card_software(astring &result)
 
 //--------------------------------
 //
-//	Datach Minicart implementation
+//  Datach Minicart implementation
 //
 //  Two kinds of PCB exist
 //  * ROM only, used by most games
@@ -221,7 +221,7 @@ machine_config_constructor nes_datach_24c01_device::device_mconfig_additions() c
 
 //---------------------------------
 //
-//	Datach Base Unit implementation
+//  Datach Base Unit implementation
 //
 //---------------------------------
 
@@ -244,7 +244,7 @@ void nes_datach_device::device_start()
 	serial_timer = timer_alloc(TIMER_SERIAL);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
 	serial_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_datach_latch));
@@ -256,7 +256,7 @@ void nes_datach_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
-	
+
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_datach_latch = 0;
@@ -269,27 +269,27 @@ void nes_datach_device::pcb_reset()
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  Bandai LZ93D50 + Datach barcode reader emulation
- 
+
  Games: Datach Games
- 
+
  iNES: mappers 157
- 
+
  In MESS: Supported
- 
+
  TODO: Datach carts should actually be handled
  separately! Original carts were minicarts to be
  inserted in a smaller slot of the Barcode reader
  FC cart. The Barcode reader acts as a passthrough
  but it has no internal ROM (it does not work if
  you don't have any minicart inserted)
- 
- TODO2: This class should be derived from the 
+
+ TODO2: This class should be derived from the
  LZ93D50 + X24C02 class, since the main board
- has this EEPROM. Moreover, Datach - Battle Rush 
+ has this EEPROM. Moreover, Datach - Battle Rush
  has a second X24C01 EEPROM that we don't emulate yet...
- 
+
  -------------------------------------------------*/
 
 
@@ -318,14 +318,14 @@ READ8_MEMBER(nes_datach_device::read_h)
 
 	if (m_subslot->m_cart)
 		return m_subslot->m_cart->read(space, offset, mem_mask);
-	else	// this is "fake" in the sense that we fill CPU space with 0xff if no Datach cart is loaded
+	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Datach cart is loaded
 		return hi_access_rom(offset);
 }
 
 WRITE8_MEMBER(nes_datach_device::write_h)
 {
 	LOG_MMC(("Datach write_h, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
@@ -406,7 +406,7 @@ void nes_datach_device::device_timer(emu_timer &timer, device_timer_id id, int p
 				m_irq_count = 0xffff;
 			else
 				m_irq_count--;
-			
+
 			if (!m_irq_count)
 			{
 				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);

@@ -283,15 +283,15 @@ void nes_un1rom_device::pcb_reset()
  -------------------------------------------------*/
 
 /*-------------------------------------------------
- 
+
  NROM-368 board emulation
- 
+
  iNES: mapper 0 with 3xPRG banks
  This is an homebrew extension to map linearly 46KB
  or PRG in boards with no PRG bankswitch logic
- 
+
  In MESS: Supported
- 
+
  -------------------------------------------------*/
 
 READ8_MEMBER(nes_nrom368_device::read_l)
@@ -425,7 +425,7 @@ READ8_MEMBER(nes_cnrom_device::chr_r)
 	// For most boards, chr_open_bus remains always zero.
 	if (m_chr_open_bus)
 		return m_open_bus;
-	
+
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
@@ -549,16 +549,16 @@ WRITE8_MEMBER(nes_un1rom_device::write_h)
 }
 
 /*-------------------------------------------------
- 
+
  NoCash NOCHR board emulation
- 
+
  This is an homebrew PCB design on a single chip
  (+possibly CIC) which uses the NTRAM as CHRRAM!
- 
+
  iNES: mapper 218
- 
+
  In MESS: Supported.
- 
+
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_nochr_device::chr_w)
@@ -569,7 +569,7 @@ WRITE8_MEMBER(nes_nochr_device::chr_w)
 	else if (mirr == PPU_MIRROR_LOW)
 		m_ciram[(offset & 0x3ff) + 0x400] = data;
 	else
-		m_ciram[offset & 0x7ff] = data;	// not sure here, since there is no software to test...
+		m_ciram[offset & 0x7ff] = data; // not sure here, since there is no software to test...
 }
 
 READ8_MEMBER(nes_nochr_device::chr_r)
@@ -580,5 +580,5 @@ READ8_MEMBER(nes_nochr_device::chr_r)
 	else if (mirr == PPU_MIRROR_LOW)
 		return m_ciram[(offset & 0x3ff) + 0x400];
 	else
-		return m_ciram[offset & 0x7ff];	// not sure here, since there is no software to test...
+		return m_ciram[offset & 0x7ff]; // not sure here, since there is no software to test...
 }

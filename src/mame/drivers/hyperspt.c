@@ -345,7 +345,7 @@ static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 	MCFG_CPU_PROGRAM_MAP(roadf_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
-	
+
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(roadf_sound_map)
 	MCFG_DEVICE_REMOVE("vlm")

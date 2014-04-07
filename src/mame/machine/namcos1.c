@@ -13,7 +13,6 @@
 
 UINT8 namcos1_state::bank_r(address_space &space, offs_t offset, int bank)
 {
-	
 	return m_active_bank[bank].bank_handler_r(space, offset + m_active_bank[bank].bank_offset, 0xff);
 }
 
@@ -641,7 +640,7 @@ void namcos1_state::set_bank(int banknum, const bankhandler *handler)
 		"bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8",
 		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
 	};
-	
+
 	static const struct { read8_delegate func; } io_bank_handler_r[16] =
 	{
 		{ read8_delegate(FUNC(namcos1_state::bank1_r),this) }, { read8_delegate(FUNC(namcos1_state::bank2_r),this) }, { read8_delegate(FUNC(namcos1_state::bank3_r),this) }, { read8_delegate(FUNC(namcos1_state::bank4_r),this) },
@@ -660,7 +659,7 @@ void namcos1_state::set_bank(int banknum, const bankhandler *handler)
 
 
 	static const char *const cputags[] = { "maincpu", "sub" };
-	
+
 	address_space &space = machine().device(cputags[(banknum >> 3) & 1])->memory().space(AS_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 

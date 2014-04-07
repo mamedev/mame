@@ -235,7 +235,7 @@ void es5503_device::device_start()
 
 	m_irq_func.resolve_safe();
 	m_adc_func.resolve_safe(0);
-	
+
 	rege0 = 0xff;
 
 	for (osc = 0; osc < 32; osc++)

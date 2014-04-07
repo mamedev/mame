@@ -443,7 +443,7 @@ WRITE_LINE_MEMBER( tms5501_device::xi7_w )
 		}
 	}
 
-	m_xi7 = state;	
+	m_xi7 = state;
 }
 
 
@@ -458,7 +458,7 @@ WRITE_LINE_MEMBER( tms5501_device::sens_w )
 		set_interrupt(IRQ_SENS);
 	}
 
-	m_sens = state;	
+	m_sens = state;
 }
 
 
@@ -501,7 +501,7 @@ void tms5501_device::check_interrupt()
 	}
 	else
 	{
-		m_write_irq(CLEAR_LINE);	
+		m_write_irq(CLEAR_LINE);
 	}
 }
 
@@ -522,7 +522,7 @@ UINT8 tms5501_device::get_vector()
 			m_irq &= ~(1 << i);
 
 			check_interrupt();
-		
+
 			if (LOG) logerror("%s: TMS5501 '%s' Interrupt Acknowledge %02x\n", machine().describe_context(), tag(), rst);
 			break;
 		}

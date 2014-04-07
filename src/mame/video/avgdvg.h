@@ -24,13 +24,13 @@ class avgdvg_device : public device_t
 public:
 	// construction/destruction
 	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	
+
 	static void static_set_vector_tag(device_t &device, const char *tag);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);
 	DECLARE_WRITE8_MEMBER(reset_w);
-	
+
 	DECLARE_WRITE16_MEMBER(go_word_w);
 	DECLARE_WRITE16_MEMBER(reset_word_w);
 
@@ -43,7 +43,7 @@ public:
 protected:
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);
-	
+
 	void vg_flush();
 	void vg_add_point_buf(int x, int y, rgb_t color, int intensity);
 	void vg_add_clip (int xmin, int ymin, int xmax, int ymax);
@@ -52,10 +52,10 @@ protected:
 
 	UINT8 *avgdvg_vectorram;
 	size_t avgdvg_vectorram_size;
-	
+
 	UINT8 *avgdvg_colorram;
-	
-	
+
+
 	int xmin, xmax, ymin, ymax;
 	int xcenter, ycenter;
 	emu_timer *vg_run_timer, *vg_halt_timer;
@@ -64,7 +64,7 @@ protected:
 
 	int nvect;
 	vgvector vectbuf[MAXVECT];
-	
+
 
 	UINT16 m_pc;
 	UINT8 m_sp;
@@ -103,21 +103,21 @@ protected:
 	INT32 m_clipy_min;
 	INT32 m_clipx_max;
 	INT32 m_clipy_max;
-	
 
-	virtual	int handler_0() = 0;
-	virtual	int handler_1() = 0;
-	virtual	int handler_2() = 0;
-	virtual	int handler_3() = 0;
-	virtual	int handler_4() = 0;
-	virtual	int handler_5() = 0;
-	virtual	int handler_6() = 0;
-	virtual	int handler_7() = 0;
+
+	virtual int handler_0() = 0;
+	virtual int handler_1() = 0;
+	virtual int handler_2() = 0;
+	virtual int handler_3() = 0;
+	virtual int handler_4() = 0;
+	virtual int handler_5() = 0;
+	virtual int handler_6() = 0;
+	virtual int handler_7() = 0;
 	virtual UINT8 state_addr() = 0;
 	virtual void update_databus() = 0;
 	virtual void vggo() = 0;
 	virtual void vgrst() = 0;
-	
+
 	required_device<vector_device> m_vector;
 };
 
@@ -126,22 +126,22 @@ class dvg_device : public avgdvg_device
 public:
 	// construction/destruction
 	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	void dvg_draw_to(int x, int y, int intensity);
-	
-	virtual	int handler_0();
-	virtual	int handler_1();
-	virtual	int handler_2();
-	virtual	int handler_3();
-	virtual	int handler_4();
-	virtual	int handler_5();
-	virtual	int handler_6();
-	virtual	int handler_7();
+
+	virtual int handler_0();
+	virtual int handler_1();
+	virtual int handler_2();
+	virtual int handler_3();
+	virtual int handler_4();
+	virtual int handler_5();
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual UINT8 state_addr();
 	virtual void update_databus();
 	virtual void vggo();
 	virtual void vgrst();
-	
+
 	virtual void device_start();
 };
 
@@ -158,20 +158,20 @@ public:
 	int avg_common_strobe1();
 	int avg_common_strobe2();
 	int avg_common_strobe3();
-	
-	virtual	int handler_0();
-	virtual	int handler_1();
-	virtual	int handler_2();
-	virtual	int handler_3();
-	virtual	int handler_4();
-	virtual	int handler_5();
-	virtual	int handler_6();
-	virtual	int handler_7();
+
+	virtual int handler_0();
+	virtual int handler_1();
+	virtual int handler_2();
+	virtual int handler_3();
+	virtual int handler_4();
+	virtual int handler_5();
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual UINT8 state_addr();
 	virtual void update_databus();
 	virtual void vggo();
 	virtual void vgrst();
-	
+
 	virtual void device_start();
 	void avg_start_common();
 };
@@ -184,9 +184,9 @@ class avg_tempest_device : public avg_device
 public:
 	// construction/destruction
 	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	virtual	int handler_6();
-	virtual	int handler_7();
+
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual void vggo();
 };
 
@@ -199,9 +199,9 @@ public:
 	// construction/destruction
 	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual	int handler_1();
-	virtual	int handler_6();
-	virtual	int handler_7();
+	virtual int handler_1();
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual void update_databus();
 	virtual void vgrst();
 };
@@ -214,8 +214,8 @@ class avg_starwars_device : public avg_device
 public:
 	// construction/destruction
 	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual	int handler_6();
-	virtual	int handler_7();
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual void update_databus();
 };
 
@@ -227,14 +227,14 @@ class avg_quantum_device : public avg_device
 public:
 	// construction/destruction
 	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual	int handler_0();
-	virtual	int handler_1();
-	virtual	int handler_2();
-	virtual	int handler_3();
-	virtual	int handler_4();
-	virtual	int handler_5();
-	virtual	int handler_6();
-	virtual	int handler_7();
+	virtual int handler_0();
+	virtual int handler_1();
+	virtual int handler_2();
+	virtual int handler_3();
+	virtual int handler_4();
+	virtual int handler_5();
+	virtual int handler_6();
+	virtual int handler_7();
 	virtual void update_databus();
 	virtual void vggo();
 };
@@ -247,9 +247,9 @@ class avg_bzone_device : public avg_device
 public:
 	// construction/destruction
 	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual	int handler_1();
-	virtual	int handler_6();
-	virtual	int handler_7();
+	virtual int handler_1();
+	virtual int handler_6();
+	virtual int handler_7();
 };
 
 // device type definition
@@ -260,9 +260,9 @@ class avg_tomcat_device : public avg_device
 public:
 	// construction/destruction
 	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	virtual	int handler_6();
-	virtual	int handler_7();
+
+	virtual int handler_6();
+	virtual int handler_7();
 };
 
 // device type definition

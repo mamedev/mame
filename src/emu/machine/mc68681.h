@@ -149,7 +149,7 @@ private:
 	PAIR  CTR;  /* Counter/Timer Preset Value */
 	UINT8 IPCR; /* Input Port Control Register */
 
-	bool m_read_vector;	// if this is read and IRQ is active, it counts as pulling IACK
+	bool m_read_vector; // if this is read and IRQ is active, it counts as pulling IACK
 
 	/* state */
 	UINT8 IP_last_state; /* last state of IP bits */

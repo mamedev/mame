@@ -228,7 +228,7 @@ void bfm_adder2_device::device_start()
 	m_palette->set_pen_color(12,rgb_t(0x80,0x00,0x00));
 	m_palette->set_pen_color(13,rgb_t(0x80,0x00,0x80));
 	m_palette->set_pen_color(14,rgb_t(0x80,0x80,0x00));
-	m_palette->set_pen_color(15,rgb_t(0x80,0x80,0x80));	
+	m_palette->set_pen_color(15,rgb_t(0x80,0x80,0x80));
 }
 
 // video update ///////////////////////////////////////////////////////////

@@ -51,7 +51,7 @@ private:
 		int m_width, m_height, m_patofsx, m_patofsy;
 		UINT32 m_vram_addr, m_vram_src;
 		UINT8 m_fillbytes[256];
-		required_device<palette_device> m_palette;	
+		required_device<palette_device> m_palette;
 };
 
 

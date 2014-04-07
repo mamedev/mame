@@ -499,7 +499,7 @@ enum {
 	H8_E6,
 	H8_E7,
 	H8_CCR,
-	H8_EXR,	
+	H8_EXR,
 };
 
 #endif

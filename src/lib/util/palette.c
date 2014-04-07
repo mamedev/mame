@@ -47,14 +47,14 @@ inline rgb_t palette_t::adjust_palette_entry(rgb_t entry, float brightness, floa
 
 palette_client::dirty_state::dirty_state()
 	: m_mindirty(0),
-	  m_maxdirty(0)
+		m_maxdirty(0)
 {
 }
 
 
 //-------------------------------------------------
 //  dirty_list - return the current list and
-//	min/max values
+//  min/max values
 //-------------------------------------------------
 
 const UINT32 *palette_client::dirty_state::dirty_list(UINT32 &mindirty, UINT32 &maxdirty)
@@ -70,7 +70,7 @@ const UINT32 *palette_client::dirty_state::dirty_list(UINT32 &mindirty, UINT32 &
 
 //-------------------------------------------------
 //  resize - resize the dirty array and mark all
-//	dirty
+//  dirty
 //-------------------------------------------------
 
 void palette_client::dirty_state::resize(UINT32 colors)
@@ -82,7 +82,7 @@ void palette_client::dirty_state::resize(UINT32 colors)
 	// mark all entries dirty
 	m_dirty[dirty_dwords - 1] &= (1 << (colors % 32)) - 1;
 
-	// set min/max	
+	// set min/max
 	m_mindirty = 0;
 	m_maxdirty = colors - 1;
 }
@@ -102,7 +102,7 @@ void palette_client::dirty_state::mark_dirty(UINT32 index)
 
 //-------------------------------------------------
 //  reset - clear the dirty array to mark all
-//	entries as clean
+//  entries as clean
 //-------------------------------------------------
 
 void palette_client::dirty_state::reset()
@@ -125,9 +125,9 @@ void palette_client::dirty_state::reset()
 
 palette_client::palette_client(palette_t &palette)
 	: m_palette(palette),
-	  m_next(NULL),
-	  m_live(&m_dirty[0]),
-	  m_previous(&m_dirty[1])
+		m_next(NULL),
+		m_live(&m_dirty[0]),
+		m_previous(&m_dirty[1])
 {
 	// add a reference to the palette
 	palette.ref();
@@ -163,7 +163,7 @@ palette_client::~palette_client()
 
 
 //-------------------------------------------------
-//  dirty_list - atomically get the current dirty 
+//  dirty_list - atomically get the current dirty
 //  list for a client
 //-------------------------------------------------
 
@@ -206,18 +206,18 @@ palette_t *palette_t::alloc(UINT32 numcolors, UINT32 numgroups)
 
 palette_t::palette_t(UINT32 numcolors, UINT32 numgroups)
 	: m_refcount(1),
-	  m_numcolors(numcolors),
-	  m_numgroups(numgroups),
-	  m_brightness(0.0f),
-	  m_contrast(1.0f),
-	  m_gamma(1.0f),
-	  m_entry_color(numcolors),
-	  m_entry_contrast(numcolors),
-	  m_adjusted_color(numcolors * numgroups + 2),
-	  m_adjusted_rgb15(numcolors * numgroups + 2),
-	  m_group_bright(numgroups),
-	  m_group_contrast(numgroups),
-	  m_client_list(NULL)
+		m_numcolors(numcolors),
+		m_numgroups(numgroups),
+		m_brightness(0.0f),
+		m_contrast(1.0f),
+		m_gamma(1.0f),
+		m_entry_color(numcolors),
+		m_entry_contrast(numcolors),
+		m_adjusted_color(numcolors * numgroups + 2),
+		m_adjusted_rgb15(numcolors * numgroups + 2),
+		m_group_bright(numgroups),
+		m_group_contrast(numgroups),
+		m_client_list(NULL)
 {
 	// initialize gamma map
 	for (UINT32 index = 0; index < 256; index++)
@@ -273,7 +273,7 @@ void palette_t::deref()
 
 
 //-------------------------------------------------
-//  set_brightness - set the overall brightness 
+//  set_brightness - set the overall brightness
 //  for the palette
 //-------------------------------------------------
 
@@ -295,7 +295,7 @@ void palette_t::set_brightness(float brightness)
 
 
 //-------------------------------------------------
-//  set_contrast - set the overall contrast for 
+//  set_contrast - set the overall contrast for
 //  the palette
 //-------------------------------------------------
 
@@ -314,7 +314,7 @@ void palette_t::set_contrast(float contrast)
 
 
 //-------------------------------------------------
-//  set_gamma - set the overall gamma for the 
+//  set_gamma - set the overall gamma for the
 //  palette
 //-------------------------------------------------
 
@@ -342,7 +342,7 @@ void palette_t::set_gamma(float gamma)
 
 
 //-------------------------------------------------
-//  entry_set_color - set the raw RGB color for a 
+//  entry_set_color - set the raw RGB color for a
 //  given palette index
 //-------------------------------------------------
 
@@ -362,7 +362,7 @@ void palette_t::entry_set_color(UINT32 index, rgb_t rgb)
 
 
 //-------------------------------------------------
-//  entry_set_contrast - set the contrast 
+//  entry_set_contrast - set the contrast
 //  adjustment for a single palette index
 //-------------------------------------------------
 
@@ -382,7 +382,7 @@ void palette_t::entry_set_contrast(UINT32 index, float contrast)
 
 
 //-------------------------------------------------
-//  group_set_brightness - configure overall 
+//  group_set_brightness - configure overall
 //  brightness for a palette group
 //-------------------------------------------------
 
@@ -405,7 +405,7 @@ void palette_t::group_set_brightness(UINT32 group, float brightness)
 
 
 //-------------------------------------------------
-//  group_set_contrast - configure overall 
+//  group_set_contrast - configure overall
 //  contrast for a palette group
 //-------------------------------------------------
 
@@ -425,7 +425,7 @@ void palette_t::group_set_contrast(UINT32 group, float contrast)
 
 
 //-------------------------------------------------
-//  normalize_range - normalize a range of palette 
+//  normalize_range - normalize a range of palette
 //  entries
 //-------------------------------------------------
 
@@ -474,9 +474,9 @@ void palette_t::update_adjusted_color(UINT32 group, UINT32 index)
 {
 	// compute the adjusted value
 	rgb_t adjusted = adjust_palette_entry(m_entry_color[index],
-										  m_group_bright[group] + m_brightness,
-										  m_group_contrast[group] * m_entry_contrast[index] * m_contrast,
-										  m_gamma_map);
+											m_group_bright[group] + m_brightness,
+											m_group_contrast[group] * m_entry_contrast[index] * m_contrast,
+											m_gamma_map);
 
 	// if not different, ignore
 	UINT32 finalindex = group * m_numcolors + index;

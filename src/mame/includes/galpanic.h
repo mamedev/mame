@@ -20,7 +20,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(galpanic_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(galpanica_misc_w);

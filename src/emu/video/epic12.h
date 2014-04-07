@@ -3,8 +3,8 @@
 	MCFG_DEVICE_ADD(_tag, EPIC12, 0)
 
 //#define MCFG_EP1C12_ADD(_tag,_config,_map)
-//	MCFG_DEVICE_CONFIG(_config)
-//	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
+//  MCFG_DEVICE_CONFIG(_config)
+//  MCFG_DEVICE_ADDRESS_MAP(AS_0, _map)
 
 #define MCFG_EPIC12_SET_MAINRAMSIZE( _rgn ) \
 	epic12_device::set_mainramsize(*device, _rgn);
@@ -29,19 +29,19 @@ union colour_t
 };
 
 typedef const void (*epic12_device_blitfunction)(bitmap_rgb32 *,
-					 const rectangle *,
-					 UINT32 *, /* gfx */
-					 int , /* src_x */
-					 int , /* src_y */
-					 const int , /* dst_x_start */
-					 const int , /* dst_y_start */
-					 int , /* dimx */
-					 int , /* dimy */
-					 const int , /* flipy */
-					 const UINT8 , /* s_alpha */
-					 const UINT8 , /* d_alpha */
-					 //int , /* tint */
-					 const clr_t * );
+						const rectangle *,
+						UINT32 *, /* gfx */
+						int , /* src_x */
+						int , /* src_y */
+						const int , /* dst_x_start */
+						const int , /* dst_y_start */
+						int , /* dimx */
+						int , /* dimy */
+						const int , /* flipy */
+						const UINT8 , /* s_alpha */
+						const UINT8 , /* d_alpha */
+						//int , /* tint */
+						const clr_t * );
 
 
 class epic12_device : public device_t,
@@ -79,7 +79,7 @@ public:
 	bitmap_rgb32 *epic12_device_bitmaps;
 	rectangle epic12_device_clip;
 
-	
+
 	UINT16* use_ram;
 	int m_main_ramsize; // type D has double the main ram
 	int m_main_rammask;
@@ -676,15 +676,14 @@ public:
 	// convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
 	static inline void tint_to_clr(UINT8 r, UINT8 g, UINT8 b, clr_t *clr)
 	{
-		clr->r	=	r>>2;
-		clr->g	=	g>>2;
-		clr->b	=	b>>2;
+		clr->r  =   r>>2;
+		clr->g  =   g>>2;
+		clr->b  =   b>>2;
 	};
 
 	// clr_t to r5g5b5
 	static inline UINT32 clr_to_pen(const clr_t *clr)
 	{
-
 	// --t- ---- rrrr r--- gggg g--- bbbb b---  format
 		return (clr->r << (16+3)) | (clr->g << (8+3)) | (clr->b << 3);
 
@@ -739,9 +738,9 @@ public:
 	static inline  void clr_add(clr_t *clr, const clr_t *clr0, const clr_t *clr1)
 	{
 	/*
-		clr->r = clr0->r + clr1->r;
-		clr->g = clr0->g + clr1->g;
-		clr->b = clr0->b + clr1->b;
+	    clr->r = clr0->r + clr1->r;
+	    clr->g = clr0->g + clr1->g;
+	    clr->b = clr0->b + clr1->b;
 	*/
 		// use pre-clamped lookup table
 		clr->r =  epic12_device_colrtable_add[clr0->r][clr1->r];
@@ -834,7 +833,7 @@ protected:
 
 
 
-	osd_work_queue *	queue;					/* work queue */
+	osd_work_queue *    queue;                  /* work queue */
 	osd_work_item * blitter_request;
 
 	// blit timing

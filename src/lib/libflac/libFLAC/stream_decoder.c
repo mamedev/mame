@@ -1290,7 +1290,7 @@ FILE *get_binary_stdin_(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdin), _O_BINARY);
-#elif defined __CYGWIN__ 
+#elif defined __CYGWIN__
 	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
 	setmode(_fileno(stdin), _O_BINARY);
 #elif defined __EMX__
@@ -3152,11 +3152,11 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 			}
 			/* our last move backwards wasn't big enough, try again */
 			approx_bytes_per_frame = approx_bytes_per_frame? approx_bytes_per_frame * 2 : 16;
-			continue;	
+			continue;
 		}
 		/* allow one seek over upper bound, so we can get a correct upper_bound_sample for streams with unknown total_samples */
 		first_seek = false;
-		
+
 		/* make sure we are not seeking in corrupted stream */
 		if (this_frame_sample < lower_bound_sample) {
 			decoder->protected_->state = FLAC__STREAM_DECODER_SEEK_ERROR;
@@ -3196,7 +3196,7 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 	FLAC__bool did_a_seek;
 	unsigned iteration = 0;
 
-	/* In the first iterations, we will calculate the target byte position 
+	/* In the first iterations, we will calculate the target byte position
 	 * by the distance from the target sample to left_sample and
 	 * right_sample (let's call it "proportional search").  After that, we
 	 * will switch to binary search.

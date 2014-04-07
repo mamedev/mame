@@ -6,7 +6,7 @@
 
 //-----------------------------------------------
 //
-//	Nantettate!! Baseball Cartslot implementation
+//  Nantettate!! Baseball Cartslot implementation
 //
 //-----------------------------------------------
 
@@ -77,7 +77,7 @@ extern const device_type NES_NTB_SLOT;
 
 //-----------------------------------------------
 //
-//	Nantettate!! Baseball Minicart implementation
+//  Nantettate!! Baseball Minicart implementation
 //
 //-----------------------------------------------
 
@@ -106,8 +106,8 @@ extern const device_type NES_NTB_ROM;
 
 //------------------------------------------------
 //
-//	Nantettate!! Baseball base cart implementation
-//  a.k.a. Sunsoft Dual Cassette System 
+//  Nantettate!! Baseball base cart implementation
+//  a.k.a. Sunsoft Dual Cassette System
 //  (variant of Sunsoft-4 PCB)
 //
 //------------------------------------------------

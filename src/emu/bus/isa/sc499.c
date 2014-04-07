@@ -1,8 +1,8 @@
 /*
  * sc499.c - ARCHIVE SC-499 cartridge tape controller (for Apollo DN3x00)
  *  Created on: April 17, 2011
- *  	Author: Hans Ostermeyer
- *  	ISA conversion by R. Belmont
+ *      Author: Hans Ostermeyer
+ *      ISA conversion by R. Belmont
  *
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
@@ -636,7 +636,7 @@ void sc499_device::set_interrupt(enum line_state state)
 {
 	if (state != irq_state)
 	{
-		LOG2(("set_interrupt(%d)",state)); 
+		LOG2(("set_interrupt(%d)",state));
 		switch (m_irq)
 		{
 			case 2: m_isa->irq2_w(state); break;
@@ -659,7 +659,7 @@ void sc499_device::set_dma_drq(enum line_state state)
 {
 	if (state != dma_drq_state)
 	{
-		LOG2(("set_dma_drq(%d)",state)); 
+		LOG2(("set_dma_drq(%d)",state));
 
 		switch (m_drq)
 		{
@@ -668,7 +668,7 @@ void sc499_device::set_dma_drq(enum line_state state)
 			case 3: m_isa->drq3_w(state); break;
 			default: logerror("sc499: invalid DRQ %d\n", m_drq); break;
 		}
-		
+
 		dma_drq_state = state;
 	}
 }
@@ -1115,7 +1115,7 @@ UINT8 sc499_device::dack_r(int line)
 	return data;
 }
 
-void sc499_device::dack_w(int line, UINT8 data) 
+void sc499_device::dack_w(int line, UINT8 data)
 {
 	LOG3(("dack_write: data=%x", data));
 
@@ -1311,4 +1311,3 @@ void sc499_ctape_image_device::device_config_complete()
 {
 	update_names(SC499_CTAPE, "ctape", "ct");
 };
-

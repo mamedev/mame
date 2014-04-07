@@ -2,11 +2,11 @@
 
         Indiana University 68030 board
 
-    	08/12/2009 Skeleton driver.
-    	01/20/2014 Added ISA bus and peripherals
- 
-    	TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
- 
+        08/12/2009 Skeleton driver.
+        01/20/2014 Added ISA bus and peripherals
+
+        TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
+
         System often reads/writes 6003D4/5, might be a cut-down 6845,
         as it only uses registers C,D,E,F.
 
@@ -120,7 +120,7 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", serial_keyboard_device, input_txd))
-	
+
 	MCFG_SERIAL_KEYBOARD_ADD("keyboard", keyboard_interface, 1200)
 MACHINE_CONFIG_END
 

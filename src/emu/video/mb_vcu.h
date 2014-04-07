@@ -19,7 +19,7 @@ Template for skeleton device
 
 #define MCFG_MB_VCU_ADD(_tag,_freq,_config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, MB_VCU, _freq) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 //**************************************************************************

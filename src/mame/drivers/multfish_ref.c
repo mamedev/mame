@@ -624,5 +624,3 @@ ROM_END
 //GAME( 2008, fcockt2_2,   fcockt2_parent,  igrosoft_gamble, igrosoft_gamble, driver_device,  0,        ROT0, "Igrosoft", "Fruit Cocktail 2 (080904 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
 #endif
-
-

@@ -570,7 +570,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0,80*8-1,0,25*10-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nanos)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

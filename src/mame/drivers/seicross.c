@@ -52,10 +52,10 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[32] = { 
+	static const UINT8 init[32] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
 		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, };
-	
+
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
 }

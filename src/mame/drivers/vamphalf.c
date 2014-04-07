@@ -90,7 +90,7 @@ public:
 	optional_shared_ptr<UINT16> m_wram;
 	optional_shared_ptr<UINT32> m_tiles32;
 	optional_shared_ptr<UINT32> m_wram32;
-	
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<qs1000_device> m_qs1000;
 	optional_device<okim6295_device> m_oki;
@@ -98,7 +98,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	int m_flip_bit;
 	int m_flipscreen;
 	int m_palshift;

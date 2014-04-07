@@ -2669,7 +2669,7 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 					return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
 				}
 			}
-			
+
 			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
 		return 0xFF;

@@ -32,7 +32,7 @@ public:
 	required_device<namco_device> m_namco_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 	emu_timer *m_cpu3_interrupt_timer;
 	UINT8 m_custom_mod;
 

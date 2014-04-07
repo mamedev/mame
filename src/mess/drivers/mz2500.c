@@ -71,7 +71,7 @@ public:
 		m_pit(*this, "pit"),
 		m_beeper(*this, "beeper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -2127,7 +2127,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_Z80SIO0_ADD( "z80sio", 6000000, mz2500_sio_intf )
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
-	
+
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))

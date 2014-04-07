@@ -43,15 +43,15 @@ public:
 		NET_CONNECT(_name, A, _A)
 
 #define TTL_7404_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7402_dip, _name)
+		NET_REGISTER_DEV(7402_dip, _name)
 
 NETLIB_DEVICE(7404_dip,
 
-    NETLIB_NAME(7404) m_1;
-    NETLIB_NAME(7404) m_2;
-    NETLIB_NAME(7404) m_3;
-    NETLIB_NAME(7404) m_4;
-    NETLIB_NAME(7404) m_5;
-    NETLIB_NAME(7404) m_6;
+	NETLIB_NAME(7404) m_1;
+	NETLIB_NAME(7404) m_2;
+	NETLIB_NAME(7404) m_3;
+	NETLIB_NAME(7404) m_4;
+	NETLIB_NAME(7404) m_5;
+	NETLIB_NAME(7404) m_6;
 );
 #endif /* NLD_7404_H_ */

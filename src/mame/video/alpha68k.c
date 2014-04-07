@@ -345,7 +345,7 @@ void alpha68k_state::draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &clip
 			fy = data & 0x4000;
 			color = color_prom[tile << 1 | data >> 15];
 
-			 gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
+				gfx->transpen(bitmap,cliprect, tile, color, 0, fy, mx, my, 0);
 
 			my = (my + 8) & 0xff;
 		}

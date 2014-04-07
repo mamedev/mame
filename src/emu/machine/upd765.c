@@ -133,7 +133,7 @@ void upd765_family_device::device_start()
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
 	hdl_cb.resolve_safe();
-	
+
 	for(int i=0; i != 4; i++) {
 		char name[2];
 		flopi[i].tm = timer_alloc(i);

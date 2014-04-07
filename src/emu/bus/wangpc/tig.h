@@ -61,7 +61,7 @@ private:
 	UINT8 m_option;
 	UINT8 m_attr[16];
 	UINT8 m_underline;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 

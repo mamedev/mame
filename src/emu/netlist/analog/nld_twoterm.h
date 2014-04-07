@@ -84,23 +84,23 @@ public:
 		m_P.m_Idr = (  V) * G - I;
 	}
 
-    ATTR_HOT inline double deltaV() { return m_P.net().Q_Analog()- m_N.net().Q_Analog(); }
+	ATTR_HOT inline double deltaV() { return m_P.net().Q_Analog()- m_N.net().Q_Analog(); }
 
-    ATTR_HOT void set_mat(double a11, double a12, double a21, double a22, double r1, double r2)
-    {
-        m_P.m_gt = a11;
-        m_P.m_go = -a12;
-        m_N.m_gt = a22;
-        m_N.m_go = -a21;
+	ATTR_HOT void set_mat(double a11, double a12, double a21, double a22, double r1, double r2)
+	{
+		m_P.m_gt = a11;
+		m_P.m_go = -a12;
+		m_N.m_gt = a22;
+		m_N.m_go = -a21;
 
-        m_P.m_Idr = -r1;
-        m_N.m_Idr = -r2;
+		m_P.m_Idr = -r1;
+		m_N.m_Idr = -r2;
 
-    }
+	}
 
 protected:
 	ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void reset();
 	ATTR_HOT ATTR_ALIGN void update();
 
 private:
@@ -119,7 +119,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void reset();
 	ATTR_HOT ATTR_ALIGN void update();
 };
 
@@ -159,7 +159,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 
@@ -175,67 +175,67 @@ protected:
 class netlist_generic_diode
 {
 public:
-    ATTR_COLD netlist_generic_diode();
+	ATTR_COLD netlist_generic_diode();
 
-    ATTR_HOT inline void update_diode(const double nVd)
-    {
-        //FIXME: Optimize cutoff case
+	ATTR_HOT inline void update_diode(const double nVd)
+	{
+		//FIXME: Optimize cutoff case
 
-        if (nVd < -5.0 * m_Vt)
-        {
-            m_Vd = nVd;
-            m_G = m_gmin;
-            m_Id = - m_Is;
-        }
-        else if (nVd < m_Vcrit)
-        {
-            m_Vd = nVd;
+		if (nVd < -5.0 * m_Vt)
+		{
+			m_Vd = nVd;
+			m_G = m_gmin;
+			m_Id = - m_Is;
+		}
+		else if (nVd < m_Vcrit)
+		{
+			m_Vd = nVd;
 
-            const double eVDVt = exp(m_Vd * m_VtInv);
-            m_Id = m_Is * (eVDVt - 1.0);
-            m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-        }
-        else
-        {
+			const double eVDVt = exp(m_Vd * m_VtInv);
+			m_Id = m_Is * (eVDVt - 1.0);
+			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		}
+		else
+		{
 #if defined(_MSC_VER) && _MSC_VER < 1800
-            m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
+			m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
 #else
-            double a = (nVd - m_Vd) * m_VtInv;
-            if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
-            m_Vd = m_Vd + log1p(a) * m_Vt;
+			double a = (nVd - m_Vd) * m_VtInv;
+			if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
+			m_Vd = m_Vd + log1p(a) * m_Vt;
 #endif
-            const double eVDVt = exp(m_Vd * m_VtInv);
-            m_Id = m_Is * (eVDVt - 1.0);
+			const double eVDVt = exp(m_Vd * m_VtInv);
+			m_Id = m_Is * (eVDVt - 1.0);
 
-            m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-        }
+			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+		}
 
-        //printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
-    }
+		//printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
+	}
 
-    ATTR_COLD void set_param(const double Is, const double n, double gmin);
+	ATTR_COLD void set_param(const double Is, const double n, double gmin);
 
-    ATTR_HOT inline double I() const { return m_Id; }
-    ATTR_HOT inline double G() const { return m_G; }
-    ATTR_HOT inline double Ieq() const { return (m_Id - m_Vd * m_G); }
-    ATTR_HOT inline double Vd() const { return m_Vd; }
+	ATTR_HOT inline double I() const { return m_Id; }
+	ATTR_HOT inline double G() const { return m_G; }
+	ATTR_HOT inline double Ieq() const { return (m_Id - m_Vd * m_G); }
+	ATTR_HOT inline double Vd() const { return m_Vd; }
 
-    /* owning object must save those ... */
+	/* owning object must save those ... */
 
-    ATTR_COLD void save(pstring name, netlist_object_t &parent);
+	ATTR_COLD void save(pstring name, netlist_object_t &parent);
 
 private:
-    double m_Vd;
-    double m_Id;
-    double m_G;
+	double m_Vd;
+	double m_Id;
+	double m_G;
 
-    double m_Vt;
-    double m_Is;
-    double m_n;
-    double m_gmin;
+	double m_Vt;
+	double m_Is;
+	double m_n;
+	double m_gmin;
 
-    double m_VtInv;
-    double m_Vcrit;
+	double m_VtInv;
+	double m_Vcrit;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -278,7 +278,7 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-	    m_D.update_diode(deltaV());
+		m_D.update_diode(deltaV());
 		set(m_D.G(), 0.0, m_D.Ieq());
 	}
 

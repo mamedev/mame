@@ -188,7 +188,7 @@
 #define SEC_CLOCK            XTAL_8MHz
 #define HCGA_CLOCK           XTAL_14_31818MHz
 
-#define PRG_CPU_CLOCK        MAIN_CLOCK /2		/* 8 MHz. (measured) */
+#define PRG_CPU_CLOCK        MAIN_CLOCK /2      /* 8 MHz. (measured) */
 #define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. (measured) */
 #define SND_AY_CLOCK         SEC_CLOCK /4       /* 2 MHz. (measured) */
 #define CRTC_CLOCK           SEC_CLOCK /2       /* 8 MHz. (measured) */
@@ -321,9 +321,9 @@ void isa8_cga_4enlinea_device::device_start()
 		}
 	}
 
-//	astring tempstring;
-//	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
-//	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
+//  astring tempstring;
+//  m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
+//  m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 }
 
 
@@ -346,7 +346,7 @@ READ8_MEMBER(_4enlinea_state::serial_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enlinea_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-//	AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
+//  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe001) AM_READ(serial_r)
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 
-//	AM_RANGE(0x3d4, 0x3df) CGA regs
+//  AM_RANGE(0x3d4, 0x3df) CGA regs
 	AM_RANGE(0x3bf, 0x3bf) AM_WRITENOP // CGA mode control, TODO
 ADDRESS_MAP_END
 
@@ -455,12 +455,10 @@ INPUT_PORTS_END
 
 void _4enlinea_state::machine_start()
 {
-
 }
 
 void _4enlinea_state::machine_reset()
 {
-
 }
 
 
@@ -535,7 +533,7 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_irq, 60) //TODO
-//	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SND_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -550,8 +548,8 @@ static MACHINE_CONFIG_START( 4enlinea, _4enlinea_state )
     CRTC_CLOCK is 8MHz, entering for pin 1 of UM487F. This clock is used
     only for UM6845R embedded mode. The frequency divisor is unknown.
 
-	CRTC_CLOCK / 4.0 = 66.961296 Hz.
-	CRTC_CLOCK / 4.5 = 59.521093 Hz.
+    CRTC_CLOCK / 4.0 = 66.961296 Hz.
+    CRTC_CLOCK / 4.5 = 59.521093 Hz.
     CRTC_CLOCK / 5.0 = 53.569037 Hz.
 */
 

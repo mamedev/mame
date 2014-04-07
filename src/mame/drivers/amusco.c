@@ -24,14 +24,14 @@
   1x MOS 6845 (U27)       CRT Controller.
   2x P8255                Programmable Peripheral Interface (I/O).
 
-  2x SRM2264		8k X 8 CMOS Static RAM.
+  2x SRM2264        8k X 8 CMOS Static RAM.
 
-  1x 27128 (U35) ROM.	Handwritten sticker:  Char A U35.
-  1x 27128 (U36) ROM.	Handwritten sticker:  Char B U36.
-  1x 27128 (U37) ROM.	Handwritten sticker:  Char C U37.
-  1x 27256 (U42) ROM.	Handwritten sticker:  PK V1.4 U42.
+  1x 27128 (U35) ROM.   Handwritten sticker:  Char A U35.
+  1x 27128 (U36) ROM.   Handwritten sticker:  Char B U36.
+  1x 27128 (U37) ROM.   Handwritten sticker:  Char C U37.
+  1x 27256 (U42) ROM.   Handwritten sticker:  PK V1.4 U42.
 
-  1x TI SN76489		Digital Complex Sound Generator (DCSG).
+  1x TI SN76489     Digital Complex Sound Generator (DCSG).
 
   3x MMI PAL16L8ACN (U47, U48, U50)
   1x MMI PAL16R4 (U49)    <-- couldn't get a consistent read
@@ -62,12 +62,12 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK		XTAL_22_1184MHz		/* confirmed */
-#define SECOND_CLOCK		XTAL_15MHz			/* confirmed */
+#define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
+#define SECOND_CLOCK        XTAL_15MHz          /* confirmed */
 
-#define CPU_CLOCK			MASTER_CLOCK / 4	/* guess */
-#define CRTC_CLOCK			SECOND_CLOCK / 8	/* guess */
-#define SND_CLOCK			SECOND_CLOCK / 8	/* guess */
+#define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
+#define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
+#define SND_CLOCK           SECOND_CLOCK / 8    /* guess */
 
 
 #include "emu.h"
@@ -120,7 +120,6 @@ public:
 
 WRITE16_MEMBER(amusco_state::amusco_videoram_w)
 {
-
 }
 
 PALETTE_INIT_MEMBER(amusco_state, amusco_palette_init)
@@ -180,7 +179,7 @@ PALETTE_INIT_MEMBER(amusco_state, amusco)
 
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 16, amusco_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")	// placeholder
+	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -213,19 +212,19 @@ WRITE16_MEMBER( amusco_state::vram_w)
 {
 	m_videoram[m_video_update_address] = data;
 	m_bg_tilemap->mark_tile_dirty(m_video_update_address);
-//	printf("%04x %04x\n",m_video_update_address,data);
+//  printf("%04x %04x\n",m_video_update_address,data);
 }
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 16, amusco_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE8(mc6845_r, mc6845_w, 0xffff)
-//	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0x00ff)
-//	AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+//  AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0x00ff)
+//  AM_RANGE(0x0000, 0x0001) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff ) //PPI 8255
 
-	AM_RANGE(0x0060, 0x0061) AM_DEVWRITE8("sn", sn76489_device, write, 0x00ff)								/* sound */
+	AM_RANGE(0x0060, 0x0061) AM_DEVWRITE8("sn", sn76489_device, write, 0x00ff)                              /* sound */
 	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
-//	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN1")
-//	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
+//  AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN1")
+//  AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
 	AM_RANGE(0x0030, 0x0031) AM_READ_PORT("DSW1") AM_WRITENOP // lamps?
 	AM_RANGE(0x0040, 0x0041) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
@@ -485,8 +484,8 @@ GFXDECODE_END
 
 MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
-//	amusco_state *state = device->machine().driver_data<amusco_state>();
-//	state->m_video_update_address = address;
+//  amusco_state *state = device->machine().driver_data<amusco_state>();
+//  state->m_video_update_address = address;
 }
 
 static MC6845_INTERFACE( mc6845_intf )
@@ -537,8 +536,8 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(88*8, 27*10)							// screen size: 88*8 27*10
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)	// visible scr: 74*8 24*10
+	MCFG_SCREEN_SIZE(88*8, 27*10)                           // screen size: 88*8 27*10
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 74*8-1, 0*10, 24*10-1)    // visible scr: 74*8 24*10
 	MCFG_SCREEN_UPDATE_DRIVER(amusco_state, screen_update_amusco)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -568,9 +567,9 @@ ROM_START( amusco )
 	ROM_LOAD( "char_a_u35.u35",  0x0000, 0x4000, CRC(ded67ef6) SHA1(da7326c190211e956e5a5f763d5045615bb8ffb3) )
 	ROM_LOAD( "char_b_u36.u36",  0x4000, 0x4000, CRC(55523513) SHA1(97fd221c298698628d4f6564389d96eb89e55927) )
 	ROM_LOAD( "char_c_u37.u37",  0x8000, 0x4000, CRC(d26f3b94) SHA1(e58af4f6f1a9091c23827997d03b91f02bb07856) )
-//	ROM_LOAD( "char_a_u35.u35",  0x8000, 0x4000, CRC(ded67ef6) SHA1(da7326c190211e956e5a5f763d5045615bb8ffb3) )
-//	ROM_LOAD( "char_b_u36.u36",  0x4000, 0x4000, CRC(55523513) SHA1(97fd221c298698628d4f6564389d96eb89e55927) )
-//	ROM_LOAD( "char_c_u37.u37",  0x0000, 0x4000, CRC(d26f3b94) SHA1(e58af4f6f1a9091c23827997d03b91f02bb07856) )
+//  ROM_LOAD( "char_a_u35.u35",  0x8000, 0x4000, CRC(ded67ef6) SHA1(da7326c190211e956e5a5f763d5045615bb8ffb3) )
+//  ROM_LOAD( "char_b_u36.u36",  0x4000, 0x4000, CRC(55523513) SHA1(97fd221c298698628d4f6564389d96eb89e55927) )
+//  ROM_LOAD( "char_c_u37.u37",  0x0000, 0x4000, CRC(d26f3b94) SHA1(e58af4f6f1a9091c23827997d03b91f02bb07856) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "pal16l8a.u47", 0x0000, 0x0104, CRC(554b4286) SHA1(26bc991f2cc58644cd2d9ce5c1867a94455b95a8) )

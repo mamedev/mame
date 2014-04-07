@@ -246,11 +246,11 @@ void ui_menu_main::handle()
 		case BIOS_SELECTION:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_bios_selection(machine(), container)));
 			break;
-				
+
 		case BARCODE_READ:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_reader(machine(), container)));
 			break;
-				
+
 		default:
 			fatalerror("ui_menu_main::handle - unknown reference\n");
 		}

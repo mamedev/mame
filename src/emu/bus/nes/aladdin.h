@@ -6,7 +6,7 @@
 
 //----------------------------------
 //
-//	Aladdin Cartslot implementation
+//  Aladdin Cartslot implementation
 //
 //----------------------------------
 
@@ -18,14 +18,14 @@ public:
 	// construction/destruction
 	aladdin_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~aladdin_cart_interface();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
-	
+
 	UINT8 *get_cart_base() { return m_rom; }
 	void set_cart_size(UINT32 size) { m_rom_size = size; m_rom_mask = (size / 0x4000) - 1; }
 	virtual void write_prg(UINT32 offset, UINT8 data) { }
-	
+
 protected:
 	// internal state
 	UINT8 *m_rom;
@@ -43,15 +43,15 @@ public:
 	// construction/destruction
 	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nes_aladdin_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { update_names(); }
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -61,13 +61,13 @@ public:
 	virtual const char *image_interface() const { return "ade_cart"; }
 	virtual const char *file_extensions() const { return "nes,bin"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
-	
+
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg(UINT32 offset, UINT8 data) { if (m_cart) m_cart->write_prg(offset, data); }
-	
+
 	aladdin_cart_interface*      m_cart;
 };
 
@@ -82,7 +82,7 @@ extern const device_type NES_ALADDIN_SLOT;
 
 //----------------------------------
 //
-//	Aladdin Minicart implementation
+//  Aladdin Minicart implementation
 //
 //----------------------------------
 
@@ -95,12 +95,12 @@ public:
 	// construction/destruction
 	nes_algn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_algn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual UINT8* get_cart_base();
 	virtual void write_prg(UINT32 offset, UINT8 data);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -115,7 +115,7 @@ class nes_algq_rom_device : public nes_algn_rom_device
 public:
 	// construction/destruction
 	nes_algq_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual void write_prg(UINT32 offset, UINT8 data);
 
@@ -134,7 +134,7 @@ extern const device_type NES_ALGQ_ROM;
 
 //-----------------------------------------------
 //
-//	Codemasters Aladdin passthru implementation
+//  Codemasters Aladdin passthru implementation
 //
 //-----------------------------------------------
 

@@ -16,11 +16,11 @@ class stratos_state : public driver_device
 public:
 	stratos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  maincpu(*this, "maincpu"),
-		  nvram(*this, "nvram"),
-		  bank_8000(*this, "bank_8000"),
-		  bank_4000(*this, "bank_4000"),
-		  nvram_bank(*this, "nvram_bank")
+			maincpu(*this, "maincpu"),
+			nvram(*this, "nvram"),
+			bank_8000(*this, "bank_8000"),
+			bank_4000(*this, "bank_4000"),
+			nvram_bank(*this, "nvram_bank")
 	{ }
 
 	required_device<m65c02_device> maincpu;
@@ -255,10 +255,10 @@ READ8_MEMBER(stratos_state::control_r)
 	// 0f08 Bi
 	// 1008 Kn
 	// 1108 Pa
-	// 0108 
-	// 0208 
-	// 0308 
-	// 0408 
+	// 0108
+	// 0208
+	// 0308
+	// 0408
 	// 0617 8
 	// 0016 7
 	// 0015 6

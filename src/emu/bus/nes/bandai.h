@@ -38,7 +38,7 @@ public:
 	// construction/destruction
 	nes_fcg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -46,11 +46,11 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
 	virtual void pcb_reset();
-	
+
 protected:
 	UINT16     m_irq_count;
 	int        m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };

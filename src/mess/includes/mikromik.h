@@ -30,7 +30,7 @@
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define RS232_C_TAG     "rs232c"
-#define KB_TAG			"kb"
+#define KB_TAG          "kb"
 
 class mm1_state : public driver_device
 {

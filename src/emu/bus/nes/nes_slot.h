@@ -119,8 +119,8 @@ enum
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, HOSENKAN_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD,
 	WHIRLWIND_2706,
-	NOCASH_NOCHR,	// homebrew PCB design which uses NTRAM for CHRRAM
-	BTL_ACTION53,	// homebrew PCB for homebrew multicarts
+	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
+	BTL_ACTION53,   // homebrew PCB for homebrew multicarts
 	/* FFE boards, for mappers 6, 8, 17 */
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	/* Unsupported (for place-holder boards, with no working emulation) & no-board (at init) */

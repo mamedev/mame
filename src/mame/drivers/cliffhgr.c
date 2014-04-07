@@ -120,7 +120,7 @@ public:
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 };
 
 

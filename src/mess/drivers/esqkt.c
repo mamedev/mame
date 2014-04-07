@@ -18,71 +18,71 @@
     0x280000-0x2801FF   ES5510
     0x300000-0x30000F   68681 DUART
     0xFF0000-0xFFFFFF   OS RAM
- 
+
     Ensoniq KT-76
-	Ensoniq 1994
+    Ensoniq 1994
 
-	This is a wavetable-based synth keyboard made by Ensoniq in 1994
+    This is a wavetable-based synth keyboard made by Ensoniq in 1994
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	KT-76
-	|---------------------------------------------|
-	|J12 J3      J11                         J10  |
-	|                                  LM393 LM358|
-	|                                     74HC4051|
-	|ADM691                                       |
-	|              62256                          |
-	|                                             |
-	|3V_BATTERY  KT76_0590_LO.U5          ROM0    |
-	|                                             |
-	|   68EC020    62256       OTTOR2     ROM1    |
-	|                                             |
-	|            KT76_690B_HI.U6          ROM2    |
-	| PAL1                                        |
-	|       HP_6N138                              |
-	| PAL2                     OTTOR2           J6|
-	|      7407                                   |
-	|                                             |
-	|          D41464 D41464                      |
-	|                                             |
-	| SCN2681  D41464 D41464                      |
-	|                         137000402           |
-	|                                             |
-	|                                18.432MHz    |
-	|       ESPR6                    16MHz        |
-	|    POT                                      |
-	|                                  R1136-11   |
-	|                                             |
-	|                                LM339 LM339  |
-	|    J13             J5  J1            J2  J4 |
-	|---------------------------------------------|
-	Notes:
-		  J1         - connector for digital jacks
-		  J2         - connector for keyboard
-		  J3         - connector for LCD display
-		  J4         - connector for keyboard
-		  J5         - connector for power input
-		  J6         - connector for wave expansion
-		  J10        - connector for wheels/pressure
-		  J11        - connector for memory card
-		  J12        - connector for headphones
-		  J13        - connector for analog jacks
-		  68EC020    - Motorola MC68EC020FG16 CPU. Clock input 16MHz
-		  1370000402 - Unknown PLCC44 IC stamped with the Ensoniq logo. Likely CPLD or gate array.
-		  ESPR6      - Ensoniq ESPR6 (ES5510) sound chip
-		  OTTOR2     - Ensoniq OTTOR2 (ES5506) sound chip
-		  POT        - ESP adjustment pot
-		  KT76*      - 27C2048/27C210 EPROM
-		  ROM*       - 2M x8-bit SOP44 mask ROM
-		  R1136-11   - DIP40 IC manufactured by Rockwell - believed to be some type of MCU.
-		  D41464     - NEC D41464 64k x4-bit DRAM
-		  62256      - 32k x8-bit SRAM
-		  SCN2681    - Philips SCN2681 Dual Universal Asynchronous Receiver/Transmitter (DUART)
-		  HP_6N138   - HP/Agilent HP 6N138 Low Input Current High Gain Optocoupler
-		  PAL1       - MMI PAL20L8ACN stamped 'KT-76 MMU 6A0A'. Printing is faint so 0 could be a B or a D.
-		  PAL2       - MMI PAL20L8ACN stamped 'KT-76 BCU 73D6'
+    KT-76
+    |---------------------------------------------|
+    |J12 J3      J11                         J10  |
+    |                                  LM393 LM358|
+    |                                     74HC4051|
+    |ADM691                                       |
+    |              62256                          |
+    |                                             |
+    |3V_BATTERY  KT76_0590_LO.U5          ROM0    |
+    |                                             |
+    |   68EC020    62256       OTTOR2     ROM1    |
+    |                                             |
+    |            KT76_690B_HI.U6          ROM2    |
+    | PAL1                                        |
+    |       HP_6N138                              |
+    | PAL2                     OTTOR2           J6|
+    |      7407                                   |
+    |                                             |
+    |          D41464 D41464                      |
+    |                                             |
+    | SCN2681  D41464 D41464                      |
+    |                         137000402           |
+    |                                             |
+    |                                18.432MHz    |
+    |       ESPR6                    16MHz        |
+    |    POT                                      |
+    |                                  R1136-11   |
+    |                                             |
+    |                                LM339 LM339  |
+    |    J13             J5  J1            J2  J4 |
+    |---------------------------------------------|
+    Notes:
+          J1         - connector for digital jacks
+          J2         - connector for keyboard
+          J3         - connector for LCD display
+          J4         - connector for keyboard
+          J5         - connector for power input
+          J6         - connector for wave expansion
+          J10        - connector for wheels/pressure
+          J11        - connector for memory card
+          J12        - connector for headphones
+          J13        - connector for analog jacks
+          68EC020    - Motorola MC68EC020FG16 CPU. Clock input 16MHz
+          1370000402 - Unknown PLCC44 IC stamped with the Ensoniq logo. Likely CPLD or gate array.
+          ESPR6      - Ensoniq ESPR6 (ES5510) sound chip
+          OTTOR2     - Ensoniq OTTOR2 (ES5506) sound chip
+          POT        - ESP adjustment pot
+          KT76*      - 27C2048/27C210 EPROM
+          ROM*       - 2M x8-bit SOP44 mask ROM
+          R1136-11   - DIP40 IC manufactured by Rockwell - believed to be some type of MCU.
+          D41464     - NEC D41464 64k x4-bit DRAM
+          62256      - 32k x8-bit SRAM
+          SCN2681    - Philips SCN2681 Dual Universal Asynchronous Receiver/Transmitter (DUART)
+          HP_6N138   - HP/Agilent HP 6N138 Low Input Current High Gain Optocoupler
+          PAL1       - MMI PAL20L8ACN stamped 'KT-76 MMU 6A0A'. Printing is faint so 0 could be a B or a D.
+          PAL2       - MMI PAL20L8ACN stamped 'KT-76 BCU 73D6'
 
 ***************************************************************************/
 
@@ -263,13 +263,13 @@ ROM_START( kt76 )
 	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
 
 	ROM_REGION(0x400000, "waverom", ROMREGION_ERASE00)
-	ROM_LOAD16_BYTE( "1351000401_rom0.u103", 0x000001, 0x200000, CRC(425047af) SHA1(9680d1fc222b29ba24f0fbf6136982bee87a60ef) ) 
+	ROM_LOAD16_BYTE( "1351000401_rom0.u103", 0x000001, 0x200000, CRC(425047af) SHA1(9680d1fc222b29ba24f0fbf6136982bee87a60ef) )
 
 	ROM_REGION(0x400000, "waverom2", ROMREGION_ERASE00)
-	ROM_LOAD16_BYTE( "1351000402_rom1.u102", 0x000001, 0x200000, CRC(64459185) SHA1(0fa20b16847fc02a384057fc3d385226eb3e7527) ) 
+	ROM_LOAD16_BYTE( "1351000402_rom1.u102", 0x000001, 0x200000, CRC(64459185) SHA1(0fa20b16847fc02a384057fc3d385226eb3e7527) )
 
 	ROM_REGION(0x400000, "waverom3", ROMREGION_ERASE00)
-	ROM_LOAD16_BYTE( "1351000403_rom2.u104", 0x000001, 0x200000, CRC(c2aacc5d) SHA1(7fab518ba92ddb23cdc4dcb04751b26d25c298c0) ) 
+	ROM_LOAD16_BYTE( "1351000403_rom2.u104", 0x000001, 0x200000, CRC(c2aacc5d) SHA1(7fab518ba92ddb23cdc4dcb04751b26d25c298c0) )
 
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END

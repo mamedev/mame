@@ -244,7 +244,7 @@ void driver_enumerator::include_all()
 {
 	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count);
 	m_filtered_count = s_driver_count;
-	
+
 	// always exclude the empty driver
 	int empty = find("___empty");
 	assert(empty != -1);
@@ -385,7 +385,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 //-------------------------------------------------
 //  release_current - release bulky memory
 //  structures from the current entry because
-//	we're done with it
+//  we're done with it
 //-------------------------------------------------
 
 void driver_enumerator::release_current()
@@ -393,7 +393,7 @@ void driver_enumerator::release_current()
 	// skip if no current entry
 	if (m_current < 0 || m_current >= s_driver_count)
 		return;
-	
+
 	// skip if we haven't cached a config
 	if (m_config[m_current] == NULL)
 		return;

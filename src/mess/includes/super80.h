@@ -42,7 +42,7 @@ public:
 			m_io_x6(*this, "X6"),
 			m_io_x7(*this, "X7"),
 			m_io_config(*this, "CONFIG"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	DECLARE_READ8_MEMBER( super80v_low_r );

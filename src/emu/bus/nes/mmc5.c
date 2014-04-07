@@ -117,7 +117,7 @@ void nes_exrom_device::pcb_reset()
 	m_split_chr = 0;
 	m_ex1_bank = 0;
 	m_vcount = 0;
-	
+
 	memset(m_vrom_bank, 0x3ff, ARRAY_LENGTH(m_vrom_bank));
 	m_prg_regs[0] = 0xfc;
 	m_prg_regs[1] = 0xfd;
@@ -241,7 +241,7 @@ void nes_exrom_device::update_prg()
 void nes_exrom_device::hblank_irq(int scanline, int vblank, int blanked )
 {
 	m_vcount = scanline;
-	
+
 	if (scanline == m_irq_count)
 	{
 		if (m_irq_enable)
@@ -284,7 +284,7 @@ inline bool nes_exrom_device::in_split()
 {
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	int tile = ppu->get_tilenum();
-	
+
 	if (tile < 34)
 	{
 		if (!m_split_rev && tile < m_split_ctrl)
@@ -303,7 +303,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 	{
 		case MMC5FILL:
 			if ((offset & 0x3ff) >= 0x3c0)
-				return m_floodattr;			
+				return m_floodattr;
 			return m_floodtile;
 
 		case EXRAM:
@@ -315,7 +315,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 
 		case CIRAM:
 		default:
-			// Uchuu Keibitai SDF uses extensively split screen for its intro, 
+			// Uchuu Keibitai SDF uses extensively split screen for its intro,
 			// but it does not work yet
 			if (m_split_scr && !(m_exram_control & 0x02) && in_split())
 			{
@@ -338,7 +338,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 			{
 				if ((offset & 0x3ff) >= 0x3c0)
 					return m_mmc5_attrib[(m_exram[offset & 0x3ff] >> 6) & 0x03];
-				else	// in this case, we write Ex1 CHR bank, but then access NT normally!
+				else    // in this case, we write Ex1 CHR bank, but then access NT normally!
 				{
 					m_ex1_chr = 1;
 					m_ex1_bank = (m_exram[offset & 0x3ff] & 0x3f) | (m_high_chr << 6);
@@ -350,17 +350,17 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 
 WRITE8_MEMBER(nes_exrom_device::nt_w)
 {
-	int page = ((offset & 0xc00) >> 10);	
-	
+	int page = ((offset & 0xc00) >> 10);
+
 	if (!m_nt_writable[page])
 		return;
-	
+
 	switch (m_nt_src[page])
 	{
 		case EXRAM:
 			m_exram[offset & 0x3ff] = data;
 			break;
-			
+
 		case CIRAM:
 		default:
 			m_nt_access[page][offset & 0x3ff] = data;
@@ -415,10 +415,10 @@ READ8_MEMBER(nes_exrom_device::chr_r)
 	// However, if a game enables Ex1 but does not write a new m_ex1_bank, I'm not sure here we get the correct behavior
 	if (m_exram_control == 1 && ppu->get_draw_phase() == PPU_DRAW_BG && m_ex1_chr)
 		return bg_ex1_chr_r(offset & 0xfff);
-	
+
 	if (m_split_scr && !(m_exram_control & 0x02) && in_split() && ppu->get_draw_phase() == PPU_DRAW_BG && m_split_chr)
 		return split_chr_r(offset & 0xfff);
-	
+
 	if (ppu->is_sprite_8x16())
 	{
 		if (ppu->get_draw_phase() == PPU_DRAW_OAM)
@@ -444,9 +444,9 @@ READ8_MEMBER(nes_exrom_device::read_l)
 	if ((offset >= 0x1c00) && (offset <= 0x1fff))
 	{
 		// EXRAM
-		if (BIT(m_exram_control, 1))	// Modes 2,3 = read
+		if (BIT(m_exram_control, 1))    // Modes 2,3 = read
 			return m_exram[offset - 0x1c00];
-		else			
+		else
 			return m_open_bus;   // Modes 0,1 = open bus
 	}
 
@@ -486,9 +486,9 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 	if ((offset >= 0x1c00) && (offset <= 0x1fff))
 	{
 		// EXRAM
-		if (m_exram_control == 0x02)	// Mode 2 = write data
+		if (m_exram_control == 0x02)    // Mode 2 = write data
 			m_exram[offset - 0x1c00] = data;
-		else if (m_exram_control != 0x03)	// Modes 0,1 = write data in frame / write 0 otherwise
+		else if (m_exram_control != 0x03)   // Modes 0,1 = write data in frame / write 0 otherwise
 		{
 			if (m_irq_status & 0x40)
 				m_exram[offset - 0x1c00] = data;
@@ -554,7 +554,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 		case 0x1116:
 		case 0x1117:
 			m_prg_regs[offset & 3] = data & 0x7f;
-			m_prg_ram_mapped[offset & 3] = !BIT(data, 7);	// m_prg_ram_mapped[3] is not used, in fact!
+			m_prg_ram_mapped[offset & 3] = !BIT(data, 7);   // m_prg_ram_mapped[3] is not used, in fact!
 			update_prg();
 			break;
 

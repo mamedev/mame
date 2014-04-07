@@ -8,22 +8,22 @@
 
 
  Here we emulate the following PCBs Bandai Karaoke Studio [mapper 188]
- 
+
  The Karaoke Studio cart consist of a large connector which fits the FC cart slot, with a microphone
- connected. The game data is in the connector itself. The microphone has two buttons on it, and the 
- game uses these only to navigate through the menus (the two buttons are not read through the controller 
- port, which is not accessible from the cart, but from $6000-$7fff). Part of the connector body can be 
+ connected. The game data is in the connector itself. The microphone has two buttons on it, and the
+ game uses these only to navigate through the menus (the two buttons are not read through the controller
+ port, which is not accessible from the cart, but from $6000-$7fff). Part of the connector body can be
  removed to be replaced by an expansion cart containing new songs (we emulate this by adding a -cart2 slot).
 
- 
+
  TODO:
  - verify expansion slot emulation for the Senyou Cassettes:
    not much documentation exists about the expansion carts (except for few paragraphs
    at Enri's FC webpage), so I implemented it based on "common sense"
    * expansion carts do not contain the required game data => main PRG must be in the main cart
-     so to remain connected even when an expansion is inserted (differently from Datach, where 
+     so to remain connected even when an expansion is inserted (differently from Datach, where
      the base unit contains no PRG)
-   * bankswicth writes with bit3=0 (to access expansion) when no expansion is present should do 
+   * bankswicth writes with bit3=0 (to access expansion) when no expansion is present should do
      nothing
 
  ***********************************************************************************************************/
@@ -43,7 +43,7 @@
 
 //-----------------------------------------
 //
-//	Karaoke Studio Cartslot implementation
+//  Karaoke Studio Cartslot implementation
 //
 //-----------------------------------------
 
@@ -93,7 +93,7 @@ READ8_MEMBER(nes_kstudio_slot_device::read)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
-	
+
 	return 0xff;
 }
 
@@ -102,27 +102,27 @@ bool nes_kstudio_slot_device::call_load()
 	if (m_cart)
 	{
 		UINT8 *ROM = m_cart->get_cart_base();
-		
+
 		if (!ROM)
 			return IMAGE_INIT_FAIL;
-		
+
 		// Existing exapnsion carts are all 128K, so we only load files of this size
 		if (software_entry() == NULL)
 		{
 			if (length() != 0x20000)
 				return IMAGE_INIT_FAIL;
-			
-			fread(&ROM, 0x20000);			
+
+			fread(&ROM, 0x20000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x20000)
 				return IMAGE_INIT_FAIL;
-			
+
 			memcpy(ROM, get_software_region("rom"), 0x20000);
 		}
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -141,7 +141,7 @@ void nes_kstudio_slot_device::get_default_card_software(astring &result)
 
 //-----------------------------------------------
 //
-//	Karaoke Studio Expansion cart implementation
+//  Karaoke Studio Expansion cart implementation
 //
 //-----------------------------------------------
 
@@ -181,7 +181,7 @@ UINT8 *nes_kstudio_rom_device::get_cart_base()
 
 //------------------------------------------
 //
-//	Karaoke Studio Base Cart implementation
+//  Karaoke Studio Base Cart implementation
 //
 //------------------------------------------
 
@@ -220,7 +220,7 @@ void nes_karaokestudio_device::pcb_reset()
 
  Bandai Karaoke Studio board emulation
 
- Games: Karaoke Studio + expansion carts with 
+ Games: Karaoke Studio + expansion carts with
  additional songs
 
  Note: we currently do not emulate properly the
@@ -260,7 +260,7 @@ WRITE8_MEMBER(nes_karaokestudio_device::write_h)
 	// cart (when expansion is present, code keeps switching both from the expansion rom and from
 	// the main ROM)
 	// my guess is that writes with bit3=0 and no expansion just do nothing, but it shall be verified
-	
+
 	if (offset >= 04000)
 	{
 		if (BIT(data, 3))
@@ -268,7 +268,7 @@ WRITE8_MEMBER(nes_karaokestudio_device::write_h)
 			m_exp_active = 0;
 			prg16_89ab(data & 7);
 		}
-		else	// expansion cart
+		else    // expansion cart
 		{
 			m_exp_active = 1;
 			m_subslot->write_prg_bank(data & 7);
@@ -308,4 +308,3 @@ machine_config_constructor nes_karaokestudio_device::device_mconfig_additions() 
 {
 	return MACHINE_CONFIG_NAME( karaoke_studio );
 }
-

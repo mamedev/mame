@@ -1858,7 +1858,7 @@ mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 s68047_device::s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mc6847_base_device(mconfig, S68047, "S68047", tag, owner, clock, s68047_fontdata8x12, 262.0, "s68047", __FILE__)
+	: mc6847_base_device(mconfig, S68047, "S68047", tag, owner, clock, s68047_fontdata8x12, 262.0, "s68047", __FILE__)
 {
 }
 
@@ -1879,23 +1879,22 @@ void s68047_device::hack_black_becomes_blue(bool flag)
 
 const UINT32 s68047_device::s_s68047_hack_palette[16] =
 {
-    rgb_t(0x07, 0xff, 0x00), /* GREEN */
-    rgb_t(0xff, 0xff, 0x00), /* YELLOW */
-    rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-    rgb_t(0xcc, 0x00, 0x3b), /* RED */
-    rgb_t(0xff, 0xff, 0xff), /* BUFF */
-    rgb_t(0x07, 0xe3, 0x99), /* CYAN */
-    rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
-    rgb_t(0xff, 0x81, 0x00), /* ORANGE */
+	rgb_t(0x07, 0xff, 0x00), /* GREEN */
+	rgb_t(0xff, 0xff, 0x00), /* YELLOW */
+	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
+	rgb_t(0xcc, 0x00, 0x3b), /* RED */
+	rgb_t(0xff, 0xff, 0xff), /* BUFF */
+	rgb_t(0x07, 0xe3, 0x99), /* CYAN */
+	rgb_t(0xff, 0x1c, 0xff), /* MAGENTA */
+	rgb_t(0xff, 0x81, 0x00), /* ORANGE */
 
-    rgb_t(0x00, 0x00, 0x00), /* BLACK */
-    rgb_t(0x07, 0xff, 0x00), /* GREEN */
-    rgb_t(0x3b, 0x08, 0xff), /* BLUE */
-    rgb_t(0xff, 0xff, 0xff), /* BUFF */
+	rgb_t(0x00, 0x00, 0x00), /* BLACK */
+	rgb_t(0x07, 0xff, 0x00), /* GREEN */
+	rgb_t(0x3b, 0x08, 0xff), /* BLUE */
+	rgb_t(0xff, 0xff, 0xff), /* BUFF */
 
-    rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
-    rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
-    rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
-    rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
+	rgb_t(0x00, 0x7c, 0x00), /* ALPHANUMERIC DARK GREEN */
+	rgb_t(0x07, 0xff, 0x00), /* ALPHANUMERIC BRIGHT GREEN */
+	rgb_t(0x91, 0x00, 0x00), /* ALPHANUMERIC DARK ORANGE */
+	rgb_t(0xff, 0x81, 0x00)  /* ALPHANUMERIC BRIGHT ORANGE */
 };
-

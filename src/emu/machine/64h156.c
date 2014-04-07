@@ -19,7 +19,7 @@
     - cycle exact VIA
 
     - get these running and we're golden
-    	- Bounty Bob Strikes Back (aligned halftracks)
+        - Bounty Bob Strikes Back (aligned halftracks)
         - Quiwi (speed change within track)
         - Defender of the Crown (V-MAX! v2, density checks)
         - Test Drive / Cabal (HLS, sub-cycle jitter)
@@ -201,7 +201,7 @@ void c64h156_device::commit(attotime tm)
 {
 	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
 		return;
-	
+
 	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
 
 	m_floppy->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
@@ -293,14 +293,14 @@ void c64h156_device::live_run(attotime limit)
 				cur_live.cell_counter++;
 				cur_live.cell_counter &= 0xf;
 			}
-			
+
 			if (!BIT(cell_counter, 1) && BIT(cur_live.cell_counter, 1)) {
 				// read bit
 				cur_live.shift_reg <<= 1;
 				cur_live.shift_reg |= !(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2));
 				cur_live.shift_reg &= 0x3ff;
-	
-				if (LOG) logerror("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter, 
+
+				if (LOG) logerror("%s read bit %u (%u) >> %03x, oe=%u soe=%u sync=%u byte=%u\n", cur_live.tm.as_string(), cur_live.bit_counter,
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.oe, cur_live.soe, cur_live.sync, cur_live.byte);
 
 				syncpoint = true;
@@ -392,7 +392,7 @@ int c64h156_device::get_next_bit(attotime &tm, attotime limit)
 	if (bit) {
 		cur_live.zero_counter = 0;
 		cur_live.cycles_until_random_flux = (rand() % 31) + 289;
-		
+
 		get_next_edge(next);
 	}
 

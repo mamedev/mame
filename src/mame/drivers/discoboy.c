@@ -487,12 +487,12 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2)	/* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2) /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(discoboy_state, nmi_line_pulse, 32*60)
 
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)	/* 2.5 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 

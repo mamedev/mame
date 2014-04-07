@@ -89,7 +89,7 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 };
 
 /* Discrete Sound Input Nodes */

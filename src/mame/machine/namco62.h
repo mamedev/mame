@@ -34,10 +34,10 @@ public:
 	template<class _Object> static devcb2_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_in_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_2_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_in_2.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_3_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_in_3.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_output_0_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_out_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_output_1_callback(device_t &device, _Object object) { return downcast<namco_62xx_device &>(device).m_out_1.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

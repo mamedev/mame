@@ -19,7 +19,7 @@ class mc6843_device : public device_t
 public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mc6843_device() {}
-	
+
 	template<class _Object> static devcb2_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mc6843_device &>(device).m_write_irq.set_callback(object); }
 
 	DECLARE_READ8_MEMBER(read);
@@ -34,13 +34,13 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	enum
 	{
 		TIMER_CONT
 	};
-	
+
 	devcb2_write_line m_write_irq;
 
 	/* registers */
@@ -66,7 +66,7 @@ private:
 
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* m_timer_cont;
-	
+
 	legacy_floppy_image_device* floppy_image(UINT8 drive);
 	legacy_floppy_image_device* floppy_image();
 	void status_update();
@@ -78,7 +78,7 @@ private:
 	void finish_RCR();
 	void cont_SR();
 	void cont_SW();
-	
+
 };
 
 extern const device_type MC6843;

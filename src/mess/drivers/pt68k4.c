@@ -8,38 +8,38 @@
     2013-09-30 Connected to a terminal
     2014-01-03 Connect real DUARTs, FDC, and TimeKeeper.  Settings now save properly, floppies can be read.
     2014-01-19 ISA bus and compatible cards, PC keyboard support, speaker support
- 
+
 This has the appearance of a PC, including pc power supply, slots, etc
 on a conventional pc-like motherboard and case.
 
 Some pics: http://www.wormfood.net/old_computers/
 
-Chips: 
+Chips:
     68230 Parallel Interface/Timer @ FE0081
     68681 DUART/Timer (x2) @ FE0001 and FE0041
     WD37C65 FDC (PC FDC compatible, even mapped as an ISA device)
     MK48T02 TimeKeeper @ odd bytes from FF0001 to FF0FFF.  even bytes in that range are a standard SRAM chip which is not backed up.
     Keyboard at FE01C1 (status/IRQ clear)/FE01C3 (AT scan codes)
     WD1002 HDD controller @ FE0141-FE014F.  "Monk" BIOS also supports an 8-bit ISA IDE card.
- 
+
 Video: ISA MDA or CGA/EGA/VGA-style boards
     ISA memory is C00001-DFFFFF odd bytes only.  So the MDA B0000 framebuffer becames (B0000*2) + C00001 = D60001.
     ISA I/O is at FA0001-FBFFFF odd bytes only, and the mapping is similar.
- 
+
     HUMBUG BIOS tests MDA and CGA VRAM to determine existence, falls back to serial console if neither exists.  If both exist, MDA is used.
     VRAM is every other byte for ISA cards.  (Only 8 bit cards are supported).
- 
+
     OP3 on DUART1 drives a speaker.
     IP2 on DUART1 signals if a new keyboard scan code is available.
- 
-IRQs: 
+
+IRQs:
     2: 68230 PIT
     4: DUART2
     5: DUART1
     6: PC FDC IRQ
- 
+
 TODO: 68230 device.  Better hardware documentation would be nice too, and working OS disks.
- 
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -55,9 +55,9 @@ TODO: 68230 device.  Better hardware documentation would be nice too, and workin
 #include "sound/speaker.h"
 
 #define M68K_TAG "maincpu"
-#define DUART1_TAG	"duart1"
-#define DUART2_TAG	"duart2"
-#define TIMEKEEPER_TAG	"timekpr"
+#define DUART1_TAG  "duart1"
+#define DUART2_TAG  "duart2"
+#define TIMEKEEPER_TAG  "timekpr"
 #define ISABUS_TAG "isa"
 #define KBDC_TAG "pc_kbdc"
 #define SPEAKER_TAG "speaker"
@@ -109,7 +109,7 @@ private:
 // XT keyboard interface - done in TTL instead of an 804x
 WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
 {
-//	printf("KCLK: %d\n", state ? 1 : 0);
+//  printf("KCLK: %d\n", state ? 1 : 0);
 
 	// rising edge?
 	if ((state == ASSERT_LINE) && (!m_kclk))
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
 		// stop bit?
 		if (m_kbit == 9)
 		{
-//			printf("scancode %02x\n", m_scancode);
+//          printf("scancode %02x\n", m_scancode);
 			m_kbit = 0;
 			m_kbdflag = 0x80;
 			m_duart1->ip2_w(CLEAR_LINE);
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
 
 WRITE_LINE_MEMBER(pt68k4_state::keyboard_data_w)
 {
-//	printf("KDATA: %d\n", state ? 1 : 0);
+//  printf("KDATA: %d\n", state ? 1 : 0);
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
 }
 
@@ -228,11 +228,11 @@ SLOT_INTERFACE_START( pt68k4_isa8_cards )
 	SLOT_INTERFACE("mda", ISA8_MDA)
 	SLOT_INTERFACE("cga", ISA8_CGA)
 	SLOT_INTERFACE("ega", ISA8_EGA) // Monk only
-	SLOT_INTERFACE("vga", ISA8_VGA)	// Monk only
+	SLOT_INTERFACE("vga", ISA8_VGA) // Monk only
 	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
 	SLOT_INTERFACE("wdxt_gen", ISA8_WDXT_GEN)
 	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("xtide", ISA8_XTIDE)	// Monk only
+	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
 SLOT_INTERFACE_END
 
 static const isa8bus_interface pt68k4_isabus_intf =
@@ -309,4 +309,3 @@ ROM_END
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY             FULLNAME       FLAGS */
 COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", GAME_NOT_WORKING )
-

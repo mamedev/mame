@@ -153,7 +153,7 @@ UINT8 a2bus_cffa2000_device::read_c0nx(address_space &space, UINT8 offset)
 			// Apple /// driver uses sta $c080,x when writing, which causes spurious reads of c088
 			if (!m_inwritecycle)
 			{
-				m_lastreaddata = m_ata->read_cs0(space, offset - 8, 0xffff); 
+				m_lastreaddata = m_ata->read_cs0(space, offset - 8, 0xffff);
 			}
 			return m_lastreaddata & 0xff;
 
@@ -184,7 +184,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 0:
 			m_lastdata &= 0x00ff;
 			m_lastdata |= data<<8;
-//			printf("%02x to 0, m_lastdata = %x\n", data, m_lastdata);
+//          printf("%02x to 0, m_lastdata = %x\n", data, m_lastdata);
 			m_inwritecycle = true;
 			break;
 
@@ -199,7 +199,7 @@ void a2bus_cffa2000_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 		case 8:
 			m_lastdata &= 0xff00;
 			m_lastdata |= data;
-//			printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
+//          printf("%02x to 8, m_lastdata = %x\n", data, m_lastdata);
 			m_ata->write_cs0(space, offset-8, m_lastdata, 0xffff);
 			break;
 

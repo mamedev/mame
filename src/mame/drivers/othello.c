@@ -81,7 +81,7 @@ public:
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
 	DECLARE_WRITE8_MEMBER(unk_8c_w);

@@ -76,7 +76,7 @@ bfmdm01_device::bfmdm01_device(const machine_config &mconfig, const char *tag, d
 void bfmdm01_device::device_start()
 {
 	m_busy_cb.resolve_safe();
-	
+
 	save_item(NAME(m_data_avail));
 	save_item(NAME(m_control));
 	save_item(NAME(m_xcounter));
@@ -100,7 +100,7 @@ void bfmdm01_device::device_reset()
 	m_control  = 0;
 	m_xcounter = 0;
 	m_data_avail = 0;
-	
+
 	m_busy_cb(m_busy);
 }
 

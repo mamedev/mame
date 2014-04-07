@@ -52,13 +52,13 @@ const rom_entry *apricot_keyboard_device::device_rom_region() const
 
 #ifdef UPD7507_EMULATED
 static ADDRESS_MAP_START( apricot_keyboard_io, AS_IO, 8, apricot_keyboard_device )
-    AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
-    AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
-    AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)
-    AM_RANGE(0x04, 0x04) AM_WRITE(kb_y0_w)
-    AM_RANGE(0x05, 0x05) AM_WRITE(kb_y4_w)
-    AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
-    AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
+	AM_RANGE(0x00, 0x00) AM_READ(kb_lo_r)
+	AM_RANGE(0x01, 0x01) AM_READ(kb_hi_r)
+	AM_RANGE(0x03, 0x03) AM_WRITE(kb_p3_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(kb_y0_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(kb_y4_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(kb_p6_r, kb_yc_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(kb_y8_w)
 ADDRESS_MAP_END
 #endif
 
@@ -69,8 +69,8 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( apricot_keyboard )
 #ifdef UPD7507_EMULATED
-    MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
-    MCFG_CPU_IO_MAP(apricot_keyboard_io)
+	MCFG_CPU_ADD(UPD7507C_TAG, UPD7507, XTAL_32_768kHz)
+	MCFG_CPU_IO_MAP(apricot_keyboard_io)
 #endif
 MACHINE_CONFIG_END
 

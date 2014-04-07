@@ -40,7 +40,7 @@ enum
     LOCAL VARIABLES
 ***************************************************************************/
 
-// list of natural keyboard keys that are not associated with UI_EVENT_CHARs 
+// list of natural keyboard keys that are not associated with UI_EVENT_CHARs
 static const input_item_id non_char_keys[] =
 {
 	ITEM_ID_ESC,
@@ -88,11 +88,11 @@ static const input_item_id non_char_keys[] =
     GLOBAL VARIABLES
 ***************************************************************************/
 
-// messagebox buffer 
+// messagebox buffer
 static astring messagebox_text;
 static rgb_t messagebox_backcolor;
 
-// slider info 
+// slider info
 static slider_state *slider_list;
 static slider_state *slider_current;
 
@@ -101,7 +101,7 @@ static slider_state *slider_current;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-// slider controls 
+// slider controls
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
 static slider_state *slider_init(running_machine &machine);
 static INT32 slider_volume(running_machine &machine, void *arg, astring *string, INT32 newval);
@@ -221,11 +221,11 @@ static const UINT32 mouse_bitmap[] = {
 ui_manager::ui_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	// initialize the other UI bits 
+	// initialize the other UI bits
 	ui_menu::init(machine);
 	ui_gfx_init(machine);
 
-	// reset instance variables 
+	// reset instance variables
 	m_font = NULL;
 	m_handler_callback = NULL;
 	m_handler_param = 0;
@@ -245,7 +245,7 @@ ui_manager::ui_manager(running_machine &machine)
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_manager::exit), this));
 
-	// retrieve options 
+	// retrieve options
 	m_use_natural_keyboard = machine.options().natural_keyboard();
 	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine, bitmap_argb32(32, 32));
 	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
@@ -265,7 +265,7 @@ void ui_manager::exit()
 	machine().render().texture_free(m_mouse_arrow_texture);
 	m_mouse_arrow_texture = NULL;
 
-	// free the font 
+	// free the font
 	if (m_font != NULL)
 	{
 		machine().render().font_free(m_font);
@@ -280,7 +280,7 @@ void ui_manager::exit()
 
 void ui_manager::initialize(running_machine &machine)
 {
-	// initialize the on-screen display system 
+	// initialize the on-screen display system
 	slider_list = slider_current = slider_init(machine);
 }
 
@@ -712,7 +712,7 @@ void ui_manager::draw_text_full(render_container *container, const char *origs, 
 		if (curwidth > maxwidth)
 			maxwidth = curwidth;
 
-		// if opaque, add a black box 
+		// if opaque, add a black box
 		if (draw == DRAW_OPAQUE)
 			container->add_rect(curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
@@ -1131,7 +1131,7 @@ astring &ui_manager::game_info_astring(astring &string)
 		// get cpu specific clock that takes internal multiplier/dividers into account
 		int clock = exec->device().clock();
 
-		// count how many identical CPUs we have 
+		// count how many identical CPUs we have
 		int count = 1;
 		const char *name = exec->device().name();
 		execute_interface_iterator execinneriter(machine().root_device());
@@ -1142,19 +1142,19 @@ astring &ui_manager::game_info_astring(astring &string)
 					count++;
 		}
 
-		// if more than one, prepend a #x in front of the CPU name 
+		// if more than one, prepend a #x in front of the CPU name
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
 		string.cat(name);
 
-		// display clock in kHz or MHz 
+		// display clock in kHz or MHz
 		if (clock >= 1000000)
 			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else
 			string.catprintf(" %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 	}
 
-	// loop over all sound chips 
+	// loop over all sound chips
 	sound_interface_iterator snditer(machine().root_device());
 	tagmap_t<UINT8> soundtags;
 	bool found_sound = false;
@@ -1163,12 +1163,12 @@ astring &ui_manager::game_info_astring(astring &string)
 		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
 			continue;
 
-		// append the Sound: string 
+		// append the Sound: string
 		if (!found_sound)
 			string.cat("\nSound:\n");
 		found_sound = true;
 
-		// count how many identical sound chips we have 
+		// count how many identical sound chips we have
 		int count = 1;
 		sound_interface_iterator sndinneriter(machine().root_device());
 		for (device_sound_interface *scan = sndinneriter.first(); scan != NULL; scan = sndinneriter.next())
@@ -1177,12 +1177,12 @@ astring &ui_manager::game_info_astring(astring &string)
 				if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
 					count++;
 		}
-		// if more than one, prepend a #x in front of the CPU name 
+		// if more than one, prepend a #x in front of the CPU name
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
 		string.cat(sound->device().name());
 
-		// display clock in kHz or MHz 
+		// display clock in kHz or MHz
 		int clock = sound->device().clock();
 		if (clock >= 1000000)
 			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
@@ -1192,7 +1192,7 @@ astring &ui_manager::game_info_astring(astring &string)
 			string.cat("\n");
 	}
 
-	// display screen information 
+	// display screen information
 	string.cat("\nVideo:\n");
 	screen_device_iterator scriter(machine().root_device());
 	int scrcount = scriter.count();
@@ -1250,18 +1250,18 @@ UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container
 
 UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
 {
-	// draw a standard message window 
+	// draw a standard message window
 	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
-	// an 'O' or left joystick kicks us to the next state 
+	// an 'O' or left joystick kicks us to the next state
 	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
 		state++;
 
-	// a 'K' or right joystick exits the state 
+	// a 'K' or right joystick exits the state
 	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
 		state = UI_HANDLER_CANCEL;
 
-	// if the user cancels, exit out completely 
+	// if the user cancels, exit out completely
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
@@ -1280,17 +1280,17 @@ UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_contai
 
 UINT32 ui_manager::handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
 {
-	// draw a standard message window 
+	// draw a standard message window
 	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
-	// if the user cancels, exit out completely 
+	// if the user cancels, exit out completely
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
-	// if any key is pressed, just exit 
+	// if any key is pressed, just exit
 	else if (machine.input().poll_switches() != INPUT_CODE_INVALID)
 		state = UI_HANDLER_CANCEL;
 
@@ -1312,39 +1312,39 @@ void ui_manager::process_natural_keyboard()
 	UINT8 *key_down_ptr;
 	UINT8 key_down_mask;
 
-	// loop while we have interesting events 
+	// loop while we have interesting events
 	while (ui_input_pop_event(machine(), &event))
 	{
-		// if this was a UI_EVENT_CHAR event, post it 
+		// if this was a UI_EVENT_CHAR event, post it
 		if (event.event_type == UI_EVENT_CHAR)
 			machine().ioport().natkeyboard().post(event.ch);
 	}
 
-	// process natural keyboard keys that don't get UI_EVENT_CHARs 
+	// process natural keyboard keys that don't get UI_EVENT_CHARs
 	for (i = 0; i < ARRAY_LENGTH(non_char_keys); i++)
 	{
-		// identify this keycode 
+		// identify this keycode
 		itemid = non_char_keys[i];
 		code = machine().input().code_from_itemid(itemid);
 
-		// ...and determine if it is pressed 
+		// ...and determine if it is pressed
 		pressed = machine().input().code_pressed(code);
 
-		// figure out whey we are in the key_down map 
+		// figure out whey we are in the key_down map
 		key_down_ptr = &m_non_char_keys_down[i / 8];
 		key_down_mask = 1 << (i % 8);
 
 		if (pressed && !(*key_down_ptr & key_down_mask))
 		{
-			// this key is now down 
+			// this key is now down
 			*key_down_ptr |= key_down_mask;
 
-			// post the key 
+			// post the key
 			machine().ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
-			// this key is now up 
+			// this key is now up
 			*key_down_ptr &= ~key_down_mask;
 		}
 	}
@@ -1357,13 +1357,13 @@ void ui_manager::process_natural_keyboard()
 
 void ui_manager::increase_frameskip()
 {
-	// get the current value and increment it 
+	// get the current value and increment it
 	int newframeskip = machine().video().frameskip() + 1;
 	if (newframeskip > MAX_FRAMESKIP)
 		newframeskip = -1;
 	machine().video().set_frameskip(newframeskip);
 
-	// display the FPS counter for 2 seconds 
+	// display the FPS counter for 2 seconds
 	machine().ui().show_fps_temp(2.0);
 }
 
@@ -1374,13 +1374,13 @@ void ui_manager::increase_frameskip()
 
 void ui_manager::decrease_frameskip()
 {
-	// get the current value and decrement it 
+	// get the current value and decrement it
 	int newframeskip = machine().video().frameskip() - 1;
 	if (newframeskip < -1)
 		newframeskip = MAX_FRAMESKIP;
 	machine().video().set_frameskip(newframeskip);
 
-	// display the FPS counter for 2 seconds 
+	// display the FPS counter for 2 seconds
 	machine().ui().show_fps_temp(2.0);
 }
 
@@ -1391,7 +1391,7 @@ void ui_manager::decrease_frameskip()
 
 bool ui_manager::can_paste()
 {
-	// retrieve the clipboard text 
+	// retrieve the clipboard text
 	char *text = osd_get_clipboard_text();
 
 	// free the string if allocated
@@ -1409,16 +1409,16 @@ bool ui_manager::can_paste()
 
 void ui_manager::paste()
 {
-	// retrieve the clipboard text 
+	// retrieve the clipboard text
 	char *text = osd_get_clipboard_text();
 
-	// was a result returned? 
+	// was a result returned?
 	if (text != NULL)
 	{
-		// post the text 
+		// post the text
 		machine().ioport().natkeyboard().post_utf8(text);
 
-		// free the string 
+		// free the string
 		osd_free(text);
 	}
 }
@@ -1431,7 +1431,7 @@ void ui_manager::paste()
 
 void ui_manager::image_handler_ingame()
 {
-	// run display routine for devices 
+	// run display routine for devices
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
 	{
 		image_interface_iterator iter(machine().root_device());
@@ -1450,7 +1450,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 {
 	bool is_paused = machine.paused();
 
-	// first draw the FPS counter 
+	// first draw the FPS counter
 	if (machine.ui().show_fps_counter())
 	{
 		astring tempstring;
@@ -1458,33 +1458,33 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
-	// draw the profiler if visible 
+	// draw the profiler if visible
 	if (machine.ui().show_profiler())
 	{
 		const char *text = g_profiler.text(machine);
 		machine.ui().draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
-	// if we're single-stepping, pause now 
+	// if we're single-stepping, pause now
 	if (machine.ui().single_step())
 	{
 		machine.pause();
 		machine.ui().set_single_step(false);
 	}
 
-	// determine if we should disable the rest of the UI 
+	// determine if we should disable the rest of the UI
 	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
 
-	// is ScrLk UI toggling applicable here? 
+	// is ScrLk UI toggling applicable here?
 	if (machine.ioport().has_keyboard())
 	{
-		// are we toggling the UI with ScrLk? 
+		// are we toggling the UI with ScrLk?
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
 		{
-			// toggle the UI 
+			// toggle the UI
 			machine.set_ui_active(!machine.ui_active());
 
-			// display a popup indicating the new status 
+			// display a popup indicating the new status
 			if (machine.ui_active())
 			{
 				machine.ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -1508,13 +1508,13 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 		}
 	}
 
-	// is the natural keyboard enabled? 
+	// is the natural keyboard enabled?
 	if (machine.ui().use_natural_keyboard() && (machine.phase() == MACHINE_PHASE_RUNNING))
 		machine.ui().process_natural_keyboard();
 
 	if (!ui_disabled)
 	{
-		// paste command 
+		// paste command
 		if (ui_input_pressed(machine, IPT_UI_PASTE))
 			machine.ui().paste();
 	}
@@ -1529,21 +1529,21 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 		return 0;
 	}
 
-	// turn on menus if requested 
+	// turn on menus if requested
 	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		return machine.ui().set_handler(ui_menu::ui_handler, 0);
 
-	// if the on-screen display isn't up and the user has toggled it, turn it on 
+	// if the on-screen display isn't up and the user has toggled it, turn it on
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
 		return machine.ui().set_handler(ui_menu_sliders::ui_handler, 1);
 
-	// handle a reset request 
+	// handle a reset request
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
 		machine.schedule_hard_reset();
 	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
 		machine.schedule_soft_reset();
 
-	// handle a request to display graphics/palette 
+	// handle a request to display graphics/palette
 	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
@@ -1551,28 +1551,28 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 		return machine.ui().set_handler(ui_gfx_ui_handler, is_paused);
 	}
 
-	// handle a save state request 
+	// handle a save state request
 	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
-	// handle a load state request 
+	// handle a load state request
 	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
 		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
-	// handle a save snapshot request 
+	// handle a save snapshot request
 	if (ui_input_pressed(machine, IPT_UI_SNAPSHOT))
 		machine.video().save_active_screen_snapshots();
 
-	// toggle pause 
+	// toggle pause
 	if (ui_input_pressed(machine, IPT_UI_PAUSE))
 	{
-		// with a shift key, it is single step 
+		// with a shift key, it is single step
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
 		{
 			machine.ui().set_single_step(true);
@@ -1582,35 +1582,35 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 			machine.toggle_pause();
 	}
 
-	// handle a toggle cheats request 
+	// handle a toggle cheats request
 	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 		machine.cheat().set_enable(!machine.cheat().enabled());
 
-	// toggle movie recording 
+	// toggle movie recording
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
 		machine.video().toggle_record_movie();
 
-	// toggle profiler display 
+	// toggle profiler display
 	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
 		machine.ui().set_show_profiler(!machine.ui().show_profiler());
 
-	// toggle FPS display 
+	// toggle FPS display
 	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
 		machine.ui().set_show_fps(!machine.ui().show_fps());
 
-	// increment frameskip? 
+	// increment frameskip?
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
 		machine.ui().increase_frameskip();
 
-	// decrement frameskip? 
+	// decrement frameskip?
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
 		machine.ui().decrease_frameskip();
 
-	// toggle throttle? 
+	// toggle throttle?
 	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
 		machine.video().toggle_throttle();
 
-	// check for fast forward 
+	// check for fast forward
 	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{
 		machine.video().set_fastforward(true);
@@ -1634,31 +1634,31 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	input_code code;
 	char file = 0;
 
-	// if we're not in the middle of anything, skip 
+	// if we're not in the middle of anything, skip
 	if (state == LOADSAVE_NONE)
 		return 0;
 
-	// okay, we're waiting for a key to select a slot; display a message 
+	// okay, we're waiting for a key to select a slot; display a message
 	if (state == LOADSAVE_SAVE)
 		machine.ui().draw_message_window(container, "Select position to save to");
 	else
 		machine.ui().draw_message_window(container, "Select position to load from");
 
-	// check for cancel key 
+	// check for cancel key
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
-		// display a popup indicating things were cancelled 
+		// display a popup indicating things were cancelled
 		if (state == LOADSAVE_SAVE)
 			popmessage("Save cancelled");
 		else
 			popmessage("Load cancelled");
 
-		// reset the state 
+		// reset the state
 		machine.resume();
 		return UI_HANDLER_CANCEL;
 	}
 
-	// check for A-Z or 0-9 
+	// check for A-Z or 0-9
 	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
 		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			file = id - ITEM_ID_A + 'a';
@@ -1673,7 +1673,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 	if (file == 0)
 		return state;
 
-	// display a popup indicating that the save will proceed 
+	// display a popup indicating that the save will proceed
 	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
@@ -1686,7 +1686,7 @@ UINT32 ui_manager::handler_load_save(running_machine &machine, render_container 
 		machine.schedule_load(filename);
 	}
 
-	// remove the pause and reset the state 
+	// remove the pause and reset the state
 	machine.resume();
 	return UI_HANDLER_CANCEL;
 }
@@ -1719,11 +1719,11 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 	machine.ui().draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine.pause();
 
-	// if the user press ENTER, quit the game 
+	// if the user press ENTER, quit the game
 	if (ui_input_pressed(machine, IPT_UI_SELECT))
 		machine.schedule_exit();
 
-	// if the user press ESC, just continue 
+	// if the user press ESC, just continue
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.resume();
@@ -1783,11 +1783,11 @@ static slider_state *slider_init(running_machine &machine)
 	astring string;
 	int item;
 
-	// add overall volume 
+	// add overall volume
 	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, NULL);
 	tailptr = &(*tailptr)->next;
 
-	// add per-channel volume 
+	// add per-channel volume
 	mixer_input info;
 	for (item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
@@ -1800,7 +1800,7 @@ static slider_state *slider_init(running_machine &machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	// add analog adjusters 
+	// add analog adjusters
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (field->type() == IPT_ADJUSTER)
@@ -1810,7 +1810,7 @@ static slider_state *slider_init(running_machine &machine)
 				tailptr = &(*tailptr)->next;
 			}
 
-	// add CPU overclocking (cheat only) 
+	// add CPU overclocking (cheat only)
 	if (machine.options().cheat())
 	{
 		execute_interface_iterator iter(machine.root_device());
@@ -1823,7 +1823,7 @@ static slider_state *slider_init(running_machine &machine)
 		}
 	}
 
-	// add screen parameters 
+	// add screen parameters
 	screen_device_iterator scriter(machine.root_device());
 	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 	{
@@ -1833,7 +1833,7 @@ static slider_state *slider_init(running_machine &machine)
 		int defyoffset = floor(screen->yoffset() * 1000.0f + 0.5f);
 		void *param = (void *)screen;
 
-		// add refresh rate tweaker 
+		// add refresh rate tweaker
 		if (machine.options().cheat())
 		{
 			string.printf("%s Refresh Rate", slider_get_screen_desc(*screen));
@@ -1841,7 +1841,7 @@ static slider_state *slider_init(running_machine &machine)
 			tailptr = &(*tailptr)->next;
 		}
 
-		// add standard brightness/contrast/gamma controls per-screen 
+		// add standard brightness/contrast/gamma controls per-screen
 		string.printf("%s Brightness", slider_get_screen_desc(*screen));
 		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 10, slider_brightness, param);
 		tailptr = &(*tailptr)->next;
@@ -1852,7 +1852,7 @@ static slider_state *slider_init(running_machine &machine)
 		*tailptr = slider_alloc(machine, string, 100, 1000, 3000, 50, slider_gamma, param);
 		tailptr = &(*tailptr)->next;
 
-		// add scale and offset controls per-screen 
+		// add scale and offset controls per-screen
 		string.printf("%s Horiz Stretch", slider_get_screen_desc(*screen));
 		*tailptr = slider_alloc(machine, string, 500, defxscale, 1500, 2, slider_xscale, param);
 		tailptr = &(*tailptr)->next;
@@ -1879,7 +1879,7 @@ static slider_state *slider_init(running_machine &machine)
 			int defyoffset = floor(config.m_overposy * 1000.0f + 0.5f);
 			void *param = (void *)laserdisc;
 
-			// add scale and offset controls per-overlay 
+			// add scale and offset controls per-overlay
 			string.printf("Laserdisc '%s' Horiz Stretch", laserdisc->tag());
 			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
@@ -1897,7 +1897,7 @@ static slider_state *slider_init(running_machine &machine)
 	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
-			// add flicker control 
+			// add flicker control
 			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
 			tailptr = &(*tailptr)->next;
 			*tailptr = slider_alloc(machine, "Beam Width", 10, 100, 1000, 10, slider_beam, NULL);
@@ -1906,7 +1906,7 @@ static slider_state *slider_init(running_machine &machine)
 		}
 
 #ifdef MAME_DEBUG
-	// add crosshair adjusters 
+	// add crosshair adjusters
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)

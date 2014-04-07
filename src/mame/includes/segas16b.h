@@ -200,7 +200,7 @@ protected:
 	UINT8               m_hwc_input_value;
 	UINT8               m_mj_input_num;
 	UINT8               m_mj_last_val;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

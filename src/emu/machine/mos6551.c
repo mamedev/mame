@@ -577,7 +577,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					m_rx_counter = 0;
 
 					if (LOG) logerror("MOS6551 '%s': RX STOP BIT\n", tag());
-		
+
 					if (!(m_status & SR_RDRF))
 					{
 						if (!m_rxd)

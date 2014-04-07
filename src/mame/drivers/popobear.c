@@ -110,7 +110,7 @@ public:
 	required_shared_ptr<UINT16> m_vregs;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	UINT16* m_vram;
 	UINT16* m_vram_rearranged;
 
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz/16)  // XTAL CORRECT, DIVISOR GUESSED
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

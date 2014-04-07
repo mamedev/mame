@@ -655,7 +655,7 @@ protected:
 	virtual UINT32 PSA_ADDR();
 	virtual UINT32 read_irq_vector();
 };
-	    
+
 
 extern const device_type Z8001;
 extern const device_type Z8002;

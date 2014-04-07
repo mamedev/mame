@@ -90,7 +90,7 @@ public:
 	// inline configuration helpers
 	static void static_set_config(device_t &device, const avr8_config &config);
 
-  // fuse configs
+	// fuse configs
 	void set_low_fuses(UINT8 byte);
 	void set_high_fuses(UINT8 byte);
 	void set_extended_fuses(UINT8 byte);
@@ -147,15 +147,15 @@ protected:
 	const address_space_config m_io_config;
 	UINT8 *m_eeprom;
 
-  // bootloader
+	// bootloader
 	UINT16 m_boot_size;
 	UINT8 m_cpu_type;
 
-  // Fuses
-  UINT8 m_lfuses;
-  UINT8 m_hfuses;
-  UINT8 m_efuses;
-  UINT8 m_lock_bits;
+	// Fuses
+	UINT8 m_lfuses;
+	UINT8 m_hfuses;
+	UINT8 m_efuses;
+	UINT8 m_lock_bits;
 
 	// CPU registers
 	UINT32 m_pc;
@@ -241,8 +241,8 @@ protected:
 	void changed_tccr3a(UINT8 data);
 	void changed_tccr3b(UINT8 data);
 	void changed_tccr3c(UINT8 data);
-//	void update_ocr3(UINT8 newval, UINT8 reg);
-//	void timer3_force_output_compare(int reg);
+//  void update_ocr3(UINT8 newval, UINT8 reg);
+//  void timer3_force_output_compare(int reg);
 
 	// timer 4
 	void timer4_tick();
@@ -256,8 +256,8 @@ protected:
 	void timer5_tick();
 	void changed_tccr5a(UINT8 data);
 	void changed_tccr5b(UINT8 data);
-//	void update_ocr5(UINT8 newval, UINT8 reg);
-//	void timer5_force_output_compare(int reg);
+//  void update_ocr5(UINT8 newval, UINT8 reg);
+//  void timer5_force_output_compare(int reg);
 
 	// address spaces
 	address_space *m_program;
@@ -496,24 +496,24 @@ enum
 	AVR8_REGIDX_TCNT0,
 	AVR8_REGIDX_OCR0A,
 	AVR8_REGIDX_OCR0B,
-  //0x49: Reserved
+	//0x49: Reserved
 	AVR8_REGIDX_GPIOR1 = 0x4A,
 	AVR8_REGIDX_GPIOR2,
 	AVR8_REGIDX_SPCR,
 	AVR8_REGIDX_SPSR,
 	AVR8_REGIDX_SPDR,
-  //0x4F: Reserved
+	//0x4F: Reserved
 	AVR8_REGIDX_ACSR = 0x50,
 	AVR8_REGIDX_OCDR,
-  //0x52: Reserved
+	//0x52: Reserved
 	AVR8_REGIDX_SMCR = 0x53,
 	AVR8_REGIDX_MCUSR,
 	AVR8_REGIDX_MCUCR,
-  //0x56: Reserved
+	//0x56: Reserved
 	AVR8_REGIDX_SPMCSR = 0x57,
-  //0x58: Reserved
-  //0x59: Reserved
-  //0x5A: Reserved
+	//0x58: Reserved
+	//0x59: Reserved
+	//0x5A: Reserved
 	AVR8_REGIDX_RAMPZ = 0x5B,
 	AVR8_REGIDX_EIND,
 	AVR8_REGIDX_SPL,
@@ -522,12 +522,12 @@ enum
 //--------------------------
 	AVR8_REGIDX_WDTCSR = 0x60,
 	AVR8_REGIDX_CLKPR,
-  //0x62: Reserved
-  //0x63: Reserved
+	//0x62: Reserved
+	//0x63: Reserved
 	AVR8_REGIDX_PRR0 = 0x64,
 	AVR8_REGIDX_PRR1,
 	AVR8_REGIDX_OSCCAL,
-  //0x67: Reserved
+	//0x67: Reserved
 	AVR8_REGIDX_PCICR = 0x68,
 	AVR8_REGIDX_EICRA,
 	AVR8_REGIDX_EICRB,
@@ -542,8 +542,8 @@ enum
 	AVR8_REGIDX_TIMSK5,
 	AVR8_REGIDX_XMCRA,
 	AVR8_REGIDX_XMCRB,
-  //0x76: Reserved
-  //0x77: Reserved
+	//0x76: Reserved
+	//0x77: Reserved
 	AVR8_REGIDX_ADCL = 0x78,
 	AVR8_REGIDX_ADCH,
 	AVR8_REGIDX_ADCSRA,
@@ -555,7 +555,7 @@ enum
 	AVR8_REGIDX_TCCR1A,
 	AVR8_REGIDX_TCCR1B,
 	AVR8_REGIDX_TCCR1C,
-  //0x83: Reserved
+	//0x83: Reserved
 	AVR8_REGIDX_TCNT1L = 0x84,
 	AVR8_REGIDX_TCNT1H,
 	AVR8_REGIDX_ICR1L,
@@ -566,12 +566,12 @@ enum
 	AVR8_REGIDX_OCR1BH,
 	AVR8_REGIDX_OCR1CL,
 	AVR8_REGIDX_OCR1CH,
-  //0x8E: Reserved
-  //0x8F: Reserved
+	//0x8E: Reserved
+	//0x8F: Reserved
 	AVR8_REGIDX_TCCR3A = 0x90,
 	AVR8_REGIDX_TCCR3B,
 	AVR8_REGIDX_TCCR3C,
-  //0x93: Reserved
+	//0x93: Reserved
 	AVR8_REGIDX_TCNT3L = 0x94,
 	AVR8_REGIDX_TCNT3H,
 	AVR8_REGIDX_ICR3L,
@@ -582,12 +582,12 @@ enum
 	AVR8_REGIDX_OCR3BH,
 	AVR8_REGIDX_OCR3CL,
 	AVR8_REGIDX_OCR3CH,
-  //0x9E: Reserved
-  //0x9F: Reserved
+	//0x9E: Reserved
+	//0x9F: Reserved
 	AVR8_REGIDX_TCCR4A = 0xA0,
 	AVR8_REGIDX_TCCR4B,
 	AVR8_REGIDX_TCCR4C,
-  //0xA3: Reserved
+	//0xA3: Reserved
 	AVR8_REGIDX_TCNT4L = 0xA4,
 	AVR8_REGIDX_TCNT4H,
 	AVR8_REGIDX_ICR4L,
@@ -598,88 +598,88 @@ enum
 	AVR8_REGIDX_OCR4BH,
 	AVR8_REGIDX_OCR4CL,
 	AVR8_REGIDX_OCR4CH,
-  //0xAE: Reserved
-  //0xAF: Reserved
+	//0xAE: Reserved
+	//0xAF: Reserved
 	AVR8_REGIDX_TCCR2A = 0xB0,
 	AVR8_REGIDX_TCCR2B,
 	AVR8_REGIDX_TCNT2,
 	AVR8_REGIDX_OCR2A,
 	AVR8_REGIDX_OCR2B,
-  //0xB5: Reserved
+	//0xB5: Reserved
 	AVR8_REGIDX_ASSR = 0xB6,
-  //0xB7: Reserved
+	//0xB7: Reserved
 	AVR8_REGIDX_TWBR = 0xB8,
 	AVR8_REGIDX_TWSR,
 	AVR8_REGIDX_TWAR,
 	AVR8_REGIDX_TWDR,
 	AVR8_REGIDX_TWCR,
 	AVR8_REGIDX_TWAMR,
-  //0xBE: Reserved
-  //0xBF: Reserved
+	//0xBE: Reserved
+	//0xBF: Reserved
 	AVR8_REGIDX_UCSR0A = 0xC0,
 	AVR8_REGIDX_UCSR0B,
 	AVR8_REGIDX_UCSR0C,
-  //0xC3: Reserved
+	//0xC3: Reserved
 	AVR8_REGIDX_UBRR0L = 0xC4,
 	AVR8_REGIDX_UBRR0H,
 	AVR8_REGIDX_UDR0,
-  //0xC7: Reserved
+	//0xC7: Reserved
 	AVR8_REGIDX_UCSR1A = 0xC8,
 	AVR8_REGIDX_UCSR1B,
 	AVR8_REGIDX_UCSR1C,
-  //0xCB: Reserved
+	//0xCB: Reserved
 	AVR8_REGIDX_UBRR1L = 0xCC,
 	AVR8_REGIDX_UBRR1H,
 	AVR8_REGIDX_UDR1,
-  //0xCF: Reserved
+	//0xCF: Reserved
 	AVR8_REGIDX_UCSR2A = 0xD0,
 	AVR8_REGIDX_UCSR2B,
 	AVR8_REGIDX_UCSR2C,
-  //0xD3: Reserved
+	//0xD3: Reserved
 	AVR8_REGIDX_UBRR2L = 0xD4,
 	AVR8_REGIDX_UBRR2H,
 	AVR8_REGIDX_UDR2,
-  //0xD7: Reserved
-  //0xD8: Reserved
-  //0xD9: Reserved
-  //0xDA: Reserved
-  //0xDB: Reserved
-  //0xDC: Reserved
-  //0xDD: Reserved
-  //0xDE: Reserved
-  //0xDF: Reserved
-  //0xE0: Reserved
-  //0xE1: Reserved
-  //0xE2: Reserved
-  //0xE3: Reserved
-  //0xE4: Reserved
-  //0xE5: Reserved
-  //0xE6: Reserved
-  //0xE7: Reserved
-  //0xE8: Reserved
-  //0xE9: Reserved
-  //0xEA: Reserved
-  //0xEB: Reserved
-  //0xEC: Reserved
-  //0xED: Reserved
-  //0xEE: Reserved
-  //0xEF: Reserved
-  //0xF0: Reserved
-  //0xF1: Reserved
-  //0xF2: Reserved
-  //0xF3: Reserved
-  //0xF4: Reserved
-  //0xF5: Reserved
-  //0xF6: Reserved
-  //0xF7: Reserved
-  //0xF8: Reserved
-  //0xF9: Reserved
-  //0xFA: Reserved
-  //0xFB: Reserved
-  //0xFC: Reserved
-  //0xFD: Reserved
-  //0xFE: Reserved
-  //0xFF: Reserved
+	//0xD7: Reserved
+	//0xD8: Reserved
+	//0xD9: Reserved
+	//0xDA: Reserved
+	//0xDB: Reserved
+	//0xDC: Reserved
+	//0xDD: Reserved
+	//0xDE: Reserved
+	//0xDF: Reserved
+	//0xE0: Reserved
+	//0xE1: Reserved
+	//0xE2: Reserved
+	//0xE3: Reserved
+	//0xE4: Reserved
+	//0xE5: Reserved
+	//0xE6: Reserved
+	//0xE7: Reserved
+	//0xE8: Reserved
+	//0xE9: Reserved
+	//0xEA: Reserved
+	//0xEB: Reserved
+	//0xEC: Reserved
+	//0xED: Reserved
+	//0xEE: Reserved
+	//0xEF: Reserved
+	//0xF0: Reserved
+	//0xF1: Reserved
+	//0xF2: Reserved
+	//0xF3: Reserved
+	//0xF4: Reserved
+	//0xF5: Reserved
+	//0xF6: Reserved
+	//0xF7: Reserved
+	//0xF8: Reserved
+	//0xF9: Reserved
+	//0xFA: Reserved
+	//0xFB: Reserved
+	//0xFC: Reserved
+	//0xFD: Reserved
+	//0xFE: Reserved
+	//0xFF: Reserved
 	AVR8_REGIDX_PINH = 0x100,
 	AVR8_REGIDX_DDRH,
 	AVR8_REGIDX_PORTH,
@@ -692,30 +692,30 @@ enum
 	AVR8_REGIDX_PINL,
 	AVR8_REGIDX_DDRL,
 	AVR8_REGIDX_PORTL,
-  //0x10C: Reserved
-  //0x10D: Reserved
-  //0x10E: Reserved
-  //0x10F: Reserved
-  //0x110: Reserved
-  //0x111: Reserved
-  //0x112: Reserved
-  //0x113: Reserved
-  //0x114: Reserved
-  //0x115: Reserved
-  //0x116: Reserved
-  //0x117: Reserved
-  //0x118: Reserved
-  //0x119: Reserved
-  //0x11A: Reserved
-  //0x11B: Reserved
-  //0x11C: Reserved
-  //0x11D: Reserved
-  //0x11E: Reserved
-  //0x11F: Reserved
+	//0x10C: Reserved
+	//0x10D: Reserved
+	//0x10E: Reserved
+	//0x10F: Reserved
+	//0x110: Reserved
+	//0x111: Reserved
+	//0x112: Reserved
+	//0x113: Reserved
+	//0x114: Reserved
+	//0x115: Reserved
+	//0x116: Reserved
+	//0x117: Reserved
+	//0x118: Reserved
+	//0x119: Reserved
+	//0x11A: Reserved
+	//0x11B: Reserved
+	//0x11C: Reserved
+	//0x11D: Reserved
+	//0x11E: Reserved
+	//0x11F: Reserved
 	AVR8_REGIDX_TCCR5A,
 	AVR8_REGIDX_TCCR5B,
 	AVR8_REGIDX_TCCR5C,
-  //0x123: Reserved
+	//0x123: Reserved
 	AVR8_REGIDX_TCNT5L,
 	AVR8_REGIDX_TCNT5H,
 	AVR8_REGIDX_ICR5L,
@@ -726,34 +726,34 @@ enum
 	AVR8_REGIDX_OCR5BH,
 	AVR8_REGIDX_OCR5CL,
 	AVR8_REGIDX_OCR5CH,
-  //0x12E: Reserved
-  //0x12F: Reserved
+	//0x12E: Reserved
+	//0x12F: Reserved
 	AVR8_REGIDX_UCSR3A,
 	AVR8_REGIDX_UCSR3B,
 	AVR8_REGIDX_UCSR3C,
-  //0x133: Reserved
+	//0x133: Reserved
 	AVR8_REGIDX_UBRR3L,
 	AVR8_REGIDX_UBRR3H,
 	AVR8_REGIDX_UDR3,
-  //0x137: Reserved
-  //  .
-  //  . up to
-  //  .
-  //0x1FF: Reserved
+	//0x137: Reserved
+	//  .
+	//  . up to
+	//  .
+	//0x1FF: Reserved
 };
 
 enum {
-  AVR8_IO_PORTA = 0,
-  AVR8_IO_PORTB, 
-  AVR8_IO_PORTC,
-  AVR8_IO_PORTD,
-  AVR8_IO_PORTE,
-  AVR8_IO_PORTF,
-  AVR8_IO_PORTG,
-  AVR8_IO_PORTH,
-  AVR8_IO_PORTJ,
-  AVR8_IO_PORTK,
-  AVR8_IO_PORTL
+	AVR8_IO_PORTA = 0,
+	AVR8_IO_PORTB,
+	AVR8_IO_PORTC,
+	AVR8_IO_PORTD,
+	AVR8_IO_PORTE,
+	AVR8_IO_PORTF,
+	AVR8_IO_PORTG,
+	AVR8_IO_PORTH,
+	AVR8_IO_PORTJ,
+	AVR8_IO_PORTK,
+	AVR8_IO_PORTL
 };
 
 //TODO: AVR8_REG_* and AVR8_IO_PORT* seem to serve the same purpose and thus should be unified. Verify this!
@@ -810,46 +810,46 @@ enum
 //lock bit masks
 enum
 {
-  LB1 = (1 << 0),
-  LB2 = (1 << 1),
-  BLB01 = (1 << 2),
-  BLB02 = (1 << 3),
-  BLB11 = (1 << 4),
-  BLB12 = (1 << 5),
+	LB1 = (1 << 0),
+	LB2 = (1 << 1),
+	BLB01 = (1 << 2),
+	BLB02 = (1 << 3),
+	BLB11 = (1 << 4),
+	BLB12 = (1 << 5),
 };
 
 //extended fuses bit masks
 enum
 {
-  BODLEVEL0 = (1 << 0),
-  BODLEVEL1 = (1 << 1),
-  BODLEVEL2 = (1 << 2),
+	BODLEVEL0 = (1 << 0),
+	BODLEVEL1 = (1 << 1),
+	BODLEVEL2 = (1 << 2),
 };
 
 //high fuses bit masks
 enum
 {
-  BOOTRST = (1 << 0),
-  BOOTSZ0 = (1 << 1),
-  BOOTSZ1 = (1 << 2),
-  EESAVE = (1 << 3),
-  WDTON = (1 << 4),
-  SPIEN = (1 << 5),
-  JTAGEN = (1 << 6),
-  OCDEN = (1 << 7),
+	BOOTRST = (1 << 0),
+	BOOTSZ0 = (1 << 1),
+	BOOTSZ1 = (1 << 2),
+	EESAVE = (1 << 3),
+	WDTON = (1 << 4),
+	SPIEN = (1 << 5),
+	JTAGEN = (1 << 6),
+	OCDEN = (1 << 7),
 };
 
 //low fuses bit masks
 enum
 {
-  CKSEL0 = (1 << 0),
-  CKSEL1 = (1 << 1),
-  CKSEL2 = (1 << 2),
-  CKSEL3 = (1 << 3),
-  SUT0 = (1 << 4),
-  SUT1 = (1 << 5),
-  CKOUT = (1 << 6),
-  CKDIV8 = (1 << 7),
+	CKSEL0 = (1 << 0),
+	CKSEL1 = (1 << 1),
+	CKSEL2 = (1 << 2),
+	CKSEL3 = (1 << 3),
+	SUT0 = (1 << 4),
+	SUT1 = (1 << 5),
+	CKOUT = (1 << 6),
+	CKDIV8 = (1 << 7),
 };
 
 #define AVR8_EEARH_MASK         0x01

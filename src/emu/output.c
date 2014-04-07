@@ -31,14 +31,14 @@ class output_notify
 public:
 	output_notify(output_notifier_func callback, void *param)
 		: m_next(NULL),
-		  m_notifier(callback),
-		  m_param(param) { }
+			m_notifier(callback),
+			m_param(param) { }
 
 	output_notify *next() const { return m_next; }
 
-	output_notify *     	m_next;           /* link to next item */
+	output_notify *         m_next;           /* link to next item */
 	output_notifier_func    m_notifier;       /* callback to call */
-	void *              	m_param;          /* parameter to pass the callback */
+	void *                  m_param;          /* parameter to pass the callback */
 };
 
 

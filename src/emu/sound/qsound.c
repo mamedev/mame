@@ -11,7 +11,7 @@
 
   Many thanks to CAB (the author of Amuse), without whom this probably would
   never have been finished.
-  
+
   TODO:
   - hook up the DSP!
   - is master volume really linear?
@@ -116,7 +116,7 @@ void qsound_device::device_start()
 	// create pan table
 	for (int i = 0; i < 33; i++)
 		m_pan_table[i] = (int)((256 / sqrt(32.0)) * sqrt((double)i));
-	
+
 	// init sound regs
 	memset(m_channel, 0, sizeof(m_channel));
 
@@ -165,18 +165,18 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				m_channel[ch].address += (m_channel[ch].step_ptr >> 12);
 				m_channel[ch].step_ptr &= 0xfff;
 				m_channel[ch].step_ptr += m_channel[ch].freq;
-				
+
 				if (m_channel[ch].address >= m_channel[ch].end)
 				{
 					if (m_channel[ch].loop)
 					{
 						// Reached the end, restart the loop
 						m_channel[ch].address -= m_channel[ch].loop;
-						
+
 						// Make sure we don't overflow (what does the real chip do in this case?)
 						if (m_channel[ch].address >= m_channel[ch].end)
 							m_channel[ch].address = m_channel[ch].end - m_channel[ch].loop;
-						
+
 						m_channel[ch].address &= 0xffff;
 					}
 					else
@@ -186,7 +186,7 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						break;
 					}
 				}
-				
+
 				INT8 sample = read_sample(m_channel[ch].bank | m_channel[ch].address);
 				*lmix++ += ((sample * m_channel[ch].lvol * m_channel[ch].vol) >> 14);
 				*rmix++ += ((sample * m_channel[ch].rvol * m_channel[ch].vol) >> 14);
@@ -237,7 +237,7 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 		ch = address >> 3;
 		reg = address & 7;
 	}
-	
+
 	// >= 0x80 is probably for the dsp?
 	else if (address < 0x90)
 	{
@@ -312,12 +312,12 @@ void qsound_device::write_data(UINT8 address, UINT16 data)
 				pan = 0x20;
 			if (pan < 0)
 				pan = 0;
-			
+
 			m_channel[ch].rvol = m_pan_table[pan];
 			m_channel[ch].lvol = m_pan_table[0x20 - pan];
 			break;
 		}
-		
+
 		case 9:
 			// unknown
 			break;

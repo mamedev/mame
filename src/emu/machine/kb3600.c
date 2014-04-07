@@ -160,7 +160,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 				if (!found)
 				{
-					ako = 1; 
+					ako = 1;
 
 					if (m_b != b)
 					{
@@ -181,7 +181,7 @@ void ay3600_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					}
 				}
 			}
-			else	// key released, unmark it from the keys_down table
+			else    // key released, unmark it from the keys_down table
 			{
 				for (int k = 0; k < MAX_KEYS_DOWN; k++)
 				{

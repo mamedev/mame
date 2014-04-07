@@ -1885,7 +1885,7 @@ prof181x
 // SWTPC S/09
 swtpc09   // S09, DMF2 Floppy SBUG rom - FLEX
 swtpc09i  // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
-swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX 
+swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX
 swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
 
 
@@ -1955,7 +1955,7 @@ batmantv    // The Batman, 2004
 harriet // 1990
 
 // Fanuc
-fanucspg	// 1983
+fanucspg    // 1983
 fanucs15    // 1990
 
 //********** Misc **********************************************************

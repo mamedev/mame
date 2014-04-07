@@ -1596,7 +1596,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	// reading random values in some games for example in timecris to determine
 	// where certain enemies will emerge.
 	// It works in combination with keycus_w, but not yet understood how.
-	
+
 //  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, space.device().safe_pc());
 
 	// protection (not used for all games)
@@ -1608,11 +1608,11 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 		case NAMCOS22_RIDGE_RACER2:
 			if (offset == 0) return 0x0172;
 			break;
-		
+
 		case NAMCOS22_ACE_DRIVER:
 			if (offset == 3) return 0x0173;
 			break;
-		
+
 		case NAMCOS22_CYBER_COMMANDO:
 			if (offset == 1) return 0x0185;
 			break;
@@ -1640,11 +1640,11 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 		case NAMCOS22_TOKYO_WARS:
 			if (offset == 4) return 0x01a8;
 			break;
-		
+
 		default:
 			break;
 	}
-	
+
 	// pick a random number, but don't pick the same twice in a row
 	UINT16 old_rng = m_keycus_rng;
 	do

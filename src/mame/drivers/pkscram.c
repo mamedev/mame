@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 };
 
 

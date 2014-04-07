@@ -13,7 +13,7 @@ Exidy discrete hardware games
  Super Death Chase (1977)
  Table Football (1975)
  Tv Pinball (1974)
- 
+
 ***************************************************************************/
 
 
@@ -53,15 +53,15 @@ class exidyttl_state : public driver_device
 public:
 	exidyttl_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
 
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
 
 	// driver_device overrides
@@ -77,14 +77,14 @@ private:
 
 static NETLIST_START(attack)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -105,7 +105,7 @@ void exidyttl_state::video_start()
 static MACHINE_CONFIG_START( attack, exidyttl_state )
 
 	/* basic machine hardware */
-    MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(attack)
 
 	/* video hardware */
@@ -147,32 +147,32 @@ ROM_END
 /***********
 
  Exidy Death Race 1976
- 
+
  Drawing Name
  ------------
- 6331-36.E7	32x8	Right Gremlin
- 6301-91.J10	256x4
- 
- 6331-36.R7	32x8	Left Gremlin
- 6301-91.V10	256x4
- 
- 6301-92.V5		P1 (left car)
+ 6331-36.E7 32x8    Right Gremlin
+ 6301-91.J10    256x4
+
+ 6331-36.R7 32x8    Left Gremlin
+ 6301-91.V10    256x4
+
+ 6301-92.V5     P1 (left car)
  6331-35.T7
- 
- 6301-92.J5		P2 (right car)
+
+ 6301-92.J5     P2 (right car)
  6331-35.G7
- 
- 6301-97.M11		Image Generation
+
+ 6301-97.M11        Image Generation
  6301-98.L11
  6301-99.K11
  6301-100.J11
- 
- 6331-33.P14		Score & Timer
- 
- 6331-31.A11		Timing / Sync
+
+ 6331-33.P14        Score & Timer
+
+ 6331-31.A11        Timing / Sync
  6331-32.C12
- 
-***********/ 
+
+***********/
 
 
 ROM_START( deathrac )

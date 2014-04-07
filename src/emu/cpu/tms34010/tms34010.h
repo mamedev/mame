@@ -216,7 +216,7 @@ public:
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
 	DECLARE_WRITE16_MEMBER( io_register_w );
 	DECLARE_READ16_MEMBER( io_register_r );
-	
+
 	DECLARE_WRITE16_MEMBER(host_w);
 	DECLARE_READ16_MEMBER(host_r);
 };

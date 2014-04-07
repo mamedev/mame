@@ -66,7 +66,7 @@ class _5a22_device : public legacy_cpu_device
 {
 public:
 	_5a22_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_WRITE8_MEMBER( wrmpya_w );
 	DECLARE_WRITE8_MEMBER( wrmpyb_w );
 	DECLARE_WRITE8_MEMBER( wrdivl_w );
@@ -77,7 +77,7 @@ public:
 	DECLARE_READ8_MEMBER( rddivh_r );
 	DECLARE_READ8_MEMBER( rdmpyl_r );
 	DECLARE_READ8_MEMBER( rdmpyh_r );
-	
+
 	void set_5a22_map();
 };
 

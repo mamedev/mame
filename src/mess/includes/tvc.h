@@ -38,7 +38,7 @@
 // ======================> tvc_sound_device
 
 class tvc_sound_device : public device_t,
-						 public device_sound_interface
+							public device_sound_interface
 {
 public:
 	// construction/destruction

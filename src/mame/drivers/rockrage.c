@@ -261,10 +261,10 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_K007342_GFXNUM(0)
 	MCFG_K007342_CALLBACK_OWNER(rockrage_state, rockrage_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
-	
+
 	MCFG_K007420_ADD("k007420")
 	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)	
+	MCFG_K007420_CALLBACK_OWNER(rockrage_state, rockrage_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rockrage)

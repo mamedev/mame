@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER( gsword_8741_3_r );
 	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
 	DECLARE_DRIVER_INIT(gsword);
-	DECLARE_DRIVER_INIT(gsword2);	
+	DECLARE_DRIVER_INIT(gsword2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(gsword);

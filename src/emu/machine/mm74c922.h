@@ -106,12 +106,12 @@ private:
 	void clock_scan_counters();
 	void detect_keypress();
 
-	devcb2_write_line 	m_write_da;
-	devcb2_read8 		m_read_x1;
-	devcb2_read8 		m_read_x2;
-	devcb2_read8 		m_read_x3;
-	devcb2_read8 		m_read_x4;
-	devcb2_read8 		m_read_x5;
+	devcb2_write_line   m_write_da;
+	devcb2_read8        m_read_x1;
+	devcb2_read8        m_read_x2;
+	devcb2_read8        m_read_x3;
+	devcb2_read8        m_read_x4;
+	devcb2_read8        m_read_x5;
 
 	double              m_cap_osc;
 	double              m_cap_debounce;

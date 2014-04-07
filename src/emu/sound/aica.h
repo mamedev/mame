@@ -82,7 +82,7 @@ public:
 	static void set_roffset(device_t &device, int roffset) { downcast<aica_device &>(device).m_roffset = roffset; }
 	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_main_irq_callback(device_t &device, _Object object) { return downcast<aica_device &>(device).m_main_irq_cb.set_callback(object); }
-	
+
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -90,7 +90,7 @@ public:
 	// MIDI I/O access
 	DECLARE_WRITE16_MEMBER( midi_in );
 	DECLARE_READ16_MEMBER( midi_out_r );
-	
+
 	void set_ram_base(void *base, int size);
 
 protected:
@@ -146,7 +146,7 @@ private:
 		UINT16 data[0xc0/2];
 		UINT8 datab[0xc0];
 	} m_udata;
-	
+
 	UINT16 m_IRQL, m_IRQR;
 	UINT16 m_EFSPAN[0x48];
 	AICA_SLOT m_Slots[64];
@@ -193,9 +193,9 @@ private:
 
 	stream_sample_t *m_bufferl;
 	stream_sample_t *m_bufferr;
-	
+
 	int m_length;
-	
+
 	signed short *m_RBUFDST;   //this points to where the sample will be stored in the RingBuf
 	INT32 m_EG_TABLE[0x400];
 	int m_PLFO_TRI[256],m_PLFO_SQR[256],m_PLFO_SAW[256],m_PLFO_NOI[256];

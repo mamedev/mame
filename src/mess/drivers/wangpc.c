@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
 	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
 	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
-	
+
 	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(wangpc_state, epci_irq_w))

@@ -22,7 +22,7 @@ public:
 	~upd775x_device() {}
 
 	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(object); }
-	
+
 	void set_bank_base(offs_t base);
 
 	void reset_w(UINT8 data);
@@ -82,7 +82,7 @@ protected:
 	UINT32      m_rommask;                    /* maximum address offset */
 
 	devcb2_write_line m_drqcallback;
-	
+
 	void update_adpcm(int data);
 	void advance_state();
 };

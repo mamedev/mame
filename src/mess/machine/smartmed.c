@@ -76,12 +76,12 @@ const device_type NAND = &device_creator<nand_device>;
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock, "nand", __FILE__),
-	  m_write_rnb(*this)
+		m_write_rnb(*this)
 {
 }
 nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_write_rnb(*this)
+		m_write_rnb(*this)
 {
 }
 

@@ -88,7 +88,7 @@ void sgi_mc_device::device_start()
 	}
 
 	timer_init();
-	
+
 	save_item(NAME(m_nCPUControl0));
 	save_item(NAME(m_nCPUControl1));
 	save_item(NAME(m_nWatchdog));

@@ -196,7 +196,7 @@ void sspeedr_state::draw_drones(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		y = 0xf0 - m_drones_vert[i >> 1];
 
-		
+
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 			code[i] ^ m_toggle,
 			0,
@@ -226,7 +226,7 @@ void sspeedr_state::draw_driver(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	y = 0xf0 - m_driver_vert;
 
-	
+
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 		m_driver_pic,
 		0,

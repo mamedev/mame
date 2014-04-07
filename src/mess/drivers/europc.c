@@ -32,7 +32,7 @@ public:
 
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
-	
+
 	DECLARE_DRIVER_INIT(europc);
 
 	void europc_rtc_set_time();
@@ -47,7 +47,7 @@ public:
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	emu_timer* m_rtc_timer;
-	
+
 	enum
 	{
 		TIMER_RTC
@@ -345,9 +345,9 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 	m_rtc_timer = timer_alloc();
 	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
 	//  europc_rtc_set_time();
-	
+
 	machine().device<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
-	m_aga = machine().device<isa8_aga_device>("aga:aga");		
+	m_aga = machine().device<isa8_aga_device>("aga:aga");
 
 }
 
@@ -402,7 +402,7 @@ ALT,[SPACE], SPACE BAR,[SPACE],CAPS LOCK,[SPACE], KEYPAD 0, KEYPAD ., KEYPAD ENT
 \ and ~ had to be swapped
 i am not sure if keypad enter delivers the mf2 keycode
  */
- 
+
 static INPUT_PORTS_START( europc )
 	PORT_START("DSW0") /* IN1 */
 
@@ -476,21 +476,21 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( europc, europc_pc_state )
-	MCFG_CPU_ADD("maincpu", I8088, 4772720*2) 
+	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
-	
+
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "aga", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
-	
+
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")

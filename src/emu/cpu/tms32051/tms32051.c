@@ -520,4 +520,3 @@ bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int 
 	}
 	return 1;
 }
-

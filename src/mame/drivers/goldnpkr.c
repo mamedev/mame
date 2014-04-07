@@ -3410,8 +3410,8 @@ static INPUT_PORTS_START( mondial )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* the following one is connected to DIP switches and is meant
-    for switch between different programs stored in different
-    halves of the program ROM */
+	for switch between different programs stored in different
+	halves of the program ROM */
 	PORT_START("SELDSW")
 	PORT_DIPNAME( 0x01, 0x00, "Game Selector" )
 	PORT_DIPSETTING(    0x00, "Game 1 (Italian" )
@@ -4048,7 +4048,7 @@ ROM_START( videtron )
 ROM_END
 
 ROM_START( videtron2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* different from videtron */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* different from videtron */
 	ROM_LOAD( "4.bin", 0x5000, 0x1000, CRC(4a7dab42) SHA1(7fcdab985b783d90879a99b2a53a6814ca4278eb) )
 	ROM_LOAD( "5.bin", 0x6000, 0x1000, CRC(c70e8127) SHA1(7db2d4a29cba7c336f254393955fad71f30a539a) )
 	ROM_LOAD( "6.bin", 0x7000, 0x1000, CRC(490c7304) SHA1(1a6c6112571fd0e35b640ed58f66582a2d99c58b) )
@@ -10335,5 +10335,5 @@ GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
 
 GAMEL( 198?, bchancep,  0,        bchancep, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel HW)", GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )					// banked selectable program
-GAME(  198?, pokersis,  0,        bchancep, goldnpkr, driver_device,  0,        ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            GAME_NOT_WORKING )	// fix banking (4 prgs?)...
+GAME(  1987, pokermon,  0,        mondial,  mondial,  driver_device,  0,        ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0 )                  // banked selectable program
+GAME(  198?, pokersis,  0,        bchancep, goldnpkr, driver_device,  0,        ROT0,   "Sisteme France",           "unknown Sisteme France Poker",            GAME_NOT_WORKING )   // fix banking (4 prgs?)...

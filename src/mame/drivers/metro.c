@@ -1731,8 +1731,8 @@ const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
 
 puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
-	  data_cb(*this),
-	  port(*this, ":IN0")
+		data_cb(*this),
+		port(*this, ":IN0")
 {
 }
 
@@ -5316,9 +5316,9 @@ ROM_END
 /* an 'Electronic Devices' manufactured board has been seen with the following roms. The data is 100% identical to the above set
    but due to lazy manufacturing larger ROMs were used and the first half filled with 0xff
 
-	ROM_LOAD16_BYTE( "ladyki_3.h9",   0x000000, 0x080000, CRC(c658f954) SHA1(d50043457e67a94feff1328fe9bf522aa3c124b6) ) // == e2.8g
-	ROM_LOAD16_BYTE( "ladyki_2.h10",  0x000001, 0x080000, CRC(bf58e4db) SHA1(9d7f74dc348b0ccb3bcf1b618d6092292b6945b8) ) // == e3.10g
-	ROM_LOAD( "ladyki_1.d1", 0x000000, 0x080000, CRC(3dca957c) SHA1(4b815b7cb124a38c639a4b425ed6e8b1f0946451) ) // == e8.1d
+    ROM_LOAD16_BYTE( "ladyki_3.h9",   0x000000, 0x080000, CRC(c658f954) SHA1(d50043457e67a94feff1328fe9bf522aa3c124b6) ) // == e2.8g
+    ROM_LOAD16_BYTE( "ladyki_2.h10",  0x000001, 0x080000, CRC(bf58e4db) SHA1(9d7f74dc348b0ccb3bcf1b618d6092292b6945b8) ) // == e3.10g
+    ROM_LOAD( "ladyki_1.d1", 0x000000, 0x080000, CRC(3dca957c) SHA1(4b815b7cb124a38c639a4b425ed6e8b1f0946451) ) // == e8.1d
 */
 
 ROM_START( moegonta )

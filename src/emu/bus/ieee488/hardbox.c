@@ -53,7 +53,7 @@
 #define Z80_TAG         "z80"
 #define I8255_0_TAG     "ic17"
 #define I8255_1_TAG     "ic16"
-#define CORVUS_HDC_TAG	"corvus"
+#define CORVUS_HDC_TAG  "corvus"
 
 
 
@@ -88,9 +88,9 @@ ROM_START( hardbox )
 	         The version numbers listed are the ROM version reported by the HardBox diagnostics program.
 	         Disassembling the ROMs showed that v2.3 and v2.4 are for Corvus Systems drives but v3.1 is
 	         for Sunol Systems drives.  Both types use the Corvus flat cable interface but there may be
-	         some programming differences, e.g. the v3.1 firmware for Sunol does not have the park heads 
-		 routine in the Corvus versions.  MESS emulates a Corvus drive so we default to the last 
-		 known HardBox firmware for Corvus (v2.4). */
+	         some programming differences, e.g. the v3.1 firmware for Sunol does not have the park heads
+	     routine in the Corvus versions.  MESS emulates a Corvus drive so we default to the last
+	     known HardBox firmware for Corvus (v2.4). */
 ROM_END
 
 

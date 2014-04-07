@@ -12,4 +12,3 @@
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(sol20_cassette_formats);
-

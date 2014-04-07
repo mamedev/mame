@@ -29,7 +29,7 @@ enum pstate_data_type_e {
 	DT_CUSTOM,
 	DT_DOUBLE,
 	DT_INT64,
-    DT_INT16,
+	DT_INT16,
 	DT_INT8,
 	DT_INT,
 	DT_BOOLEAN
@@ -70,22 +70,22 @@ protected:
 
 struct pstate_entry_t
 {
-    typedef netlist_list_t<pstate_entry_t *> list_t;
+	typedef netlist_list_t<pstate_entry_t *> list_t;
 
-    pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
-            const int size, const int count, void *ptr)
-    : m_name(stname), m_dt(dt), m_owner(owner), m_callback(NULL), m_size(size), m_count(count), m_ptr(ptr) { }
+	pstate_entry_t(const pstring &stname, const pstate_data_type_e dt, const void *owner,
+			const int size, const int count, void *ptr)
+	: m_name(stname), m_dt(dt), m_owner(owner), m_callback(NULL), m_size(size), m_count(count), m_ptr(ptr) { }
 
-    pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
-    : m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL) { }
+	pstate_entry_t(const pstring &stname, const void *owner, pstate_callback_t *callback)
+	: m_name(stname), m_dt(DT_CUSTOM), m_owner(owner), m_callback(callback), m_size(0), m_count(0), m_ptr(NULL) { }
 
-    pstring m_name;
-    const pstate_data_type_e m_dt;
-    const void *m_owner;
-    pstate_callback_t *m_callback;
-    const int m_size;
-    const int m_count;
-    void *m_ptr;
+	pstring m_name;
+	const pstate_data_type_e m_dt;
+	const void *m_owner;
+	pstate_callback_t *m_callback;
+	const int m_size;
+	const int m_count;
+	void *m_ptr;
 };
 
 class pstate_manager_t
@@ -125,8 +125,8 @@ private:
 template<> ATTR_COLD inline void pstate_manager_t::save_item(pstate_callback_t &state, const void *owner, const pstring &stname)
 {
 	//save_state_ptr(stname, DT_CUSTOM, 0, 1, &state);
-    pstate_entry_t *p = new pstate_entry_t(stname, owner, &state);
-    m_save.add(p);
+	pstate_entry_t *p = new pstate_entry_t(stname, owner, &state);
+	m_save.add(p);
 	state.register_state(*this, stname);
 }
 

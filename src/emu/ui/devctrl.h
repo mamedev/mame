@@ -23,7 +23,7 @@ public:
 protected:
 	_DeviceType *current_device() { return m_device; }
 	int count() { return m_count; }
-	
+
 	int current_index();
 	void previous();
 	void next();
@@ -32,8 +32,8 @@ private:
 	// device iterator
 	typedef device_type_iterator<&device_creator<_DeviceType>, _DeviceType> iterator;
 
-	_DeviceType *	m_device;
-	int				m_count;
+	_DeviceType *   m_device;
+	int             m_count;
 };
 
 

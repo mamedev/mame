@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", airsys)
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)

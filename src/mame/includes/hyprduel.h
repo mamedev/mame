@@ -69,7 +69,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ16_MEMBER(hyprduel_irq_cause_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_irq_cause_w);
 	DECLARE_WRITE16_MEMBER(hyprduel_subcpu_control_w);

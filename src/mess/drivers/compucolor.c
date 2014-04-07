@@ -10,20 +10,20 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- floppy
-	- interlaced video
-	- add-on ROM
-	- add-on RAM
-	- add-on unit
+    - floppy
+    - interlaced video
+    - add-on ROM
+    - add-on RAM
+    - add-on unit
 
 */
 
-#define I8080_TAG	"ua2"
-#define TMS5501_TAG	"ud2"
-#define CRT5027_TAG	"uf9"
-#define RS232_TAG	"rs232"
+#define I8080_TAG   "ua2"
+#define TMS5501_TAG "ud2"
+#define CRT5027_TAG "uf9"
+#define RS232_TAG   "rs232"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -37,31 +37,31 @@ class compucolor2_state : public driver_device
 public:
 	compucolor2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I8080_TAG),
-		  m_mioc(*this, TMS5501_TAG),
-		  m_vtac(*this, CRT5027_TAG),
-		  m_rs232(*this, RS232_TAG),
-		  m_floppy0(*this, "cd0"),
-		  m_floppy1(*this, "cd1"),
-		  m_char_rom(*this, "chargen"),
-		  m_video_ram(*this, "videoram"),
-		  m_y0(*this, "Y0"),
-		  m_y1(*this, "Y1"),
-		  m_y2(*this, "Y2"),
-		  m_y3(*this, "Y3"),
-		  m_y4(*this, "Y4"),
-		  m_y5(*this, "Y5"),
-		  m_y6(*this, "Y6"),
-		  m_y7(*this, "Y7"),
-		  m_y8(*this, "Y8"),
-		  m_y9(*this, "Y9"),
-		  m_y10(*this, "Y10"),
-		  m_y11(*this, "Y11"),
-		  m_y12(*this, "Y12"),
-		  m_y13(*this, "Y13"),
-		  m_y14(*this, "Y14"),
-		  m_y15(*this, "Y15"),
-		  m_y128(*this, "Y128")
+			m_maincpu(*this, I8080_TAG),
+			m_mioc(*this, TMS5501_TAG),
+			m_vtac(*this, CRT5027_TAG),
+			m_rs232(*this, RS232_TAG),
+			m_floppy0(*this, "cd0"),
+			m_floppy1(*this, "cd1"),
+			m_char_rom(*this, "chargen"),
+			m_video_ram(*this, "videoram"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8"),
+			m_y9(*this, "Y9"),
+			m_y10(*this, "Y10"),
+			m_y11(*this, "Y11"),
+			m_y12(*this, "Y12"),
+			m_y13(*this, "Y13"),
+			m_y14(*this, "Y14"),
+			m_y15(*this, "Y15"),
+			m_y128(*this, "Y128")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -93,7 +93,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(compucolor2);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( xi_r );
@@ -299,7 +299,7 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 		{
 			UINT8 code = m_video_ram[offset++];
 			UINT8 attr = m_video_ram[offset++];
-			
+
 			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
 			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
 
@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(compucolor2_state, compucolor2)
-	
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

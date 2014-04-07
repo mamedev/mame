@@ -32,13 +32,13 @@ WRITE8_MEMBER(h8_sci_device::smr_w)
 {
 	smr = data;
 	logerror("%s: smr_w %02x %s %c%c%c%s /%d (%06x)\n", tag(), data,
-			 data & SMR_CA ? "sync" : "async",
-			 data & SMR_CHR ? '7' : '8',
-			 data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
-			 data & SMR_STOP ? '2' : '1',
-			 data & SMR_MP ? " mp" : "",
-			 1 << 2*(data & SMR_CKS),
-			 cpu->pc());
+				data & SMR_CA ? "sync" : "async",
+				data & SMR_CHR ? '7' : '8',
+				data & SMR_PE ? data & SMR_OE ? 'o' : 'e' : 'n',
+				data & SMR_STOP ? '2' : '1',
+				data & SMR_MP ? " mp" : "",
+				1 << 2*(data & SMR_CKS),
+				cpu->pc());
 	clock_update();
 }
 
@@ -64,14 +64,14 @@ READ8_MEMBER(h8_sci_device::brr_r)
 WRITE8_MEMBER(h8_sci_device::scr_w)
 {
 	logerror("%s: scr_w %02x%s%s%s%s%s%s clk=%d (%06x)\n", tag(), data,
-			 data & SCR_TIE  ? " txi" : "",
-			 data & SCR_RIE  ? " rxi" : "",
-			 data & SCR_TE   ? " tx" : "",
-			 data & SCR_RE   ? " rx" : "",
-			 data & SCR_MPIE ? " mpi" : "",
-			 data & SCR_TEIE ? " tei" : "",
-			 data & SCR_CKE,
-			 cpu->pc());
+				data & SCR_TIE  ? " txi" : "",
+				data & SCR_RIE  ? " rxi" : "",
+				data & SCR_TE   ? " tx" : "",
+				data & SCR_RE   ? " rx" : "",
+				data & SCR_MPIE ? " mpi" : "",
+				data & SCR_TEIE ? " tei" : "",
+				data & SCR_CKE,
+				cpu->pc());
 
 	UINT8 delta = scr ^ data;
 	scr = data;
@@ -217,7 +217,7 @@ void h8_sci_device::device_start()
 		external_to_internal_ratio = (external_clock_period*cpu->clock()).as_double();
 		internal_to_external_ratio = 1/external_to_internal_ratio;
 	}
-		
+
 	intc = siblingdevice<h8_intc_device>(intc_tag);
 	save_item(NAME(rdr));
 	save_item(NAME(tdr));
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER(h8_sci_device::clk_w)
 			case CLKM_EXTERNAL_SYNC:
 				if((!ext_clock_value) && (clock_state & CLK_TX))
 					tx_dropped_edge();
-				
+
 				else if(ext_clock_value && (clock_state & CLK_RX))
 					rx_raised_edge();
 				break;
@@ -324,16 +324,16 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 					clock_base += fp;
 				}
 				assert(delta < fp);
-				
+
 				bool new_clock = delta >= divider;
 				if(new_clock != clock_value) {
 					cpu->synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
-					
+
 					else if(new_clock && (clock_state & CLK_RX))
 						rx_raised_edge();
-					
+
 					clock_value = new_clock;
 					if(clock_state || clock_value)
 						clk_cb(clock_value);
@@ -359,16 +359,16 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 					cpu->synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
-					
+
 					else if(new_clock && (clock_state & CLK_RX))
 						rx_raised_edge();
-					
+
 					clock_value = new_clock;
 					if(clock_mode == CLKM_INTERNAL_ASYNC_OUT && (clock_state || !clock_value))
 						clk_cb(clock_value);
 				}
 			}
-			
+
 			event = clock_base + (clock_value ? fp : divider*8);
 		}
 		break;
@@ -385,14 +385,14 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 					cpu->synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
-					
+
 					else if(new_clock && (clock_state & CLK_RX))
 						rx_raised_edge();
-					
+
 					clock_value = new_clock;
 				}
 			}
-			
+
 			event = UINT64((clock_base + (clock_value ? 2 : 1))*external_to_internal_ratio)+1;
 		}
 		break;
@@ -409,14 +409,14 @@ UINT64 h8_sci_device::internal_update(UINT64 current_time)
 					cpu->synchronize();
 					if((!new_clock) && (clock_state & CLK_TX))
 						tx_dropped_edge();
-					
+
 					else if(new_clock && (clock_state & CLK_RX))
 						rx_raised_edge();
-					
+
 					clock_value = new_clock;
 				}
 			}
-			
+
 			event = UINT64((clock_base + (clock_value ? 16 : 8))*external_to_internal_ratio)+1;
 		}
 		break;
@@ -503,7 +503,7 @@ void h8_sci_device::tx_start()
 	}
 	clock_start(CLK_TX);
 }
- 
+
 void h8_sci_device::tx_dropped_edge()
 {
 	logerror("%s: tx_dropped_edge state=%s bit=%d\n", tag(), state_names[tx_state], tx_bit);
@@ -676,4 +676,3 @@ void h8_sci_device::rx_raised_edge()
 	}
 	logerror("%s:             -> state=%s, bit=%d\n", tag(), state_names[rx_state], rx_bit);
 }
-

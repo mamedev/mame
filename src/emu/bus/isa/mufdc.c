@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Multi Unique FDC
+    Multi Unique FDC
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best

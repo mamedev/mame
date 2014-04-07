@@ -57,7 +57,7 @@ public:
 	m_sn(*this, "sn1"),
 	m_beeper(*this, "beeper"),
 	m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -1095,7 +1095,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_PALETTE_INIT_OWNER(smc777_state, smc777)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 
 	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)

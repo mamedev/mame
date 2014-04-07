@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
 
-    MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
+	MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
 
-    MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
+	MCFG_DEVICE_ADD("lx388_kr2376", KR2376, 50000)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")

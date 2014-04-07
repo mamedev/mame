@@ -641,7 +641,7 @@ static MACHINE_CONFIG_DERIVED( model3, model1 )
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",trs80m4)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_trs80m4)
 	MCFG_SCREEN_SIZE(80*8, 240)
@@ -676,7 +676,7 @@ static MACHINE_CONFIG_DERIVED( lnw80, model1 )
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(trs80_state,lnw80)

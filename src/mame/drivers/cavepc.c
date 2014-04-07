@@ -134,8 +134,8 @@ DRIVER_INIT_MEMBER(cavepc_state,cavepc)
 
 Deathshmiles II (2009/10/14 MASTER VER 4.00)
 
-CAVE's venture into PC based hardware platforms. The game did not 
-sell that well and was plagued by BSODs and hardware issues. The 
+CAVE's venture into PC based hardware platforms. The game did not
+sell that well and was plagued by BSODs and hardware issues. The
 motherboard bios version that shipped out with the game is F2 on
 a Gigabyte GA-MA78GPM-UD2H board
 ( http://www.gigabyte.com/products/product-page.aspx?pid=3016#ov )
@@ -143,13 +143,13 @@ a Gigabyte GA-MA78GPM-UD2H board
 The following versions are known to have existed.
 
 1.00 - released 2009/05/14
-2.00    
+2.00
 3.00 - sometimes scrolls the text "2ND UPDATE MASTER VER 3.00" at
        the bottom of the title screen
 
 The archive contains the following:
 
-./images, documentaiton 
+./images, documentaiton
 ./cf_card_2gb, a dd image of the 2GB CF FLASH card
 ./usb_drive, the game is updated using a USB drive and will not
   start if it is not present

@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( p2000m, p2000t_state )
 	MCFG_VIDEO_START_OVERRIDE(p2000t_state,p2000m)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000t_state, screen_update_p2000m)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m )
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(p2000t_state,p2000m)

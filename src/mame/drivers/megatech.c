@@ -88,13 +88,13 @@ public:
 		TIMER_Z80_RUN_STATE,
 		TIMER_Z80_STOP_STATE
 	};
-	
+
 	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
 	m_vdp1(*this, "vdp1"),
 	m_bioscpu(*this, "mtbios")
 	{ }
-	
+
 	DECLARE_WRITE_LINE_MEMBER( snd_int_callback );
 	DECLARE_WRITE_LINE_MEMBER( bios_int_callback );
 	DECLARE_READ8_MEMBER(cart_select_r);
@@ -113,8 +113,8 @@ public:
 	DECLARE_READ8_MEMBER(sms_count_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
-	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);	
-	
+	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
+
 	DECLARE_DRIVER_INIT(mt_crt);
 	DECLARE_DRIVER_INIT(mt_slot);
 	DECLARE_MACHINE_RESET(megatech);
@@ -122,32 +122,32 @@ public:
 	UINT32 screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_main(screen_device &screen, bool state);
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
-private:	
+
+private:
 	UINT8 m_mt_cart_select_reg;
 	UINT32 m_bios_port_ctrl;
 	int m_current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	UINT32 m_bios_ctrl_inputs;
 	UINT8 m_bios_ctrl[6];
 	int m_mt_bank_addr;
-	
+
 	int m_cart_is_genesis[8];
-	
+
 	void set_genz80_as_md();
 	void set_genz80_as_sms();
-	
+
 	TIMER_CALLBACK_MEMBER(z80_run_state);
 	TIMER_CALLBACK_MEMBER(z80_stop_state);
-	
+
 	UINT8* m_banked_ram;
 	UINT8* sms_mainram;
 	UINT8* sms_rom;
-	
+
 	required_device<sega315_5124_device> m_vdp1;
-	required_device<cpu_device>          m_bioscpu;	
+	required_device<cpu_device>          m_bioscpu;
 };
 
 
@@ -328,7 +328,7 @@ WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
 {
 	int bank = data & 0x1f;
 	//logerror("bank w %02x %02x\n", offset, data);
-	
+
 	sms_mainram[0x1ffc + offset] = data;
 	switch (offset)
 	{
@@ -347,7 +347,7 @@ WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
 		case 3:
 			memcpy(sms_rom+0x8000, space.machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
-			
+
 	}
 }
 
@@ -356,26 +356,26 @@ void mtech_state::set_genz80_as_sms()
 	address_space &prg = machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM);
 	address_space &io = machine().device("genesis_snd_z80")->memory().space(AS_IO);
 	sn76496_base_device *sn = machine().device<sn76496_base_device>("snsnd");
-	
+
 	// main ram area
 	sms_mainram = (UINT8 *)prg.install_ram(0xc000, 0xdfff, 0, 0x2000);
 	memset(sms_mainram,0x00,0x2000);
-	
+
 	// fixed rom bank area
 	sms_rom = (UINT8 *)prg.install_rom(0x0000, 0xbfff, NULL);
-	
+
 	memcpy(sms_rom, machine().root_device().memregion("maincpu")->base(), 0xc000);
-	
+
 	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
-	
+
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0xff, 0x3e, read8_delegate(FUNC(mtech_state::sms_count_r),this));
 	io.install_write_handler     (0x40, 0x41, 0xff, 0x3e, write8_delegate(FUNC(sn76496_device::write),sn));
 	io.install_readwrite_handler (0x80, 0x80, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
 	io.install_readwrite_handler (0x81, 0x81, 0xff, 0x3e, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
-	
+
 	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
-	
+
 	io.install_read_handler      (0xdc, 0xdc, read8_delegate(FUNC(mtech_state::sms_ioport_dc_r),this));
 	io.install_read_handler      (0xdd, 0xdd, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
 	io.install_read_handler      (0xde, 0xde, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this));
@@ -391,7 +391,7 @@ void mtech_state::set_genz80_as_md()
 
 	prg.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
-	
+
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
 
 	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
@@ -558,7 +558,7 @@ WRITE8_MEMBER(mtech_state::bios_port_ctrl_w )
 READ8_MEMBER(mtech_state::bios_joypad_r )
 {
 	UINT8 retdata = 0;
-	
+
 	if (m_bios_port_ctrl == 0x55)
 	{
 		/* A keys */
@@ -570,7 +570,7 @@ READ8_MEMBER(mtech_state::bios_joypad_r )
 			retdata = (m_io_pad_3b[0]->read() & 0x3f) | ((m_io_pad_3b[1]->read() & 0x03) << 6);
 		else
 			retdata = ((m_io_pad_3b[1]->read() & 0x3c) >> 2) | 0xf0;
-		
+
 	}
 	return retdata;
 }
@@ -637,10 +637,10 @@ UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			UINT32* lineptr = &bitmap.pix32(y);
 			UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
-			
+
 			for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 				lineptr[x] = srcptr[x];
-		}	
+		}
 #endif
 	}
 	return 0;

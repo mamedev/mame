@@ -100,11 +100,11 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	astring line;
 	offs_t byteoffs = 0;
 	char hex[3] = {0};
-	
+
 	do {
 		end = ccvf.chr(start, 10);
 		line.cpysubstr(ccvf, start, end);
-		if (line.find(0, "Compucolor Virtual Floppy Disk Image") &&	line.find(0, "Label") && line.find(0, "Track")) {
+		if (line.find(0, "Compucolor Virtual Floppy Disk Image") && line.find(0, "Label") && line.find(0, "Track")) {
 			for (int byte = 0; byte < 32; byte++) {
 				if (byteoffs==78720) break;
 				hex[0]=line[byte * 2];
@@ -117,11 +117,11 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	UINT64 pos = 0;
 	int total_size = 200000000/f.cell_size;
-	
+
 	for(int track=0; track < f.track_count; track++) {
 		dynamic_array<UINT32> buffer(total_size);
 		int offset = 0;
-	
+
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
 			for (int bit=0; bit<8; bit++) {
 				bit_w(buffer, offset++, BIT(bytes[pos], bit), f.cell_size);

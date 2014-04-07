@@ -74,10 +74,10 @@ class image_device_format
 public:
 	image_device_format(const char *name, const char *description, const char *extensions, const char *optspec)
 		: m_next(NULL),
-		  m_name(name),
-		  m_description(description),
-		  m_extensions(extensions),
-		  m_optspec(optspec)  { }
+			m_name(name),
+			m_description(description),
+			m_extensions(extensions),
+			m_optspec(optspec)  { }
 
 	image_device_format *next() const { return m_next; }
 	const char *name() const { return m_name; }

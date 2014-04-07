@@ -103,7 +103,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
-	
+
 	DECLARE_READ8_MEMBER(pc_page_r);
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
@@ -175,7 +175,7 @@ protected:
 public:
 	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
 	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
-	
+
 	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 

@@ -854,7 +854,7 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_TC0110PCR_PALETTE("palette2")
 	MCFG_TC0110PCR_ADD("tc0110pcr_3")
 	MCFG_TC0110PCR_PALETTE("palette3")
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -52,7 +52,7 @@ public:
 	required_device<filter_volume_device> m_filter3;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	// Misc
 	UINT16  m_cpua_ctrl;
 	INT32   m_ioc220_port;

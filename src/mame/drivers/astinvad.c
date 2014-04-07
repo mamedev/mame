@@ -74,7 +74,7 @@ public:
 
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
-	
+
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
 	DECLARE_READ8_MEMBER(kamikaze_ppi_r);

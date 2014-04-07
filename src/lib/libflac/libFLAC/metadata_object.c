@@ -1330,7 +1330,7 @@ FLAC_API FLAC__bool FLAC__metadata_object_vorbiscomment_entry_from_name_value_pa
 		memcpy(entry->entry+nn+1, field_value, nv);
 		entry->entry[entry->length] = '\0';
 	}
-	
+
 	return true;
 }
 

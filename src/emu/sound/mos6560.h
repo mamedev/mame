@@ -138,7 +138,7 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb2_base &set_potx_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_potx.set_callback(object); }
 	template<class _Object> static devcb2_base &set_poty_rd_callback(device_t &device, _Object object) { return downcast<mos6560_device &>(device).m_read_poty.set_callback(object); }
 

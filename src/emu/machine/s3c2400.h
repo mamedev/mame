@@ -16,7 +16,7 @@
 
 #define MCFG_S3C2400_ADD(_tag, _clock, _config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, S3C2400, _clock) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 	s3c2400_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define S3C2400_INTERFACE(name) \
@@ -369,7 +369,7 @@ struct s3c2400_interface
 #define S3C24XX_DMA_COUNT   4
 #define S3C24XX_SPI_COUNT   1
 
-class s3c2400_device : public device_t, 
+class s3c2400_device : public device_t,
 								public s3c2400_interface
 {
 public:
@@ -536,19 +536,19 @@ public:
 	void s3c24xx_spi_reset();
 	UINT32 s3c24xx_spi_r(UINT32 ch, UINT32 offset);
 	void s3c24xx_spi_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
-	READ32_MEMBER( s3c24xx_spi_0_r );	
+	READ32_MEMBER( s3c24xx_spi_0_r );
 	WRITE32_MEMBER( s3c24xx_spi_0_w );
 	void s3c24xx_mmc_reset();
 	READ32_MEMBER( s3c24xx_mmc_r );
 	WRITE32_MEMBER( s3c24xx_mmc_w );
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();
-	
+
 
 	void s3c2400_uart_fifo_w(int uart, UINT8 data);
 
 	/*******************************************************************************
-		TYPE DEFINITIONS
+	    TYPE DEFINITIONS
 	*******************************************************************************/
 
 	struct s3c24xx_memcon_regs_t
@@ -901,7 +901,7 @@ public:
 	devcb_resolved_write8 m_address_w;
 	devcb_resolved_read8  m_nand_data_r;
 	devcb_resolved_write8 m_nand_data_w;
-	
+
 };
 
 extern const device_type S3C2400;

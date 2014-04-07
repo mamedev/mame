@@ -97,7 +97,7 @@ TIMER_CALLBACK_MEMBER( taito8741_4pack_device::serial_tx )
 
 void taito8741_4pack_device::device_reset()
 {
-	for (int i=0;i<4;i++) 
+	for (int i=0;i<4;i++)
 	{
 		I8741 *st = &m_taito8741[i];
 		st->number = i;
@@ -305,7 +305,7 @@ void taito8741_4pack_device::command_w(int num, int data)
 
 UINT8 taito8741_4pack_device::port_read(int num, int offset)
 {
-	switch(num) 
+	switch(num)
 	{
 		case 0 : return m_port_handler_0_r(offset);
 		case 1 : return m_port_handler_1_r(offset);
@@ -473,7 +473,7 @@ UINT8 josvolly8741_4pack_device::read(int num,int offset)
 
 UINT8 josvolly8741_4pack_device::port_read(int num)
 {
-	switch(num) 
+	switch(num)
 	{
 		case 0 : return m_port_handler_0_r(0);
 		case 1 : return m_port_handler_1_r(0);
@@ -482,4 +482,3 @@ UINT8 josvolly8741_4pack_device::port_read(int num)
 		default : return 0;
 	}
 }
-

@@ -327,7 +327,7 @@ PALETTE_INIT_MEMBER(nevada_state, nevada)
 void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
 	memset(data, 0x00, size);
-	if (memregion("defaults")->base()) 
+	if (memregion("defaults")->base())
 		memcpy(data, memregion("defaults")->base(), memregion("defaults")->bytes());
 }
 
@@ -649,7 +649,7 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
-	
+
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(nevada_state, nevada_rtc_irq))

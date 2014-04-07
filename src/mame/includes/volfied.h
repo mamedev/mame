@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<screen_device> m_screen;
-	
+
 	DECLARE_WRITE16_MEMBER(volfied_cchip_ctrl_w);
 	DECLARE_WRITE16_MEMBER(volfied_cchip_bank_w);
 	DECLARE_WRITE16_MEMBER(volfied_cchip_ram_w);

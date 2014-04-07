@@ -18,7 +18,7 @@
 
 #define MCFG_MC6846_OUT_CP2_CB(_devcb) \
 	devcb = &mc6846_device::set_out_cp2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_MC6846_IN_PORT_CB(_devcb) \
 	devcb = &mc6846_device::set_in_port_callback(*device, DEVCB2_##_devcb);
 
@@ -41,7 +41,7 @@ public:
 	template<class _Object> static devcb2_base &set_in_port_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_in_port_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_cto_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_out_cto_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_irq_cb.set_callback(object); }
-	
+
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

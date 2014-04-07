@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 
 	// devices
 	MCFG_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
-	
+
 	MCFG_DEVICE_ADD("ttl74145", TTL74145, 0)
 	MCFG_TTL74145_OUTPUT_LINE_0_CB(WRITELINE(sym1_state, sym1_74145_output_0_w))
 	MCFG_TTL74145_OUTPUT_LINE_1_CB(WRITELINE(sym1_state, sym1_74145_output_1_w))
@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	MCFG_TTL74145_OUTPUT_LINE_5_CB(WRITELINE(sym1_state, sym1_74145_output_5_w))
 	MCFG_TTL74145_OUTPUT_LINE_6_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	// lines 7-9 not connected
-	
+
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
 

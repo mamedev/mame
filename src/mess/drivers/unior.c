@@ -83,7 +83,7 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
 	required_device<i8251_device> m_uart;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

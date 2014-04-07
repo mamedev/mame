@@ -34,7 +34,7 @@ public:
 	required_shared_ptr<UINT8> m_timedata;
 	required_shared_ptr<UINT8> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	int m_up_8w;
 	int m_pc10_nmi_enable;
 	int m_pc10_dog_di;

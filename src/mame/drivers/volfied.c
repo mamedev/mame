@@ -274,7 +274,7 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_PC090OJ_ADD("pc090oj", volfied_pc090oj_intf)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

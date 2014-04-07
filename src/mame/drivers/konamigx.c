@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state,konamigx_type3)
 
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16384)
 	MCFG_PALETTE_ENABLE_SHADOWS()

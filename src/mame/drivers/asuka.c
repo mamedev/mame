@@ -888,7 +888,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_TC0100SCN_PALETTE("palette")
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -920,7 +920,7 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

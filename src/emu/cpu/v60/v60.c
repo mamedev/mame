@@ -550,4 +550,3 @@ void v60_device::execute_run()
 			v60_try_irq();
 	}
 }
-

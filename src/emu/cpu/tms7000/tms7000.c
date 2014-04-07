@@ -572,4 +572,3 @@ READ8_MEMBER( tms7000_device::tms7000_internal_r )
 {
 	return m_rf[ offset ];
 }
-

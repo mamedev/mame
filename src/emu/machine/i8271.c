@@ -133,12 +133,12 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	{
 		m_CommandParameters[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 2; i++ )
 	{
 		m_CurrentTrack[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 4; i++ )
 	{
 		m_BadTracks[i] = 0;
@@ -313,19 +313,19 @@ void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		/* stop it */
 		m_data_timer->reset();
 		break;
-		
+
 	case TIMER_TIMED_COMMAND_COMPLETE:
 		command_complete(1,1);
 
 		/* stop it, but don't allow it to be free'd */
 		m_command_complete_timer->reset();
 		break;
-		
+
 	default:
 		break;
 	}
 }
-	
+
 /* setup a timed data request - data request will be triggered in a few usecs time */
 void i8271_device::timed_data_request()
 {
@@ -345,7 +345,7 @@ command completion. Required for read data and write data, where last byte could
 void i8271_device::timed_command_complete()
 {
 	int usecs;
-	
+
 	/* 64 for single density - 2 crc bytes later*/
 	usecs = 64*2;
 
@@ -669,7 +669,7 @@ void i8271_device::do_read()
 void i8271_device::do_read_id()
 {
 	chrn_id id;
-	
+
 	/* get next id from disc */
 	current_image()->floppy_drive_get_next_id(m_side,&id);
 

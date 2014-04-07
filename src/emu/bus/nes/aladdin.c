@@ -31,7 +31,7 @@
 
 //----------------------------------
 //
-//	Aladdin Cartslot implementation
+//  Aladdin Cartslot implementation
 //
 //----------------------------------
 
@@ -52,7 +52,7 @@ aladdin_cart_interface::~aladdin_cart_interface()
 }
 
 READ8_MEMBER(aladdin_cart_interface::read)
-{ 
+{
 	if (offset < 0x4000)
 		return m_rom[(m_lobank * 0x4000) + (offset & 0x3fff)];
 	else
@@ -86,7 +86,7 @@ READ8_MEMBER(nes_aladdin_slot_device::read)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
-	
+
 	return 0xff;
 }
 
@@ -100,18 +100,18 @@ bool nes_aladdin_slot_device::call_load()
 
 		if (!ROM)
 			return IMAGE_INIT_FAIL;
-		
+
 		if (software_entry() == NULL)
 		{
 			if (length() != 0x20010 && length() != 0x40010)
 				return IMAGE_INIT_FAIL;
-			
+
 			UINT8 temp[0x40010];
 			size = length() - 0x10;
 			fread(&temp, length());
 			memcpy(ROM, temp + 0x10, size);
-			
-			// double check that iNES files are really mapper 71 or 232 
+
+			// double check that iNES files are really mapper 71 or 232
 			{
 				UINT8 mapper = (temp[6] & 0xf0) >> 4;
 				mapper |= temp[7] & 0xf0;
@@ -123,14 +123,14 @@ bool nes_aladdin_slot_device::call_load()
 		{
 			if (get_software_region_length("rom") != 0x20000 && get_software_region_length("rom") != 0x40000)
 				return IMAGE_INIT_FAIL;
-			
+
 			size = get_software_region_length("rom");
 			memcpy(ROM, get_software_region("rom"), size);
 		}
 
 		m_cart->set_cart_size(size);
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -149,19 +149,19 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 		UINT8 mapper;
-	
+
 		core_fread(m_file, rom, len);
 
 		mapper = (rom[6] & 0xf0) >> 4;
 		mapper |= rom[7] & 0xf0;
 
-//		if (mapper == 71)
-//			slot_string = "algn";
+//      if (mapper == 71)
+//          slot_string = "algn";
 		if (mapper == 232)
 			slot_string = "algq";
 
 		clear();
-		
+
 		result.cpy(slot_string);
 	}
 	else
@@ -171,7 +171,7 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 
 //----------------------------------
 //
-//	Aladdin Minicart implementation
+//  Aladdin Minicart implementation
 //
 //----------------------------------
 
@@ -262,7 +262,7 @@ void nes_algq_rom_device::write_prg(UINT32 offset, UINT8 data)
 
 //-----------------------------------------------
 //
-//	Camerica/Codemasters Aladdin passthru 
+//  Camerica/Codemasters Aladdin passthru
 //  implementation
 //
 //-----------------------------------------------
@@ -295,7 +295,7 @@ void nes_aladdin_device::pcb_reset()
 /*-------------------------------------------------
 
  Camerica/Codemasters Aladdin Deck Enhancer
- 
+
  iNES: mapper 71 & 232
 
  In MESS: Supported (but timing issues in some games)
@@ -307,10 +307,10 @@ READ8_MEMBER(nes_aladdin_device::read_h)
 	LOG_MMC(("aladdin read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
 	//return m_subslot->read(space, offset, mem_mask);
-	
+
 	if (m_subslot->m_cart)
 		return m_subslot->m_cart->read(space, offset, mem_mask);
-	else	// this is "fake" in the sense that we fill CPU space with 0xff if no Aladdin cart is loaded
+	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Aladdin cart is loaded
 		return hi_access_rom(offset);
 }
 

@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
-	
+
 	DECLARE_WRITE8_MEMBER(harem_portA_w);
 	DECLARE_WRITE8_MEMBER(harem_portB_w);
 

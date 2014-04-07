@@ -96,7 +96,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 		if (sy >= 256) sy -= 512;
 		sx = 240 - sx;
 		sy = 240 - sy;
-		
+
 		if (machine.driver_data()->flip_screen())
 		{
 			sy = 240 - sy;
@@ -122,7 +122,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 				code += h-1;
 				incy = 1;
 			}
-			
+
 			for (y = 0; y < h; y++)
 			{
 				if (spriteram[offs] & 0x8000)

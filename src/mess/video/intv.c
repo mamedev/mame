@@ -82,7 +82,7 @@ UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bi
 			for(x=0;x<40;x++)
 			{
 				offs = current_row*64+x;
-				
+
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					videoram[offs],
 					7, /* white */
@@ -93,7 +93,7 @@ UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bi
 			{
 				/* draw the cursor as a solid white block */
 				/* (should use a filled rect here!) */
-				
+
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					191, /* a block */
 					7,   /* white   */

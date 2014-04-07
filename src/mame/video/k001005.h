@@ -28,7 +28,7 @@ public:
 	~k001005_device() {}
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void swap_buffers();
 	void preprocess_texture_data(UINT8 *rom, int length, int gticlub);

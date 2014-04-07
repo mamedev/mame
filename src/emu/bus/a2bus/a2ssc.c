@@ -228,7 +228,7 @@ WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
 {
 	if (m_started)
 	{
-		if (!(m_dsw2->read() & 4)) 
+		if (!(m_dsw2->read() & 4))
 		{
 			if (state)
 			{

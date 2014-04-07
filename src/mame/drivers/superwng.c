@@ -39,7 +39,7 @@ public:
 		m_colorram_bg(*this, "colorrabg"),
 		m_colorram_fg(*this, "colorrafg"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -119,7 +119,7 @@ public:
 	const char *m_memory_region;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* alt implementation - to be collapsed */
 	void alt_k055673_vh_start(running_machine &machine, const char *gfx_memory_region, int alt_layout, int dx, int dy,
 			void (*callback)(running_machine &machine, int *code,int *color,int *priority));

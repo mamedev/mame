@@ -163,7 +163,7 @@ Speedups
 
 Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait looops
- - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it) 
+ - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
 */
 
@@ -204,16 +204,16 @@ public:
 
 	INTERRUPT_GEN_MEMBER(cv1k_interrupt);
 	UINT32 screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	DECLARE_MACHINE_RESET( cv1k );
 
 	/* game specific */
-    DECLARE_READ64_MEMBER(mushisam_speedup_r);
-    DECLARE_READ64_MEMBER(mushisama_speedup_r);
-    DECLARE_READ64_MEMBER(espgal2_speedup_r);
-    DECLARE_DRIVER_INIT(mushisam);
-    DECLARE_DRIVER_INIT(mushisama);
-    DECLARE_DRIVER_INIT(espgal2);
+	DECLARE_READ64_MEMBER(mushisam_speedup_r);
+	DECLARE_READ64_MEMBER(mushisama_speedup_r);
+	DECLARE_READ64_MEMBER(espgal2_speedup_r);
+	DECLARE_DRIVER_INIT(mushisam);
+	DECLARE_DRIVER_INIT(mushisama);
+	DECLARE_DRIVER_INIT(espgal2);
 };
 
 
@@ -237,7 +237,7 @@ UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitma
 
 READ64_MEMBER( cv1k_state::cv1k_flash_port_e_r )
 {
-	return	((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
+	return  ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
-//	AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
 	AM_RANGE(0x10C00000, 0x10C00007) AM_READWRITE8(serial_rtc_eeprom_r, serial_rtc_eeprom_w, U64(0xffffffffffffffff))
-//	AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	AM_RANGE(0xf0000000, 0xf0ffffff) AM_RAM // mem mapped cache (sh3 internal?)
 ADDRESS_MAP_END
 
@@ -349,7 +349,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( cv1k )
-	PORT_START("DSW")		// 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
+	PORT_START("DSW")       // 18000050.l (18000050.b + 3 i.e. MSB + 3, is shown as DIPSW)
 //  PORT_BIT(        0xfcfffffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME(    0x00000002, 0x00000000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
@@ -357,9 +357,9 @@ static INPUT_PORTS_START( cv1k )
 	PORT_SERVICE(    0x00000001, IP_ACTIVE_HIGH )
 
 	PORT_START("PORT_C")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )	// Service coin
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// Test button copied here
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  )	// IMPLEMENT COIN ERROR!
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // Test button copied here
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1  ) // IMPLEMENT COIN ERROR!
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -376,10 +376,10 @@ static INPUT_PORTS_START( cv1k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(1)
 
 	PORT_START("PORT_F")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )	// Test Push Button
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )  // Test Push Button
 	PORT_BIT( 0xfd, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("PORT_L")	// 4000134.b, 4000136.b
+	PORT_START("PORT_L")    // 4000134.b, 4000136.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
@@ -528,7 +528,7 @@ ROM_START( mushisamb )
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
 	ROM_LOAD("mushisamb_u2", 0x000000, 0x8400000, CRC(6cc9d1a9) SHA1(17907798dce1defadd10354cec6c8d364e045570) ) /* (2004/10/12 MASTER VER) */
-		
+
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(138e2050) SHA1(9e86489a4e65af5efb5495adf6d4b3e01d5b2816) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
@@ -798,25 +798,25 @@ READ64_MEMBER( cv1k_state::mushisam_speedup_r )
 	int pc = m_maincpu->pc();
 	if ( pc == 0xc04a0aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
 	else if (pc == 0xc04a0da)  m_maincpu->spin_until_time( attotime::from_usec(10)); // mushitam
-//	else printf("read %08x\n", m_maincpu->pc());
+//  else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x0022f0/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisam)
 {
-    m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0022f0, 0xc0022f7, read64_delegate(FUNC(cv1k_state::mushisam_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0022f0, 0xc0022f7, read64_delegate(FUNC(cv1k_state::mushisam_speedup_r),this));
 }
 
 READ64_MEMBER( cv1k_state::mushisama_speedup_r )
 {
 	if (m_maincpu->pc()== 0xc04a2aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
-//	else printf("read %08x\n", m_maincpu->pc());
+//  else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x00024d8/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisama)
 {
-    m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0024d8, 0xc0024df, read64_delegate(FUNC(cv1k_state::mushisama_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0024d8, 0xc0024df, read64_delegate(FUNC(cv1k_state::mushisama_speedup_r),this));
 }
 
 READ64_MEMBER( cv1k_state::espgal2_speedup_r )
@@ -827,13 +827,13 @@ READ64_MEMBER( cv1k_state::espgal2_speedup_r )
 	if ( pc == 0xc05176a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
 	if ( pc == 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
 	if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dsmbl
-//	else printf("read %08x\n", m_maincpu->pc());
+//  else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x002310/8];
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,espgal2)
 {
-    m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::espgal2_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::espgal2_speedup_r),this));
 }
 
 

@@ -170,7 +170,7 @@ private:
 
 	// incidentals
 	address_space *             m_cpu_space;
-	devcb2_read8        		m_read_res;
+	devcb2_read8                m_read_res;
 	sam_bank                    m_banks[8];
 	sam_space<0x0000, 0x7FFF>   m_space_0000;
 	sam_space<0x8000, 0x9FFF>   m_space_8000;

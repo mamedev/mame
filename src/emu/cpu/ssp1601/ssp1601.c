@@ -780,4 +780,3 @@ void ssp1601_device::execute_set_input( int inputnum, int state )
 {
 	fatalerror("ssp1610: execute_set_input not implemented yet!\n");
 }
-

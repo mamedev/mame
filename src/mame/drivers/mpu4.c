@@ -34,7 +34,7 @@ ROM_START( m4clr )
 ROM_END
 
 ROM_START( m4rltst )
-	ROM_REGION( 0x10000, "maincpu", 0 ) 
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rtv.p1", 0x08000, 0x08000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
 ROM_END
 
@@ -2729,7 +2729,7 @@ GAME( 199?, m4goldnn    , 0         ,  mod4oki      , mpu4      , mpu4_state, m4
 
 
 
-GAME(198?, m4funh      , 0         , mod4oki    ,mpu4  			, mpu4_state, m4default         , 0,       "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
+GAME(198?, m4funh      , 0         , mod4oki    ,mpu4           , mpu4_state, m4default         , 0,       "<unknown>",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
 
 GAME(199?, m4sunseta    ,m4sunset   ,mod4oki    ,mpu4               , mpu4_state,m4default          ,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )

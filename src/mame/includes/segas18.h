@@ -151,6 +151,6 @@ protected:
 	UINT8               m_wwally_last_y[3];
 	UINT8               m_lghost_value;
 	UINT8               m_lghost_select;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 };

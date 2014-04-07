@@ -65,31 +65,31 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AY3600_MATRIX_X0(_cb)	\
+#define MCFG_AY3600_MATRIX_X0(_cb)  \
 	devcb = &ay3600_device::set_x0_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X1(_cb)	\
+#define MCFG_AY3600_MATRIX_X1(_cb)  \
 	devcb = &ay3600_device::set_x1_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X2(_cb)	\
+#define MCFG_AY3600_MATRIX_X2(_cb)  \
 	devcb = &ay3600_device::set_x2_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X3(_cb)	\
+#define MCFG_AY3600_MATRIX_X3(_cb)  \
 	devcb = &ay3600_device::set_x3_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X4(_cb)	\
+#define MCFG_AY3600_MATRIX_X4(_cb)  \
 	devcb = &ay3600_device::set_x4_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X5(_cb)	\
+#define MCFG_AY3600_MATRIX_X5(_cb)  \
 	devcb = &ay3600_device::set_x5_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X6(_cb)	\
+#define MCFG_AY3600_MATRIX_X6(_cb)  \
 	devcb = &ay3600_device::set_x6_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X7(_cb)	\
+#define MCFG_AY3600_MATRIX_X7(_cb)  \
 	devcb = &ay3600_device::set_x7_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_MATRIX_X8(_cb)	\
+#define MCFG_AY3600_MATRIX_X8(_cb)  \
 	devcb = &ay3600_device::set_x8_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_SHIFT_CB(_cb)	\
+#define MCFG_AY3600_SHIFT_CB(_cb)   \
 	devcb = &ay3600_device::set_shift_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_CONTROL_CB(_cb)	\
+#define MCFG_AY3600_CONTROL_CB(_cb) \
 	devcb = &ay3600_device::set_control_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_DATA_READY_CB(_cb)	\
+#define MCFG_AY3600_DATA_READY_CB(_cb)  \
 	devcb = &ay3600_device::set_data_ready_cb(*device, DEVCB2_##_cb);
-#define MCFG_AY3600_AKO_CB(_cb)	\
+#define MCFG_AY3600_AKO_CB(_cb) \
 	devcb = &ay3600_device::set_ako_cb(*device, DEVCB2_##_cb);
 
 //**************************************************************************

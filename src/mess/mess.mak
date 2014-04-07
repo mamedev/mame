@@ -1771,8 +1771,8 @@ $(MESSOBJ)/svision.a:           \
 	$(MESS_DRIVERS)/svision.o   \
 	$(MESS_AUDIO)/svision.o     \
 
-$(MESSOBJ)/swtpc09.a:			\
-	$(MESS_DRIVERS)/swtpc09.o	\
+$(MESSOBJ)/swtpc09.a:           \
+	$(MESS_DRIVERS)/swtpc09.o   \
 	$(MESS_MACHINE)/swtpc09.o    \
 
 $(MESSOBJ)/synertec.a:          \

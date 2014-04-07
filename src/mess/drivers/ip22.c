@@ -110,7 +110,7 @@ public:
 	m_dac(*this, "dac"),
 	m_kbdc8042(*this, "kbdc")
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<wd33c93_device> m_wd33c93;
 	required_shared_ptr<UINT32> m_unkpbus0;
@@ -1623,7 +1623,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_PALETTE_ADD("palette", 65536)
 
 	MCFG_NEWPORT_ADD("newport")
-	
+
 	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
 
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)

@@ -3546,7 +3546,7 @@ void coolridr_state::machine_reset()
 
 WRITE8_MEMBER(coolridr_state::scsp_irq)
 {
-	m_soundcpu->set_input_line(offset, data);		
+	m_soundcpu->set_input_line(offset, data);
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)

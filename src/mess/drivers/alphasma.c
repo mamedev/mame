@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_SCREEN_SIZE(6*40, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, (6*40)-1, 0, (9*4)-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(alphasmart_state, alphasmart)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

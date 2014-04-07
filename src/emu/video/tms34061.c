@@ -54,7 +54,7 @@ void tms34061_device::device_start()
 {
 	/* resolve callbak */
 	m_interrupt_cb.resolve();
-	
+
 	/* reset the data */
 	m_vrammask = m_vramsize - 1;
 

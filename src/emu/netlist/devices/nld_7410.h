@@ -43,13 +43,13 @@
 NETLIB_SIGNAL(7410, 3, 0, 0);
 
 #define TTL_7410_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7410_dip, _name)
+		NET_REGISTER_DEV(7410_dip, _name)
 
 NETLIB_DEVICE(7410_dip,
 
-    NETLIB_NAME(7410) m_1;
-    NETLIB_NAME(7410) m_2;
-    NETLIB_NAME(7410) m_3;
+	NETLIB_NAME(7410) m_1;
+	NETLIB_NAME(7410) m_2;
+	NETLIB_NAME(7410) m_3;
 );
 
 #endif /* NLD_7410_H_ */

@@ -98,7 +98,7 @@ private:
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_SCREEN_SIZE(640, 276)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 275)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(zorba_state, zorba)
 

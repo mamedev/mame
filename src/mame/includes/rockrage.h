@@ -37,7 +37,7 @@ public:
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(rockrage_vreg_w);
@@ -53,4 +53,3 @@ public:
 	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
 
 };
-

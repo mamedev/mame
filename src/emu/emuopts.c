@@ -491,7 +491,7 @@ void emu_options::set_system_name(const char *name)
 		astring error;
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
 		assert(!error);
-		
+
 		// remove any existing device options and then add them afresh
 		remove_device_options();
 		if (add_slot_options(true))

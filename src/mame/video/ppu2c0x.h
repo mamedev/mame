@@ -180,7 +180,7 @@ public:
 	int is_sprite_8x16() { return m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE; };
 	int get_draw_phase() { return m_draw_phase; };
 	int get_tilenum() { return m_tilecount; };
-	
+
 	//27/12/2002 (HACK!)
 	void set_latch( ppu2c0x_latch_delegate cb ) { m_latch = cb; m_latch.bind_relative_to(*owner()); };
 
@@ -213,8 +213,8 @@ public:
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
-	int                         m_tilecount;			/* MMC5 can change attributes to subsets of the 34 visibile tiles */
-	int                         m_draw_phase;			/* MMC5 uses different regs for BG and OAM */
+	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visibile tiles */
+	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
 	ppu2c0x_latch_delegate      m_latch;
 
 	// timers
@@ -223,7 +223,7 @@ public:
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
 
 	const char        *m_cpu_tag;
-	
+
 private:
 	static const device_timer_id TIMER_HBLANK = 0;
 	static const device_timer_id TIMER_NMI = 1;
@@ -231,7 +231,7 @@ private:
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
-	
+
 };
 
 class ppu2c02_device : public ppu2c0x_device {

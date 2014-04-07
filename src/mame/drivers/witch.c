@@ -221,7 +221,7 @@ TODO :
 #define MAIN_CLOCK        XTAL_12MHz
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
-#define ES8712_CLOCK      8000				// 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
+#define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
 
 #include "emu.h"
@@ -249,18 +249,18 @@ public:
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	required_shared_ptr<UINT8> m_gfx0_vram;
 	required_shared_ptr<UINT8> m_gfx0_cram;
 	required_shared_ptr<UINT8> m_gfx1_vram;
 	required_shared_ptr<UINT8> m_gfx1_cram;
 	required_shared_ptr<UINT8> m_sprite_ram;
 	required_device<palette_device> m_palette;
-	
+
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
@@ -305,7 +305,7 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
 	}
 
 	SET_TILE_INFO_MEMBER(1,
-			code,	//tiles beyond 0x7ff only for sprites?
+			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
 }
@@ -833,7 +833,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	MCFG_CPU_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
-	
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -854,14 +854,14 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ES8712_ADD("essnd", ES8712_CLOCK) 			/* 8Khz, it's the only clock for sure (pin13) it comes from pin14 of M5205 */
+	MCFG_ES8712_ADD("essnd", ES8712_CLOCK)          /* 8Khz, it's the only clock for sure (pin13) it comes from pin14 of M5205 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym1", YM2203, YM2203_CLOCK)		/* 3 MHz */
+	MCFG_SOUND_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
 	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ym2", YM2203, YM2203_CLOCK)		/* 3 MHz */
+	MCFG_SOUND_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
 	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 

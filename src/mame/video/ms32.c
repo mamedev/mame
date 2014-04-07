@@ -97,7 +97,7 @@ void ms32_state::video_start()
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
-	
+
 	save_item(NAME(m_irqreq));
 	save_item(NAME(m_temp_bitmap_tilemaps));
 	save_item(NAME(m_temp_bitmap_sprites));

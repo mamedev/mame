@@ -170,25 +170,25 @@ public:
 
 private:
 	// instance variables
-	running_machine &		m_machine;
-	render_font *			m_font;
-	ui_callback				m_handler_callback;
-	UINT32					m_handler_param;
-	bool					m_single_step;
-	bool					m_showfps;
-	osd_ticks_t				m_showfps_end;
-	bool					m_show_profiler;
-	osd_ticks_t				m_popup_text_end;
-	bool					m_use_natural_keyboard;
-	UINT8 *					m_non_char_keys_down;
-	render_texture *		m_mouse_arrow_texture;
-	bool					m_mouse_show;
+	running_machine &       m_machine;
+	render_font *           m_font;
+	ui_callback             m_handler_callback;
+	UINT32                  m_handler_param;
+	bool                    m_single_step;
+	bool                    m_showfps;
+	osd_ticks_t             m_showfps_end;
+	bool                    m_show_profiler;
+	osd_ticks_t             m_popup_text_end;
+	bool                    m_use_natural_keyboard;
+	UINT8 *                 m_non_char_keys_down;
+	render_texture *        m_mouse_arrow_texture;
+	bool                    m_mouse_show;
 
-	// text generators 
+	// text generators
 	astring &disclaimer_string(astring &buffer);
 	astring &warnings_string(astring &buffer);
 
-	// UI handlers 
+	// UI handlers
 	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);

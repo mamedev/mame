@@ -762,9 +762,9 @@ WRITE8_MEMBER(saturn_state::scsp_irq)
 
 	if (offset != 0)
 	{
-		if (data == ASSERT_LINE) m_scsp_last_line = offset;		
+		if (data == ASSERT_LINE) m_scsp_last_line = offset;
 		m_audiocpu->set_input_line(offset, data);
-	}	
+	}
 	else
 	{
 		m_audiocpu->set_input_line(m_scsp_last_line, data);

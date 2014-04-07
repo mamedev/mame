@@ -681,14 +681,14 @@ void avg_tempest_device::vggo() // tempest_vggo
 	nvect = 0;
 }
 
- 
- /*************************************
- *
- *  Mhavoc handler functions
- *
- *************************************/
 
- int avg_mhavoc_device::handler_1() //  mhavoc_latch1
+	/*************************************
+	*
+	*  Mhavoc handler functions
+	*
+	*************************************/
+
+	int avg_mhavoc_device::handler_1() //  mhavoc_latch1
 {
 	/*
 	 * Major Havoc just has ymin clipping
@@ -860,7 +860,7 @@ void avg_starwars_device::update_databus() // starwars_data
 	m_data = avgdvg_vectorram[m_pc];
 }
 
- 
+
 int avg_starwars_device::handler_6() // starwars_strobe2
 {
 	if ((OP2 == 0) && (m_dvy12 == 0))
@@ -887,11 +887,11 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 	return cycles;
 }
 
- /*************************************
- *
- *  Quantum handler functions
- *
- *************************************/
+	/*************************************
+	*
+	*  Quantum handler functions
+	*
+	*************************************/
 void avg_quantum_device::update_databus() // quantum_data
 {
 	m_data = ((UINT16 *)avgdvg_vectorram)[m_pc >> 1];
@@ -1054,11 +1054,11 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 	return cycles;
 }
 
- /*************************************
- *
- *  Bzone handler functions
- *
- *************************************/
+	/*************************************
+	*
+	*  Bzone handler functions
+	*
+	*************************************/
 int avg_bzone_device::handler_1() // bzone_latch1
 {
 	/*
@@ -1133,7 +1133,7 @@ int avg_bzone_device::handler_7() // bzone_strobe3
  *  Tomcat handler functions
  *
  *************************************/
- 
+
 int avg_tomcat_device::handler_6() // starwars_strobe2
 {
 	if ((OP2 == 0) && (m_dvy12 == 0))
@@ -1166,7 +1166,7 @@ int avg_tomcat_device::handler_7() // starwars_strobe3
  *  halt functions
  *
  *************************************/
- 
+
 void avgdvg_device::vg_set_halt(int dummy)
 {
 	m_halt = dummy;
@@ -1342,7 +1342,7 @@ void avg_device::device_start()
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
 
 	avgdvg_colorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("colorram")->ptr());
-	
+
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
 	xmax = visarea.max_x;
@@ -1371,7 +1371,7 @@ void dvg_device::device_start()
 {
 	if(!m_vector->started())
 		throw device_missing_dependencies();
-	
+
 	const rectangle &visarea = machine().first_screen()->visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<UINT8 *>(machine().root_device().memshare("vectorram")->ptr());
@@ -1384,7 +1384,7 @@ void dvg_device::device_start()
 
 	vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::vg_set_halt_callback),this));
 	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));
-	
+
 	register_state();
 }
 
@@ -1437,7 +1437,7 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 	m_clipy_min = 0;
 	m_clipx_max = 0;
 	m_clipy_max = 0;
-	
+
 	xmin = 0;
 	xmax = 0;
 	ymin = 0;
@@ -1446,7 +1446,7 @@ avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, co
 	ycenter = 0;
 	flip_x = 0;
 	flip_y = 0;
-	nvect = 0;	
+	nvect = 0;
 }
 
 dvg_device::dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

@@ -56,8 +56,8 @@ static const nes_mmc mmc_list[] =
 	{ 24, KONAMI_VRC6 },
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
-	{ 27, UNL_WORLDHERO },	// 27 World Hero board - Unsupported
-	{ 28, BTL_ACTION53 },	// 28 - Multi-discrete PCB designed by Tepples for Action 53
+	{ 27, UNL_WORLDHERO },  // 27 World Hero board - Unsupported
+	{ 28, BTL_ACTION53 },   // 28 - Multi-discrete PCB designed by Tepples for Action 53
 	// 29 Unused
 	// 30 Unused
 	// 31 Unused
@@ -132,7 +132,7 @@ static const nes_mmc mmc_list[] =
 	// 100 images hacked to work with nesticle?
 	// 101 Unused (Urusei Yatsura had been assigned to this mapper, but it's Mapper 87)
 	// 102 Unused
-	{ 103, UNL_2708 },	// 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
+	{ 103, UNL_2708 },  // 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
 	{ 104, CAMERICA_GOLDENFIVE },
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
@@ -191,7 +191,7 @@ static const nes_mmc mmc_list[] =
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
-	{ 162, WAIXING_FS304},	// not confirmed, but a lot of chinese releases use it like this...
+	{ 162, WAIXING_FS304},  // not confirmed, but a lot of chinese releases use it like this...
 	{ 163, NANJING_BOARD},
 	{ 164, WAIXING_FFV },
 	{ 165, WAIXING_SH2 },
@@ -264,7 +264,7 @@ static const nes_mmc mmc_list[] =
 	{ 232, CAMERICA_BF9096 },
 	{ 233, BMC_SUPER22 },
 	{ 234, AVE_MAXI15 },
-	{ 235, BMC_GOLD150 },	// 235 Golden Game x-in-1 - Unsupported
+	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
 	// 236 Game 800-in-1 - Unsupported
 	// 237 Unused
 	{ 238, UNL_603_5052 },
@@ -525,7 +525,7 @@ void nes_cart_slot_device::call_load_ines()
 	switch (m_pcb_id)
 	{
 		case STD_NROM:
-			if (prg_size == 3 * 0x4000)	// NROM368 are padded with 2k empty data at start to accomplish with iNES standard
+			if (prg_size == 3 * 0x4000) // NROM368 are padded with 2k empty data at start to accomplish with iNES standard
 			{
 				m_pcb_id = STD_NROM368;
 				fseek(0x810, SEEK_SET);
@@ -834,7 +834,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	}
 
 	// use info from nes.hsi if available!
-//	if (hashfile_extrainfo(*this, mapinfo))
+//  if (hashfile_extrainfo(*this, mapinfo))
 	if (0)
 	{
 		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))

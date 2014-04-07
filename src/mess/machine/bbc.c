@@ -1445,7 +1445,7 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 {
 	m_acia->write_txc(state);
-	
+
 	if (m_serproc_data & 0x40)
 		m_acia->write_rxc(state);
 }
@@ -1965,12 +1965,12 @@ int bbc_state::exp_rom_load(device_image_interface &image, int index)
 	UINT8 *RAM = m_region_user1->base();
 	int size, read_;
 	int addr = 0x8000 + (0x4000 * index);
-	
+
 	if (image.software_entry() == NULL)
 	{
 		size = image.length();
 		logerror("loading rom %s, at %.4x size:%.4x\n", image.filename(), addr, size);
-		
+
 		switch (size)
 		{
 			case 0x2000:
@@ -1988,7 +1988,7 @@ int bbc_state::exp_rom_load(device_image_interface &image, int index)
 				logerror("bad rom file size of %.4x\n", size);
 				break;
 		}
-		
+
 		if (read_ != size)
 			return IMAGE_INIT_FAIL;
 	}
@@ -2005,7 +2005,7 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbc_exp_rom )
 
 	if (strcmp(image.device().tag(),":exp_rom3") == 0)
 		return exp_rom_load(image, 2);
-	
+
 	if (strcmp(image.device().tag(),":exp_rom4") == 0)
 		return exp_rom_load(image, 3);
 
@@ -2038,7 +2038,7 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcm_cart )
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size");
 			return IMAGE_INIT_FAIL;
 		}
-		
+
 		image.fread(RAM + addr, size);
 	}
 	else

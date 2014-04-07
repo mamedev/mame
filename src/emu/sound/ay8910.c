@@ -422,18 +422,17 @@ INLINE void build_single_table(double rl, const ay_ym_param *par, int normalize,
 
 INLINE void build_resisor_table(const ay_ym_param *par, INT32 *tab, int zero_is_off)
 {
-    int j;
+	int j;
 
-    for (j=0; j < par->res_count; j++)
-    {
-
-        if (zero_is_off && j == 0)
-        {
-            tab[j] = 1e6;
-        }
-        else
-            tab[j] = par->res[j];
-    }
+	for (j=0; j < par->res_count; j++)
+	{
+		if (zero_is_off && j == 0)
+		{
+			tab[j] = 1e6;
+		}
+		else
+			tab[j] = par->res[j];
+	}
 }
 
 
@@ -605,21 +604,21 @@ static STREAM_UPDATE( ay8910_update )
 		psg->count_noise++;
 		if (psg->count_noise >= NOISE_PERIOD(psg))
 		{
-		    /* toggle the prescaler output. Noise is no different to
-		     * channels.
-		     */
-            psg->count_noise = 0;
-		    psg->prescale_noise ^= 1;
+			/* toggle the prescaler output. Noise is no different to
+			 * channels.
+			 */
+			psg->count_noise = 0;
+			psg->prescale_noise ^= 1;
 
-		    if ( psg->prescale_noise)
-		    {
-	            /* The Random Number Generator of the 8910 is a 17-bit shift */
-	            /* register. The input to the shift register is bit0 XOR bit3 */
-	            /* (bit0 is the output). This was verified on AY-3-8910 and YM2149 chips. */
+			if ( psg->prescale_noise)
+			{
+				/* The Random Number Generator of the 8910 is a 17-bit shift */
+				/* register. The input to the shift register is bit0 XOR bit3 */
+				/* (bit0 is the output). This was verified on AY-3-8910 and YM2149 chips. */
 
-	            psg->rng ^= (((psg->rng & 1) ^ ((psg->rng >> 3) & 1)) << 17);
-	            psg->rng >>= 1;
-		    }
+				psg->rng ^= (((psg->rng & 1) ^ ((psg->rng >> 3) & 1)) << 17);
+				psg->rng >>= 1;
+			}
 		}
 
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
@@ -704,22 +703,22 @@ static void build_mixer_table(ay8910_context *psg)
 		normalize = 1;
 	}
 
-    if ((psg->intf->flags & AY8910_RESISTOR_OUTPUT) != 0)
-    {
-        for (chan=0; chan < NUM_CHANNELS; chan++)
-        {
-            build_resisor_table(psg->par, psg->vol_table[chan], psg->zero_is_off);
-            build_resisor_table(psg->par_env, psg->env_table[chan], 0);
-        }
-    }
-    else
-    {
-        for (chan=0; chan < NUM_CHANNELS; chan++)
-        {
-            build_single_table(psg->intf->res_load[chan], psg->par, normalize, psg->vol_table[chan], psg->zero_is_off);
-            build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
-        }
-    }
+	if ((psg->intf->flags & AY8910_RESISTOR_OUTPUT) != 0)
+	{
+		for (chan=0; chan < NUM_CHANNELS; chan++)
+		{
+			build_resisor_table(psg->par, psg->vol_table[chan], psg->zero_is_off);
+			build_resisor_table(psg->par_env, psg->env_table[chan], 0);
+		}
+	}
+	else
+	{
+		for (chan=0; chan < NUM_CHANNELS; chan++)
+		{
+			build_single_table(psg->intf->res_load[chan], psg->par, normalize, psg->vol_table[chan], psg->zero_is_off);
+			build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
+		}
+	}
 	/*
 	 * The previous implementation added all three channels up instead of averaging them.
 	 * The factor of 3 will force the same levels if normalizing is used.

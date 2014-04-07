@@ -848,7 +848,7 @@ char *osd_get_clipboard_text(void);
 
         an allocated pointer to an osd_directory_entry representing
         info on the path; even if the file does not exist.
-		free with osd_free()
+        free with osd_free()
 
 -----------------------------------------------------------------------------*/
 osd_directory_entry *osd_stat(const char *path);

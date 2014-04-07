@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Multi Unique FDC
+    Multi Unique FDC
 
     license: MAME, GPL-2.0+
     copyright-holders: Dirk Best
@@ -33,7 +33,7 @@
 // ======================> mufdc_device
 
 class mufdc_device : public device_t,
-					   public device_isa8_card_interface
+						public device_isa8_card_interface
 {
 public:
 	// construction/destruction

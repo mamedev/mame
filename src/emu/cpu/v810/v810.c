@@ -1392,4 +1392,3 @@ void v810_device::execute_set_input( int irqline, int state)
 	m_irq_state = state;
 	m_irq_line = irqline;
 }
-

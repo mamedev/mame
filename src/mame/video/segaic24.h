@@ -14,10 +14,10 @@
 
 #define MCFG_S24TILE_DEVICE_GFXDECODE(_gfxtag) \
 	segas24_tile::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-	
+
 #define MCFG_S24TILE_DEVICE_PALETTE(_palette_tag) \
 	segas24_tile::static_set_palette_tag(*device, "^" _palette_tag);
-	
+
 class segas24_tile : public device_t
 {
 	friend class segas24_tile_config;

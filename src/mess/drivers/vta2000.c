@@ -171,8 +171,8 @@ static MACHINE_CONFIG_START( vta2000, vta2000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
 	MCFG_SCREEN_PALETTE("palette")
-	
-	MCFG_PALETTE_ADD("palette", 3)	
+
+	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vta2000)
 MACHINE_CONFIG_END

@@ -135,7 +135,7 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_SCREEN_SIZE( WSWAN_X_PIXELS, WSWAN_Y_PIXELS )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -169,7 +169,7 @@ static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor )
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_PALETTE_INIT_OWNER(wswan_state, wscolor )

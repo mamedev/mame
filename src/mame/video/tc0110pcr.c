@@ -46,7 +46,6 @@ void tc0110pcr_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void tc0110pcr_device::device_config_complete()
 {
-
 }
 
 //-------------------------------------------------

@@ -11,10 +11,10 @@
     TODO:
 
     - floppy
-    	- HDL is also connected to WP/TS input where TS is used to detect motor status
-    	- 3 second motor off delay timer
+        - HDL is also connected to WP/TS input where TS is used to detect motor status
+        - 3 second motor off delay timer
     - DMA
-	- video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
+    - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
     - keyboard ROM
     - hires graphics board
     - WD1010
@@ -187,7 +187,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	int dme = (drq0 > 2) || (drq1 > 2);
 
 	m_pic1->ir6_w(dme);
-	
+
 	update_drq();
 }
 
@@ -339,7 +339,7 @@ UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	const pen_t *pen = m_palette->pens();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	
+
 	for (int y = 0; y < 400; y++)
 	{
 		UINT8 cgra = y % 16;
@@ -355,7 +355,7 @@ UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				int color = BIT(data, 7);
 				bitmap.pix32(y, (sx * 8) + x) = pen[color];
 				data <<= 1;
-			}			
+			}
 		}
 	}
 
@@ -398,7 +398,7 @@ WRITE_LINE_MEMBER( tandy2k_state::vpac_slg_w )
 WRITE_LINE_MEMBER( tandy2k_state::vpac_sld_w )
 {
 	m_sld = state;
-	
+
 	m_vac->sld_w(state);
 }
 
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
 	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
-	
+
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/20/8)
@@ -816,9 +816,9 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
 
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
-	
+
 	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NULL)
-	
+
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(I8259A_0_TAG, pic8259_device, ir4_w))

@@ -94,7 +94,7 @@
 		<text string="LOCK">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
-	</element>	
+	</element>
 	<element name="l10_comp">
 		<text string="COMP">
 			<color red="1.0" green="1.0" blue="1.0" />

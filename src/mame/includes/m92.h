@@ -45,7 +45,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	UINT16 m_sound_status;
 	UINT8 m_irq_vectorbase;
 	UINT32 m_raster_irq_position;

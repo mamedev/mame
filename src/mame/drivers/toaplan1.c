@@ -2035,7 +2035,7 @@ static MACHINE_CONFIG_START( outzone, toaplan1_state )
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
 	MCFG_SCREEN_VBLANK_DRIVER(toaplan1_state, screen_eof_toaplan1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
 	MCFG_PALETTE_ADD("palette", (64*16)+(64*16))
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

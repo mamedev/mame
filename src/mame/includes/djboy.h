@@ -56,7 +56,7 @@ public:
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_data_r);
 	DECLARE_READ8_MEMBER(beast_status_r);

@@ -25,7 +25,7 @@ class mb87078_device : public device_t
 public:
 	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~mb87078_device() {}
-	
+
 	template<class _Object> static devcb2_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
 
 	void data_w(int data, int dsel);
@@ -57,7 +57,7 @@ private:
 	int          m_channel_latch; /* current channel */
 	UINT8        m_latch[2][4];   /* 6bit+3bit 4 data latches */
 	UINT8        m_reset_comp;
-	
+
 	devcb2_write8 m_gain_changed_cb;
 };
 

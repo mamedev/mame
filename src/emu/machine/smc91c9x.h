@@ -25,7 +25,7 @@ public:
 	~smc91c9x_device() {}
 
 	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<smc91c9x_device &>(device).m_irq_handler.set_callback(object); }
-	
+
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
@@ -86,7 +86,7 @@ extern const device_type SMC91C96;
 
 #define MCFG_SMC91C94_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SMC91C94, 0)
-	
+
 #define MCFG_SMC91C94_IRQ_CALLBACK(_write) \
 	devcb = &smc91c94_device::set_irq_callback(*device, DEVCB2_##_write);
 

@@ -102,7 +102,7 @@ public:
 
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
-	
+
 	DECLARE_READ16_MEMBER(sc4_mem_r);
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 
@@ -112,12 +112,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
 	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
 	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
 	DECLARE_READ8_MEMBER(m68307_duart_input_r);
 	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
-	
+
 	DECLARE_DRIVER_INIT(sc4);
 	DECLARE_DRIVER_INIT(sc4mbus);
 	DECLARE_DRIVER_INIT(sc4cvani);

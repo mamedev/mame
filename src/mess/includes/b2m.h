@@ -45,7 +45,7 @@ public:
 	required_device<pit8253_device> m_pit;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
-	
+
 	/* devices */
 	fd1793_t *m_fdc;
 	pic8259_device *m_pic;

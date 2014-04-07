@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_ES5503_OUTPUT_CHANNELS(8)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(esq1_state, esq1_doc_irq))
 	MCFG_ES5503_ADC_FUNC(READ8(esq1_state, esq1_adc_read))
-	
+
 	MCFG_SOUND_ROUTE_EX(0, "filters", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "filters", 1.0, 1)
 	MCFG_SOUND_ROUTE_EX(2, "filters", 1.0, 2)

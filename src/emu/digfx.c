@@ -89,10 +89,10 @@ void device_gfx_interface::interface_pre_start()
 								device().tag(),
 								(m_palette_is_sibling ? "sibling " : "sub"),
 								m_palette_tag);
-	
+
 	// if palette device isn't started, wait for it
 	// if (!m_palette->started())
-	//	throw device_missing_dependencies();
+	//  throw device_missing_dependencies();
 }
 
 

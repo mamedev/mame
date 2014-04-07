@@ -2,23 +2,23 @@
 
  Atari / Kee Games Driver - Discrete Games made in the 1970's
 
- 
+
  Atari / Kee Games List and Data based, in part from:
- 
+
  - Andy's collection of Bronzeage Atari Video Arcade PCB's"
  http://www.andysarcade.net/personal/bronzeage/index.htm
- 
+
  - "Atari's Technical Manual Log"
  http://www.atarigames.com/manuals.txt
- 
+
  Suspected "same games" are grouped together.  These are usually the exact same game but different cabinet/name.
- 
- 
+
+
  Technical Manual #s  Game Name(s)                                         Atari Part #'s                     Data      PROM/ROM Chip Numbers
  -------------------+----------------------------------------------------+----------------------------------+---------+---------------------------------------
  TM-025               Anti-Aircraft (1975)                                 A000951                            YES       003127
  TM-058               Breakout/Breakout Cocktail (1976)                    A004533                            NO
- TM-048               Crash 'N Score/Stock Car (1975)                      A004256                            YES       003186(x2), 003187(x2), 004248, 004247 
+ TM-048               Crash 'N Score/Stock Car (1975)                      A004256                            YES       003186(x2), 003187(x2), 004248, 004247
  TM-030               Crossfire (1975)
  TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)   A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
  TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)               A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
@@ -33,7 +33,7 @@
  TM-040               Outlaw (1976)                                        A003213                            YES       003323 - ROM (8205 @ J4)
  TM-007               Pin Pong (1974)                                      A001660                            NO
  TM-013               Pong/Super Pong (1972)                               A001433,A000423                    NO
- TM-015               Pong Cocktail (1974)                                                                    NO 
+ TM-015               Pong Cocktail (1974)                                                                    NO
  TM-014               Pong Doubles/Coupe Davis (1974)                      A000785                            NO
  TM-018               Pursuit (1975)                                       K8P-B 90128                        NO
  TM-012,022,034       Quadrapong/Elimination (1974)                        A000845                            NO
@@ -46,13 +46,13 @@
  TM-057               Stunt Cycle (1976)                                   A004128                            YES       004275 ROM Motorcycle/Bus (1F), 004811 ROM Score Translator (D7)
  TM-010,036,049       Tank/Tank Cocktail/Tank II (1974/1975)               A003111 (K5T-F 90124)              YES       90-2006
  TM-002               Touch Me (1974)                                                                         NO
- 
+
  - Not Known to be released or produced, but at least announced.
- 
+
  TM-024               Qwakers (Not Produced/Released)
  TM-017               World Cup Football (Not Produced/Released)
- 
- 
+
+
 ***************************************************************************/
 
 
@@ -94,39 +94,39 @@ class atarikee_state : public driver_device
 public:
 	atarikee_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 
 static NETLIST_START(atarikee)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, atarikee_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, atarikee_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -147,7 +147,7 @@ void atarikee_state::video_start()
 static MACHINE_CONFIG_START( atarikee, atarikee_state )
 
 	/* basic machine hardware */
-    MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(atarikee)
 
 	/* video hardware */
@@ -309,15 +309,15 @@ ROM_START( tank )
 ROM_END
 
 
-/*	// NO DUMPED ROMS
+/*  // NO DUMPED ROMS
 
 // Astroturf
 ROM_START( astrotrf )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-	ROM_LOAD( "003774.c8",     0x0000, 0x0100, NO_DUMP ) // Bugle
-	ROM_LOAD( "003773-02.c4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Astroturf - Rev.A)
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+    ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
+    ROM_LOAD( "003774.c8",     0x0000, 0x0100, NO_DUMP ) // Bugle
+    ROM_LOAD( "003773-02.c4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Astroturf - Rev.A)
 ROM_END
 
 // Crossfire
@@ -327,91 +327,91 @@ ROM_END
 
 // Gran Trak 10
 ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-	ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+    ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
 ROM_END
- 
+
 // Gran Trak 20
 ROM_START( gtrak20 )  // Unknown size, assumed 2K Bytes
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
-	ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+    ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+    ROM_LOAD( "74168.k5",     0x0000, 0x0800, NO_DUMP) // Racetrack
 ROM_END
 
 // LeMans
 ROM_START( lemans )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-	ROM_LOAD( "005837-01.n5",  0x0000, 0x0100, NO_DUMP ) // Rom 1
-	ROM_LOAD( "005838-01.n4",  0x0100, 0x0100, NO_DUMP ) // Rom 2
-	ROM_LOAD( "005839-01.n6",  0x0200, 0x0100, NO_DUMP ) // Rom 3
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+    ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
+    ROM_LOAD( "005837-01.n5",  0x0000, 0x0100, NO_DUMP ) // Rom 1
+    ROM_LOAD( "005838-01.n4",  0x0100, 0x0100, NO_DUMP ) // Rom 2
+    ROM_LOAD( "005839-01.n6",  0x0200, 0x0100, NO_DUMP ) // Rom 3
 ROM_END
- 
-// Qwak! 
+
+// Qwak!
 ROM_START( qwak )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-	ROM_LOAD( "37-2530n.k9",  0x0000, 0x0200, NO_DUMP ) // Custom Rom (2530 N)
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+    ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
+    ROM_LOAD( "37-2530n.k9",  0x0000, 0x0200, NO_DUMP ) // Custom Rom (2530 N)
 ROM_END
- 
+
 */
 
 
-/*	// 100% TTL - NO ROMS
- 
+/*  // 100% TTL - NO ROMS
+
 ROM_START( breakout )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( goal4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( gotcha )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( gotchac )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( highway )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pinpong )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pongdbl )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pursuit )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( quadpong )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( rebound )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( spacrace )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( touchme )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
- 
+
 */
 
 

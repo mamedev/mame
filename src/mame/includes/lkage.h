@@ -59,7 +59,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);

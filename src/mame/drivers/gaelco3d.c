@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( gaelco3d, gaelco3d_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
-	
+
 	MCFG_DEVICE_ADD("serial", GAELCO_SERIAL, 0)
 	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(gaelco3d_state, ser_irq))
 

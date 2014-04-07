@@ -20,7 +20,7 @@ class beta_disk_device : public device_t
 public:
 	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~beta_disk_device() {}
-	
+
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(track_r);
 	DECLARE_READ8_MEMBER(sector_r);
@@ -32,18 +32,18 @@ public:
 	DECLARE_WRITE8_MEMBER(track_w);
 	DECLARE_WRITE8_MEMBER(sector_w);
 	DECLARE_WRITE8_MEMBER(data_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(wd179x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(wd179x_drq_w);
-	
+
 	int is_active();
 	void enable();
 	void disable();
 	void clear_status();
-	
+
 	UINT8 m_betadisk_status;
 	UINT8 m_betadisk_active;
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

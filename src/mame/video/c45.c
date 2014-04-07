@@ -232,7 +232,6 @@ machine_config_constructor namco_c45_road_device::device_mconfig_additions() con
 
 void namco_c45_road_device::device_stop()
 {
-
 }
 
 

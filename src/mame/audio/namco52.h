@@ -23,7 +23,7 @@
 
 #define MCFG_NAMCO_52XX_SI_CB(_devcb) \
 	devcb = &namco_52xx_device::set_si_callback(*device, DEVCB2_##_devcb);
-	
+
 
 class namco_52xx_device : public device_t
 {
@@ -35,7 +35,7 @@ public:
 	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
 	template<class _Object> static devcb2_base &set_romread_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(object); }
 	template<class _Object> static devcb2_base &set_si_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_si.set_callback(object); }
-	
+
 	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_READ8_MEMBER( K_r );
@@ -52,7 +52,7 @@ protected:
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );
 	TIMER_CALLBACK_MEMBER( external_clock_pulse );
@@ -60,12 +60,12 @@ private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	required_device<discrete_device> m_discrete;
-	
+
 	int m_basenode;
 	attoseconds_t m_extclock;
 	devcb2_read8 m_romread;
 	devcb2_read8 m_si;
-	
+
 	UINT8 m_latched_cmd;
 	UINT32 m_address;
 };

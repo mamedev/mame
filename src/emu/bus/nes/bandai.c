@@ -19,11 +19,11 @@
  * Bandai Datach Joint ROM System [mapper 157] is emulated in a separate source file
    to implement also the subslot, but the PCB is basically a Bandai LZ93D50 + 24C02 EEPROM
    pcb with added barcode reader and subslot
- 
+
  * Bandai Karaoke Studio [mapper 188] is emulated in a separate source file
    to implement also the subslot and the mic inputs
- 
- 
+
+
  TODO:
  - investigate why EEPROM does not work
  - add support to the PPU for the code necessary to Oeka Kids games (also needed by UNL-DANCE2000 PCB)

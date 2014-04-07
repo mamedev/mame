@@ -698,9 +698,9 @@ void sms_state::setup_media_slots()
 		// a bunch of SG1000 carts (compatible with SG1000 Mark III) use their own RAM...
 		// TODO: are BASIC and Music actually compatible with Mark III??
 		if (m_cartslot->get_type() == SEGA8_BASIC_L3 ||
-		    m_cartslot->get_type() == SEGA8_MUSIC_EDITOR ||
-		    m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA ||
-		    m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+			m_cartslot->get_type() == SEGA8_MUSIC_EDITOR ||
+			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA ||
+			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
 		{
 			m_mem_device_enabled |= ENABLE_EXT_RAM;
 		}
@@ -773,10 +773,10 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// the "call $4010" without a following RET statement. That is basically
 		// a bug in the program code. The only way this cartridge could have run
 		// successfully on a real unit is if the RAM would be initialized with
-		// a F0 pattern on power up; F0 = RET P. 
-		// This initialization breaks the some Game Gear games though (e.g. 
+		// a F0 pattern on power up; F0 = RET P.
+		// This initialization breaks the some Game Gear games though (e.g.
 		// tempojr), suggesting that not all systems had the same initialization.
-		// For the moment we apply this to systems that have the Japanese SMS 
+		// For the moment we apply this to systems that have the Japanese SMS
 		// cartridge slot.
 		if (m_has_jpn_sms_cart_slot)
 		{
@@ -888,7 +888,7 @@ WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
 // - the one with 16 cart slots and 3 card slots;
 // - the one with 16 cart slots and 16 card slots.
 //
-// On front panel of both models there are only 16 game switches, 
+// On front panel of both models there are only 16 game switches,
 // that seems to change the active cart/card slot pair or, for the 4th
 // game switch onward of the 16-3 model, the active cart slot only.
 

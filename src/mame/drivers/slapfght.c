@@ -9,7 +9,7 @@
     Guardian / Get Star
     Performan
     Tiger Heli
-  
+
   TODO:
   - proper MCU emulation (mame/machine/slapfght.c)
   - alcon cocktail/flipscreen, it doesn't write to the flipscreen reg
@@ -358,7 +358,7 @@ INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 WRITE8_MEMBER(slapfght_state::irq_enable_w)
 {
 	m_main_irq_enabled = offset ? true : false;
-	
+
 	if (!m_main_irq_enabled)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -366,7 +366,7 @@ WRITE8_MEMBER(slapfght_state::irq_enable_w)
 WRITE8_MEMBER(slapfght_state::sound_reset_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	if (offset == 0)
 		m_sound_nmi_enabled = false;
 }
@@ -482,7 +482,7 @@ ADDRESS_MAP_END
 /***************************************************************************
 
   MCU Memory Maps
-  
+
   NOTE: handlers and simulation are in the src/mame/machine folder
 
 ***************************************************************************/
@@ -834,7 +834,7 @@ MACHINE_RESET_MEMBER(slapfght_state,getstar)
 {
 	// don't boot the mcu since we don't have a dump yet
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	
+
 	machine_reset();
 }
 
@@ -844,7 +844,7 @@ void slapfght_state::init_banks()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
-	
+
 	membank("bank1")->set_entry(0);
 }
 
@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tigerhb1_map)
 	MCFG_CPU_IO_MAP(tigerhb_io_map)
-	
+
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
@@ -1167,7 +1167,7 @@ static MACHINE_CONFIG_DERIVED( getstar, slapfigh )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(getstar_map)
 	MCFG_CPU_IO_MAP(getstar_io_map)
-	
+
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state, getstar)
 MACHINE_CONFIG_END
 

@@ -17,7 +17,7 @@
     * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
     * A value (displayed below) will appear next to RF/AMT on the right of the screen
     * Key out both the Jackpot and Audit Keys
-    
+
 
     This method works with the following games:
     3bagflnz 200
@@ -68,7 +68,7 @@
     eforest
     fhunter
     fhuntera
-    
+
     Technical Notes:
 
     68B09EP Motorola Processor
@@ -303,11 +303,11 @@ public:
 	required_device<ay8910_device> m_ay1;
 	required_device<ay8910_device> m_ay2;
 	required_device<samples_device> m_samples;
-	
+
 	required_shared_ptr<UINT8> m_mkiv_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
 	UINT8 *m_shapeRomPtr;
@@ -2381,25 +2381,25 @@ ROM_END
 ROM_START( gunnrose ) // MK2.5
 	ROM_REGION(0x10000, "maincpu", 0 )
 		/* VIDEO AND SOUND EPROM */
-	ROM_LOAD("gnr.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3F3F4809534065C33ECA2CFFF0D1D2A3E3992406))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3F3F4809534065C33ECA2CFFF0D1D2A3E3992406))   // 1VL/SH136 RED AND BLACK
 
 		/* GAME EPROMS */
-	ROM_LOAD("gnr.u9", 0x08000, 0x8000, CRC(4fb5f757) SHA1(A4129BCA7E573FAAC0D11DE41A9BF8EA144091EE))	// E/C606191SMP
+	ROM_LOAD("gnr.u9", 0x08000, 0x8000, CRC(4fb5f757) SHA1(A4129BCA7E573FAAC0D11DE41A9BF8EA144091EE))   // E/C606191SMP
 
 		/* SHAPE EPROMS */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("gnr.u8",  0x00000, 0x2000, CRC(dec9e695) SHA1(A596C4243D6D39E0611FF714E19E14188C90B6F1))	// 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u10", 0x02000, 0x2000, CRC(e83b8e79) SHA1(595F41A5F59F938581A57B445370AA716C6B1409))	// 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u12", 0x04000, 0x2000, CRC(9134d029) SHA1(D698FB91D8F5FA78FFD056149421008D3F12C456))	// 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u9t", 0x06000, 0x2000, CRC(73a0c2cd) SHA1(662056D570EAA069483D378B77EFCFB42EFF6D0D))	// E/C606191SMP
-	ROM_LOAD("gnr.u11", 0x08000, 0x2000, CRC(c50adffe) SHA1(A7C4A3CDD4D5D31A1420E47859408CAA75CE2636))	// 1VL/SH136 RED AND BLACK
-	ROM_LOAD("gnr.u13", 0x0a000, 0x2000, CRC(e0a6bfc5) SHA1(07E4C8191503F0EA2DE4F7CE18FE6290D20EF80E))	// 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u8",  0x00000, 0x2000, CRC(dec9e695) SHA1(A596C4243D6D39E0611FF714E19E14188C90B6F1))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u10", 0x02000, 0x2000, CRC(e83b8e79) SHA1(595F41A5F59F938581A57B445370AA716C6B1409))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u12", 0x04000, 0x2000, CRC(9134d029) SHA1(D698FB91D8F5FA78FFD056149421008D3F12C456))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u9t", 0x06000, 0x2000, CRC(73a0c2cd) SHA1(662056D570EAA069483D378B77EFCFB42EFF6D0D))  // E/C606191SMP
+	ROM_LOAD("gnr.u11", 0x08000, 0x2000, CRC(c50adffe) SHA1(A7C4A3CDD4D5D31A1420E47859408CAA75CE2636))  // 1VL/SH136 RED AND BLACK
+	ROM_LOAD("gnr.u13", 0x0a000, 0x2000, CRC(e0a6bfc5) SHA1(07E4C8191503F0EA2DE4F7CE18FE6290D20EF80E))  // 1VL/SH136 RED AND BLACK
 
 		/* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 ) /* are either of these correct?  They are taken from different games */
 	//ROM_LOAD("2cm07.u71", 0x0000, 0x0200, CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
 	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, BAD_DUMP CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
-	
+
 ROM_END
 
 GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", GAME_NOT_WORKING, layout_topgear )

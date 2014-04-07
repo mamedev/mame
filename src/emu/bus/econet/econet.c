@@ -196,7 +196,7 @@ inline int econet_device::get_signal(int signal)
 //  econet_device - constructor
 //-------------------------------------------------
 
-econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)	:
+econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, ECONET, "Econet", tag, owner, clock, "econet", __FILE__),
 	m_write_clk(*this),
 	m_write_data(*this)

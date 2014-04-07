@@ -16,7 +16,7 @@ struct namco_06xx_config
 
 #define MCFG_NAMCO_06XX_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock)
-	
+
 #define MCFG_NAMCO_06XX_MAINCPU(_tag) \
 	namco_06xx_device::set_maincpu(*device, "^" _tag);
 
@@ -44,20 +44,20 @@ struct namco_06xx_config
 
 #define MCFG_NAMCO_06XX_READ_REQUEST_3_CB(_devcb) \
 	devcb = &namco_06xx_device::set_read_request_3_callback(*device, DEVCB2_##_devcb);
-	
+
 
 #define MCFG_NAMCO_06XX_WRITE_0_CB(_devcb) \
 	devcb = &namco_06xx_device::set_write_0_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_1_CB(_devcb) \
 	devcb = &namco_06xx_device::set_write_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_NAMCO_06XX_WRITE_2_CB(_devcb) \
 	devcb = &namco_06xx_device::set_write_2_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_NAMCO_06XX_WRITE_3_CB(_devcb) \
 	devcb = &namco_06xx_device::set_write_3_callback(*device, DEVCB2_##_devcb);
-	
+
 
 /* device get info callback */
 class namco_06xx_device : public device_t
@@ -66,17 +66,17 @@ public:
 	namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void set_maincpu(device_t &device, const char *tag) { downcast<namco_06xx_device &>(device).m_nmicpu.set_tag(tag); }
-	
+
 	template<class _Object> static devcb2_base &set_read_0_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_1_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_2_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_2.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_3_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_read_3.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_read_request_0_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_readreq_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_request_1_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_readreq_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_request_2_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_readreq_2.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_request_3_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_readreq_3.set_callback(object); }
-	
+
 
 	template<class _Object> static devcb2_base &set_write_0_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_write_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_1_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_write_1.set_callback(object); }
@@ -95,8 +95,8 @@ protected:
 private:
 
 	TIMER_CALLBACK_MEMBER( nmi_generate );
-	
-	// internal state	
+
+	// internal state
 	UINT8 m_control;
 	emu_timer *m_nmi_timer;
 
@@ -106,16 +106,16 @@ private:
 	devcb2_read8 m_read_1;
 	devcb2_read8 m_read_2;
 	devcb2_read8 m_read_3;
-	
+
 	devcb2_write_line m_readreq_0;
 	devcb2_write_line m_readreq_1;
 	devcb2_write_line m_readreq_2;
 	devcb2_write_line m_readreq_3;
-		
+
 	devcb2_write8 m_write_0;
 	devcb2_write8 m_write_1;
 	devcb2_write8 m_write_2;
-	devcb2_write8 m_write_3;	
+	devcb2_write8 m_write_3;
 };
 
 extern const device_type NAMCO_06XX;

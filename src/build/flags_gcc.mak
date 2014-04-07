@@ -8,7 +8,7 @@ endif
 ifeq ($(findstring 4.8.,$(TEST_GCC)),4.8.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes -Wno-unused-local-typedefs
 	# array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-	CCOMFLAGS += -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow	
+	CCOMFLAGS += -Wno-unused-variable -Wno-array-bounds -Wno-strict-overflow
 endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)

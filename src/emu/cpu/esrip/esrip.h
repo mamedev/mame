@@ -27,13 +27,13 @@
 
 #define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
 	devcb = &esrip_device::static_set_fdt_r_callback(*device, DEVCB2_##_read);
- 
+
 #define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
 	devcb = &esrip_device::static_set_fdt_w_callback(*device, DEVCB2_##_write);
- 
+
 #define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
 	devcb = &esrip_device::static_set_status_in_callback(*device, DEVCB2_##_read);
- 
+
 #define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
 	esrip_device::static_set_draw_callback(*device, esrip_draw_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 

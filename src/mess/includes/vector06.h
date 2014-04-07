@@ -31,7 +31,7 @@ public:
 	m_ppi(*this, "ppi8255"),
 	m_ppi2(*this, "ppi8255_2"),
 	m_ram(*this, RAM_TAG),
-	m_palette(*this, "palette") 
+	m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

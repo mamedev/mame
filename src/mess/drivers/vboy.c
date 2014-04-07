@@ -106,7 +106,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maintimer(*this, "timer_main"),
 			m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 		m_vip_regs.INTPND = 0;
 		m_vip_regs.INTENB = 0;

@@ -480,7 +480,7 @@ static MACHINE_CONFIG_START( lastbank, lastbank_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
-	
+
 	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
 	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 	MCFG_TC0091LVC_PALETTE("palette")

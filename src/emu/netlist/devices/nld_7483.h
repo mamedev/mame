@@ -42,7 +42,7 @@
 		NET_CONNECT(_name, C0, _CI)
 
 #define TTL_7483_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7483_dip, _name)
+		NET_REGISTER_DEV(7483_dip, _name)
 
 NETLIB_DEVICE(7483,
 	netlist_ttl_input_t m_C0;

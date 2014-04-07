@@ -69,8 +69,7 @@
 //**************************************************************************
 
 #define MCFG_ECBBUS_ADD() \
-	MCFG_DEVICE_ADD(ECBBUS_TAG, ECBBUS, 0) \
-
+	MCFG_DEVICE_ADD(ECBBUS_TAG, ECBBUS, 0)
 #define MCFG_ECBBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
@@ -94,7 +93,7 @@
 class ecbbus_device;
 
 class ecbbus_slot_device : public device_t,
-						   public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction

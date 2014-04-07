@@ -134,7 +134,7 @@ private:
 	bool m_testmode;            // testmode active
 
 	int m_variant;
-	
+
 	// timers
 	emu_timer *m_timer_clock;
 	emu_timer *m_timer_tp;

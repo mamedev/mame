@@ -101,7 +101,7 @@ protected:
 	int m_offset1;
 
 	int m_poll_delay;
-	
+
 	required_device<at_keyboard_device> m_keyboard_dev;
 
 	devcb_resolved_write_line   m_system_reset_func;

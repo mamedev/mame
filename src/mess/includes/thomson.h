@@ -306,7 +306,7 @@ public:
 	WRITE_LINE_MEMBER( fdc_index_3_w );
 	void thomson_index_callback(legacy_floppy_image_device *device, int state);
 	DECLARE_PALETTE_INIT(thom);
-	
+
 	optional_device<mc6854_device> m_mc6854;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);

@@ -35,7 +35,7 @@ public:
 	required_device<dac_device> m_dac2;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
-	
+
 	int m_sound_flags;
 	int m_coin_flag;
 	int m_channel_active[2];

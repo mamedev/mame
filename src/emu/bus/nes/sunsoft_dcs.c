@@ -27,7 +27,7 @@
 
 //-----------------------------------------------
 //
-//	Nantettate!! Baseball Cartslot implementation
+//  Nantettate!! Baseball Cartslot implementation
 //
 //-----------------------------------------------
 
@@ -119,7 +119,7 @@ void nes_ntb_slot_device::get_default_card_software(astring &result)
 
 //-----------------------------------------------
 //
-//	Nantettate!! Baseball Minicart implementation
+//  Nantettate!! Baseball Minicart implementation
 //
 //-----------------------------------------------
 
@@ -154,8 +154,8 @@ UINT8 *nes_ntb_rom_device::get_cart_base()
 
 //------------------------------------------------
 //
-//	Nantettate!! Baseball base cart implementation
-//  a.k.a. Sunsoft Dual Cassette System 
+//  Nantettate!! Baseball base cart implementation
+//  a.k.a. Sunsoft Dual Cassette System
 //  (variant of Sunsoft-4 PCB)
 //
 //------------------------------------------------

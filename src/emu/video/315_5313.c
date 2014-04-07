@@ -2530,7 +2530,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 				lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 				m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 			}
-			
+
 		}
 		else
 		{
@@ -2546,26 +2546,26 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 					lineptr[x] = m_palette_lookup_shadow[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
 					break;
-					
+
 				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 				case 0x8000: // low pri, highlight sprite = normal;
 					lineptr[x] = m_palette_lookup[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 					break;
-					
+
 				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 				case 0x18000: // (sprite) low pri, highlight sprite = normal;
 					lineptr[x] = m_palette_lookup_sprite[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 					break;
-					
-					
+
+
 				case 0x0c000: // normal pri, highlight set = highlight?
 				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
 					lineptr[x] = m_palette_lookup_highlight[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
 					break;
-					
+
 				case 0x0a000: // shadow set, highlight set - not possible
 				case 0x0e000: // shadow set, highlight set, normal set, not possible
 				case 0x1a000: // (sprite)shadow set, highlight set - not possible

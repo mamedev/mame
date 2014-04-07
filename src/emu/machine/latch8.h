@@ -26,8 +26,8 @@ class latch8_device : public device_t
 {
 public:
 	latch8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	
+
+
 	/* write & read full byte */
 
 	DECLARE_READ8_MEMBER( read );
@@ -76,7 +76,7 @@ public:
 	static void set_maskout(device_t &device, UINT32 maskout) { downcast<latch8_device &>(device).m_maskout = maskout; }
 	static void set_xorvalue(device_t &device, UINT32 xorvalue) { downcast<latch8_device &>(device).m_xorvalue = xorvalue; }
 	static void set_nosync(device_t &device, UINT32 nosync) { downcast<latch8_device &>(device).m_nosync = nosync; }
-		
+
 	template<class _Object> static devcb2_base &set_write_0(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[0] = offset; return downcast<latch8_device &>(device).m_write_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_1(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[1] = offset; return downcast<latch8_device &>(device).m_write_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_2(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[2] = offset; return downcast<latch8_device &>(device).m_write_2.set_callback(object); }
@@ -85,7 +85,7 @@ public:
 	template<class _Object> static devcb2_base &set_write_5(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[5] = offset; return downcast<latch8_device &>(device).m_write_5.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_6(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[6] = offset; return downcast<latch8_device &>(device).m_write_6.set_callback(object); }
 	template<class _Object> static devcb2_base &set_write_7(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[7] = offset; return downcast<latch8_device &>(device).m_write_7.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_read_0(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[0] = offset; return downcast<latch8_device &>(device).m_read_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_1(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[1] = offset; return downcast<latch8_device &>(device).m_read_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_2(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[2] = offset; return downcast<latch8_device &>(device).m_read_2.set_callback(object); }
@@ -94,13 +94,13 @@ public:
 	template<class _Object> static devcb2_base &set_read_5(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[5] = offset; return downcast<latch8_device &>(device).m_read_5.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_6(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[6] = offset; return downcast<latch8_device &>(device).m_read_6.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_7(device_t &device, _Object object, UINT32 offset) { downcast<latch8_device &>(device).m_offset[7] = offset; return downcast<latch8_device &>(device).m_read_7.set_callback(object); }
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_validity_check(validity_checker &valid) const;
-	
+
 	TIMER_CALLBACK_MEMBER( timerproc );
 	void update(UINT8 new_val, UINT8 mask);
 	inline UINT8 bitx_r( offs_t offset, int bit);
@@ -110,12 +110,12 @@ private:
 	UINT8            m_value;
 	UINT8            m_has_write;
 	UINT8            m_has_read;
-	
+
 	/* only for byte reads, does not affect bit reads and node_map */
 	UINT32           m_maskout;
 	UINT32           m_xorvalue;  /* after mask */
 	UINT32           m_nosync;
-	
+
 	devcb2_write8    m_write_0;
 	devcb2_write8    m_write_1;
 	devcb2_write8    m_write_2;
@@ -133,7 +133,7 @@ private:
 	devcb2_read8     m_read_5;
 	devcb2_read8     m_read_6;
 	devcb2_read8     m_read_7;
-	
+
 	UINT32           m_offset[8];
 };
 
@@ -186,7 +186,7 @@ extern const device_type LATCH8;
 /* Upon read, replace bits by reading from another device handler */
 #define MCFG_LATCH8_READ_0(_devcb, _from_bit) \
 	devcb = &latch8_device::set_read_0(*device, DEVCB2_##_devcb, _from_bit);
-	
+
 #define MCFG_LATCH8_READ_1(_devcb, _from_bit) \
 	devcb = &latch8_device::set_read_1(*device, DEVCB2_##_devcb, _from_bit);
 

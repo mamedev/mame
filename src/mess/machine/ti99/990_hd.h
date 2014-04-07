@@ -14,7 +14,7 @@ class ti990_hdc_device : public device_t
 {
 public:
 	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb2_base &static_set_int_callback(device_t &device, _Object object) { return downcast<ti990_hdc_device &>(device).m_interrupt_callback.set_callback(object); }
 
 	DECLARE_READ16_MEMBER(read);
@@ -62,7 +62,7 @@ private:
 		/* disk geometry */
 		unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;
 	};
-	
+
 	UINT16 m_w[8];
 
 	devcb2_write_line m_interrupt_callback;

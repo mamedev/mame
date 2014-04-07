@@ -28,7 +28,7 @@ public:
 
 	template<class _Object> static devcb2_base &set_in_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_in_parallel_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
-	
+
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
 	DECLARE_WRITE16_MEMBER( regs_w );
@@ -58,7 +58,7 @@ protected:
 private:
 	devcb2_read16         m_in_parallel_cb;
 	devcb2_write16        m_out_parallel_cb;
-	
+
 	// internal state
 	UINT16 m_regs[0x400];
 

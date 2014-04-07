@@ -86,7 +86,7 @@
 /* ... */
 
 void S3C24_CLASS_NAME::s3c24xx_reset()
-{	
+{
 	verboselog( machine(), 1, "reset\n");
 	m_cpu->reset();
 	this->reset();
@@ -3472,7 +3472,6 @@ void S3C24_CLASS_NAME::s3c24xx_device_reset()
 
 void S3C24_CLASS_NAME::s3c24xx_device_start()
 {
-
 	verboselog( machine(), 1, "s3c24xx device start\n");
 	m_pin_r.resolve(m_iface_core.pin_r, *this);
 	m_pin_w.resolve(m_iface_core.pin_w, *this);

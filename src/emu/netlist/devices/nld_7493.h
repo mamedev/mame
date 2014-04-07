@@ -67,7 +67,7 @@
 		NET_CONNECT(_name, R2,  _R2)
 
 #define TTL_7493_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7493_dip, _name)
+		NET_REGISTER_DEV(7493_dip, _name)
 
 NETLIB_SUBDEVICE(7493ff,
 	netlist_ttl_input_t m_I;

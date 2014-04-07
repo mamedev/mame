@@ -577,7 +577,7 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		}
 
 		/* draw */
-		
+
 				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
 				code, color,
 				flipx, flipy,

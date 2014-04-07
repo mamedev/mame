@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
-	
+
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)

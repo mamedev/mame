@@ -526,7 +526,7 @@ private:
 			, m_compression(0)
 			, m_codecs(NULL)
 		{ }
-	
+
 		osd_work_item *     m_osd;              // OSD work item running on this block
 		chd_file_compressor *m_compressor;      // pointer back to the compressor
 		volatile work_status m_status;          // current status of this item

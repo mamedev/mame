@@ -5,7 +5,7 @@
 			<color red="0.75" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
-	
+
 	<element name="led" defstate="0">
 		<disk state="1">
 			<color red="0.75" green="0.0" blue="0.0" />
@@ -14,12 +14,12 @@
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>
 	</element>
-	
+
 	<element name="background">
 		<rect>
- 			<bounds left="0" top="0" right="1" bottom="1" />
+			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>		
+		</rect>
 	</element>
 
 	<view name="Default Layout">
@@ -126,6 +126,6 @@
 		</bezel>
 		<bezel name="digit23" element="digit">
 			<bounds x="2302" y="15" width="50" height="80" />
-		</bezel> 
+		</bezel>
 	</view>
 </mamelayout>

@@ -61,9 +61,9 @@
 #else
 
 #ifdef FLAC_API_EXPORTS
-#define	FLAC_API	_declspec(dllexport)
+#define FLAC_API    _declspec(dllexport)
 #else
-#define FLAC_API	_declspec(dllimport)
+#define FLAC_API    _declspec(dllimport)
 
 #endif
 #endif

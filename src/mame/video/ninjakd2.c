@@ -384,7 +384,7 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 				{
 					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
-					 gfx->transpen(bitmap,bitmap.cliprect(),
+						gfx->transpen(bitmap,bitmap.cliprect(),
 							tile,
 							color,
 							flipx,flipy,

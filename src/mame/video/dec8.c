@@ -298,8 +298,6 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 
 UINT32 dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	
-	
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);

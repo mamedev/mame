@@ -56,12 +56,12 @@ typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, UINT8 video, i
 // ======================> crt9021_t
 
 class crt9021_t :  public device_t,
-				   public device_video_interface
+					public device_video_interface
 {
 public:
 	// construction/destruction
 	crt9021_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void static_set_display_callback(device_t &device, crt9021_draw_character_delegate callback) { downcast<crt9021_t &>(device).m_display_cb = callback; }
 
 	void write(UINT8 data) { m_data = data; }

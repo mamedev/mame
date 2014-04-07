@@ -450,7 +450,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 	      bit 1: transmitting
 	      bit 2: irq enable on buffer empty
 	      bit 3: led on (direct mode)
-                     on HP49 G, flash ROM write enable
+	                 on HP49 G, flash ROM write enable
 
 	   - 0x1d: I/R output buffer
 	*/
@@ -576,10 +576,10 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 
 READ8_MEMBER(hp48_state::hp48_bank_r)
 {
-	/* HP48 GX 
+	/* HP48 GX
 	   bit 0: ignored
 	   bits 2-5: bank number
-	   bit 6: enable 
+	   bit 6: enable
 	*/
 
 	/* HP49 G
@@ -746,7 +746,7 @@ void hp48_state::hp48_apply_modules()
 		else
 		{
 			/* NCE3 */
-			nce3_enable = m_bank_switch >> 6; 
+			nce3_enable = m_bank_switch >> 6;
 			LOG(( "hp48_apply_modules: A19 disabled, NCE3 %s\n", nce3_enable ? "enabled" : "disabled" ));
 			space.install_read_bank( 0, 0x7ffff, 0, 0x80000, "bank5" );
 		}
@@ -1130,7 +1130,7 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	m_model = model;
 
 	/* internal RAM */
-	ram_size = 
+	ram_size =
 		HP49_G_MODEL  ? (512 * 1024) :
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
@@ -1139,7 +1139,7 @@ void hp48_state::hp48_machine_start( hp48_models model )
 
 
 	/* ROM load */
-	rom_size = 
+	rom_size =
 		HP49_G_MODEL  ? (2048 * 1024) :
 		HP48_S_SERIES ?  (256 * 1024) : (512 * 1024);
 	m_rom = auto_alloc_array(machine(), UINT8, 2 * rom_size);

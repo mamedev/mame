@@ -97,10 +97,10 @@ static int phc25_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 	UINT32 i;
 
 	// silence
-//	sample_count += phc25_put_samples(buffer, 6640, 2, WAVEENTRY_HIGH);
+//  sample_count += phc25_put_samples(buffer, 6640, 2, WAVEENTRY_HIGH);
 
 	/* start */
-//	for (i=0; i<12155; i++)
+//  for (i=0; i<12155; i++)
 	for (i=0; i<2155; i++)
 		sample_count += phc25_output_bit(buffer, sample_count, 1);
 

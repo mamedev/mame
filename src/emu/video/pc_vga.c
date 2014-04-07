@@ -128,13 +128,13 @@ const device_type MACH8 = &device_creator<mach8_device>;
 
 vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  m_palette(*this, "^palette")
+		m_palette(*this, "^palette")
 {
 }
 
 vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
-	  m_palette(*this, "^palette")
+		m_palette(*this, "^palette")
 {
 }
 
@@ -2873,7 +2873,7 @@ void s3_vga_device::s3_define_video_mode()
 		// DCLK calculation
 		freq = ((double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r)))) * 14.318f; // clock between XIN and XOUT
 		xtal = freq * 1000000;
- 	}
+	}
 
 	if((s3.ext_misc_ctrl_2) >> 4)
 	{

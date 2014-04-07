@@ -125,7 +125,7 @@ private:
 	int         m_rw_state;
 	bool        m_nibble;
 	int         m_charset_type;
-	UINT8		m_render_buf[80*16];
+	UINT8       m_render_buf[80*16];
 
 	enum        { DDRAM, CGRAM };
 };

@@ -37,7 +37,7 @@ public:
 	required_device<dac_device> m_dac;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

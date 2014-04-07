@@ -233,7 +233,7 @@ public:
 		, m_keyrow16(*this, "ROW16")
 		, m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	// devices

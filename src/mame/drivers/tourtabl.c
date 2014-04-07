@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tourtabl_state, tourtabl_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tourtabl_state, tourtabl_get_databus_contents))
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)

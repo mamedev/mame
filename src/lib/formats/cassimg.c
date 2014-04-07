@@ -379,7 +379,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	/* is this block beyond the edge of our waveform? */
 	if (sample_blocknum >= cassette->blocks.count())
 		cassette->blocks.resize_keep_and_clear_new(sample_blocknum + 1);
-	
+
 	if (cassette->blocks[sample_blocknum] == NULL)
 		cassette->blocks[sample_blocknum] = global_alloc(sample_block);
 

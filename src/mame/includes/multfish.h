@@ -113,7 +113,3 @@ public:
 MACHINE_CONFIG_EXTERN( igrosoft_gamble );
 MACHINE_CONFIG_EXTERN( rollfr );
 INPUT_PORTS_EXTERN( igrosoft_gamble );
-
-
-
-

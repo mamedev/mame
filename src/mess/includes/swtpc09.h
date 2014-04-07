@@ -1,6 +1,6 @@
 /***************************************************************************
-	swtpc09 include file
-	Robert Justice ,2009-2014
+    swtpc09 include file
+    Robert Justice ,2009-2014
 
 ****************************************************************************/
 
@@ -32,14 +32,14 @@ public:
 	swtpc09_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-    m_pia(*this, "pia"),
- 	m_ptm(*this, "ptm"),
+	m_pia(*this, "pia"),
+	m_ptm(*this, "ptm"),
 	m_acia(*this, "acia"),
 	m_fdc(*this, "fdc"),
 	m_via(*this, "via"),
-    m_piaide(*this, "piaide"),
-    m_harddisk(*this, "harddisk"),
-    m_ide(*this, "ide")
+	m_piaide(*this, "piaide"),
+	m_harddisk(*this, "harddisk"),
+	m_ide(*this, "ide")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -56,15 +56,15 @@ public:
 	DECLARE_READ8_MEMBER(pia0_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
-    DECLARE_WRITE8_MEMBER( ptm_o1_callback );
-    DECLARE_WRITE8_MEMBER( ptm_o3_callback );
-    DECLARE_WRITE_LINE_MEMBER( ptm_irq );
+	DECLARE_WRITE8_MEMBER( ptm_o1_callback );
+	DECLARE_WRITE8_MEMBER( ptm_o3_callback );
+	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
-    DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-    DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
 	DECLARE_READ8_MEMBER( dmf3_via_read_porta );
 	DECLARE_READ8_MEMBER( dmf3_via_read_portb );
@@ -74,32 +74,32 @@ public:
 
 	DECLARE_READ8_MEMBER(piaide_a_r);
 	DECLARE_READ8_MEMBER(piaide_b_r);
-    DECLARE_WRITE8_MEMBER(piaide_a_w);
-    DECLARE_WRITE8_MEMBER(piaide_b_w);
+	DECLARE_WRITE8_MEMBER(piaide_a_w);
+	DECLARE_WRITE8_MEMBER(piaide_b_w);
 
 	DECLARE_WRITE8_MEMBER(swtpc09_kbd_put);
 
-    DECLARE_READ8_MEMBER ( dmf2_dma_address_reg_r );
-    DECLARE_WRITE8_MEMBER ( dmf2_dma_address_reg_w );
-    DECLARE_READ8_MEMBER ( dmf2_control_reg_r );
-    DECLARE_WRITE8_MEMBER ( dmf2_control_reg_w );
+	DECLARE_READ8_MEMBER ( dmf2_dma_address_reg_r );
+	DECLARE_WRITE8_MEMBER ( dmf2_dma_address_reg_w );
+	DECLARE_READ8_MEMBER ( dmf2_control_reg_r );
+	DECLARE_WRITE8_MEMBER ( dmf2_control_reg_w );
 
-    DECLARE_READ8_MEMBER ( dmf3_dma_address_reg_r );
-    DECLARE_WRITE8_MEMBER ( dmf3_dma_address_reg_w );
-    DECLARE_READ8_MEMBER ( dmf3_control_reg_r );
-    DECLARE_WRITE8_MEMBER ( dmf3_control_reg_w );
+	DECLARE_READ8_MEMBER ( dmf3_dma_address_reg_r );
+	DECLARE_WRITE8_MEMBER ( dmf3_dma_address_reg_w );
+	DECLARE_READ8_MEMBER ( dmf3_control_reg_r );
+	DECLARE_WRITE8_MEMBER ( dmf3_control_reg_w );
 
-    DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
+	DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
 
-    DECLARE_WRITE8_MEMBER(dat_w);
-	
-    DECLARE_DRIVER_INIT( swtpc09 );
-    DECLARE_DRIVER_INIT( swtpc09i );
-    DECLARE_DRIVER_INIT( swtpc09u );
-    DECLARE_DRIVER_INIT( swtpc09d3 );
-	
+	DECLARE_WRITE8_MEMBER(dat_w);
+
+	DECLARE_DRIVER_INIT( swtpc09 );
+	DECLARE_DRIVER_INIT( swtpc09i );
+	DECLARE_DRIVER_INIT( swtpc09u );
+	DECLARE_DRIVER_INIT( swtpc09d3 );
+
 	void swtpc09_fdc_dma_transfer();
-    void swtpc09_irq_handler(UINT8 peripheral, UINT8 state);
+	void swtpc09_irq_handler(UINT8 peripheral, UINT8 state);
 
 	UINT8 m_term_data;               // terminal keyboard value
 	UINT8 m_pia_counter;             // this is the counter on pia porta
@@ -112,10 +112,10 @@ public:
 	UINT8 m_piaide_portb;
 	UINT8 m_active_interrupt;
 	UINT8 m_interrupt;
-	
-	
+
+
 	// TODO: move this in proper device
-	
+
 	/* channel_data structure holds info about each 6844 DMA channel */
 	typedef struct m6844_channel_data
 	{
@@ -143,6 +143,3 @@ extern const wd17xx_interface swtpc09_wd17xx_interface;
 extern const ptm6840_interface swtpc09_6840_intf;
 
 #endif /* swtpc09_H_ */
-
-
-

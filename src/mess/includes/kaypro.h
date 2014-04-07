@@ -101,7 +101,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

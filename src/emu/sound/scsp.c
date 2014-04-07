@@ -173,7 +173,7 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	memset(m_MidiStack, 0, sizeof(m_MidiStack));
 	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));
 	memset(m_RPANTABLE, 0, sizeof(m_RPANTABLE));
-	memset(m_TimPris, 0, sizeof(m_TimPris));	
+	memset(m_TimPris, 0, sizeof(m_TimPris));
 	memset(m_ARTABLE, 0, sizeof(m_ARTABLE));
 	memset(m_DRTABLE, 0, sizeof(m_DRTABLE));
 	memset(m_EG_TABLE, 0, sizeof(m_EG_TABLE));
@@ -187,8 +187,8 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 	memset(m_ALFO_NOI, 0, sizeof(m_ALFO_NOI));
 	memset(m_PSCALES, 0, sizeof(m_PSCALES));
 	memset(m_ASCALES, 0, sizeof(m_ASCALES));
-	memset(&m_Slots, 0, sizeof(m_Slots));	
-	memset(&m_udata.data, 0, sizeof(m_udata.data));	
+	memset(&m_Slots, 0, sizeof(m_Slots));
+	memset(&m_udata.data, 0, sizeof(m_udata.data));
 	m_TimCnt[0] = 0;
 	m_TimCnt[1] = 0;
 	m_TimCnt[2] = 0;
@@ -205,7 +205,7 @@ void scsp_device::device_start()
 
 	// set up the IRQ callbacks
 	m_irq_cb.resolve_safe();
-	m_main_irq_cb.resolve_safe();	
+	m_main_irq_cb.resolve_safe();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100, this);
 }
@@ -219,7 +219,7 @@ void scsp_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	m_bufferl = outputs[0];
 	m_bufferr = outputs[1];
 	m_length = samples;
-	DoMasterSamples(samples);	
+	DoMasterSamples(samples);
 }
 
 unsigned char scsp_device::DecodeSCI(unsigned char irq)
@@ -937,7 +937,7 @@ void scsp_device::w16(address_space &space,unsigned int addr,unsigned short val)
 			*((unsigned short *) (m_DSP.COEF+(addr-0x700)/2))=val;
 		else if(addr<0x7c0)
 			*((unsigned short *) (m_DSP.MADRS+(addr-0x780)/2))=val;
-		else if(addr<0x800)	// MADRS is mirrored twice
+		else if(addr<0x800) // MADRS is mirrored twice
 			*((unsigned short *) (m_DSP.MADRS+(addr-0x7c0)/2))=val;
 		else if(addr<0xC00)
 		{

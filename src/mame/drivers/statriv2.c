@@ -88,7 +88,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_question_offset(*this, "question_offset"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 			{ }
 
 	required_device<cpu_device> m_maincpu;

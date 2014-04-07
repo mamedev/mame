@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( bzone_base, bzone_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_DEVICE_ADD("avg", AVG_BZONE, 0)	
+	MCFG_DEVICE_ADD("avg", AVG_BZONE, 0)
 	MCFG_AVGDVG_VECTOR("vector")
 
 	/* Drivers */

@@ -452,7 +452,7 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
-	
+
 	struct OAM
 	{
 		UINT16 tile;
@@ -577,7 +577,7 @@ public:
 	UINT16 *m_oam_ram;     /* Object Attribute Memory */
 	UINT16 *m_cgram;   /* Palette RAM */
 	UINT8  *m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
-	
+
 	snes_state *m_state;
 };
 

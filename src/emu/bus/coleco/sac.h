@@ -26,7 +26,7 @@
 // ======================> coleco_super_action_controller_t
 
 class coleco_super_action_controller_t : public device_t,
-										 public device_colecovision_control_port_interface
+											public device_colecovision_control_port_interface
 {
 public:
 	// construction/destruction

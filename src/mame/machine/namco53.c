@@ -69,13 +69,13 @@ READ8_MEMBER( namco_53xx_device::K_r )
 READ8_MEMBER( namco_53xx_device::Rx_r )
 {
 	switch(offset) {
-		case 0 : return m_in_0(0); 
-		case 1 : return m_in_1(0); 
-		case 2 : return m_in_2(0); 
-		case 3 : return m_in_3(0); 
+		case 0 : return m_in_0(0);
+		case 1 : return m_in_1(0);
+		case 2 : return m_in_2(0);
+		case 3 : return m_in_3(0);
 		default : return 0xff;
 	}
-	
+
 }
 
 WRITE8_MEMBER( namco_53xx_device::O_w )

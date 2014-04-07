@@ -97,31 +97,31 @@ public:
 	m_upd7759(*this, "upd"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette") { }
-	
+
 	// for Print Club only
 	int m_cam_data;
-	
+
 	int m_segac2_enable_display;
-	
+
 	required_shared_ptr<UINT16> m_paletteram;
-	
+
 	/* internal states */
 	UINT8       m_misc_io_data[0x10];   /* holds values written to the I/O chip */
-	
+
 	/* protection-related tracking */
 	int (*m_prot_func)(int in);     /* emulation of protection chip */
 	UINT8       m_prot_write_buf;       /* remembers what was written */
 	UINT8       m_prot_read_buf;        /* remembers what was returned */
-	
+
 	/* palette-related variables */
 	UINT8       m_segac2_alt_palette_mode;
 	UINT8       m_palbank;
 	UINT8       m_bg_palbase;
 	UINT8       m_sp_palbase;
-	
+
 	/* sound-related variables */
 	UINT8       m_sound_banks;      /* number of sound banks */
-	
+
 	DECLARE_DRIVER_INIT(c2boot);
 	DECLARE_DRIVER_INIT(bloxeedc);
 	DECLARE_DRIVER_INIT(columns);
@@ -151,16 +151,16 @@ public:
 	DECLARE_VIDEO_START(segac2_new);
 	DECLARE_MACHINE_START(segac2);
 	DECLARE_MACHINE_RESET(segac2);
-	
+
 	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
-	
+
 	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
-	
+
 	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
@@ -177,7 +177,7 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 };
 
 
@@ -195,7 +195,7 @@ MACHINE_START_MEMBER(segac2_state,segac2)
 	save_item(NAME(m_misc_io_data));
 	save_item(NAME(m_prot_write_buf));
 	save_item(NAME(m_prot_read_buf));
-	
+
 	m_vdp->stop_timers();
 }
 

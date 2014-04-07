@@ -19,7 +19,7 @@ public:
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	
+
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
 
 protected:

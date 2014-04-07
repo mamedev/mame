@@ -19,7 +19,7 @@
 	devcb = &k053252_device::set_int2_ack_callback(*device, DEVCB2_##_devcb);
 
 /*#define MCFG_K053252_INT_TIME_CB(_devcb) \
-	devcb = &k053252_device::set_int_time_callback(*device, DEVCB2_##_devcb); */
+    devcb = &k053252_device::set_int_time_callback(*device, DEVCB2_##_devcb); */
 
 #define MCFG_K053252_OFFSETS(_offsx, _offsy) \
 	k053252_device::set_offsets(*device, _offsx, _offsy);
@@ -38,7 +38,7 @@ public:
 	template<class _Object> static devcb2_base &set_int2_ack_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int2_ack_cb.set_callback(object); }
 	//template<class _Object> static devcb2_base &set_int_time_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(object); }
 	static void set_offsets(device_t &device, int offsx, int offsy) { downcast<k053252_device &>(device).m_offsx = offsx; downcast<k053252_device &>(device).m_offsy = offsy;}
-	
+
 	DECLARE_READ8_MEMBER( read );  // CCU registers
 	DECLARE_WRITE8_MEMBER( write );
 

@@ -25,7 +25,7 @@
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(switch2,
-    NETLIB_NAME(R_base) m_R[2];
+	NETLIB_NAME(R_base) m_R[2];
 
 	netlist_param_int_t m_POS;
 );

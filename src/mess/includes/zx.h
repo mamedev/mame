@@ -102,7 +102,7 @@ protected:
 	required_ioport m_io_row7;
 	optional_ioport m_io_config;
 	required_device<screen_device> m_screen;
-	
+
 	void zx_ula_r(int offs, memory_region *region, const UINT8 param);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( subs, subs_state )
 
 	MCFG_PALETTE_ADD("palette", 4)
 	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)

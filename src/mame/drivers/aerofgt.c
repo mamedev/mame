@@ -1489,7 +1489,7 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR2_PALETTE("palette")
-	
+
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
@@ -1542,7 +1542,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR2_PALETTE("palette")
-	
+
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback ) // rom lookup
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
@@ -1596,7 +1596,7 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR2_PALETTE("palette")
-	
+
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
@@ -1650,8 +1650,8 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR2_PALETTE("palette")
-	
-	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)	
+
+	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
@@ -1806,7 +1806,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8+14, 44*8-1+4, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)	
+	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_wbbc97)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wbbc97)
 	MCFG_PALETTE_ADD("palette", 2048)

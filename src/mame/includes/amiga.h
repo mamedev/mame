@@ -432,7 +432,7 @@ public:
 
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	
+
 	address_space* m_maincpu_program_space;
 
 	const amiga_machine_interface *m_intf;
@@ -499,7 +499,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
 	DECLARE_READ8_MEMBER( amiga_cia_0_portA_r );
 	DECLARE_WRITE8_MEMBER( amiga_cia_0_portA_w );
-	
+
 	DECLARE_READ16_MEMBER( amiga_clock_r );
 	DECLARE_WRITE16_MEMBER( amiga_clock_w );
 

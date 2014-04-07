@@ -41,8 +41,8 @@ MACHINE_CONFIG_FRAGMENT( cclimber_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 
 	MCFG_SAMPLES_ADD("samples", cclimber_samples_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.5)	
-MACHINE_CONFIG_END	
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.5)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -136,4 +136,3 @@ void cclimber_audio_device::play_sample(int start,int freq,int volume)
 
 	m_samples->start_raw(0,samplebuf,2 * len,freq);
 }
-

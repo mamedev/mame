@@ -210,7 +210,7 @@
     . NEO-MVS PROGSS3
     . NEO-MVS PROGTOP
     . NEO-MVS PROGSF1 (1998.6.17)
-	. NEO-MVS PROGSF1E (1998.6.18)
+    . NEO-MVS PROGSF1E (1998.6.18)
     . NEO-MVS PROGEOP (1999.2.2)
     . NEO-MVS PROGLBA (1999.4.12) - LBA-SUB (2000.2.24)
     . NEO-MVS PROGBK1 (1994)
@@ -787,7 +787,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 READ16_MEMBER(neogeo_state::memcard_r)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
-	
+
 	UINT16 ret;
 
 	if (memcard_present(machine()) != -1)
@@ -1810,7 +1810,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
@@ -11558,4 +11558,3 @@ GAME( 2004, sbp,        neogeo,   neogeo,   neogeo, neogeo_state,   sbp,      RO
 /* N.C.I - LE CORTEX */
 // Bang Bang Busters (c)2010 - MVS?/AES
 // Treasure of the Caribbean (c)2011 - MVS?/AES
-

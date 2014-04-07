@@ -71,7 +71,7 @@ offs_t abc800c_state::translate_trom_offset(offs_t offset)
 void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	
+
 	UINT16 addr = 0;
 
 	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 480); y += 2)
@@ -201,7 +201,7 @@ MACHINE_CONFIG_END
 void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
-	
+
 	const pen_t *pen = m_palette->pens();
 
 	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)

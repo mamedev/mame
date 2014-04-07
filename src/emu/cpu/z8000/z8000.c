@@ -834,4 +834,3 @@ void z8002_device::execute_set_input(int irqline, int state)
 		}
 	}
 }
-

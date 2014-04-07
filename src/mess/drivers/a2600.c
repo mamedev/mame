@@ -1939,7 +1939,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback))
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31 )
 	MCFG_SCREEN_UPDATE_DEVICE("tia_video", tia_video_device, screen_update)
@@ -1977,7 +1977,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_TIA_READ_INPUT_PORT_CB(READ16(a2600_state, a2600_read_input_port))
 	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(a2600_state, a2600_get_databus_contents))
 	MCFG_TIA_VSYNC_CB(WRITE16(a2600_state, a2600_tia_vsync_callback_pal))
-	
+
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK_PAL, 228, 26, 26 + 160 + 16, 312, 32, 32 + 228 + 31 )

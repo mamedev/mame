@@ -175,7 +175,7 @@ private:
 	bool validate_and_set_data(entry &curentry, const char *newdata, int priority, astring &error_string);
 
 	// internal state
-	simple_list<entry>		m_entrylist;            // head of list of entries
+	simple_list<entry>      m_entrylist;            // head of list of entries
 	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
 	astring                 m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"

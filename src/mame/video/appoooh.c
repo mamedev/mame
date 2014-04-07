@@ -219,7 +219,7 @@ void appoooh_state::appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangl
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		
+
 				gfx->transpen(dest_bmp,cliprect,
 				code,
 				color,
@@ -250,7 +250,7 @@ void appoooh_state::robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectang
 			sy = 239 - sy;
 			flipx = !flipx;
 		}
-		
+
 				gfx->transpen(dest_bmp,cliprect,
 				code,
 				color,

@@ -98,7 +98,7 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 		m_soundlatch = 0;
 		m_bank = 0;
@@ -112,7 +112,7 @@ public:
 	required_shared_ptr<UINT8> m_fbram;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -204,7 +204,7 @@ UINT32 flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb3
 			int tile = m_bank << 8 | m_vram[x+y*0x100];
 			int color = m_cram[x+y*0x100] & 0x3f;
 
-			 gfx->transpen(bitmap,cliprect, tile, color, 0, 0, x*8, y*8, 0);
+				gfx->transpen(bitmap,cliprect, tile, color, 0, 0, x*8, y*8, 0);
 		}
 	}
 

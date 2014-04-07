@@ -194,7 +194,7 @@ Notes:
       DSW       - 2-position DIP Switch, present only on Sega GDROM version PCB
       PIC16C621 - DIP18 socket and 4MHz OSC on a 90-degrees-mounted small PCB for
                   Microchip PIC16C621A protection key chip
- 
+
 ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart version of the Media Board)
 ---------
 

@@ -629,16 +629,16 @@ WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
 
 /*
 
-	bit     description
+    bit     description
 
-	PA0     E0
-	PA1     E1
-	PA2     I1
-	PA3     E2
-	PA4     E4
-	PA5     E5
-	PA6     I7
-	PA7     E6
+    PA0     E0
+    PA1     E1
+    PA2     I1
+    PA3     E2
+    PA4     E4
+    PA5     E5
+    PA6     I7
+    PA7     E6
 
 */
 

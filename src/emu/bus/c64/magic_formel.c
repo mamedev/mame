@@ -11,9 +11,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- pia6821 port A DDR needs to reset to 0xff or this won't boot
+    - pia6821 port A DDR needs to reset to 0xff or this won't boot
 
 */
 
@@ -69,7 +69,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
 	    PB2     RAM A9
 	    PB3     RAM A8
 	    PB4     RAM A12
-	    PB5		U9A clr
+	    PB5     U9A clr
 	    PB6
 	    PB7     ROMH enable
 

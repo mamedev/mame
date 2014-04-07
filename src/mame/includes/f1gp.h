@@ -42,7 +42,7 @@ public:
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_fgregs;
 	optional_shared_ptr<UINT16> m_rozregs;
-	
+
 	optional_memory_bank m_z80bank;
 
 	/* devices referenced above */
@@ -74,7 +74,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<k053936_device> m_k053936;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ16_MEMBER(command_pending_r);

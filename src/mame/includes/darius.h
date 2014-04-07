@@ -93,7 +93,7 @@ public:
 	required_device<filter_volume_device> m_msm5205_r;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(darius_watchdog_w);
 	DECLARE_READ16_MEMBER(darius_ioc_r);

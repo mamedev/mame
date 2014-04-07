@@ -12,4 +12,3 @@
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(spc1000_cassette_formats);
-

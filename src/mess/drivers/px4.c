@@ -66,7 +66,7 @@
 //**************************************************************************
 
 class px4_state : public driver_device,
-				  public device_serial_interface
+					public device_serial_interface
 {
 public:
 	px4_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -83,7 +83,7 @@ public:
 	m_isr(0), m_ier(0), m_str(0), m_sior(0xbf),
 	m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
 	m_swr(0),
-	m_one_sec_int_enabled(true), m_alarm_int_enabled(true),	m_key_int_enabled(true),
+	m_one_sec_int_enabled(true), m_alarm_int_enabled(true), m_key_int_enabled(true),
 	m_ramdisk_address(0),
 	m_ear_last_state(0)
 	{ }

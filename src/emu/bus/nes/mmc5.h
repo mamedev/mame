@@ -66,7 +66,7 @@ protected:
 	UINT8 m_prg_ram_mapped[4];
 
 	UINT8 m_ex1_bank;
-	
+
 	UINT8 m_high_chr;   // $5130
 
 	UINT8 m_split_scr;  // $5200

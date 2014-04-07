@@ -3,12 +3,12 @@
     drivers/apple3.c
 
     Apple ///
- 
+
     driver by Nathan Woods and R. Belmont
- 
+
     Special thanks to Chris Smolinski (author of the Sara emulator)
     for his input about this poorly known system.
- 
+
     Also thanks to Washington Apple Pi for the "Apple III DVD" containing the
     technical manual, schematics, and software.
 
@@ -176,24 +176,24 @@ static INPUT_PORTS_START( apple3 )
 	*/
 
 /*
-	Esc
-	0x00
+    Esc
+    0x00
 
-	  `    1	2    3    4    5	6    7    8    9	0    -   =   BACKSPACE
-	0x38 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x30 0x31 0x2f 0x104
+      `    1    2    3    4    5    6    7    8    9    0    -   =   BACKSPACE
+    0x38 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x30 0x31 0x2f 0x104
 
-	 Tab   Q	W    E    R    T	Y    U   I     O	P    [    ]    \
-	0x0a 0x0b 0x0c 0x0d 0x0e 0x0f 0x10 0x11 0x12 0x13 0x3a 0x3b 0x39 0x2e
+     Tab   Q    W    E    R    T    Y    U   I     O    P    [    ]    \
+    0x0a 0x0b 0x0c 0x0d 0x0e 0x0f 0x10 0x11 0x12 0x13 0x3a 0x3b 0x39 0x2e
 
-	  A    S	D    F    G    H	J    K    L    ;	'   ENTER
-	0x14 0x15 0x16 0x17 0x19 0x18 0x1a 0x1b 0x1d 0x1c 0x105 0x102
- 
-      Z    X	C    V    B    N    M   ,     .    /
+      A    S    D    F    G    H    J    K    L    ;    '   ENTER
+    0x14 0x15 0x16 0x17 0x19 0x18 0x1a 0x1b 0x1d 0x1c 0x105 0x102
+
+      Z    X    C    V    B    N    M   ,     .    /
     0x1e 0x1f 0x20 0x21 0x22 0x23 0x24 0x25 0x26 0x27
- 
-    SPACE   UP    LT    DN    RT   KP-   KP7  KP8  KP9 
+
+    SPACE   UP    LT    DN    RT   KP-   KP7  KP8  KP9
     0x109  0x103 0x10e 0x10d 0x10c 0x10b 0x2d 0x2b 0x29
- 
+
     KP4  KP5  KP6   KP1  KP2  KP3  KPEN  KP0   KP.
     0x37 0x35 0x33 0x101 0x3f 0x3d 0x108 0x100 0x3e
 */
@@ -310,8 +310,8 @@ static INPUT_PORTS_START( apple3 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT) 
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT) 
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 INPUT_PORTS_END
 
@@ -322,4 +322,3 @@ ROM_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
 COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_SUPPORTS_SAVE )
-

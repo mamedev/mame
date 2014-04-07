@@ -1623,15 +1623,15 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 
 	MCFG_NAMCO_50XX_ADD("50xx_1", MASTER_CLOCK/6/2) /* 1.536 MHz */
 	MCFG_NAMCO_50XX_ADD("50xx_2", MASTER_CLOCK/6/2) /* 1.536 MHz */
-	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */	
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_51XX_INPUT_0_CB(IOPORT("IN0L"))
 	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0H"))
 	MCFG_NAMCO_51XX_INPUT_2_CB(IOPORT("IN1L"))
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("IN1H"))
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(galaga_state,out_1))
-	
-	
+
+
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_52XX_DISCRETE("discrete")
 	MCFG_NAMCO_52XX_BASENODE(NODE_04)
@@ -1642,21 +1642,21 @@ static MACHINE_CONFIG_START( bosco, bosco_state )
 	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_54XX_DISCRETE("discrete")
 	MCFG_NAMCO_54XX_BASENODE(NODE_01)
-	
+
 	MCFG_NAMCO_06XX_ADD("06xx_0", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
 	MCFG_NAMCO_06XX_READ_2_CB(DEVREAD8("50xx_1", namco_50xx_device, read))
 	MCFG_NAMCO_06XX_READ_REQUEST_2_CB(DEVWRITELINE("50xx_1", namco_50xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_2_CB(DEVWRITE8("50xx_1", namco_50xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_2_CB(DEVWRITE8("50xx_1", namco_50xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(DEVWRITE8("54xx", namco_54xx_device, write))
-	
+
 	MCFG_NAMCO_06XX_ADD("06xx_1", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("sub")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("50xx_2", namco_50xx_device, read))
 	MCFG_NAMCO_06XX_READ_REQUEST_0_CB(DEVWRITELINE("50xx_2", namco_50xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("50xx_2", namco_50xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("50xx_2", namco_50xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_1_CB(DEVWRITE8("52xx", namco_52xx_device, write))
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -1712,7 +1712,7 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("IN1H"))
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(galaga_state,out_1))
-	
+
 	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_54XX_DISCRETE("discrete")
 	MCFG_NAMCO_54XX_BASENODE(NODE_01)
@@ -1720,9 +1720,9 @@ static MACHINE_CONFIG_START( galaga, galaga_state )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(DEVWRITE8("54xx", namco_54xx_device, write))
-	
+
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -1766,8 +1766,8 @@ static MACHINE_CONFIG_DERIVED( galagab, galaga )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
-	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
+
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_mem4)
 
@@ -1798,7 +1798,7 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("IN1H"))
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(galaga_state,out_1))
-	
+
 	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_54XX_DISCRETE("discrete")
 	MCFG_NAMCO_54XX_BASENODE(NODE_01)
@@ -1806,10 +1806,10 @@ static MACHINE_CONFIG_START( xevious, xevious_state )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
 	MCFG_NAMCO_06XX_READ_2_CB(DEVREAD8("50xx", namco_50xx_device, read))
 	MCFG_NAMCO_06XX_READ_REQUEST_2_CB(DEVWRITELINE("50xx", namco_50xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_2_CB(DEVWRITE8("50xx", namco_50xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_2_CB(DEVWRITE8("50xx", namco_50xx_device, write))
 	MCFG_NAMCO_06XX_WRITE_3_CB(DEVWRITE8("54xx", namco_54xx_device, write))
 
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -1855,7 +1855,7 @@ static MACHINE_CONFIG_DERIVED( battles, xevious )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
 
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(battles_mem4)
@@ -1897,7 +1897,7 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("IN1H"))
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(galaga_state,out_0))
 	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(galaga_state,out_1))
-	
+
 	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/6/2)      /* 1.536 MHz */
 	MCFG_NAMCO_53XX_K_CB(READ8(galaga_state,custom_mod_r))
 	MCFG_NAMCO_53XX_INPUT_0_CB(IOPORT("DSWA"))
@@ -1908,7 +1908,7 @@ static MACHINE_CONFIG_START( digdug, digdug_state )
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/6/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))	
+	MCFG_NAMCO_06XX_WRITE_0_CB(DEVWRITE8("51xx", namco_51xx_device, write))
 	MCFG_NAMCO_06XX_READ_1_CB(DEVREAD8("53xx", namco_53xx_device, read))
 	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(DEVWRITELINE("53xx", namco_53xx_device, read_request))
 

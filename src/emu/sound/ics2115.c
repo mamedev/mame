@@ -30,7 +30,7 @@ void ics2115_device::device_start()
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);
-	
+
 	m_irq_cb.resolve_safe();
 
 	//Exact formula as per patent 5809466

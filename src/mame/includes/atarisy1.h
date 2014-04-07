@@ -48,7 +48,7 @@ public:
 	int             m_next_timer_scanline;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
-	
+
 	/* speech */
 	required_device<tms5220_device> m_tms;
 

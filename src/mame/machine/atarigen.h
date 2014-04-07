@@ -79,7 +79,7 @@
 	{ astring fulltag(device->tag(), ":mob"); device_t *device; \
 	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag, "^^screen", _config) \
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxtag) }
-	
+
 
 
 #define MCFG_ATARI_EEPROM_2804_ADD(_tag) \

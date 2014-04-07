@@ -98,7 +98,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	
+
 	UINT8 segaic16_display_enable;
 	UINT16 *segaic16_tileram_0;
 	UINT16 *segaic16_textram_0;

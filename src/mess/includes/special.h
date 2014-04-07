@@ -169,11 +169,11 @@ class specimx_sound_device : public device_t,
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~specimx_sound_device() { }
-	
+
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
 	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

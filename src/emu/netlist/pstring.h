@@ -97,7 +97,7 @@ public:
 	inline const char *cstr() const { return m_ptr->str(); }
 
 	// concatenation operators
-    pstring& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
+	pstring& operator+=(const char c) { char buf[2] = { c, 0 }; pcat(buf); return *this; }
 	pstring& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
 	friend pstring operator+(const pstring &lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
 	friend pstring operator+(const pstring &lhs, const char *rhs) { return pstring(lhs) += rhs; }
@@ -133,12 +133,12 @@ public:
 		return (result != NULL) ? (result - cstr()) : -1;
 	}
 
-    inline int find(const char search, int start = 0) const
-    {
-        int alen = len();
-        const char *result = strchr(cstr() + MIN(start, alen), search);
-        return (result != NULL) ? (result - cstr()) : -1;
-    }
+	inline int find(const char search, int start = 0) const
+	{
+		int alen = len();
+		const char *result = strchr(cstr() + MIN(start, alen), search);
+		return (result != NULL) ? (result - cstr()) : -1;
+	}
 
 	// various
 
@@ -174,7 +174,7 @@ protected:
 
 	struct str_t
 	{
-        str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
+		str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
 		str_t(int alen) : m_ref_count(1), m_len(alen) { m_str[0] = 0; }
 
 		char *str() { return &m_str[0]; }

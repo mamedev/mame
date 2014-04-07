@@ -12,4 +12,3 @@
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(phc25_cassette_formats);
-

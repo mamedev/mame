@@ -38,9 +38,9 @@
 
 #define MCFG_QS1000_OUT_P3_CB(_devcb) \
 	devcb = &qs1000_device::set_out_p3_callback(*device, DEVCB2_##_devcb);
-	
+
 /*#define MCFG_QS1000_SERIAL_W_CB(_devcb) \
-	devcb = &qs1000_device::set_serial_w_callback(*device, DEVCB2_##_devcb);*/
+    devcb = &qs1000_device::set_serial_w_callback(*device, DEVCB2_##_devcb);*/
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -67,7 +67,7 @@ public:
 	template<class _Object> static devcb2_base &set_out_p2_callback(device_t &device, _Object object) { return downcast<qs1000_device &>(device).m_out_p2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_p3_callback(device_t &device, _Object object) { return downcast<qs1000_device &>(device).m_out_p3_cb.set_callback(object); }
 	//template<class _Object> static devcb2_base &set_serial_w_callback(device_t &device, _Object object) { return downcast<qs1000_device &>(device).m_serial_w_cb.set_callback(object); }
-	
+
 	// external
 	void serial_in(UINT8 data);
 	void set_irq(int state);
@@ -113,7 +113,7 @@ public:
 	void set_voice_regs(int ch);
 
 	bool                    m_external_rom;
-	
+
 	// Callbacks
 	devcb2_read8             m_in_p1_cb;
 	devcb2_read8             m_in_p2_cb;

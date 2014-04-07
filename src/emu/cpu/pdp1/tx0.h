@@ -96,8 +96,8 @@ protected:
 	unsigned int m_run;       /* processor is running */
 	unsigned int m_rim;       /* processor is in read-in mode */
 	unsigned int m_cycle;     /* 0 -> fetch */
-	                          /* 1 -> execute (except for taken branches) */
-	                          /* 2 -> extra execute cycle for SXA and ADO */
+								/* 1 -> execute (except for taken branches) */
+								/* 2 -> extra execute cycle for SXA and ADO */
 
 	unsigned int m_ioh;       /* i-o halt: processor is executing an Input-Output Transfer wait */
 	unsigned int m_ios;       /* i-o synchronizer: set on i-o operation completion */

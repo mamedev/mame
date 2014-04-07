@@ -582,7 +582,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 			//  if(color==0) color=0xf;
 
-				  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
+					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
 
 				++idx;
 			}
@@ -603,7 +603,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 			{
 				//for(int x=0;x<4;++x)
 				{
-					  m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
+						m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
 					++num;
 				}
 			}
@@ -643,7 +643,7 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 				for(int y=0;y<4;++y)
 				{
-					  m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
+						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
 					++strip_num;
 				}
 			}

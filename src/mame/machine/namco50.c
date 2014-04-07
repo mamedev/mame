@@ -176,7 +176,7 @@ TIMER_CALLBACK_MEMBER( namco_50xx_device::irq_clear )
 }
 
 void namco_50xx_device::irq_set()
-{	
+{
 	m_cpu->set_input_line(0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to

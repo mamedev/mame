@@ -19,7 +19,7 @@
 
 
     * PCB1: PULL TABS.
-	
+
     Board silkscreend:
 
      GAME-A-TRON CORP.
@@ -72,7 +72,7 @@
     Identified the unknown writes as a init sequence for 1x PSG sound device.
     The type/class is unknown due to almost all devices are plastic covered.
 
-	
+
     * PCB 3: BINGO.
 
     The PCB doesn't looks like an official Game-A-Tron board. Maybe it's a bootleg,
@@ -190,7 +190,7 @@
     Press "LADY LUCK TICKET" (key X) to play with Lady Luck (center) Ticket.
     Press "BIG BAR TICKET" (key C) to play with Big Bar (right) Ticket.
 
-	
+
     * Bingo:
 
     Pressing SERVICE 1 (key 9) you enter the Test/Settings Mode. You can test
@@ -213,8 +213,8 @@
     Press "CHANGE CARD" (key Z) to change for another card with a different set of numbers.
     Press "START" (key X) to start the game.
     Press "CHANGE GAME" (key C) to switch between games X-L-T-C-N-U.
-	
-	Note that letters in games X-L-T-C-N-U are just references to the shape of the special
+
+    Note that letters in games X-L-T-C-N-U are just references to the shape of the special
     numbers group inside the card, which will play.
 
     You must setup double-ups to something different of 0 (default), to play with these
@@ -253,9 +253,9 @@
 
     [2014-02-04]
     - Added Bingo (1983). PCB seems bootleg, but the game looks legit.
-	- Worked from the scratch a whole set of inputs and button-lamps support for this game.
+    - Worked from the scratch a whole set of inputs and button-lamps support for this game.
     - Changed the poker41 description to Four in One Poker (as seen in the official brochure).
-	- Added game and technical notes.
+    - Added game and technical notes.
 
     [2008-10-14]
     - Improved the button-lamps layouts to look more realistic.
@@ -625,4 +625,3 @@ ROM_END
 GAMEL( 1983, poker41,  0,      gat,     poker41,   driver_device,  0,    ROT0, "Game-A-Tron",  "Four in One Poker",  0,     layout_poker41  )
 GAMEL( 1983, pulltabs, 0,      gat,     pulltabs,  driver_device,  0,    ROT0, "Game-A-Tron",  "Pull Tabs",          0,     layout_pulltabs )
 GAMEL( 1983, bingo,    0,      gat,     bingo,     driver_device,  0,    ROT0, "Game-A-Tron?", "Bingo",              0,     layout_bingo  )
-

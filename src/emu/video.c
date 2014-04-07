@@ -1247,7 +1247,7 @@ void video_manager::record_frame()
 }
 
 //-------------------------------------------------
-//	toggle_throttle
+//  toggle_throttle
 //-------------------------------------------------
 
 void video_manager::toggle_throttle()
@@ -1257,7 +1257,7 @@ void video_manager::toggle_throttle()
 
 
 //-------------------------------------------------
-//	toggle_record_movie
+//  toggle_record_movie
 //-------------------------------------------------
 
 void video_manager::toggle_record_movie()

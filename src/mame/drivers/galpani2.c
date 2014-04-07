@@ -966,8 +966,8 @@ ROM_END
 
 ROM_START( galpani2e2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
-	ROM_LOAD16_BYTE( "g000i1-u133-0.u133", 0x000000, 0x080000, CRC(7df7b759) SHA1(2479a6389649ee6042b175b71d7ed54bc116add5) )	//english version specific
-	ROM_LOAD16_BYTE( "g001i1-u134-0.u134", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )	//same as german version
+	ROM_LOAD16_BYTE( "g000i1-u133-0.u133", 0x000000, 0x080000, CRC(7df7b759) SHA1(2479a6389649ee6042b175b71d7ed54bc116add5) )   //english version specific
+	ROM_LOAD16_BYTE( "g001i1-u134-0.u134", 0x000001, 0x080000, CRC(c92937c3) SHA1(0c9e894c0e23e319bd2d01ec573f02ed510e3ed6) )   //same as german version
 
 	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
 	ROM_LOAD16_BYTE( "g002i1.125", 0x000000, 0x020000, CRC(a3034e1c) SHA1(493e4be36f2aea0083d5d37e16486ed66dab952e) )

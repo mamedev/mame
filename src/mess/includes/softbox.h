@@ -21,7 +21,7 @@
 #define I8255_1_TAG     "ic16"
 #define COM8116_TAG     "ic14"
 #define RS232_TAG       "rs232"
-#define CORVUS_HDC_TAG	"corvus"
+#define CORVUS_HDC_TAG  "corvus"
 
 class softbox_state : public driver_device
 {

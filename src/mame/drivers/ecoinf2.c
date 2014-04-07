@@ -21,7 +21,7 @@ class ecoinf2_state : public driver_device
 public:
 	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),	
+		m_maincpu(*this, "maincpu"),
 		m_coins(*this, "COINS"),
 		m_key(*this, "PERKEY"),
 		m_panel(*this, "PANEL")
@@ -38,7 +38,7 @@ public:
 	UINT16 m_lamps[16];
 	UINT16 m_leds[16];
 	//UINT16 m_chars[14];
-//	void update_display();
+//  void update_display();
 	int m_optic_pattern;
 	int strobe_addr;
 	int strobe_amount;
@@ -89,7 +89,7 @@ public:
 	}
 	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_c_strobe)
 	{
-//		if (data>=0xf0)
+//      if (data>=0xf0)
 		{
 			strobe_addr = data & 0xf;
 
@@ -100,7 +100,7 @@ public:
 			update_lamps();
 			update_leds();
 		}
-	//	else logerror("%04x - ppi8255_ic10_(used)write_c %02x (UNUSUAL?)\n", m_maincpu->pcbase(), data);
+	//  else logerror("%04x - ppi8255_ic10_(used)write_c %02x (UNUSUAL?)\n", m_maincpu->pcbase(), data);
 	}
 
 
@@ -149,7 +149,7 @@ public:
 			return 0x00;
 		}
 
-//		return m_misc->read();
+//      return m_misc->read();
 	}
 
 
@@ -177,11 +177,11 @@ public:
 		coin_lockout_w(machine(), 1, (data & 0x02) );
 		coin_lockout_w(machine(), 2, (data & 0x04) );
 		coin_lockout_w(machine(), 3, (data & 0x08) );
-		coin_lockout_w(machine(), 4, (data & 0x10) );	
-		
+		coin_lockout_w(machine(), 4, (data & 0x10) );
+
 		//int wdog = (data& 0x80);
 	}
-	
+
 
 
 
@@ -254,7 +254,7 @@ static I8255_INTERFACE (ppi8255_ic22_intf)//inputs
 	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_c_misc),            /* Port C read (0x20 appears to be meter power)*/
 	DEVCB_NULL
 };
-	
+
 // IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
 static I8255_INTERFACE (ppi8255_ic24_intf)//coins and related
 {
@@ -295,10 +295,10 @@ static ADDRESS_MAP_START( oxo_portmap, AS_IO, 8, ecoinf2_state )
 	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("ic22_inpt", i8255_device, read, write) //*
 	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ic23_reel", i8255_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("ic13_leds", i8255_device, read, write) //*
-//	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
+//  AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
 
-	
-//	AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
+
+//  AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
 ADDRESS_MAP_END
 
 
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( ecoinf2 )
 	PORT_DIPNAME( 0x80, 0x80, "IN7:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+
 	PORT_START("PANEL")
 	PORT_DIPNAME( 0x01, 0x01, "IN8:01" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
 	MCFG_CPU_PROGRAM_MAP(oxo_memmap)
 	MCFG_CPU_IO_MAP(oxo_portmap)
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
 
 	MCFG_MACHINE_START_OVERRIDE(ecoinf2_state, ecoinf2 )
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_I8255_ADD( "ic22_inpt", ppi8255_ic22_intf )
 	MCFG_I8255_ADD( "ic23_reel", ppi8255_ic23_intf )
 	MCFG_I8255_ADD( "ic13_leds", ppi8255_ic13_intf )
-//	MCFG_I8255_ADD( "ic25_dips", ppi8255_ic25_intf )
+//  MCFG_I8255_ADD( "ic25_dips", ppi8255_ic25_intf )
 
 MACHINE_CONFIG_END
 

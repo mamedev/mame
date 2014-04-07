@@ -373,11 +373,11 @@ GAME_CUSTOM( 199?, m4shkwav,       0,          "swave_v210_1135_08dd_lv.bin",   
 GAME_CUSTOM( 199?, m4shkwav__a,    m4shkwav,   "swave_v210_11376_0bb3_nlv.bin",    0x0000, 0x040000, CRC(3fcaf973) SHA1(28258c8c60e6b542e1789cd8a4cfd530d1ed6084), "Qps","Shockwave (Qps) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4shkwav__b,    m4shkwav,   "swsplv.bin",                       0x0000, 0x040000, CRC(1e33e93f) SHA1(3e87f8ed35da776e1968c9574c140cc3984ea8de), "Qps","Shockwave (Qps) (MPU4) (set 3)" )
 //This rom is possibly bad, data content isn't multiple of 0x800, padding with low bits rather than high
-	ROM_START( m4shkwav__c ) 
-		ROM_REGION( 0x080000, "maincpu", 0 ) 
-		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) ) 
-		M4SHKWAV_EXTRA_ROMS 
-	ROM_END 
+	ROM_START( m4shkwav__c )
+		ROM_REGION( 0x080000, "maincpu", 0 )
+		ROM_LOAD( "sho1_0lv.bin", 0x0000, 0x080000, BAD_DUMP CRC(a76d8544) SHA1(8277a2ce311840b8405a087d3dc0bbf97054ad87) )
+		M4SHKWAV_EXTRA_ROMS
+	ROM_END
 GAME(199?, m4shkwav__c, m4shkwav ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,"Qps","Shockwave (Qps) (MPU4) (set 4)",GAME_FLAGS )
 GAME_CUSTOM( 199?, m4shkwav__d,    m4shkwav,   "swave_v300_1552_13ed_nlv.bin",     0x0000, 0x040000, CRC(b0e03f04) SHA1(fdd113af30fd9e87b171ecdf3be7e720366476b3), "Qps","Shockwave (Qps) (MPU4) (set 5)" )
 GAME_CUSTOM( 199?, m4shkwav__e,    m4shkwav,   "swave_v300_1555_119d_lv.bin",      0x0000, 0x040000, CRC(45b786d4) SHA1(24fd4fdea684103334385ca329f384796b496e2c), "Qps","Shockwave (Qps) (MPU4) (set 6)" )

@@ -4326,4 +4326,3 @@ void pentium4_device::device_reset()
 
 	CHANGE_PC(m_eip);
 }
-

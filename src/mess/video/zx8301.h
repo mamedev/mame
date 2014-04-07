@@ -103,7 +103,7 @@ private:
 	required_device<cpu_device> m_cpu;
 
 	devcb2_write_line   m_write_vsync;
-	
+
 	//address_space *m_data;
 
 	int m_dispoff;                  // display off

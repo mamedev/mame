@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 2);
 	decospr_device::set_pri_callback(*device, dblwings_pri_callback);

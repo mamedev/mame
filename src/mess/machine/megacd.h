@@ -111,8 +111,8 @@ public:
 
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
-	void set_total_scanlines(int total) { m_base_total_scanlines = total; }		// this gets set at start only
-	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }	// this gets set at each EOF
+	void set_total_scanlines(int total) { m_base_total_scanlines = total; }     // this gets set at start only
+	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index );

@@ -197,7 +197,7 @@ WRITE_LINE_MEMBER( e01_device::fdc_irq_w )
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( e01_device::fdc_drq_w ) 
+WRITE_LINE_MEMBER( e01_device::fdc_drq_w )
 {
 	m_fdc_drq = state;
 

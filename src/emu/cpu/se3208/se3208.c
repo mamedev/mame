@@ -1830,5 +1830,3 @@ offs_t se3208_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
 	extern CPU_DISASSEMBLE( se3208 );
 	return CPU_DISASSEMBLE_NAME(se3208)(this, buffer, pc, oprom, opram, options);
 }
-
-

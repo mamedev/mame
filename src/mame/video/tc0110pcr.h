@@ -15,9 +15,9 @@ public:
 	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
 
 	void restore_colors();
-	
+
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -28,14 +28,13 @@ private:
 	UINT16 *     m_ram;
 	int          m_type;
 	int          m_addr;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 extern const device_type TC0110PCR;
 
 #define MCFG_TC0110PCR_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0) \
-
+	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0)
 #define MCFG_TC0110PCR_PALETTE(_palette_tag) \
 	tc0110pcr_device::static_set_palette_tag(*device, "^" _palette_tag);
 

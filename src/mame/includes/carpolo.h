@@ -65,7 +65,7 @@ public:
 	required_device<ttl7474_device> m_ttl7474_1a_2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap1;
 	bitmap_ind16 *m_sprite_sprite_collision_bitmap2;
 	bitmap_ind16 *m_sprite_goal_collision_bitmap1;

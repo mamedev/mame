@@ -46,7 +46,7 @@ public:
 		m_chargen(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
 		m_ic8j1(*this, "ic8j1"),
-		m_ic8j2(*this, "ic8j2"),		
+		m_ic8j2(*this, "ic8j2"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -81,7 +81,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m15_ctrl_w);

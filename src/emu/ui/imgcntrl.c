@@ -119,7 +119,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 			need_confirm = false;
 			break;
 	}
-	
+
 	if (entry != NULL)
 		osd_free(entry);
 }

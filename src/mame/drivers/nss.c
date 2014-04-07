@@ -311,7 +311,7 @@ public:
 	required_device<rp5h01_device> m_rp5h01;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	
+
 	UINT8 m_wram_wp_flag;
 	UINT8 *m_wram;
 	UINT8 m_nmi_enable;

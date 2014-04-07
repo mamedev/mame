@@ -145,7 +145,7 @@ private:
 	dynamic_array<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;
-	static UINT64			s_id;
+	static UINT64           s_id;
 };
 
 

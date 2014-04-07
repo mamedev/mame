@@ -137,7 +137,7 @@ class isa8_cga_filetto_device : public isa8_cga_device
 public:
 	// construction/destruction
 	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual const rom_entry *device_rom_region() const;
 };
 
@@ -149,7 +149,7 @@ const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
 
 isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_FILETTO, "ISA8_CGA_FILETTO", tag, owner, clock, "filetto_cga", __FILE__)
-{	
+{
 }
 
 ROM_START( filetto_cga )
@@ -169,11 +169,11 @@ class isa8_cga_tetriskr_device : public isa8_cga_superimpose_device
 public:
 	// construction/destruction
 	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 private:
@@ -190,7 +190,7 @@ const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
 
 isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		isa8_cga_superimpose_device( mconfig, ISA8_CGA_TETRISKR, "ISA8_CGA_TETRISKR", tag, owner, clock, "tetriskr_cga", __FILE__)
-{	
+{
 }
 
 
@@ -788,7 +788,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 	MCFG_FRAGMENT_ADD( pcxt )
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(tetriskr_io)
 

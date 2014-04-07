@@ -32,7 +32,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pic )
 	ROM_REGION(0x000200, PIC_ROM_REGION, 0)
-	ROM_LOAD( "341-0057.bin", 0x000000, 0x000200, CRC(0d2d84ee) SHA1(bfc5b863d37e59875a6159528eb0f2b6082063b5) ) 
+	ROM_LOAD( "341-0057.bin", 0x000000, 0x000200, CRC(0d2d84ee) SHA1(bfc5b863d37e59875a6159528eb0f2b6082063b5) )
 ROM_END
 
 static INPUT_PORTS_START( pic )
@@ -182,13 +182,13 @@ UINT8 a2bus_pic_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	switch (offset)
 	{
-		case 3:	
+		case 3:
 			return m_ctx_data_in->read();
 
 		case 4:
 			return m_ack;
 
-		case 6:	// does reading this really work?
+		case 6: // does reading this really work?
 			m_irqenable = true;
 			break;
 
@@ -211,16 +211,16 @@ void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 {
 	switch (offset)
 	{
-		case 0:	// set data out and send a strobe
+		case 0: // set data out and send a strobe
 			m_ctx_data_out->write(data);
 
 			if (m_autostrobe)
 			{
 				start_strobe();
 			}
-			break; 
+			break;
 
-		case 2:	// send a strobe
+		case 2: // send a strobe
 			start_strobe();
 			break;
 
@@ -236,13 +236,13 @@ void a2bus_pic_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_pic_device::ack_w ) 
+WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
 {
 	if (m_started)
 	{
-		UINT8 dsw1 = m_dsw1->read(); 
+		UINT8 dsw1 = m_dsw1->read();
 
-		if (dsw1 & 0x10)	// negative polarity
+		if (dsw1 & 0x10)    // negative polarity
 		{
 			m_ack = (state == ASSERT_LINE) ? 0x00 : 0x80;
 		}
@@ -251,7 +251,7 @@ WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
 			m_ack = (state == ASSERT_LINE) ? 0x80 : 0x00;
 		}
 
-		m_ack |= 0x40;	// set ACK flip-flop
+		m_ack |= 0x40;  // set ACK flip-flop
 
 		if ((dsw1 & 0x40) && (m_irqenable))
 		{
@@ -262,9 +262,9 @@ WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
 
 void a2bus_pic_device::start_strobe()
 {
-	int usec = ((m_dsw1->read() & 7) * 2) + 1;	// strobe length in microseconds
+	int usec = ((m_dsw1->read() & 7) * 2) + 1;  // strobe length in microseconds
 
-	if (m_dsw1->read() & 0x8)	// negative polarity
+	if (m_dsw1->read() & 0x8)   // negative polarity
 	{
 		m_ctx->write_strobe(CLEAR_LINE);
 	}
@@ -278,7 +278,7 @@ void a2bus_pic_device::start_strobe()
 
 void a2bus_pic_device::clear_strobe()
 {
-	if (m_dsw1->read() & 0x8)	// negative polarity
+	if (m_dsw1->read() & 0x8)   // negative polarity
 	{
 		m_ctx->write_strobe(ASSERT_LINE);
 	}

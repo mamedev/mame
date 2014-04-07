@@ -290,8 +290,8 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 	MCFG_SCREEN_SIZE(512, 320)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
-	
+
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// devices

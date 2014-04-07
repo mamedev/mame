@@ -38,7 +38,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sysreg;
 	required_shared_ptr<UINT16> m_936_videoram;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling

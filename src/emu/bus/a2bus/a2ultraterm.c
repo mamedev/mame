@@ -7,18 +7,18 @@
     Notes:
 
     C0nX: C0n0 is 6845 register address,
-    	  C0n1 is 6845 register data.
-    	  C0n2 is control 1: b7 = 0 to read RAM at cc00, 1 for ROM (writes always to RAM)
-    						 b6 = 0 for Apple II video, 1 for 6845
-    						 b5 = 0 for 17.430 MHz 6845 clock, 1 for 28.7595 MHz 6845 clock
-    						 b4 = 0 for 512 byte RAM block addressing (VideoTerm emulation), 1 for 256-byte RAM page addressing
-    						 b3-b0 = page select
-    	  C0n3 is control 2: b7 = 0 for attributes software controllable, 1 for DIP switches control attributes
-    						 b5 = 0 for normal video if bit 7 set, 1 for inverse if bit 7 set
-    						 b4 = 0 for lowlight if bit 7 set, 1 for highlight if bit 7 set
-    						 b2 = 0 for high-density character set, 1 for low-density character set
-    						 b1 = same as b5
-    						 b0 = same as b4
+          C0n1 is 6845 register data.
+          C0n2 is control 1: b7 = 0 to read RAM at cc00, 1 for ROM (writes always to RAM)
+                             b6 = 0 for Apple II video, 1 for 6845
+                             b5 = 0 for 17.430 MHz 6845 clock, 1 for 28.7595 MHz 6845 clock
+                             b4 = 0 for 512 byte RAM block addressing (VideoTerm emulation), 1 for 256-byte RAM page addressing
+                             b3-b0 = page select
+          C0n3 is control 2: b7 = 0 for attributes software controllable, 1 for DIP switches control attributes
+                             b5 = 0 for normal video if bit 7 set, 1 for inverse if bit 7 set
+                             b4 = 0 for lowlight if bit 7 set, 1 for highlight if bit 7 set
+                             b2 = 0 for high-density character set, 1 for low-density character set
+                             b1 = same as b5
+                             b0 = same as b4
 
     C800-CBFF: ROM page 1
     CC00-CFEF: VRAM window or ROM page 2
@@ -46,20 +46,20 @@ const device_type A2BUS_ULTRATERMENH = &device_creator<a2bus_ultratermenh_device
 #define ULTRATERM_MC6845_NAME "mc6845_uterm"
 
 #define CLOCK_LOW   17430000
-#define CLOCK_HIGH	28759500
+#define CLOCK_HIGH  28759500
 
-#define CT1_MEMSEL	(0x80)	// 0 for read RAM at cc00, 1 for read ROM
-#define CT1_VIDSEL	(0x40)	// 0 for Apple video passthrough, 1 for 6845 video
-#define CT1_CLKSEL	(0x20)	// 0 for Videoterm clock, 1 for faster clock
-#define CT1_VTEMU	(0x10)	// Videoterm emulation mode if 0
+#define CT1_MEMSEL  (0x80)  // 0 for read RAM at cc00, 1 for read ROM
+#define CT1_VIDSEL  (0x40)  // 0 for Apple video passthrough, 1 for 6845 video
+#define CT1_CLKSEL  (0x20)  // 0 for Videoterm clock, 1 for faster clock
+#define CT1_VTEMU   (0x10)  // Videoterm emulation mode if 0
 #define CT1_PAGEMASK (0x0f)
 
-#define CT2_USEDIPS	(0x80)	// 0 to use the rest of ctrl2's bits, 1 to use DIPs
+#define CT2_USEDIPS (0x80)  // 0 to use the rest of ctrl2's bits, 1 to use DIPs
 #define CT2_INVBIT7H (0x20)
-#define CT2_HLBIT7H	(0x10)
+#define CT2_HLBIT7H (0x10)
 #define CT2_HIDENSITY (0x04)
 #define CT2_INVBIT7L (0x02)
-#define CT2_HLBIT7L	(0x01)
+#define CT2_HLBIT7L (0x01)
 
 static MC6845_UPDATE_ROW( ultraterm_update_row );
 
@@ -96,24 +96,24 @@ MACHINE_CONFIG_END
 
 ROM_START( a2ultraterm )
 	ROM_REGION(0x1000, ULTRATERM_ROM_REGION, 0)
-	ROM_LOAD( "frm_b537.bin", 0x000000, 0x001000, CRC(1e85a93e) SHA1(b4acd1775c08ae43996ab4edf6d8e28f4736346b) ) 
+	ROM_LOAD( "frm_b537.bin", 0x000000, 0x001000, CRC(1e85a93e) SHA1(b4acd1775c08ae43996ab4edf6d8e28f4736346b) )
 
 	ROM_REGION(0x1000, ULTRATERM_GFX_REGION, 0)
-	ROM_LOAD( "chs_7859.bin", 0x000000, 0x001000, CRC(ebe8f333) SHA1(3517fa9e7a39573f1cb159b3161d6939dec199ba) ) 
+	ROM_LOAD( "chs_7859.bin", 0x000000, 0x001000, CRC(ebe8f333) SHA1(3517fa9e7a39573f1cb159b3161d6939dec199ba) )
 
 	ROM_REGION(0x400, "pal", 0)
-	ROM_LOAD( "ult_2a313.jed", 0x000000, 0x000305, CRC(dcd51dea) SHA1(0ad0c5e802e48495da27f7bd26ee3ab1c92d74dd) ) 
+	ROM_LOAD( "ult_2a313.jed", 0x000000, 0x000305, CRC(dcd51dea) SHA1(0ad0c5e802e48495da27f7bd26ee3ab1c92d74dd) )
 ROM_END
 
 ROM_START( a2ultratermenh )
 	ROM_REGION(0x1000, ULTRATERM_ROM_REGION, 0)
-	ROM_LOAD( "frm_b5c9.bin", 0x000000, 0x001000, CRC(b71e05e0) SHA1(092e3eda4644d4f465809864a7f023ac7d1d1542) ) 
+	ROM_LOAD( "frm_b5c9.bin", 0x000000, 0x001000, CRC(b71e05e0) SHA1(092e3eda4644d4f465809864a7f023ac7d1d1542) )
 
 	ROM_REGION(0x1000, ULTRATERM_GFX_REGION, 0)
-	ROM_LOAD( "chs_5604.bin", 0x000000, 0x001000, CRC(3fb4e90a) SHA1(94ff75199232a9b613585c22f88470f73fb7dd09) ) 
+	ROM_LOAD( "chs_5604.bin", 0x000000, 0x001000, CRC(3fb4e90a) SHA1(94ff75199232a9b613585c22f88470f73fb7dd09) )
 
 	ROM_REGION(0x400, "pal", 0)
-	ROM_LOAD( "ult_251c.jed", 0x000000, 0x000305, CRC(12fabb0d) SHA1(d4a36837cb98bb65f7ddef7455eb5a7f8e648a82) ) 
+	ROM_LOAD( "ult_251c.jed", 0x000000, 0x000305, CRC(12fabb0d) SHA1(d4a36837cb98bb65f7ddef7455eb5a7f8e648a82) )
 ROM_END
 
 /***************************************************************************
@@ -245,24 +245,24 @@ void a2bus_videx160_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 
 		case 2:
 			m_ctrl1 = data;
-//			printf("%02x to ctrl1\n", data);
+//          printf("%02x to ctrl1\n", data);
 
 			// if disabling Videoterm emulation, change RAM banking
 			if (data & CT1_VTEMU)
 			{
 				m_rambank = (data & CT1_PAGEMASK) * 256;
 			}
-			break; 
+			break;
 
 		case 3:
 			m_ctrl2 = data;
-//			printf("%02x to ctrl2\n", data);
+//          printf("%02x to ctrl2\n", data);
 			break;
 	}
 
 	if (!(m_ctrl1 & CT1_VTEMU))
 	{
-		m_rambank = ((offset >> 2) & 3) * 512; 
+		m_rambank = ((offset >> 2) & 3) * 512;
 	}
 }
 
@@ -298,12 +298,12 @@ UINT8 a2bus_videx160_device::read_c800(address_space &space, UINT16 offset)
 	}
 	else
 	{
-		if (m_ctrl1 & CT1_MEMSEL)	// read ROM?
+		if (m_ctrl1 & CT1_MEMSEL)   // read ROM?
 		{
 			return m_rom[offset + 0x800];
 		}
 
-		return m_ram[(offset - 0x400) + m_rambank]; 
+		return m_ram[(offset - 0x400) + m_rambank];
 	}
 }
 

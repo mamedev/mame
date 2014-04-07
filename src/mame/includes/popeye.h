@@ -27,7 +27,7 @@ public:
 	UINT8 m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_lastflip;
-	int	  m_field;
+	int   m_field;
 
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);

@@ -109,7 +109,7 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		/* clip Y */
 		diff = WSTART_Y(tms) - sy;
 		if (diff > 0)
-		{	
+		{
 #if 0 // littlerb and megaphx do not work correctly with this enabled, see items dropping into playfield from top
 			if (srcaddr)
 				*srcaddr += diff * SPTCH(tms);

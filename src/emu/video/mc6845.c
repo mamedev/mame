@@ -1472,7 +1472,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor mos8563_device::device_mconfig_additions() const
 {
-        return MACHINE_CONFIG_NAME( mos8563 );
+		return MACHINE_CONFIG_NAME( mos8563 );
 }
 
 

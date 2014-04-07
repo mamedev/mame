@@ -54,8 +54,8 @@ INLINE UINT32 pixel_ycc_to_rgb_pal(UINT16 *pixel, const rgb_t *palette)
 
 #define OP_RGB32PAL_ARGB32(_src) \
 	(texsource->palette[0x200 + (((_src) >> 16) & 0xff) ] | \
-	 texsource->palette[0x100 + (((_src) >> 8) & 0xff) ] | \
-	 texsource->palette[((_src) & 0xff) ] | 0xff000000)
+		texsource->palette[0x100 + (((_src) >> 8) & 0xff) ] | \
+		texsource->palette[((_src) & 0xff) ] | 0xff000000)
 
 #define OP_PAL16_ARGB32(_src) (0xff000000 | texsource->palette[_src])
 

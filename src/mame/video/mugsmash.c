@@ -43,7 +43,7 @@ void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		xpos -= 28;
 		ypos -= 16;
 
-		
+
 				gfx->transpen(
 				bitmap,
 				cliprect,

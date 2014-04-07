@@ -287,4 +287,3 @@ void pci_bus_legacy_device::device_reset()
 	m_devicenum = -1;
 	m_address = 0;
 }
-

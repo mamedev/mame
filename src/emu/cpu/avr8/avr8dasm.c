@@ -30,73 +30,73 @@ CPU_DISASSEMBLE( avr8 )
 	UINT32 op = oprom[pos++];
 	op |= oprom[pos++] << 8;
 	UINT32 addr = 0;
-  const char* register_names[0x40] = {"PINA", "DDRA", "PORTA", "PINB", "DDRB", "PORTB", "PINC", "DDRC", "PORTC", "PIND", "DDRD", "PORTD", "PINE", "DDRE", "PORTE", "PINF", "DDRF", "PORTF", "PING", "DDRG", "PORTG", "TIFR0", "TIFR1", "TIFR2","TIFR3", "TIFR4", "TIFR5", "PCIFR", "EIFR", "EIMSK", "GPIOR0", "EECR", "EEDR", "EEARL", "EEARH", "GTCCR", "TCCR0A", "TCCR0B", "TCNT0", "OCR0A", "OCR0B", "0x29", "GPIOR1", "GPIOR2", "SPCR", "SPSR", "SPDR", "0x2F", "ACSR", "OCDR", "0x32", "SMCR", "MCUSR", "MCUCR", "0x36", "SPMCSR", "0x38", "0x39", "0x3A", "RAMPZ", "EIND", "SPL", "SPH", "SREG"};
+	const char* register_names[0x40] = {"PINA", "DDRA", "PORTA", "PINB", "DDRB", "PORTB", "PINC", "DDRC", "PORTC", "PIND", "DDRD", "PORTD", "PINE", "DDRE", "PORTE", "PINF", "DDRF", "PORTF", "PING", "DDRG", "PORTG", "TIFR0", "TIFR1", "TIFR2","TIFR3", "TIFR4", "TIFR5", "PCIFR", "EIFR", "EIMSK", "GPIOR0", "EECR", "EEDR", "EEARL", "EEARH", "GTCCR", "TCCR0A", "TCCR0B", "TCNT0", "OCR0A", "OCR0B", "0x29", "GPIOR1", "GPIOR2", "SPCR", "SPSR", "SPDR", "0x2F", "ACSR", "OCDR", "0x32", "SMCR", "MCUSR", "MCUCR", "0x36", "SPMCSR", "0x38", "0x39", "0x3A", "RAMPZ", "EIND", "SPL", "SPH", "SREG"};
 
-  const char* register_bit_names[0x40][8] = {
-    /* PINA   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRA   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTA  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PINB   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRB   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTB  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PINC   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRC   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTC  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PIND   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRD   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTD  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PINE   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRE   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTE  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PINF   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRF   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTF  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PING   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* DDRG   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* PORTG  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* TIFR0  */ { "TOV0", "OCF0A", "OCF0B",     "3",     "4",     "5",     "6",     "7"},
-    /* TIFR1  */ { "TOV1", "OCF1A", "OCF1B", "OCF1C",     "4",  "ICF1",     "6",     "7"},
-    /* TIFR2  */ { "TOV2", "OCF2A", "OCF2B",     "3",     "4",     "5",     "6",     "7"},
-    /* TIFR3  */ { "TOV3", "OCF3A", "OCF3B", "OCF3C",     "4",  "ICF3",     "6",     "7"},
-    /* TIFR4  */ { "TOV4", "OCF4A", "OCF4B", "OCF4C",     "4",  "ICF4",     "6",     "7"},
-    /* TIFR5  */ { "TOV5", "OCF5A", "OCF5B", "OCF5C",     "4",  "ICF5",     "6",     "7"},
-    /* PCIFR  */ {"PCIF0", "PCIF1", "PCIF2",     "3",     "4",     "5",     "6",     "7"},
-    /* EIFR   */ {"INTF0", "INTF1", "INTF2", "INTF3", "INTF4", "INTF5", "INTF6", "INTF7"},
-    /* EIMSK  */ { "INT0",  "INT1",  "INT2",  "INT3",  "INT4",  "INT5",  "INT6",  "INT7"},
-    /* GPIOR0 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* EECR   */ { "EERE",  "EEPE", "EEMPE", "EERIE", "EEPM0", "EEPM1",     "6",     "7"},
-    /* EEDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* EEARL  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* EEARH  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* GTCCR  */ {"PSRSYNC", "PSRASY",  "2",     "3",     "4",     "5",     "6",   "TSM"},
-    /* TCCR0A */ {"WGM00", "WGM01",     "2",     "3","COM0B0","COM0B1","COM0A0","COM0A1"},
-    /* TCCR0B */ {  "CS0",   "CS1",   "CS2", "WGM02",     "4",     "5", "FOC0B", "FOC0A"},
-    /* TCNT0  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* OCR0A  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* OCR0B  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* 0x29   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* GPIOR1 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* GPIOR2 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* SPCR   */ { "SPR0",  "SPR1",  "CPHA",  "CPOL",  "MSTR",  "DORD",   "SPE",  "SPIE"},
-    /* SPSR   */ {"SPI2X",     "1",     "2",     "3",     "4",     "5",  "WCOL",  "SPIF"},
-    /* SPDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* 0x2F   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* ACSR   */ {"ACIS0", "ACIS1",  "ACIC",  "ACIE",   "ACI",   "ACO",  "ACBG",   "ACD"},
-    /* OCDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* 0x32   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* SMCR   */ {   "SE",   "SM0",   "SM1",   "SM2",     "4",     "5",     "6",     "7"},
-    /* MCUSR  */ { "PORF", "EXTRF",  "BORF",  "WDRF",  "JTRF",     "5",     "6",     "7"},
-    /* MCUCR  */ { "IVCE", "IVSEL",     "2",     "3",   "PUD",     "5",     "6",   "JTD"},
-    /* 0x36   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* SPMCSR */ {"SPMEN", "PGERS", "PGWRT","BLBSET","RWWSRE", "SIGRD", "RWWSB", "SPMIE"},
-    /* 0x38   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* 0x39   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* 0x3A   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* RAMPZ  */ {"RAMPZ0","RAMPZ1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* EIND   */ {"EIND0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
-    /* SPL    */ {  "SP0",   "SP1",   "SP2",   "SP3",   "SP4",   "SP5",   "SP6",   "SP7"},
-    /* SPH    */ {  "SP8",   "SP9",  "SP10",  "SP11",  "SP12",  "SP13",  "SP14",  "SP15"},
-    /* SREG   */ {    "C",     "Z",     "N",     "V",     "S",     "H",     "T",     "I"}};
+	const char* register_bit_names[0x40][8] = {
+	/* PINA   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRA   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTA  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PINB   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRB   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTB  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PINC   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRC   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTC  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PIND   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRD   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTD  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PINE   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRE   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTE  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PINF   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRF   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTF  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PING   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* DDRG   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* PORTG  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* TIFR0  */ { "TOV0", "OCF0A", "OCF0B",     "3",     "4",     "5",     "6",     "7"},
+	/* TIFR1  */ { "TOV1", "OCF1A", "OCF1B", "OCF1C",     "4",  "ICF1",     "6",     "7"},
+	/* TIFR2  */ { "TOV2", "OCF2A", "OCF2B",     "3",     "4",     "5",     "6",     "7"},
+	/* TIFR3  */ { "TOV3", "OCF3A", "OCF3B", "OCF3C",     "4",  "ICF3",     "6",     "7"},
+	/* TIFR4  */ { "TOV4", "OCF4A", "OCF4B", "OCF4C",     "4",  "ICF4",     "6",     "7"},
+	/* TIFR5  */ { "TOV5", "OCF5A", "OCF5B", "OCF5C",     "4",  "ICF5",     "6",     "7"},
+	/* PCIFR  */ {"PCIF0", "PCIF1", "PCIF2",     "3",     "4",     "5",     "6",     "7"},
+	/* EIFR   */ {"INTF0", "INTF1", "INTF2", "INTF3", "INTF4", "INTF5", "INTF6", "INTF7"},
+	/* EIMSK  */ { "INT0",  "INT1",  "INT2",  "INT3",  "INT4",  "INT5",  "INT6",  "INT7"},
+	/* GPIOR0 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* EECR   */ { "EERE",  "EEPE", "EEMPE", "EERIE", "EEPM0", "EEPM1",     "6",     "7"},
+	/* EEDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* EEARL  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* EEARH  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* GTCCR  */ {"PSRSYNC", "PSRASY",  "2",     "3",     "4",     "5",     "6",   "TSM"},
+	/* TCCR0A */ {"WGM00", "WGM01",     "2",     "3","COM0B0","COM0B1","COM0A0","COM0A1"},
+	/* TCCR0B */ {  "CS0",   "CS1",   "CS2", "WGM02",     "4",     "5", "FOC0B", "FOC0A"},
+	/* TCNT0  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* OCR0A  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* OCR0B  */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* 0x29   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* GPIOR1 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* GPIOR2 */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* SPCR   */ { "SPR0",  "SPR1",  "CPHA",  "CPOL",  "MSTR",  "DORD",   "SPE",  "SPIE"},
+	/* SPSR   */ {"SPI2X",     "1",     "2",     "3",     "4",     "5",  "WCOL",  "SPIF"},
+	/* SPDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* 0x2F   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* ACSR   */ {"ACIS0", "ACIS1",  "ACIC",  "ACIE",   "ACI",   "ACO",  "ACBG",   "ACD"},
+	/* OCDR   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* 0x32   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* SMCR   */ {   "SE",   "SM0",   "SM1",   "SM2",     "4",     "5",     "6",     "7"},
+	/* MCUSR  */ { "PORF", "EXTRF",  "BORF",  "WDRF",  "JTRF",     "5",     "6",     "7"},
+	/* MCUCR  */ { "IVCE", "IVSEL",     "2",     "3",   "PUD",     "5",     "6",   "JTD"},
+	/* 0x36   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* SPMCSR */ {"SPMEN", "PGERS", "PGWRT","BLBSET","RWWSRE", "SIGRD", "RWWSB", "SPMIE"},
+	/* 0x38   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* 0x39   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* 0x3A   */ {    "0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* RAMPZ  */ {"RAMPZ0","RAMPZ1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* EIND   */ {"EIND0",     "1",     "2",     "3",     "4",     "5",     "6",     "7"},
+	/* SPL    */ {  "SP0",   "SP1",   "SP2",   "SP3",   "SP4",   "SP5",   "SP6",   "SP7"},
+	/* SPH    */ {  "SP8",   "SP9",  "SP10",  "SP11",  "SP12",  "SP13",  "SP14",  "SP15"},
+	/* SREG   */ {    "C",     "Z",     "N",     "V",     "S",     "H",     "T",     "I"}};
 
 	switch(op & 0xf000)
 	{
@@ -524,28 +524,28 @@ CPU_DISASSEMBLE( avr8 )
 					output += sprintf( output, "SBIW    R%d:R%d, 0x%02x", 24+(RD2(op) << 1)+1, 24+(RD2(op) << 1), KCONST6(op) );
 					break;
 				case 0x0800:
-          if (ACONST5(op) < 0x20)
-            output += sprintf( output, "CBI     %s, %s", register_names[ACONST5(op)], register_bit_names[ACONST5(op)][RR3(op)] );
-          else
-            output += sprintf( output, "CBI     0x%02x, %d", ACONST5(op), RR3(op) );
+			if (ACONST5(op) < 0x20)
+			output += sprintf( output, "CBI     %s, %s", register_names[ACONST5(op)], register_bit_names[ACONST5(op)][RR3(op)] );
+			else
+			output += sprintf( output, "CBI     0x%02x, %d", ACONST5(op), RR3(op) );
 					break;
 				case 0x0900:
-          if (ACONST5(op) < 0x20)
-            output += sprintf( output, "SBIC    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
-          else
-            output += sprintf( output, "SBIC    0x%02x, %d", ACONST5(op), RR3(op) );
+			if (ACONST5(op) < 0x20)
+			output += sprintf( output, "SBIC    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
+			else
+			output += sprintf( output, "SBIC    0x%02x, %d", ACONST5(op), RR3(op) );
 					break;
 				case 0x0a00:
-          if (ACONST5(op) < 0x20)
-            output += sprintf( output, "SBI     %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
-          else
-            output += sprintf( output, "SBI     0x%02x, %d", ACONST5(op), RR3(op) );
+			if (ACONST5(op) < 0x20)
+			output += sprintf( output, "SBI     %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
+			else
+			output += sprintf( output, "SBI     0x%02x, %d", ACONST5(op), RR3(op) );
 					break;
 				case 0x0b00:
-          if (ACONST5(op) < 0x20)
-            output += sprintf( output, "SBIS    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
-          else
-            output += sprintf( output, "SBIS    0x%02x, %d", ACONST5(op), RR3(op) );
+			if (ACONST5(op) < 0x20)
+			output += sprintf( output, "SBIS    %s, %s", register_names[ACONST5(op)],  register_bit_names[ACONST5(op)][RR3(op)] );
+			else
+			output += sprintf( output, "SBIS    0x%02x, %d", ACONST5(op), RR3(op) );
 					break;
 				case 0x0c00:
 				case 0x0d00:
@@ -558,23 +558,23 @@ CPU_DISASSEMBLE( avr8 )
 		case 0xb000:
 			if(op & 0x0800)
 			{
-        if (ACONST6(op) < 0x40 ) {
-          output += sprintf( output, "OUT     %s, R%d", register_names[ACONST6(op)], RD5(op) );
-        } else {
-          output += sprintf( output, "OUT     0x%02x, R%d", ACONST6(op), RD5(op) );
-        }
+		if (ACONST6(op) < 0x40 ) {
+			output += sprintf( output, "OUT     %s, R%d", register_names[ACONST6(op)], RD5(op) );
+		} else {
+			output += sprintf( output, "OUT     0x%02x, R%d", ACONST6(op), RD5(op) );
+		}
 			}
 			else
 			{
-        if (ACONST6(op) < 0x40 ) {
-          output += sprintf( output, "IN      R%d, %s", RD5(op), register_names[ACONST6(op)] );
-        } else {
-          output += sprintf( output, "IN      R%d, 0x%02x", RD5(op), ACONST6(op) );
-        }
+		if (ACONST6(op) < 0x40 ) {
+			output += sprintf( output, "IN      R%d, %s", RD5(op), register_names[ACONST6(op)] );
+		} else {
+			output += sprintf( output, "IN      R%d, 0x%02x", RD5(op), ACONST6(op) );
+		}
 			}
 			break;
 		case 0xc000:
-      //I'm not sure if this is correct. why pc + ... : pc + 8 + ... ?
+		//I'm not sure if this is correct. why pc + ... : pc + 8 + ... ?
 			output += sprintf( output, "RJMP    %08x", (((op & 0x0800) ? pc + ((op & 0x0fff) | 0xfffff000) : pc + 8 + (op & 0x0fff)) << 0) );
 			break;
 		case 0xd000:

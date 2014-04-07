@@ -185,7 +185,7 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 			y = (30 * 8) - y;
 		}
 
-		
+
 			gfx->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,

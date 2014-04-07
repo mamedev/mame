@@ -46,12 +46,12 @@
 NETLIB_SIGNAL(7420, 4, 0, 0);
 
 #define TTL_7420_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7420_dip, _name)
+		NET_REGISTER_DEV(7420_dip, _name)
 
 NETLIB_DEVICE(7420_dip,
 
-    NETLIB_NAME(7420) m_1;
-    NETLIB_NAME(7420) m_2;
+	NETLIB_NAME(7420) m_1;
+	NETLIB_NAME(7420) m_2;
 );
 
 #endif /* NLD_7420_H_ */

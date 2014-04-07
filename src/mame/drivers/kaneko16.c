@@ -1666,16 +1666,16 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
+//  MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)    // mangled sprites otherwise
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kaneko16_berlwall_state, screen_update_berlwall)
-//	MCFG_SCREEN_PALETTE("palette")
+//  MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
-	MCFG_PALETTE_ADD("palette", 2048 )    
+	MCFG_PALETTE_ADD("palette", 2048 )
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
@@ -1688,7 +1688,7 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD_VU002_SPRITES
-//	kaneko16_sprite_device::set_altspacing(*device, 1);
+//  kaneko16_sprite_device::set_altspacing(*device, 1);
 	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
 
 	MCFG_VIDEO_START_OVERRIDE(kaneko16_berlwall_state,berlwall)
@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
 	MCFG_KANEKO_TMAP_GFXDECODE("gfxdecode")
-	
+
 	MCFG_DEVICE_ADD("view2_1", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 2);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, -0x8, 256, 240);
@@ -1809,7 +1809,7 @@ static MACHINE_CONFIG_START( blazeon, kaneko16_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1x4bit_1x4bit)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	
+
 	MCFG_DEVICE_ADD("view2_0", KANEKO_TMAP, 0)
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x33, 0x8, 320, 240);

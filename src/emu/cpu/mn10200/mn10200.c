@@ -74,7 +74,7 @@ void mn10200_device::device_start()
 	save_item(NAME(m_icrl));
 	save_item(NAME(m_icrh));
 	save_item(NAME(m_possible_irq));
-	
+
 	// timers
 	m_sysclock_base = attotime::from_hz(unscaled_clock() / 2);
 
@@ -94,7 +94,7 @@ void mn10200_device::device_start()
 		save_item(NAME(m_simple_timer[i].base), i);
 		save_item(NAME(m_simple_timer[i].cur), i);
 	}
-	
+
 	for (int i = 0; i < MN10200_NUM_PRESCALERS; i++)
 	{
 		m_prescaler[i].mode = 0;
@@ -105,7 +105,7 @@ void mn10200_device::device_start()
 		save_item(NAME(m_prescaler[i].base), i);
 		save_item(NAME(m_prescaler[i].cur), i);
 	}
-	
+
 	// dma
 	for (int i = 0; i < 8; i++)
 	{
@@ -123,7 +123,7 @@ void mn10200_device::device_start()
 		save_item(NAME(m_dma[i].ctrlh), i);
 		save_item(NAME(m_dma[i].irq), i);
 	}
-	
+
 	// serial
 	for (int i = 0; i < 2; i++)
 	{
@@ -135,7 +135,7 @@ void mn10200_device::device_start()
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
 	}
-	
+
 	// ports
 	m_p4 = 0xf;
 
@@ -211,18 +211,18 @@ void mn10200_device::device_reset()
 {
 	change_pc(0x80000);
 	m_psw = 0;
-	
+
 	// note: officially, these registers are reset to 'undefined'
 	memset(m_d, 0, sizeof(m_d));
 	memset(m_a, 0, sizeof(m_a));
 	m_mdr = 0;
-	
+
 	// reset internal peripherals
 	m_nmicr = 0;
 	m_iagr = 0;
 	write_mem16(0xfc00, 0x8000);
 	write_mem16(0xfc02, 0x0737);
-	
+
 	// need to clear them twice since some rely on the value of others
 	for (int i = 0; i < 2; i++)
 		for (int address = 0xfc04; address < 0x10000; address++)
@@ -250,10 +250,10 @@ void mn10200_device::check_irq()
 {
 	if (!m_nmicr && !(m_psw & FLAG_IE))
 		return;
-	
+
 	int level = m_psw >> 8 & 7;
 	int group = 0;
-	
+
 	// find highest valid level
 	for (int i = 1; i < 11; i++)
 	{
@@ -263,7 +263,7 @@ void mn10200_device::check_irq()
 			group = i;
 		}
 	}
-	
+
 	// take interrupt
 	if (m_nmicr && group)
 		take_irq(level, 0);
@@ -271,7 +271,7 @@ void mn10200_device::check_irq()
 		take_irq(0, 0);
 	else if (group)
 		take_irq(level, group);
-	
+
 	return;
 }
 
@@ -283,7 +283,7 @@ void mn10200_device::check_ext_irq()
 		if ((m_p4 >> i & 1) == (m_extmdl >> (i * 2) & 3))
 			m_icrl[8] |= (1 << (4 + i));
 	}
-	
+
 	m_possible_irq = true;
 }
 
@@ -295,33 +295,33 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 	int pin = state ? 0 : 1;
 	int old = m_p4 >> irqnum & 1;
 	bool active = false;
-	
+
 	switch (m_extmdl >> (irqnum * 2) & 3)
 	{
 		// 'L' level
 		case 0:
 			active = (pin == 0);
 			break;
-		
+
 		// 'H' level
 		case 1:
 			active = (pin == 1);
 			break;
-		
+
 		// falling edge
 		case 2:
 			active = (pin == 0 && old == 1);
 			break;
-		
+
 		// rising edge
 		case 3:
 			active = (pin == 1 && old == 0);
 			break;
 	}
-	
+
 	m_p4 &= ~(1 << irqnum);
 	m_p4 |= pin << irqnum;
-	
+
 	if (active)
 	{
 		m_icrl[8] |= (1 << (4 + irqnum));
@@ -335,7 +335,7 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 int mn10200_device::timer_tick_simple(int tmr)
 {
 	int next = tmr + 1;
-	
+
 	// is it a cascaded timer, and enabled?
 	if (next < MN10200_NUM_TIMERS_8BIT && m_simple_timer[next].mode & 0x83 && (m_simple_timer[next].mode & 0x83) == 0x81)
 	{
@@ -391,13 +391,13 @@ void mn10200_device::refresh_all_timers()
 TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 {
 	int tmr = param;
-	
+
 	// handle our expiring and also tick our cascaded children
 	if (timer_tick_simple(tmr) == 2)
 		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
 	else
 		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
-	
+
 	// refresh this timer
 	refresh_timer(tmr);
 }
@@ -492,7 +492,6 @@ void mn10200_device::execute_run()
 {
 	while (m_cycles > 0)
 	{
-
 	// internal peripheral, external pin, or prev instruction may have changed irq state
 	while (m_possible_irq)
 	{
@@ -780,7 +779,6 @@ void mn10200_device::execute_run()
 
 		switch (op)
 		{
-
 		// jmp (an)
 		case 0x00: case 0x04: case 0x08: case 0x0c:
 			m_cycles -= 1;
@@ -868,7 +866,6 @@ void mn10200_device::execute_run()
 
 		switch (op & 0xc0)
 		{
-
 		// mov (di, an), am
 		case 0x00:
 			m_cycles -= 1;
@@ -903,7 +900,6 @@ void mn10200_device::execute_run()
 
 		switch (op & 0xf0)
 		{
-
 		// add dm, an
 		case 0x00:
 			m_a[op&3] = do_add(m_a[op&3], m_d[op>>2&3], 0);
@@ -999,7 +995,6 @@ void mn10200_device::execute_run()
 
 		switch (op)
 		{
-
 		// and dn, dm
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
@@ -1180,7 +1175,6 @@ void mn10200_device::execute_run()
 
 		switch (op)
 		{
-
 		// mov dm, (d24, an)
 		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
 		case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
@@ -1346,7 +1340,6 @@ void mn10200_device::execute_run()
 
 		switch (op)
 		{
-
 		// and imm8, dn
 		case 0x00: case 0x01: case 0x02: case 0x03:
 			test_nz16(m_d[op&3] &= 0xff0000 | read_arg8(m_pc));
@@ -1507,7 +1500,6 @@ void mn10200_device::execute_run()
 
 		switch (op)
 		{
-
 		// and imm16, dn
 		case 0x00: case 0x01: case 0x02: case 0x03:
 			test_nz16(m_d[op&3] &= 0xff0000 | read_arg16(m_pc));
@@ -2164,7 +2156,7 @@ READ8_MEMBER(mn10200_device::io_control_r)
 			return (m_io->read_byte(MN10200_PORT2) & 0x0f) | m_port[2].dir;
 		case 0x3d3:
 			return (m_io->read_byte(MN10200_PORT3) & 0x1f) | m_port[3].dir;
-		
+
 		// directions (0=input, 1=output)
 		case 0x3e0:
 			return m_port[0].dir;
@@ -2184,6 +2176,6 @@ READ8_MEMBER(mn10200_device::io_control_r)
 			log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
 			break;
 	}
-	
+
 	return 0;
 }

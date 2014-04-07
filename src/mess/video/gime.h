@@ -21,9 +21,9 @@
 //  GIME CONFIG/INTERFACE
 //**************************************************************************
 
-#define MCFG_GIME_HSYNC_CALLBACK	MCFG_MC6847_HSYNC_CALLBACK
+#define MCFG_GIME_HSYNC_CALLBACK    MCFG_MC6847_HSYNC_CALLBACK
 
-#define MCFG_GIME_FSYNC_CALLBACK	MCFG_MC6847_FSYNC_CALLBACK
+#define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
 
 #define MCFG_GIME_IRQ_CALLBACK(_write) \
 	devcb = &gime_base_device::set_irq_wr_callback(*device, DEVCB2_##_write);

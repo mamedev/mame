@@ -40,7 +40,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;	
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(fuuki16_vregs_w);
 	DECLARE_WRITE16_MEMBER(fuuki16_sound_command_w);
 	DECLARE_WRITE8_MEMBER(fuuki16_sound_rombank_w);

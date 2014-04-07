@@ -1505,7 +1505,7 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 
 	MCFG_PALETTE_ADD("palette", 256+1)
 	MCFG_PALETTE_INIT_OWNER(mazerbla_state, mazerbla)
-	
+
 	/* sound hardware */
 MACHINE_CONFIG_END
 

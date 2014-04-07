@@ -2025,7 +2025,7 @@ static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas1x_bootleg_state,sound_cause_nmi))	
+	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(segas1x_bootleg_state,sound_cause_nmi))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_CONFIG_END

@@ -36,7 +36,7 @@
 #define M6504_TAG       "uh3"
 #define M6522_TAG       "um3"
 #define M6530_TAG       "uk3"
-#define FDC_TAG			"fdc"
+#define FDC_TAG         "fdc"
 
 
 
@@ -385,14 +385,14 @@ READ8_MEMBER( c2040_device::miot_pb_r )
 
 	    bit     description
 
-	    PB0     
-	    PB1     
-	    PB2     
+	    PB0
+	    PB1
+	    PB2
 	    PB3     WPS
 	    PB4
 	    PB5
 	    PB6     SYNC
-	    PB7     
+	    PB7
 
 	*/
 
@@ -416,10 +416,10 @@ WRITE8_MEMBER( c2040_device::miot_pb_w )
 	    PB0     DRV SEL
 	    PB1     DS0
 	    PB2     DS1
-	    PB3     
+	    PB3
 	    PB4
 	    PB5
-	    PB6     
+	    PB6
 	    PB7     M6504 IRQ
 
 	*/
@@ -452,7 +452,7 @@ static MOS6530_INTERFACE( miot_intf )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c2040_floppies )
-    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
 SLOT_INTERFACE_END
 
 
@@ -461,9 +461,9 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( c2040_device::floppy_formats )
-    FLOPPY_D64_FORMAT,
-    FLOPPY_G64_FORMAT,
-    FLOPPY_D67_FORMAT
+	FLOPPY_D64_FORMAT,
+	FLOPPY_G64_FORMAT,
+	FLOPPY_D67_FORMAT
 FLOPPY_FORMATS_END
 
 

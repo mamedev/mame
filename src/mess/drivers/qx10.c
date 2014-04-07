@@ -70,7 +70,7 @@ public:
 		m_vram_bank(0),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -849,7 +849,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
-	
+
 	MCFG_DEVICE_ADD("upd7220", UPD7220, MAIN_CLK/6) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(qx10_state, hgdc_display_pixels)

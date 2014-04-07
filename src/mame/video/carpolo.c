@@ -205,7 +205,7 @@ void carpolo_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 	x = 240 - x;
 	y = 240 - y;
-	
+
 	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 			remapped_code, col,
 			0, flipy,

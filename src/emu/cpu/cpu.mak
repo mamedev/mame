@@ -489,39 +489,39 @@ $(CPUOBJ)/g65816/g65816o4.o:    $(CPUSRC)/g65816/g65816o4.c \
 ifneq ($(filter H8,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h8
 CPUOBJS += $(CPUOBJ)/h8/h8.o $(CPUOBJ)/h8/h8h.o $(CPUOBJ)/h8/h8s2000.o $(CPUOBJ)/h8/h8s2600.o \
-           $(CPUOBJ)/h8/h83337.o \
-           $(CPUOBJ)/h8/h83002.o $(CPUOBJ)/h8/h83006.o  $(CPUOBJ)/h8/h83008.o \
-           $(CPUOBJ)/h8/h83048.o \
-           $(CPUOBJ)/h8/h8s2245.o $(CPUOBJ)/h8/h8s2320.o $(CPUOBJ)/h8/h8s2357.o \
-           $(CPUOBJ)/h8/h8s2655.o \
-           $(CPUOBJ)/h8/h8_adc.o $(CPUOBJ)/h8/h8_port.o $(CPUOBJ)/h8/h8_intc.o \
-           $(CPUOBJ)/h8/h8_timer8.o $(CPUOBJ)/h8/h8_timer16.o $(CPUOBJ)/h8/h8_sci.o
+			$(CPUOBJ)/h8/h83337.o \
+			$(CPUOBJ)/h8/h83002.o $(CPUOBJ)/h8/h83006.o  $(CPUOBJ)/h8/h83008.o \
+			$(CPUOBJ)/h8/h83048.o \
+			$(CPUOBJ)/h8/h8s2245.o $(CPUOBJ)/h8/h8s2320.o $(CPUOBJ)/h8/h8s2357.o \
+			$(CPUOBJ)/h8/h8s2655.o \
+			$(CPUOBJ)/h8/h8_adc.o $(CPUOBJ)/h8/h8_port.o $(CPUOBJ)/h8/h8_intc.o \
+			$(CPUOBJ)/h8/h8_timer8.o $(CPUOBJ)/h8/h8_timer16.o $(CPUOBJ)/h8/h8_sci.o
 DASMOBJS +=
 endif
 
-$(CPUOBJ)/h8/h8.o:				$(CPUSRC)/h8/h8.c \
+$(CPUOBJ)/h8/h8.o:              $(CPUSRC)/h8/h8.c \
 								$(CPUOBJ)/h8/h8.inc \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8h.o:				$(CPUSRC)/h8/h8h.c \
+$(CPUOBJ)/h8/h8h.o:             $(CPUSRC)/h8/h8h.c \
 								$(CPUOBJ)/h8/h8h.inc \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8s2000.o:			$(CPUSRC)/h8/h8s2000.c \
+$(CPUOBJ)/h8/h8s2000.o:         $(CPUSRC)/h8/h8s2000.c \
 								$(CPUOBJ)/h8/h8s2000.inc \
 								$(CPUSRC)/h8/h8s2000.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8s2600.o:			$(CPUSRC)/h8/h8s2600.c \
+$(CPUOBJ)/h8/h8s2600.o:         $(CPUSRC)/h8/h8s2600.c \
 								$(CPUOBJ)/h8/h8s2600.inc \
 								$(CPUSRC)/h8/h8s2600.h \
 								$(CPUSRC)/h8/h8s2000.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h83337.o:			$(CPUSRC)/h8/h83337.c \
+$(CPUOBJ)/h8/h83337.o:          $(CPUSRC)/h8/h83337.c \
 								$(CPUSRC)/h8/h83337.h \
 								$(CPUSRC)/h8/h8.h \
 								$(CPUSRC)/h8/h8_intc.h \
@@ -531,7 +531,7 @@ $(CPUOBJ)/h8/h83337.o:			$(CPUSRC)/h8/h83337.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h83002.o:			$(CPUSRC)/h8/h83002.c \
+$(CPUOBJ)/h8/h83002.o:          $(CPUSRC)/h8/h83002.c \
 								$(CPUSRC)/h8/h83002.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h \
@@ -541,7 +541,7 @@ $(CPUOBJ)/h8/h83002.o:			$(CPUSRC)/h8/h83002.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h83006.o:			$(CPUSRC)/h8/h83006.c \
+$(CPUOBJ)/h8/h83006.o:          $(CPUSRC)/h8/h83006.c \
 								$(CPUSRC)/h8/h83006.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h \
@@ -552,7 +552,7 @@ $(CPUOBJ)/h8/h83006.o:			$(CPUSRC)/h8/h83006.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h83008.o:			$(CPUSRC)/h8/h83008.c \
+$(CPUOBJ)/h8/h83008.o:          $(CPUSRC)/h8/h83008.c \
 								$(CPUSRC)/h8/h83008.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h \
@@ -563,7 +563,7 @@ $(CPUOBJ)/h8/h83008.o:			$(CPUSRC)/h8/h83008.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h83048.o:			$(CPUSRC)/h8/h83048.c \
+$(CPUOBJ)/h8/h83048.o:          $(CPUSRC)/h8/h83048.c \
 								$(CPUSRC)/h8/h83048.h \
 								$(CPUSRC)/h8/h8h.h \
 								$(CPUSRC)/h8/h8.h \
@@ -573,7 +573,7 @@ $(CPUOBJ)/h8/h83048.o:			$(CPUSRC)/h8/h83048.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h8s2245.o:			$(CPUSRC)/h8/h8s2245.c \
+$(CPUOBJ)/h8/h8s2245.o:         $(CPUSRC)/h8/h8s2245.c \
 								$(CPUSRC)/h8/h8s2245.h \
 								$(CPUSRC)/h8/h8s2000.h \
 								$(CPUSRC)/h8/h8h.h \
@@ -585,7 +585,7 @@ $(CPUOBJ)/h8/h8s2245.o:			$(CPUSRC)/h8/h8s2245.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h8s2320.o:			$(CPUSRC)/h8/h8s2320.c \
+$(CPUOBJ)/h8/h8s2320.o:         $(CPUSRC)/h8/h8s2320.c \
 								$(CPUSRC)/h8/h8s2320.h \
 								$(CPUSRC)/h8/h8s2000.h \
 								$(CPUSRC)/h8/h8h.h \
@@ -597,7 +597,7 @@ $(CPUOBJ)/h8/h8s2320.o:			$(CPUSRC)/h8/h8s2320.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h8s2357.o:			$(CPUSRC)/h8/h8s2357.c \
+$(CPUOBJ)/h8/h8s2357.o:         $(CPUSRC)/h8/h8s2357.c \
 								$(CPUSRC)/h8/h8s2357.h \
 								$(CPUSRC)/h8/h8s2000.h \
 								$(CPUSRC)/h8/h8h.h \
@@ -609,7 +609,7 @@ $(CPUOBJ)/h8/h8s2357.o:			$(CPUSRC)/h8/h8s2357.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h8s2655.o:			$(CPUSRC)/h8/h8s2655.c \
+$(CPUOBJ)/h8/h8s2655.o:         $(CPUSRC)/h8/h8s2655.c \
 								$(CPUSRC)/h8/h8s2655.h \
 								$(CPUSRC)/h8/h8s2600.h \
 								$(CPUSRC)/h8/h8s2000.h \
@@ -622,25 +622,25 @@ $(CPUOBJ)/h8/h8s2655.o:			$(CPUSRC)/h8/h8s2655.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_sci.h
 
-$(CPUOBJ)/h8/h8_intc.o:			$(CPUSRC)/h8/h8_intc.c \
+$(CPUOBJ)/h8/h8_intc.o:         $(CPUSRC)/h8/h8_intc.c \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8_adc.o:			$(CPUSRC)/h8/h8_adc.c \
+$(CPUOBJ)/h8/h8_adc.o:          $(CPUSRC)/h8/h8_adc.c \
 								$(CPUSRC)/h8/h8_adc.h \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8_port.o:			$(CPUSRC)/h8/h8_port.c \
+$(CPUOBJ)/h8/h8_port.o:         $(CPUSRC)/h8/h8_port.c \
 								$(CPUSRC)/h8/h8_port.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8_timer16.o:		$(CPUSRC)/h8/h8_timer16.c \
+$(CPUOBJ)/h8/h8_timer16.o:      $(CPUSRC)/h8/h8_timer16.c \
 								$(CPUSRC)/h8/h8_timer16.h \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8.h
 
-$(CPUOBJ)/h8/h8_sci.o:			$(CPUSRC)/h8/h8_sci.c \
+$(CPUOBJ)/h8/h8_sci.o:          $(CPUSRC)/h8/h8_sci.c \
 								$(CPUSRC)/h8/h8_sci.h \
 								$(CPUSRC)/h8/h8_intc.h \
 								$(CPUSRC)/h8/h8.h

@@ -452,7 +452,7 @@ public:
 		m_beeper(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -683,8 +683,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_ext2_video_ff_w);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-    UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-    UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
+	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
+	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
@@ -726,8 +726,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_fdd_portc_w);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
-    DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
-    DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
+	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
 
 	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
 	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
@@ -3566,8 +3566,8 @@ WRITE_LINE_MEMBER( pc9801_state::keyboard_irq )
 }
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
-    MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
-    MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE(pc9801_state, keyboard_irq))
+	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
+	MCFG_PC9801_KBD_IRQ_CALLBACK(WRITELINE(pc9801_state, keyboard_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
@@ -3627,11 +3627,11 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
-    MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
-    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
-    MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, fdc_2dd_irq))
-    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, fdc_2dd_irq))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq3_w)) MCFG_DEVCB_INVERT
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3654,14 +3654,14 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
-    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
-    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
-    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
-    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
+	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
@@ -3711,8 +3711,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
-    MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_irq))
-    MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_drq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(pc9801_state, pc9801rs_fdc_drq))
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3732,14 +3732,14 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
-    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
-    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
-    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
-    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
+	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)
@@ -3803,8 +3803,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
-    MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
-    MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
+	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8237", am9517a_device, dreq2_w)) MCFG_DEVCB_INVERT
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats)
@@ -3824,14 +3824,14 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
-    MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
-    MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
-    MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))    
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(pc9801_state, hgdc_draw_text)
+	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_btm", upd7220_device, ext_sync_w))
 
-    MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
-    MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
-    MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
+	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 5000000/2)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(pc9801_state, hgdc_display_pixels)
 
 	MCFG_PALETTE_ADD("palette", 16+16+256)
 	MCFG_PALETTE_INIT_OWNER(pc9801_state,pc9801)

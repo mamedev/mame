@@ -73,7 +73,7 @@ public:
 	required_device<tc0640fio_device> m_tc0640fio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ16_MEMBER(color_ram_word_r);
 	DECLARE_WRITE16_MEMBER(color_ram_word_w);
 	DECLARE_READ16_MEMBER(slapshot_service_input_r);

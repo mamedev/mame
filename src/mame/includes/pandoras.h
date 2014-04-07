@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(pandoras_int_control_w);
 	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);

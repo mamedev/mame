@@ -37,7 +37,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(pushman_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(pushman_control_w);
 	DECLARE_READ16_MEMBER(pushman_68705_r);

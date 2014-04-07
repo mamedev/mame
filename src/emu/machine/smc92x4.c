@@ -189,12 +189,12 @@ enum
 
 smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, SMC92X4, "SMC 9224/9234 Hard/Floppy Disk Controller", tag, owner, clock, "smc92x4", __FILE__),
-  m_out_intrq(*this),
-  m_out_dip(*this),
-  m_out_auxbus(*this),
-  m_in_auxbus(*this),
-  m_in_dma(*this),
-  m_out_dma(*this)
+	m_out_intrq(*this),
+	m_out_dip(*this),
+	m_out_auxbus(*this),
+	m_in_auxbus(*this),
+	m_in_dma(*this),
+	m_out_dma(*this)
 {
 }
 

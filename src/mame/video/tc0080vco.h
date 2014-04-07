@@ -84,7 +84,7 @@ extern const device_type TC0080VCO;
 #define MCFG_TC0080VCO_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0080VCO, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-	
+
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
 	tc0080vco_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 

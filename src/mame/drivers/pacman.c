@@ -4246,7 +4246,7 @@ ROM_START( mspacmancr )  /* Bootleg on Crush Roller Board - Midway Graphics and 
 	ROM_LOAD( "5f",           0x1000, 0x1000, CRC(615af909) SHA1(fd6a1dde780b39aea76bf1c4befa5882573c2ef4) ) // 6.5f
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "mb7051.7f",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) ) 
+	ROM_LOAD( "mb7051.7f",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
 	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) ) // m82s129n.4a
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
@@ -4629,11 +4629,11 @@ ROM_START( crushbl3 )
 	ROM_LOAD( "cr4.5j",       0x1800, 0x0800, CRC(d35d1caf) SHA1(65dd7861e05651485626465dc97215fed58db551) )
 
 	// the set with the above 'crushbl3' program roms and these gfx roms just seems to be a bad dump (some bad maze tiles?)
-//	ROM_REGION( 0x2000, "gfx1", 0 )
-//	ROM_LOAD( "cr1.bin",       0x0000, 0x0800, CRC(cc31c649) SHA1(a0640d2abc21872b0e680e8e31e3bcb7e7a07953) )
-//	ROM_LOAD( "cr3.bin",       0x0800, 0x0800, CRC(14c121d8) SHA1(05f900a2e2a67401ab357340c1fb36153f365f1b) )
-//	ROM_LOAD( "cr2.bin",       0x1000, 0x0800, CRC(882dc667) SHA1(5ea01d9c692b3061a0e39e2227fbc6af4baaab11) )  /* copyright sign was removed */
-//	ROM_LOAD( "cr4.bin",       0x1800, 0x0800, CRC(0d3877c4) SHA1(0a6f4098181480aa85225324129e37bba375252d) )
+//  ROM_REGION( 0x2000, "gfx1", 0 )
+//  ROM_LOAD( "cr1.bin",       0x0000, 0x0800, CRC(cc31c649) SHA1(a0640d2abc21872b0e680e8e31e3bcb7e7a07953) )
+//  ROM_LOAD( "cr3.bin",       0x0800, 0x0800, CRC(14c121d8) SHA1(05f900a2e2a67401ab357340c1fb36153f365f1b) )
+//  ROM_LOAD( "cr2.bin",       0x1000, 0x0800, CRC(882dc667) SHA1(5ea01d9c692b3061a0e39e2227fbc6af4baaab11) )  /* copyright sign was removed */
+//  ROM_LOAD( "cr4.bin",       0x1800, 0x0800, CRC(0d3877c4) SHA1(0a6f4098181480aa85225324129e37bba375252d) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "74s288.8a",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )

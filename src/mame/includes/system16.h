@@ -119,7 +119,7 @@ public:
 	optional_device<msm5205_device> m_msm;
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);

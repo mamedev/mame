@@ -92,7 +92,7 @@ void h8_timer8_channel_device::update_tcr()
 		clock_type = INPUT_UPDOWN;
 		clock_divider = 0;
 		logerror("%s: clock external both edges", tag());
-		break;		
+		break;
 	}
 
 	switch(tcr & TCR_CCLR) {
@@ -118,9 +118,9 @@ void h8_timer8_channel_device::update_tcr()
 	}
 
 	logerror(", irq=%c%c%c\n",
-			 tcr & TCR_CMIEB ? 'b' : '-',
-			 tcr & TCR_CMIEA ? 'a' : '-',
-			 tcr & TCR_OVIE  ? 'o' : '-');
+				tcr & TCR_CMIEB ? 'b' : '-',
+				tcr & TCR_CMIEA ? 'a' : '-',
+				tcr & TCR_OVIE  ? 'o' : '-');
 }
 
 READ8_MEMBER(h8_timer8_channel_device::tcsr_r)
@@ -223,7 +223,7 @@ void h8_timer8_channel_device::update_counter(UINT64 cur_time)
 	if(tt == tcor[0] || tcnt == tcor[0]) {
 		if(chained_timer)
 			chained_timer->chained_timer_tcora();
-		
+
 		if(!(tcsr & TCSR_CMFA)) {
 			tcsr |= TCSR_CMFA;
 			if(tcr & TCR_CMIEA)
@@ -317,7 +317,7 @@ void h8_timer8_channel_device::timer_tick()
 	if(tcnt == tcor[0]) {
 		if(chained_timer)
 			chained_timer->chained_timer_tcora();
-		
+
 		if(!(tcsr & TCSR_CMFA)) {
 			tcsr |= TCSR_CMFA;
 			if(tcr & TCR_CMIEA)

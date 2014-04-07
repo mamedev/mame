@@ -4,27 +4,27 @@
 
     Implementation of the Corvus flat-cable hard disk interface
     for the Apple II.
- 
+
     This same card was used in the Corvus Concept.
- 
+
     C0n0 = drive read/write
     C0n1 = read status (busy in bit 7, data direction in bit 6)
- 
-	Reads and writes to C0n2+ happen; the contents of the reads are thrown away
+
+    Reads and writes to C0n2+ happen; the contents of the reads are thrown away
     immediately by all the code I've examined, and sending the writes to the
     drive's write port makes it not work so they're intended to be ignored too.
- 
+
     5 MB: -chs 144,4,20 -ss 512
     10 MB: -chs 358,3,20 -ss 512
     20 MB: -chs 388,5,20 -ss 512
- 
+
     To set up a disk from scratch on the Apple II:
     1) Create a disk of your desired capacity using CHDMAN -c none and the parameters
        listed above for each of the possible sizes.
     2) Boot apple2p with the corvus in slot 2 and a diskii(ng) in slot 6 with the
        "Corvus Hard Drive - Diagnostics.dsk" mounted.
     3) Press F to format.  Accept all the default options from now on;
-	   there is no "format switch" to worry about with the current emulation.
+       there is no "format switch" to worry about with the current emulation.
     4) Quit MESS.  Restart with the corvus in slot 6 and a diskii(ng) in slot 7
        with the "Corvus Hard Drive - Utilities 1.dsk" mounted.
     5) When you get the BASIC prompt, "LOAD BSYSGEN"
@@ -35,7 +35,7 @@
     10) When the format completes, type "RUN APPLESOFT BOOT PREP" and press Enter.
     11) Once it finishes, quit MESS.  Remove the diskii(ng) from slot 7 and
        the system should boot from the Corvus HD.
- 
+
 *********************************************************************/
 
 #include "a2corvus.h"
@@ -53,7 +53,7 @@
 const device_type A2BUS_CORVUS = &device_creator<a2bus_corvus_device>;
 
 #define CORVUS_ROM_REGION  "corvus_rom"
-#define CORVUS_HD_TAG	   "corvushd"
+#define CORVUS_HD_TAG      "corvushd"
 
 static MACHINE_CONFIG_FRAGMENT(corvus)
 	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
@@ -158,7 +158,7 @@ void a2bus_corvus_device::write_c0nx(address_space &space, UINT8 offset, UINT8 d
 {
 	if (offset == 0)
 	{
-		m_corvushd->write(space, 0, data); 
+		m_corvushd->write(space, 0, data);
 	}
 }
 
@@ -180,4 +180,3 @@ UINT8 a2bus_corvus_device::read_c800(address_space &space, UINT16 offset)
 {
 	return m_rom[offset & 0x7ff];
 }
-

@@ -274,12 +274,12 @@ WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 
 static I8255_INTERFACE( sv8000_i8255_interface )
 {
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_r),   /* port A read */
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_w),   /* port A write */
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_r),   /* port B read */
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_w),   /* port B write */
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_r),   /* port C read */
-    DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_w)    /* port C write */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_r),   /* port A read */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_porta_w),   /* port A write */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_r),   /* port B read */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portb_w),   /* port B write */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_r),   /* port C read */
+	DEVCB_DRIVER_MEMBER(sv8000_state, i8255_portc_w)    /* port C write */
 };
 
 
@@ -379,7 +379,7 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 			offset = ( ( offset & 0x1fc0 ) >> 1 ) | ( offset & 0x1f );
 			return m_videoram[offset % 0xc00];
 		}
- 		else
+		else
 		{
 			// 256 x 96 / 3KB
 			return m_videoram[offset % 0xc00];
@@ -455,4 +455,3 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   INIT                  COMPANY   FULLNAME                            FLAGS */
 CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
-

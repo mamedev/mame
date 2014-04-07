@@ -67,7 +67,7 @@ public:
 		m_y10(*this, "Y10"),
 		m_y11(*this, "Y11"),
 		m_y12(*this, "Y12"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

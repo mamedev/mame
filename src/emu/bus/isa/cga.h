@@ -68,7 +68,7 @@ public:
 	bool    m_superimpose;
 	UINT8   m_plantronics; /* This should be moved into the appropriate subclass */
 	offs_t  m_start_offset;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 // device type definition

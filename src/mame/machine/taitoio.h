@@ -21,7 +21,7 @@ public:
 	template<class _Object> static devcb2_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_3_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_7_cb.set_callback(object); }
-		
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( port_r );
@@ -59,7 +59,7 @@ public:
 	template<class _Object> static devcb2_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_3_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_7_cb.set_callback(object); }
-		
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ16_MEMBER( halfword_r );
@@ -96,8 +96,8 @@ public:
 	template<class _Object> static devcb2_base &set_read_2_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_2_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_3_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_7_cb.set_callback(object); }
-	
-		
+
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ16_MEMBER( halfword_r );
@@ -133,29 +133,29 @@ extern const device_type TC0640FIO;
 
 #define MCFG_TC0220IOC_READ_1_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_read_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0220IOC_READ_2_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_read_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0220IOC_READ_3_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_read_3_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0220IOC_READ_7_CB(_devcb) \
 	devcb = &tc0220ioc_device::set_read_7_callback(*device, DEVCB2_##_devcb);
-	
+
 
 #define MCFG_TC0510NIO_READ_0_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_0_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_TC0510NIO_READ_1_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0510NIO_READ_2_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0510NIO_READ_3_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_3_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0510NIO_READ_7_CB(_devcb) \
 	devcb = &tc0510nio_device::set_read_7_callback(*device, DEVCB2_##_devcb);
 
@@ -165,15 +165,15 @@ extern const device_type TC0640FIO;
 
 #define MCFG_TC0640FIO_READ_1_CB(_devcb) \
 	devcb = &tc0640fio_device::set_read_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0640FIO_READ_2_CB(_devcb) \
 	devcb = &tc0640fio_device::set_read_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_TC0640FIO_READ_3_CB(_devcb) \
 	devcb = &tc0640fio_device::set_read_3_callback(*device, DEVCB2_##_devcb);
-	
-#define MCFG_TC0640FIO_READ_7_CB(_devcb) \
-	devcb = &tc0640fio_device::set_read_7_callback(*device, DEVCB2_##_devcb);	
 
-	
+#define MCFG_TC0640FIO_READ_7_CB(_devcb) \
+	devcb = &tc0640fio_device::set_read_7_callback(*device, DEVCB2_##_devcb);
+
+
 #endif  /* __TAITOIO_H__ */

@@ -223,7 +223,7 @@ private:
 	// We expect the embedding board to replace the drive according to the
 	// select lines.
 	legacy_floppy_image_device    *m_drive;
-	mfm_harddisk_device			  *m_harddisk;
+	mfm_harddisk_device           *m_harddisk;
 };
 
 #define MCFG_SMC92X4_ADD(_tag, _intrf) \

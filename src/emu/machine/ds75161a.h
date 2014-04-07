@@ -37,22 +37,22 @@
 
 #define MCFG_DS75161A_IN_REN_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_ren_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_IFC_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_ifc_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_NDAC_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_ndac_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_NRFD_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_nrfd_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_DAV_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_dav_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_EOI_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_eoi_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_IN_ATN_CB(_devcb) \
 	devcb = &ds75161a_device::set_in_atn_callback(*device, DEVCB2_##_devcb);
 
@@ -61,22 +61,22 @@
 
 #define MCFG_DS75161A_OUT_REN_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_ren_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_IFC_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_ifc_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_NDAC_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_ndac_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_NRFD_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_nrfd_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_DAV_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_dav_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_EOI_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_eoi_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_DS75161A_OUT_ATN_CB(_devcb) \
 	devcb = &ds75161a_device::set_out_atn_callback(*device, DEVCB2_##_devcb);
 
@@ -94,7 +94,7 @@ class ds75161a_device : public device_t
 public:
 	// construction/destruction
 	ds75161a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb2_base &set_in_ren_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ren_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_ifc_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ifc_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_ndac_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_in_ndac_cb.set_callback(object); }

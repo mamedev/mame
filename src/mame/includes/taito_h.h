@@ -34,7 +34,7 @@ public:
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	virtual void machine_start();

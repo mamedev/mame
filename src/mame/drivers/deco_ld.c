@@ -141,7 +141,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_WRITE8_MEMBER(rblaster_sound_w);
@@ -266,7 +266,7 @@ WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
 /* same as Burger Time HW */
 WRITE8_MEMBER(deco_ld_state::decold_palette_w)
 {
-	m_palette->write(space, offset, UINT8(~data)); 
+	m_palette->write(space, offset, UINT8(~data));
 }
 
 /* unknown, but certainly related to audiocpu somehow */

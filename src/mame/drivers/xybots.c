@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xybots)
-	
+
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
 

@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(512)
 	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)

@@ -58,7 +58,7 @@ TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
 }
 
 READ8_MEMBER( namco_54xx_device::K_r )
-{	
+{
 	return m_latched_cmd >> 4;
 }
 

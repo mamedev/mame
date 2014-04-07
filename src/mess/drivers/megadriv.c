@@ -286,7 +286,7 @@ MACHINE_START_MEMBER(md_cons_state, ms_megacd)
 {
 	MACHINE_START_CALL_MEMBER( md_common );
 
-	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for, 
+	// the segaCD introduces some kind of DMA 'lag', which we have to compensate for,
 	// at least when reading wordram? we might need to check what mode we're in the DMA...
 	m_vdp->set_dma_delay(2);
 }
@@ -295,7 +295,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 {
 	m_maincpu->reset();
 	MACHINE_RESET_CALL_MEMBER( megadriv );
-	
+
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
 	if (m_32x)
 		m_32x->pause_cpu();
@@ -306,7 +306,7 @@ void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 {
 	if (m_io_reset->read_safe(0x00) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-	
+
 	// rising edge
 	if (state)
 	{
@@ -315,7 +315,7 @@ void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 			bool mode3 = (m_vdp->get_imode() == 3);
 			m_vdp->vdp_handle_eof();
 			m_vdp->m_megadriv_scanline_timer->adjust(attotime::zero);
-			
+
 			if (m_32x)
 			{
 				m_32x->m_32x_vblank_flag = 0;
@@ -410,8 +410,8 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 		m_segacd->set_framerate(60);
 		m_segacd->set_total_scanlines(262);
 	}
-	
-	m_version_hi_nibble = 0x80;	// Export NTSC
+
+	m_version_hi_nibble = 0x80; // Export NTSC
 	if (!m_segacd)
 		m_version_hi_nibble |= 0x20;
 }
@@ -420,7 +420,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 {
 	DRIVER_INIT_CALL(megadrie);
 	DRIVER_INIT_CALL(mess_md_common);
-	
+
 	if (m_32x)
 	{
 		m_32x->set_32x_pal(TRUE);
@@ -432,8 +432,8 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 		m_segacd->set_framerate(50);
 		m_segacd->set_total_scanlines(313);
 	}
-	
-	m_version_hi_nibble = 0xc0;	// Export PAL
+
+	m_version_hi_nibble = 0xc0; // Export PAL
 	if (!m_segacd)
 		m_version_hi_nibble |= 0x20;
 }
@@ -442,7 +442,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 {
 	DRIVER_INIT_CALL(megadrij);
 	DRIVER_INIT_CALL(mess_md_common);
-	
+
 	if (m_32x)
 	{
 		m_32x->set_32x_pal(FALSE);
@@ -454,8 +454,8 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 		m_segacd->set_framerate(60);
 		m_segacd->set_total_scanlines(262);
 	}
-	
-	m_version_hi_nibble = 0x00;	// JPN NTSC
+
+	m_version_hi_nibble = 0x00; // JPN NTSC
 	if (!m_segacd)
 		m_version_hi_nibble |= 0x20;
 }
@@ -728,7 +728,7 @@ static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	
+
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")

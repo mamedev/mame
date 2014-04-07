@@ -65,7 +65,7 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_p_videoram(*this, "p_videoram"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(m20_state::kbd_tx)
 		m_kbrecv_data = (m_kbrecv_data >> 1) | (state ? (1<<10) : 0);
 		if (m_kbrecv_bitcount == 11) {
 			data = (m_kbrecv_data >> 1) & 0xff;
-//			printf ("0x%02X received by keyboard\n", data);
+//          printf ("0x%02X received by keyboard\n", data);
 			switch (data) {
 				case 0x03: m_kbdi8251->receive_character(2); printf ("sending 2 back from kb...\n"); break;
 				case 0x0a: break;
@@ -173,11 +173,11 @@ WRITE_LINE_MEMBER(m20_state::kbd_tx)
 			m_kbrecv_in_progress = 0;
 		}
 	}
-	else 
+	else
 	{
 		if (state == 0)
 		{
-			m_kbrecv_in_progress = 1; 
+			m_kbrecv_in_progress = 1;
 			m_kbrecv_bitcount = 1;
 			m_kbrecv_data = state ? (1<<10) : 0;
 		}
@@ -388,7 +388,6 @@ ADDRESS_MAP_END
 
 void m20_state::install_memory()
 {
-
 	m_memsize = m_ram->size();
 	UINT8 *memptr = m_ram->pointer();
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
@@ -811,7 +810,6 @@ IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 
 void m20_state::machine_start()
 {
-
 	install_memory();
 }
 
@@ -937,7 +935,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	/* Devices */
 	MCFG_FD1797x_ADD("fd1797", 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))	
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("i8259", pic8259_device, ir0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK/8, mc6845_intf) /* hand tuned to get ~50 fps */
@@ -991,4 +989,3 @@ ROM_END
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT   INIT COMPANY     FULLNAME        FLAGS */
 COMP( 1981, m20,   0,      0,      m20,    m20, m20_state,    m20,  "Olivetti", "Olivetti L1 M20", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1981, m40,   m20,    0,      m20,    m20, m20_state,    m20, "Olivetti", "Olivetti L1 M40", GAME_NOT_WORKING | GAME_NO_SOUND)
-

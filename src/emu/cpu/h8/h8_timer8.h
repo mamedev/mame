@@ -44,11 +44,11 @@
 #include "h8_intc.h"
 
 #define MCFG_H8_TIMER8_CHANNEL_ADD( _tag, intc, irq_ca, irq_cb, irq_v, div1, div2, div3, div4, div5, div6 ) \
-	MCFG_DEVICE_ADD( _tag, H8_TIMER8_CHANNEL, 0 )	\
+	MCFG_DEVICE_ADD( _tag, H8_TIMER8_CHANNEL, 0 )   \
 	downcast<h8_timer8_channel_device *>(device)->set_info(intc, irq_ca, irq_cb, irq_v, div1, div2, div3, div4, div5, div6);
 
 #define MCFG_H8H_TIMER8_CHANNEL_ADD( _tag, intc, irq_ca, irq_cb, irq_v, chain, chain_mode, has_adte, has_ice ) \
-	MCFG_DEVICE_ADD( _tag, H8H_TIMER8_CHANNEL, 0 )	\
+	MCFG_DEVICE_ADD( _tag, H8H_TIMER8_CHANNEL, 0 )  \
 	downcast<h8h_timer8_channel_device *>(device)->set_info(intc, irq_ca, irq_cb, irq_v, chain, chain_mode, has_adte, has_ice);
 
 class h8_timer8_channel_device : public device_t {
@@ -95,7 +95,7 @@ protected:
 		TCSR_ADTE = 0x10,
 		TCSR_OVF  = 0x20,
 		TCSR_CMFA = 0x40,
-		TCSR_CMFB = 0x80		
+		TCSR_CMFB = 0x80
 	};
 
 	enum {

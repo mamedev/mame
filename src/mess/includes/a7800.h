@@ -114,7 +114,7 @@ protected:
 	required_ioport m_io_console_buttons;
 	memory_bank *m_bank10;
 	memory_bank *m_bank11;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 
 	void maria_draw_scanline();
 	int is_holey(unsigned int addr);

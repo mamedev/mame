@@ -85,7 +85,7 @@ public:
 private:
 	UINT8 m_timer_bit;
 	UINT8 m_cass_data[4];
-	bool m_cass_state;	
+	bool m_cass_state;
 	emu_timer* m_sys_timer;
 	virtual void video_start();
 	virtual void machine_start();
@@ -97,7 +97,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	required_shared_ptr<UINT8> m_p_ram;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Seibu COP device
+    Seibu COP device
 
 ***************************************************************************/
 
@@ -20,7 +20,7 @@
 
 #define MCFG_SEIBU_COP_IN_WORD_CB(_devcb) \
 	devcb = &seibu_cop_device::set_in_word_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_SEIBU_COP_IN_DWORD_CB(_devcb) \
 	devcb = &seibu_cop_device::set_in_dword_callback(*device, DEVCB2_##_devcb);
 
@@ -32,7 +32,7 @@
 
 #define MCFG_SEIBU_COP_OUT_DWORD_CB(_devcb) \
 	devcb = &seibu_cop_device::set_out_dword_callback(*device, DEVCB2_##_devcb);
-	
+
 
 
 //**************************************************************************
@@ -47,7 +47,7 @@ class seibu_cop_device :    public device_t,
 public:
 	// construction/destruction
 	seibu_cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	template<class _Object> static devcb2_base &set_in_byte_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_byte_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_word_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_word_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_dword_callback(device_t &device, _Object object) { return downcast<seibu_cop_device &>(device).m_in_dword_cb.set_callback(object); }

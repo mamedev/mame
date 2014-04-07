@@ -54,7 +54,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	for (int track = 0; track < track_count; track++)
 	{
 		offs_t track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
-		
+
 		if (!track_offset)
 			continue;
 
@@ -68,7 +68,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		UINT16 track_bytes = pick_integer_le(img, track_offset, 2);
 		int track_size = track_bytes * 8;
-		
+
 		LOG_FORMATS("track %u size %u cell %ld\n", track, track_size, 200000000L/track_size);
 
 		generate_track_from_bitstream(track, head, &img[track_offset+2], track_size, image);
@@ -82,9 +82,9 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 int g64_format::generate_bitstream(int track, int head, int speed_zone, UINT8 *trackbuf, int &track_size, floppy_image *image)
 {
 	int cell_size = c1541_cell_size[speed_zone];
-	
+
 	generate_bitstream_from_track(track, head, cell_size, trackbuf, track_size, image);
-	
+
 	int actual_cell_size = 200000000L/track_size;
 
 	// allow a tolerance of +- 10 us (3990..4010 -> 4000)
@@ -96,7 +96,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 	UINT8 header[] = { 'G', 'C', 'R', '-', '1', '5', '4', '1', 0x00, 0x54, TRACK_LENGTH & 0xff, TRACK_LENGTH >> 8 };
 
 	io_generic_write(io, header, SIGNATURE, sizeof(header));
-	
+
 	int head = 0;
 	int tracks_written = 0;
 
@@ -137,7 +137,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
 		io_generic_write(io, track_length, dpos, 2);
 		io_generic_write(io, trackbuf, dpos + 2, track_size);
-		
+
 		tracks_written++;
 	}
 

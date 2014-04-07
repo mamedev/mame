@@ -39,7 +39,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(ironhors_videoram_w);
 	DECLARE_WRITE8_MEMBER(ironhors_colorram_w);

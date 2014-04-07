@@ -123,7 +123,7 @@ void baraduke_state::video_start()
 	m_bg_tilemap[0]->set_scrolldx(-26, -227+26);
 	m_bg_tilemap[1]->set_scrolldx(-24, -227+24);
 	m_bg_tilemap[0]->set_scrolldy(-9, 9);
-	m_bg_tilemap[1]->set_scrolldy(-9, 9);	
+	m_bg_tilemap[1]->set_scrolldy(-9, 9);
 	m_tx_tilemap->set_scrolldy(16,16);
 }
 

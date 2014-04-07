@@ -376,8 +376,8 @@ static MACHINE_CONFIG_START( micronic, micronic_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("224K")
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)	// base ram
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)	// additional ram banks
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", micronic_state, nvram_init)  // base ram
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram2", micronic_state, nvram_init)  // additional ram banks
 
 	MCFG_MC146818_ADD( MC146818_TAG, XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(micronic_state, mc146818_irq))

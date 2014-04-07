@@ -946,23 +946,23 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			result = 0;
 			{
 				UINT8 temp = m_kbspecial->read();
-				if (temp & 1)	// capslock
+				if (temp & 1)   // capslock
 				{
 					result |= 4;
 				}
-				if (temp & 6)	// shift
+				if (temp & 6)   // shift
 				{
 					result |= 1;
 				}
-				if (temp & 8)	// control
+				if (temp & 8)   // control
 				{
 					result |= 2;
 				}
-				if (temp & 0x10)	// open apple/command
+				if (temp & 0x10)    // open apple/command
 				{
 					result |= 0x40;
 				}
-				if (temp & 0x20)	// option
+				if (temp & 0x20)    // option
 				{
 					result |= 0x80;
 				}

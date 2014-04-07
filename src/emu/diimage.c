@@ -891,13 +891,13 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 				m_software_info_ptr = &m_software_part_ptr->info();
 				m_software_list_name.cpy(m_software_info_ptr->list().list_name());
 				m_full_software_name.cpy(m_software_part_ptr->info().shortname());
-				
+
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
 				if (m_software_info_ptr && m_full_software_name)
 					m_err = set_image_filename(m_full_software_name);
 
-				// check if image should be read-only		
+				// check if image should be read-only
 				const char *read_only = get_feature("read_only");
 				if (read_only && !strcmp(read_only, "true")) {
 					make_readonly();
@@ -1153,9 +1153,9 @@ void device_image_interface::update_names(const device_type device_type, const c
 }
 
 //-------------------------------------------------
-//  software_name_split - helper that splits a 
-//  software_list:software:part string into 
-//  separate software_list, software, and part 
+//  software_name_split - helper that splits a
+//  software_list:software:part string into
+//  separate software_list, software, and part
 //  strings.
 //
 //  str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
@@ -1177,7 +1177,7 @@ void device_image_interface::software_name_split(const char *swlist_swname, astr
 		swname.cpy(swlist_swname);
 		return;
 	}
-	
+
 	// if one colon, it is the swname and swpart alone
 	const char *split2 = strchr(split1 + 1, ':');
 	if (split2 == NULL)
@@ -1200,7 +1200,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	// Note: old code would explicitly load swlist_name if it was specified, rather than
 	// searching the devices.
 	//
-	// Also if not found, old code would attempt to open <drivername>.xml and even 
+	// Also if not found, old code would attempt to open <drivername>.xml and even
 	// <swinfo_name>.xml. Hopefully removing this won't break anything.
 	//
 
@@ -1213,7 +1213,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	const char *interface = NULL;
 	if (restrict_to_interface)
 		interface = image_interface();
-	
+
 	// find the software list if explicitly specified
 	software_list_device_iterator deviter(device().mconfig().root_device());
 	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
@@ -1227,7 +1227,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 					return part;
 			}
 		}
-	
+
 	// if explicitly specified and not found, just error here
 	return NULL;
 }
@@ -1284,7 +1284,7 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 					{
 						const char *option = device().mconfig().options().value(req_image->brief_instance_name());
 						// mount only if not already mounted
-						if (strlen(option) == 0 && !req_image->filename()) 
+						if (strlen(option) == 0 && !req_image->filename())
 						{
 							req_image->set_init_phase();
 							req_image->load(requirement);

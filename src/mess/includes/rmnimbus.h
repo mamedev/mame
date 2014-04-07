@@ -398,7 +398,7 @@ public:
 		m_eeprom(*this, ER59256_TAG),
 		m_via(*this, VIA_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 

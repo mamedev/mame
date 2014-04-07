@@ -314,7 +314,6 @@ void kaneko16_sprite_device::kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp
 					{
 						if (pri[x] < priority)
 						{
-
 							if (!rgb) dest[x] = pen_base + c;
 							else dest[x] = pal[pen_base + c];
 

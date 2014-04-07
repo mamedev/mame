@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x2da000, 0x2da003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
 	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w) AM_SHARE("colorram")
-	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w) 
+	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
 	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
 	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
@@ -254,13 +254,13 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)

@@ -1157,7 +1157,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_K051316_ADD("k051316_1", hotchase_k051316_intf_0)
 	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_PALETTE("palette")
-	
+
 	MCFG_K051316_ADD("k051316_2", hotchase_k051316_intf_1)
 	MCFG_K051316_GFXDECODE("gfxdecode")
 	MCFG_K051316_PALETTE("palette")

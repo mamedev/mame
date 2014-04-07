@@ -41,11 +41,11 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	device_image_interface *		m_image;
-	astring &						m_current_directory;
-	astring &						m_current_file;
-	const image_device_format *		m_current_format;
-	char							m_filename_buffer[1024];
+	device_image_interface *        m_image;
+	astring &                       m_current_directory;
+	astring &                       m_current_file;
+	const image_device_format *     m_current_format;
+	char                            m_filename_buffer[1024];
 };
 
 
@@ -82,15 +82,15 @@ private:
 	};
 
 	// internal state
-	device_image_interface *	m_image;
-	astring &					m_current_directory;
-	astring &					m_current_file;
-	bool						m_has_empty;
-	bool						m_has_softlist;
-	bool						m_has_create;
-	int *						m_result;
-	file_selector_entry *		m_entrylist;
-	char						m_filename_buffer[1024];
+	device_image_interface *    m_image;
+	astring &                   m_current_directory;
+	astring &                   m_current_file;
+	bool                        m_has_empty;
+	bool                        m_has_softlist;
+	bool                        m_has_create;
+	int *                       m_result;
+	file_selector_entry *       m_entrylist;
+	char                        m_filename_buffer[1024];
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
@@ -113,10 +113,10 @@ public:
 
 private:
 	// internal state
-	floppy_image_format_t **	m_formats;
-	int							m_ext_match;
-	int							m_total_usable;
-	int *						m_result;
+	floppy_image_format_t **    m_formats;
+	int                         m_ext_match;
+	int                         m_total_usable;
+	int *                       m_result;
 };
 
 
@@ -134,8 +134,8 @@ public:
 
 private:
 	// internal state
-	bool		m_can_in_place;
-	int *		m_result;
+	bool        m_can_in_place;
+	int *       m_result;
 };
 
 // helper

@@ -3,8 +3,6 @@
 
 const void epic12_device::FUNCNAME(BLIT_PARAMS)
 {
-
-
 	UINT32* gfx2;
 	int y, yf;
 
@@ -47,8 +45,8 @@ const void epic12_device::FUNCNAME(BLIT_PARAMS)
 	src_x += (dimx-1);
 #endif
 
-	if (flipy)	{	yf = -1;	src_y += (dimy-1);	}
-	else		{	yf = +1;						}
+	if (flipy)  {   yf = -1;    src_y += (dimy-1);  }
+	else        {   yf = +1;                        }
 
 	int starty = 0;
 	const int dst_y_end = dst_y_start+dimy;
@@ -64,13 +62,13 @@ const void epic12_device::FUNCNAME(BLIT_PARAMS)
 #if FLIPX == 1
 	if ((src_x &0x1fff) < ((src_x-(dimx-1))&0x1fff))
 	{
-	//	popmessage("sprite gets clipped off src_x %04x dimx %04x\n", src_x, dimx);
+	//  popmessage("sprite gets clipped off src_x %04x dimx %04x\n", src_x, dimx);
 		return;
 	}
 #else
 	if ((src_x &0x1fff) > ((src_x+(dimx-1))&0x1fff))
 	{
-	//	popmessage("sprite gets clipped off src_x %04x dimx %04x\n", src_x, dimx);
+	//  popmessage("sprite gets clipped off src_x %04x dimx %04x\n", src_x, dimx);
 		return;
 	}
 #endif

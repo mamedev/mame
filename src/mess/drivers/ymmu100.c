@@ -79,7 +79,7 @@
         16 7 mode
         15 7 eq
         14 7 exit
-        10 7 value - 
+        10 7 value -
         11 7 value +
            2 led play
            3 led edit
@@ -452,10 +452,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( mu100r, mu100, mu100r_state )
 MACHINE_CONFIG_END
-	
+
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
- 
+
 ROM_START( mu100 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "bios0", "xu50720 (v1.11, Aug. 3, 1999)" )

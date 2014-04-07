@@ -141,7 +141,7 @@ public:
 		m_joy1(*this, "joy1"),
 		m_joy2(*this, "joy2"),
 		m_dsw(*this, "DSW"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 

@@ -1190,7 +1190,7 @@ void isa8_sblaster1_0_device::device_start()
 	set_isa_device();
 	// 1.0 always has the SAA1099s for CMS back-compatibility
 	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_1_16_w), this ) );
-	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );	
+	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );
 	m_isa->set_dma_channel(1, this, FALSE);
 	m_dsp.version = 0x0105;
 	sb8_device::device_start();

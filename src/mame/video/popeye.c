@@ -58,24 +58,24 @@ enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
 static const res_net_decode_info popeye_7051_decode_info =
 {
-	1,		/*  one prom 5 lines */
-	0,		/*  start at 0 */
-	15,		/*  end at 15 (banked) */
+	1,      /*  one prom 5 lines */
+	0,      /*  start at 0 */
+	15,     /*  end at 15 (banked) */
 	/*  R,   G,   B,  */
-	{   0,   0,   0 },		/*  offsets */
-	{   0,   3,   6 },		/*  shifts */
-	{0x07,0x07,0x03 }		    /*  masks */
+	{   0,   0,   0 },      /*  offsets */
+	{   0,   3,   6 },      /*  shifts */
+	{0x07,0x07,0x03 }           /*  masks */
 };
 
 static const res_net_decode_info popeye_7052_decode_info =
 {
-	2,		/*  there may be two proms needed to construct color */
-	0,		/*  start at 0 */
-	255,	/*  end at 255 */
+	2,      /*  there may be two proms needed to construct color */
+	0,      /*  start at 0 */
+	255,    /*  end at 255 */
 	/*  R,   G,   B,   R,   G,   B */
-	{   0,   0,   0, 256, 256, 256},		/*  offsets */
-	{   0,   3,   0,   0,  -1,   2},		/*  shifts */
-	{0x07,0x01,0x00,0x00,0x06,0x03}		    /*  masks */
+	{   0,   0,   0, 256, 256, 256},        /*  offsets */
+	{   0,   3,   0,   0,  -1,   2},        /*  shifts */
+	{0x07,0x01,0x00,0x00,0x06,0x03}         /*  masks */
 };
 
 static const res_net_info popeye_7051_txt_net_info =
@@ -122,7 +122,7 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 #if USE_NEW_COLOR
 	for (i = 0; i < 16; i++)
 	{
-		int prom_offs = i | ((i & 8) << 1);	/* address bits 3 and 4 are tied together */
+		int prom_offs = i | ((i & 8) << 1); /* address bits 3 and 4 are tied together */
 		int r, g, b;
 		r = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x07, 0, popeye_7051_txt_net_info);
 		g = compute_res_net(((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x07, 1, popeye_7051_txt_net_info);
@@ -344,10 +344,10 @@ void popeye_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_lastflip = 0;
-    m_field = 0;
+	m_field = 0;
 
-    save_item(NAME(m_field));
- 	save_item(NAME(m_lastflip));
+	save_item(NAME(m_field));
+	save_item(NAME(m_lastflip));
 	save_item(NAME(*m_tmpbitmap2));
 	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
 }
@@ -362,10 +362,10 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popeye_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-    m_lastflip = 0;
-    m_field = 0;
+	m_lastflip = 0;
+	m_field = 0;
 
-    save_item(NAME(m_field));
+	save_item(NAME(m_field));
 	save_item(NAME(m_lastflip));
 	save_item(NAME(*m_tmpbitmap2));
 	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);

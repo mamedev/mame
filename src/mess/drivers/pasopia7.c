@@ -45,7 +45,7 @@ public:
 	m_floppy(*this, "fdc:0:525hd"),
 	m_sn1(*this, "sn1"),
 	m_sn2(*this, "sn2"),
-	m_palette(*this, "palette") 
+	m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -60,7 +60,7 @@ public:
 	required_device<sn76489a_device> m_sn1;
 	required_device<sn76489a_device> m_sn2;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(pasopia7_memory_ctrl_w);
@@ -1017,7 +1017,7 @@ static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_PALETTE_ADD("palette", 8)
@@ -1037,7 +1037,7 @@ static MACHINE_CONFIG_DERIVED( p7_lcd, p7_base )
 	MCFG_VIDEO_START_OVERRIDE(pasopia7_state,pasopia7)
 	MCFG_SCREEN_UPDATE_DRIVER(pasopia7_state, screen_update_pasopia7)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(pasopia7_state,p7_lcd)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pasopia7 )

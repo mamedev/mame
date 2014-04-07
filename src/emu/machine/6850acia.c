@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 				{
 					m_status &= ~SR_DCD;
 				}
-	
+
 				m_rx_counter++;
 
 				switch (m_rx_state)
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 						m_rx_counter = 0;
 
 						if (LOG) logerror("MC6850 '%s': RX STOP BIT\n", tag());
-		
+
 						if (!m_rxd)
 						{
 							m_status |= SR_FE;
@@ -536,7 +536,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_txc )
 				if (m_tx_counter == m_divide)
 				{
 					m_tx_counter = 0;
-					
+
 					m_tx_bits++;
 
 					if (LOG) logerror("MC6850 '%s': TX STOP BIT %d\n", tag(), m_tx_bits);

@@ -180,7 +180,7 @@ READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_r)
 WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_reg_w)
 {
 	COMBINE_DATA(&m_bg15_reg[0]);
-//	printf("kaneko16_bg15_reg_w %04x\n", m_bg15_reg[0]);
+//  printf("kaneko16_bg15_reg_w %04x\n", m_bg15_reg[0]);
 	double brt1 = data & 0xff;
 	brt1 = brt1 / 255.0;
 
@@ -198,10 +198,10 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 		int flip    =   select & 0x20;
 		int sx;//, sy;
 
-	//	if (flip)   select ^= 0x1f;
+	//  if (flip)   select ^= 0x1f;
 
 		sx      =   (select & 0x1f) * 256;
-	//	sy      =   0;
+	//  sy      =   0;
 
 		const pen_t *pal = m_bgpalette->pens();
 		UINT16* srcbitmap;

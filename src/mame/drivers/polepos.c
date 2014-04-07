@@ -856,21 +856,21 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_NAMCO_51XX_INPUT_2_CB(IOPORT("DSWB"))
 	MCFG_NAMCO_51XX_INPUT_3_CB(IOPORT("DSWB_HI"))
 	MCFG_NAMCO_51XX_OUTPUT_0_CB(WRITE8(polepos_state,out_0))
-	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(polepos_state,out_1))	
+	MCFG_NAMCO_51XX_OUTPUT_1_CB(WRITE8(polepos_state,out_1))
 
 	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_52XX_DISCRETE("discrete")
 	MCFG_NAMCO_52XX_BASENODE(NODE_04)
 	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(polepos_state,namco_52xx_rom_r))
 	MCFG_NAMCO_52XX_SI_CB(READ8(polepos_state,namco_52xx_si_r))
-	
+
 	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
 	MCFG_NAMCO_53XX_K_CB(READ8(polepos_state,namco_53xx_k_r))
 	MCFG_NAMCO_53XX_INPUT_0_CB(READ8(polepos_state,steering_changed_r))
 	MCFG_NAMCO_53XX_INPUT_1_CB(READ8(polepos_state,steering_delta_r))
 	MCFG_NAMCO_53XX_INPUT_2_CB(IOPORT("DSWA"))
 	MCFG_NAMCO_53XX_INPUT_3_CB(IOPORT("DSWA_HI"))
-	
+
 	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2)  /* 1.536 MHz */
 	MCFG_NAMCO_54XX_DISCRETE("discrete")
 	MCFG_NAMCO_54XX_BASENODE(NODE_01)
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	   they probably simulate some of the logic */
 	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2)       /* 1.536 MHz */
 	MCFG_NAMCO_51XX_INPUT_1_CB(IOPORT("IN0H"))
-	
+
 	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
 	MCFG_NAMCO_06XX_MAINCPU("maincpu")
 	MCFG_NAMCO_06XX_READ_0_CB(DEVREAD8("51xx", namco_51xx_device, read))

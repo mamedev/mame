@@ -239,7 +239,7 @@ void qs1000_device::device_start()
 	m_out_p1_cb.resolve_safe();
 	m_out_p2_cb.resolve_safe();
 	m_out_p3_cb.resolve_safe();
-	
+
 	//m_serial_w_cb.resolve_safe();
 
 	m_cpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(qs1000_device::data_to_i8052),this));

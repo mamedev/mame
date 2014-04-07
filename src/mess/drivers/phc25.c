@@ -266,7 +266,7 @@ READ8_MEMBER( phc25_state::video_ram_r )
 	{
 		return m_video_ram[offset];
 	}
-	else	// text
+	else    // text
 	{
 		offset &= 0x7ff;
 		m_vdg->inv_w(BIT(m_video_ram[offset | 0x800], 0)); // cursor attribute

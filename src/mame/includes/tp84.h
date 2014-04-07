@@ -31,7 +31,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 

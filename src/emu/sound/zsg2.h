@@ -74,7 +74,7 @@ private:
 	INT16 *m_full_samples;
 
 	sound_stream *m_stream;
-	
+
 	devcb2_read32 m_ext_read_handler;
 
 	UINT32 read_memory(UINT32 offset);

@@ -538,7 +538,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	{
 	case 0x00:
 		//if(mem_mask == 0xff)
-		//	printf("%c",data & 0xff);
+		//  printf("%c",data & 0xff);
 		break;
 	case 0x01:
 		//printf("%08x %02x %02x\n",mem_mask,offset,data);

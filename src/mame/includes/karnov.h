@@ -27,7 +27,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<deco_karnovsprites_device> m_spritegen;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -35,7 +35,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* video-related */
 	bitmap_ind16    *m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
@@ -51,7 +51,7 @@ public:
 	int         m_microcontroller_id;
 	int         m_coin_mask;
 	int         m_latch;
-	
+
 	DECLARE_WRITE16_MEMBER(karnov_control_w);
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);

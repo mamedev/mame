@@ -51,7 +51,7 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);
 	DECLARE_READ8_MEMBER(firetrap_8751_bootleg_r);

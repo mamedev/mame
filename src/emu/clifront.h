@@ -114,7 +114,7 @@ private:
 	cli_options &       m_options;
 	osd_interface &     m_osd;
 	int                 m_result;
-	UINT64				m_start_memory;
+	UINT64              m_start_memory;
 };
 
 

@@ -38,6 +38,3 @@
 
 #undef BLENDED
 #undef REALLY_SIMPLE
-
-
-

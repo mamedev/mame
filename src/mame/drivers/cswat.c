@@ -4,7 +4,7 @@
   mirrors and motors to move a spotlight(s) on a large projection screen,
   similar to Namco Shoot Away/Shoot Away II.
   The CRT is just used for showing status and keeping scores.
-  
+
   X1 18.432MHz
   HD68A09EP   - Hitachi M6809 CPU
   2 * M58725P - Mitsubishi 2KB SRAM
@@ -134,13 +134,13 @@ READ8_MEMBER(cswat_state::sensors_r)
 static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )
 	AM_RANGE(0x0000, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-//	AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000
+//  AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(irq_ack_w) // writes 1 at end of vblank irq, 0 at gamestart
 	AM_RANGE(0x2000, 0x2001) AM_READ(dipswitch_r)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(irq_ack_w) // writes 0 at start of vblank irq
 	AM_RANGE(0x2002, 0x2002) AM_READ(sensors_r)
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
-//	AM_RANGE(0x4000, 0x4009) AM_NOP // ?
+//  AM_RANGE(0x4000, 0x4009) AM_NOP // ?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

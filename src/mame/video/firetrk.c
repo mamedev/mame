@@ -262,7 +262,7 @@ void firetrk_state::firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &clip
 		y = 104;
 	}
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
+		m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 }
 
 
@@ -274,7 +274,7 @@ void firetrk_state::superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cli
 	int flip_x = *m_car_rot & 0x04;
 	int flip_y = *m_car_rot & 0x08;
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, 144, 104, 0);
+		m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, 144, 104, 0);
 }
 
 
@@ -303,7 +303,7 @@ void firetrk_state::montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cli
 		y = 104;
 	}
 
-	 m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
+		m_gfxdecode->gfx(gfx_bank)->transpen(bitmap,cliprect, code, color, flip_x, flip_y, x, y, 0);
 }
 
 
@@ -313,7 +313,7 @@ void firetrk_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, U
 	int i;
 
 	for (i = 0; i < count; i++)
-		 m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, alpha_ram[i], 0, 0, 0, x, i * height);
+			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, alpha_ram[i], 0, 0, 0, x, i * height);
 }
 
 

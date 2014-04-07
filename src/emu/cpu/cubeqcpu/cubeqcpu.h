@@ -357,10 +357,10 @@ private:
 	UINT32  m_clkcnt;
 
 	/* RAM */
-	UINT16  m_sram[4096];		/* Shared with rotate CPU */
-	UINT8   m_ptr_ram[1024];	/* Pointer RAM */
-	UINT32  m_e_stack[32768];	/* Stack DRAM: 32kx20 */
-	UINT32  m_o_stack[32768];	/* Stack DRAM: 32kx20 */
+	UINT16  m_sram[4096];       /* Shared with rotate CPU */
+	UINT8   m_ptr_ram[1024];    /* Pointer RAM */
+	UINT32  m_e_stack[32768];   /* Stack DRAM: 32kx20 */
+	UINT32  m_o_stack[32768];   /* Stack DRAM: 32kx20 */
 
 	address_space *m_program;
 	direct_read_data *m_direct;

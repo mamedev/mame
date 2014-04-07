@@ -257,10 +257,10 @@ void gbusters_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 	membank("bank1")->set_entry(0);
-	
+
 	m_paletteram.resize(0x800);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	
+
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_priority));
@@ -298,7 +298,7 @@ static MACHINE_CONFIG_START( gbusters, gbusters_state )
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(gbusters_state, screen_update_gbusters)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)

@@ -81,7 +81,7 @@ Notes:
       CAT702         - Protection chip labelled 'TT10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
       NEC_78081G503  - NEC uPD78081 MCU, 5MHz
-      
+
       Video syncs are 59.8260Hz and 15.4333kHz
 
 
@@ -420,7 +420,7 @@ WRITE8_MEMBER(taitogn_state::control_w)
 {
 	// 20 = watchdog
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
-	
+
 	// 10 = sound hw reset, but make sure it's only booted on games that use it
 	if (m_has_zoom)
 	{
@@ -429,7 +429,7 @@ WRITE8_MEMBER(taitogn_state::control_w)
 		if (~data & m_control & 0x10)
 		{
 			logerror("control_w Zoom reset\n");
-			
+
 			m_zoom->reset();
 
 			// assume that this also readys the sound flash chips
@@ -489,7 +489,7 @@ READ16_MEMBER(taitogn_state::hack1_r)
 			m_v = m_v ^ 8;
 			// Probably something to do with MCU
 			return m_v;
-		
+
 		default:
 			break;
 	}
@@ -550,7 +550,7 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 		case 0x08: return ioport("KEY1")->read();
 		case 0x40: return ioport("KEY2")->read();
 		case 0x80: return ioport("KEY3")->read();
-		
+
 		default:
 			break;
 	}
@@ -587,7 +587,7 @@ void taitogn_state::machine_reset()
 {
 	// halt sound CPU since it has no valid program at start
 	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	
+
 	m_control = 0x10;
 }
 
@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
-	
+
 	MCFG_AT28C16_ADD( "at28c16", 0 )
 	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
 	MCFG_RF5C296_SLOT(":pccard")

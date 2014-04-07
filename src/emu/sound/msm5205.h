@@ -35,7 +35,7 @@
 
 #define MCFG_MSM6585_VCLK_CB(_devcb) \
 	devcb = &msm6585_device::set_vclk_callback(*device, DEVCB2_##_devcb);
-	
+
 
 class msm5205_device : public device_t,
 							public device_sound_interface
@@ -44,7 +44,7 @@ public:
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	msm5205_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~msm5205_device() {}
-	
+
 	static void set_prescaler_selector(device_t &device, int select) { downcast<msm5205_device &>(device).m_select = select; }
 	template<class _Object> static devcb2_base &set_vclk_callback(device_t &device, _Object object) { return downcast<msm5205_device &>(device).m_vclk_cb.set_callback(object); }
 

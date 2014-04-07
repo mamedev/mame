@@ -3,8 +3,8 @@
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
- *  	ISA conversion by R. Belmont
- * 
+ *      ISA conversion by R. Belmont
+ *
  *  Released for general non-commercial use under the MAME license
  *  Visit http://mamedev.org for licensing and usage restrictions.
  *
@@ -566,7 +566,7 @@ void threecom3c505_device::set_interrupt(enum line_state state)
 			case 5: m_isa->irq5_w(state); break;
 			case 6: m_isa->irq6_w(state); break;
 			case 7: m_isa->irq7_w(state); break;
-			case 9: m_isa->irq2_w(state); break;	// IRQ 9 on ISA16 goes to IRQ 2
+			case 9: m_isa->irq2_w(state); break;    // IRQ 9 on ISA16 goes to IRQ 2
 			case 10: m_isa->irq10_w(state); break;
 			case 11: m_isa->irq11_w(state); break;
 			case 12: m_isa->irq12_w(state); break;
@@ -1579,4 +1579,3 @@ READ8_MEMBER(threecom3c505_device::read)
 	LOG2(("reading 3C505 Register at offset %02x = %02x", offset, data));
 	return data;
 }
-
