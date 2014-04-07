@@ -40,8 +40,6 @@ Notes:
 #include "includes/shangha3.h"
 
 
-#define MASTER_CLOCK XTAL_48MHz
-
 /* this looks like a simple protection check */
 /*
 write    read
@@ -473,7 +471,7 @@ WRITE_LINE_MEMBER(shangha3_state::irqhandler)
 static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(shangha3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
@@ -483,7 +481,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
@@ -497,7 +495,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_48MHz/32) // 1.5MHz
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -509,11 +507,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( heberpop, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16 like the others??
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16 like the others??
 	MCFG_CPU_PROGRAM_MAP(heberpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)  /* 6 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_48MHz/8)  /* 6 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
@@ -523,7 +521,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
@@ -537,7 +535,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/6) /* 8 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
@@ -550,11 +548,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(blocken_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)   /* 6 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_48MHz/8)   /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
@@ -564,7 +562,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
 	MCFG_SCREEN_PALETTE("palette")
@@ -578,7 +576,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/6) /* 8 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
