@@ -1419,7 +1419,7 @@ void cli_frontend::getsoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
-			if (core_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
 				if (swlistdev->first_software_info() != NULL)
 				{
 					if (isfirst) { fprintf( out, SOFTLIST_XML_BEGIN); isfirst = FALSE; }
@@ -1452,7 +1452,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	{
 		software_list_device_iterator iter(drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
-			if (core_strwildcmp(swlistdev->list_name(), gamename) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
+			if (core_strwildcmp(gamename, swlistdev->list_name()) == 0 && list_map.add(swlistdev->list_name(), 0, false) != TMERR_DUPLICATE)
 				if (swlistdev->first_software_info() != NULL)
 				{
 					matched++;
