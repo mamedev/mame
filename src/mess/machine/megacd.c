@@ -2,7 +2,11 @@
 #include "machine/megacd.h"
 #include "machine/nvram.h"
 #include "megacd.lh"
-#include "sound/rf5c68.h"
+
+
+const device_type SEGA_SEGACD_US = &device_creator<sega_segacd_us_device>;
+const device_type SEGA_SEGACD_JAPAN = &device_creator<sega_segacd_japan_device>;
+const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device>;
 
 
 /* Callback when the genesis enters interrupt code */
@@ -19,43 +23,16 @@ IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
 }
 
 
-const device_type SEGA_SEGACD_US = &device_creator<sega_segacd_us_device>;
-const device_type SEGA_SEGACD_JAPAN = &device_creator<sega_segacd_japan_device>;
-const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device>;
-
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_scdcpu(*this, "segacd_68k"),
-		m_gfxdecode(*this, "gfxdecode")
-{
-}
-
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
-{
-}
-
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
-{
-}
-
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
-{
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_irq3_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::irq3_timer_callback )
 {
 	CHECK_SCD_LV3_INTERRUPT
-	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
+	m_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_gfx_conversion_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::stamp_timer_callback )
 {
-	//printf("segacd_gfx_conversion_timer_callback\n");
+	//printf("stamp_timer_callback\n");
 
 	CHECK_SCD_LV1_INTERRUPT
 
@@ -66,20 +43,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::segacd_gfx_conversion_timer_ca
 }
 
 
-
-
-ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("segacd_program")
-
+static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("prgram")
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_SHARE("dataram")
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) //AM_SHARE("dataram2")
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") // backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE8(backupram_r, backupram_w, 0x00ff) // backup RAM, odd bytes only!
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_device, rf5c68_w, 0x00ff)  // PCM, RF5C164
 	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_device, rf5c68_r, 0x00ff)
 	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
-
 
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
@@ -98,9 +71,9 @@ ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
 	AM_RANGE(0xff8036, 0xff8037) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_DEVREAD8("tempcdc",lc89510_temp_device,segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_DEVWRITE8("tempcdc",lc89510_temp_device,segacd_cdd_tx_w,0xffff)
-	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE(segacd_font_color_r, segacd_font_color_w)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("segacd_font")
-	AM_RANGE(0xff8050, 0xff8057) AM_READ(segacd_font_converted_r)
+	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE8(font_color_r, font_color_w, 0x00ff)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_SHARE("font_bits")
+	AM_RANGE(0xff8050, 0xff8057) AM_READ(font_converted_r)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
@@ -126,11 +99,11 @@ ADDRESS_MAP_END
 #define SEGACD_NUM_TILES16 (0x40000/SEGACD_BYTES_PER_TILE16)
 #define SEGACD_NUM_TILES32 (0x40000/SEGACD_BYTES_PER_TILE32)
 
-#define _16x16_SEQUENCE_1  { 8,12,0,4,24,28,16,20, 512+8, 512+12, 512+0, 512+4, 512+24, 512+28, 512+16, 512+20 },
-#define _16x16_SEQUENCE_1_FLIP  { 512+20,512+16,512+28,512+24,512+4,512+0, 512+12,512+8, 20,16,28,24,4,0,12,8 },
+#define _16x16_SEQUENCE_1  { STEP8(0, 4), STEP8(512, 4) },
+#define _16x16_SEQUENCE_1_FLIP  { STEP8(512+28, -4), STEP8(28, -4) },
 
-#define _16x16_SEQUENCE_2  { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
-#define _16x16_SEQUENCE_2_FLIP  { 15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32, 8*32, 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+#define _16x16_SEQUENCE_2  { STEP16(0, 32) },
+#define _16x16_SEQUENCE_2_FLIP  { STEP16(15*32, -32) },
 
 
 #define _16x16_START \
@@ -153,29 +126,12 @@ ADDRESS_MAP_END
 	8*512 \
 };
 
+#define _32x32_SEQUENCE_1 { STEP8(0, 4), STEP8(1024, 4), STEP8(2048, 4), STEP8(3072, 4) },
+#define _32x32_SEQUENCE_1_FLIP { STEP8(3072+28, -4), STEP8(2048+28, -4), STEP8(1024+28, -4), STEP8(28, -4) },
 
-#define _32x32_SEQUENCE_1 \
-	{ 8,12,0,4,24,28,16,20, \
-	1024+8, 1024+12, 1024+0, 1024+4, 1024+24, 1024+28, 1024+16, 1024+20, \
-	2048+8, 2048+12, 2048+0, 2048+4, 2048+24, 2048+28, 2048+16, 2048+20, \
-	3072+8, 3072+12, 3072+0, 3072+4, 3072+24, 3072+28, 3072+16, 3072+20  \
-	},
-#define _32x32_SEQUENCE_1_FLIP \
-{ 3072+20, 3072+16, 3072+28, 3072+24, 3072+4, 3072+0, 3072+12, 3072+8, \
-	2048+20, 2048+16, 2048+28, 2048+24, 2048+4, 2048+0, 2048+12, 2048+8, \
-	1024+20, 1024+16, 1024+28, 1024+24, 1024+4, 1024+0, 1024+12, 1024+8, \
-	20, 16, 28, 24, 4, 0, 12, 8},
+#define _32x32_SEQUENCE_2 { STEP32(0, 32) },
+#define _32x32_SEQUENCE_2_FLIP { STEP32(31*32, -32) },
 
-#define _32x32_SEQUENCE_2 \
-		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, \
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
-		16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
-		24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32},
-#define _32x32_SEQUENCE_2_FLIP \
-{ 31*32, 30*32, 29*32, 28*32, 27*32, 26*32, 25*32, 24*32, \
-	23*32, 22*32, 21*32, 20*32, 19*32, 18*32, 17*32, 16*32, \
-	15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32 , 8*32 , \
-	7*32 , 6*32 , 5*32 , 4*32 , 3*32 , 2*32 , 1*32 , 0*32},
 
 /* 16x16 decodes */
 static const gfx_layout sega_16x16_r00_f0_layout =
@@ -275,25 +231,24 @@ _32x32_START
 	_32x32_SEQUENCE_1_FLIP
 _32x32_END
 
-GFXDECODE_START( segacd )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r00_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r01_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r10_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r11_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r00_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r11_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r10_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_16x16_r01_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r00_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r01_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r10_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r11_f0_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r00_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r11_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r10_f1_layout, 0, 0 )
-	GFXDECODE_ENTRY( NULL, 0, sega_32x32_r01_f1_layout, 0, 0 )
+static GFXDECODE_START( segacd )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r00_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r11_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r10_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_16x16_r01_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f0_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r00_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r11_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r10_f1_layout, 0, 0 )
+	GFXDECODE_DEVICE_RAM( "dataram", 0, sega_32x32_r01_f1_layout, 0, 0 )
 GFXDECODE_END
-
 
 
 static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
@@ -308,11 +263,9 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_SEGACD_HACK_SET_CDC_DO_DMA( sega_segacd_device, SegaCD_CDC_Do_DMA ) // hack
 
 	MCFG_TIMER_ADD_NONE("sw_timer") //stopwatch timer
-	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, segacd_irq3_timer_callback)
-	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, segacd_gfx_conversion_timer_callback)
-	MCFG_TIMER_DRIVER_ADD("scd_dma_timer", sega_segacd_device, scd_dma_timer_callback)
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "^gen_vdp:palette", segacd) // FIXME
+	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, stamp_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("irq3_timer", sega_segacd_device, irq3_timer_callback)
+	MCFG_TIMER_DRIVER_ADD("dma_timer", sega_segacd_device, dma_timer_callback)
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
@@ -333,11 +286,39 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
+		m_scdcpu(*this, "segacd_68k"),
+		m_rfsnd(*this, "rfsnd"),
+		m_lc89510_temp(*this, "tempcdc"),
+		m_stopwatch_timer(*this, "sw_timer"),
+		m_stamp_timer(*this, "stamp_timer"),
+		m_irq3_timer(*this, "irq3_timer"),
+		m_dma_timer(*this, "dma_timer"),
+		m_prgram(*this, "prgram"),
+		m_dataram(*this, "dataram"),
+		m_font_bits(*this, "font_bits")
+{
+}
+
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
+{
+}
+
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
+{
+}
+
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
+{
+}
 
 
-
-
-inline void sega_segacd_device::write_pixel(running_machine& machine, UINT8 pix, int pixeloffset )
+inline void sega_segacd_device::write_pixel(UINT8 pix, int pixeloffset)
 {
 	int shift = 12-(4*(pixeloffset&0x3));
 	UINT16 datamask = (0x000f) << shift;
@@ -350,31 +331,31 @@ inline void sega_segacd_device::write_pixel(running_machine& machine, UINT8 pix,
 	switch (segacd_memory_priority_mode)
 	{
 		case 0x00: // normal write, just write the data
-			segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
-			segacd_dataram[offset] |= pix << shift;
+			m_dataram[offset] = m_dataram[offset] &~ datamask;
+			m_dataram[offset] |= pix << shift;
 			break;
 
 		case 0x01: // underwrite, only write if the existing data is 0
-			if ((segacd_dataram[offset]&datamask) == 0x0000)
+			if ((m_dataram[offset]&datamask) == 0x0000)
 			{
-				segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
-				segacd_dataram[offset] |= pix << shift;
+				m_dataram[offset] = m_dataram[offset] &~ datamask;
+				m_dataram[offset] |= pix << shift;
 			}
 			break;
 
 		case 0x02: // overwrite, only write non-zero data
 			if (pix)
 			{
-				segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
-				segacd_dataram[offset] |= pix << shift;
+				m_dataram[offset] = m_dataram[offset] &~ datamask;
+				m_dataram[offset] |= pix << shift;
 			}
 			break;
 
 		default:
 		case 0x03:
-			pix = machine.rand() & 0x000f;
-			segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
-			segacd_dataram[offset] |= pix << shift;
+			pix = machine().rand() & 0x000f;
+			m_dataram[offset] = m_dataram[offset] &~ datamask;
+			m_dataram[offset] |= pix << shift;
 			break;
 
 	}
@@ -393,7 +374,7 @@ UINT16 sega_segacd_device::segacd_1meg_mode_word_read(int offset, UINT16 mem_mas
 
 	offset &=0x1ffff;
 
-	return segacd_dataram[offset];
+	return m_dataram[offset];
 }
 
 
@@ -413,45 +394,45 @@ void sega_segacd_device::segacd_1meg_mode_word_write(int offset, UINT16 data, UI
 		switch (segacd_memory_priority_mode)
 		{
 			case 0x00: // normal write, just write the data
-				COMBINE_DATA(&segacd_dataram[offset]);
+				COMBINE_DATA(&m_dataram[offset]);
 				break;
 
 			case 0x01: // underwrite, only write if the existing data is 0
 				if (ACCESSING_BITS_8_15)
 				{
-					if ((segacd_dataram[offset]&0xf000) == 0x0000) segacd_dataram[offset] |= (data)&0xf000;
-					if ((segacd_dataram[offset]&0x0f00) == 0x0000) segacd_dataram[offset] |= (data)&0x0f00;
+					if ((m_dataram[offset]&0xf000) == 0x0000) m_dataram[offset] |= (data)&0xf000;
+					if ((m_dataram[offset]&0x0f00) == 0x0000) m_dataram[offset] |= (data)&0x0f00;
 				}
 				if (ACCESSING_BITS_0_7)
 				{
-					if ((segacd_dataram[offset]&0x00f0) == 0x0000) segacd_dataram[offset] |= (data)&0x00f0;
-					if ((segacd_dataram[offset]&0x000f) == 0x0000) segacd_dataram[offset] |= (data)&0x000f;
+					if ((m_dataram[offset]&0x00f0) == 0x0000) m_dataram[offset] |= (data)&0x00f0;
+					if ((m_dataram[offset]&0x000f) == 0x0000) m_dataram[offset] |= (data)&0x000f;
 				}
 				break;
 
 			case 0x02: // overwrite, only write non-zero data
 				if (ACCESSING_BITS_8_15)
 				{
-					if ((data)&0xf000) segacd_dataram[offset] = (segacd_dataram[offset] & 0x0fff) | ((data)&0xf000);
-					if ((data)&0x0f00) segacd_dataram[offset] = (segacd_dataram[offset] & 0xf0ff) | ((data)&0x0f00);
+					if ((data)&0xf000) m_dataram[offset] = (m_dataram[offset] & 0x0fff) | ((data)&0xf000);
+					if ((data)&0x0f00) m_dataram[offset] = (m_dataram[offset] & 0xf0ff) | ((data)&0x0f00);
 				}
 				if (ACCESSING_BITS_0_7)
 				{
-					if ((data)&0x00f0) segacd_dataram[offset] = (segacd_dataram[offset] & 0xff0f) | ((data)&0x00f0);
-					if ((data)&0x000f) segacd_dataram[offset] = (segacd_dataram[offset] & 0xfff0) | ((data)&0x000f);
+					if ((data)&0x00f0) m_dataram[offset] = (m_dataram[offset] & 0xff0f) | ((data)&0x00f0);
+					if ((data)&0x000f) m_dataram[offset] = (m_dataram[offset] & 0xfff0) | ((data)&0x000f);
 				}
 				break;
 
 			default:
 			case 0x03: // invalid?
-				COMBINE_DATA(&segacd_dataram[offset]);
+				COMBINE_DATA(&m_dataram[offset]);
 				break;
 
 		}
 	}
 	else
 	{
-		COMBINE_DATA(&segacd_dataram[offset]);
+		COMBINE_DATA(&m_dataram[offset]);
 	}
 }
 
@@ -731,7 +712,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_comms_flags_maincpu_w )
 READ16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_r )
 {
 	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
-	return segacd_4meg_prgram[realoffset];
+	return m_prgram[realoffset];
 
 }
 
@@ -742,7 +723,7 @@ WRITE16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_w )
 	// todo:
 	// check for write protection? (or does that only apply to writes on the SubCPU side?
 
-	COMBINE_DATA(&segacd_4meg_prgram[realoffset]);
+	COMBINE_DATA(&m_prgram[realoffset]);
 
 }
 
@@ -797,9 +778,9 @@ READ16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_r )
 		// is this correct?
 		if (!(scd_rammode&1))
 		{
-			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
+			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, m_dataram[offset]);
 
-			return segacd_dataram[offset];
+			return m_dataram[offset];
 
 		}
 		else
@@ -864,8 +845,8 @@ WRITE16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_w )
 		// is this correct?
 		if (!(scd_rammode&1))
 		{
-			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space.machine(), offset);
+			COMBINE_DATA(&m_dataram[offset]);
+			segacd_mark_tiles_dirty(offset);
 		}
 		else
 		{
@@ -925,29 +906,25 @@ WRITE16_MEMBER( sega_segacd_device::scd_a12006_hint_register_w )
 }
 
 
-
-
-
-
-void sega_segacd_device::segacd_mark_tiles_dirty(running_machine& machine, int offset)
+void sega_segacd_device::segacd_mark_tiles_dirty(int offset)
 {
-	m_gfxdecode->gfx(0)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(1)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(2)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(3)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(4)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(5)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(6)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
-	m_gfxdecode->gfx(7)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(0)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(1)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(2)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(3)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(4)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(5)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(6)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx(7)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE16));
 
-	m_gfxdecode->gfx(8)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(9)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(10)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(11)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(12)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(13)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(14)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
-	m_gfxdecode->gfx(15)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(8)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(9)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(10)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(11)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(12)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(13)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(14)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx(15)->mark_dirty((offset*2)/(SEGACD_BYTES_PER_TILE32));
 }
 
 
@@ -964,7 +941,7 @@ void sega_segacd_device::SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& til
 	tile_region = 0; // 16x16 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xff80) * 4;
 
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tiledat = m_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
 	tileno = tiledat & 0x07ff;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
@@ -978,7 +955,7 @@ void sega_segacd_device::SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& til
 	tile_region = 8; // 32x32 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xffe0) * 4;
 
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tiledat = m_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
 	tileno = (tiledat & 0x07fc)>>2;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
@@ -993,7 +970,7 @@ void sega_segacd_device::SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& t
 	tile_region = 0; // 16x16 tiles
 	int tile_base = (0x8000) * 4; // fixed address in this mode
 
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tiledat = m_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
 	tileno = tiledat & 0x07ff;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
@@ -1008,7 +985,7 @@ void sega_segacd_device::SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& t
 	tile_region = 8; // 32x32 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xe000) * 4;
 
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tiledat = m_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
 	tileno = (tiledat & 0x07fc)>>2;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
@@ -1052,7 +1029,7 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
@@ -1082,16 +1059,15 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(running_
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 
-	gfx_element *gfx = m_gfxdecode->gfx(tile_region);
-	tileno %= gfx->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
@@ -1121,16 +1097,15 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(running_
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
 
-	gfx_element *gfx = m_gfxdecode->gfx(tile_region);
-	tileno %= gfx->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
 
-	const UINT8* srcdata = gfx->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
@@ -1160,16 +1135,15 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(runnin
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 
-	gfx_element *gfx = m_gfxdecode->gfx(tile_region);
-	tileno %= gfx->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00; // does this apply in this mode
 
-	const UINT8* srcdata = gfx->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos)
+inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
@@ -1199,12 +1173,11 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(runnin
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 
-	gfx_element *gfx = m_gfxdecode->gfx(tile_region);
-	tileno %= gfx->elements();
+	tileno %= gfx(tile_region)->elements();
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx->get_data(tileno);
+	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1213,14 +1186,14 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(runnin
 WRITE16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_w )
 {
 	if(data == 0)
-		stopwatch_timer->reset();
+		m_stopwatch_timer->reset();
 	else
 		printf("Stopwatch timer %04x\n",data);
 }
 
 READ16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_r )
 {
-	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
+	INT32 result = (m_stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
 	return result & 0xfff;
 }
@@ -1279,7 +1252,7 @@ READ16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_r )
 	{
 		// is this correct?
 		if (scd_rammode&1)
-			return segacd_dataram[offset];
+			return m_dataram[offset];
 		else
 		{
 			//printf("Illegal: segacd_sub_dataram_part1_r in mode 0 without permission\n");
@@ -1322,8 +1295,8 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_w )
 		// is this correct?
 		if (scd_rammode&1)
 		{
-			COMBINE_DATA(&segacd_dataram[offset]);
-			segacd_mark_tiles_dirty(space.machine(), offset);
+			COMBINE_DATA(&m_dataram[offset]);
+			segacd_mark_tiles_dirty(offset);
 		}
 		else
 		{
@@ -1452,7 +1425,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-inline UINT8 sega_segacd_device::read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* srcbitmap, int x, int y)
+inline UINT8 sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
@@ -1470,10 +1443,10 @@ inline UINT8 sega_segacd_device::read_pixel_from_stampmap( running_machine& mach
 
 	switch (segacd_get_active_stampmap_tilemap()&3)
 	{
-		case 0x00: return get_stampmap_16x16_1x1_tile_info_pixel( machine, x, y );
-		case 0x01: return get_stampmap_32x32_1x1_tile_info_pixel( machine, x, y );
-		case 0x02: return get_stampmap_16x16_16x16_tile_info_pixel( machine, x, y );
-		case 0x03: return get_stampmap_32x32_16x16_tile_info_pixel( machine, x, y );
+		case 0x00: return get_stampmap_16x16_1x1_tile_info_pixel( x, y );
+		case 0x01: return get_stampmap_32x32_1x1_tile_info_pixel( x, y );
+		case 0x02: return get_stampmap_16x16_16x16_tile_info_pixel( x, y );
+		case 0x03: return get_stampmap_32x32_16x16_tile_info_pixel( x, y );
 	}
 
 	return 0;
@@ -1504,7 +1477,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		segacd_gfx_conversion_timer->adjust(attotime::from_nsec(30000));
+		m_stamp_timer->adjust(attotime::from_nsec(30000));
 
 
 
@@ -1521,10 +1494,10 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 			INT16 tilemapxoffs,tilemapyoffs;
 			INT16 deltax,deltay;
 
-			tilemapxoffs = segacd_dataram[(currbase+0x0)>>1];
-			tilemapyoffs = segacd_dataram[(currbase+0x2)>>1];
-			deltax = segacd_dataram[(currbase+0x4)>>1]; // x-zoom
-			deltay = segacd_dataram[(currbase+0x6)>>1]; // rotation
+			tilemapxoffs = m_dataram[(currbase+0x0)>>1];
+			tilemapyoffs = m_dataram[(currbase+0x2)>>1];
+			deltax = m_dataram[(currbase+0x4)>>1]; // x-zoom
+			deltay = m_dataram[(currbase+0x6)>>1]; // rotation
 
 			//printf("%06x:  %04x (%d) %04x (%d) %04x %04x\n", currbase, tilemapxoffs, tilemapxoffs>>3, tilemapyoffs, tilemapyoffs>>3, deltax, deltay);
 
@@ -1537,7 +1510,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 				//int i;
 				UINT8 pix = 0x0;
 
-				pix = read_pixel_from_stampmap(space.machine(), srcbitmap, xbase>>(3+8), ybase>>(3+8));
+				pix = read_pixel_from_stampmap(srcbitmap, xbase>>(3+8), ybase>>(3+8));
 
 				xbase += deltax;
 				ybase += deltay;
@@ -1557,10 +1530,10 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 
 				offset+=countx & 0x7;
 
-				write_pixel( space.machine(), pix, offset );
+				write_pixel( pix, offset );
 
-				segacd_mark_tiles_dirty(space.machine(), (offset>>3));
-				segacd_mark_tiles_dirty(space.machine(), (offset>>3)+1);
+				segacd_mark_tiles_dirty(offset>>3);
+				segacd_mark_tiles_dirty((offset>>3)+1);
 
 			}
 
@@ -1648,7 +1621,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_imagebuffer_hdot_size_w )
 
 READ16_MEMBER( sega_segacd_device::segacd_irq3timer_r )
 {
-	return segacd_irq3_timer_reg; // always returns value written, not current counter!
+	return m_irq3_timer_reg; // always returns value written, not current counter!
 }
 
 
@@ -1656,65 +1629,50 @@ WRITE16_MEMBER( sega_segacd_device::segacd_irq3timer_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		segacd_irq3_timer_reg = data & 0xff;
+		m_irq3_timer_reg = data & 0xff;
 
 		// time = reg * 30.72 us
 
-		if (segacd_irq3_timer_reg)
-			segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
+		if (m_irq3_timer_reg)
+			m_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 		else
-			segacd_irq3_timer->adjust(attotime::never);
+			m_irq3_timer->adjust(attotime::never);
 
-		//printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
+		//printf("segacd_irq3timer_w %02x\n", segacd_m_irq3_timer_reg);
 	}
 }
 
 
-
-
-
-
-
-READ16_MEMBER( sega_segacd_device::segacd_backupram_r )
+READ8_MEMBER( sega_segacd_device::backupram_r )
 {
-	if(ACCESSING_BITS_8_15 && !(space.debugger_access()))
-		printf("Warning: read to backupram even bytes! [%04x]\n",offset);
-
-	return segacd_backupram[offset] & 0xff;
+	return m_backupram[offset];
 }
 
-WRITE16_MEMBER( sega_segacd_device::segacd_backupram_w )
+WRITE8_MEMBER( sega_segacd_device::backupram_w )
 {
-	if(ACCESSING_BITS_0_7)
-		segacd_backupram[offset] = data;
-
-	if(ACCESSING_BITS_8_15 && !(space.debugger_access()))
-		printf("Warning: write to backupram even bytes! [%04x] %02x\n",offset,data);
+	m_backupram[offset] = data;
 }
 
-READ16_MEMBER( sega_segacd_device::segacd_font_color_r )
+READ8_MEMBER( sega_segacd_device::font_color_r )
 {
-	return segacd_font_color;
+	return m_font_color;
 }
 
-WRITE16_MEMBER( sega_segacd_device::segacd_font_color_w )
+WRITE8_MEMBER( sega_segacd_device::font_color_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		segacd_font_color = data & 0xff;
-	}
+	m_font_color = data;
 }
 
-READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
+READ16_MEMBER( sega_segacd_device::font_converted_r )
 {
-	int scbg = (segacd_font_color & 0x0f);
-	int scfg = (segacd_font_color & 0xf0)>>4;
+	int scbg = (m_font_color & 0x0f);
+	int scfg = (m_font_color & 0xf0)>>4;
 	UINT16 retdata = 0;
 	int bit;
 
 	for (bit=0;bit<4;bit++)
 	{
-		if (*segacd_font_bits&((0x1000>>offset*4)<<bit))
+		if (*m_font_bits&((0x1000>>offset*4)<<bit))
 			retdata |= scfg << (bit*4);
 		else
 			retdata |= scbg << (bit*4);
@@ -1729,26 +1687,14 @@ READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
 
 void sega_segacd_device::device_start()
 {
-	if (!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
-	segacd_gfx_conversion_timer = machine().device<timer_device>(":segacd:stamp_timer");
-	segacd_irq3_timer = machine().device<timer_device>(":segacd:irq3_timer");
-	scd_dma_timer = machine().device<timer_device>(":segacd:scd_dma_timer");
-
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	segacd_font_bits = reinterpret_cast<UINT16 *>(memshare(":segacd:segacd_font")->ptr());
-	segacd_backupram = reinterpret_cast<UINT16 *>(memshare(":segacd:backupram")->ptr());
-	segacd_dataram = reinterpret_cast<UINT16 *>(memshare(":segacd:dataram")->ptr());
-//  segacd_dataram2 = reinterpret_cast<UINT16 *>(memshare(":segacd:dataram2")->ptr());
-	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(memshare(":segacd:segacd_program")->ptr());
+	m_backupram.resize(0x2000);
+	subdevice<nvram_device>("backupram")->set_base(m_backupram, 0x2000);
 
 	segacd_4meg_prgbank = 0;
 
-
 	space.unmap_readwrite        (0x020000,0x3fffff);
-
 
 	space.install_read_handler (0x0020000, 0x003ffff, read16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_r),this) );
 	space.install_write_handler (0x0020000, 0x003ffff, write16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_w),this) );
@@ -1775,14 +1721,10 @@ void sega_segacd_device::device_start()
 
 	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
 
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	for (int i = 0; i < 16; i++)
-		m_gfxdecode->gfx(i)->set_source((UINT8 *)segacd_dataram);
-
-	segacd_stampmap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	segacd_stampmap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
-	segacd_stampmap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
-	segacd_stampmap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
+	segacd_stampmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	segacd_stampmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
+	segacd_stampmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
 
 	// todo register save state stuff
 }
@@ -1809,12 +1751,9 @@ void sega_segacd_device::device_reset()
 	scd_rammode = 0;
 	scd_mode_dmna_ret_flags = 0x5421;
 
-	lc89510_temp = machine().device<lc89510_temp_device>(":segacd:tempcdc");
-	lc89510_temp->reset_cd();
+	m_lc89510_temp->reset_cd();
 	m_dmaaddr = 0;
-	scd_dma_timer->adjust(attotime::zero);
-
-	stopwatch_timer = machine().device<timer_device>(":segacd:sw_timer");
+	m_dma_timer->adjust(attotime::zero);
 
 	m_total_scanlines = 262;
 
@@ -1848,26 +1787,26 @@ void sega_segacd_device::device_reset()
 	segacd_redled = 0;
 	segacd_greenled = 0;
 	segacd_ready = 1; // actually set 100ms after startup?
-	segacd_irq3_timer_reg = 0;
+	m_irq3_timer_reg = 0;
 
-	segacd_gfx_conversion_timer->adjust(attotime::never);
-	segacd_irq3_timer->adjust(attotime::never);
+	m_stamp_timer->adjust(attotime::never);
+	m_irq3_timer->adjust(attotime::never);
 
 }
 
 
 // todo: tidy up
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
+TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 {
 	// todo: accurate timing of this!
 
 	#define RATE 256
-	lc89510_temp->CDC_Do_DMA(machine(), RATE);
+	m_lc89510_temp->CDC_Do_DMA(machine(), RATE);
 
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
 
-	scd_dma_timer->adjust(attotime::from_hz(m_framerate) / m_total_scanlines);
+	m_dma_timer->adjust(attotime::from_hz(m_framerate) / m_total_scanlines);
 
 }
 
@@ -1875,7 +1814,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
 void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination )
 {
 	int length = dmacount;
-	UINT8 *dest;
+	UINT16 *dest;
 	int srcoffset = 0;
 	int dstoffset = 0;
 	address_space& space = m_scdcpu->space(AS_PROGRAM);
@@ -1899,11 +1838,11 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 		if (destination==DMA_PRG)
 		{
-			dest = (UINT8 *) segacd_4meg_prgram;
+			dest = m_prgram;
 		}
 		else if (destination==DMA_WRAM)
 		{
-			dest = (UINT8*)segacd_dataram;
+			dest = m_dataram;
 		}
 		else if (destination==DMA_PCM)
 		{
@@ -1916,8 +1855,8 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 		if (PCM_DMA)
 		{
-			space.write_byte(0xff2000+(((dstoffset*2)+1)&0x1fff),data >> 8);
-			space.write_byte(0xff2000+(((dstoffset*2)+3)&0x1fff),data & 0xff);
+			m_rfsnd->rf5c68_mem_w(space, dstoffset & 0xfff, data >> 8);
+			m_rfsnd->rf5c68_mem_w(space, (dstoffset+1) & 0xfff, data);
 		//  printf("PCM_DMA writing %04x %04x\n",0xff2000+(dstoffset*2), data);
 		}
 		else
@@ -1930,10 +1869,9 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 					{
 						dstoffset &= 0x3ffff;
 
-						dest[dstoffset+1] = data >>8;
-						dest[dstoffset+0] = data&0xff;
+						dest[dstoffset/2] = data;
 
-						segacd_mark_tiles_dirty(space.machine(), dstoffset/2);
+						segacd_mark_tiles_dirty(dstoffset/2);
 					}
 					else
 					{
@@ -1953,8 +1891,7 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 				else
 				{
 					// main ram
-					dest[dstoffset+1] = data >>8;
-					dest[dstoffset+0] = data&0xff;
+					dest[dstoffset/2] = data;
 				}
 
 			}
