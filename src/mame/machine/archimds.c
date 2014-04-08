@@ -75,6 +75,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 void archimedes_state::archimedes_clear_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] &= ~mask;
+	archimedes_request_irq_a(0);
 }
 
 void archimedes_state::archimedes_clear_irq_b(int mask)
@@ -111,17 +112,26 @@ void archimedes_state::vidc_vblank()
 
 /* video DMA */
 /* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
+/* TODO: change m_region_vram into proper alloc array */
 void archimedes_state::vidc_video_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static UINT8 *vram = m_region_vram->base();
 	UINT32 size;
 	UINT32 m_vidc_ccur;
+	UINT32 offset_ptr;
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
+	offset_ptr = m_vidc_vidstart+m_vidc_vidinit;
+
 	for(m_vidc_vidcur = 0;m_vidc_vidcur < size;m_vidc_vidcur++)
-		vram[m_vidc_vidcur] = (space.read_byte(m_vidc_vidstart+m_vidc_vidcur));
+	{
+		vram[m_vidc_vidcur] = (space.read_byte(offset_ptr));
+		offset_ptr++;
+		if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
+			offset_ptr = m_vidc_vidstart;
+	}
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
@@ -129,7 +139,9 @@ void archimedes_state::vidc_video_tick()
 		m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
 
 	if(m_video_dma_on)
+	{
 		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+	}
 	else
 		m_vid_timer->adjust(attotime::never);
 }
@@ -798,10 +810,10 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
 
-			logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-				m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
-				visarea.max_x, visarea.max_y,
-				m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
+			//logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+			//	m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
+			//	visarea.max_x, visarea.max_y,
+			//	m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
 
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
