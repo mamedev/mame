@@ -115,9 +115,12 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
         switch(m_tx_latch)
         {
             case 0x00:
+            case 0x02:
             case 0x03:
             case 0x07:
-                // ---- -xxx led enables;
+                // ---- -x-- scroll lock
+                // ---- --x- num lock
+                // ---- ---x caps lock
                 break;
             case 0x20:
                 m_rx = 0x81;
