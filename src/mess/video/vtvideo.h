@@ -15,21 +15,8 @@
 
 #include "emu.h"
 
-#define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
-	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB2_##_read);
-
-#define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
-	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB2_##_write);
-
-struct vt_video_interface
-{
-	const char *m_char_rom_tag; /* character rom region */
-};
-
-
 class vt100_video_device : public device_t,
-							public device_video_interface,
-							public vt_video_interface
+							public device_video_interface
 {
 public:
 	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -39,6 +26,8 @@ public:
 	template<class _Object> static devcb2_base &set_ram_rd_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_read_ram.set_callback(object); }
 	template<class _Object> static devcb2_base &set_clear_video_irq_wr_callback(device_t &device, _Object object) { return downcast<vt100_video_device &>(device).m_write_clear_video_interrupt.set_callback(object); }
 
+	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom_tag = tag; }
+
 	DECLARE_READ8_MEMBER(lba7_r);
 	DECLARE_WRITE8_MEMBER(dc012_w);
 	DECLARE_WRITE8_MEMBER(dc011_w);
@@ -47,7 +36,6 @@ public:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -67,7 +55,6 @@ protected:
 	bool MHFU_FLAG;
 	int MHFU_counter;
 
-
 	// dc012 attributes
 	UINT8 m_scroll_latch;
 	UINT8 m_scroll_latch_valid;
@@ -82,6 +69,7 @@ protected:
 	UINT8 m_frequency;
 	UINT8 m_interlaced;
 
+	const char *m_char_rom_tag; /* character rom region */
 	required_device<palette_device> m_palette;
 };
 
@@ -106,16 +94,15 @@ extern const device_type VT100_VIDEO;
 extern const device_type RAINBOW_VIDEO;
 
 
-#define MCFG_VT100_VIDEO_ADD(_tag, _screen_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
-	MCFG_DEVICE_CONFIG(_intrf) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
+#define MCFG_VT_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#define MCFG_RAINBOW_VIDEO_ADD(_tag, _screen_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, RAINBOW_VIDEO, 0) \
-	MCFG_DEVICE_CONFIG(_intrf) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
+#define MCFG_VT_CHARGEN(_tag) \
+	vt100_video_device::set_chargen_tag(*device, _tag);
 
+#define MCFG_VT_VIDEO_RAM_CALLBACK(_read) \
+	devcb = &vt100_video_device::set_ram_rd_callback(*device, DEVCB2_##_read);
 
+#define MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(_write) \
+	devcb = &vt100_video_device::set_clear_video_irq_wr_callback(*device, DEVCB2_##_write);
 
 #endif

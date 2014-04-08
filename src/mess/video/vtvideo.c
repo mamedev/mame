@@ -49,6 +49,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, device_typ
 						device_video_interface(mconfig, *this),
 						m_read_ram(*this),
 						m_write_clear_video_interrupt(*this),
+						m_char_rom_tag(""),
 						m_palette(*this, "palette")
 {
 }
@@ -59,6 +60,7 @@ vt100_video_device::vt100_video_device(const machine_config &mconfig, const char
 						device_video_interface(mconfig, *this),
 						m_read_ram(*this),
 						m_write_clear_video_interrupt(*this),
+						m_char_rom_tag(""),
 						m_palette(*this, "palette")
 {
 }
@@ -69,26 +71,6 @@ rainbow_video_device::rainbow_video_device(const machine_config &mconfig, const 
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vt100_video_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vt_video_interface *intf = reinterpret_cast<const vt_video_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<vt_video_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_char_rom_tag = "";
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
