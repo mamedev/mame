@@ -525,12 +525,6 @@ GFXDECODE_END
                      DEVICES
 ***********************************************************/
 
-static const pc080sn_interface pc080sn_intf =
-{
-	1,          // gfxnum
-	0, 8, 0, 0  // x_offset, y_offset, y_invert, dblwidth
-};
-
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_NULL, // Interrupt handler
@@ -591,10 +585,15 @@ static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	MCFG_Z80CTC_ADD("ctc", XTAL_16MHz / 4, ctc_intf)
 
-	MCFG_PC080SN_ADD("pc080sn_1", pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
+	MCFG_PC080SN_OFFSETS(0, 8)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
-	MCFG_PC080SN_ADD("pc080sn_2", pc080sn_intf)
+
+	MCFG_DEVICE_ADD("pc080sn_2", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
+	MCFG_PC080SN_OFFSETS(0, 8)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 

@@ -784,12 +784,6 @@ static const ay8910_interface ay8910_config_2 =
                        MACHINE DRIVERS
 ***********************************************************/
 
-static const pc080sn_interface darius_pc080sn_intf =
-{
-	1,   /* gfxnum */
-	-16, 8, 0, 1    /* x_offset, y_offset, y_invert, dblwidth */
-};
-
 void darius_state::darius_postload()
 {
 	parse_control();
@@ -891,8 +885,11 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
 	MCFG_SCREEN_PALETTE("palette")
 
-
-	MCFG_PC080SN_ADD("pc080sn", darius_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
+	MCFG_PC080SN_OFFSETS(-16, 8)
+	MCFG_PC080SN_YINVERT(0)
+	MCFG_PC080SN_DBLWIDTH(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 

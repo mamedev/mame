@@ -680,12 +680,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const pc080sn_interface opwolf_pc080sn_intf =
-{
-	1,   /* gfxnum */
-	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
-};
-
 static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	/* basic machine hardware */
@@ -713,7 +707,8 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 
@@ -778,7 +773,8 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 

@@ -619,18 +619,6 @@ GFXDECODE_END
                       MACHINE DRIVERS
 ***********************************************************/
 
-static const pc080sn_interface rbisland_pc080sn_intf =
-{
-	1,   /* gfxnum */
-	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
-};
-
-static const pc080sn_interface jumping_pc080sn_intf =
-{
-	1,   /* gfxnum */
-	0, 0, 1, 0  /* x_offset, y_offset, y_invert, dblwidth */
-};
-
 void rbisland_state::machine_start()
 {
 }
@@ -661,7 +649,8 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_PC080SN_ADD("pc080sn", rbisland_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 
@@ -713,7 +702,9 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
-	MCFG_PC080SN_ADD("pc080sn", jumping_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
+	MCFG_PC080SN_GFX_REGION(1)
+	MCFG_PC080SN_YINVERT(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 

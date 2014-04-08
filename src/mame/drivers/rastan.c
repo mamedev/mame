@@ -356,12 +356,6 @@ void rastan_state::machine_reset()
 }
 
 
-static const pc080sn_interface rastan_pc080sn_intf =
-{
-	0,   /* gfxnum */
-	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
-};
-
 static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	/* basic machine hardware */
@@ -388,7 +382,7 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
+	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
 
