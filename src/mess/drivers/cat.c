@@ -282,10 +282,9 @@ ToDo:
     data, though track 0 is just a disk "unique" identifier for the cat
     meaning 404480 usable bytes
   * (Once the floppy is working I'd declare the system working)
-- WIP: Centronics port (not sure what is wrong right now, ip4 is never reading
-    as high meaning nothing works; does our centronics implementation correctly
-    assert BUSY at all?)
+- Centronics port finishing touches: verify where the paper out, slct/err, and IPP pins map in memory
 - RS232C port and Modem "port" connected to the DUART's two ports
+  These are currently optionally debug-logged but don't connect anywhere
 - DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
 - WIP: Watchdog timer/powerfail at 0x85xxxx (watchdog NMI needs to actually
   fire if wdt goes above a certain number, possibly 3, 7 or F?)
@@ -308,7 +307,7 @@ ToDo:
   happens inside an asic) for the SVROMS (or the svram or the code roms, for
   that matter!)
 - Hook Battery Low input to a dipswitch.
-- Hook pfail to a dipswitch?
+- Hook pfail to a dipswitch.
 - Hook the floppy control register readback up properly, things seem to get
   confused.
 
@@ -341,7 +340,7 @@ ToDo:
 #undef DEBUG_FLOPPY_DATA_R
 #undef DEBUG_FLOPPY_STATUS_R
 
-#define DEBUG_PRINTER_DATA_W 1
+#undef DEBUG_PRINTER_DATA_W
 #undef DEBUG_PRINTER_CONTROL_W
 
 #undef DEBUG_MODEM_R
@@ -353,7 +352,7 @@ ToDo:
 // data sent to modem chip
 #undef DEBUG_DUART_TXB
 #undef DEBUG_DUART_IRQ_HANDLER
-#define DEBUG_PRN_FF 1
+#undef DEBUG_PRN_FF
 
 #undef DEBUG_TEST_W
 
@@ -820,7 +819,8 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * \--------- (unused?)
 	 */
 #ifdef DEBUG_GA2OPR_W
-	fprintf(stderr, "GA2 OPR (video ena/inv, watchdog, and phone relay) reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
+	if (data != 0x001C)
+		fprintf(stderr, "GA2 OPR (video ena/inv, watchdog, and phone relay) reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
 #endif
 	if (data&0x08) m_wdt_counter = 0;
 	m_video_enable = BIT( data, 2 );
@@ -834,7 +834,7 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * before each write to SVRAM, the forth code does NOT actually do that!
 	 *
 	 * 76543210
-	 * ??????\\-- Watchdog count? (counts upward? if this reaches <some unknown number greater than 2> the watchdog fires? writing bit 3 set to opr above resets this)
+	 * ??????\\-- Watchdog count? (counts upward? if this reaches <some unknown number greater than 3> the watchdog fires? writing bit 3 set to opr above resets this)
 	 *
 	 * FEDCBA98
 	 * |||||||\-- PFAIL state (MB3771 comparator: 1: vcc = 5v; 0: vcc != 5v, hence do not write to svram!)
@@ -1673,7 +1673,8 @@ ROM_START( cat )
 	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(d177e1d3a39b005dd94a6bda186221d597129af4), ROM_SKIP(1) | ROM_BIOS(1))
 	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source
 	 * code disks recovered around 2004. It does NOT exactly match the above
-	 * set exactly but has a few small differences.
+	 * set exactly but has a few small differences. One of the printer drivers
+	 * may have been replaced by Dwight with an HP PCL4 driver.
 	 * It is as of yet unknown whether it is earlier or later code than the
 	 * set above.
 	 */
