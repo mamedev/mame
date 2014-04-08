@@ -113,6 +113,7 @@ void archimedes_state::vidc_vblank()
 /* video DMA */
 /* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
 /* TODO: change m_region_vram into proper alloc array */
+/* TODO: Erotictac and Poizone sets up vidinit register AFTER vidend, for double buffering? (fixes Poizone "Eterna" logo display on attract) */
 void archimedes_state::vidc_video_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -124,6 +125,10 @@ void archimedes_state::vidc_video_tick()
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
 	offset_ptr = m_vidc_vidstart+m_vidc_vidinit;
+	if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
+		offset_ptr = m_vidc_vidstart;
+
+	//popmessage("%08x %08x %08x",m_vidc_vidstart,m_vidc_vidinit,m_vidc_vidend);
 
 	for(m_vidc_vidcur = 0;m_vidc_vidcur < size;m_vidc_vidcur++)
 	{
