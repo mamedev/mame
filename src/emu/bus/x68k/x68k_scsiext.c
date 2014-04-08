@@ -18,12 +18,6 @@
 
 const device_type X68K_SCSIEXT = &device_creator<x68k_scsiext_device>;
 
-static const mb89352_interface mb89352_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,x68k_scsiext_device,irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,x68k_scsiext_device,drq_w)
-};
-
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
@@ -48,7 +42,9 @@ static MACHINE_CONFIG_FRAGMENT( x68k_scsiext )
 	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
 	MCFG_SCSIDEV_ADD("scsi:harddisk5", SCSIHD, SCSI_ID_5)
 	MCFG_SCSIDEV_ADD("scsi:harddisk6", SCSIHD, SCSI_ID_6)
-	MCFG_MB89352A_ADD("scsi:mb89352",mb89352_intf)
+	MCFG_DEVICE_ADD("scsi:mb89352", MB89352A, 0)
+	MCFG_MB89352A_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_scsiext_device, irq_w))
+	MCFG_MB89352A_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, x68k_scsiext_device, drq_w))
 MACHINE_CONFIG_END
 
 machine_config_constructor x68k_scsiext_device::device_mconfig_additions() const
