@@ -322,6 +322,10 @@ public:
 	template<class _InterfaceClass> bool next(_InterfaceClass *&intf) const { return m_device.next(intf); }
 
 	// optional operation overrides
+	//
+	// WARNING: interface_pre_start must be callable multiple times in
+	// case another interface throws a missing dependency.  In
+	// particular, state saving registrations should be done in post.
 	virtual void interface_config_complete();
 	virtual void interface_validity_check(validity_checker &valid) const;
 	virtual void interface_pre_start();

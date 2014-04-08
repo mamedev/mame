@@ -94,6 +94,16 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_device.machine().save().save_item("stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
 	}
 
+	// Mark synchronous streams as such
+	m_synchronous = m_sample_rate == STREAM_SYNC;
+	if (m_synchronous)
+	{
+		m_sample_rate = 0;
+		m_sync_timer = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_stream::sync_update), this));
+	}
+	else
+		m_sync_timer = NULL;
+
 	// force an update to the sample rates; this will cause everything to be recomputed
 	// and will generate the initial resample buffers for our inputs
 	recompute_sample_rate_data();
@@ -284,6 +294,15 @@ void sound_stream::update()
 }
 
 
+void sound_stream::sync_update(void *, INT32)
+{
+	update();
+	attotime time = m_device.machine().time();
+	attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds % m_attoseconds_per_sample);
+	m_sync_timer->adjust(attotime(0, next_edge));
+}
+
+
 //-------------------------------------------------
 //  output_since_last_update - return a pointer to
 //  the output buffer and the number of samples
@@ -447,6 +466,26 @@ STREAM_UPDATE( sound_stream::device_stream_update_stub )
 
 void sound_stream::recompute_sample_rate_data()
 {
+	if (m_synchronous)
+	{
+		m_sample_rate = 0;
+		// When synchronous, pick the sample rate for the inputs, if any
+		for (int inputnum = 0; inputnum < m_input.count(); inputnum++)
+		{
+			stream_input &input = m_input[inputnum];
+			if (input.m_source != NULL)
+			{
+				if (!m_sample_rate)
+					m_sample_rate = input.m_source->m_stream->m_sample_rate;
+				else if (m_sample_rate != input.m_source->m_stream->m_sample_rate)
+					throw emu_fatalerror("Incompatible sample rates as input of a synchronous stream: %d and %d\n", m_sample_rate, input.m_source->m_stream->m_sample_rate);
+			}
+		}
+		if (!m_sample_rate)
+			m_sample_rate = 1000;
+	}
+
+
 	// recompute the timing parameters
 	attoseconds_t update_attoseconds = m_device.machine().sound().update_attoseconds();
 	m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
@@ -482,6 +521,14 @@ void sound_stream::recompute_sample_rate_data()
 			input.m_latency_attoseconds = MAX(input.m_latency_attoseconds, latency);
 			assert(input.m_latency_attoseconds < update_attoseconds);
 		}
+	}
+
+	// If synchronous, prime the timer
+	if (m_synchronous)
+	{
+		attotime time = m_device.machine().time();
+		attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds % m_attoseconds_per_sample);
+		m_sync_timer->adjust(attotime(0, next_edge));
 	}
 }
 

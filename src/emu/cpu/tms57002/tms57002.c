@@ -22,8 +22,9 @@ ADDRESS_MAP_END
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS57002, "TMS57002", tag, owner, clock, "tms57002", __FILE__),
-		program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm)),
-		data_config("data", ENDIANNESS_LITTLE, 8, 20)
+	  device_sound_interface(mconfig, *this),
+	  program_config("program", ENDIANNESS_LITTLE, 32, 8, -2, ADDRESS_MAP_NAME(internal_pgm)),
+	  data_config("data", ENDIANNESS_LITTLE, 8, 20)
 {
 }
 
@@ -211,29 +212,30 @@ void tms57002_device::xm_step_read()
 	if(st0 & ST0_WORD) {
 		if(st0 & ST0_SEL) {
 			int off = 16 - ((adr & 3) << 3);
-			xrd = (xrd & ~(0xff << off)) | (v << off);
+			txrd = (txrd & ~(0xff << off)) | (v << off);
 			done = off == 0;
 		} else {
 			int off = 20 - ((adr & 7) << 2);
-			xrd = (xrd & ~(0xf << off)) | ((v & 0xf) << off);
+			txrd = (txrd & ~(0xf << off)) | ((v & 0xf) << off);
 			done = off == 0;
 		}
 	} else {
 		if(st0 & ST0_SEL) {
 			int off = 16 - ((adr & 1) << 3);
-			xrd = (xrd & ~(0xff << off)) | (v << off);
+			txrd = (txrd & ~(0xff << off)) | (v << off);
 			done = off == 8;
 			if(done)
-				xrd &= 0xffff00;
+				txrd &= 0xffff00;
 		} else {
 			int off = 20 - ((adr & 3) << 2);
-			xrd = (xrd & ~(0xf << off)) | ((v & 0xf) << off);
+			txrd = (txrd & ~(0xf << off)) | ((v & 0xf) << off);
 			done = off == 8;
 			if(done)
-				xrd &= 0xffff00;
+				txrd &= 0xffff00;
 		}
 	}
 	if(done) {
+		xrd = txrd;
 		sti &= ~S_READ;
 		xm_adr = 0;
 	} else
@@ -782,6 +784,29 @@ void tms57002_device::execute_run()
 		icount = 0;
 }
 
+void tms57002_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	assert(samples == 1);
+
+	if(st0 & ST0_SIM) {
+		si[0] = (inputs[0][0] << 8) & 0xffffff;
+		si[1] = (inputs[1][0] << 8) & 0xffffff;
+		si[2] = (inputs[2][0] << 8) & 0xffffff;
+		si[3] = (inputs[3][0] << 8) & 0xffffff;
+	} else {
+		si[0] = inputs[0][0] & 0xffffff;
+		si[1] = inputs[1][0] & 0xffffff;
+		si[2] = inputs[2][0] & 0xffffff;
+		si[3] = inputs[3][0] & 0xffffff;
+	}
+	outputs[0][0] = INT16(so[0] >> 8);
+	outputs[1][0] = INT16(so[1] >> 8);
+	outputs[2][0] = INT16(so[2] >> 8);
+	outputs[3][0] = INT16(so[3] >> 8);
+
+	sync_w(1);
+}
+
 void tms57002_device::device_start()
 {
 	sti = S_IDLE;
@@ -812,6 +837,8 @@ void tms57002_device::device_start()
 
 	m_icountptr = &icount;
 
+	stream_alloc(4, 4, STREAM_SYNC);
+
 	save_item(NAME(macc));
 
 	save_item(NAME(cmem));
@@ -829,6 +856,7 @@ void tms57002_device::device_start()
 	save_item(NAME(xba));
 	save_item(NAME(xwr));
 	save_item(NAME(xrd));
+	save_item(NAME(txrd));
 	save_item(NAME(creg));
 
 	save_item(NAME(pc));
