@@ -48,23 +48,21 @@
 #define SERR_SCSI_PAR   0x80
 
 
-struct mb89352_interface
-{
-	devcb_write_line irq_callback;  /* irq callback */
-	devcb_write_line drq_callback;  /* drq callback */
-};
+#define MCFG_MB89352A_IRQ_CB(_devcb) \
+	devcb = &mb89352_device::set_irq_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_MB89352A_DRQ_CB(_devcb) \
+	devcb = &mb89352_device::set_drq_callback(*device, DEVCB2_##_devcb);
 
-#define MCFG_MB89352A_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, MB89352A, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-class mb89352_device : public device_t,
-						public mb89352_interface
+class mb89352_device : public device_t
 {
 public:
 	// construction/destruction
 	mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_irq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }
+	
 	// any publically accessible interfaces needed for runtime
 	DECLARE_READ8_MEMBER( mb89352_r );
 	DECLARE_WRITE8_MEMBER( mb89352_w );
@@ -77,7 +75,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_stop();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -87,8 +84,8 @@ private:
 	int get_scsi_cmd_len(UINT8 cbyte);
 	//void set_ints(UINT8 flag);
 
-	devcb_resolved_write_line m_irq_func;
-	devcb_resolved_write_line m_drq_func;
+	devcb2_write_line m_irq_cb;  /* irq callback */
+	devcb2_write_line m_drq_cb;  /* drq callback */
 
 	scsihle_device* m_SCSIdevices[8];
 
