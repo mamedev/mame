@@ -128,7 +128,3 @@ public:
 
 	DECLARE_READ8_MEMBER( vsnes_bootleg_z80_latch_r );
 };
-
-/*----------- defined in video/vsnes.c -----------*/
-extern const ppu2c0x_interface vsnes_ppu_interface_1;
-extern const ppu2c0x_interface vsnes_ppu_interface_2;

@@ -652,14 +652,6 @@ void nes_state::ppu_nmi(int *ppu_regs)
 }
 
 
-static const ppu2c0x_interface nes_ppu_interface =
-{
-	"maincpu",
-	0,
-	0,
-	PPU_MIRROR_NONE
-};
-
 static const floppy_interface nes_floppy_interface =
 {
 	DEVCB_NULL,
@@ -710,7 +702,8 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_PALETTE_ADD("palette", 4*16*8)
 	MCFG_PALETTE_INIT_OWNER(nes_state, nes)
 
-	MCFG_PPU2C02_ADD("ppu", nes_ppu_interface)
+	MCFG_PPU2C02_ADD("ppu")
+	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* sound hardware */
@@ -734,7 +727,8 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 	MCFG_CPU_CLOCK(PAL_CLOCK)
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_PPU2C07_ADD("ppu", nes_ppu_interface)
+	MCFG_PPU2C07_ADD("ppu")
+	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */
@@ -757,7 +751,8 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 	MCFG_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 
 	MCFG_DEVICE_REMOVE("ppu")
-	MCFG_PPU2C07_ADD("ppu", nes_ppu_interface)
+	MCFG_PPU2C07_ADD("ppu")
+	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */

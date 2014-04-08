@@ -343,8 +343,6 @@ DRIVER_INIT_MEMBER(vsnes_state,vsnormal)
 
 WRITE8_MEMBER(vsnes_state::gun_in0_w)
 {
-	ppu2c0x_device *ppu1 = machine().device<ppu2c0x_device>("ppu1");
-
 	if (m_do_vrom_bank)
 	{
 		/* switch vrom */
@@ -363,10 +361,10 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
-		pix = ppu1->get_pixel(x, y);
+		pix = m_ppu1->get_pixel(x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu1->get_colorbase();
+		color_base = m_ppu1->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20 ) || (pix == color_base + 0x30) ||
@@ -669,7 +667,6 @@ void vsnes_state::mapper4_irq( int scanline, int vblank, int blanked )
 
 WRITE8_MEMBER(vsnes_state::mapper4_w)
 {
-	ppu2c0x_device *ppu1 = machine().device<ppu2c0x_device>("ppu1");
 	UINT8 MMC3_helper, cmd;
 
 	switch (offset & 0x6001)
@@ -718,30 +715,25 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 
 		case 0x2001: /* $a001 - extra RAM enable/disable */
 			/* ignored - we always enable it */
-
 			break;
+
 		case 0x4000: /* $c000 - IRQ scanline counter */
 			m_IRQ_count = data;
-
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			m_IRQ_count_latch = data;
-
 			break;
 
 		case 0x6000: /* $e000 - Disable IRQs */
 			m_IRQ_enable = 0;
 			m_IRQ_count = m_IRQ_count_latch;
-
-			ppu1->set_scanline_callback(ppu2c0x_scanline_delegate());
-
+			m_ppu1->set_scanline_callback(ppu2c0x_scanline_delegate());
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			m_IRQ_enable = 1;
-			ppu1->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(vsnes_state::mapper4_irq),this));
-
+			m_ppu1->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(vsnes_state::mapper4_irq), this));
 			break;
 
 		default:

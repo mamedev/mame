@@ -291,15 +291,6 @@ void cham24_state::ppu_irq(int *ppu_regs)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-/* our ppu interface                                            */
-static const ppu2c0x_interface ppu_interface =
-{
-	"maincpu",
-	0,                  /* gfxlayout num */
-	0,                  /* color base */
-	PPU_MIRROR_NONE     /* mirroring */
-};
-
 void cham24_state::video_start()
 {
 }
@@ -362,7 +353,8 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_PALETTE_ADD("palette", 8*4*16)
 	MCFG_PALETTE_INIT_OWNER(cham24_state, cham24)
 
-	MCFG_PPU2C04_ADD("ppu", ppu_interface)
+	MCFG_PPU2C04_ADD("ppu")
+	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)
 
 	/* sound hardware */

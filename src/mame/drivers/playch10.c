@@ -665,7 +665,6 @@ static const nesapu_interface nes_config =
 	"cart"
 };
 
-
 static MACHINE_CONFIG_START( playch10, playch10_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
@@ -697,9 +696,10 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
 	MCFG_SCREEN_PALETTE("palette")
 
-
-	MCFG_PPU2C03B_ADD("ppu", playch10_ppu_interface)
+	MCFG_PPU2C03B_ADD("ppu")
 	MCFG_PPU2C0X_SET_SCREEN("bottom")
+	MCFG_PPU2C0X_CPU("cart")
+	MCFG_PPU2C0X_COLORBASE(256)
 	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
 
 	// sound hardware
