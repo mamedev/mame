@@ -631,11 +631,6 @@ static const pc080sn_interface jumping_pc080sn_intf =
 	0, 0, 1, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
-static const pc090oj_interface rbisland_pc090oj_intf =
-{
-	0, 0, 0, 0
-};
-
 void rbisland_state::machine_start()
 {
 }
@@ -669,7 +664,8 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_PC080SN_ADD("pc080sn", rbisland_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
-	MCFG_PC090OJ_ADD("pc090oj", rbisland_pc090oj_intf)
+
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 

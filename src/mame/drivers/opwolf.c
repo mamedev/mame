@@ -686,11 +686,6 @@ static const pc080sn_interface opwolf_pc080sn_intf =
 	0, 0, 0, 0  /* x_offset, y_offset, y_invert, dblwidth */
 };
 
-static const pc090oj_interface opwolf_pc090oj_intf =
-{
-	0, 0, 0, 0
-};
-
 static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	/* basic machine hardware */
@@ -721,7 +716,8 @@ static MACHINE_CONFIG_START( opwolf, opwolf_state )
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
-	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
@@ -785,7 +781,8 @@ static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for t
 	MCFG_PC080SN_ADD("pc080sn", opwolf_pc080sn_intf)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
 	MCFG_PC080SN_PALETTE("palette")
-	MCFG_PC090OJ_ADD("pc090oj", opwolf_pc090oj_intf)
+
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 

@@ -796,17 +796,6 @@ static const tc0100scn_interface cadash_tc0100scn_intf =
 	0, 0
 };
 
-static const pc090oj_interface asuka_pc090oj_intf =
-{
-	0, 0, 8, 1
-};
-
-static const pc090oj_interface bonzeadv_pc090oj_intf =
-{
-	0, 0, 8, 0
-};
-
-
 
 void asuka_state::machine_start()
 {
@@ -875,9 +864,11 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -931,9 +922,12 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
+	MCFG_PC090OJ_USEBUFFER(1)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -996,9 +990,12 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
+	MCFG_PC090OJ_USEBUFFER(1)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -1052,9 +1049,11 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -1113,9 +1112,11 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -1169,9 +1170,11 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
+
 	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")

@@ -235,11 +235,6 @@ void volfied_state::machine_reset()
 	volfied_cchip_reset();
 }
 
-static const pc090oj_interface volfied_pc090oj_intf =
-{
-	0, 0, 0, 0
-};
-
 static MACHINE_CONFIG_START( volfied, volfied_state )
 
 	/* basic machine hardware */
@@ -266,7 +261,7 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_PALETTE_ADD("palette", 8192)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_PC090OJ_ADD("pc090oj", volfied_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
