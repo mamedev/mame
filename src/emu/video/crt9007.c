@@ -398,16 +398,15 @@ inline void crt9007_t::update_dma_timer()
 
 inline void crt9007_t::recompute_parameters()
 {
-#ifdef UNUSED_FOR_NOW
 	// check that necessary registers have been loaded
 	if (!HAS_VALID_PARAMETERS) return;
 
 	// screen dimensions
-	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
-	int vert_pix_total = SCAN_LINES_PER_FRAME;
+	//int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
+	//int vert_pix_total = SCAN_LINES_PER_FRAME;
 
 	// refresh rate
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
+	//attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
 
 	// horizontal sync
 	m_hsync_start = 0;
@@ -426,23 +425,22 @@ inline void crt9007_t::recompute_parameters()
 	m_vsync_end = VERTICAL_SYNC_WIDTH;
 
 	// visible area
-	rectangle visarea;
+	//rectangle visarea;
 
-	visarea.set(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
+	//visarea.set(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
 
-	if (LOG)
-	{
-		logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	}
+	//if (LOG)
+	//{
+	//	logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	//	logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	//}
 
-	m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+	//m_screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	m_hsync_timer->adjust(m_screen->time_until_pos(0, 0));
 	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
 	m_vlt_timer->adjust(m_screen->time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(m_screen->time_until_pos(0, 0));
-#endif
 }
 
 
