@@ -1732,7 +1732,7 @@ static const gfx_layout charlayout =
 static const gfx_layout charlayout2 =
 {
 	8, 32,   /* 8*32 characters */
-	RGN_FRAC(1, 3),
+	RGN_FRAC(1, 3*4),
 	6,      /* 6 bits per pixel */
 	{ RGN_FRAC(0,3)+8,RGN_FRAC(0,3)+0,
 		RGN_FRAC(1,3)+8,RGN_FRAC(1,3)+0,

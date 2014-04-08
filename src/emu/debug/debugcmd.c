@@ -1993,14 +1993,14 @@ static void execute_cheatinit(running_machine &machine, int ref, int params, con
 		{
 			cheat_region[region_count].offset = space->address_to_byte(entry->m_addrstart) & space->bytemask();
 			cheat_region[region_count].endoffset = space->address_to_byte(entry->m_addrend) & space->bytemask();
-			cheat_region[region_count].share = entry->m_share;
+			cheat_region[region_count].share = entry->m_sharetag;
 			cheat_region[region_count].disabled = (entry->m_write.m_type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (entry->m_share != NULL)
+			if (entry->m_sharetag != NULL)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != NULL)
-						if (strcmp(cheat_region[i].share, entry->m_share) == 0)
+						if (strcmp(cheat_region[i].share, entry->m_sharetag) == 0)
 							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;

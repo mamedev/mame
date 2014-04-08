@@ -10,7 +10,7 @@
 
 const device_type TOAPLAN_SCU = &device_creator<toaplan_scu_device>;
 
-static const gfx_layout spritelayout =
+const gfx_layout toaplan_scu_device::spritelayout =
 {
 	16,16,          /* 16*16 sprites */
 	RGN_FRAC(1,4),
@@ -21,14 +21,14 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( toaplan_scu )
+GFXDECODE_MEMBER( toaplan_scu_device::gfxinfo )
 	GFXDECODE_DEVICE( DEVICE_SELF, 0, spritelayout, 0, 64 )
 GFXDECODE_END
 
 
 toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, "toaplan_scu_device", tag, owner, clock, "toaplan_scu", __FILE__),
-	device_gfx_interface(mconfig, *this, GFXDECODE_NAME( toaplan_scu ))
+	device_gfx_interface(mconfig, *this, gfxinfo )
 {
 }
 

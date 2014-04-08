@@ -4,6 +4,9 @@
 
 class toaplan_scu_device : public device_t, public device_gfx_interface
 {
+	static const gfx_layout spritelayout;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
 public:
 	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 

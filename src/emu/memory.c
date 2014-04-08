@@ -1886,11 +1886,11 @@ void address_space::prepare_map()
 		adjust_addresses(entry->m_bytestart, entry->m_byteend, entry->m_bytemask, entry->m_bytemirror);
 
 		// if we have a share entry, add it to our map
-		if (entry->m_share != NULL)
+		if (entry->m_sharetag != NULL)
 		{
 			// if we can't find it, add it to our map
 			astring fulltag;
-			if (manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr()) == NULL)
+			if (manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr()) == NULL)
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
 				memory_share *share = global_alloc(memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
@@ -1910,7 +1910,7 @@ void address_space::prepare_map()
 		}
 
 		// validate adjusted addresses against implicit regions
-		if (entry->m_region != NULL && entry->m_share == NULL)
+		if (entry->m_region != NULL && entry->m_sharetag == NULL)
 		{
 			// determine full tag
 			astring fulltag;
@@ -2224,18 +2224,18 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())
 	{
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
-		if (entry->m_memory == NULL && entry->m_share != NULL)
+		if (entry->m_memory == NULL && entry->m_sharetag != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_sharetag, entry->m_memory));
 			}
 			else
 			{
-				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_share));
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_sharetag));
 			}
 		}
 
@@ -2247,14 +2247,14 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		}
 
 		// if we're the first match on a shared pointer, assign it now
-		if (entry->m_memory != NULL && entry->m_share != NULL)
+		if (entry->m_memory != NULL && entry->m_sharetag != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
-				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_share, entry->m_memory));
+				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_sharetag, entry->m_memory));
 			}
 		}
 
@@ -2801,10 +2801,10 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 bool address_space::needs_backing_store(const address_map_entry *entry)
 {
 	// if we are sharing, and we don't have a pointer yet, create one
-	if (entry->m_share != NULL)
+	if (entry->m_sharetag != NULL)
 	{
 		astring fulltag;
-		memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
+		memory_share *share = manager().m_sharelist.find(entry->m_sharebase->subtag(fulltag, entry->m_sharetag).cstr());
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}
