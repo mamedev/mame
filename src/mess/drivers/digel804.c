@@ -585,7 +585,7 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_CPU_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
