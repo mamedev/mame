@@ -638,13 +638,6 @@ WRITE_LINE_MEMBER(taitoair_state::irqhandler)
                 MACHINE DRIVERS
 ************************************************************/
 
-static const tc0080vco_interface airsys_tc0080vco_intf =
-{
-	0, 1,   /* gfxnum, txnum */
-	1, 1, -2,
-	0
-};
-
 void taitoair_state::machine_start()
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
@@ -716,7 +709,11 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 512*16+512*16)
 
-	MCFG_TC0080VCO_ADD("tc0080vco", airsys_tc0080vco_intf)
+	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
+	MCFG_TC0080VCO_GFX_REGION(0)
+	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_TC0080VCO_OFFSETS(1, 1)
+	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 	MCFG_TC0080VCO_PALETTE("palette")
 

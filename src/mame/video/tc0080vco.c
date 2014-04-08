@@ -95,6 +95,12 @@ tc0080vco_device::tc0080vco_device(const machine_config &mconfig, const char *ta
 	m_bg1_scrollx(0),
 	m_bg1_scrolly(0),
 	m_flipscreen(0),
+	m_gfxnum(0),
+	m_txnum(0),
+	m_bg_xoffs(0), 
+	m_bg_yoffs(0),
+	m_bg_flip_yoffs(0),
+	m_has_fg0(1),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
@@ -118,25 +124,6 @@ void tc0080vco_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 void tc0080vco_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<tc0080vco_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0080vco_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0080vco_interface *intf = reinterpret_cast<const tc0080vco_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0080vco_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------
