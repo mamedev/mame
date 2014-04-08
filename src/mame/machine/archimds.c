@@ -416,37 +416,37 @@ void archimedes_state::archimedes_driver_init()
 static const char *const ioc_regnames[] =
 {
 	"(rw) Control",                 // 0
-	"(read) Keyboard receive (write) keyboard send",    // 1
+	"(read) Keyboard receive (write) keyboard send",    // 4
 	"?",
 	"?",
-	"(read) IRQ status A",              // 4
-	"(read) IRQ request A (write) IRQ clear",   // 5
-	"(rw) IRQ mask A",              // 6
+	"(read) IRQ status A",              // 10
+	"(read) IRQ request A (write) IRQ clear",   // 14
+	"(rw) IRQ mask A",              // 18
 	"?",
-	"(read) IRQ status B",      // 8
-	"(read) IRQ request B",     // 9
-	"(rw) IRQ mask B",      // 10
+	"(read) IRQ status B",      // 20
+	"(read) IRQ request B",     // 24
+	"(rw) IRQ mask B",      // 28
 	"?",
-	"(read) FIQ status",        // 12
-	"(read) FIQ request",       // 13
-	"(rw) FIQ mask",        // 14
+	"(read) FIQ status",        // 30
+	"(read) FIQ request",       // 34
+	"(rw) FIQ mask",        // 38
 	"?",
-	"(read) Timer 0 count low (write) Timer 0 latch low",       // 16
-	"(read) Timer 0 count high (write) Timer 0 latch high",     // 17
-	"(write) Timer 0 go command",                   // 18
-	"(write) Timer 0 latch command",                // 19
-	"(read) Timer 1 count low (write) Timer 1 latch low",       // 20
-	"(read) Timer 1 count high (write) Timer 1 latch high",     // 21
-	"(write) Timer 1 go command",                   // 22
-	"(write) Timer 1 latch command",                // 23
-	"(read) Timer 2 count low (write) Timer 2 latch low",       // 24
-	"(read) Timer 2 count high (write) Timer 2 latch high",     // 25
-	"(write) Timer 2 go command",                   // 26
-	"(write) Timer 2 latch command",                // 27
-	"(read) Timer 3 count low (write) Timer 3 latch low",       // 28
-	"(read) Timer 3 count high (write) Timer 3 latch high",     // 29
-	"(write) Timer 3 go command",                   // 30
-	"(write) Timer 3 latch command"                 // 31
+	"(read) Timer 0 count low (write) Timer 0 latch low",       // 40
+	"(read) Timer 0 count high (write) Timer 0 latch high",     // 44
+	"(write) Timer 0 go command",                   // 48
+	"(write) Timer 0 latch command",                // 4c
+	"(read) Timer 1 count low (write) Timer 1 latch low",       // 50
+	"(read) Timer 1 count high (write) Timer 1 latch high",     // 54
+	"(write) Timer 1 go command",                   // 58
+	"(write) Timer 1 latch command",                // 5c
+	"(read) Timer 2 count low (write) Timer 2 latch low",       // 60
+	"(read) Timer 2 count high (write) Timer 2 latch high",     // 64
+	"(write) Timer 2 go command",                   // 68
+	"(write) Timer 2 latch command",                // 6c
+	"(read) Timer 3 count low (write) Timer 3 latch low",       // 70
+	"(read) Timer 3 count high (write) Timer 3 latch high",     // 74
+	"(write) Timer 3 go command",                   // 78
+	"(write) Timer 3 latch command"                 // 7c
 };
 
 void archimedes_state::latch_timer_cnt(int tmr)
