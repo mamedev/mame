@@ -186,7 +186,7 @@ void archimedes_state::vidc_audio_tick()
 		372,   356,   340,   324,   308,   292,   276,   260,
 		244,   228,   212,   196,   180,   164,   148,   132,
 		120,   112,   104,    96,    88,    80,    72,    64,
-			56,    48,    40,    32,    24,    16,     8,     0
+		56,    48,    40,    32,    24,    16,     8,     0
 	};
 
 	for(ch=0;ch<8;ch++)
@@ -226,7 +226,7 @@ void archimedes_state::a310_set_timer(int tmr)
 	{
 		case 0:
 		case 1:
-			m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+			m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/2), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/2
 			break;
 		case 2:
 			freq = 1000000.0 / (double)(m_ioc_timercnt[tmr]+1);
