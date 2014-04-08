@@ -6,11 +6,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-struct vr0video_interface
-{
-	const char *m_cpu_tag;
-};
-
 struct RenderStateInfo
 {
 	UINT32 Tx;
@@ -35,9 +30,7 @@ struct RenderStateInfo
 	UINT32 Height;
 };
 
-
-class vr0video_device : public device_t,
-										vr0video_interface
+class vr0video_device : public device_t
 {
 public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -45,15 +38,16 @@ public:
 
 	int vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE);
 
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<vr0video_device &>(device).m_cpu.set_tag(tag); }
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
 	// internal state
-	device_t *m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	UINT16 m_InternalPalette[256];
 	UINT32 m_LastPalUpdate;
@@ -66,8 +60,7 @@ private:
 extern const device_type VIDEO_VRENDER0;
 
 
-#define MCFG_VIDEO_VRENDER0_ADD(_tag, _interface) \
-MCFG_DEVICE_ADD(_tag, VIDEO_VRENDER0, 0) \
-MCFG_DEVICE_CONFIG(_interface)
+#define MCFG_VIDEO_VRENDER0_CPU(_tag) \
+	vr0video_device::set_cpu_tag(*device, "^"_tag);
 
 #endif /* __VR0VIDEO_H__ */

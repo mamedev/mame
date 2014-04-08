@@ -900,17 +900,11 @@ static const vr0_interface vr0_config =
 	0x04800000
 };
 
-static const vr0video_interface vr0video_config =
-{
-	"maincpu"
-};
-
 static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(crystal_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
-
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -923,7 +917,8 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MCFG_SCREEN_VBLANK_DRIVER(crystal_state, screen_eof_crystal)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_VIDEO_VRENDER0_ADD("vr0", vr0video_config)
+	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
+	MCFG_VIDEO_VRENDER0_CPU("maincpu")
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
@@ -1142,8 +1137,6 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x19C70 / 2)] = 0x900C; // PUSH %R2-%R3
 	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001; // PUSH %R0
 }
-
-
 
 
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )

@@ -24,28 +24,9 @@
 const device_type VIDEO_VRENDER0 = &device_creator<vr0video_device>;
 
 vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VIDEO_VRENDER0, "VRender0 Video", tag, owner, clock, "vr0video", __FILE__)
+	: device_t(mconfig, VIDEO_VRENDER0, "VRender0 Video", tag, owner, clock, "vr0video", __FILE__),
+		m_cpu(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vr0video_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vr0video_interface *intf = reinterpret_cast<const vr0video_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<vr0video_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_cpu_tag = "";
-	}
 }
 
 //-------------------------------------------------
@@ -54,8 +35,6 @@ void vr0video_device::device_config_complete()
 
 void vr0video_device::device_start()
 {
-	m_cpu = machine().device(m_cpu_tag);
-
 	save_item(NAME(m_InternalPalette));
 	save_item(NAME(m_LastPalUpdate));
 
@@ -418,7 +397,7 @@ static const _DrawTemplate DrawTile[]=
 //Returns TRUE if the operation was a flip (sync or async)
 int vr0video_device::vrender0_ProcessPacket(UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)
 {
-	address_space &space = m_cpu->memory().space(AS_PROGRAM);
+	address_space &space = m_cpu->space(AS_PROGRAM);
 	UINT32 Dx = Packet(1) & 0x3ff;
 	UINT32 Dy = Packet(2) & 0x1ff;
 	UINT32 Endx = Packet(3) & 0x3ff;
