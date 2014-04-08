@@ -17,7 +17,7 @@
 static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
-    GND()
+	NET_REGISTER_DEV(gnd, GND)
 
     INCLUDE(diode_models);
     INCLUDE(bjt_models);
@@ -45,7 +45,7 @@ void netlist_setup_t::init()
 
 netlist_setup_t::~netlist_setup_t()
 {
-	m_links.reset();
+	m_links.clear();
 	m_alias.reset();
 	m_params.reset();
 	m_terminals.reset();
@@ -614,7 +614,7 @@ void netlist_setup_t::resolve_inputs()
 
     netlist().log("deleting empty nets ...");
 
-	// delete empty nets ...
+	// delete empty nets ... and save m_list ...
 
     netlist_net_t::list_t todelete;
 
@@ -623,6 +623,11 @@ void netlist_setup_t::resolve_inputs()
 		if ((*pn)->m_list.is_empty())
 		{
 		    todelete.add(*pn);
+		}
+		else
+		{
+		    for (netlist_core_terminal_t *p = (*pn)->m_list.first(); p != NULL; p = (*pn)->m_list.next(p))
+		        (*pn)->m_registered.add(p);
 		}
 	}
 

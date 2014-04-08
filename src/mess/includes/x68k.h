@@ -9,6 +9,7 @@
 #ifndef X68K_H_
 #define X68K_H_
 
+#include "cpu/m68000/m68000.h"
 #include "machine/hd63450.h"
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
@@ -58,7 +59,7 @@ public:
 			m_gvram32(*this, "gvram32"),
 			m_tvram32(*this, "tvram32") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 	required_device<hd63450_device> m_hd63450;
 	required_device<ram_device> m_ram;
@@ -327,6 +328,8 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void set_bus_error(UINT32 address, bool write, UINT16 mem_mask);
+	bool m_bus_error;
 };
 
 

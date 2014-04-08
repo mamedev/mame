@@ -403,6 +403,7 @@ ATTR_COLD void netlist_mame_device_t::device_post_load()
 	LOG_DEV_CALLS(("device_post_load\n"));
 
 	netlist().post_load();
+	netlist().rebuild_lists();
 }
 
 ATTR_COLD void netlist_mame_device_t::device_pre_save()

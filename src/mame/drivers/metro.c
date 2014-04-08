@@ -1699,6 +1699,85 @@ ADDRESS_MAP_END
                                 Puzzlet
 ***************************************************************************/
 
+#define MCFG_PUZZLET_IO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PUZZLET_IO, 0)
+
+#define MCFG_PUZZLET_IO_DATA_CALLBACK(_devcb) \
+	devcb = &puzzlet_io_device::set_data_cb(*device, DEVCB2_##_devcb);
+
+class puzzlet_io_device : public device_t {
+public:
+	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE_LINE_MEMBER( ce_w );
+	DECLARE_WRITE_LINE_MEMBER( clk_w );
+
+	template<class _Object> static devcb2_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	devcb2_write_line data_cb;
+	required_ioport port;
+	int ce, clk;
+	int cur_bit;
+	UINT8 value;
+};
+
+const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
+
+
+puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
+	  data_cb(*this),
+	  port(*this, ":IN0")
+{
+}
+
+void puzzlet_io_device::device_start()
+{
+	data_cb.resolve_safe();
+	save_item(NAME(ce));
+	save_item(NAME(clk));
+	save_item(NAME(cur_bit));
+	save_item(NAME(value));
+	ce = 1;
+	clk = 1;
+}
+
+void puzzlet_io_device::device_reset()
+{
+	cur_bit = 0;
+	value = 0xff;
+}
+
+WRITE_LINE_MEMBER(puzzlet_io_device::ce_w)
+{
+	if(ce && !state) {
+		value = port->read();
+		cur_bit = 0;
+	} else if(!ce && state)
+		data_cb(1);
+
+	ce = state;
+}
+
+WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
+{
+	if(clk && !state) {
+		if(cur_bit == 8)
+			data_cb(1);
+		else {
+			data_cb((value >> cur_bit) & 1);
+			cur_bit++;
+		}
+	}
+	clk = state;
+}
+
+
 WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -4529,6 +4608,13 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 
 	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
 	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
+
+	/* Coins/service */
+	MCFG_PUZZLET_IO_ADD("coins")
+	MCFG_PUZZLET_IO_DATA_CALLBACK(DEVWRITELINE("maincpu:sci1", h8_sci_device, rx_w))
+	MCFG_DEVICE_MODIFY("maincpu:sci1")
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":coins", puzzlet_io_device, ce_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":coins", puzzlet_io_device, clk_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

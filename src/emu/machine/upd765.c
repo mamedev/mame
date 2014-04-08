@@ -101,12 +101,14 @@ int upd765_family_device::rates[4] = { 500000, 300000, 250000, 1000000 };
 upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	pc_fdc_interface(mconfig, type, name, tag, owner, clock, shortname, source),
 	intrq_cb(*this),
-	drq_cb(*this)
+	drq_cb(*this),
+	hdl_cb(*this)
 {
 	ready_polled = true;
 	ready_connected = true;
 	select_connected = true;
 	external_ready = false;
+	no_poll_irq = false;
 	dor_reset = 0x00;
 	mode = MODE_AT;
 }
@@ -128,8 +130,9 @@ void upd765_family_device::set_mode(int _mode)
 
 void upd765_family_device::device_start()
 {
-	intrq_cb.resolve();
-	drq_cb.resolve();
+	intrq_cb.resolve_safe();
+	drq_cb.resolve_safe();
+	hdl_cb.resolve_safe();
 	
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -441,8 +444,7 @@ void upd765_family_device::set_drq(bool state)
 {
 	if(state != drq) {
 		drq = state;
-		if(!drq_cb.isnull())
-			drq_cb(drq);
+		drq_cb(drq);
 	}
 }
 
@@ -1441,6 +1443,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	hdl_cb(1);
 	read_data_continue(fi);
 }
 
@@ -1618,6 +1621,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	st1 = ST1_MA;
 	st2 = 0x00;
 
+	hdl_cb(1);
 	write_data_continue(fi);
 }
 
@@ -1726,6 +1730,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	hdl_cb(1);
 	read_track_continue(fi);
 }
 
@@ -1840,6 +1845,7 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 	sector_size = calc_sector_size(command[2]);
 
+	hdl_cb(1);
 	format_track_continue(fi);
 }
 
@@ -1902,6 +1908,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 	for(int i=0; i<4; i++)
 		cur_live.idbuf[i] = 0x00;
 
+	hdl_cb(1);
 	read_id_continue(fi);
 }
 
@@ -1954,7 +1961,7 @@ void upd765_family_device::check_irq()
 	bool old_irq = cur_irq;
 	cur_irq = data_irq || other_irq || internal_drq;
 	cur_irq = cur_irq && (dor & 4) && (mode != MODE_AT || (dor & 8));
-	if(cur_irq != old_irq && !intrq_cb.isnull()) {
+	if(cur_irq != old_irq) {
 		logerror("%s: irq = %d\n", tag(), cur_irq);
 		intrq_cb(cur_irq);
 	}
@@ -2018,7 +2025,8 @@ void upd765_family_device::run_drive_ready_polling()
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
-				other_irq = true;
+				if(!no_poll_irq)
+					other_irq = true;
 			}
 		}
 	}
@@ -2225,6 +2233,7 @@ i8272a_device::i8272a_device(const machine_config &mconfig, const char *tag, dev
 upd72065_device::upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, UPD72065, "UPD72065", tag, owner, clock, "upd72065", __FILE__)
 {
 	dor_reset = 0x0c;
+	no_poll_irq = true;
 }
 
 smc37c78_device::smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, SMC37C78, "SMC37C78", tag, owner, clock, "smc37c78", __FILE__)

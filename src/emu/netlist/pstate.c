@@ -7,7 +7,7 @@
 
 ATTR_COLD pstate_manager_t::~pstate_manager_t()
 {
-	m_save.reset_and_free();
+	m_save.clear_and_free();
 }
 
 
@@ -44,7 +44,7 @@ ATTR_COLD void pstate_manager_t::remove_save_items(const void *owner)
     {
         m_save.remove(todelete[i]);
     }
-    todelete.reset_and_free();
+    todelete.clear_and_free();
 }
 
 ATTR_COLD void pstate_manager_t::pre_save()

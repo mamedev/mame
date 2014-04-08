@@ -148,7 +148,7 @@ netlist_base_t::~netlist_base_t()
         }
 	}
 
-	m_nets.reset();
+	m_nets.clear();
 
 	tagmap_free_entries<tagmap_devices_t>(m_devices);
 
@@ -199,6 +199,13 @@ ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 	}
 	return NULL;
 }
+
+ATTR_COLD void netlist_base_t::rebuild_lists()
+{
+    for (int i = 0; i < m_nets.count(); i++)
+        m_nets[i]->rebuild_list();
+}
+
 
 ATTR_COLD void netlist_base_t::reset()
 {
@@ -537,6 +544,15 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
     }
 }
 
+ATTR_COLD void netlist_net_t::rebuild_list()
+{
+    /* rebuild m_list */
+
+    m_list.clear();
+    for (int i=0; i < m_registered.count(); i++)
+        if (m_registered[i]->state() != netlist_input_t::STATE_INP_PASSIVE)
+            m_list.add(*m_registered[i]);
+}
 
 ATTR_COLD void netlist_net_t::reset()
 {
@@ -549,6 +565,12 @@ ATTR_COLD void netlist_net_t::reset()
     m_time = netlist_time::zero;
     m_active = 0;
     m_in_queue = 2;
+
+    /* rebuild m_list */
+
+    m_list.clear();
+    for (int i=0; i < m_registered.count(); i++)
+        m_list.add(*m_registered[i]);
 
     for (netlist_core_terminal_t *t = m_list.first(); t != NULL; t = m_list.next(t))
     {

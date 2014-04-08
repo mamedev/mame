@@ -1042,20 +1042,22 @@ WRITE16_MEMBER(x68k_state::x68k_enh_areaset_w )
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 {
-	int val = param;
-	int v;
-	UINT8 *ram = m_ram->pointer();
+	m_bus_error = false;
+}
 
-	if(strcmp(machine().system().name,"x68030") == 0)
-		v = 0x0b;
-	else
-		v = 0x09;
-	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		popmessage("Bus error: Unused RAM access [%08x]", val);
-	}
+void x68k_state::set_bus_error(UINT32 address, bool write, UINT16 mem_mask)
+{
+	if(m_bus_error)
+		return;
+	if(!ACCESSING_BITS_8_15)
+		address++;
+	m_bus_error = true;
+	m68k_set_buserror_details(m_maincpu, address, write, m68k_get_fc(m_maincpu));
+	m_maincpu->mmu_tmp_buserror_address = address; // Hack for x68030
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR); // let rmw cycles complete
+	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);	
 }
 
 READ16_MEMBER(x68k_state::x68k_rom0_r)
@@ -1064,14 +1066,8 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
-	if(ioport("options")->read() & 0x02)
-	{
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, 0xbffffc+offset);
-	}
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
 
@@ -1081,14 +1077,8 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
-	if(ioport("options")->read() & 0x02)
-	{
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, 0xbffffc+offset);
-	}
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_emptyram_r)
@@ -1097,14 +1087,8 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
-	if(ioport("options")->read() & 0x02)
-	{
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, offset);
-	}
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
 
@@ -1114,45 +1098,27 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
-	if(ioport("options")->read() & 0x02)
-	{
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(4), TIMER_X68K_BUS_ERROR, offset);
-	}
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1), 1, mem_mask);
 }
 
 READ16_MEMBER(x68k_state::x68k_exp_r)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(ioport("options")->read() & 0x02)
-	{
-		m_current_vector[2] = 0x02;  // bus error
-		m_current_irq_line = 2;
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR, 0xeafa00+offset);
-//      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
-	}
-	return 0xffff;
+	m_current_vector[2] = 0x02;  // bus error
+	m_current_irq_line = 2;
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
+	return 0xff;
 }
 
 WRITE16_MEMBER(x68k_state::x68k_exp_w)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(ioport("options")->read() & 0x02)
-	{
-		m_current_vector[2] = 0x02;  // bus error
-		m_current_irq_line = 2;
-		offset *= 2;
-		if(ACCESSING_BITS_0_7)
-			offset++;
-		timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR, 0xeafa00+offset);
-//      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
-	}
+	m_current_vector[2] = 0x02;  // bus error
+	m_current_irq_line = 2;
+	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
 void x68k_state::dma_irq(int channel)
@@ -1766,8 +1732,8 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
-	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_rom0_r),this),0xffffffff);
-	space.install_write_handler(0x000000,0xbffffb,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_rom0_w),this),0xffffffff);
+	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_emptyram_r),this),0xffffffff);
+	space.install_write_handler(0x000000,0xbffffb,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_emptyram_w),this),0xffffffff);
 	space.install_readwrite_bank(0x000000,m_ram->size()-1,0xffffffff,0,"bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 	space.install_read_handler(0xc00000,0xdfffff,0xffffffff,0,read32_delegate(FUNC(x68k_state::x68k_gvram32_r),this));

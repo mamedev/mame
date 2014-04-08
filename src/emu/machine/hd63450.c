@@ -269,6 +269,8 @@ void hd63450_device::dma_transfer_start(int channel, int dir)
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, m_our_clock[channel]);
 	else if((m_reg[channel].ocr & 3) == 3)
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, attotime::never);
+	else if((m_reg[channel].ocr & 3) == 2)
+		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
 
 	m_transfer_size[channel] = m_reg[channel].mtc;
 
@@ -284,6 +286,8 @@ void hd63450_device::set_timer(int channel, attotime tm)
 
 TIMER_CALLBACK_MEMBER(hd63450_device::dma_transfer_timer)
 {
+	if((m_reg[param].ocr & 3) == 2)
+		return;
 	single_transfer(param);
 }
 

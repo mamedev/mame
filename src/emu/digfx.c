@@ -80,7 +80,7 @@ void device_gfx_interface::interface_pre_start()
 
 	// find our palette device, either as a sibling device or subdevice
 	if (m_palette_is_sibling)
-		m_palette = device().siblingdevice<palette_device>(m_palette_tag);
+		m_palette = device().owner()->subdevice<palette_device>(m_palette_tag);
 	else
 		m_palette = device().subdevice<palette_device>(m_palette_tag);
 
@@ -301,7 +301,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 	{
 		palette_device *palette;
 		if (m_palette_is_sibling)
-			palette = device().siblingdevice<palette_device>(m_palette_tag);
+			palette = device().owner()->subdevice<palette_device>(m_palette_tag);
 		else
 			palette = device().subdevice<palette_device>(m_palette_tag);
 

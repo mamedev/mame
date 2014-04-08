@@ -33,7 +33,7 @@
 		NET_REGISTER_DEV(clock, _name)                                       \
         PARAM(_name.FREQ, _freq)
 
-#define GND()                                                                \
+#define GNDA()                                                                \
         NET_REGISTER_DEV(gnd, GND)
 
 // ----------------------------------------------------------------------------------------
