@@ -1906,30 +1906,6 @@ WRITE8_MEMBER(taitob_state::mb87078_gain_changed)
 	}
 }
 
-/* this is the basic layout used in: Nastar, Ashura Blaster, Hit the Ice, Rambo3, Tetris */
-static const tc0180vcu_interface color0_tc0180vcu_intf =
-{
-	0xc0,       /* background */
-	0x80,       /* foreground */
-	0x00        /* text       */
-};
-
-/* this is the reversed layout used in: Crime City, Puzzle Bobble */
-static const tc0180vcu_interface color1_tc0180vcu_intf =
-{
-	0x00,       /* background */
-	0x40,       /* foreground */
-	0xc0        /* text       */
-};
-
-/* this is used in: rambo3a, masterw, silentd, selfeena, ryujin */
-static const tc0180vcu_interface color2_tc0180vcu_intf =
-{
-	0x30,       /* background */
-	0x20,       /* foreground */
-	0x00        /* text       */
-};
-
 
 void taitob_state::machine_start()
 {
@@ -1981,7 +1957,10 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2034,7 +2013,10 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2106,7 +2088,10 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2159,7 +2144,10 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x00)
+	MCFG_TC0180VCU_FG_COLORBASE(0x40)
+	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2213,7 +2201,10 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,hitice)
 	MCFG_VIDEO_RESET_OVERRIDE(taitob_state,hitice)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2271,7 +2262,10 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2324,7 +2318,10 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2383,7 +2380,10 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x00)
+	MCFG_TC0180VCU_FG_COLORBASE(0x40)
+	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2442,7 +2442,10 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x00)
+	MCFG_TC0180VCU_FG_COLORBASE(0x40)
+	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2495,7 +2498,10 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2554,7 +2560,10 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order1)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color1_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x00)
+	MCFG_TC0180VCU_FG_COLORBASE(0x40)
+	MCFG_TC0180VCU_TX_COLORBASE(0xc0)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2607,7 +2616,10 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2665,7 +2677,10 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2718,7 +2733,10 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2780,7 +2798,10 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order2)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color2_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0x30)
+	MCFG_TC0180VCU_FG_COLORBASE(0x20)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2840,7 +2861,10 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,taitob_color_order0)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
@@ -2899,7 +2923,10 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_HD63484_ADD("hd63484", realpunc_hd63484_intf)
 
-	MCFG_TC0180VCU_ADD("tc0180vcu", color0_tc0180vcu_intf)
+	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
+	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
+	MCFG_TC0180VCU_FG_COLORBASE(0x80)
+	MCFG_TC0180VCU_TX_COLORBASE(0x00)
 	MCFG_TC0180VCU_GFXDECODE("gfxdecode")
 
 	/* sound hardware */

@@ -19,6 +19,9 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 	//m_tx_rambank(0),
 	m_framebuffer_page(0),
 	m_video_control(0),
+	m_bg_color_base(0),
+	m_fg_color_base(0),
+	m_tx_color_base(0),
 	m_gfxdecode(*this)
 {
 }
@@ -31,26 +34,6 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<tc0180vcu_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0180vcu_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0180vcu_interface *intf = reinterpret_cast<const tc0180vcu_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0180vcu_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------
