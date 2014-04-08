@@ -535,6 +535,7 @@ READ8_MEMBER( maygayv1_state::kbd_r )
 	return ioport(portnames[m_lamp_strobe&0x07])->read();
 }
 
+/*
 static I8279_INTERFACE( v1_i8279_intf )
 {
 	DEVCB_NULL,                                     // irq
@@ -545,6 +546,7 @@ static I8279_INTERFACE( v1_i8279_intf )
 	DEVCB_NULL,                                     // Shift key
 	DEVCB_NULL                                      // Ctrl-Strobe line
 };
+*/
 
 
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
@@ -908,7 +910,8 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
-	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, v1_i8279_intf)    // unknown clock
+	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
+//	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, v1_i8279_intf)    // unknown clock
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
