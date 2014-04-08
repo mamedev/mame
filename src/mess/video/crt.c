@@ -25,7 +25,6 @@ Theory of operation:
     Based on earlier work by Chris Salomon
 */
 
-#include <math.h>
 #include "emu.h"
 #include "video/crt.h"
 
@@ -68,29 +67,15 @@ crt_device::crt_device(const machine_config &mconfig, const char *tag, device_t 
 
 void crt_device::device_start()
 {
-	const crt_interface *intf = (const crt_interface *)static_config();
-	int width = intf->width;
-	int height = intf->height;
-	int i;
-
-	m_num_intensity_levels = intf->num_levels;
-	m_window_offset_x = intf->offset_x;
-	m_window_offset_y = intf->offset_y;
-	m_window_width = width;
-	m_window_height = height;
-
 	/* alloc the arrays */
-	m_list = auto_alloc_array(machine(), crt_point, width * height);
-
-	m_list_head = auto_alloc_array(machine(), int, height);
+	m_list = auto_alloc_array(machine(), crt_point, m_window_width * m_window_height);
+	m_list_head = auto_alloc_array(machine(), int, m_window_height);
 
 	/* fill with black and set up list as empty */
-	for (i=0; i<(width * height); i++)
-	{
+	for (int i = 0; i < (m_window_width * m_window_height); i++)
 		m_list[i].intensity = intensity_pixel_not_in_list;
-	}
 
-	for (i=0; i<height; i++)
+	for (int i = 0; i < m_window_height; i++)
 		m_list_head[i] = -1;
 
 	m_decay_counter = 0;
