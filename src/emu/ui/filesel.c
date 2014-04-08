@@ -342,17 +342,10 @@ void ui_menu_file_create::handle()
 //  ctor
 //-------------------------------------------------
 
-<<<<<<< HEAD
 ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_create, int *result)
  	: ui_menu(machine, container),
 	  m_current_directory(current_directory),
 	  m_current_file(current_file)
-=======
-ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
-	: ui_menu(machine, container),
-		m_current_directory(current_directory),
-		m_current_file(current_file)
->>>>>>> b8b662877e2b80cf9607b7d23a72942cf61c2032
 {
 	m_image = image;
 	m_has_empty = has_empty;

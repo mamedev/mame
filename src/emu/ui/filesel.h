@@ -81,16 +81,6 @@ private:
 	};
 
 	// internal state
-<<<<<<< HEAD
-	device_image_interface *	m_image;
-	astring &					m_current_directory;
-	astring &					m_current_file;
-	bool						m_has_empty;
-	bool						m_has_create;
-	int *						m_result;
-	file_selector_entry *		m_entrylist;
-	char						m_filename_buffer[1024];
-=======
 	device_image_interface *    m_image;
 	astring &                   m_current_directory;
 	astring &                   m_current_file;
@@ -100,7 +90,6 @@ private:
 	int *                       m_result;
 	file_selector_entry *       m_entrylist;
 	char                        m_filename_buffer[1024];
->>>>>>> b8b662877e2b80cf9607b7d23a72942cf61c2032
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
