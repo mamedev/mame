@@ -84,7 +84,7 @@ MOD0- 3 - early boards with small RAM allocations
 MOD4- Some modifications on the PCB that didnt work, so field engineers reverted them to MOD3.
 MOD5- board revision with bigger RAM and reset sensitivity circuit added on the PCB.
 
-MOD6- adaption of the PCB to use small daughter card with 6116 RAM
+MOD6- adaptation of the PCB to use small daughter card with 6116 RAM
 
 Collectors have gone further with zero power RAM and the like, but these are the ones out in the wild.
 
@@ -850,7 +850,7 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
 
-	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
+	MCFG_MSC1937_ADD("vfd",0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu3_state, gen_50hz, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))

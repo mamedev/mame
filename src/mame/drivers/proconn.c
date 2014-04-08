@@ -30,6 +30,7 @@
 #include "sound/ay8910.h"
 #include "video/awpvid.h"
 #include "machine/roc10937.h"
+#include "machine/meters.h"
 
 #include "proconn.lh"
 
@@ -50,7 +51,7 @@ public:
 			m_ay(*this, "aysnd")
 	{ }
 
-	optional_device<roc10937_t> m_vfd;
+	optional_device<s16lf01_t> m_vfd;
 
 	DECLARE_WRITE8_MEMBER( ay_w0 ) { m_ay->address_data_w(space, 0, data); }
 	DECLARE_WRITE8_MEMBER( ay_w1 ) { m_ay->address_data_w(space, 1, data); }
@@ -186,8 +187,10 @@ protected:
 	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
 public:
+	int m_meter;
 	DECLARE_DRIVER_INIT(proconn);
 	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(meter_w);
 	DECLARE_WRITE16_MEMBER(serial_transmit);
 	DECLARE_READ16_MEMBER(serial_receive);
 };
@@ -343,6 +346,7 @@ WRITE16_MEMBER(proconn_state::serial_transmit)
 
 READ16_MEMBER(proconn_state::serial_receive)
 {
+	logerror("proconn serial receive read %x",offset);
 	return -1;
 }
 
@@ -357,12 +361,26 @@ static const z80sio_interface sio_intf =
 	DEVCB_DRIVER_MEMBER16(proconn_state,serial_receive)     /* receive handler */
 };
 
+WRITE8_MEMBER(proconn_state::meter_w)
+{
+	int i;
+	for (i=0; i<8; i++)
+	{
+		if ( data & (1 << i) )
+		{
+			MechMtr_update(i, data & (1 << i) );
+			m_meter = data;
+		}
+	}
+}
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(proconn_state,meter_w),
 };
 
 
@@ -383,7 +401,7 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
-	MCFG_ROC10937_ADD("vfd",0,LEFT_TO_RIGHT)
+	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, pio_interface_1 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_2", 4000000, pio_interface_2 ) /* ?? Mhz */

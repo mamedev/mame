@@ -1,7 +1,8 @@
 /**********************************************************************
 
-    Rockwell 10937/10957 interface and emulation by J.Wallace
-    OKI MSC1937 is a clone of this chip
+    Rockwell 10937/10957 interface and simlar chips 
+	Emulation by J.Wallace
+    OKI MSC1937 is a clone of this chip, with many others.
 
 **********************************************************************/
 #pragma once
@@ -9,43 +10,40 @@
 #ifndef ROC10937_H
 #define ROC10937_H
 
-#define LEFT_TO_RIGHT 1
-#define RIGHT_TO_LEFT 0
-
-#define MCFG_ROC10937_ADD(_tag,_val,_reversed) \
+#define MCFG_ROC10937_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
-		MCFG_ROC10937_PORT(_val) \
-		MCFG_ROC10937_REVERSE(_reversed)
+		MCFG_ROC10937_PORT(_val) 
+
 #define MCFG_ROC10937_PORT(_val) \
 	roc10937_t::static_set_value(*device, _val);
-#define MCFG_ROC10937_REVERSE(_reversed) \
-	roc10937_t::static_set_zero(*device, _reversed);
 #define MCFG_ROC10937_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_ROC10957_ADD(_tag,_val,_reversed) \
+#define MCFG_ROC10957_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10957,60)\
-		MCFG_ROC10957_PORT(_val) \
-		MCFG_ROC10957_REVERSE(_reversed)
+		MCFG_ROC10957_PORT(_val) 
+		
 #define MCFG_ROC10957_PORT(_val) \
 	roc10957_t::static_set_value(*device, _val);
-#define MCFG_ROC10957_REVERSE(_reversed) \
-	roc10957_t::static_set_zero(*device, _reversed);
 #define MCFG_ROC10957_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
-#define MCFG_MSC1937_ADD(_tag,_val,_reversed) \
+#define MCFG_MSC1937_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
-		MCFG_MSC1937_PORT(_val) \
-		MCFG_MSC1937_REVERSE(_reversed)
+		MCFG_MSC1937_PORT(_val) 
+		
 #define MCFG_MSC1937_PORT(_val) \
 	MCFG_ROC10937_PORT(_val)
 
-#define MCFG_MSC1937_REVERSE(_reversed) \
-	roc10937_t::static_set_zero(*device, _reversed);
 #define MCFG_MSC1937_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
+#define MCFG_S16LF01_ADD(_tag,_val) \
+		MCFG_DEVICE_ADD(_tag, S16LF01,60)\
+		MCFG_S16LF01_PORT(_val) 
+
+#define MCFG_S16LF01_PORT(_val) \
+	MCFG_ROC10937_PORT(_val)
 
 class rocvfd_t : public device_t {
 public:
@@ -53,10 +51,8 @@ public:
 
 	// inline configuration helpers
 	static void static_set_value(device_t &device, int val);
-	static void static_set_zero(device_t &device, bool reversed);
 	virtual void update_display();
 	UINT8   m_port_val;
-	bool m_reversed;
 	void blank(int data);
 	void shift_data(int data);
 	void write_char(int data);
@@ -110,8 +106,18 @@ protected:
 
 };
 
+class s16lf01_t : public rocvfd_t {
+public:
+	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void update_display();
+protected:
+
+};
+
 extern const device_type ROC10937;
 extern const device_type MSC1937;
 extern const device_type ROC10957;
+extern const device_type S16LF01;
 
 #endif

@@ -8,6 +8,8 @@
 #define M1_DUART_CLOCK  (XTAL_3_6864MHz)
 
 #include "cpu/m6809/m6809.h"
+#include "machine/i8279.h"
+
 #include "video/awpvid.h"       //Fruit Machines Only
 #include "machine/6821pia.h"
 #include "machine/mc68681.h"
@@ -19,23 +21,6 @@
 #include "sound/okim6376.h"
 #include "machine/nvram.h"
 
-struct i8279_state
-{
-	UINT8       command;
-	UINT8       mode;
-	UINT8       prescale;
-	UINT8       inhibit;
-	UINT8       clear;
-	UINT8       ram[16];
-	UINT8       read_sensor;
-	UINT8       write_display;
-	UINT8       sense_address;
-	UINT8       sense_auto_inc;
-	UINT8       disp_address;
-	UINT8       disp_auto_inc;
-};
-
-
 class maygay1b_state : public driver_device
 {
 public:
@@ -43,17 +28,38 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vfd(*this, "vfd"),
+		m_ay(*this, "aysnd"),
 		m_msm6376(*this, "msm6376"),
-		m_duart68681(*this, "duart68681") {
-		m_NMIENABLE = 0;
-	}
+		m_duart68681(*this, "duart68681"),
+		m_sw1_port(*this, "SW1"),
+		m_sw2_port(*this, "SW2"),
+		m_s2_port(*this, "STROBE2"),
+		m_s3_port(*this, "STROBE3"),
+		m_s4_port(*this, "STROBE4"),
+		m_s5_port(*this, "STROBE5"),
+		m_s6_port(*this, "STROBE6"),
+		m_s7_port(*this, "STROBE7")
+	{}
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<roc10937_t> m_vfd;
+	optional_device<s16lf01_t> m_vfd;
+	required_device<ay8910_device> m_ay;
 	optional_device<okim6376_device> m_msm6376;
 	required_device<mc68681_device> m_duart68681;
+	required_ioport m_sw1_port;
+	required_ioport m_sw2_port;
+	required_ioport m_s2_port;
+	required_ioport m_s3_port;
+	required_ioport m_s4_port;
+	required_ioport m_s5_port;
+	required_ioport m_s6_port;
+	required_ioport m_s7_port;
 
 	UINT8 m_lamppos;
+	int m_lamp_strobe;
+	int m_old_lamp_strobe;
+	int m_lamp_strobe2;
+	int m_old_lamp_strobe2;
 	int m_alpha_clock;
 	int m_RAMEN;
 	int m_ALARMEN;
@@ -65,11 +71,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
-	i8279_state m_i8279[2];
-	DECLARE_READ8_MEMBER(m1_8279_r);
-	DECLARE_WRITE8_MEMBER(m1_8279_w);
-	DECLARE_READ8_MEMBER(m1_8279_2_r);
-	DECLARE_WRITE8_MEMBER(m1_8279_2_w);
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(lamp_data_w);
+	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
+	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
 	DECLARE_WRITE8_MEMBER(reel34_w);
 	DECLARE_WRITE8_MEMBER(reel56_w);
@@ -78,17 +83,17 @@ public:
 	DECLARE_READ8_MEMBER(latch_st_hi);
 	DECLARE_READ8_MEMBER(latch_st_lo);
 	DECLARE_WRITE8_MEMBER(m1ab_no_oki_w);
-	void m1_draw_lamps(int data,int strobe, int col);
 	DECLARE_WRITE8_MEMBER(m1_pia_porta_w);
 	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
+	DECLARE_WRITE8_MEMBER(m1_lockout_w);
 	DECLARE_WRITE8_MEMBER(m1_meter_w);
 	DECLARE_READ8_MEMBER(m1_meter_r);
+	DECLARE_READ8_MEMBER(m1_firq_clr_r);
 	DECLARE_READ8_MEMBER(m1_firq_trg_r);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_READ8_MEMBER(m1_duart_r);
 	DECLARE_DRIVER_INIT(m1);
 	virtual void machine_start();
 	virtual void machine_reset();
-	void update_outputs(i8279_state *chip, UINT16 which);
 	void m1_stepper_reset();
 };

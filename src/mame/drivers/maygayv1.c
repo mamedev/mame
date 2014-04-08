@@ -128,6 +128,7 @@ Find lamps/reels after UPD changes.
 #include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/i8279.h"
 #include "machine/6821pia.h"
 #include "machine/mc68681.h"
 #include "sound/2413intf.h"
@@ -202,17 +203,6 @@ struct i82716_t
 };
 
 
-struct i8279_t
-{
-	UINT8   command;
-	UINT8   mode;
-	UINT8   prescale;
-	UINT8   inhibit;
-	UINT8   clear;
-	UINT8   fifo[8];
-	UINT8   ram[16];
-};
-
 class maygayv1_state : public driver_device
 {
 public:
@@ -230,23 +220,25 @@ public:
 	required_device<mc68681_device> m_duart68681;
 	required_device<palette_device> m_palette;
 
+	int m_lamp_strobe;
+	int m_old_lamp_strobe;
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
 	UINT8 m_p3;
 	int m_d68681_val;
 	i82716_t m_i82716;
-	i8279_t m_i8279;
 	DECLARE_WRITE16_MEMBER(i82716_w);
 	DECLARE_READ16_MEMBER(i82716_r);
 	DECLARE_WRITE16_MEMBER(write_odd);
 	DECLARE_READ16_MEMBER(read_odd);
-	DECLARE_READ16_MEMBER(maygay_8279_r);
-	DECLARE_WRITE16_MEMBER(maygay_8279_w);
 	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_READ8_MEMBER(b_read);
 	DECLARE_WRITE8_MEMBER(b_writ);
+	DECLARE_WRITE8_MEMBER(strobe_w);
+	DECLARE_WRITE8_MEMBER(lamp_data_w);
+	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_DRIVER_INIT(screenpl);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -506,179 +498,53 @@ READ16_MEMBER(maygayv1_state::read_odd)
 	return 0;
 }
 
+/*************************************
+ *
+ *  8279 display/keyboard driver
+ *
+ *************************************/
 
-/* TODO */
-static void update_outputs(i8279_t &i8279, UINT16 which)
+WRITE8_MEMBER( maygayv1_state::strobe_w )
 {
-	int i;
-
-	/* update the items in the bitmask */
-	for (i = 0; i < 16; i++)
-		if (which & (1 << i))
-		{
-/*
-            int val;
-
-            val = i8279.ram[i] & 0xff;
-
-            val = i8279.ram[i] & 0x0f;
-            if (i8279.inhibit & 0x01)
-                val = i8279.clear & 0x0f;
-
-                if(val) printf("%x\n", val);
-
-            val = i8279.ram[i] >> 4;
-            if (i8279.inhibit & 0x02)
-                val = i8279.clear >> 4;
-
-                if(val) printf("%x\n", val);
-*/
-		}
+	m_lamp_strobe = data;
 }
 
-READ16_MEMBER(maygayv1_state::maygay_8279_r)
+WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 {
-	i8279_t &i8279 = m_i8279;
+	//The two A/B ports are merged back into one, to make one row of 8 lamps.
+	
+	if (m_old_lamp_strobe != m_lamp_strobe)
+	{
+		// Because of the nature of the lamping circuit, there is an element of persistance
+		// As a consequence, the lamp column data can change before the input strobe without
+		// causing the relevant lamps to black out.
+
+		for (int i = 0; i < 8; i++)
+		{
+			output_set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+		}
+		m_old_lamp_strobe = m_lamp_strobe;
+	}
+	
+}
+
+READ8_MEMBER( maygayv1_state::kbd_r )
+{
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
-	UINT8 result = 0xff;
-	UINT8 addr;
 
-	/* read data */
-	if ((offset & 1) == 0)
-	{
-		switch (i8279.command & 0xe0)
-		{
-			/* read sensor RAM */
-			case 0x40:
-				addr = i8279.command & 0x07;
-
-				result = ioport(portnames[addr])->read();
-
-				/* handle autoincrement */
-				if (i8279.command & 0x10)
-					i8279.command = (i8279.command & 0xf0) | ((addr + 1) & 0x0f);
-
-				break;
-
-			/* read display RAM */
-			case 0x60:
-
-				/* set the value of the corresponding outputs */
-				addr = i8279.command & 0x0f;
-				result = i8279.ram[addr];
-
-				/* handle autoincrement */
-				if (i8279.command & 0x10)
-					i8279.command = (i8279.command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-	/* read status word */
-	else
-	{
-		printf("read 0xfc%02x\n", offset);
-		result = 0x10;
-	}
-	return result;
+	return ioport(portnames[m_lamp_strobe&0x07])->read();
 }
 
-
-WRITE16_MEMBER(maygayv1_state::maygay_8279_w)
+static I8279_INTERFACE( v1_i8279_intf )
 {
-	i8279_t &i8279 = m_i8279;
-	UINT8 addr;
-
-	data >>= 8;
-
-	/* write data */
-	if ((offset & 1) == 0)
-	{
-		switch (i8279.command & 0xe0)
-		{
-			/* write display RAM */
-			case 0x80:
-
-				/* set the value of the corresponding outputs */
-				addr = i8279.command & 0x0f;
-				if (!(i8279.inhibit & 0x04))
-					i8279.ram[addr] = (i8279.ram[addr] & 0xf0) | (data & 0x0f);
-				if (!(i8279.inhibit & 0x08))
-					i8279.ram[addr] = (i8279.ram[addr] & 0x0f) | (data & 0xf0);
-				update_outputs(i8279, 1 << addr);
-
-				/* handle autoincrement */
-				if (i8279.command & 0x10)
-					i8279.command = (i8279.command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* write command */
-	else
-	{
-		i8279.command = data;
-
-		switch (data & 0xe0)
-		{
-			/* command 0: set mode */
-			/*
-			    Display modes:
-
-			    00 = 8 x 8-bit character display -- left entry
-			    01 = 16 x 8-bit character display -- left entry
-			    10 = 8 x 8-bit character display -- right entry
-			    11 = 16 x 8-bit character display -- right entry
-
-			    Keyboard modes:
-
-			    000 = Encoded scan keyboard -- 2 key lockout
-			    001 = Decoded scan keyboard -- 2 key lockout
-			    010 = Encoded scan keyboard -- N-key rollover
-			    011 = Decoded scan keyboard -- N-key rollover
-			    100 = Encoded scan sensor matrix
-			    101 = Decoded scan sensor matrix
-			    110 = Strobed input, encoded display scan
-			    111 = Strobed input, decoded display scan
-			*/
-			case 0x00:
-				logerror("8279: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
-				i8279.mode = data & 0x1f;
-				break;
-
-			/* command 1: program clock */
-			case 0x20:
-				logerror("8279: clock prescaler set to %02X\n", data & 0x1f);
-				i8279.prescale = data & 0x1f;
-				break;
-
-			/* command 2: read FIFO/sensor RAM */
-			/* command 3: read display RAM */
-			/* command 4: write display RAM */
-			case 0x40:
-			case 0x60:
-			case 0x80:
-				break;
-
-			/* command 5: display write inhibit/blanking */
-			case 0xa0:
-				i8279.inhibit = data & 0x0f;
-				update_outputs(i8279, ~0);
-				logerror("8279: clock prescaler set to %02X\n", data & 0x1f);
-				break;
-
-			/* command 6: clear */
-			case 0xc0:
-				i8279.clear = (data & 0x08) ? ((data & 0x04) ? 0xff : 0x20) : 0x00;
-				if (data & 0x11)
-					memset(i8279.ram, i8279.clear, sizeof(i8279.ram));
-				break;
-
-			/* command 7: end interrupt/error mode set */
-			case 0xe0:
-				break;
-		}
-	}
-}
+	DEVCB_NULL,                                     // irq
+	DEVCB_DRIVER_MEMBER(maygayv1_state, strobe_w),  // scan SL lines
+	DEVCB_DRIVER_MEMBER(maygayv1_state, lamp_data_w),      // display A&B
+	DEVCB_NULL,                                     // BD
+	DEVCB_DRIVER_MEMBER(maygayv1_state,kbd_r),      // kbd RL lines
+	DEVCB_NULL,                                     // Shift key
+	DEVCB_NULL                                      // Ctrl-Strobe line
+};
 
 
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
@@ -694,7 +560,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
-	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
+	AM_RANGE(0x820000, 0x820001) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w ,0xff)
+	AM_RANGE(0x820002, 0x820003) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w,0xff)
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
@@ -1040,6 +907,8 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_MC68681_ADD("duart68681", DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
+
+	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, v1_i8279_intf)    // unknown clock
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

@@ -68,392 +68,14 @@
             3x trimmer
 
 
-        TODO: Convert to stock i8279 implementation, as currently inputs aren't read.
-              Fix meter reading (possibly related to above)
+        TODO: I/O is generally a nightmare, probably needs a rebuild at the address level.
+			  Inputs need a sort out.
+			  Some games require dongles for security, need to figure this out.
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
 
 #include "maygay1b.lh"
-
-
-void maygay1b_state::m1_draw_lamps(int data,int strobe, int col)
-{
-	int i;
-
-	for ( i = 0; i < 8; i++ )
-	{
-		m_lamppos = (strobe*8) + col + i;
-
-		if ((data>>i)&1)
-			m_Lamps[m_lamppos] = 1;
-		else
-			m_Lamps[m_lamppos] = 0;
-
-		output_set_lamp_value(m_lamppos, m_Lamps[m_lamppos]);
-	}
-}
-
-
-/*************************************
- *
- *  8279 display/keyboard driver
- *
- *************************************/
-
-void maygay1b_state::update_outputs(i8279_state *chip, UINT16 which)
-{
-	static const UINT8 ls48_map[16] =
-		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	int i;
-
-	/* update the items in the bitmask */
-	for (i = 0; i < 16; i++)
-		if (which & (1 << i))
-		{
-			int val;
-
-			val = chip->ram[i] & 0x0f;
-			if (chip->inhibit & 0x01)
-				val = chip->clear & 0x0f;
-			output_set_digit_value(i * 2 + 0, ls48_map[val]);
-
-			val = chip->ram[i] >> 4;
-			if (chip->inhibit & 0x02)
-				val = chip->clear >> 4;
-			output_set_digit_value(i * 2 + 1, ls48_map[val]);
-		}
-}
-
-READ8_MEMBER(maygay1b_state::m1_8279_r)
-{
-	i8279_state *chip = m_i8279 + 0;
-	static const char *const portnames[] = { "SW1","STROBE5","STROBE7","STROBE3","SW2","STROBE4","STROBE6","STROBE2" };
-	UINT8 result = 0xff;
-	UINT8 addr;
-
-	/* read data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* read sensor RAM */
-			case 0x40:
-				addr = chip->command & 0x07;
-				result = ioport("SW1")->read();
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-
-				break;
-
-
-			/* read display RAM */
-			case 0x60:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				result = chip->ram[addr];
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* read status word */
-	else
-	{
-		if ( chip->read_sensor )
-		{
-		result = ioport(portnames[chip->sense_address])->read();
-//          break
-		}
-		if ( chip->sense_auto_inc )
-		{
-			chip->sense_address = (chip->sense_address + 1 ) & 7;
-		}
-		else
-		{
-			result = chip->ram[chip->disp_address];
-			if ( chip->disp_auto_inc )
-			chip->disp_address++;
-		}
-	}
-	return result;
-}
-
-WRITE8_MEMBER(maygay1b_state::m1_8279_w)
-{
-	i8279_state *chip = m_i8279 + 0;
-	UINT8 addr;
-
-	/* write data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* write display RAM */
-			case 0x80:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				if (!(chip->inhibit & 0x04))
-					chip->ram[addr] = (chip->ram[addr] & 0xf0) | (data & 0x0f);
-				if (!(chip->inhibit & 0x08))
-					chip->ram[addr] = (chip->ram[addr] & 0x0f) | (data & 0xf0);
-				update_outputs(chip, 1 << addr);
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* write command */
-	else
-	{
-		chip->command = data;
-
-		switch (data & 0xe0)
-		{
-			/* command 0: set mode */
-			/*
-			    Display modes:
-
-			    00 = 8 x 8-bit character display -- left entry
-			    01 = 16 x 8-bit character display -- left entry
-			    10 = 8 x 8-bit character display -- right entry
-			    11 = 16 x 8-bit character display -- right entry
-
-			    Keyboard modes:
-
-			    000 = Encoded scan keyboard -- 2 key lockout
-			    001 = Decoded scan keyboard -- 2 key lockout
-			    010 = Encoded scan keyboard -- N-key rollover
-			    011 = Decoded scan keyboard -- N-key rollover
-			    100 = Encoded scan sensor matrix
-			    101 = Decoded scan sensor matrix
-			    110 = Strobed input, encoded display scan
-			    111 = Strobed input, decoded display scan
-			*/
-			case 0x00:
-				logerror("8279A: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
-				chip->mode = data & 0x1f;
-				break;
-
-			/* command 1: program clock */
-			case 0x20:
-				logerror("8279A: clock prescaler set to %02X\n", data & 0x1f);
-				chip->prescale = data & 0x1f;
-				break;
-
-			/* command 2: read FIFO/sensor RAM */
-			case 0x40:
-				chip->sense_address = data & 0x07;
-				chip->sense_auto_inc = data & 0x10;
-				chip->read_sensor = 1;
-				break;
-			/* command 3: read display RAM */
-			case 0x60:
-				chip->disp_address = data & 0x0f;
-				chip->disp_auto_inc = data & 0x10;
-				chip->read_sensor = 0;
-				break;
-			/* command 4: write display RAM */
-			case 0x80:
-				chip->disp_address = data & 0x0f;
-				chip->disp_auto_inc = data & 0x10;
-				chip->write_display = 1;
-				break;
-
-			/* command 5: display write inhibit/blanking */
-			case 0xa0:
-				chip->inhibit = data & 0x0f;
-				update_outputs(chip, 0);
-				logerror("8279: clock prescaler set to %02X\n", data & 0x1f);
-				break;
-
-				break;
-
-			/* command 6: clear */
-			case 0xc0:
-				chip->clear = (data & 0x08) ? ((data & 0x04) ? 0xff : 0x20) : 0x00;
-				if (data & 0x11)
-					memset(chip->ram, chip->clear, sizeof(chip->ram));
-				break;
-
-			/* command 7: end interrupt/error mode set */
-			case 0xe0:
-				break;
-		}
-	}
-	if ( chip->write_display )
-	{  // Data
-		assert(chip->disp_address < ARRAY_LENGTH(chip->ram));
-		if ( chip->ram[chip->disp_address] != data )
-		{
-			m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 0);
-		}
-		chip->ram[chip->disp_address] = data;
-
-		if ( chip->disp_auto_inc )
-			chip->disp_address ++;
-	}
-}
-
-READ8_MEMBER(maygay1b_state::m1_8279_2_r)
-{
-	i8279_state *chip = m_i8279 + 1;
-	UINT8 result = 0xff;
-	UINT8 addr;
-
-	/* read data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* read sensor RAM */
-			case 0x40:
-				//result = ~ioport("DSW1")->read();  /* DSW 1 - inverted! */
-				break;
-
-			/* read display RAM */
-			case 0x60:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				result = chip->ram[addr];
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* read status word */
-	else
-	{
-		logerror("read 0xfc%02x\n", offset);
-		result = 0x10;
-	}
-	return result;
-}
-
-
-WRITE8_MEMBER(maygay1b_state::m1_8279_2_w)
-{
-	i8279_state *chip = m_i8279 + 1;
-	UINT8 addr;
-
-	/* write data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* write display RAM */
-			case 0x80:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				if (!(chip->inhibit & 0x04))
-					chip->ram[addr] = (chip->ram[addr] & 0xf0) | (data & 0x0f);
-				if (!(chip->inhibit & 0x08))
-					chip->ram[addr] = (chip->ram[addr] & 0x0f) | (data & 0xf0);
-				update_outputs(chip, 1 << addr);
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* write command */
-	else
-	{
-		chip->command = data;
-
-		switch (data & 0xe0)
-		{
-			/* command 0: set mode */
-			/*
-			    Display modes:
-
-			    00 = 8 x 8-bit character display -- left entry
-			    01 = 16 x 8-bit character display -- left entry
-			    10 = 8 x 8-bit character display -- right entry
-			    11 = 16 x 8-bit character display -- right entry
-
-			    Keyboard modes:
-
-			    000 = Encoded scan keyboard -- 2 key lockout
-			    001 = Decoded scan keyboard -- 2 key lockout
-			    010 = Encoded scan keyboard -- N-key rollover
-			    011 = Decoded scan keyboard -- N-key rollover
-			    100 = Encoded scan sensor matrix
-			    101 = Decoded scan sensor matrix
-			    110 = Strobed input, encoded display scan
-			    111 = Strobed input, decoded display scan
-			*/
-			case 0x00:
-				logerror("8279A: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
-				chip->mode = data & 0x1f;
-				break;
-
-			/* command 1: program clock */
-			case 0x20:
-				logerror("8279A: clock prescaler set to %02X\n", data & 0x1f);
-				chip->prescale = data & 0x1f;
-				break;
-
-			/* command 2: read FIFO/sensor RAM */
-			case 0x40:
-				chip->sense_address = data & 0x07;
-				chip->sense_auto_inc = data & 0x10;
-				chip->read_sensor = 1;
-				break;
-			/* command 3: read display RAM */
-			case 0x60:
-				chip->disp_address = data & 0x0f;
-				chip->disp_auto_inc = data & 0x10;
-				chip->read_sensor = 0;
-				break;
-			/* command 4: write display RAM */
-			case 0x80:
-				chip->disp_address = data & 0x0f;
-				chip->disp_auto_inc = data & 0x10;
-				chip->write_display = 1;
-				break;
-
-			/* command 5: display write inhibit/blanking */
-			case 0xa0:
-				break;
-
-			/* command 6: clear */
-			case 0xc0:
-				break;
-
-			/* command 7: end interrupt/error mode set */
-			case 0xe0:
-				break;
-		}
-	}
-	if ( chip->write_display )
-	{  // Data
-		if ( chip->ram[chip->disp_address] != data )
-		{
-			m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 128);
-		}
-		chip->ram[chip->disp_address] = data;
-		if ( chip->disp_auto_inc )
-			chip->disp_address ++;
-	}
-
-}
 
 ///////////////////////////////////////////////////////////////////////////
 // called if board is reset ///////////////////////////////////////////////
@@ -492,6 +114,15 @@ READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 	i ^= 0xff;
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	LOG(("6809 firq\n"));
+	return i;
+}
+
+READ8_MEMBER( maygay1b_state::m1_firq_clr_r )
+{
+	static int i = 0xff;
+	i ^= 0xff;
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	LOG(("6809 firq clr\n"));
 	return i;
 }
 
@@ -784,11 +415,16 @@ READ8_MEMBER(maygay1b_state::latch_st_lo)
 
 READ8_MEMBER(maygay1b_state::m1_meter_r)
 {
-	//ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
-	//return ay8910->data_r(space, offset);
-
-	//TODO: Game should read the meter state through Port A of the AY chip, but our timings aren't good enough (?)
+	//TODO: Can we just return the AY port A data?
 	return m_meter;
+}
+WRITE8_MEMBER(maygay1b_state::m1_lockout_w)
+{
+	int i;
+	for (i=0; i<6; i++)
+	{
+		coin_lockout_w(machine(), i, data & (1 << i) );
+	}
 }
 
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
@@ -798,9 +434,13 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
-	// there is actually an 8279 and an 8051..
-	AM_RANGE(0x2030, 0x2031) AM_READWRITE(m1_8279_r,m1_8279_w)
-	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
+	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
+	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+
+	//8051
+	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
+	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", mc68681_device, read, write )
@@ -817,6 +457,8 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
 	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
 
+	AM_RANGE(0x2410, 0x2410) AM_READ(m1_firq_clr_r)
+
 	AM_RANGE(0x2412, 0x2412) AM_READ(m1_firq_trg_r) // firq, sample playback?
 
 	AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
@@ -831,7 +473,87 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_meter_w),
-	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_lockout_w),
+};
+
+/*************************************
+ *
+ *  8279 display/keyboard driver
+ *
+ *************************************/
+
+WRITE8_MEMBER( maygay1b_state::scanlines_w )
+{
+	m_lamp_strobe = data;
+}
+
+WRITE8_MEMBER( maygay1b_state::lamp_data_w )
+{
+	//The two A/B ports are merged back into one, to make one row of 8 lamps.
+	
+	if (m_old_lamp_strobe != m_lamp_strobe)
+	{
+		// Because of the nature of the lamping circuit, there is an element of persistance
+		// As a consequence, the lamp column data can change before the input strobe without
+		// causing the relevant lamps to black out.
+
+		for (int i = 0; i < 8; i++)
+		{
+			output_set_lamp_value((8*m_lamp_strobe)+i, ((data  & (1 << i)) !=0));
+		}
+		m_old_lamp_strobe = m_lamp_strobe;
+	}
+	
+}
+
+READ8_MEMBER( maygay1b_state::kbd_r )
+{
+	ioport_port * portnames[] = { m_sw1_port, m_s2_port, m_s3_port, m_s4_port, m_s5_port, m_s6_port, m_s7_port, m_sw2_port};
+	return (portnames[m_lamp_strobe&0x07])->read();
+}
+
+static I8279_INTERFACE( m1_i8279_intf )
+{
+	DEVCB_NULL,                                     // irq
+	DEVCB_DRIVER_MEMBER(maygay1b_state, scanlines_w),  // scan SL lines
+	DEVCB_DRIVER_MEMBER(maygay1b_state, lamp_data_w),      // display A&B
+	DEVCB_NULL,                                     // BD
+	DEVCB_DRIVER_MEMBER(maygay1b_state,kbd_r),      // kbd RL lines
+	DEVCB_NULL,                                     // Shift key
+	DEVCB_NULL                                      // Ctrl-Strobe line
+};
+
+
+
+
+WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
+{
+	//The two A/B ports are merged back into one, to make one row of 8 lamps.
+	
+	if (m_old_lamp_strobe2 != m_lamp_strobe2)
+	{
+		// Because of the nature of the lamping circuit, there is an element of persistance
+		// As a consequence, the lamp column data can change before the input strobe without
+		// causing the relevant lamps to black out.
+
+		for (int i = 0; i < 8; i++)
+		{
+			output_set_lamp_value((8*m_lamp_strobe)+i+128, ((data  & (1 << i)) !=0));
+		}
+		m_old_lamp_strobe2 = m_lamp_strobe2;
+	}
+	
+}
+
+static I8279_INTERFACE( m1_i8279_2_intf )
+{
+	DEVCB_NULL,                                     // irq
+	DEVCB_NULL,  // scan SL lines
+	DEVCB_DRIVER_MEMBER(maygay1b_state, lamp_data_2_w),      // display A&B
+	DEVCB_NULL,                                     // BD
+	DEVCB_NULL,				                       // kbd RL lines
+	DEVCB_NULL,                                     // Shift key
+	DEVCB_NULL                                      // Ctrl-Strobe line
 };
 
 // machine driver for maygay m1 board /////////////////////////////////
@@ -851,7 +573,7 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
 
-	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_S16LF01_ADD("vfd",0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",YM2149, M1_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(ay8910_config)
@@ -863,6 +585,9 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	MCFG_I8279_ADD("i8279", M1_MASTER_CLOCK/4, m1_i8279_intf)    // unknown clock
+
+	MCFG_I8279_ADD("i8279_2", M1_MASTER_CLOCK/4, m1_i8279_2_intf)    // unknown clock
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

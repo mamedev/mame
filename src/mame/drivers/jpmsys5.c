@@ -646,7 +646,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)//for debug ports
+	MCFG_S16LF01_ADD("vfd",0)//for debug ports
 
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5v)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5v)
@@ -864,7 +864,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(jpmsys5_state, write_acia_clock))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
@@ -911,7 +911,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(jpmsys5_state, write_acia_clock))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmsys5_state,jpmsys5)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmsys5_state,jpmsys5)
