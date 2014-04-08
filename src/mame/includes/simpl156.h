@@ -38,7 +38,7 @@ public:
 	required_device<palette_device> m_palette;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	DECLARE_READ32_MEMBER(simpl156_inputs_read);
 	DECLARE_READ32_MEMBER(simpl156_palette_r);

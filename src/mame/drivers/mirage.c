@@ -80,7 +80,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };
 
 void miragemi_state::video_start()
@@ -287,7 +287,7 @@ static GFXDECODE_START( mirage )
 GFXDECODE_END
 
 
-int miragemi_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(miragemi_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

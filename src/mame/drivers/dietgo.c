@@ -189,7 +189,7 @@ static GFXDECODE_START( dietgo )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      512, 16 )    /* Sprites (16x16) */
 GFXDECODE_END
 
-int dietgo_state::bank_callback(int bank)
+DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

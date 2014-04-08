@@ -387,7 +387,7 @@ INTERRUPT_GEN_MEMBER(simpl156_state::simpl156_vbl_interrupt)
 }
 
 
-int simpl156_state::bank_callback(int bank)
+DECO16IC_BANK_CB_MEMBER(simpl156_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

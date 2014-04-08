@@ -76,7 +76,7 @@ public:
 	UINT32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask);
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	READ16_MEMBER( nb_protection_region_0_146_r );
 	WRITE16_MEMBER( nb_protection_region_0_146_w );

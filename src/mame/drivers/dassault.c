@@ -450,7 +450,7 @@ WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-int dassault_state::dassault_bank_callback( const int bank )
+DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 {
 	return ((bank >> 4) & 0xf) << 12;
 }
@@ -499,8 +499,8 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_DECO16IC_PF2_COL_BANK(16)
 	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
 	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dassault_state, dassault_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dassault_state, dassault_bank_callback)
+	MCFG_DECO16IC_BANK1_CB(dassault_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(dassault_state, bank_callback)
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 
@@ -516,8 +516,8 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_DECO16IC_PF2_COL_BANK(16)
 	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
 	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dassault_state, dassault_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dassault_state, dassault_bank_callback)
+	MCFG_DECO16IC_BANK1_CB(dassault_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(dassault_state, bank_callback)
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	

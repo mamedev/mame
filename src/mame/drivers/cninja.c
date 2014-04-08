@@ -785,24 +785,24 @@ WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-int cninja_state::cninja_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(cninja_state::cninja_bank_callback)
 {
 	if ((bank >> 4) & 0xf)
 		return 0x0000; /* Only 2 banks */
 	return 0x1000;
 }
 
-int cninja_state::robocop2_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(cninja_state::robocop2_bank_callback)
 {
 	return (bank & 0x30) << 8;
 }
 
-int cninja_state::mutantf_1_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_1_bank_callback)
 {
 	return ((bank >> 4) & 0x3) << 12;
 }
 
-int cninja_state::mutantf_2_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_2_bank_callback)
 {
 	return ((bank >> 5) & 0x1) << 14;
 }

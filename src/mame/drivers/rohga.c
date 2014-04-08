@@ -759,7 +759,7 @@ WRITE8_MEMBER(rohga_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-int rohga_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(rohga_state::bank_callback)
 {
 	return ((bank >> 4) & 0x3) << 12;
 }

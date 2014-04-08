@@ -96,7 +96,7 @@ public:
 	UINT32 screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound();
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
@@ -447,8 +447,7 @@ INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
 }
 
 
-
-int backfire_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(backfire_state::bank_callback)
 {
 	//  mame_printf_debug("bank callback %04x\n",bank); // bit 1 gets set too?
 	bank = bank >> 4;

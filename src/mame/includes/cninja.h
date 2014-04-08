@@ -92,10 +92,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 
-	int cninja_bank_callback(int bank);
-	int robocop2_bank_callback(int bank);
-	int mutantf_1_bank_callback(int bank);
-	int mutantf_2_bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(cninja_bank_callback);
+	DECO16IC_BANK_CB_MEMBER(robocop2_bank_callback);
+	DECO16IC_BANK_CB_MEMBER(mutantf_1_bank_callback);
+	DECO16IC_BANK_CB_MEMBER(mutantf_2_bank_callback);
 
 	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );

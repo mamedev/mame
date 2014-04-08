@@ -296,12 +296,12 @@ WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 }
 
 
-int boogwing_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-int boogwing_state::bank_callback2( int bank )
+DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 {
 	int offset = ((bank >> 4) & 0x7) * 0x1000;
 	if ((bank & 0xf) == 0xa)

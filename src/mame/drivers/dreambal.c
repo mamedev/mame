@@ -50,7 +50,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	DECLARE_READ16_MEMBER( dreambal_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dreambal_protection_region_0_104_w );
@@ -286,7 +286,7 @@ static INPUT_PORTS_START( dreambal )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-int dreambal_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(dreambal_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

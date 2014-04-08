@@ -113,7 +113,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void dblewing_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 
 	READ16_MEMBER( wf_protection_region_0_104_r );
@@ -332,7 +332,7 @@ WRITE_LINE_MEMBER(dblewing_state::sound_irq)
 	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-int dblewing_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(dblewing_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

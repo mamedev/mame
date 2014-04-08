@@ -64,6 +64,6 @@ public:
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
 	
-	int bank_callback(int bank);
-	int bank_callback2(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECO16IC_BANK_CB_MEMBER(bank_callback2);
 };

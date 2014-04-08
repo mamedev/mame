@@ -206,4 +206,7 @@ extern const device_type DECO16IC;
 #define MCFG_DECO16IC_PALETTE(_palette_tag) \
 	deco16ic_device::static_set_palette_tag(*device, "^" _palette_tag);
 
+// function definition for a callback
+#define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)
+
 #endif

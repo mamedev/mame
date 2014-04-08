@@ -1665,7 +1665,7 @@ UINT16 captaven_pri_callback(UINT16 x)
 	}
 }
 
-int deco32_state::captaven_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(deco32_state::captaven_bank_callback)
 {
 	bank = bank >> 4;
 	bank = (bank & 2) >> 1;
@@ -1773,7 +1773,7 @@ UINT16 deco32_state::port_c_fghthist(int unused)
 	return machine().root_device().ioport(":IN1")->read();
 }
 
-int deco32_state::fghthist_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(deco32_state::fghthist_bank_callback)
 {
 	bank = bank >> 4;
 	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
@@ -1953,14 +1953,14 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 MACHINE_CONFIG_END
 
 
-int dragngun_state::bank_1_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(dragngun_state::bank_1_callback)
 {
 	bank = bank >> 4;
 	return bank * 0x1000;
 }
 
 
-int dragngun_state::bank_2_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(dragngun_state::bank_2_callback)
 {
 	bank = bank >> 5;
 	return bank * 0x1000;
@@ -2171,7 +2171,7 @@ static MACHINE_CONFIG_DERIVED( lockloadu, lockload )
 MACHINE_CONFIG_END
 
 
-int deco32_state::tattass_bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(deco32_state::tattass_bank_callback)
 {
 	bank = bank >> 4;
 	return bank * 0x1000;

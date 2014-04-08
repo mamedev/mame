@@ -65,7 +65,7 @@ public:
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };
 
 
@@ -322,7 +322,7 @@ INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
-int deco156_state::bank_callback(int bank)
+DECO16IC_BANK_CB_MEMBER(deco156_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

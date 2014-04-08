@@ -379,7 +379,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-int sshangha_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 {
 	return (bank >> 4) * 0x1000;
 }
