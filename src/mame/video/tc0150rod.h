@@ -1,17 +1,13 @@
 #ifndef __TC0150ROD_H__
 #define __TC0150ROD_H__
 
-struct tc0150rod_interface
-{
-	const char      *m_gfx_region;    /* gfx region for the road */
-};
-
-class tc0150rod_device : public device_t,
-											public tc0150rod_interface
+class tc0150rod_device : public device_t
 {
 public:
 	tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~tc0150rod_device() {}
+
+	static void set_gfx_tag(device_t &device, const char *tag) { downcast<tc0150rod_device &>(device).m_gfx_region = tag; }
 
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
@@ -19,18 +15,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
 	// internal state
 	UINT16 *        m_ram;
+	const char      *m_gfx_region;    /* gfx region for the road */
+	UINT16 *        m_roadgfx;
 };
 
 extern const device_type TC0150ROD;
 
-#define MCFG_TC0150ROD_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, TC0150ROD, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_TC0150ROD_GFXTAG(_tag) \
+	tc0150rod_device::set_gfx_tag(*device, _tag);
 
 #endif

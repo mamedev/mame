@@ -2994,8 +2994,6 @@ static const tc0480scp_interface taitoz_tc0480scp_intf =
 };
 
 
-static const tc0150rod_interface taitoz_tc0150rod_intf = { "gfx3" };
-
 /***********************************************************
                    SAVE STATES
 ***********************************************************/
@@ -3081,7 +3079,9 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3156,7 +3156,9 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3233,7 +3235,9 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3306,7 +3310,8 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3385,7 +3390,8 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3459,7 +3465,9 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3536,7 +3544,9 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3679,7 +3689,8 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3752,7 +3763,8 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
