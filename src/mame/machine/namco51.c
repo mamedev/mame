@@ -350,7 +350,12 @@ namco_51xx_device::namco_51xx_device(const machine_config &mconfig, const char *
 	m_in_2(*this),
 	m_in_3(*this),
 	m_out_0(*this),
-	m_out_1(*this)
+	m_out_1(*this),
+	m_lastcoins(0),
+	m_lastbuttons(0),
+	m_mode(0),
+	m_coincred_mode(0),
+	m_remap_joy(0)
 {
 }
 

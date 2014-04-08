@@ -134,7 +134,8 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, NAMCO_54XX, "Namco 54xx", tag, owner, clock, "namco54", __FILE__),
 	m_cpu(*this, "mcu"),
 	m_discrete(*this),
-	m_basenode(0)
+	m_basenode(0),
+	m_latched_cmd(0)
 {
 }
 //-------------------------------------------------
