@@ -1038,14 +1038,8 @@ void ui_menu::do_handle()
 
 UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container, UINT32 state)
 {
-<<<<<<< HEAD
 	// if we have no menus stacked up, we have to have something
 	assert(menu_stack != NULL);
-=======
-	// if we have no menus stacked up, start with the main menu
-	if (menu_stack == NULL)
-		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
->>>>>>> b8b662877e2b80cf9607b7d23a72942cf61c2032
 
 	// update the menu state
 	if (menu_stack != NULL)
