@@ -9785,7 +9785,7 @@ static MACHINE_CONFIG_START( kotbinyo, ddenlovr_state )
 
 	/* devices */
 //  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
-//	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
+//  MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )

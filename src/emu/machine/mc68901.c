@@ -530,7 +530,7 @@ void mc68901_device::rcv_complete()
 	receive_register_extract();
 	m_receive_buffer = get_received_char();
 	//if (m_receive_pending) TODO: error?
-		
+
 	m_receive_pending = 1;
 	rx_buffer_full();
 }

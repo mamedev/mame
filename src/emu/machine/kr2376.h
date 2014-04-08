@@ -59,7 +59,7 @@ public:
 	~kr2376_device() {}
 
 	template<class _Object> static devcb2_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
-	
+
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
 
@@ -74,7 +74,7 @@ protected:
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual ioport_constructor device_input_ports() const;
-	
+
 private:
 	// internal state
 	int m_pins[41];
@@ -91,12 +91,12 @@ private:
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
 	devcb2_write_line m_write_strobe;
-	
+
 	enum
 	{
 		TIMER_SCAN_TICK
 	};
-	
+
 	void change_output_lines();
 	void clock_scan_counters();
 	void detect_keypress();

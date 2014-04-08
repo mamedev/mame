@@ -74,7 +74,7 @@
 class device_comx_expansion_card_interface;
 
 class comx_expansion_slot_device : public device_t,
-								   public device_slot_interface
+									public device_slot_interface
 {
 public:
 	// construction/destruction

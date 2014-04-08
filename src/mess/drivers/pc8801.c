@@ -310,7 +310,7 @@ public:
 			m_beeper(*this, "beeper"),
 			m_opna(*this, "opna"),
 			m_opn(*this, "opn"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -322,7 +322,7 @@ public:
 	required_device<ym2608_device> m_opna;
 	required_device<ym2203_device> m_opn;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 *m_work_ram;
 	UINT8 *m_hi_work_ram;
 	UINT8 *m_ext_work_ram;
@@ -2644,7 +2644,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_I8255_ADD( "d8255_slave", slave_fdd_intf )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-    MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
+	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
 
 	#ifdef USE_PROPER_I8214
 	MCFG_I8214_ADD(I8214_TAG, MASTER_CLOCK, pic_intf)

@@ -68,7 +68,7 @@ public:
 	optional_shared_ptr<UINT16> m_kiwame_nvram;
 	optional_shared_ptr<UINT16> m_inttoote_key_select;
 	optional_shared_ptr<UINT16> m_inttoote_700000;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

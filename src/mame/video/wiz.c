@@ -121,7 +121,7 @@ void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 	UINT8 *cram = layer ? m_colorram2 : m_colorram;
 	gfx_element *gfx = m_gfxdecode->gfx(charbank);
 	int palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
-	
+
 	/* draw the tiles. They are characters, but draw them as sprites. */
 	for (int offs = 0x400-1; offs >= 0; offs--)
 	{
@@ -129,7 +129,7 @@ void wiz_state::draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int 
 		int sx = offs & 0x1f;
 		int sy = offs >> 5;
 		int color = aram[sx << 1 | 1] & 7;
-		
+
 		// wiz/kungfut hw allows more color variety on screen
 		if (colortype)
 			color = layer ? (cram[offs] & 7) : ((color & 4) | (code & 3));
@@ -154,16 +154,16 @@ void wiz_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	UINT8 *sram = set ? m_spriteram2 : m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(charbank);
 	int palbank = m_palbank[1] << 4 | m_palbank[0] << 3;
-	
+
 	for (int offs = 0x20-4; offs >= 0; offs -= 4)
 	{
 		int code = sram[offs + 1];
 		int sx = sram[offs + 3];
 		int sy = sram[offs];
 		int color = sram[offs + 2] & 7; // high bits unused
-		
+
 		if (!sx || !sy) continue;
-		
+
 		// like on galaxian hw, the first three sprites match against y-1 (not on m_spriteram2)
 		if (set == 0 && offs <= 8)
 			sy += (m_flipy) ? 1 : -1;

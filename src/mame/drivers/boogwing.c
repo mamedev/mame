@@ -364,7 +364,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECO16IC_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")

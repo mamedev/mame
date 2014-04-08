@@ -129,7 +129,7 @@ public:
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
-	UINT16	sf2ceblp_prot;
+	UINT16  sf2ceblp_prot;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
@@ -202,7 +202,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);

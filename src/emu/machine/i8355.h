@@ -57,13 +57,13 @@
 
 #define MCFG_I8355_OUT_PA_CB(_devcb) \
 	devcb = &i8355_device::set_out_pa_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_I8355_IN_PB_CB(_devcb) \
 	devcb = &i8355_device::set_in_pb_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_I8355_OUT_PB_CB(_devcb) \
 	devcb = &i8355_device::set_out_pb_callback(*device, DEVCB2_##_devcb);
-	
+
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -82,7 +82,7 @@ public:
 	template<class _Object> static devcb2_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pa_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_in_pb_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pb_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 

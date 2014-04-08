@@ -160,7 +160,7 @@ INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 }
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)	// (A15 | A1) == 0
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(pentagon_port_7ffd_w)  AM_MIRROR(0x7ffd)  // (A15 | A1) == 0
 	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)

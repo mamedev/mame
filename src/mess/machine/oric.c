@@ -55,7 +55,7 @@ void oric_state::oric_refresh_ints()
 	if (m_is_telestrat==0)
 	{
 		/* oric 1 or oric atmos */
-		
+
 		/* if floppy disc hardware is disabled, do not allow interrupts from it */
 		if ((m_io_floppy->manager().safe_to_read()) && ((m_io_floppy->read() & 0x07) == ORIC_FLOPPY_INTERFACE_NONE))
 		{

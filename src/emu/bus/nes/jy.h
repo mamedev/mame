@@ -20,7 +20,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
+
 	virtual DECLARE_READ8_MEMBER(chr_r);
 	virtual DECLARE_READ8_MEMBER(nt_r);
 
@@ -39,7 +39,7 @@ protected:
 	UINT8 m_mul[2];
 	UINT8 m_latch;
 	UINT8 m_reg[4];
-	UINT8 m_chr_latch[2];	// type C uses a more complex CHR 4K mode, and these vars are only changed for those games
+	UINT8 m_chr_latch[2];   // type C uses a more complex CHR 4K mode, and these vars are only changed for those games
 	UINT8 m_mmc_prg_bank[4];
 	UINT16 m_mmc_nt_bank[4];
 	UINT16 m_mmc_vrom_bank[8];

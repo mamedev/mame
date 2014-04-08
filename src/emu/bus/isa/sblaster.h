@@ -157,17 +157,17 @@ class sb8_device : public sb_device,
 public:
 		// construction/destruction
 		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
-		
+
 		DECLARE_READ8_MEMBER(ym3812_16_r);
-		DECLARE_WRITE8_MEMBER(ym3812_16_w);		
+		DECLARE_WRITE8_MEMBER(ym3812_16_w);
 protected:
 		virtual void device_start();
 		virtual void drq_w(int state) { m_isa->drq1_w(state); }
 		virtual void irq_w(int state, int source) { m_isa->irq5_w(state); }
 		virtual UINT8 dack_r(int line) { return sb_device::dack_r(line); }
 		virtual void dack_w(int line, UINT8 data) { sb_device::dack_w(line, data); }
-private:		
-		required_device<ym3812_device> m_ym3812;		
+private:
+		required_device<ym3812_device> m_ym3812;
 };
 
 class isa8_sblaster1_0_device : public sb8_device
@@ -189,7 +189,7 @@ private:
 		// internal state
 		required_device<saa1099_device> m_saa1099_1;
 		required_device<saa1099_device> m_saa1099_2;
-		
+
 };
 
 class isa8_sblaster1_5_device : public sb8_device

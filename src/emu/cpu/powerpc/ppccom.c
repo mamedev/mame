@@ -2489,7 +2489,7 @@ void ppc4xx_set_dma_write_handler(device_t *device, int channel, ppc4xx_dma_writ
 }
 
 /*-------------------------------------------------
-    ppc4xx_set_dcr_read_handler 
+    ppc4xx_set_dcr_read_handler
 -------------------------------------------------*/
 
 void ppc4xx_set_dcr_read_handler(device_t *device, read32_delegate dcr_read_func)
@@ -2500,7 +2500,7 @@ void ppc4xx_set_dcr_read_handler(device_t *device, read32_delegate dcr_read_func
 }
 
 /*-------------------------------------------------
-    ppc4xx_set_dcr_write_handler 
+    ppc4xx_set_dcr_write_handler
 -------------------------------------------------*/
 
 void ppc4xx_set_dcr_write_handler(device_t *device, write32_delegate dcr_write_func)

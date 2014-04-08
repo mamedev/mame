@@ -5,7 +5,7 @@
     Double Crown (c) 1997 Cadence Technology / Dyna
 
     Driver by Angelo Salese
-	Additional work by Roberto Fresca.
+    Additional work by Roberto Fresca.
 
     TODO:
     - Bogus "Hole" in main screen display;
@@ -35,14 +35,14 @@
     4 * dipsw 8pos
     YMZ284-D (ay8910, but without i/o ports)
     MAXIM MAX693ACPE is a "Microprocessor Supervisory Circuit", for watchdog
-	and for nvram functions.
+    and for nvram functions.
 
 ***************************************************************************/
 
 
-#define MAIN_CLOCK			XTAL_28_63636MHz
-#define CPU_CLOCK			MAIN_CLOCK / 6
-#define SND_CLOCK			MAIN_CLOCK / 12
+#define MAIN_CLOCK          XTAL_28_63636MHz
+#define CPU_CLOCK           MAIN_CLOCK / 6
+#define SND_CLOCK           MAIN_CLOCK / 12
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -298,9 +298,9 @@ WRITE8_MEMBER( dblcrown_state::output_w )
   x-x- --xx  unknown
 */
 
-	coin_counter_w(machine(), 0, data & 0x10);	/* Coin In counter pulse */
-	coin_counter_w(machine(), 1 ,data & 0x08);	/* Payout counter pulse */
-//	popmessage("out: %02x", data);
+	coin_counter_w(machine(), 0, data & 0x10);  /* Coin In counter pulse */
+	coin_counter_w(machine(), 1 ,data & 0x08);  /* Payout counter pulse */
+//  popmessage("out: %02x", data);
 }
 
 

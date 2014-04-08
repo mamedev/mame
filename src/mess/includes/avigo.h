@@ -36,7 +36,7 @@ public:
 			m_speaker(*this, "speaker"),
 			m_uart(*this, "ns16550"),
 			m_serport(*this, "serport"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

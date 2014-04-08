@@ -46,14 +46,14 @@ public:
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	// internal state
 	enum
@@ -64,7 +64,7 @@ private:
 
 	devcb2_write_line m_write_irq;
 	devcb2_write_line m_write_drq;
-	
+
 	int m_flags;
 	int m_state;
 	unsigned char m_Command;
@@ -127,7 +127,7 @@ private:
 
 	emu_timer *m_data_timer;
 	emu_timer *m_command_complete_timer;
-	
+
 	legacy_floppy_image_device *current_image();
 	void seek_to_track(int track);
 	void load_bad_tracks(int surface);

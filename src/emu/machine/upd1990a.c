@@ -171,7 +171,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			int max_shift = is_serial_mode() ? 6 : 5;
 			m_data_out = (m_time_counter[max_shift - 1] == 0);
 			m_write_data(get_data_out());
-			
+
 			for (int i = 0; i < max_shift; i++)
 			{
 				m_time_counter[i]++;
@@ -219,11 +219,11 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		{
 			m_c = m_c_unlatched;
 			if (m_c == 7)
-				m_c = MODE_TEST;			
+				m_c = MODE_TEST;
 		}
-		
+
 		if (LOG) logerror("uPD1990A '%s' Command %x\n", tag(), m_c);
-		
+
 		// common functions
 		if (m_c == MODE_REGISTER_HOLD || (m_c >= MODE_TP_64HZ && m_c < MODE_TEST))
 		{
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			m_testmode = false;
 			m_timer_test_mode->enable(0);
 		}
-		
+
 		switch (m_c)
 		{
 		case MODE_REGISTER_HOLD:
@@ -285,10 +285,10 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 				bcd_to_integer(m_time_counter[1]),
 				bcd_to_integer(m_time_counter[0])
 			);
-			
+
 			// reset stage 10-15 of clock divider
 			m_timer_clock->adjust(attotime::from_ticks(m_timer_clock->remaining().as_ticks(clock()) % (clock() / 512), clock()), 0, attotime::from_hz(clock() / 32768.0));
-			
+
 			// disable(low) time pulse in testmode
 			if (m_testmode)
 			{
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			// set timer pulse
 			const float div[4] = { 512.0, 128.0, 16.0, 8.0 };
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz((clock() / div[m_c - MODE_TP_64HZ]) * 2.0));
-			
+
 			break;
 		}
 
@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			attotime one_second = attotime::from_hz(clock() / 32768.0);
 			const float mul[4] = { 1.0, 10.0, 30.0, 60.0 };
 			m_timer_tp->adjust(attotime::zero, 0, one_second * mul[m_c - MODE_TP_1S_INT] / 2.0);
-			
+
 			break;
 		}
 
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			m_timer_test_mode->adjust(attotime::zero, 0, attotime::from_hz(clock() / div));
 			break;
 		}
-		
+
 		default:
 			break;
 		}
@@ -399,7 +399,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 	if (!m_clk && state)
 	{
 		int in = m_data_in;
-		
+
 		if (is_serial_mode())
 		{
 			// always clock serial command register
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 			m_shift_reg[6] >>= 1;
 			m_shift_reg[6] |= (m_data_in << 3);
 		}
-		
+
 		if (m_c == MODE_SHIFT)
 		{
 			// clock shift register
@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 				else
 					m_shift_reg[i] |= (m_shift_reg[i + 1] << 7 & 0x80);
 			}
-			
+
 			// data out LSB of shift register
 			m_data_out = m_shift_reg[0] & 1;
 			m_write_data(get_data_out());
@@ -449,7 +449,7 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 
 	int prev_oe = m_oe;
 	m_oe = state;
-	
+
 	if (m_oe != prev_oe && m_c != MODE_TEST)
 		m_write_data(get_data_out());
 }

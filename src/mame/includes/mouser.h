@@ -20,7 +20,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;	
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* misc */
 	UINT8      m_sound_byte;
@@ -31,7 +31,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(mouser_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
 	DECLARE_READ8_MEMBER(mouser_sound_byte_r);

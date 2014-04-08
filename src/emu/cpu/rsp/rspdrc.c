@@ -3829,56 +3829,56 @@ INLINE void cfunc_rsp_vmacf_simd(void *param)
 	}
 	VEC_WRITEBACK_RESULT();
 /*
-	__m128i loProduct, hiProduct, unpackLo, unpackHi;
-	__m128i vaccHigh;
-	__m128i vdReg, vdRegLo, vdRegHi;
+    __m128i loProduct, hiProduct, unpackLo, unpackHi;
+    __m128i vaccHigh;
+    __m128i vdReg, vdRegLo, vdRegHi;
 
-	__m128i vsReg = rsp->xv[VS1REG];
-	__m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
+    __m128i vsReg = rsp->xv[VS1REG];
+    __m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 
-	__m128i vaccLow = rsp->accum_l;
+    __m128i vaccLow = rsp->accum_l;
 
-	// Unpack to obtain for 32-bit precision.
-	RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
+    // Unpack to obtain for 32-bit precision.
+    RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
 
-	// Begin accumulating the products.
-	unpackLo = _mm_mullo_epi16(vsReg, vtReg);
-	unpackHi = _mm_mulhi_epi16(vsReg, vtReg);
-	loProduct = _mm_unpacklo_epi16(unpackLo, unpackHi);
-	hiProduct = _mm_unpackhi_epi16(unpackLo, unpackHi);
-	loProduct = _mm_slli_epi32(loProduct, 1);
-	hiProduct = _mm_slli_epi32(hiProduct, 1);
+    // Begin accumulating the products.
+    unpackLo = _mm_mullo_epi16(vsReg, vtReg);
+    unpackHi = _mm_mulhi_epi16(vsReg, vtReg);
+    loProduct = _mm_unpacklo_epi16(unpackLo, unpackHi);
+    hiProduct = _mm_unpackhi_epi16(unpackLo, unpackHi);
+    loProduct = _mm_slli_epi32(loProduct, 1);
+    hiProduct = _mm_slli_epi32(hiProduct, 1);
 
-	vdRegLo = _mm_srli_epi32(loProduct, 16);
-	vdRegHi = _mm_srli_epi32(hiProduct, 16);
-	vdRegLo = _mm_slli_epi32(vdRegLo, 16);
-	vdRegHi = _mm_slli_epi32(vdRegHi, 16);
-	vdRegLo = _mm_xor_si128(vdRegLo, loProduct);
-	vdRegHi = _mm_xor_si128(vdRegHi, hiProduct);
+    vdRegLo = _mm_srli_epi32(loProduct, 16);
+    vdRegHi = _mm_srli_epi32(hiProduct, 16);
+    vdRegLo = _mm_slli_epi32(vdRegLo, 16);
+    vdRegHi = _mm_slli_epi32(vdRegHi, 16);
+    vdRegLo = _mm_xor_si128(vdRegLo, loProduct);
+    vdRegHi = _mm_xor_si128(vdRegHi, hiProduct);
 
-	vaccLow = _mm_add_epi32(vaccLow, vdRegLo);
-	vaccHigh = _mm_add_epi32(vaccHigh, vdRegHi);
+    vaccLow = _mm_add_epi32(vaccLow, vdRegLo);
+    vaccHigh = _mm_add_epi32(vaccHigh, vdRegHi);
 
-	rsp->accum_l = vdReg = RSPPackLo32to16(vaccLow, vaccHigh);
+    rsp->accum_l = vdReg = RSPPackLo32to16(vaccLow, vaccHigh);
 
-	// Multiply the MSB of sources, accumulate the product.
-	vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
-	vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
+    // Multiply the MSB of sources, accumulate the product.
+    vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
+    vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
 
-	loProduct = _mm_srai_epi32(loProduct, 16);
-	hiProduct = _mm_srai_epi32(hiProduct, 16);
-	vaccLow = _mm_srai_epi32(vaccLow, 16);
-	vaccHigh = _mm_srai_epi32(vaccHigh, 16);
+    loProduct = _mm_srai_epi32(loProduct, 16);
+    hiProduct = _mm_srai_epi32(hiProduct, 16);
+    vaccLow = _mm_srai_epi32(vaccLow, 16);
+    vaccHigh = _mm_srai_epi32(vaccHigh, 16);
 
-	vaccLow = _mm_add_epi32(loProduct, vaccLow);
-	vaccHigh = _mm_add_epi32(hiProduct, vaccHigh);
-	vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
-	vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
+    vaccLow = _mm_add_epi32(loProduct, vaccLow);
+    vaccHigh = _mm_add_epi32(hiProduct, vaccHigh);
+    vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
+    vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
 
-	// Clamp the accumulator and write it all out.
-	rsp->xv[VDREG] = _mm_packs_epi32(vaccLow, vaccHigh);
-	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
-	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+    // Clamp the accumulator and write it all out.
+    rsp->xv[VDREG] = _mm_packs_epi32(vaccLow, vaccHigh);
+    rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
+    rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
 */
 }
 
@@ -4269,55 +4269,55 @@ INLINE void cfunc_rsp_vmadn_simd(void *param)
 }
 /*INLINE void cfunc_rsp_vmadn_simd(void *param)
 {
-	rsp_state *rsp = (rsp_state*)param;
-	int op = rsp->impstate->arg0;
+    rsp_state *rsp = (rsp_state*)param;
+    int op = rsp->impstate->arg0;
 
-	__m128i vaccLow, vaccHigh, loProduct, hiProduct;
-	__m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi, vdRegLo, vdRegHi;
+    __m128i vaccLow, vaccHigh, loProduct, hiProduct;
+    __m128i vsRegLo, vsRegHi, vtRegLo, vtRegHi, vdRegLo, vdRegHi;
 
-	__m128i vsReg = rsp->xv[VS1REG];
-	__m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
+    __m128i vsReg = rsp->xv[VS1REG];
+    __m128i vtReg = _mm_shuffle_epi8(rsp->xv[VS2REG], vec_shuf_inverse[EL]);
 
-	vaccLow = rsp->accum_l;
+    vaccLow = rsp->accum_l;
 
-	RSPZeroExtend16to32(vsReg, &vsRegLo, &vsRegHi);
-	RSPSignExtend16to32(vtReg, &vtRegLo, &vtRegHi);
-	RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
+    RSPZeroExtend16to32(vsReg, &vsRegLo, &vsRegHi);
+    RSPSignExtend16to32(vtReg, &vtRegLo, &vtRegHi);
+    RSPZeroExtend16to32(vaccLow, &vaccLow, &vaccHigh);
 
-	// Begin accumulating the products.
-	loProduct = _mm_mullo_epi32(vsRegLo, vtRegLo);
-	hiProduct = _mm_mullo_epi32(vsRegHi, vtRegHi);
+    // Begin accumulating the products.
+    loProduct = _mm_mullo_epi32(vsRegLo, vtRegLo);
+    hiProduct = _mm_mullo_epi32(vsRegHi, vtRegHi);
 
-	vdRegLo = _mm_srli_epi32(loProduct, 16);
-	vdRegHi = _mm_srli_epi32(hiProduct, 16);
-	vdRegLo = _mm_slli_epi32(vdRegLo, 16);
-	vdRegHi = _mm_slli_epi32(vdRegHi, 16);
-	vdRegLo = _mm_xor_si128(vdRegLo, loProduct);
-	vdRegHi = _mm_xor_si128(vdRegHi, hiProduct);
+    vdRegLo = _mm_srli_epi32(loProduct, 16);
+    vdRegHi = _mm_srli_epi32(hiProduct, 16);
+    vdRegLo = _mm_slli_epi32(vdRegLo, 16);
+    vdRegHi = _mm_slli_epi32(vdRegHi, 16);
+    vdRegLo = _mm_xor_si128(vdRegLo, loProduct);
+    vdRegHi = _mm_xor_si128(vdRegHi, hiProduct);
 
-	vaccLow = _mm_add_epi32(vaccLow, vdRegLo);
-	vaccHigh = _mm_add_epi32(vaccHigh, vdRegHi);
+    vaccLow = _mm_add_epi32(vaccLow, vdRegLo);
+    vaccHigh = _mm_add_epi32(vaccHigh, vdRegHi);
 
-	rsp->accum_l = RSPPackLo32to16(vaccLow, vaccHigh);
+    rsp->accum_l = RSPPackLo32to16(vaccLow, vaccHigh);
 
-	// Multiply the MSB of sources, accumulate the product.
-	vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
-	vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
+    // Multiply the MSB of sources, accumulate the product.
+    vdRegLo = _mm_unpacklo_epi16(rsp->accum_m, rsp->accum_h);
+    vdRegHi = _mm_unpackhi_epi16(rsp->accum_m, rsp->accum_h);
 
-	loProduct = _mm_srai_epi32(loProduct, 16);
-	hiProduct = _mm_srai_epi32(hiProduct, 16);
-	vaccLow = _mm_srai_epi32(vaccLow, 16);
-	vaccHigh = _mm_srai_epi32(vaccHigh, 16);
+    loProduct = _mm_srai_epi32(loProduct, 16);
+    hiProduct = _mm_srai_epi32(hiProduct, 16);
+    vaccLow = _mm_srai_epi32(vaccLow, 16);
+    vaccHigh = _mm_srai_epi32(vaccHigh, 16);
 
-	vaccLow = _mm_add_epi32(loProduct, vaccLow);
-	vaccHigh = _mm_add_epi32(hiProduct, vaccHigh);
-	vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
-	vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
+    vaccLow = _mm_add_epi32(loProduct, vaccLow);
+    vaccHigh = _mm_add_epi32(hiProduct, vaccHigh);
+    vaccLow = _mm_add_epi32(vdRegLo, vaccLow);
+    vaccHigh = _mm_add_epi32(vdRegHi, vaccHigh);
 
-	// Clamp the accumulator and write it all out.
-	rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
-	rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
-	rsp->xv[VDREG] = RSPClampLowToVal(rsp->accum_l, rsp->accum_m, rsp->accum_h);
+    // Clamp the accumulator and write it all out.
+    rsp->accum_m = RSPPackLo32to16(vaccLow, vaccHigh);
+    rsp->accum_h = RSPPackHi32to16(vaccLow, vaccHigh);
+    rsp->xv[VDREG] = RSPClampLowToVal(rsp->accum_l, rsp->accum_m, rsp->accum_h);
 }*/
 
 #endif

@@ -53,7 +53,7 @@ char *core_strdup(const char *str);
 #define strdup !MUST_USE_CORE_STRDUP_INSTEAD!
 
 
-/* additional string compare helper */
+/* additional string compare helper (up to 16 characters at the moment) */
 int core_strwildcmp(const char *sp1, const char *sp2);
 
 

@@ -1400,10 +1400,10 @@ void aica_device::device_start()
 
 	// set up the IRQ callbacks
 	m_irq_cb.resolve_safe();
-	m_main_irq_cb.resolve_safe();	
+	m_main_irq_cb.resolve_safe();
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
-	
+
 	// save state
 	save_item(NAME(m_IrqTimA));
 	save_item(NAME(m_IrqTimBC));
@@ -1416,7 +1416,7 @@ void aica_device::device_start()
 	save_item(NAME(m_LPANTABLE),0x20000);
 	save_item(NAME(m_RPANTABLE),0x20000);
 	save_item(NAME(m_TimPris),3);
-	save_item(NAME(m_TimCnt),3);	
+	save_item(NAME(m_TimCnt),3);
 }
 
 void aica_device::set_ram_base(void *base, int size)
@@ -1489,40 +1489,40 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 		m_bufferr(NULL),
 		m_length(0),
 		m_RBUFDST(NULL)
-		
+
 {
-	memset(&m_udata.data, 0, sizeof(m_udata.data));	
-	memset(m_EFSPAN, 0, sizeof(m_EFSPAN));	
-	memset(m_Slots, 0, sizeof(m_Slots));	
-	memset(m_RINGBUF, 0, sizeof(m_RINGBUF));	
-	memset(m_MidiStack, 0, sizeof(m_MidiStack));	
+	memset(&m_udata.data, 0, sizeof(m_udata.data));
+	memset(m_EFSPAN, 0, sizeof(m_EFSPAN));
+	memset(m_Slots, 0, sizeof(m_Slots));
+	memset(m_RINGBUF, 0, sizeof(m_RINGBUF));
+	memset(m_MidiStack, 0, sizeof(m_MidiStack));
 
-	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));	
-	memset(m_RPANTABLE, 0, sizeof(m_RPANTABLE));	
+	memset(m_LPANTABLE, 0, sizeof(m_LPANTABLE));
+	memset(m_RPANTABLE, 0, sizeof(m_RPANTABLE));
 
-	memset(m_TimPris, 0, sizeof(m_TimPris));	
-	memset(m_TimCnt, 0, sizeof(m_TimCnt));	
+	memset(m_TimPris, 0, sizeof(m_TimPris));
+	memset(m_TimCnt, 0, sizeof(m_TimCnt));
 
-	memset(&m_dma, 0, sizeof(m_dma));	
-	
-	memset(m_ARTABLE, 0, sizeof(m_ARTABLE));	
-	memset(m_DRTABLE, 0, sizeof(m_DRTABLE));			
+	memset(&m_dma, 0, sizeof(m_dma));
 
-	memset(&m_DSP, 0, sizeof(m_DSP));			
-	
-	memset(m_EG_TABLE, 0, sizeof(m_EG_TABLE));			
-	memset(m_PLFO_TRI, 0, sizeof(m_PLFO_TRI));			
-	memset(m_PLFO_SQR, 0, sizeof(m_PLFO_SQR));			
-	memset(m_PLFO_SAW, 0, sizeof(m_PLFO_SAW));			
-	memset(m_PLFO_NOI, 0, sizeof(m_PLFO_NOI));			
-	
-	memset(m_ALFO_TRI, 0, sizeof(m_ALFO_TRI));			
-	memset(m_ALFO_SQR, 0, sizeof(m_ALFO_SQR));			
-	memset(m_ALFO_SAW, 0, sizeof(m_ALFO_SAW));			
-	memset(m_ALFO_NOI, 0, sizeof(m_ALFO_NOI));			
-	
-	memset(m_PSCALES, 0, sizeof(m_PSCALES));			
-	memset(m_ASCALES, 0, sizeof(m_ASCALES));			
+	memset(m_ARTABLE, 0, sizeof(m_ARTABLE));
+	memset(m_DRTABLE, 0, sizeof(m_DRTABLE));
+
+	memset(&m_DSP, 0, sizeof(m_DSP));
+
+	memset(m_EG_TABLE, 0, sizeof(m_EG_TABLE));
+	memset(m_PLFO_TRI, 0, sizeof(m_PLFO_TRI));
+	memset(m_PLFO_SQR, 0, sizeof(m_PLFO_SQR));
+	memset(m_PLFO_SAW, 0, sizeof(m_PLFO_SAW));
+	memset(m_PLFO_NOI, 0, sizeof(m_PLFO_NOI));
+
+	memset(m_ALFO_TRI, 0, sizeof(m_ALFO_TRI));
+	memset(m_ALFO_SQR, 0, sizeof(m_ALFO_SQR));
+	memset(m_ALFO_SAW, 0, sizeof(m_ALFO_SAW));
+	memset(m_ALFO_NOI, 0, sizeof(m_ALFO_NOI));
+
+	memset(m_PSCALES, 0, sizeof(m_PSCALES));
+	memset(m_ASCALES, 0, sizeof(m_ASCALES));
 }
 
 

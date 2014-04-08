@@ -73,7 +73,7 @@ void ygv608_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void ygv608_device::set_gfxbank(UINT8 gfxbank)
 {
-	m_namcond1_gfxbank = gfxbank;	
+	m_namcond1_gfxbank = gfxbank;
 }
 
 /* interrupt generated every 1ms second */
@@ -95,7 +95,7 @@ INTERRUPT_GEN_MEMBER(ygv608_device::timed_interrupt )
 	{
 		m_ports.s.p6 |= p6_fv;
 		if (m_regs.s.r14 & r14_iev)
-			device.execute().set_input_line(2, HOLD_LINE); 
+			device.execute().set_input_line(2, HOLD_LINE);
 	}
 
 	/* once every 60Hz, set the position detection flag (somewhere) */
@@ -103,7 +103,7 @@ INTERRUPT_GEN_MEMBER(ygv608_device::timed_interrupt )
 	{
 		m_ports.s.p6 |= p6_fp;
 		if (m_regs.s.r14 & r14_iep)
-			device.execute().set_input_line(2, HOLD_LINE); 
+			device.execute().set_input_line(2, HOLD_LINE);
 	}
 }
 

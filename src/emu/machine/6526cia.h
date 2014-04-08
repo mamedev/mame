@@ -1,6 +1,6 @@
 /**********************************************************************
-	
-	WARNING: DO NOT USE! WILL BE REMOVED IN FAVOR OF machine/mos6526.h
+
+    WARNING: DO NOT USE! WILL BE REMOVED IN FAVOR OF machine/mos6526.h
 
 **********************************************************************
 

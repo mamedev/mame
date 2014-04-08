@@ -347,7 +347,7 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 			flipy = !flipy;
 		}
 
-		
+
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
@@ -356,7 +356,6 @@ void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		/* sprite wrapping - verified on real hardware*/
 		if (sx > 0xf0)
 		{
-			
 			m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 			code, color,
 			flipx, flipy,

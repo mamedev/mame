@@ -111,7 +111,7 @@ compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig
 
 
 //-------------------------------------------------
-//  device_config_complete - 
+//  device_config_complete -
 //-------------------------------------------------
 
 void compucolor_floppy_port_device::device_config_complete()

@@ -162,13 +162,13 @@ void unsp_device::state_export(const device_state_entry &entry)
 
 void unsp_device::state_import(const device_state_entry &entry)
 {
-    switch (entry.index())
-    {
-        case UNSP_PC:
+	switch (entry.index())
+	{
+		case UNSP_PC:
 			UNSP_REG(PC) = (m_debugger_temp & 0x0001fffe) >> 1;
 			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((m_debugger_temp & 0x007e0000) >> 17);
-            break;
-    }
+			break;
+	}
 }
 
 void unsp_device::device_reset()
@@ -863,4 +863,3 @@ void unsp_device::execute_set_input(int irqline, int state)
 	UNSP_REG(PC) = READ16(irq_vector);
 	UNSP_REG(SR) = 0;
 }
-

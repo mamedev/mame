@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( wiz_main_map, AS_PROGRAM, 8, wiz_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_main_map, AS_PROGRAM, 8, wiz_state )
-//	AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
+//  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
 	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
@@ -751,7 +751,7 @@ void wiz_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 	save_item(NAME(m_dsc0));
 	save_item(NAME(m_dsc1));
-	
+
 	save_item(NAME(m_sprite_bank));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_palbank));

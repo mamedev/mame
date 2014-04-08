@@ -18,9 +18,9 @@
 //**************************************************************************
 
 #define M6801_TAG       "m6801"
-#define MC2661_TAG		"mc2661"
-#define RS232_TAG		"rs232"
-#define CENTRONICS_TAG	"centronics"
+#define MC2661_TAG      "mc2661"
+#define RS232_TAG       "rs232"
+#define CENTRONICS_TAG  "centronics"
 
 
 

@@ -28,7 +28,7 @@ extern const device_type CCLIMBER_AUDIO;
 #define MCFG_CCLIMBER_AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, CCLIMBER_AUDIO, 0)
 
-	
+
 // ======================> cclimber_audio_device
 
 class cclimber_audio_device : public device_t
@@ -41,14 +41,14 @@ public:
 	DECLARE_WRITE8_MEMBER( sample_rate_w );
 	DECLARE_WRITE8_MEMBER( sample_volume_w );
 	DECLARE_WRITE8_MEMBER( sample_select_w );
-		
+
 protected:
-	// device level overrides	
-	virtual void device_start();	
+	// device level overrides
+	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	void play_sample(int start,int freq,int volume);
-private:	
+private:
 	int m_sample_num;
 	int m_sample_freq;
 	int m_sample_volume;

@@ -139,7 +139,6 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 	{
 		for (x = 0; x < 256 / 32; x++)
 		{
-			
 					m_gfxdecode->gfx(1)->opaque(bitmap,
 					cliprect,
 					m_bgram[index] + 256 * (m_bgram[index + 1] & 0xf),
@@ -154,7 +153,6 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 	{
 		for (x = 0; x < 32; x++)
 		{
-			
 					m_gfxdecode->gfx(0)->transpen(bitmap,
 					cliprect,
 					m_videoram[(y * 32 + x) * 2 + 1] + (m_videoram[(y * 32 + x) * 2] & 7) * 256,

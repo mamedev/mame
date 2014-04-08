@@ -273,7 +273,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 		case 0xFF :
 		{
 			nand.mode = NAND_M_INIT;
-			 m_s3c2410->frnb_w(1);
+				m_s3c2410->frnb_w(1);
 		}
 		break;
 		case 0x00 :

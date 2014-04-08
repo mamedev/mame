@@ -75,7 +75,7 @@ void K001006_init(running_machine &machine, palette_device *palette)
 		K001006_addr[i] = 0;
 		K001006_device_sel[i] = 0;
 		K001006_palette[i] = auto_alloc_array(machine, UINT32, 0x800);
-		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));		
+		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
 	}
 	m_palette = palette;
 }

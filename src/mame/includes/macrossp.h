@@ -71,7 +71,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
 	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
 	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);

@@ -394,7 +394,7 @@ static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(XBGR)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bootleg)
 
 	/* sound hardware */

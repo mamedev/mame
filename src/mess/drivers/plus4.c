@@ -690,7 +690,7 @@ void plus4_state::machine_start()
 	{
 		m_acia->write_cts(0);
 	}
-	
+
 	m_spi_kb->write_p0(1);
 	m_spi_kb->write_p1(1);
 	m_spi_kb->write_p2(1);

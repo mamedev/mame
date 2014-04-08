@@ -23,7 +23,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		
+
 		DECLARE_READ8_MEMBER(ym3812_16_r);
 		DECLARE_WRITE8_MEMBER(ym3812_16_w);
 protected:

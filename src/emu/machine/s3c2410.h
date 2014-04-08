@@ -16,7 +16,7 @@
 
 #define MCFG_S3C2410_ADD(_tag, _clock, _config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, S3C2410, _clock) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 	s3c2410_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define S3C2410_INTERFACE(name) \
@@ -454,7 +454,7 @@ static const UINT32 MAP_SUBINT_TO_INT[11] =
 #define S3C24XX_DMA_COUNT   4
 #define S3C24XX_SPI_COUNT   2
 
-class s3c2410_device : public device_t, 
+class s3c2410_device : public device_t,
 								public s3c2410_interface
 {
 public:
@@ -465,7 +465,7 @@ public:
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
 	DECLARE_WRITE_LINE_MEMBER( frnb_w );
-	
+
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
@@ -475,7 +475,7 @@ private:
 	required_device<palette_device> m_palette;
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void s3c24xx_reset();
 	inline int iface_core_pin_r(int pin);
 	void s3c24xx_lcd_reset();
@@ -633,7 +633,7 @@ public:
 	void s3c24xx_spi_w(UINT32 ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
 	READ32_MEMBER( s3c24xx_spi_0_r );
 	READ32_MEMBER( s3c24xx_spi_1_r );
-	WRITE32_MEMBER( s3c24xx_spi_0_w );	
+	WRITE32_MEMBER( s3c24xx_spi_0_w );
 	WRITE32_MEMBER( s3c24xx_spi_1_w );
 	void s3c24xx_sdi_reset();
 	READ32_MEMBER( s3c24xx_sdi_r );
@@ -661,9 +661,9 @@ public:
 	void s3c2410_touch_screen( int state);
 	void s3c2410_request_eint( UINT32 number);
 	void s3c2410_nand_calculate_mecc( UINT8 *data, UINT32 size, UINT8 *mecc);
-	
+
 	/*******************************************************************************
-		TYPE DEFINITIONS
+	    TYPE DEFINITIONS
 	*******************************************************************************/
 
 	struct s3c24xx_memcon_regs_t
@@ -1070,7 +1070,7 @@ public:
 	devcb_resolved_write8 m_command_w;
 	devcb_resolved_write8 m_address_w;
 	devcb_resolved_read8  m_nand_data_r;
-	devcb_resolved_write8 m_nand_data_w;	
+	devcb_resolved_write8 m_nand_data_w;
 };
 
 extern const device_type S3C2410;

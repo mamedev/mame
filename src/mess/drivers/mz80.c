@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 199)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mz80k)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

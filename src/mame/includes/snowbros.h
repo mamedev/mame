@@ -25,7 +25,7 @@ public:
 	optional_shared_ptr<UINT16> m_bootleg_spriteram16;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	UINT8 m_semicom_prot_offset;

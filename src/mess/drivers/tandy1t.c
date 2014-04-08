@@ -434,7 +434,7 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_MODIFY("pc_keyboard_2")
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP) /*                             29  A9 */
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT) /*                             2B  AB */
-	
+
 	PORT_MODIFY("pc_keyboard_3")
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE   /* Caps Lock                   3A  BA */
 
@@ -566,10 +566,10 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_fdc", pc_isa8_cards, "fdc_xt", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
-	
+
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_lpt", pc_isa8_cards, "lpt", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa_com", pc_isa8_cards, "com", true)
-	
+
 	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
@@ -579,12 +579,12 @@ static MACHINE_CONFIG_FRAGMENT(tandy1000_common)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000hx, tandy1000_state )
-	MCFG_CPU_ADD("maincpu", I8088, 8000000) 
+	MCFG_CPU_ADD("maincpu", I8088, 8000000)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map)
 	MCFG_CPU_IO_MAP(tandy1000_io)
 
 	MCFG_FRAGMENT_ADD(tandy1000_common)
-	
+
 	// plus cards are isa with a nonstandard conntector
 	MCFG_ISA8_SLOT_ADD("mb:isa", "plus1", pc_isa8_cards, NULL, false)
 MACHINE_CONFIG_END
@@ -809,4 +809,3 @@ COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t, tandy1000_s
 COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t, tandy1000_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
 COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t, tandy1000_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
 COMP( 1988, t1000sl2,   ibm5150,    0,          t1000_16_8, tandy1t, tandy1000_state,    t1000sl,    "Tandy Radio Shack", "Tandy 1000 SL/2", 0)
-

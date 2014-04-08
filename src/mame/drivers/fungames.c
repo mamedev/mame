@@ -1,7 +1,7 @@
 /***************************************************************************
- 
+
  Fun Games discrete hardware games
- 
+
  Biplane (1975)
  Biplane 4 (1976)
  King
@@ -9,7 +9,7 @@
  Take 5 (1975)
  Take 7 (1975)
  Tankers (1975)
- 
+
 ***************************************************************************/
 
 
@@ -49,38 +49,38 @@ class fungames_state : public driver_device
 public:
 	fungames_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 static NETLIST_START(fungames)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -110,9 +110,9 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
- 
+
  Game driver(s)
- 
+
  ***************************************************************************/
 
 

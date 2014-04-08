@@ -39,7 +39,7 @@ public:
 	rgb_t(UINT32 data) { m_data = data; }
 	rgb_t(UINT8 r, UINT8 g, UINT8 b) { m_data = (255 << 24) | (r << 16) | (g << 8) | b; }
 	rgb_t(UINT8 a, UINT8 r, UINT8 g, UINT8 b) { m_data = (a << 24) | (r << 16) | (g << 8) | b; }
-	
+
 	// getters
 	UINT8 a() const { return m_data >> 24; }
 	UINT8 r() const { return m_data >> 16; }
@@ -53,7 +53,7 @@ public:
 	rgb_t &set_r(UINT8 r) { m_data &= ~0x00ff0000; m_data |= r << 16; return *this; }
 	rgb_t &set_g(UINT8 g) { m_data &= ~0x0000ff00; m_data |= g <<  8; return *this; }
 	rgb_t &set_b(UINT8 b) { m_data &= ~0x000000ff; m_data |= b <<  0; return *this; }
-	
+
 	// implicit conversion operators
 	operator UINT32() const { return m_data; }
 
@@ -64,11 +64,11 @@ public:
 	rgb_t &operator=(UINT32 rhs) { m_data = rhs; return *this; }
 	rgb_t &operator+=(const rgb_t &rhs) { m_data = rgb_t(clamphi(a() + rhs.a()), clamphi(r() + rhs.r()), clamphi(g() + rhs.g()), clamphi(b() + rhs.b())); return *this; }
 	rgb_t &operator-=(const rgb_t &rhs) { m_data = rgb_t(clamplo(a() - rhs.a()), clamplo(r() - rhs.r()), clamplo(g() - rhs.g()), clamplo(b() - rhs.b())); return *this; }
-	
+
 	// arithmetic operators
 	const rgb_t operator+(const rgb_t &rhs) const { rgb_t result = *this; result += rhs; return result; }
 	const rgb_t operator-(const rgb_t &rhs) const { rgb_t result = *this; result -= rhs; return result; }
-	
+
 	// static helpers
 	static UINT8 clamp(INT32 value) { return (value < 0) ? 0 : (value > 255) ? 255 : value; }
 	static UINT8 clamphi(INT32 value) { return (value > 255) ? 255 : value; }
@@ -79,7 +79,7 @@ public:
 	static const rgb_t white;
 
 private:
-	UINT32	m_data;
+	UINT32  m_data;
 };
 
 
@@ -108,7 +108,7 @@ private:
 	public:
 		// construction
 		dirty_state();
-		
+
 		// operations
 		const UINT32 *dirty_list(UINT32 &mindirty, UINT32 &maxdirty);
 		void resize(UINT32 colors);
@@ -127,7 +127,7 @@ private:
 	palette_client *m_next;                     // pointer to next client
 	dirty_state *   m_live;                     // live dirty state
 	dirty_state *   m_previous;                 // previous dirty state
-	dirty_state		m_dirty[2];					// two dirty states
+	dirty_state     m_dirty[2];                 // two dirty states
 };
 
 
@@ -141,7 +141,7 @@ class palette_t
 public:
 	// static constructor: used to ensure same new/delete is used
 	static palette_t *alloc(UINT32 numcolors, UINT32 numgroups = 1);
-	
+
 	// reference counting
 	void ref() { m_refcount++; }
 	void deref();
@@ -152,12 +152,12 @@ public:
 	int max_index() const { return m_numcolors * m_numgroups + 2; }
 	UINT32 black_entry() const { return m_numcolors * m_numgroups + 0; }
 	UINT32 white_entry() const { return m_numcolors * m_numgroups + 1; }
-	
+
 	// overall adjustments
 	void set_brightness(float brightness);
 	void set_contrast(float contrast);
 	void set_gamma(float gamma);
-	
+
 	// entry getters
 	rgb_t entry_color(UINT32 index) const { return (index < m_numcolors) ? m_entry_color[index] : rgb_t::black; }
 	rgb_t entry_adjusted_color(UINT32 index) const { return (index < m_numcolors * m_numgroups) ? m_adjusted_color[index] : rgb_t::black; }
@@ -166,19 +166,19 @@ public:
 	// entry setters
 	void entry_set_color(UINT32 index, rgb_t rgb);
 	void entry_set_contrast(UINT32 index, float contrast);
-	
+
 	// entry list getters
 	const rgb_t *entry_list_raw() const { return m_entry_color; }
 	const rgb_t *entry_list_adjusted() const { return m_adjusted_color; }
 	const rgb_t *entry_list_adjusted_rgb15() const { return m_adjusted_rgb15; }
-	
+
 	// group adjustments
 	void group_set_brightness(UINT32 group, float brightness);
 	void group_set_contrast(UINT32 group, float contrast);
-	
+
 	// utilities
 	void normalize_range(UINT32 start, UINT32 end, int lum_min = 0, int lum_max = 255);
-	
+
 private:
 	// construction/destruction
 	palette_t(UINT32 numcolors, UINT32 numgroups = 1);

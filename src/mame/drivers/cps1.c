@@ -951,10 +951,10 @@ static INPUT_PORTS_START( ghoulsu )
 	PORT_DIPSETTING(    0x30, "30K, 60K and every 70K" )
 	PORT_DIPSETTING(    0x00, "40K, 70K and every 80K" )
 /* Manuals states the following bonus settings
-	PORT_DIPSETTING(    0x20, "20K, 50K and every 70K" )
-	PORT_DIPSETTING(    0x10, "10K, 30K and every 30K" )
-	PORT_DIPSETTING(    0x30, "40K, 70K and every 80K" )
-	PORT_DIPSETTING(    0x00, "30K, 60K and every 70K" )
+    PORT_DIPSETTING(    0x20, "20K, 50K and every 70K" )
+    PORT_DIPSETTING(    0x10, "10K, 30K and every 30K" )
+    PORT_DIPSETTING(    0x30, "40K, 70K and every 80K" )
+    PORT_DIPSETTING(    0x00, "30K, 60K and every 70K" )
 */
 	/* Debug Dip Switches */
 	PORT_DIPNAME( 0x07, 0x07, "Starting Weapon" ) PORT_CONDITION("DSWC", 0x80, EQUALS, 0x00) PORT_DIPLOCATION("SW(B):1,2,3")
@@ -1077,11 +1077,11 @@ static INPUT_PORTS_START( strider )
 	PORT_DIPSETTING(    0x20, "30K, 50K then every 70K" )
 	PORT_DIPSETTING(    0x10, "20K & 60K only" )
 	PORT_DIPSETTING(    0x00, "30K & 60K only" )
-/* According to manual, these are the proper settings 
-	PORT_DIPSETTING(    0x30, "40K, 70K then every 80K" )
-	PORT_DIPSETTING(    0x20, "20K, 50K then every 70K" )
-	PORT_DIPSETTING(    0x10, "10k, 30k then every 30k" )
-	PORT_DIPSETTING(    0x00, "30K, 60k then every 70k" )
+/* According to manual, these are the proper settings
+    PORT_DIPSETTING(    0x30, "40K, 70K then every 80K" )
+    PORT_DIPSETTING(    0x20, "20K, 50K then every 70K" )
+    PORT_DIPSETTING(    0x10, "10k, 30k then every 30k" )
+    PORT_DIPSETTING(    0x00, "30K, 60k then every 70k" )
 */
 
 	PORT_DIPNAME( 0xc0, 0x80, "Internal Diff. on Life Loss" )   PORT_DIPLOCATION("SW(B):7,8")
@@ -8633,10 +8633,10 @@ CPS1 motherboard (no dash)
 Original 88622-c-2 C board
 
 Bootleg B board with
-	PIC16c55 near PRG roms seem protected
-	8 dipswith near both sound roms and gfx roms
-	1,4,5,8 ON
-	2,3,6,7 OFF
+    PIC16c55 near PRG roms seem protected
+    8 dipswith near both sound roms and gfx roms
+    1,4,5,8 ON
+    2,3,6,7 OFF
 
 Sound rom match various romset
 */
@@ -8652,7 +8652,7 @@ ROM_START( sf2ceblp )
 	ROM_LOAD16_BYTE( "prg34.bin",      0x80001, 0x20000, CRC(f06a12f2) SHA1(ddc431ce01392d4a7562760743abd9ea73b06cf3) )
 	ROM_LOAD16_BYTE( "prg28.bin",      0xc0000, 0x40000, CRC(b7ad5214) SHA1(17b05e0aa9a4eb5f1aaafe35fa029d2a9aea530d) )
 	ROM_LOAD16_BYTE( "prg33.bin",      0xc0001, 0x40000, CRC(6340b914) SHA1(443e37a06058548c8ce7a15ecd10a6635e69d09f) )
-	
+
 	ROM_REGION( 0x600000, "gfx", 0 )
 	ROMX_LOAD( "24.bin",   0x000000, 0x40000, CRC(a8b5633a) SHA1(6548a89d616910d06db126eb1a9c6b5979baff03) , ROM_SKIP(7) )
 	ROMX_LOAD( "14.bin",   0x000001, 0x40000, CRC(5db24ca7) SHA1(0543e89174fecc866a08e0ecc7c31a6efca15da5) , ROM_SKIP(7) )
@@ -8688,8 +8688,8 @@ ROM_START( sf2ceblp )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s92_18.bin",    0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
 	ROM_LOAD( "s92_19.bin",    0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
-	
-	ROM_REGION( 0x2000, "protectin_pic", 0 ) 
+
+	ROM_REGION( 0x2000, "protectin_pic", 0 )
 	ROM_LOAD( "pic16c55",    0x00000, 0x2000, BAD_DUMP CRC(f22e2311) SHA1(320edfba140728599e91c01e863a8b6d071e4bbf) )
 ROM_END
 

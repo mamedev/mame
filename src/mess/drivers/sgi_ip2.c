@@ -378,8 +378,8 @@ static ADDRESS_MAP_START(sgi_ip2_map, AS_PROGRAM, 32, sgi_ip2_state )
 	AM_RANGE(0x30800000, 0x30800003) AM_READWRITE8(sgi_ip2_m_but_r,         sgi_ip2_m_but_w,        0xffffffff)
 	AM_RANGE(0x31000000, 0x31000003) AM_READWRITE16(sgi_ip2_m_quad_r,       sgi_ip2_m_quad_w,       0xffffffff)
 	AM_RANGE(0x31800000, 0x31800003) AM_READ16(sgi_ip2_swtch_r,                                     0xffffffff)
-	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8("duart68681a", mc68681_device, read, write, 	0xffffffff) 
-	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8("duart68681b", mc68681_device, read, write, 	0xffffffff) 
+	AM_RANGE(0x32000000, 0x3200000f) AM_DEVREADWRITE8("duart68681a", mc68681_device, read, write,   0xffffffff)
+	AM_RANGE(0x32800000, 0x3280000f) AM_DEVREADWRITE8("duart68681b", mc68681_device, read, write,   0xffffffff)
 	AM_RANGE(0x33000000, 0x330007ff) AM_RAM
 	AM_RANGE(0x34000000, 0x34000003) AM_READWRITE8(sgi_ip2_clock_ctl_r,     sgi_ip2_clock_ctl_w,    0xffffffff)
 	AM_RANGE(0x35000000, 0x35000003) AM_READWRITE8(sgi_ip2_clock_data_r,    sgi_ip2_clock_data_w,   0xffffffff)
@@ -423,11 +423,11 @@ static MACHINE_CONFIG_START( sgi_ip2, sgi_ip2_state )
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
 
 	MCFG_MC68681_ADD( "duart68681a", XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler)) 
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_MC68681_ADD( "duart68681b", XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler)) 
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler))
 
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 

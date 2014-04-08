@@ -1623,7 +1623,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	int base = m_spriteram[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;
-	
+
 	// airco22b doesn't use spriteset #1
 	if (m_gametype == NAMCOS22_AIR_COMBAT22)
 		num_sprites = 0;

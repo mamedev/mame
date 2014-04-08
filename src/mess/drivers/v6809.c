@@ -108,7 +108,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

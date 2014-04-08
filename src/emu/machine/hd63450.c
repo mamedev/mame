@@ -61,7 +61,7 @@ void hd63450_device::device_start()
 	// get the CPU device
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	assert(m_cpu != NULL);
-	
+
 	// resolve callbacks
 	m_dma_end.resolve();
 	m_dma_error.resolve_safe();
@@ -73,7 +73,7 @@ void hd63450_device::device_start()
 	m_dma_write_1.resolve();
 	m_dma_write_2.resolve();
 	m_dma_write_3.resolve();
-	
+
 	// Initialise timers and registers
 	for (int x = 0; x < 4 ; x++)
 	{
@@ -86,7 +86,7 @@ void hd63450_device::device_start()
 READ16_MEMBER(hd63450_device::read)
 {
 	int channel,reg;
-	
+
 	channel = (offset & 0x60) >> 5;
 	reg = offset & 0x1f;
 
@@ -321,7 +321,7 @@ void hd63450_device::single_transfer(int x)
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	int data;
 	int datasize = 1;
-	
+
 	if(m_in_progress[x] != 0)  // DMA in progress in channel x
 		{
 			if(m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory

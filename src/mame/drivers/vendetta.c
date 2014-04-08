@@ -443,7 +443,7 @@ void vendetta_state::machine_start()
 
 	m_paletteram.resize(0x1000);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	
+
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));

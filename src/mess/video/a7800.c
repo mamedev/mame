@@ -4,7 +4,7 @@
 
   Routines to control the Atari 7800 video hardware
 
-    2014-03-24 Mike Saarna Fixed DMA regarding startup, shutdown and 
+    2014-03-24 Mike Saarna Fixed DMA regarding startup, shutdown and
                             cycle stealing.
 
     2013-05-08 huygens rewrite to emulate line ram buffers (mostly fixes Kung-Fu Master
@@ -126,11 +126,11 @@ void a7800_state::maria_draw_scanline()
 	int x, d, c, i, pixel_cell, cells;
 	int maria_cycles;
 
-     if ( m_maria_offset == 0 )
-	     maria_cycles = 5+21; // DMA startup + last line shutdown
-	 else
- 	     maria_cycles = 5+16; // DMA startup + other line shutdown
-		
+		if ( m_maria_offset == 0 )
+			maria_cycles = 5+21; // DMA startup + last line shutdown
+		else
+			maria_cycles = 5+16; // DMA startup + other line shutdown
+
 	cells = 0;
 
 	/* Process this DLL entry */
@@ -202,9 +202,9 @@ void a7800_state::maria_draw_scanline()
 			}
 		}
 	}
-	        // spin the CPU for Maria DMA, if it's not already spinning for WSYNC
-        if ( ! m_maria_wsync )
-                m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(maria_cycles/4)); // Maria clock rate is 4 times that of the CPU
+			// spin the CPU for Maria DMA, if it's not already spinning for WSYNC
+		if ( ! m_maria_wsync )
+				m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(maria_cycles/4)); // Maria clock rate is 4 times that of the CPU
 
 	// draw line buffer to screen
 	m_active_buffer = !m_active_buffer; // switch buffers

@@ -336,7 +336,7 @@ void pc_keyboard_device::device_start()
 		ioport_queue_chars_delegate(FUNC(pc_keyboard_device::queue_chars), this),
 		ioport_accept_char_delegate(FUNC(pc_keyboard_device::accept_char), this),
 		ioport_charqueue_empty_delegate(FUNC(pc_keyboard_device::charqueue_empty), this));
-		
+
 	m_out_keypress_func.resolve_safe();
 	m_keyboard_timer = timer_alloc();
 }

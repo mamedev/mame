@@ -23,7 +23,7 @@ public:
 	required_device<vector_device> m_vector;
 	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_vectorram;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 
 	int m_sound_status;
 	int m_xcenter;

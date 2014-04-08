@@ -20,7 +20,7 @@ extern const device_type INDER_VIDEO;
 
 
 class inder_vid_device :  public device_t
-/*	public device_video_interface */
+/*  public device_video_interface */
 {
 public:
 	// construction/destruction
@@ -29,7 +29,7 @@ public:
 	required_shared_ptr<UINT16> m_vram;
 	required_device<palette_device> m_palette;
 	required_device<tms34010_device> m_tms;
-	
+
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
 
 protected:

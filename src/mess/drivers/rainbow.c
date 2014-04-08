@@ -6,11 +6,11 @@
 
     STATE AS OF MARCH 2014
     ----------------------
-	Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
-	While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
+    Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
+    While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 
-	Currently, there are 2 showstoppers:
-	(1) IRQ logic for 100-B needs further work (text in RBCONVERT.ZIP has details concerning -A versus -B)
+    Currently, there are 2 showstoppers:
+    (1) IRQ logic for 100-B needs further work (text in RBCONVERT.ZIP has details concerning -A versus -B)
     (2) Keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
 
     - FLOPPY TIMING: 'wd17xx_complete_command' * must * be hard wired to about 13 usecs.
@@ -35,8 +35,8 @@
             * Extended communication option (same as BUNDLE_OPTION ?)
 
     - OTHER HARDWARE UPGRADES:
-			* Suitable Solutions ClikClok (real time clock)
-			
+            * Suitable Solutions ClikClok (real time clock)
+
             * Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
               plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Altered BOOT ROM labeled 'TBSS1.3 - 3ED4'.
 
@@ -269,9 +269,9 @@ protected:
 private:
 	enum
 	{
-		IRQ_8088_MAILBOX = 0,	// vector 0x27/a7
-		IRQ_8088_VBL,			// vector 0x20/a0
-		IRQ_8088_KBD,			// vector 0x26/a6
+		IRQ_8088_MAILBOX = 0,   // vector 0x27/a7
+		IRQ_8088_VBL,           // vector 0x20/a0
+		IRQ_8088_KBD,           // vector 0x26/a6
 
 		IRQ_8088_MAX
 	};
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	//   BOOT LOADERS:
 	//   - the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
 	//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
-	//   SOFTWARE: 
+	//   SOFTWARE:
 	//   - MS-DOS 2 allows a maximum partition size of 16 MB (sizes > 15 MB are incompatible to DOS 3)
 	//   - MS-DOS 3 has a global 1024 cylinder limit (32 MB).
 	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
@@ -528,15 +528,15 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// Native 400K format (80 T * 10 S * 512 bytes) on 'quad density' RX50 drives 
+// Native 400K format (80 T * 10 S * 512 bytes) on 'quad density' RX50 drives
 // ( 5.25" single sided; 300 rpm; MFM 250 kbps; 96 - 100 tpi ).
-//     
+//
 // Additionally, the BIOS can *read* VT-180 disks and MS-DOS 160 k disks
 // - MS-DOS: FORMAT A: /F:160 and MEDIACHK ON
 // ( 40 tracks; single sided with 9 or 8 sectors per track )
 static LEGACY_FLOPPY_OPTIONS_START( dec100_floppy )
 	LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL )
-	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,             
+	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,
 		HEADS([1])
 		TRACKS(40/[80])
 		SECTORS(8/9/[10])
@@ -578,7 +578,7 @@ void rainbow_state::machine_reset()
 	output_set_value("led7", 1);
 
 	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
-	output_set_value("led_wait", 0);    // led8 
+	output_set_value("led_wait", 0);    // led8
 	output_set_value("led_compose", 0); // led9
 	output_set_value("led_lock", 0);    // led10
 	output_set_value("led_hold", 0);    // led11
@@ -654,7 +654,7 @@ void rainbow_state::update_8088_irqs()
 	}
 	else
 	{
-		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);  
+		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 	}
 }
 
@@ -1210,7 +1210,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
-	
+
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", "screen", video_interface)
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
@@ -1236,7 +1236,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-// 'Rainbow 100-A' (introduced May 1982) is first-generation hardware with ROM 04.03.11 
+// 'Rainbow 100-A' (introduced May 1982) is first-generation hardware with ROM 04.03.11
 // - 64 K base RAM on board (instead of 128 K on 'B' model).  832 K RAM max.
 // - inability to boot from hard disc (mind the inadequate PSU)
 // - cannot control bit 7 of IRQ vector (prevents DOS 2.0x from booting on unmodified hardware)
@@ -1298,7 +1298,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME         PARENT   COMPAT  MACHINE       INPUT      STATE          INIT COMPANY                         FULLNAME       FLAGS */
-COMP( 1982, rainbow100 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON						 )
+COMP( 1982, rainbow100 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-A", GAME_IS_SKELETON                        )
 COMP( 1983, rainbow   , 0      ,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
 COMP( 1985, rainbow190 , rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
-

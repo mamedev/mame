@@ -25,7 +25,7 @@
 // ======================> colecovision_standard_cartridge_device
 
 class colecovision_standard_cartridge_device : public device_t,
-											   public device_colecovision_cartridge_interface
+												public device_colecovision_cartridge_interface
 {
 public:
 	// construction/destruction

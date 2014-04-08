@@ -38,7 +38,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 };
 
 

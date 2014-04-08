@@ -93,7 +93,7 @@ private:
 
 	emu_timer *m_busy_timer;
 	//address_space *m_data;
-	
+
 	bool m_bf;                      // busy flag
 
 	UINT8 m_ir;                     // instruction register

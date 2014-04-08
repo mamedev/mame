@@ -305,13 +305,13 @@ static MC6845_INTERFACE( crtc_intf )
 static MC6845_INTERFACE( grip5_crtc_intf )
 {
     false,
-	0,0,0,0,
+    0,0,0,0,
     8,
     NULL,
     grip5_update_row,
     NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i1_w),
-	DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i2_w),
+    DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i1_w),
+    DEVCB_DEVICE_LINE_MEMBER(Z80STI_TAG, z80sti_device, i2_w),
     DEVCB_NULL,
     DEVCB_NULL,
     grip5_update_addr_changed

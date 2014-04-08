@@ -1,24 +1,24 @@
 /**************************************************************************
 
-	SWTPC S/09 Mess driver
-	Robert Justice ,2009-2014
-	
-	Emulates four different fixed combinations of hardware
-	1. swtpc09
-	   MP-09 with SBUG rom, MP-ID, MP-S2, DMF2.
-	   Will boot Flex operating system
-	2. swtpc09i
-	   MP-09 with SBUG rom + HDrom, MP-ID, MP-S2, DMF2, PIAIDE.
-	   Will boot Flex operating system
-	   TODO: finish ide part and get this one working.
-	3. swtpc09u
-	   MP-09 with UniBUG rom, MP-ID, MP-S2, DMF2.
-	   Will boot UniFlex operating system
-	4. swtpc09d3
-	   MP-09 with UniBUG U3 rom, MP-ID, MP-S2, DMF3.
-	   Will boot UniFlex operating system
-	   TODO: add Harddisk support, DMF3 has WD1000 interface
-	   
+    SWTPC S/09 Mess driver
+    Robert Justice ,2009-2014
+
+    Emulates four different fixed combinations of hardware
+    1. swtpc09
+       MP-09 with SBUG rom, MP-ID, MP-S2, DMF2.
+       Will boot Flex operating system
+    2. swtpc09i
+       MP-09 with SBUG rom + HDrom, MP-ID, MP-S2, DMF2, PIAIDE.
+       Will boot Flex operating system
+       TODO: finish ide part and get this one working.
+    3. swtpc09u
+       MP-09 with UniBUG rom, MP-ID, MP-S2, DMF2.
+       Will boot UniFlex operating system
+    4. swtpc09d3
+       MP-09 with UniBUG U3 rom, MP-ID, MP-S2, DMF3.
+       Will boot UniFlex operating system
+       TODO: add Harddisk support, DMF3 has WD1000 interface
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -52,15 +52,15 @@
  F024 - F024  DMF3 Drive select register
  F025 - F025  DMF3 DMA Address register
  F040 - F04F  DMF3 6522 VIA
- 
+
 ***************************************************************************/
 
 /* Address map is dynamically setup when DAT memory is written to  */
 /* only ROM from FF00-FFFF and DAT memory at FFF0-FFFF (write only) is guaranteed always*/
 
 static ADDRESS_MAP_START(swtpc09_mem, AS_PROGRAM, 8, swtpc09_state)
-    AM_RANGE(0xff00, 0xffef) AM_ROM
-    AM_RANGE(0xfff0, 0xffff) AM_ROM AM_WRITE(dat_w)
+	AM_RANGE(0xff00, 0xffef) AM_ROM
+	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_WRITE(dat_w)
 ADDRESS_MAP_END
 
 
@@ -146,73 +146,73 @@ WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
 /* Machine driver */
 /* MPU09, MPID, MPS2 DMF2 */
 static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6809, 1000000)
-    MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6809, 1000000)
+	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
-	
-  	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
-  	
+
+	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
+
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_a_r))
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_ca1_r))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(swtpc09_state, pia0_irq_a))
 
-  	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-    MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
-	
-    MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
-    MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+
+	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
 
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
 static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6809, 1000000)
-    MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6809, 1000000)
+	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-  	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
+	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_a_r))
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_ca1_r))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(swtpc09_state, pia0_irq_a))
 
-  	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-    MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-    MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
-    MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
-  	MCFG_DEVICE_ADD("piaide", PIA6821, 0)
+	MCFG_DEVICE_ADD("piaide", PIA6821, 0)
 
 /* old start to adding ide support, needs major updating */
 /* this is to support an add on card driving IDE from a PIA */
-// 	MCFG_HARDDISK_ADD("harddisk")
-//	MCFG_IDE_CONTROLLER_ADD("ide", NULL)
-//	MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
-// 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", NULL, false )	/* FIXME */ bebox
+//  MCFG_HARDDISK_ADD("harddisk")
+//  MCFG_IDE_CONTROLLER_ADD("ide", NULL)
+//  MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
+//  MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", NULL, false )  /* FIXME */ bebox
 
 
 MACHINE_CONFIG_END
@@ -220,65 +220,65 @@ MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DMF3 */
 static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
-    /* basic machine hardware */
-    MCFG_CPU_ADD("maincpu", M6809, 2000000)
-    MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)
+	MCFG_CPU_PROGRAM_MAP(swtpc09_mem)
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-  	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
-  	
+	MCFG_PTM6840_ADD("ptm", swtpc09_6840_intf)
+
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_a_r))
 	MCFG_PIA_READPA_HANDLER(READ8(swtpc09_state, pia0_ca1_r))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(swtpc09_state, pia0_irq_a))
-	
-  	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-    MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
-	
+
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))
 
-    MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
-    MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
+	MCFG_FD1793_ADD("fdc", swtpc09_wd17xx_interface )
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(swtpc09_floppy_interface)
 
-  	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(swtpc09_state, dmf3_via_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swtpc09_state, dmf3_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swtpc09_state, dmf3_via_write_porta))
 	//MCFG_VIA6522_CA1_HANDLER(WRITELINE(swtpc09_state, dmf3_via_write_ca1))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swtpc09_state, dmf3_via_irq))
-	
+
 
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( swtpc09 )
-    ROM_REGION( 0x100000, "maincpu", 0 )
-    ROM_LOAD ( "sbugh1-8.bin", 0xf800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d) )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD ( "sbugh1-8.bin", 0xf800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d) )
 ROM_END
 
 ROM_START( swtpc09i )
-    ROM_REGION( 0x100000, "maincpu", 0 )
-    ROM_LOAD ( "hd-rom.bin", 0xe800, 0x0800, CRC(b898b4d7) SHA1(2806633eda7da4e9a243fc534f15526ee928b6bc) )
-    ROM_LOAD ( "sbugh1-8.bin", 0xf800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d) )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD ( "hd-rom.bin", 0xe800, 0x0800, CRC(b898b4d7) SHA1(2806633eda7da4e9a243fc534f15526ee928b6bc) )
+	ROM_LOAD ( "sbugh1-8.bin", 0xf800, 0x0800, CRC(10a045a7) SHA1(de547b77653951c7424a069520d52c5b0432e98d) )
 ROM_END
 
 ROM_START( swtpc09u )
-    ROM_REGION( 0x100000, "maincpu", 0 )
-    ROM_LOAD ( "unibug.bin", 0xf800, 0x0800, CRC(92e1cbf2) SHA1(db00f17ee9accdbfa1775fe0162d3556159b8e70) )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD ( "unibug.bin", 0xf800, 0x0800, CRC(92e1cbf2) SHA1(db00f17ee9accdbfa1775fe0162d3556159b8e70) )
 ROM_END
 
 ROM_START( swtpc09d3 )
-    ROM_REGION( 0x100000, "maincpu", 0 )
-    ROM_LOAD ( "uos3.bin", 0xf800, 0x0800, CRC(e95eb3e0) SHA1(3e971d3b7e143bc87e4b506e18a8c928c089c25a) )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD ( "uos3.bin", 0xf800, 0x0800, CRC(e95eb3e0) SHA1(3e971d3b7e143bc87e4b506e18a8c928c089c25a) )
 ROM_END
 
 /* Driver */

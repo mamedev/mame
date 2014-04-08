@@ -322,7 +322,7 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_DECO16IC_ADD("tilegen1", twocrude_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", twocrude_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")

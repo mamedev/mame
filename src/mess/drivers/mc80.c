@@ -174,7 +174,7 @@ static MACHINE_CONFIG_START( mc8020, mc80_state )
 	MCFG_VIDEO_START_OVERRIDE(mc80_state,mc8020)
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8020)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */
@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( mc8030, mc80_state )
 	MCFG_VIDEO_START_OVERRIDE(mc80_state,mc8030)
 	MCFG_SCREEN_UPDATE_DRIVER(mc80_state, screen_update_mc8030)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* Devices */

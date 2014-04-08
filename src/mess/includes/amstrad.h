@@ -288,7 +288,7 @@ protected:
 	optional_ioport m_io_analog4;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	void amstrad_init_lookups();
 	void amstrad_vh_update_mode();
 	void amstrad_plus_dma_parse(int channel);

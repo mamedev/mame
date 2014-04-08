@@ -16,25 +16,25 @@
 
 #define MCFG_HD63450_DMA_READ_1_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_read_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HD63450_DMA_READ_2_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_read_2_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_HD63450_DMA_READ_3_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_read_3_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HD63450_DMA_WRITE_0_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_write_0_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_HD63450_DMA_WRITE_1_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_write_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HD63450_DMA_WRITE_2_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_write_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
 	devcb = &hd63450_device::set_dma_write_3_callback(*device, DEVCB2_##_devcb);
-	
+
 
 struct hd63450_regs
 {  // offsets in bytes
@@ -81,16 +81,16 @@ public:
 	template<class _Object> static devcb2_base &set_dma_write_0_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dma_write_1_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dma_write_2_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_2.set_callback(object); }
-	template<class _Object> static devcb2_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(object); }	
+	template<class _Object> static devcb2_base &set_dma_write_3_callback(device_t &device, _Object object) { return downcast<hd63450_device &>(device).m_dma_write_3.set_callback(object); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-	
+
 	void single_transfer(int x);
 	void set_timer(int channel, attotime tm);
 	int get_vector(int channel);
 	int get_error_vector(int channel);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -107,7 +107,7 @@ private:
 	devcb2_write8 m_dma_write_1;
 	devcb2_write8 m_dma_write_2;
 	devcb2_write8 m_dma_write_3;
-	
+
 	// internal state
 	hd63450_regs m_reg[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel

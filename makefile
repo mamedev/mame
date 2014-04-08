@@ -262,6 +262,9 @@ BUILD_MIDILIB = 1
 # uncomment next line to enable networking
 # USE_NETWORK = 1
 
+# uncomment to enable SSE2 optimized code and SSE2 code generation
+# SSE2 = 1
+
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
@@ -532,6 +535,10 @@ CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
 ifdef LTO
 CCOMFLAGS += -flto
 endif
+endif
+
+ifdef SSE2
+CCOMFLAGS += -msse2
 endif
 
 # add a basic set of warnings

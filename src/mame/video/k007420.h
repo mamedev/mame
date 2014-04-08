@@ -11,7 +11,7 @@ public:
 	~k007420_device() {}
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_bank_limit(device_t &device, int limit) { downcast<k007420_device &>(device).m_banklimit = limit; } 
+	static void static_set_bank_limit(device_t &device, int limit) { downcast<k007420_device &>(device).m_banklimit = limit; }
 	static void static_set_callback(device_t &device, k007420_delegate callback) { downcast<k007420_device &>(device).m_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read );
@@ -48,7 +48,7 @@ extern const device_type K007420;
 	k007420_device::static_set_callback(*device, k007420_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 // function definition for a callback
-#define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)	
+#define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)
 
 
 #endif

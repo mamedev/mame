@@ -61,7 +61,7 @@ public:
 		m_vs(*this, "VS"),
 		m_bankr0(*this, "bankr0"),
 		m_bankw0(*this, "bankw0"),
-		m_bank2(*this, "bank2")	{}
+		m_bank2(*this, "bank2") {}
 
 public:
 	const UINT8 *m_p_chargen;
@@ -340,7 +340,7 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* sound hardware */

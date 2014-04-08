@@ -325,7 +325,7 @@ public:
 	void ms_atari800xl_machine_start(int type, int has_cart);
 
 	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(data); }
-	
+
 	DECLARE_READ8_MEMBER(atari_pia_pa_r);
 	DECLARE_READ8_MEMBER(atari_pia_pb_r);
 

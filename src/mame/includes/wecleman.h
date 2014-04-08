@@ -24,7 +24,7 @@ public:
 		m_k007232_3(*this, "k007232_3"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")		{ }
+		m_screen(*this, "screen")       { }
 
 	optional_shared_ptr<UINT16> m_videostatus;
 	optional_shared_ptr<UINT16> m_protection_ram;

@@ -111,7 +111,7 @@ public:
 	required_device<kaneko_pandora_device> m_pandora;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mermaid_data_w);

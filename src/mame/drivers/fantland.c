@@ -996,7 +996,7 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
+
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */

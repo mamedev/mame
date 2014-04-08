@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( c2031_device::byte_w )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c2031_floppies )
-    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
 SLOT_INTERFACE_END
 
 

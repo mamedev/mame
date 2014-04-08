@@ -203,7 +203,6 @@ void igs_m027_state::video_start()
 
 void igs_m027_state::video_start_fearless()
 {
-
 }
 
 UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

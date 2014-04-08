@@ -1511,7 +1511,7 @@ void gaiden_state::descramble_drgnbowl_gfx()
 	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
-	
+
 	{
 		dynamic_buffer buffer(size);
 

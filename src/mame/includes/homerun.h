@@ -32,7 +32,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 m_control;
 	UINT8 m_sample;
 

@@ -165,4 +165,3 @@ private:
 
 
 extern const device_type SE3208;
-

@@ -310,13 +310,13 @@ void nes_jy_typea_device::update_prg()
 			prg32((last & 0x0f) | (exPrg >> 2));
 			m_bank_6000 = (((m_mmc_prg_bank[3] * 4) + 3) & 0x3f) | (exPrg >> 2);
 			break;
-			
+
 		case 1: // 16KB
 			prg16_89ab((m_mmc_prg_bank[1] & 0x1f) | (exPrg >> 1));
 			prg16_cdef((last & 0x1f) | (exPrg >> 1));
 			m_bank_6000 = (((m_mmc_prg_bank[3] * 2) + 1) & 0x1f) | (exPrg >> 1);
 			break;
-			
+
 		case 2: // 8KB
 			prg8_89(m_mmc_prg_bank[0] | exPrg);
 			prg8_ab(m_mmc_prg_bank[1] | exPrg);
@@ -324,7 +324,7 @@ void nes_jy_typea_device::update_prg()
 			prg8_ef(last | exPrg);
 			m_bank_6000 = m_mmc_prg_bank[3] | exPrg;
 			break;
-			
+
 		case 3: // 8KB Alt
 			prg8_89((unscramble(m_mmc_prg_bank[0]) & 0x3f) | exPrg);
 			prg8_ab((unscramble(m_mmc_prg_bank[1]) & 0x3f) | exPrg);
@@ -347,12 +347,12 @@ void nes_jy_typea_device::update_chr()
 	// Block mode enabled: in this case lower bits select a 256KB page inside CHRROM
 	// and the low bytes of m_mmc_vrom_bank select the banks inside such a page
 
-	// docs suggest m_reg[3] & 0x1f for chr_page below, 
+	// docs suggest m_reg[3] & 0x1f for chr_page below,
 	// but 45 in 1 (JY-120A) menu requires to use this (from NEStopia)
-	UINT8 chr_page = (m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2);	
+	UINT8 chr_page = (m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2);
 	UINT32 extra_chr_base = BIT(m_reg[3], 5) ? 0 : (chr_page * 0x100);
 	UINT32 extra_chr_mask = BIT(m_reg[3], 5) ? 0xffffff : 0xff;
-	
+
 	switch (m_reg[0] & 0x18)
 	{
 		case 0x00:  // 8KB
@@ -360,7 +360,7 @@ void nes_jy_typea_device::update_chr()
 			extra_chr_mask >>= 3;
 			chr8(extra_chr_base | (m_mmc_vrom_bank[0] & extra_chr_mask), m_chr_source);
 			break;
-			
+
 		case 0x08:  // 4KB
 			extra_chr_base >>= 2;
 			extra_chr_mask >>= 2;
@@ -369,7 +369,7 @@ void nes_jy_typea_device::update_chr()
 			chr4_0(extra_chr_base | (m_mmc_vrom_bank[m_chr_latch[0]] & extra_chr_mask), m_chr_source);
 			chr4_4(extra_chr_base | (m_mmc_vrom_bank[m_chr_latch[1]] & extra_chr_mask), m_chr_source);
 			break;
-			
+
 		case 0x10:  // 2KB
 			extra_chr_base >>= 1;
 			extra_chr_mask >>= 1;
@@ -378,7 +378,7 @@ void nes_jy_typea_device::update_chr()
 			chr2_4(extra_chr_base | (m_mmc_vrom_bank[4] & extra_chr_mask), m_chr_source);
 			chr2_6(extra_chr_base | (m_mmc_vrom_bank[6] & extra_chr_mask), m_chr_source);
 			break;
-			
+
 		case 0x18:  // 1KB
 			chr1_0(extra_chr_base | (m_mmc_vrom_bank[0] & extra_chr_mask), m_chr_source);
 			chr1_1(extra_chr_base | (m_mmc_vrom_bank[1] & extra_chr_mask), m_chr_source);
@@ -573,7 +573,7 @@ void nes_jy_typec_device::update_mirror_typec()
 READ8_MEMBER(nes_jy_typec_device::chr_r)
 {
 	int bank = offset >> 10;
-	
+
 	irq_clock(0, 2);
 	switch (offset & 0xff0)
 	{

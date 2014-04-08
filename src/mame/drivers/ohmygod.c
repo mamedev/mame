@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ohmygod)
-	
+
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 

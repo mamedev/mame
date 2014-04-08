@@ -227,7 +227,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 class namcos2_state : public namcos2_shared_state

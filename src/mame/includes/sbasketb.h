@@ -35,7 +35,7 @@ public:
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 

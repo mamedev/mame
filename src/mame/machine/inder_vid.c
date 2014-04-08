@@ -13,7 +13,7 @@ extern const device_type INDER_VIDEO = &device_creator<inder_vid_device>;
 
 inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, INDER_VIDEO, "Inder / Dinamic TMS Video", tag, owner, clock, "indervd", __FILE__),
-/*	device_video_interface(mconfig, *this, false), */
+/*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
 		m_palette(*this, "palette"),
 		m_tms(*this, "tms")
@@ -71,7 +71,7 @@ static void megaphx_to_shiftreg(address_space &space, UINT32 address, UINT16 *sh
 
 static void megaphx_from_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg)
 {
-//	printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+//  printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
 
 	inder_vid_device *state = (inder_vid_device*)space.machine().device("inder_vid");
 
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_FRAGMENT( inder_vid )
 
 
 	MCFG_PALETTE_ADD("palette", 256)
-	
+
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
 
 
@@ -138,7 +138,6 @@ machine_config_constructor inder_vid_device::device_mconfig_additions() const
 
 void inder_vid_device::device_start()
 {
-
 }
 
 void inder_vid_device::device_reset()

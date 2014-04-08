@@ -21,7 +21,7 @@
 
 #define MCFG_EF9345_PALETTE(_palette_tag) \
 	ef9345_device::static_set_palette_tag(*device, "^" _palette_tag);
-	
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -38,7 +38,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -112,7 +112,7 @@ private:
 	// timers
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
-	
+
 	required_device<palette_device> m_palette;
 };
 

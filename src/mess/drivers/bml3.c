@@ -153,7 +153,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
 	required_device<acia6850_device> m_acia6850;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

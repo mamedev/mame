@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	MCFG_DEVICE_ADD("scc", SCC8530, C7M)
 	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(mac_state, set_scc_interrupt))
-	
+
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
@@ -955,7 +955,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
- 	MCFG_MACKBD_ADD(MACKBD_TAG)
+	MCFG_MACKBD_ADD(MACKBD_TAG)
 #ifdef MAC_USE_EMULATED_KBD
 	MCFG_MACKBD_DATAOUT_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
@@ -1565,7 +1565,7 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 	MCFG_SCREEN_SIZE(700, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macpb160)
-	MCFG_SCREEN_PALETTE("palette")	
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(mac_state,macgsc)
@@ -1697,7 +1697,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)	
+	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
 	MCFG_DEFAULT_LAYOUT(layout_mac)
 
 	/* internal ram */
@@ -1825,7 +1825,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
 	MCFG_SCREEN_SIZE(1152, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macdafb)	
+	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macdafb)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macdafb)
 	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macdafb)

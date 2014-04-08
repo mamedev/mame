@@ -37,7 +37,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(mcat_coin_w);
 	DECLARE_READ16_MEMBER(mcat_wd_r);

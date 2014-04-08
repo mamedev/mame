@@ -58,7 +58,7 @@ public:
 	optional_device<msm5205_device> m_msm5205;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(combatscb_io_r);

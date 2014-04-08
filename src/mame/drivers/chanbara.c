@@ -84,7 +84,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
 	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
 	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);

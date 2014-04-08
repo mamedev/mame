@@ -13,8 +13,8 @@ Notes:
    two don't run on the same hardware. mjcamera is in nbmj8688.c.
 
 - In mjfocus(Medal Type), sometimes CPU's hands are forced out from the screen.
-  This is correct behaviour.   
-  
+  This is correct behaviour.
+
 TODO:
 
 - Telmajan cannot set to JAMMA type. I don't know why.

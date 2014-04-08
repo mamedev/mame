@@ -33,8 +33,8 @@
 #include "includes/slapstic.h"
 
 
-#define MASTER_CLOCK (12096000)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL_12_096MHz)
+#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
 
 
 WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
@@ -328,12 +328,11 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert,  (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
 
 	MCFG_RIOT6532_ADD("riot", MASTER_CLOCK / 8, starwars_riot6532_intf)
 
@@ -342,7 +341,7 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 6)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 250, 0, 280)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)

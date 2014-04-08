@@ -22,7 +22,7 @@ public:
 			m_speaker(*this, "speaker"),
 			m_videoram(*this, "videoram"),
 			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

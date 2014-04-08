@@ -54,7 +54,7 @@ READ8_MEMBER( latch8_device::read )
 	{
 		int i;
 		for (i=0; i<8; i++)
-		{			
+		{
 			if (i==0 && !m_read_0.isnull()) { res &= ~( 1 << i); res |= ((m_read_0(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
 			if (i==1 && !m_read_1.isnull()) { res &= ~( 1 << i); res |= ((m_read_1(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
 			if (i==2 && !m_read_2.isnull()) { res &= ~( 1 << i); res |= ((m_read_2(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
@@ -62,7 +62,7 @@ READ8_MEMBER( latch8_device::read )
 			if (i==4 && !m_read_4.isnull()) { res &= ~( 1 << i); res |= ((m_read_4(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
 			if (i==5 && !m_read_5.isnull()) { res &= ~( 1 << i); res |= ((m_read_5(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
 			if (i==6 && !m_read_6.isnull()) { res &= ~( 1 << i); res |= ((m_read_6(space, 0, 0xff) >> m_offset[i]) & 0x01) << i; }
-			if (i==7 && !m_read_7.isnull()) { res &= ~( 1 << i); res |= ((m_read_7(space, 0, 0xff) >> m_offset[i]) & 0x01) << i;}			
+			if (i==7 && !m_read_7.isnull()) { res &= ~( 1 << i); res |= ((m_read_7(space, 0, 0xff) >> m_offset[i]) & 0x01) << i;}
 		}
 	}
 	return (res & ~m_maskout) ^ m_xorvalue;
@@ -150,7 +150,7 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 		m_has_read(0),
 		m_maskout(0),
 		m_xorvalue(0),
-		m_nosync(0),	
+		m_nosync(0),
 		m_write_0(*this),
 		m_write_1(*this),
 		m_write_2(*this),
@@ -168,13 +168,13 @@ latch8_device::latch8_device(const machine_config &mconfig, const char *tag, dev
 		m_read_6(*this),
 		m_read_7(*this)
 {
-	memset(m_offset, 0, sizeof(m_offset));	
+	memset(m_offset, 0, sizeof(m_offset));
 }
 
 
 //-------------------------------------------------
 //  device_validity_check - validate device
-//	configuration
+//  configuration
 //-------------------------------------------------
 
 void latch8_device::device_validity_check(validity_checker &valid) const
@@ -202,7 +202,7 @@ void latch8_device::device_start()
 	m_write_5.resolve();
 	m_write_6.resolve();
 	m_write_7.resolve();
-	
+
 	m_read_0.resolve();
 	m_read_1.resolve();
 	m_read_2.resolve();
@@ -211,7 +211,7 @@ void latch8_device::device_start()
 	m_read_5.resolve();
 	m_read_6.resolve();
 	m_read_7.resolve();
-	
+
 	/* setup nodemap */
 	if (!m_write_0.isnull()) m_has_write = 1;
 	if (!m_write_1.isnull()) m_has_write = 1;
@@ -221,7 +221,7 @@ void latch8_device::device_start()
 	if (!m_write_5.isnull()) m_has_write = 1;
 	if (!m_write_6.isnull()) m_has_write = 1;
 	if (!m_write_7.isnull()) m_has_write = 1;
-	
+
 	/* setup device read handlers */
 	if (!m_read_0.isnull()) m_has_read = 1;
 	if (!m_read_1.isnull()) m_has_read = 1;

@@ -931,7 +931,7 @@ void dgn_beta_state::dgn_beta_line_interrupt (int data)
 
 /********************************* Machine/Driver Initialization ****************************************/
 void dgn_beta_state::machine_reset()
-{	
+{
 	wd2797_device *fdc = machine().device<wd2797_device>(FDC_TAG);
 	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
 	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );

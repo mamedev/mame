@@ -24,7 +24,7 @@ public:
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(io_r);
 	virtual void machine_start();

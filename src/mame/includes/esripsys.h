@@ -123,7 +123,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
 	required_device<dac_device> m_dac;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
 };
 

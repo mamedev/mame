@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)

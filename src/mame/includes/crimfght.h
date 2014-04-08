@@ -34,7 +34,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(crimfght_coin_w);
 	DECLARE_WRITE8_MEMBER(crimfght_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(k052109_051960_r);

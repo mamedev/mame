@@ -1,12 +1,12 @@
 /***************************************************************************
- 
+
  A-1 Supply discrete hardware games
- 
+
  TV 21 (197?)
  TV 21 III (197?)
  TV Poker (197?)
 
- These actually seem to use Intel 4040 as a CPU + a lot of discrete circuitry... 
+ These actually seem to use Intel 4040 as a CPU + a lot of discrete circuitry...
  to be checked!
 
 ***************************************************************************/
@@ -48,38 +48,38 @@ class a1supply_state : public driver_device
 public:
 	a1supply_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 static NETLIST_START(a1supply)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -109,9 +109,9 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
- 
+
  Game driver(s)
- 
+
  ***************************************************************************/
 
 

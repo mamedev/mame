@@ -1,7 +1,7 @@
 /***************************************************************************
- 
+
  Electra discrete hardware games
- 
+
  Game Name
  Avenger (1975)                EG-1020
  Eliminator IV (1976)
@@ -9,7 +9,7 @@
  Pace Car Pro (1975)           EG-1000
  UFO Chase (1975)              EG-1010
  Wings (1976)
- 
+
 ***************************************************************************/
 
 
@@ -49,38 +49,38 @@ class electra_state : public driver_device
 public:
 	electra_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 static NETLIST_START(electra)
 	SOLVER(Solve, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -110,9 +110,9 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
- 
+
  Game driver(s)
- 
+
  ***************************************************************************/
 
 

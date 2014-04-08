@@ -218,7 +218,7 @@ J2: unpopulated 8-pin sip header, serial/rs232-related?
     (vcc ? ? ? ? ? ? gnd) (random guess: txd, rxd, rts, cts, dsr, dtr, and one pin could be cd/ri though the modem circuit may do that separately?)
 J3: Floppy Connector
     (standard DIL 34 pin 2-row rectangular connector for mini-shugart/pc floppy cable; pin 2 IS connected somewhere and ?probably? is used for /DISKCHANGE like on an Amiga, with pin 34 being /TRUEREADY?)
-    (as opposed to normal ibm pc 3.5" drives where pin 2 is unconnected or is /DENSITY *input to drive*, and pin 34 is /DISKCHANGE) 
+    (as opposed to normal ibm pc 3.5" drives where pin 2 is unconnected or is /DENSITY *input to drive*, and pin 34 is /DISKCHANGE)
 J4: 18-pin sip header for keyboard ribbon cable
     (needs tracing to see the VIA hookup order)
 J5: locking-tab-type "CONN HEADER VERT 4POS .100 TIN" connector for supplying power
@@ -282,7 +282,7 @@ ToDo:
     data, though track 0 is just a disk "unique" identifier for the cat
     meaning 404480 usable bytes
   * (Once the floppy is working I'd declare the system working)
-- WIP: Centronics port (not sure what is wrong right now, ip4 is never reading 
+- WIP: Centronics port (not sure what is wrong right now, ip4 is never reading
     as high meaning nothing works; does our centronics implementation correctly
     assert BUSY at all?)
 - RS232C port and Modem "port" connected to the DUART's two ports
@@ -597,7 +597,7 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 	 *   sync is active here for 7 cycles; manual claims 10 but is wrong
 	 *   HST (96) is the horizontal count at which the HSYNC pin goes low
 	 *   sync is inactive here for 7 cycles, manual claims 8 but is wrong?, this is the frontporch
-	 *   HSE (104) is the horizontal count at which the horizontal counter is reset to 0 (so counts 0-103 then back to 0) 
+	 *   HSE (104) is the horizontal count at which the horizontal counter is reset to 0 (so counts 0-103 then back to 0)
 	 *
 	 * VERTICAL:
 	 *   0 is the first vertical line displayed to screen
@@ -654,7 +654,7 @@ WRITE16_MEMBER( cat_state::cat_keyboard_w )
 	m_keyboard_line = data >> 8;
 }
 
-// 0x800004-0x800005 'pr.data' write 
+// 0x800004-0x800005 'pr.data' write
 // /DSTB (centronics pin 1) is implied by the cat source code to be pulsed
 // low (for some unknown period of time) upon any write to this port.
 WRITE16_MEMBER( cat_state::cat_printer_data_w )
@@ -764,7 +764,7 @@ WRITE16_MEMBER( cat_state::cat_printer_control_w )
 	 * |||||||\-- CC line enable (pin 34) (verified from cat source code)
 	 * ||||||\--- LEDE line enable (pin 33) (verified from cat source code)
 	 * |||||\---- ?
-	 * ||||\----- ? may be IPP (pin 2) write (non-standard pin 34 of centronics port) or another watchdog reset bit; may also be /DSTB-enable-on-pr.data-write 
+	 * ||||\----- ? may be IPP (pin 2) write (non-standard pin 34 of centronics port) or another watchdog reset bit; may also be /DSTB-enable-on-pr.data-write
 	 * |||\------ ?
 	 * ||\------- ?
 	 * |\-------- ?
@@ -835,7 +835,7 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 *
 	 * 76543210
 	 * ??????\\-- Watchdog count? (counts upward? if this reaches <some unknown number greater than 2> the watchdog fires? writing bit 3 set to opr above resets this)
-     *
+	 *
 	 * FEDCBA98
 	 * |||||||\-- PFAIL state (MB3771 comparator: 1: vcc = 5v; 0: vcc != 5v, hence do not write to svram!)
 	 * ||||||\--- (always 0?)
@@ -847,7 +847,7 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * \--------- (always 0?)
 	 */
 READ16_MEMBER( cat_state::cat_wdt_r )
-{	
+{
 	uint16 Retval = 0x0100; // set pfail to 1; should this be a dipswitch?
 	return Retval | m_wdt_counter;
 }

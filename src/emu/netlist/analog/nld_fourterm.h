@@ -15,10 +15,10 @@
 // ----------------------------------------------------------------------------------------
 
 #define VCCS(_name)                                                                \
-        NET_REGISTER_DEV(VCCS, _name)
+		NET_REGISTER_DEV(VCCS, _name)
 
 #define VCVS(_name)                                                                \
-        NET_REGISTER_DEV(VCVS, _name)
+		NET_REGISTER_DEV(VCVS, _name)
 
 // ----------------------------------------------------------------------------------------
 // nld_CCCS
@@ -70,30 +70,30 @@
 class NETLIB_NAME(VCCS) : public netlist_device_t
 {
 public:
-    ATTR_COLD NETLIB_NAME(VCCS)()
-    : netlist_device_t(VCCS) {  }
-    ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-    : netlist_device_t(afamily) {  }
+	ATTR_COLD NETLIB_NAME(VCCS)()
+	: netlist_device_t(VCCS) {  }
+	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
+	: netlist_device_t(afamily) {  }
 
 protected:
-    ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
-    ATTR_COLD virtual void update_param();
-    ATTR_HOT ATTR_ALIGN void update();
+	ATTR_COLD virtual void start();
+	ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void update_param();
+	ATTR_HOT ATTR_ALIGN void update();
 
-    netlist_terminal_t m_OP;
-    netlist_terminal_t m_ON;
+	netlist_terminal_t m_OP;
+	netlist_terminal_t m_ON;
 
-    netlist_terminal_t m_IP;
-    netlist_terminal_t m_IN;
+	netlist_terminal_t m_IP;
+	netlist_terminal_t m_IN;
 
-    netlist_terminal_t m_OP1;
-    netlist_terminal_t m_ON1;
+	netlist_terminal_t m_OP1;
+	netlist_terminal_t m_ON1;
 
-    netlist_param_double_t m_G;
-    netlist_param_double_t m_RI;
+	netlist_param_double_t m_G;
+	netlist_param_double_t m_RI;
 
-    double m_gfac;
+	double m_gfac;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -127,19 +127,19 @@ protected:
 class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
 {
 public:
-    ATTR_COLD NETLIB_NAME(VCVS)()
-    : NETLIB_NAME(VCCS)(VCVS) { }
+	ATTR_COLD NETLIB_NAME(VCVS)()
+	: NETLIB_NAME(VCCS)(VCVS) { }
 
 protected:
-    ATTR_COLD virtual void start();
-    ATTR_COLD virtual void reset();
-    ATTR_COLD virtual void update_param();
-    //ATTR_HOT ATTR_ALIGN void update();
+	ATTR_COLD virtual void start();
+	ATTR_COLD virtual void reset();
+	ATTR_COLD virtual void update_param();
+	//ATTR_HOT ATTR_ALIGN void update();
 
-    netlist_terminal_t m_OP2;
-    netlist_terminal_t m_ON2;
+	netlist_terminal_t m_OP2;
+	netlist_terminal_t m_ON2;
 
-    netlist_param_double_t m_RO;
+	netlist_param_double_t m_RO;
 };
 
 

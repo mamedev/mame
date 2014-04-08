@@ -204,7 +204,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -6846,7 +6846,7 @@ ROM_END
 
 ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */ 
+	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002066p.u66",   0x00000, 0x10000, CRC(01236011) SHA1(3edfee014705b3540386c5e42026ab93628b2597) ) /* Double Double Bonus Poker */

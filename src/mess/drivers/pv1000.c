@@ -470,7 +470,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 
 	MCFG_PALETTE_ADD( "palette", 8 )
 	MCFG_PALETTE_INIT_OWNER(pv1000_state, pv1000)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pv1000 )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

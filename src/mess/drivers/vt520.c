@@ -85,7 +85,7 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	// On the board there are two M5M44256BJ-7 chips

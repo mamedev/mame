@@ -24,7 +24,7 @@ public:
 	void enable(UINT8 enable);
 	void set_frequency(double frequency);
 	void set_volume(UINT16 volume);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

@@ -30,8 +30,8 @@
 #define VAR_EXTPOWER    0x0040
 #define VAR_EXTSIDE     0x0080
 
-#define SPEAKER_TAG	"a3spkr"
-#define DAC_TAG		"a3dac"
+#define SPEAKER_TAG "a3spkr"
+#define DAC_TAG     "a3dac"
 
 class apple3_state : public driver_device
 {
@@ -50,7 +50,7 @@ public:
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG),
 		m_kbspecial(*this, "keyb_special"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 

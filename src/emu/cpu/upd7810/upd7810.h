@@ -81,7 +81,7 @@ enum
 	upd7810_device::set_an7_func(*device, DEVCB2_##_devcb);
 
 
-class upd7810_device : public cpu_device 
+class upd7810_device : public cpu_device
 {
 public:
 	// construction/destruction

@@ -97,8 +97,8 @@
 // ======================> crt9007_t
 
 class crt9007_t :  public device_t,
-				   public device_memory_interface,
-				   public device_video_interface
+					public device_memory_interface,
+					public device_video_interface
 {
 public:
 	// construction/destruction

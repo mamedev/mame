@@ -466,7 +466,7 @@ int base_md_cart_slot_device::load_nonlist()
 	bool is_smd, is_md;
 	UINT32 tmplen = length(), offset, len;
 	dynamic_buffer tmpROM(tmplen);
-	
+
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
 	fread(tmpROM, tmplen);
 	is_smd = genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);

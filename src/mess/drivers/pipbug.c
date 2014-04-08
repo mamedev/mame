@@ -71,7 +71,7 @@ static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8, pipbug_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pipbug_io, AS_IO, 8, pipbug_state)
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READNOP // this has to return zero or the parameter to write_sense is ignored
 ADDRESS_MAP_END

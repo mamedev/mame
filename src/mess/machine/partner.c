@@ -77,7 +77,7 @@ void partner_state::partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom)
 	}
 }
 
-READ8_MEMBER(partner_state::partner_floppy_r){	
+READ8_MEMBER(partner_state::partner_floppy_r){
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : return m_fdc->status_r(space, 0);

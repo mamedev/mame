@@ -695,14 +695,14 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(bwidow_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert,  (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bwidow_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 4)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
@@ -736,7 +736,6 @@ static MACHINE_CONFIG_DERIVED( lunarbat, gravitar )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(45)
 	MCFG_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
 MACHINE_CONFIG_END
 
@@ -749,7 +748,6 @@ static MACHINE_CONFIG_DERIVED( spacduel, gravitar )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(45)
 	MCFG_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
 MACHINE_CONFIG_END
 

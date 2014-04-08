@@ -462,7 +462,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_ay8910(*this, "ay8910"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 

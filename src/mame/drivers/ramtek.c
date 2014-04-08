@@ -1,7 +1,7 @@
 /***************************************************************************
- 
+
  Ramtek Discrete Games List
- 
+
  Game Name                  DATA      Board #
  --------------------------------------------
  (Deluxe) Baseball (1974)   YES
@@ -14,7 +14,7 @@
  Trivia (1976)              YES
  Volly/Volley (1973)        YES
  Wipe Out (1974)            YES
- 
+
  ***************************************************************************/
 
 
@@ -54,38 +54,38 @@ class ramtek_state : public driver_device
 public:
 	ramtek_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 static NETLIST_START(ramtek)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -115,9 +115,9 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
- 
+
  Game driver(s)
- 
+
  ***************************************************************************/
 
 
@@ -138,20 +138,20 @@ ROM_START( bballrmt )
 ROM_END
 
 
-// The board number for Clean Sweep is 501082, and the letter to the right would be the revision letter (A, B, C, D). 
-// Ramtek had revisions A, B, C, D, noted with a sticker that shows the letter for each specific revision. 
+// The board number for Clean Sweep is 501082, and the letter to the right would be the revision letter (A, B, C, D).
+// Ramtek had revisions A, B, C, D, noted with a sticker that shows the letter for each specific revision.
 // Revisions A,B,C have been dumped and rom content is the same (only diff is the location of some chips on the rev B pcb)
 ROM_START( cleanswp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "501075.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )	// shape of paddle
-	ROM_LOAD( "501076.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )	// ball control memory 
-	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )	// number character generation
+	ROM_LOAD( "501075.c6",     0x0000, 0x0020, CRC(be02b5f5) SHA1(f1c616a73c6c2915ea3d0252543b0806704ab2e9) )   // shape of paddle
+	ROM_LOAD( "501076.d7",     0x0000, 0x0020, CRC(be40b153) SHA1(07fb64ea8caee601e3e3bd6c69beea619dd0489d) )   // ball control memory
+	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )   // number character generation
 ROM_END
 
 
-ROM_START( ramtek3 )	// maybe Hockey?
+ROM_START( ramtek3 )    // maybe Hockey?
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0020, "roms", ROMREGION_ERASE00 )

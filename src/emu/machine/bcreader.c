@@ -4,46 +4,46 @@
 
     Generic barcode reader emulation.
 
-	This device only provides the storage of the actual barcode, entered 
-	by the user via Internal UI, both as a raw strip of pixels (up to 95, 
-	for an EAN-13 barcode) and as an array of 0-9 digits.
- 
-	It is up to the driver to handle the serial transfer of the data to
-	the emulated machine, depending on the used protocol
- 
-	E.g. Bandai Datach games directly read the raw pixel sequence of
-	black/white bars; 
-	OTOH Barcode Battle (used by Barcode World for NES and a few SNES 
-	titles) sends the digits as sequences of 20 bytes (13 for the code, 
-	suitably padded for shorted codes, followed by a signature) and the 
-	actual serial transmission to the console is up to the slot device 
-	connected to the NES/SNES controller port (yet to be emulated, in this
-	case)
+    This device only provides the storage of the actual barcode, entered
+    by the user via Internal UI, both as a raw strip of pixels (up to 95,
+    for an EAN-13 barcode) and as an array of 0-9 digits.
+
+    It is up to the driver to handle the serial transfer of the data to
+    the emulated machine, depending on the used protocol
+
+    E.g. Bandai Datach games directly read the raw pixel sequence of
+    black/white bars;
+    OTOH Barcode Battle (used by Barcode World for NES and a few SNES
+    titles) sends the digits as sequences of 20 bytes (13 for the code,
+    suitably padded for shorted codes, followed by a signature) and the
+    actual serial transmission to the console is up to the slot device
+    connected to the NES/SNES controller port (yet to be emulated, in this
+    case)
 
     Note: we currently support the following barcode formats
     * UPC-A: 12 digits
     * EAN-13: 13 digits (extension of the former)
-	* EAN-8: 8 digits (same encoding as UPC-A, but 4-digits blocks instead 
-	  of 6-digits blocks)
+    * EAN-8: 8 digits (same encoding as UPC-A, but 4-digits blocks instead
+      of 6-digits blocks)
     Notice that since EAN-13 is an extension of UPC-A, we just treat UPC-A
-    as an EAN-13 code with leading '0'. If any barcode reader shall be found	
-	which supports the older format only, this shall be changed
+    as an EAN-13 code with leading '0'. If any barcode reader shall be found
+    which supports the older format only, this shall be changed
 
- 
-	TODO: add support for UPC-E barcodes? these are 8 digits barcodes with 17 
-	black stripes (they are compressed UPC-A codes). Datach reader does not 
-	support these, so it is low priority
 
- 
-	TODO 2: verify barcode checksum in is_valid() and not only length, so
-	that we can then use the actual last digit in the decode function below,
-	rather than replacing it with the checksum value
- 
- 
-	TODO 3: possibly the white spaces before the actual barcode (see the
-	61 white pixels sent by read_pixel() before and after the code), shall
-	be moved to the specific implementations to emulate different "sensitivity"
-	of the readers? Bandai Datach seems to need at least 32 pixels...
+    TODO: add support for UPC-E barcodes? these are 8 digits barcodes with 17
+    black stripes (they are compressed UPC-A codes). Datach reader does not
+    support these, so it is low priority
+
+
+    TODO 2: verify barcode checksum in is_valid() and not only length, so
+    that we can then use the actual last digit in the decode function below,
+    rather than replacing it with the checksum value
+
+
+    TODO 3: possibly the white spaces before the actual barcode (see the
+    61 white pixels sent by read_pixel() before and after the code), shall
+    be moved to the specific implementations to emulate different "sensitivity"
+    of the readers? Bandai Datach seems to need at least 32 pixels...
 
 ***************************************************************************/
 
@@ -85,7 +85,7 @@ void barcode_reader_device::device_start()
 
 //-------------------------------------------------
 //  Barcode Decoding - convert the entered sequence
-//  of digits into a sequence of B/W pixels (the 
+//  of digits into a sequence of B/W pixels (the
 //  actual bars) - each digit corresponds to 7 pixels
 //  0 is black, 1 is white
 //-------------------------------------------------
@@ -140,11 +140,11 @@ void barcode_reader_device::decode(int len)
 	if (len == 13)
 	{
 		// UPC-A and EAN-13
-		
+
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
-		
+
 		for (int i = 1; i < 7; i++)
 		{
 			if (bcread_parity_type[m_byte_data[0]][i - 1])
@@ -158,13 +158,13 @@ void barcode_reader_device::decode(int len)
 					m_pixel_data[output++] = bcread_data_LE[m_byte_data[i]][j];
 			}
 		}
-		
+
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
-		
+
 		for (int i = 7; i < 12; i++)
 		{
 			for (int j = 0; j < 7; j++)
@@ -178,59 +178,59 @@ void barcode_reader_device::decode(int len)
 	else if (len == 8)
 	{
 		// EAN-8 (same encoding as UPC-A, but only 4+4 digits, instead of 6+6)
-		
+
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
-		
+
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 7; j++)
 				m_pixel_data[output++] = bcread_data_LO[m_byte_data[i]][j];
 		}
-		
+
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
-		
+
 		for (int i = 4; i < 7; i++)
 		{
 			for (int j = 0; j < 7; j++)
 				m_pixel_data[output++] = bcread_data_RE[m_byte_data[i]][j];
 		}
-		
+
 		// ignore the last digit and compute it as checksum of the first 12
 		for (int i = 0; i < 7; i++)
 			sum += (i & 1) ? (m_byte_data[i] * 1) : (m_byte_data[i] * 3);
 	}
-	
+
 	if (m_pixel_data)
 	{
 		sum = (10 - (sum % 10)) % 10;
 		if (sum != m_byte_data[len - 1])
-			logerror("WARNING: wrong checksum detected in the barcode! chksum %d last digit %d\n", 
+			logerror("WARNING: wrong checksum detected in the barcode! chksum %d last digit %d\n",
 								sum, m_byte_data[len - 1]);
-		
+
 		for (int i = 0; i < 7; i++)
 			m_pixel_data[output++] = bcread_data_RE[sum][i];
-		
+
 		m_pixel_data[output++] = 0;
 		m_pixel_data[output++] = 1;
 		m_pixel_data[output++] = 0;
 	}
-	
+
 	m_byte_length = len;
 	m_pixel_length = output;
 
-//	printf("byte len %d - pixel len\n", m_byte_length, m_pixel_length);
+//  printf("byte len %d - pixel len\n", m_byte_length, m_pixel_length);
 }
 
 
 //-------------------------------------------------
 //  write_code - invoked by UI, stores the barcode
-//  both as an array of digits and as a sequence 
+//  both as an array of digits and as a sequence
 //  of B/W pixels (the actual bars)
 //-------------------------------------------------
 
@@ -322,7 +322,7 @@ int barcode_reader_device::read_pixel()
 			return 0;
 		}
 	}
-	
+
 	// no pending transfer = black pixel = 0
 	return 0;
 }

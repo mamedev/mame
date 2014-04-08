@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
-	
+
 	MCFG_PALETTE_ADD("palette", 2*256+1)
 	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)

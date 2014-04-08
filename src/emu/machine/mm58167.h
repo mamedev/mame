@@ -1,9 +1,9 @@
 /**********************************************************************
 
     mm58167.h - National Semiconductor MM58167 real-time clock emulation
- 
-	license: MAME, BSD-3-Clause, LGPL v2
-	copyright-holders: R. Belmont
+
+    license: MAME, BSD-3-Clause, LGPL v2
+    copyright-holders: R. Belmont
 
 **********************************************************************/
 

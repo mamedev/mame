@@ -113,7 +113,7 @@ static MACHINE_CONFIG_START( sitcom, sitcom_state )
 	MCFG_CPU_IO_MAP(sitcom_io)
 	MCFG_I8085A_SID(READLINE(sitcom_state, sid_line))
 	MCFG_I8085A_SOD(WRITELINE(sitcom_state, sod_led))
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_sitcom)
 
 	/* video hardware */

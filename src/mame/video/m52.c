@@ -305,7 +305,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	/* this may not be correct */
 	ypos = ypos + (22 - 8);
 
-	
+
 		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),
@@ -313,7 +313,7 @@ void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		xpos,
 		ypos, 0);
 
-	
+
 		m_gfxdecode->gfx(image)->transpen(bitmap,cliprect,
 		0, 0,
 		flip_screen(),

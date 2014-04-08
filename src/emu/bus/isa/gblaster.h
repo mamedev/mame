@@ -23,7 +23,7 @@ public:
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
-		
+
 		DECLARE_READ8_MEMBER(saa1099_16_r);
 		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
 		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);

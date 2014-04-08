@@ -36,7 +36,7 @@ const device_type CRT5037 = &device_creator<crt5037_device>;
 const device_type CRT5057 = &device_creator<crt5057_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock, "tms9927", __FILE__),
+				: device_t(mconfig, TMS9927, "TMS9927 VTC", tag, owner, clock, "tms9927", __FILE__),
 					device_video_interface(mconfig, *this),
 					m_write_vsyn(*this)
 {

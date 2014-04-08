@@ -77,7 +77,7 @@ ROM_END
 
 ROM_START( vulcangold )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
-	ROM_LOAD( "ae vulcan gold rom v2.0.bin", 0x000000, 0x004000, CRC(19bc3958) SHA1(96a22c2540fa603648a4e638e176eee76523b4e1) ) 
+	ROM_LOAD( "ae vulcan gold rom v2.0.bin", 0x000000, 0x004000, CRC(19bc3958) SHA1(96a22c2540fa603648a4e638e176eee76523b4e1) )
 ROM_END
 
 /***************************************************************************

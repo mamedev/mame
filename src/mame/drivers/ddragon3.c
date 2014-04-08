@@ -802,7 +802,7 @@ void ddragon3_state::machine_start()
 {
 	m_paletteram.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	
+
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ctribe)
 

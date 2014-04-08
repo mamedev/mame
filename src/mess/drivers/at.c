@@ -24,7 +24,7 @@ static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ps2m30286_map, AS_PROGRAM, 16, at_state)
-        AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
+		AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dffff) AM_RAM
@@ -130,9 +130,9 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_kbdc_r )
 {
-        UINT8 ret;
- 	if(offset == 0) ret = at_keybc_r(space, offset, mem_mask);
- 	else ret = ps2_portb_r(space,offset, mem_mask);
+		UINT8 ret;
+	if(offset == 0) ret = at_keybc_r(space, offset, mem_mask);
+	else ret = ps2_portb_r(space,offset, mem_mask);
 	return ret;
 }
 
@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	
+
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)

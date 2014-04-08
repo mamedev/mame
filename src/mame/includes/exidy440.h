@@ -32,7 +32,7 @@ public:
 	required_device<exidy440_sound_device> m_custom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];
 	INT8 m_showdown_bank_select;

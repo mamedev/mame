@@ -639,7 +639,7 @@ inline void z80_device::ret_cond(bool cond, UINT8 opcode)
  ***************************************************************/
 inline void z80_device::retn()
 {
-	LOG(("Z80 '%s' RETN m_iff1:%d m_iff2:%d\n", 
+	LOG(("Z80 '%s' RETN m_iff1:%d m_iff2:%d\n",
 		tag(), m_iff1, m_iff2));
 	pop(m_pc);
 	WZ = PC;
@@ -2649,7 +2649,7 @@ OP(ed,54) { neg();                                           } /* NEG           
 OP(ed,55) { retn();                                          } /* RETN             */
 OP(ed,56) { m_im = 1;                                        } /* IM   1           */
 OP(ed,57) { ld_a_i();                                        } /* LD   A,i         */
- 
+
 OP(ed,58) { E = in(BC); F = (F & CF) | SZP[E];               } /* IN   E,(C)       */
 OP(ed,59) { out(BC, E);                                      } /* OUT  (C),E       */
 OP(ed,5a) { adc_hl(m_de);                                    } /* ADC  HL,DE       */

@@ -10,7 +10,7 @@
     ----------------------------------
     - TESTS REQUIRED : do line and character attributes (plus combinations) match real hardware?
 
-	- JUMPY SOFT SCROLL : Soft scroll *should* be synced with beam or DMA (line linking/unlinking is done during VBI, in less than 550ms).
+    - JUMPY SOFT SCROLL : Soft scroll *should* be synced with beam or DMA (line linking/unlinking is done during VBI, in less than 550ms).
                           See 4.7.4 and up in VT manual.
 
     - UNDOCUMENTED FEATURES of DC011 / DC012 (CLUES WANTED)
@@ -253,7 +253,7 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 			// set higher part scroll
 			m_scroll_latch = (m_scroll_latch & 0x03) | ((data & 0x03) << 2);
 
-			m_scroll_latch_valid = 1; // MSB is written last. 
+			m_scroll_latch_valid = 1; // MSB is written last.
 		}
 	}
 	else
@@ -570,35 +570,35 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		// Offset to bitmap in char-rom (used later below)
 		int i = scan_line;
 
- 		// Affects 'i'  / 'y_preset' / 'scan_line' (= LOOP VARIABLE) 
-        if ( m_scroll_latch_valid == 1)
-	    {
-		 // **** START IF SCROLL REGION:
-		 if ( (old_scroll_region == 0) && (scroll_region == 1) )
-		 {	
+		// Affects 'i'  / 'y_preset' / 'scan_line' (= LOOP VARIABLE)
+		if ( m_scroll_latch_valid == 1)
+		{
+			// **** START IF SCROLL REGION:
+			if ( (old_scroll_region == 0) && (scroll_region == 1) )
+			{
 			if (scan_line == 0)  // * EXECUTED ONCE *
-			{	
-			    scan_line = m_scroll_latch; // write less lines  ! SIDE EFFECT ON LOOP !
+			{
+				scan_line = m_scroll_latch; // write less lines  ! SIDE EFFECT ON LOOP !
 				i = m_scroll_latch;         // set hard offset to char-rom
 			}
-		 } 
-
-		 // **** MIDDLE OF REGION:
-		 if ( (old_scroll_region == 1) && (scroll_region == 1) )
-		 {
-			if (	( y * 10 + scan_line - m_scroll_latch ) >=	 0 )
-				      y_preset = y * 10 + scan_line - m_scroll_latch;
-		 } 
-
-		 // **** END OF SCROLL REGION:
-		 if ( (old_scroll_region == 1) && (scroll_region == 0) )
-		 { 
-			if (i > (9 - m_scroll_latch) )
-			{	old_scroll_region = m_scroll_latch_valid; // keep track
-				return;							// WHAT HAPPENS WITH THE REST OF THE LINE (BLANK ?)
 			}
-		 } 
-	    } // (IF) scroll latch valid
+
+			// **** MIDDLE OF REGION:
+			if ( (old_scroll_region == 1) && (scroll_region == 1) )
+			{
+			if (    ( y * 10 + scan_line - m_scroll_latch ) >=   0 )
+						y_preset = y * 10 + scan_line - m_scroll_latch;
+			}
+
+			// **** END OF SCROLL REGION:
+			if ( (old_scroll_region == 1) && (scroll_region == 0) )
+			{
+			if (i > (9 - m_scroll_latch) )
+			{   old_scroll_region = m_scroll_latch_valid; // keep track
+				return;                         // WHAT HAPPENS WITH THE REST OF THE LINE (BLANK ?)
+			}
+			}
+		} // (IF) scroll latch valid
 
 		switch (display_type)
 		{

@@ -72,7 +72,7 @@
 		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
 
 #define TTL_74107_DIP(_name)                                                         \
-        NET_REGISTER_DEV(74107_dip, _name)
+		NET_REGISTER_DEV(74107_dip, _name)
 
 NETLIB_SUBDEVICE(74107Asub,
 	netlist_ttl_input_t m_clk;
@@ -108,8 +108,8 @@ public:
 
 NETLIB_DEVICE(74107_dip,
 
-    NETLIB_NAME(74107) m_1;
-    NETLIB_NAME(74107) m_2;
+	NETLIB_NAME(74107) m_1;
+	NETLIB_NAME(74107) m_2;
 );
 
 #endif /* NLD_74107_H_ */

@@ -48,7 +48,7 @@ public:
 	required_shared_ptr<UINT8> m_sprite_position;
 
 	required_device<samples_device> m_samples;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 

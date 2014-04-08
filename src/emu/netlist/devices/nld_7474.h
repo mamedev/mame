@@ -52,7 +52,7 @@
 		NET_CONNECT(_name, PREQ,  _PREQ)
 
 #define TTL_7474_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7474_dip, _name)
+		NET_REGISTER_DEV(7474_dip, _name)
 
 NETLIB_SUBDEVICE(7474sub,
 	netlist_ttl_input_t m_CLK;
@@ -75,8 +75,8 @@ public:
 
 NETLIB_DEVICE(7474_dip,
 
-    NETLIB_NAME(7474) m_1;
-    NETLIB_NAME(7474) m_2;
+	NETLIB_NAME(7474) m_1;
+	NETLIB_NAME(7474) m_2;
 );
 
 #endif /* NLD_7474_H_ */

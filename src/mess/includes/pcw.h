@@ -124,7 +124,7 @@ public:
 	required_device<beep_device> m_beeper;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pcw_update_interrupt_counter();
 	void pcw_update_irqs();

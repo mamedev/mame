@@ -1,24 +1,24 @@
 /********************************************************************
 
     G-Stream (c)2002 Oriental Soft Japan
-	X2222 (prototype) (c)2000 Oriental Soft
+    X2222 (prototype) (c)2000 Oriental Soft
 
-	---
-	X2222 has corrupt boss graphics because the program roms we use don't match the sprite roms.
-	--
+    ---
+    X2222 has corrupt boss graphics because the program roms we use don't match the sprite roms.
+    --
 
     Hyperstone based hardware
 
     Simple Sprites (16x16x8bpp tiles)
     3 Simple Tilemaps (32x32x8bpp tiles)
 
-	X2222 uses raw 16bpp palette data instead of 8bpp indexed colours.
+    X2222 uses raw 16bpp palette data instead of 8bpp indexed colours.
 
     todo: sprite lag (sprites need buffering?)
           sprite wraparound is imperfect
 
     The following is confirmed on G-Stream only
-	---
+    ---
 
     CPU:  E1-32XT
     Sound: 2x AD-65 (OKIM6295 clone)
@@ -41,7 +41,7 @@
     ---
 
     Dump Notes:::
-	
+
     G-Stream 2020, 2002 Oriental Soft Japan
 
     Shooter from Oriental soft, heavy influence from XII Stag
@@ -146,7 +146,7 @@ public:
 		m_workram(*this, "workram"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 		m_toggle = 0;
 	}
@@ -172,8 +172,8 @@ public:
 	/* misc */
 	int       m_oki_bank_1;
 	int       m_oki_bank_2;
-	int		  m_toggle;
-	int		  m_xoffset;
+	int       m_toggle;
+	int       m_xoffset;
 
 	DECLARE_WRITE32_MEMBER(gstream_vram_w);
 	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
@@ -201,7 +201,7 @@ public:
 
 	void rearrange_sprite_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2);
 	void rearrange_tile_data(UINT8* ROM, UINT32* NEW, UINT32* NEW2);
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
@@ -599,11 +599,10 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 	code %= gfx->elements();
 
 	// render
-                        
+
 	do {
 		g_profiler.start(PROFILER_DRAWGFX);
 		do {
-
 			const UINT8 *srcdata, *srcdata2;
 			INT32 destendx, destendy;
 			INT32 srcx, srcy;
@@ -695,7 +694,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 					{
 						UINT32 srcdata = (srcptr[0]);
 						UINT32 srcdata2 = (srcptr2[0]);
-				
+
 						UINT32 fullval = (srcdata | (srcdata2 << 8));
 						UINT32 r = ((fullval >> 0) & 0x1f) << 3;
 						UINT32 g = ((fullval >> 5) & 0x3f) << 2;
@@ -703,7 +702,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 						UINT32 full = (r << 16) | (g << 8) | (b << 0);
 						if (full != 0)
 							destptr[0] = full;
-						
+
 						srcptr++;
 						srcptr2++;
 						destptr++;
@@ -729,7 +728,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 					{
 						UINT32 srcdata = (srcptr[0]);
 						UINT32 srcdata2 = (srcptr2[0]);
-						
+
 						UINT32 fullval = (srcdata | (srcdata2 << 8));
 						UINT32 r = ((fullval >> 0) & 0x1f) << 3;
 						UINT32 g = ((fullval >> 5) & 0x3f) << 2;
@@ -737,7 +736,7 @@ void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_e
 						UINT32 full = (r << 16) | (g << 8) | (b << 0);
 						if (full != 0)
 							destptr[0] = full;
-						
+
 						srcptr--;
 						srcptr2--;
 						destptr++;
@@ -766,7 +765,7 @@ void gstream_state::draw_bg_gstream(bitmap_rgb32 &bitmap, const rectangle &clipr
 			int vram_data = (ram[(basex&0x0f)+((basey&0x0f)*0x10)]);
 			int pal = (vram_data & 0xc0000000) >> 30;
 			int code = (vram_data & 0x0fff0000) >> 16;
-			
+
 			pal += palbase;
 
 			if (m_gfxdecode->gfx(map+5))
@@ -806,7 +805,7 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_rgb32 
 
 
 	draw_bg_gstream(bitmap, cliprect, m_tmap3_scrollx >> 16, m_tmap3_scrolly >> 16, 2, m_vram + 0x800/4, 0x18);
-	draw_bg_gstream(bitmap, cliprect, m_tmap2_scrollx >> 16, m_tmap2_scrolly >> 16, 1, m_vram + 0x400/4, 0x14); 
+	draw_bg_gstream(bitmap, cliprect, m_tmap2_scrollx >> 16, m_tmap2_scrolly >> 16, 1, m_vram + 0x400/4, 0x14);
 	draw_bg_gstream(bitmap, cliprect, m_tmap1_scrollx >> 16, m_tmap1_scrolly >> 16, 0, m_vram + 0x000/4, 0x10); // move on top for x2222 , check
 
 
@@ -907,7 +906,7 @@ static MACHINE_CONFIG_START( x2222, gstream_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
-//	MCFG_NVRAM_ADD_1FILL("nvram")
+//  MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -979,7 +978,7 @@ ROM_START( x2222 )
 
 	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
 	ROM_LOAD( "test.hye", 0x000000, 0x0112dda, CRC(c1142b2f) SHA1(5807930820a53604013a6ac66e4d4ebe3628e1fc) ) // the above binary was built from this
-	
+
 	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
 	/* filled in at init*/
@@ -1041,7 +1040,7 @@ ROM_START( x2222o )
 
 	ROM_REGION32_BE( 0x0200000, "misc", 0 ) /* other code */
 	ROM_LOAD( "older.hye", 0x000000, 0x010892f, CRC(cf3a004e) SHA1(1cba64cfa235b9540f33a5ee0cc02dfd267e00fc) ) // this corresponds to the older.bin we're using, for reference
-	
+
 	/* x2222 uses raw rgb16 data rather than 8bpp indexed, in order to use the same gfx decodes with a custom draw routine we arrange the data into 2 8bpp regions on init */
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )  /* sprite tiles (16x16x8) */
 	/* filled in at init*/

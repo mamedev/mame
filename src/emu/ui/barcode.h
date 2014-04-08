@@ -22,7 +22,7 @@ public:
 	virtual ~ui_menu_barcode_code();
 	virtual void populate();
 	virtual void handle();
-	
+
 private:
 	barcode_reader_device *m_reader;
 	char  m_barcode_buffer[20];

@@ -18,9 +18,9 @@
 
   Technical notes....
 
-  
+
   There are at least 2 different boards.
-  
+
   A) Unknown, with 2x 6264 RAM, mapped $C000-$DFFF and $E000-$FFFF.
   B) 'PCB-001-POK', with 3x 6116 RAM, mapped $E000-$E7FF, $E800-$EFFF, and $F000-$F7FF.
 
@@ -40,7 +40,7 @@
 
   AY-3-8912
   ---------
-  
+
   - IO pins connected to DIP switches bank.
   - Data pin connected to CPU data pin.
   - BC1 goes to PAL IC12 pin 12
@@ -50,7 +50,7 @@
 
   PIAs
   ----
-  
+
   PIA0 (IC24) Port A --> Input.
   PIA0 (IC24) Port B --> Output.
 
@@ -58,15 +58,15 @@
   PB0 to PB6 go to ULN2003 (IC19) then on PCB connector.
   PB7 goes to ULM2003 (IC40) pin 1 then on PCB connector.
 
-  
+
   PIA1 (IC39) Port A --> Output.
   PIA1 (IC39) Port B --> Output.
 
   PA0-PA7 go to 22 KOhm resistor, then a "pull up" capacitor, and then into the base of a transistor.
-		  Collector connected to +5V, emitter is the output (1 KOhm pulldown), it goes into an ULN2803
-		  and then to PCB connector. 3 of that transistors outputs (input of the ULN) are connected
-		  together and connected to another circuit that generate 2 more outputs on PCB connector. 
-		 (them seem unused no solder on the pcb connector)
+          Collector connected to +5V, emitter is the output (1 KOhm pulldown), it goes into an ULN2803
+          and then to PCB connector. 3 of that transistors outputs (input of the ULN) are connected
+          together and connected to another circuit that generate 2 more outputs on PCB connector.
+         (them seem unused no solder on the pcb connector)
 
   PB0 to PB6 goes to ULN2003 (IC34) then on PCB connector.
   PB7 goes to ULM2003 (IC40) pin 2 then on PCB connector.
@@ -78,7 +78,7 @@
   PB0 to PB6 go to ULN2003 (IC31) then on PCB connector.
   PB7 goes to ULM2003 (IC40) pin 3 then on PCB connector.
 
-  
+
 ====================================================================================
 
   Notes by game....
@@ -91,7 +91,7 @@
 
   DIP switch #1 changes the minimal hand between "Jacks or Better" and
   "Pair of Aces".
- 
+
   There are two bookkeeping modes. I think these are for different levels
   like operator and manager/supervisor. With the DIP switch #4 you can
   switch between them. Is possible that this input would be meant to be
@@ -114,7 +114,7 @@
 
   Pressing DEAL/START, you can get the winning hands, occurence of
   spades, diamonds, clubs and hearts. also number of jokers dealt.
- 
+
   With DIP switch #8 ON, you can enter a sort of test mode, where you
   can set the cards using the HOLD buttons, and test the winning hands.
 
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 /* 2x 6462 hardware C000-DFFF & E000-FFFF */
 static ADDRESS_MAP_START( jpcoin_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM		/* 2x 6462 hardware */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM     /* 2x 6462 hardware */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 /* 3x 6116 hardware E000-E800, E800-EFFF & F000-F7FF */
 static ADDRESS_MAP_START( jpcoin2_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM		/* only for the 2x 6462 hardware */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM     /* only for the 2x 6462 hardware */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_SHARE("attr_ram1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_SHARE("attr_ram2")
@@ -486,7 +486,7 @@ E0-E1 CRTC
 	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("pia0", pia6821_device, read, write)    /* confirmed */
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)    /* confirmed */
-//	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
+//  AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
 	AM_RANGE(0xc4, 0xc4) AM_READ(ff_r)  /* needed to boot */
 ADDRESS_MAP_END
 
@@ -820,12 +820,12 @@ static INPUT_PORTS_START( trailblz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( supnudg2 )	/* need to find the button 'B' to be playable */
+static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be playable */
 	PORT_START("PIA0.A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	PORT_NAME("1 Pound (5 credits)")	// coin x 5
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )	PORT_NAME("50 Pence (2.5 credits)")	// coin x 2.5
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )	PORT_NAME("20 Pence (1 credit)")	// coin x 1
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )	PORT_NAME("10 Pence (0.5 credit)")	// coin x 0.5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("1 Pound (5 credits)")    // coin x 5
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_NAME("50 Pence (2.5 credits)") // coin x 2.5
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )  PORT_NAME("20 Pence (1 credit)")    // coin x 1
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )  PORT_NAME("10 Pence (0.5 credit)")  // coin x 0.5
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_A)  PORT_NAME("PIA0.A_0x10")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_S)  PORT_NAME("PIA0.A_0x20")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )  PORT_CODE(KEYCODE_D)  PORT_NAME("PIA0.A_0x40")
@@ -992,14 +992,14 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-/*	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+/*  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 */
 	PORT_START("PIA2.B")
 	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
@@ -1525,14 +1525,14 @@ static MACHINE_CONFIG_DERIVED( jpcoin, coinmstr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
 	MCFG_CPU_IO_MAP(jpcoin_io_map)
-//	MCFG_NVRAM_ADD_0FILL("attr_ram3")
+//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jpcoin2, coinmstr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin2_map)
 	MCFG_CPU_IO_MAP(jpcoin2_io_map)
-//	MCFG_NVRAM_ADD_0FILL("attr_ram3")
+//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
 MACHINE_CONFIG_END
 
 /*
@@ -1691,23 +1691,23 @@ ROM_END
 
 /*
  Looks like the 2x 6264, since checks C000-DFFF
- 
+
  BP 1D0 (PIAS init)
  BP 1102 (calls)
- 
+
  Output C0
  Input C1
- 
+
  Input C8
  Output C9 (masked)
  Output CA
- 
+
  Input D0
  Output D1
  Output D2
  Input D3
  Output DA
- 
+
  Output E0  CRTC
  Output E1  CRTC
 
@@ -1753,8 +1753,8 @@ ROM_START( jpcoin2 )
 	ROM_LOAD( "jp88-1.ic9", 0x0000, 0x4000, CRC(60d31daf) SHA1(204537887388f1a174d1a09331186182be31e8ee) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "jp88-3.ic45", 0x0000, 0x2000, CRC(f2f92a7e) SHA1(ce6f6fd5af0049269357527650b51a1016caf636) ) 
-	ROM_LOAD( "jp88-2.ic41", 0x2000, 0x2000, CRC(57db61b2) SHA1(a3bc2056866cbb9fdca52e62f2ff4a952d1d7484) ) 
+	ROM_LOAD( "jp88-3.ic45", 0x0000, 0x2000, CRC(f2f92a7e) SHA1(ce6f6fd5af0049269357527650b51a1016caf636) )
+	ROM_LOAD( "jp88-2.ic41", 0x2000, 0x2000, CRC(57db61b2) SHA1(a3bc2056866cbb9fdca52e62f2ff4a952d1d7484) )
 ROM_END
 
 

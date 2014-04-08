@@ -438,7 +438,7 @@ struct tile_data
 	UINT8           flags;          // defaults to 0; one or more of TILE_* flags above
 	UINT8           pen_mask;       // defaults to 0xff; mask to apply to pen_data while rendering the tile
 	UINT8           gfxnum;         // defaults to 0xff; specify index of gfx for auto-invalidation on dirty
-	
+
 	void set(int _gfxnum, int rawcode, int rawcolor, int _flags)
 	{
 		gfx_element *gfx = decoder->gfx(_gfxnum);

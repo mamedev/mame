@@ -706,7 +706,7 @@ WRITE_LINE_MEMBER( base_c1541_device::byte_w )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c1540_floppies )
-    SLOT_INTERFACE( "525ssqd", ALPS_3255190x )
+	SLOT_INTERFACE( "525ssqd", ALPS_3255190x )
 SLOT_INTERFACE_END
 
 
@@ -715,8 +715,8 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( base_c1541_device::floppy_formats )
-    FLOPPY_D64_FORMAT,
-    FLOPPY_G64_FORMAT
+	FLOPPY_D64_FORMAT,
+	FLOPPY_G64_FORMAT
 FLOPPY_FORMATS_END
 
 
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_FRAGMENT( c1541pdc )
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_printers, "image")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(MC6821_TAG, pia6821_device, ca1_w))
-    MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 

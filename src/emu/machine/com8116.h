@@ -90,7 +90,7 @@ private:
 	int m_fx4;
 	int m_fr;
 	int m_ft;
-	
+
 	const int *m_fr_divisors;
 	const int *m_ft_divisors;
 

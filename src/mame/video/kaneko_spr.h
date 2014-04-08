@@ -85,7 +85,7 @@ private:
 	template<class _BitmapClass>
 	void kaneko16_draw_sprites(running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, UINT16* spriteram16, int spriteram16_bytes);
 
-	
+
 	template<class _BitmapClass>
 	void kaneko16_draw_sprites_custom(_BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
 			UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,

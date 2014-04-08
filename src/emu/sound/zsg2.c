@@ -89,10 +89,10 @@ void zsg2_device::device_start()
 	m_mem_base = *region();
 	m_mem_size = region()->bytes();
 	m_mem_blocks = m_mem_size / 4;
-	
+
 	m_mem_copy = auto_alloc_array_clear(machine(), UINT32, m_mem_blocks);
 	m_full_samples = auto_alloc_array_clear(machine(), INT16, m_mem_blocks * 4 + 4); // +4 is for empty block
-	
+
 	// register for savestates
 	save_pointer(NAME(m_mem_copy), m_mem_blocks / sizeof(UINT32));
 	save_pointer(NAME(m_full_samples), (m_mem_blocks * 4 + 4) / sizeof(INT16));
@@ -129,7 +129,7 @@ void zsg2_device::device_reset()
 	control_w(4, 0xffff);
 	control_w(5, 0xffff);
 	control_w(6, 0xffff);
-	
+
 	for (int ch = 0; ch < 48; ch++)
 		for (int reg = 0; reg < 0x10; reg++)
 			chan_w(ch, reg, 0);
@@ -155,20 +155,20 @@ INT16 *zsg2_device::prepare_samples(UINT32 offset)
 
 	if (block == 0)
 		return &m_full_samples[m_mem_blocks]; // overflow or 0
-	
+
 	if (block == m_mem_copy[offset])
 		return &m_full_samples[offset * 4]; // cached
-	
+
 	m_mem_copy[offset] = block;
 	offset *= 4;
-	
+
 	// decompress 32 byte block to 4 16-bit samples
 	// 42222222 51111111 60000000 ssss3333
 	m_full_samples[offset|0] = block >> 8 & 0x7f;
 	m_full_samples[offset|1] = block >> 16 & 0x7f;
 	m_full_samples[offset|2] = block >> 24 & 0x7f;
 	m_full_samples[offset|3] = (block >> (8+1) & 0x40) | (block >> (16+2) & 0x20) | (block >> (24+3) & 0x10) | (block & 0xf);
-	
+
 	// sign-extend and shift
 	UINT8 shift = block >> 4 & 0xf;
 	for (int i = offset; i < (offset + 4); i++)
@@ -176,7 +176,7 @@ INT16 *zsg2_device::prepare_samples(UINT32 offset)
 		m_full_samples[i] <<= 9;
 		m_full_samples[i] >>= shift;
 	}
-	
+
 	return &m_full_samples[offset];
 }
 
@@ -197,7 +197,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 		{
 			if (!m_chan[ch].is_playing)
 				continue;
-			
+
 			m_chan[ch].step_ptr += m_chan[ch].step;
 			if (m_chan[ch].step_ptr & 0x40000)
 			{
@@ -215,9 +215,9 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				}
 				m_chan[ch].samples = prepare_samples(m_chan[ch].page | m_chan[ch].cur_pos);
 			}
-			
+
 			INT32 sample = (m_chan[ch].samples[m_chan[ch].step_ptr >> 16 & 3] * m_chan[ch].vol) >> 16;
-			
+
 			mix_l += (sample * m_chan[ch].panl + sample * (0x1f - m_chan[ch].panr)) >> 5;
 			mix_r += (sample * m_chan[ch].panr + sample * (0x1f - m_chan[ch].panl)) >> 5;
 		}
@@ -246,15 +246,15 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			m_chan[ch].start_pos = (m_chan[ch].start_pos & 0x00ff) | (data << 8 & 0xff00);
 			m_chan[ch].page = data << 8 & 0xff0000;
 			break;
-		
+
 		case 0x2:
 			// no function? always 0
 			break;
-		
+
 		case 0x3:
 			// unknown, always 0x0400
 			break;
-		
+
 		case 0x4:
 			// frequency
 			m_chan[ch].step = data + 1;
@@ -266,7 +266,7 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0xff00) | (data & 0xff);
 			m_chan[ch].panr = data >> 8 & 0x1f;
 			break;
-		
+
 		case 0x6:
 			// end address
 			m_chan[ch].end_pos = data;
@@ -278,26 +278,26 @@ void zsg2_device::chan_w(int ch, int reg, UINT16 data)
 			m_chan[ch].loop_pos = (m_chan[ch].loop_pos & 0x00ff) | (data << 8 & 0xff00);
 			m_chan[ch].panl = data >> 8 & 0x1f;
 			break;
-		
+
 		case 0x9:
 			// no function? always 0
 			break;
-		
+
 		case 0xb:
 			// always writes 0
 			// this register is read-only
 			break;
-		
+
 		case 0xe:
 			// volume
 			m_chan[ch].vol = data;
 			break;
-		
+
 		case 0xf:
 			// flags
 			m_chan[ch].flags = data;
 			break;
-		
+
 		default:
 			break;
 	}
@@ -316,7 +316,7 @@ UINT16 zsg2_device::chan_r(int ch, int reg)
 		default:
 			break;
 	}
-	
+
 	return m_chan[ch].v[reg];
 }
 
@@ -397,7 +397,7 @@ UINT16 zsg2_device::control_r(int reg)
 		default:
 			break;
 	}
-	
+
 	return 0;
 }
 

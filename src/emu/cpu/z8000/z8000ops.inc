@@ -69,7 +69,7 @@ void z8001_device::CHANGE_FCW(UINT16 fcw)
 	if (fcw & F_S_N)    /* new mode is system mode */
 	{
 		if (!(m_fcw & F_S_N)                /* old mode was user mode */
-		    || ((fcw ^ m_fcw) & F_SEG))     /* or switch between segmented and non-segmented */
+			|| ((fcw ^ m_fcw) & F_SEG))     /* or switch between segmented and non-segmented */
 		{
 			tmp = RW(14);
 			RW(14) = m_nspseg;
@@ -79,7 +79,7 @@ void z8001_device::CHANGE_FCW(UINT16 fcw)
 	else    /* new mode is user mode */
 	{
 		if (m_fcw & F_S_N          /* old mode was system mode */
-		    && m_fcw & F_SEG)      /* and was segmented */
+			&& m_fcw & F_SEG)      /* and was segmented */
 		{
 			tmp = RW(14);
 			RW(14) = m_nspseg;

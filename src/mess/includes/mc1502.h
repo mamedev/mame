@@ -36,7 +36,7 @@ public:
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device>  m_maincpu;
-	required_device<i8251_device> m_upd8251;		
+	required_device<i8251_device> m_upd8251;
 	required_device<pic8259_device>  m_pic8259;
 	required_device<pit8253_device>  m_pit8253;
 	required_device<i8255_device>  m_ppi8255n1;
@@ -86,7 +86,7 @@ private:
         int         fdc_motor_on;
         emu_timer   *fdc_motor_timer;
     } m_motor;
-	const char *m_cputag;
+    const char *m_cputag;
 */
 };
 

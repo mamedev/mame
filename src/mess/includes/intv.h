@@ -142,7 +142,7 @@ protected:
 	required_ioport m_io_options;
 	optional_ioport m_io_ecs_cntrlsel;
 	optional_ioport m_io_test;
-	
+
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

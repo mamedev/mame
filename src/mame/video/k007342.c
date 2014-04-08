@@ -49,7 +49,7 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	//m_regs[8],
 	//m_scrollx[2],
 	//m_scrolly[2],
-	m_gfxdecode(*this),	
+	m_gfxdecode(*this),
 	m_gfxnum(0)
 {
 }
@@ -74,8 +74,8 @@ void k007342_device::device_start()
 		throw device_missing_dependencies();
 
 	// bind the init function
-    m_callback.bind_relative_to(*owner());
-	
+	m_callback.bind_relative_to(*owner());
+
 	m_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
 
@@ -281,10 +281,10 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	flags = TILE_FLIPYX((color & 0x30) >> 4);
 
 	tileinfo.category = (color & 0x80) >> 7;
-	
+
 	if (!m_callback.isnull())
 		m_callback(layer, m_regs[1], &code, &color, &flags);
-	
+
 
 	SET_TILE_INFO_MEMBER(m_gfxnum,
 			code,

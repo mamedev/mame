@@ -22,7 +22,7 @@ public:
 	required_device<ssem_device> m_maincpu;
 	required_shared_ptr<UINT8> m_store;
 	required_device<screen_device> m_screen;
-	
+
 	UINT8 m_store_line;
 	virtual void machine_reset();
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

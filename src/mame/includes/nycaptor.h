@@ -63,7 +63,7 @@ public:
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);

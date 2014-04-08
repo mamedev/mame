@@ -73,7 +73,7 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 			   -------- --------  xxxxxxxx xxxxxxxx  end address high
 			7  xxxxxxxx xxxxxxxx  -------- --------  volume right (signed?)
 			   -------- --------  xxxxxxxx xxxxxxxx  volume left (signed?)
-			
+
 			(*) reg 5 and 6 are always the same. One of them probably means loop-end address,
 			    but we won't know which until we do tests on real hw.
 			*/
@@ -87,10 +87,10 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 
 			INT16 vol_l = (vptr->regs[7] & 0xffff);
 			INT16 vol_r = (vptr->regs[7] >> 16 & 0xffff);
-			
+
 			UINT32 pos = vptr->pos;
 			UINT32 frac = vptr->frac;
-			
+
 			/* TODO */
 			start -= 0x400000;
 			end -= 0x400000;
@@ -144,7 +144,7 @@ WRITE32_MEMBER( cps3_sound_device::cps3_sound_w )
 	else if (offset == 0x80)
 	{
 		assert((mem_mask & 0xffff0000) == 0xffff0000); // doesn't happen
-		
+
 		UINT16 key = data >> 16;
 
 		for (int i = 0; i < CPS3_VOICES; i++)

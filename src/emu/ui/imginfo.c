@@ -186,5 +186,3 @@ void ui_menu_image_info::image_info_astring(running_machine &machine, astring &s
 		}
 	}
 }
-
-

@@ -1,11 +1,11 @@
 /***************************************************************************
- 
+
  Taito Discrete Hardware Games
- 
- 
+
+
  Game Name(s)                                Part #'s    Data      PROM/ROM Chip Numbers
  ------------------------------------------+-----------+---------+---------------------------------------
- Acrobat (1978)                                          UNKNOWN              
+ Acrobat (1978)                                          UNKNOWN
  Astro Race (1973)                                       UNKNOWN
  Avenger (1976) - Vertical                   EG-1020     UNKNOWN
  Attack (1976)                                           UNKNOWN
@@ -37,7 +37,7 @@
  Wall Block (1978)                                       UNKNOWN
  Western Gun (1975)                                      UNKNOWN
  Zun Zun Block (1979)                                    YES        3 - (2 x 512bytes, 1 x 32bytes)
- 
+
 ***************************************************************************/
 
 
@@ -77,38 +77,38 @@ class taitottl_state : public driver_device
 public:
 	taitottl_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-	  m_maincpu(*this, "maincpu"),
-	  m_video(*this, "fixfreq")
+		m_maincpu(*this, "maincpu"),
+		m_video(*this, "fixfreq")
 	{
 	}
-	
+
 	// devices
 	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-	
+
 protected:
-	
+
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void video_start();
-	
+
 private:
-	
+
 };
 
 
 static NETLIST_START(taitottl)
 	SOLVER(Solver, 48000)
-//	PARAM(Solver.FREQ, 48000)
+//  PARAM(Solver.FREQ, 48000)
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
 	// schematics
 	//...
 
-	//	NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
-	//	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+	//  NETDEV_ANALOG_CALLBACK(sound_cb, sound, exidyttl_state, sound_cb, "")
+	//  NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END()
 
 
@@ -138,27 +138,27 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
- 
+
  Game driver(s)
- 
+
  ***************************************************************************/
 
 /*
- 
- label	loc. Part #
+
+ label  loc. Part #
  ==========================================================
- CR11	N5	74s287		yes, it says CRxx not GNxx
- GN10	H5	5623
- GN09	N6	soldered in
- GN08	J7	IM5200CJG
- GN07	L9	soldered in
- GN06	H6	7621	
- GN05	G9	74s287		
- GN04	F9	7643
- GN03	D9	7621
- GN02	C9	74s287		
- GN01	B9	7643
- 
+ CR11   N5  74s287      yes, it says CRxx not GNxx
+ GN10   H5  5623
+ GN09   N6  soldered in
+ GN08   J7  IM5200CJG
+ GN07   L9  soldered in
+ GN06   H6  7621
+ GN05   G9  74s287
+ GN04   F9  7643
+ GN03   D9  7621
+ GN02   C9  74s287
+ GN01   B9  7643
+
 */
 
 ROM_START( gunman )
@@ -180,7 +180,7 @@ ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 )
-	ROM_LOAD( "tl01.4a",     0x0000, 0x0800, CRC(65b730f7) SHA1(f82931c9a128021c97d1d41b5eac05df55dd5994) )	// MMI 6353
+	ROM_LOAD( "tl01.4a",     0x0000, 0x0800, CRC(65b730f7) SHA1(f82931c9a128021c97d1d41b5eac05df55dd5994) ) // MMI 6353
 ROM_END
 
 

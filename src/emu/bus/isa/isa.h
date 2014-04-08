@@ -156,22 +156,22 @@ public:
 	template<class _iochck> void set_iochck_callback(_iochck iochck) { m_write_iochck.set_callback(iochck); }
 
 	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
-	{ 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const
+	{
 		switch (spacenum)
 		{
 			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:		 return &m_io_config;
-			case AS_DATA:  	 return &m_program16_config;
-			case AS_3:		 return &m_io16_config;
-			default:		 fatalerror("isa: invalid memory space!\n");
+			case AS_IO:      return &m_io_config;
+			case AS_DATA:    return &m_program16_config;
+			case AS_3:       return &m_io16_config;
+			default:         fatalerror("isa: invalid memory space!\n");
 		}
 	}
 
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff)) 
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff))
 	{
-		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);	
+		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
 	}
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
@@ -331,15 +331,15 @@ public:
 	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
-	{ 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const
+	{
 		switch (spacenum)
 		{
 			case AS_PROGRAM: return &m_program16_config;
-			case AS_IO:		 return &m_io16_config;
-			case AS_DATA:	 return &m_program_config;
-			case AS_3:		 return &m_io_config;
-			default:		 fatalerror("isa: invalid memory space!\n");
+			case AS_IO:      return &m_io16_config;
+			case AS_DATA:    return &m_program_config;
+			case AS_3:       return &m_io_config;
+			default:         fatalerror("isa: invalid memory space!\n");
 		}
 	}
 

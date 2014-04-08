@@ -24,7 +24,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "lpalette"),
 		m_palette2(*this, "rpalette"),
-		m_screen(*this, "screen")		
+		m_screen(*this, "screen")
 	{ }
 
 	/* memory pointers */

@@ -45,7 +45,7 @@ public:
 	required_ioport m_a;
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 

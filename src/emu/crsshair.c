@@ -38,7 +38,7 @@ struct crosshair_global
 	UINT8               visible[MAX_PLAYERS];   /* visibility per player */
 	bitmap_argb32 *     bitmap[MAX_PLAYERS];    /* bitmap per player */
 	render_texture *    texture[MAX_PLAYERS];   /* texture per player */
-	screen_device *		screen[MAX_PLAYERS];  	/* the screen on which this player's crosshair is drawn */
+	screen_device *     screen[MAX_PLAYERS];    /* the screen on which this player's crosshair is drawn */
 	float               x[MAX_PLAYERS];         /* current X position */
 	float               y[MAX_PLAYERS];         /* current Y position */
 	float               last_x[MAX_PLAYERS];    /* last X position */

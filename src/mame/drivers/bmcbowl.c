@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x090000, 0x090001) AM_WRITE(bmc_RAMDAC_offset_w) AM_SHARE("colorram")
-	AM_RANGE(0x090002, 0x090003) AM_WRITE(bmc_RAMDAC_color_w) 
+	AM_RANGE(0x090002, 0x090003) AM_WRITE(bmc_RAMDAC_color_w)
 	AM_RANGE(0x090004, 0x090005) AM_WRITENOP//RAMDAC
 
 	AM_RANGE(0x090800, 0x090803) AM_WRITENOP
@@ -489,7 +489,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)

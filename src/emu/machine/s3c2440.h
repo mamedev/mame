@@ -15,7 +15,7 @@
 
 #define MCFG_S3C2440_ADD(_tag, _clock, _config, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, S3C2440, _clock) \
-	MCFG_DEVICE_CONFIG(_config)	\
+	MCFG_DEVICE_CONFIG(_config) \
 	s3c2440_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #define S3C2440_INTERFACE(name) \
@@ -486,7 +486,7 @@ static const UINT32 MAP_SUBINT_TO_INT[15] =
 #define S3C24XX_DMA_COUNT   4
 #define S3C24XX_SPI_COUNT   2
 
-class s3c2440_device : public device_t, 
+class s3c2440_device : public device_t,
 								public s3c2440_interface
 {
 public:
@@ -508,7 +508,7 @@ private:
 	required_device<palette_device> m_palette;
 public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void s3c24xx_reset();
 	inline int iface_core_pin_r(int pin);
 	void s3c24xx_lcd_reset();
@@ -696,7 +696,7 @@ public:
 	void s3c24xx_nand_auto_boot();
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();
-	
+
 
 	void s3c2440_uart_fifo_w( int uart, UINT8 data);
 	void s3c2440_touch_screen( int state);
@@ -705,7 +705,7 @@ public:
 
 
 	/*******************************************************************************
-		TYPE DEFINITIONS
+	    TYPE DEFINITIONS
 	*******************************************************************************/
 
 	struct s3c24xx_memcon_regs_t
@@ -1119,7 +1119,7 @@ public:
 		s3c24xx_ac97_regs_t regs;
 	};
 
-	
+
 	UINT8 m_steppingstone[4*1024];
 	s3c24xx_memcon_t m_memcon;
 	s3c24xx_usbhost_t m_usbhost;
@@ -1156,7 +1156,7 @@ public:
 	devcb_resolved_write8 m_address_w;
 	devcb_resolved_read8  m_nand_data_r;
 	devcb_resolved_write8 m_nand_data_w;
-	
+
 };
 
 extern const device_type S3C2440;

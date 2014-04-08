@@ -712,12 +712,12 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	
+
 	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_state, hgdc_display_pixels)	
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(compis_state, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	
+
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	// devices

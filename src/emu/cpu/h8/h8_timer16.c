@@ -94,14 +94,14 @@ WRITE8_MEMBER(h8_timer16_channel_device::tier_w)
 	tier = data;
 	tier_update();
 	logerror("%s: irq %c%c%c%c%c%c trigger=%d\n",
-			 tag(),
-			 ier & IRQ_A ? 'a' : '.',
-			 ier & IRQ_B ? 'b' : '.',
-			 ier & IRQ_C ? 'c' : '.',
-			 ier & IRQ_D ? 'd' : '.',
-			 ier & IRQ_V ? 'v' : '.',
-			 ier & IRQ_U ? 'u' : '.',
-			 ier & IRQ_TRIG ? 1 : 0);
+				tag(),
+				ier & IRQ_A ? 'a' : '.',
+				ier & IRQ_B ? 'b' : '.',
+				ier & IRQ_C ? 'c' : '.',
+				ier & IRQ_D ? 'd' : '.',
+				ier & IRQ_V ? 'v' : '.',
+				ier & IRQ_U ? 'u' : '.',
+				ier & IRQ_TRIG ? 1 : 0);
 	recalc_event();
 }
 
@@ -218,11 +218,11 @@ void h8_timer16_channel_device::update_counter(UINT64 cur_time)
 		tcnt = tt % counter_cycle;
 		if(0)
 		logerror("%s: Updating %d (%ld %ld) (%ld %ld) -> %d/%d\n",
-				 tag(),
-				 ott,
-				 long(last_clock_update), long(cur_time),
-				 long(base_time), long(new_time),
-				 tt, tcnt);
+					tag(),
+					ott,
+					long(last_clock_update), long(cur_time),
+					long(base_time), long(new_time),
+					tt, tcnt);
 
 		for(int i=0; i<tgr_count; i++)
 			if((ier & (1 << i)) && (tt == tgr[i] || tcnt == tgr[i]) && interrupt[i] != -1) {
@@ -284,7 +284,7 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 
 				if(0)
 				logerror("%s: tcnt=%d tgr%c=%d cycle=%d -> delay=%d\n",
-						 tag(), tcnt, 'a'+i, tgr[i], counter_cycle, new_delay);
+							tag(), tcnt, 'a'+i, tgr[i], counter_cycle, new_delay);
 				if(event_delay > new_delay)
 					event_delay = new_delay;
 			}
@@ -292,10 +292,10 @@ void h8_timer16_channel_device::recalc_event(UINT64 cur_time)
 			event_time = ((((cur_time + (1ULL << clock_divider) - phase) >> clock_divider) + event_delay - 1) << clock_divider) + phase;
 		else
 			event_time = 0;
-		
+
 		if(event_time && 0)
 			logerror("%s: next event in %d cycles (%ld)\n", tag(), int(event_time - cpu->get_cycle()), long(event_time));
-		
+
 	} else {
 		logerror("decrementing counter\n");
 		exit(1);
@@ -622,7 +622,7 @@ void h8s_timer16_channel_device::set_chain(const char *_chain_tag)
 }
 
 void h8s_timer16_channel_device::set_info(int _tgr_count, UINT8 _tier_mask, const char *intc, int irq_base,
-										  int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
+											int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
 {
 	tgr_count = _tgr_count;
 	tbr_count = 0;

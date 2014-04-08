@@ -4161,14 +4161,14 @@ void thomson_state::mo6_update_cart_bank()
 					{
 						if ( bank_is_read_only )
 						{
-                                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
-                                                        space.nop_write( 0xb000, 0xefff);
+														space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+														space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+														space.nop_write( 0xb000, 0xefff);
 						}
 						else
 						{
 							space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                        space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
+														space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 						}
 					}
 				}
@@ -4186,14 +4186,14 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if (m_to8_cart_vpage < 4)
 					{
-                                                space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
-                                                space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
+												space.install_write_handler( 0xb000, 0xbfff, write8_delegate(FUNC(thomson_state::mo6_vcart_lo_w),this));
+												space.install_write_handler( 0xc000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_vcart_hi_w),this));
 
 					}
 					else
 					{
-                                                space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
+												space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+												space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 					}
 				}
 				LOG_BANK(( "mo6_update_cart_bank: update CART bank %i write status to %s\n",
@@ -4210,8 +4210,8 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 				{
-                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+										space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+										space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.nop_write( 0xb000, 0xefff);
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is external cartridge bank %i (A7CB style)\n", bank ));
@@ -4229,14 +4229,14 @@ void thomson_state::mo6_update_cart_bank()
 				{
 					if ( bank_is_read_only )
 					{
-                                                space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+												space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+												space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 						space.nop_write( 0xb000, 0xefff);
 					}
 					else
 					{
-                                                space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
+												space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+												space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 					}
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is RAM bank %i (MO5 compat.) (%s)\n",
@@ -4247,14 +4247,14 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( bank_is_read_only )
 				{
-                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+										space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+										space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.nop_write( 0xb000, 0xefff);
 				}
 				else
 				{
-                                        space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                        space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
+										space.install_readwrite_bank( 0xb000, 0xbfff, MO6_CART_LO );
+										space.install_readwrite_bank( 0xc000, 0xefff, MO6_CART_HI );
 				}
 				LOG_BANK(( "mo5_update_cart_bank: update CART bank %i write status to %s\n",
 											m_to8_cart_vpage,
@@ -4281,8 +4281,8 @@ void thomson_state::mo6_update_cart_bank()
 			{
 				if ( m_old_cart_bank < 4 || m_old_cart_bank > 7 )
 				{
-                                        space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                        space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+										space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+										space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 					space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
 				}
 				LOG_BANK(( "mo6_update_cart_bank: CART is internal ROM bank %i\n", b ));
@@ -4296,10 +4296,10 @@ void thomson_state::mo6_update_cart_bank()
 				bank = m_thom_cart_bank % m_thom_cart_nb_banks;
 				if ( bank != m_old_cart_bank )
 				{
-                                  if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
+									if ( m_old_cart_bank < 0 || m_old_cart_bank > 3 )
 					{
-                                                space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
-                                                space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
+												space.install_read_bank( 0xb000, 0xbfff, MO6_CART_LO );
+												space.install_read_bank( 0xc000, 0xefff, MO6_CART_HI );
 						space.install_write_handler( 0xb000, 0xefff, write8_delegate(FUNC(thomson_state::mo6_cartridge_w),this) );
 						space.install_read_handler( 0xbffc, 0xbfff, read8_delegate(FUNC(thomson_state::mo6_cartridge_r),this) );
 					}

@@ -33,23 +33,23 @@
 
 #define SN74LS629(_name, _cap)                                                      \
 		NET_REGISTER_DEV(SN74LS629, _name)                                          \
-        NETDEV_PARAMI(_name, CAP, _cap)
+		NETDEV_PARAMI(_name, CAP, _cap)
 
 NETLIB_SUBDEVICE(SN74LS629clk,
-    netlist_logic_input_t m_FB;
-    netlist_logic_output_t m_Y;
+	netlist_logic_input_t m_FB;
+	netlist_logic_output_t m_Y;
 
-    netlist_time m_inc;
-    netlist_sig_t m_enableq;
+	netlist_time m_inc;
+	netlist_sig_t m_enableq;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(SN74LS629,
 public:
 	NETLIB_NAME(SN74LS629clk) m_clock;
-    NETLIB_NAME(R_base) m_R_FC;
-    NETLIB_NAME(R_base) m_R_RNG;
+	NETLIB_NAME(R_base) m_R_FC;
+	NETLIB_NAME(R_base) m_R_RNG;
 
-    netlist_logic_input_t m_ENQ;
+	netlist_logic_input_t m_ENQ;
 	netlist_analog_input_t m_RNG;
 	netlist_analog_input_t m_FC;
 
@@ -57,13 +57,13 @@ public:
 );
 
 #define SN74LS629_DIP(_name, _cap1, _cap2)                                        \
-        NET_REGISTER_DEV(SN74LS629_dip, _name)                                    \
-        NETDEV_PARAMI(_name, 1.CAP, _cap1)                                        \
-        NETDEV_PARAMI(_name, 2.CAP, _cap2)
+		NET_REGISTER_DEV(SN74LS629_dip, _name)                                    \
+		NETDEV_PARAMI(_name, 1.CAP, _cap1)                                        \
+		NETDEV_PARAMI(_name, 2.CAP, _cap2)
 
 NETLIB_DEVICE(SN74LS629_dip,
-    NETLIB_NAME(SN74LS629) m_1;
-    NETLIB_NAME(SN74LS629) m_2;
+	NETLIB_NAME(SN74LS629) m_1;
+	NETLIB_NAME(SN74LS629) m_2;
 );
 
 

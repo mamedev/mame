@@ -34,7 +34,7 @@ public:
 	required_device<cpu_device> m_slavecpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(jackalr_rotary_r);
 	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
 	DECLARE_READ8_MEMBER(jackal_zram_r);

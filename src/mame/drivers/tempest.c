@@ -309,7 +309,7 @@ public:
 
 
 #define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
+#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
 
 #define TEMPEST_KNOB_P1_TAG ("KNOBP1")
 #define TEMPEST_KNOB_P2_TAG ("KNOBP2")
@@ -599,11 +599,10 @@ static MACHINE_CONFIG_START( tempest, tempest_state )
 	/* needed to ensure routine at ae1c passes checks and does not corrupt data */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert,  (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
 
 	MCFG_ATARIVGEAROM_ADD("earom")
-
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")

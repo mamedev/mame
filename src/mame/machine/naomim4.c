@@ -139,7 +139,7 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 		if (rombdid_tag && memregion(rombdid_tag) != NULL)
 		{
 			fpr_num = *memregion(rombdid_tag)->base() & 0x7f;
-		
+
 		}
 
 		if (((rom_cur_address >> 26) & 0x07) < fpr_num) {
@@ -210,7 +210,7 @@ READ16_MEMBER(naomi_m4_board::m4_id_r)
 	if (rombdid_tag && memregion(rombdid_tag) != NULL)
 	{
 		epr_flag = *memregion(rombdid_tag)->base() & 0x80;
-		
+
 	}
 
 	return 0x5500 | epr_flag;

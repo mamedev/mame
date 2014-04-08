@@ -7,7 +7,7 @@
 
 
 #define MCFG_NAMCO_51XX_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock) 
+	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock)
 
 #define MCFG_NAMCO_51XX_INPUT_0_CB(_devcb) \
 	devcb = &namco_51xx_device::set_input_0_callback(*device, DEVCB2_##_devcb);
@@ -36,13 +36,13 @@ public:
 	template<class _Object> static devcb2_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_2_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_2.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_3_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_in_3.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_output_0_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_out_0.set_callback(object); }
 	template<class _Object> static devcb2_base &set_output_1_callback(device_t &device, _Object object) { return downcast<namco_51xx_device &>(device).m_out_1.set_callback(object); }
-	
+
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

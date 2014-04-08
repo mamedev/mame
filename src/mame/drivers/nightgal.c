@@ -129,7 +129,7 @@ protected:
 	required_ioport m_io_dswb;
 	required_ioport m_io_dswc;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 nightgal_gfx_nibble( int niboffset );
 	void plot_nightgal_gfx_pixel( UINT8 pix, int x, int y );
 };

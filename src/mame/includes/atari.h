@@ -21,7 +21,7 @@ class atari_common_state : public driver_device
 public:
 	atari_common_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		tv_artifacts(0)	{ }
+		tv_artifacts(0) { }
 
 	void a600xl_mmu(UINT8 new_mmu);
 

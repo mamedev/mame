@@ -2094,7 +2094,7 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 		LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
 		return m_current_chr_table[m_prot_col].response;
 	}
-		
+
 	if (offset == 3)
 	{
 		LOG_CHR(("Characteriser read data off 3 %02X \n",m_current_chr_table[m_lamp_col+64].response));
@@ -2395,7 +2395,7 @@ static mpu4_chr_table blsbys_data[8] = {
 	//      6  0  7  0  8  0  7  0  0  8
 //request 36 42 27 42 09 42 27 42 42 09
 //verify  00 04 04 0C 0C 1C 14 2C 5C 2C
-	
+
 DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 {
 	m_reel_mux=SIX_REEL_1TO8;

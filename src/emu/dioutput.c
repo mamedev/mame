@@ -40,7 +40,7 @@ void device_output_interface::set_output_value(int value)
 	if (m_output_name)
 		output_set_value(m_output_name, value);
 	else
-		fatalerror("Output name not set!");	
+		fatalerror("Output name not set!");
 }
 
 void device_output_interface::set_led_value(int value)

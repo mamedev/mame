@@ -43,7 +43,7 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-#define MCFG_H8_ADC_GENERIC_ADD( _tag, _type, intc, vect )	\
+#define MCFG_H8_ADC_GENERIC_ADD( _tag, _type, intc, vect )  \
 	MCFG_DEVICE_ADD( _tag, _type, 0 ) \
 	downcast<h8_adc_device *>(device)->set_info(intc, vect);
 

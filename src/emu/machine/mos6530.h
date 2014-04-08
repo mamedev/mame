@@ -70,20 +70,20 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	UINT8 porta_in_get();
 	UINT8 portb_in_get();
 
 	UINT8 porta_out_get();
 	UINT8 portb_out_get();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	// internal state
 
@@ -99,13 +99,13 @@ private:
 	emu_timer *     m_timer;
 
 	UINT32          m_clock;
-	
-	void update_irqstate();	
+
+	void update_irqstate();
 	UINT8 get_timer();
-	
+
 	void porta_in_set(UINT8 data, UINT8 mask);
 	void portb_in_set(UINT8 data, UINT8 mask);
-	
+
 	enum
 	{
 		TIMER_END_CALLBACK

@@ -121,7 +121,7 @@ public:
 	required_device<mc6845_device> m_mc6845;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
-	
+
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(audio_1_command_w);
 	DECLARE_WRITE8_MEMBER(audio_1_answer_w);

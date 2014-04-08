@@ -289,7 +289,7 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ16_MEMBER( read );
 

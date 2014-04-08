@@ -23,8 +23,8 @@
  * - http://www.freescale.com/files/32bit/doc/inactive/MC68681UM.pdf
  *
  *  SIO usage:
- *  	SIO: ch A keyboard, ch B serial console
- *		SIO2: modem/printer?
+ *      SIO: ch A keyboard, ch B serial console
+ *      SIO2: modem/printer?
  *
  */
 
@@ -190,7 +190,7 @@ static UINT16 cpu_control_register = 0x0000;
 
 /*static int apollo_csr_get_servicemode()
 {
-	return cpu_status_register & APOLLO_CSR_SR_SERVICE ? 0 : 1;
+    return cpu_status_register & APOLLO_CSR_SR_SERVICE ? 0 : 1;
 }*/
 
 static void apollo_csr_set_servicemode(int mode)
@@ -569,7 +569,7 @@ void apollo_state::select_dma_channel(int channel, bool state)
 #undef VERBOSE
 #define VERBOSE 0
 
-void apollo_state::apollo_pic_set_irq_line(int irq, int state) 
+void apollo_state::apollo_pic_set_irq_line(int irq, int state)
 {
 	switch (irq) {
 	case 0: m_pic8259_master->ir0_w(state); break;
@@ -665,7 +665,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_ptm_timer_tick)
 {
 	if ((state) && (m_ptm->started()))
 	{
-		ptm_counter++; 
+		ptm_counter++;
 		m_ptm->set_c1( 1);
 		m_ptm->set_c1( 0);
 		m_ptm->set_c2(ptm_counter & 1);
@@ -751,7 +751,7 @@ WRITE_LINE_MEMBER(apollo_state::sio_irq_handler)
 
 WRITE8_MEMBER(apollo_state::sio_output)
 {
-	if ((data & 0x80) != (sio_output_data & 0x80)) 
+	if ((data & 0x80) != (sio_output_data & 0x80))
 	{
 		apollo_pic_set_irq_line(APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
 		sio_output_data = data;
@@ -762,7 +762,7 @@ WRITE8_MEMBER(apollo_state::sio_output)
 	// The period of the output is 15 microseconds.
 
 	// toggle memory refresh counter
-//	sio_input_data ^= 0x01;
+//  sio_input_data ^= 0x01;
 
 //##########################################################################
 // machine/apollo_sio2.c - APOLLO DS3500 SIO2
@@ -808,9 +808,9 @@ static const isa16bus_interface isabus_intf =
 };
 
 static SLOT_INTERFACE_START(apollo_isa_cards)
-	SLOT_INTERFACE("wdc", ISA16_OMTI8621)	// Combo ESDI/AT floppy controller
-	SLOT_INTERFACE("ctape", ISA8_SC499)		// Archive SC499 cartridge tape
-	SLOT_INTERFACE("3c505", ISA16_3C505)	// 3Com 3C505 Ethernet card
+	SLOT_INTERFACE("wdc", ISA16_OMTI8621)   // Combo ESDI/AT floppy controller
+	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
+	SLOT_INTERFACE("3c505", ISA16_3C505)    // 3Com 3C505 Ethernet card
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( common )
@@ -849,7 +849,7 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 
 	MCFG_MC68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output)) 
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(APOLLO_KBD_TAG, apollo_kbd_device, rx_w))
 MACHINE_CONFIG_END
 
@@ -868,7 +868,7 @@ MACHINE_CONFIG_FRAGMENT( apollo_terminal )
 
 	MCFG_MC68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz )
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(apollo_state, sio_irq_handler))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output)) 
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(apollo_state, sio_output))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")

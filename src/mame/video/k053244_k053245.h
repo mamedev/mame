@@ -70,7 +70,7 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ16_MEMBER( k053244_reg_word_r );    // OBJSET0 debug handler
 };
 

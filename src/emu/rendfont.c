@@ -392,8 +392,8 @@ bool render_font::load_cached_bdf(const char *filename)
 			// if that worked, we're done
 			if (result)
 			{
-			    // don't do that - glyphs data point into this array ...
-			    // m_rawdata.reset();
+				// don't do that - glyphs data point into this array ...
+				// m_rawdata.reset();
 				return true;
 			}
 		}

@@ -12,9 +12,9 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_gfxnum(device_t &device, int gfxnum) { downcast<k007342_device &>(device).m_gfxnum = gfxnum; } 
+	static void static_set_gfxnum(device_t &device, int gfxnum) { downcast<k007342_device &>(device).m_gfxnum = gfxnum; }
 	static void static_set_callback(device_t &device, k007342_delegate callback) { downcast<k007342_device &>(device).m_callback = callback; }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( scroll_r );
@@ -56,8 +56,7 @@ private:
 extern const device_type K007342;
 
 #define MCFG_K007342_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K007342, 0) \
-
+	MCFG_DEVICE_ADD(_tag, K007342, 0)
 #define MCFG_K007342_GFXDECODE(_gfxtag) \
 	k007342_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
@@ -68,9 +67,9 @@ extern const device_type K007342;
 	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_K007342_CALLBACK_DEVICE(_tag, _class, _method) \
-	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, _tag));	
+	k007342_device::static_set_callback(*device, k007342_delegate(&_class::_method, #_class "::" #_method, _tag));
 
 // function definition for a callback
-#define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)	
+#define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)
 
 #endif

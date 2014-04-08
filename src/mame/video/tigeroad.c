@@ -96,7 +96,7 @@ void tigeroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				flipy = !flipy;
 			}
 
-			
+
 				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
 				tile_number,
 				color,

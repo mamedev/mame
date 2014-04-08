@@ -156,7 +156,7 @@ private:
 	UINT8 m_rcv_bit_count;
 	/* the byte of data received */
 	UINT8 m_rcv_byte_received;
-	
+
 	bool m_rcv_framing_error;
 	bool m_rcv_parity_error;
 

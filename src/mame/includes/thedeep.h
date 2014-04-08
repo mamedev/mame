@@ -34,7 +34,7 @@ public:
 	required_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(thedeep_nmi_w);
 	DECLARE_WRITE8_MEMBER(thedeep_sound_w);
 	DECLARE_WRITE8_MEMBER(thedeep_protection_w);

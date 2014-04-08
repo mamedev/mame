@@ -2682,7 +2682,7 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 	MCFG_SOUND_CONFIG(sys905_ay8912_intf)
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
-	
+
 	MCFG_DEVICE_REMOVE("aciabaud")
 MACHINE_CONFIG_END
 
@@ -2706,7 +2706,7 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 	MCFG_SOUND_CONFIG(sys905_ay8912_intf)
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
-	
+
 	MCFG_DEVICE_REMOVE("aciabaud")
 MACHINE_CONFIG_END
 
@@ -2738,7 +2738,7 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 	MCFG_SOUND_CONFIG(sys906_ay8912_intf)
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
-	
+
 	MCFG_DEVICE_REMOVE("aciabaud")
 MACHINE_CONFIG_END
 
@@ -3879,7 +3879,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 			BPR[x] = 0x04;  /* blue background */
 	}
 	m_palette->update();
-	
+
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.

@@ -79,7 +79,7 @@ public:
 	required_device<cpu_device> m_tms;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
-	
+
 	UINT16 m_sound_data;
 	UINT8 m_sound_status;
 	offs_t m_tms_offset_xor;

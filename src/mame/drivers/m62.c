@@ -1045,7 +1045,7 @@ static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lotlot)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(768)
 

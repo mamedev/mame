@@ -39,7 +39,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	address_map_bank_device *m_page[4];
 	memory_bank *m_bank[4];
 	UINT8 m_primary_slot_reg;
@@ -48,7 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
-	
+
 	DECLARE_WRITE8_MEMBER(pengadvb_psg_port_b_w);
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_a_r);
 	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_a_w);
@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank_mem, AS_PROGRAM, 8, pengadvb_state )
 	// slot 0, MSX BIOS
 	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("maincpu", 0)
-	
+
 	// slot 1, MegaROM
 	AM_RANGE(0x14000, 0x15fff) AM_ROMBANK("bank0")
 	AM_RANGE(0x16000, 0x17fff) AM_ROMBANK("bank1")
@@ -184,10 +184,10 @@ READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
 	{
 		case 0x0:
 			return ioport("IN1")->read();
-		
+
 		default:
 			break;
-	}			
+	}
 
 	return 0xff;
 }
@@ -327,7 +327,7 @@ DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
 {
 	pengadvb_decrypt("maincpu");
 	pengadvb_decrypt("game");
-	
+
 	// init banks
 	static const char * const pagenames[] = { "page0", "page1", "page2", "page3" };
 	static const char * const banknames[] = { "bank0", "bank1", "bank2", "bank3" };

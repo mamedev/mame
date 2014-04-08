@@ -12,4 +12,3 @@
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(sorcerer_cassette_formats);
-

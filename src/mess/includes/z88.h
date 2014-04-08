@@ -49,7 +49,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

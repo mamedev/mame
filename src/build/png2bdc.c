@@ -74,7 +74,7 @@ struct render_font_char
 	INT32               width;              // width from this character to the next
 	INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
 	INT32               bmwidth, bmheight;  // width and height of bitmap
-	bitmap_argb32 *	 	bitmap;             // pointer to the bitmap containing the raw data
+	bitmap_argb32 *     bitmap;             // pointer to the bitmap containing the raw data
 };
 
 
@@ -107,7 +107,7 @@ inline int pixel_is_set(bitmap_argb32 &bitmap, int y, int x)
 
 //-------------------------------------------------
 //  write_data - write data to the given file and
-//	throw an exception if an error occurs
+//  throw an exception if an error occurs
 //-------------------------------------------------
 
 static void write_data(core_file &file, UINT8 *base, UINT8 *end)
@@ -123,7 +123,7 @@ static void write_data(core_file &file, UINT8 *base, UINT8 *end)
 
 //-------------------------------------------------
 //  render_font_save_cached - write the cached
-//	data out to the file
+//  data out to the file
 //-------------------------------------------------
 
 static bool render_font_save_cached(render_font &font, const char *filename, UINT32 hash)
@@ -248,7 +248,7 @@ static bool render_font_save_cached(render_font &font, const char *filename, UIN
 
 //-------------------------------------------------
 //  bitmap_to_chars - convert a bitmap to
-//	characters in the given font
+//  characters in the given font
 //-------------------------------------------------
 
 static bool bitmap_to_chars(bitmap_argb32 &bitmap, render_font &font)

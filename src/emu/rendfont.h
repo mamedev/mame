@@ -52,11 +52,11 @@ private:
 	public:
 		glyph()
 			: width(0),
-			  xoffs(0), yoffs(0),
-			  bmwidth(0), bmheight(0),
-			  rawdata(NULL),
-			  texture(NULL) { }
-	
+				xoffs(0), yoffs(0),
+				bmwidth(0), bmheight(0),
+				rawdata(NULL),
+				texture(NULL) { }
+
 		INT32               width;              // width from this character to the next
 		INT32               xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
 		INT32               bmwidth, bmheight;  // width and height of bitmap

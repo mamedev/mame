@@ -56,7 +56,7 @@ public:
 private:
 	UINT8 m_portb;
 	required_device<cassette_image_device> m_cass;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

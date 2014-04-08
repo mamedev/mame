@@ -624,7 +624,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 }
 
 READ16_MEMBER(towns_state::towns_fdc_dma_r)
-{	UINT16 data = m_fdc->data_r(generic_space(), 0);
+{   UINT16 data = m_fdc->data_r(generic_space(), 0);
 	return data;
 }
 

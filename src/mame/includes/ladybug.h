@@ -49,7 +49,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(sraider_sound_low_r);
 	DECLARE_READ8_MEMBER(sraider_sound_high_r);
 	DECLARE_WRITE8_MEMBER(sraider_sound_low_w);

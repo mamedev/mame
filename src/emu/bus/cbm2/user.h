@@ -104,7 +104,7 @@ protected:
 // ======================> cbm2_user_port_device
 
 class cbm2_user_port_device : public device_t,
-							  public device_slot_interface
+								public device_slot_interface
 {
 public:
 	// construction/destruction

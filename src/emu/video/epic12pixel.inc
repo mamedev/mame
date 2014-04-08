@@ -3,14 +3,12 @@
 #if FLIPX == 1
 #define LOOP_INCREMENTS \
 			bmp++;  \
-			gfx2--; \
-
+			gfx2--;
 #else
 
 #define LOOP_INCREMENTS \
 			bmp++;  \
-			gfx2++; \
-
+			gfx2++;
 #endif
 
 
@@ -49,7 +47,7 @@
 
 				// convert destination to clr
 				pen_to_clr(*bmp, &d_clr.trgb);
-                //d_clr.u32 = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
+				//d_clr.u32 = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);
 
@@ -193,4 +191,3 @@
 			}
 #endif
 			LOOP_INCREMENTS
-

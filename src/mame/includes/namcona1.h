@@ -78,7 +78,7 @@ public:
 	UINT8 m_mask_data[8];
 	UINT8 m_conv_data[9];
 
-	
+
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
 	DECLARE_READ16_MEMBER(namcona1_vreg_r);
@@ -111,8 +111,8 @@ public:
 	DECLARE_WRITE16_MEMBER(namcona1_paletteram_w);
 	DECLARE_READ16_MEMBER(namcona1_gfxram_r);
 	DECLARE_WRITE16_MEMBER(namcona1_gfxram_w);
-	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, UINT32 code,	int color,
-		int sx, int sy,	int flipx, int flipy, int priority,	int bShadow, int bOpaque, int gfx_region );
+	void pdraw_tile( screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, UINT32 code, int color,
+		int sx, int sy, int flipx, int flipy, int priority, int bShadow, int bOpaque, int gfx_region );
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
 	DECLARE_READ16_MEMBER(snd_r);

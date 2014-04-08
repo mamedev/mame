@@ -418,4 +418,3 @@ ioport_constructor generic_terminal_device::device_input_ports() const
 }
 
 const device_type GENERIC_TERMINAL = &device_creator<generic_terminal_device>;
-

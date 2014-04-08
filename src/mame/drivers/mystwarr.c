@@ -987,10 +987,10 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
-	
+
 	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
 	MCFG_K053252_OFFSETS(24, 16)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_K056832_ADD_NOINTF("k056832"/*, mystwarr_k056832_intf*/)
 	MCFG_K056832_GFXDECODE("gfxdecode")
@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
 	MCFG_K053252_OFFSETS(40, 16)
-	
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(viostorm_map)
@@ -1070,7 +1070,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(24, 15)
-	
+
 	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
 
 	/* video hardware */
@@ -1122,7 +1122,7 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 
 	MCFG_DEVICE_MODIFY("k053252")
 	MCFG_K053252_OFFSETS(40, 16)
-	
+
 	MCFG_K054000_ADD("k054000")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gaiapols)

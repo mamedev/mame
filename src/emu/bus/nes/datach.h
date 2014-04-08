@@ -7,7 +7,7 @@
 
 //--------------------------------
 //
-//	Datach Cartslot implementation
+//  Datach Cartslot implementation
 //
 //--------------------------------
 
@@ -84,7 +84,7 @@ extern const device_type NES_DATACH_SLOT;
 
 //--------------------------------
 //
-//	Datach Minicart implementation
+//  Datach Minicart implementation
 //
 //--------------------------------
 
@@ -127,7 +127,7 @@ extern const device_type NES_DATACH_24C01;
 
 //---------------------------------
 //
-//	Datach Base Unit implementation
+//  Datach Base Unit implementation
 //
 //---------------------------------
 
@@ -138,7 +138,7 @@ class nes_datach_device : public nes_lz93d50_device
 public:
 	// construction/destruction
 	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -146,17 +146,17 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
+
 	virtual void pcb_reset();
-	
+
 protected:
 	UINT8 m_datach_latch;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<barcode_reader_device> m_reader;	
+	required_device<barcode_reader_device> m_reader;
 	required_device<nes_datach_slot_device> m_subslot;
 	UINT8 m_i2c_dir;
 	UINT8 m_i2c_in_use;
-	
+
 	static const device_timer_id TIMER_SERIAL = 1;
 	emu_timer *serial_timer;
 };

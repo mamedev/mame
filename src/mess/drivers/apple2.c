@@ -358,7 +358,7 @@ INPUT_PORTS_END
 
 	/*
 	  Apple IIe & IIc key matrix (from "Sams ComputerFacts: Apple IIe" and "Sams ComputerFacts: Apple IIc")
-																  
+
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
 	      |     |     |     |     |     |     |     |     |     |     |
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
@@ -382,7 +382,7 @@ INPUT_PORTS_END
 
 	/*
 	  Apple IIe platinum key matrix
-																  
+
 	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
 	      |     |     |     |     |     |     |     |     |     |     |
 	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
@@ -617,11 +617,11 @@ static INPUT_PORTS_START( apple2e_common )
 
 	PORT_START("X6")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
@@ -671,7 +671,7 @@ static INPUT_PORTS_START( apple2euk )
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR(0xa3)	// a3 is Unicode for the pound sign
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR(0xa3)  // a3 is Unicode for the pound sign
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
@@ -741,11 +741,11 @@ static INPUT_PORTS_START( apple2euk )
 
 	PORT_START("X6")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED) 
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
@@ -862,7 +862,7 @@ INPUT_PORTS_START( apple2ep )
 
 	PORT_START("X6")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK)    PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED) 
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
@@ -997,8 +997,8 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
 	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
 	SLOT_INTERFACE("aevm80", A2BUS_VTC2)    /* Applied Engineering ViewMaster 80 */
-	SLOT_INTERFACE("parallel", A2BUS_PIC)	/* Apple Parallel Interface Card */
-	SLOT_INTERFACE("corvus", A2BUS_CORVUS)	/* Corvus flat-cable HDD interface (must go in slot 6) */
+	SLOT_INTERFACE("parallel", A2BUS_PIC)   /* Apple Parallel Interface Card */
+	SLOT_INTERFACE("corvus", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (must go in slot 6) */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)
@@ -1321,7 +1321,7 @@ ROM_END
 
 /*
     J-Plus ROM numbers confirmed by:
-	http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
+    http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/Apple%20II/Apple%20II%20j-plus/Photos/Apple%20II%20j-plus%20-%20Motherboard.jpg
 */
 
 ROM_START(apple2jp)
@@ -1566,7 +1566,7 @@ ROM_START(ivelultr)
 	ROM_CONTINUE(0x1000, 0x1000)
 	ROM_LOAD( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
 
-	ROM_REGION(0x800, "kbmcu", 0)	// 6802 code for keyboard MCU (very unlike real Apples, will require some reverse-engineering)
+	ROM_REGION(0x800, "kbmcu", 0)   // 6802 code for keyboard MCU (very unlike real Apples, will require some reverse-engineering)
 	ROM_LOAD( "ultra4.bin", 0x0000, 0x0800, CRC(3dce51ac) SHA1(676b6e775d5159049cae5b6143398ec7b2bf437a) )
 ROM_END
 
@@ -1627,7 +1627,7 @@ COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  
 COMP( 1980, apple2jp, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,      apple2e, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2e,  0,        apple2,   apple2e,     apple2e, driver_device,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
-COMP( 1983, apple2euk,apple2e, 	0,        apple2e,     apple2euk,driver_device, 0,        "Apple Computer",    "Apple //e (UK)", GAME_SUPPORTS_SAVE )
+COMP( 1983, apple2euk,apple2e,  0,        apple2e,     apple2euk,driver_device, 0,        "Apple Computer",    "Apple //e (UK)", GAME_SUPPORTS_SAVE )
 COMP( 1983, mprof3,   apple2e,  0,        mprof3,      apple2e, driver_device,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,    apple2e, driver_device,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2eeuk,apple2e, 0,        apple2ee,    apple2euk, driver_device,0,        "Apple Computer",    "Apple //e (enhanced, UK)", GAME_SUPPORTS_SAVE )

@@ -47,14 +47,14 @@ public:
 );
 
 #define TTL_7486_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7486_dip, _name)
+		NET_REGISTER_DEV(7486_dip, _name)
 
 NETLIB_DEVICE(7486_dip,
 
-    NETLIB_NAME(7486) m_1;
-    NETLIB_NAME(7486) m_2;
-    NETLIB_NAME(7486) m_3;
-    NETLIB_NAME(7486) m_4;
+	NETLIB_NAME(7486) m_1;
+	NETLIB_NAME(7486) m_2;
+	NETLIB_NAME(7486) m_3;
+	NETLIB_NAME(7486) m_4;
 );
 
 #endif /* NLD_7486_H_ */

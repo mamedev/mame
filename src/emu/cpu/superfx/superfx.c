@@ -1432,11 +1432,10 @@ offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *
 {
 extern offs_t superfx_dasm_one(char *buffer, offs_t pc, UINT8 op, UINT8 param0, UINT8 param1, UINT16 alt);
 
-    UINT8  op = *(UINT8 *)(opram + 0);
-    UINT8  param0 = *(UINT8 *)(opram + 1);
-    UINT8  param1 = *(UINT8 *)(opram + 2);
-    UINT16 alt = m_sfr & SUPERFX_SFR_ALT;
+	UINT8  op = *(UINT8 *)(opram + 0);
+	UINT8  param0 = *(UINT8 *)(opram + 1);
+	UINT8  param1 = *(UINT8 *)(opram + 2);
+	UINT16 alt = m_sfr & SUPERFX_SFR_ALT;
 
-    return superfx_dasm_one(buffer, pc, op, param0, param1, alt);
+	return superfx_dasm_one(buffer, pc, op, param0, param1, alt);
 }
-

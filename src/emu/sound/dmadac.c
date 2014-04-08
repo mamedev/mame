@@ -46,7 +46,6 @@
 
 void dmadac_sound_device::device_start()
 {
-
 	/* allocate a clear a buffer */
 	m_buffer = auto_alloc_array_clear(machine(), INT16, BUFFER_SIZE);
 
@@ -186,7 +185,7 @@ void dmadac_set_volume(dmadac_sound_device **devlist, UINT8 num_channels, UINT16
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
-	{		
+	{
 		devlist[i]->set_volume(volume);
 	}
 }

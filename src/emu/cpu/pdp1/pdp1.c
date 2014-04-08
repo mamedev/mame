@@ -1813,4 +1813,3 @@ void pdp1_device::pulse_start_clear()
 	if (m_io_sc_callback)
 		(*m_io_sc_callback)(this);
 }
-

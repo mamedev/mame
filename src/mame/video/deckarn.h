@@ -6,7 +6,7 @@ public:
 	deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	void set_gfxregion(int region) { m_gfxregion = region; };
 	void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority );
-	
+
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);

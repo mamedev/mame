@@ -80,7 +80,7 @@
 
 #define LOG_FDC                 0
 #define WD_TAG                  "wd17xx"
-#define WD2797_TAG				"wd2797"
+#define WD2797_TAG              "wd2797"
 #define DISTO_TAG               "disto"
 #define CLOUD9_TAG              "cloud9"
 
@@ -437,7 +437,7 @@ const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
 //  dragon_fdc_device - constructor
 //-------------------------------------------------
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)	  
+	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

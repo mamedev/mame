@@ -793,7 +793,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbeeic)
-	
+
 	MCFG_PALETTE_ADD("palette", 96)
 	MCFG_PALETTE_INIT_OWNER(mbee_state,mbeeic)
 

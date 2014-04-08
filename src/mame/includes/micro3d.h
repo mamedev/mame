@@ -136,7 +136,7 @@ public:
 	DECLARE_READ8_MEMBER(duart_input_r);
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
 	required_device<upd7759_device> m_upd7759;

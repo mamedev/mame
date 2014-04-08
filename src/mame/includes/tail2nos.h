@@ -37,7 +37,7 @@ public:
 	required_device<k051316_device> m_k051316;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_bgvideoram_w);
 	DECLARE_READ16_MEMBER(tail2nos_zoomdata_r);

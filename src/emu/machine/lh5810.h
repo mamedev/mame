@@ -43,16 +43,16 @@ enum
 
 #define MCFG_LH5810_PORTA_W_CB(_devcb) \
 	devcb = &lh5810_device::set_porta_w_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_LH5810_PORTB_R_CB(_devcb) \
 	devcb = &lh5810_device::set_portb_r_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_LH5810_PORTB_W_CB(_devcb) \
 	devcb = &lh5810_device::set_portb_w_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_LH5810_PORTC_W_CB(_devcb) \
 	devcb = &lh5810_device::set_portc_w_callback(*device, DEVCB2_##_devcb);
- 
+
 #define MCFG_LH5810_OUT_INT_CB(_devcb) \
 	devcb = &lh5810_device::set_out_int_callback(*device, DEVCB2_##_devcb); //currently unused
 
@@ -76,7 +76,7 @@ public:
 	template<class _Object> static devcb2_base &set_portb_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portb_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_portc_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portc_w_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_int_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_out_int_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 

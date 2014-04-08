@@ -94,13 +94,13 @@ private:
 
 //WRITE8_MEMBER( amust_state::port00_w )
 //{
-//	membank("bankr0")->set_entry(BIT(data, 6));
-//	m_fdc->dden_w(BIT(data, 5));
-//	floppy_image_device *floppy = NULL;
-//	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-//	m_fdc->set_floppy(floppy);
-//	if (floppy)
-//		floppy->ss_w(BIT(data, 4));
+//  membank("bankr0")->set_entry(BIT(data, 6));
+//  m_fdc->dden_w(BIT(data, 5));
+//  floppy_image_device *floppy = NULL;
+//  if (BIT(data, 0)) floppy = m_floppy0->get_device();
+//  m_fdc->set_floppy(floppy);
+//  if (floppy)
+//      floppy->ss_w(BIT(data, 4));
 //}
 
 static ADDRESS_MAP_START(amust_mem, AS_PROGRAM, 8, amust_state)
@@ -179,22 +179,22 @@ INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
 
 //static I8255_INTERFACE( ppi1_intf )
 //{
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_r),   // Port A read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_w),   // Port A write
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_r),   // Port B read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_w),   // Port B write
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_r),   // Port C read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_w),   // Port C write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_r),   // Port A read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pa_w),   // Port A write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_r),   // Port B read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pb_w),   // Port B write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_r),   // Port C read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi1_pc_w),   // Port C write
 //};
 
 //static I8255_INTERFACE( ppi2_intf )
 //{
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_r),   // Port A read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_w),   // Port A write
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_r),   // Port B read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_w),   // Port B write
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_r),   // Port C read
-//	DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_w),   // Port C write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_r),   // Port A read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pa_w),   // Port A write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_r),   // Port B read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pb_w),   // Port B write
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_r),   // Port C read
+//  DEVCB_DRIVER_MEMBER(amust_state, ppi2_pc_w),   // Port C write
 //};
 
 WRITE8_MEMBER( amust_state::kbd_put )

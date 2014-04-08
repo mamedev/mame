@@ -40,7 +40,7 @@ static Z80PIO_INTERFACE( pio_intf )
 static const z80sio_interface sio_intf =
 {
 	DEVCB_CPU_INPUT_LINE(DEVICE_SELF_OWNER, INPUT_LINE_IRQ0), /* interrupt handler */
-  DEVCB_NULL, /* DTR changed handler */
+	DEVCB_NULL, /* DTR changed handler */
 	DEVCB_NULL, /* RTS changed handler */
 	DEVCB_NULL, /* BREAK changed handler */
 	DEVCB_NULL, /* transmit handler */
@@ -63,9 +63,9 @@ static ADDRESS_MAP_START( tlcs_z80_internal_io_map, AS_IO, 8, tlcs_z80_device )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(TLCSZ80_INTERNAL_CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x18, 0x1B) AM_DEVREADWRITE(TLCSZ80_INTERNAL_SIO_TAG, z80sio_device, read, write)
 	AM_RANGE(0x1C, 0x1F) AM_DEVREADWRITE(TLCSZ80_INTERNAL_PIO_TAG, z80pio_device, read, write)
-//	AM_RANGE(0xF0, 0xF0) TODO: Watchdog Timer: Stand-by mode Register
-//	AM_RANGE(0xF1, 0xF1) TODO: Watchdog Timer: command Register
-//	AM_RANGE(0xF4, 0xF4) TODO: Daisy chain interrupt precedence Register
+//  AM_RANGE(0xF0, 0xF0) TODO: Watchdog Timer: Stand-by mode Register
+//  AM_RANGE(0xF1, 0xF1) TODO: Watchdog Timer: command Register
+//  AM_RANGE(0xF4, 0xF4) TODO: Daisy chain interrupt precedence Register
 ADDRESS_MAP_END
 
 //This is wrong!
@@ -79,7 +79,7 @@ static MACHINE_CONFIG_FRAGMENT( tlcs_z80 )
 MACHINE_CONFIG_END
 
 tlcs_z80_device::tlcs_z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: z80_device(mconfig, TLCS_Z80, "TLCS-Z80", tag, owner, clock, "tlcs_z80", __FILE__), 
+	: z80_device(mconfig, TLCS_Z80, "TLCS-Z80", tag, owner, clock, "tlcs_z80", __FILE__),
 		m_z80ctc(*this, TLCSZ80_INTERNAL_CTC_TAG),
 		m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 8, 0, ADDRESS_MAP_NAME( tlcs_z80_internal_io_map ) )
 	{ }
@@ -97,4 +97,3 @@ machine_config_constructor tlcs_z80_device::device_mconfig_additions() const
 }
 
 const device_type TLCS_Z80 = &device_creator<tlcs_z80_device>;
-

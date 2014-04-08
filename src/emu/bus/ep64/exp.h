@@ -69,8 +69,7 @@
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_ADD(_tag, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, EP64_EXPANSION_BUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false) \
-
+	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false)
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(_tag) \
 	ep64_expansion_bus_slot_device::static_set_dave_tag(*device, "^"_tag);
@@ -95,7 +94,7 @@
 class device_ep64_expansion_bus_card_interface;
 
 class ep64_expansion_bus_slot_device : public device_t,
-									   public device_slot_interface
+										public device_slot_interface
 {
 	friend class device_ep64_expansion_bus_card_interface;
 

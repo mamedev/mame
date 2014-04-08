@@ -46,7 +46,7 @@ public:
 	const char *        m_file;             // file the allocation was made from
 	int                 m_line;             // line number within that file
 	UINT64              m_id;               // unique id
-	bool				m_array;			// array?
+	bool                m_array;            // array?
 
 	// hashing prime number
 	static const int    k_hash_prime = 6151;
@@ -115,7 +115,7 @@ void *malloc_file_line(size_t size, const char *file, int line, bool array, bool
 	if (clear)
 		memset(result, 0, size);
 	else
-	{	
+	{
 #if !__has_feature(memory_sanitizer) && defined(INITIALIZE_ALLOCATED_MEMORY)
 		memset(result, 0xdd, size);
 #endif
@@ -145,7 +145,7 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 		osd_break_into_debugger("Error: attempt to free untracked memory");
 		return;
 	}
-	
+
 	// warn about mismatched arrays
 	if (!array && entry->m_array)
 	{
@@ -182,8 +182,8 @@ void track_memory(bool track)
 
 
 //-------------------------------------------------
-//  next_memory_id - return the ID of the next 
-//	allocated block
+//  next_memory_id - return the ID of the next
+//  allocated block
 //-------------------------------------------------
 
 UINT64 next_memory_id()

@@ -99,7 +99,7 @@ public:
 		#endif
 		m_adb_mousex(*this, "adb_mouse_x"),
 		m_adb_mousey(*this, "adb_mouse_y"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;

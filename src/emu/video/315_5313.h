@@ -149,25 +149,25 @@
 
 #define MCFG_SEGA315_5313_INT_CB(_devcb) \
 	devcb = &sega315_5313_device::set_int_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_SEGA315_5313_PAUSE_CB(_devcb) \
 	devcb = &sega315_5313_device::set_pause_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_SEGA315_5313_SND_IRQ_CALLBACK(_write) \
 	devcb = &sega315_5313_device::set_sndirqline_callback(*device, DEVCB2_##_write);
- 
+
 #define MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(_write) \
 	devcb = &sega315_5313_device::set_lv6irqline_callback(*device, DEVCB2_##_write);
- 
+
 #define MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(_write) \
 	devcb = &sega315_5313_device::set_lv4irqline_callback(*device, DEVCB2_##_write);
- 
+
 #define MCFG_SEGA315_5313_ALT_TIMING(_data) \
 	sega315_5313_device::set_alt_timing(*device, _data);
- 
+
 #define MCFG_SEGA315_5313_PAL_WRITE_BASE(_data) \
 	sega315_5313_device::set_palwrite_base(*device, _data);
- 
+
 #define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
 	sega315_5313_device::static_set_palette_tag(*device, "^" _palette_tag);
 
@@ -257,11 +257,11 @@ protected:
 	devcb2_write_line m_sndirqline_callback;
 	devcb2_write_line m_lv6irqline_callback;
 	devcb2_write_line m_lv4irqline_callback;
-	
+
 	md_32x_scanline_delegate m_32x_scanline_func;
 	md_32x_interrupt_delegate m_32x_interrupt_func;
 	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
-	
+
 private:
 
 	int m_command_pending; // 2nd half of command pending..
@@ -291,7 +291,7 @@ private:
 	int m_framerate;
 	int m_vdp_pal;
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
-	int m_dma_delay;	// SVP and SegaCD have some 'lag' in DMA transfers
+	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
 
 	UINT16* m_regs;
 	UINT16* m_vram;

@@ -49,7 +49,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 m_semicom_prot_offset;
 	UINT16 m_protbase;
 	DECLARE_WRITE16_MEMBER(tumblepb_oki_w);

@@ -68,8 +68,8 @@ static int glsl_mamebm_fsh2vsh[GLSL_SHADER_FEAT_MAX_NUMBER] =
 };
 
 static GLhandleARB glsl_mamebm_vsh_shader[GLSL_VERTEX_SHADER_MAX_NUMBER+9] =
-{ 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 }; /* general, custom0-9 */
 
 static GLhandleARB glsl_mamebm_fsh_shader [GLSL_SHADER_FEAT_MAX_NUMBER+9] =
@@ -83,13 +83,13 @@ static GLhandleARB glsl_scrn_programs [10] =
 };
 
 static GLhandleARB glsl_scrn_vsh_shader[10] =
-{ 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 }; /* custom0-9 */
 
 static GLhandleARB glsl_scrn_fsh_shader [10] =
-{ 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 }; /* rgb32: custom0-9 */
 
 const char * glsl_shader_get_filter_name_mamebm(int glslShaderFeature)

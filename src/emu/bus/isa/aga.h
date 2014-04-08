@@ -38,7 +38,7 @@ public:
 	isa8_aga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	isa8_aga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	// device-level overrides
-	virtual void device_start();	
+	virtual void device_start();
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
@@ -46,7 +46,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	
+
 	DECLARE_READ8_MEMBER( pc_aga_mda_r );
 	DECLARE_WRITE8_MEMBER( pc_aga_mda_w );
 	DECLARE_READ8_MEMBER( pc_aga_cga_r );
@@ -56,9 +56,9 @@ public:
 	DECLARE_WRITE8_MEMBER( pc_aga_videoram_w );
 	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
 
-	required_device<palette_device> m_palette;	
-	required_device<mc6845_device> m_mc6845;	
-	
+	required_device<palette_device> m_palette;
+	required_device<mc6845_device> m_mc6845;
+
 	required_ioport m_cga_config;
 
 	mc6845_update_row_func  m_update_row;
@@ -75,11 +75,11 @@ public:
 	int   m_framecnt;
 	UINT8   m_vsync;
 	UINT8   m_hsync;
-	
+
 
 	UINT8   m_cga_palette_lut_2bpp[4];
 
-	UINT8  *m_videoram;	
+	UINT8  *m_videoram;
 };
 
 // device type definition
@@ -94,14 +94,14 @@ public:
 	// construction/destruction
 	isa8_aga_pc200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// device-level overrides
-	virtual void device_start();		
+	virtual void device_start();
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	UINT8 m_port8;
 	UINT8 m_portd;
 	UINT8 m_porte;
-	
+
 	DECLARE_READ8_MEMBER( pc200_videoram_r );
 	DECLARE_WRITE8_MEMBER( pc200_videoram_w );
 	DECLARE_WRITE8_MEMBER( pc200_cga_w );

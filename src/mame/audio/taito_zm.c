@@ -55,7 +55,7 @@ taito_zoom_device::taito_zoom_device(const machine_config &mconfig, const char *
 void taito_zoom_device::device_start()
 {
 	m_snd_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x100);
-	
+
 	// register for savestates
 	save_item(NAME(m_reg_address));
 	save_item(NAME(m_tms_ctrl));
@@ -69,7 +69,7 @@ void taito_zoom_device::device_start()
 void taito_zoom_device::device_reset()
 {
 	m_reg_address = 0;
-	
+
 	m_zsg2->reset();
 }
 
@@ -150,7 +150,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 				popmessage("ZOOM gain L %04X, contact MAMEdev", data);
 			m_zsg2->set_output_gain(0, (data & 0x3f) / 63.0);
 			break;
-		
+
 		case 0x05:
 			// zsg2+dsp global volume right
 			if (data & 0xc0c0)

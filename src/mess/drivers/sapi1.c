@@ -87,7 +87,7 @@ private:
 	required_ioport m_line3;
 	required_ioport m_line4;
 	required_device<cpu_device> m_maincpu;
-public:	
+public:
 	optional_device<palette_device> m_palette;
 };
 
@@ -572,7 +572,7 @@ static MACHINE_CONFIG_START( sapi1, sapi1_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */

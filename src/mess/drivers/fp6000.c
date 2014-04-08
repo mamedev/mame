@@ -33,7 +33,7 @@ public:
 		m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	UINT8 *m_char_rom;

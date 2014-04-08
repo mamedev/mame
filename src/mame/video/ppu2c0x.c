@@ -930,12 +930,12 @@ void ppu2c0x_device::render_scanline( void )
 	}
 
 	m_draw_phase = PPU_DRAW_OAM;
-	
+
 	/* if sprites are on, draw them, but we call always to process them */
 	draw_sprites(line_priority);
 
 	m_draw_phase = PPU_DRAW_BG;
-	
+
 	/* done updating, whew */
 	g_profiler.stop();
 }

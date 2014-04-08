@@ -841,7 +841,7 @@ static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
-	
+
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
 	MCFG_CARTSLOT_NOT_MANDATORY
@@ -860,7 +860,7 @@ static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
-	
+
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
 	MCFG_CARTSLOT_NOT_MANDATORY

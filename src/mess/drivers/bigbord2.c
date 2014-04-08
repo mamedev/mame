@@ -163,7 +163,7 @@ private:
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankv;
 	required_memory_bank m_banka;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

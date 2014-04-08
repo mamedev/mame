@@ -32,7 +32,7 @@ public:
 	required_device<sn76477_device> m_sn;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	UINT16 m_collision_address;
 	UINT8 m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;

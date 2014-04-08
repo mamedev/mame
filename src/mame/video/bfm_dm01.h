@@ -16,7 +16,7 @@ class bfmdm01_device : public device_t
 public:
 	bfmdm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~bfmdm01_device() {}
-	
+
 	template<class _Object> static devcb2_base &set_busy_callback(device_t &device, _Object object) { return downcast<bfmdm01_device &>(device).m_busy_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( control_r );
@@ -46,7 +46,7 @@ private:
 
 	UINT8 m_scanline[DM_BYTESPERROW];
 	UINT8 m_comdata;
-	
+
 	devcb2_write_line m_busy_cb;
 
 	int read_data(void);

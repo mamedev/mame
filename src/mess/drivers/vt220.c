@@ -68,7 +68,7 @@ static MACHINE_CONFIG_START( vt220, vt220_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vt220_state, screen_update_vt220)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
 	/* internal ram */

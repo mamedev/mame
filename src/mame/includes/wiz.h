@@ -49,7 +49,7 @@ public:
 	UINT8 m_main_nmi_mask;
 	UINT8 m_sound_nmi_mask;
 	UINT8 m_sprite_bank;
-	
+
 	int m_dsc0;
 	int m_dsc1;
 

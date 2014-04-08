@@ -3853,7 +3853,7 @@ DRIVER_INIT_MEMBER(subsino_state,tesorone)
 DRIVER_INIT_MEMBER(subsino_state,tesorone230)
 {
 #if 1
-	UINT8 *rom = memregion( "maincpu" )->base();			//check this patch!!!!
+	UINT8 *rom = memregion( "maincpu" )->base();            //check this patch!!!!
 	rom[0x10a8] = 0x18; //patch protection check ("ERROR 08073"):
 	rom[0x10a9] = 0x11;
 	rom[0x8ba] = 0x18; //patch "winning protection" check

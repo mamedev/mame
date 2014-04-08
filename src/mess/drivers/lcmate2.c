@@ -235,7 +235,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_SCREEN_SIZE(120, 18)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(lcmate2_state, lcmate2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)

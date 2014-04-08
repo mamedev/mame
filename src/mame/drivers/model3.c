@@ -2941,13 +2941,13 @@ ROM_START( bassdx ) /* step 1.0, Sega game ID# is 833-13476 BSS DX JPN, ROM boar
 ROM_END
 
 /*
-In Mame getbass is marked as GET BASS STD, while my pcb came from a DLX cab. 
+In Mame getbass is marked as GET BASS STD, while my pcb came from a DLX cab.
 Rom board 833-13317
 834-13318 sticker is on rom board too.
 On cage the follow sticker are present
 BSS-4500-CVT2
 833-13317 GAME BD BSS-CVT2
- 
+
 I/O board 837-13283 (GET BASS MEC CONT BD in manual)  171-7558c
 
 epr20690.ic11 is controller board prg
@@ -5442,7 +5442,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SCREEN_SIZE(512, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(model3_state, screen_update_model3)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 

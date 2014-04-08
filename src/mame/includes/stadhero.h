@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_data;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	tilemap_t *m_pf1_tilemap;
 	int m_flipscreen;
 	DECLARE_READ16_MEMBER(stadhero_control_r);

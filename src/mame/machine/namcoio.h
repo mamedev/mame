@@ -17,8 +17,8 @@ public:
 	template<class _Object> static devcb2_base &set_in_3_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_3_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_out_0_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_out_1_cb.set_callback(object); }
-	
-	
+
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -104,7 +104,7 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO56XX_IN_2_CB(_devcb) \
 	devcb = &namco56xx_device::set_in_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_NAMCO56XX_IN_3_CB(_devcb) \
 	devcb = &namco56xx_device::set_in_3_callback(*device, DEVCB2_##_devcb);
 
@@ -113,7 +113,7 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO56XX_OUT_1_CB(_devcb) \
 	devcb = &namco56xx_device::set_out_1_callback(*device, DEVCB2_##_devcb);
-	
+
 
 #define MCFG_NAMCO58XX_IN_0_CB(_devcb) \
 	devcb = &namco58xx_device::set_in_0_callback(*device, DEVCB2_##_devcb);
@@ -123,7 +123,7 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO58XX_IN_2_CB(_devcb) \
 	devcb = &namco58xx_device::set_in_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_NAMCO58XX_IN_3_CB(_devcb) \
 	devcb = &namco58xx_device::set_in_3_callback(*device, DEVCB2_##_devcb);
 
@@ -132,8 +132,8 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO58XX_OUT_1_CB(_devcb) \
 	devcb = &namco58xx_device::set_out_1_callback(*device, DEVCB2_##_devcb);
-	
-	
+
+
 #define MCFG_NAMCO59XX_IN_0_CB(_devcb) \
 	devcb = &namco59xx_device::set_in_0_callback(*device, DEVCB2_##_devcb);
 
@@ -142,7 +142,7 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO59XX_IN_2_CB(_devcb) \
 	devcb = &namco59xx_device::set_in_2_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_NAMCO59XX_IN_3_CB(_devcb) \
 	devcb = &namco59xx_device::set_in_3_callback(*device, DEVCB2_##_devcb);
 
@@ -151,5 +151,5 @@ extern const device_type NAMCO59XX;
 
 #define MCFG_NAMCO59XX_OUT_1_CB(_devcb) \
 	devcb = &namco59xx_device::set_out_1_callback(*device, DEVCB2_##_devcb);
-	
+
 #endif  /* __NAMCOIO_H__ */

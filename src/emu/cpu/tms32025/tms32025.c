@@ -2279,4 +2279,3 @@ bool tms32025_device::memory_write(address_spacenum spacenum, offs_t offset, int
 
 	return 1;
 }
-

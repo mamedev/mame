@@ -144,7 +144,7 @@ void mc6843_device::device_reset()
 		img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0 );
 		img->floppy_drive_set_rpm( 300. );
 	}
-	
+
 	/* reset registers */
 	m_CMR &= 0xf0; /* zero only command */
 	m_ISR = 0;
@@ -464,7 +464,7 @@ void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				}
 			}
 			break;
-			
+
 		default:
 			break;
 	}

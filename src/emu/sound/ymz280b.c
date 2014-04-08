@@ -505,7 +505,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		if (samples_left || voice->ended)
 		{
 			voice->ended = false;
-			
+
 			/* if there are leftovers, ramp back to 0 */
 			int base = new_samples - samples_left;
 			int i, t = (base == 0) ? curr : m_scratch[base - 1];

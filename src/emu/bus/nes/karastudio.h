@@ -6,7 +6,7 @@
 
 //-----------------------------------------
 //
-//	Karaoke Studio Cartslot implementation
+//  Karaoke Studio Cartslot implementation
 //
 //-----------------------------------------
 
@@ -18,13 +18,13 @@ public:
 	// construction/destruction
 	kstudio_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~kstudio_cart_interface();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read);
-	
+
 	UINT8 *get_cart_base() { return m_rom; }
 	void write_prg_bank(UINT8 bank) { m_bank = bank; }
-	
+
 protected:
 	// internal state
 	UINT8 *m_rom;
@@ -42,15 +42,15 @@ public:
 	// construction/destruction
 	nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nes_kstudio_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { update_names(); }
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry);
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -60,13 +60,13 @@ public:
 	virtual const char *image_interface() const { return "ks_cart"; }
 	virtual const char *file_extensions() const { return "bin"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// slot interface overrides
 	virtual void get_default_card_software(astring &result);
-	
+
 	virtual DECLARE_READ8_MEMBER(read);
 	void write_prg_bank(UINT8 bank) { if (m_cart) m_cart->write_prg_bank(bank); }
-	
+
 	kstudio_cart_interface*      m_cart;
 };
 
@@ -81,7 +81,7 @@ MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, NULL, false)
 
 //-----------------------------------------------
 //
-//	Karaoke Studio Expansion cart implementation
+//  Karaoke Studio Expansion cart implementation
 //
 //-----------------------------------------------
 
@@ -93,11 +93,11 @@ class nes_kstudio_rom_device : public device_t,
 public:
 	// construction/destruction
 	nes_kstudio_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual UINT8* get_cart_base();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -110,7 +110,7 @@ extern const device_type NES_KSEXPANSION_ROM;
 
 //-------------------------------------------
 //
-//	Karaoke Studio Base Cart implementation
+//  Karaoke Studio Base Cart implementation
 //
 //-------------------------------------------
 

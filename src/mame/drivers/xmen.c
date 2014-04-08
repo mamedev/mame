@@ -359,7 +359,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )   /* correct, same issue of TMNT2 */
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	MCFG_K052109_ADD("k052109", xmen_k052109_intf)
 	MCFG_K052109_GFXDECODE("gfxdecode")
 	MCFG_K052109_PALETTE("palette")
-	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)	
+	MCFG_K053246_ADD("k053246", xmen6p_k053246_intf)
 	MCFG_K053246_SET_SCREEN("screen")
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")

@@ -285,7 +285,7 @@ void isa8_cga_device::device_start()
 	m_vram.resize(m_vram_size);
 	m_update_row = NULL;
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);	
+	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
 
 	/* Initialise the cga palette */
 	int i;
@@ -1799,7 +1799,7 @@ isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, co
 ROM_START( mc1502 )
 	ROM_REGION(0x2000,"gfx1", 0)
 	// taken from mc1502
-	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))	
+	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
 const rom_entry *isa8_cga_mc1502_device::device_rom_region() const

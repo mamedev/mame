@@ -41,7 +41,7 @@ READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 		res |= 0x02;
 	if (!m_mcu_sent)
 		res |= 0x04;
-	
+
 	return res;
 }
 

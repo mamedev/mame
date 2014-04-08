@@ -46,7 +46,7 @@ public:
 
 		void set_intrq(UINT8 val) { m_intrq = val; }
 		void set_drq(UINT8 val) { m_drq = val; }
-		
+
 		DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 		DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 protected:
@@ -65,12 +65,12 @@ protected:
 		UINT8 m_intrq : 1;
 
 		optional_device<wd1773_device> m_wd17xx;              /* WD17xx */
-		optional_device<wd2797_device> m_wd2797;              /* WD2797 */		
+		optional_device<wd2797_device> m_wd2797;              /* WD2797 */
 		optional_device<ds1315_device> m_ds1315;         /* DS1315 */
 
 		/* Disto RTC */
 		optional_device<msm6242_device> m_disto_msm6242;        /* 6242 RTC on Disto interface */
-		
+
 		offs_t m_msm6242_rtc_address;
 };
 

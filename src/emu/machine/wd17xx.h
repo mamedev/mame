@@ -68,7 +68,7 @@ public:
 	WRITE_LINE_MEMBER( wprt_w );
 	WRITE_LINE_MEMBER( dden_w );
 	READ_LINE_MEMBER( drq_r );
-	READ_LINE_MEMBER( intrq_r );	
+	READ_LINE_MEMBER( intrq_r );
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -179,7 +179,7 @@ protected:
 	UINT8   m_was_busy;
 
 	/* Pointer to interface */
-	const wd17xx_interface *m_intf;	
+	const wd17xx_interface *m_intf;
 };
 
 extern ATTR_DEPRECATED const device_type WD1770;

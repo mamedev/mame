@@ -64,7 +64,7 @@ public:
 	bool throttled() const { return m_throttled; }
 	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
-	bool is_recording() const { return (m_mngfile != NULL || m_avifile != NULL); }
+	bool is_recording() const { return (m_mng_file != NULL || m_avi_file != NULL); }
 
 	// setters
 	void set_frameskip(int frameskip);
@@ -89,8 +89,8 @@ public:
 	void save_active_screen_snapshots();
 
 	// movies
-	void begin_recording(const char *name, movie_format format = MF_AVI);
-	void end_recording();
+	void begin_recording(const char *name, movie_format format);
+	void end_recording(movie_format format);
 	void add_sound_to_recording(const INT16 *sound, int numsamples);
 
 private:
@@ -165,12 +165,17 @@ private:
 	INT32               m_snap_width;               // width of snapshots (0 == auto)
 	INT32               m_snap_height;              // height of snapshots (0 == auto)
 
-	// movie recording
-	auto_pointer<emu_file> m_mngfile;               // handle to the open movie file
-	avi_file *          m_avifile;                  // handle to the open movie file
-	attotime            m_movie_frame_period;       // period of a single movie frame
-	attotime            m_movie_next_frame_time;    // time of next frame
-	UINT32              m_movie_frame;              // current movie frame number
+	// movie recording - MNG
+	auto_pointer<emu_file> m_mng_file;              // handle to the open movie file
+	attotime            m_mng_frame_period;         // period of a single movie frame
+	attotime            m_mng_next_frame_time;      // time of next frame
+	UINT32              m_mng_frame;                // current movie frame number
+	
+	// movie recording - AVI
+	avi_file *          m_avi_file;                 // handle to the open movie file
+	attotime            m_avi_frame_period;         // period of a single movie frame
+	attotime            m_avi_next_frame_time;      // time of next frame
+	UINT32              m_avi_frame;                // current movie frame number
 
 	static const UINT8      s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 

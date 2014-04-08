@@ -554,5 +554,3 @@
 #undef TINT
 #undef TRANSPARENT
 #undef REALLY_SIMPLE
-
-

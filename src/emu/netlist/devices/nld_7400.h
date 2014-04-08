@@ -42,7 +42,7 @@
 NETLIB_SIGNAL(7400, 2, 0, 0);
 
 #define TTL_7400_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7400_dip, _name)
+		NET_REGISTER_DEV(7400_dip, _name)
 
 NETLIB_DEVICE(7400_dip,
 

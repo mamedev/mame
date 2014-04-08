@@ -13,7 +13,7 @@
 
     TODO:
 
-	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
+    - Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
 
     - BASIC program to set 8250/SFD-1001 to 8050 mode:
 

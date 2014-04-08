@@ -650,7 +650,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 
 	switch (offset*4)
 	{
-		case 0x000:	return 0x00000400;
+		case 0x000: return 0x00000400;
 		case 0x004: return ioport("SYSTEM")->read();
 		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
@@ -919,12 +919,12 @@ WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
 	//if(data & 2) // swap buffers
 	//{
-	//	clear3d();
+	//  clear3d();
 	//}
 
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 
-//	if(data & 1) // process DMA from 3d FIFO to framebuffer
+//  if(data & 1) // process DMA from 3d FIFO to framebuffer
 
 //  if(data & 4) // reset buffer count
 }
@@ -984,11 +984,11 @@ READ32_MEMBER(hng64_state::tcram_r)
    */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
-//	m_unk_vreg_toggle^=0x8000;
+//  m_unk_vreg_toggle^=0x8000;
 
 	return 0;
 
-//	return ++m_unk_vreg_toggle;
+//  return ++m_unk_vreg_toggle;
 }
 
 /***** I don't think there is a soundram2, having it NOT hooked up causes xrally to copy the sound program to the expected location, see memory map note *****/
@@ -1890,11 +1890,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 	switch(scanline)
 	{
-		case 224*2:	m_set_irq(0x0001);  break; // lv 0 vblank irq
-//		case 0*2:   m_set_irq(0x0002);  break; // lv 1
-//		case 32*2:  m_set_irq(0x0008);  break; // lv 2
-//		case 64*2:  m_set_irq(0x0008);  break; // lv 2
-		case 128*2:	m_set_irq(0x0800);  break; // lv 11 network irq?
+		case 224*2: m_set_irq(0x0001);  break; // lv 0 vblank irq
+//      case 0*2:   m_set_irq(0x0002);  break; // lv 1
+//      case 32*2:  m_set_irq(0x0008);  break; // lv 2
+//      case 64*2:  m_set_irq(0x0008);  break; // lv 2
+		case 128*2: m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
 }
 
@@ -1923,11 +1923,11 @@ void hng64_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-//	m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
-//	m_activeBuffer = 0;
+//  m_activeBuffer = 0;
 
 	/* For simulate MCU stepping */
 	m_mcu_fake_time = 0;
@@ -1955,7 +1955,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_CPU_IO_MAP(hng_comm_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
+
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)

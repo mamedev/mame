@@ -42,13 +42,13 @@
 
 #include "h8.h"
 
-#define MCFG_H8_INTC_ADD( _tag )	\
+#define MCFG_H8_INTC_ADD( _tag )    \
 	MCFG_DEVICE_ADD( _tag, H8_INTC, 0 )
 
-#define MCFG_H8H_INTC_ADD( _tag )	\
+#define MCFG_H8H_INTC_ADD( _tag )   \
 	MCFG_DEVICE_ADD( _tag, H8H_INTC, 0 )
 
-#define MCFG_H8S_INTC_ADD( _tag )	\
+#define MCFG_H8S_INTC_ADD( _tag )   \
 	MCFG_DEVICE_ADD( _tag, H8S_INTC, 0 )
 
 
@@ -100,7 +100,7 @@ public:
 	h8h_intc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(isr_r);
-	DECLARE_WRITE8_MEMBER(isr_w);	
+	DECLARE_WRITE8_MEMBER(isr_w);
 	DECLARE_READ8_MEMBER(icr_r);
 	DECLARE_WRITE8_MEMBER(icr_w);
 	DECLARE_READ8_MEMBER(icrc_r);

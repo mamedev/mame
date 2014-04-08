@@ -23,7 +23,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
@@ -57,5 +57,5 @@ extern const device_type DECOCOMN;
 
 #define MCFG_DECOCOMN_PALETTE(_palette_tag) \
 	decocomn_device::static_set_palette_tag(*device, "^" _palette_tag);
-	
+
 #endif

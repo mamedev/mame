@@ -13,7 +13,7 @@
 
     TODO:
 
-	http://www.wfking.de/hires.htm
+    http://www.wfking.de/hires.htm
 
     - version A (EF9365, 512x512 interlaced, 1 page)
     - version B (EF9366, 512x256 non-interlaced, 2 pages)

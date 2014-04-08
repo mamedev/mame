@@ -32,7 +32,7 @@ public:
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_pandora(*this, "pandora"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ public:
 	DECLARE_VIDEO_START(kaneko16);
 	DECLARE_MACHINE_RESET(mgcrystl);
 	UINT32 screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	template<class _BitmapClass>
 	UINT32 screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
 
@@ -82,7 +82,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
-	
+
 	template<class _BitmapClass>
 	void kaneko16_fill_bitmap(palette_device* palette, _BitmapClass &bitmap, const rectangle &cliprect);
 
@@ -123,7 +123,7 @@ public:
 		: kaneko16_state(mconfig, type, tag),
 		m_bg15_reg(*this, "bg15_reg"),
 		m_bg15_select(*this, "bg15_select"),
-		m_bgpalette(*this, "bgpalette") 
+		m_bgpalette(*this, "bgpalette")
 
 	{
 	}

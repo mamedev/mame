@@ -30,7 +30,7 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	tilemap_t *m_pf3_layer;
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_layer;

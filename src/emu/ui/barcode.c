@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	ui/barcode.c
- 
-	MESS's "barcode reader" control
- 
+    ui/barcode.c
+
+    MESS's "barcode reader" control
+
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -21,9 +21,9 @@
 
 
 /**************************************************
- 
+
  BARCODE INPUT MENU
- 
+
  **************************************************/
 
 
@@ -67,7 +67,7 @@ void ui_menu_barcode_code::populate()
 	}
 
 	item_append("New Barcode:", new_barcode, 0, ITEMREF_NEW_BARCODE);
-	
+
 	// finish up the menu
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Enter Code", NULL, 0, ITEMREF_ENTER);
@@ -108,12 +108,12 @@ void ui_menu_barcode_code::handle()
 					}
 				}
 				break;
-				
+
 			case IPT_SPECIAL:
 				if (get_selection() == ITEMREF_NEW_BARCODE)
 				{
 					int buflen = strlen(m_barcode_buffer);
-					
+
 					// if it's a backspace and we can handle it, do so
 					if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
 						*(char *)utf8_previous_char(&m_barcode_buffer[buflen]) = 0;
@@ -140,7 +140,7 @@ void ui_menu_barcode_code::handle()
 /**************************************************
 
  READER MENU
- 
+
 **************************************************/
 
 //-------------------------------------------------
@@ -168,14 +168,14 @@ ui_menu_barcode_reader::~ui_menu_barcode_reader()
 void ui_menu_barcode_reader::populate()
 {
 	astring buffer;
-	
+
 	barcode_reader_device_iterator iter(machine().config().root_device());
 	for (const barcode_reader_device *bcreader = iter.first(); bcreader != NULL; bcreader = iter.next())
 	{
 		char label[0x400];
 		sprintf(label,"[%s (%s)]",bcreader->name(),bcreader->basetag());
 		item_append(label, NULL, 0, (void *)bcreader);
-	}	
+	}
 }
 
 
@@ -187,7 +187,7 @@ void ui_menu_barcode_reader::handle()
 {
 	// process the menu
 	const ui_menu_event *event = process(0);
-	
+
 	// process the event
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
@@ -195,6 +195,6 @@ void ui_menu_barcode_reader::handle()
 		{
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_barcode_code(machine(), container, (barcode_reader_device *)event->itemref)));
 		}
-		
+
 	}
 }

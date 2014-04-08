@@ -21,7 +21,7 @@ public:
 			m_maincpu(*this, I8048_TAG),
 			m_soundcpu(*this, COP411_TAG),
 			m_dac(*this, "dac"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

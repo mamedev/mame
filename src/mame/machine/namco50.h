@@ -14,11 +14,11 @@ class namco_50xx_device : public device_t
 {
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER(read_request);
 	READ8_MEMBER( read );
-	
+
 	READ8_MEMBER( K_r );
 	READ8_MEMBER( R0_r );
 	READ8_MEMBER( R2_r );
@@ -29,11 +29,11 @@ protected:
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	TIMER_CALLBACK_MEMBER( latch_callback );
 	TIMER_CALLBACK_MEMBER( readrequest_callback );
 	TIMER_CALLBACK_MEMBER( irq_clear );
-	void irq_set();	
+	void irq_set();
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

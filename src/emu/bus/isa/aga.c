@@ -92,7 +92,7 @@ void isa8_aga_device::device_start()
 	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_r),this), write8_delegate(FUNC(isa8_aga_device::pc_aga_videoram_w),this));
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_cga_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_cga_w), this ) );
-	
+
 	/* Initialise the cga palette */
 	int i;
 
@@ -113,8 +113,8 @@ void isa8_aga_device::device_start()
 			}
 		}
 	}
-		
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];	
+
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	/* just a plain bit pattern for graphics data generation */
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
@@ -179,7 +179,7 @@ void isa8_aga_pc200_device::device_start()
 	m_isa->install_memory(0xb0000, 0xbffff, 0, 0, read8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_r),this), write8_delegate(FUNC(isa8_aga_pc200_device::pc200_videoram_w),this));
 	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate( FUNC(isa8_aga_device::pc_aga_mda_r), this ), write8_delegate( FUNC(isa8_aga_device::pc_aga_mda_w), this ) );
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_r), this ), write8_delegate( FUNC(isa8_aga_pc200_device::pc200_cga_w), this ) );
-	
+
 	/* Initialise the cga palette */
 	int i;
 
@@ -200,8 +200,8 @@ void isa8_aga_pc200_device::device_start()
 			}
 		}
 	}
-		
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];	
+
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	/* just a plain bit pattern for graphics data generation */
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
@@ -765,7 +765,6 @@ void isa8_aga_device::set_palette_luts(void)
 WRITE8_MEMBER (isa8_aga_device:: pc_aga_cga_w )
 {
 	if ( m_mode == AGA_COLOR ) {
-
 		switch(offset) {
 		case 0: case 2: case 4: case 6:
 			m_mc6845->address_w( space, offset, data );
@@ -867,7 +866,7 @@ WRITE8_MEMBER ( isa8_aga_device::pc_aga_videoram_w )
 }
 
 READ8_MEMBER( isa8_aga_device::pc_aga_videoram_r )
-{	
+{
 	switch (m_mode) {
 	case AGA_COLOR:
 		if (offset>=0x8000) return m_videoram[offset-0x8000];

@@ -620,14 +620,14 @@ static void sdlwindow_update_cursor_state(running_machine &machine, sdl_window_i
 			SDL_ShowCursor(SDL_ENABLE);
 			if (SDL_GetWindowGrab(window->sdl_window ))
 				SDL_SetWindowGrab(window->sdl_window, SDL_FALSE);
-	        SDL_SetRelativeMouseMode(SDL_FALSE);
+			SDL_SetRelativeMouseMode(SDL_FALSE);
 		}
 		else
 		{
 			SDL_ShowCursor(SDL_DISABLE);
 			if (!SDL_GetWindowGrab(window->sdl_window))
 				SDL_SetWindowGrab(window->sdl_window, SDL_TRUE);
-            SDL_SetRelativeMouseMode(SDL_TRUE);
+			SDL_SetRelativeMouseMode(SDL_TRUE);
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
 	}

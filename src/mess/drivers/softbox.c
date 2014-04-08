@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
 
 	MCFG_CBM_IEEE488_ADD("c8050")
-	
+
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_CONFIG_ADD("harddisk1", corvus_hdc_t::hd_intf)
 	MCFG_HARDDISK_CONFIG_ADD("harddisk2", corvus_hdc_t::hd_intf)

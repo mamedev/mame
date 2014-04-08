@@ -64,7 +64,7 @@
 
 #define MCFG_ZX8302_OUT_NETOUT_CB(_devcb) \
 	devcb = &zx8302_device::set_out_netout_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_ZX8302_OUT_MDSELCK_CB(_devcb) \
 	devcb = &zx8302_device::set_out_mdselck_callback(*device, DEVCB2_##_devcb);
 
@@ -79,7 +79,7 @@
 
 #define MCFG_ZX8302_OUT_RAW1_CB(_devcb) \
 	devcb = &zx8302_device::set_out_raw1_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_ZX8302_IN_RAW1_CB(_devcb) \
 	devcb = &zx8302_device::set_in_raw1_callback(*device, DEVCB2_##_devcb);
 
@@ -102,7 +102,7 @@ class zx8302_device :  public device_t,
 public:
 	// construction/destruction
 	zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void set_rtc_clock(device_t &device, int rtc_clock) { downcast<zx8302_device &>(device).m_rtc_clock = rtc_clock; }
 	template<class _Object> static devcb2_base &set_out_ipl1l_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_ipl1l_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_baudx4_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_baudx4_cb.set_callback(object); }
@@ -239,9 +239,9 @@ private:
 	UINT8 m_status;                 // status register
 
 	// IPC communication state
-	int m_comdata_from_ipc;			// pending data from IPC->68000
-	int m_comdata_to_cpu;			// communication data IPC->68000
-	int m_comdata_to_ipc;			// communication data 68000->IPC
+	int m_comdata_from_ipc;         // pending data from IPC->68000
+	int m_comdata_to_cpu;           // communication data IPC->68000
+	int m_comdata_to_ipc;           // communication data 68000->IPC
 	int m_comctl;                   // communication control
 	int m_ipc_state;                // communication state
 	int m_ipc_busy;                 // IPC busy

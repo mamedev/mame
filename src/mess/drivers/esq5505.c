@@ -222,7 +222,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
-	
+
 	//dmac
 	DECLARE_WRITE8_MEMBER(dma_end);
 	DECLARE_WRITE8_MEMBER(dma_error);

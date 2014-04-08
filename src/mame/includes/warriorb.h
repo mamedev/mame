@@ -56,7 +56,7 @@ public:
 	required_device<filter_volume_device> m_2610_2r;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(warriorb_sound_w);
 	DECLARE_READ16_MEMBER(warriorb_sound_r);

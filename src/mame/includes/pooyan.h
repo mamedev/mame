@@ -28,7 +28,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(pooyan_videoram_w);
 	DECLARE_WRITE8_MEMBER(pooyan_colorram_w);

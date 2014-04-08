@@ -49,11 +49,11 @@
 NETLIB_SIGNAL(7425, 4, 1, 0);
 
 #define TTL_7425_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7425_dip, _name)
+		NET_REGISTER_DEV(7425_dip, _name)
 
 NETLIB_DEVICE(7425_dip,
 
-    NETLIB_NAME(7425) m_1;
-    NETLIB_NAME(7425) m_2;
+	NETLIB_NAME(7425) m_1;
+	NETLIB_NAME(7425) m_2;
 );
 #endif /* NLD_7425_H_ */

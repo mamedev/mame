@@ -470,7 +470,7 @@ UINT8 via6522_device::input_pb()
 void via6522_device::output_pb()
 {
 	UINT8 pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
-	
+
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
 

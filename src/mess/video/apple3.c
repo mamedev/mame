@@ -19,7 +19,7 @@
 #define DKGRAY  5
 #define BLUE    6
 #define LTBLUE  7
-#define BROWN   8   					   
+#define BROWN   8
 #define ORANGE  9
 #define GRAY    10
 #define PINK    11
@@ -411,7 +411,7 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 
 UINT32 apple3_state::screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
+//  printf("gfx mode %x\n", m_flags & (VAR_VM3|VAR_VM1|VAR_VM0));
 
 	switch(m_flags & (VAR_VM3|VAR_VM1|VAR_VM0))
 	{

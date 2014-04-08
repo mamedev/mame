@@ -87,7 +87,7 @@ public:
 		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
 	}
-	
+
 	// ----- core graphics drawing -----
 
 	// specific drawgfx implementations for each transparency type

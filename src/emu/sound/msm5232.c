@@ -26,7 +26,7 @@ void msm5232_device::device_start()
 {
 	int rate = clock()/CLOCK_RATE_DIVIDER;
 	int voicenum;
-	
+
 	m_gate_handler_cb.resolve();
 
 	init(clock(), rate);

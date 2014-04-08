@@ -1,7 +1,7 @@
 /********************************************************
 
   KO Punch (c) 1981 Sega
-  
+
   XTAL: ?
   CPU: 8085 (proof: it uses SIM opcode)
   Other: 4 x i8255 for all I/O
@@ -13,12 +13,12 @@
 
 
 *********************************************************
-  
+
   This is a simple boxing bag game, but for visual feedback
   it has a small CRT instead of LEDs or a dial.
-  
+
   Insert coin, select your weightclass (7 buttons on cab), and punch.
-  
+
   Heavyweight   - 300K
   Middleweight  - 260K
   Welterweight  - 230K

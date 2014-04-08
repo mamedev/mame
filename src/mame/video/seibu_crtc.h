@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Seibu CRTC device
+    Seibu CRTC device
 
 ***************************************************************************/
 
@@ -16,7 +16,7 @@
 
 #define MCFG_SEIBU_CRTC_LAYER_EN_CB(_devcb) \
 	devcb = &seibu_crtc_device::set_layer_en_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(_devcb) \
 	devcb = &seibu_crtc_device::set_layer_scroll_callback(*device, DEVCB2_##_devcb);
 
@@ -37,7 +37,7 @@ public:
 
 	template<class _Object> static devcb2_base &set_layer_en_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_en_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_layer_scroll_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_scroll_cb.set_callback(object); }
-	
+
 	// I/O operations
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_WRITE16_MEMBER( write_alt );
@@ -47,7 +47,7 @@ public:
 	DECLARE_READ16_MEMBER( read_xor );
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;

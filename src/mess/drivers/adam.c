@@ -289,7 +289,7 @@ Mark Gordon
 
     TODO:
 
-	- spinner INT
+    - spinner INT
     - printer
     - SPI
 
@@ -443,11 +443,11 @@ READ8_MEMBER( adam_state::mreq_r )
 		case 5:
 			cs2 = 0;
 			break;
-			
+
 		case 6:
 			cs3 = 0;
 			break;
-			
+
 		case 7:
 			cs4 = 0;
 			break;

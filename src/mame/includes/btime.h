@@ -63,7 +63,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(lnc_w);
 	DECLARE_WRITE8_MEMBER(mmonkey_w);

@@ -58,7 +58,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(bwp12_sharedram1_w);
 	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);

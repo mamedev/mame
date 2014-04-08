@@ -154,7 +154,7 @@ public:
 
 	DECLARE_READ16_MEMBER(periphs_r);
 	DECLARE_WRITE16_MEMBER(periphs_w);
-	
+
 	DECLARE_READ16_MEMBER(uart_loopback_enable);
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );

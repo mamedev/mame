@@ -1,27 +1,27 @@
 /************************************************************************************************************
 
-	Bowling Try
+    Bowling Try
 
-	(c)200? Atlus
+    (c)200? Atlus
 
-	TODO:
-	- Tight loops at 0x60e090-0x60e093, control status from video chip?
-	- YGV631-B ... what's that?
+    TODO:
+    - Tight loops at 0x60e090-0x60e093, control status from video chip?
+    - YGV631-B ... what's that?
 
-	ATLUS PCB  BT-208001
-	------------------------
+    ATLUS PCB  BT-208001
+    ------------------------
 
-	At U12 the chip is Toshiba TA8428FG
+    At U12 the chip is Toshiba TA8428FG
 
-	At U1 the chip is H8/3008
+    At U1 the chip is H8/3008
 
-	At X1 on the crystal it is printed S753
+    At X1 on the crystal it is printed S753
 
-	big gfx chip marked
+    big gfx chip marked
 
-	YAMAHA JAPAN
-	YGV631-B
-	0806LU004
+    YAMAHA JAPAN
+    YGV631-B
+    0806LU004
 
 ************************************************************************************************************/
 
@@ -94,7 +94,7 @@ UINT32 bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb32 
 static MACHINE_CONFIG_START( bowltry, bowltry_state )
 	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( bowltry_map )
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

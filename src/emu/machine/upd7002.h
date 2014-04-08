@@ -33,7 +33,7 @@ struct upd7002_interface
 ***************************************************************************/
 
 class upd7002_device : public device_t,
-								public upd7002_interface								
+								public upd7002_interface
 {
 public:
 	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -42,17 +42,17 @@ public:
 	DECLARE_READ8_MEMBER ( eoc_r );
 	DECLARE_READ8_MEMBER ( read );
 	DECLARE_WRITE8_MEMBER ( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	// internal state
-	
+
 	/* Status Register
 	    D0 and D1 define the currently selected input channel
 	    D2 flag output
@@ -83,7 +83,7 @@ private:
 	the counter at the end of the first conversion will not match and not be processed
 	only then at the end of the second conversion will the conversion complete function run */
 	int m_conversion_counter;
-	
+
 	enum
 	{
 		TIMER_CONVERSION_COMPLETE

@@ -72,7 +72,7 @@ class crt9212_t :  public device_t
 public:
 	// construction/destruction
 	crt9212_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void static_set_wen2(device_t &device, int state) { downcast<crt9212_t &>(device).m_wen2 = state; }
 
 	template<class _Object> static devcb2_base &set_dout_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_dout.set_callback(object); }
@@ -94,7 +94,7 @@ protected:
 	virtual void device_start();
 
 private:
-	devcb2_write8			m_write_dout;
+	devcb2_write8           m_write_dout;
 	devcb2_write_line       m_write_rof;
 	devcb2_write_line       m_write_wof;
 

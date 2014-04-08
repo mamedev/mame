@@ -151,7 +151,7 @@ protected:
 	required_ioport m_buttons;
 	required_ioport m_config;
 	optional_ioport m_80column_dips;
-public:	
+public:
 	optional_device<palette_device> m_palette;
 
 	void einstein_scan_keyboard();

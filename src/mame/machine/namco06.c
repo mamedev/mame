@@ -101,7 +101,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 
 
 READ8_MEMBER( namco_06xx_device::data_r )
-{	
+{
 	UINT8 result = 0xff;
 
 	LOG(("%s: 06XX '%s' read offset %d\n",machine().describe_context(),tag(),offset));
@@ -122,7 +122,7 @@ READ8_MEMBER( namco_06xx_device::data_r )
 
 
 WRITE8_MEMBER( namco_06xx_device::data_w )
-{	
+{
 	LOG(("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data));
 
 	if (m_control & 0x10)
@@ -138,13 +138,13 @@ WRITE8_MEMBER( namco_06xx_device::data_w )
 
 
 READ8_MEMBER( namco_06xx_device::ctrl_r )
-{	
+{
 	LOG(("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag()));
 	return m_control;
 }
 
 WRITE8_MEMBER( namco_06xx_device::ctrl_w )
-{	
+{
 	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data));
 
 	m_control = data;
@@ -183,11 +183,11 @@ namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *
 	m_read_0(*this),
 	m_read_1(*this),
 	m_read_2(*this),
-	m_read_3(*this),	
+	m_read_3(*this),
 	m_readreq_0(*this),
 	m_readreq_1(*this),
 	m_readreq_2(*this),
-	m_readreq_3(*this),	
+	m_readreq_3(*this),
 	m_write_0(*this),
 	m_write_1(*this),
 	m_write_2(*this),
@@ -212,7 +212,7 @@ void namco_06xx_device::device_start()
 	m_write_0.resolve();
 	m_write_1.resolve();
 	m_write_2.resolve();
-	m_write_3.resolve();	
+	m_write_3.resolve();
 	/* allocate a timer */
 	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_06xx_device::nmi_generate),this));
 

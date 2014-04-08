@@ -18,10 +18,10 @@
         World Darts
         Xenon
         World Trophy Soccer
-		Delta Command (N.Y Warriors)
-		Blastaball
-		Aaargh
-		Pharaohs Match
+        Delta Command (N.Y Warriors)
+        Blastaball
+        Aaargh
+        Pharaohs Match
 
     Other Arcadia games (not dumped):
 
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( amiga_map, AS_PROGRAM, 16, arcadia_amiga_state )
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)       /* Kickstart BIOS */
-	
+
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_SHARE("nvram")
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( argh_map, AS_PROGRAM, 16, arcadia_amiga_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)       /* Kickstart BIOS */
 
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
-//	AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
+//  AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
 	AM_RANGE(0x9ff000, 0x9fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user3", 0)
 ADDRESS_MAP_END
@@ -915,7 +915,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 	#if 0
 	{
 		UINT8 *ROM = memregion(tag)->base();
-	//	int size = memregion(tag)->bytes();
+	//  int size = memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
@@ -962,7 +962,7 @@ void arcadia_amiga_state::arcadia_init()
 
 	/* OnePlay bios is encrypted, TenPlay is not */
 	biosrom = (UINT16 *)memregion("user2")->base();
-	
+
 	if (biosrom)
 		if (biosrom[0] != 0x4afc)
 			generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);

@@ -116,58 +116,58 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 //  SERIAL COMMUNICATIONS INTERFACE
 //-------------------------------------------------
 
-#define SCI_BAUD		0								// Baud rate register
-#define BAUD_SCR		0x07							// SCI baud rate select
-#define BAUD_SCP		0x30							// SCI prescaler select
+#define SCI_BAUD        0                               // Baud rate register
+#define BAUD_SCR        0x07                            // SCI baud rate select
+#define BAUD_SCP        0x30                            // SCI prescaler select
 
-#define SCI_SCCR1		1								// Control register 1
-#define SCCR1_WAKE		0x08							// Wakeup method
-#define SCCR1_M			0x10							// Character length
-#define SCCR1_T8		0x40							// Transmit bit 8
-#define SCCR1_R8		0x80							// Receive bit 8
+#define SCI_SCCR1       1                               // Control register 1
+#define SCCR1_WAKE      0x08                            // Wakeup method
+#define SCCR1_M         0x10                            // Character length
+#define SCCR1_T8        0x40                            // Transmit bit 8
+#define SCCR1_R8        0x80                            // Receive bit 8
 
-#define SCI_SCCR2		2								// Control register 2
-#define SCCR2_SBK		0x01							// Send break
-#define SCCR2_RWU		0x02							// Receiver wakeup enable
-#define SCCR2_RE		0x04							// Receiver enable
-#define SCCR2_TE		0x08							// Transmitter enable
-#define SCCR2_ILIE		0x10							// Idle line interrupt enable
-#define SCCR2_RIE		0x20							// Receiver interrupt enable
-#define SCCR2_TCIE		0x40							// Transmit complete interrupt enable
-#define SCCR2_TIE		0x80							// Transmit interrupt enable
+#define SCI_SCCR2       2                               // Control register 2
+#define SCCR2_SBK       0x01                            // Send break
+#define SCCR2_RWU       0x02                            // Receiver wakeup enable
+#define SCCR2_RE        0x04                            // Receiver enable
+#define SCCR2_TE        0x08                            // Transmitter enable
+#define SCCR2_ILIE      0x10                            // Idle line interrupt enable
+#define SCCR2_RIE       0x20                            // Receiver interrupt enable
+#define SCCR2_TCIE      0x40                            // Transmit complete interrupt enable
+#define SCCR2_TIE       0x80                            // Transmit interrupt enable
 
-#define SCI_SCSR		3								// Status register
-#define SCSR_FE			0x02							// Receiver framing error
-#define SCSR_NF			0x04							// Receiver noise
-#define SCSR_OR			0x08							// Receiver overrun
-#define SCSR_IDLE		0x10							// Receiver idle
-#define SCSR_RDRF		0x20							// Receive data register full
-#define SCSR_TC			0x40							// Transmit complete
-#define SCSR_TDRE		0x80							// Transmit data register empty
-#define SCSR_INT		(SCSR_IDLE | SCSR_RDRF| \
-							SCSR_TC | SCSR_TDRE)		// Interrupt sources
+#define SCI_SCSR        3                               // Status register
+#define SCSR_FE         0x02                            // Receiver framing error
+#define SCSR_NF         0x04                            // Receiver noise
+#define SCSR_OR         0x08                            // Receiver overrun
+#define SCSR_IDLE       0x10                            // Receiver idle
+#define SCSR_RDRF       0x20                            // Receive data register full
+#define SCSR_TC         0x40                            // Transmit complete
+#define SCSR_TDRE       0x80                            // Transmit data register empty
+#define SCSR_INT        (SCSR_IDLE | SCSR_RDRF| \
+							SCSR_TC | SCSR_TDRE)        // Interrupt sources
 
-#define SCI_SCDR		4								// Data register
+#define SCI_SCDR        4                               // Data register
 
 //-------------------------------------------------
 //  SERIAL PERIPHERAL INTERFACE
 //-------------------------------------------------
 
-#define SPI_SPCR		0								// Control register
-#define SPCR_SPR		0x03							// SPI clock rate select
-#define SPCR_CPHA		0x04							// Clock phase
-#define SPCR_CPOL		0x08							// Clock polarity
-#define SPCR_MSTR		0x10							// Master mode select
-#define SPCR_DWOM		0x20							// Port D wire-or mode option
-#define SPCR_SPE		0x40							// Serial peripheral system enable
-#define SPCR_SPIE		0x80							// Serial peripheral interrupt enable
+#define SPI_SPCR        0                               // Control register
+#define SPCR_SPR        0x03                            // SPI clock rate select
+#define SPCR_CPHA       0x04                            // Clock phase
+#define SPCR_CPOL       0x08                            // Clock polarity
+#define SPCR_MSTR       0x10                            // Master mode select
+#define SPCR_DWOM       0x20                            // Port D wire-or mode option
+#define SPCR_SPE        0x40                            // Serial peripheral system enable
+#define SPCR_SPIE       0x80                            // Serial peripheral interrupt enable
 
-#define SPI_SPSR		1								// Status register
-#define SPSR_MODF		0x10							// Mode fault flag
-#define SPSR_WCOL		0x40							// Write collision
-#define SPSR_SPIF		0x80							// SPI transfer complete
+#define SPI_SPSR        1                               // Status register
+#define SPSR_MODF       0x10                            // Mode fault flag
+#define SPSR_WCOL       0x40                            // Write collision
+#define SPSR_SPIF       0x80                            // SPI transfer complete
 
-#define SPI_SPDR		2								// Data I/O Register
+#define SPI_SPDR        2                               // Data I/O Register
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -338,8 +338,8 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD11")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)  
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)      
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // FIXME - duplicate "Return"
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
@@ -363,7 +363,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Previous") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Do (F16)") 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Do (F16)")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert Here") PORT_CODE(KEYCODE_HOME)
 
@@ -494,7 +494,7 @@ void lk201_device::rcv_complete()
 	sci_status |= SCSR_RDRF;
 	update_interrupts();
 	receive_register_extract();
-//	printf("lk201 got %02x\n", get_received_char());
+//  printf("lk201 got %02x\n", get_received_char());
 }
 
 void lk201_device::tra_complete()
@@ -527,7 +527,7 @@ READ8_MEMBER( lk201_device::ddr_r )
 
 WRITE8_MEMBER( lk201_device::ddr_w )
 {
-//	printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
+//  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
 	send_port(space, offset, ports[offset] & data);
 
@@ -543,7 +543,7 @@ READ8_MEMBER( lk201_device::ports_r )
 	// add in ddr-masked version of port writes
 	incoming |= (ports[offset] & ddrs[offset]);
 
-//	printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
+//  printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
 
 	return incoming;
 }
@@ -557,7 +557,7 @@ WRITE8_MEMBER( lk201_device::ports_w )
 
 void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 {
-//	printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
+//  printf("PORT %c write %02x (DDR = %02x) (PC=%x)\n", 'A' + offset, data, ddrs[offset], m_maincpu->pc());
 
 	switch (offset)
 	{
@@ -609,21 +609,21 @@ READ8_MEMBER( lk201_device::sci_r )
 
 	switch (offset)
 	{
-		case SCI_BAUD:	// Baud rate
+		case SCI_BAUD:  // Baud rate
 			break;
 
-		case SCI_SCCR1:	// Control 1
+		case SCI_SCCR1: // Control 1
 			break;
 
-		case SCI_SCCR2:	// Control 2
+		case SCI_SCCR2: // Control 2
 			incoming = sci_ctl2;
 			break;
 
-		case SCI_SCSR:	// Status
+		case SCI_SCSR:  // Status
 			incoming = sci_status;
 			break;
 
-		case SCI_SCDR:	// Data
+		case SCI_SCDR:  // Data
 			incoming = get_received_char();
 			sci_status &= ~SCSR_RDRF;
 			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
@@ -631,7 +631,7 @@ READ8_MEMBER( lk201_device::sci_r )
 			break;
 	}
 
-//	printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
+//  printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
 
 	return incoming;
 }
@@ -640,22 +640,22 @@ WRITE8_MEMBER( lk201_device::sci_w )
 {
 	switch (offset)
 	{
-		case SCI_BAUD:	// Baud rate
+		case SCI_BAUD:  // Baud rate
 			break;
 
-		case SCI_SCCR1:	// Control 1
+		case SCI_SCCR1: // Control 1
 			break;
 
-		case SCI_SCCR2:	// Control 2
+		case SCI_SCCR2: // Control 2
 			sci_ctl2 = data;
 			update_interrupts();
 			break;
 
-		case SCI_SCSR:	// Status
+		case SCI_SCSR:  // Status
 			break;
 
-		case SCI_SCDR:	// Data
-//			printf("LK201: sending %02x\n", data);
+		case SCI_SCDR:  // Data
+//          printf("LK201: sending %02x\n", data);
 			transmit_register_setup(data);
 			sci_status &= ~(SCSR_TC | SCSR_TDRE);
 			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
@@ -663,7 +663,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
 			break;
 	}
 
-//	printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
+//  printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
 READ8_MEMBER( lk201_device::spi_r )
@@ -672,20 +672,20 @@ READ8_MEMBER( lk201_device::spi_r )
 
 	switch (offset)
 	{
-		case SPI_SPCR:	// Control
+		case SPI_SPCR:  // Control
 			break;
 
-		case SPI_SPSR:	// Status
+		case SPI_SPSR:  // Status
 			incoming = spi_status;
 			spi_status &= ~SPSR_SPIF;
 			break;
 
-		case SPI_SPDR:	// Data I/O
+		case SPI_SPDR:  // Data I/O
 			incoming = spi_data;
 			break;
 	}
 
-//	printf("SPI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
+//  printf("SPI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
 
 	return incoming;
 }
@@ -694,13 +694,13 @@ WRITE8_MEMBER( lk201_device::spi_w )
 {
 	switch (offset)
 	{
-		case SPI_SPCR:	// Control
+		case SPI_SPCR:  // Control
 			break;
 
-		case SPI_SPSR:	// Status (read only)
+		case SPI_SPSR:  // Status (read only)
 			break;
 
-		case SPI_SPDR:	// Data I/O
+		case SPI_SPDR:  // Data I/O
 			spi_data = data;
 
 			// Transfer only allowed if transfer complete flag has been acknowleged
@@ -718,6 +718,5 @@ WRITE8_MEMBER( lk201_device::spi_w )
 			break;
 	}
 
-//	printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
+//  printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
-

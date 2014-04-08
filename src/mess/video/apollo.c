@@ -1725,7 +1725,6 @@ apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const cha
 	m_lut_fifo(NULL),
 	m_bt458(NULL)
 {
-	
 }
 
 apollo_graphics_15i::apollo_graphics_15i(const machine_config &mconfig,const char *tag, device_t *owner, UINT32 clock, device_type type,const char *name, const char *shortname, const char *source) :
@@ -1884,7 +1883,7 @@ void apollo_graphics_15i::device_reset()
 	memset(m_image_memory, 0, m_image_memory_size * 2);
 
 	//  register_vblank_callback(this);
-	
+
 	/* FIXME: register for VBLANK callbacks */
 	register_vblank_callback();
 }
@@ -1960,7 +1959,7 @@ void apollo_graphics_19i::device_reset()
 
 
 READ16_MEMBER( apollo_graphics_15i::apollo_mgm_r )
-{	
+{
 	if (is_mono())
 	{
 		return apollo_mem_r(space, offset, mem_mask);

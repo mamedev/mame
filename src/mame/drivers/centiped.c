@@ -2052,7 +2052,7 @@ ROM_START( magworm )
 ROM_END
 
 
-ROM_START( magworma ) 
+ROM_START( magworma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "h41.1d",  0x2000, 0x0800, CRC(773a3da6) SHA1(577ae0578231df83a768d6a50b86dcaf715a32d7) )
 	ROM_LOAD( "h42.1e",  0x2800, 0x0800, CRC(482c7808) SHA1(6d274a988e603d33131cb6ffbfe2cdd22fabf25b) )

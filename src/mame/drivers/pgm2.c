@@ -1,55 +1,55 @@
 /* PGM 2 hardware.
 
-	Motherboard is bare bones stuff, and does not contain any ROMs.
-	The IGS036 used by the games is an ARM based CPU, like IGS027A used on PGM1 it has internal ROM.
-	Decryption should be correct in most cases, but the ARM mode code at the start of the external
-	ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
-	the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
-	 
-	 - Some of the THUMB code looks like THUMB2 code
-	  eg 
-	    f004 BL (HI) 00004000
-		e51f B #fffffa3e
-		0434 LSL R4, R6, 16
-		0000 LSL R0, R0, 0
+    Motherboard is bare bones stuff, and does not contain any ROMs.
+    The IGS036 used by the games is an ARM based CPU, like IGS027A used on PGM1 it has internal ROM.
+    Decryption should be correct in most cases, but the ARM mode code at the start of the external
+    ROMs is a bit weird, with many BNV instructions rather than jumps.  Maybe the ARM is customized,
+    the code has been 'NOPPED' out this way (BNV is Branch Never) or it's a different type of ARM?
 
-		should be a 32-bit branch instruction with the 2nd dword used as data.
+     - Some of the THUMB code looks like THUMB2 code
+      eg
+        f004 BL (HI) 00004000
+        e51f B #fffffa3e
+        0434 LSL R4, R6, 16
+        0000 LSL R0, R0, 0
 
-
-	We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
+        should be a 32-bit branch instruction with the 2nd dword used as data.
 
 
-	PGM2 Motherboard Components:
+    We need to determine where VRAM etc. map in order to attempt tests on the PCBs.
 
-	 IS61LV25616AL(SRAM)
-	 IGS037(GFX PROCESSOR)
-	 YMZ774-S(SOUND)
-	 R5F21256SN(extra MCU for protection and ICcard communication)
-	  - Appears to be refered to by the games as MPU
 
-	Cartridges
-	 IGS036 (MAIN CPU) (differs per game, internal code)
-	 ROMs
-	 Custom program ROM module (KOV3 only)
-	  - on some games ROM socket contains Flash ROM + SRAM
+    PGM2 Motherboard Components:
 
-	 QFP100 chip (Xlinx CPLD)
+     IS61LV25616AL(SRAM)
+     IGS037(GFX PROCESSOR)
+     YMZ774-S(SOUND)
+     R5F21256SN(extra MCU for protection and ICcard communication)
+      - Appears to be refered to by the games as MPU
 
-	 Single PCB versions of some of the titles were also available
+    Cartridges
+     IGS036 (MAIN CPU) (differs per game, internal code)
+     ROMs
+     Custom program ROM module (KOV3 only)
+      - on some games ROM socket contains Flash ROM + SRAM
 
-	Only 5 Games were released for this platform, 3 of which are just updates / re-releases of older titles!
-	The platform has since been superseded by PGM3 (HD system uses flash cards etc.)
+     QFP100 chip (Xlinx CPLD)
 
-	Oriental Legend 2
-	The King of Fighters '98 - Ultimate Match - Hero  (NOT DUMPED)
-	Knights of Valour 2 New Legend
-	Dodonpachi Daioujou Tamashii
-	Knights of Valour 3
+     Single PCB versions of some of the titles were also available
 
-	These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
+    Only 5 Games were released for this platform, 3 of which are just updates / re-releases of older titles!
+    The platform has since been superseded by PGM3 (HD system uses flash cards etc.)
 
-	Jigsaw World Arena
-	Puzzle of Ocha / Ochainu No Pazuru
+    Oriental Legend 2
+    The King of Fighters '98 - Ultimate Match - Hero  (NOT DUMPED)
+    Knights of Valour 2 New Legend
+    Dodonpachi Daioujou Tamashii
+    Knights of Valour 3
+
+    These were only released as single board PGM2 based hardware, seen for sale in Japan for around $250-$300
+
+    Jigsaw World Arena
+    Puzzle of Ocha / Ochainu No Pazuru
 
 */
 
@@ -511,4 +511,3 @@ GAME( 2011, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0,
 // The King of Fighters '98 - Ultimate Match - Hero
 // Jigsaw World Arena
 //Puzzle of Ocha / Ochainu No Pazuru
-

@@ -20,16 +20,16 @@
 
 #define MCFG_HUC6260_NEXT_PIXEL_DATA_CB(_devcb) \
 	devcb = &huc6260_device::set_next_pixel_data_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(_devcb) \
 	devcb = &huc6260_device::set_time_til_next_event_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HUC6260_VSYNC_CHANGED_CB(_devcb) \
 	devcb = &huc6260_device::set_vsync_changed_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_HUC6260_HSYNC_CHANGED_CB(_devcb) \
 	devcb = &huc6260_device::set_hsync_changed_callback(*device, DEVCB2_##_devcb);
-	
+
 
 class huc6260_device :  public device_t,
 						public device_video_interface
@@ -42,7 +42,7 @@ public:
 	template<class _Object> static devcb2_base &set_time_til_next_event_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_time_til_next_event_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_vsync_changed_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_vsync_changed_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_hsync_changed_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_hsync_changed_cb.set_callback(object); }
-	
+
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

@@ -308,4 +308,3 @@ WRITE8_MEMBER(nsc810_device::write)
 		}
 	}
 }
-

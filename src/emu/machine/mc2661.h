@@ -78,7 +78,7 @@
 // ======================> mc2661_device
 
 class mc2661_device :  public device_t,
-					   public device_serial_interface
+						public device_serial_interface
 {
 public:
 	// construction/destruction

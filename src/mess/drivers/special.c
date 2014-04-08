@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 2)
 
 	/* audio hardware */
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
@@ -436,7 +436,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch1))
 	MCFG_PIT8253_CLK2(2000000)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch2))
-	
+
 	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_I8255_ADD( "ppi8255", specimx_ppi8255_interface )
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
@@ -467,7 +467,7 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(special_state,erik)
 

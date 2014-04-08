@@ -1636,11 +1636,11 @@ ROM_START( stargrds )
 ROM_END
 
 
-/* Spy Hunter labels look like this 
+/* Spy Hunter labels look like this
    SPY-HUNTER
      C.P.U.
       PG3
-	 2/9/84
+     2/9/84
 */
 
 ROM_START( spyhunt )

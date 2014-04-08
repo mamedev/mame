@@ -66,7 +66,7 @@ private:
 	UINT32 m_nDMAMode;
 	UINT32 m_nDMAZoomByteCnt;
 	UINT32 m_nDMARunning;
-	
+
 	void update();
 	TIMER_CALLBACK_MEMBER(update_callback);
 	void timer_init();

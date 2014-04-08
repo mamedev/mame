@@ -404,7 +404,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 	const int center = 0x80;
 	const int right_limit = 0xe0;
 	const int tolerance = 2;
-	
+
 	if (pos <= left_limit + tolerance)
 		ret ^= 0x20;
 	else if (pos >= center - tolerance && pos <= center + tolerance)
@@ -428,9 +428,9 @@ WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
 
 	if (data == 0)
 		return;
-	
+
 	m_bankmotor_delta = 8 - data;
-	
+
 	// convert to speed and direction for output
 	if (data < 8)
 	{
@@ -662,7 +662,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 					next_scanline = 65;
 					m_subcpu->set_input_line(4, CLEAR_LINE);
 					break;
-				
+
 				default:
 					break;
 			}
@@ -688,7 +688,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
 	const int speed = 100;
 	const int left_limit = 0x2000;
 	const int right_limit = 0xe000;
-	
+
 	m_bankmotor_pos += speed * m_bankmotor_delta;
 	if (m_bankmotor_pos <= left_limit)
 		m_bankmotor_pos = left_limit;
@@ -729,7 +729,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 
 		case 0x60/2:
 			return watchdog_reset_r(space, 0);
-		
+
 		default:
 			break;
 	}
@@ -781,7 +781,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 		case 0x70/2:
 			m_sprites->draw_write(space, offset, data, mem_mask);
 			return;
-		
+
 		default:
 			break;
 	}
@@ -814,7 +814,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 			return ioport(ports[m_adc_select])->read_safe(0x0010);
 		}
-		
+
 		default:
 			break;
 	}
@@ -866,7 +866,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 		case 0x3020/2:
 			// ADC trigger
 			return;
-		
+
 		default:
 			break;
 	}
@@ -1210,7 +1210,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_SEGAIC16VID_ADD("segaic16vid")
 	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
 	MCFG_SEGAIC16_ROAD_ADD("segaic16road")

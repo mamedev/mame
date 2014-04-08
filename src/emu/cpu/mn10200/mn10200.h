@@ -43,7 +43,7 @@ enum
 	MN10200_IRQ1,
 	MN10200_IRQ2,
 	MN10200_IRQ3,
-	
+
 	MN10200_MAX_EXT_IRQ
 };
 
@@ -155,7 +155,7 @@ private:
 		UINT8 ctrlh;
 		UINT8 buf;
 	} m_serial[2];
-	
+
 	// ports
 	UINT8 m_pplul;
 	UINT8 m_ppluh;
@@ -167,7 +167,7 @@ private:
 		UINT8 out;
 		UINT8 dir;
 	} m_port[4];
-	
+
 	// internal read/write
 	inline UINT8 read_arg8(UINT32 address) { return m_program->read_byte(address); }
 	inline UINT16 read_arg16(UINT32 address) { return m_program->read_byte(address) | m_program->read_byte(address + 1) << 8; }

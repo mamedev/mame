@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	/* video hardware */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)

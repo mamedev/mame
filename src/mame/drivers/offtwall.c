@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config, "gfxdecode")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)	
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
@@ -422,17 +422,17 @@ ROM_START( offtwall )
 	ROM_REGION( 0x800, "eeprom:eeprom", 0 )
 	ROM_LOAD( "offtwall-eeprom.17l", 0x0000, 0x800, CRC(5eaf2d5b) SHA1(934a76a23960e6ed2cc33c359f9735caee762145) )
 
-    ROM_REGION(0x022f, "jsa:plds", 0)
-    ROM_LOAD("136085-1038.17c.bin", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-    ROM_LOAD("136085-1039.20c.bin", 0x0118, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_REGION(0x022f, "jsa:plds", 0)
+	ROM_LOAD("136085-1038.17c.bin", 0x0000, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136085-1039.20c.bin", 0x0118, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
 
-    ROM_REGION(0x2591, "main:plds", 0)
-    ROM_LOAD("136090-1001.14l.bin", 0x0000, 0x201d, NO_DUMP ) /* GAL6001-35P is read protected */
-    ROM_LOAD("136090-1002.11r.bin", 0x201e, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-    ROM_LOAD("136090-1003.15f.bin", 0x2135, 0x0117, CRC(5e723b46) SHA1(e686920d0af342e33f836fec15b6e8b5ef1b8be5)) /* GAL16V8A-25LP */
-    ROM_LOAD("136090-1005.5n.bin",  0x224c, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-    ROM_LOAD("136090-1006.5f.bin",  0x2363, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
-    ROM_LOAD("136090-1007.3f.bin",  0x247a, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_REGION(0x2591, "main:plds", 0)
+	ROM_LOAD("136090-1001.14l.bin", 0x0000, 0x201d, NO_DUMP ) /* GAL6001-35P is read protected */
+	ROM_LOAD("136090-1002.11r.bin", 0x201e, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136090-1003.15f.bin", 0x2135, 0x0117, CRC(5e723b46) SHA1(e686920d0af342e33f836fec15b6e8b5ef1b8be5)) /* GAL16V8A-25LP */
+	ROM_LOAD("136090-1005.5n.bin",  0x224c, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136090-1006.5f.bin",  0x2363, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
+	ROM_LOAD("136090-1007.3f.bin",  0x247a, 0x0117, NO_DUMP ) /* GAL16V8A-25LP is read protected */
 ROM_END
 
 

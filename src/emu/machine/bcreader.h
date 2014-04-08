@@ -31,11 +31,11 @@ public:
 	// TODO: add checksum validation!
 	bool is_valid(int len) { return (len != 12 && len != 13 && len != 8) ? FALSE : TRUE; }
 	void decode(int len);
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();
-	
+
 	UINT8 m_byte_data[13];
 	UINT8 m_pixel_data[100];
 	int m_byte_length;

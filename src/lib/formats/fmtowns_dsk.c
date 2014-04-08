@@ -1,7 +1,7 @@
 /*
  * fmtowns_dsk.c
  *
- *	FM Towns floppy image format
+ *  FM Towns floppy image format
  *
  *  Created on: 23/03/2014
  */

@@ -1301,7 +1301,7 @@ static INPUT_PORTS_START( sf2mdtb )
 	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW(A):7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" ) 	//sort of debug mode...
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )  //sort of debug mode...
 													//depnding (???) of other DSW setting get different
 													//"game" mode, autoplay, bonus round, ecc...
 	PORT_START("DSWB")
@@ -2482,7 +2482,7 @@ static MACHINE_CONFIG_START( sf2m1, cps_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cps1)
 	MCFG_PALETTE_ADD("palette", 0xc00)
 	MCFG_VIDEO_START_OVERRIDE(cps_state,cps1)

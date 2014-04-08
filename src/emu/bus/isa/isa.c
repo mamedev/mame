@@ -243,12 +243,12 @@ void isa8_device::device_start()
 		m_iowidth = m_iospace->data_width();
 		m_prgwidth = m_prgspace->data_width();
 	}
-	else	// use host CPU's program and I/O spaces directly
+	else    // use host CPU's program and I/O spaces directly
 	{
-		m_iospace = &m_maincpu->space(AS_IO); 
-		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width; 
+		m_iospace = &m_maincpu->space(AS_IO);
+		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width;
 		m_prgspace = &m_maincpu->space(AS_PROGRAM);
-		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width; 
+		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	}
 }
 
@@ -679,5 +679,3 @@ UINT16 device_isa16_card_interface::dack16_r(int line)
 void device_isa16_card_interface::dack16_w(int line,UINT16 data)
 {
 }
-
-

@@ -176,7 +176,7 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+64-1, 0, 256+64-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vector06_state, screen_update_vector06)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(vector06_state, vector06)
 

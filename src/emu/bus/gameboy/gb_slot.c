@@ -36,8 +36,8 @@ const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device
 
 device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		has_rumble(false), 
-		has_timer(false), 
+		has_rumble(false),
+		has_timer(false),
 		has_battery(false)
 {
 }

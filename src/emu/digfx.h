@@ -212,14 +212,14 @@ protected:
 
 private:
 	// configuration
-	const gfx_decode_entry *	m_gfxdecodeinfo;		// pointer to array of gfx decode information
-	const char *				m_palette_tag;			// configured tag for palette device
-	bool						m_palette_is_sibling;	// is palette a sibling or a subdevice?
+	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
+	const char *                m_palette_tag;          // configured tag for palette device
+	bool                        m_palette_is_sibling;   // is palette a sibling or a subdevice?
 
 	// internal state
-	bool						m_decoded;					// have we processed our decode info yet?
-	palette_device *			m_palette;					// pointer to the palette device
-	auto_pointer<gfx_element>	m_gfx[MAX_GFX_ELEMENTS];	// array of pointers to graphic sets
+	bool                        m_decoded;                  // have we processed our decode info yet?
+	palette_device *            m_palette;                  // pointer to the palette device
+	auto_pointer<gfx_element>   m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 };
 
 // iterator

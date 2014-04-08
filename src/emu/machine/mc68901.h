@@ -74,16 +74,16 @@
 
 #define MCFG_MC68901_OUT_TDO_CB(_devcb) \
 	devcb = &mc68901_device::set_out_tdo_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_MC68901_OUT_SO_CB(_devcb) \
 	devcb = &mc68901_device::set_out_so_callback(*device, DEVCB2_##_devcb);
 
 /*#define MCFG_MC68901_OUT_RR_CB(_devcb) \
-	devcb = &mc68901_device::set_out_rr_callback(*device, DEVCB2_##_devcb);
+    devcb = &mc68901_device::set_out_rr_callback(*device, DEVCB2_##_devcb);
 
 #define MCFG_MC68901_OUT_TR_CB(_devcb) \
-	devcb = &mc68901_device::set_out_tr_callback(*device, DEVCB2_##_devcb);*/ 
-	
+    devcb = &mc68901_device::set_out_tr_callback(*device, DEVCB2_##_devcb);*/
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -98,7 +98,7 @@ class mc68901_device :  public device_t,
 public:
 	// construction/destruction
 	mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
 	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }
 	static void set_tx_clock(device_t &device, int tx_clock) { downcast<mc68901_device &>(device).m_tx_clock = tx_clock; }

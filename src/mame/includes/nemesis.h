@@ -80,7 +80,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);

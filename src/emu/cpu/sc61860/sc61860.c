@@ -259,4 +259,3 @@ void sc61860_device::execute_run()
 
 	} while (m_icount > 0);
 }
-

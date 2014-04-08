@@ -43,7 +43,7 @@ public:
 	optional_device<pc090oj_device> m_pc090oj;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);
 	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);

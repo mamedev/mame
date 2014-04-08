@@ -260,7 +260,7 @@ public:
 	required_device<adsp21062_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
-	required_device<adc1038_device> m_adc1038;	
+	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 
@@ -1108,11 +1108,11 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
-	
+
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")

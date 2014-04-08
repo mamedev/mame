@@ -103,10 +103,10 @@ static ADDRESS_MAP_START(hunter2_io, AS_IO, 8, hunter2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("iotimer", nsc810_device, read, write) // device not yet emulated
-//	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-//	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
-//	AM_RANGE(0x02, 0x02) AM_READ(port02_r)
-//	AM_RANGE(0x03, 0x1F) AM_WRITENOP
+//  AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+//  AM_RANGE(0x01, 0x01) AM_WRITE(port01_w)
+//  AM_RANGE(0x02, 0x02) AM_READ(port02_r)
+//  AM_RANGE(0x03, 0x1F) AM_WRITENOP
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("lcdc", hd61830_device, data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("lcdc", hd61830_device, status_r, control_w)
 	AM_RANGE(0x3e, 0x3e) AM_DEVREAD("lcdc", hd61830_device, data_r)
@@ -255,19 +255,19 @@ WRITE8_MEMBER( hunter2_state::port80_w )
 WRITE8_MEMBER( hunter2_state::port81_w )
 {
 	m_rs232->write_txd(data & 0x01);
-//	logerror("TXD write %02x\n",data);
+//  logerror("TXD write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port82_w )
 {
 	m_rs232->write_dtr(data & 0x01);
-//	logerror("DTR write %02x\n",data);
+//  logerror("DTR write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port84_w )
 {
 	m_rs232->write_rts(data & 0x01);
-//	logerror("RTS write %02x\n",data);
+//  logerror("RTS write %02x\n",data);
 }
 
 WRITE8_MEMBER( hunter2_state::port86_w )
@@ -277,7 +277,7 @@ WRITE8_MEMBER( hunter2_state::port86_w )
 
 /*
 Bit 0 = Enable normal interrupts
-Bit 1 = Enable RSTC interrupts 
+Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_SCREEN_SIZE(240, 128)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)

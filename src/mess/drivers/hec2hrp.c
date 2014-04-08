@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
 	MCFG_SCREEN_UPDATE_DRIVER(hec2hrp_state, screen_update_hec2hrp)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_VIDEO_START_OVERRIDE(hec2hrp_state,hec2hrp)

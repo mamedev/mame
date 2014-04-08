@@ -222,7 +222,7 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 	}
 
 	DRIVER_INIT_CALL(megadriv);
-	
+
 	m_vdp->stop_timers();
 }
 

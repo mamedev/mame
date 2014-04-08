@@ -39,7 +39,7 @@ const char *const_string_pool::add(const char *string)
 		if (result != NULL)
 			return result;
 	}
-	
+
 	// no space anywhere, create a new pool and prepend it (so it gets used first)
 	const char *result = m_chunklist.prepend(*global_alloc(pool_chunk)).add(string);
 	assert(result != NULL);
@@ -48,7 +48,7 @@ const char *const_string_pool::add(const char *string)
 
 
 //-------------------------------------------------
-//  contains - determine if the given string 
+//  contains - determine if the given string
 //  pointer lives in the pool
 //-------------------------------------------------
 
@@ -62,7 +62,7 @@ bool const_string_pool::contains(const char *string)
 	for (pool_chunk *chunk = m_chunklist.first(); chunk != NULL; chunk = chunk->next())
 		if (chunk->contains(string))
 			return true;
-	
+
 	return false;
 }
 
@@ -72,8 +72,8 @@ bool const_string_pool::contains(const char *string)
 //-------------------------------------------------
 
 const_string_pool::pool_chunk::pool_chunk()
-	: m_next(NULL), 
-	  m_used(0)
+	: m_next(NULL),
+		m_used(0)
 {
 }
 
@@ -87,7 +87,7 @@ const char *const_string_pool::pool_chunk::add(const char *string)
 	// get the length of the string (no string can be longer than a full pool)
 	int bytes = strlen(string) + 1;
 	assert(bytes < POOL_SIZE);
-	
+
 	// if too big, return NULL
 	if (m_used + bytes > POOL_SIZE)
 		return NULL;

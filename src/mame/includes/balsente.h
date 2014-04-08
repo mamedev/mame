@@ -219,7 +219,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };
 
 

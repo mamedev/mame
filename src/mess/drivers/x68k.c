@@ -1057,7 +1057,7 @@ void x68k_state::set_bus_error(UINT32 address, bool write, UINT16 mem_mask)
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	timer_set(m_maincpu->cycles_to_attotime(16), TIMER_X68K_BUS_ERROR); // let rmw cycles complete
-	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);	
+	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
 READ16_MEMBER(x68k_state::x68k_rom0_r)
@@ -1873,7 +1873,7 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
 	MCFG_PALETTE_ADD("palette", 65536)

@@ -3091,4 +3091,3 @@ static void drawogl_window_clear(sdl_window_info *window)
 	//FIXME: Handled in drawogl_window_draw as well
 	sdl->blittimer = 3;
 }
-

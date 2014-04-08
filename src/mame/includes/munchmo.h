@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);

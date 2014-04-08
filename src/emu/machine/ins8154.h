@@ -46,13 +46,13 @@
 
 #define MCFG_INS8154_IN_A_CB(_devcb) \
 	devcb = &ins8154_device::set_in_a_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_INS8154_OUT_A_CB(_devcb) \
 	devcb = &ins8154_device::set_out_a_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_INS8154_IN_B_CB(_devcb) \
 	devcb = &ins8154_device::set_in_b_callback(*device, DEVCB2_##_devcb);
-	
+
 #define MCFG_INS8154_OUT_B_CB(_devcb) \
 	devcb = &ins8154_device::set_out_b_callback(*device, DEVCB2_##_devcb);
 
@@ -76,7 +76,7 @@ public:
 	template<class _Object> static devcb2_base &set_in_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_b_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(object); }
 	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( ins8154_r );
 	DECLARE_WRITE8_MEMBER( ins8154_w );
 

@@ -379,7 +379,7 @@ public:
 	DECLARE_WRITE16_MEMBER( hdds3_sdsp_control_w );
 	DECLARE_READ16_MEMBER( hdds3_xdsp_control_r );
 	DECLARE_WRITE16_MEMBER( hdds3_xdsp_control_w );
-	
+
 	void hdds3sdsp_reset_timer();
 	void hdds3xdsp_reset_timer();
 

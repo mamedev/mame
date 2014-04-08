@@ -189,7 +189,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
-	
+
 	/* radarscp_scanline */
 	int m_counter;
 

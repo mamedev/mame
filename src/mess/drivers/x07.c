@@ -1481,7 +1481,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_SCREEN_SIZE(120, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -1499,7 +1499,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)	// t6834 RAM
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)   // t6834 RAM
 	MCFG_NVRAM_ADD_0FILL("nvram2") // RAM banks
 
 	/* internal ram */
@@ -1540,14 +1540,14 @@ ROM_START( x07 )
 	ROM_REGION( 0x0800, "default", ROMREGION_ERASE00 )
 ROM_END
 
-DRIVER_INIT_MEMBER(x07_state, x07)  
-{ 
+DRIVER_INIT_MEMBER(x07_state, x07)
+{
 	UINT8 *RAM = memregion("default")->base();
 	UINT8 *GFX = memregion("gfx1")->base();
-	
+
 	for (int i = 0; i < 12; i++)
 		strcpy((char *)RAM + udk_offset[i], udk_ini[i]);
-	
+
 	//copy default chars in the UDC
 	memcpy(RAM + 0x200, GFX + 0x400, 0x100);
 	memcpy(RAM + 0x300, GFX + 0x700, 0x100);

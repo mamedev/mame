@@ -152,7 +152,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	
+
 	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
 
 	int exp_rom_load(device_image_interface &image, int index);

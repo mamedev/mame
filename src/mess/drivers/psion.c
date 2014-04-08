@@ -388,7 +388,7 @@ void psion_state::machine_start()
 	m_nvram2->set_base(m_ram, m_ram.bytes());
 	if (m_nvram3)
 		m_nvram3->set_base(m_paged_ram, m_ram_bank_count * 0x4000);
-	
+
 	save_item(NAME(m_kb_counter));
 	save_item(NAME(m_enable_nmi));
 	save_item(NAME(m_tcsr_value));
@@ -467,7 +467,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_SCREEN_SIZE(6*16, 9*2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_START( psion_2lines, psion_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)		// sys_regs
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
 	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))

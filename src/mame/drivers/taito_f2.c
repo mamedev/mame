@@ -3260,7 +3260,7 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_gunfront)
 	MCFG_SCREEN_MODIFY("screen")
@@ -3388,7 +3388,7 @@ static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	
+
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_yuyugogo)
@@ -3585,7 +3585,7 @@ static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dinorex)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3607,7 +3607,7 @@ static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3629,7 +3629,7 @@ static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
@@ -3651,7 +3651,7 @@ static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_quiz)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 

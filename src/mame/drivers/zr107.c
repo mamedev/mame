@@ -776,7 +776,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,zr107)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_VIDEO_START_OVERRIDE(zr107_state,jetwave)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
@@ -1107,4 +1107,3 @@ GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "
 GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", GAME_IMPERFECT_GRAPHICS )
-

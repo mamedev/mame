@@ -58,7 +58,7 @@ public:
 
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
-	
+
 	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);

@@ -196,5 +196,5 @@ public:
 	optional_device<cpu_device> m_dsp1;
 	optional_device<cpu_device> m_dsp2;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 };

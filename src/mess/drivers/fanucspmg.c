@@ -400,14 +400,14 @@ The arrows denote direction of data flow.
               |      /-->| Graphic memory|------|                             |
               |      |   |---------------|      |                             |     |----------------|
               |      |                          |         |--------|          |<--->|RS232C interface|---CN2
-              |   	 |		                      |         | BOOT   |<-------->|     |----------------|
+              |      |                            |         | BOOT   |<-------->|     |----------------|
               |      |                          |         | EPROM  |          |
               |      |   |----------------|     |         |--------|          |     |----------------|
               |<-----|-->|Character memory|--|  |                             |<--->|RS232C interface|---CN3
               |      |-->|----------------|  |  |         |--------|          |     |----------------|
               |      |                       |  |         |Main RAM|<-------->|
               |      |                       |  |         |--------|          |     |----------------|
-              |      |	                     |  |                             |<--->|RS232C interface|---CN4
+              |      |                       |  |                             |<--->|RS232C interface|---CN4
               |      |                       |  |                             |     |----------------|
 |---------|   |      |                       \/ \/                            |
 |Keyboard |   \/     \---|---------------------------|                        |     |-----------------|  CN9  |--------|
@@ -421,8 +421,8 @@ The arrows denote direction of data flow.
  |---|----|                       |----|----|
  |Keyboard|                       | Screen  |
  |--------|                       |---------|
- 
- 
+
+
   TODO:
     - Is the VRAM hookup anything like correct?
     - Hookup enough keyboard to get it to boot a floppy, the FAPT DOCTOR
@@ -430,25 +430,25 @@ The arrows denote direction of data flow.
     - Shared RAM is 8k, but there are 2 6264s on the sub board.  Is shared RAM
        banked?
     - I/O is at F00xx:
-		':maincpu' (FC15A): unmapped program memory write to F0012 = 00CE & 00FF
-		':maincpu' (FC15D): unmapped program memory write to F0016 = 00CE & 00FF
-		':maincpu' (FC160): unmapped program memory write to F001A = 00CE & 00FF
-		':maincpu' (FC163): unmapped program memory write to F001E = 00CE & 00FF
-		':maincpu' (FC16D): unmapped program memory write to F000E = 0034 & 00FF
-		':maincpu' (FC172): unmapped program memory write to F0008 = 00D4 & 00FF
-		':maincpu' (FC177): unmapped program memory write to F0008 = 0030 & 00FF
-		':maincpu' (FC17C): unmapped program memory write to F000E = 0056 & 00FF
-		':maincpu' (FC181): unmapped program memory write to F000A = 0010 & 00FF
-		':maincpu' (FC186): unmapped program memory write to F000E = 0096 & 00FF
-		':maincpu' (FC18B): unmapped program memory write to F000C = 0010 & 00FF
-		':maincpu' (FC190): unmapped program memory write to F004E = 0034 & 00FF
-		':maincpu' (FC195): unmapped program memory write to F0048 = 0020 & 00FF
-		':maincpu' (FC19A): unmapped program memory write to F0048 = 004E & 00FF
-		':maincpu' (FC19F): unmapped program memory write to F004E = 0056 & 00FF
-		':maincpu' (FC1A4): unmapped program memory write to F004A = 0010 & 00FF
-		':maincpu' (FC1A9): unmapped program memory write to F004E = 0096 & 00FF
-		':maincpu' (FC1AE): unmapped program memory write to F004C = 0010 & 00FF
- 
+        ':maincpu' (FC15A): unmapped program memory write to F0012 = 00CE & 00FF
+        ':maincpu' (FC15D): unmapped program memory write to F0016 = 00CE & 00FF
+        ':maincpu' (FC160): unmapped program memory write to F001A = 00CE & 00FF
+        ':maincpu' (FC163): unmapped program memory write to F001E = 00CE & 00FF
+        ':maincpu' (FC16D): unmapped program memory write to F000E = 0034 & 00FF
+        ':maincpu' (FC172): unmapped program memory write to F0008 = 00D4 & 00FF
+        ':maincpu' (FC177): unmapped program memory write to F0008 = 0030 & 00FF
+        ':maincpu' (FC17C): unmapped program memory write to F000E = 0056 & 00FF
+        ':maincpu' (FC181): unmapped program memory write to F000A = 0010 & 00FF
+        ':maincpu' (FC186): unmapped program memory write to F000E = 0096 & 00FF
+        ':maincpu' (FC18B): unmapped program memory write to F000C = 0010 & 00FF
+        ':maincpu' (FC190): unmapped program memory write to F004E = 0034 & 00FF
+        ':maincpu' (FC195): unmapped program memory write to F0048 = 0020 & 00FF
+        ':maincpu' (FC19A): unmapped program memory write to F0048 = 004E & 00FF
+        ':maincpu' (FC19F): unmapped program memory write to F004E = 0056 & 00FF
+        ':maincpu' (FC1A4): unmapped program memory write to F004A = 0010 & 00FF
+        ':maincpu' (FC1A9): unmapped program memory write to F004E = 0096 & 00FF
+        ':maincpu' (FC1AE): unmapped program memory write to F004C = 0010 & 00FF
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -464,22 +464,22 @@ The arrows denote direction of data flow.
 #include "video/mc6845.h"
 #include "formats/imd_dsk.h"
 
-#define MAINCPU_TAG	"maincpu"
-#define SUBCPU_TAG	"subcpu"
-#define USART0_TAG	"usart0"
-#define USART1_TAG	"usart1"
-#define USART2_TAG	"usart2"
-#define USART3_TAG	"usart3"
-#define PIT0_TAG	"pit0"
-#define PIT1_TAG	"pit1"
-#define PIC0_TAG   	"pic0"
-#define PIC1_TAG   	"pic1"
-#define DMAC_TAG	"dmac"
-#define CRTC_TAG	"crtc"
-#define FDC_TAG		"fdc"
-#define SCREEN_TAG	"screen"
-#define SHARED_TAG	"shared"
-#define CHARGEN_TAG	"chargen"
+#define MAINCPU_TAG "maincpu"
+#define SUBCPU_TAG  "subcpu"
+#define USART0_TAG  "usart0"
+#define USART1_TAG  "usart1"
+#define USART2_TAG  "usart2"
+#define USART3_TAG  "usart3"
+#define PIT0_TAG    "pit0"
+#define PIT1_TAG    "pit1"
+#define PIC0_TAG    "pic0"
+#define PIC1_TAG    "pic1"
+#define DMAC_TAG    "dmac"
+#define CRTC_TAG    "crtc"
+#define FDC_TAG     "fdc"
+#define SCREEN_TAG  "screen"
+#define SHARED_TAG  "shared"
+#define CHARGEN_TAG "chargen"
 
 class fanucspmg_state : public driver_device
 {
@@ -577,7 +577,7 @@ WRITE8_MEMBER(fanucspmg_state::shared_w)
 
 READ8_MEMBER(fanucspmg_state::test_r)
 {
-	return 0x00;	// 0x80 to start weird not-sure-what process which may be FDC related
+	return 0x00;    // 0x80 to start weird not-sure-what process which may be FDC related
 }
 
 READ8_MEMBER(fanucspmg_state::vbl_r)
@@ -586,14 +586,14 @@ READ8_MEMBER(fanucspmg_state::vbl_r)
 }
 
 static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 16, fanucspmg_state)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM	// main RAM
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM   // main RAM
 
 	AM_RANGE(0x88000, 0x88001) AM_READ8(vbl_r, 0xffff)
 
 	AM_RANGE(0xf0004, 0xf0005) AM_READ8(test_r, 0xffff)
 
 	AM_RANGE(0xf8000, 0xf9fff) AM_READWRITE8(shared_r, shared_w, 0xffff)
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0) 
+	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(MAINCPU_TAG, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 16, fanucspmg_state)
@@ -603,7 +603,7 @@ WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
 {
 	if ((m_vbl_ctrl & 0x08) == 0x08)
 	{
-		if (state == ASSERT_LINE) 
+		if (state == ASSERT_LINE)
 		{
 			m_subcpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		}
@@ -672,19 +672,19 @@ static ADDRESS_MAP_START(subcpu_mem, AS_PROGRAM, 8, fanucspmg_state)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(SUBCPU_TAG, 0)
 
 	AM_RANGE(0x4000, 0x45ff) AM_READWRITE(vram1_r, vram1_w)
-	AM_RANGE(0x4800, 0x4dff) AM_READWRITE(vram2_r, vram2_w) 
+	AM_RANGE(0x4800, 0x4dff) AM_READWRITE(vram2_r, vram2_w)
 
 	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
 	AM_RANGE(0x5001, 0x5001) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x5008, 0x5008) AM_WRITE(keyboard_row_w)
 	AM_RANGE(0x5009, 0x5009) AM_READ(keyboard_r)
-	AM_RANGE(0x500a, 0x500b) AM_WRITENOP	// probably keyboard related, not sure how though
+	AM_RANGE(0x500a, 0x500b) AM_WRITENOP    // probably keyboard related, not sure how though
 	AM_RANGE(0x500c, 0x500c) AM_WRITE(vbl_ctrl_w)
 	AM_RANGE(0x500d, 0x500d) AM_WRITE(vram_bank_w)
 	AM_RANGE(0x500e, 0x500e) AM_READ(vblank_ack_r)
-	AM_RANGE(0x5018, 0x5018) AM_WRITE(video_ctrl_w) 
+	AM_RANGE(0x5018, 0x5018) AM_WRITE(video_ctrl_w)
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM	AM_SHARE(SHARED_TAG) // shared RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(SHARED_TAG) // shared RAM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -752,8 +752,8 @@ static MC6845_UPDATE_ROW( fanuc_update_row )
 				*p++ = ( data & 0x01 ) ? fg : bg;
 				*p++ = ( data & 0x02 ) ? fg : bg;
 				*p++ = ( data & 0x04 ) ? fg : bg;
-				*p++ = ( data & 0x08 ) ? fg : bg;   						  
-				*p++ = ( data & 0x10 ) ? fg : bg;   						  
+				*p++ = ( data & 0x08 ) ? fg : bg;
+				*p++ = ( data & 0x10 ) ? fg : bg;
 				*p++ = ( data & 0x20 ) ? fg : bg;
 				*p++ = ( data & 0x40 ) ? fg : bg;
 				*p++ = ( data & 0x80 ) ? fg : bg;
@@ -784,7 +784,7 @@ static MC6845_INTERFACE( mc6845_fanuc_intf )
 	DEVCB_NULL,         /* on_de_changed */
 	DEVCB_NULL,         /* on_cur_changed */
 	DEVCB_NULL,         /* on hsync changed */
-	DEVCB_DRIVER_LINE_MEMBER(fanucspmg_state, vsync_w),	/* on vsync changed */
+	DEVCB_DRIVER_LINE_MEMBER(fanucspmg_state, vsync_w), /* on vsync changed */
 	NULL
 };
 
@@ -838,18 +838,16 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( fanucspg )
 	ROM_REGION(0x4000, MAINCPU_TAG, 0)
-	ROM_LOAD16_BYTE( "a40_001a.13a", 0x000000, 0x002000, CRC(1b8ac8ef) SHA1(309c081d25270e082ebf846b4f73cef76b52d991) ) 
-	ROM_LOAD16_BYTE( "a40_002a.15a", 0x000001, 0x002000, CRC(587ae652) SHA1(ebc5a4c3d64ab9d6dd4d5355f85bc894e7294e17) ) 
+	ROM_LOAD16_BYTE( "a40_001a.13a", 0x000000, 0x002000, CRC(1b8ac8ef) SHA1(309c081d25270e082ebf846b4f73cef76b52d991) )
+	ROM_LOAD16_BYTE( "a40_002a.15a", 0x000001, 0x002000, CRC(587ae652) SHA1(ebc5a4c3d64ab9d6dd4d5355f85bc894e7294e17) )
 
 	ROM_REGION(0x4000, SUBCPU_TAG, 0)
-	ROM_LOAD( "a41_010b.28b", 0x000000, 0x004000, CRC(35a9714f) SHA1(5697b6c4db5adb5702dc1290ecc98758d5fab221) ) 
+	ROM_LOAD( "a41_010b.28b", 0x000000, 0x004000, CRC(35a9714f) SHA1(5697b6c4db5adb5702dc1290ecc98758d5fab221) )
 
 	ROM_REGION(0x8000, CHARGEN_TAG, 0)
-	ROM_LOAD( "a42_020a.30b", 0x000000, 0x008000, CRC(33eb5962) SHA1(1157a72089ff77e8db9a9a8fcd0f6c32a1374f56) ) 
+	ROM_LOAD( "a42_020a.30b", 0x000000, 0x008000, CRC(33eb5962) SHA1(1157a72089ff77e8db9a9a8fcd0f6c32a1374f56) )
 ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
 COMP( 1983, fanucspg, 0,      0,    fanucspmg, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", GAME_NOT_WORKING | GAME_NO_SOUND)
-
-

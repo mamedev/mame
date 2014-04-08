@@ -40,7 +40,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 	device_t *m_bsmt;
 	DECLARE_WRITE16_MEMBER(eeprom_control_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);

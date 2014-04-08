@@ -50,7 +50,7 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
 	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
 	DECLARE_READ8_MEMBER(nitedrvr_in0_r);

@@ -177,7 +177,7 @@ static int sol20_read_hex(const UINT8 *bytes, UINT8 numdigits)
 	}
 	return data;
 }
- 			
+
 // Turn digits into decimal
 static int sol20_read_dec(const UINT8 *bytes)
 {
@@ -191,7 +191,7 @@ static int sol20_read_dec(const UINT8 *bytes)
 
 	return data;
 }
- 			
+
 static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 {
 	UINT32 sample_count = 0;
@@ -283,7 +283,7 @@ static int sol20_handle_cassette(INT16 *buffer, const UINT8 *bytes)
 							sample_count += sol20_output_byte(buffer, sample_count, sol20_header[i]);
 						// write checksum
 						sample_count += sol20_output_byte(buffer, sample_count, sol20_cksm_byte);
-	
+
 						sol20_cksm_byte = 0;
 						process_d = 1;
 						sol20_scan_to_eol(bytes);

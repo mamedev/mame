@@ -289,9 +289,9 @@ READ8_MEMBER( ql_state::disk_io_r )
 		case 0x0002 : result=m_fdc->read(space, offset); break;
 		case 0x0003 : result=m_fdc->read(space, offset); break;
 		case 0x000C : if(IS_SANDY_DISK(m_disk_type))
-					    result = (m_mouse_int ^ MOUSE_DIRX) | m_mouseb->read() | 0x01; break;
+						result = (m_mouse_int ^ MOUSE_DIRX) | m_mouseb->read() | 0x01; break;
 		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
-		                m_mouse_int &= ~MOUSE_INT_MASK; break;
+						m_mouse_int &= ~MOUSE_INT_MASK; break;
 		default     : logerror("%s DiskIO undefined read : from %08X\n",machine().describe_context(),m_disk_io_base+offset); break;
 	}
 
@@ -314,7 +314,7 @@ WRITE8_MEMBER( ql_state::disk_io_w )
 		case 0x0008 : if(IS_SANDY_DISK(m_disk_type))
 						sandy_print_char(data); break;
 		case 0x0010 : if(IS_SANDY_DISK(m_disk_type))
-		                m_mouse_int &= ~MOUSE_INT_MASK; break;
+						m_mouse_int &= ~MOUSE_INT_MASK; break;
 		case 0x2000 : if(m_disk_type==DISK_TYPE_TRUMP)
 						trump_card_set_control(data);break;
 		default     : logerror("%s DiskIO undefined write : %02X to %08X\n",machine().describe_context(),data,m_disk_io_base+offset); break;
@@ -382,7 +382,7 @@ void ql_state::sandy_set_control(UINT8 data)
 		if(data & SANDY_PRINTER_INTMASK)
 			m_zx8302->extint_w(ASSERT_LINE);
 	}
- 
+
 	m_disk_io_byte=data;
 }
 
@@ -390,8 +390,8 @@ void ql_state::sandy_print_char(UINT8 data)
 {
 	// latch the data until it's  strobed out
 	m_printer_char=data;
-	
-//	m_centronics->write(data);
+
+//  m_centronics->write(data);
 }
 
 WRITE_LINE_MEMBER( ql_state::sandy_printer_busy )
@@ -423,14 +423,14 @@ WRITE_LINE_MEMBER(ql_state::disk_io_drq_w)
 
 void ql_state::mouse_tick()
 {
-	UINT8 x 		= m_mousex->read();
-	UINT8 y 		= m_mousey->read();
-	UINT8 do_int	= 0;
+	UINT8 x         = m_mousex->read();
+	UINT8 y         = m_mousey->read();
+	UINT8 do_int    = 0;
 
 	//m_mouse_int = 0;
 
 	// Set X interupt flag and direction if x has changed
-	if (x > m_ql_mouse_x) 
+	if (x > m_ql_mouse_x)
 	{
 		m_mouse_int |= MOUSE_INTX;
 		m_mouse_int |= MOUSE_DIRX;
@@ -442,7 +442,7 @@ void ql_state::mouse_tick()
 	}
 
 	// Set Y interupt flag and direction if y has changed
-	if (y > m_ql_mouse_y) 
+	if (y > m_ql_mouse_y)
 	{
 		m_mouse_int |= MOUSE_INTY;
 		m_mouse_int &= ~MOUSE_DIRY;
@@ -463,9 +463,9 @@ void ql_state::mouse_tick()
 		do_int = 1;
 	else
 		do_int = IS_SANDY_DISK(m_disk_type) && (m_disk_io_byte & SANDY_MOUSE_INTMASK);
-	
+
 	//logerror("m_mouse_int=%02X, MOUSE_INT_MASK=%02X, m_disk_io_byte=%02X, (m_disk_io_byte & SANDY_MOUSE_INTMASK)=%02x\n",m_mouse_int,MOUSE_INT_MASK,m_disk_io_byte,(m_disk_io_byte & SANDY_MOUSE_INTMASK));
-	
+
 	// if mouse moved trigger external int
 	if((m_mouse_int & MOUSE_INT_MASK) && do_int)
 	{
@@ -477,25 +477,25 @@ READ8_MEMBER( ql_state::qimi_io_r )
 {
 	UINT8 result = 0;
 	UINT8 buttons;
-	
+
 	switch (offset)
 	{
 		// 0x1bf9c, button status
-		case 0x00	: 
+		case 0x00   :
 			buttons = m_mouseb->read();
 			result = ((buttons & MOUSE_RIGHT) << 2) | ((buttons & MOUSE_LEFT) << 2);
 			break;
-		
+
 		// 0x1bfbc, direction status
-		case 0x20	:
+		case 0x20   :
 			result = ((m_mouse_int & MOUSE_INTX) >> 5) | ((m_mouse_int & MOUSE_INTY) >> 1) |
-				     ((m_mouse_int & MOUSE_DIRX) >> 1) | ((m_mouse_int & MOUSE_DIRY) >> 4);
+						((m_mouse_int & MOUSE_DIRX) >> 1) | ((m_mouse_int & MOUSE_DIRY) >> 4);
 			break;
-		case 0x22 	:
+		case 0x22   :
 			m_mouse_int &= ~MOUSE_INT_MASK;
 			break;
 	}
-	
+
 	return result;
 }
 
@@ -664,24 +664,24 @@ static INPUT_PORTS_START( ql )
 	PORT_CONFNAME( QIMI_PORT_MASK, QIMI_NONE, "QIMI enabled")
 	PORT_CONFSETTING( QIMI_NONE, "No" )
 	PORT_CONFSETTING( QIMI_MOUSE, "Yes" )
-	
+
 	PORT_CONFNAME( DISK_TYPE_MASK, DISK_TYPE_NONE, "Disk interface select" )
 	PORT_CONFSETTING(DISK_TYPE_NONE,     DEF_STR( None ))
 	PORT_CONFSETTING(DISK_TYPE_TRUMP,    "Miracle Trump card")
 	PORT_CONFSETTING(DISK_TYPE_SANDY_SD, "Sandy Superdisk")
 	PORT_CONFSETTING(DISK_TYPE_SANDY_SQB,"Sandy SuperQBoard")
 
-	
+
 	PORT_START(MOUSEX_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) 
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START(MOUSEY_TAG)
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) 
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START(MOUSEB_TAG)  /* Mouse buttons */
-	PORT_BIT( MOUSE_RIGHT, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1) 
-	PORT_BIT( MOUSE_LEFT,  IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2) 
-	PORT_BIT( MOUSE_MIDDLE, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3) 
+	PORT_BIT( MOUSE_RIGHT, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( MOUSE_LEFT,  IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( MOUSE_MIDDLE, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)
 
 INPUT_PORTS_END
 
@@ -1031,9 +1031,9 @@ void ql_state::machine_reset()
 	m_printer_char=0;
 	m_disk_io_byte=0;
 	m_mouse_int = 0;
-	
+
 	logerror("Configuring RAM %d\n",m_ram->size() / 1024);
-	
+
 	// configure RAM
 	switch (m_ram->size())
 	{
@@ -1086,13 +1086,13 @@ void ql_state::machine_reset()
 			break;
 	}
 
-	
+
 	// QIMI QL Internal Mouse Interface
 	if (m_config->read() & QIMI_MOUSE)
-	{	
+	{
 		logerror("QIMI enabled\n");
 		program.install_read_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, read8_delegate(FUNC(ql_state::qimi_io_r), this));
-		program.install_write_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, write8_delegate(FUNC(ql_state::qimi_io_w), this));	
+		program.install_write_handler(QIMI_IO_BASE, QIMI_IO_END, 0, 0, write8_delegate(FUNC(ql_state::qimi_io_w), this));
 	}
 }
 
@@ -1129,9 +1129,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
 	MCFG_ZX8301_CPU(M68008_TAG)
 	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
-	
+
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-	
+
 	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
 	MCFG_ZX8302_RTC_CLOCK(X2)
 	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
@@ -1149,7 +1149,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
 	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(ql_floppy_interface)
-	
+
 	MCFG_WD1772_ADD(WD1772_TAG,ql_wd17xx_interface)
 	MCFG_MICRODRIVE_ADD(MDV_1, mdv1_config)
 	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))

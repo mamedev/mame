@@ -166,7 +166,7 @@ namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *
 	m_basenode(0),
 	m_extclock(0),
 	m_romread(*this),
-	m_si(*this)	
+	m_si(*this)
 {
 }
 

@@ -10,10 +10,10 @@ public:
 	void decrypter_rom(memory_region* region);
 	UINT16 decrypt(UINT16 cipherword, int word_address)const;
 	UINT16 deobfuscate(UINT16 cipherword, int word_address)const;
-	
+
 private:
 	const UINT16* key;
-	
+
 	static int (*rot_enabling[16][4])(int);
 	static int (*rot_direction[4][8])(int);
 	static const UINT16 triggers[16][2];

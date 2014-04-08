@@ -20,7 +20,7 @@
 
 #define MCFG_TMS34061_INTERRUPT_CB(_devcb) \
 	devcb = &tms34061_device::set_interrupt_callback(*device, DEVCB2_##_devcb);
-	
+
 
 /* register constants */
 enum
@@ -67,7 +67,7 @@ class tms34061_device :  public device_t,
 public:
 	// construction/destruction
 	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	static void set_rowshift(device_t &device, UINT8 rowshift) { downcast<tms34061_device &>(device).m_rowshift = rowshift; }
 	static void set_vram_size(device_t &device, UINT32 vramsize) { downcast<tms34061_device &>(device).m_vramsize = vramsize; }
 	template<class _Object> static devcb2_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<tms34061_device &>(device).m_interrupt_cb.set_callback(object); }
@@ -91,10 +91,10 @@ protected:
 	virtual void device_reset();
 
 private:
-	UINT8       		m_rowshift;			/* VRAM address is (row << rowshift) | col */
-	UINT32      		m_vramsize;			/* size of video RAM */
-	devcb2_write_line 	m_interrupt_cb;		/* interrupt gen callback */
-	
+	UINT8               m_rowshift;         /* VRAM address is (row << rowshift) | col */
+	UINT32              m_vramsize;         /* size of video RAM */
+	devcb2_write_line   m_interrupt_cb;     /* interrupt gen callback */
+
 	UINT16              m_regs[TMS34061_REGCOUNT];
 	UINT16              m_xmask;
 	UINT8               m_yshift;

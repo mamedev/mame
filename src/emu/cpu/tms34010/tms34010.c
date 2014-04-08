@@ -1659,7 +1659,7 @@ READ16_MEMBER( tms34010_device::host_r )
 	tms34010_state *tms = get_safe_token(this);
 	unsigned int addr;
 	int result = 0;
-	
+
 	/* swap to the target cpu */
 
 	switch (reg)

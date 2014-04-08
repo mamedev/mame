@@ -44,7 +44,7 @@ public:
 	required_device<cquestrot_cpu_device> m_rotatecpu;
 	required_device<cquestlin_cpu_device> m_linecpu;
 	required_device<cquestsnd_cpu_device> m_soundcpu;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 	rgb_t *m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);

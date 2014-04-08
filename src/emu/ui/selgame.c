@@ -47,8 +47,8 @@ ui_menu_select_game::~ui_menu_select_game()
 
 
 //-------------------------------------------------
-//	build_driver_list - build a list of available
-//	drivers
+//  build_driver_list - build a list of available
+//  drivers
 //-------------------------------------------------
 
 void ui_menu_select_game::build_driver_list()
@@ -108,7 +108,7 @@ void ui_menu_select_game::handle()
 			m_error = false;
 
 		// handle selections
-		else 
+		else
 		{
 			switch(menu_event->iptkey)
 			{

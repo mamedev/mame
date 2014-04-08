@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ8_MEMBER(deco16_bank_r);
 	DECLARE_READ8_MEMBER(deco16_io_r);

@@ -76,7 +76,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	int m_exp_bank;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_reel1_tilemap;

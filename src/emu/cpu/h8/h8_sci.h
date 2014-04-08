@@ -84,7 +84,7 @@ public:
 	template<class _Object> static devcb2_base &set_clk_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).clk_cb.set_callback(object); }
 
 	UINT64 internal_update(UINT64 current_time);
-	
+
 protected:
 	enum {
 		ST_IDLE, ST_START, ST_BIT, ST_PARITY, ST_STOP, ST_LAST_TICK,

@@ -43,7 +43,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);

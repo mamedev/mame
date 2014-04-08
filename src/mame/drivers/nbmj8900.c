@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj8900_state, screen_update_nbmj8900)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 256)
 
 

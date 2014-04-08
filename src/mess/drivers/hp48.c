@@ -767,25 +767,25 @@ INPUT_PORTS_END
    keyboard layout for 49 G model
 
    -------------------------------------------------
-   |   F1  |   F2  |   F3  |   F4  |   F5  |  F6   | 
+   |   F1  |   F2  |   F3  |   F4  |   F5  |  F6   |
    |-----------------------------------------------|
    |   APPS  |  MODE  |  TOOL  |        up         |
    |---------+--------+--------| left        right |
    |   VAR   |  STO   |  NXT   |       down        |
    |---------+--------+--------+-------------------|
-   |   HIST  |  CAT   |  EQW   |  SYMB   |   <=    | 
+   |   HIST  |  CAT   |  EQW   |  SYMB   |   <=    |
    |---------+--------+--------+---------+---------|
-   |   y^x   |  sqrt  |  SIN   |  COS    |   TAN   | 
+   |   y^x   |  sqrt  |  SIN   |  COS    |   TAN   |
    |---------+--------+--------+---------+---------|
-   |   EEX   |  +/-   |   X    |  1/x    |    /    | 
+   |   EEX   |  +/-   |   X    |  1/x    |    /    |
    |---------+--------+--------+---------+---------|
-   |  alpha  |   7    |   8    |   9     |    *    | 
+   |  alpha  |   7    |   8    |   9     |    *    |
    |---------+--------+--------+---------+---------|
-   |   blue  |   4    |   5    |   6     |    -    | 
+   |   blue  |   4    |   5    |   6     |    -    |
    |---------+--------+--------+---------+---------|
-   |   red   |   1    |   2    |   3     |    +    | 
+   |   red   |   1    |   2    |   3     |    +    |
    |---------+--------+--------+---------+---------|
-   |   ON    |   0    |    .   |  SPC    |  ENTER  | 
+   |   ON    |   0    |    .   |  SPC    |  ENTER  |
    -------------------------------------------------
 
    * 51 keys
@@ -798,14 +798,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hp49g_kbd )
 
-        PORT_START( "LINE0" ) /* OUT = 0x001 */
+		PORT_START( "LINE0" ) /* OUT = 0x001 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "ENTER   ANS  NUM")
 	PORT_CODE ( KEYCODE_ENTER )
 
 	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "+  { }  \xC2\xAB \xC2\xBB")  /* << >> */
+		PORT_NAME ( "+  { }  \xC2\xAB \xC2\xBB")  /* << >> */
 	PORT_CODE ( KEYCODE_EQUALS )
 	PORT_CODE ( KEYCODE_PLUS_PAD )
 
@@ -826,11 +826,11 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_Z)
 
 	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "TAN  ATAN  \xE2\x88\xAB  U") /* integral */
+		PORT_NAME ( "TAN  ATAN  \xE2\x88\xAB  U") /* integral */
 	PORT_CODE ( KEYCODE_U )
 
 	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "\xE2\x87\x90  DEL  CLEAR") /* double left arrow */
+		PORT_NAME ( "\xE2\x87\x90  DEL  CLEAR") /* double left arrow */
 	PORT_CODE ( KEYCODE_BACKSPACE )
 	PORT_CODE ( KEYCODE_DEL )
 	PORT_CODE ( KEYCODE_DEL_PAD )
@@ -839,13 +839,13 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "NXT  PREV  PASTE  L")
 	PORT_CODE ( KEYCODE_L )
 
-        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE1" ) /* OUT = 0x002 */
+		PORT_START( "LINE1" ) /* OUT = 0x002 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "SPC  \xCF\x80  ,")  /* pi */
+		PORT_NAME ( "SPC  \xCF\x80  ,")  /* pi */
 	PORT_CODE ( KEYCODE_SPACE )
 
 	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
@@ -864,11 +864,11 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_9_PAD )
 
 	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "1/x  \xE2\x89\xA5  >  Y") /* >= */
+		PORT_NAME ( "1/x  \xE2\x89\xA5  >  Y") /* >= */
 	PORT_CODE ( KEYCODE_Y )
 
 	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "COS  ACOS  \xE2\x88\x82  T") /* delta */
+		PORT_NAME ( "COS  ACOS  \xE2\x88\x82  T") /* delta */
 	PORT_CODE ( KEYCODE_T )
 
 	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
@@ -879,10 +879,10 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "STO\xE2\x8A\xB3  RCL  CUT  K")
 	PORT_CODE ( KEYCODE_K )
 
-        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE2" ) /* OUT = 0x004 */
+		PORT_START( "LINE2" ) /* OUT = 0x004 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( ".  : :  \xE2\x86\xb5") /* return arrow */
@@ -904,7 +904,7 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_8_PAD )
 
 	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "X  \xE2\x89\xA4  <  X") /* <= */
+		PORT_NAME ( "X  \xE2\x89\xA4  <  X") /* <= */
 	PORT_CODE ( KEYCODE_X )
 
 	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
@@ -919,13 +919,13 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "VAR  UPDIR  COPY  J")
 	PORT_CODE ( KEYCODE_J )
 
-        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE3" ) /* OUT = 0x008 */
+		PORT_START( "LINE3" ) /* OUT = 0x008 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "0  \xE2\x88\x9E  \xE2\x86\x92") /* infinity, right arrow */
+		PORT_NAME ( "0  \xE2\x88\x9E  \xE2\x86\x92") /* infinity, right arrow */
 	PORT_CODE ( KEYCODE_0 )
 	PORT_CODE ( KEYCODE_0_PAD )
 
@@ -945,11 +945,11 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_7_PAD )
 
 	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "+/-  \xE2\x89\xA0  =  W") /* =/ */
+		PORT_NAME ( "+/-  \xE2\x89\xA0  =  W") /* =/ */
 	PORT_CODE ( KEYCODE_W )
 
 	PORT_BIT  ( 32, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "\xE2\x88\x9A  x^2  sqrt(x,y)  R") /* square root */
+		PORT_NAME ( "\xE2\x88\x9A  x^2  sqrt(x,y)  R") /* square root */
 	PORT_CODE ( KEYCODE_R )
 
 	PORT_BIT  ( 64, IP_ACTIVE_HIGH, IPT_KEYBOARD )
@@ -960,10 +960,10 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "TOOL i  |  I")
 	PORT_CODE ( KEYCODE_I )
 
-        PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f00, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE4" ) /* OUT = 0x010 */
+		PORT_START( "LINE4" ) /* OUT = 0x010 */
 
 	PORT_BIT  ( 16, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "EEX  10^x  LOG  V")
@@ -981,10 +981,10 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "MODE  CUSTOM  END  H")
 	PORT_CODE ( KEYCODE_H )
 
-        PORT_BIT ( 0x7f0f, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f0f, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE5" ) /* OUT = 0x020 */
+		PORT_START( "LINE5" ) /* OUT = 0x020 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "F1  Y=  A")
@@ -1020,10 +1020,10 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_NAME ( "APPS  FILES  BEGIN  G")
 	PORT_CODE ( KEYCODE_G )
 
-        PORT_BIT ( 0x7f40, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7f40, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE6" ) /* OUT = 0x040 */
+		PORT_START( "LINE6" ) /* OUT = 0x040 */
 
 	PORT_BIT  ( 1, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "\xE2\x86\x92") /* right arrow */
@@ -1034,17 +1034,17 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_DOWN )
 
 	PORT_BIT  ( 4, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-	PORT_NAME ( "\xE2\x86\x90") /* left arrow */ 
+	PORT_NAME ( "\xE2\x86\x90") /* left arrow */
 	PORT_CODE ( KEYCODE_LEFT )
 
 	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "\xE2\x86\x91") /* up arrow */
 	PORT_CODE ( KEYCODE_UP )
 
-        PORT_BIT ( 0x7ff0, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7ff0, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE7" ) /* OUT = 0x080 */
+		PORT_START( "LINE7" ) /* OUT = 0x080 */
 
 	PORT_BIT  ( 2, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "right shift")
@@ -1055,25 +1055,25 @@ static INPUT_PORTS_START( hp49g_kbd )
 	PORT_CODE ( KEYCODE_LSHIFT )
 
 	PORT_BIT  ( 8, IP_ACTIVE_HIGH, IPT_KEYBOARD )
-        PORT_NAME ( "\xCE\xB1  USER  ENTRY") /* alpha */
+		PORT_NAME ( "\xCE\xB1  USER  ENTRY") /* alpha */
 	PORT_CODE ( KEYCODE_LALT )
 
-        PORT_BIT ( 0x7ff1, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7ff1, 0, IPT_UNUSED )
 
 
-        PORT_START( "LINE8" ) /* OUT = 0x100 */
+		PORT_START( "LINE8" ) /* OUT = 0x100 */
 
-        PORT_BIT ( 0xffff, 0, IPT_UNUSED )
+		PORT_BIT ( 0xffff, 0, IPT_UNUSED )
 
 
-        PORT_START( "ON" ) /* ON key, appears on all OUT lines */
+		PORT_START( "ON" ) /* ON key, appears on all OUT lines */
 
 	PORT_BIT  ( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_NAME ( "ON  CONT  OFF  CANCEL" )
 	PORT_CODE ( KEYCODE_ESC )
 	PORT_CODE ( KEYCODE_HOME )
 
-        PORT_BIT ( 0x7fff, 0, IPT_UNUSED )
+		PORT_BIT ( 0x7fff, 0, IPT_UNUSED )
 
 INPUT_PORTS_END
 
@@ -1109,8 +1109,8 @@ static INPUT_PORTS_START( hp48gx )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hp49g )
-        PORT_INCLUDE( hp49g_kbd )
-        PORT_INCLUDE( hp48_battery )
+		PORT_INCLUDE( hp49g_kbd )
+		PORT_INCLUDE( hp48_battery )
 INPUT_PORTS_END
 
 
@@ -1356,8 +1356,8 @@ static MACHINE_CONFIG_DERIVED( hp49g, hp48_common )
 	MCFG_DEFAULT_LAYOUT ( layout_hp49g )
 
 	/* serial I/O */
-        //MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-        //MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
+		//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
+		//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
 MACHINE_CONFIG_END
 
 

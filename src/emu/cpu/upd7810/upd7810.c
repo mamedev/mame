@@ -487,7 +487,7 @@ upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd78c05_device::upd78c05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : upd7810_device(mconfig, UPD78C05, "uPD78C05", tag, owner, clock, "upd78c05", __FILE__)
+	: upd7810_device(mconfig, UPD78C05, "uPD78C05", tag, owner, clock, "upd78c05", __FILE__)
 {
 	m_op48 = s_op48_78c05;
 	m_op4C = s_op4C_78c05;
@@ -2250,4 +2250,3 @@ void upd7810_device::execute_set_input(int irqline, int state)
 	}
 	/* resetting interrupt requests is done with the SKIT/SKNIT opcodes only! */
 }
-

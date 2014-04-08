@@ -76,7 +76,7 @@
 // ======================> z8536_device
 
 class z8536_device :  public device_t,
-					  public device_z80daisy_interface
+						public device_z80daisy_interface
 {
 public:
 	// construction/destruction

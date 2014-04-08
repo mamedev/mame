@@ -60,14 +60,14 @@
 #define TTL_7490(_name, _A, _B, _R1, _R2, _R91, _R92)                               \
 		NET_REGISTER_DEV(7490, _name)                                               \
 		NET_CONNECT(_name, A, _A)                                                   \
-        NET_CONNECT(_name, B, _B)                                                   \
+		NET_CONNECT(_name, B, _B)                                                   \
 		NET_CONNECT(_name, R1,  _R1)                                                \
 		NET_CONNECT(_name, R2,  _R2)                                                \
 		NET_CONNECT(_name, R91, _R91)                                               \
 		NET_CONNECT(_name, R92, _R92)
 
 #define TTL_7490_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7490_dip, _name)
+		NET_REGISTER_DEV(7490_dip, _name)
 
 
 NETLIB_DEVICE(7490,
@@ -78,7 +78,7 @@ NETLIB_DEVICE(7490,
 	netlist_ttl_input_t m_R91;
 	netlist_ttl_input_t m_R92;
 	netlist_ttl_input_t m_A;
-    netlist_ttl_input_t m_B;
+	netlist_ttl_input_t m_B;
 
 	UINT8 m_cnt;
 

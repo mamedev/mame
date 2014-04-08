@@ -125,10 +125,10 @@ ROM_END
 
 ROM_START( a2aevm80 )
 	ROM_REGION(0x800, VIDEOTERM_ROM_REGION, 0)
-	ROM_LOAD( "ae viewmaster 80 rom.bin", 0x000000, 0x000800, CRC(62a4b111) SHA1(159bf7c4add1435be215fddb648c0743fbcc49b5) ) 
+	ROM_LOAD( "ae viewmaster 80 rom.bin", 0x000000, 0x000800, CRC(62a4b111) SHA1(159bf7c4add1435be215fddb648c0743fbcc49b5) )
 
 	ROM_REGION(0x1000, VIDEOTERM_GFX_REGION, 0)
-	ROM_LOAD( "ae viewmaster 80 video rom.bin", 0x000000, 0x000800, CRC(4801ab90) SHA1(f90658ffee7740f3cb30ecef2e151f7dc6098833) ) 
+	ROM_LOAD( "ae viewmaster 80 video rom.bin", 0x000000, 0x000800, CRC(4801ab90) SHA1(f90658ffee7740f3cb30ecef2e151f7dc6098833) )
 ROM_END
 
 /***************************************************************************

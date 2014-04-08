@@ -27,7 +27,7 @@ public:
 	~upd1771c_device() {}
 
 	template<class _Object> static devcb2_base &set_ack_handler(device_t &device, _Object object) { return downcast<upd1771c_device &>(device).m_ack_handler.set_callback(object); }
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	WRITE_LINE_MEMBER( pcm_write );

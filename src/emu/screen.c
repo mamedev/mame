@@ -226,7 +226,7 @@ void screen_device::static_set_palette(device_t &device, const char *tag)
 
 
 //-------------------------------------------------
-//  static_set_video_attributes - set the screen 
+//  static_set_video_attributes - set the screen
 //  video attributes
 //-------------------------------------------------
 
@@ -260,10 +260,10 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	// check for zero frame rate
 	if (m_refresh == 0)
 		mame_printf_error("Invalid (zero) refresh rate\n");
-	
+
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 	if (m_palette == NULL && texformat == TEXFORMAT_PALETTE16)
-		mame_printf_error("Screen does not have palette defined\n");		
+		mame_printf_error("Screen does not have palette defined\n");
 	if (m_palette != NULL && texformat == TEXFORMAT_RGB32)
 		mame_printf_warning("Screen does not need palette defined\n");
 }
@@ -279,7 +279,7 @@ void screen_device::device_start()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.bind_relative_to(*owner());
-	
+
 	// if we have a palette and it's not started, wait for it
 	if (m_palette != NULL && !m_palette->started())
 		throw device_missing_dependencies();

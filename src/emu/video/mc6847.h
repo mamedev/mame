@@ -44,7 +44,7 @@
 #define MCFG_MC6847_FSYNC_CALLBACK(_write) \
 	devcb = &mc6847_friend_device::set_fsync_wr_callback(*device, DEVCB2_##_write);
 
-	
+
 /* interface */
 struct mc6847_interface
 {
@@ -668,12 +668,12 @@ public:
 class s68047_device : public mc6847_base_device
 {
 public:
-    s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void hack_black_becomes_blue(bool flag);
 
 private:
-    static const UINT32 s_s68047_hack_palette[16];
+	static const UINT32 s_s68047_hack_palette[16];
 };
 
 

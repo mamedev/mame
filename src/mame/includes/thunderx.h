@@ -49,7 +49,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(scontra_bankedram_r);
 	DECLARE_WRITE8_MEMBER(scontra_bankedram_w);
 	DECLARE_READ8_MEMBER(thunderx_bankedram_r);

@@ -28,15 +28,15 @@
 #include "../analog/nld_twoterm.h"
 
 #define CD_4066_DIP(_name)                                                         \
-        NET_REGISTER_DEV(4066_dip, _name)
+		NET_REGISTER_DEV(4066_dip, _name)
 
 NETLIB_SUBDEVICE(vdd_vss,
 	netlist_analog_input_t m_vdd;
-    netlist_analog_input_t m_vss;
+	netlist_analog_input_t m_vss;
 
 public:
-    ATTR_HOT inline double vdd() { return INPANALOG(m_vdd); }
-    ATTR_HOT inline double vss() { return INPANALOG(m_vss); }
+	ATTR_HOT inline double vdd() { return INPANALOG(m_vdd); }
+	ATTR_HOT inline double vss() { return INPANALOG(m_vss); }
 );
 
 NETLIB_SUBDEVICE(4066,
@@ -50,11 +50,11 @@ public:
 
 NETLIB_DEVICE(4066_dip,
 
-    NETLIB_NAME(4066) m_A;
-    NETLIB_NAME(4066) m_B;
-    NETLIB_NAME(4066) m_C;
-    NETLIB_NAME(4066) m_D;
-    NETLIB_NAME(vdd_vss) m_supply;
+	NETLIB_NAME(4066) m_A;
+	NETLIB_NAME(4066) m_B;
+	NETLIB_NAME(4066) m_C;
+	NETLIB_NAME(4066) m_D;
+	NETLIB_NAME(vdd_vss) m_supply;
 );
 
 #endif /* NLD_4066_H_ */

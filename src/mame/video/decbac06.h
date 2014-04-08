@@ -108,7 +108,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tile_shape2_8x8_scan);
 	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
-	required_device<gfxdecode_device> m_gfxdecode;	
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 extern const device_type DECO_BAC06;

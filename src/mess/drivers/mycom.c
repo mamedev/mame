@@ -118,8 +118,8 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
-public:	
-	required_device<palette_device> m_palette;	
+public:
+	required_device<palette_device> m_palette;
 };
 
 

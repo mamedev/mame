@@ -201,7 +201,7 @@ void apollo_kbd_device::beeper::on()
 
 int apollo_kbd_device::beeper::keyboard_has_beeper()
 {
-	return true;	// driver has no facility to return false here, so go with it
+	return true;    // driver has no facility to return false here, so go with it
 }
 
 void apollo_kbd_device::beeper::beeper_callback()

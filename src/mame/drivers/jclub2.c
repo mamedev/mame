@@ -293,14 +293,13 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 ***************************************************************************/
 
 
-WRITE32_MEMBER(darkhors_state::jclub2o_eeprom_w)		//seiko s-2929 is used on old style pcb
+WRITE32_MEMBER(darkhors_state::jclub2o_eeprom_w)        //seiko s-2929 is used on old style pcb
 {
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n",machine().describe_context(),data);
-	
+
 	if ( ACCESSING_BITS_24_31 )
 	{
-		
 		// latch the bit
 		m_eeprom->di_write((data & 0x01000000) >> 24);
 
@@ -355,7 +354,6 @@ static int mask_to_bit( int mask )
 
 READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
 {
-
 	// from bit mask to bit number
 	int bit_p1 = mask_to_bit((m_input_sel & 0x00ff0000) >> 16);
 	int bit_p2 = mask_to_bit((m_input_sel & 0xff000000) >> 24);
@@ -371,7 +369,6 @@ READ32_MEMBER(darkhors_state::p_580004)
 {
 UINT32 ret = ioport("580004")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
-
 	case 0x01: return  ret | (ioport("580004-01")->read()<<24);
 	case 0x02: return  ret | (ioport("580004-02")->read()<<24);
 	case 0x04: return  ret | (ioport("580004-04")->read()<<24);
@@ -381,7 +378,7 @@ switch (m_input_sel_jc_2p){
 	case 0x40: return  ret | (ioport("580004-40")->read()<<24);
 	case 0x80: return  ret | (ioport("580004-80")->read()<<24);
 	}
-	
+
 	return  ret;
 }
 
@@ -390,7 +387,6 @@ READ32_MEMBER(darkhors_state::p_4e0000)
 {
 UINT32 ret = ioport("4E0000")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
-
 	case 0x01: return  ret | (ioport("4E0000-01")->read()<<24);
 	case 0x02: return  ret | (ioport("4E0000-02")->read()<<24);
 	case 0x04: return  ret | (ioport("4E0000-04")->read()<<24);
@@ -456,24 +452,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")	//all 68k ram is battery backup
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")   //all 68k ram is battery backup
 	//AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
 	AM_RANGE(0x490000, 0x490003) AM_WRITE(darkhors_eeprom_w)
-	AM_RANGE(0x4E0000, 0x4E0003) AM_READ(p_4e0000)		//input 2p
+	AM_RANGE(0x4E0000, 0x4E0003) AM_READ(p_4e0000)      //input 2p
 	AM_RANGE(0x4E0000, 0x4E0003) AM_WRITE(jclub2_input_sel_w_p1)
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")		//eeprom related? 
-	AM_RANGE(0x580004, 0x580007) AM_READ(p_580004)		//system + some 1p input here
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("580008")		//input 1p + coins
+	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")     //eeprom related?
+	AM_RANGE(0x580004, 0x580007) AM_READ(p_580004)      //system + some 1p input here
+	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("580008")     //input 1p + coins
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(jclub2_input_sel_w_p2)
-	AM_RANGE(0x580200, 0x580203) AM_READNOP	//????
+	AM_RANGE(0x580200, 0x580203) AM_READNOP //????
 
 	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
 	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
 
-//	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
+//  AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
 	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
@@ -483,20 +479,20 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
-	
+
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")	//all 68k ram is battery backup
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")   //all 68k ram is battery backup
 	//AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	
-	AM_RANGE(0x490000, 0x490003) AM_WRITE(jclub2o_eeprom_w)	//eeprom s2929 not 93c46
-	AM_RANGE(0x4E0000, 0x4E0003) AM_READ(p_4e0000)			//input 2p
+
+	AM_RANGE(0x490000, 0x490003) AM_WRITE(jclub2o_eeprom_w) //eeprom s2929 not 93c46
+	AM_RANGE(0x4E0000, 0x4E0003) AM_READ(p_4e0000)          //input 2p
 	AM_RANGE(0x4E0000, 0x4E0003) AM_WRITE(jclub2_input_sel_w_p1)
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")		//eeprom read
-	AM_RANGE(0x580004, 0x580007) AM_READ(p_580004)			//system + some 1p keyboard input here
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("580008")		//input 1p + coins
+	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")     //eeprom read
+	AM_RANGE(0x580004, 0x580007) AM_READ(p_580004)          //system + some 1p keyboard input here
+	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("580008")     //input 1p + coins
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(jclub2_input_sel_w_p2)
-	
-	AM_RANGE(0x580200, 0x580203) AM_READNOP	//????
+
+	AM_RANGE(0x580200, 0x580203) AM_READNOP //????
 
 	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -722,50 +718,50 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jclub2 )
 
-	
+
 	PORT_START("580000")
 	PORT_BIT( 0x7fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("580008")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)	// payout 1p
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)    // payout 1p
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START1   )    												// start 1p
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START1   )                                                    // start 1p
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 coin out") PORT_CODE(KEYCODE_RSHIFT)				//coin out 2p
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 coin out") PORT_CODE(KEYCODE_LSHIFT)				//coin out 1p
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 coin out") PORT_CODE(KEYCODE_RSHIFT)                //coin out 2p
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 coin out") PORT_CODE(KEYCODE_LSHIFT)                //coin out 1p
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_COIN1 )   													//1p coin drop
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_COIN3 )    													//2p coin drop
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_COIN1 )    													//1p coin in s1
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_COIN2 )    													//1p coin in s2
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_COIN3 )    													//2p coin in s1
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_COIN4 )    													//2p coin in s2
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_COIN1 )                                                       //1p coin drop
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_COIN3 )                                                       //2p coin drop
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_COIN1 )                                                       //1p coin in s1
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_COIN2 )                                                       //1p coin in s2
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_COIN3 )                                                       //2p coin in s1
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_COIN4 )                                                       //2p coin in s2
 
 	PORT_START("580004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_SERVICE2 )    												//reset
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_SERVICE3 ) 													//meter
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_SERVICE4 )    												//last game
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_SERVICE2 )                                                    //reset
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_SERVICE3 )                                                    //meter
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_SERVICE4 )                                                    //last game
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)        // cancel 1p
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	//test
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   //test
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 hopper full") PORT_CODE(KEYCODE_CLOSEBRACE)					//hopper full 2p
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 hopper full") PORT_CODE(KEYCODE_OPENBRACE)					//hopper full 1p
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 	//keyboard input 1p 
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )  	//keyboard input 1p 
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )		//keyboard input 1p 
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 	//keyboard input 1p 
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )  	//keyboard input 1p 
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 	//keyboard input 1p 
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 	//keyboard input 1p 
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 	//keyboard input 1p 
-	
-	PORT_START("580004-01")	//1P
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 hopper full") PORT_CODE(KEYCODE_CLOSEBRACE)                 //hopper full 2p
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 hopper full") PORT_CODE(KEYCODE_OPENBRACE)                  //hopper full 1p
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )     //keyboard input 1p
+
+	PORT_START("580004-01") //1P
 	PORT_BIT( 0x00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2") PORT_CODE(KEYCODE_2_PAD)
@@ -776,7 +772,7 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 8") PORT_CODE(KEYCODE_8_PAD)
 
-	PORT_START("580004-02")	//1P
+	PORT_START("580004-02") //1P
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-2") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-3") PORT_CODE(KEYCODE_W)
@@ -785,9 +781,9 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-6") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-7") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-8") PORT_CODE(KEYCODE_U)
-	
 
-	PORT_START("580004-04")	//1P
+
+	PORT_START("580004-04") //1P
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-3") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-4") PORT_CODE(KEYCODE_O)
@@ -795,8 +791,8 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-6") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-7") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-8") PORT_CODE(KEYCODE_F)
-	
-	PORT_START("580004-08")	//1P
+
+	PORT_START("580004-08") //1P
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-4") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-5") PORT_CODE(KEYCODE_H)
@@ -804,52 +800,52 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-7") PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-8") PORT_CODE(KEYCODE_L)
 
-	PORT_START("580004-10")	//1P
+	PORT_START("580004-10") //1P
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-5") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-6") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-7") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-8") PORT_CODE(KEYCODE_V)
 
-	
-	PORT_START("580004-20")	//1P
+
+	PORT_START("580004-20") //1P
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-6") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-7") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-8") PORT_CODE(KEYCODE_M)
 
-	
-	PORT_START("580004-40")	//1P
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+
+	PORT_START("580004-40") //1P
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 6-7") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 6-8") PORT_CODE(KEYCODE_STOP)
 
-	
-	PORT_START("580004-80")	//1P
+
+	PORT_START("580004-80") //1P
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 7-8") PORT_CODE(KEYCODE_SLASH)
 
 
 	PORT_START("4E0000")   // 4E0000
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)	// payout 2p
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Payout") PORT_CODE(KEYCODE_RCONTROL)    // payout 2p
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START2   )    												// start 2p
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW,  IPT_START2   )                                                    // start 2p
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_RALT) 		// cancel 2p
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_RALT)        // cancel 2p
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) //unused???
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )  					//keyboard input 2p
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )  					//keyboard input 2p
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN ) 					//keyboard input 2p	
-	
-	PORT_START("4E0000-01")	//2P
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW,  IPT_UNKNOWN )                     //keyboard input 2p
+
+	PORT_START("4E0000-01") //2P
 	PORT_BIT( 0x00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2") PORT_CODE(KEYCODE_2_PAD)
@@ -860,7 +856,7 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 8") PORT_CODE(KEYCODE_8_PAD)
 
-	PORT_START("4E0000-02")	//2P
+	PORT_START("4E0000-02") //2P
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-2") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-3") PORT_CODE(KEYCODE_W)
@@ -869,9 +865,9 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-6") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-7") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-8") PORT_CODE(KEYCODE_U)
-	
 
-	PORT_START("4E0000-04")	//2P
+
+	PORT_START("4E0000-04") //2P
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-3") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-4") PORT_CODE(KEYCODE_O)
@@ -879,8 +875,8 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-6") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-7") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-8") PORT_CODE(KEYCODE_F)
-	
-	PORT_START("4E0000-08")	//2P
+
+	PORT_START("4E0000-08") //2P
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-4") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-5") PORT_CODE(KEYCODE_H)
@@ -888,26 +884,26 @@ static INPUT_PORTS_START( jclub2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-7") PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-8") PORT_CODE(KEYCODE_L)
 
-	PORT_START("4E0000-10")	//2P
+	PORT_START("4E0000-10") //2P
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-5") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-6") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-7") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-8") PORT_CODE(KEYCODE_V)
 
-	
-	PORT_START("4E0000-20")	//2P
+
+	PORT_START("4E0000-20") //2P
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 5-6") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 5-7") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 5-8") PORT_CODE(KEYCODE_M)
-	
-	PORT_START("4E0000-40")	//2P
+
+	PORT_START("4E0000-40") //2P
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 6-7") PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 6-8") PORT_CODE(KEYCODE_STOP)
-	
-	PORT_START("4E0000-80")	//2P
+
+	PORT_START("4E0000-80") //2P
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 7-8") PORT_CODE(KEYCODE_SLASH)
 INPUT_PORTS_END
@@ -1023,7 +1019,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_st0032(*device, 1);
@@ -1085,8 +1081,8 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkhors_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")		//not correct
-	
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")      //not correct
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1098,9 +1094,9 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-	
+
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
 	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
@@ -1220,7 +1216,7 @@ ROM_START( jclub2 )
 	ROM_REGION( 0x80000, "misc", ROMREGION_ERASEFF )
 	ROM_LOAD( "gal16v8b-m88-03.bin", 0x000, 0x117, CRC(6d9c882e) SHA1(84cb95ab540290c2f8b740668360e9c643a67dcf) )
 	ROM_LOAD( "gal16v8b-m88-04.bin", 0x000, 0x117, CRC(5e79f292) SHA1(5e44c234e2b15d486a1af71fee986892aa245b4d) )
-	
+
 	ROM_REGION( 0x80, "eeprom", 0 ) // EEPROM
 	ROM_LOAD( "eeprom-jclub2.bin", 0x0000, 0x0080, CRC(1513cdc8) SHA1(22ff752f3e0f8f611c234a1dc4327aa360b4d6eb) )
 ROM_END
@@ -1271,16 +1267,16 @@ ROM_START( jclub2o )
 
 	ROM_REGION( 0x80000, "st0016", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
-	
+
 	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
-	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )	//jclub2ob ones
+	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )   //jclub2ob ones
 ROM_END
 
 /*
   Jockey Club II (26-mar-1997)
   8 Horses, old style PCB.
   Maybe upgraded to a release candidate software revision.
-*/  
+*/
 ROM_START( jclub2ob )
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68EC020 code + compressed gfx
 	ROM_LOAD16_WORD_SWAP( "sx006a-01.u26",0x00000, 0x200000, CRC(55e249bc) SHA1(ed0f066ed17f047760b712cbbfba1a62d4b452ba) )
@@ -1292,7 +1288,7 @@ ROM_START( jclub2ob )
 
 	ROM_REGION( 0x80000, "st0016", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
-	
+
 	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
 	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )
 ROM_END
@@ -1325,7 +1321,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
 
 		memcpy(eeprom, temp, len);
-		
+
 	}
 }
 
@@ -1336,7 +1332,7 @@ GAME( 199?, jclub2ob, jclub2, jclub2o, jclub2, driver_device,  0,       ROT0, "S
 GAME( 2001, darkhors, jclub2, darkhors,darkhors,darkhors_state, darkhors,ROT0, "bootleg", "Dark Horse (bootleg of Jockey Club II)", GAME_IMPERFECT_GRAPHICS )
 
 
-//test boot = test mode 
+//test boot = test mode
 //reset +start 1p at boot, when msg on screen press test without release other key = setup
 //reset +cancel 1p  = backup all clear
 //reset, test, meter and last game are keys so once you turn them they stay "active"
@@ -1347,4 +1343,3 @@ boot with
 - 0 + left alt (reset + p1 cancel) to clear data
 - 0 + 1 + f1 (IIRC) to write ID
 */
-

@@ -43,7 +43,7 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k051960_device> m_k051960;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	DECLARE_READ16_MEMBER(k052109_halfword_r);
 	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
 	DECLARE_READ16_MEMBER(k051937_halfword_r);

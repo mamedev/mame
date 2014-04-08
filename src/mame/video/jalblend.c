@@ -110,7 +110,7 @@ void jal_blend_drawgfx_common(palette_device &palette,_BitmapClass &dest_bmp,con
 		x_index_base = flipx ? gfx->width()-1 : 0;
 		y_index = flipy ? gfx->height()-1 : 0;
 
-		// start coordinates 
+		// start coordinates
 		sx = offsx;
 		sy = offsy;
 

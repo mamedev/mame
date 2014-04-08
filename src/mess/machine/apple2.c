@@ -2374,7 +2374,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_control_r)
 
 static const UINT8 a2_key_remap[0x32][4] =
 {
-/*	  norm shft ctrl both */
+/*    norm shft ctrl both */
 	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
 	{ 0x34,0x24,0x34,0x24 },    /* 4 $     01     */
 	{ 0x35,0x25,0x35,0x25 },    /* 5 %     02     */
@@ -2432,7 +2432,7 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 	if (state == ASSERT_LINE)
 	{
 		int mod = 0;
-		m_lastchar = m_ay3600->b_r(); 
+		m_lastchar = m_ay3600->b_r();
 
 		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
 		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
@@ -2442,7 +2442,7 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 		if (m_transchar != 0)
 		{
 			m_strobe = 0x80;
-//			printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
+//          printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
 		}
 	}
 }
@@ -2456,16 +2456,16 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_iie_data_ready_w)
 
 		m_lastchar = m_ay3600->b_r();
 
-		trans = m_lastchar & ~(0x1c0);	// clear the 3600's control/shift stuff
-		trans |= (m_lastchar & 0x100)>>2;	// bring the 0x100 bit down to the 0x40 place
-		trans <<= 2;					// 4 entries per key
-		trans |= (m_kbspecial->read() & 0x06) ? 0x00 : 0x01;	// shift is bit 1 (active low)
-		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02; 	// control is bit 2 (active low)
-		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200; 	// caps lock is bit 9 (active low)
+		trans = m_lastchar & ~(0x1c0);  // clear the 3600's control/shift stuff
+		trans |= (m_lastchar & 0x100)>>2;   // bring the 0x100 bit down to the 0x40 place
+		trans <<= 2;                    // 4 entries per key
+		trans |= (m_kbspecial->read() & 0x06) ? 0x00 : 0x01;    // shift is bit 1 (active low)
+		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
+		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
 		m_transchar = decode[trans];
 		m_strobe = 0x80;
 
-//		printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+//      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
 	}
 }

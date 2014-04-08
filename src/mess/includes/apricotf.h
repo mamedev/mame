@@ -55,7 +55,7 @@ public:
 			m_sio_int(CLEAR_LINE),
 			m_p_scrollram(*this, "p_scrollram"),
 			m_p_paletteram(*this, "p_paletteram"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	virtual void machine_start();

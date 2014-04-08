@@ -30,7 +30,7 @@ public:
 	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _Object> static devcb2_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
-	
+
 	// device interface
 	UINT8 data_read();
 	void data_write(UINT8 data);

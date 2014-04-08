@@ -598,20 +598,20 @@ static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 	MCFG_K053244_PALETTE("palette")
 MACHINE_CONFIG_END
 
-ROM_START( lethalen )	// US version UAE
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethalen )   // US version UAE
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191uae01.u4", 0x00000, 0x40000, CRC(dca340e3) SHA1(8efbba0e3a459bcfe23c75c584bf3a4ce25148bb) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -622,27 +622,27 @@ ROM_START( lethalen )	// US version UAE
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethalenue.nv", 0x0000, 0x0080, CRC(6e7224e6) SHA1(86dea9262d55e58b573d397d0fea437c58728707) )
 ROM_END
 
-ROM_START( lethalenub )	// US version UAB
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethalenub ) // US version UAB
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191uab01.u4", 0x00000, 0x40000, CRC(2afd7528) SHA1(65ce4a54fe96ad38d39d335b5d3a644a495c7e31) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -653,27 +653,27 @@ ROM_START( lethalenub )	// US version UAB
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethalenub.nv", 0x0000, 0x0080, CRC(14c6c6e5) SHA1(8a498b5322266df25fb24d1b7bd7937de459d207) )
 ROM_END
 
-ROM_START( lethalenua )	// US version UAA
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethalenua ) // US version UAA
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191uaa01.u4", 0x00000, 0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -684,27 +684,27 @@ ROM_START( lethalenua )	// US version UAA
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethalenua.nv", 0x0000, 0x0080, CRC(f71ad1c3) SHA1(04c7052d0895797af8a06183b8a877795bf2dbb3) )
 ROM_END
 
-ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other sets
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethalenux ) // US version ?, proto / hack?, very different to other sets
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191xxx01.u4", 0x00000, 0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test, verified on multiple boards
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -715,27 +715,27 @@ ROM_START( lethalenux )	// US version ?, proto / hack?, very different to other 
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethalenux.nv", 0x0000, 0x0080, CRC(5d69c39d) SHA1(e468df829ee5094792289f9166d7e39b638ab70d) )
 ROM_END
 
-ROM_START( lethaleneab )	// Euro ver. EAB
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethaleneab )    // Euro ver. EAB
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191eab01.u4", 0x00000, 0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -746,27 +746,27 @@ ROM_START( lethaleneab )	// Euro ver. EAB
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethaleneab.nv", 0x0000, 0x0080, CRC(4e9bb34d) SHA1(9502583bc9f5f6fc5bba333869398b24bf154b73) )
 ROM_END
 
-ROM_START( lethaleneae )	// Euro ver. EAE
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethaleneae )    // Euro ver. EAE
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191eae01.u4",    0x00000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -777,27 +777,27 @@ ROM_START( lethaleneae )	// Euro ver. EAE
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "lethaleneae.nv", 0x0000, 0x0080, CRC(eb369a67) SHA1(6c67294669614e96de5efb38372dbed435ee04d3) )
 ROM_END
 
-ROM_START( lethalenj )	// Japan version JAD
-	ROM_REGION( 0x40000, "maincpu", 0 )	/* main program */
+ROM_START( lethalenj )  // Japan version JAD
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191jad01.u4",    0x00000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Z80 sound program */
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* tilemaps */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
 	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )	/* sprites - fake 6bpp decode is done from here */
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* sprites - fake 6bpp decode is done from here */
 	ROM_LOAD( "191a04", 0x000000, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
 	ROM_LOAD( "191a05", 0x100000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
 	ROM_LOAD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
@@ -808,7 +808,7 @@ ROM_START( lethalenj )	// Japan version JAD
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_ERASE00 )
 	ROM_COPY("gfx2",0x200000,0, 0x200000)
 
-	ROM_REGION( 0x200000, "k054539", 0 )	/* K054539 samples */
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
 	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )

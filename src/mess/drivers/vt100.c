@@ -421,7 +421,7 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", vt100)
-//	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+//  MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 

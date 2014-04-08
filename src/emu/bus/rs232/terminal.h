@@ -27,7 +27,7 @@ protected:
 	virtual void rcv_complete();
 	virtual void send_key(UINT8 code);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { output_dsr(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) { if (started()) { output_dsr(state); } }
 
 private:
 	required_ioport m_io_term_txbaud;

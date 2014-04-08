@@ -220,7 +220,7 @@ void upd775x_device::device_start()
 void upd7759_device::device_start()
 {
 	m_drqcallback.resolve_safe();
-	
+
 	/* chip configuration */
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 
@@ -295,7 +295,7 @@ void upd7759_device::device_start()
 void upd7756_device::device_start()
 {
 	m_drqcallback.resolve_safe();
-	
+
 	/* chip configuration */
 	m_sample_offset_shift = (type() == UPD7759) ? 1 : 0;
 

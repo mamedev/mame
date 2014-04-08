@@ -195,7 +195,7 @@ private:
 	required_ioport m_io_k3b0;
 	required_ioport m_io_k0b;
 	required_shared_ptr<UINT16> m_expansion;
-public:	
+public:
 	required_device<palette_device> m_palette;
 };
 

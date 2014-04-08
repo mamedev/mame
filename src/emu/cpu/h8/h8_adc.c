@@ -124,7 +124,7 @@ void h8_adc_device::device_reset()
 	mode = IDLE;
 	channel = 0;
 	count = 0;
-	next_event = 0;  
+	next_event = 0;
 	mode_update();
 	analog_powered = !analog_power_control;
 	adtrg = true;
@@ -188,7 +188,7 @@ void h8_adc_device::start_conversion()
 	count = start_count;
 	sampling();
 	conversion_wait(true, !analog_powered);
-	analog_powered = true;	
+	analog_powered = true;
 }
 
 void h8_adc_device::timeout(UINT64 current_time)
@@ -450,7 +450,7 @@ void h8_adc_2655_device::mode_update()
 
 	if(adcsr & 0x03) {
 		mode |= BUFFER;
-		
+
 	}
 
 	if(adcsr & 0x08) {

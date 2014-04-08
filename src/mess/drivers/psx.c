@@ -623,7 +623,7 @@ ROM_START( psu )
 	ROM_FILL( 0x0400, 0x0c00, 0xff )
 	ROM_LOAD( "scea.ic304",   0x001000, 0x004000, CRC(82729934) SHA1(7d5f52eb9df1243dcdab32cb763a9eb6a22706d7) )
 	ROM_FILL( 0x5000, 0xae00, 0xff )
-	ROM_LOAD( "test.ic304",   0x00fe00, 0x000200, CRC(3b2f8041) SHA1(d7127cb4a9b5efe9deffab3b72ab4451cb30675b) )	
+	ROM_LOAD( "test.ic304",   0x00fe00, 0x000200, CRC(3b2f8041) SHA1(d7127cb4a9b5efe9deffab3b72ab4451cb30675b) )
 ROM_END
 
 ROM_START( pse )

@@ -27,22 +27,22 @@
 #include "nld_signal.h"
 
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
-        NET_REGISTER_DEV(7450, _name)                                               \
-        NET_CONNECT(_name, A, _I1)                                                  \
-        NET_CONNECT(_name, B, _I2)                                                  \
-        NET_CONNECT(_name, C, _I3)                                                  \
-        NET_CONNECT(_name, D, _I4)
+		NET_REGISTER_DEV(7450, _name)                                               \
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)
 
 #define TTL_7450_DIP(_name)                                                         \
-        NET_REGISTER_DEV(7450_dip, _name)
+		NET_REGISTER_DEV(7450_dip, _name)
 
 NETLIB_DEVICE(7450,
 public:
-    netlist_ttl_input_t m_A;
-    netlist_ttl_input_t m_B;
-    netlist_ttl_input_t m_C;
-    netlist_ttl_input_t m_D;
-    netlist_ttl_output_t m_Q;
+	netlist_ttl_input_t m_A;
+	netlist_ttl_input_t m_B;
+	netlist_ttl_input_t m_C;
+	netlist_ttl_input_t m_D;
+	netlist_ttl_output_t m_Q;
 );
 
 NETLIB_DEVICE(7450_dip,

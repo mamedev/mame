@@ -88,7 +88,7 @@ public:
 
 	UINT8 app_ram_enable;
 	UINT8 file_ram_enable;
-	
+
 	DECLARE_PALETTE_INIT(molecula);
 
 protected:

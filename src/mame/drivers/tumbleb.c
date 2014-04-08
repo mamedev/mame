@@ -2067,7 +2067,7 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tumbleb)
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)	
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 

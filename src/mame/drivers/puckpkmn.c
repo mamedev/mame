@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
-	
+
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
 
 	/* Unknown reads/writes: */
@@ -453,7 +453,7 @@ ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */
 ROM_END
 
 
-ROM_START( puckpkmnb ) 
+ROM_START( puckpkmnb )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "200061.u5", 0x000000, 0x080000, CRC(502a5093) SHA1(6dc1c79d52ebb653cb2e4388f74fd975ec323566) )
 	ROM_LOAD16_BYTE( "200060.u4", 0x000001, 0x080000, CRC(5f160c18) SHA1(5a5ce1b9a81afe836e435e9d6f16cf57b63cbd31) )

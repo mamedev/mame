@@ -167,7 +167,7 @@ void mc68681_device::update_interrupts()
 	{
 		LOG(( "68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR));
 		write_irq(CLEAR_LINE);
-		m_read_vector = false;	// clear IACK too
+		m_read_vector = false;  // clear IACK too
 	}
 };
 
@@ -235,7 +235,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 		// timer output to bit 3?
 		if ((OPCR & 0xc) == 0x4)
 		{
-			OPR ^= 0x8; 
+			OPR ^= 0x8;
 			write_outport(OPR ^ 0xff);
 		}
 
@@ -280,7 +280,7 @@ READ8_MEMBER( mc68681_device::read )
 
 			// reading this clears all the input change bits
 			IPCR &= 0x0f;
-			ISR &= ~INT_INPUT_PORT_CHANGE; 
+			ISR &= ~INT_INPUT_PORT_CHANGE;
 			update_interrupts();
 		}
 		break;
@@ -304,20 +304,20 @@ READ8_MEMBER( mc68681_device::read )
 			break;
 
 		case 0x0a: /* 1X/16X Test */
-			r = 0x61;	// the old 68681 returned this and it makes Apollo happy
+			r = 0x61;   // the old 68681 returned this and it makes Apollo happy
 			break;
 
 		case 0x0d: /* IP */
 			if (!read_inport.isnull())
 			{
-				r = read_inport();	// TODO: go away
+				r = read_inport();  // TODO: go away
 			}
 			else
 			{
 				r = IP_last_state;
 			}
 
-			r |= 0x80;	// bit 7 is always set
+			r |= 0x80;  // bit 7 is always set
 
 			// bit 6 is /IACK (note the active-low)
 			if (m_read_vector)
@@ -328,7 +328,7 @@ READ8_MEMBER( mc68681_device::read )
 			{
 				r |= 0x40;
 			}
-			break; 
+			break;
 
 		case 0x0e: /* Start counter command */
 		{
@@ -402,7 +402,7 @@ WRITE8_MEMBER( mc68681_device::write )
 			// check for pending input port delta interrupts
 			if ((((IPCR>>4) & data) & 0x0f) != 0)
 			{
-				ISR |= INT_INPUT_PORT_CHANGE; 
+				ISR |= INT_INPUT_PORT_CHANGE;
 			}
 
 			m_chanA->ACR_updated();
@@ -466,7 +466,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip0_w )
 
 		if (ACR & 1)
 		{
-			ISR |= INT_INPUT_PORT_CHANGE; 
+			ISR |= INT_INPUT_PORT_CHANGE;
 			update_interrupts();
 		}
 	}
@@ -486,7 +486,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip1_w )
 
 		if (ACR & 2)
 		{
-			ISR |= INT_INPUT_PORT_CHANGE; 
+			ISR |= INT_INPUT_PORT_CHANGE;
 			update_interrupts();
 		}
 	}
@@ -506,7 +506,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip2_w )
 
 		if (ACR & 4)
 		{
-			ISR |= INT_INPUT_PORT_CHANGE; 
+			ISR |= INT_INPUT_PORT_CHANGE;
 			update_interrupts();
 		}
 	}
@@ -526,7 +526,7 @@ WRITE_LINE_MEMBER( mc68681_device::ip3_w )
 
 		if (ACR & 8)
 		{
-			ISR |= INT_INPUT_PORT_CHANGE; 
+			ISR |= INT_INPUT_PORT_CHANGE;
 			update_interrupts();
 		}
 	}
@@ -671,7 +671,7 @@ void mc68681_channel::rcv_complete()
 {
 	receive_register_extract();
 
-//	printf("%s ch %d rcv complete\n", tag(), m_ch);
+//  printf("%s ch %d rcv complete\n", tag(), m_ch);
 
 	if ( rx_enabled )
 	{
@@ -693,7 +693,7 @@ void mc68681_channel::rcv_complete()
 
 void mc68681_channel::tra_complete()
 {
-//	printf("%s ch %d Tx complete\n", tag(), m_ch);
+//  printf("%s ch %d Tx complete\n", tag(), m_ch);
 	tx_ready = 1;
 	SR |= STATUS_TRANSMITTER_READY;
 
@@ -730,7 +730,7 @@ void mc68681_channel::tra_callback()
 	if ((MR2&0xC0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
-//		printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
+//      printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
 		if (m_ch == 0)
 		{
 			m_uart->write_a_tx(bit);
@@ -740,7 +740,7 @@ void mc68681_channel::tra_callback()
 			m_uart->write_b_tx(bit);
 		}
 	}
-	else	// must call this to advance the transmitter
+	else    // must call this to advance the transmitter
 	{
 		transmit_register_get_data_bit();
 	}
@@ -750,7 +750,7 @@ void mc68681_channel::update_interrupts()
 {
 	if (rx_enabled)
 	{
-		if (rx_fifo_num > 0) 
+		if (rx_fifo_num > 0)
 		{
 			SR |= STATUS_RECEIVER_READY;
 		}
@@ -867,7 +867,7 @@ UINT8 mc68681_channel::read_rx_fifo()
 	rx_fifo_num--;
 	update_interrupts();
 
-//	printf("Rx read %02x\n", rv);
+//  printf("Rx read %02x\n", rv);
 
 	return rv;
 };
@@ -917,7 +917,7 @@ void mc68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-//		printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
+//      printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -1000,7 +1000,7 @@ void mc68681_channel::recalc_framing()
 			break;
 	}
 
-//	printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
+//  printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
 	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
 }
@@ -1092,7 +1092,7 @@ void mc68681_channel::write_TX(UINT8 data)
          printf("Write %02x to TX when TX not ready!\n", data);
     }*/
 
-//	printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
+//  printf("%s ch %d Tx %02x\n", tag(), m_ch, data);
 
 	tx_ready = 0;
 	SR &= ~STATUS_TRANSMITTER_READY;

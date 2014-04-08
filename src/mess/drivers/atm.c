@@ -190,7 +190,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( atm, spectrum_128, atm_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	
+
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atm)
 MACHINE_CONFIG_END
 

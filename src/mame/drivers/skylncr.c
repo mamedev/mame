@@ -29,7 +29,7 @@
 ****************************************************************************************************
 
   Settings:
-  
+
   Pressing F2, you can enter the DIP switches settings.
   Here the translated items:
 
@@ -47,13 +47,13 @@
   |                                       |
   '---------------------------------------'
 
-  'Special Bonus' and 'Super Star' appearance, are per 1000. 
+  'Special Bonus' and 'Super Star' appearance, are per 1000.
   You also can find the MAME DIP switches menu already translated.
   The <unknown> items still need translation.
 
   Press START (key 1) to exit the mode.
 
-  
+
   Bookkeeping:
 
   Pressing BOOKKEEPING (key 0), you enter the Record Mode.
@@ -199,8 +199,8 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
 {
 	UINT8 bank = 1;
 	UINT16 code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
-//	if (code > 0x200)
-//		bank = 2;	
+//  if (code > 0x200)
+//      bank = 2;
 	SET_TILE_INFO_MEMBER(bank, code, 0, TILE_FLIPYX( 0 ));
 }
 
@@ -516,7 +516,7 @@ static const gfx_layout layout8x8x8 =
 	8*8*4
 };
 
-static const gfx_layout layout8x8x8_alt =	/* for sstar97 */
+static const gfx_layout layout8x8x8_alt =   /* for sstar97 */
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -572,7 +572,7 @@ static const gfx_layout layout8x32x8_rot =
 	8*32*8/2
 };
 
-static const gfx_layout layout8x32x8_alt =	/* for sstar97 */
+static const gfx_layout layout8x32x8_alt =  /* for sstar97 */
 {
 	8,32,
 	RGN_FRAC(1,2),
@@ -1146,15 +1146,15 @@ ROM_END
 ROM_START( sstar97 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "27256.u15",    0x0000, 0x8000, CRC(a5da4f92) SHA1(82ac70bd379649f130db017aa226d0247db0f3cd) )
-	ROM_LOAD( "unknown.u48",  0x8000, 0x8000, BAD_DUMP CRC(9f4c02e3) SHA1(05975184130ea7dd3bb5d32eff77b585bd53e6b5) )	// palette borrowed from other game
+	ROM_LOAD( "unknown.u48",  0x8000, 0x8000, BAD_DUMP CRC(9f4c02e3) SHA1(05975184130ea7dd3bb5d32eff77b585bd53e6b5) )   // palette borrowed from other game
 
-	ROM_REGION( 0x40000, "gfx1", 0 )	// All ROMs are 28-pins mask ROMs dumped as 27512. Should be dumped as Fujitsu MB831000 or TC531000 (mask ROM).
+	ROM_REGION( 0x40000, "gfx1", 0 )    // All ROMs are 28-pins mask ROMs dumped as 27512. Should be dumped as Fujitsu MB831000 or TC531000 (mask ROM).
 	ROM_LOAD16_BYTE( "bor_dun_4.u23", 0x00000, 0x10000, BAD_DUMP CRC(82c9db19) SHA1(3611fb59bb7c962c7fabe7a29fa72b632fa69bed) )
 	ROM_LOAD16_BYTE( "bor_dun_2.u25", 0x00001, 0x10000, BAD_DUMP CRC(42ee9b7a) SHA1(b39f677f58072ea7dcd7f49208be1a7b70bdc5e5) )
 	ROM_LOAD16_BYTE( "bor_dun_3.u24", 0x20000, 0x10000, BAD_DUMP CRC(6d70879b) SHA1(83cbe67cda95e5f3d95065015f6b1b2044b88989) )
 	ROM_LOAD16_BYTE( "bor_dun_1.u26", 0x20001, 0x10000, BAD_DUMP CRC(1b8b84ac) SHA1(b914bad0b1fb58cf581d1227e8127c6afb906fb7) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )	// All ROMs are 28-pins mask ROMs dumped as 27512. Should be dumped as Fujitsu MB831000 or TC531000 (mask ROM).
+	ROM_REGION( 0x40000, "gfx2", 0 )    // All ROMs are 28-pins mask ROMs dumped as 27512. Should be dumped as Fujitsu MB831000 or TC531000 (mask ROM).
 	ROM_LOAD16_BYTE( "bor_dun_8.u19", 0x00000, 0x10000, BAD_DUMP CRC(daf651a7) SHA1(d4e472aa90aa2b52c997b2f2272007b139e3cbc2) )
 	ROM_LOAD16_BYTE( "bor_dun_6.u21", 0x00001, 0x10000, BAD_DUMP CRC(1d88bc70) SHA1(49246d96a4ce2b8e9b10e928d7dd13973feac883) )
 	ROM_LOAD16_BYTE( "bor_dun_7.u20", 0x20000, 0x10000, BAD_DUMP CRC(7e28ba2f) SHA1(ac8d4e95efce87456f569a71650bd7afcb59095e) )

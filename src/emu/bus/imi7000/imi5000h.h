@@ -32,7 +32,7 @@
 // ======================> imi5000h_device
 
 class imi5000h_device :  public device_t,
-						 public device_imi7000_interface
+							public device_imi7000_interface
 {
 public:
 	// construction/destruction

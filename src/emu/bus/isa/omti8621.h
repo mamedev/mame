@@ -2,8 +2,8 @@
  * omti8621.h - SMS OMTI 8621 disk controller
  *
  *  Created on: August 30, 2010
- *  	Author: Hans Ostermeyer
- * 
+ *      Author: Hans Ostermeyer
+ *
  *  Converted to ISA device March 3, 2014 by R. Belmont
  *
  *  Released for general non-commercial use under the MAME license
@@ -28,7 +28,7 @@
  ***************************************************************************/
 
 class omti_disk_image_device;
- 
+
 /* ----- device interface ----- */
 
 class omti8621_device : public device_t, public device_isa16_card_interface

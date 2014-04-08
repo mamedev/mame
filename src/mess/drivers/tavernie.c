@@ -106,7 +106,7 @@ private:
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
-public:	
+public:
 	optional_device<palette_device> m_palette;
 };
 

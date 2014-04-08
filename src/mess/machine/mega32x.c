@@ -1582,14 +1582,14 @@ void sega_32x_device::_32x_interrupt_cb(int scanline, int irq6)
 	_32x_check_framebuffer_swap(scanline >= irq6);
 
 	m_32x_hcount_compare_val++;
-	
+
 	if (m_32x_hcount_compare_val >= m_32x_hcount_reg)
 	{
 		m_32x_hcount_compare_val = -1;
-		
+
 		if (scanline < 224 || m_sh2_hint_in_vbl)
 		{
-			if (m_sh2_master_hint_enable) 
+			if (m_sh2_master_hint_enable)
 				m_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL, ASSERT_LINE);
 			if (m_sh2_slave_hint_enable)
 				m_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL, ASSERT_LINE);

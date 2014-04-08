@@ -29,11 +29,11 @@ private:
 	};
 
 	// variables
-	const software_info *	m_info;
-	const char *			m_interface;
-	const software_part **	m_selected_part;
-	bool					m_opt_fmgr;
-	int *					m_result;
+	const software_info *   m_info;
+	const char *            m_interface;
+	const software_part **  m_selected_part;
+	bool                    m_opt_fmgr;
+	int *                   m_result;
 };
 
 
@@ -55,12 +55,12 @@ private:
 	};
 
 	// variables
-	software_list_device *			m_swlist; // currently selected list
-	const char *					m_interface;
-	astring &						m_result;
-	entry_info *					m_entrylist;
-	char							m_filename_buffer[1024];
-	bool							m_ordered_by_shortname;
+	software_list_device *          m_swlist; // currently selected list
+	const char *                    m_interface;
+	astring &                       m_result;
+	entry_info *                    m_entrylist;
+	char                            m_filename_buffer[1024];
+	bool                            m_ordered_by_shortname;
 
 	// functions
 	int compare_entries(const entry_info *e1, const entry_info *e2, bool shortname);
@@ -68,5 +68,21 @@ private:
 };
 
 
+<<<<<<< HEAD
+=======
+// ======================> ui_menu_software
+
+class ui_menu_software : public ui_menu {
+public:
+	ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result);
+	virtual ~ui_menu_software();
+	virtual void populate();
+	virtual void handle();
+
+private:
+	const char *                    m_interface;
+	software_list_device **         m_result;
+};
+>>>>>>> b8b662877e2b80cf9607b7d23a72942cf61c2032
 
 #endif  /* __UI_SWLIST_H__ */

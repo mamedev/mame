@@ -26,7 +26,7 @@
 #define MCFG_NAMCO_53XX_P_CB(_devcb) \
 	devcb = &namco_53xx_device::set_p_port_callback(*device, DEVCB2_##_devcb);
 
-	
+
 class namco_53xx_device : public device_t
 {
 public:
@@ -36,7 +36,7 @@ public:
 	template<class _Object> static devcb2_base &set_input_1_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_in_1.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_2_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_in_2.set_callback(object); }
 	template<class _Object> static devcb2_base &set_input_3_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_in_3.set_callback(object); }
-	
+
 	template<class _Object> static devcb2_base &set_k_port_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_k.set_callback(object); }
 	template<class _Object> static devcb2_base &set_p_port_callback(device_t &device, _Object object) { return downcast<namco_53xx_device &>(device).m_p.set_callback(object); }
 
@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER( Rx_r );
 	DECLARE_WRITE8_MEMBER( O_w );
 	DECLARE_WRITE8_MEMBER( P_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER(read_request);
 	DECLARE_READ8_MEMBER( read );
 
@@ -53,17 +53,17 @@ protected:
 	virtual void device_start();
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	TIMER_CALLBACK_MEMBER( irq_clear );
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;
 	UINT8           m_portO;
 	devcb2_read8    m_k;
-	devcb2_read8 	m_in_0;
-	devcb2_read8 	m_in_1;
-	devcb2_read8 	m_in_2;
-	devcb2_read8 	m_in_3;
+	devcb2_read8    m_in_0;
+	devcb2_read8    m_in_1;
+	devcb2_read8    m_in_2;
+	devcb2_read8    m_in_3;
 	devcb2_write8   m_p;
 
 };

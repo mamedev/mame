@@ -73,7 +73,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_beeper(*this, "beeper"),
 		m_rtc_portc(0),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc100)
 	MCFG_PALETTE_ADD("palette", 16)
 //  MCFG_PALETTE_INIT(black_and_white)

@@ -1068,4 +1068,3 @@ offs_t tx0_64kw_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
 	extern CPU_DISASSEMBLE( tx0_64kw );
 	return CPU_DISASSEMBLE_NAME(tx0_64kw)(this, buffer, pc, oprom, opram, options);
 }
-

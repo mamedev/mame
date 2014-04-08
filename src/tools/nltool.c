@@ -59,16 +59,16 @@ void free_file_line( void *memory, const char *file, int line )
 
 void CLIB_DECL logerror(const char *format, ...)
 {
-    va_list arg;
-    va_start(arg, format);
-    vprintf(format, arg);
-    va_end(arg);
+	va_list arg;
+	va_start(arg, format);
+	vprintf(format, arg);
+	va_end(arg);
 }
 
 struct options_entry oplist[] =
 {
 	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
-    { "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
+	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
 	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
@@ -123,20 +123,19 @@ public:
 
 	void init()
 	{
-        m_setup = new netlist_setup_t(*this);
-        this->init_object(*this, "netlist");
-        m_setup->init();
+		m_setup = new netlist_setup_t(*this);
+		this->init_object(*this, "netlist");
+		m_setup->init();
 	}
 
-    void read_netlist(const char *buffer)
-    {
-
+	void read_netlist(const char *buffer)
+	{
 		// read the netlist ...
 
-        netlist_sources_t sources;
+		netlist_sources_t sources;
 
-        sources.add(netlist_source_t(buffer));
-        sources.parse(*m_setup,"");
+		sources.add(netlist_source_t(buffer));
+		sources.parse(*m_setup,"");
 		//m_setup->parse(buffer);
 		log_setup();
 
@@ -147,37 +146,37 @@ public:
 		this->reset();
 	}
 
-    void log_setup()
-    {
-        NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
-        nl_util::pstring_list ll = nl_util::split(m_logs, ":");
-        for (int i=0; i < ll.count(); i++)
-        {
-            netlist_device_t *nc = m_setup->factory().new_device_by_classname("nld_log", *m_setup);
-            pstring name = "log_" + ll[i];
-            m_setup->register_dev(nc, name);
-            m_setup->register_link(name + ".I", ll[i]);
-        }
-    }
+	void log_setup()
+	{
+		NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
+		nl_util::pstring_list ll = nl_util::split(m_logs, ":");
+		for (int i=0; i < ll.count(); i++)
+		{
+			netlist_device_t *nc = m_setup->factory().new_device_by_classname("nld_log", *m_setup);
+			pstring name = "log_" + ll[i];
+			m_setup->register_dev(nc, name);
+			m_setup->register_link(name + ".I", ll[i]);
+		}
+	}
 
-    pstring m_logs;
+	pstring m_logs;
 protected:
 
 	void verror(const loglevel_e level, const char *format, va_list ap) const
 	{
-	    switch (level)
-	    {
-	        case NL_LOG:
-	        case NL_WARNING:
-                vprintf(format, ap);
-                printf("\n");
-                break;
-	        case NL_ERROR:
-	            vprintf(format, ap);
-                printf("\n");
-	            throw;
-	            break;
-	    }
+		switch (level)
+		{
+			case NL_LOG:
+			case NL_WARNING:
+				vprintf(format, ap);
+				printf("\n");
+				break;
+			case NL_ERROR:
+				vprintf(format, ap);
+				printf("\n");
+				throw;
+				break;
+		}
 	}
 
 private:
@@ -200,71 +199,71 @@ void usage(core_options &opts)
 
 static void run(core_options &opts)
 {
-    netlist_tool_t nt;
-    osd_ticks_t t = osd_ticks();
+	netlist_tool_t nt;
+	osd_ticks_t t = osd_ticks();
 
-    nt.init();
-    nt.m_logs = opts.value("l");
-    nt.read_netlist(filetobuf(opts.value("f")));
-    double ttr = opts.float_value("t");
+	nt.init();
+	nt.m_logs = opts.value("l");
+	nt.read_netlist(filetobuf(opts.value("f")));
+	double ttr = opts.float_value("t");
 
-    printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
-    printf("runnning ...\n");
-    t = osd_ticks();
+	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
+	printf("runnning ...\n");
+	t = osd_ticks();
 
-    nt.process_queue(netlist_time::from_double(ttr));
+	nt.process_queue(netlist_time::from_double(ttr));
 
-    double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
-    printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
+	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
+	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
 }
 
 static void listdevices()
 {
-    netlist_tool_t nt;
-    nt.init();
-    const netlist_factory_t::list_t &list = nt.setup().factory().list();
+	netlist_tool_t nt;
+	nt.init();
+	const netlist_factory_t::list_t &list = nt.setup().factory().list();
 
-    nt.setup().start_devices();
-    nt.setup().resolve_inputs();
+	nt.setup().start_devices();
+	nt.setup().resolve_inputs();
 
-    for (int i=0; i < list.count(); i++)
-    {
-        pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
-                list[i]->name().cstr() );
-        pstring terms("");
+	for (int i=0; i < list.count(); i++)
+	{
+		pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
+				list[i]->name().cstr() );
+		pstring terms("");
 
-        net_device_t_base_factory *f = list[i];
-        netlist_device_t *d = f->Create();
-        d->init(nt, pstring::sprintf("dummy%d", i));
-        d->start_dev();
+		net_device_t_base_factory *f = list[i];
+		netlist_device_t *d = f->Create();
+		d->init(nt, pstring::sprintf("dummy%d", i));
+		d->start_dev();
 
-        // get the list of terminals ...
-        for (int j=0; j < d->m_terminals.count(); j++)
-        {
-            pstring inp = d->m_terminals[j];
-            if (inp.startsWith(d->name() + "."))
-                inp = inp.substr(d->name().len() + 1);
-            terms += "," + inp;
-        }
+		// get the list of terminals ...
+		for (int j=0; j < d->m_terminals.count(); j++)
+		{
+			pstring inp = d->m_terminals[j];
+			if (inp.startsWith(d->name() + "."))
+				inp = inp.substr(d->name().len() + 1);
+			terms += "," + inp;
+		}
 
-        if (list[i]->param_desc().startsWith("+"))
-        {
-            out += "," + list[i]->param_desc().substr(1);
-            terms = "";
-        }
-        else if (list[i]->param_desc() == "-")
-        {
-            /* no params at all */
-        }
-        else
-        {
-            out += "," + list[i]->param_desc();
-        }
-        out += ")";
-        printf("%s\n", out.cstr());
-        if (terms != "")
-            printf("Terminals: %s\n", terms.substr(1).cstr());
-    }
+		if (list[i]->param_desc().startsWith("+"))
+		{
+			out += "," + list[i]->param_desc().substr(1);
+			terms = "";
+		}
+		else if (list[i]->param_desc() == "-")
+		{
+			/* no params at all */
+		}
+		else
+		{
+			out += "," + list[i]->param_desc();
+		}
+		out += ")";
+		printf("%s\n", out.cstr());
+		if (terms != "")
+			printf("Terminals: %s\n", terms.substr(1).cstr());
+	}
 }
 
 /*-------------------------------------------------
@@ -291,14 +290,14 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-    if (opts.bool_value("ld"))
-    {
-        listdevices();
-    }
-    else
-    {
-        run(opts);
-    }
+	if (opts.bool_value("ld"))
+	{
+		listdevices();
+	}
+	else
+	{
+		run(opts);
+	}
 
 	return 0;
 }

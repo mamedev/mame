@@ -1242,7 +1242,7 @@ READ8_MEMBER(mac_state::mac_via_in_a_pmu)
 //  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
 	#if LOG_ADB
-//	printf("Read PM data %x\n", m_pm_data_recv);
+//  printf("Read PM data %x\n", m_pm_data_recv);
 	#endif
 	return m_pm_data_recv;
 }
@@ -1312,7 +1312,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 {
 	int val = 0;
-//	printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
+//  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
 	val = 0x80 | 0x04 | m_pm_ack;   // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
 
 //  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
@@ -1358,7 +1358,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	#if LOG_ADB
-//	printf("%02x to PM\n", data);
+//  printf("%02x to PM\n", data);
 	#endif
 	m_pm_data_send = data;
 	return;
@@ -1657,7 +1657,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 
 WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
 {
-//	logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
+//  logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
 
 	if ((data & 4) && !(m_pm_req & 4))
 	{

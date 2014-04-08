@@ -78,7 +78,7 @@ public:
 	required_device<filter_volume_device> m_2610_2r;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(othunder_tc0220ioc_w);
 	DECLARE_READ16_MEMBER(othunder_tc0220ioc_r);

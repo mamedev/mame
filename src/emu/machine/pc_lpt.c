@@ -167,4 +167,3 @@ WRITE_LINE_MEMBER( pc_lpt_device::write_centronics_ack )
 	m_cent_status_in->write_bit6(state);
 	update_irq();
 }
-

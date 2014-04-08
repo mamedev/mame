@@ -752,7 +752,7 @@ READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 }
 
 WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
-{	
+{
 	m_z80dma->rdy_w(data & 0x01);
 }
 
@@ -1731,7 +1731,7 @@ static MACHINE_CONFIG_START( dkong3, dkong_state )
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)	
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
 
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
@@ -1763,7 +1763,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
 
-	/* basic machine hardware */	
+	/* basic machine hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
 MACHINE_CONFIG_END

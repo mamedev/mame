@@ -3,43 +3,43 @@
     machine/apple3.c
 
     Apple ///
- 
+
     VIA #0 (D VIA)
-	CA1: IRQ from the MM58167 RTC
-    	CA2: 1 if key pressed, 0 otherwise
-    	CB1/CB2: connected to VBL
- 
-		Port A: Environment register (all bits out)
-			bit 7: 1 for 1 MHz, 0 for 2 MHz
-			bit 6: 1 for I/O at C000-CFFF
-			bit 5: 1 to enable video 
-			bit 4: 1 to enable NMI/Reset 
-			bit 3: 1 to write-protect RAM in system bank C000-FFFF
-			bit 2: 1 to force primary stack at 0100-01FF
-			bit 1: 1 for primary ROM, 0 for secondary (Apple III doesn't have a secondary ROM, so this should always be '1' when bit 0 is)
-			bit 0: 1 to enable ROM in F000-FFFF
- 
-		Port B: Zero page high 8 address bits, also MM58167 RTC register select (all bits out)
- 
+    CA1: IRQ from the MM58167 RTC
+        CA2: 1 if key pressed, 0 otherwise
+        CB1/CB2: connected to VBL
+
+        Port A: Environment register (all bits out)
+            bit 7: 1 for 1 MHz, 0 for 2 MHz
+            bit 6: 1 for I/O at C000-CFFF
+            bit 5: 1 to enable video
+            bit 4: 1 to enable NMI/Reset
+            bit 3: 1 to write-protect RAM in system bank C000-FFFF
+            bit 2: 1 to force primary stack at 0100-01FF
+            bit 1: 1 for primary ROM, 0 for secondary (Apple III doesn't have a secondary ROM, so this should always be '1' when bit 0 is)
+            bit 0: 1 to enable ROM in F000-FFFF
+
+        Port B: Zero page high 8 address bits, also MM58167 RTC register select (all bits out)
+
     VIA #1 (E VIA)
-    	CA1: OR of all 4 slots' IRQ status
-    	CA2: SW1 (Open Apple key?)
-    	CB1: SW3/SCO
-    	CB2: SER
- 
-    	Port A:
-			bits 0-2: bank select for $2000-$9FFF range
-			bit 3: n/c
-			bit 4: slot 4 IRQ (in)
-			bit 5: slot 3 IRQ (in)
-			bit 6: Apple II mode trap output (out)
-			bit 7: IRQ status (in) (0 = IRQ, 1 = no IRQ)
- 
-		Port B:
-			bits 0-5: 6-bit audio DAC output
-			bit 6: screen blank
-			bit 7: OR of NMI from slots
- 
+        CA1: OR of all 4 slots' IRQ status
+        CA2: SW1 (Open Apple key?)
+        CB1: SW3/SCO
+        CB2: SER
+
+        Port A:
+            bits 0-2: bank select for $2000-$9FFF range
+            bit 3: n/c
+            bit 4: slot 4 IRQ (in)
+            bit 5: slot 3 IRQ (in)
+            bit 6: Apple II mode trap output (out)
+            bit 7: IRQ status (in) (0 = IRQ, 1 = no IRQ)
+
+        Port B:
+            bits 0-5: 6-bit audio DAC output
+            bit 6: screen blank
+            bit 7: OR of NMI from slots
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -53,14 +53,14 @@ static void apple3_update_drives(device_t *device);
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
 
-#define ENV_SLOWSPEED	(0x80)
-#define ENV_IOENABLE	(0x40)
-#define ENV_VIDENABLE	(0x20)
-#define ENV_NMIENABLE	(0x10)
-#define ENV_WRITEPROT	(0x08)
-#define ENV_STACK1XX	(0x04)
-#define ENV_PRIMARYROM	(0x02)
-#define ENV_ROMENABLE	(0x01)
+#define ENV_SLOWSPEED   (0x80)
+#define ENV_IOENABLE    (0x40)
+#define ENV_VIDENABLE   (0x20)
+#define ENV_NMIENABLE   (0x10)
+#define ENV_WRITEPROT   (0x08)
+#define ENV_STACK1XX    (0x04)
+#define ENV_PRIMARYROM  (0x02)
+#define ENV_ROMENABLE   (0x01)
 
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
@@ -109,7 +109,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 					result &= ~0x20;
 				}
 			}
-//			printf("modifier = %02x\n", result);
+//          printf("modifier = %02x\n", result);
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -174,7 +174,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			{
 				result = slotdevice->read_c0nx(space, offset&0xf);
 			}
-			break; 
+			break;
 
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
 		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
@@ -185,7 +185,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			{
 				result = slotdevice->read_c0nx(space, offset&0xf);
 			}
-			break; 
+			break;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -196,7 +196,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			{
 				result = slotdevice->read_c0nx(space, offset&0xf);
 			}
-			break; 
+			break;
 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -207,7 +207,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			{
 				result = slotdevice->read_c0nx(space, offset&0xf);
 			}
-			break; 
+			break;
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
@@ -305,7 +305,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			{
 				slotdevice->write_c0nx(space, offset&0xf, data);
 			}
-			break; 
+			break;
 
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
 		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
@@ -316,7 +316,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			{
 				slotdevice->write_c0nx(space, offset&0xf, data);
 			}
-			break; 
+			break;
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 		case 0xb4: case 0xb5: case 0xb6: case 0xb7:
@@ -327,7 +327,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			{
 				slotdevice->write_c0nx(space, offset&0xf, data);
 			}
-			break; 
+			break;
 
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -338,7 +338,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			{
 				slotdevice->write_c0nx(space, offset&0xf, data);
 			}
-			break; 
+			break;
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
@@ -372,7 +372,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
 {
-	m_via_1->write_cb1(machine().first_screen()->vblank()); 
+	m_via_1->write_cb1(machine().first_screen()->vblank());
 	m_via_1->write_cb2(machine().first_screen()->vblank());
 }
 
@@ -437,31 +437,31 @@ void apple3_state::apple3_update_memory()
 		bank = ~0;
 		page = 0x01;
 	}
-	m_bank2 = apple3_bankaddr(bank, ((offs_t) page) * 0x100); 
+	m_bank2 = apple3_bankaddr(bank, ((offs_t) page) * 0x100);
 
 	/* bank 3 (0200-1FFF) */
-	m_bank3 = apple3_bankaddr(~0, 0x0200); 
+	m_bank3 = apple3_bankaddr(~0, 0x0200);
 
 	/* bank 4 (2000-9FFF) */
-	m_bank4 = apple3_bankaddr(m_via_1_a, 0x0000); 
+	m_bank4 = apple3_bankaddr(m_via_1_a, 0x0000);
 
 	/* bank 5 (A000-BFFF) */
-	m_bank5 = apple3_bankaddr(~0, 0x2000); 
+	m_bank5 = apple3_bankaddr(~0, 0x2000);
 
 	/* bank 8 (C000-C0FF) */
 	if (!(m_via_0_a & ENV_IOENABLE))
 	{
-		m_bank8 = apple3_bankaddr(~0, 0x4000); 
+		m_bank8 = apple3_bankaddr(~0, 0x4000);
 	}
 
 	/* bank 9 (C100-C4FF) */
 	if (!(m_via_0_a & ENV_IOENABLE))
 	{
-		m_bank9 = apple3_bankaddr(~0, 0x4100);                                  
+		m_bank9 = apple3_bankaddr(~0, 0x4100);
 	}
 
 	/* bank 10 (C500-C7FF) */
-	m_bank10 = apple3_bankaddr(~0, 0x4500); 
+	m_bank10 = apple3_bankaddr(~0, 0x4500);
 
 	/* bank 11 (C800-CFFF) */
 	if (!(m_via_0_a & ENV_IOENABLE))
@@ -507,7 +507,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
 {
-//	printf("ZP to %02x\n", data);
+//  printf("ZP to %02x\n", data);
 	apple3_via_out(&m_via_0_b, data);
 }
 
@@ -529,7 +529,7 @@ void apple3_state::apple3_irq_update()
 		// HACK: SOS floppy driver enables ROM at Fxxx *before* trying to
 		// suppress IRQs.  IRQ hits at inopportune time -> bad vector -> system crash.
 		// This breaks the Confidence Test, but the Confidence Test
-		// never disables the ROM so checking for that gets us 
+		// never disables the ROM so checking for that gets us
 		// working in all cases.
 		// Bonus points: for some reason this isn't a problem with -debug.
 		// m6502 heisenbug maybe?
@@ -537,13 +537,13 @@ void apple3_state::apple3_irq_update()
 		{
 			return;
 		}
-//		printf("   setting IRQ\n");
+//      printf("   setting IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		m_via_1->write_pa7(0);	// this is active low
+		m_via_1->write_pa7(0);  // this is active low
 	}
 	else
 	{
-//		printf("   clearing IRQ\n");
+//      printf("   clearing IRQ\n");
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 		m_via_1->write_pa7(1);
 	}
@@ -551,14 +551,14 @@ void apple3_state::apple3_irq_update()
 
 WRITE_LINE_MEMBER(apple3_state::apple3_acia_irq_func)
 {
-//	printf("acia IRQ: %d\n", state);
+//  printf("acia IRQ: %d\n", state);
 	m_acia_irq = state;
 	apple3_irq_update();
 }
 
 WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
 {
-//	printf("via 1 IRQ: %d\n", state);
+//  printf("via 1 IRQ: %d\n", state);
 	m_via_1_irq = state;
 	apple3_irq_update();
 }
@@ -566,7 +566,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
 
 WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
 {
-//	printf("via 0 IRQ: %d\n", state);
+//  printf("via 0 IRQ: %d\n", state);
 	m_via_0_irq = state;
 	apple3_irq_update();
 }
@@ -745,7 +745,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 
 	if (offset < 0x100)
 	{
-		rv = *apple3_get_zpa_addr(offset); 
+		rv = *apple3_get_zpa_addr(offset);
 
 		if ((!m_sync) && (m_via_0_b >= 0x18) && (m_via_0_b <= 0x1F))
 		{
@@ -849,7 +849,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 		}
 		else
 		{
-			rv = m_bank7rd[offset - 0xf000]; 
+			rv = m_bank7rd[offset - 0xf000];
 		}
 	}
 
@@ -1002,7 +1002,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 
 WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
 {
-//	printf("sync: %d\n", state);
+//  printf("sync: %d\n", state);
 	m_sync = (state == ASSERT_LINE) ? true : false;
 
 	if (m_sync)
@@ -1044,7 +1044,7 @@ READ_LINE_MEMBER(apple3_state::ay3600_control_r)
 
 static const UINT8 key_remap[0x50][4] =
 {
-/*	  norm shft ctrl both */
+/*    norm shft ctrl both */
 	{ 0x9b,0x9b,0x9b,0x9b },    /* Escape  00     */
 	{ 0x31,0x21,0x31,0x31 },    /* 1 !     01     */
 	{ 0x32,0x40,0x32,0x00 },    /* 2 @     02     */
@@ -1135,10 +1135,10 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 	{
 		UINT16 trans;
 		int mod = 0;
-		m_lastchar = m_ay3600->b_r(); 
+		m_lastchar = m_ay3600->b_r();
 
-		trans = m_lastchar & ~(0x1c0);	// clear the 3600's control/shift stuff
-		trans |= (m_lastchar & 0x100)>>2;	// bring the 0x100 bit down to the 0x40 place
+		trans = m_lastchar & ~(0x1c0);  // clear the 3600's control/shift stuff
+		trans |= (m_lastchar & 0x100)>>2;   // bring the 0x100 bit down to the 0x40 place
 
 		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
 		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
@@ -1148,8 +1148,7 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 		if (m_transchar != 0)
 		{
 			m_strobe = 0x80;
-//			printf("new char = %04x (%02x)\n", trans, m_transchar);
+//          printf("new char = %04x (%02x)\n", trans, m_transchar);
 		}
 	}
 }
-

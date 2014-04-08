@@ -1092,7 +1092,7 @@ static MACHINE_CONFIG_START( mgakuen, mitchell_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgakuen)
-	
+
 	MCFG_PALETTE_ADD("palette", 1024)   /* less colors than the others */
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 

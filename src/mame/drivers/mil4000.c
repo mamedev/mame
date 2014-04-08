@@ -314,29 +314,29 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
 {
 /*  Damn thing!
     708010-708011 communicate with the MCU.
-	The returned value is critical to the reels.
-	
-	Writes to MCU:
-	
-	0x11 --> seems quiet or null.
-	0x1A --> command for reels state/gfx. Two bytes (command + parameter).
+    The returned value is critical to the reels.
+
+    Writes to MCU:
+
+    0x11 --> seems quiet or null.
+    0x1A --> command for reels state/gfx. Two bytes (command + parameter).
              The second value will be the parameter to feed.
              The MCU will respond with one value (see table below).
 
-	bits:
-	7654-3210
-	---- ----  = cherries.
-	---- ---x  = single bar.
+    bits:
+    7654-3210
+    ---- ----  = cherries.
+    ---- ---x  = single bar.
     ---- --x-  = double bars.
     ---- --xx  = triple bars.
-	---- -x--  = unknown (combinations produce reset).
-	---- x---  = sevens.
-	---- x--x  = double plums.
-	---- x-x-  = plums.
-	---- x-xx  = bells.
-	---x ----  = blanks.
-	-xx- ----  = some kind of gfx retrace.
-	x--- ----  = reset the game
+    ---- -x--  = unknown (combinations produce reset).
+    ---- x---  = sevens.
+    ---- x--x  = double plums.
+    ---- x-x-  = plums.
+    ---- x-xx  = bells.
+    ---x ----  = blanks.
+    -xx- ----  = some kind of gfx retrace.
+    x--- ----  = reset the game
 
    There are other commands, like:
    0x1B (+4 parameters)
@@ -344,42 +344,42 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
    0x1D (+2 parameters)
    0x1E (+1 parameter)
 
-   You can find a 1E-18 at start.   
-   
+   You can find a 1E-18 at start.
+
 */
-	switch( mcucomm )	/* MCU command */
+	switch( mcucomm )   /* MCU command */
 	{
-		case 0x11:	/* Idle - Null */ 
+		case 0x11:  /* Idle - Null */
 		{
 			logerror("Writes idle command 0x11 to MCU");
-			return (machine().rand() & 0x0b);	// otherwise got corrupt gfx...
+			return (machine().rand() & 0x0b);   // otherwise got corrupt gfx...
 		}
 
-		case 0x1a:	/* Reels state - Control */
+		case 0x1a:  /* Reels state - Control */
 		{
 			logerror("MCU feedback to command 0x1a with data: %02x\n", mcudata);
 			return (machine().rand() & 0x0b);
 		}
 
-		case 0x1b:	/* Unknown */
+		case 0x1b:  /* Unknown */
 		{
 			logerror("MCU feedback to command 0x1b with data: %02x\n", mcudata);
 			return 0x00;
 		}
 
-		case 0x1c:	/* Unknown. Always 00's? */
+		case 0x1c:  /* Unknown. Always 00's? */
 		{
 			logerror("MCU feedback to command 0x1c with data: %02x\n", mcudata);
 			return 0x00;
 		}
 
-		case 0x1d:	/* Unknown */
+		case 0x1d:  /* Unknown */
 		{
 			logerror("MCU feedback to command 0x1d with data: %02x\n", mcudata);
 			return 0x00;
 		}
 
-		case 0x1e:	/* Unknown, only one at boot (1e 18) */ 
+		case 0x1e:  /* Unknown, only one at boot (1e 18) */
 		{
 			logerror("MCU feedback to command 0x1e with data: %02x\n", mcudata);
 			return 0x00;
@@ -387,7 +387,7 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
 	}
 
 	logerror("MCU feedback to unknown command: %02x\n", mcucomm);
-	return (machine().rand() & 0x0b);	// otherwise got corrupt gfx...
+	return (machine().rand() & 0x0b);   // otherwise got corrupt gfx...
 }
 
 WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
@@ -407,14 +407,14 @@ WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
 
 READ16_MEMBER(mil4000_state::unk_r)
 {
-//	reads:  51000C-0E. touch screen?
+//  reads:  51000C-0E. touch screen?
 	return 0xff;
 }
 
 WRITE16_MEMBER(mil4000_state::unk_w)
 {
-//	writes: 510000-02-04-06-08-0A-0C-0E
-//	logerror("unknown writes from address %04x\n", offset);
+//  writes: 510000-02-04-06-08-0A-0C-0E
+//  logerror("unknown writes from address %04x\n", offset);
 }
 
 
@@ -444,8 +444,8 @@ static ADDRESS_MAP_START( chewheel_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")  // V62C518256L-35P (U8).
 	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")  // V62C518256L-35P (U8).
 
-	AM_RANGE(0x51000c, 0x51000f) AM_READ(unk_r)		// no idea what's mapped here.
-	AM_RANGE(0x510000, 0x51000f) AM_WRITE(unk_w)	// no idea what's mapped here.
+	AM_RANGE(0x51000c, 0x51000f) AM_READ(unk_r)     // no idea what's mapped here.
+	AM_RANGE(0x510000, 0x51000f) AM_WRITE(unk_w)    // no idea what's mapped here.
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")
@@ -456,8 +456,8 @@ static ADDRESS_MAP_START( chewheel_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x780000, 0x780fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM AM_SHARE("nvram")	// V62C51864L-70P (U77).
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM						// V62C51864L-70P (U78).
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM AM_SHARE("nvram")   // V62C51864L-70P (U77).
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM                     // V62C51864L-70P (U78).
 
 ADDRESS_MAP_END
 
@@ -702,7 +702,7 @@ Cherry Wheel.
 Similar hardware to TOP XXI
 
 But...
-2x V62C518256L-35P.  32K x 8 Static RAM. (U7-U8) 
+2x V62C518256L-35P.  32K x 8 Static RAM. (U7-U8)
 2x V62C51864L-70P.    8K x 8 Static RAM. (U77-U78)
 
 Only U77 is tied to the battery.

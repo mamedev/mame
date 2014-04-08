@@ -157,7 +157,7 @@ private:
 		UINT8 OV;
 		UINT8 S;
 		UINT8 Z;
-    }                   m_flags;
+	}                   m_flags;
 	UINT8               m_irq_line;
 	UINT8               m_nmi_line;
 	address_space *m_program;

@@ -1487,7 +1487,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	deco_mxc06_device::set_gfx_region(*device, 3);
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 	MCFG_DECO_MXC06_PALETTE("palette")
-	
+
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)

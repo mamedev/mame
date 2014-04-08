@@ -78,8 +78,8 @@ public:
 	// construction/destruction
 	feature_list_item(const char *name = NULL, const char *value = NULL)
 		: m_next(NULL),
-		  m_name(name),
-		  m_value(value) { }
+			m_name(name),
+			m_value(value) { }
 
 	// getters
 	feature_list_item *next() const { return m_next; }
@@ -87,10 +87,10 @@ public:
 	const char *value() const { return m_value; }
 
 private:
-	// internal state		
+	// internal state
 	feature_list_item * m_next;
-	const char *    	m_name;
-	const char *    	m_value;
+	const char *        m_name;
+	const char *        m_value;
 };
 
 
@@ -101,7 +101,7 @@ class software_part
 {
 	friend class softlist_parser;
 	friend class simple_list<software_part>;
-	
+
 public:
 	// construction/destruction
 	software_part(software_info &info, const char *name = NULL, const char *interface = NULL);
@@ -121,10 +121,10 @@ public:
 
 private:
 	// internal state
-	software_part *		m_next;
-	software_info &		m_info;
-	const char *		m_name;
-	const char *		m_interface;
+	software_part *     m_next;
+	software_info &     m_info;
+	const char *        m_name;
+	const char *        m_interface;
 	simple_list<feature_list_item> m_featurelist;
 	dynamic_array<rom_entry> m_romdata;
 };
@@ -137,11 +137,11 @@ class software_info
 {
 	friend class softlist_parser;
 	friend class simple_list<software_info>;
-	
+
 public:
 	// construction/destruction
 	software_info(software_list_device &list, const char *name, const char *parent, const char *supported);
-	
+
 	// getters
 	software_info *next() const { return m_next; }
 	software_list_device &list() const { return m_list; }
@@ -156,24 +156,24 @@ public:
 	int num_parts() const { return m_partdata.count(); }
 	software_part *first_part() const { return m_partdata.first(); }
 	software_part *last_part() const { return m_partdata.last(); }
-	
+
 	// additional operations
 	software_part *find_part(const char *partname, const char *interface = NULL);
 	bool has_multiple_parts(const char *interface) const;
 
 private:
 	// internal state
-	software_info *			m_next;
-	software_list_device &	m_list;
-	UINT32 					m_supported;
-	const char *			m_shortname;
-	const char *			m_longname;
-	const char *			m_parentname;
-	const char *			m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
-	const char *			m_publisher;
+	software_info *         m_next;
+	software_list_device &  m_list;
+	UINT32                  m_supported;
+	const char *            m_shortname;
+	const char *            m_longname;
+	const char *            m_parentname;
+	const char *            m_year;           // Copyright year on title screen, actual release dates can be tracked in external resources
+	const char *            m_publisher;
 	simple_list<feature_list_item> m_other_info;   // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
 	simple_list<feature_list_item> m_shared_info;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
-											  // by each part of this software entry (after loading these are stored in partdata->featurelist)
+												// by each part of this software entry (after loading these are stored in partdata->featurelist)
 	simple_list<software_part> m_partdata;
 };
 
@@ -228,17 +228,17 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 
 	// configuration state
-	astring		  				m_list_name;
+	astring                     m_list_name;
 	softlist_type               m_list_type;
 	const char *                m_filter;
 
 	// internal state
-	bool						m_parsed;
-	emu_file    				m_file;
-	const char *				m_description;
-	astring 					m_errors;
-	simple_list<software_info> 	m_infolist;
-	const_string_pool			m_stringpool;
+	bool                        m_parsed;
+	emu_file                    m_file;
+	const char *                m_description;
+	astring                     m_errors;
+	simple_list<software_info>  m_infolist;
+	const_string_pool           m_stringpool;
 };
 
 

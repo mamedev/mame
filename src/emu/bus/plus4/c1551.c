@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c1551_floppies )
-    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
 SLOT_INTERFACE_END
 
 

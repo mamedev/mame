@@ -163,7 +163,7 @@ public:
 		m_pics(*this, "pic8259_slave"),
 		m_fdc(*this, "z207_fdc"),
 		m_crtc(*this, "crtc"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -174,7 +174,7 @@ public:
 	required_device<fd1797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);
 	DECLARE_READ8_MEMBER(keyb_data_r);
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(z100_state, screen_update_z100)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */

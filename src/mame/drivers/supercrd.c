@@ -411,7 +411,7 @@ GFXDECODE_END
 //static MC6845_INTERFACE( mc6845_intf )
 //{
 //  false,
-//	0,0,0,0,    /* visarea adjustment */
+//  0,0,0,0,    /* visarea adjustment */
 //  4,          /* number of pixels per video memory address */
 //  NULL,       /* before pixel update callback */
 //  NULL,       /* row update callback */

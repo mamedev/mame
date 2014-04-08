@@ -334,12 +334,12 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	MCFG_K007342_GFXNUM(0)
 	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
 	MCFG_K007342_GFXDECODE("gfxdecode")
-	
+
 	MCFG_K007420_ADD("k007420")
 	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)	
+	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)
 	MCFG_K007420_PALETTE("palette")
-	
+
 	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */

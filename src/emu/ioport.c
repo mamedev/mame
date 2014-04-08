@@ -706,7 +706,7 @@ void input_type_entry::configure_osd(const char *token, const char *name)
 
 //-------------------------------------------------
 //  restore_default_seq - restores the sequence
-//	from the default
+//  from the default
 //-------------------------------------------------
 
 void input_type_entry::restore_default_seq()

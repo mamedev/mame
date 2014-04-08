@@ -109,7 +109,7 @@ static MACHINE_CONFIG_START( konendev, konendev_state )
 	MCFG_CPU_PROGRAM_MAP(konendev_map)
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette") 
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

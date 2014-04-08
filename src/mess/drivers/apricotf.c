@@ -312,7 +312,7 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", act_f1)
 

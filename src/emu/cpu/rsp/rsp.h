@@ -17,7 +17,7 @@
 #define __RSP_H__
 
 #define USE_SIMD        (0)
-#define SIMUL_SIMD		(0)
+#define SIMUL_SIMD      (0)
 
 #if USE_SIMD
 #include <tmmintrin.h>

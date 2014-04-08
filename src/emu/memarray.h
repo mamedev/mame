@@ -70,7 +70,7 @@ public:
 	// entry-level readers and writers
 	UINT32 read(int index) { return (this->*m_read_entry)(index); }
 	void write(int index, UINT32 data) { (this->*m_write_entry)(index, data); }
-	
+
 	// byte/word/dword-level readers and writers
 	UINT8 read8(offs_t offset) { return reinterpret_cast<UINT8 *>(m_base)[offset]; }
 	UINT16 read16(offs_t offset) { return reinterpret_cast<UINT16 *>(m_base)[offset]; }

@@ -161,7 +161,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

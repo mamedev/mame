@@ -24,7 +24,7 @@ public:
 		m_subcpu(*this,"subcpu"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -87,7 +87,7 @@ void palette_device::static_enable_hilights(device_t &device)
 
 
 //**************************************************************************
-//	INDIRECTION (AKA COLORTABLES)
+//  INDIRECTION (AKA COLORTABLES)
 //**************************************************************************
 
 //-------------------------------------------------
@@ -132,7 +132,7 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 
 //-------------------------------------------------
 //  transpen_mask - return a mask of pens that
-//  whose indirect values match the given 
+//  whose indirect values match the given
 //  transcolor
 //-------------------------------------------------
 
@@ -160,7 +160,7 @@ UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor
 
 //-------------------------------------------------
 //  configure_tilemap_groups - configure groups
-//	within a tilemap to match the indirect masks
+//  within a tilemap to match the indirect masks
 //-------------------------------------------------
 
 void palette_device::configure_tilemap_groups(tilemap_t &tmap, gfx_element &gfx, int transcolor)
@@ -227,7 +227,7 @@ void palette_device::configure_tilemap_groups(tilemap_t &tmap, gfx_element &gfx,
 //-------------------------------------------------
 
 //-------------------------------------------------
-//  set_shadow_dRGB32 - configure delta RGB values 
+//  set_shadow_dRGB32 - configure delta RGB values
 //  for 1 of 4 shadow tables
 //-------------------------------------------------
 
@@ -269,7 +269,7 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 			g = rgb_t::clamp(g);
 			b = rgb_t::clamp(b);
 		}
-		rgb_t final = rgb_t(r, g, b); 
+		rgb_t final = rgb_t(r, g, b);
 
 		// store either 16 or 32 bit
 		if (m_format == BITMAP_FORMAT_RGB32)
@@ -282,13 +282,13 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 
 
 //**************************************************************************
-//	GENERIC WRITE HANDLERS
+//  GENERIC WRITE HANDLERS
 //**************************************************************************
 
 //-------------------------------------------------
 //  update_for_write - given a write of a given
-//	length to a given byte offset, update all
-//	potentially modified palette entries
+//  length to a given byte offset, update all
+//  potentially modified palette entries
 //-------------------------------------------------
 
 inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modified)
@@ -319,7 +319,7 @@ WRITE8_MEMBER(palette_device::write)
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
- 
+
 WRITE16_MEMBER(palette_device::write)
 {
 	m_paletteram.write16(offset, data, mem_mask);
@@ -349,7 +349,7 @@ READ32_MEMBER(palette_device::read)
 
 
 //-------------------------------------------------
-//  write_ext - write a byte to the extended 
+//  write_ext - write a byte to the extended
 //  paletteram
 //-------------------------------------------------
 
@@ -369,7 +369,7 @@ WRITE16_MEMBER(palette_device::write_ext)
 
 
 //**************************************************************************
-//	DEVICE MANAGEMENT
+//  DEVICE MANAGEMENT
 //**************************************************************************
 
 //-------------------------------------------------
@@ -379,7 +379,7 @@ WRITE16_MEMBER(palette_device::write_ext)
 void palette_device::device_start()
 {
 	// bind the init function
-    m_init.bind_relative_to(*owner());
+	m_init.bind_relative_to(*owner());
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());
@@ -401,7 +401,7 @@ void palette_device::device_start()
 			m_paletteram.set(*share, bytes_per_entry / 2);
 			m_paletteram_ext.set(*share_ext, bytes_per_entry / 2);
 		}
-		
+
 		// override endianness if provided
 		if (m_endianness_supplied)
 		{
@@ -421,7 +421,7 @@ void palette_device::device_start()
 		allocate_palette();
 		allocate_color_tables();
 		allocate_shadow_tables();
-		
+
 		// allocate indirection tables
 		if (m_indirect_entries > 0)
 		{
@@ -447,7 +447,7 @@ void palette_device::device_start()
 	m_save_contrast.resize(m_palette->num_colors());
 	save_item(NAME(m_save_pen));
 	save_item(NAME(m_save_contrast));
-	
+
 	// save indirection tables if we have them
 	if (m_indirect_entries > 0)
 	{
@@ -510,7 +510,7 @@ void palette_device::device_stop()
 
 //-------------------------------------------------
 //  device_validity_check - validate device
-//	configuration
+//  configuration
 //-------------------------------------------------
 
 void palette_device::device_validity_check(validity_checker &valid) const

@@ -18,21 +18,21 @@ void h8_port_device::set_info(int _address, UINT8 _default_ddr, UINT8 _mask)
 
 WRITE8_MEMBER(h8_port_device::ddr_w)
 {
-	//	logerror("%s: ddr_w %02x\n", tag(), data);
+	//  logerror("%s: ddr_w %02x\n", tag(), data);
 	ddr = data;
 	update_output();
 }
 
 WRITE8_MEMBER(h8_port_device::dr_w)
 {
-	//	logerror("%s: dr_w %02x\n", tag(), data);
+	//  logerror("%s: dr_w %02x\n", tag(), data);
 	dr = data;
 	update_output();
 }
 
 READ8_MEMBER(h8_port_device::dr_r)
 {
-	//	logerror("%s: dr_r %02x\n", tag(), (dr | mask) & 0xff);
+	//  logerror("%s: dr_r %02x\n", tag(), (dr | mask) & 0xff);
 	return dr | mask;
 }
 
@@ -41,8 +41,8 @@ READ8_MEMBER(h8_port_device::port_r)
 	UINT8 res = mask | (dr & ddr);
 	if((ddr & ~mask) != UINT8(~mask))
 		res |= io->read_word(address) & ~ddr;
-	
-	//	logerror("%s: port_r %02x (%02x %02x)\n", tag(), res, ddr & ~mask, UINT8(~mask));
+
+	//  logerror("%s: port_r %02x (%02x %02x)\n", tag(), res, ddr & ~mask, UINT8(~mask));
 	return res;
 }
 

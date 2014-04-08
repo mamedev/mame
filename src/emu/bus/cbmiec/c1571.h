@@ -42,8 +42,8 @@
 // ======================> c1571_device
 
 class c1571_device :  public device_t,
-					  public device_cbm_iec_interface,
-					  public device_c64_floppy_parallel_interface
+						public device_cbm_iec_interface,
+						public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction

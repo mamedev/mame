@@ -636,4 +636,3 @@ void upd3301_device::recompute_parameters()
 	update_hrtc_timer(0);
 	update_vrtc_timer(0);
 }
-

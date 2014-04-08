@@ -937,7 +937,7 @@ macro jsr32 %opc %spreg
 	}
 	r8_w(IR[0], do_add8(TMP1, TMP2));
 	prefetch();
-		
+
 0f80         ff88         0 mov.l    r32h     r32l     h
 	TMP1 = r32_r(IR[0] >> 4);
 	set_nzv32(TMP1);
@@ -1303,7 +1303,7 @@ macro jsr32 %opc %spreg
 	}
 	r8_w(IR[0], do_add8(TMP1, TMP2));
 	prefetch();
-		
+
 1f80         ff88         0 cmp.l    r32h     r32l     h
 	do_sub32(r32_r(IR[0]), r32_r(IR[0] >> 4));
 	prefetch();
@@ -2206,19 +2206,19 @@ macro jsr32 %opc %spreg
 7000         ff80         0 bset     imm3     r8l
 	TMP1 = r8_r(IR[0]);
 	bset IR[0] >> 4
-	r8_w(IR[0], TMP1);	
+	r8_w(IR[0], TMP1);
 	prefetch();
 
 7100         ff80         0 bnot     imm3     r8l
 	TMP1 = r8_r(IR[0]);
 	bnot IR[0] >> 4
-	r8_w(IR[0], TMP1);	
+	r8_w(IR[0], TMP1);
 	prefetch();
 
 7200         ff80         0 bclr     imm3     r8l
 	TMP1 = r8_r(IR[0]);
 	bclr IR[0] >> 4
-	r8_w(IR[0], TMP1);	
+	r8_w(IR[0], TMP1);
 	prefetch();
 
 7300         ff80         0 btst     imm3     r8l

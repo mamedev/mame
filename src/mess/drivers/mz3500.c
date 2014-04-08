@@ -50,7 +50,7 @@ public:
 			m_fdc(*this, "upd765a"),
 			m_video_ram(*this, "video_ram"),
 			m_beeper(*this, "beeper"),
-			m_palette(*this, "palette") 
+			m_palette(*this, "palette")
 	{ }
 
 	// devices
@@ -837,7 +837,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))	
+	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)

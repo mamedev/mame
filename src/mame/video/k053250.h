@@ -13,7 +13,7 @@
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	k053250_device::static_set_offsets(*device, offx, offy);
 
-class k053250_device :	public device_t,
+class k053250_device :  public device_t,
 						public device_gfx_interface,
 						public device_video_interface
 {

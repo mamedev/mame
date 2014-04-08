@@ -208,7 +208,7 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 
 	/* set up sector map */
 	sector_map.resize_and_clear(sectors, 0xFF);
-	
+
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)
 	{

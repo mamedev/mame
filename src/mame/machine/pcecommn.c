@@ -67,4 +67,3 @@ WRITE_LINE_MEMBER(pce_common_state::pce_irq_changed)
 {
 	m_maincpu->set_input_line(0, state);
 }
-

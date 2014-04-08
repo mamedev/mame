@@ -32,7 +32,7 @@ public:
 	required_shared_ptr<UINT16> m_tilemapram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_ioc_ram;
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling

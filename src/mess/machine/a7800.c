@@ -19,8 +19,8 @@
                             added Activision bank select type
     19-Feb-2010 DanB        Added return values for TIA collision registers
 
-    04-Apr-2014 Mike Saarna Fix to controller button RIOT behavior and  
-				expanded cart handling (bit 05).
+    04-Apr-2014 Mike Saarna Fix to controller button RIOT behavior and
+                expanded cart handling (bit 05).
 ***************************************************************************/
 
 #include "emu.h"
@@ -406,7 +406,7 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		if(m_cart_type & 0x04)
 		{
 			//adjust write location if supercart bankram is in use
-			if(m_cart_type & 0x20) 
+			if(m_cart_type & 0x20)
 		{
 			UINT8 *currentbank1 = (UINT8 *)m_bank1->base();
 			currentbank1[offset] = data;
@@ -435,7 +435,7 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		if( m_cart_size == 0x10000 )
 		{
 			data &= 0x03;
-		 		}
+				}
 		else if( m_cart_size == 0x40000 )
 		{
 			data &= 0x0f;

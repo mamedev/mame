@@ -37,7 +37,7 @@ const device_type X2210 = &device_creator<x2210_device>;
 //-------------------------------------------------
 
 x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, X2212, "X2212", tag, owner, clock, "x2212", __FILE__),
+	: device_t(mconfig, X2212, "X2212 NVRAM", tag, owner, clock, "x2212", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_auto_save(false),

@@ -301,7 +301,7 @@ public:
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
 	~apollo_graphics_15i();
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// monochrome control
 	DECLARE_READ8_MEMBER( apollo_mcr_r );
@@ -314,13 +314,13 @@ public:
 	// color control
 	DECLARE_READ8_MEMBER( apollo_ccr_r );
 	DECLARE_WRITE8_MEMBER( apollo_ccr_w );
-	
+
 	DECLARE_READ16_MEMBER( apollo_mgm_r );
 	DECLARE_WRITE16_MEMBER( apollo_mgm_w );
 
 	DECLARE_READ16_MEMBER( apollo_cgm_r );
 	DECLARE_WRITE16_MEMBER( apollo_cgm_w );
-		
+
 	void vblank_state_changed(screen_device &screen, bool vblank_state);
 
 	int is_mono() { return m_n_planes == 1; }
@@ -347,7 +347,7 @@ protected:
 	void set_lut_cr(UINT8 data);
 
 	void register_vblank_callback();
-	
+
 	UINT32 set_msb0(UINT32 value, UINT8 data)
 	{
 		return (value & 0xffffff00) | data;

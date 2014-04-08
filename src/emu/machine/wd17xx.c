@@ -376,7 +376,7 @@ void wd1770_device::wd17xx_set_intrq()
 
 /* set intrq after delay */
 TIMER_CALLBACK_MEMBER( wd1770_device::wd17xx_command_callback )
-{	
+{
 	if (m_last_command_data != FDC_FORCE_INT)
 	{
 		wd17xx_set_intrq();

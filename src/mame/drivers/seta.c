@@ -2208,7 +2208,7 @@ static ADDRESS_MAP_START( blockcarb_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")              // Coins
-//	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound - not on this bootleg
+//  AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound - not on this bootleg
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_SHARE("paletteram")  // Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM // ? 0x4000
@@ -8036,8 +8036,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blockcarb_sound_portmap, AS_IO, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(wiggie_soundlatch_r)
+//  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(wiggie_soundlatch_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( blockcarb, blockcar )
@@ -10101,10 +10101,10 @@ ROM_START( blockcarb )
 	ROM_LOAD16_BYTE( "tl5.bin",  0x080001, 0x040000, CRC(9369e8dc) SHA1(645ae72a8b49ec43c26cdee5b6cb8cca5f46e542) )
 
 	ROM_REGION( 0x100000, "oki", 0 )  /* 6295 samples */
-	ROM_LOAD( "tl7.bin",  0x000000, 0x040000, CRC(41e899dc) SHA1(36c8161dcb68cdc312c7d1177dbcfb9b62b18f05) )	// == so2_09.12b  mercs      Mercs (World 900302)
+	ROM_LOAD( "tl7.bin",  0x000000, 0x040000, CRC(41e899dc) SHA1(36c8161dcb68cdc312c7d1177dbcfb9b62b18f05) )    // == so2_09.12b  mercs      Mercs (World 900302)
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tl8.bin",  0x000000, 0x010000, CRC(d09d7c7a) SHA1(8e8532be08818c855d9c3ce45716eb07cfab5767) )	//cpu prg
+	ROM_LOAD( "tl8.bin",  0x000000, 0x010000, CRC(d09d7c7a) SHA1(8e8532be08818c855d9c3ce45716eb07cfab5767) )    //cpu prg
 ROM_END
 
 

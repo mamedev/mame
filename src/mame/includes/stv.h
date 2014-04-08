@@ -24,7 +24,7 @@ public:
 			m_scudsp(*this, "scudsp"),
 			m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -644,7 +644,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 	DECLARE_READ16_MEMBER(scudsp_dma_r);
 	DECLARE_WRITE16_MEMBER(scudsp_dma_w);
-	
+
 	// FROM smpc.c
 	TIMER_CALLBACK_MEMBER( stv_bankswitch_state );
 	void stv_select_game(int gameno);
@@ -671,7 +671,7 @@ public:
 	void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv);
 	DECLARE_READ8_MEMBER( stv_SMPC_r );
 	DECLARE_WRITE8_MEMBER( stv_SMPC_w );
-	
+
 };
 
 class stv_state : public saturn_state

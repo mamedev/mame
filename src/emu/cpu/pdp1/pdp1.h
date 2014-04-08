@@ -73,7 +73,7 @@ struct pdp1_reset_param_t
 
 
 class pdp1_device : public cpu_device
-                  , public pdp1_reset_param_t
+					, public pdp1_reset_param_t
 {
 public:
 	// construction/destruction

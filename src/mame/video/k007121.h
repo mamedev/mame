@@ -9,7 +9,7 @@ public:
 	~k007121_device() {}
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	DECLARE_READ8_MEMBER( ctrlram_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 

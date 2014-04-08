@@ -202,7 +202,7 @@ public:
 	static void static_set_char_ram_write(device_t &device, cdp1869_char_ram_write_delegate callback) { downcast<cdp1869_device &>(device).m_out_char_ram_func = callback; }
 	static void static_set_pcb_read(device_t &device, cdp1869_pcb_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_pcb_func = callback; }
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
-	
+
 	DECLARE_PALETTE_INIT(cdp1869);
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
@@ -228,7 +228,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const;	
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -11,7 +11,7 @@
   Sets below are bootleg / hacked sets, descriptions of what has been modified are provided where known
  -- use of these sets may present a risk to the operator, you should always ensure you're using original Igrosoft program roms on your PCB!
 
- -------------------------------- 
+ --------------------------------
 
   The sets which differs from the originals by 5-6 bytes are bootlegs that simply change
      the banking address. Usually to convert a Crazy Monkey PCB which use the address "F9".

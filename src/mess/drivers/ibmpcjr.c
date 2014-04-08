@@ -78,7 +78,7 @@ public:
 	UINT32 m_raw_keyb_data;
 	int m_signal_count;
 	UINT8 m_nmi_enabled;
-	
+
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	emu_timer *m_pc_int_delay_timer;
 	emu_timer *m_pcjr_watchdog;
@@ -90,7 +90,7 @@ public:
 		TIMER_WATCHDOG,
 		TIMER_KB_SIGNAL
 	};
-	
+
 	void machine_reset();
 	DECLARE_DRIVER_INIT(pcjr);
 };
@@ -146,7 +146,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			else
 				m_pic8259->ir6_w(0);
 			break;
-				
+
 		case TIMER_KB_SIGNAL:
 			m_raw_keyb_data = m_raw_keyb_data >> 1;
 			m_signal_count--;
@@ -246,7 +246,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
 WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
-	
+
 	if(state && (data = m_keyboard->read(machine().driver_data()->generic_space(), 0)))
 	{
 		UINT8   parity = 0;
@@ -650,7 +650,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
 
 	/* sound hardware */

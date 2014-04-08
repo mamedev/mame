@@ -1196,7 +1196,7 @@ static MACHINE_CONFIG_DERIVED( quizvid, findout )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizvid_map)
-	
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(gei_state,quizvid)
 MACHINE_CONFIG_END

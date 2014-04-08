@@ -47,12 +47,10 @@ void isa8_pds_device::device_start()
 
 void isa8_pds_device::device_reset()
 {
-
 }
 
 void isa8_pds_device::device_stop()
 {
-
 }
 
 I8255_INTERFACE(pds_ppi_intf)
@@ -73,4 +71,3 @@ machine_config_constructor isa8_pds_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( pds_config );
 }
-

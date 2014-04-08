@@ -13,10 +13,10 @@
  * Camerica BF9096 Boards [mapper 232]
  * Camerica Golden Five [mapper 104]
 
- Aladdin Deck Enhancer pass-thru cart and the corresponding minicarts 
+ Aladdin Deck Enhancer pass-thru cart and the corresponding minicarts
  (ALGNV11 & ALGQV11 PCBs) are emulated in a separate source file.
 
- 
+
  TODO:
  - check what causes flickering from PPU in Fire Hawk, Poogie and Big Nose (same PPU issue as Back to
    Future 2&3?)
@@ -189,7 +189,7 @@ WRITE8_MEMBER(nes_bf9096_device::write_h)
 	{
 		m_latch = data & 3;
 		prg16_89ab(m_bank_base | m_latch);
-	}	
+	}
 }
 
 /*-------------------------------------------------

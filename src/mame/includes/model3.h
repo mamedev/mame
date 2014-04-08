@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<screen_device> m_screen;	
+	required_device<screen_device> m_screen;
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;

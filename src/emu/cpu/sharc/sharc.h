@@ -212,7 +212,7 @@ private:
 	UINT32 m_astat_old_old;
 	UINT32 m_astat_old_old_old;
 
-	UINT16 m_internal_ram[2 * 0x10000];	// 2x 128KB
+	UINT16 m_internal_ram[2 * 0x10000]; // 2x 128KB
 
 	inline void CHANGE_PC(UINT32 newpc);
 	inline void CHANGE_PC_DELAYED(UINT32 newpc);

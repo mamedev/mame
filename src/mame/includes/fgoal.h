@@ -40,7 +40,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_READ8_MEMBER(fgoal_analog_r);
 	DECLARE_READ8_MEMBER(fgoal_nmi_reset_r);
 	DECLARE_READ8_MEMBER(fgoal_irq_reset_r);

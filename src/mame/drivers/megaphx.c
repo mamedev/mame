@@ -1,8 +1,8 @@
-/* 
+/*
    Dinamic / Inder arcade hardware
 
    Mega Phoenix
- 
+
  also known to exist on this hardware:
    Hammer Boy
    Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
@@ -22,7 +22,7 @@
  I/O:
   - port_c_r / port_c_w should go through the 8255 but I don't see how to hook them up that way? various bits of the writes are lost?
 
-  
+
   --
 
 
@@ -33,7 +33,7 @@
   TS68000CP8
   TMS34010FNL-40
   TMP82C55AP-2
- 
+
   Bt478KPJ35  Palette / RAMDAC
 
   Actel A1010A-PL68C  (custom blitter maybe?)
@@ -45,11 +45,11 @@
   ST Z8430AB1
 
   custom INDER badged chip 40 pin?  (probably just a z80 - it's in the sound section)
-	MODELO: MEGA PHOENIX
-	KIT NO. 1.034
-	FECHA FABRICACION 08.10.91
-	LA MANIPULCION DE LA ETIQUETA O DE LA PLACA ANULA SU SARANTIA
-	(this sticker is also present on the other PCB)
+    MODELO: MEGA PHOENIX
+    KIT NO. 1.034
+    FECHA FABRICACION 08.10.91
+    LA MANIPULCION DE LA ETIQUETA O DE LA PLACA ANULA SU SARANTIA
+    (this sticker is also present on the other PCB)
 
 
 */
@@ -77,8 +77,7 @@ public:
 		m_indersb(*this, "inder_sb"),
 		m_indervid(*this, "inder_vid")
 
-	{ 
-
+	{
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -126,7 +125,7 @@ static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
 	AM_RANGE(0x060004, 0x060005) AM_READ8( port_c_r, 0x00ff )
 	AM_RANGE(0x060006, 0x060007) AM_WRITE8( port_c_w, 0x00ff )
 	AM_RANGE(0x060000, 0x060003) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0x00ff)
-	
+
 	AM_RANGE(0x800000, 0x83ffff) AM_ROM  AM_REGION("roms01", 0x00000) // code + bg gfx are in here
 	AM_RANGE(0x840000, 0x87ffff) AM_ROM  AM_REGION("roms23", 0x00000) // bg gfx are in here
 	AM_RANGE(0x880000, 0x8bffff) AM_ROM  AM_REGION("roms45", 0x00000) // bg gfx + title screen in here
@@ -210,7 +209,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0002, IP_ACTIVE_HIGH ) 
+	PORT_SERVICE( 0x0002, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x001c, 0x0010, "Difficulty?"  ) // in hammer boy at least..
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0004, "1" )
@@ -240,39 +239,35 @@ INPUT_PORTS_END
 
 READ8_MEMBER(megaphx_state::port_c_r)
 {
-	
 	//printf("read port c - write value was %02x\n", port_c_value);
 
-//	int pc = machine().device("maincpu")->safe_pc();
+//  int pc = machine().device("maincpu")->safe_pc();
 	UINT8 ret = 0;
 
-//	printf("(%06x) port_c_r (thru 8255)\n", pc);
-	
+//  printf("(%06x) port_c_r (thru 8255)\n", pc);
+
 	if (m_pic_clock == 1) ret |= 0x08;
 	if (m_pic_readbit == 1) ret |= 0x02;
-//	return ioport("SYS")->read();
+//  return ioport("SYS")->read();
 	return ret;
 }
 
 
 WRITE8_MEMBER(megaphx_state::port_c_w)
 {
-	
-
-
-//	int pc = machine().device("maincpu")->safe_pc();
+//  int pc = machine().device("maincpu")->safe_pc();
 	port_c_value = (data & 0x0f);
 
 	if (port_c_value == 0x9)
 	{
-	//	printf("Assert PIC reset line\n");
+	//  printf("Assert PIC reset line\n");
 		m_pic_is_reset = 1;
 	}
 	else if (port_c_value == 0x8)
 	{
-	//	printf("Clear PIC reset line\n");
+	//  printf("Clear PIC reset line\n");
 		m_pic_is_reset = 0;
-	
+
 		m_pic_shift_pos = 0;
 		m_pic_data = 0;
 		m_pic_data_bit = 0;
@@ -282,31 +277,30 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 	}
 	else if (port_c_value == 0xd)
 	{
-	//	printf("Set PIC data line\n");
+	//  printf("Set PIC data line\n");
 		m_pic_data_bit = 1;
 	}
 	else if (port_c_value == 0xc)
 	{
-	//	printf("Clear PIC data line\n");
+	//  printf("Clear PIC data line\n");
 		m_pic_data_bit = 0;
 	}
 	else if (port_c_value == 0xf)
 	{
 		if (m_pic_clock == 0)
 		{
-		//	printf("Set PIC clock line | pos %d | bit %d\n", m_pic_shift_pos, m_pic_data_bit);
-			
+		//  printf("Set PIC clock line | pos %d | bit %d\n", m_pic_shift_pos, m_pic_data_bit);
+
 
 
 
 
 			m_pic_clock = 1;
-		
+
 		}
 	}
 	else if (port_c_value == 0xe)
 	{
-
 		if (m_pic_clock == 1)
 		{
 			m_pic_data |= m_pic_data_bit << m_pic_shift_pos;
@@ -339,13 +333,13 @@ WRITE8_MEMBER(megaphx_state::port_c_w)
 			m_pic_shift_pos++;
 
 
-			//	printf("Clear PIC clock line\n");
+			//  printf("Clear PIC clock line\n");
 			m_pic_clock = 0;
 		}
 	}
 	else
 	{
-	//	printf("Unknown write to PIC %02x (PC %06x)\n", port_c_value, pc);
+	//  printf("Unknown write to PIC %02x (PC %06x)\n", port_c_value, pc);
 	}
 
 

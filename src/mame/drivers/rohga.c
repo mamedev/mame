@@ -840,7 +840,7 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -889,7 +889,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_wizdfire)	
+	MCFG_SCREEN_UPDATE_DRIVER(rohga_state, screen_update_wizdfire)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wizdfire)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -900,7 +900,7 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -968,7 +968,7 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")

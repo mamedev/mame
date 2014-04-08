@@ -31,7 +31,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(battlane_palette_w);
 	DECLARE_WRITE8_MEMBER(battlane_scrollx_w);

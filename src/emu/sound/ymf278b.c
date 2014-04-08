@@ -267,7 +267,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				if (slot->stepptr >= slot->endaddr)
 				{
 					slot->stepptr = slot->stepptr - slot->endaddr + slot->loopaddr;
-					
+
 					// NOTE: loop overflow is still possible here if (slot->stepptr >= slot->endaddr)
 					// This glitch may be (ab)used to your advantage to create pseudorandom noise.
 				}

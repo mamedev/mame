@@ -966,7 +966,7 @@ void validity_checker::validate_inputs()
 void validity_checker::validate_devices()
 {
 	int_map device_map;
-	
+
 	device_iterator iter_find(m_current_config->root_device());
 	for (const device_t *device = iter_find.first(); device != NULL; device = iter_find.next())
 	{

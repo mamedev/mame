@@ -116,7 +116,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	dynamic_array<UINT8> m_paletteram;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -2150,7 +2150,7 @@ DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 
 	// RAM banks
 	m_paletteram.resize_and_clear(0x3000);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);	
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 	membank("palbank")->set_base(m_paletteram);
 	m_rambank = 0x64;
 

@@ -119,7 +119,7 @@ mb87078_device::mb87078_device(const machine_config &mconfig, const char *tag, d
 void mb87078_device::device_start()
 {
 	m_gain_changed_cb.resolve_safe();
-	
+
 	save_item(NAME(m_channel_latch));
 	save_item(NAME(m_reset_comp));
 	save_item(NAME(m_latch[0]));

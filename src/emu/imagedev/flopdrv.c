@@ -206,7 +206,7 @@ void legacy_floppy_image_device::floppy_drive_set_flag_state(int flag, int state
 a fixed set of circumstances */
 /* use this to set ready state of drive */
 void legacy_floppy_image_device::floppy_drive_set_ready_state(int state, int flag)
-{	
+{
 	if (flag)
 	{
 		/* set ready only if drive is present, disk is in the drive,
@@ -252,7 +252,7 @@ int legacy_floppy_image_device::floppy_drive_get_flag_state(int flag)
 
 
 void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
-{	
+{
 	LOG(("seek from: %d delta: %d\n",m_current_track, signed_tracks));
 
 	/* update position */
@@ -432,7 +432,7 @@ int legacy_floppy_image_device::internal_floppy_device_load(int create_format, o
 	const char *extension;
 
 	device_image_interface *image = NULL;
-	interface(image);	/* figure out the floppy options */
+	interface(image);   /* figure out the floppy options */
 	floppy_options = ((floppy_interface*)static_config())->formats;
 
 	if (has_been_created())
@@ -621,7 +621,6 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_wtd_w )
 /* step */
 WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 {
-
 	/* move head one track when going from high to low and write gate is high */
 	if (m_active && m_stp && state == CLEAR_LINE && m_wtg)
 	{

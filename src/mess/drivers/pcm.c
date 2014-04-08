@@ -327,7 +327,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_SIZE(64*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcm)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 

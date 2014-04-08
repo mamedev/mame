@@ -59,9 +59,9 @@ public:
 
 	virtual void machine_reset();
 
-	DECLARE_DRIVER_INIT(asr);	
+	DECLARE_DRIVER_INIT(asr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);	
+	DECLARE_READ16_MEMBER(esq5506_read_adc);
 };
 
 void esqasr_state::machine_reset()

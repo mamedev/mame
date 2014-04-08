@@ -88,7 +88,7 @@ void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 		{
 			int tile_number = base + source[0] + source[0x400] * 0x100;
 			source++;
-			
+
 				gfx->opaque(bitmap,cliprect,
 				tile_number,
 				0, /* color */

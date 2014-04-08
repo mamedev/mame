@@ -93,7 +93,7 @@ public:
 		m_bgattrram(*this, "bgattrram"),
 		m_sprram(*this, "sprram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") 
+		m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

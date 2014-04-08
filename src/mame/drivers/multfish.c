@@ -3,11 +3,11 @@
        to make it clearer why all the sets with hacked bank
        setup existed in the wild
 
-	note:
-	 this file contains the originals only
-	 for bootlegs see multfish_boot.c
-	 for reference information about undumped sets see multfish_Ref.c - if adding a new set ALWAYS check that, anything not listed in there is
-	                                                                    almost certainly a bootleg.
+    note:
+     this file contains the originals only
+     for bootlegs see multfish_boot.c
+     for reference information about undumped sets see multfish_Ref.c - if adding a new set ALWAYS check that, anything not listed in there is
+                                                                        almost certainly a bootleg.
 
 */
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START( igrosoft_gamble, igrosoft_gamble_state )
 	MCFG_SCREEN_VISIBLE_AREA(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igrosoft_gamble_state, screen_update_igrosoft_gamble)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igrosoft_gamble)
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
@@ -2807,5 +2807,3 @@ GAME( 2008, fcockt2_7,   fcockt2_parent,  igrosoft_gamble, igrosoft_gamble, igro
 GAME( 2010, crzmon2,     0,               igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state,crzmon2,   ROT0, "Igrosoft", "Crazy Monkey 2 (100310)",  GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) /* World */ // xored and bitswapped palette and gfx roms
 GAME( 2010, crzmon2_2,   crzmon2_parent,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state,crzmon2lot,ROT0, "Igrosoft", "Crazy Monkey 2 (100311 Lottery)",  GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) /* Lottery */
 GAME( 2010, crzmon2_3,   crzmon2_parent,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state,crzmon2ent,ROT0, "Igrosoft", "Crazy Monkey 2 (100315 Entertainment)",  GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) /* Entertainment */
-
-

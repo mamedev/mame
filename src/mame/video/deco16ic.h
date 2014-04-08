@@ -39,11 +39,11 @@ class deco16ic_device : public device_t,
 public:
 	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~deco16ic_device() {}
-	
+
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 
 	DECLARE_WRITE16_MEMBER( pf1_data_w );
 	DECLARE_WRITE16_MEMBER( pf2_data_w );

@@ -29,50 +29,50 @@
 struct Mono555Desc
 {
 public:
-        double r, c;
+		double r, c;
 
-        Mono555Desc(double res, double cap) : r(res), c(cap) { }
+		Mono555Desc(double res, double cap) : r(res), c(cap) { }
 };
 
 struct SeriesRCDesc
 {
 public:
-        double r, c;
+		double r, c;
 
-        SeriesRCDesc(double res, double cap) : r(res), c(cap) { }
+		SeriesRCDesc(double res, double cap) : r(res), c(cap) { }
 };
 
 #define CHIP_555_Mono(_name,  _pdesc)   \
-    CHIP(# _name, NE555) \
-    NET_C(_name.6, _name.7) \
-    RES(_name ## _R, (_pdesc)->r) \
-    CAP(_name ## _C, (_pdesc)->c) \
-    NET_C(_name.6, _name ## _R.1) \
-    NET_C(_name.6, _name ## _C.1) \
-    NET_C(_name ## _R.2, V5) \
-    NET_CSTR(# _name "_C.2", "GND") \
-    NET_C(_name.8, V5) \
-    NET_CSTR(# _name ".1", "GND")
+	CHIP(# _name, NE555) \
+	NET_C(_name.6, _name.7) \
+	RES(_name ## _R, (_pdesc)->r) \
+	CAP(_name ## _C, (_pdesc)->c) \
+	NET_C(_name.6, _name ## _R.1) \
+	NET_C(_name.6, _name ## _C.1) \
+	NET_C(_name ## _R.2, V5) \
+	NET_CSTR(# _name "_C.2", "GND") \
+	NET_C(_name.8, V5) \
+	NET_CSTR(# _name ".1", "GND")
 
 #define CHIP_SERIES_RC(_name,  _pdesc)   \
-    RES(_name ## _R, (_pdesc)->r) \
-    CAP(_name ## _C, (_pdesc)->c) \
-    NET_C(_name ## _R.1, _name ## _C.2) \
-    ALIAS(_name.3, _name ## _R.1) \
-    ALIAS(_name.2, _name ## _R.2) \
-    ALIAS(_name.1, _name ## _C.1)
+	RES(_name ## _R, (_pdesc)->r) \
+	CAP(_name ## _C, (_pdesc)->c) \
+	NET_C(_name ## _R.1, _name ## _C.2) \
+	ALIAS(_name.3, _name ## _R.1) \
+	ALIAS(_name.2, _name ## _R.2) \
+	ALIAS(_name.1, _name ## _C.1)
 
 #define CHIP_INPUT(_name)   \
 	SWITCH2(_name ## _SW) \
-    NET_C(_name ## _SW.2, V5) \
-    NET_CSTR(# _name "_SW.1", "GND") \
-    ALIAS(_name.1, _name ## _SW.Q)
+	NET_C(_name ## _SW.2, V5) \
+	NET_CSTR(# _name "_SW.1", "GND") \
+	ALIAS(_name.1, _name ## _SW.Q)
 
 #define CHIP_LATCH(_name)   \
 	NETDEV_RSFF(_name) \
-    ALIAS(_name.1, _name.S) \
-    ALIAS(_name.2, _name.R) \
-    ALIAS(_name.3, _name.QQ)
+	ALIAS(_name.1, _name.S) \
+	ALIAS(_name.2, _name.R) \
+	ALIAS(_name.3, _name.QQ)
 
 
 

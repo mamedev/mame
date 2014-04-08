@@ -1626,7 +1626,7 @@ ROM_START( magicbom )
 	ROM_LOAD( "sound-magic-bomb-hmb-vers1-memory-4m.ic16", 0x00000, 0x80000, CRC(45b2b53a) SHA1(983bcc5869d84938ba278f26339dd72c17ed1d00) )
 ROM_END
 
-ROM_START( record )	// do checks and expect something... pc=e8044
+ROM_START( record ) // do checks and expect something... pc=e8044
 	ROM_REGION( 0x100000, "user1", 0 ) /* V30 Code */
 	ROM_LOAD16_BYTE( "record-vrc-i17-vers1-video-map.ic7", 0x00000, 0x80000, CRC(d0e59a64) SHA1(5f51448a4cdefd335e19affa4b47df7b428b0e7c) )
 	ROM_LOAD16_BYTE( "record-vrc-i17-vers1-video-map.ic8", 0x00001, 0x80000, CRC(823d1c25) SHA1(3104567b2b05708d1b5218f9f0e64bfa3d0df46b) )
@@ -1644,9 +1644,9 @@ READ16_MEMBER(highvdeo_state::record_status_r)
 	switch(offset*2)
 	{
 		case 0:
-		resetpulse^=0x15;		// and 0x07, cmp with 0x05
+		resetpulse^=0x15;       // and 0x07, cmp with 0x05
 		return 0 | resetpulse;
-		case 2: return 0x15;	// unknown
+		case 2: return 0x15;    // unknown
 	}
 
 	return 0;

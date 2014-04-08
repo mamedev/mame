@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1028,7 +1028,7 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1091,7 +1091,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1141,7 +1141,7 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", edrandy_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", edrandy_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1206,7 +1206,7 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", robocop2_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", robocop2_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
@@ -1276,7 +1276,7 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", mutantf_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
-	
+
 	MCFG_DECO16IC_ADD("tilegen2", mutantf_deco16ic_tilegen2_intf)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")

@@ -597,7 +597,7 @@ MACHINE_START_MEMBER(thunderx_state,scontra)
 {
 	m_paletteram.resize(0x800);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	
+
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_1f98_data));

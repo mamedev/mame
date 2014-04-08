@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_ES5503_OUTPUT_CHANNELS(2)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(mirage_state, mirage_doc_irq))
 	MCFG_ES5503_ADC_FUNC(READ8(mirage_state, mirage_adc_read))
-	
+
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

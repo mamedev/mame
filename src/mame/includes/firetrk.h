@@ -64,7 +64,7 @@ public:
 	optional_shared_ptr<UINT8> m_drone_rot;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;	
+	required_device<palette_device> m_palette;
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];

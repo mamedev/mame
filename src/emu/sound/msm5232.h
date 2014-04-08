@@ -6,7 +6,7 @@
 
 #define MCFG_MSM5232_SET_CAPACITORS(_a, _b, _c, _d, _e, _f, _g, _h) \
 	msm5232_device::static_set_capacitors(*device, _a, _b, _c, _d, _e, _f, _g, _h);
-	
+
 #define MCFG_MSM5232_GATE_HANDLER_CB(_devcb) \
 	devcb = &msm5232_device::set_gate_handler_callback(*device, DEVCB2_##_devcb);
 
@@ -45,7 +45,7 @@ class msm5232_device : public device_t,
 public:
 	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~msm5232_device() {}
-	
+
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
 	template<class _Object> static devcb2_base &set_gate_handler_callback(device_t &device, _Object object) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(object); }
 

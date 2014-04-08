@@ -247,7 +247,7 @@ public:
 	offs_t m_collision_detection;
 	int m_latch_delay;
 	dynamic_array<UINT8> m_paletteram;
-	
+
 	DECLARE_WRITE8_MEMBER(bgtile_w);
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -1282,10 +1282,10 @@ void halleys_state::video_start()
 
 		m_alpha_table[(src<<8)+dst] = c | BG_RGB;
 	}
-	
+
 	m_paletteram.resize(m_palette->entries());
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 1);
-	
+
 	m_bgcolor         = m_palette->black_pen();
 }
 

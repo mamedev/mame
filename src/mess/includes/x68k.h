@@ -248,7 +248,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
-	
+
 	//dmac
 	void dma_irq(int channel);
 	DECLARE_WRITE8_MEMBER(dma_end);

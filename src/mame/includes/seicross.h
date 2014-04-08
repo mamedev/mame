@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<UINT8> m_row_scroll;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_colorram;
-	
+
 	UINT8 m_portb;
 	tilemap_t *m_bg_tilemap;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);

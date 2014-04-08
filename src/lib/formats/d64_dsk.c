@@ -228,7 +228,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			build_sector_description(f, img, track_offset, error_offset, sectors, sector_count);
 			generate_track(desc, physical_track, head, sectors, sector_count, total_size, image);
-			
+
 			track_offset += track_size;
 			error_offset += sector_count;
 		}

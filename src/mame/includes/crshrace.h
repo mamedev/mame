@@ -23,9 +23,9 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
-	
+
 	required_memory_bank m_z80bank;
-	
+
 	required_device<z80_device> m_audiocpu;
 	required_device<k053936_device> m_k053936;
 	required_device<buffered_spriteram16_device> m_spriteram;
