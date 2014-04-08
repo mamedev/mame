@@ -1664,11 +1664,12 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 	float bloom_height = rt->target_height;
 	vec2f screendims = d3d->get_dims();
 	curr_effect->set_vector("ScreenSize", 2, &screendims.c.x);
+	float bloom_dims[11][2];
 	for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
-		target_size[0] = bloom_width;
-		target_size[1] = bloom_height;
-		curr_effect->set_vector("TargetSize", 2, target_size);
+		bloom_dims[bloom_index][0] = bloom_width;
+		bloom_dims[bloom_index][1] = bloom_height;
+		curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
 
 		curr_effect->begin(&num_passes, 0);
 
@@ -1698,13 +1699,20 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 
 	curr_effect = bloom_effect;
 
+	float target_size[2] = { d3d->get_width(), d3d->get_height() };
+	curr_effect->set_vector("TargetSize", 2, target_size);
 	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
 	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
 	float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
 	curr_effect->set_vector("Level89AWeight", 3, weight89A);
-	curr_effect->set_vector("TargetSize", 2, &screendims.c.x);
+	curr_effect->set_vector("Level01Size", 4, bloom_dims[0]);
+	curr_effect->set_vector("Level23Size", 4, bloom_dims[2]);
+	curr_effect->set_vector("Level45Size", 4, bloom_dims[4]);
+	curr_effect->set_vector("Level67Size", 4, bloom_dims[6]);
+	curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
+	curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
 	curr_effect->set_texture("DiffuseA", rt->render_texture[2]);
 
@@ -1846,11 +1854,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		float bloom_height = rt->target_height;
 		float screen_size[2] = { d3d->get_width(), d3d->get_height() };
 		curr_effect->set_vector("ScreenSize", 2, screen_size);
+		float bloom_dims[11][2];
 		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
-			target_size[0] = bloom_width;
-			target_size[1] = bloom_height;
-			curr_effect->set_vector("TargetSize", 2, target_size);
+			bloom_dims[bloom_index][0] = bloom_width;
+			bloom_dims[bloom_index][1] = bloom_height;
+			curr_effect->set_vector("TargetSize", 2, bloom_dims[bloom_index]);
 
 			curr_effect->begin(&num_passes, 0);
 
@@ -1891,6 +1900,12 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect->set_vector("Level0123Weight", 4, weight0123);
 		curr_effect->set_vector("Level4567Weight", 4, weight4567);
 		curr_effect->set_vector("Level89AWeight", 3, weight89A);
+		curr_effect->set_vector("Level01Size", 4, bloom_dims[0]);
+		curr_effect->set_vector("Level23Size", 4, bloom_dims[2]);
+		curr_effect->set_vector("Level45Size", 4, bloom_dims[4]);
+		curr_effect->set_vector("Level67Size", 4, bloom_dims[6]);
+		curr_effect->set_vector("Level89Size", 4, bloom_dims[8]);
+		curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
 		curr_effect->set_texture("DiffuseA", rt->render_texture[0]);
 
@@ -3140,9 +3155,6 @@ void uniform::update()
 			m_shader->set_vector("Floor", 3, options->floor);
 			break;
 
-		case CU_BLOOM_TARGET_SIZE:
-			m_shader->set_vector("TargetSize", 2, shadersys->target_size);
-			break;
 		case CU_BLOOM_RESCALE:
 			m_shader->set_float("BloomRescale", options->raster_bloom_scale);
 			break;
