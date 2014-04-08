@@ -55,6 +55,9 @@ const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KANEKO_PANDORA, "Kaneko Pandora - PX79C480FP-3", tag, owner, clock, "kaneko_pandora", __FILE__),
 		device_video_interface(mconfig, *this),
+		m_gfx_region(0),
+		m_xoffset(0),
+		m_yoffset(0),
 		m_gfxdecode(*this),
 		m_palette(*this)
 {
@@ -78,28 +81,6 @@ void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const cha
 void kaneko_pandora_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<kaneko_pandora_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kaneko_pandora_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const kaneko_pandora_interface *intf = reinterpret_cast<const kaneko_pandora_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<kaneko_pandora_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gfx_region = 0;
-		m_xoffset = 0;
-		m_yoffset = 0;
-	}
 }
 
 //-------------------------------------------------
