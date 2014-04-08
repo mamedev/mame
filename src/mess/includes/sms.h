@@ -200,9 +200,6 @@ public:
 
 	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
 	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
-	DECLARE_READ8_MEMBER(sms_store_select1);
-	DECLARE_READ8_MEMBER(sms_store_select2);
-	DECLARE_READ8_MEMBER(sms_store_control_r);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
 	DECLARE_DRIVER_INIT(smssdisp);
 
