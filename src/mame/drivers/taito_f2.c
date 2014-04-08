@@ -2976,9 +2976,6 @@ static const tc0480scp_interface metalb_tc0480scp_intf =
 };
 
 
-static const tc0280grd_interface taitof2_tc0280grd_intf = { 2 };
-static const tc0280grd_interface taitof2_tc0430grw_intf = { 2 };
-
 MACHINE_START_MEMBER(taitof2_state,common)
 {
 }
@@ -3096,9 +3093,11 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0280GRD_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_DEVICE_ADD("tc0280grd", TC0280GRD, 0)
+	MCFG_TC0280GRD_GFX_REGION(2)
 	MCFG_TC0280GRD_GFXDECODE("gfxdecode");
-	MCFG_TC0360PRI_ADD("tc0360pri")
+
+MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
@@ -3162,8 +3161,10 @@ static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0280GRD_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_DEVICE_ADD("tc0280grd", TC0280GRD, 0)
+	MCFG_TC0280GRD_GFX_REGION(2)
 	MCFG_TC0280GRD_GFXDECODE("gfxdecode");
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
@@ -3468,8 +3469,10 @@ static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_DEVICE_ADD("tc0430grw", TC0430GRW, 0)
+	MCFG_TC0430GRW_GFX_REGION(2)
 	MCFG_TC0430GRW_GFXDECODE("gfxdecode")
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
@@ -3676,8 +3679,10 @@ static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_DEVICE_ADD("tc0430grw", TC0430GRW, 0)
+	MCFG_TC0430GRW_GFX_REGION(2)
 	MCFG_TC0430GRW_GFXDECODE("gfxdecode")
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
@@ -3721,8 +3726,10 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0280GRD_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_DEVICE_ADD("tc0280grd", TC0280GRD, 0)
+	MCFG_TC0280GRD_GFX_REGION(2)
 	MCFG_TC0280GRD_GFXDECODE("gfxdecode");
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
@@ -3784,8 +3791,10 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_DEVICE_ADD("tc0430grw", TC0430GRW, 0)
+	MCFG_TC0430GRW_GFX_REGION(2)
 	MCFG_TC0430GRW_GFXDECODE("gfxdecode")
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */

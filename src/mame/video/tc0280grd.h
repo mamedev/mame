@@ -1,13 +1,7 @@
-#ifndef _TC0280GRD_H_
-#define _TC0280GRD_H_
+#ifndef __TC0280GRD_H__
+#define __TC0280GRD_H__
 
-struct tc0280grd_interface
-{
-	int                m_gfxnum;
-};
-
-class tc0280grd_device : public device_t,
-							public tc0280grd_interface
+class tc0280grd_device : public device_t
 {
 public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -15,6 +9,7 @@ public:
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0280grd_device &>(device).m_gfxnum = gfxregion; }
 
 	DECLARE_READ16_MEMBER( tc0280grd_word_r );
 	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
@@ -30,7 +25,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -42,6 +36,7 @@ private:
 
 	UINT16         m_ctrl[8];
 	int            m_base_color;
+	int            m_gfxnum;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	TILE_GET_INFO_MEMBER(tc0280grd_get_tile_info);
@@ -59,6 +54,12 @@ extern const device_type TC0280GRD;
 #define MCFG_TC0430GRW_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, TC0430GRW, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_TC0280GRD_GFX_REGION(_region) \
+	tc0280grd_device::set_gfx_region(*device, _region);
+
+#define MCFG_TC0430GRW_GFX_REGION(_region) \
+	tc0280grd_device::set_gfx_region(*device, _region);
 
 #define MCFG_TC0280GRD_GFXDECODE(_gfxtag) \
 	tc0280grd_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
