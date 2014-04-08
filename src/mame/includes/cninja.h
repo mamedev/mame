@@ -97,6 +97,8 @@ public:
 	DECO16IC_BANK_CB_MEMBER(mutantf_1_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(mutantf_2_bank_callback);
 
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+
 	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
 	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );
 	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );

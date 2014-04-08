@@ -97,7 +97,8 @@ public:
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+						   
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;
 	required_ioport m_io_in2;
@@ -456,13 +457,9 @@ DECO16IC_BANK_CB_MEMBER(backfire_state::bank_callback)
 	return bank * 0x1000;
 }
 
-void backfire_state::machine_start()
+DECOSPR_PRIORITY_CB_MEMBER(backfire_state::pri_callback)
 {
-}
-
-UINT16 backfire_pri_callback(UINT16 x)
-{
-	switch (x & 0xc000)
+	switch (pri & 0xc000)
 	{
 		case 0x0000: return 0;    // numbers, people, cars when in the air, status display..
 		case 0x4000: return 0xf0; // cars most of the time
@@ -470,6 +467,10 @@ UINT16 backfire_pri_callback(UINT16 x)
 		case 0xc000: return 0xf0; // car wheels in race?
 	}
 	return 0;
+}
+
+void backfire_state::machine_start()
+{
 }
 
 static MACHINE_CONFIG_START( backfire, backfire_state )
@@ -539,15 +540,15 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("lscreen")
-	decospr_device::set_gfx_region(*device, 4);
-	decospr_device::set_pri_callback(*device, backfire_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(4)
+	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_VIDEO_SET_SCREEN("rscreen")
-	decospr_device::set_gfx_region(*device, 5);
-	decospr_device::set_pri_callback(*device, backfire_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(5)
+	MCFG_DECO_SPRITE_PRIORITY_CB(backfire_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

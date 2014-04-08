@@ -764,6 +764,33 @@ DECO16IC_BANK_CB_MEMBER(rohga_state::bank_callback)
 	return ((bank >> 4) & 0x3) << 12;
 }
 
+DECOSPR_PRIORITY_CB_MEMBER(rohga_state::rohga_pri_callback)
+{
+	switch (pri & 0x6000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x6000: return 0xf0 | 0xcc;
+		case 0x2000: return 0;//0xf0|0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+	}
+	
+	return 0;
+}
+
+DECOSPR_COLOUR_CB_MEMBER(rohga_state::rohga_col_callback)
+{
+	return (col >> 9) & 0xf;
+}
+
+DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
+{
+	UINT16 colour = ((col >> 9) & 0xf) << 2;
+	if (col & 0x8000)
+		colour++;
+	
+	return colour;
+}
+
 static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	/* basic machine hardware */
@@ -787,8 +814,6 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rohga)
 	MCFG_PALETTE_ADD("palette", 2048)
-
-	MCFG_VIDEO_START_OVERRIDE(rohga_state,rohga)
 
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
@@ -826,7 +851,9 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_PRIORITY_CB(rohga_state, rohga_pri_callback)
+	MCFG_DECO_SPRITE_COLOUR_CB(rohga_state, rohga_col_callback)
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -910,19 +937,19 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 
-	MCFG_VIDEO_START_OVERRIDE(rohga_state,wizdfire)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1002,16 +1029,16 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
-	MCFG_VIDEO_START_OVERRIDE(rohga_state,wizdfire)
+	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
@@ -1060,8 +1087,6 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", schmeisr)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_VIDEO_START_OVERRIDE(rohga_state,schmeisr)
-
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
@@ -1098,7 +1123,9 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_PRIORITY_CB(rohga_state, rohga_pri_callback)
+	MCFG_DECO_SPRITE_COLOUR_CB(rohga_state, schmeisr_col_callback)	// wire mods on pcb...
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

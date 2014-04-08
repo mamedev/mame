@@ -39,6 +39,7 @@ public:
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
 	DECLARE_READ32_MEMBER(simpl156_inputs_read);
 	DECLARE_READ32_MEMBER(simpl156_palette_r);

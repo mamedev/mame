@@ -171,6 +171,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
+	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 };
 
 class dragngun_state : public deco32_state

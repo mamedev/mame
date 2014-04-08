@@ -281,9 +281,9 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 1);
-	decospr_device::set_is_bootleg(*device, true);
-	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
+	MCFG_DECO_SPRITE_GFX_REGION(1)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

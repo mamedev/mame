@@ -592,9 +592,9 @@ void esd16_state::machine_reset()
 	m_tilemap0_color = 0;
 }
 
-UINT16 esd16_state::hedpanic_pri_callback(UINT16 x)
+DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 {
-	if (x & 0x8000)
+	if (pri & 0x8000)
 		return 0xfffe; // under "tilemap 1"
 	else
 		return 0; // above everything
@@ -623,10 +623,10 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 0);
-	decospr_device::set_is_bootleg(*device, true);
-	decospr_device::set_pri_callback(*device, esd16_state::hedpanic_pri_callback);
-	decospr_device::set_flipallx(*device, 1);
+	MCFG_DECO_SPRITE_GFX_REGION(0)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_PRIORITY_CB(esd16_state, hedpanic_pri_callback)
+	MCFG_DECO_SPRITE_FLIPALLX(1)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -679,7 +679,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hedpanic, hedpanio )
 	MCFG_DEVICE_MODIFY("spritegen")
-	decospr_device::set_offsets(*device, -0x18,-0x100);
+	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
 MACHINE_CONFIG_END
 
 /* ESD 08-26-1999 PCBs with different memory maps */

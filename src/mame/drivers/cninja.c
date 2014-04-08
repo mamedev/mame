@@ -808,6 +808,21 @@ DECO16IC_BANK_CB_MEMBER(cninja_state::mutantf_2_bank_callback)
 }
 
 
+DECOSPR_PRIORITY_CB_MEMBER(cninja_state::pri_callback)
+{
+	/* Sprite/playfield priority */
+	switch (pri & 0xc000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x8000: return 0xf0 | 0xcc;
+		case 0xc000: return 0xf0 | 0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+	}
+	
+	return 0;
+}
+
+
 void cninja_state::machine_start()
 {
 	save_item(NAME(m_scanline));
@@ -819,22 +834,6 @@ void cninja_state::machine_reset()
 	m_scanline = 0;
 	m_irq_mask = 0;
 }
-
-
-UINT16 cninja_pri_callback(UINT16 x)
-{
-	/* Sprite/playfield priority */
-	switch (x & 0xc000)
-	{
-		case 0x0000: return 0;
-		case 0x4000: return 0xf0;
-		case 0x8000: return 0xf0 | 0xcc;
-		case 0xc000: return 0xf0 | 0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
-	}
-
-	return 0;
-}
-
 
 static MACHINE_CONFIG_START( cninja, cninja_state )
 
@@ -896,8 +895,8 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -986,8 +985,8 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -1143,8 +1142,8 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -1231,8 +1230,8 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_pri_callback(*device, cninja_pri_callback);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -1325,12 +1324,12 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
