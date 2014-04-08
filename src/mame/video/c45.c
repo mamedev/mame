@@ -141,7 +141,6 @@ WRITE16_MEMBER( namco_c45_road_device::tileram_w )
 
 void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	const UINT8 *clut = (const UINT8 *)memregion("clut")->base();
 	bitmap_ind16 &source_bitmap = m_tilemap->pixmap();
 	unsigned yscroll = m_lineram[0x3fe/2];
 
@@ -201,8 +200,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 				int pen = source_gfx[sourcex >> 16];
 				if (palette()->pen_indirect(pen) != m_transparent_color)
 				{
-					if (clut != NULL)
-						pen = (pen & ~0xff) | clut[pen & 0xff];
+					if (m_clut != NULL)
+						pen = (pen & ~0xff) | m_clut[pen & 0xff];
 					dest[screenx] = pen;
 				}
 				screenx++;
@@ -214,8 +213,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (clut != NULL)
-					pen = (pen & ~0xff) | clut[pen & 0xff];
+				if (m_clut != NULL)
+					pen = (pen & ~0xff) | m_clut[pen & 0xff];
 				dest[screenx++] = pen;
 				sourcex += dsourcex;
 			}
@@ -230,6 +229,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
+	m_clut = memregion("clut")->base();
+
 	// create a tilemap for the road
 	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);

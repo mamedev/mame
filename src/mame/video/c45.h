@@ -61,8 +61,9 @@ private:
 	required_shared_ptr<UINT16> m_tmapram;
 	required_shared_ptr<UINT16> m_tileram;
 	required_shared_ptr<UINT16> m_lineram;
-	pen_t                       m_transparent_color;
+	UINT8 *                     m_clut;
 	tilemap_t *                 m_tilemap;
+	pen_t                       m_transparent_color;
 };
 
 
