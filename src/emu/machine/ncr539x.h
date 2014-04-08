@@ -8,28 +8,28 @@
 
 #include "machine/scsihle.h"
 
-struct NCR539Xinterface
-{
-	devcb_write_line m_out_irq_cb;          /* IRQ line */
-	devcb_write_line m_out_drq_cb;          /* DRQ line */
-};
-
 //// 539x registers
 //enum
 //{
 //};
 
 // device stuff
-#define MCFG_NCR539X_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, NCR539X, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
-class ncr539x_device : public device_t,
-						public NCR539Xinterface
+#define MCFG_NCR539X_OUT_IRQ_CB(_devcb) \
+	devcb = &ncr539x_device::set_out_irq_callback(*device, DEVCB2_##_devcb);
+	
+#define MCFG_NCR539X_OUT_DRQ_CB(_devcb) \
+	devcb = &ncr539x_device::set_out_drq_callback(*device, DEVCB2_##_devcb);
+	
+
+class ncr539x_device : public device_t
 {
 public:
 	// construction/destruction
 	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(object); }
 
 	// our API
 	DECLARE_READ8_MEMBER(read);
@@ -42,7 +42,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
@@ -83,8 +82,8 @@ private:
 
 	emu_timer *m_operation_timer;
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_drq_func;
+	devcb2_write_line m_out_irq_cb;          /* IRQ line */
+	devcb2_write_line m_out_drq_cb;          /* DRQ line */
 };
 
 // device type definition
