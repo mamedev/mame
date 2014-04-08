@@ -187,12 +187,6 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
-static const nmk112_interface quizpani_nmk112_intf =
-{
-	"oki", "oki", 0
-};
-
-
 static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(quizpani_map)
@@ -217,7 +211,9 @@ static MACHINE_CONFIG_START( quizpani, quizpani_state )
 	MCFG_OKIM6295_ADD("oki", 16000000/4, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NMK112_ADD("nmk112", quizpani_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki")
+	MCFG_NMK112_ROM1("oki")
 MACHINE_CONFIG_END
 
 ROM_START( quizpani )

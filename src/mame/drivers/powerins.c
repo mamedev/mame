@@ -328,12 +328,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 };
 
-static const nmk112_interface powerins_nmk112_intf =
-{
-	"oki1", "oki2", 0
-};
-
-
 static MACHINE_CONFIG_START( powerins, powerins_state )
 
 	/* basic machine hardware */
@@ -374,7 +368,9 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MCFG_NMK112_ADD("nmk112", powerins_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( powerina, powerins )

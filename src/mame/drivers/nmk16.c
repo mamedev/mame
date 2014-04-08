@@ -3626,12 +3626,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-
-static const nmk112_interface nmk16_nmk112_intf =
-{
-	"oki1", "oki2", 0
-};
-
 static MACHINE_CONFIG_START( tharrier, nmk16_state )
 
 	/* basic machine hardware */
@@ -4345,7 +4339,9 @@ static MACHINE_CONFIG_START( macross2, nmk16_state )
 	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tdragon2, nmk16_state )
@@ -4390,7 +4386,9 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
-	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( raphero, nmk16_state )
@@ -4437,7 +4435,9 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
-	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bjtwin, nmk16_state )
@@ -4473,7 +4473,9 @@ static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 	MCFG_OKIM6295_ADD("oki2", 16000000/4, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 
