@@ -291,7 +291,7 @@ void tumbleb_state::tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bit
 	else
 		m_pf1_alt_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 }
 
 UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

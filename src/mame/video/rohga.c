@@ -82,7 +82,7 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 	bitmap_ind16* sprite_bitmap;
 	int penbase;
 
-	sprite_bitmap = &machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
+	sprite_bitmap = &m_sprgen2->get_sprite_temp_bitmap();
 	penbase = 0x600;
 
 	UINT16* srcline;
