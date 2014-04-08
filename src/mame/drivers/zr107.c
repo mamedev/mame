@@ -800,14 +800,6 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 MACHINE_CONFIG_END
 
 
-static const k001604_interface jetwave_k001604_intf =
-{
-	0, 1,   /* gfx index 1 & 2 */
-	0, 0,       /* layer_size, roz_size */
-	0,      /* text layer mem offset */
-	16384,  /* roz layer mem offset */
-};
-
 static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	/* basic machine hardware */
@@ -841,7 +833,13 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
+	MCFG_DEVICE_ADD("k001604", K001604, 0)
+	MCFG_K001604_GFX_INDEX1(0)
+	MCFG_K001604_GFX_INDEX2(1)
+	MCFG_K001604_LAYER_SIZE(0)
+	MCFG_K001604_ROZ_SIZE(0)
+	MCFG_K001604_TXT_OFFSET(0)
+	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 

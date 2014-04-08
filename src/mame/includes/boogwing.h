@@ -27,13 +27,13 @@ public:
 			m_oki2(*this, "oki2"),
 			m_spriteram(*this, "spriteram"),
 			m_spriteram2(*this, "spriteram2") ,
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2"),
-		m_palette(*this, "palette")
+			m_pf1_rowscroll(*this, "pf1_rowscroll"),
+			m_pf2_rowscroll(*this, "pf2_rowscroll"),
+			m_pf3_rowscroll(*this, "pf3_rowscroll"),
+			m_pf4_rowscroll(*this, "pf4_rowscroll"),
+			m_sprgen1(*this, "spritegen1"),
+			m_sprgen2(*this, "spritegen2"),
+			m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -63,5 +63,7 @@ public:
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );
-
+	
+	int bank_callback(int bank);
+	int bank_callback2(int bank);
 };

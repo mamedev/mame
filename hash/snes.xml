@@ -23,7 +23,6 @@ Undumped
   <Japan>
           o   PCB pic    Clock Tower / Prototype with 3 sample games
           o   PCB pic    Dai-3-Ji Super Robot Taisen / Revision C / C2941881
-          o   PCB pic    Doraemon - Nobita to Yousei no Kuni / Revision A / 55E44983
           ?              Dragon Slayer - Eiyuu Densetsu II / Prototype
           x   n/a        Eiga Shoukai Soft - Mizu no Tabinin
           o   Wii VC     Gakkou de Atta Kowai Hanashi / Revision A
@@ -398,27 +397,6 @@ Beyond that last category are the roms waiting to be classified.
                 <rom name="shvc-rt-3 p1.u2" size="524288"  crc="" sha1="" offset="0x100000" />
             </dataarea>
             <dataarea name="nvram" size="8192">
-            </dataarea>
-        </part>
-    </software>
-
-    <software name="doraemonra" cloneof="doraemon">
-        <description>Doraemon - Nobita to Yousei no Kuni (Jpn, Rev. A)</description>
-        <year>1993</year>
-        <publisher>Epoch</publisher>
-        <info name="serial" value="SHVC-DR" />
-        <info name="release" value="19930219" />
-        <info name="alt_title" value="ドラえもん のび太と妖精の国" />
-        <part name="cart" interface="snes_cart">
-            <feature name="pcb" value="SHVC-1J0N-01" />
-            <feature name="u1" value="U1 MASK ROM(N)" />
-            <feature name="u2" value="U2 CIC" />
-            <feature name="lockout" value="" />
-            <feature name="cart_revision" value="A" />
-            <feature name="cart_model" value="SHVC-006" />
-            <feature name="cart_back_label" value="920214" />
-            <dataarea name="rom" size="524288">
-                <rom name="shvc-dr-1.u1" size="524288" crc="55e44983" offset="0x000000" />
             </dataarea>
         </part>
     </software>
@@ -1372,6 +1350,23 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="u1" size="524288" crc="e76979ce" sha1="e0c31970b286f07b15e4a8b14e70460be1c073c2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hebepopnjp" cloneof="hebepopn">
+		<!-- lytron -->
+		<description>Hebereke no Popoon (Jpn, Prototype 19931101)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="37" />
+		<info name="alt_title" value="へべれけのぽぷーん" />
+		<part name="cart" interface="snes_cart">
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="s931101-037.u1" size="524288" crc="da56ab79" sha1="1b12feb8c6863d94ec077c8d52cab2bc35f72956" offset="0x000000" />
+				<rom name="u2"             size="524288" crc="b6cec398" sha1="6cf5153a056240b37f2ebfcaccf9828be9f55c87" offset="0x080000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3260,6 +3255,22 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="chou makai taisen! dorabocchan (japan) (beta) (1992-12-21).sfc" size="1048576" crc="0c34d7b5" sha1="68c77c52e5d91c379a897ce4048922e15ac9b9ed" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="contra3p" cloneof="sprobot">
+		<!-- Notes: this rom image was released in 2014 without any documentation, despite its name, it is a prototype of Contra III 
+		            the rom was overdumped to 4MiB likely due to header based dumping tools, the right size "should be" 1MiB -->
+		<description>Contra IV - The Alien Wars (USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="contra iv - the alien wars (prototype).sfc" size="4194304" crc="8f3deca5" sha1="daba9ebb5162fc4631d663ab5681c2518f6311e5" offset="0x000000" status="baddump" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -10901,7 +10912,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="doraemon">
+	<software name="doraemona" cloneof="doraemon">
 		<description>Doraemon - Nobita to Yousei no Kuni (Jpn)</description>
 		<year>1993</year>
 		<publisher>Epoch</publisher>
@@ -26165,7 +26176,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="sjinsei3">
+	<software name="sjinsei3a" cloneof="sjinsei3">
 		<description>Super Jinsei Game 3 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
@@ -28817,7 +28828,6 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="swordwl2a" cloneof="swordwl2">
-		<!-- Notes: Revision A (firmware update? initial cart unknown) -->
 		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn)</description>
 		<year>1994</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -28831,10 +28841,10 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9353 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
-			<feature name="cart_revision" value="A" />
+			<!--feature name="cart_revision" value="A" factory issue? /-->
 			<feature name="cart_back_label" value="901121" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -32197,6 +32207,28 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="doraemon">
+		<!-- single cartridge source: ototo -->
+		<description>Doraemon - Nobita to Yousei no Kuni (Jpn, Rev. A)</description>
+		<year>1993</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="SHVC-DR" />
+		<info name="release" value="19930219" />
+		<info name="alt_title" value="ドラえもん のび太と妖精の国" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-01" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="524288">
+				<rom name="shvc-dr-1.u1" size="524288" crc="55e44983" sha1="95b8e45c194618fc122ca10d5af5dbf9b9077aac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="estpolisa" cloneof="lufia">
 		<!-- single cartridge source: eyedunno -->
 		<description>Estpolis Denki (Jpn, Rev. A)</description>
@@ -32290,6 +32322,34 @@ Alternate board (XL-1)
 			<dataarea name="rom" size="1572864">
 				<rom name="shvc-gn-1 p0.u1" size="1048576" crc="7296a468" sha1="2e0262fb9e41e7eee0ccf7bbbcc30f66a0a10b7f" offset="0x000000" />
 				<rom name="shvc-gn-1 p1.u2" size="524288"  crc="7379b893" sha1="159a759e5a6186cdaea187bcf4903dfaa9fdbf6c" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="granhist">
+		<!-- single cartridge source: bigfred -->
+		<description>Granhistoria - Genshi Sekaiki (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="SHVC-AIRJ-JPN" />
+		<info name="release" value="19950630" />
+		<info name="alt_title" value="グランヒストリア~幻史世界記~" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-30" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9527 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-airj-1.u1" size="2097152" crc="27eb2cf0" sha1="d75bf1b46b8ac90e773ddf20e3e8abd38f0d4dc5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -32908,6 +32968,35 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="shinmomo">
+		<!-- single cartridge source: bigfred -->
+		<!-- Notes: Also re-released through Nintendo Power -->
+		<description>Shin Momotarou Densetsu (Jpn, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="SHVC-M5-1" />
+		<info name="release" value="19931224" />
+		<info name="alt_title" value="新 桃太郎伝説" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411B 9512 B" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-m5-1.u1" size="2097152" crc="4a653411" sha1="a9e0b5e6b0479871792f8b44f032b71fdb8f12b4" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sf2tu" cloneof="sf2t">
 		<!-- single cartridge source: nitro322 -->
 		<description>Street Fighter II Turbo - Hyper Fighting (USA, Rev. A)</description>
@@ -33178,6 +33267,35 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
+	<software name="swordwl2">
+		<!-- single cartridge source: bigfred -->
+		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn, Rev. A)</description>
+		<year>1994</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="serial" value="SHVC-7M" />
+		<info name="release" value="19940715" />
+		<info name="alt_title" value="ソードワールドSFC2 いにし えの巨人伝説" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-21" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9440 CB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shvc-7m-1.u1" size="2097152" crc="cb148365" sha1="a90412a32828fdf02968bf7b1f2efd57453ef031" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turnburns" cloneof="turnburn">
 		<!-- single cartridge source: Zidanax -->
 		<description>Turn and Burn - No-Fly Zone (Spa)</description>
@@ -33302,23 +33420,6 @@ Alternate board (XL-1)
 
 -->
 
-	<software name="granhist">
-		<description>Granhistoria - Genshi Sekaiki (Jpn, Rev. A)</description>
-		<year>1995</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="SHVC-AIRJ-JPN" />
-		<info name="release" value="19950630" />
-		<info name="alt_title" value="グランヒストリア~幻史世界記~" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="granhistoria - genshi sekaiki (japan) (rev 1).sfc" size="2097152" crc="27eb2cf0" sha1="d75bf1b46b8ac90e773ddf20e3e8abd38f0d4dc5" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mechwarri" cloneof="mechwarr">
 		<description>MechWarrior (Ita)</description>
 		<year>1993</year>
@@ -33329,24 +33430,6 @@ Alternate board (XL-1)
 				<rom name="mechwarrior (italy).sfc" size="1048576" crc="9136dce8" sha1="d85e61b4fa00172a7bd2e7f1fd06f939752b6238" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shinmomo">
-		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Shin Momotarou Densetsu (Jpn, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Hudson</publisher>
-		<info name="serial" value="SHVC-M5" />
-		<info name="release" value="19931224" />
-		<info name="alt_title" value="新 桃太郎伝説" />
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="shin momotarou densetsu (japan) (rev 1).sfc" size="2097152" crc="4a653411" sha1="a9e0b5e6b0479871792f8b44f032b71fdb8f12b4" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -33375,24 +33458,6 @@ Alternate board (XL-1)
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super big 2 (china) (unlicensed).sfc" size="2097152" crc="6865f663" sha1="9b4c25f1219335e43db59e3b511c9187ee82fd20" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swordwl2">
-		<description>Sword World SFC 2 - Inishie no Kyojin Densetsu (Jpn, Rev. A)</description>
-		<year>1994</year>
-		<publisher>T&amp;E Soft</publisher>
-		<info name="serial" value="SHVC-7M" />
-		<info name="release" value="19940715" />
-		<info name="alt_title" value="ソードワールドSFC2 いにし えの巨人伝説" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="sword world sfc 2 - inishie no kyojin densetsu (japan) (rev 1).sfc" size="2097152" crc="cb148365" sha1="a90412a32828fdf02968bf7b1f2efd57453ef031" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -57021,6 +57086,23 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="sjinsei3">
+		<description>Super Jinsei Game 3 (Jpn, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="SHVC-A3XJ-JPN" />
+		<info name="release" value="19961129" />
+		<info name="alt_title" value="スーパー人生ゲーム3" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super jinsei game 3 (japan) (rev 1).sfc" size="2097152" crc="61b947e2" sha1="99780e28af77452f00108e5c33966e7a372fe6b0" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skeirin">
 		<description>Super Keirin (Jpn)</description>
 		<year>1995</year>
@@ -62732,7 +62814,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="yokozuna">
+	<software name="yokozunaa" cloneof="yokozuna">
 		<description>Yokozuna Monogatari (Jpn)</description>
 		<year>1994</year>
 		<publisher>KSS</publisher>
@@ -62743,6 +62825,23 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="yokozuna monogatari (japan).sfc" size="1048576" crc="dda56921" sha1="8f746b8acda8fa29d85c7b90a4e64b58552176a9" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yokozuna">
+		<description>Yokozuna Monogatari (Jpn, Rev. A)</description>
+		<year>1994</year>
+		<publisher>KSS</publisher>
+		<info name="serial" value="SHVC-5U" />
+		<info name="release" value="19940825" />
+		<info name="alt_title" value="横綱物語" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="yokozuna monogatari (japan) (rev 1).sfc" size="1048576" crc="b5084d76" sha1="dda5b613f4dbc639719a99e35e6bb48e2fa24dfc" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

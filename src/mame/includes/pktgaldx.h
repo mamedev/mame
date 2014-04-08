@@ -58,4 +58,6 @@ public:
 
 	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
 	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
+
+	int bank_callback(int bank);
 };

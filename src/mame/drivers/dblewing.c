@@ -113,6 +113,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	int bank_callback(int bank);
 	void dblewing_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 
 	READ16_MEMBER( wf_protection_region_0_104_r );
@@ -331,21 +332,10 @@ WRITE_LINE_MEMBER(dblewing_state::sound_irq)
 	m_audiocpu->set_input_line(0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static int dblewing_bank_callback( const int bank )
+int dblewing_state::bank_callback( int bank )
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
-
-static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x0f,     /* trans masks (default values) */
-	0, 16, /* color base (default values) */
-	0x0f, 0x0f, /* color masks (default values) */
-	dblewing_bank_callback,
-	dblewing_bank_callback,
-	0,1,
-};
 
 void dblewing_state::machine_start()
 {
@@ -391,7 +381,19 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dblewing)
 
-	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(dblewing_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(dblewing_state, bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 

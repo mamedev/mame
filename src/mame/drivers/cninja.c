@@ -785,119 +785,27 @@ WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
 
 /**********************************************************************************/
 
-static int cninja_bank_callback( const int bank )
+int cninja_state::cninja_bank_callback( int bank )
 {
 	if ((bank >> 4) & 0xf)
 		return 0x0000; /* Only 2 banks */
 	return 0x1000;
 }
 
-static int robocop2_bank_callback( const int bank )
+int cninja_state::robocop2_bank_callback( int bank )
 {
 	return (bank & 0x30) << 8;
 }
 
-static int mutantf_1_bank_callback( const int bank )
+int cninja_state::mutantf_1_bank_callback( int bank )
 {
 	return ((bank >> 4) & 0x3) << 12;
 }
 
-static int mutantf_2_bank_callback( const int bank )
+int cninja_state::mutantf_2_bank_callback( int bank )
 {
 	return ((bank >> 5) & 0x1) << 14;
 }
-
-static const deco16ic_interface cninja_deco16ic_tilegen1_intf =
-{
-	1, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 16, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	NULL,
-	NULL,
-	0, 1,
-};
-
-static const deco16ic_interface cninja_deco16ic_tilegen2_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 48, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	cninja_bank_callback,
-	cninja_bank_callback,
-	0, 2,
-};
-
-
-
-static const deco16ic_interface edrandy_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 16, /* color base  */
-	0x0f, 0x0f, /* color masks (default values) */
-	NULL,
-	NULL,
-	0,1,
-};
-
-static const deco16ic_interface edrandy_deco16ic_tilegen2_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 48, /* color base  */
-	0x0f, 0x0f, /* color masks (default values) */
-	cninja_bank_callback,
-	cninja_bank_callback,
-	0,2,
-};
-
-
-static const deco16ic_interface robocop2_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 16, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	NULL,
-	robocop2_bank_callback,
-	0,1,
-};
-
-static const deco16ic_interface robocop2_deco16ic_tilegen2_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 48, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	robocop2_bank_callback,
-	robocop2_bank_callback,
-	0,2,
-};
-
-
-static const deco16ic_interface mutantf_deco16ic_tilegen1_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0, 0x30, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	mutantf_1_bank_callback,
-	mutantf_2_bank_callback,
-	0,1,
-};
-
-static const deco16ic_interface mutantf_deco16ic_tilegen2_intf =
-{
-	0, 1,
-	0x0f, 0x0f, /* trans masks (default values) */
-	0x20, 0x40, /* color base */
-	0x0f, 0x0f, /* color masks (default values) */
-	mutantf_1_bank_callback,
-	mutantf_1_bank_callback,
-	0,2,
-};
 
 
 void cninja_state::machine_start()
@@ -957,11 +865,33 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(1)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
@@ -1025,11 +955,33 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(1)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
@@ -1088,11 +1040,33 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(1)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
@@ -1138,11 +1112,33 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", edrandy_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", edrandy_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
@@ -1203,11 +1199,34 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", robocop2_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, robocop2_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", robocop2_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, robocop2_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, robocop2_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
@@ -1273,11 +1292,35 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DECOCOMN_ADD("deco_common")
 	MCFG_DECOCOMN_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen1", mutantf_deco16ic_tilegen1_intf)
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x30)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, mutantf_1_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, mutantf_2_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 
-	MCFG_DECO16IC_ADD("tilegen2", mutantf_deco16ic_tilegen2_intf)
+	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x20)
+	MCFG_DECO16IC_PF2_COL_BANK(0x40)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(cninja_state, mutantf_1_bank_callback)
+	MCFG_DECO16IC_BANK2_CB(cninja_state, mutantf_1_bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 	MCFG_DECO16IC_PALETTE("palette")
 

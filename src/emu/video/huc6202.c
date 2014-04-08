@@ -12,34 +12,20 @@
 const device_type HUC6202 = &device_creator<huc6202_device>;
 
 
-void huc6202_device::device_config_complete()
-{
-	const huc6202_interface *intf = reinterpret_cast<const huc6202_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<huc6202_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_next_pixel_0, 0, sizeof(m_next_pixel_0));
-		memset(&m_get_time_til_next_event_0, 0, sizeof(m_get_time_til_next_event_0));
-		memset(&m_hsync_changed_0, 0, sizeof(m_hsync_changed_0));
-		memset(&m_vsync_changed_0, 0, sizeof(m_vsync_changed_0));
-		memset(&m_read_0, 0, sizeof(m_read_0));
-		memset(&m_write_0, 0, sizeof(m_write_0));
-		memset(&m_next_pixel_1, 0, sizeof(m_next_pixel_1));
-		memset(&m_get_time_til_next_event_1, 0, sizeof(m_get_time_til_next_event_1));
-		memset(&m_hsync_changed_1, 0, sizeof(m_hsync_changed_1));
-		memset(&m_vsync_changed_1, 0, sizeof(m_vsync_changed_1));
-		memset(&m_read_1, 0, sizeof(m_read_1));
-		memset(&m_write_1, 0, sizeof(m_write_1));
-	}
-}
-
-
 huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__)
+	: device_t(mconfig, HUC6202, "HuC6202 VPC", tag, owner, clock, "huc6202", __FILE__),
+		m_next_pixel_0_cb(*this),
+		m_time_til_next_event_0_cb(*this),
+		m_vsync_changed_0_cb(*this),
+		m_hsync_changed_0_cb(*this),
+		m_read_0_cb(*this),
+		m_write_0_cb(*this),
+		m_next_pixel_1_cb(*this),
+		m_time_til_next_event_1_cb(*this),
+		m_vsync_changed_1_cb(*this),
+		m_hsync_changed_1_cb(*this),
+		m_read_1_cb(*this),
+		m_write_1_cb(*this)
 {
 }
 
@@ -48,8 +34,8 @@ READ16_MEMBER( huc6202_device::next_pixel )
 {
 	UINT16 data = huc6270_device::HUC6270_BACKGROUND;
 
-	UINT16 data_0 = m_next_pixel_0( 0, 0xffff );
-	UINT16 data_1 = m_next_pixel_1( 0, 0xffff );
+	UINT16 data_0 = m_next_pixel_0_cb( 0, 0xffff );
+	UINT16 data_1 = m_next_pixel_1_cb( 0, 0xffff );
 
 	if ( data_0 == huc6270_device::HUC6270_SPRITE && data_1 == huc6270_device::HUC6270_SPRITE )
 	{
@@ -164,8 +150,8 @@ READ16_MEMBER( huc6202_device::next_pixel )
 
 READ16_MEMBER( huc6202_device::time_until_next_event )
 {
-	UINT16 next_event_clocks_0 = m_get_time_til_next_event_0( 0, 0xffff  );
-	UINT16 next_event_clocks_1 = m_get_time_til_next_event_1( 0, 0xffff );
+	UINT16 next_event_clocks_0 = m_time_til_next_event_0_cb( 0, 0xffff  );
+	UINT16 next_event_clocks_1 = m_time_til_next_event_1_cb( 0, 0xffff );
 
 	return MIN( next_event_clocks_0, next_event_clocks_1 );
 }
@@ -173,15 +159,15 @@ READ16_MEMBER( huc6202_device::time_until_next_event )
 
 WRITE_LINE_MEMBER( huc6202_device::vsync_changed )
 {
-	m_vsync_changed_0( state );
-	m_vsync_changed_1( state );
+	m_vsync_changed_0_cb( state );
+	m_vsync_changed_1_cb( state );
 }
 
 
 WRITE_LINE_MEMBER( huc6202_device::hsync_changed )
 {
-	m_hsync_changed_0( state );
-	m_hsync_changed_1( state );
+	m_hsync_changed_0_cb( state );
+	m_hsync_changed_1_cb( state );
 }
 
 
@@ -283,11 +269,11 @@ READ8_MEMBER( huc6202_device::io_read )
 {
 	if ( m_io_device )
 	{
-		return m_read_1( offset );
+		return m_read_1_cb( offset );
 	}
 	else
 	{
-		return m_read_0( offset );
+		return m_read_0_cb( offset );
 	}
 }
 
@@ -296,11 +282,11 @@ WRITE8_MEMBER( huc6202_device::io_write )
 {
 	if ( m_io_device )
 	{
-		m_write_1( offset, data );
+		m_write_1_cb( offset, data );
 	}
 	else
 	{
-		m_write_0( offset, data );
+		m_write_0_cb( offset, data );
 	}
 }
 
@@ -308,33 +294,33 @@ WRITE8_MEMBER( huc6202_device::io_write )
 void huc6202_device::device_start()
 {
 	/* Resolve callbacks */
-	m_next_pixel_0.resolve( device_0_next_pixel, *this );
-	m_get_time_til_next_event_0.resolve( get_time_til_next_event_0, *this );
-	m_hsync_changed_0.resolve( hsync_0_changed, *this );
-	m_vsync_changed_0.resolve( vsync_0_changed, *this );
-	m_read_0.resolve( read_0, *this );
-	m_write_0.resolve( write_0, *this );
+	m_next_pixel_0_cb.resolve();
+	m_time_til_next_event_0_cb.resolve();
+	m_hsync_changed_0_cb.resolve();
+	m_vsync_changed_0_cb.resolve();
+	m_read_0_cb.resolve();
+	m_write_0_cb.resolve();
 
-	m_next_pixel_1.resolve( device_1_next_pixel, *this );
-	m_get_time_til_next_event_1.resolve( get_time_til_next_event_1, *this );
-	m_hsync_changed_1.resolve( hsync_1_changed, *this );
-	m_vsync_changed_1.resolve( vsync_1_changed, *this );
-	m_read_1.resolve( read_1, *this );
-	m_write_1.resolve( write_1, *this );
+	m_next_pixel_1_cb.resolve();
+	m_time_til_next_event_1_cb.resolve();
+	m_hsync_changed_1_cb.resolve();
+	m_vsync_changed_1_cb.resolve();
+	m_read_1_cb.resolve();
+	m_write_1_cb.resolve();
 
 	/* We want all our callbacks to be resolved */
-	assert( ! m_next_pixel_0.isnull() );
-	assert( ! m_get_time_til_next_event_0.isnull() );
-	assert( ! m_hsync_changed_0.isnull() );
-	assert( ! m_vsync_changed_0.isnull() );
-	assert( ! m_read_0.isnull() );
-	assert( ! m_write_0.isnull() );
-	assert( ! m_next_pixel_1.isnull() );
-	assert( ! m_get_time_til_next_event_1.isnull() );
-	assert( ! m_hsync_changed_1.isnull() );
-	assert( ! m_vsync_changed_1.isnull() );
-	assert( ! m_read_1.isnull() );
-	assert( ! m_write_1.isnull() );
+	assert( ! m_next_pixel_0_cb.isnull() );
+	assert( ! m_time_til_next_event_0_cb.isnull() );
+	assert( ! m_hsync_changed_0_cb.isnull() );
+	assert( ! m_vsync_changed_0_cb.isnull() );
+	assert( ! m_read_0_cb.isnull() );
+	assert( ! m_write_0_cb.isnull() );
+	assert( ! m_next_pixel_1_cb.isnull() );
+	assert( ! m_time_til_next_event_1_cb.isnull() );
+	assert( ! m_hsync_changed_1_cb.isnull() );
+	assert( ! m_vsync_changed_1_cb.isnull() );
+	assert( ! m_read_1_cb.isnull() );
+	assert( ! m_write_1_cb.isnull() );
 
 	/* Register save items */
 	save_item(NAME(m_prio[0].prio_type));

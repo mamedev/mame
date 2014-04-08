@@ -17,6 +17,12 @@ const device_type K001604 = &device_creator<k001604_device>;
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K001604, "Konami 001604", tag, owner, clock, "k001604", __FILE__),
+	m_gfx_index_1(0),
+	m_gfx_index_2(0),
+	m_layer_size(0),
+	m_roz_size(0),
+	m_txt_mem_offset(0),
+	m_roz_mem_offset(0),
 	m_tile_ram(NULL),
 	m_char_ram(NULL),
 	m_reg(NULL),
@@ -35,31 +41,6 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 void k001604_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 {
 	downcast<k001604_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k001604_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k001604_interface *intf = reinterpret_cast<const k001604_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k001604_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_gfx_index_1 = 0;
-		m_gfx_index_2 = 0;
-		m_layer_size = 0;
-		m_roz_size = 0;
-		m_txt_mem_offset = 0;
-		m_roz_mem_offset = 0;
-	}
 }
 
 //-------------------------------------------------

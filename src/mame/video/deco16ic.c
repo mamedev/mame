@@ -169,20 +169,30 @@ const device_type DECO16IC = &device_creator<deco16ic_device>;
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DECO16IC, "Data East IC 55 / 56 / 74 / 141", tag, owner, clock, "deco16ic", __FILE__),
 		device_video_interface(mconfig, *this),
-	m_pf1_data(NULL),
-	m_pf2_data(NULL),
-	m_pf12_control(NULL),
-	m_pf1_rowscroll_ptr(NULL),
-	m_pf2_rowscroll_ptr(NULL),
-	m_use_custom_pf1(0),
-	m_use_custom_pf2(0),
-	m_pf1_bank(0),
-	m_pf2_bank(0),
-	m_pf12_last_small(0),
-	m_pf12_last_big(0),
-	m_pf1_8bpp_mode(0),
-	m_gfxdecode(*this),
-	m_palette(*this)
+		m_pf1_data(NULL),
+		m_pf2_data(NULL),
+		m_pf12_control(NULL),
+		m_pf1_rowscroll_ptr(NULL),
+		m_pf2_rowscroll_ptr(NULL),
+		m_use_custom_pf1(0),
+		m_use_custom_pf2(0),
+		m_pf1_bank(0),
+		m_pf2_bank(0),
+		m_pf12_last_small(0),
+		m_pf12_last_big(0),
+		m_pf1_8bpp_mode(0),
+		m_split(0),
+		m_full_width12(1),
+		m_pf1_trans_mask(0xf),
+		m_pf2_trans_mask(0xf),
+		m_pf1_colour_bank(0),
+		m_pf2_colour_bank(0),
+		m_pf1_colourmask(0xf),
+		m_pf2_colourmask(0xf),
+		m_pf12_8x8_gfx_bank(0), 
+		m_pf12_16x16_gfx_bank(0),
+		m_gfxdecode(*this),
+		m_palette(*this)
 {
 }
 
@@ -197,27 +207,6 @@ void deco16ic_device::static_set_gfxdecode_tag(device_t &device, const char *tag
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void deco16ic_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const deco16ic_interface *intf = reinterpret_cast<const deco16ic_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<deco16ic_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_bank_cb0 = NULL;
-	m_bank_cb1 = NULL;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -226,8 +215,8 @@ void deco16ic_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_bank_cb_func[0] = m_bank_cb0;
-	m_bank_cb_func[1] = m_bank_cb1;
+	m_bank1_cb.bind_relative_to(*owner());
+	m_bank2_cb.bind_relative_to(*owner());
 
 	int fullheight = 0;
 	int fullwidth = 0;
@@ -832,9 +821,9 @@ void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *ro
 	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff);
 
 	/* Update banking and global flip state */
-	if (m_bank_cb_func[0])
+	if (!m_bank1_cb.isnull())
 	{
-		bank1 = m_bank_cb_func[0](m_pf12_control[7] & 0xff);
+		bank1 = m_bank1_cb(m_pf12_control[7] & 0xff);
 
 		if (bank1 != m_pf1_bank)
 		{
@@ -847,9 +836,9 @@ void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *ro
 		}
 	}
 
-	if (m_bank_cb_func[1])
+	if (!m_bank2_cb.isnull())
 	{
-		bank2 = m_bank_cb_func[1](m_pf12_control[7] >> 8);
+		bank2 = m_bank2_cb(m_pf12_control[7] >> 8);
 
 		if (bank2 != m_pf2_bank)
 		{

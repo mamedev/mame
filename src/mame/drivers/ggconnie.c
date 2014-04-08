@@ -180,23 +180,6 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static const huc6202_interface sgx_huc6202_config =
-{
-	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, next_pixel ),
-	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, time_until_next_event ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270_0", huc6270_device, vsync_changed ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270_0", huc6270_device, hsync_changed ),
-	DEVCB_DEVICE_MEMBER( "huc6270_0", huc6270_device, read ),
-	DEVCB_DEVICE_MEMBER( "huc6270_0", huc6270_device, write ),
-	DEVCB_DEVICE_MEMBER16( "huc6270_1", huc6270_device, next_pixel ),
-	DEVCB_DEVICE_MEMBER16( "huc6270_1", huc6270_device, time_until_next_event ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270_1", huc6270_device, vsync_changed ),
-	DEVCB_DEVICE_LINE_MEMBER( "huc6270_1", huc6270_device, hsync_changed ),
-	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, read ),
-	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, write ),
-};
-
-
 static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
@@ -220,7 +203,19 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
-	MCFG_HUC6202_ADD( "huc6202", sgx_huc6202_config )
+	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
+	MCFG_HUC6202_NEXT_PIXEL_0_CB(DEVREAD16("huc6270_0", huc6270_device, next_pixel))
+	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(DEVREAD16("huc6270_0", huc6270_device, time_until_next_event))
+	MCFG_HUC6202_VSYNC_CHANGED_0_CB(DEVWRITELINE("huc6270_0", huc6270_device, vsync_changed))
+	MCFG_HUC6202_HSYNC_CHANGED_0_CB(DEVWRITELINE("huc6270_0", huc6270_device, hsync_changed))
+	MCFG_HUC6202_READ_0_CB(DEVREAD8("huc6270_0", huc6270_device, read))
+	MCFG_HUC6202_WRITE_0_CB(DEVWRITE8("huc6270_0", huc6270_device, write))
+	MCFG_HUC6202_NEXT_PIXEL_1_CB(DEVREAD16("huc6270_1", huc6270_device, next_pixel))
+	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(DEVREAD16("huc6270_1", huc6270_device, time_until_next_event))
+	MCFG_HUC6202_VSYNC_CHANGED_1_CB(DEVWRITELINE("huc6270_1", huc6270_device, vsync_changed))
+	MCFG_HUC6202_HSYNC_CHANGED_1_CB(DEVWRITELINE("huc6270_1", huc6270_device, hsync_changed))
+	MCFG_HUC6202_READ_1_CB(DEVREAD8("huc6270_1", huc6270_device, read))
+	MCFG_HUC6202_WRITE_1_CB(DEVWRITE8("huc6270_1", huc6270_device, write))
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
 
