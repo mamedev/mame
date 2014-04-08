@@ -153,17 +153,6 @@ READ8_MEMBER( selz80_state::kbd_r )
 	return data;
 }
 
-static I8279_INTERFACE( selz80_intf )
-{
-	DEVCB_NULL, // irq
-	DEVCB_DRIVER_MEMBER(selz80_state, scanlines_w), // scan SL lines
-	DEVCB_DRIVER_MEMBER(selz80_state, digit_w),     // display A&B
-	DEVCB_NULL,                     // BD
-	DEVCB_DRIVER_MEMBER(selz80_state, kbd_r),       // kbd RL lines
-	DEVCB_LINE_VCC,                     // Shift key
-	DEVCB_LINE_VCC
-};
-
 static MACHINE_CONFIG_START( selz80, selz80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -174,7 +163,12 @@ static MACHINE_CONFIG_START( selz80, selz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_selz80)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 2500000, selz80_intf) // based on divider
+	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
+	MCFG_I8279_OUT_SL_CB(WRITE8(selz80_state, scanlines_w))			// scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(selz80_state, digit_w))			// display A&B
+	MCFG_I8279_IN_RL_CB(READ8(selz80_state, kbd_r))					// kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(VCC)										// Shift key
+	MCFG_I8279_IN_CTRL_CB(VCC)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dagz80, selz80 )

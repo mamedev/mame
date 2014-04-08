@@ -410,18 +410,6 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 	return data;
 }
 
-
-static I8279_INTERFACE( mmd2_intf )
-{
-	DEVCB_NULL,                     // irq
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_scanlines_w),  // scan SL lines
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_digit_w),      // display A&B
-	DEVCB_NULL,                     // BD
-	DEVCB_DRIVER_MEMBER(mmd1_state, mmd2_kbd_r),        // kbd RL lines
-	DEVCB_LINE_VCC,                     // Shift key
-	DEVCB_LINE_VCC
-};
-
 WRITE8_MEMBER( mmd1_state::mmd2_status_callback )
 {
 	// operate the HALT LED
@@ -513,7 +501,13 @@ static MACHINE_CONFIG_START( mmd2, mmd1_state )
 	MCFG_DEFAULT_LAYOUT(layout_mmd2)
 
 	/* Devices */
-	MCFG_I8279_ADD("i8279", 400000, mmd2_intf) // based on divider
+	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
+	MCFG_I8279_OUT_SL_CB(WRITE8(mmd1_state, mmd2_scanlines_w))			// scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(mmd1_state, mmd2_digit_w))			// display A&B
+	MCFG_I8279_IN_RL_CB(READ8(mmd1_state, mmd2_kbd_r))					// kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(VCC)										// Shift key
+	MCFG_I8279_IN_CTRL_CB(VCC)
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
