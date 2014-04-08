@@ -742,8 +742,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(analog2_lsb_r)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(analog3_msb_r)
 	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(analog3_lsb_r)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -797,8 +797,8 @@ static ADDRESS_MAP_START( audio_map_prog, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_2_start_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_2_stop_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_1_start_w)
@@ -925,12 +925,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const tc0140syt_interface mlanding_tc0140syt_intf =
-{
-	"maincpu", "audiocpu"
-};
-
-
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_NULL, // Interrupt handler
@@ -970,7 +964,10 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_IO_MAP(dsp_map_io)
 
 	MCFG_Z80CTC_ADD("ctc", 4000000, ctc_intf)
-	MCFG_TC0140SYT_ADD("tc0140syt", mlanding_tc0140syt_intf)
+
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

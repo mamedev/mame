@@ -172,7 +172,7 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 	switch (offset)
 	{
 		case 0x01:
-			return (m_tc0140syt->tc0140syt_comm_r(space, 0) & 0xff);    /* sound interface read */
+			return (m_tc0140syt->master_comm_r(space, 0) & 0xff);    /* sound interface read */
 
 		case 0x04:
 			return ioport("P1")->read();
@@ -201,12 +201,12 @@ WRITE16_MEMBER(darius_state::darius_ioc_w)
 	{
 		case 0x00:  /* sound interface write */
 
-			m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
+			m_tc0140syt->master_port_w(space, 0, data & 0xff);
 			return;
 
 		case 0x01:  /* sound interface write */
 
-			m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
+			m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 			return;
 
 		case 0x28:  /* unknown, written by both cpus - always 0? */
@@ -464,8 +464,8 @@ static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -790,11 +790,6 @@ static const pc080sn_interface darius_pc080sn_intf =
 	-16, 8, 0, 1    /* x_offset, y_offset, y_invert, dblwidth */
 };
 
-static const tc0140syt_interface darius_tc0140syt_intf =
-{
-	"maincpu", "audiocpu"
-};
-
 void darius_state::darius_postload()
 {
 	parse_control();
@@ -972,7 +967,9 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_FILTER_VOLUME_ADD("msm5205.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", darius_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

@@ -44,8 +44,8 @@ tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *ta
 		m_submode(0),
 		m_status(0),
 		m_nmi_enabled(0),
-		m_mastercpu(NULL),
-		m_slavecpu(NULL)
+		m_mastercpu(*this),
+		m_slavecpu(*this)
 {
 	memset(m_slavedata, 0, sizeof(UINT8)*4);
 	memset(m_masterdata, 0, sizeof(UINT8)*4);
@@ -58,11 +58,6 @@ tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *ta
 
 void tc0140syt_device::device_start()
 {
-	const tc0140syt_interface *intf = reinterpret_cast<const tc0140syt_interface*>(static_config());
-
-	m_mastercpu = machine().device(intf->master);
-	m_slavecpu = machine().device(intf->slave);
-
 	save_item(NAME(m_mainmode));
 	save_item(NAME(m_submode));
 	save_item(NAME(m_status));
@@ -100,7 +95,7 @@ void tc0140syt_device::update_nmi()
 	UINT32 nmi_pending = m_status & (TC0140SYT_PORT23_FULL | TC0140SYT_PORT01_FULL);
 	UINT32 state = (nmi_pending && m_nmi_enabled) ? ASSERT_LINE : CLEAR_LINE;
 
-	m_slavecpu->execute().set_input_line(INPUT_LINE_NMI, state);
+	m_slavecpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 
@@ -108,7 +103,7 @@ void tc0140syt_device::update_nmi()
 //  MASTER SIDE
 //-------------------------------------------------
 
-WRITE8_MEMBER( tc0140syt_device::tc0140syt_port_w )
+WRITE8_MEMBER( tc0140syt_device::master_port_w )
 {
 	data &= 0x0f;
 	m_mainmode = data;
@@ -119,7 +114,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_port_w )
 	}
 }
 
-WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
+WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 {
 	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
 	data &= 0x0f; /* this is important, otherwise ballbros won't work */
@@ -148,7 +143,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 
 		case 0x04: // port status
 			/* this does a hi-lo transition to reset the sound cpu */
-			m_slavecpu->execute().set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+			m_slavecpu->set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		default:
@@ -156,7 +151,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 	}
 }
 
-READ8_MEMBER( tc0140syt_device::tc0140syt_comm_r )
+READ8_MEMBER( tc0140syt_device::master_comm_r )
 {
 	machine().scheduler().synchronize(); // let slavecpu catch up before changing anything
 	UINT8 res = 0;
@@ -197,7 +192,7 @@ READ8_MEMBER( tc0140syt_device::tc0140syt_comm_r )
 //  SLAVE SIDE
 //-------------------------------------------------
 
-WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_port_w )
+WRITE8_MEMBER( tc0140syt_device::slave_port_w )
 {
 	data &= 0x0f;
 	m_submode = data;
@@ -208,7 +203,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_port_w )
 	}
 }
 
-WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
+WRITE8_MEMBER( tc0140syt_device::slave_comm_w )
 {
 	data &= 0x0f;
 
@@ -251,7 +246,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
 	}
 }
 
-READ8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_r )
+READ8_MEMBER( tc0140syt_device::slave_comm_r )
 {
 	UINT8 res = 0;
 
