@@ -1,44 +1,20 @@
 // license: ?
 // copyright-holders: Angelo Salese
-/***************************************************************************
-
-Template for skeleton device
-
-***************************************************************************/
-
 #pragma once
 
 #ifndef __MB_VCUDEV_H__
 #define __MB_VCUDEV_H__
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB_VCU_ADD(_tag,_freq,_config, _palette_tag) \
-	MCFG_DEVICE_ADD(_tag, MB_VCU, _freq) \
-	MCFG_DEVICE_CONFIG(_config) \
-	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> mb_vcu_interface
-
-struct mb_vcu_interface
-{
-	const char         *m_cpu_tag;
-};
 
 // ======================> mb_vcu_device
 
 class mb_vcu_device : public device_t,
 						public device_memory_interface,
-						public device_video_interface,
-						public mb_vcu_interface
+						public device_video_interface
 {
 public:
 	// construction/destruction
@@ -46,6 +22,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<mb_vcu_device &>(device).m_cpu.set_tag(tag); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write_vregs );
@@ -65,7 +42,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
@@ -81,7 +57,6 @@ private:
 	UINT8 m_status;
 	UINT8 *m_ram;
 	UINT8 *m_palram;
-	cpu_device *m_cpu;
 	UINT16 m_param_offset_latch;
 
 	INT16 m_xpos, m_ypos;
@@ -95,6 +70,7 @@ private:
 	double m_weights_r[2];
 	double m_weights_g[3];
 	double m_weights_b[3];
+	required_device<cpu_device>     m_cpu;
 	required_device<palette_device> m_palette;
 };
 
@@ -103,11 +79,14 @@ private:
 extern const device_type MB_VCU;
 
 
-
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_MB_VCU_CPU(_tag) \
+	mb_vcu_device::set_cpu_tag(*device, "^"_tag);
 
+#define MCFG_MB_VCU_PALETTE(_palette_tag) \
+	mb_vcu_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif
