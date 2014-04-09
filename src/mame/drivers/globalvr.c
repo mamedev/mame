@@ -74,7 +74,7 @@ protected:
 
 
 static ADDRESS_MAP_START( globalvr_map, AS_PROGRAM, 32, globalvr_state )
-	AM_RANGE(0x00000000, 0xffffffff) AM_RAM
+	AM_RANGE(0x00000000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
