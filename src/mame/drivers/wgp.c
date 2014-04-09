@@ -933,24 +933,6 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::wgp_postload), this));
 }
 
-static const tc0100scn_interface wgp_tc0100scn_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface wgp2_tc0100scn_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	4, 2,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
 static MACHINE_CONFIG_START( wgp, wgp_state )
 
 	/* basic machine hardware */
@@ -988,7 +970,9 @@ static MACHINE_CONFIG_START( wgp, wgp_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", wgp_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -1014,8 +998,8 @@ static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state,wgp2)
 
-	MCFG_DEVICE_REMOVE("tc0100scn")
-	MCFG_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)
+	MCFG_DEVICE_MODIFY("tc0100scn")
+	MCFG_TC0100SCN_OFFSETS(4, 2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END

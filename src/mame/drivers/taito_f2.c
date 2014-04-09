@@ -2833,98 +2833,6 @@ static const ay8910_interface ay8910_config =
                       MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0100scn_interface taitof2_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface liquidk_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface dondokod_tc0100scn_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	3, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface finalb_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	1, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-#if 0
-static const tc0100scn_interface ninjak_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	1, 2,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-#endif
-
-static const tc0100scn_interface qzchikyu_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	-4, 0,      /* flip_xoff, flip_yoff */
-	-11, 0,     /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface solfigtr_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3, 0,       /* x_offset, y_offset */
-	6, 0,       /* flip_xoff, flip_yoff */
-	6, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface koshien_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	1, 0,       /* x_offset, y_offset */
-	2, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface thundfox_tc0100scn_intf_1 =
-{
-	1, 3,       /* gfxnum, txnum */
-	3, 0,       /* x_offset, y_offset */
-	5, 0,       /* flip_xoff, flip_yoff */
-	4, 1,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface thundfox_tc0100scn_intf_2 =
-{
-	2, 4,       /* gfxnum, txnum */
-	3, 0,       /* x_offset, y_offset */
-	5, 0,       /* flip_xoff, flip_yoff */
-	4, 1,       /* flip_text_xoff, flip_text_yoff */
-	TC0100SCN_SINGLE_VDU, 1
-};
-
 static const tc0480scp_interface footchmp_tc0480scp_intf =
 {
 	1, 2,       /* gfxnum, txnum */
@@ -3067,7 +2975,10 @@ static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3089,7 +3000,10 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3097,7 +3011,7 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 	MCFG_TC0280GRD_GFX_REGION(2)
 	MCFG_TC0280GRD_GFXDECODE("gfxdecode");
 
-MCFG_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
@@ -3112,7 +3026,10 @@ static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3133,11 +3050,23 @@ static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_thundfox)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_thundfox)
 
-	MCFG_TC0100SCN_ADD("tc0100scn_1", thundfox_tc0100scn_intf_1)
+	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIP(5, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIPTX(4, 1)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn_2", thundfox_tc0100scn_intf_2)
+	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(4)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIP(5, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIPTX(4, 1)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(TC0100SCN_SINGLE_VDU)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3157,7 +3086,10 @@ static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3180,7 +3112,9 @@ static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3201,7 +3135,10 @@ static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3220,7 +3157,9 @@ static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3244,7 +3183,10 @@ static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_ssi)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_thundfox)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3265,7 +3207,10 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3284,7 +3229,10 @@ static MACHINE_CONFIG_DERIVED( growl, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3301,7 +3249,9 @@ static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_mjnquest)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3370,7 +3320,11 @@ static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", koshien_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIP(2, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3393,7 +3347,10 @@ static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3410,7 +3367,10 @@ static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3429,7 +3389,12 @@ static MACHINE_CONFIG_DERIVED( solfigtr, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", solfigtr_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIP(6, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIPTX(6, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3447,7 +3412,9 @@ static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3465,7 +3432,10 @@ static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3511,7 +3481,12 @@ static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_qzchikyu)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", qzchikyu_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(0, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIP(-4, 0)
+	MCFG_TC0100SCN_OFFSETS_FLIPTX(-11, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3529,7 +3504,10 @@ static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_yesnoj)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3589,7 +3567,10 @@ static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3611,7 +3592,10 @@ static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3633,7 +3617,10 @@ static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3655,7 +3642,10 @@ static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3675,7 +3665,10 @@ static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3722,7 +3715,10 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3787,7 +3783,10 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_driftout)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 

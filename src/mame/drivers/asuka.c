@@ -778,25 +778,6 @@ WRITE_LINE_MEMBER(asuka_state::irqhandler)
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0100scn_interface asuka_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface cadash_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	1, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-
 void asuka_state::machine_start()
 {
 	/* configure the banks */
@@ -869,9 +850,12 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -928,9 +912,12 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -996,9 +983,13 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1054,9 +1045,13 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1117,9 +1112,13 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1175,9 +1174,13 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
 
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 

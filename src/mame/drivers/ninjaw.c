@@ -724,33 +724,6 @@ to the scrolling background.
 Darius2: arbitrary interleaving of 10 to keep cpus synced.
 *************************************************************/
 
-static const tc0100scn_interface darius2_tc0100scn_intf_l =
-{
-	1, 3,       /* gfxnum, txnum */
-	22, 0,      /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface darius2_tc0100scn_intf_m =
-{
-	2, 3,       /* gfxnum, txnum */
-	22, 0,      /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	2, 1
-};
-
-static const tc0100scn_interface darius2_tc0100scn_intf_r =
-{
-	2, 3,       /* gfxnum, txnum */
-	22, 0,      /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	4, 1
-};
-
 void ninjaw_state::ninjaw_postload()
 {
 	parse_control();
@@ -832,20 +805,39 @@ static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_ninjaw_right)
 	MCFG_SCREEN_PALETTE("palette3")
 
-	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(0)
+	MCFG_TC0100SCN_MULTISCR_HACK(0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette2")
-	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette3")
 
 	MCFG_TC0110PCR_ADD("tc0110pcr_1")
 	MCFG_TC0110PCR_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(2)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette2")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")
 	MCFG_TC0110PCR_PALETTE("palette2")
+
+	MCFG_DEVICE_ADD("tc0100scn_3", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(4)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_3")
 	MCFG_TC0110PCR_PALETTE("palette3")
 
@@ -933,20 +925,39 @@ static MACHINE_CONFIG_START( darius2, ninjaw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ninjaw_state, screen_update_ninjaw_right)
 	MCFG_SCREEN_PALETTE("palette3")
 
-	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2_tc0100scn_intf_l)
+	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(0)
+	MCFG_TC0100SCN_MULTISCR_HACK(0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2_tc0100scn_intf_m)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette2")
-	MCFG_TC0100SCN_ADD("tc0100scn_3", darius2_tc0100scn_intf_r)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette3")
 
 	MCFG_TC0110PCR_ADD("tc0110pcr_1")
 	MCFG_TC0110PCR_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(2)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette2")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")
 	MCFG_TC0110PCR_PALETTE("palette2")
+
+	MCFG_DEVICE_ADD("tc0100scn_3", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(22, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(4)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr_3")
 	MCFG_TC0110PCR_PALETTE("palette3")
 

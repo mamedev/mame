@@ -2955,34 +2955,6 @@ Contcirc road glitchiness in attract?
 
 ***********************************************************/
 
-
-static const tc0100scn_interface taitoz_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface chasehq_tc0100scn_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface spacegun_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
 static const tc0480scp_interface taitoz_tc0480scp_intf =
 {
 	1, 2,       /* gfxnum, txnum */
@@ -3075,7 +3047,9 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3152,7 +3126,9 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3231,7 +3207,9 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3306,7 +3284,9 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3386,7 +3366,9 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3461,7 +3443,9 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3540,7 +3524,9 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3614,7 +3600,10 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", spacegun_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 

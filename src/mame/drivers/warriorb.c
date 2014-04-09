@@ -423,43 +423,6 @@ WRITE_LINE_MEMBER(warriorb_state::irqhandler)
                        MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0100scn_interface darius2d_tc0100scn_intf_l =
-{
-	1, 3,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface darius2d_tc0100scn_intf_r =
-{
-	2, 3,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 1
-};
-
-static const tc0100scn_interface warriorb_tc0100scn_intf_l =
-{
-	1, 3,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface warriorb_tc0100scn_intf_r =
-{
-	2, 3,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	1, 1
-};
-
-
 void warriorb_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
@@ -509,6 +472,16 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_left)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
+
+	MCFG_TC0110PCR_ADD("tc0110pcr_1")
+	MCFG_TC0110PCR_PALETTE("palette")
+
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -517,16 +490,14 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-	MCFG_TC0100SCN_ADD("tc0100scn_1", darius2d_tc0100scn_intf_l)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
-
-	MCFG_TC0100SCN_ADD("tc0100scn_2", darius2d_tc0100scn_intf_r)
+	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")
 	MCFG_TC0110PCR_PALETTE("palette2")
 
@@ -589,6 +560,16 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_left)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
+
+	MCFG_TC0110PCR_ADD("tc0110pcr_1")
+	MCFG_TC0110PCR_PALETTE("palette")
+
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -597,16 +578,15 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SCREEN_UPDATE_DRIVER(warriorb_state, screen_update_warriorb_right)
 	MCFG_SCREEN_PALETTE("palette2")
 
-	MCFG_TC0100SCN_ADD("tc0100scn_1", warriorb_tc0100scn_intf_l)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
-
-	MCFG_TC0100SCN_ADD("tc0100scn_2", warriorb_tc0100scn_intf_r)
+	MCFG_DEVICE_ADD("tc0100scn_2", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(2)
+	MCFG_TC0100SCN_TX_REGION(3)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(1)
+	MCFG_TC0100SCN_MULTISCR_HACK(1)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette2")
 
-	MCFG_TC0110PCR_ADD("tc0110pcr_1")
-	MCFG_TC0110PCR_PALETTE("palette")
 	MCFG_TC0110PCR_ADD("tc0110pcr_2")
 	MCFG_TC0110PCR_PALETTE("palette2")
 
