@@ -1447,8 +1447,8 @@ public:
 	UINT16 m_c435_buffer[256];
 	int m_c435_buffer_pos;
 
-	int m_porta;
-	int m_lastpb;
+	UINT8 m_sub_porta;
+	UINT8 m_sub_portb;
 	UINT8 m_tssio_port_4;
 
 	void update_main_interrupts(UINT32 cause);
@@ -1508,7 +1508,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
-	void sub_irq(screen_device &screen, bool state);
+	void sub_irq(screen_device &screen, bool vblank_state);
 	UINT8 nthbyte(const UINT32 *pSource, int offs);
 	UINT16 nthword(const UINT32 *pSource, int offs);
 	inline INT32 u32_to_s24(UINT32 v);
@@ -2255,11 +2255,11 @@ INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
 	m_render.count[m_render.cur] = 0;
 }
 
-void namcos23_state::sub_irq(screen_device &screen, bool state)
+void namcos23_state::sub_irq(screen_device &screen, bool vblank_state)
 {
-	m_subcpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
-	m_adc->adtrg_w(state);
-	m_lastpb = (m_lastpb & 0x7f) | (state << 7);
+	m_subcpu->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
+	m_adc->adtrg_w(vblank_state);
+	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
 
@@ -2861,15 +2861,15 @@ WRITE16_MEMBER(namcos23_state::mcu_p8_w)
 
 READ16_MEMBER(namcos23_state::mcu_pa_r)
 {
-	return m_porta;
+	return m_sub_porta;
 }
 
 WRITE16_MEMBER(namcos23_state::mcu_pa_w)
 {
 	m_rtc->ce_w(data & 1);
-	m_porta = data;
-	m_rtc->ce_w((m_lastpb & 0x20) && (m_porta & 1));
-	m_settings->ce_w((m_lastpb & 0x20) && !(m_porta & 1));
+	m_sub_porta = data;
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 
@@ -2878,14 +2878,14 @@ WRITE16_MEMBER(namcos23_state::mcu_pa_w)
 
 READ16_MEMBER(namcos23_state::mcu_pb_r)
 {
-	return m_lastpb;
+	return m_sub_portb;
 }
 
 WRITE16_MEMBER(namcos23_state::mcu_pb_w)
 {
-	m_lastpb = data;
-	m_rtc->ce_w((m_lastpb & 0x20) && (m_porta & 1));
-	m_settings->ce_w((m_lastpb & 0x20) && !(m_porta & 1));
+	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 
@@ -3256,9 +3256,9 @@ DRIVER_INIT_MEMBER(namcos23_state,s23)
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
-	m_lastpb = 0x50;
+	m_sub_portb = 0x50;
 	m_tssio_port_4 = 0;
-	m_porta = 0;
+	m_sub_porta = 0;
 	m_subcpu_running = false;
 	m_render.count[0] = m_render.count[1] = 0;
 	m_render.cur = 0;

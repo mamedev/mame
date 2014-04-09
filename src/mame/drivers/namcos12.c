@@ -1077,8 +1077,8 @@ public:
 
 	int m_ttt_cnt;
 	UINT32 m_ttt_val[2];
-	int m_s12_porta;
-	int m_s12_lastpB;
+	UINT8 m_sub_porta;
+	UINT8 m_sub_portb;
 
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
@@ -1235,7 +1235,7 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 {
 	m_sub->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(vblank_state);
-	m_s12_lastpB = (m_s12_lastpB & 0x7f) | (vblank_state << 7);
+	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
@@ -1473,27 +1473,27 @@ READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 
 READ16_MEMBER(namcos12_state::s12_mcu_pa_r)
 {
-	return m_s12_porta;
+	return m_sub_porta;
 }
 
 WRITE16_MEMBER(namcos12_state::s12_mcu_pa_w)
 {
 	logerror("pa_w %02x\n", data);
-	m_s12_porta = data;
-	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
-	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
+	m_sub_porta = data;
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 READ16_MEMBER(namcos12_state::s12_mcu_portB_r)
 {
-	return m_s12_lastpB;
+	return m_sub_portb;
 }
 
 WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 {
-	m_s12_lastpB = data;
-	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
-	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
+	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
@@ -1537,8 +1537,8 @@ DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
 	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
-	m_s12_porta = 0;
-	m_s12_lastpB = 0x50;
+	m_sub_porta = 0;
+	m_sub_portb = 0x50;
 
 	m_n_tektagdmaoffset = 0;
 	m_n_dmaoffset = 0;
