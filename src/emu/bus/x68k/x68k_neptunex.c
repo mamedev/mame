@@ -13,17 +13,12 @@
 
 const device_type X68K_NEPTUNEX = &device_creator<x68k_neptune_device>;
 
-static const dp8390_interface neptune_dp8390_interface = {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_mem_read),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, x68k_neptune_device, x68k_neptune_mem_write)
-};
-
-
 // device machine config
 static MACHINE_CONFIG_FRAGMENT( x68k_neptunex )
-	MCFG_DP8390D_ADD("dp8390d", neptune_dp8390_interface)
+	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
+	MCFG_DP8390D_IRQ_CB(WRITELINE(x68k_neptune_device, x68k_neptune_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(x68k_neptune_device, x68k_neptune_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(x68k_neptune_device, x68k_neptune_mem_write))
 MACHINE_CONFIG_END
 
 machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
@@ -85,7 +80,7 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 		m_dp8390->dp8390_reset(CLEAR_LINE);
 		return 0;
 	default:
-		logerror("ne2000: invalid register read %02X\n", offset);
+		logerror("x68k_neptune: invalid register read %02X\n", offset);
 	}
 	return 0;
 }
@@ -118,7 +113,7 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 		m_dp8390->dp8390_reset(ASSERT_LINE);
 		return;
 	default:
-		logerror("ne2000: invalid register write %02X\n", offset);
+		logerror("x68k_neptune: invalid register write %02X\n", offset);
 	}
 	return;
 }
@@ -128,7 +123,7 @@ READ8_MEMBER(x68k_neptune_device::x68k_neptune_mem_read)
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024)))
 	{
-		logerror("ne2000: invalid memory read %04X\n", offset);
+		logerror("x68k_neptune: invalid memory read %04X\n", offset);
 		return 0xff;
 	}
 	return m_board_ram[offset - (16*1024)];
@@ -138,7 +133,7 @@ WRITE8_MEMBER(x68k_neptune_device::x68k_neptune_mem_write)
 {
 	if((offset < (16*1024)) || (offset >= (32*1024)))
 	{
-		logerror("ne2000: invalid memory write %04X\n", offset);
+		logerror("x68k_neptune: invalid memory write %04X\n", offset);
 		return;
 	}
 	m_board_ram[offset - (16*1024)] = data;

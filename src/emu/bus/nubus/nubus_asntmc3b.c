@@ -16,16 +16,12 @@
 #define MAC8390_ROM_REGION  "asntm3b_rom"
 #define MAC8390_839X  "dp83902"
 
-static const dp8390_interface dp8390_interface =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_mem_read),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, nubus_mac8390_device, dp_mem_write)
-};
 
 MACHINE_CONFIG_FRAGMENT( asntm3b )
-	MCFG_DP8390D_ADD(MAC8390_839X, dp8390_interface)
+	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
+	MCFG_DP8390D_IRQ_CB(WRITELINE(nubus_mac8390_device, dp_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(nubus_mac8390_device, dp_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(nubus_mac8390_device, dp_mem_write))
 MACHINE_CONFIG_END
 
 ROM_START( asntm3nb )

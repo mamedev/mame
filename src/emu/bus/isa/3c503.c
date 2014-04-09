@@ -3,15 +3,11 @@
 
 #define SADDR 0xcc000
 
-static const dp8390_interface el2_3c503_dp8390_interface = {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_mem_read),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, el2_3c503_device, el2_3c503_mem_write)
-};
-
 static MACHINE_CONFIG_FRAGMENT(el2_3c503_config)
-	MCFG_DP8390D_ADD("dp8390d", el2_3c503_dp8390_interface)
+	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
+	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
+	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))
+	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
 MACHINE_CONFIG_END
 
 const device_type EL2_3C503 = &device_creator<el2_3c503_device>;
