@@ -42,38 +42,6 @@
 const device_type WD11C00_17 = &device_creator<wd11c00_17_device>;
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wd11c00_17_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const wd11c00_17_interface *intf = reinterpret_cast<const wd11c00_17_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<wd11c00_17_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq5_cb, 0, sizeof(m_out_irq5_cb));
-		memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
-		memset(&m_out_mr_cb, 0, sizeof(m_out_mr_cb));
-		memset(&m_out_busy_cb, 0, sizeof(m_out_busy_cb));
-		memset(&m_out_req_cb, 0, sizeof(m_out_req_cb));
-		memset(&m_out_ra3_cb, 0, sizeof(m_out_ra3_cb));
-		memset(&m_in_rd322_cb, 0, sizeof(m_in_rd322_cb));
-		memset(&m_in_ramcs_cb, 0, sizeof(m_in_ramcs_cb));
-		memset(&m_out_ramwr_cb, 0, sizeof(m_out_ramwr_cb));
-		memset(&m_in_cs1010_cb, 0, sizeof(m_in_cs1010_cb));
-		memset(&m_out_cs1010_cb, 0, sizeof(m_out_cs1010_cb));
-	}
-}
-
-
-
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
@@ -93,7 +61,7 @@ inline void wd11c00_17_device::check_interrupt()
 
 	if (m_ra3 != ra3)
 	{
-		m_out_ra3_func(ra3 ? ASSERT_LINE : CLEAR_LINE);
+		m_out_ra3_cb(ra3 ? ASSERT_LINE : CLEAR_LINE);
 		m_ra3 = ra3;
 	}
 
@@ -101,7 +69,7 @@ inline void wd11c00_17_device::check_interrupt()
 
 	if (m_irq5 != irq5)
 	{
-		m_out_irq5_func(irq5);
+		m_out_irq5_cb(irq5);
 		m_irq5 = irq5;
 	}
 
@@ -109,7 +77,7 @@ inline void wd11c00_17_device::check_interrupt()
 
 	if (m_drq3 != drq3)
 	{
-		m_out_drq3_func(drq3);
+		m_out_drq3_cb(drq3);
 		m_drq3 = drq3;
 	}
 
@@ -117,7 +85,7 @@ inline void wd11c00_17_device::check_interrupt()
 
 	if (m_busy != busy)
 	{
-		m_out_busy_func(busy);
+		m_out_busy_cb(busy);
 		m_busy = busy;
 	}
 
@@ -125,7 +93,7 @@ inline void wd11c00_17_device::check_interrupt()
 
 	if (m_req != req)
 	{
-		m_out_req_func(req);
+		m_out_req_cb(req);
 		m_req = req;
 	}
 }
@@ -152,7 +120,7 @@ inline UINT8 wd11c00_17_device::read_data()
 
 	if (m_status & STATUS_BUSY)
 	{
-		data = m_in_ramcs_func(m_ra & 0x7ff);
+		data = m_in_ramcs_cb(m_ra & 0x7ff);
 
 		increment_address();
 	}
@@ -169,7 +137,7 @@ inline void wd11c00_17_device::write_data(UINT8 data)
 {
 	if (m_status & STATUS_BUSY)
 	{
-		m_out_ramwr_func(m_ra & 0x7ff, data);
+		m_out_ramwr_cb(m_ra & 0x7ff, data);
 
 		increment_address();
 	}
@@ -182,8 +150,8 @@ inline void wd11c00_17_device::write_data(UINT8 data)
 
 inline void wd11c00_17_device::software_reset()
 {
-	m_out_mr_func(ASSERT_LINE);
-	m_out_mr_func(CLEAR_LINE);
+	m_out_mr_cb(ASSERT_LINE);
+	m_out_mr_cb(CLEAR_LINE);
 
 	device_reset();
 }
@@ -212,6 +180,17 @@ inline void wd11c00_17_device::select()
 
 wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock, "wd11c00_17", __FILE__),
+		m_out_irq5_cb(*this),
+		m_out_drq3_cb(*this),
+		m_out_mr_cb(*this),
+		m_out_busy_cb(*this),
+		m_out_req_cb(*this),
+		m_out_ra3_cb(*this),
+		m_in_rd322_cb(*this),
+		m_in_ramcs_cb(*this),
+		m_out_ramwr_cb(*this),
+		m_in_cs1010_cb(*this),
+		m_out_cs1010_cb(*this),
 		m_status(0),
 		m_ra(0),
 		m_irq5(CLEAR_LINE),
@@ -230,17 +209,17 @@ wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *
 void wd11c00_17_device::device_start()
 {
 	// resolve callbacks
-	m_out_irq5_func.resolve(m_out_irq5_cb, *this);
-	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
-	m_out_mr_func.resolve(m_out_mr_cb, *this);
-	m_out_busy_func.resolve(m_out_busy_cb, *this);
-	m_out_req_func.resolve(m_out_req_cb, *this);
-	m_out_ra3_func.resolve(m_out_ra3_cb, *this);
-	m_in_rd322_func.resolve(m_in_rd322_cb, *this);
-	m_in_ramcs_func.resolve(m_in_ramcs_cb, *this);
-	m_out_ramwr_func.resolve(m_out_ramwr_cb, *this);
-	m_in_cs1010_func.resolve(m_in_cs1010_cb, *this);
-	m_out_cs1010_func.resolve(m_out_cs1010_cb, *this);
+	m_out_irq5_cb.resolve_safe();
+	m_out_drq3_cb.resolve_safe();
+	m_out_mr_cb.resolve_safe();
+	m_out_busy_cb.resolve_safe();
+	m_out_req_cb.resolve_safe();
+	m_out_ra3_cb.resolve_safe();
+	m_in_rd322_cb.resolve_safe(0);
+	m_in_ramcs_cb.resolve_safe(0);
+	m_out_ramwr_cb.resolve_safe();
+	m_in_cs1010_cb.resolve_safe(0);
+	m_out_cs1010_cb.resolve_safe();
 }
 
 
@@ -280,7 +259,7 @@ READ8_MEMBER( wd11c00_17_device::io_r )
 		break;
 
 	case 2: // Read Drive Configuration Information
-		data = m_in_rd322_func(0);
+		data = m_in_rd322_cb(0);
 		break;
 
 	case 3: // Not Used
@@ -361,7 +340,7 @@ READ8_MEMBER( wd11c00_17_device::read )
 		break;
 
 	case 0x20:
-		data = m_in_cs1010_func(m_ra >> 8);
+		data = m_in_cs1010_cb(m_ra >> 8);
 		break;
 	}
 
@@ -384,7 +363,7 @@ WRITE8_MEMBER( wd11c00_17_device::write )
 		break;
 
 	case 0x20:
-		m_out_cs1010_func(m_ra >> 8, data);
+		m_out_cs1010_cb(m_ra >> 8, data);
 		break;
 
 	case 0x60:
