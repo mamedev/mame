@@ -115,13 +115,9 @@
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/i8255.h"
 #include "machine/mc68901.h"
 #include "machine/upd765.h"
-#include "sound/2151intf.h"
 #include "sound/okim6258.h"
-#include "machine/8530scc.h"
 #include "machine/rp5c15.h"
 #include "machine/mb89352.h"
 #include "formats/xdf_dsk.h"
@@ -181,6 +177,10 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_fdc.fdc->tc_w(ASSERT_LINE);
 		m_fdc.fdc->tc_w(CLEAR_LINE);
 		break;
+	case TIMER_X68K_ADPCM:
+		m_hd63450->drq3_w(1);
+		m_hd63450->drq3_w(0);
+		break;
 	default:
 		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
 	}
@@ -213,25 +213,24 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
 // typically read from the SCC data port on receive buffer full interrupt per byte
 int x68k_state::x68k_read_mouse()
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	char val = 0;
 	char ipt = 0;
 
-	if(!(scc->get_reg_b(5) & 0x02))
+	if(!(m_scc->get_reg_b(5) & 0x02))
 		return 0xff;
 
 	switch(m_mouse.inputtype)
 	{
 	case 0:
-		ipt = ioport("mouse1")->read();
+		ipt = m_mouse1->read();
 		break;
 	case 1:
-		val = ioport("mouse2")->read();
+		val = m_mouse2->read();
 		ipt = val - m_mouse.last_mouse_x;
 		m_mouse.last_mouse_x = val;
 		break;
 	case 2:
-		val = ioport("mouse3")->read();
+		val = m_mouse3->read();
 		ipt = val - m_mouse.last_mouse_y;
 		m_mouse.last_mouse_y = val;
 		break;
@@ -239,11 +238,11 @@ int x68k_state::x68k_read_mouse()
 	m_mouse.inputtype++;
 	if(m_mouse.inputtype > 2)
 	{
-		int i_val = scc->get_reg_b(0);
+		int i_val = m_scc->get_reg_b(0);
 		m_mouse.inputtype = 0;
 		m_mouse.bufferempty = 1;
 		i_val &= ~0x01;
-		scc->set_reg_b(0, i_val);
+		m_scc->set_reg_b(0, i_val);
 		logerror("SCC: mouse buffer empty\n");
 	}
 
@@ -258,18 +257,17 @@ int x68k_state::x68k_read_mouse()
 */
 READ16_MEMBER(x68k_state::x68k_scc_r )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	offset %= 4;
 	switch(offset)
 	{
 	case 0:
-		return scc->reg_r(space, 0);
+		return m_scc->reg_r(space, 0);
 	case 1:
 		return x68k_read_mouse();
 	case 2:
-		return scc->reg_r(space, 1);
+		return m_scc->reg_r(space, 1);
 	case 3:
-		return scc->reg_r(space, 3);
+		return m_scc->reg_r(space, 3);
 	default:
 		return 0xff;
 	}
@@ -277,40 +275,38 @@ READ16_MEMBER(x68k_state::x68k_scc_r )
 
 WRITE16_MEMBER(x68k_state::x68k_scc_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	offset %= 4;
 
 	switch(offset)
 	{
 	case 0:
-		scc->reg_w(space, 0,(UINT8)data);
-		if((scc->get_reg_b(5) & 0x02) != m_scc_prev)
+		m_scc->reg_w(space, 0,(UINT8)data);
+		if((m_scc->get_reg_b(5) & 0x02) != m_scc_prev)
 		{
-			if(scc->get_reg_b(5) & 0x02)  // Request to Send
+			if(m_scc->get_reg_b(5) & 0x02)  // Request to Send
 			{
-				int val = scc->get_reg_b(0);
+				int val = m_scc->get_reg_b(0);
 				m_mouse.bufferempty = 0;
 				val |= 0x01;
-				scc->set_reg_b(0,val);
+				m_scc->set_reg_b(0,val);
 			}
 		}
 		break;
 	case 1:
-		scc->reg_w(space, 2,(UINT8)data);
+		m_scc->reg_w(space, 2,(UINT8)data);
 		break;
 	case 2:
-		scc->reg_w(space, 1,(UINT8)data);
+		m_scc->reg_w(space, 1,(UINT8)data);
 		break;
 	case 3:
-		scc->reg_w(space, 3,(UINT8)data);
+		m_scc->reg_w(space, 3,(UINT8)data);
 		break;
 	}
-	m_scc_prev = scc->get_reg_b(5) & 0x02;
+	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	if(m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
@@ -318,11 +314,11 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 //      return;
 
 	// hard-code the IRQ vector for now, until the SCC code is more complete
-	if((scc->get_reg_a(9) & 0x08) || (scc->get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
+	if((m_scc->get_reg_a(9) & 0x08) || (m_scc->get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
 	{
-		if((scc->get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
+		if((m_scc->get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
 		{
-			if(scc->get_reg_b(5) & 0x02)  // RTS signal
+			if(m_scc->get_reg_b(5) & 0x02)  // RTS signal
 			{
 				m_mouse.irqactive = 1;
 				m_current_vector[5] = 0x54;
@@ -354,7 +350,7 @@ void x68k_state::x68k_set_adpcm()
 	}
 	if(m_adpcm.clock != 0)
 		rate = rate/2;
-	m_hd63450->set_timer(3,attotime::from_hz(rate));
+	m_adpcm_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 }
 
 // Megadrive 3 button gamepad
@@ -367,8 +363,8 @@ UINT8 x68k_state::md_3button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = ioport("md3b")->read() & 0xff;
-		UINT8 portb = (ioport("md3b")->read() >> 8) & 0xff;
+		UINT8 porta = m_md3b->read() & 0xff;
+		UINT8 portb = (m_md3b->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
@@ -380,8 +376,8 @@ UINT8 x68k_state::md_3button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (ioport("md3b")->read() >> 16) & 0xff;
-		UINT8 portb = (ioport("md3b")->read() >> 24) & 0xff;
+		UINT8 porta = (m_md3b->read() >> 16) & 0xff;
+		UINT8 portb = (m_md3b->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -415,9 +411,9 @@ UINT8 x68k_state::md_6button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = ioport("md6b")->read() & 0xff;
-		UINT8 portb = (ioport("md6b")->read() >> 8) & 0xff;
-		UINT8 extra = ioport("md6b_extra")->read() & 0x0f;
+		UINT8 porta = m_md6b->read() & 0xff;
+		UINT8 portb = (m_md6b->read() >> 8) & 0xff;
+		UINT8 extra = m_md6b_extra->read() & 0x0f;
 
 		switch(m_mdctrl.seq1)
 		{
@@ -453,9 +449,9 @@ UINT8 x68k_state::md_6button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (ioport("md6b")->read() >> 16) & 0xff;
-		UINT8 portb = (ioport("md6b")->read() >> 24) & 0xff;
-		UINT8 extra = (ioport("md6b_extra")->read() >> 4) & 0x0f;
+		UINT8 porta = (m_md6b->read() >> 16) & 0xff;
+		UINT8 portb = (m_md6b->read() >> 24) & 0xff;
+		UINT8 extra = (m_md6b_extra->read() >> 4) & 0x0f;
 
 		switch(m_mdctrl.seq2)
 		{
@@ -503,8 +499,8 @@ UINT8 x68k_state::xpd1lr_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = ioport("xpd1lr")->read() & 0xff;
-		UINT8 portb = (ioport("xpd1lr")->read() >> 8) & 0xff;
+		UINT8 porta = m_xpd1lr->read() & 0xff;
+		UINT8 portb = (m_xpd1lr->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
 			return porta;
@@ -516,8 +512,8 @@ UINT8 x68k_state::xpd1lr_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (ioport("xpd1lr")->read() >> 16) & 0xff;
-		UINT8 portb = (ioport("xpd1lr")->read() >> 24) & 0xff;
+		UINT8 porta = (m_xpd1lr->read() >> 16) & 0xff;
+		UINT8 portb = (m_xpd1lr->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -533,13 +529,13 @@ UINT8 x68k_state::xpd1lr_r(int port)
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 READ8_MEMBER(x68k_state::ppi_port_a_r)
 {
-	int ctrl = ioport("ctrltype")->read() & 0x0f;
+	int ctrl = m_ctrltype->read() & 0x0f;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(m_joy.joy1_enable == 0)
-				return ioport("joy1")->read();
+				return m_joy1->read();
 			else
 				return 0xff;
 		case 0x01:  // 3-button Megadrive gamepad
@@ -555,13 +551,13 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 
 READ8_MEMBER(x68k_state::ppi_port_b_r)
 {
-	int ctrl = ioport("ctrltype")->read() & 0xf0;
+	int ctrl = m_ctrltype->read() & 0xf0;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(m_joy.joy2_enable == 0)
-				return ioport("joy2")->read();
+				return m_joy2->read();
 			else
 				return 0xff;
 		case 0x10:  // 3-button Megadrive gamepad
@@ -736,23 +732,13 @@ WRITE8_MEMBER(x68k_state::fdc_write_byte)
 	return m_fdc.fdc->dma_w(data);
 }
 
-WRITE_LINE_MEMBER( x68k_state::fdc_drq )
-{
-	bool ostate = m_fdc.drq_state;
-	m_fdc.drq_state = state;
-	if(state && !ostate)
-	{
-		m_hd63450->single_transfer(0);
-	}
-}
-
 WRITE16_MEMBER(x68k_state::x68k_fm_w)
 {
 	switch(offset)
 	{
 	case 0x00:
 	case 0x01:
-		machine().device<ym2151_device>("ym2151")->write(space, offset, data);
+		m_ym2151->write(space, offset, data);
 		break;
 	}
 }
@@ -760,7 +746,7 @@ WRITE16_MEMBER(x68k_state::x68k_fm_w)
 READ16_MEMBER(x68k_state::x68k_fm_r)
 {
 	if(offset == 0x01)
-		return machine().device<ym2151_device>("ym2151")->read(space, 1);
+		return m_ym2151->read(space, 1);
 
 	return 0xffff;
 }
@@ -901,14 +887,12 @@ READ16_MEMBER(x68k_state::x68k_sysport_r)
 
 WRITE16_MEMBER(x68k_state::x68k_ppi_w)
 {
-	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
-	ppi->write(space,offset & 0x03,data);
+	m_ppi->write(space,offset & 0x03,data);
 }
 
 READ16_MEMBER(x68k_state::x68k_ppi_r)
 {
-	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
-	return ppi->read(space,offset & 0x03);
+	return m_ppi->read(space,offset & 0x03);
 }
 
 
@@ -1066,7 +1050,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xbffffc, 0, mem_mask);
 	return 0xff;
 }
@@ -1077,7 +1061,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
@@ -1087,7 +1071,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1), 0, mem_mask);
 	return 0xff;
 }
@@ -1098,7 +1082,7 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
@@ -1107,7 +1091,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 	/* These are expansion devices, if not present, they cause a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xeafa00, 0, mem_mask);
 	return 0xff;
 }
@@ -1117,7 +1101,7 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 	/* These are expansion devices, if not present, they cause a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-	if((ioport("options")->read() & 0x02) && !space.debugger_access())
+	if((m_options->read() & 0x02) && !space.debugger_access())
 		set_bus_error((offset << 1) + 0xeafa00, 1, mem_mask);
 }
 
@@ -1147,6 +1131,7 @@ WRITE8_MEMBER(x68k_state::dma_error)
 	{
 		m_current_vector[3] = m_hd63450->get_error_vector(offset);
 		m_current_irq_line = 3;
+		logerror("DMA#%i: DMA Error (vector 0x%02x)\n",offset,m_current_vector[3]);
 		m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 	}
 }
@@ -1793,6 +1778,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	m_led_timer = timer_alloc(TIMER_X68K_LED);
 	m_net_timer = timer_alloc(TIMER_X68K_NET_IRQ);
 	m_fdc_tc = timer_alloc(TIMER_X68K_FDC_TC);
+	m_adpcm_timer = timer_alloc(TIMER_X68K_ADPCM);
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init();
@@ -1891,7 +1877,7 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	MCFG_UPD72065_ADD("upd72065", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(x68k_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(x68k_state, fdc_drq))
+	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("hd63450", hd63450_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", x68k_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", x68k_state::floppy_formats)

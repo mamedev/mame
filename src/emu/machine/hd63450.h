@@ -85,6 +85,10 @@ public:
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER(drq0_w);
+	DECLARE_WRITE_LINE_MEMBER(drq1_w);
+	DECLARE_WRITE_LINE_MEMBER(drq2_w);
+	DECLARE_WRITE_LINE_MEMBER(drq3_w);
 
 	void single_transfer(int x);
 	void set_timer(int channel, attotime tm);
@@ -95,6 +99,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	devcb2_write8 m_dma_end;
@@ -115,12 +120,13 @@ private:
 	int m_transfer_size[4];
 	int m_halted[4];  // non-zero if a channel has been halted, and can be continued later.
 	cpu_device *m_cpu;
+	bool m_drq_state[4];
 
 	TIMER_CALLBACK_MEMBER(dma_transfer_timer);
 	void dma_transfer_abort(int channel);
 	void dma_transfer_halt(int channel);
 	void dma_transfer_continue(int channel);
-	void dma_transfer_start(int channel, int dir);
+	void dma_transfer_start(int channel);
 };
 
 extern const device_type HD63450;

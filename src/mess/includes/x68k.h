@@ -15,6 +15,9 @@
 #include "machine/upd765.h"
 #include "sound/okim6258.h"
 #include "machine/ram.h"
+#include "machine/8530scc.h"
+#include "sound/2151intf.h"
+#include "machine/i8255.h"
 
 #define MC68901_TAG     "mc68901"
 #define RP5C15_TAG      "rp5c15"
@@ -40,6 +43,7 @@ public:
 		TIMER_X68K_CRTC_RASTER_IRQ,
 		TIMER_X68K_CRTC_VBLANK_IRQ,
 		TIMER_X68K_FDC_TC,
+		TIMER_X68K_ADPCM
 	};
 
 	x68k_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -52,12 +56,27 @@ public:
 			m_palette(*this, "palette"),
 			m_mfpdev(*this, MC68901_TAG),
 			m_rtc(*this, RP5C15_TAG),
+			m_scc(*this, "scc"),
+			m_ym2151(*this, "ym2151"),
+			m_ppi(*this, "ppi8255"),
 			m_nvram16(*this, "nvram16"),
 			m_nvram32(*this, "nvram32"),
 			m_gvram16(*this, "gvram16"),
 			m_tvram16(*this, "tvram16"),
 			m_gvram32(*this, "gvram32"),
-			m_tvram32(*this, "tvram32") { }
+			m_tvram32(*this, "tvram32"),
+			m_options(*this, "options"),
+			m_mouse1(*this, "mouse1"), 
+			m_mouse2(*this, "mouse2"), 
+			m_mouse3(*this, "mouse3"),
+			m_xpd1lr(*this, "xpd1lr"),
+			m_ctrltype(*this, "ctrltype"),
+			m_joy1(*this, "joy1"),
+			m_joy2(*this, "joy2"),
+			m_md3b(*this, "md3b"),
+			m_md6b(*this, "md6b"),
+			m_md6b_extra(*this, "md6b_extra")
+	{ }
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
@@ -67,6 +86,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
+	required_device<scc8530_t> m_scc;
+	required_device<ym2151_device> m_ym2151;
+	required_device<i8255_device> m_ppi;
 
 	optional_shared_ptr<UINT16> m_nvram16;
 	optional_shared_ptr<UINT32> m_nvram32;
@@ -75,6 +97,18 @@ public:
 	optional_shared_ptr<UINT16> m_tvram16;
 	optional_shared_ptr<UINT32> m_gvram32;
 	optional_shared_ptr<UINT32> m_tvram32;
+	
+	required_ioport m_options;
+	required_ioport m_mouse1;
+	required_ioport m_mouse2;
+	required_ioport m_mouse3;
+	required_ioport m_xpd1lr;
+	required_ioport m_ctrltype;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
+	required_ioport m_md3b;
+	required_ioport m_md6b;
+	required_ioport m_md6b_extra;
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tbo_w );
 
@@ -100,7 +134,6 @@ public:
 		int eject[4];
 		int motor[4];
 		int selected_drive;
-		int drq_state;
 	} m_fdc;
 	struct
 	{
@@ -203,6 +236,7 @@ public:
 	emu_timer* m_raster_irq;
 	emu_timer* m_vblank_irq;
 	emu_timer* m_fdc_tc;
+	emu_timer* m_adpcm_timer;
 	UINT16* m_spriteram;
 	UINT16* m_spritereg;
 	tilemap_t* m_bg0_8;
@@ -241,7 +275,6 @@ public:
 	DECLARE_READ8_MEMBER(ppi_port_c_r);
 	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_WRITE8_MEMBER(x68k_ct_w);
 	DECLARE_WRITE_LINE_MEMBER(x68k_rtc_alarm_irq);
 	DECLARE_WRITE8_MEMBER(x68030_adpcm_w);
