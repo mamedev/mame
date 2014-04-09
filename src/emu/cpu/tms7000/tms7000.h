@@ -92,30 +92,32 @@ private:
 	static const opcode_func s_opfn_exl[0x100];
 	const opcode_func *m_opcode;
 
-	static UINT16 bcd_add( UINT16 a, UINT16 b );
-	static UINT16 bcd_tencomp( UINT16 a );
-	static UINT16 bcd_sub( UINT16 a, UINT16 b);
+	inline UINT8 bcd_add( UINT8 a, UINT8 b, UINT8 c );
+	inline UINT8 bcd_sub( UINT8 a, UINT8 b, UINT8 c );
 
-	PAIR        m_pc;         /* Program counter */
-	UINT8       m_sp;     /* Stack Pointer */
-	UINT8       m_sr;     /* Status Register */
-	UINT8       m_irq_state[3];   /* State of the three IRQs */
-	UINT8       m_rf[0x80];   /* Register file (SJE) */
-	UINT8       m_pf[0x100];  /* Perpherial file */
-	address_space *m_program;
-	direct_read_data *m_direct;
-	address_space *m_io;
+	PAIR        m_pc;               /* Program counter */
+	UINT8       m_sp;               /* Stack Pointer */
+	UINT8       m_sr;               /* Status Register */
+	UINT8       m_irq_state[3];     /* State of the three IRQs */
+	UINT8       m_rf[0x80];         /* Register file (SJE) */
+	UINT8       m_pf[0x100];        /* Perpherial file */
+
 	int         m_icount;
 	int         m_div_by_16_trigger;
 	int         m_cycles_per_INT2;
 	UINT8       m_t1_capture_latch; /* Timer 1 capture latch */
-	INT8        m_t1_prescaler;   /* Timer 1 prescaler (5 bits) */
-	INT16       m_t1_decrementer; /* Timer 1 decrementer (8 bits) */
-	UINT8       m_idle_state; /* Set after the execution of an idle instruction */
+	INT8        m_t1_prescaler;     /* Timer 1 prescaler (5 bits) */
+	INT16       m_t1_decrementer;   /* Timer 1 decrementer (8 bits) */
+	UINT8       m_idle_state;       /* Set after the execution of an idle instruction */
+
+	address_space *m_program;
+	direct_read_data *m_direct;
+	address_space *m_io;
 
 	inline UINT16 RM16( UINT32 mAddr );
 	inline UINT16 RRF16( UINT32 mAddr );
 	inline void WRF16( UINT32 mAddr, PAIR p );
+
 	void tms7000_check_IRQ_lines();
 	void tms7000_do_interrupt( UINT16 address, UINT8 line );
 	void illegal();
@@ -348,7 +350,6 @@ private:
 	void xorp_b2p();
 	void xorp_i2p();
 	void tms7000_service_timer1();
-
 };
 
 
