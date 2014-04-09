@@ -2833,57 +2833,6 @@ static const ay8910_interface ay8910_config =
                       MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0480scp_interface footchmp_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	0x1d, 0x08,     /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	-1, 0,      /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
-static const tc0480scp_interface hthero_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	0x33, -0x04,        /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	-1, 0,      /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
-static const tc0480scp_interface deadconx_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	0x1e, 0x08,     /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	-1, 0,      /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
-static const tc0480scp_interface deadconxj_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	0x34, -0x05,        /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	-1, 0,      /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
-static const tc0480scp_interface metalb_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	0x32, -0x04,        /* x_offset, y_offset */
-	1, 0,       /* text_xoff, text_yoff */
-	-1, 0,      /* flip_xoff, flip_yoff */
-	256     /* col_base */
-};
-
-
 MACHINE_START_MEMBER(taitof2_state,common)
 {
 }
@@ -3273,7 +3222,12 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_full_buffer_delayed)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", footchmp_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1d + 3, 0x08)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -3301,7 +3255,13 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_full_buffer_delayed)
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
-	MCFG_TC0480SCP_ADD("tc0480scp", hthero_tc0480scp_intf)
+
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x33 + 3, -0x04)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 MACHINE_CONFIG_END
@@ -3462,7 +3422,13 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_metalb)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", metalb_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x32 + 3, -0x04)
+	MCFG_TC0480SCP_OFFSETS_TX(1, 0)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
+	MCFG_TC0480SCP_COL_BASE(256)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -3525,7 +3491,12 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", deadconx_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1e + 3, 0x08)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -3545,7 +3516,12 @@ static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", deadconxj_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x34 + 3, -0x05)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

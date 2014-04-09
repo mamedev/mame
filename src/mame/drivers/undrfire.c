@@ -696,16 +696,6 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static const tc0480scp_interface undrfire_tc0480scp_intf =
-{
-	1, 4,       /* gfxnum, txnum */
-	0,      /* pixels */
-	0x24, 0,        /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
 static MACHINE_CONFIG_START( undrfire, undrfire_state )
 
 	/* basic machine hardware */
@@ -734,7 +724,11 @@ static MACHINE_CONFIG_START( undrfire, undrfire_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(4)
+	MCFG_TC0480SCP_OFFSETS(0x24, 0)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -777,7 +771,11 @@ static MACHINE_CONFIG_START( cbombers, undrfire_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(4)
+	MCFG_TC0480SCP_OFFSETS(0x24, 0)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

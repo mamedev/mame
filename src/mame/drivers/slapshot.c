@@ -491,16 +491,6 @@ WRITE_LINE_MEMBER(slapshot_state::irqhandler)
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0480scp_interface slapshot_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	3,      /* pixels */
-	30, 9,      /* x_offset, y_offset */
-	-1, 1,      /* text_xoff, text_yoff */
-	0, 2,       /* flip_xoff, flip_yoff */
-	256     /* col_base */
-};
-
 void slapshot_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
@@ -542,9 +532,16 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
+	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
+	MCFG_TC0480SCP_COL_BASE(256)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
@@ -595,10 +592,16 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
 	MCFG_PALETTE_ADD("palette", 8192)
 
-
-	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
+	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
+	MCFG_TC0480SCP_COL_BASE(256)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
+
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */

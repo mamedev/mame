@@ -324,16 +324,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0480scp_interface groundfx_tc0480scp_intf =
-{
-	1, 4,       /* gfxnum, txnum */
-	0,      /* pixels */
-	0x24, 0,        /* x_offset, y_offset */
-	-1, 0,      /* text_xoff, text_yoff */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
 INTERRUPT_GEN_MEMBER(groundfx_state::groundfx_interrupt)
 {
 	m_frame_counter^=1;
@@ -368,7 +358,11 @@ static MACHINE_CONFIG_START( groundfx, groundfx_state )
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(4)
+	MCFG_TC0480SCP_OFFSETS(0x24, 0)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

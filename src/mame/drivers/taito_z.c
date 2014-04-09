@@ -2955,17 +2955,6 @@ Contcirc road glitchiness in attract?
 
 ***********************************************************/
 
-static const tc0480scp_interface taitoz_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0,          /* pixels */
-	0x1f, 0x08, /* x_offset, y_offset */
-	0, 0,       /* text_xoff, text_yoff */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0           /* col_base */
-};
-
-
 /***********************************************************
                    SAVE STATES
 ***********************************************************/
@@ -3674,7 +3663,10 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
@@ -3748,7 +3740,10 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
