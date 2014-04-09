@@ -14,6 +14,20 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
+enum
+{
+	ARM_COPRO_TYPE_UNKNOWN_CP15 = 0,
+	ARM_COPRO_TYPE_VL86C020
+};
+
+struct arm_interface
+{
+	UINT8 coprotype;
+};
+
+#define ARM_INTERFACE(name) \
+	const arm_interface (name) =
+
 
 enum
 {
@@ -25,7 +39,8 @@ enum
 };
 
 
-class arm_cpu_device : public cpu_device
+class arm_cpu_device : public cpu_device,
+  					   public arm_interface
 {
 public:
 	// construction/destruction
@@ -34,6 +49,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -80,6 +96,7 @@ protected:
 	void HandleMemSingle(UINT32 insn);
 	void HandleMemBlock(UINT32 insn);
 	void HandleCoPro(UINT32 insn);
+	void HandleCoProVL86C020(UINT32 insn);
 	UINT32 decodeShift(UINT32 insn, UINT32 *pCarry);
 	void arm_check_irq_state();
 	int loadInc(UINT32 pat, UINT32 rbv, UINT32 s);

@@ -138,6 +138,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                     m_rx = m_keyb_row;
                     m_out_tx_func(ASSERT_LINE);
                 }
+
                 break;
             case 0x3f:
                 if(m_keyb_enable & 1 && m_keyb_state & 1)
@@ -147,6 +148,8 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                     m_out_tx_func(ASSERT_LINE);
                     m_keyb_state = 0;
                 }
+
+
                 break;
             case 0xfd:
                 m_rx = 0xfd;
