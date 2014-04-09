@@ -220,9 +220,6 @@ void K053936_set_offset(int chip, int xoffs, int yoffs)
 
 
 
-
-
-
 /***************************************************************************/
 /*                                                                         */
 /*                                 053936                                  */
@@ -234,30 +231,11 @@ const device_type K053936 = &device_creator<k053936_device>;
 k053936_device::k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053936, "Konami 053936", tag, owner, clock, "k053936", __FILE__),
 	m_ctrl(NULL),
-	m_linectrl(NULL)
+	m_linectrl(NULL),
+	m_wrap(0),
+	m_xoff(0), 
+	m_yoff(0)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053936_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k053936_interface *intf = reinterpret_cast<const k053936_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k053936_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_wrap = 0;
-		m_xoff = 0;
-		m_yoff = 0;
-	}
 }
 
 //-------------------------------------------------

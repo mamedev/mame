@@ -330,11 +330,6 @@ static const k054539_interface k054539_config =
 };
 
 
-static const k053936_interface rng_k053936_intf =
-{
-	0, 34, 9
-};
-
 static const k053247_interface rng_k055673_intf =
 {
 	"gfx2", 1,
@@ -398,7 +393,9 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_K053936_ADD("k053936", rng_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_OFFSETS(34, 9)
+
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
 	MCFG_K055673_GFXDECODE("gfxdecode")
 	MCFG_K055673_PALETTE("palette")

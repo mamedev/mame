@@ -406,12 +406,6 @@ WRITE_LINE_MEMBER(crshrace_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const k053936_interface crshrace_k053936_intf =
-{
-	1, -48, -21 /* wrap, xoff, yoff */
-};
-
-
 void crshrace_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
@@ -464,8 +458,9 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
-	MCFG_K053936_ADD("k053936", crshrace_k053936_intf)
-
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-48, -21)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

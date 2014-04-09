@@ -307,12 +307,6 @@ static const k053247_interface dbz_k053246_intf =
 	dbz_sprite_callback
 };
 
-/* both k053936 use the same wrap/offs */
-static const k053936_interface dbz_k053936_intf =
-{
-	1, -46, -16
-};
-
 WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
@@ -370,12 +364,21 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_K056832_ADD("k056832", dbz_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K053246_ADD("k053246", dbz_k053246_intf)
 	MCFG_K053246_GFXDECODE("gfxdecode")
 	MCFG_K053246_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053936_ADD("k053936_1", dbz_k053936_intf)
-	MCFG_K053936_ADD("k053936_2", dbz_k053936_intf)
+
+	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-46, -16)
+
+	MCFG_DEVICE_ADD("k053936_2", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-46, -16)
+
 	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(dbz_state, dbz_irq2_ack_w))
 

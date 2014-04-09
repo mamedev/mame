@@ -4501,11 +4501,6 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 MACHINE_CONFIG_END
 
 
-static const k053936_interface blzntrnd_k053936_intf =
-{
-	0, -69, -21
-};
-
 static MACHINE_CONFIG_START( blzntrnd, metro_state )
 
 	/* basic machine hardware */
@@ -4535,7 +4530,8 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_K053936_ADD("k053936", blzntrnd_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_OFFSETS(-69, -21)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -4549,11 +4545,6 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 MACHINE_CONFIG_END
 
 /* like blzntrnd but new vidstart / gfxdecode for the different bg tilemap */
-
-static const k053936_interface gstrik2_k053936_intf =
-{
-	0, -69, -19
-};
 
 static MACHINE_CONFIG_START( gstrik2, metro_state )
 
@@ -4584,7 +4575,8 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
-	MCFG_K053936_ADD("k053936", gstrik2_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_OFFSETS(-69, -19)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

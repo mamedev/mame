@@ -367,17 +367,6 @@ WRITE_LINE_MEMBER(f1gp_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const k053936_interface f1gp_k053936_intf =
-{
-	1, -58, -2  /* wrap, xoff, yoff */
-};
-
-static const k053936_interface f1gp2_k053936_intf =
-{
-	1, -48, -21 /* wrap, xoff, yoff */
-};
-
-
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
 	save_item(NAME(m_pending_command));
@@ -452,7 +441,9 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
-	MCFG_K053936_ADD("k053936", f1gp_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-58, -2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -525,8 +516,8 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
-	MCFG_DEVICE_REMOVE("k053936")
-	MCFG_K053936_ADD("k053936", f1gp2_k053936_intf)
+	MCFG_DEVICE_MODIFY("k053936")
+	MCFG_K053936_OFFSETS(-48, -21)
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp2)
 MACHINE_CONFIG_END
