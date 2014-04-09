@@ -474,11 +474,6 @@ WRITE8_MEMBER( dg680_state::kbd_put )
 	m_pio->strobe_a(1);
 }
 
-static ASCII_KEYBOARD_INTERFACE( dg680_keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(dg680_state, kbd_put)
-};
-
 READ8_MEMBER( dg680_state::porta_r )
 {
 	UINT8 data = m_term_data;
@@ -566,7 +561,8 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette")
 
 	/* Keyboard */
-	MCFG_ASCII_KEYBOARD_ADD("keyb", dg680_keyboard_intf)
+	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dg680_state, kbd_put))
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

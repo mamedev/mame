@@ -220,12 +220,6 @@ WRITE8_MEMBER( p8k_state::kbd_put )
 	m_maincpu->set_state_int(Z80_PC, 0x078A);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(p8k_state, kbd_put)
-};
-
-
 /***************************************************************************
 
     P8000 8bit Peripherals
@@ -482,14 +476,6 @@ WRITE8_MEMBER( p8k_state::kbd_put_16 )
 	mem.write_byte(addr, data);
 	mem.write_byte(0x43a0, 1);
 }
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf_16 )
-{
-	DEVCB_DRIVER_MEMBER(p8k_state, kbd_put_16)
-};
-
-
-
 
 MACHINE_RESET_MEMBER(p8k_state,p8k_16)
 {
@@ -814,7 +800,8 @@ static MACHINE_CONFIG_START( p8k, p8k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(p8k_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( p8k_16, p8k_state )
@@ -841,7 +828,8 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf_16)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(p8k_state, kbd_put_16))
 MACHINE_CONFIG_END
 
 /* ROM definition */

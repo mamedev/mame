@@ -318,11 +318,6 @@ WRITE8_MEMBER( dim68k_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_MEMBER(dim68k_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -348,7 +343,8 @@ static MACHINE_CONFIG_START( dim68k, dim68k_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1790000, dim68k_crtc)
-	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(dim68k_state, kbd_put))
 MACHINE_CONFIG_END
 
 /*

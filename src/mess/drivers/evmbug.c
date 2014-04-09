@@ -85,12 +85,6 @@ WRITE8_MEMBER( evmbug_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(evmbug_state, kbd_put)
-};
-
-
 void evmbug_state::machine_reset()
 {
 	m_term_data = 0;
@@ -105,7 +99,8 @@ static MACHINE_CONFIG_START( evmbug, evmbug_state )
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, evmbug_mem, evmbug_io )
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(evmbug_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

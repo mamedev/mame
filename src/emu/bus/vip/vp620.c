@@ -34,18 +34,13 @@ WRITE8_MEMBER( vp620_device::kb_w )
 	m_keystb = ASSERT_LINE;
 }
 
-static ASCII_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, vp620_device, kb_w)
-};
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( vp620 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vp620 )
-	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(vp620_device, kb_w))
 MACHINE_CONFIG_END
 
 

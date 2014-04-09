@@ -128,12 +128,6 @@ void besta_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(besta_state, kbd_put)
-};
-
-
 /* CP31 processor board */
 static MACHINE_CONFIG_START( besta, besta_state )
 	/* basic machine hardware */
@@ -143,7 +137,8 @@ static MACHINE_CONFIG_START( besta, besta_state )
 #if 0
 	MCFG_DEVICE_ADD("mpcc", MPCC68561, XTAL_25MHz);    // confirm internal oscillator frequency
 #endif
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(besta_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -254,11 +254,6 @@ WRITE8_MEMBER( v6809_state::kbd_put )
 	m_pia0->cb1_w(1);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(v6809_state, kbd_put)
-};
-
 WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
 {
 	m_acia0->write_txc(state);
@@ -359,7 +354,8 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8, v6809_crtc)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(v6809_state, kbd_put))
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)

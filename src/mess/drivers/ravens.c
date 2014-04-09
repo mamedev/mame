@@ -260,11 +260,6 @@ WRITE8_MEMBER( ravens_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ravens_state, kbd_put)
-};
-
 QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -359,7 +354,8 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ravens_state, kbd_put))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)

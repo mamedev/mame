@@ -521,13 +521,6 @@ WRITE8_MEMBER( grip_device::kb_w )
 	}
 }
 
-static ASCII_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, kb_w)
-};
-
-
-
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -571,7 +564,8 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(grip_device, kb_w))
 MACHINE_CONFIG_END
 
 

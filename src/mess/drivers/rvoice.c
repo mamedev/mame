@@ -356,11 +356,6 @@ WRITE8_MEMBER(rvoice_state::null_kbd_put)
 {
 }
 
-static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(rvoice_state,null_kbd_put)
-};
-
 static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
@@ -379,7 +374,8 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 
 	/* sound hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(rvoice_state, null_kbd_put))
 
 MACHINE_CONFIG_END
 

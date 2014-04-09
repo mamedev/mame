@@ -77,11 +77,6 @@ WRITE8_MEMBER( dual68_state::kbd_put )
 	//m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(dual68_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( dual68, dual68_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
@@ -93,7 +88,8 @@ static MACHINE_CONFIG_START( dual68, dual68_state )
 
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dual68_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

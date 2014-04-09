@@ -205,23 +205,6 @@ static const wd17xx_interface fdc_intf =
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
-
-//-------------------------------------------------
-//  GENERIC_TERMINAL_INTERFACE( terminal_intf )
-//-------------------------------------------------
-
-static GENERIC_TERMINAL_INTERFACE( jupiter2_terminal_intf )
-{
-	DEVCB_NULL
-};
-
-static ASCII_KEYBOARD_INTERFACE( jupiter3_keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(jupiter3_state, kbd_put)
-};
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -264,7 +247,7 @@ static MACHINE_CONFIG_START( jupiter, jupiter2_state )
 
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, jupiter2_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -296,7 +279,8 @@ static MACHINE_CONFIG_START( jupiter3, jupiter3_state )
 
 	// devices
 	MCFG_FD1771_ADD(INS1771N1_TAG, fdc_intf)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, jupiter3_keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(jupiter3_state, kbd_put))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

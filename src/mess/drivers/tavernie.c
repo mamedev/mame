@@ -316,11 +316,6 @@ WRITE8_MEMBER( tavernie_state::kbd_put )
 	m_pia_ivg->cb1_w(1);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(tavernie_state, kbd_put)
-};
-
 WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
 {
 	m_acia->write_txc(state);
@@ -384,7 +379,8 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tavernie_state, kbd_put))
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
 
 	MCFG_DEVICE_ADD("pia_ivg", PIA6821, 0)

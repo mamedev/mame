@@ -230,11 +230,6 @@ WRITE8_MEMBER( czk80_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(czk80_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( czk80, czk80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
@@ -243,7 +238,8 @@ static MACHINE_CONFIG_START( czk80, czk80_state )
 	MCFG_CPU_CONFIG(daisy_chain)
 	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(czk80_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_Z80CTC_ADD( "z80ctc",  XTAL_16MHz / 4, ctc_intf)

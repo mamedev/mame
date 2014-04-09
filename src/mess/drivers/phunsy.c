@@ -184,12 +184,6 @@ WRITE8_MEMBER( phunsy_state::kbd_put )
 }
 
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(phunsy_state, kbd_put)
-};
-
-
 void phunsy_state::machine_reset()
 {
 	membank("bankru")->set_entry(0); // point at ram
@@ -367,7 +361,8 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(phunsy_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* quickload */

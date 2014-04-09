@@ -511,12 +511,6 @@ WRITE8_MEMBER( trs80m2_state::kbd_w )
 	m_ctc->trg3(m_kbirq);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(trs80m2_state, kbd_w)
-};
-
-
 //-------------------------------------------------
 //  Z80DMA_INTERFACE( dma_intf )
 //-------------------------------------------------
@@ -842,7 +836,8 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -906,7 +901,8 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)

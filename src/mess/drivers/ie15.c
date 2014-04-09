@@ -486,12 +486,6 @@ WRITE8_MEMBER( ie15_state::kbd_put )
 	}
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(ie15_state, kbd_put)
-};
-
-
 void ie15_state::machine_reset()
 {
 	m_ruslat = m_beep = m_statusline = m_cursor = m_video = m_kb_data = m_kb_flag0 = 0;
@@ -640,7 +634,8 @@ static MACHINE_CONFIG_START( ie15, ie15_state )
 	MCFG_PALETTE_INIT_OWNER(ie15_state, ie15)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ie15_state, kbd_put))
 	MCFG_BITBANGER_ADD(BITBANGER_TAG, ie15_state::ie15_bitbanger_config)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

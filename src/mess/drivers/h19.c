@@ -411,11 +411,6 @@ WRITE8_MEMBER( h19_state::h19_kbd_put )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(h19_state, h19_kbd_put)
-};
-
 static MACHINE_CONFIG_START( h19, h19_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, H19_CLOCK) // From schematics
@@ -435,7 +430,8 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8, h19_crtc6845_interface) // clk taken from schematics
 	MCFG_INS8250_ADD( "ins8250", h19_ace_interface, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(h19_state, h19_kbd_put))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

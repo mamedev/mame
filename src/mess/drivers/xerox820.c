@@ -520,12 +520,6 @@ WRITE8_MEMBER( xerox820_state::kbd_w )
 	m_kbpio->strobe_b(1);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(xerox820_state, kbd_w)
-};
-
-
 /* Video */
 
 UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -719,7 +713,8 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xerox820_state, kbd_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -780,7 +775,8 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(xerox820_state, fr_w))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxtxcb_w))
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xerox820_state, kbd_w))
 
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)

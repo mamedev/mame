@@ -567,11 +567,6 @@ WRITE8_MEMBER(digel804_state::digel804_serial_put)
 	//m_acia->receive_character(data);
 }
 
-static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(digel804_state,digel804_serial_put)
-};
-
 WRITE_LINE_MEMBER( digel804_state::da_w )
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -588,7 +583,8 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_ROC10937_ADD("vfd",0) // RIGHT_TO_LEFT
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(digel804_state, digel804_serial_put))
 
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
 

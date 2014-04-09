@@ -226,11 +226,6 @@ WRITE8_MEMBER( z9001_state::kbd_put )
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(z9001_state, kbd_put)
-};
-
 static GFXDECODE_START( z9001 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z9001_charlayout, 0, 1 )
 GFXDECODE_END
@@ -263,7 +258,8 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(z9001_state, kbd_put))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )

@@ -1048,11 +1048,6 @@ void cxhumax_state::machine_reset()
 	memset(m_gxa_cmd_regs,0,sizeof(m_gxa_cmd_regs));
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
 	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
 	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
@@ -1072,8 +1067,7 @@ static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
 
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )

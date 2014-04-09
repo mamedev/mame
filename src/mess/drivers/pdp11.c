@@ -344,11 +344,6 @@ WRITE8_MEMBER( pdp11_state::kbd_put )
 	m_teletype_status |= 0x80;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(pdp11_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( pdp11, pdp11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
@@ -357,7 +352,8 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pdp11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END

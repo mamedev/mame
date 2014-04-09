@@ -75,18 +75,13 @@ void msbc1_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( msbc1, msbc1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
 
 	// devices
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

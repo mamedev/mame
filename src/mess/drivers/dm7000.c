@@ -297,11 +297,6 @@ WRITE8_MEMBER( dm7000_state::kbd_put )
 	m_scc0_lsr = 1;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(dm7000_state, kbd_put)
-};
-
 static const powerpc_config ppc405_config =
 {
 	252000000
@@ -323,7 +318,8 @@ static MACHINE_CONFIG_START( dm7000, dm7000_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dm7000_state, screen_update_dm7000)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dm7000_state, kbd_put))
 
 MACHINE_CONFIG_END
 

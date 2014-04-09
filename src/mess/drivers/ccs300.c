@@ -93,11 +93,6 @@ WRITE8_MEMBER( ccs300_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ccs300_state, kbd_put)
-};
-
 //*************************************
 //
 //  Machine
@@ -131,7 +126,8 @@ static MACHINE_CONFIG_START( ccs300, ccs300_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ccs300_state, ccs300)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs300_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

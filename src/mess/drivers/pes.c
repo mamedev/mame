@@ -91,11 +91,6 @@ WRITE8_MEMBER(pes_state::pes_kbd_input)
 	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
-static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(pes_state,pes_kbd_input)
-};
-
 /* Helper Functions */
 READ8_MEMBER( pes_state::data_to_i8031)
 {
@@ -266,7 +261,8 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	MCFG_SOUND_ADD("tms5220", TMS5220C, 720000) /* 720Khz clock, 10khz output */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,pes_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pes_state, pes_kbd_input))
 MACHINE_CONFIG_END
 
 /******************************************************************************

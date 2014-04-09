@@ -80,11 +80,6 @@ WRITE8_MEMBER( modellot_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(modellot_state, kbd_put)
-};
-
 void modellot_state::machine_reset()
 {
 	m_term_data = 1;
@@ -172,7 +167,8 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

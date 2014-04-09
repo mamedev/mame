@@ -4,23 +4,11 @@
 #include "emu.h"
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct keyboard_interface
-{
-	devcb_write8 m_keyboard_cb;
-};
-
-#define ASCII_KEYBOARD_INTERFACE(name) const keyboard_interface (name) =
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_ASCII_KEYBOARD_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_KEYBOARD, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_GENERIC_KEYBOARD_CB(_devcb) \
+	devcb = &generic_keyboard_device::set_keyboard_callback(*device, DEVCB2_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -28,13 +16,13 @@ struct keyboard_interface
 
 INPUT_PORTS_EXTERN( generic_keyboard );
 
-class generic_keyboard_device :
-	public device_t,
-	public keyboard_interface
+class generic_keyboard_device :	public device_t
 {
 public:
 	generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	generic_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	template<class _Object> static devcb2_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<generic_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
 
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -52,8 +40,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
-	virtual void send_key(UINT8 code) { m_keyboard_func(0, code); }
+	virtual void send_key(UINT8 code) { m_keyboard_cb((offs_t)0, code); }
 	emu_timer *m_timer;
 private:
 	virtual UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
@@ -61,7 +48,7 @@ private:
 	UINT8 m_last_code;
 	UINT8 m_scan_line;
 
-	devcb_resolved_write8 m_keyboard_func;
+	devcb2_write8 m_keyboard_cb;
 };
 
 extern const device_type GENERIC_KEYBOARD;

@@ -74,11 +74,6 @@ WRITE8_MEMBER( imds_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(imds_state, kbd_put)
-};
-
 void imds_state::machine_reset()
 {
 	m_term_data = 0;
@@ -102,7 +97,8 @@ static MACHINE_CONFIG_START( imds, imds_state )
 //  MCFG_INS8250_ADD( "ins8250", imds_com_interface )
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(imds_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

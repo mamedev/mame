@@ -149,11 +149,6 @@ WRITE8_MEMBER( k8915_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(k8915_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( k8915, k8915_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
@@ -171,7 +166,8 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))
 MACHINE_CONFIG_END
 
 

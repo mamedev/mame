@@ -105,12 +105,6 @@ WRITE8_MEMBER( dms86_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(dms86_state, kbd_put)
-};
-
-
 static MACHINE_CONFIG_START( dms86, dms86_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
@@ -118,7 +112,8 @@ static MACHINE_CONFIG_START( dms86, dms86_state )
 	MCFG_CPU_IO_MAP(dms86_io)
 
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dms86_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

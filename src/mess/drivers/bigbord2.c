@@ -217,13 +217,6 @@ WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 	}
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(bigbord2_state, bigbord2_kbd_put)
-};
-
-
-
 /* Z80 DMA */
 
 
@@ -653,7 +646,8 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, SCREEN_TAG, XTAL_16MHz / 8, bigbord2_crtc)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(bigbord2_state, bigbord2_kbd_put))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
