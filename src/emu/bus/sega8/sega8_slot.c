@@ -49,10 +49,6 @@ const device_type SEGA8_CARD_SLOT = &device_creator<sega8_card_slot_device>;
 
 device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ram(NULL),
-		m_rom_size(0),
-		m_ram_size(0),
 		m_rom_page_count(0),
 		has_battery(FALSE),
 		m_late_battery_enable(FALSE),
@@ -74,12 +70,11 @@ device_sega8_cart_interface::~device_sega8_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sega8_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
+void device_sega8_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
 	{
-		m_rom = auto_alloc_array_clear(machine, UINT8, size);
-		m_rom_size = size;
+		m_rom.resize(size);
 		m_rom_page_count = size / 0x4000;
 		if (!m_rom_page_count)
 			m_rom_page_count = 1;   // we compute rom pages through (XXX % m_rom_page_count)!
@@ -92,13 +87,12 @@ void device_sega8_cart_interface::rom_alloc(running_machine &machine, UINT32 siz
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_sega8_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
+void device_sega8_cart_interface::ram_alloc(UINT32 size)
 {
 	if (m_ram == NULL)
 	{
-		m_ram = auto_alloc_array_clear(machine, UINT8, size);
-		m_ram_size = size;
-		state_save_register_item_pointer(machine, "SEGA8_CART", this->device().tag(), 0, m_ram, m_ram_size);
+		m_ram.resize(size);
+		device().save_item(NAME(m_ram));
 	}
 }
 
@@ -284,38 +278,38 @@ void sega8_cart_slot_device::setup_ram()
 	{
 		if (m_type == SEGA8_CASTLE)
 		{
-			m_cart->ram_alloc(machine(), 0x2000);
+			m_cart->ram_alloc(0x2000);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_OTHELLO)
 		{
-			m_cart->ram_alloc(machine(), 0x800);
+			m_cart->ram_alloc(0x800);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_BASIC_L3)
 		{
-			m_cart->ram_alloc(machine(), 0x8000);
+			m_cart->ram_alloc(0x8000);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_MUSIC_EDITOR)
 		{
-			m_cart->ram_alloc(machine(), 0x2800);
+			m_cart->ram_alloc(0x2800);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_DAHJEE_TYPEA)
 		{
-			m_cart->ram_alloc(machine(), 0x2400);
+			m_cart->ram_alloc(0x2400);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_DAHJEE_TYPEB)
 		{
-			m_cart->ram_alloc(machine(), 0x2000);
+			m_cart->ram_alloc(0x2000);
 			m_cart->set_has_battery(FALSE);
 		}
 		else if (m_type == SEGA8_CODEMASTERS)
 		{
 			// Codemasters cart can have 64KB of RAM (Ernie Els Golf? or 8KB?) and no battery
-			m_cart->ram_alloc(machine(), 0x10000);
+			m_cart->ram_alloc(0x10000);
 			m_cart->set_has_battery(FALSE);
 		}
 		else
@@ -324,7 +318,7 @@ void sega8_cart_slot_device::setup_ram()
 			// how much RAM was in the cart and if there was a battery so we always alloc 32KB and
 			// we save its content only if the game enable the RAM
 			m_cart->set_late_battery(TRUE);
-			m_cart->ram_alloc(machine(), 0x08000);
+			m_cart->ram_alloc(0x08000);
 		}
 	}
 	else
@@ -334,7 +328,7 @@ void sega8_cart_slot_device::setup_ram()
 		m_cart->set_late_battery(FALSE);
 
 		if (get_software_region_length("ram"))
-			m_cart->ram_alloc(machine(), get_software_region_length("ram"));
+			m_cart->ram_alloc(get_software_region_length("ram"));
 
 		if (battery && !strcmp(battery, "yes"))
 			m_cart->set_has_battery(TRUE);
@@ -366,7 +360,7 @@ bool sega8_cart_slot_device::call_load()
 		if (len & 0x3fff)
 			len = ((len >> 14) + 1) << 14;
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)

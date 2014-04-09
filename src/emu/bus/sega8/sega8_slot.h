@@ -49,8 +49,8 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	void rom_alloc(running_machine &machine, UINT32 size);
-	void ram_alloc(running_machine &machine, UINT32 size);
+	void rom_alloc(UINT32 size);
+	void ram_alloc(UINT32 size);
 
 	virtual void late_bank_setup() {}
 
@@ -66,18 +66,16 @@ public:
 //protected:
 	UINT8* get_rom_base() { return m_rom; }
 	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram_size; }
+	UINT32 get_rom_size() { return m_rom.count(); }
+	UINT32 get_ram_size() { return m_ram.count(); }
 
 	void rom_map_setup(UINT32 size);
 	void ram_map_setup(UINT8 banks);
 
 //private:
 	// internal state
-	UINT8  *m_rom;
-	UINT8  *m_ram;
-	UINT32 m_rom_size;
-	UINT32 m_ram_size;
+	dynamic_buffer m_rom;
+	dynamic_buffer m_ram;
 	int m_rom_page_count;
 
 	bool has_battery;

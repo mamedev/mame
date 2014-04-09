@@ -25,11 +25,7 @@ const device_type PCE_CART_SLOT = &device_creator<pce_cart_slot_device>;
 //-------------------------------------------------
 
 device_pce_cart_interface::device_pce_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_ram(NULL),
-		m_rom_size(0),
-		m_ram_size(0)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -46,13 +42,10 @@ device_pce_cart_interface::~device_pce_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_pce_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
+void device_pce_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
-	{
-		m_rom = auto_alloc_array_clear(machine, UINT8, size);
-		m_rom_size = size;
-	}
+		m_rom.resize(size);
 }
 
 
@@ -60,13 +53,12 @@ void device_pce_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_pce_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
+void device_pce_cart_interface::ram_alloc(UINT32 size)
 {
 	if (m_ram == NULL)
 	{
-		m_ram = auto_alloc_array_clear(machine, UINT8, size);
-		m_ram_size = size;
-		state_save_register_item_pointer(machine, "PCE_CART", this->device().tag(), 0, m_ram, m_ram_size);
+		m_ram.resize(size);
+		device().save_item(NAME(m_ram));
 	}
 }
 
@@ -228,7 +220,7 @@ bool pce_cart_slot_device::call_load()
 			fseek(offset, SEEK_SET);
 		}
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (software_entry() == NULL)
@@ -263,9 +255,9 @@ bool pce_cart_slot_device::call_load()
 		//printf("Type: %s\n", pce_get_slot(m_type));
 
 		if (m_type == PCE_POPULOUS)
-			m_cart->ram_alloc(machine(), 0x8000);
+			m_cart->ram_alloc(0x8000);
 		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
-			m_cart->ram_alloc(machine(), 0x30000);
+			m_cart->ram_alloc(0x30000);
 
 		return IMAGE_INIT_PASS;
 	}

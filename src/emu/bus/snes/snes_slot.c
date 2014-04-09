@@ -86,7 +86,8 @@ device_sns_cart_interface::~device_sns_cart_interface()
 
 void device_sns_cart_interface::rom_alloc(UINT32 size)
 {
-	m_rom.resize(size);
+	if (m_rom == NULL)
+		m_rom.resize(size);
 }
 
 
@@ -128,7 +129,8 @@ void device_sns_cart_interface::rtc_ram_alloc(UINT32 size)
 
 void device_sns_cart_interface::addon_bios_alloc(UINT32 size)
 {
-	m_bios.resize(size);
+	if (m_bios == NULL)
+		m_bios.resize(size);
 }
 
 
