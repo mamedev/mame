@@ -40,6 +40,10 @@ public:
 		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 		DECLARE_WRITE_LINE_MEMBER(vblank_changed);
 
+		CRTC_EGA_ROW_UPDATE(ega_update_row);
+		CRTC_EGA_ROW_UPDATE(pc_ega_graphics);
+		CRTC_EGA_ROW_UPDATE(pc_ega_text);
+
 protected:
 		// device-level overrides
 		virtual void device_start();
@@ -54,8 +58,6 @@ public:
 		void change_mode();
 		DECLARE_WRITE8_MEMBER(pc_ega8_3X0_w);
 		DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
-
-		crtc_ega_update_row_func    m_update_row;
 
 		/* Video memory and related variables */
 		memory_region   *m_vram;
@@ -96,6 +98,7 @@ public:
 		UINT8   m_vsync;
 		UINT8   m_vblank;
 		UINT8   m_display_enable;
+		int     m_video_mode;
 		required_device<palette_device> m_palette;
 };
 
