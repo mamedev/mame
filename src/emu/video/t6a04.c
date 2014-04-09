@@ -18,35 +18,13 @@
 const device_type T6A04 = &device_creator<t6a04_device>;
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void t6a04_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const t6a04_interface *intf = reinterpret_cast<const t6a04_interface *>(static_config());
-
-	if (intf != NULL)
-	{
-		*static_cast<t6a04_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		height = width = 0;
-	}
-}
-
-//-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
 //-------------------------------------------------
 
 void t6a04_device::device_validity_check(validity_checker &valid) const
 {
-	if (height == 0 || width == 0)
+	if (m_height == 0 || m_width == 0)
 		mame_printf_error("Configured with invalid parameter\n");
 }
 
@@ -59,7 +37,9 @@ void t6a04_device::device_validity_check(validity_checker &valid) const
 //-------------------------------------------------
 
 t6a04_device::t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, T6A04, "T6A04", tag, owner, clock, "t6a04", __FILE__)
+	device_t(mconfig, T6A04, "T6A04", tag, owner, clock, "t6a04", __FILE__),
+	m_height(0),
+	m_width(0)
 {
 }
 
@@ -115,8 +95,8 @@ void t6a04_device::device_reset()
 
 UINT32 t6a04_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 ypages = width>>3;
-	UINT8 last_line = m_zpos + height;
+	UINT8 ypages = m_width>>3;
+	UINT8 last_line = m_zpos + m_height;
 
 	if (m_display_on)
 	{

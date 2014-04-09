@@ -11,31 +11,25 @@
 #ifndef __T6A04_H__
 #define __T6A04_H__
 
-#define MCFG_T6A04_ADD( _tag, _config ) \
-	MCFG_DEVICE_ADD( _tag, T6A04, 0 ) \
-	MCFG_DEVICE_CONFIG(_config)
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> t6a04_interface
-
-struct t6a04_interface
-{
-	UINT8 height;           // number of lines
-	UINT8 width;            // pixels for line
-};
-
 // ======================> t6a04_device
 
-class t6a04_device : public device_t,
-						public t6a04_interface
+class t6a04_device : public device_t
 {
 public:
 	// construction/destruction
 	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void set_size(device_t &device, int w, int h)
+	{
+		t6a04_device &dev = downcast<t6a04_device &>(device);
+		dev.m_width = w;
+		dev.m_height = h;
+	}
+	
 	// device interface
 	DECLARE_WRITE8_MEMBER(control_write);
 	DECLARE_READ8_MEMBER(control_read);
@@ -48,7 +42,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
 
 private:
@@ -65,9 +58,15 @@ private:
 	UINT8 m_opa1;
 	UINT8 m_opa2;
 	UINT8 m_output_reg;
+
+	UINT8 m_height;           // number of lines
+	UINT8 m_width;            // pixels for line
 };
 
 // device type definition
 extern const device_type T6A04;
+
+#define MCFG_T6A04_SIZE(_width, _height) \
+	t6a04_device::set_size(*device, _width, _height);
 
 #endif
