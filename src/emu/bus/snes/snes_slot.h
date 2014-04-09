@@ -91,13 +91,6 @@ enum
 	ADDON_Z80GB
 };
 
-// ======================> sns_cart_interface
-
-struct sns_cart_interface
-{
-};
-
-
 // ======================> device_sns_cart_interface
 
 class device_sns_cart_interface : public device_slot_card_interface
@@ -110,38 +103,34 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
 	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (m_nvram) { UINT32 mask = m_nvram_size - 1; return m_nvram[offset & mask]; } else return 0xff; }   // NVRAM access
+	virtual DECLARE_READ8_MEMBER(read_ram) { if (m_nvram) { UINT32 mask = m_nvram.count() - 1; return m_nvram[offset & mask]; } else return 0xff; }   // NVRAM access
 	virtual DECLARE_WRITE8_MEMBER(write_l) {}   // used by carts with subslots
 	virtual DECLARE_WRITE8_MEMBER(write_h) {}   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (m_nvram) { UINT32 mask = m_nvram_size - 1; m_nvram[offset & mask] = data; return; } } // NVRAM access
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (m_nvram) { UINT32 mask = m_nvram.count() - 1; m_nvram[offset & mask] = data; return; } } // NVRAM access
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 	virtual void speedup_addon_bios_access() {};
 
-	void rom_alloc(running_machine &machine, UINT32 size);
-	void nvram_alloc(running_machine &machine, UINT32 size);
-	void rtc_ram_alloc(running_machine &machine, UINT32 size);
-	void addon_bios_alloc(running_machine &machine, UINT32 size);
+	void rom_alloc(UINT32 size);
+	void nvram_alloc(UINT32 size);
+	void rtc_ram_alloc(UINT32 size);
+	void addon_bios_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; };
 	UINT8* get_nvram_base() { return m_nvram; };
 	UINT8* get_addon_bios_base() { return m_bios; };
 	UINT8* get_rtc_ram_base() { return m_rtc_ram; };
-	UINT32 get_rom_size() { return m_rom_size; };
-	UINT32 get_nvram_size() { return m_nvram_size; };
-	UINT32 get_addon_bios_size() { return m_bios_size; };
-	UINT32 get_rtc_ram_size() { return m_rtc_ram_size; };
+	UINT32 get_rom_size() { return m_rom.count(); };
+	UINT32 get_nvram_size() { return m_nvram.count(); };
+	UINT32 get_addon_bios_size() { return m_bios.count(); };
+	UINT32 get_rtc_ram_size() { return m_rtc_ram.count(); };
 
 	void rom_map_setup(UINT32 size);
 
 	// internal state
-	UINT8  *m_rom;
-	UINT8  *m_nvram;
-	UINT8  *m_bios;
-	UINT8  *m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
-	UINT32 m_rom_size;
-	UINT32 m_nvram_size;
-	UINT32 m_bios_size;
-	UINT32 m_rtc_ram_size;  // temp
+	dynamic_buffer m_rom;
+	dynamic_buffer m_nvram;
+	dynamic_buffer m_bios;
+	dynamic_buffer m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 
 	UINT8 rom_bank_map[256];    // 32K chunks of rom
 };
@@ -150,7 +139,6 @@ public:
 // ======================> base_sns_cart_slot_device
 
 class base_sns_cart_slot_device : public device_t,
-								public sns_cart_interface,
 								public device_image_interface,
 								public device_slot_interface
 {
