@@ -541,12 +541,6 @@ static const k053247_interface bucky_k053247_intf =
 	moo_sprite_callback
 };
 
-static const k054338_interface moo_k054338_intf =
-{
-	0,
-	"none"
-};
-
 static k054539_interface k054539_config;
 
 static MACHINE_CONFIG_START( moo, moo_state )
@@ -590,8 +584,10 @@ static MACHINE_CONFIG_START( moo, moo_state )
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
-	MCFG_K054338_ADD("k054338", moo_k054338_intf)
+
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -640,8 +636,10 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 	MCFG_K056832_ADD("k056832", moo_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
+
 	MCFG_K053251_ADD("k053251")
-	MCFG_K054338_ADD("k054338", moo_k054338_intf)
+
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

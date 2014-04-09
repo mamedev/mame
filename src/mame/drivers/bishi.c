@@ -372,12 +372,6 @@ static const k056832_interface bishi_k056832_intf =
 	bishi_tile_callback, "none"
 };
 
-static const k054338_interface bishi_k054338_intf =
-{
-	0,
-	"none"
-};
-
 void bishi_state::machine_start()
 {
 	save_item(NAME(m_cur_control));
@@ -416,7 +410,10 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_K056832_ADD("k056832", bishi_k056832_intf)
 	MCFG_K056832_GFXDECODE("gfxdecode")
 	MCFG_K056832_PALETTE("palette")
-	MCFG_K054338_ADD("k054338", bishi_k054338_intf)
+
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	// FP 201404: any reason why this is not connected to the k055555 below?
+
 	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
