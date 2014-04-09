@@ -50,6 +50,33 @@
 #define MCFG_GF1_RXIRQ_HANDLER(_devcb) \
 	devcb = &gf1_device::set_rxirq_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_GF1_WAVE_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_wave_irq_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_GF1_RAMP_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_ramp_irq_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_GF1_TIMER1_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_timer1_irq_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_GF1_TIMER2_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_timer2_irq_handler(*device, DEVCB2_##_devcb);
+	
+#define MCFG_GF1_SB_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_sb_irq_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_GF1_DMA_IRQ_HANDLER(_devcb) \
+	devcb = &gf1_device::set_dma_irq_handler(*device, DEVCB2_##_devcb);
+	
+#define MCFG_GF1_DRQ1_HANDLER(_devcb) \
+	devcb = &gf1_device::set_drq1_handler(*device, DEVCB2_##_devcb);
+	
+#define MCFG_GF1_DRQ2_HANDLER(_devcb) \
+	devcb = &gf1_device::set_drq2_handler(*device, DEVCB2_##_devcb);
+	
+#define MCFG_GF1_NMI_HANDLER(_devcb) \
+	devcb = &gf1_device::set_nmi_handler(*device, DEVCB2_##_devcb);
+	
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -86,23 +113,9 @@ struct gus_voice
 	INT16 sample;  // current sample data
 };
 
-struct gf1_interface
-{
-	devcb_write_line wave_irq_cb;
-	devcb_write_line ramp_irq_cb;
-	devcb_write_line timer1_irq_cb;
-	devcb_write_line timer2_irq_cb;
-	devcb_write_line sb_irq_cb;
-	devcb_write_line dma_irq_cb;
-	devcb_write_line drq1_cb;
-	devcb_write_line drq2_cb;
-	devcb_write_line nmi_cb;
-};
-
 class gf1_device :
 	public acia6850_device,
-	public device_sound_interface,
-	public gf1_interface
+	public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -110,6 +123,15 @@ public:
 
 	template<class _Object> static devcb2_base &set_txirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_txirq_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_rxirq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_rxirq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_wave_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_wave_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_ramp_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_ramp_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_timer1_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_timer1_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_timer2_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_timer2_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sb_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_sb_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dma_irq_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_dma_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq1_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_drq1_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_drq2_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_drq2_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_nmi_handler(device_t &device, _Object object) { return downcast<gf1_device &>(device).m_nmi_handler.set_callback(object); }
 
 	// current IRQ/DMA channel getters
 	UINT8 gf1_irq() { if(m_gf1_irq != 0) return m_gf1_irq; else return m_midi_irq; }  // workaround for win95 loading dumb values
@@ -143,7 +165,6 @@ public:
 	// optional information overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	virtual void device_config_complete();
 
 	// voice-specific registers
 	gus_voice m_voice[32];
@@ -177,16 +198,6 @@ protected:
 	virtual void device_stop();
 
 	virtual void update_irq();
-
-	devcb_resolved_write_line m_wave_irq_func;
-	devcb_resolved_write_line m_ramp_irq_func;
-	devcb_resolved_write_line m_timer1_irq_func;
-	devcb_resolved_write_line m_timer2_irq_func;
-	devcb_resolved_write_line m_sb_irq_func;
-	devcb_resolved_write_line m_dma_irq_func;
-	devcb_resolved_write_line m_drq1;
-	devcb_resolved_write_line m_drq2;
-	devcb_resolved_write_line m_nmi_func;
 
 private:
 	// internal state
@@ -238,6 +249,15 @@ private:
 
 	devcb2_write_line m_txirq_handler;
 	devcb2_write_line m_rxirq_handler;
+	devcb2_write_line m_wave_irq_handler;
+	devcb2_write_line m_ramp_irq_handler;
+	devcb2_write_line m_timer1_irq_handler;
+	devcb2_write_line m_timer2_irq_handler;
+	devcb2_write_line m_sb_irq_handler;
+	devcb2_write_line m_dma_irq_handler;
+	devcb2_write_line m_drq1_handler;
+	devcb2_write_line m_drq2_handler;
+	devcb2_write_line m_nmi_handler;
 };
 
 class isa16_gus_device :

@@ -85,8 +85,8 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 			{
 				if(data & 0x80)
 				{
-					m_timer1_irq_func(0);
-					m_timer2_irq_func(0);
+					m_timer1_irq_handler(0);
+					m_timer2_irq_handler(0);
 					m_adlib_status &= ~0xe0;
 					logerror("GUS: Timer flags reset\n");
 				}
@@ -122,7 +122,7 @@ WRITE8_MEMBER( gf1_device::adlib_w )
 				if(m_timer_ctrl & 0x02)
 				{
 					m_adlib_status |= 0x01;
-					m_nmi_func(1);
+					m_nmi_handler(1);
 					logerror("GUS: 2X9 Timer triggered!\n");
 				}
 			}
@@ -209,7 +209,7 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				m_adlib_status |= 0xc0;
 				m_timer1_count = m_timer1_value;
 				if(m_timer_ctrl & 0x04)
-					m_timer1_irq_func(1);
+					m_timer1_irq_handler(1);
 			}
 			m_timer1_count++;
 		}
@@ -222,13 +222,13 @@ void gf1_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 				m_adlib_status |= 0xa0;
 				m_timer2_count = m_timer2_value;
 				if(m_timer_ctrl & 0x08)
-					m_timer2_irq_func(1);
+					m_timer2_irq_handler(1);
 			}
 			m_timer2_count++;
 		}
 		break;
 	case DMA_TIMER:
-		m_drq1(1);
+		m_drq1_handler(1);
 		break;
 	case VOL_RAMP_TIMER:
 		update_volume_ramps();
@@ -352,30 +352,17 @@ gf1_device::gf1_device(const machine_config &mconfig, const char *tag, device_t 
 	acia6850_device(mconfig, GGF1, "Gravis GF1", tag, owner, clock, "gf1", __FILE__),
 	device_sound_interface( mconfig, *this ),
 	m_txirq_handler(*this),
-	m_rxirq_handler(*this)
+	m_rxirq_handler(*this),
+	m_wave_irq_handler(*this),
+	m_ramp_irq_handler(*this),
+	m_timer1_irq_handler(*this),
+	m_timer2_irq_handler(*this),
+	m_sb_irq_handler(*this),
+	m_dma_irq_handler(*this),
+	m_drq1_handler(*this),
+	m_drq2_handler(*this),
+	m_nmi_handler(*this)
 {
-}
-
-void gf1_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const gf1_interface *intf = reinterpret_cast<const gf1_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<gf1_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&wave_irq_cb, 0, sizeof(wave_irq_cb));
-		memset(&ramp_irq_cb, 0, sizeof(ramp_irq_cb));
-		memset(&timer1_irq_cb, 0, sizeof(timer1_irq_cb));
-		memset(&timer2_irq_cb, 0, sizeof(timer2_irq_cb));
-		memset(&sb_irq_cb, 0, sizeof(sb_irq_cb));
-		memset(&dma_irq_cb, 0, sizeof(dma_irq_cb));
-		memset(&drq1_cb, 0, sizeof(drq1_cb));
-		memset(&drq2_cb, 0, sizeof(drq2_cb));
-		memset(&nmi_cb, 0, sizeof(nmi_cb));
-	}
 }
 
 //-------------------------------------------------
@@ -391,6 +378,15 @@ void gf1_device::device_start()
 
 	m_txirq_handler.resolve_safe();
 	m_rxirq_handler.resolve_safe();
+	m_wave_irq_handler.resolve_safe();
+	m_ramp_irq_handler.resolve_safe();
+	m_timer1_irq_handler.resolve_safe();
+	m_timer2_irq_handler.resolve_safe();
+	m_sb_irq_handler.resolve_safe();
+	m_dma_irq_handler.resolve_safe();
+	m_drq1_handler.resolve_safe();
+	m_drq2_handler.resolve_safe();
+	m_nmi_handler.resolve_safe();
 
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
 	m_wave_ram.resize_and_clear(1024*1024);
@@ -404,16 +400,6 @@ void gf1_device::device_start()
 	m_voltimer = timer_alloc(VOL_RAMP_TIMER);
 
 	save_item(NAME(m_wave_ram));
-
-	m_wave_irq_func.resolve(wave_irq_cb, *this);
-	m_ramp_irq_func.resolve(ramp_irq_cb, *this);
-	m_timer1_irq_func.resolve(timer1_irq_cb, *this);
-	m_timer2_irq_func.resolve(timer2_irq_cb, *this);
-	m_sb_irq_func.resolve(sb_irq_cb, *this);
-	m_dma_irq_func.resolve(dma_irq_cb, *this);
-	m_drq1.resolve(drq1_cb,*this);
-	m_drq2.resolve(drq2_cb,*this);
-	m_nmi_func.resolve(nmi_cb, *this);
 
 	m_voice_irq_current = 0;
 	m_voice_irq_ptr = 0;
@@ -499,7 +485,7 @@ READ8_MEMBER(gf1_device::global_reg_data_r)
 		{
 			ret = m_dma_dram_ctrl;
 			m_dma_dram_ctrl &= ~0x40;
-			m_dma_irq_func(0);
+			m_dma_irq_handler(0);
 			return ret;
 		}
 	case 0x45:  // Timer control
@@ -595,8 +581,8 @@ READ8_MEMBER(gf1_device::global_reg_data_r)
 				m_voice_irq_current++;
 			else
 				ret = 0xe0;
-			m_wave_irq_func(0);
-			m_ramp_irq_func(0);
+			m_wave_irq_handler(0);
+			m_ramp_irq_handler(0);
 			return ret;
 		}
 		break;
@@ -799,16 +785,16 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
 			if(!(data & 0x02))
 				m_adlib_status &= ~0x01;
 			if(!(m_adlib_status & 0x19))
-				m_sb_irq_func(0);
+				m_sb_irq_handler(0);
 			if(!(data & 0x04))
 			{
 				m_adlib_status &= ~0x40;
-				m_timer1_irq_func(0);
+				m_timer1_irq_handler(0);
 			}
 			if(!(data & 0x08))
 			{
 				m_adlib_status &= ~0x20;
-				m_timer2_irq_func(0);
+				m_timer2_irq_handler(0);
 			}
 			if((m_adlib_status & 0x60) != 0)
 				m_adlib_status &= ~0x80;
@@ -1044,7 +1030,7 @@ WRITE8_MEMBER(gf1_device::adlib_cmd_w)
 			break;
 		case 0x05:
 			m_statread = 0;
-			//m_other_irq_func(0);
+			//m_other_irq_handler(0);
 			break;
 		case 0x06:
 			// TODO: Jumper register (joy/MIDI enable)
@@ -1093,7 +1079,7 @@ READ8_MEMBER(gf1_device::sb_r)
 		if(m_reg_ctrl & 0x80)
 		{
 			m_statread |= 0x80;
-			m_nmi_func(1);
+			m_nmi_handler(1);
 		}
 		return m_sb_data_2xe;
 	}
@@ -1108,7 +1094,7 @@ WRITE8_MEMBER(gf1_device::sb_w)
 		if(m_timer_ctrl & 0x20)
 		{
 			m_adlib_status |= 0x10;
-			m_nmi_func(1);
+			m_nmi_handler(1);
 			logerror("GUS: SB 0x2XC IRQ active\n");
 		}
 		break;
@@ -1128,7 +1114,7 @@ WRITE8_MEMBER(gf1_device::sb2x6_w)
 		if(m_timer_ctrl & 0x20)
 		{
 			m_adlib_status |= 0x08;
-			m_nmi_func(1);
+			m_nmi_handler(1);
 			logerror("GUS: SB 0x2X6 IRQ active\n");
 		}
 	}
@@ -1153,7 +1139,7 @@ void gf1_device::set_irq(UINT8 source, UINT8 voice)
 	{
 		m_irq_source = 0xe0 | (voice & 0x1f);
 		m_irq_source &= ~0x80;
-		m_wave_irq_func(1);
+		m_wave_irq_handler(1);
 		m_voice_irq_fifo[m_voice_irq_ptr % 32] = m_irq_source;
 		m_voice_irq_ptr++;
 		m_voice[voice].voice_ctrl |= 0x80;
@@ -1162,7 +1148,7 @@ void gf1_device::set_irq(UINT8 source, UINT8 voice)
 	{
 		m_irq_source = 0xe0 | (voice & 0x1f);
 		m_irq_source &= ~0x40;
-		m_ramp_irq_func(1);
+		m_ramp_irq_handler(1);
 		m_voice_irq_fifo[m_voice_irq_ptr % 32] = m_irq_source;
 		m_voice_irq_ptr++;
 	}
@@ -1173,12 +1159,12 @@ void gf1_device::reset_irq(UINT8 source)
 	if(source & IRQ_WAVETABLE)
 	{
 		m_irq_source |= 0x80;
-		m_wave_irq_func(0);
+		m_wave_irq_handler(0);
 	}
 	if(source & IRQ_VOLUME_RAMP)
 	{
 		m_irq_source |= 0x40;
-		m_ramp_irq_func(0);
+		m_ramp_irq_handler(0);
 	}
 }
 
@@ -1204,7 +1190,7 @@ void gf1_device::dack_w(int line,UINT8 data)
 	}
 	m_wave_ram[m_dma_current & 0xfffff] = data;
 	m_dma_current++;
-	m_drq1(0);
+	m_drq1_handler(0);
 }
 
 void gf1_device::eop_w(int state)
@@ -1212,11 +1198,11 @@ void gf1_device::eop_w(int state)
 	if(state == ASSERT_LINE) {
 		// end of transfer
 		m_dmatimer->reset();
-		//m_drq1(0);
+		//m_drq1_handler(0);
 		if(m_dma_dram_ctrl & 0x20)
 		{
 			m_dma_dram_ctrl |= 0x40;
-			m_dma_irq_func(1);
+			m_dma_irq_handler(1);
 		}
 		logerror("GUS: End of transfer. (%05x)\n",m_dma_current);
 	}
@@ -1225,29 +1211,24 @@ void gf1_device::eop_w(int state)
 
 /* 16-bit ISA card device implementation */
 
-static const gf1_interface gus_gf1_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,wavetable_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,volumeramp_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,timer1_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,timer2_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,sb_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,dma_irq),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,drq1_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,drq2_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,nmi_w)
-};
-
 static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
-	MCFG_SOUND_CONFIG(gus_gf1_config)
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_GF1_TXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
 	MCFG_GF1_RXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
+	MCFG_GF1_WAVE_IRQ_HANDLER(WRITELINE(isa16_gus_device, wavetable_irq))
+	MCFG_GF1_RAMP_IRQ_HANDLER(WRITELINE(isa16_gus_device, volumeramp_irq))
+	MCFG_GF1_TIMER1_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer1_irq))
+	MCFG_GF1_TIMER2_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer2_irq))
+	MCFG_GF1_SB_IRQ_HANDLER(WRITELINE(isa16_gus_device, sb_irq))
+	MCFG_GF1_DMA_IRQ_HANDLER(WRITELINE(isa16_gus_device, dma_irq))
+	MCFG_GF1_DRQ1_HANDLER(WRITELINE(isa16_gus_device, drq1_w))
+	MCFG_GF1_DRQ2_HANDLER(WRITELINE(isa16_gus_device, drq2_w))
+	MCFG_GF1_NMI_HANDLER(WRITELINE(isa16_gus_device, nmi_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("gf1", acia6850_device, write_rxd))
