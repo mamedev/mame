@@ -58,28 +58,9 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_rwp_dn(0),
 	m_cpx(0),
 	m_cpy(0),
-	m_regno(0)
+	m_regno(0),
+	m_skattva_hack(0)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void hd63484_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const hd63484_interface *intf = reinterpret_cast<const hd63484_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<hd63484_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_skattva_hack = 0;
-	}
 }
 
 //-------------------------------------------------
@@ -122,7 +103,6 @@ void hd63484_device::device_start()
 	save_item(NAME(m_cpx));
 	save_item(NAME(m_cpy));
 	save_item(NAME(m_regno));
-	save_item(NAME(m_skattva_hack));
 }
 
 //-------------------------------------------------

@@ -585,9 +585,6 @@ void sigmab52_state::machine_start()
 #endif
 }
 
-//static const hd63484_interface jwildb52_hd63484_intf = { 1 };
-
-
 /*************************
 *    Machine Drivers     *
 *************************/
