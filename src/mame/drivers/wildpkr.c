@@ -262,11 +262,6 @@ ADDRESS_MAP_END
 
 
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -288,7 +283,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 //  MCFG_DEVICE_ADD("hd63484", HD63484, 0)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)

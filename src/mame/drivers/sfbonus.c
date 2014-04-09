@@ -1349,11 +1349,6 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sfbonus_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 
 static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
@@ -1377,7 +1372,7 @@ static MACHINE_CONFIG_START( sfbonus, sfbonus_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100*2) // *2 for priority workaraound / custom drawing
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */

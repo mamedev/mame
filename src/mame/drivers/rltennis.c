@@ -168,11 +168,6 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	1
-};
-
 static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
@@ -190,7 +185,8 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	MCFG_RAMDAC_SPLIT_READ(1)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

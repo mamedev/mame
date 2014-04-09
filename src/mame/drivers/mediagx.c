@@ -870,11 +870,6 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, mediagx_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
@@ -892,7 +887,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

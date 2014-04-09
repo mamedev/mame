@@ -195,11 +195,6 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, chsuper_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 static MACHINE_CONFIG_START( chsuper, chsuper_state )
 
 	/* basic machine hardware */
@@ -222,7 +217,7 @@ static MACHINE_CONFIG_START( chsuper, chsuper_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
