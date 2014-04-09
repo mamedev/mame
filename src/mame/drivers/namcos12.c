@@ -1498,9 +1498,9 @@ WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
+	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w)
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
 	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
@@ -1508,26 +1508,21 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 ADDRESS_MAP_END
 
 
-/* Golgo 13 lightgun inputs
- *
- * Note: The H8/3002's ADC is 10 bits wide, but
- * it expects the 10-bit value to be left-justified
- * within the 16-bit word.
- */
+// Golgo 13 lightgun inputs
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
-	return ioport("LIGHT0_X")->read() << 2;
+	return ioport("LIGHT0_X")->read();
 }
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
-	return ioport("LIGHT0_Y")->read() << 2;
+	return ioport("LIGHT0_Y")->read();
 }
 
 static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r )
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r )
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r)
 
 	AM_IMPORT_FROM( s12h8iomap )
 ADDRESS_MAP_END
