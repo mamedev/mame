@@ -535,20 +535,6 @@ READ8_MEMBER( maygayv1_state::kbd_r )
 	return ioport(portnames[m_lamp_strobe&0x07])->read();
 }
 
-/*
-static I8279_INTERFACE( v1_i8279_intf )
-{
-	DEVCB_NULL,                                     // irq
-	DEVCB_DRIVER_MEMBER(maygayv1_state, strobe_w),  // scan SL lines
-	DEVCB_DRIVER_MEMBER(maygayv1_state, lamp_data_w),      // display A&B
-	DEVCB_NULL,                                     // BD
-	DEVCB_DRIVER_MEMBER(maygayv1_state,kbd_r),      // kbd RL lines
-	DEVCB_NULL,                                     // Shift key
-	DEVCB_NULL                                      // Ctrl-Strobe line
-};
-*/
-
-
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 {
 	m_vsync_latch_preset = data & 0x0100;
@@ -911,8 +897,10 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-//	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, v1_i8279_intf)    // unknown clock
-
+	MCFG_I8279_OUT_SL_CB(WRITE8(maygayv1_state, strobe_w))		// scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygayv1_state, lamp_data_w))	// display A&B
+	MCFG_I8279_IN_RL_CB(READ8(maygayv1_state, kbd_r))					// kbd RL lines
+	
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)

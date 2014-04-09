@@ -512,21 +512,6 @@ READ8_MEMBER( maygay1b_state::kbd_r )
 	return (portnames[m_lamp_strobe&0x07])->read();
 }
 
-/*
-static I8279_INTERFACE( m1_i8279_intf )
-{
-	DEVCB_NULL,                                     // irq
-	DEVCB_DRIVER_MEMBER(maygay1b_state, scanlines_w),  // scan SL lines
-	DEVCB_DRIVER_MEMBER(maygay1b_state, lamp_data_w),      // display A&B
-	DEVCB_NULL,                                     // BD
-	DEVCB_DRIVER_MEMBER(maygay1b_state,kbd_r),      // kbd RL lines
-	DEVCB_NULL,                                     // Shift key
-	DEVCB_NULL                                      // Ctrl-Strobe line
-};
-*/
-
-
-
 WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
@@ -545,19 +530,6 @@ WRITE8_MEMBER( maygay1b_state::lamp_data_2_w )
 	}
 	
 }
-
-/*
-static I8279_INTERFACE( m1_i8279_2_intf )
-{
-	DEVCB_NULL,                                     // irq
-	DEVCB_NULL,  // scan SL lines
-	DEVCB_DRIVER_MEMBER(maygay1b_state, lamp_data_2_w),      // display A&B
-	DEVCB_NULL,                                     // BD
-	DEVCB_NULL,				                       // kbd RL lines
-	DEVCB_NULL,                                     // Shift key
-	DEVCB_NULL                                      // Ctrl-Strobe line
-};
-*/
 
 // machine driver for maygay m1 board /////////////////////////////////
 
@@ -589,11 +561,12 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
 	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
-	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)    // unknown clock
-
-//	MCFG_I8279_ADD("i8279", M1_MASTER_CLOCK/4, m1_i8279_intf)    // unknown clock
-//	MCFG_I8279_ADD("i8279_2", M1_MASTER_CLOCK/4, m1_i8279_2_intf)    // unknown clock
-
+	MCFG_I8279_OUT_SL_CB(WRITE8(maygay1b_state, scanlines_w))	// scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_w))		// display A&B
+	MCFG_I8279_IN_RL_CB(READ8(maygay1b_state, kbd_r))			// kbd RL lines
+	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)		// unknown clock
+	MCFG_I8279_OUT_DISP_CB(WRITE8(maygay1b_state, lamp_data_2_w))		// display A&B
+	
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEFAULT_LAYOUT(layout_maygay1b)
