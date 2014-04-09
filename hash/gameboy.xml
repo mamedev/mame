@@ -15933,7 +15933,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="power racer (usa, europe).bin" size="65536" crc="cf8aeee8" sha1="6e10f59bb4090c0d0e79b57a2e39d9577ce0282e" offset="000000" />
+				<rom name="power racer (europe).bin" size="65536" crc="cf8aeee8" sha1="6e10f59bb4090c0d0e79b57a2e39d9577ce0282e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15946,7 +15946,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="power racer (usa, europe).bin" size="65536" crc="afc6a949" sha1="c0c8f28a9b66b6c08a0ed4d31a186c3382160c3d" offset="000000" />
+				<rom name="power racer (usa).bin" size="65536" crc="afc6a949" sha1="c0c8f28a9b66b6c08a0ed4d31a186c3382160c3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
