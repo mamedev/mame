@@ -1651,22 +1651,22 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_MODIFY("dasp")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
 	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigx_state, k054539_irq_gen))
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.9, 0)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.9, 1)
+	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 0)
+	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.9, 2)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.9, 3)
+	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 2)
+	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
