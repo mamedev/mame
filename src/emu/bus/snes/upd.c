@@ -76,20 +76,20 @@ sns_rom_seta11dsp_device::sns_rom_seta11dsp_device(const machine_config &mconfig
 
 void sns_rom20_necdsp_device::device_start()
 {
-	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x2000/4);
-	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x800/2);
+	m_dsp_prg.resize(0x2000/sizeof(UINT32));
+	m_dsp_data.resize(0x800/sizeof(UINT16));
 }
 
 void sns_rom21_necdsp_device::device_start()
 {
-	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x2000/4);
-	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x800/2);
+	m_dsp_prg.resize(0x2000/sizeof(UINT32));
+	m_dsp_data.resize(0x800/sizeof(UINT16));
 }
 
 void sns_rom_setadsp_device::device_start()
 {
-	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x10000/4);
-	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x1000/2);
+	m_dsp_prg.resize(0x10000/sizeof(UINT32));
+	m_dsp_data.resize(0x1000/sizeof(UINT16));
 }
 
 /*-------------------------------------------------

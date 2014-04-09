@@ -32,8 +32,8 @@ sns_pfest94_device::sns_pfest94_device(const machine_config &mconfig, const char
 
 void sns_pfest94_device::device_start()
 {
-	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x2000/4);
-	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x800/2);
+	m_dsp_prg.resize(0x2000/sizeof(UINT32));
+	m_dsp_data.resize(0x800/sizeof(UINT16));
 	pfest94_timer = timer_alloc(TIMER_EVENT);
 	pfest94_timer->reset();
 

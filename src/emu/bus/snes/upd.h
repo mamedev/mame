@@ -29,8 +29,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-	UINT32 *m_dsp_prg;
-	UINT16 *m_dsp_data;
+	dynamic_array<UINT32> m_dsp_prg;
+	dynamic_array<UINT16> m_dsp_data;
 };
 
 // ======================> sns_rom21_necdsp_device
@@ -56,8 +56,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
-	UINT32 *m_dsp_prg;
-	UINT16 *m_dsp_data;
+	dynamic_array<UINT32> m_dsp_prg;
+	dynamic_array<UINT16> m_dsp_data;
 };
 
 // ======================> sns_rom_setadsp_device
@@ -81,8 +81,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
 
-	UINT32 *m_dsp_prg;
-	UINT16 *m_dsp_data;
+	dynamic_array<UINT32> m_dsp_prg;
+	dynamic_array<UINT16> m_dsp_data;
 };
 
 // ======================> sns_rom_seta10dsp_device
