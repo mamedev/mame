@@ -14,116 +14,69 @@ void namcona1_state::tilemap_get_info(
 	tile_data &tileinfo,
 	int tile_index,
 	const UINT16 *tilemap_videoram,
-	int tilemap_color,
 	bool use_4bpp_gfx )
 {
 	UINT16 *source;
 
 	int data = tilemap_videoram[tile_index];
 	int tile = data&0xfff;
-	int gfx;
-
-	if( use_4bpp_gfx )
-	{
-		gfx = 1;
-		tilemap_color *= 0x10;
-		tilemap_color += (data & 0x7000)>>12;
-	}
-	else
-	{
-		gfx = 0;
-	}
+	int gfx = use_4bpp_gfx ? 1 : 0;
+	int color = use_4bpp_gfx ? (data & 0x7000)>>12 : 0;
 
 	if( data & 0x8000 )
 	{
-		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
-		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,0 );
-		if (ENDIANNESS_NATIVE == ENDIANNESS_BIG)
-			tileinfo.mask_data = (UINT8 *)(m_shaperam+4*tile);
-		else
-		{
-			UINT8 *mask_data = m_mask_data;
-			source = m_shaperam+4*tile;
-			mask_data[0] = source[0]>>8;
-			mask_data[1] = source[0]&0xff;
-			mask_data[2] = source[1]>>8;
-			mask_data[3] = source[1]&0xff;
-			mask_data[4] = source[2]>>8;
-			mask_data[5] = source[2]&0xff;
-			mask_data[6] = source[3]>>8;
-			mask_data[7] = source[3]&0xff;
-			tileinfo.mask_data = mask_data;
-		}
+		SET_TILE_INFO_MEMBER(gfx,tile,color,0 );
+		tileinfo.mask_data = &m_shaperam[tile*8];
 	}
 } /* tilemap_get_info */
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info0)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,0*0x1000+videoram,m_tilemap_palette_bank[0],m_vreg[0xbc/2]&1);
+	tilemap_get_info(tileinfo,tile_index,0*0x1000+videoram,m_vreg[0xbc/2]&1);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info1)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,1*0x1000+videoram,m_tilemap_palette_bank[1],m_vreg[0xbc/2]&2);
+	tilemap_get_info(tileinfo,tile_index,1*0x1000+videoram,m_vreg[0xbc/2]&2);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info2)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,2*0x1000+videoram,m_tilemap_palette_bank[2],m_vreg[0xbc/2]&4);
+	tilemap_get_info(tileinfo,tile_index,2*0x1000+videoram,m_vreg[0xbc/2]&4);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info3)
 {
 	UINT16 *videoram = m_videoram;
-	tilemap_get_info(tileinfo,tile_index,3*0x1000+videoram,m_tilemap_palette_bank[3],m_vreg[0xbc/2]&8);
+	tilemap_get_info(tileinfo,tile_index,3*0x1000+videoram,m_vreg[0xbc/2]&8);
 }
 
 TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 {
-	UINT16 *videoram = m_videoram;
 	/* each logical tile is constructed from 4*4 normal tiles */
-	int tilemap_color = m_roz_palette;
 	int use_4bpp_gfx = m_vreg[0xbc/2]&16; /* ? */
 	int c = tile_index%0x40;
 	int r = tile_index/0x40;
-	int data = videoram[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
+	int data = m_videoram[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
 	int tile = (data+(c%4)+(r%4)*0x40)&0xfff;
-	int gfx = use_4bpp_gfx;
-	if( use_4bpp_gfx )
-	{
-		tilemap_color *= 0x10;
-		tilemap_color += (data & 0x7000)>>12;
-	}
+	int gfx = use_4bpp_gfx ? 1 : 0;
+	int color = use_4bpp_gfx ? (data & 0x7000)>>12 : 0;
+
 	if( data & 0x8000 )
 	{
-		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+		SET_TILE_INFO_MEMBER(gfx,tile,color,TILE_FORCE_LAYER0 );
 	}
 	else
 	{
-		UINT8 *mask_data = (UINT8 *)(m_shaperam+4*tile);
-
-		if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
-		{
-			UINT16 *source = (UINT16 *)mask_data;
-			UINT8 *conv_data = m_conv_data;
-			conv_data[0] = source[0]>>8;
-			conv_data[1] = source[0]&0xff;
-			conv_data[2] = source[1]>>8;
-			conv_data[3] = source[1]&0xff;
-			conv_data[4] = source[2]>>8;
-			conv_data[5] = source[2]&0xff;
-			conv_data[6] = source[3]>>8;
-			conv_data[7] = source[3]&0xff;
-			mask_data = conv_data;
-		}
-		SET_TILE_INFO_MEMBER(gfx,tile,tilemap_color,0 );
-		tileinfo.mask_data = mask_data;
+		SET_TILE_INFO_MEMBER(gfx,tile,color,0 );
+		tileinfo.mask_data = &m_shaperam[tile*8];
 	}
 } /* roz_get_info */
 
@@ -135,25 +88,19 @@ WRITE16_MEMBER(namcona1_state::namcona1_videoram_w)
 	COMBINE_DATA( &videoram[offset] );
 	if( offset<0x8000/2 )
 	{
-		m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff );
+		m_bg_tilemap[offset/0x1000]->mark_tile_dirty(offset&0xfff);
 	}
 	else if( offset<0xa000/2 )
 	{
-		m_roz_tilemap ->mark_all_dirty();
+		m_bg_tilemap[4]->mark_all_dirty();
 	}
 } /* namcona1_videoram_w */
-
-READ16_MEMBER(namcona1_state::namcona1_videoram_r)
-{
-	UINT16 *videoram = m_videoram;
-	return videoram[offset];
-} /* namcona1_videoram_r */
 
 /*************************************************************************/
 
 void namcona1_state::UpdatePalette( int offset )
 {
-	UINT16 data = m_generic_paletteram_16[offset]; /* -RRRRRGG GGGBBBBB */
+	UINT16 data = m_paletteram[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
 	 * sprites can be configured to use an alternate interpretation of palette ram
 	 * (used in-game in Emeraldia)
@@ -168,14 +115,9 @@ void namcona1_state::UpdatePalette( int offset )
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 } /* namcona1_paletteram_w */
 
-READ16_MEMBER(namcona1_state::namcona1_paletteram_r)
-{
-	return m_generic_paletteram_16[offset];
-} /* namcona1_paletteram_r */
-
 WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
 {
-	COMBINE_DATA( &m_generic_paletteram_16[offset] );
+	COMBINE_DATA( &m_paletteram[offset] );
 	if( m_vreg[0x8e/2] )
 	{ /* graphics enabled; update palette immediately */
 		UpdatePalette( offset );
@@ -186,40 +128,6 @@ WRITE16_MEMBER(namcona1_state::namcona1_paletteram_w)
 	}
 }
 
-/*************************************************************************/
-
-static const gfx_layout shape_layout =
-{
-	8,8,
-	0x1000,
-	1,
-	{ 0 },
-	{ STEP8(0, 1) },
-	{ STEP8(0, 8) },
-	8*8
-}; /* shape_layout */
-
-static const gfx_layout cg_layout_8bpp =
-{
-	8,8,
-	0x1000,
-	8, /* 8BPP */
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP8(0, 8) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-}; /* cg_layout_8bpp */
-
-static const gfx_layout cg_layout_4bpp =
-{
-	8,8,
-	0x1000,
-	4, /* 4BPP */
-	{ 4,5,6,7 },
-	{ STEP8(0, 8) },
-	{ STEP8(0, 8*8) },
-	8*8*8
-}; /* cg_layout_4bpp */
 
 READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
 {
@@ -228,7 +136,8 @@ READ16_MEMBER(namcona1_state::namcona1_gfxram_r)
 	{
 		if( offset<0x4000 )
 		{
-			return m_shaperam[offset];
+			offset *= 2;
+			return (m_shaperam[offset] << 8) | m_shaperam[offset+1];
 		}
 	}
 	else if( type == 0x02 )
@@ -247,10 +156,12 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 	{
 		if( offset<0x4000 )
 		{
-			old_word = m_shaperam[offset];
-			COMBINE_DATA( &m_shaperam[offset] );
-			if( m_shaperam[offset]!=old_word )
-				m_gfxdecode->gfx(2)->mark_dirty(offset/4);
+			offset *= 2;
+			if (ACCESSING_BITS_8_15)
+				m_shaperam[offset] = data >> 8;
+			if (ACCESSING_BITS_0_7)
+				m_shaperam[offset+1] = data;
+			m_gfxdecode->gfx(2)->mark_dirty(offset/8);
 		}
 	}
 	else if( type == 0x02 )
@@ -267,26 +178,18 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 
 void namcona1_state::video_start()
 {
-	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
-	m_roz_palette = -1;
-
-	for( int i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
-	{
-		m_tilemap_palette_bank[i] = -1;
-	}
-
+	// normal tilemaps
 	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 
-	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
-	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
+	// roz tilemap
+	m_bg_tilemap[4] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 
-	m_gfxdecode->set_gfx(0, global_alloc( gfx_element(m_palette, cg_layout_8bpp, (UINT8 *)m_cgram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/256, 0 )));
-	m_gfxdecode->set_gfx(1, global_alloc( gfx_element(m_palette, cg_layout_4bpp, (UINT8 *)m_cgram, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/16, 0 )));
-	m_gfxdecode->set_gfx(2, global_alloc( gfx_element(m_palette, shape_layout, (UINT8 *)m_shaperam, NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries()/2, 0 )));
+	m_shaperam.resize(0x8000);
 
+	m_gfxdecode->gfx(2)->set_source(m_shaperam);
 } /* namcona1_vh_start */
 
 /*************************************************************************/
@@ -533,9 +436,9 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 
 void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask )
 {
-	if(which == NAMCONA1_NUM_TILEMAPS )
+	if(which == 4)
 	{
-		/* draw roz all at once */
+		/* draw the roz tilemap all at once */
 		int incxx = ((INT16)m_vreg[0xc0/2])<<8;
 		int incxy = ((INT16)m_vreg[0xc2/2])<<8;
 		int incyx = ((INT16)m_vreg[0xc4/2])<<8;
@@ -546,7 +449,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		int dy = -8; /* vertical adjust */
 		UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 		UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-		m_roz_tilemap->draw_roz(screen, bitmap, cliprect,
+		m_bg_tilemap[4]->draw_roz(screen, bitmap, cliprect,
 			startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
 	}
 	else
@@ -559,7 +462,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		*  tmap3   ffec00  ffee00
 		*/
 		const UINT16 *scroll = &m_scroll[which * 0x400/2];
-		const pen_t *paldata = &m_palette->pen(m_tilemap_palette_bank[which] * 256);
+		const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
 		int scrollx = 0;
@@ -626,24 +529,10 @@ UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind1
 			m_palette_is_dirty = 0;
 		}
 
-		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
-		{
-			int tilemap_color = m_vreg[0xb0/2+(which&3)]&0xf;
-			if( tilemap_color!=m_tilemap_palette_bank[which] )
-			{
-				m_bg_tilemap[which] ->mark_all_dirty();
-				m_tilemap_palette_bank[which] = tilemap_color;
-			}
-		} /* next tilemap */
+		for( which=0; which < 4; which++ )
+			m_bg_tilemap[which]->set_palette_offset((m_vreg[0xb0/2 + which] & 0xf) * 256);
 
-		{ /* ROZ tilemap */
-			int color = m_vreg[0xba/2]&0xf;
-			if( color != m_roz_palette )
-			{
-				m_roz_tilemap ->mark_all_dirty();
-				m_roz_palette = color;
-			}
-		}
+		m_bg_tilemap[4]->set_palette_offset((m_vreg[0xba/2] & 0xf) * 256);
 
 		screen.priority().fill(0, cliprect );
 
