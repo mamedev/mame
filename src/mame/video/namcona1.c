@@ -265,10 +265,6 @@ WRITE16_MEMBER(namcona1_state::namcona1_gfxram_w)
 	}
 } /* namcona1_gfxram_w */
 
-static void UpdateGfx(running_machine &machine)
-{
-} /* UpdateGfx */
-
 void namcona1_state::video_start()
 {
 	m_roz_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
@@ -537,77 +533,68 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 
 void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask )
 {
-	UINT16 *videoram = m_videoram;
-	/*          scrollx lineselect
-	 *  tmap0   ffe000  ffe200
-	 *  tmap1   ffe400  ffe600
-	 *  tmap2   ffe800  ffea00
-	 *  tmap3   ffec00  ffee00
-	 */
-	int xadjust = 0x3a - which*2;
-	const UINT16 *scroll = m_scroll+0x200*which;
-	int line;
-	UINT16 xdata, ydata;
-	int scrollx, scrolly;
-	rectangle clip;
-	const pen_t *paldata;
-	gfx_element *pGfx;
-
-	pGfx = m_gfxdecode->gfx(0);
-	assert(which >= 0 && which < ARRAY_LENGTH(m_tilemap_palette_bank));
-	paldata = &m_palette->pen(pGfx->colorbase() + pGfx->granularity() * m_tilemap_palette_bank[which]);
-
-	/* draw one scanline at a time */
-	clip.min_x = cliprect.min_x;
-	clip.max_x = cliprect.max_x;
-	scrollx = 0;
-	scrolly = 0;
-	for( line=0; line<256; line++ )
+	if(which == NAMCONA1_NUM_TILEMAPS )
 	{
-		clip.min_y = line;
-		clip.max_y = line;
-		xdata = scroll[line];
-		if( xdata )
-		{
-			/* screenwise linescroll */
-			scrollx = xadjust+xdata;
-		}
-		ydata = scroll[line+0x100];
-		if( ydata&0x4000 )
-		{
-			/* line select: dword offset from 0xff000 or tilemap source line */
-			scrolly = (ydata - line)&0x1ff;
-		}
+		/* draw roz all at once */
+		int incxx = ((INT16)m_vreg[0xc0/2])<<8;
+		int incxy = ((INT16)m_vreg[0xc2/2])<<8;
+		int incyx = ((INT16)m_vreg[0xc4/2])<<8;
+		int incyy = ((INT16)m_vreg[0xc6/2])<<8;
+		INT16 xoffset = m_vreg[0xc8/2];
+		INT16 yoffset = m_vreg[0xca/2];
+		int dx = 46; /* horizontal adjust */
+		int dy = -8; /* vertical adjust */
+		UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
+		UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
+		m_roz_tilemap->draw_roz(screen, bitmap, cliprect,
+			startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
+	}
+	else
+	{
+		/* draw one scanline at a time */
+		/*          scrollx lineselect
+		*  tmap0   ffe000  ffe200
+		*  tmap1   ffe400  ffe600
+		*  tmap2   ffe800  ffea00
+		*  tmap3   ffec00  ffee00
+		*/
+		const UINT16 *scroll = &m_scroll[which * 0x400/2];
+		const pen_t *paldata = &m_palette->pen(m_tilemap_palette_bank[which] * 256);
+		rectangle clip = cliprect;
+		int xadjust = 0x3a - which*2;
+		int scrollx = 0;
+		int scrolly = 0;
 
-		if (line >= cliprect.min_y && line <= cliprect.max_y)
+		for( int line = 0; line < 256; line++ )
 		{
-			if( xdata == 0xc001 )
+			clip.min_y = line;
+			clip.max_y = line;
+			int xdata = scroll[line];
+			int ydata = scroll[line + 0x200/2];
+
+			if( xdata )
 			{
-				/* This is a simplification, but produces the correct behavior for the only game that uses this
-				 * feature, Numan Athletics.
-				 */
-				draw_pixel_line(
-					&bitmap.pix16(line),
-					&screen.priority().pix8(line),
-					videoram + ydata + 25,
-					paldata );
+				/* screenwise linescroll */
+				scrollx = xadjust+xdata;
 			}
-			else
+
+			if( ydata&0x4000 )
 			{
-				if(which == NAMCONA1_NUM_TILEMAPS )
+				/* line select: dword offset from 0xff000 or tilemap source line */
+				scrolly = (ydata - line)&0x1ff;
+			}
+
+			if (line >= cliprect.min_y && line <= cliprect.max_y)
+			{
+				if( xdata == 0xc001 )
 				{
-					int incxx = ((INT16)m_vreg[0xc0/2])<<8;
-					int incxy = ((INT16)m_vreg[0xc2/2])<<8;
-					int incyx = ((INT16)m_vreg[0xc4/2])<<8;
-					int incyy = ((INT16)m_vreg[0xc6/2])<<8;
-					INT16 xoffset = m_vreg[0xc8/2];
-					INT16 yoffset = m_vreg[0xca/2];
-					int dx = 46; /* horizontal adjust */
-					int dy = -8; /* vertical adjust */
-					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
-					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
-					m_roz_tilemap->draw_roz(screen, bitmap, clip,
-						startx, starty, incxx, incxy, incyx, incyy, 0, 0, primask, 0);
+					/* This is a simplification, but produces the correct behavior for the only game that uses this
+					* feature, Numan Athletics.
+					*/
+					draw_pixel_line(&bitmap.pix16(line),
+								&screen.priority().pix8(line),
+								m_videoram + ydata + 25,
+								paldata );
 				}
 				else
 				{
@@ -638,7 +625,7 @@ UINT32 namcona1_state::screen_update_namcona1(screen_device &screen, bitmap_ind1
 			}
 			m_palette_is_dirty = 0;
 		}
-		UpdateGfx(machine());
+
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			int tilemap_color = m_vreg[0xb0/2+(which&3)]&0xf;
