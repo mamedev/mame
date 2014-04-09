@@ -1,22 +1,7 @@
 #ifndef __TC0480SCP_H__
 #define __TC0480SCP_H__
 
-struct tc0480scp_interface
-{
-	int                m_gfxnum;
-	int                m_txnum;
-
-	int                m_pixels;
-
-	int                m_x_offset, m_y_offset;
-	int                m_text_xoffs, m_text_yoffs;
-	int                m_flip_xoffs, m_flip_yoffs;
-
-	int                m_col_base;
-};
-
-class tc0480scp_device : public device_t,
-											public tc0480scp_interface
+class tc0480scp_device : public device_t
 {
 public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -25,7 +10,28 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-
+	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0480scp_device &>(device).m_gfxnum = gfxregion; }
+	static void set_tx_region(device_t &device, int txregion) { downcast<tc0480scp_device &>(device).m_txnum = txregion; }
+	static void set_col_base(device_t &device, int col) { downcast<tc0480scp_device &>(device).m_col_base = col; }
+	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	{
+		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
+		dev.m_x_offset = x_offset;
+		dev.m_y_offset = y_offset;
+	}
+	static void set_offsets_tx(device_t &device, int x_offset, int y_offset)
+	{
+		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
+		dev.m_text_xoffs = x_offset;
+		dev.m_text_yoffs = y_offset;
+	}
+	static void set_offsets_flip(device_t &device, int x_offset, int y_offset)
+	{
+		tc0480scp_device &dev = downcast<tc0480scp_device &>(device);
+		dev.m_flip_xoffs = x_offset;
+		dev.m_flip_yoffs = y_offset;
+	}
+	
 	/* When writing a driver, pass zero for the text and flip offsets initially:
 	then tweak them once you have the 4 bg layer positions correct. Col_base
 	may be needed when tilemaps use a palette area from sprites. */
@@ -56,7 +62,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -76,10 +81,17 @@ private:
 	int              m_pri_reg;
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
-	tilemap_t         *m_tilemap[5][2];
-	INT32           m_dblwidth;
-	int             m_x_offs;
+	tilemap_t        *m_tilemap[5][2];
+	INT32            m_dblwidth;
 
+	int              m_gfxnum;
+	int              m_txnum;
+	int              m_x_offset, m_y_offset;
+	int              m_text_xoffs, m_text_yoffs;
+	int              m_flip_xoffs, m_flip_yoffs;
+	
+	int              m_col_base;
+	
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -100,9 +112,24 @@ private:
 
 extern const device_type TC0480SCP;
 
-#define MCFG_TC0480SCP_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, TC0480SCP, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_TC0480SCP_GFX_REGION(_region) \
+	tc0480scp_device::set_gfx_region(*device, _region);
+
+#define MCFG_TC0480SCP_TX_REGION(_region) \
+	tc0480scp_device::set_tx_region(*device, _region);
+
+#define MCFG_TC0480SCP_OFFSETS(_xoffs, _yoffs) \
+	tc0480scp_device::set_offsets(*device, _xoffs, _yoffs);
+
+#define MCFG_TC0480SCP_OFFSETS_TX(_xoffs, _yoffs) \
+	tc0480scp_device::set_offsets_tx(*device, _xoffs, _yoffs);
+
+#define MCFG_TC0480SCP_OFFSETS_FLIP(_xoffs, _yoffs) \
+	tc0480scp_device::set_offsets_flip(*device, _xoffs, _yoffs);
+
+#define MCFG_TC0480SCP_COL_BASE(_col) \
+	tc0480scp_device::set_col_base(*device, _col);
 
 #define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
 	tc0480scp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

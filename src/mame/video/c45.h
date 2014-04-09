@@ -11,9 +11,6 @@
 #define MCFG_NAMCO_C45_ROAD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_C45_ROAD, 0)
 
-#define MCFG_NAMCO_C45_ROAD_PALETTE(_palette_tag) \
-	namco_c45_road_device::static_set_palette_tag(*device, "^" _palette_tag);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,7 +19,7 @@
 
 // ======================> namco_c45_road_device
 
-class namco_c45_road_device : public device_t
+class namco_c45_road_device : public device_t, public device_gfx_interface, public device_memory_interface
 {
 	// constants
 	static const int ROAD_COLS = 64;
@@ -30,21 +27,18 @@ class namco_c45_road_device : public device_t
 	static const int ROAD_TILE_SIZE = 16;
 	static const int ROAD_TILEMAP_WIDTH = ROAD_TILE_SIZE * ROAD_COLS;
 	static const int ROAD_TILEMAP_HEIGHT = ROAD_TILE_SIZE * ROAD_ROWS;
-	static const int ROAD_TILE_COUNT_MAX = 0xfa00 / 0x40; // 0x3e8
 	static const int WORDS_PER_ROAD_TILE = 0x40/2;
+	static const gfx_layout tilelayout;
 
 public:
 	// construction/destruction
 	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_palette_tag(device_t &device, const char *tag);
+	DECLARE_ADDRESS_MAP(map, 16);
 
 	// read/write handlers
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// C45 Land (Road) Emulation
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
@@ -53,19 +47,23 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_stop();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
+private:
 	// internal helpers
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+	DECLARE_WRITE16_MEMBER( tilemap_w );
+	DECLARE_WRITE16_MEMBER( tileram_w );
 	TILE_GET_INFO_MEMBER( get_road_info );
 
 	// internal state
-	pen_t           m_transparent_color;
-	tilemap_t *     m_tilemap;
-	UINT16          m_ram[0x20000/2]; // at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild
-
-	static const gfx_layout s_tile_layout;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	address_space_config        m_space_config;
+	required_shared_ptr<UINT16> m_tmapram;
+	required_shared_ptr<UINT16> m_tileram;
+	required_shared_ptr<UINT16> m_lineram;
+	UINT8 *                     m_clut;
+	tilemap_t *                 m_tilemap;
+	pen_t                       m_transparent_color;
 };
 
 

@@ -1143,11 +1143,6 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
 }
 
-static const vt_video_interface video_interface =
-{
-	"chargen",
-};
-
 /* F4 Character Displayer */
 static const gfx_layout rainbow_charlayout =
 {
@@ -1211,7 +1206,9 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_PALETTE("vt100_video:palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
 
-	MCFG_RAINBOW_VIDEO_ADD("vt100_video", "screen", video_interface)
+	MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, 0)
+	MCFG_VT_SET_SCREEN("screen")
+	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 

@@ -6,30 +6,27 @@
 
 *************************************************************************/
 
-#ifndef CRT_H_
-#define CRT_H_
+#ifndef __CRT_H__
+#define __CRT_H__
 
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CRT_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, CRT, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+#define MCFG_CRT_NUM_LEVELS(_lev) \
+	crt_device::set_num_levels(*device, _lev);
+
+#define MCFG_CRT_OFFSETS(_xoffs, _yoffs) \
+	crt_device::set_offsets(*device, _xoffs, _yoffs);
+
+#define MCFG_CRT_SIZE(_width, _height) \
+	crt_device::set_size(*device, _width, _height);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct crt_interface
-{
-	int num_levels;
-	int offset_x, offset_y;
-	int width, height;
-};
-
 
 struct crt_point
 {
@@ -50,14 +47,27 @@ public:
 	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~crt_device() { }
 
-protected:
-	// device-level overrides
-	virtual void device_start();
-
-public:
+	static void set_num_levels(device_t &device, int levels) { downcast<crt_device &>(device).m_num_intensity_levels = levels; }
+	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	{
+		crt_device &dev = downcast<crt_device &>(device);
+		dev.m_window_offset_x = x_offset;
+		dev.m_window_offset_y = y_offset;
+	}
+	static void set_size(device_t &device, int width, int height)
+	{
+		crt_device &dev = downcast<crt_device &>(device);
+		dev.m_window_width = width;
+		dev.m_window_height = height;
+	}
+	
 	void plot(int x, int y);
 	void eof();
 	void update(bitmap_ind16 &bitmap);
+	
+protected:
+	// device-level overrides
+	virtual void device_start();
 
 private:
 	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */

@@ -660,8 +660,8 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_port_w)
-	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
+	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP   // Direct copy of input port 0
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
@@ -676,8 +676,8 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
@@ -687,8 +687,8 @@ static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP    // Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_port_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -712,8 +712,8 @@ static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -739,8 +739,8 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
 	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
-	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_port_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
+	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
@@ -749,8 +749,8 @@ static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(champwr_msm5205_start_w)
@@ -1782,12 +1782,6 @@ static const ay8910_interface single_ay8910_config =
 };
 
 
-static const tc0140syt_interface taitol_tc0140syt_intf =
-{
-	"slave", "audiocpu"
-};
-
-
 static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	/* basic machine hardware */
@@ -1833,7 +1827,9 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("slave")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -1926,8 +1922,6 @@ static MACHINE_CONFIG_START( kurikint, taitol_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
@@ -1974,8 +1968,6 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
@@ -2067,8 +2059,6 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE

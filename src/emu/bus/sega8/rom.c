@@ -329,7 +329,7 @@ READ8_MEMBER(sega8_rom_device::read_cart)
 	int bank = offset / 0x4000;
 
 	if (bank == 2 && m_ram && m_ram_enabled)
-		return m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size];
+		return m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram.count()];
 
 	if (offset < 0x400) // first 1k is hardcoded
 		return m_rom[offset];
@@ -342,7 +342,7 @@ WRITE8_MEMBER(sega8_rom_device::write_cart)
 	int bank = offset / 0x4000;
 
 	if (bank == 2 && m_ram && m_ram_enabled)
-		m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram_size] = data;
+		m_ram[(m_ram_base * 0x4000 + (offset & 0x3fff)) % m_ram.count()] = data;
 }
 
 WRITE8_MEMBER(sega8_rom_device::write_mapper)
@@ -422,7 +422,7 @@ READ8_MEMBER(sega8_othello_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x7ff];
 
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 WRITE8_MEMBER(sega8_othello_device::write_cart)
@@ -446,7 +446,7 @@ READ8_MEMBER(sega8_castle_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 WRITE8_MEMBER(sega8_castle_device::write_cart)
@@ -470,7 +470,7 @@ READ8_MEMBER(sega8_basic_l3_device::read_cart)
 	if (offset >= 0x8000)
 		return m_ram[offset & 0x3fff];
 
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 WRITE8_MEMBER(sega8_basic_l3_device::write_cart)
@@ -504,7 +504,7 @@ READ8_MEMBER(sega8_music_editor_device::read_cart)
 	if (offset >= 0x8000 && offset < 0xa000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 WRITE8_MEMBER(sega8_music_editor_device::write_cart)
@@ -623,7 +623,7 @@ READ8_MEMBER(sega8_dahjee_typea_device::read_cart)
 	if (offset >= 0x2000 && offset < 0x4000)
 		return m_ram[offset & 0x1fff];
 
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 WRITE8_MEMBER(sega8_dahjee_typea_device::write_cart)
@@ -651,7 +651,7 @@ WRITE8_MEMBER(sega8_dahjee_typea_device::write_ram)
 // TYPE B
 READ8_MEMBER(sega8_dahjee_typeb_device::read_cart)
 {
-	return m_rom[offset % m_rom_size];
+	return m_rom[offset % m_rom.count()];
 }
 
 READ8_MEMBER(sega8_dahjee_typeb_device::read_ram)
@@ -750,7 +750,7 @@ READ8_MEMBER(sega8_codemasters_device::read_cart)
 	int bank = offset / 0x2000;
 
 	if (bank == 5 && m_ram && m_ram_enabled)
-		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
+		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram.count()];
 
 	return m_rom[m_rom_bank_base[bank/2] * 0x4000 + (offset & 0x3fff)];
 }
@@ -782,7 +782,7 @@ WRITE8_MEMBER(sega8_codemasters_device::write_cart)
 	}
 
 	if (bank == 5 && m_ram && m_ram_enabled)
-		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size] = data;
+		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram.count()] = data;
 }
 
 /*-------------------------------------------------
@@ -824,7 +824,7 @@ READ8_MEMBER(sega8_zemina_device::read_cart)
 	int bank = offset / 0x2000;
 
 	if (bank >= 4 && m_ram && m_ram_enabled)
-		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size];
+		return m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram.count()];
 
 	return m_rom[m_rom_bank_base[bank] * 0x2000 + (offset & 0x1fff)];
 }
@@ -834,7 +834,7 @@ WRITE8_MEMBER(sega8_zemina_device::write_cart)
 	int bank = offset / 0x2000;
 
 	if (bank >= 4 && m_ram && m_ram_enabled)
-		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram_size] = data;
+		m_ram[(m_ram_base * 0x2000 + (offset & 0x1fff)) % m_ram.count()] = data;
 
 	if (offset < 4)
 	{

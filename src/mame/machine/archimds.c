@@ -75,6 +75,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 void archimedes_state::archimedes_clear_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] &= ~mask;
+	archimedes_request_irq_a(0);
 }
 
 void archimedes_state::archimedes_clear_irq_b(int mask)
@@ -111,17 +112,31 @@ void archimedes_state::vidc_vblank()
 
 /* video DMA */
 /* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
+/* TODO: change m_region_vram into proper alloc array */
+/* TODO: Erotictac and Poizone sets up vidinit register AFTER vidend, for double buffering? (fixes Poizone "Eterna" logo display on attract) */
 void archimedes_state::vidc_video_tick()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static UINT8 *vram = m_region_vram->base();
 	UINT32 size;
 	UINT32 m_vidc_ccur;
+	UINT32 offset_ptr;
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
+	offset_ptr = m_vidc_vidstart+m_vidc_vidinit;
+	if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
+		offset_ptr = m_vidc_vidstart;
+
+	//popmessage("%08x %08x %08x",m_vidc_vidstart,m_vidc_vidinit,m_vidc_vidend);
+
 	for(m_vidc_vidcur = 0;m_vidc_vidcur < size;m_vidc_vidcur++)
-		vram[m_vidc_vidcur] = (space.read_byte(m_vidc_vidstart+m_vidc_vidcur));
+	{
+		vram[m_vidc_vidcur] = (space.read_byte(offset_ptr));
+		offset_ptr++;
+		if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
+			offset_ptr = m_vidc_vidstart;
+	}
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
@@ -129,7 +144,9 @@ void archimedes_state::vidc_video_tick()
 		m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
 
 	if(m_video_dma_on)
+	{
 		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+	}
 	else
 		m_vid_timer->adjust(attotime::never);
 }
@@ -174,7 +191,7 @@ void archimedes_state::vidc_audio_tick()
 		372,   356,   340,   324,   308,   292,   276,   260,
 		244,   228,   212,   196,   180,   164,   148,   132,
 		120,   112,   104,    96,    88,    80,    72,    64,
-			56,    48,    40,    32,    24,    16,     8,     0
+		56,    48,    40,    32,    24,    16,     8,     0
 	};
 
 	for(ch=0;ch<8;ch++)
@@ -214,7 +231,7 @@ void archimedes_state::a310_set_timer(int tmr)
 	{
 		case 0:
 		case 1:
-			m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+			m_timer[tmr]->adjust(attotime::from_usec(m_ioc_timercnt[tmr]/2), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/2
 			break;
 		case 2:
 			freq = 1000000.0 / (double)(m_ioc_timercnt[tmr]+1);
@@ -416,37 +433,37 @@ void archimedes_state::archimedes_driver_init()
 static const char *const ioc_regnames[] =
 {
 	"(rw) Control",                 // 0
-	"(read) Keyboard receive (write) keyboard send",    // 1
+	"(read) Keyboard receive (write) keyboard send",    // 4
 	"?",
 	"?",
-	"(read) IRQ status A",              // 4
-	"(read) IRQ request A (write) IRQ clear",   // 5
-	"(rw) IRQ mask A",              // 6
+	"(read) IRQ status A",              // 10
+	"(read) IRQ request A (write) IRQ clear",   // 14
+	"(rw) IRQ mask A",              // 18
 	"?",
-	"(read) IRQ status B",      // 8
-	"(read) IRQ request B",     // 9
-	"(rw) IRQ mask B",      // 10
+	"(read) IRQ status B",      // 20
+	"(read) IRQ request B",     // 24
+	"(rw) IRQ mask B",      // 28
 	"?",
-	"(read) FIQ status",        // 12
-	"(read) FIQ request",       // 13
-	"(rw) FIQ mask",        // 14
+	"(read) FIQ status",        // 30
+	"(read) FIQ request",       // 34
+	"(rw) FIQ mask",        // 38
 	"?",
-	"(read) Timer 0 count low (write) Timer 0 latch low",       // 16
-	"(read) Timer 0 count high (write) Timer 0 latch high",     // 17
-	"(write) Timer 0 go command",                   // 18
-	"(write) Timer 0 latch command",                // 19
-	"(read) Timer 1 count low (write) Timer 1 latch low",       // 20
-	"(read) Timer 1 count high (write) Timer 1 latch high",     // 21
-	"(write) Timer 1 go command",                   // 22
-	"(write) Timer 1 latch command",                // 23
-	"(read) Timer 2 count low (write) Timer 2 latch low",       // 24
-	"(read) Timer 2 count high (write) Timer 2 latch high",     // 25
-	"(write) Timer 2 go command",                   // 26
-	"(write) Timer 2 latch command",                // 27
-	"(read) Timer 3 count low (write) Timer 3 latch low",       // 28
-	"(read) Timer 3 count high (write) Timer 3 latch high",     // 29
-	"(write) Timer 3 go command",                   // 30
-	"(write) Timer 3 latch command"                 // 31
+	"(read) Timer 0 count low (write) Timer 0 latch low",       // 40
+	"(read) Timer 0 count high (write) Timer 0 latch high",     // 44
+	"(write) Timer 0 go command",                   // 48
+	"(write) Timer 0 latch command",                // 4c
+	"(read) Timer 1 count low (write) Timer 1 latch low",       // 50
+	"(read) Timer 1 count high (write) Timer 1 latch high",     // 54
+	"(write) Timer 1 go command",                   // 58
+	"(write) Timer 1 latch command",                // 5c
+	"(read) Timer 2 count low (write) Timer 2 latch low",       // 60
+	"(read) Timer 2 count high (write) Timer 2 latch high",     // 64
+	"(write) Timer 2 go command",                   // 68
+	"(write) Timer 2 latch command",                // 6c
+	"(read) Timer 3 count low (write) Timer 3 latch low",       // 70
+	"(read) Timer 3 count high (write) Timer 3 latch high",     // 74
+	"(write) Timer 3 go command",                   // 78
+	"(write) Timer 3 latch command"                 // 7c
 };
 
 void archimedes_state::latch_timer_cnt(int tmr)
@@ -798,10 +815,10 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
 
-			logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-				m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
-				visarea.max_x, visarea.max_y,
-				m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
+			//logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+			//	m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
+			//	visarea.max_x, visarea.max_y,
+			//	m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
 
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];

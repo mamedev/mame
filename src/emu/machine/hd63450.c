@@ -83,6 +83,11 @@ void hd63450_device::device_start()
 	}
 }
 
+void hd63450_device::device_reset()
+{
+	m_drq_state[0] = m_drq_state[1] = m_drq_state[2] = m_drq_state[3] = 0;
+}
+
 READ16_MEMBER(hd63450_device::read)
 {
 	int channel,reg;
@@ -143,7 +148,7 @@ WRITE16_MEMBER(hd63450_device::write)
 	case 0x00:  // CSR / CER
 		if(ACCESSING_BITS_8_15)
 		{
-//          m_reg[channel].csr = (data & 0xff00) >> 8;
+			m_reg[channel].csr &= ~((data & 0xff00) >> 8);
 //          logerror("DMA#%i: Channel status write : %02x\n",channel,dmac.reg[channel].csr);
 		}
 		// CER is read-only, so no action needed there.
@@ -170,7 +175,7 @@ WRITE16_MEMBER(hd63450_device::write)
 		{
 			m_reg[channel].ccr = data & 0x00ff;
 			if((data & 0x0080))// && !m_dma_read[channel] && !m_dma_write[channel])
-				dma_transfer_start(channel,0);
+				dma_transfer_start(channel);
 			if(data & 0x0010)  // software abort
 				dma_transfer_abort(channel);
 			if(data & 0x0020)  // halt operation
@@ -243,7 +248,7 @@ WRITE16_MEMBER(hd63450_device::write)
 	}
 }
 
-void hd63450_device::dma_transfer_start(int channel, int dir)
+void hd63450_device::dma_transfer_start(int channel)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	m_in_progress[channel] = 1;
@@ -293,18 +298,23 @@ TIMER_CALLBACK_MEMBER(hd63450_device::dma_transfer_timer)
 
 void hd63450_device::dma_transfer_abort(int channel)
 {
+	if(!m_in_progress[channel])
+		return;
+
 	logerror("DMA#%i: Transfer aborted\n",channel);
-	m_timer[channel]->adjust(attotime::zero);
+	m_timer[channel]->adjust(attotime::never);
 	m_in_progress[channel] = 0;
-	m_reg[channel].mtc = m_transfer_size[channel];
-	m_reg[channel].csr |= 0xe0;  // channel operation complete, block transfer complete
+	m_reg[channel].csr |= 0x90;  // channel error
 	m_reg[channel].csr &= ~0x08;  // channel no longer active
+	m_reg[channel].cer = 0x11;
+	m_reg[channel].ccr &= ~0xc0;
+	m_dma_error((offs_t)3, 1);
 }
 
 void hd63450_device::dma_transfer_halt(int channel)
 {
 	m_halted[channel] = 1;
-	m_timer[channel]->adjust(attotime::zero);
+	m_timer[channel]->adjust(attotime::never);
 }
 
 void hd63450_device::dma_transfer_continue(int channel)
@@ -478,6 +488,7 @@ void hd63450_device::single_transfer(int x)
 				m_in_progress[x] = 0;
 				m_reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 				m_reg[x].csr &= ~0x08;  // channel no longer active
+				m_reg[x].ccr &= ~0xc0;
 
 				// Burst transfer
 				if((m_reg[x].dcr & 0xc0) == 0x00)
@@ -489,6 +500,42 @@ void hd63450_device::single_transfer(int x)
 					m_dma_end((offs_t)x, m_reg[x].ccr & 0x08);
 			}
 		}
+}
+
+WRITE_LINE_MEMBER(hd63450_device::drq0_w)
+{
+	bool ostate = m_drq_state[0];
+	m_drq_state[0] = state;
+	
+	if((m_reg[0].ocr & 2) && (state && !ostate))
+		single_transfer(0);
+}
+
+WRITE_LINE_MEMBER(hd63450_device::drq1_w)
+{
+	bool ostate = m_drq_state[1];
+	m_drq_state[1] = state;
+
+	if((m_reg[1].ocr & 2) && (state && !ostate))
+		single_transfer(1);
+}
+
+WRITE_LINE_MEMBER(hd63450_device::drq2_w)
+{
+	bool ostate = m_drq_state[2];
+	m_drq_state[2] = state;
+	
+	if((m_reg[2].ocr & 2) && (state && !ostate))
+		single_transfer(2);
+}
+
+WRITE_LINE_MEMBER(hd63450_device::drq3_w)
+{
+	bool ostate = m_drq_state[3];
+	m_drq_state[3] = state;
+	
+	if((m_reg[3].ocr & 2) && (state && !ostate))
+		single_transfer(3);
 }
 
 int hd63450_device::get_vector(int channel)

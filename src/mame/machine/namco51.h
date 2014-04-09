@@ -58,6 +58,7 @@ private:
 	devcb2_read8 m_in_3;
 	devcb2_write8 m_out_0;
 	devcb2_write8 m_out_1;
+
 	INT32 m_lastcoins;
 	INT32 m_lastbuttons;
 	INT32 m_credits;

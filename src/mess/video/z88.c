@@ -72,7 +72,7 @@ void z88_state::vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen)
 		plot_pixel(bitmap, x + i, y + 7, pen);
 }
 
-void z88_state::lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
+UPD65031_SCREEN_UPDATE(z88_state::lcd_update)
 {
 	if (sbf == 0)
 	{

@@ -1350,7 +1350,7 @@ MACHINE_CONFIG_START( impctawp, jpmimpct_state )
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)

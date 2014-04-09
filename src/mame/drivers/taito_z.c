@@ -1404,9 +1404,9 @@ WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 {
 	if (offset == 0)
-		m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
+		m_tc0140syt->master_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
-		m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
+		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1422,7 +1422,7 @@ WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 READ16_MEMBER(taitoz_state::taitoz_sound_r)
 {
 	if (offset == 1)
-		return (m_tc0140syt->tc0140syt_comm_r(space, 0) & 0xff);
+		return (m_tc0140syt->master_comm_r(space, 0) & 0xff);
 	else
 		return 0;
 }
@@ -1431,9 +1431,9 @@ READ16_MEMBER(taitoz_state::taitoz_sound_r)
 WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 {
 	if (offset == 0)
-		m_tc0140syt->tc0140syt_port_w(0, (data >> 8) & 0xff);
+		m_tc0140syt->master_port_w(0, (data >> 8) & 0xff);
 	else if (offset == 1)
-		m_tc0140syt->tc0140syt_comm_w(0, (data >> 8) & 0xff);
+		m_tc0140syt->master_comm_w(0, (data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -1449,7 +1449,7 @@ WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 {
 	if (offset == 1)
-		return ((m_tc0140syt->tc0140syt_comm_r(0) & 0xff) << 8);
+		return ((m_tc0140syt->master_comm_r(0) & 0xff) << 8);
 	else
 		return 0;
 }
@@ -1733,8 +1733,8 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, taitoz_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -2955,54 +2955,6 @@ Contcirc road glitchiness in attract?
 
 ***********************************************************/
 
-
-static const tc0100scn_interface taitoz_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface chasehq_tc0100scn_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface spacegun_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0480scp_interface taitoz_tc0480scp_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0,          /* pixels */
-	0x1f, 0x08, /* x_offset, y_offset */
-	0, 0,       /* text_xoff, text_yoff */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0           /* col_base */
-};
-
-
-static const tc0150rod_interface taitoz_tc0150rod_intf = { "gfx3" };
-
-
-static const tc0140syt_interface taitoz_tc0140syt_intf =
-{
-	"sub", "audiocpu"
-};
-
-
 /***********************************************************
                    SAVE STATES
 ***********************************************************/
@@ -3084,11 +3036,15 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3114,7 +3070,9 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3157,11 +3115,15 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3187,7 +3149,9 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3232,11 +3196,15 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3261,7 +3229,9 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3303,11 +3273,14 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3329,8 +3302,6 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
@@ -3384,11 +3355,14 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3411,7 +3385,9 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3456,11 +3432,15 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", chasehq_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(3)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3486,7 +3466,9 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3531,11 +3513,15 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", taitoz_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -3560,7 +3546,9 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3601,7 +3589,10 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0100SCN_ADD("tc0100scn", spacegun_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -3628,8 +3619,6 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
@@ -3674,11 +3663,15 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3701,7 +3694,9 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -3745,11 +3740,15 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
-	MCFG_TC0480SCP_ADD("tc0480scp", taitoz_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 
-	MCFG_TC0150ROD_ADD("tc0150rod", taitoz_tc0150rod_intf)
+	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
+	MCFG_TC0150ROD_GFXTAG("gfx3")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3772,7 +3771,9 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoz_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("sub")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

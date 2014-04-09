@@ -2085,19 +2085,6 @@ static const k051960_interface thndrx2_k051960_intf =
 	thndrx2_sprite_callback
 };
 
-
-/* 053936 interfaces */
-static const k053936_interface glfgreat_k053936_interface =
-{
-	1, 85, 0        /* wrap, xoff, yoff */
-};
-
-static const k053936_interface prmrsocr_k053936_interface =
-{
-	0, 85, 1        /* wrap, xoff, yoff */
-};
-
-
 MACHINE_START_MEMBER(tmnt_state,common)
 {
 	save_item(NAME(m_toggle));
@@ -2496,7 +2483,11 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 	MCFG_K053245_ADD("k053245", glfgreat_k05324x_intf)
 	MCFG_K053245_GFXDECODE("gfxdecode")
 	MCFG_K053245_PALETTE("palette")
-	MCFG_K053936_ADD("k053936", glfgreat_k053936_interface)
+
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(85, 0)
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
@@ -2562,7 +2553,10 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	MCFG_K053245_ADD("k053245", prmrsocr_k05324x_intf)
 	MCFG_K053245_GFXDECODE("gfxdecode")
 	MCFG_K053245_PALETTE("palette")
-	MCFG_K053936_ADD("k053936", prmrsocr_k053936_interface)
+
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_OFFSETS(85, 1)
+
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */

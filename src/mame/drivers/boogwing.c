@@ -296,12 +296,12 @@ WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 }
 
 
-int boogwing_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-int boogwing_state::bank_callback2( int bank )
+DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 {
 	int offset = ((bank >> 4) & 0x7) * 0x1000;
 	if ((bank & 0xf) == 0xa)
@@ -371,12 +371,12 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 4);
+	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

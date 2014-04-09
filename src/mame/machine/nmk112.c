@@ -18,17 +18,12 @@
 const device_type NMK112 = &device_creator<nmk112_device>;
 
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NMK112, "NMK 112", tag, owner, clock, "nmk112", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nmk112_device::device_config_complete()
+	: device_t(mconfig, NMK112, "NMK 112", tag, owner, clock, "nmk112", __FILE__),
+		m_page_mask(0xff),
+		m_rom0(NULL),
+		m_rom1(NULL),
+		m_size0(0),
+		m_size1(0)
 {
 }
 
@@ -38,34 +33,19 @@ void nmk112_device::device_config_complete()
 
 void nmk112_device::device_start()
 {
-	const nmk112_interface *intf = (const nmk112_interface *)static_config();
-
-	if (intf->rgn0 == NULL)
-	{
-		m_rom0 = NULL;
-		m_size0 = 0;
-	}
-	else
-	{
-		m_rom0 = machine().root_device().memregion(intf->rgn0)->base();
-		m_size0 = machine().root_device().memregion(intf->rgn0)->bytes() - 0x40000;
-	}
-
-	if (intf->rgn1 == NULL)
-	{
-		m_rom1 = NULL;
-		m_size1 = 0;
-	}
-	else
-	{
-		m_rom1 = machine().root_device().memregion(intf->rgn1)->base();
-		m_size1 = machine().root_device().memregion(intf->rgn1)->bytes() - 0x40000;
-	}
-
-	m_page_mask = ~intf->disable_page_mask;
-
 	save_item(NAME(m_current_bank));
 	machine().save().register_postload(save_prepost_delegate(FUNC(nmk112_device::postload_bankswitch), this));
+
+	if (m_tag0)
+	{
+		m_rom0 = machine().root_device().memregion(m_tag0)->base();
+		m_size0 = machine().root_device().memregion(m_tag0)->bytes() - 0x40000;
+	}
+	if (m_tag1)
+	{
+		m_rom1 = machine().root_device().memregion(m_tag1)->base();
+		m_size1 = machine().root_device().memregion(m_tag1)->bytes() - 0x40000;
+	}
 }
 
 //-------------------------------------------------
@@ -80,7 +60,6 @@ void nmk112_device::device_reset()
 		do_bankswitch(i, m_current_bank[i]);
 	}
 }
-
 
 void nmk112_device::do_bankswitch( int offset, int data )
 {

@@ -57,9 +57,9 @@ const device_type TMS7000_EXL = &device_creator<tms7000_exl_device>;
 
 
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0x0000, 0x007f)    AM_READWRITE(tms7000_internal_r, tms7000_internal_w) /* tms7000 internal RAM */
-	AM_RANGE(0x0080, 0x00ff)    AM_NOP                      /* reserved */
-	AM_RANGE(0x0100, 0x01ff)    AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
+	AM_RANGE(0x0000, 0x007f) AM_READWRITE(tms7000_internal_r, tms7000_internal_w) /* tms7000 internal RAM */
+	AM_RANGE(0x0080, 0x00ff) AM_NOP                                               /* reserved */
+	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)             /* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
 
@@ -133,7 +133,7 @@ UINT16 tms7000_device::RM16( UINT32 mAddr ) /* Read memory (16-bit) */
 	return result | RM((mAddr+1)&0xffff);
 }
 
-UINT16 tms7000_device::RRF16( UINT32 mAddr )    /*Read register file (16 bit) */
+UINT16 tms7000_device::RRF16( UINT32 mAddr ) /* Read register file (16 bit) */
 {
 	PAIR result;
 	result.b.h = RM((mAddr-1)&0xffff);
@@ -141,7 +141,7 @@ UINT16 tms7000_device::RRF16( UINT32 mAddr )    /*Read register file (16 bit) */
 	return result.w.l;
 }
 
-void tms7000_device::WRF16( UINT32 mAddr, PAIR p )  /*Write register file (16 bit) */
+void tms7000_device::WRF16( UINT32 mAddr, PAIR p ) /* Write register file (16 bit) */
 {
 	WM( (mAddr-1)&0xffff, p.b.h );
 	WM( mAddr, p.b.l );
@@ -527,40 +527,62 @@ READ8_MEMBER( tms7000_device::tms70x0_pf_r )    /* Perpherial file read */
 }
 
 // BCD arthrimetic handling
-UINT16 tms7000_device::bcd_add( UINT16 a, UINT16 b )
-{
-	UINT16  t1,t2,t3,t4,t5,t6;
+static const UINT8 lut_bcd_out[6] = { 0x00, 0x06, 0x00, 0x66, 0x60, 0x66 };
 
-	/* Sure it is a lot of code, but it works! */
-	t1 = a + 0x0666;
-	t2 = t1 + b;
-	t3 = t1 ^ b;
-	t4 = t2 ^ t3;
-	t5 = ~t4 & 0x1110;
-	t6 = (t5 >> 2) | (t5 >> 3);
-	return t2-t6;
+inline UINT8 tms7000_device::bcd_add( UINT8 a, UINT8 b, UINT8 c )
+{
+	c = (c != 0) ? 1 : 0;
+
+	UINT8 h1 = a >> 4 & 0xf;
+	UINT8 l1 = a >> 0 & 0xf;
+	UINT8 h2 = b >> 4 & 0xf;
+	UINT8 l2 = b >> 0 & 0xf;
+	
+	// compute bcd constant
+	UINT8 d = ((l1 + l2 + c) < 10) ? 0 : 1;
+	if ((h1 + h2) == 9)
+		d |= 2;
+	else if ((h1 + h2) > 9)
+		d |= 4;
+	
+	UINT8 ret = a + b + c + lut_bcd_out[d];
+	
+	CLR_NZC;
+	SET_N8(ret);
+	SET_Z8(ret);
+	
+	if (d > 2)
+		pSR |= SR_C;
+	
+	return ret;
 }
 
-UINT16 tms7000_device::bcd_tencomp( UINT16 a )
+inline UINT8 tms7000_device::bcd_sub( UINT8 a, UINT8 b, UINT8 c )
 {
-	UINT16  t1,t2,t3,t4,t5,t6;
+	c = (c != 0) ? 0 : 1;
 
-	t1 = 0xffff - a;
-	t2 = -a;
-	t3 = t1 ^ 0x0001;
-	t4 = t2 ^ t3;
-	t5 = ~t4 & 0x1110;
-	t6 = (t5 >> 2)|(t5>>3);
-	return t2-t6;
-}
+	UINT8 h1 = a >> 4 & 0xf;
+	UINT8 l1 = a >> 0 & 0xf;
+	UINT8 h2 = b >> 4 & 0xf;
+	UINT8 l2 = b >> 0 & 0xf;
 
-/*
-    Compute difference a-b???
-*/
-UINT16 tms7000_device::bcd_sub( UINT16 a, UINT16 b)
-{
-	//return bcd_tencomp(b) - bcd_tencomp(a);
-	return bcd_add(a, bcd_tencomp(b) & 0xff);
+	// compute bcd constant
+	UINT8 d = ((l1 - c) >= l2) ? 0 : 1;
+	if (h1 == h2)
+		d |= 2;
+	else if (h1 < h2)
+		d |= 4;
+
+	UINT8 ret = a - b - c - lut_bcd_out[d];
+	
+	CLR_NZC;
+	SET_N8(ret);
+	SET_Z8(ret);
+	
+	if (d > 2)
+		pSR |= SR_C;
+	
+	return ret;
 }
 
 WRITE8_MEMBER( tms7000_device::tms7000_internal_w )

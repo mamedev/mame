@@ -374,11 +374,6 @@ WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
 	m_vertical_int = 0;
 }
 
-static const vt_video_interface vt100_video_interface =
-{
-	"chargen",
-};
-
 INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
 {
 	m_vertical_int = 1;
@@ -425,7 +420,9 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
-	MCFG_VT100_VIDEO_ADD("vt100_video", "screen", vt100_video_interface)
+	MCFG_DEVICE_ADD("vt100_video", VT100_VIDEO, 0)
+	MCFG_VT_SET_SCREEN("screen")
+	MCFG_VT_CHARGEN("chargen")
 	MCFG_VT_VIDEO_RAM_CALLBACK(READ8(vt100_state, vt100_read_video_ram_r))
 	MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(vt100_state, vt100_clear_video_interrupt))
 

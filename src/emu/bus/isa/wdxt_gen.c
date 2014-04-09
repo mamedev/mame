@@ -157,28 +157,6 @@ static WD11C00_17_INTERFACE( host_intf )
 
 
 //-------------------------------------------------
-//  WD2010_INTERFACE( hdc_intf )
-//-------------------------------------------------
-
-static WD2010_INTERFACE( hdc_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, clct_w),
-	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, read),
-	DEVCB_DEVICE_MEMBER(WD11C00_17_TAG, wd11c00_17_device, write),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC,
-	DEVCB_LINE_VCC
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( wdxt_gen )
 //-------------------------------------------------
 
@@ -187,7 +165,15 @@ static MACHINE_CONFIG_FRAGMENT( wdxt_gen )
 	MCFG_CPU_IO_MAP(wd1015_io)
 
 	MCFG_WD11C00_17_ADD(WD11C00_17_TAG, 5000000, host_intf)
-	MCFG_WD2010_ADD(WD2010A_TAG, 5000000, hdc_intf)
+	MCFG_DEVICE_ADD(WD2010A_TAG, WD2010, 5000000)
+	MCFG_WD2010_OUT_BCR_CB(DEVWRITELINE(WD11C00_17_TAG, wd11c00_17_device, clct_w))
+	MCFG_WD2010_IN_BCS_CB(DEVREAD8(WD11C00_17_TAG, wd11c00_17_device, read))
+	MCFG_WD2010_OUT_BCS_CB(DEVWRITE8(WD11C00_17_TAG, wd11c00_17_device, write))
+	MCFG_WD2010_IN_DRDY_CB(VCC)
+	MCFG_WD2010_IN_INDEX_CB(VCC)
+	MCFG_WD2010_IN_WF_CB(VCC)
+	MCFG_WD2010_IN_TK000_CB(VCC)
+	MCFG_WD2010_IN_SC_CB(VCC)
 
 	MCFG_HARDDISK_ADD("hard0")
 	MCFG_HARDDISK_ADD("hard1")

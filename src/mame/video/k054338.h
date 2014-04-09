@@ -1,14 +1,8 @@
-
 #pragma once
 #ifndef __K054338_H__
 #define __K054338_H__
 
 #include "k055555.h"
-
-#define MCFG_K054338_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K054338, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 
 
 /* K054338 mixer/alpha blender */
@@ -38,20 +32,16 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_CLIPSL     0x20
 
 
-struct k054338_interface
-{
-	int                m_alpha_inv;
-	const char         *m_k055555_tag;
-};
-
-
 class k054338_device : public device_t,
-										public device_video_interface,
-										public k054338_interface
+						public device_video_interface
 {
 public:
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k054338_device() {}
+
+	// static configuration
+	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
+	static void set_yinvert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
 
 	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
 	DECLARE_WRITE32_MEMBER( long_w );
@@ -68,18 +58,27 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
 	// internal state
-	UINT16    m_regs[32];
-	int       m_shd_rgb[9];
+	UINT16      m_regs[32];
+	int         m_shd_rgb[9];
+	int         m_alpha_inv;
+	const char  *m_k055555_tag;
 
 	k055555_device *m_k055555;  /* used to fill BG color */
 };
 
 extern const device_type K054338;
+
+
+#define MCFG_K054338_MIXER(_tag) \
+	k054338_device::set_mixer_tag(*device, _tag);
+
+#define MCFG_K054338_ALPHAINV(_alphainv) \
+	k054338_device::set_alpha_invert(*device, _alphainv);
+
 
 #endif

@@ -1862,7 +1862,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, finallap)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_NAMCO_C45_ROAD_PALETTE("palette")
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2020,7 +2020,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
 	MCFG_NAMCO_C45_ROAD_ADD("c45_road")
-	MCFG_NAMCO_C45_ROAD_PALETTE("palette")
+	MCFG_GFX_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

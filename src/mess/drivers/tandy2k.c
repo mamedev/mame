@@ -13,7 +13,6 @@
     - floppy
         - HDL is also connected to WP/TS input where TS is used to detect motor status
         - 3 second motor off delay timer
-    - DMA
     - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
     - keyboard ROM
     - hires graphics board
@@ -24,6 +23,8 @@
 */
 
 #include "includes/tandy2k.h"
+
+#define LOG 1
 
 // Read/Write Handlers
 
@@ -50,6 +51,7 @@ void tandy2k_state::update_drq()
 void tandy2k_state::dma_request(int line, int state)
 {
 	m_busdmarq[line] = state;
+
 	update_drq();
 }
 
@@ -119,8 +121,8 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 
 	    0       KBEN        keyboard enable
 	    1       EXTCLK      external baud rate clock
-	    2       SPKRGATE    enable periodic m_speaker output
-	    3       SPKRDATA    direct output to m_speaker
+	    2       SPKRGATE    enable periodic speaker output
+	    3       SPKRDATA    direct output to speaker
 	    4       RFRQGATE    enable refresh and baud rate clocks
 	    5       FDCRESET*   reset 8272
 	    6       TMRIN0      enable 80186 timer 0
@@ -128,16 +130,18 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 
 	*/
 
+	if (LOG) logerror("ENABLE %02x\n", data);
+
 	// keyboard enable
 	m_kb->power_w(BIT(data, 0));
 
 	// external baud rate clock
 	m_extclk = BIT(data, 1);
 
-	// m_speaker gate
+	// speaker gate
 	m_pit->write_gate0(BIT(data, 2));
 
-	// m_speaker data
+	// speaker data
 	m_spkrdata = BIT(data, 3);
 	speaker_update();
 
@@ -146,8 +150,10 @@ WRITE8_MEMBER( tandy2k_state::enable_w )
 	m_pit->write_gate2(BIT(data, 4));
 
 	// FDC reset
-	if(!BIT(data, 5))
+	if (!BIT(data, 5))
+	{
 		m_fdc->reset();
+	}
 
 	// timer 0 enable
 	m_maincpu->tmrin0_w(BIT(data, 6));
@@ -172,6 +178,8 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 	    7       DMA channel 3 select
 
 	*/
+
+	if (LOG) logerror("DMA MUX %02x\n", data);
 
 	m_dma_mux = data;
 
@@ -228,6 +236,8 @@ WRITE16_MEMBER( tandy2k_state::vpac_w )
 
 READ8_MEMBER( tandy2k_state::fldtc_r )
 {
+	if (LOG) logerror("FLDTC\n");
+
 	fldtc_w(space, 0, 0);
 
 	return 0;
@@ -256,6 +266,8 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 	*/
 
+	if (LOG) logerror("Address Control %02x\n", data);
+
 	// video access
 	m_vram_base = data & 0x1f;
 
@@ -281,8 +293,6 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 	// video source select
 	m_vidouts = BIT(data, 7);
-
-	logerror("Address Control %02x\n", data);
 }
 
 // Memory Maps
@@ -297,17 +307,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_io, AS_IO, 16, tandy2k_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0x00ff)
-	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
-	AM_RANGE(0x00004, 0x00005) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
-	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00030, 0x00033) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
-	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00052, 0x00053) AM_READ8(kbint_clr_r, 0x00ff)
-	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
+	AM_RANGE(0x00000, 0x00001) AM_MIRROR(0x8) AM_READWRITE8(enable_r, enable_w, 0x00ff)
+	AM_RANGE(0x00002, 0x00003) AM_MIRROR(0x8) AM_WRITE8(dma_mux_w, 0x00ff)
+	AM_RANGE(0x00004, 0x00005) AM_MIRROR(0x8) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
+	AM_RANGE(0x00010, 0x00013) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x00030, 0x00033) AM_MIRROR(0xc) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
+	AM_RANGE(0x00040, 0x00047) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0x00052, 0x00053) AM_MIRROR(0x8) AM_READ8(kbint_clr_r, 0x00ff)
+	AM_RANGE(0x00050, 0x00057) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00060, 0x00063) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00070, 0x00073) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00080, 0x00081) AM_MIRROR(0xe) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
 //  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_t, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
 	AM_RANGE(0x00100, 0x0017f) AM_READWRITE(vpac_r, vpac_w)
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
@@ -516,6 +526,7 @@ WRITE_LINE_MEMBER( tandy2k_state::intbrclk_w )
 
 WRITE_LINE_MEMBER( tandy2k_state::rfrqpulse_w )
 {
+	// memory refresh counter up
 }
 
 // Intel 8255A Interface
@@ -786,7 +797,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, XTAL_16MHz*28/20)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vidldsh", tandy2k_state, vidldsh_tick, attotime::from_hz(XTAL_16MHz*28/20/8))
+	MCFG_TIMER_DRIVER_ADD("vidldsh", tandy2k_state, vidldsh_tick)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -806,14 +817,16 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	// TODO pin 15 external transmit clock
+	// TODO pin 17 external receiver clock
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz/16)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(tandy2k_state, outspkr_w))
 	MCFG_PIT8253_CLK1(XTAL_16MHz/8)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(tandy2k_state, intbrclk_w))
-	MCFG_PIT8253_CLK2(XTAL_16MHz/8)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
+	//MCFG_PIT8253_CLK2(XTAL_16MHz/8)
+	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
 
 	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NULL)
 

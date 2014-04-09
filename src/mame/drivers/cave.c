@@ -2067,11 +2067,6 @@ MACHINE_CONFIG_END
                                     Donpachi
 ***************************************************************************/
 
-static const nmk112_interface donpachi_nmk112_intf =
-{
-	"oki1", "oki2", 1 << 0  // chip #0 (music) is not paged
-};
-
 static MACHINE_CONFIG_START( donpachi, cave_state )
 
 	/* basic machine hardware */
@@ -2110,7 +2105,10 @@ static MACHINE_CONFIG_START( donpachi, cave_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_NMK112_ADD("nmk112", donpachi_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
+	MCFG_NMK112_DISABLE_PAGEMASK(1 << 0)	// chip #0 (music) is not paged
 MACHINE_CONFIG_END
 
 
@@ -2578,11 +2576,6 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-static const nmk112_interface pwrinst2_nmk112_intf =
-{
-	"oki1", "oki2", 0
-};
-
 static MACHINE_CONFIG_START( pwrinst2, cave_state )
 
 	/* basic machine hardware */
@@ -2637,7 +2630,9 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 

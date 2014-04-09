@@ -1292,153 +1292,69 @@ void tms7000_device::cmpa_inx()
 
 void tms7000_device::dac_b2a()
 {
-	UINT16  t;
-
-	t = bcd_add( RDA, RDB );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_add(RDA, RDB, pSR & SR_C));
 
 	m_icount -= 7;
 }
 
 void tms7000_device::dac_r2a()
 {
-	UINT8   r;
-	UINT16  t;
-
+	UINT8 r;
 	IMMBYTE(r);
 
-	t = bcd_add( RDA, RM(r) );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_add(RDA, RM(r), pSR & SR_C));
 
 	m_icount -= 10;
 }
 
 void tms7000_device::dac_r2b()
 {
-	UINT8   r;
-	UINT16  t;
-
+	UINT8 r;
 	IMMBYTE(r);
 
-	t = bcd_add( RDB, RM(r) );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WRB(t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRB(bcd_add(RDB, RM(r), pSR & SR_C));
 
 	m_icount -= 10;
 }
 
 void tms7000_device::dac_r2r()
 {
-	UINT8   r,s;
-	UINT16  t;
-
+	UINT8 s, r;
 	IMMBYTE(s);
 	IMMBYTE(r);
 
-	t = bcd_add( RM(s), RM(r) );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WM(r,t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WM(r, bcd_add(RM(s), RM(r), pSR & SR_C));
 
 	m_icount -= 12;
 }
 
 void tms7000_device::dac_i2a()
 {
-	UINT8   i;
-	UINT16  t;
-
+	UINT8 i;
 	IMMBYTE(i);
 
-	t = bcd_add( i, RDA );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_add(i, RDA, pSR & SR_C));
 
 	m_icount -= 9;
 }
 
 void tms7000_device::dac_i2b()
 {
-	UINT8   i;
-	UINT16  t;
-
+	UINT8 i;
 	IMMBYTE(i);
 
-	t = bcd_add( i, RDB );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WRB(t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRB(bcd_add(i, RDB, pSR & SR_C));
 
 	m_icount -= 9;
 }
 
 void tms7000_device::dac_i2r()
 {
-	UINT8   i,r;
-	UINT16  t;
-
+	UINT8 i, r;
 	IMMBYTE(i);
 	IMMBYTE(r);
 
-	t = bcd_add( i, RM(r) );
-
-	if (pSR & SR_C)
-		t = bcd_add( t, 1 );
-
-	WM(r,t);
-
-	CLR_NZC;
-	SET_C8(t);
-	SET_N8(t);
-	SET_Z8(t);
+	WM(r, bcd_add(i, RM(r), pSR & SR_C));
 
 	m_icount -= 11;
 }
@@ -1642,153 +1558,69 @@ void tms7000_device::djnz_r()
 
 void tms7000_device::dsb_b2a()
 {
-	UINT16  t;
-
-	t = bcd_sub( RDA, RDB );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_sub(RDA, RDB, pSR & SR_C));
 
 	m_icount -= 7;
 }
 
 void tms7000_device::dsb_r2a()
 {
-	UINT8   r;
-	UINT16  t;
-
+	UINT8 r;
 	IMMBYTE(r);
 
-	t = bcd_sub( RDA, RM(r) );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_sub(RDA, RM(r), pSR & SR_C));
 
 	m_icount -= 10;
 }
 
 void tms7000_device::dsb_r2b()
 {
-	UINT8   r;
-	UINT16  t;
-
+	UINT8 r;
 	IMMBYTE(r);
 
-	t = bcd_sub( RDB, RM(r) );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WRB(t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRB(bcd_sub(RDB, RM(r), pSR & SR_C));
 
 	m_icount -= 10;
 }
 
 void tms7000_device::dsb_r2r()
 {
-	UINT8   r,s;
-	UINT16  t;
-
+	UINT8 s, r;
 	IMMBYTE(s);
 	IMMBYTE(r);
 
-	t = bcd_sub( RM(s), RM(r) );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WM(r,t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WM(r, bcd_sub(RM(s), RM(r), pSR & SR_C));
 
 	m_icount -= 12;
 }
 
 void tms7000_device::dsb_i2a()
 {
-	UINT8   i;
-	UINT16  t;
-
+	UINT8 i;
 	IMMBYTE(i);
 
-	t = bcd_sub( RDA, i );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WRA(t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRA(bcd_sub(RDA, i, pSR & SR_C));
 
 	m_icount -= 9;
 }
 
 void tms7000_device::dsb_i2b()
 {
-	UINT8   i;
-	UINT16  t;
-
+	UINT8 i;
 	IMMBYTE(i);
 
-	t = bcd_sub( RDB, i );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WRB(t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WRB(bcd_sub(RDB, i, pSR & SR_C));
 
 	m_icount -= 9;
 }
 
 void tms7000_device::dsb_i2r()
 {
-	UINT8   r,i;
-	UINT16  t;
-
+	UINT8 i, r;
 	IMMBYTE(i);
 	IMMBYTE(r);
 
-	t = bcd_sub( RM(r), i );
-
-	if( !(pSR & SR_C) )
-		t = bcd_sub( t, 1 );
-
-	WM(r,t);
-
-	CLR_NZC;
-	SET_C8(~t);
-	SET_N8(t);
-	SET_Z8(t);
+	WM(r, bcd_sub(RM(r), i, pSR & SR_C));
 
 	m_icount -= 11;
 }

@@ -3,6 +3,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/lc89510.h"
 #include "machine/megacdcd.h"
+#include "sound/rf5c68.h"
 
 #define SEGACD_CLOCK      12500000
 
@@ -15,49 +16,53 @@
 
 // irq3 timer
 #define CHECK_SCD_LV3_INTERRUPT \
-	if (lc89510_temp->get_segacd_irq_mask() & 0x08) \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x08) \
 	{ \
 		m_scdcpu->set_input_line(3, HOLD_LINE); \
 	}
 // from master
 #define CHECK_SCD_LV2_INTERRUPT \
-	if (lc89510_temp->get_segacd_irq_mask() & 0x04) \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x04) \
 	{ \
 		m_scdcpu->set_input_line(2, HOLD_LINE); \
 	}
 
 // gfx convert
 #define CHECK_SCD_LV1_INTERRUPT \
-	if (lc89510_temp->get_segacd_irq_mask() & 0x02) \
+	if (m_lc89510_temp->get_segacd_irq_mask() & 0x02) \
 	{ \
 		m_scdcpu->set_input_line(1, HOLD_LINE); \
 	}
 
-#define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(segacd_irq3_timer_reg*30720))
+#define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(m_irq3_timer_reg*30720))
 
 
-class sega_segacd_device : public device_t
+class sega_segacd_device : public device_t, public device_gfx_interface
 {
 public:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	required_device<cpu_device> m_scdcpu;
-	lc89510_temp_device *lc89510_temp;
+	required_device<rf5c68_device> m_rfsnd;
+	required_device<lc89510_temp_device> m_lc89510_temp;
+	required_device<timer_device> m_stopwatch_timer;
+	required_device<timer_device> m_stamp_timer;
+	required_device<timer_device> m_irq3_timer;
+	required_device<timer_device> m_dma_timer;
+	//required_device<timer_device> m_hock_timer;
 
-	UINT16 *segacd_backupram;
-	timer_device *stopwatch_timer;
-	UINT8 segacd_font_color;
-	UINT16* segacd_font_bits;
+	required_shared_ptr<UINT16> m_prgram;
+	required_shared_ptr<UINT16> m_dataram;
+	required_shared_ptr<UINT16> m_font_bits;
+
+	// can't use a memshare because it's 8-bit RAM in a 16-bit address space
+	dynamic_array<UINT8> m_backupram;
+
+	UINT8 m_font_color;
+
 	UINT16 scd_rammode;
 	UINT32 scd_mode_dmna_ret_flags ;
 
-	timer_device *segacd_gfx_conversion_timer;
-	timer_device *segacd_irq3_timer;
-	//timer_device *segacd_hock_timer;
-
-	UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
-	UINT16* segacd_dataram;
-	UINT16* segacd_dataram2;
 	tilemap_t    *segacd_stampmap[4];
 
 
@@ -84,15 +89,15 @@ public:
 	int segacd_redled;// = 0;
 	int segacd_greenled;// = 0;
 	int segacd_ready;// = 1; // actually set 100ms after startup?
-	UINT16 segacd_irq3_timer_reg;
+	UINT8 m_irq3_timer_reg;
 
 
-	TIMER_DEVICE_CALLBACK_MEMBER( segacd_irq3_timer_callback );
-	TIMER_DEVICE_CALLBACK_MEMBER( segacd_gfx_conversion_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
+	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
 
 	UINT16 handle_segacd_sub_int_callback(int irqline);
 
-	inline void write_pixel(running_machine& machine, UINT8 pix, int pixeloffset );
+	inline void write_pixel(UINT8 pix, int pixeloffset);
 	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
 	void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm);
 
@@ -106,7 +111,7 @@ public:
 	int m_base_total_scanlines;
 	int m_total_scanlines;
 
-	void segacd_mark_tiles_dirty(running_machine& machine, int offset);
+	void segacd_mark_tiles_dirty(int offset);
 	int segacd_get_active_stampmap_tilemap(void);
 
 	// set some variables at start, depending on region (shall be moved to a device interface?)
@@ -124,10 +129,10 @@ public:
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
 
-	UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos);
-	UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine& machine, int xpos, int ypos);
-	UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos);
-	UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine& machine, int xpos, int ypos);
+	UINT8 get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
+	UINT8 get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
+	UINT8 get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos);
+	UINT8 get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos);
 
 	WRITE16_MEMBER( scd_a12000_halt_reset_w );
 	READ16_MEMBER( scd_a12000_halt_reset_r );
@@ -177,7 +182,7 @@ public:
 	READ16_MEMBER( segacd_stampsize_r );
 	WRITE16_MEMBER( segacd_stampsize_w );
 
-	UINT8 read_pixel_from_stampmap( running_machine& machine, bitmap_ind16* srcbitmap, int x, int y);
+	UINT8 read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
 
 	WRITE16_MEMBER( segacd_trace_vector_base_address_w );
 	READ16_MEMBER( segacd_imagebuffer_vdot_size_r );
@@ -194,17 +199,15 @@ public:
 	WRITE16_MEMBER( segacd_imagebuffer_hdot_size_w );
 	READ16_MEMBER( segacd_irq3timer_r );
 	WRITE16_MEMBER( segacd_irq3timer_w );
-	READ16_MEMBER( segacd_backupram_r );
-	WRITE16_MEMBER( segacd_backupram_w );
-	READ16_MEMBER( segacd_font_color_r );
-	WRITE16_MEMBER( segacd_font_color_w );
-	READ16_MEMBER( segacd_font_converted_r );
-	TIMER_DEVICE_CALLBACK_MEMBER( scd_dma_timer_callback );
+	READ8_MEMBER( backupram_r );
+	WRITE8_MEMBER( backupram_w );
+	READ8_MEMBER( font_color_r );
+	WRITE8_MEMBER( font_color_w );
+	READ16_MEMBER( font_converted_r );
+	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
 
 	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
-	timer_device* scd_dma_timer;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
 	virtual void device_start();

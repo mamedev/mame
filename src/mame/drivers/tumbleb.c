@@ -2060,8 +2060,8 @@ static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2099,8 +2099,8 @@ static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2141,8 +2141,8 @@ static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2179,9 +2179,9 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
-	decospr_device::set_transpen(*device, 15);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_TRANSPEN(15)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2240,8 +2240,8 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2351,8 +2351,8 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
@@ -2390,8 +2390,8 @@ static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
+	MCFG_DECO_SPRITE_GFX_REGION(3)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

@@ -277,25 +277,6 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static const tc0100scn_interface galastrm_tc0100scn_intf =
-{
-	0, 2,       /* gfxnum, txnum */
-	-48, -56,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0480scp_interface galastrm_tc0480scp_intf =
-{
-	1, 3,       /* gfxnum, txnum */
-	0,      /* pixels */
-	-40, -3,        /* x_offset, y_offset */
-	0, 0,       /* text_xoff, text_yoff */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0       /* col_base */
-};
-
 static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
@@ -316,11 +297,17 @@ static MACHINE_CONFIG_START( galastrm, galastrm_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galastrm)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-
-	MCFG_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(0)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(-48, -56)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
-	MCFG_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
+
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(3)
+	MCFG_TC0480SCP_OFFSETS(-40, -3)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

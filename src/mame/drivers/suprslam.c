@@ -283,11 +283,6 @@ WRITE_LINE_MEMBER(suprslam_state::irqhandler)
 
 /*** MACHINE DRIVER **********************************************************/
 
-static const k053936_interface suprslam_k053936_intf =
-{
-	1, -45, -21 /* wrap, xoff, yoff */
-};
-
 void suprslam_state::machine_start()
 {
 	save_item(NAME(m_screen_bank));
@@ -333,7 +328,9 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
 	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
-	MCFG_K053936_ADD("k053936", suprslam_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-45, -21)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

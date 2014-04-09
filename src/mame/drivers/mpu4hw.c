@@ -2633,7 +2633,7 @@ const ay8910_interface ay8910_config =
 MACHINE_CONFIG_FRAGMENT( mpu4_common )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu4_state, gen_50hz, attotime::from_hz(100))
 
-	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
+	MCFG_MSC1937_ADD("vfd",0)
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 

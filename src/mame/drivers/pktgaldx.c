@@ -303,7 +303,7 @@ static GFXDECODE_START( bootleg )
 GFXDECODE_END
 
 
-int pktgaldx_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(pktgaldx_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
@@ -355,7 +355,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 2);
+	MCFG_DECO_SPRITE_GFX_REGION(2)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

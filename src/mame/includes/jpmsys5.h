@@ -33,7 +33,7 @@ public:
 	required_device<acia6850_device> m_acia6850_2;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<tms34061_device> m_tms34061;
-	optional_device<roc10937_t> m_vfd;
+	optional_device<s16lf01_t> m_vfd;
 	required_ioport m_direct_port;
 	optional_device<palette_device> m_palette;
 

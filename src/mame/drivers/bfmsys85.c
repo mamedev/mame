@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( bfmsys85, bfmsys85_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)                        // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfmsys85_state, timer_irq,  1000)              // generate 1000 IRQ's per second
-	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
+	MCFG_MSC1937_ADD("vfd",0)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfmsys85_state,sys85_data_w))

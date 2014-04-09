@@ -545,13 +545,6 @@ static GFXDECODE_START( galpanic )
 GFXDECODE_END
 
 
-static const kaneko_pandora_interface galpanic_pandora_config =
-{
-	0,  /* gfx_region */
-	0, -16  /* x_offs, y_offs */
-};
-
-
 static MACHINE_CONFIG_START( galpanic, galpanic_state )
 
 	/* basic machine hardware */
@@ -573,15 +566,13 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_PALETTE_ADD("palette", 1024 + 32768)
 	MCFG_PALETTE_INIT_OWNER(galpanic_state,galpanic)
 
-	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
+	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);
-
-
-
 
 	MCFG_VIDEO_START_OVERRIDE(galpanic_state,galpanic)
 

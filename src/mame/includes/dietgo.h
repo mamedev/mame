@@ -41,7 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(dietgo);
 	virtual void machine_start();
 	UINT32 screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	int bank_callback(int bank);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );

@@ -46,22 +46,29 @@
 const device_type NAMCO_C45_ROAD = &device_creator<namco_c45_road_device>;
 
 
-const gfx_layout namco_c45_road_device::s_tile_layout =
+const gfx_layout namco_c45_road_device::tilelayout =
 {
 	ROAD_TILE_SIZE, ROAD_TILE_SIZE,
-	ROAD_TILE_COUNT_MAX,
+	RGN_FRAC(1,1),
 	2,
 	{ 0, 8 },
-	{// x offset
-		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
-		0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17
-	},
-	{// y offset
-		0x000,0x020,0x040,0x060,0x080,0x0a0,0x0c0,0x0e0,
-		0x100,0x120,0x140,0x160,0x180,0x1a0,0x1c0,0x1e0
-	},
+	{ STEP8(0, 1), STEP8(16, 1) },
+	{ STEP16(0, 32) },
 	0x200 // offset to next tile
 };
+
+
+GFXDECODE_MEMBER( namco_c45_road_device::gfxinfo )
+	GFXDECODE_DEVICE_RAM( "tileram", 0, tilelayout, 0xf00, 64 )
+GFXDECODE_END
+
+
+DEVICE_ADDRESS_MAP_START(map, 16, namco_c45_road_device)
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM_WRITE(tilemap_w) AM_SHARE("tmapram")
+	AM_RANGE(0x10000, 0x1f9ff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0x1fa00, 0x1ffff) AM_RAM AM_SHARE("lineram")
+ADDRESS_MAP_END
+
 
 //-------------------------------------------------
 //  namco_c45_road_device -- constructor
@@ -69,41 +76,62 @@ const gfx_layout namco_c45_road_device::s_tile_layout =
 
 namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_C45_ROAD, "Namco C45 Road", tag, owner, clock, "namco_c45_road", __FILE__),
-		m_transparent_color(~0),
-		m_tilemap(NULL),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this)
+		device_gfx_interface(mconfig, *this, gfxinfo),
+		device_memory_interface(mconfig, *this),
+		m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_delegate(FUNC(namco_c45_road_device::map), this)),
+		m_tmapram(*this, "tmapram"),
+		m_tileram(*this, "tileram"),
+		m_lineram(*this, "lineram"),
+		m_transparent_color(~0)
 {
 }
 
+
+
+// We need these trampolines for now because uplift_submaps()
+// can't deal with address maps that contain RAM.
+// We need to explicitly use device_memory_interface::space()
+// because read/write handlers have a parameter called 'space'
+
 //-------------------------------------------------
-//  read -- read from RAM
+//  read -- CPU read from our address space
 //-------------------------------------------------
 
 READ16_MEMBER( namco_c45_road_device::read )
 {
-	return m_ram[offset];
+	return device_memory_interface::space().read_word(offset*2);
 }
 
 
 //-------------------------------------------------
-//  write -- write to RAM
+//  write -- CPU write to our address space
 //-------------------------------------------------
 
 WRITE16_MEMBER( namco_c45_road_device::write )
 {
-	COMBINE_DATA(&m_ram[offset]);
+	device_memory_interface::space().write_word(offset*2, data, mem_mask);
+}
 
-	// first half maps to the tilemap
-	if (offset < 0x10000/2)
-		m_tilemap->mark_tile_dirty(offset);
 
-	// second half maps to the gfx elements
-	else
-	{
-		offset -= 0x10000/2;
-		m_gfxdecode->gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
-	}
+//-------------------------------------------------
+//  tilemap_w -- write to tilemap RAM
+//-------------------------------------------------
+
+WRITE16_MEMBER( namco_c45_road_device::tilemap_w )
+{
+	COMBINE_DATA(&m_tmapram[offset]);
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+
+//-------------------------------------------------
+//  tileram_w -- write to tile RAM
+//-------------------------------------------------
+
+WRITE16_MEMBER( namco_c45_road_device::tileram_w )
+{
+	COMBINE_DATA(&m_tileram[offset]);
+	gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
 }
 
 
@@ -113,25 +141,24 @@ WRITE16_MEMBER( namco_c45_road_device::write )
 
 void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	const UINT8 *clut = (const UINT8 *)memregion("clut")->base();
 	bitmap_ind16 &source_bitmap = m_tilemap->pixmap();
-	unsigned yscroll = m_ram[0x1fdfe/2];
+	unsigned yscroll = m_lineram[0x3fe/2];
 
 	// loop over scanlines
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		// skip if we are not the right priority
-		int screenx = m_ram[0x1fa00/2 + y + 15];
+		int screenx = m_lineram[y + 15];
 		if (pri != ((screenx & 0xf000) >> 12))
 			continue;
 
 		// skip if we don't have a valid zoom factor
-		unsigned zoomx = m_ram[0x1fe00/2 + y + 15] & 0x3ff;
+		unsigned zoomx = m_lineram[0x400/2 + y + 15] & 0x3ff;
 		if (zoomx == 0)
 			continue;
 
 		// skip if we don't have a valid source increment
-		unsigned sourcey = m_ram[0x1fc00/2 + y + 15] + yscroll;
+		unsigned sourcey = m_lineram[0x200/2 + y + 15] + yscroll;
 		const UINT16 *source_gfx = &source_bitmap.pix(sourcey & (ROAD_TILEMAP_HEIGHT - 1));
 		unsigned dsourcex = (ROAD_TILEMAP_WIDTH << 16) / zoomx;
 		if (dsourcex == 0)
@@ -171,10 +198,10 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (m_palette->pen_indirect(pen) != m_transparent_color)
+				if (palette()->pen_indirect(pen) != m_transparent_color)
 				{
-					if (clut != NULL)
-						pen = (pen & ~0xff) | clut[pen & 0xff];
+					if (m_clut != NULL)
+						pen = (pen & ~0xff) | m_clut[pen & 0xff];
 					dest[screenx] = pen;
 				}
 				screenx++;
@@ -186,8 +213,8 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			while (numpixels-- > 0)
 			{
 				int pen = source_gfx[sourcex >> 16];
-				if (clut != NULL)
-					pen = (pen & ~0xff) | clut[pen & 0xff];
+				if (m_clut != NULL)
+					pen = (pen & ~0xff) | m_clut[pen & 0xff];
 				dest[screenx++] = pen;
 				sourcex += dsourcex;
 			}
@@ -202,36 +229,22 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void namco_c45_road_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
-	// create a gfx_element describing the road graphics
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(m_palette, s_tile_layout, 0x10000 + (UINT8 *)&m_ram[0], NATIVE_ENDIAN_VALUE_LE_BE(8,0), 0x3f, 0xf00)));
+	m_clut = memregion("clut")->base();
 
 	// create a tilemap for the road
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
+	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(namco_c45_road_device::get_road_info), this),
 		TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
 }
 
-MACHINE_CONFIG_FRAGMENT( namco_c45_road )
-	MCFG_GFXDECODE_ADD("gfxdecode", "^palette", empty) // FIXME
-MACHINE_CONFIG_END
+
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
 //-------------------------------------------------
 
-machine_config_constructor namco_c45_road_device::device_mconfig_additions() const
+const address_space_config *namco_c45_road_device::memory_space_config(address_spacenum spacenum) const
 {
-	return MACHINE_CONFIG_NAME( namco_c45_road );
-}
-
-//-------------------------------------------------
-//  device_stop -- device shutdown
-//-------------------------------------------------
-
-void namco_c45_road_device::device_stop()
-{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 
@@ -243,18 +256,8 @@ TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
 {
 	// ------xx xxxxxxxx tile number
 	// xxxxxx-- -------- palette select
-	UINT16 data = m_ram[tile_index];
+	UINT16 data = m_tmapram[tile_index];
 	int tile = data & 0x3ff;
 	int color = data >> 10;
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void namco_c45_road_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<namco_c45_road_device &>(device).m_palette.set_tag(tag);
 }

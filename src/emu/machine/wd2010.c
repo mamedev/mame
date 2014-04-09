@@ -99,40 +99,6 @@ static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 const device_type WD2010 = &device_creator<wd2010_device>;
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wd2010_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const wd2010_interface *intf = reinterpret_cast<const wd2010_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<wd2010_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_intrq_cb, 0, sizeof(m_out_intrq_cb));
-		memset(&m_out_bdrq_cb, 0, sizeof(m_out_bdrq_cb));
-		memset(&m_out_bcr_cb, 0, sizeof(m_out_bcr_cb));
-		memset(&m_in_bcs_cb, 0, sizeof(m_in_bcs_cb));
-		memset(&m_out_bcs_cb, 0, sizeof(m_out_bcs_cb));
-		memset(&m_out_dirin_cb, 0, sizeof(m_out_dirin_cb));
-		memset(&m_out_step_cb, 0, sizeof(m_out_step_cb));
-		memset(&m_out_rwc_cb, 0, sizeof(m_out_rwc_cb));
-		memset(&m_in_drdy_cb, 0, sizeof(m_in_drdy_cb));
-		memset(&m_in_index_cb, 0, sizeof(m_in_index_cb));
-		memset(&m_in_wf_cb, 0, sizeof(m_in_wf_cb));
-		memset(&m_in_tk000_cb, 0, sizeof(m_in_tk000_cb));
-		memset(&m_in_sc_cb, 0, sizeof(m_in_sc_cb));
-	}
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -143,6 +109,19 @@ void wd2010_device::device_config_complete()
 
 wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock, "wd2010", __FILE__),
+	m_out_intrq_cb(*this),
+	m_out_bdrq_cb(*this),
+	m_out_bcr_cb(*this),
+	m_in_bcs_cb(*this),
+	m_out_bcs_cb(*this),
+	m_out_dirin_cb(*this),
+	m_out_step_cb(*this),
+	m_out_rwc_cb(*this),
+	m_in_drdy_cb(*this),
+	m_in_index_cb(*this),
+	m_in_wf_cb(*this),
+	m_in_tk000_cb(*this),
+	m_in_sc_cb(*this),
 	m_status(0),
 	m_error(0)
 {
@@ -156,19 +135,19 @@ wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, dev
 void wd2010_device::device_start()
 {
 	// resolve callbacks
-	m_out_intrq_func.resolve(m_out_intrq_cb, *this);
-	m_out_bdrq_func.resolve(m_out_bdrq_cb, *this);
-	m_out_bcr_func.resolve(m_out_bcr_cb, *this);
-	m_in_bcs_func.resolve(m_in_bcs_cb, *this);
-	m_out_bcs_func.resolve(m_out_bcs_cb, *this);
-	m_out_dirin_func.resolve(m_out_dirin_cb, *this);
-	m_out_step_func.resolve(m_out_step_cb, *this);
-	m_out_rwc_func.resolve(m_out_rwc_cb, *this);
-	m_in_drdy_func.resolve(m_in_drdy_cb, *this);
-	m_in_index_func.resolve(m_in_index_cb, *this);
-	m_in_wf_func.resolve(m_in_wf_cb, *this);
-	m_in_tk000_func.resolve(m_in_tk000_cb, *this);
-	m_in_sc_func.resolve(m_in_sc_cb, *this);
+	m_out_intrq_cb.resolve_safe();
+	m_out_bdrq_cb.resolve_safe();
+	m_out_bcr_cb.resolve_safe();
+	m_in_bcs_cb.resolve_safe(0);
+	m_out_bcs_cb.resolve_safe();
+	m_out_dirin_cb.resolve_safe();
+	m_out_step_cb.resolve_safe();
+	m_out_rwc_cb.resolve_safe();
+	m_in_drdy_cb.resolve_safe(0);
+	m_in_index_cb.resolve_safe(0);
+	m_in_wf_cb.resolve_safe(0);
+	m_in_tk000_cb.resolve_safe(0);
+	m_in_sc_cb.resolve_safe(0);
 }
 
 
@@ -196,7 +175,7 @@ READ8_MEMBER( wd2010_device::read )
 		break;
 
 	case TASK_FILE_STATUS:
-		m_out_intrq_func(CLEAR_LINE);
+		m_out_intrq_cb(CLEAR_LINE);
 		data = m_status | STATUS_RDY | STATUS_SC;
 		break;
 
@@ -324,40 +303,40 @@ void wd2010_device::set_parameter(UINT8 data)
 void wd2010_device::restore(UINT8 data)
 {
 	// reset INTRQ, errors, set BUSY, CIP
-	m_out_intrq_func(CLEAR_LINE);
+	m_out_intrq_cb(CLEAR_LINE);
 	m_error = 0;
 	m_status = STATUS_BSY | STATUS_CIP;
 
 	// reset RWC, set direction=OUT, store step rate
-	m_out_rwc_func(0);
-	m_out_dirin_func(0);
+	m_out_rwc_cb(0);
+	m_out_dirin_cb(0);
 
 	int step_pulses = 0;
 
 	while (step_pulses < 2048)
 	{
-		while (!m_in_sc_func())
+		while (!m_in_sc_cb())
 		{
 			// drive not ready or write fault?
-			if (!m_in_drdy_func() || m_in_wf_func())
+			if (!m_in_drdy_cb() || m_in_wf_cb())
 			{
 				// pulse BCR, set AC, INTRQ, reset BSY, CIP
-				m_out_bcr_func(0);
-				m_out_bcr_func(1);
+				m_out_bcr_cb(0);
+				m_out_bcr_cb(1);
 				m_error = ERROR_AC;
-				m_status = (m_in_drdy_func() << 6) | (m_in_wf_func() << 5) | STATUS_ERR;
-				m_out_intrq_func(ASSERT_LINE);
+				m_status = (m_in_drdy_cb() << 6) | (m_in_wf_cb() << 5) | STATUS_ERR;
+				m_out_intrq_cb(ASSERT_LINE);
 				return;
 			}
 		}
 
-		if (m_in_tk000_func())
+		if (m_in_tk000_cb())
 		{
 			// pulse BCR, set INTRQ, reset BSY, CIP
-			m_out_bcr_func(0);
-			m_out_bcr_func(1);
+			m_out_bcr_cb(0);
+			m_out_bcr_cb(1);
 			m_status &= ~(STATUS_BSY | STATUS_CIP);
-			m_out_intrq_func(ASSERT_LINE);
+			m_out_intrq_cb(ASSERT_LINE);
 			return;
 		}
 
@@ -368,16 +347,16 @@ void wd2010_device::restore(UINT8 data)
 			m_status |= STATUS_ERR;
 
 			// pulse BCR, set INTRQ, reset BSY, CIP
-			m_out_bcr_func(0);
-			m_out_bcr_func(1);
+			m_out_bcr_cb(0);
+			m_out_bcr_cb(1);
 			m_status &= ~(STATUS_BSY | STATUS_CIP);
-			m_out_intrq_func(ASSERT_LINE);
+			m_out_intrq_cb(ASSERT_LINE);
 			return;
 		}
 
 		// issue a step pulse
-		m_out_step_func(1);
-		m_out_step_func(0);
+		m_out_step_cb(1);
+		m_out_step_cb(0);
 		step_pulses++;
 	}
 }

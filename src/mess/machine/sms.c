@@ -804,6 +804,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		save_item(NAME(m_ctrl2_th_latch));
 		save_item(NAME(m_ctrl1_th_state));
 		save_item(NAME(m_ctrl2_th_state));
+		save_item(NAME(m_lphaser_x_offs));
 	}
 
 	if (m_is_gamegear)
@@ -871,7 +872,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
 {
-	return 0xff;
+	return m_store_cart_selection_data;
 }
 
 
@@ -897,8 +898,8 @@ void sms_state::store_select_cart(UINT8 data)
 	UINT8 slot = data >> 4;
 	UINT8 slottype = data & 0x08;
 
-	// The SMS Store Display only uses the logical cartridge slot to map
-	// the active cartridge or card slot, of its multiple ones.
+	// The SMS Store Display Unit only uses the logical cartridge slot to
+	// map the active cartridge or card slot, of its multiple ones.
 	if (slottype == 0)
 		m_cartslot = m_slots[slot];
 	else
@@ -907,28 +908,16 @@ void sms_state::store_select_cart(UINT8 data)
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
-
-READ8_MEMBER(smssdisp_state::sms_store_select1)
-{
-	return 0xff;
-}
-
-
-READ8_MEMBER(smssdisp_state::sms_store_select2)
-{
-	return 0xff;
-}
-
-
-READ8_MEMBER(smssdisp_state::sms_store_control_r)
-{
-	return m_store_control;
-}
-
-
 WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
 {
+	int led_number = data >> 4;
+	int led_column = led_number / 4;
+	int led_line = 3 - (led_number % 4);
+	int game_number = (4 * led_column) + led_line;
+
 	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
+	logerror("sms_store_control: LED #%d activated for game #%d\n", led_number, game_number);
+
 	if (data & 0x02)
 	{
 		m_maincpu->resume(SUSPEND_REASON_HALT);

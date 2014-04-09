@@ -12,7 +12,7 @@
 #ifndef __TMS57002_H__
 #define __TMS57002_H__
 
-class tms57002_device : public cpu_device {
+class tms57002_device : public cpu_device, public device_sound_interface {
 public:
 	tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -29,6 +29,7 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	virtual UINT32 execute_min_cycles() const;
 	virtual UINT32 execute_max_cycles() const;
@@ -126,7 +127,7 @@ private:
 	UINT32 si[4], so[4];
 
 	UINT32 st0, st1, sti;
-	UINT32 aacc, xoa, xba, xwr, xrd, creg;
+	UINT32 aacc, xoa, xba, xwr, xrd, txrd, creg;
 
 	UINT8 pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
 

@@ -256,12 +256,12 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 1);
+	MCFG_DECO_SPRITE_GFX_REGION(1)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 0);
+	MCFG_DECO_SPRITE_GFX_REGION(0)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

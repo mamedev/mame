@@ -137,17 +137,6 @@ WRITE_LINE_MEMBER( sdk86_state::write_usart_clock )
 	m_usart->write_rxc(state);
 }
 
-static I8279_INTERFACE( sdk86_intf )
-{
-	DEVCB_NULL, // irq
-	DEVCB_DRIVER_MEMBER(sdk86_state, scanlines_w),  // scan SL lines
-	DEVCB_DRIVER_MEMBER(sdk86_state, digit_w),      // display A&B
-	DEVCB_NULL,                     // BD
-	DEVCB_DRIVER_MEMBER(sdk86_state, kbd_r),        // kbd RL lines
-	DEVCB_LINE_GND,                     // Shift key
-	DEVCB_LINE_GND
-};
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x05 ) // 4800
 	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x05 ) // 4800
@@ -180,7 +169,12 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, 307200)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk86_state, write_usart_clock))
 
-	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
+	MCFG_DEVICE_ADD("i8279", I8279, 2500000) // based on divider
+	MCFG_I8279_OUT_SL_CB(WRITE8(sdk86_state, scanlines_w))			// scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk86_state, digit_w))			// display A&B
+	MCFG_I8279_IN_RL_CB(READ8(sdk86_state, kbd_r))					// kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(GND)										// Shift key
+	MCFG_I8279_IN_CTRL_CB(GND)
 
 MACHINE_CONFIG_END
 

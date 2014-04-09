@@ -3933,18 +3933,6 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-
-static const nmk112_interface bgaregga_nmk112_intf =
-{
-	"oki", NULL, 0
-};
-
-static const nmk112_interface batrider_nmk112_intf =
-{
-	"oki1", "oki2", 0
-};
-
-
 static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	/* basic machine hardware */
@@ -3990,7 +3978,8 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki")
 MACHINE_CONFIG_END
 
 
@@ -4049,7 +4038,9 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/10, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NMK112_ADD("nmk112", batrider_nmk112_intf)
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 

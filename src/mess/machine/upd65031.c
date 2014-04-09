@@ -204,29 +204,6 @@ upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd65031_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd65031_interface *intf = reinterpret_cast<const upd65031_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<upd65031_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		m_screen_update_cb = NULL;
-		m_out_mem_cb = NULL;
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -237,6 +214,10 @@ void upd65031_device::device_start()
 	m_write_int.resolve_safe();
 	m_write_nmi.resolve_safe();
 	m_write_spkr.resolve_safe();
+
+	// bind delegates
+	m_screen_update_cb.bind_relative_to(*owner());
+	m_out_mem_cb.bind_relative_to(*owner());
 
 	// allocate timers
 	m_rtc_timer = timer_alloc(TIMER_RTC);
@@ -282,13 +263,13 @@ void upd65031_device::device_reset()
 	m_mode = 0;
 	set_mode(STATE_AWAKE);
 
-	if (m_out_mem_cb)
+	if (!m_out_mem_cb.isnull())
 	{
 		// reset bankswitch
-		(m_out_mem_cb)(*this, 0, 0, 0);
-		(m_out_mem_cb)(*this, 1, 0, 0);
-		(m_out_mem_cb)(*this, 2, 0, 0);
-		(m_out_mem_cb)(*this, 3, 0, 0);
+		m_out_mem_cb(0, 0, 0);
+		m_out_mem_cb(1, 0, 0);
+		m_out_mem_cb(2, 0, 0);
+		m_out_mem_cb(3, 0, 0);
 	}
 }
 
@@ -405,8 +386,8 @@ void upd65031_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 UINT32 upd65031_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_screen_update_cb && (m_com & COM_LCDON))
-		(m_screen_update_cb)(*this, bitmap, m_lcd_regs[4], m_lcd_regs[2], m_lcd_regs[3], m_lcd_regs[0], m_lcd_regs[1], m_flash);
+	if (!m_screen_update_cb.isnull() && (m_com & COM_LCDON))
+		m_screen_update_cb(bitmap, m_lcd_regs[4], m_lcd_regs[2], m_lcd_regs[3], m_lcd_regs[0], m_lcd_regs[1], m_flash);
 	else
 		bitmap.fill(0, cliprect);
 
@@ -528,8 +509,8 @@ WRITE8_MEMBER( upd65031_device::write )
 			}
 
 			// bit 2 controls the lower 8kb of memory
-			if (BIT(m_com^data, 2) && m_out_mem_cb)
-				(m_out_mem_cb)(*this, 0, m_sr[0], BIT(data, 2));
+			if (BIT(m_com^data, 2) && !m_out_mem_cb.isnull())
+				m_out_mem_cb(0, m_sr[0], BIT(data, 2));
 
 			m_com = data;
 			break;
@@ -582,8 +563,8 @@ WRITE8_MEMBER( upd65031_device::write )
 		case REG_SR1:
 		case REG_SR2:
 		case REG_SR3:
-			if (m_out_mem_cb && m_sr[port & 3] != data)
-				(m_out_mem_cb)(*this, port & 3, data, BIT(m_com, 2));
+			if (!m_out_mem_cb.isnull() && m_sr[port & 3] != data)
+				m_out_mem_cb(port & 3, data, BIT(m_com, 2));
 
 			m_sr[port & 3] = data;
 			break;

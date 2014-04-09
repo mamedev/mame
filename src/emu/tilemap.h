@@ -499,6 +499,7 @@ public:
 	UINT32 width() const { return m_width; }
 	UINT32 height() const { return m_height; }
 	bool enabled() const { return m_enable; }
+	int palette_offset() const { return m_palette_offset; }
 	int scrolldx() const { return (m_attributes & TILEMAP_FLIPX) ? m_dx_flipped : m_dx; }
 	int scrolldy() const { return (m_attributes & TILEMAP_FLIPY) ? m_dy_flipped : m_dy; }
 	int scrollx(int which = 0) const { return (which < m_scrollrows) ? m_rowscroll[which] : 0; }

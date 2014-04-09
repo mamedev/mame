@@ -88,38 +88,16 @@ const device_type I8279 = &device_creator<i8279_device>;
 //-------------------------------------------------
 
 i8279_device::i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8279, "8279 KDC", tag, owner, clock, "i8279", __FILE__)
+	: device_t(mconfig, I8279, "8279 KDC", tag, owner, clock, "i8279", __FILE__),
+	m_out_irq_cb(*this),
+	m_out_sl_cb(*this),
+	m_out_disp_cb(*this),
+	m_out_bd_cb(*this),
+	m_in_rl_cb(*this),
+	m_in_shift_cb(*this),
+	m_in_ctrl_cb(*this)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8279_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8279_interface *intf = reinterpret_cast<const i8279_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<i8279_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_sl_cb, 0, sizeof(m_out_sl_cb));
-		memset(&m_out_disp_cb, 0, sizeof(m_out_disp_cb));
-		memset(&m_out_bd_cb, 0, sizeof(m_out_bd_cb));
-		memset(&m_in_rl_cb, 0, sizeof(m_in_rl_cb));
-		memset(&m_in_shift_cb, 0, sizeof(m_in_shift_cb));
-		memset(&m_in_ctrl_cb, 0, sizeof(m_in_ctrl_cb));
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -128,15 +106,15 @@ void i8279_device::device_config_complete()
 void i8279_device::device_start()
 {
 	/* resolve callbacks */
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_sl_func.resolve(m_out_sl_cb, *this);
-	m_out_disp_func.resolve(m_out_disp_cb, *this);
-	m_out_bd_func.resolve(m_out_bd_cb, *this);
-	m_in_rl_func.resolve(m_in_rl_cb, *this);
-	m_in_shift_func.resolve(m_in_shift_cb, *this);
-	m_in_ctrl_func.resolve(m_in_ctrl_cb, *this);
+	m_out_irq_cb.resolve();
+	m_out_sl_cb.resolve();
+	m_out_disp_cb.resolve();
+	m_out_bd_cb.resolve();
+	m_in_rl_cb.resolve();
+	m_in_shift_cb.resolve();
+	m_in_ctrl_cb.resolve();
 	m_clock = clock();
-	m_timer = machine().scheduler().timer_alloc(FUNC(timerproc_callback), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8279_device::timerproc_callback), this));
 }
 
 
@@ -218,8 +196,8 @@ void i8279_device::clear_display()
 
 void i8279_device::set_irq(bool state)
 {
-	if ( !m_out_irq_func.isnull() )
-		m_out_irq_func( state );
+	if ( !m_out_irq_cb.isnull() )
+		m_out_irq_cb( state );
 }
 
 
@@ -267,9 +245,9 @@ void i8279_device::new_fifo(UINT8 data)
 }
 
 
-TIMER_CALLBACK( i8279_device::timerproc_callback )
+TIMER_CALLBACK_MEMBER( i8279_device::timerproc_callback )
 {
-	reinterpret_cast<i8279_device*>(ptr)->timer_mainloop();
+	timer_mainloop();
 }
 
 
@@ -295,11 +273,11 @@ void i8279_device::timer_mainloop()
 	// type 3 = strobed
 
 	// Get shift keys
-	if ( !m_in_shift_func.isnull() )
-		shift_key = m_in_shift_func();
+	if ( !m_in_shift_cb.isnull() )
+		shift_key = m_in_shift_cb();
 
-	if ( !m_in_ctrl_func.isnull() )
-		ctrl_key = m_in_ctrl_func();
+	if ( !m_in_ctrl_cb.isnull() )
+		ctrl_key = m_in_ctrl_cb();
 
 	if (ctrl_key && !m_ctrl_key)
 		strobe_pulse = 1; // low-to-high is a strobe
@@ -308,9 +286,9 @@ void i8279_device::timer_mainloop()
 
 	// Read a row of keys
 
-	if ( !m_in_rl_func.isnull() )
+	if ( !m_in_rl_cb.isnull() )
 	{
-		UINT8 rl = m_in_rl_func(0);
+		UINT8 rl = m_in_rl_cb(0);
 
 		// see if key still down from last time
 		UINT16 key_down = (m_scanner << 8) | rl;
@@ -367,13 +345,13 @@ void i8279_device::timer_mainloop()
 
 	m_scanner &= scanner_mask; // 4-bit port
 
-	if ( !m_out_sl_func.isnull() )
-		m_out_sl_func(0, m_scanner);
+	if ( !m_out_sl_cb.isnull() )
+		m_out_sl_cb((offs_t)0, m_scanner);
 
 	// output a digit
 
-	if ( !m_out_disp_func.isnull() )
-		m_out_disp_func(0, m_d_ram[m_scanner] );
+	if ( !m_out_disp_cb.isnull() )
+		m_out_disp_cb((offs_t)0, m_d_ram[m_scanner] );
 }
 
 

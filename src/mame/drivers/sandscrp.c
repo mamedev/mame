@@ -480,12 +480,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const kaneko_pandora_interface sandscrp_pandora_config =
-{
-	0,  /* gfx_region */
-	0, 0    /* x_offs, y_offs */
-};
-
 static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	/* basic machine hardware */
@@ -498,7 +492,6 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_CPU_IO_MAP(sandscrp_soundport)
 
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -522,7 +515,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
 	kaneko_hit_device::set_type(*device, 0);
 
-	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 	MCFG_KANEKO_PANDORA_PALETTE("palette")
 

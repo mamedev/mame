@@ -327,17 +327,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static I8279_INTERFACE( icecold_i8279_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w), // irq
-	DEVCB_DRIVER_MEMBER(icecold_state, scanlines_w),    // scan SL lines
-	DEVCB_DRIVER_MEMBER(icecold_state, digit_w),        // display A&B
-	DEVCB_NULL,                                         // BD
-	DEVCB_DRIVER_MEMBER(icecold_state, kbd_r),          // kbd RL lines
-	DEVCB_NULL,                                         // Shift key
-	DEVCB_NULL                                          // Ctrl-Strobe line
-};
-
 static const ay8910_interface icecold_ay8910_0_intf =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -382,8 +371,12 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 
-	MCFG_I8279_ADD("i8279", XTAL_6MHz/4, icecold_i8279_intf)
-
+	MCFG_DEVICE_ADD("i8279", I8279, XTAL_6MHz/4)
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("pia0", pia6821_device, cb1_w)) // irq
+	MCFG_I8279_OUT_SL_CB(WRITE8(icecold_state, scanlines_w))	    // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(icecold_state, digit_w))         // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(icecold_state, kbd_r))    	        // kbd RL lines
+	
 	// 30Hz signal from CH-C of ay0
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sint_timer", icecold_state, icecold_sint_timer, attotime::from_hz(30))
 

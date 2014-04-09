@@ -492,22 +492,9 @@ void device_execute_interface::interface_pre_start()
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
-	// fill in the input states and IRQ callback information
-	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
-		m_input[line].start(this, line);
-
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
 		m_timedint_timer = device().machine().scheduler().timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
-
-	// register for save states
-	device().save_item(NAME(m_suspend));
-	device().save_item(NAME(m_nextsuspend));
-	device().save_item(NAME(m_eatcycles));
-	device().save_item(NAME(m_nexteatcycles));
-	device().save_item(NAME(m_trigger));
-	device().save_item(NAME(m_totalcycles));
-	device().save_item(NAME(m_localtime));
 }
 
 
@@ -520,6 +507,19 @@ void device_execute_interface::interface_post_start()
 {
 	// make sure somebody set us up the icount
 	assert_always(m_icountptr != NULL, "m_icountptr never initialized!");
+
+	// register for save states
+	device().save_item(NAME(m_suspend));
+	device().save_item(NAME(m_nextsuspend));
+	device().save_item(NAME(m_eatcycles));
+	device().save_item(NAME(m_nexteatcycles));
+	device().save_item(NAME(m_trigger));
+	device().save_item(NAME(m_totalcycles));
+	device().save_item(NAME(m_localtime));
+
+	// fill in the input states and IRQ callback information
+	for (int line = 0; line < ARRAY_LENGTH(m_input); line++)
+		m_input[line].start(this, line);
 }
 
 

@@ -320,8 +320,8 @@ static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3d0000, 0x3d0001) AM_READNOP
-	AM_RANGE(0x3e0000, 0x3e0001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(bonzeadv_cchip_ram_r, bonzeadv_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(bonzeadv_cchip_ctrl_r, bonzeadv_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(bonzeadv_cchip_bank_w)
@@ -336,8 +336,8 @@ static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP /* Mofflott init does dummy reads here */
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_device, word_r, step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP    /* error in Asuka init code */
@@ -348,8 +348,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x0c0002, 0x0c0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)    /* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
@@ -366,8 +366,8 @@ static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16   /* N.B. tc100scn mirror over
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREAD8("tc0220ioc", tc0220ioc_device, read, 0x00ff)   /* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x4e0002, 0x4e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x4e0002, 0x4e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVWRITE("tc0100scn", tc0100scn_device, word_w)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -382,8 +382,8 @@ static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP
@@ -397,8 +397,8 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 //  AM_RANGE(0x9002, 0x9100) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(asuka_msm5205_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(asuka_msm5205_stop_w)
@@ -410,8 +410,8 @@ static ADDRESS_MAP_START( cadash_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 ADDRESS_MAP_END
 
 /*
@@ -778,36 +778,6 @@ WRITE_LINE_MEMBER(asuka_state::irqhandler)
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0100scn_interface asuka_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	0, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0100scn_interface cadash_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	1, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const pc090oj_interface asuka_pc090oj_intf =
-{
-	0, 0, 8, 1
-};
-
-static const pc090oj_interface bonzeadv_pc090oj_intf =
-{
-	0, 0, 8, 0
-};
-
-
-
 void asuka_state::machine_start()
 {
 	/* configure the banks */
@@ -849,11 +819,6 @@ void asuka_state::screen_eof_asuka(screen_device &screen, bool state)
 	}
 }
 
-static const tc0140syt_interface asuka_tc0140syt_intf =
-{
-	"maincpu", "audiocpu"
-};
-
 static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 
 	/* basic machine hardware */
@@ -880,12 +845,17 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -898,7 +868,9 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( asuka, asuka_state )
@@ -934,12 +906,18 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
+	MCFG_PC090OJ_USEBUFFER(1)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", asuka_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -957,7 +935,9 @@ static MACHINE_CONFIG_START( asuka, asuka_state )
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cadash, asuka_state )
@@ -997,12 +977,19 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", asuka_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
+	MCFG_PC090OJ_USEBUFFER(1)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1015,7 +1002,9 @@ static MACHINE_CONFIG_START( cadash, asuka_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mofflott, asuka_state )
@@ -1051,12 +1040,18 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1074,7 +1069,9 @@ static MACHINE_CONFIG_START( mofflott, asuka_state )
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( galmedes, asuka_state )
@@ -1110,12 +1107,18 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)   /* only Mofflott uses full palette space */
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1128,7 +1131,9 @@ static MACHINE_CONFIG_START( galmedes, asuka_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( eto, asuka_state )
@@ -1164,12 +1169,18 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", asuka)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_PC090OJ_ADD("pc090oj", bonzeadv_pc090oj_intf)
+	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
+	MCFG_PC090OJ_OFFSETS(0, 8)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
 	MCFG_PC090OJ_PALETTE("palette")
-	MCFG_TC0100SCN_ADD("tc0100scn", cadash_tc0100scn_intf)
+
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(1, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
 	MCFG_TC0110PCR_ADD("tc0110pcr")
 	MCFG_TC0110PCR_PALETTE("palette")
 
@@ -1182,7 +1193,9 @@ static MACHINE_CONFIG_START( eto, asuka_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

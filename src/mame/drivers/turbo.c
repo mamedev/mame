@@ -454,20 +454,6 @@ WRITE8_MEMBER( turbo_state::digit_w )
 	output_set_digit_value(m_i8279_scanlines * 2 + 1, ls48_map[(data>>4) & 0x0f]);
 }
 
-
-static I8279_INTERFACE( turbo_i8279_intf )
-{
-	DEVCB_NULL,                                     // irq
-	DEVCB_DRIVER_MEMBER(turbo_state, scanlines_w),  // scan SL lines
-	DEVCB_DRIVER_MEMBER(turbo_state, digit_w),      // display A&B
-	DEVCB_NULL,                                     // BD
-	DEVCB_INPUT_PORT("DSW1"),                       // kbd RL lines
-	DEVCB_NULL,                                     // Shift key
-	DEVCB_NULL                                      // Ctrl-Strobe line
-};
-
-
-
 /*************************************
  *
  *  Misc Turbo inputs/outputs
@@ -936,8 +922,11 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_I8255_ADD( "i8255_2", turbo_8255_intf_2 )
 	MCFG_I8255_ADD( "i8255_3", turbo_8255_intf_3 )
 
-	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
-
+	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
+	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))	  // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
+	
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -966,7 +955,10 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 	MCFG_I8255_ADD( "i8255_0", subroc3d_8255_intf_0 )
 	MCFG_I8255_ADD( "i8255_1", subroc3d_8255_intf_1 )
 
-	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
+	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
+	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))	  // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
@@ -1003,7 +995,10 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 	MCFG_I8255_ADD( "i8255_0", buckrog_8255_intf_0 )
 	MCFG_I8255_ADD( "i8255_1", buckrog_8255_intf_1 )
 
-	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)    // unknown clock
+	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
+	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))	  // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
+	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)

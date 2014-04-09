@@ -293,11 +293,6 @@ WRITE16_MEMBER(namcona1_state::custom_key_w)
 
 /***************************************************************/
 
-READ16_MEMBER(namcona1_state::namcona1_vreg_r)
-{
-	return m_vreg[offset];
-} /* namcona1_vreg_r */
-
 int namcona1_state::transfer_dword( UINT32 dest, UINT32 source )
 {
 	UINT16 data;
@@ -549,10 +544,10 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)  /* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_SHARE("vreg")
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r, namcona1_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(namcona1_vreg_w) AM_SHARE("vreg")
+	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(namcona1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w) AM_SHARE("cgram")
+	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(namcona1_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")           /* spriteram */
@@ -571,10 +566,10 @@ static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	/* xday: additional battery-backed ram at 00E024FA? */
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_SHARE("vreg")
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r, namcona1_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(namcona1_vreg_w) AM_SHARE("vreg")
+	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(namcona1_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w) AM_SHARE("cgram")
+	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(namcona1_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")           /* spriteram */
@@ -875,6 +870,47 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
+static const gfx_layout cg_layout_8bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8, /* 8BPP */
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout cg_layout_4bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4, /* 4BPP */
+	{ 4,5,6,7 },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout shape_layout =
+{
+	8,8,
+	0x1000,
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	8*8
+};
+
+static GFXDECODE_START( namcona1 )
+	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
+	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
+	GFXDECODE_RAM(  NULL,   0, shape_layout,   0, 0x2000/2   )
+GFXDECODE_END
+
+/***************************************************************************/
+
 TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 {
 	int scanline = param;
@@ -948,7 +984,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcona1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

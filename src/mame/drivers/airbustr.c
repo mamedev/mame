@@ -589,12 +589,6 @@ void airbustr_state::machine_reset()
 
 /* Machine Driver */
 
-static const kaneko_pandora_interface airbustr_pandora_config =
-{
-	1,  /* gfx_region */
-	0, 0    /* x_offs, y_offs */
-};
-
 static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* basic machine hardware */
@@ -631,7 +625,8 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_PALETTE_ADD("palette", 768)
 	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
+	MCFG_KANEKO_PANDORA_GFX_REGION(1)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 	MCFG_KANEKO_PANDORA_PALETTE("palette")
 

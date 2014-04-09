@@ -196,7 +196,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-int vaportra_state::bank_callback( int bank )
+DECO16IC_BANK_CB_MEMBER(vaportra_state::bank_callback)
 {
 	return ((bank >> 4) & 0x7) * 0x1000;
 }

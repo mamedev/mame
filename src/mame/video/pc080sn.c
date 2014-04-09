@@ -52,6 +52,11 @@ const device_type PC080SN = &device_creator<pc080sn_device>;
 pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC080SN, "Taito PC080SN", tag, owner, clock, "pc080sn", __FILE__),
 	m_ram(NULL),
+	m_gfxnum(0),
+	m_x_offset(0), 
+	m_y_offset(0),
+	m_y_invert(0),
+	m_dblwidth(0),
 	m_gfxdecode(*this),
 	m_palette(*this)
 	//m_bg_ram[0](NULL),
@@ -79,25 +84,6 @@ void pc080sn_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
 void pc080sn_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<pc080sn_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pc080sn_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pc080sn_interface *intf = reinterpret_cast<const pc080sn_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<pc080sn_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------

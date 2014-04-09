@@ -284,16 +284,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0480scp_interface gunbustr_tc0480scp_intf =
-{
-	1, 2,           /* gfxnum, txnum */
-	0,              /* pixels */
-	0x20, 0x07,     /* x_offset, y_offset */
-	-1, -1,         /* text_xoff, text_yoff */
-	-1, 0,          /* flip_xoff, flip_yoff */
-	0               /* col_base */
-};
-
 static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 
 	/* basic machine hardware */
@@ -315,8 +305,12 @@ static MACHINE_CONFIG_START( gunbustr, gunbustr_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gunbustr)
 	MCFG_PALETTE_ADD("palette", 8192)
 
-
-	MCFG_TC0480SCP_ADD("tc0480scp", gunbustr_tc0480scp_intf)
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(0x20, 0x07)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
+	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 	MCFG_TC0480SCP_PALETTE("palette")
 

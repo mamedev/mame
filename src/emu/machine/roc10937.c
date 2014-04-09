@@ -32,7 +32,7 @@ we actually have 18 segments, including the semicolon portions.
 */
 
 static const UINT16 roc10937charset[]=
-{            // FEDC BA98 7654 3210
+{           // FEDC BA98 7654 3210
 	0x507F, // 0101 0000 0111 1111 @.
 	0x44CF, // 0100 0100 1100 1111 A.
 	0x153F, // 0001 0101 0011 1111 B.
@@ -95,11 +95,12 @@ static const UINT16 roc10937charset[]=
 			//                     -.
 	0x2001, // 0010 0000 0000 0001 -
 			//                     /.
-	0x2430, // 0010 0100 0011 0000 <.
+	0x2430, // 0010 0010 0011 0000 <.
 	0x4430, // 0100 0100 0011 0000 =.
 	0x8830, // 1000 1000 0011 0000 >.
 	0x1407, // 0001 0100 0000 0111 ?.
 };
+
 
 ///////////////////////////////////////////////////////////////////////////
 static const int roc10937poslut[]=
@@ -128,7 +129,6 @@ rocvfd_t::rocvfd_t(const machine_config &mconfig, device_type type, const char *
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_port_val=0;
-	m_reversed=0;
 }
 
 
@@ -138,16 +138,9 @@ void rocvfd_t::static_set_value(device_t &device, int val)
 	roc.m_port_val = val;
 }
 
-void rocvfd_t::static_set_zero(device_t &device, bool reversed)
-{
-	rocvfd_t &roc = downcast<rocvfd_t &>(device);
-	roc.m_reversed = reversed;
-}
-
 void rocvfd_t::device_start()
 {
 	save_item(NAME(m_port_val));
-	save_item(NAME(m_reversed));
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
@@ -196,18 +189,12 @@ void rocvfd_t::device_post_load()
 	}
 }
 
+//Display on Rockwell chips is naturally backwards, due to the way it is wired. We emulate this by flipping the display at update time
 void rocvfd_t::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
-		if (m_reversed)
-		{
-			m_outputs[i] = set_display(m_chars[15-i]);
-		}
-		else
-		{
-			m_outputs[i] = set_display(m_chars[i]);
-		}
+		m_outputs[i] = set_display(m_chars[15-i]);
 		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
@@ -232,7 +219,6 @@ roc10937_t::roc10937_t(const machine_config &mconfig, const char *tag, device_t 
 	: rocvfd_t(mconfig, ROC10937, "Rockwell 10937 VFD controller and compatible", tag, owner, clock, "roc10937", __FILE__)
 {
 	m_port_val=0;
-	m_reversed=0;
 }
 
 const device_type MSC1937 = &device_creator<msc1937_t>;
@@ -241,7 +227,6 @@ msc1937_t::msc1937_t(const machine_config &mconfig, const char *tag, device_t *o
 	: rocvfd_t(mconfig, MSC1937, "OKI MSC1937 VFD controller", tag, owner, clock, "msc1937", __FILE__)
 {
 	m_port_val=0;
-	m_reversed=0;
 }
 
 void rocvfd_t::write_char(int data)
@@ -301,7 +286,6 @@ roc10957_t::roc10957_t(const machine_config &mconfig, const char *tag, device_t 
 	: rocvfd_t(mconfig, ROC10957, "Rockwell 10957 VFD controller and compatible", tag, owner, clock, "roc10957", __FILE__)
 {
 	m_port_val=0;
-	m_reversed=0;
 }
 
 void roc10957_t::write_char(int data)
@@ -361,5 +345,23 @@ void roc10957_t::write_char(int data)
 			}
 		break;
 		}
+	}
+}
+
+const device_type S16LF01 = &device_creator<s16lf01_t>;
+
+s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
+{
+	m_port_val=0;
+}
+
+//Samsung chips fix the issue with the reversal of the drive.
+void s16lf01_t::update_display()
+{
+	for (int i =0; i<16; i++)
+	{
+		m_outputs[i] = set_display(m_chars[i]);
+		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }

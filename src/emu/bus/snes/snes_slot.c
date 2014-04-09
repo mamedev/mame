@@ -67,15 +67,7 @@ const device_type SNS_BSX_CART_SLOT = &device_creator<sns_bsx_cart_slot_device>;
 //-------------------------------------------------
 
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(NULL),
-		m_nvram(NULL),
-		m_bios(NULL),
-		m_rtc_ram(NULL),
-		m_rom_size(0),
-		m_nvram_size(0),
-		m_bios_size(0),
-		m_rtc_ram_size(0)
+	: device_slot_card_interface(mconfig, device)
 {
 }
 
@@ -92,13 +84,10 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
+void device_sns_cart_interface::rom_alloc(UINT32 size)
 {
 	if (m_rom == NULL)
-	{
-		m_rom = auto_alloc_array_clear(machine, UINT8, size);
-		m_rom_size = size;
-	}
+		m_rom.resize(size);
 }
 
 
@@ -106,13 +95,12 @@ void device_sns_cart_interface::rom_alloc(running_machine &machine, UINT32 size)
 //  nvram_alloc - alloc the space for the nvram
 //-------------------------------------------------
 
-void device_sns_cart_interface::nvram_alloc(running_machine &machine, UINT32 size)
+void device_sns_cart_interface::nvram_alloc(UINT32 size)
 {
 	if (m_nvram == NULL)
 	{
-		m_nvram = auto_alloc_array_clear(machine, UINT8, size);
-		m_nvram_size = size;
-		state_save_register_item_pointer(machine, "SNES_CART", this->device().tag(), 0, m_nvram, m_nvram_size);
+		m_nvram.resize(size);
+		device().save_item(NAME(m_nvram));
 	}
 }
 
@@ -124,13 +112,12 @@ void device_sns_cart_interface::nvram_alloc(running_machine &machine, UINT32 siz
 //  saved by the device itself)
 //-------------------------------------------------
 
-void device_sns_cart_interface::rtc_ram_alloc(running_machine &machine, UINT32 size)
+void device_sns_cart_interface::rtc_ram_alloc(UINT32 size)
 {
 	if (m_rtc_ram == NULL)
 	{
-		m_rtc_ram = auto_alloc_array_clear(machine, UINT8, size);
-		m_rtc_ram_size = size;
-		state_save_register_item_pointer(machine, "SNES_CART", this->device().tag(), 0, m_rtc_ram, m_rtc_ram_size);
+		m_rtc_ram.resize(size);
+		device().save_item(NAME(m_rtc_ram));
 	}
 }
 
@@ -140,13 +127,10 @@ void device_sns_cart_interface::rtc_ram_alloc(running_machine &machine, UINT32 s
 //  (optional) add-on CPU bios
 //-------------------------------------------------
 
-void device_sns_cart_interface::addon_bios_alloc(running_machine &machine, UINT32 size)
+void device_sns_cart_interface::addon_bios_alloc(UINT32 size)
 {
 	if (m_bios == NULL)
-	{
-		m_bios = auto_alloc_array_clear(machine, UINT8, size);
-		m_bios_size = size;
-	}
+		m_bios.resize(size);
 }
 
 
@@ -638,7 +622,7 @@ bool base_sns_cart_slot_device::call_load()
 
 		len = (software_entry() == NULL) ? (length() - offset) : get_software_region_length("rom");
 
-		m_cart->rom_alloc(machine(), len);
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 		if (software_entry() == NULL)
 			fread(ROM, len);
@@ -652,7 +636,7 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			if (get_software_region("addon"))
 			{
-				m_cart->addon_bios_alloc(machine(), get_software_region_length("addon"));
+				m_cart->addon_bios_alloc(get_software_region_length("addon"));
 				memcpy(m_cart->get_addon_bios_base(), get_software_region("addon"), get_software_region_length("addon"));
 			}
 		}
@@ -746,7 +730,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0x7fff) == 0x2800)
 			{
 				logerror("Found NEC DSP dump at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2800), 0x2800);
 				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x2800);
 			}
@@ -754,7 +738,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0x7fff) == 0x2000)
 			{
 				logerror("Found NEC DSP dump (byuu's version) at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				for (int i = 0; i < 0x800; i++)
 				{
 					memcpy(m_cart->get_addon_bios_base() + i * 4 + 2, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2000) + i * 3 + 0, 1);
@@ -772,7 +756,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0x3ffff) == 0x11000)
 			{
 				logerror("Found Seta DSP dump at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x11000);
+				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x11000), 0x11000);
 				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x11000);
 			}
@@ -780,7 +764,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0xffff) == 0xd000)
 			{
 				logerror("Found Seta DSP dump (byuu's version) at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x11000);
+				m_cart->addon_bios_alloc(0x11000);
 				for (int i = 0; i < 0x4000; i++)
 				{
 					memcpy(m_cart->get_addon_bios_base() + i * 4 + 2, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0xd000) + i * 3 + 0, 1);
@@ -796,7 +780,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0x7fff) == 0x0c00)
 			{
 				logerror("Found CX4 dump at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x0c00);
+				m_cart->addon_bios_alloc(0x0c00);
 				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x0c00), 0x0c00);
 				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x0c00);
 			}
@@ -805,7 +789,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			if ((m_cart->get_rom_size() & 0x3ffff) == 0x28000)
 			{
 				logerror("Found ST018 dump at the bottom of the ROM.\n");
-				m_cart->addon_bios_alloc(machine(), 0x28000);
+				m_cart->addon_bios_alloc(0x28000);
 				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x28000), 0x28000);
 				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x28000);
 			}
@@ -822,37 +806,37 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 		{
 			case ADDON_DSP1:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP1B:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP2:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP3:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP4:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x2800);
+				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_ST010:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x11000);
+				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 			case ADDON_ST011:
 				ROM = machine().root_device().memregion(region)->base();
-				m_cart->addon_bios_alloc(machine(), 0x11000);
+				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 		}
@@ -883,18 +867,18 @@ void base_sns_cart_slot_device::setup_nvram()
 	}
 
 	if (size)
-		m_cart->nvram_alloc(machine(), size);
+		m_cart->nvram_alloc(size);
 
 	if (m_type == SNES_STROM)
-		m_cart->nvram_alloc(machine(), 0x20000);
+		m_cart->nvram_alloc(0x20000);
 	if (m_type == SNES_BSX)
-		m_cart->nvram_alloc(machine(), 0x8000);
+		m_cart->nvram_alloc(0x8000);
 
 	// setup also RTC SRAM, when needed (to be removed when RTCs are converted to devices)
 	if (m_type == SNES_SRTC)
-		m_cart->rtc_ram_alloc(machine(), 13);
+		m_cart->rtc_ram_alloc(13);
 	if (m_type == SNES_SPC7110_RTC)
-		m_cart->rtc_ram_alloc(machine(), 16);
+		m_cart->rtc_ram_alloc(16);
 }
 
 

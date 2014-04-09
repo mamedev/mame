@@ -696,6 +696,7 @@ static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
 
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
@@ -712,6 +713,7 @@ static MACHINE_CONFIG_START( md_scd, md_cons_state )
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
 
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
@@ -728,6 +730,7 @@ static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_SCREEN_VBLANK_DRIVER(md_cons_state, screen_eof_console)
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
 
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
@@ -738,6 +741,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_GFX_PALETTE("gen_vdp:palette")
+
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)

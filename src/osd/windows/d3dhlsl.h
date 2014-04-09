@@ -88,7 +88,6 @@ public:
 		CU_POST_POWER,
 		CU_POST_FLOOR,
 
-		CU_BLOOM_TARGET_SIZE,
 		CU_BLOOM_RESCALE,
 		CU_BLOOM_LVL0123_WEIGHTS,
 		CU_BLOOM_LVL4567_WEIGHTS,
@@ -402,7 +401,6 @@ private:
 
 	texture_info *          curr_texture;
 	bool                    phosphor_passthrough;
-	float                   target_size[2];
 
 public:
 	render_target *         targethead;

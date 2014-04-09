@@ -11,25 +11,22 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct nmk112_interface
-{
-	const char *rgn0, *rgn1;
-	UINT8 disable_page_mask;
-};
-
-class nmk112_device : public device_t,
-									public nmk112_interface
+class nmk112_device : public device_t
 {
 public:
 	nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nmk112_device() {}
 
+	// static configuration
+	static void set_rom0_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag0 = tag; }
+	static void set_rom1_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag1 = tag; }
+	static void set_page_mask(device_t &device, UINT8 mask) { downcast<nmk112_device &>(device).m_page_mask = ~mask; }
+	
 	DECLARE_WRITE8_MEMBER( okibank_w );
 	DECLARE_WRITE16_MEMBER( okibank_lsb_w );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -44,6 +41,7 @@ private:
 
 	UINT8 m_current_bank[8];
 
+	const char *m_tag0, *m_tag1;
 	UINT8 *m_rom0, *m_rom1;
 	int   m_size0, m_size1;
 };
@@ -55,8 +53,14 @@ extern const device_type NMK112;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_NMK112_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, NMK112, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+#define MCFG_NMK112_ROM0(_tag) \
+	nmk112_device::set_rom0_tag(*device, _tag);
+
+#define MCFG_NMK112_ROM1(_tag) \
+	nmk112_device::set_rom1_tag(*device, _tag);
+
+#define MCFG_NMK112_DISABLE_PAGEMASK(_mask) \
+	nmk112_device::set_page_mask(*device, _mask);
+
 
 #endif /* __NMK112_H__ */

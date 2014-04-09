@@ -293,7 +293,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				}
 
 				// if this entry references a memory region, validate it
-				if (entry->m_region != NULL && entry->m_share == 0)
+				if (entry->m_region != NULL && entry->m_sharetag == 0)
 				{
 					// make sure we can resolve the full path to the region
 					bool found = false;
@@ -346,8 +346,8 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					valid.validate_tag(entry->m_read.m_tag);
 				if (entry->m_write.m_type == AMH_BANK)
 					valid.validate_tag(entry->m_write.m_tag);
-				if (entry->m_share != NULL)
-					valid.validate_tag(entry->m_share);
+				if (entry->m_sharetag != NULL)
+					valid.validate_tag(entry->m_sharetag);
 			}
 
 			// release the address map

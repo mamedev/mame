@@ -47,25 +47,6 @@ void tc0280grd_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0280grd_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0280grd_interface *intf = reinterpret_cast<const tc0280grd_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0280grd_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

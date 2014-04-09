@@ -625,13 +625,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::hvyunit_scanline)
 		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-static const kaneko_pandora_interface hvyunit_pandora_config =
-{
-	0,          /* gfx_region */
-	0, 0        /* x_offs, y_offs */
-};
-
-
 /*************************************
  *
  *  Machine driver
@@ -660,7 +653,6 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -674,7 +666,7 @@ static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 	MCFG_PALETTE_ADD("palette", 0x800)
 	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	MCFG_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 	MCFG_KANEKO_PANDORA_PALETTE("palette")
 

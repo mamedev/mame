@@ -2,7 +2,10 @@
 
 /*
  the MSM6376 is on the ROM board, so some games might not have it
- the YM2149F is on the MAIN board
+ the YM2149F is on the MAIN board, but it seems very rarely used for sound.
+ 
+ On various PCBs, I've seen the AY slot filled with AY8913's, 8910's,
+ YM2419s and even AY8930s.
 
  some of the sound roms we have look more like uPD7749 ones? did some
  ROM boards use that instead?

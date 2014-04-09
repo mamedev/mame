@@ -237,7 +237,6 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 	/* do the gun thing */
 	if (m_pc10_gun_controller)
 	{
-		ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 		int trigger = ioport("P1")->read();
 		int x = ioport("GUNX")->read();
 		int y = ioport("GUNY")->read();
@@ -247,10 +246,10 @@ READ8_MEMBER(playch10_state::pc10_in1_r)
 		ret |= 0x08;
 
 		/* get the pixel at the gun position */
-		pix = ppu->get_pixel(x, y);
+		pix = m_ppu->get_pixel(x, y);
 
 		/* get the color base from the ppu */
-		color_base = ppu->get_colorbase();
+		color_base = m_ppu->get_colorbase();
 
 		/* look at the screen and see if the cursor is over a bright pixel */
 		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||

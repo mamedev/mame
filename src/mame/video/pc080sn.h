@@ -1,17 +1,7 @@
 #ifndef __PC080SN_H__
 #define __PC080SN_H__
 
-struct pc080sn_interface
-{
-	int                m_gfxnum;
-
-	int                m_x_offset, m_y_offset;
-	int                m_y_invert;
-	int                m_dblwidth;
-};
-
-class pc080sn_device : public device_t,
-										public pc080sn_interface
+class pc080sn_device : public device_t
 {
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -20,7 +10,16 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-
+	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc080sn_device &>(device).m_gfxnum = gfxregion; }
+	static void set_yinvert(device_t &device, int y_inv) { downcast<pc080sn_device &>(device).m_y_invert = y_inv; }
+	static void set_dblwidth(device_t &device, int dblwidth) { downcast<pc080sn_device &>(device).m_dblwidth = dblwidth; }
+	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	{
+		pc080sn_device &dev = downcast<pc080sn_device &>(device);
+		dev.m_x_offset = x_offset;
+		dev.m_y_offset = y_offset;
+	}
+	
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 	DECLARE_WRITE16_MEMBER( xscroll_word_w );
@@ -48,7 +47,6 @@ public:
 
 	protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	private:
@@ -62,15 +60,30 @@ public:
 	int            m_bgscrollx[2], m_bgscrolly[2];
 
 	tilemap_t      *m_tilemap[2];
+
+	int            m_gfxnum;
+	int            m_x_offset, m_y_offset;
+	int            m_y_invert;
+	int            m_dblwidth;
+	
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC080SN;
 
-#define MCFG_PC080SN_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, PC080SN, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_PC080SN_GFX_REGION(_region) \
+	pc080sn_device::set_gfx_region(*device, _region);
+
+#define MCFG_PC080SN_OFFSETS(_xoffs, _yoffs) \
+	pc080sn_device::set_offsets(*device, _xoffs, _yoffs);
+
+#define MCFG_PC080SN_YINVERT(_yinv) \
+	pc080sn_device::set_yinvert(*device, _yinv);
+
+#define MCFG_PC080SN_DBLWIDTH(_dbl) \
+	pc080sn_device::set_dblwidth(*device, _dbl);
 
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
 	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

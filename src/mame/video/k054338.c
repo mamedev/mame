@@ -1,7 +1,6 @@
 
 #include "emu.h"
 #include "k054338.h"
-#include "k055555.h"
 
 
 #define VERBOSE 0
@@ -237,31 +236,12 @@ const device_type K054338 = &device_creator<k054338_device>;
 
 k054338_device::k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__),
-	device_video_interface(mconfig, *this)
+	device_video_interface(mconfig, *this),
+	m_alpha_inv(0),
+	m_k055555_tag("")
 	//m_regs[32],
 	//m_shd_rgb[9],
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k054338_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k054338_interface *intf = reinterpret_cast<const k054338_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<k054338_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_alpha_inv = 0;
-	m_k055555_tag = "";
-	};
 }
 
 //-------------------------------------------------

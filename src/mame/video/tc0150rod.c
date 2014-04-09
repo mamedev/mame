@@ -11,8 +11,6 @@ Road generator. Two roads allow for forking. Gfx data fetched from ROM. Refer to
 
 #define TC0150ROD_RAM_SIZE 0x2000
 
-
-
 const device_type TC0150ROD = &device_creator<tc0150rod_device>;
 
 tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -22,33 +20,16 @@ tc0150rod_device::tc0150rod_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0150rod_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0150rod_interface *intf = reinterpret_cast<const tc0150rod_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0150rod_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void tc0150rod_device::device_start()
 {
 	m_ram = auto_alloc_array_clear(machine(), UINT16, TC0150ROD_RAM_SIZE / 2);
-
 	save_pointer(NAME(m_ram), TC0150ROD_RAM_SIZE / 2);
+
+	m_roadgfx = (UINT16 *)machine().root_device().memregion(m_gfx_region)->base();
+	assert(m_roadgfx);
 }
 
 
@@ -240,7 +221,6 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	UINT16 roada_line[512], roadb_line[512];
 	UINT16 *dst16;
 	UINT16 *roada, *roadb;
-	UINT16 *roadgfx = (UINT16 *)machine().root_device().memregion(m_gfx_region)->base();
 
 	UINT16 pixel, color, gfx_word;
 	UINT16 roada_clipl, roada_clipr, roada_bodyctrl;
@@ -434,7 +414,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{
 				if (road_gfx_tilenum)   /* fixes Nightstr round C */
 				{
-					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+					gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 					if ((pixel) || !(road_trans))
@@ -485,7 +465,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 				{
 					for (i = left_edge; i >= 0; i--)
 					{
-						gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+						gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 						pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 						pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
@@ -528,7 +508,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{
 				for (i = right_edge; i < screen_width; i++)
 				{
-					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+					gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 					pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
@@ -642,7 +622,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{
 				for (i = begin; i < end; i++)
 				{
-					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+					gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 					if ((pixel) || !(road_trans))
@@ -692,7 +672,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 				{
 					for (i = left_edge; i >= 0; i--)
 					{
-						gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+						gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 						pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 						pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */
@@ -735,7 +715,7 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 			{
 				for (i = right_edge; i < screen_width; i++)
 				{
-					gfx_word = roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
+					gfx_word = m_roadgfx[(road_gfx_tilenum << 8) + (x_index >> 3)];
 					pixel = ((gfx_word >> (7 - (x_index % 8) + 8)) & 0x1) * 2 + ((gfx_word >> (7 - (x_index % 8))) & 0x1);
 
 					pixpri = (pixel == 0) ? (0) : (pri);    /* off edge has low priority */

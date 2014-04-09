@@ -141,6 +141,16 @@ tc0100scn_device::tc0100scn_device(const machine_config &mconfig, const char *ta
 	m_bg1_colbank(0),
 	m_tx_colbank(0),
 	m_dblwidth(0),
+	m_gfxnum(0),
+	m_txnum(0),
+	m_x_offset(0), 
+	m_y_offset(0),
+	m_flip_xoffs(0), 
+	m_flip_yoffs(0),
+	m_flip_text_xoffs(0), 
+	m_flip_text_yoffs(0),
+	m_multiscrn_xoffs(0),
+	m_multiscrn_hack(0),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {
@@ -164,25 +174,6 @@ void tc0100scn_device::static_set_gfxdecode_tag(device_t &device, const char *ta
 void tc0100scn_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<tc0100scn_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0100scn_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const tc0100scn_interface *intf = reinterpret_cast<const tc0100scn_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<tc0100scn_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 //-------------------------------------------------
@@ -300,13 +291,11 @@ void tc0100scn_device::device_start()
 
 void tc0100scn_device::device_reset()
 {
-	int i;
-
 	m_dblwidth = 0;
 	m_colbank = 0;
 	m_gfxbank = 0; /* Mjnquest uniquely banks tiles */
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		m_ctrl[i] = 0;
 }
 

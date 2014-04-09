@@ -17,13 +17,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_UPD65031_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), UPD65031, _clock)   \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define UPD65031_INTERFACE(name) \
-	const upd65031_interface (name) =
-
 #define MCFG_UPD65031_KB_CALLBACK(_read) \
 	devcb = &upd65031_device::set_kb_rd_callback(*device, DEVCB2_##_read);
 
@@ -36,31 +29,27 @@
 #define MCFG_UPD65031_SPKR_CALLBACK(_write) \
 	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB2_##_write);
 
+#define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
+	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_UPD65031_MEM_UPDATE_CB(_class, _method) \
+	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*upd65031_screen_update_func)(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash);
-#define UPD65031_SCREEN_UPDATE(name) void name(device_t &device, bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
+typedef device_delegate<void (bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)> upd65031_screen_update_delegate;
+typedef device_delegate<void (int bank, UINT16 page, int rams)> upd65031_memory_update_delegate;
 
-typedef void (*upd65031_memory_update_func)(device_t &device, int bank, UINT16 page, int rams);
-#define UPD65031_MEMORY_UPDATE(name) void name(device_t &device, int bank, UINT16 page, int rams)
-
-
-// ======================> upd65031_interface
-
-struct upd65031_interface
-{
-	upd65031_screen_update_func m_screen_update_cb;  // callback for update the LCD
-	upd65031_memory_update_func m_out_mem_cb;        // callback for update bankswitch
-};
+#define UPD65031_SCREEN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
+#define UPD65031_MEMORY_UPDATE(_name) void _name(int bank, UINT16 page, int rams)
 
 
 // ======================> upd65031_device
 
-class upd65031_device : public device_t,
-						public upd65031_interface
+class upd65031_device : public device_t
 {
 public:
 	// construction/destruction
@@ -71,6 +60,9 @@ public:
 	template<class _Object> static devcb2_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_nmi.set_callback(object); }
 	template<class _Object> static devcb2_base &set_spkr_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_spkr.set_callback(object); }
 
+	static void set_screen_update_callback(device_t &device, upd65031_screen_update_delegate callback) { downcast<upd65031_device &>(device).m_screen_update_cb = callback; }
+	static void set_memory_update_callback(device_t &device, upd65031_memory_update_delegate callback) { downcast<upd65031_device &>(device).m_out_mem_cb = callback; }
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( flp_w );
@@ -79,7 +71,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -96,6 +87,9 @@ private:
 	devcb2_write_line   m_write_int;
 	devcb2_write_line   m_write_nmi;
 	devcb2_write_line   m_write_spkr;
+
+	upd65031_screen_update_delegate m_screen_update_cb;  // callback for update the LCD
+	upd65031_memory_update_delegate m_out_mem_cb;        // callback for update bankswitch
 
 	int     m_mode;
 	UINT16  m_lcd_regs[5];      // LCD registers

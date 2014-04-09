@@ -243,8 +243,8 @@ static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
@@ -263,8 +263,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
@@ -275,8 +275,8 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* ?? writes zero once per frame */
@@ -288,8 +288,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoh_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP        /* pan control */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP        /* ? */
@@ -646,25 +646,6 @@ void taitoh_state::machine_start()
 }
 
 
-static const tc0080vco_interface syvalion_tc0080vco_intf =
-{
-	0, 1,   /* gfxnum, txnum */
-	1, 1, -2,
-	1
-};
-
-static const tc0080vco_interface recordbr_tc0080vco_intf =
-{
-	0, 1,   /* gfxnum, txnum */
-	1, 1, -2,
-	0
-};
-
-static const tc0140syt_interface taitoh_tc0140syt_intf =
-{
-	"maincpu", "audiocpu"
-};
-
 static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	/* basic machine hardware */
@@ -698,7 +679,11 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0080VCO_ADD("tc0080vco", syvalion_tc0080vco_intf)
+	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
+	MCFG_TC0080VCO_GFX_REGION(0)
+	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_TC0080VCO_OFFSETS(1, 1)
+	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 	MCFG_TC0080VCO_PALETTE("palette")
 
@@ -711,7 +696,9 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -748,7 +735,11 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_PALETTE_ADD("palette", 32*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
+	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
+	MCFG_TC0080VCO_GFX_REGION(0)
+	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_TC0080VCO_OFFSETS(1, 1)
+	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 	MCFG_TC0080VCO_PALETTE("palette")
 
@@ -761,7 +752,9 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -806,7 +799,11 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0080VCO_ADD("tc0080vco", recordbr_tc0080vco_intf)
+	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
+	MCFG_TC0080VCO_GFX_REGION(0)
+	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_TC0080VCO_OFFSETS(1, 1)
+	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 	MCFG_TC0080VCO_PALETTE("palette")
 
@@ -819,7 +816,9 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 

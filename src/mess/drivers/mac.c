@@ -841,12 +841,6 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static const struct NCR539Xinterface mac_539x_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, irq_539x_1_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, drq_539x_1_w)
-};
-
 static const struct nbbus_interface nubus_intf =
 {
 	// interrupt lines
@@ -1868,8 +1862,10 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_5)
-	MCFG_NCR539X_ADD(MAC_539X_1_TAG, C7M, mac_539x_intf)
-
+	MCFG_DEVICE_ADD(MAC_539X_1_TAG, NCR539X, C7M)
+	MCFG_NCR539X_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, irq_539x_1_w))
+	MCFG_NCR539X_OUT_DRQ_CB(DEVWRITELINE(DEVICE_SELF_OWNER, mac_state, drq_539x_1_w))
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")

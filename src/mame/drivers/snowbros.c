@@ -1509,12 +1509,6 @@ MACHINE_RESET_MEMBER(snowbros_state,finalttr)
 		m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
-static const kaneko_pandora_interface snowbros_pandora_config =
-{
-	0,  /* gfx_region */
-	0, 0    /* x_offs, y_offs */
-};
-
 static MACHINE_CONFIG_START( snowbros, snowbros_state )
 
 	/* basic machine hardware */
@@ -1540,7 +1534,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 	MCFG_KANEKO_PANDORA_PALETTE("palette")
 

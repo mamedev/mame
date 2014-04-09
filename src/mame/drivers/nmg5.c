@@ -1025,10 +1025,10 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 1);
-	decospr_device::set_is_bootleg(*device, true);
-	decospr_device::set_flipallx(*device, 1);
-	decospr_device::set_offsets(*device, 0,8);
+	MCFG_DECO_SPRITE_GFX_REGION(1)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_FLIPALLX(1)
+	MCFG_DECO_SPRITE_OFFSETS(0, 8)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_DECO_SPRITE_PALETTE("palette")
 

@@ -58,8 +58,9 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	void bankswitch_update(int bank, UINT16 page, int rams);
 	DECLARE_READ8_MEMBER(kb_r);
+	UPD65031_MEMORY_UPDATE(bankswitch_update);
+	UPD65031_SCREEN_UPDATE(lcd_update);
 
 	// cartridges read/write
 	DECLARE_READ8_MEMBER(bank0_cart_r);
@@ -77,7 +78,6 @@ public:
 	void vh_render_8x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx);
 	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, UINT16 pen0, UINT16 pen1, UINT8 *gfx);
 	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, UINT16 pen);
-	void lcd_update(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash);
 
 	struct
 	{

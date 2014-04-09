@@ -300,30 +300,12 @@ PALETTE_INIT_MEMBER(tx0_state, tx0)
 }
 
 
-static const crt_interface tx0_crt_interface =
-{
-	pen_crt_num_levels,
-	crt_window_offset_x, crt_window_offset_y,
-	crt_window_width, crt_window_height
-};
-
 
 /*
     TX-0
 *
     Raphael Nabet, 2004
 */
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1579,7 +1561,6 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	/* dummy interrupt: handles input */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tx0_state,  tx0_interrupt)
 
-
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
@@ -1590,7 +1571,11 @@ static MACHINE_CONFIG_START( tx0_64kw, tx0_state )
 	MCFG_SCREEN_VBLANK_DRIVER(tx0_state, screen_eof_tx0)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_CRT_ADD( "crt", tx0_crt_interface )
+	MCFG_DEVICE_ADD("crt", CRT, 0)
+	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
+	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
+	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+
 	MCFG_DEVICE_ADD("readt", TX0_READTAPE, 0)
 	MCFG_DEVICE_ADD("punch", TX0_PUNCHTAPE, 0)
 	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)

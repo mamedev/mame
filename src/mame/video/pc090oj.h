@@ -1,16 +1,7 @@
-#ifndef _PC090OJ_H_
-#define _PC090OJ_H_
+#ifndef __PC090OJ_H__
+#define __PC090OJ_H__
 
-struct pc090oj_interface
-{
-	int                m_gfxnum;
-
-	int                m_x_offset, m_y_offset;
-	int                m_use_buffer;
-};
-
-class pc090oj_device : public device_t,
-						public pc090oj_interface
+class pc090oj_device : public device_t
 {
 public:
 	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -19,7 +10,15 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
-
+	static void set_gfx_region(device_t &device, int gfxregion) { downcast<pc090oj_device &>(device).m_gfxnum = gfxregion; }
+	static void set_usebuffer(device_t &device, int use_buf) { downcast<pc090oj_device &>(device).m_use_buffer = use_buf; }
+	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	{
+		pc090oj_device &dev = downcast<pc090oj_device &>(device);
+		dev.m_x_offset = x_offset;
+		dev.m_y_offset = y_offset;
+	}
+	
 	DECLARE_READ16_MEMBER( word_r );
 	DECLARE_WRITE16_MEMBER( word_w );
 
@@ -29,7 +28,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -49,15 +47,26 @@ private:
 
 	UINT16 *   m_ram;
 	UINT16 *   m_ram_buffered;
+
+	int        m_gfxnum;
+	int        m_x_offset, m_y_offset;
+	int        m_use_buffer;
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
 extern const device_type PC090OJ;
 
-#define MCFG_PC090OJ_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, PC090OJ, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
+
+#define MCFG_PC090OJ_GFX_REGION(_region) \
+	pc090oj_device::set_gfx_region(*device, _region);
+
+#define MCFG_PC090OJ_OFFSETS(_xoffs, _yoffs) \
+	pc090oj_device::set_offsets(*device, _xoffs, _yoffs);
+
+#define MCFG_PC090OJ_USEBUFFER(_use_buf) \
+	pc090oj_device::set_usebuffer(*device, _use_buf);
 
 #define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
 	pc090oj_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);

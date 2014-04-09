@@ -83,7 +83,7 @@ public:
 	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
 	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
 	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
-	void set_share(const char *tag) { assert(m_share == NULL); m_share = tag; }
+	void set_share(device_t &device, const char *tag) { assert(m_sharetag == NULL); m_sharebase = &device; m_sharetag = tag; }
 
 	// mask setting
 	void set_mask(offs_t _mask);
@@ -117,7 +117,8 @@ public:
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	map_handler_data        m_setoffsethd;          // data for setoffset handler
-	const char *            m_share;                // tag of a shared memory block
+	device_t *              m_sharebase;            // pointer to the base device for the share tag
+	const char *            m_sharetag;             // tag of a shared memory block
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
 
@@ -566,7 +567,7 @@ void _class :: _name(::address_map &map, device_t &device) \
 #define AM_REGION(_tag, _offs) \
 	curentry->set_region(_tag, _offs);
 #define AM_SHARE(_tag) \
-	curentry->set_share(_tag);
+	curentry->set_share(device, _tag);
 
 // common shortcuts
 #define AM_ROMBANK(_bank)                   AM_READ_BANK(_bank)

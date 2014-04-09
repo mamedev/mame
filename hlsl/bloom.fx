@@ -143,7 +143,12 @@ struct VS_OUTPUT
 {
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
+	float4 TexCoord01 : TEXCOORD0;
+	float4 TexCoord23 : TEXCOORD1;
+	float4 TexCoord45 : TEXCOORD2;
+	float4 TexCoord67 : TEXCOORD3;
+	float4 TexCoord89 : TEXCOORD4;
+	float2 TexCoordA : TEXCOORD5;
 };
 
 struct VS_INPUT
@@ -157,7 +162,12 @@ struct VS_INPUT
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
+	float4 TexCoord01 : TEXCOORD0;
+	float4 TexCoord23 : TEXCOORD1;
+	float4 TexCoord45 : TEXCOORD2;
+	float4 TexCoord67 : TEXCOORD3;
+	float4 TexCoord89 : TEXCOORD4;
+	float2 TexCoordA : TEXCOORD5;
 };
 
 //-----------------------------------------------------------------------------
@@ -165,6 +175,12 @@ struct PS_INPUT
 //-----------------------------------------------------------------------------
 
 uniform float2 TargetSize;
+uniform float4 Level01Size;
+uniform float4 Level23Size;
+uniform float4 Level45Size;
+uniform float4 Level67Size;
+uniform float4 Level89Size;
+uniform float2 LevelASize;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -176,7 +192,12 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.xy -= float2(0.5f, 0.5f);
 	Output.Position.xy *= float2(2.0f, 2.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = (Input.Position.xy  + 0.5f) / TargetSize;
+	Output.TexCoord01 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level01Size;
+	Output.TexCoord23 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level23Size;
+	Output.TexCoord45 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level45Size;
+	Output.TexCoord67 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level67Size;
+	Output.TexCoord89 = Input.Position.xyxy / TargetSize.xyxy - 0.5f / Level89Size;
+	Output.TexCoordA = Input.Position.xy / TargetSize - 0.5f / LevelASize;
 
 	return Output;
 }
@@ -191,17 +212,17 @@ uniform float3 Level89AWeight;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord).rgb;
-	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord).rgb;
-	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord).rgb;
-	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord).rgb;
-	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord).rgb;
-	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord).rgb;
-	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord).rgb;
-	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord).rgb;
-	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord).rgb;
-	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord).rgb;
-	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoord).rgb;
+	float3 texel0 = tex2D(DiffuseSampler0, Input.TexCoord01.xy).rgb;
+	float3 texel1 = tex2D(DiffuseSampler1, Input.TexCoord01.zw).rgb;
+	float3 texel2 = tex2D(DiffuseSampler2, Input.TexCoord23.xy).rgb;
+	float3 texel3 = tex2D(DiffuseSampler3, Input.TexCoord23.zw).rgb;
+	float3 texel4 = tex2D(DiffuseSampler4, Input.TexCoord45.xy).rgb;
+	float3 texel5 = tex2D(DiffuseSampler5, Input.TexCoord45.zw).rgb;
+	float3 texel6 = tex2D(DiffuseSampler6, Input.TexCoord67.xy).rgb;
+	float3 texel7 = tex2D(DiffuseSampler7, Input.TexCoord67.zw).rgb;
+	float3 texel8 = tex2D(DiffuseSampler8, Input.TexCoord89.xy).rgb;
+	float3 texel9 = tex2D(DiffuseSampler9, Input.TexCoord89.zw).rgb;
+	float3 texelA = tex2D(DiffuseSamplerA, Input.TexCoordA).rgb;
 
 	texel0 = texel0 * Level0123Weight.x;
 	texel1 = texel1 * Level0123Weight.y;

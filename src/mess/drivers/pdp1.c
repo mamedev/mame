@@ -351,14 +351,6 @@ PALETTE_INIT_MEMBER(pdp1_state, pdp1)
 }
 
 
-static const crt_interface pdp1_crt_interface =
-{
-	pen_crt_num_levels,
-	crt_window_offset_x, crt_window_offset_y,
-	crt_window_width, crt_window_height
-};
-
-
 /*
     pdp1 machine code
 
@@ -1945,7 +1937,6 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 
-
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
@@ -1956,7 +1947,11 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	MCFG_SCREEN_VBLANK_DRIVER(pdp1_state, screen_eof_pdp1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_CRT_ADD( "crt", pdp1_crt_interface )
+	MCFG_DEVICE_ADD("crt", CRT, 0)
+	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
+	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
+	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+
 	MCFG_DEVICE_ADD("readt", PDP1_READTAPE, 0)
 	MCFG_DEVICE_ADD("punch", PDP1_PUNCHTAPE, 0)
 	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)

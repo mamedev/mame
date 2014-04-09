@@ -643,12 +643,6 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 	m_sound_intck = state;
 }
 
-
-static const k053936_interface polygonet_k053936_intf =
-{
-	0, 0, 0 /* wrap, xoff, yoff */
-};
-
 static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
@@ -679,7 +673,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
-	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

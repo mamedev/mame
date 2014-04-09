@@ -230,13 +230,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL,
 };
 
-static const tc0080vco_interface parentj_intf =
-{
-	0, 1,   /* gfxnum, txnum */
-	1, 1, -2,
-	0
-};
-
 void taitoo_state::machine_start()
 {
 }
@@ -260,7 +253,11 @@ static MACHINE_CONFIG_START( parentj, taitoo_state )
 	MCFG_PALETTE_ADD("palette", 33*16)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_TC0080VCO_ADD("tc0080vco", parentj_intf)
+	MCFG_DEVICE_ADD("tc0080vco", TC0080VCO, 0)
+	MCFG_TC0080VCO_GFX_REGION(0)
+	MCFG_TC0080VCO_TX_REGION(1)
+	MCFG_TC0080VCO_OFFSETS(1, 1)
+	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
 	MCFG_TC0080VCO_PALETTE("palette")
 

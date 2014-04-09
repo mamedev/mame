@@ -22,8 +22,6 @@ enum
 	NAMCO_XDAY2
 };
 
-#define NAMCONA1_NUM_TILEMAPS 4
-
 
 class namcona1_state : public driver_device
 {
@@ -37,11 +35,13 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_c140(*this, "c140"),
-		m_videoram(*this,"videoram"),
-		m_spriteram(*this,"spriteram"),
 		m_workram(*this,"workram"),
 		m_vreg(*this,"vreg"),
-		m_scroll(*this,"scroll")
+		m_paletteram(*this, "paletteram"),
+		m_cgram(*this, "cgram"),
+		m_videoram(*this,"videoram"),
+		m_scroll(*this,"scroll"),
+		m_spriteram(*this,"spriteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -51,11 +51,16 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<c140_device> m_c140;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_workram;
 	required_shared_ptr<UINT16> m_vreg;
+	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<UINT16> m_cgram;
+	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_scroll;
+	required_shared_ptr<UINT16> m_spriteram;
+
+	// this has to be UINT8 to be in the right byte order for the tilemap system
+	dynamic_array<UINT8> m_shaperam;
 
 	UINT16 *m_mpBank0;
 	UINT16 *m_mpBank1;
@@ -68,20 +73,12 @@ public:
 	UINT8 m_mcu_port5;
 	UINT8 m_mcu_port6;
 	UINT8 m_mcu_port8;
-	UINT16 *m_shaperam;
-	UINT16 *m_cgram;
-	tilemap_t *m_roz_tilemap;
-	int m_roz_palette;
-	tilemap_t *m_bg_tilemap[NAMCONA1_NUM_TILEMAPS];
-	int m_tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
+	tilemap_t *m_bg_tilemap[4+1];
 	int m_palette_is_dirty;
-	UINT8 m_mask_data[8];
-	UINT8 m_conv_data[9];
 
 
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
-	DECLARE_READ16_MEMBER(namcona1_vreg_r);
 	DECLARE_WRITE16_MEMBER(namcona1_vreg_w);
 	DECLARE_READ16_MEMBER(mcu_mailbox_r);
 	DECLARE_WRITE16_MEMBER(mcu_mailbox_w_68k);
@@ -106,8 +103,6 @@ public:
 	void init_namcona1(int gametype);
 	void UpdatePalette(int offset);
 	DECLARE_WRITE16_MEMBER(namcona1_videoram_w);
-	DECLARE_READ16_MEMBER(namcona1_videoram_r);
-	DECLARE_READ16_MEMBER(namcona1_paletteram_r);
 	DECLARE_WRITE16_MEMBER(namcona1_paletteram_w);
 	DECLARE_READ16_MEMBER(namcona1_gfxram_r);
 	DECLARE_WRITE16_MEMBER(namcona1_gfxram_w);
@@ -142,5 +137,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
 
 private:
-	void tilemap_get_info(tile_data &tileinfo, int tile_index, const UINT16 *tilemap_videoram, int tilemap_color, bool use_4bpp_gfx);
+	void tilemap_get_info(tile_data &tileinfo, int tile_index, const UINT16 *tilemap_videoram, bool use_4bpp_gfx);
 };

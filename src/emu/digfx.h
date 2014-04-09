@@ -105,6 +105,11 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 #define GFXDECODE_START( name ) const gfx_decode_entry GFXDECODE_NAME(name)[] = {
 #define GFXDECODE_END { 0 } };
 
+// use these to declare a gfx_decode_entry array as a member of a device class
+#define DECLARE_GFXDECODE_MEMBER( name ) static const gfx_decode_entry name[]
+#define GFXDECODE_MEMBER( name ) const gfx_decode_entry name[] = {
+
+
 // common gfx_decode_entry macros
 #define GFXDECODE_ENTRYX(region,offset,layout,start,colors,flags) { region, offset, &layout, start, colors, flags },
 #define GFXDECODE_ENTRY(region,offset,layout,start,colors) { region, offset, &layout, start, colors, 0 },

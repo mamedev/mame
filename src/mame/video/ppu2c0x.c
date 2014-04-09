@@ -111,18 +111,11 @@ void ppu2c0x_device::set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb)
 
 void ppu2c0x_device::device_config_complete()
 {
-	const ppu2c0x_interface *config = reinterpret_cast<const ppu2c0x_interface *>(static_config());
-	assert(config);
-
 	/* reset the callbacks */
 	m_latch = ppu2c0x_latch_delegate();
 	m_scanline_callback_proc = ppu2c0x_scanline_delegate();
 	m_hblank_callback_proc = ppu2c0x_hblank_delegate();
 	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
-
-	m_color_base = config->color_base;
-
-	m_cpu_tag = config->cpu_tag;
 }
 
 ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -130,6 +123,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					device_memory_interface(mconfig, *this),
 					device_video_interface(mconfig, *this),
 					m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, NULL, *ADDRESS_MAP_NAME(ppu2c0x)),
+					m_cpu(*this),
 					m_scanline(0),  // reset the scanline count
 					m_refresh_data(0),
 					m_refresh_latch(0),
@@ -142,6 +136,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 					m_tile_page(0),
 					m_sprite_page(0),
 					m_back_color(0),
+					m_color_base(0),
 					m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
 					m_tilecount(0),
 					m_draw_phase(0)
@@ -210,10 +205,6 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *
 
 void ppu2c0x_device::device_start()
 {
-	m_cpu = machine().device<cpu_device>( m_cpu_tag );
-
-	assert(m_cpu);
-
 	// bind our handler
 	m_nmi_callback_proc.bind_relative_to(*owner());
 

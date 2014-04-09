@@ -391,15 +391,15 @@ WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
 WRITE16_MEMBER(othunder_state::othunder_sound_w)
 {
 	if (offset == 0)
-		m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
+		m_tc0140syt->master_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
-		m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
+		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
 READ16_MEMBER(othunder_state::othunder_sound_r)
 {
 	if (offset == 1)
-		return ((m_tc0140syt->tc0140syt_comm_r(space, 0) & 0xff));
+		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
 	else
 		return 0;
 }
@@ -460,8 +460,8 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, othunder_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(othunder_TC0310FAM_w) /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xea00, 0xea00) AM_READ_PORT(ROTARY_PORT_TAG)  /* rotary input */
@@ -623,20 +623,6 @@ WRITE_LINE_MEMBER(othunder_state::irqhandler)
                  MACHINE DRIVERS
 ***********************************************************/
 
-static const tc0100scn_interface othunder_tc0100scn_intf =
-{
-	1, 2,       /* gfxnum, txnum */
-	4, 0,       /* x_offset, y_offset */
-	0, 0,       /* flip_xoff, flip_yoff */
-	0, 0,       /* flip_text_xoff, flip_text_yoff */
-	0, 0
-};
-
-static const tc0140syt_interface othunder_tc0140syt_intf =
-{
-	"maincpu", "audiocpu"
-};
-
 void othunder_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
@@ -688,8 +674,10 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-
-	MCFG_TC0100SCN_ADD("tc0100scn", othunder_tc0100scn_intf)
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
 
@@ -721,7 +709,9 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_TC0140SYT_ADD("tc0140syt", othunder_tc0140syt_intf)
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
