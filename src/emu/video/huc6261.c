@@ -389,8 +389,8 @@ WRITE16_MEMBER( huc6261_device::write )
 void huc6261_device::device_start()
 {
 	/* Make sure we are supplied all our mandatory tags */
-	assert( huc6270_a_tag != NULL );
-	assert( huc6270_b_tag != NULL );
+	assert( m_huc6270_a_tag != NULL );
+	assert( m_huc6270_b_tag != NULL );
 
 	m_timer = timer_alloc();
 	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
