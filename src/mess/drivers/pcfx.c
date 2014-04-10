@@ -457,13 +457,6 @@ WRITE_LINE_MEMBER( pcfx_state::irq15_w )
 }
 
 
-static const huc6261_interface pcfx_huc6261_config =
-{
-	"huc6270_a",
-	"huc6270_b"
-};
-
-
 void pcfx_state::machine_reset()
 {
 	membank( "bank1" )->set_base( memregion("user1")->base() );
@@ -492,12 +485,16 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 	MCFG_DEVICE_ADD( "huc6270_a", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq12_w))
+
 	MCFG_DEVICE_ADD( "huc6270_b", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
 	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pcfx_state, irq14_w))
-	MCFG_HUC6261_ADD( "huc6261", XTAL_21_4772MHz, pcfx_huc6261_config )
-	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
 
+	MCFG_DEVICE_ADD("huc6261", HUC6261, XTAL_21_4772MHz)
+	MCFG_HUC6261_VDC1("huc6270_a")
+	MCFG_HUC6261_VDC2("huc6270_b")
+
+	MCFG_HUC6272_ADD( "huc6272", XTAL_21_4772MHz )
 MACHINE_CONFIG_END
 
 
