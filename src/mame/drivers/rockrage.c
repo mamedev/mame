@@ -189,13 +189,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,            /* 8*8 characters */
-	0x20000/16,     /* 8192 characters */
-	4,              /* 4 bpp */
+	8,8,            /* 8 x 8 characters */
+	0x40000/32,     /* 8192 characters */
+	4,              /* 4bpp */
 	{ 0, 1, 2, 3 }, /* the four bitplanes are packed in one nibble */
-	{ 0*4, 1*4, 0x20000*8+0*4, 0x20000*8+1*4, 2*4, 3*4, 0x20000*8+2*4, 0x20000*8+3*4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8        /* every char takes 16 consecutive bytes */
+	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8            /* every character takes 32 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -300,8 +300,8 @@ ROM_START( rockrage )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "620k06.rom", 0x000000, 0x20000, CRC(7fa2c57c) SHA1(8c5d85c31dc26cb59a012ebb1ea195c3db80cda8)  )  /* tiles */
-	ROM_LOAD( "620k05.rom", 0x020000, 0x20000, CRC(145d387c) SHA1(4fb0c54f9a218d512d8aec09ef995494a06912d6)  ) /* Both World & Japan use the same "K" code for these??? */
+	ROM_LOAD16_BYTE( "620k05.rom", 0x00000, 0x20000, CRC(145d387c) SHA1(4fb0c54f9a218d512d8aec09ef995494a06912d6)  )  /* tiles */
+	ROM_LOAD16_BYTE( "620k06.rom", 0x00001, 0x20000, CRC(7fa2c57c) SHA1(8c5d85c31dc26cb59a012ebb1ea195c3db80cda8)  ) /* Both World & Japan use the same "K" code for these??? */
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620k11.rom", 0x000000, 0x20000, CRC(70449239) SHA1(07653ea3bfe0063c9d2b2102ac52a1b50fc2971e) )   /* sprites */
@@ -325,10 +325,10 @@ ROM_START( rockragea )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) ) /* Same rom but labeled as ver "G" */
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "620d06a.15g", 0x000000, 0x10000, CRC(8cc05d4b) SHA1(0d6fef98bdc4d299229de4e0044241aedee83b85) )  /* tiles */
-	ROM_LOAD( "620d06b.15f", 0x010000, 0x10000, CRC(3892d41d) SHA1(c49f2e61f24a59be4e59e2f3c60e731b8a05ddd3) )
-	ROM_LOAD( "620d05a.16g", 0x020000, 0x10000, CRC(4d53fde9) SHA1(941fb6c94922727516945330b4b738aa052f7734) )
-	ROM_LOAD( "620d05b.16f", 0x030000, 0x10000, CRC(69f4599f) SHA1(664581874d74ed7bf59bde6730799e15f4e0144d) )
+	ROM_LOAD16_BYTE( "620d05a.16g", 0x00000, 0x10000, CRC(4d53fde9) SHA1(941fb6c94922727516945330b4b738aa052f7734) )  /* tiles */
+	ROM_LOAD16_BYTE( "620d06a.15g", 0x00001, 0x10000, CRC(8cc05d4b) SHA1(0d6fef98bdc4d299229de4e0044241aedee83b85) )
+	ROM_LOAD16_BYTE( "620d05b.16f", 0x20000, 0x10000, CRC(69f4599f) SHA1(664581874d74ed7bf59bde6730799e15f4e0144d) )
+	ROM_LOAD16_BYTE( "620d06b.15f", 0x20001, 0x10000, CRC(3892d41d) SHA1(c49f2e61f24a59be4e59e2f3c60e731b8a05ddd3) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620g11a.7g", 0x000000, 0x10000, CRC(0ef40c2c) SHA1(2c0b7e611333a072ebcef60c1985211d5936bf66) )   /* sprites */
@@ -354,8 +354,8 @@ ROM_START( rockragej )
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "620k06.15g", 0x000000, 0x20000, CRC(c0e2b35c) SHA1(fb37a151188f27f883fed5fdfb0094c3efa9470d) )   /* tiles */
-	ROM_LOAD( "620k05.16g", 0x020000, 0x20000, CRC(ca9d9346) SHA1(fee8d98def802f312c6cd0ec751c67aa18acfacd) ) /* Both World & Japan use the same "K" code for these??? */
+	ROM_LOAD16_BYTE( "620k05.16g", 0x00000, 0x20000, CRC(ca9d9346) SHA1(fee8d98def802f312c6cd0ec751c67aa18acfacd) )   /* tiles */
+	ROM_LOAD16_BYTE( "620k06.15g", 0x00001, 0x20000, CRC(c0e2b35c) SHA1(fb37a151188f27f883fed5fdfb0094c3efa9470d) ) /* Both World & Japan use the same "K" code for these??? */
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
 	ROM_LOAD( "620k11.7g",  0x000000, 0x20000, CRC(7430f6e9) SHA1(5d488c7b7b0eb4e502b3e566ac102cd3267e8568) )   /* sprites */
