@@ -300,11 +300,11 @@ int namcona1_state::transfer_dword( UINT32 dest, UINT32 source )
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
-		data = m_mpBank1[(source-0x400000)/2];
+		data = m_maskrom[(source-0x400000)/2];
 	}
 	else if( source>=0xc00000 && source<0xe00000 )
 	{
-		data = m_mpBank0[(source-0xc00000)/2];
+		data = m_prgrom[(source-0xc00000)/2];
 	}
 	else if( source<0x80000 && source>=0x1000 )
 	{
@@ -540,8 +540,8 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
 static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
-	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)  /* data */
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)  /* code */
+	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maskrom", 0)  // data
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0)  // code
 	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
 	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(namcona1_vreg_w) AM_SHARE("vreg")
@@ -555,24 +555,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
-	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)  /* data */
+	AM_IMPORT_FROM(namcona1_main_map)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITENOP /* xday: serial config? */
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)  /* code */
-	AM_RANGE(0xe00000, 0xe00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	/* xday: additional battery-backed ram at 00E024FA? */
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_RAM_WRITE(namcona1_vreg_w) AM_SHARE("vreg")
-	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(namcona1_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w) AM_SHARE("cgram")
-	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(namcona1_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")           /* spriteram */
 ADDRESS_MAP_END
 
 
@@ -580,18 +568,15 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	UINT16 data;
-
-	data = m_workram[offset];
+	UINT16 data = FLIPENDIAN_INT16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, space.device().safe_pc());
+		logerror("MD: %04x @ %x PC %x\n", data, offset*2, space.device().safe_pc());
 	}
 #endif
-
-	return ((data>>8)&0xff) | ((data<<8)&0xff00);
+	return data;
 }
 
 WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
@@ -714,10 +699,13 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 
 void namcona1_state::machine_start()
 {
+	m_prgrom = (UINT16 *)memregion("maincpu")->base();
+	m_maskrom = (UINT16 *)memregion("maskrom")->base();
+	m_mEnableInterrupts = 0;
 	m_c140->set_base(m_workram);
 }
 
-// for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
+// the MCU boots the 68000
 void namcona1_state::machine_reset()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -911,14 +899,23 @@ GFXDECODE_END
 
 /***************************************************************************/
 
+// MCU interrupts: IRQ 0 => process mail slot (probably set on mail slot write from 68k)
+//                 IRQ 1 =>
+//                 IRQ 2 =>
+
 TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 {
 	int scanline = param;
 	int enabled = m_mEnableInterrupts ? ~m_vreg[0x1a/2] : 0;
 
+	// adc (timing guessed, when does this trigger?)
+	if (scanline == 0)
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
+
 	// vblank
 	if (scanline == 224)
 	{
+		m_mcu->set_input_line(M37710_LINE_IRQ1, HOLD_LINE);
 		simulate_mcu( );
 		if (enabled & 8)
 			m_maincpu->set_input_line(4, HOLD_LINE);
@@ -935,23 +932,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 	}
 }
 
-// MCU interrupts: IRQ 0 => process mail slot (probably set on mail slot write from 68k)
-//                 IRQ 1 =>
-//                 IRQ 2 =>
-
-TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::mcu_interrupt)
-{
-	int scanline = param;
-
-	// vblank
-	if (scanline == 224)
-		m_mcu->set_input_line(M37710_LINE_IRQ1, HOLD_LINE);
-
-	// adc (timing guessed, when does this trigger?)
-	if (scanline == 0)
-		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-}
-
 static const c140_interface C140_interface_typeA =
 {
 	C140_TYPE_ASIC219
@@ -963,15 +943,14 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, namcona1_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_mcu", namcona1_state, mcu_interrupt, "screen", 0, 1)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, namcona1_interrupt, "screen", 0, 1)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_QUANTUM_TIME(attotime::from_hz(2400))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -984,6 +963,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 
 	MCFG_PALETTE_ADD("palette", 0x2000)
 	MCFG_PALETTE_ENABLE_SHADOWS()
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcona1)
 
 	/* sound hardware */
@@ -1013,41 +993,31 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 MACHINE_CONFIG_END
 
 
-void namcona1_state::init_namcona1( int gametype )
-{
-	UINT16 *pMem = (UINT16 *)memregion( "maincpu" )->base();
-
-	m_gametype = gametype;
-	m_mpBank0 = &pMem[0x80000/2];
-	m_mpBank1 = m_mpBank0 +  0x200000/2;
-
-	m_mEnableInterrupts = 0;
-}
-
-DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { init_namcona1(NAMCO_BKRTMAQ); }
-DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { init_namcona1(NAMCO_CGANGPZL); }
-DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { init_namcona1(NAMCO_EMERALDA); } /* NA-2 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { init_namcona1(NAMCO_EMERALDA); } /* NA-1 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,exbania)   { init_namcona1(NAMCO_EXBANIA); }
-DRIVER_INIT_MEMBER(namcona1_state,fa)        { init_namcona1(NAMCO_FA); }
-DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { init_namcona1(NAMCO_KNCKHEAD); }
-DRIVER_INIT_MEMBER(namcona1_state,numanath)  { init_namcona1(NAMCO_NUMANATH); }
-DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { init_namcona1(NAMCO_QUIZTOU); }
-DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { init_namcona1(NAMCO_SWCOURT); }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { init_namcona1(NAMCO_TINKLPIT); }
-DRIVER_INIT_MEMBER(namcona1_state,xday2)     { init_namcona1(NAMCO_XDAY2); }
+DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)   { m_gametype = NAMCO_BKRTMAQ; }
+DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)  { m_gametype = NAMCO_CGANGPZL; }
+DRIVER_INIT_MEMBER(namcona1_state,emeralda)  { m_gametype = NAMCO_EMERALDA; } /* NA-2 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,emeraldj)  { m_gametype = NAMCO_EMERALDA; } /* NA-1 Hardware */
+DRIVER_INIT_MEMBER(namcona1_state,exbania)   { m_gametype = NAMCO_EXBANIA; }
+DRIVER_INIT_MEMBER(namcona1_state,fa)        { m_gametype = NAMCO_FA; }
+DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { m_gametype = NAMCO_KNCKHEAD; }
+DRIVER_INIT_MEMBER(namcona1_state,numanath)  { m_gametype = NAMCO_NUMANATH; }
+DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { m_gametype = NAMCO_QUIZTOU; }
+DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { m_gametype = NAMCO_SWCOURT; }
+DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { m_gametype = NAMCO_TINKLPIT; }
+DRIVER_INIT_MEMBER(namcona1_state,xday2)     { m_gametype = NAMCO_XDAY2; }
 
 ROM_START( bkrtmaq )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mq1-ep0l.bin", 0x080001, 0x080000, CRC(f029bc57) SHA1(fdbf8b8b9f69d5755ca5197dda4f887b12dd66f4) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "mq1-ep0u.bin", 0x080000, 0x080000, CRC(4cff62b8) SHA1(5cac170dcfbeb3dcfa0840bdbe7541a9d2f44a14) )
-	ROM_LOAD16_BYTE( "mq1-ep1l.bin", 0x180001, 0x080000, CRC(e3be6f4b) SHA1(75d9a4cff25e63a9d6c092aa6e241eccd1c61f91) )
-	ROM_LOAD16_BYTE( "mq1-ep1u.bin", 0x180000, 0x080000, CRC(b44e31b2) SHA1(3d8c63789b98ada3663ba9e28c370815a9a9c3ed) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mq1-ep0l.bin", 0x000001, 0x080000, CRC(f029bc57) SHA1(fdbf8b8b9f69d5755ca5197dda4f887b12dd66f4) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "mq1-ep0u.bin", 0x000000, 0x080000, CRC(4cff62b8) SHA1(5cac170dcfbeb3dcfa0840bdbe7541a9d2f44a14) )
+	ROM_LOAD16_BYTE( "mq1-ep1l.bin", 0x100001, 0x080000, CRC(e3be6f4b) SHA1(75d9a4cff25e63a9d6c092aa6e241eccd1c61f91) )
+	ROM_LOAD16_BYTE( "mq1-ep1u.bin", 0x100000, 0x080000, CRC(b44e31b2) SHA1(3d8c63789b98ada3663ba9e28c370815a9a9c3ed) )
 
-	ROM_LOAD16_BYTE( "mq1-ma0l.bin", 0x280001, 0x100000, CRC(11fed35f) SHA1(511d98b6b42b330238a1874bca031b1892654a48) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "mq1-ma0u.bin", 0x280000, 0x100000, CRC(23442ac0) SHA1(fac706f24045d51a2712f51530967140ea8e875f) )
-	ROM_LOAD16_BYTE( "mq1-ma1l.bin", 0x480001, 0x100000, CRC(fe82205f) SHA1(860cc7a96ae3f848ce594077c1362e4e22a36908) )
-	ROM_LOAD16_BYTE( "mq1-ma1u.bin", 0x480000, 0x100000, CRC(0cdb6bd0) SHA1(b8b398477c9654e96921110fb30c754240183897) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "mq1-ma0l.bin", 0x000001, 0x100000, CRC(11fed35f) SHA1(511d98b6b42b330238a1874bca031b1892654a48) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "mq1-ma0u.bin", 0x000000, 0x100000, CRC(23442ac0) SHA1(fac706f24045d51a2712f51530967140ea8e875f) )
+	ROM_LOAD16_BYTE( "mq1-ma1l.bin", 0x200001, 0x100000, CRC(fe82205f) SHA1(860cc7a96ae3f848ce594077c1362e4e22a36908) )
+	ROM_LOAD16_BYTE( "mq1-ma1u.bin", 0x200000, 0x100000, CRC(0cdb6bd0) SHA1(b8b398477c9654e96921110fb30c754240183897) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1055,9 +1025,12 @@ ROM_START( bkrtmaq )
 ROM_END
 
 ROM_START( cgangpzl )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "cp2-ep0l.bin", 0x080001, 0x80000, CRC(8f5cdcc5) SHA1(925db3f3f16224bc28f97a57aba0ab2b51c5067c) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "cp2-ep0u.bin", 0x080000, 0x80000, CRC(3a816140) SHA1(613c367e08a0a20ec62e1938faab0128743b26f8) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cp2-ep0l.bin", 0x000001, 0x080000, CRC(8f5cdcc5) SHA1(925db3f3f16224bc28f97a57aba0ab2b51c5067c) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "cp2-ep0u.bin", 0x000000, 0x080000, CRC(3a816140) SHA1(613c367e08a0a20ec62e1938faab0128743b26f8) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", ROMREGION_ERASE00 )
+	/* no mask roms */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1068,9 +1041,12 @@ ROM_START( cgangpzl )
 ROM_END
 
 ROM_START( cgangpzlj )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cp1-ep0l.bin", 0x080001, 0x80000, CRC(2825f7ba) SHA1(5f6f8df6bdf0f45656904411cdbb31fdcf8f3be0) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "cp1-ep0u.bin", 0x080000, 0x80000, CRC(94d7d6fc) SHA1(2460741e0dbb2ccff28f4fbc419a7507382467d2) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", ROMREGION_ERASE00 )
+	/* no mask roms */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1081,11 +1057,14 @@ ROM_START( cgangpzlj )
 ROM_END
 
 ROM_START( emeraldaj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "em1-ep0lb.bin", 0x080001, 0x080000, CRC(fcd55293) SHA1(fdabf9d5f528c37196ac1e031b097618b4c887b5) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "em1-ep0ub.bin", 0x080000, 0x080000, CRC(a52f00d5) SHA1(85f95d2a69a2df2e9195f55583645c064b0b6fe6) )
-	ROM_LOAD16_BYTE( "em1-ep1l.bin",  0x180001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
-	ROM_LOAD16_BYTE( "em1-ep1u.bin",  0x180000, 0x080000, CRC(4e969152) SHA1(2c89ae5d43585f479f16cf8278f8fc001e077e45) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "em1-ep0lb.bin", 0x000001, 0x080000, CRC(fcd55293) SHA1(fdabf9d5f528c37196ac1e031b097618b4c887b5) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "em1-ep0ub.bin", 0x000000, 0x080000, CRC(a52f00d5) SHA1(85f95d2a69a2df2e9195f55583645c064b0b6fe6) )
+	ROM_LOAD16_BYTE( "em1-ep1l.bin",  0x100001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
+	ROM_LOAD16_BYTE( "em1-ep1u.bin",  0x100000, 0x080000, CRC(4e969152) SHA1(2c89ae5d43585f479f16cf8278f8fc001e077e45) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", ROMREGION_ERASE00 )
+	/* no mask roms */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1093,11 +1072,14 @@ ROM_START( emeraldaj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 ROM_END
 
 ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "em1-ep0l.bin", 0x080001, 0x080000, CRC(443f3fce) SHA1(35b6c834e5716c1e9b55f1e39f4e7336dbbe2d9b) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "em1-ep0u.bin", 0x080000, 0x080000, CRC(484a2a81) SHA1(1b60c18dfb2aebfd4aa8b2a85a1e90883a1f8e61) )
-	ROM_LOAD16_BYTE( "em1-ep1l.bin", 0x180001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
-	ROM_LOAD16_BYTE( "em1-ep1u.bin", 0x180000, 0x080000, CRC(4e969152) SHA1(2c89ae5d43585f479f16cf8278f8fc001e077e45) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "em1-ep0l.bin", 0x000001, 0x080000, CRC(443f3fce) SHA1(35b6c834e5716c1e9b55f1e39f4e7336dbbe2d9b) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "em1-ep0u.bin", 0x000000, 0x080000, CRC(484a2a81) SHA1(1b60c18dfb2aebfd4aa8b2a85a1e90883a1f8e61) )
+	ROM_LOAD16_BYTE( "em1-ep1l.bin", 0x100001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
+	ROM_LOAD16_BYTE( "em1-ep1u.bin", 0x100000, 0x080000, CRC(4e969152) SHA1(2c89ae5d43585f479f16cf8278f8fc001e077e45) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", ROMREGION_ERASE00 )
+	/* no mask roms */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1105,14 +1087,15 @@ ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 ROM_END
 
 ROM_START( exvania )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ex2-ep0l.4c", 0x080001, 0x080000, CRC(ccf46677) SHA1(f9d057a7b1c388323d49ef692f41242769f1a08c) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "ex2-ep0u.4f", 0x080000, 0x080000, CRC(37b8d890) SHA1(a0417a1b51d1206bd3eb5e7b58303a9a5691fa43) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ex2-ep0l.4c", 0x000001, 0x080000, CRC(ccf46677) SHA1(f9d057a7b1c388323d49ef692f41242769f1a08c) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "ex2-ep0u.4f", 0x000000, 0x080000, CRC(37b8d890) SHA1(a0417a1b51d1206bd3eb5e7b58303a9a5691fa43) )
 
-	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x280001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x280000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
-	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x480001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
-	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x480000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x000001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x000000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
+	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x200001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
+	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x200000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1123,14 +1106,15 @@ ROM_START( exvania )
 ROM_END
 
 ROM_START( exvaniaj )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ex1-ep0l.4c", 0x080001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "ex1-ep0u.4f", 0x080000, 0x080000, CRC(07d054d1) SHA1(e2d2cb81acd309c519686572804648bef4cbd191) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ex1-ep0l.4c", 0x000001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "ex1-ep0u.4f", 0x000000, 0x080000, CRC(07d054d1) SHA1(e2d2cb81acd309c519686572804648bef4cbd191) )
 
-	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x280001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x280000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
-	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x480001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
-	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x480000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "ex1-ma0l.2c", 0x000001, 0x100000, CRC(17922cd4) SHA1(af92c2335e7110c0c5e712f3148c1534d22d3814) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "ex1-ma0u.2f", 0x000000, 0x100000, CRC(93d66106) SHA1(c5d665db04ae0e8992ef46544e2cb7b0e27c8bfe) )
+	ROM_LOAD16_BYTE( "ex1-ma1l.3c", 0x200001, 0x100000, CRC(e4bba6ed) SHA1(6483ef91e5a5b8ddd13a3d889936c39829fa50d6) )
+	ROM_LOAD16_BYTE( "ex1-ma1u.3f", 0x200000, 0x100000, CRC(04e7c4b0) SHA1(78180d96cd1fae583617d4d227ed4ee24f2f9e29) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1141,16 +1125,17 @@ ROM_START( exvaniaj )
 ROM_END
 
 ROM_START( fghtatck )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fa2-ep0l.bin", 0x080001, 0x080000, CRC(8996db9c) SHA1(ebbe7d4cb2960a346cfbdf38c77638d71b6ba20e) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "fa2-ep0u.bin", 0x080000, 0x080000, CRC(58d5e090) SHA1(950219d4e9bf440f92e3c8765f47e23a9019d2d1) )
-	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x180001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
-	ROM_LOAD16_BYTE( "fa1-ep1u.bin", 0x180000, 0x080000, CRC(de2eb129) SHA1(912993cab1c2edcaf986478f2ae22a2f10edf807) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fa2-ep0l.bin", 0x000001, 0x080000, CRC(8996db9c) SHA1(ebbe7d4cb2960a346cfbdf38c77638d71b6ba20e) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "fa2-ep0u.bin", 0x000000, 0x080000, CRC(58d5e090) SHA1(950219d4e9bf440f92e3c8765f47e23a9019d2d1) )
+	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x100001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
+	ROM_LOAD16_BYTE( "fa1-ep1u.bin", 0x100000, 0x080000, CRC(de2eb129) SHA1(912993cab1c2edcaf986478f2ae22a2f10edf807) )
 
-	ROM_LOAD16_BYTE( "fa1-ma0l.bin", 0x280001, 0x100000, CRC(a0a95e54) SHA1(da35f8a6a5bc9e2b5b6cacf8eb0d900ef1073a67) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "fa1-ma0u.bin", 0x280000, 0x100000, CRC(1d0135bd) SHA1(2a7f8d09c213629a68376ce0379be61b37711d0a) )
-	ROM_LOAD16_BYTE( "fa1-ma1l.bin", 0x480001, 0x100000, CRC(c4adf0a2) SHA1(4cc7adc68b1db7e725a973b31d52720bd7dc1140) )
-	ROM_LOAD16_BYTE( "fa1-ma1u.bin", 0x480000, 0x100000, CRC(900297be) SHA1(57bb2078ff104c6f631c67219f80f8ede5ddbd09) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "fa1-ma0l.bin", 0x000001, 0x100000, CRC(a0a95e54) SHA1(da35f8a6a5bc9e2b5b6cacf8eb0d900ef1073a67) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "fa1-ma0u.bin", 0x000000, 0x100000, CRC(1d0135bd) SHA1(2a7f8d09c213629a68376ce0379be61b37711d0a) )
+	ROM_LOAD16_BYTE( "fa1-ma1l.bin", 0x200001, 0x100000, CRC(c4adf0a2) SHA1(4cc7adc68b1db7e725a973b31d52720bd7dc1140) )
+	ROM_LOAD16_BYTE( "fa1-ma1u.bin", 0x200000, 0x100000, CRC(900297be) SHA1(57bb2078ff104c6f631c67219f80f8ede5ddbd09) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1158,16 +1143,17 @@ ROM_START( fghtatck )
 ROM_END
 
 ROM_START( fa )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fa1-ep0l.bin", 0x080001, 0x080000, CRC(182eee5c) SHA1(49769e3b72b59fc3e7b73364fe97168977dbe66b) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "fa1-ep0u.bin", 0x080000, 0x080000, CRC(7ea7830e) SHA1(79390943eea0b8029b2b8869233caf27228e776a) )
-	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x180001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
-	ROM_LOAD16_BYTE( "fa1-ep1u.bin", 0x180000, 0x080000, CRC(de2eb129) SHA1(912993cab1c2edcaf986478f2ae22a2f10edf807) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fa1-ep0l.bin", 0x000001, 0x080000, CRC(182eee5c) SHA1(49769e3b72b59fc3e7b73364fe97168977dbe66b) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "fa1-ep0u.bin", 0x000000, 0x080000, CRC(7ea7830e) SHA1(79390943eea0b8029b2b8869233caf27228e776a) )
+	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x100001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
+	ROM_LOAD16_BYTE( "fa1-ep1u.bin", 0x100000, 0x080000, CRC(de2eb129) SHA1(912993cab1c2edcaf986478f2ae22a2f10edf807) )
 
-	ROM_LOAD16_BYTE( "fa1-ma0l.bin", 0x280001, 0x100000, CRC(a0a95e54) SHA1(da35f8a6a5bc9e2b5b6cacf8eb0d900ef1073a67) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "fa1-ma0u.bin", 0x280000, 0x100000, CRC(1d0135bd) SHA1(2a7f8d09c213629a68376ce0379be61b37711d0a) )
-	ROM_LOAD16_BYTE( "fa1-ma1l.bin", 0x480001, 0x100000, CRC(c4adf0a2) SHA1(4cc7adc68b1db7e725a973b31d52720bd7dc1140) )
-	ROM_LOAD16_BYTE( "fa1-ma1u.bin", 0x480000, 0x100000, CRC(900297be) SHA1(57bb2078ff104c6f631c67219f80f8ede5ddbd09) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "fa1-ma0l.bin", 0x000001, 0x100000, CRC(a0a95e54) SHA1(da35f8a6a5bc9e2b5b6cacf8eb0d900ef1073a67) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "fa1-ma0u.bin", 0x000000, 0x100000, CRC(1d0135bd) SHA1(2a7f8d09c213629a68376ce0379be61b37711d0a) )
+	ROM_LOAD16_BYTE( "fa1-ma1l.bin", 0x200001, 0x100000, CRC(c4adf0a2) SHA1(4cc7adc68b1db7e725a973b31d52720bd7dc1140) )
+	ROM_LOAD16_BYTE( "fa1-ma1u.bin", 0x200000, 0x100000, CRC(900297be) SHA1(57bb2078ff104c6f631c67219f80f8ede5ddbd09) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1175,16 +1161,17 @@ ROM_START( fa )
 ROM_END
 
 ROM_START( swcourt )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "sc2-ep0l.4c",  0x080001, 0x080000, CRC(5053a02e) SHA1(8ab5a085969cef5e01be01d8f531233002ea5bff) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "sc2-ep0u.4f",  0x080000, 0x080000, CRC(7b3fc7fa) SHA1(f96c03a03339b7677b8dc8689d907f2c8895886c) )
-	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x180001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
-	ROM_LOAD16_BYTE( "sc1-ep1u.bin", 0x180000, 0x080000, CRC(1ce07b15) SHA1(b1b28cc480301c9ad642597c7cdd8e9cdec996a6) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sc2-ep0l.4c",  0x000001, 0x080000, CRC(5053a02e) SHA1(8ab5a085969cef5e01be01d8f531233002ea5bff) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "sc2-ep0u.4f",  0x000000, 0x080000, CRC(7b3fc7fa) SHA1(f96c03a03339b7677b8dc8689d907f2c8895886c) )
+	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x100001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
+	ROM_LOAD16_BYTE( "sc1-ep1u.bin", 0x100000, 0x080000, CRC(1ce07b15) SHA1(b1b28cc480301c9ad642597c7cdd8e9cdec996a6) )
 
-	ROM_LOAD16_BYTE( "sc1-ma0l.bin", 0x280001, 0x100000, CRC(3e531f5e) SHA1(6da56630bdfbb19f1639c539779c180d106f6ee2) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "sc1-ma0u.bin", 0x280000, 0x100000, CRC(31e76a45) SHA1(5c278c167c1025c648ce2da2c3764645e96dcd55) )
-	ROM_LOAD16_BYTE( "sc1-ma1l.bin", 0x480001, 0x100000, CRC(8ba3a4ec) SHA1(f881e7b4728f388d18450ba85e13e233071fbc88) )
-	ROM_LOAD16_BYTE( "sc1-ma1u.bin", 0x480000, 0x100000, CRC(252dc4b7) SHA1(f1be6bd045495c7a0ecd97f01d1dc8ad341fecfd) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "sc1-ma0l.bin", 0x000001, 0x100000, CRC(3e531f5e) SHA1(6da56630bdfbb19f1639c539779c180d106f6ee2) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "sc1-ma0u.bin", 0x000000, 0x100000, CRC(31e76a45) SHA1(5c278c167c1025c648ce2da2c3764645e96dcd55) )
+	ROM_LOAD16_BYTE( "sc1-ma1l.bin", 0x200001, 0x100000, CRC(8ba3a4ec) SHA1(f881e7b4728f388d18450ba85e13e233071fbc88) )
+	ROM_LOAD16_BYTE( "sc1-ma1u.bin", 0x200000, 0x100000, CRC(252dc4b7) SHA1(f1be6bd045495c7a0ecd97f01d1dc8ad341fecfd) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1192,16 +1179,17 @@ ROM_START( swcourt )
 ROM_END
 
 ROM_START( swcourtj )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "sc1-ep0l.4c",  0x080001, 0x080000, CRC(145111dd) SHA1(f8f74f77fb80af2ea37ea8ddbf02c1f3fcaf3fdb) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "sc1-ep0u.4f",  0x080000, 0x080000, CRC(c721c138) SHA1(5d30d66629d982b54c3bb62118be940dc7b69a6b) )
-	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x180001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
-	ROM_LOAD16_BYTE( "sc1-ep1u.bin", 0x180000, 0x080000, CRC(1ce07b15) SHA1(b1b28cc480301c9ad642597c7cdd8e9cdec996a6) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sc1-ep0l.4c",  0x000001, 0x080000, CRC(145111dd) SHA1(f8f74f77fb80af2ea37ea8ddbf02c1f3fcaf3fdb) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "sc1-ep0u.4f",  0x000000, 0x080000, CRC(c721c138) SHA1(5d30d66629d982b54c3bb62118be940dc7b69a6b) )
+	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x100001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
+	ROM_LOAD16_BYTE( "sc1-ep1u.bin", 0x100000, 0x080000, CRC(1ce07b15) SHA1(b1b28cc480301c9ad642597c7cdd8e9cdec996a6) )
 
-	ROM_LOAD16_BYTE( "sc1-ma0l.bin", 0x280001, 0x100000, CRC(3e531f5e) SHA1(6da56630bdfbb19f1639c539779c180d106f6ee2) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "sc1-ma0u.bin", 0x280000, 0x100000, CRC(31e76a45) SHA1(5c278c167c1025c648ce2da2c3764645e96dcd55) )
-	ROM_LOAD16_BYTE( "sc1-ma1l.bin", 0x480001, 0x100000, CRC(8ba3a4ec) SHA1(f881e7b4728f388d18450ba85e13e233071fbc88) )
-	ROM_LOAD16_BYTE( "sc1-ma1u.bin", 0x480000, 0x100000, CRC(252dc4b7) SHA1(f1be6bd045495c7a0ecd97f01d1dc8ad341fecfd) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "sc1-ma0l.bin", 0x000001, 0x100000, CRC(3e531f5e) SHA1(6da56630bdfbb19f1639c539779c180d106f6ee2) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "sc1-ma0u.bin", 0x000000, 0x100000, CRC(31e76a45) SHA1(5c278c167c1025c648ce2da2c3764645e96dcd55) )
+	ROM_LOAD16_BYTE( "sc1-ma1l.bin", 0x200001, 0x100000, CRC(8ba3a4ec) SHA1(f881e7b4728f388d18450ba85e13e233071fbc88) )
+	ROM_LOAD16_BYTE( "sc1-ma1u.bin", 0x200000, 0x100000, CRC(252dc4b7) SHA1(f1be6bd045495c7a0ecd97f01d1dc8ad341fecfd) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1209,18 +1197,19 @@ ROM_START( swcourtj )
 ROM_END
 
 ROM_START( tinklpit )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tk1-ep0l.bin", 0x080001, 0x080000, CRC(fdccae42) SHA1(398384482ccb3eb08bfb9db495513272a5188d92) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "tk1-ep0u.bin", 0x080000, 0x080000, CRC(62cdb48c) SHA1(73c7b99b117b8dc567bc254b0ffcc117c9d42fb5) )
-	ROM_LOAD16_BYTE( "tk1-ep1l.bin", 0x180001, 0x080000, CRC(7e90f104) SHA1(79e371426b2e32dc8f687e4d124d23c251198937) )
-	ROM_LOAD16_BYTE( "tk1-ep1u.bin", 0x180000, 0x080000, CRC(9c0b70d6) SHA1(eac44d3470f4c2ddd9c41f82e6398bca0cc8a4fd) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tk1-ep0l.bin", 0x000001, 0x080000, CRC(fdccae42) SHA1(398384482ccb3eb08bfb9db495513272a5188d92) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "tk1-ep0u.bin", 0x000000, 0x080000, CRC(62cdb48c) SHA1(73c7b99b117b8dc567bc254b0ffcc117c9d42fb5) )
+	ROM_LOAD16_BYTE( "tk1-ep1l.bin", 0x100001, 0x080000, CRC(7e90f104) SHA1(79e371426b2e32dc8f687e4d124d23c251198937) )
+	ROM_LOAD16_BYTE( "tk1-ep1u.bin", 0x100000, 0x080000, CRC(9c0b70d6) SHA1(eac44d3470f4c2ddd9c41f82e6398bca0cc8a4fd) )
 
-	ROM_LOAD16_BYTE( "tk1-ma0l.bin", 0x280001, 0x100000, CRC(c6b4e15d) SHA1(55252ba4d904b14940436f1b4dc5e2a6bd163bdf) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "tk1-ma0u.bin", 0x280000, 0x100000, CRC(a3ad6f67) SHA1(54289eed5347defb5464ec5a610a6748909159f6) )
-	ROM_LOAD16_BYTE( "tk1-ma1l.bin", 0x480001, 0x100000, CRC(61cfb92a) SHA1(eacf0e7557f33d552045f43a116ff08c533a2771) )
-	ROM_LOAD16_BYTE( "tk1-ma1u.bin", 0x480000, 0x100000, CRC(54b77816) SHA1(9341d07858623e1920eaae7b2b90126c7057297e) )
-	ROM_LOAD16_BYTE( "tk1-ma2l.bin", 0x680001, 0x100000, CRC(087311d2) SHA1(6fe50f9e08551e57d15a15b01e3822a6cb7c8352) )
-	ROM_LOAD16_BYTE( "tk1-ma2u.bin", 0x680000, 0x100000, CRC(5ce20c2c) SHA1(7eaff21714bae44f8b21b6db98f055e04bfbae18) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "tk1-ma0l.bin", 0x000001, 0x100000, CRC(c6b4e15d) SHA1(55252ba4d904b14940436f1b4dc5e2a6bd163bdf) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "tk1-ma0u.bin", 0x000000, 0x100000, CRC(a3ad6f67) SHA1(54289eed5347defb5464ec5a610a6748909159f6) )
+	ROM_LOAD16_BYTE( "tk1-ma1l.bin", 0x200001, 0x100000, CRC(61cfb92a) SHA1(eacf0e7557f33d552045f43a116ff08c533a2771) )
+	ROM_LOAD16_BYTE( "tk1-ma1u.bin", 0x200000, 0x100000, CRC(54b77816) SHA1(9341d07858623e1920eaae7b2b90126c7057297e) )
+	ROM_LOAD16_BYTE( "tk1-ma2l.bin", 0x400001, 0x100000, CRC(087311d2) SHA1(6fe50f9e08551e57d15a15b01e3822a6cb7c8352) )
+	ROM_LOAD16_BYTE( "tk1-ma2u.bin", 0x400000, 0x100000, CRC(5ce20c2c) SHA1(7eaff21714bae44f8b21b6db98f055e04bfbae18) )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1234,11 +1223,14 @@ ROM_END
 
 
 ROM_START( emeralda ) /* NA-2 Game PCB, clones are NA-1 based; see games listed above */
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "em2-ep0l.6c", 0x080001, 0x080000, CRC(ff1479dc) SHA1(ea945d97ed909be13fb6e062742c7142c0d96c31) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "em2-ep0u.6f", 0x080000, 0x080000, CRC(ffe750a2) SHA1(d10d31489ae364572d7517dd515a6af2182ac764) )
-	ROM_LOAD16_BYTE( "em2-ep1l.7c", 0x180001, 0x080000, CRC(6c3e5b53) SHA1(72b941e28c7fda8cb81240a8226386fe55c14e2d) )
-	ROM_LOAD16_BYTE( "em2-ep1u.7f", 0x180000, 0x080000, CRC(dee15a81) SHA1(474a264029bd77e4205773a7461dea695e65933f) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "em2-ep0l.6c", 0x000001, 0x080000, CRC(ff1479dc) SHA1(ea945d97ed909be13fb6e062742c7142c0d96c31) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "em2-ep0u.6f", 0x000000, 0x080000, CRC(ffe750a2) SHA1(d10d31489ae364572d7517dd515a6af2182ac764) )
+	ROM_LOAD16_BYTE( "em2-ep1l.7c", 0x100001, 0x080000, CRC(6c3e5b53) SHA1(72b941e28c7fda8cb81240a8226386fe55c14e2d) )
+	ROM_LOAD16_BYTE( "em2-ep1u.7f", 0x100000, 0x080000, CRC(dee15a81) SHA1(474a264029bd77e4205773a7461dea695e65933f) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", ROMREGION_ERASE00 )
+	/* no mask roms */
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1246,20 +1238,21 @@ ROM_START( emeralda ) /* NA-2 Game PCB, clones are NA-1 based; see games listed 
 ROM_END
 
 ROM_START( knckhead )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "kh2-ep0l.6c", 0x080001, 0x080000, CRC(b4b88077) SHA1(9af03d1832ad6c77222e18427f4afca330a41ce6) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "kh2-ep0u.6f", 0x080000, 0x080000, CRC(a578d97e) SHA1(9a5bb6649cca7b98daf538a66c813f61cca2e2ec) )
-	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
-	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kh2-ep0l.6c", 0x000001, 0x080000, CRC(b4b88077) SHA1(9af03d1832ad6c77222e18427f4afca330a41ce6) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "kh2-ep0u.6f", 0x000000, 0x080000, CRC(a578d97e) SHA1(9a5bb6649cca7b98daf538a66c813f61cca2e2ec) )
+	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x100001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
+	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x100000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
 
-	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
-	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
-	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
-	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
-	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
-	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
-	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x000001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x000000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x200001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x200000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x400001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x400000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x600001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x600000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1267,20 +1260,21 @@ ROM_START( knckhead )
 ROM_END
 
 ROM_START( knckheadj )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "kh1-ep0l.6c", 0x080001, 0x080000, CRC(94660bec) SHA1(42fa23f759cf66b05f30c2fc03a12fd14ae1f796) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "kh1-ep0u.6f", 0x080000, 0x080000, CRC(ad640d69) SHA1(62595a9d1d5952cbe3dd7266cfda9292be51d269) )
-	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
-	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kh1-ep0l.6c", 0x000001, 0x080000, CRC(94660bec) SHA1(42fa23f759cf66b05f30c2fc03a12fd14ae1f796) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "kh1-ep0u.6f", 0x000000, 0x080000, CRC(ad640d69) SHA1(62595a9d1d5952cbe3dd7266cfda9292be51d269) )
+	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x100001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
+	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x100000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
 
-	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
-	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
-	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
-	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
-	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
-	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
-	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x000001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x000000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x200001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x200000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x400001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x400000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x600001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x600000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1288,20 +1282,21 @@ ROM_START( knckheadj )
 ROM_END
 
 ROM_START( knckheadjp ) /* Older or possible prototype. Doesn't show rom test at boot up */
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "2-10_9o.6c", 0x080001, 0x080000, CRC(600faf17) SHA1(21197ad1d54a68c1510d9ae6999ca41efaaed05d) ) /* handwritten label 2/10 9O */ /* 0xc00000 */
-	ROM_LOAD16_BYTE( "2-10_9e.6f", 0x080000, 0x080000, CRC(16ccc0b0) SHA1(e9b98eae7ee47c7cce2cc3de9dc39428e0648a40) ) /* handwritten label 2/10 9E */
-	ROM_LOAD16_BYTE( "2-10_8o.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) ) /* handwritten label 2/10 8O */
-	ROM_LOAD16_BYTE( "2-10_8e.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) ) /* handwritten label 2/10 8E */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2-10_9o.6c", 0x000001, 0x080000, CRC(600faf17) SHA1(21197ad1d54a68c1510d9ae6999ca41efaaed05d) ) /* handwritten label 2/10 9O */ /* 0xc00000 */
+	ROM_LOAD16_BYTE( "2-10_9e.6f", 0x000000, 0x080000, CRC(16ccc0b0) SHA1(e9b98eae7ee47c7cce2cc3de9dc39428e0648a40) ) /* handwritten label 2/10 9E */
+	ROM_LOAD16_BYTE( "2-10_8o.7c", 0x100001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) ) /* handwritten label 2/10 8O */
+	ROM_LOAD16_BYTE( "2-10_8e.7f", 0x100000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) ) /* handwritten label 2/10 8E */
 
-	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
-	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
-	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
-	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
-	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
-	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
-	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x000001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x000000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x200001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x200000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x400001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x400000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x600001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x600000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1312,20 +1307,21 @@ ROM_START( knckheadjp ) /* Older or possible prototype. Doesn't show rom test at
 ROM_END
 
 ROM_START( numanath )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "nm2-ep0l.bin", 0x080001, 0x080000, CRC(f24414bb) SHA1(68b13dfdc2292afd5279edb891fe63972f991e7b) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "nm2-ep0u.bin", 0x080000, 0x080000, CRC(25c41616) SHA1(68ba67d3dd45f3bdddfa2fd21b574535306c1214) )
-	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x180001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
-	ROM_LOAD16_BYTE( "nm1-ep1u.bin", 0x180000, 0x080000, CRC(30cd589a) SHA1(74a14ec41fe4fc9f73e5357b0903f1199ed96337) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "nm2-ep0l.bin", 0x000001, 0x080000, CRC(f24414bb) SHA1(68b13dfdc2292afd5279edb891fe63972f991e7b) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "nm2-ep0u.bin", 0x000000, 0x080000, CRC(25c41616) SHA1(68ba67d3dd45f3bdddfa2fd21b574535306c1214) )
+	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x100001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
+	ROM_LOAD16_BYTE( "nm1-ep1u.bin", 0x100000, 0x080000, CRC(30cd589a) SHA1(74a14ec41fe4fc9f73e5357b0903f1199ed96337) )
 
-	ROM_LOAD16_BYTE( "nm1-ma0l.bin", 0x280001, 0x100000, CRC(20faaa57) SHA1(9dbfc0dd48eec37b2c0715a5691c6e6f923fc7f7) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "nm1-ma0u.bin", 0x280000, 0x100000, CRC(ed7c37f2) SHA1(829751af33754ade941f76982e196b494d56ab0a) )
-	ROM_LOAD16_BYTE( "nm1-ma1l.bin", 0x480001, 0x100000, CRC(2232e3b4) SHA1(e9da3dc34eb2576c8a88e23cb9007129e885496d) )
-	ROM_LOAD16_BYTE( "nm1-ma1u.bin", 0x480000, 0x100000, CRC(6cc9675c) SHA1(fec74da4479f2a088760efc6908e6acfaea3989f) )
-	ROM_LOAD16_BYTE( "nm1-ma2l.bin", 0x680001, 0x100000, CRC(208abb39) SHA1(52d7247a71c6a14467f12f5270921bba1824cc3f) )
-	ROM_LOAD16_BYTE( "nm1-ma2u.bin", 0x680000, 0x100000, CRC(03a3f204) SHA1(9cb0422c8ecc819d0cc8a65c29a228369d78d986) )
-	ROM_LOAD16_BYTE( "nm1-ma3l.bin", 0x880001, 0x100000, CRC(42a539e9) SHA1(1c53a5a031648891ab7a37cf026c979404ce9589) )
-	ROM_LOAD16_BYTE( "nm1-ma3u.bin", 0x880000, 0x100000, CRC(f79e2112) SHA1(8bb8639a9d3a5d3ac5c9bb78e72b3d76582a9c25) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "nm1-ma0l.bin", 0x000001, 0x100000, CRC(20faaa57) SHA1(9dbfc0dd48eec37b2c0715a5691c6e6f923fc7f7) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "nm1-ma0u.bin", 0x000000, 0x100000, CRC(ed7c37f2) SHA1(829751af33754ade941f76982e196b494d56ab0a) )
+	ROM_LOAD16_BYTE( "nm1-ma1l.bin", 0x200001, 0x100000, CRC(2232e3b4) SHA1(e9da3dc34eb2576c8a88e23cb9007129e885496d) )
+	ROM_LOAD16_BYTE( "nm1-ma1u.bin", 0x200000, 0x100000, CRC(6cc9675c) SHA1(fec74da4479f2a088760efc6908e6acfaea3989f) )
+	ROM_LOAD16_BYTE( "nm1-ma2l.bin", 0x400001, 0x100000, CRC(208abb39) SHA1(52d7247a71c6a14467f12f5270921bba1824cc3f) )
+	ROM_LOAD16_BYTE( "nm1-ma2u.bin", 0x400000, 0x100000, CRC(03a3f204) SHA1(9cb0422c8ecc819d0cc8a65c29a228369d78d986) )
+	ROM_LOAD16_BYTE( "nm1-ma3l.bin", 0x600001, 0x100000, CRC(42a539e9) SHA1(1c53a5a031648891ab7a37cf026c979404ce9589) )
+	ROM_LOAD16_BYTE( "nm1-ma3u.bin", 0x600000, 0x100000, CRC(f79e2112) SHA1(8bb8639a9d3a5d3ac5c9bb78e72b3d76582a9c25) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1333,20 +1329,21 @@ ROM_START( numanath )
 ROM_END
 
 ROM_START( numanathj )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "nm1-ep0l.bin", 0x080001, 0x080000, CRC(4398b898) SHA1(0d1517409ba181f796f7f413cac704c60085b505) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "nm1-ep0u.bin", 0x080000, 0x080000, CRC(be90aa79) SHA1(6884a8d72dd34c889527e8e653f5e5b4cf3fb5d6) )
-	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x180001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
-	ROM_LOAD16_BYTE( "nm1-ep1u.bin", 0x180000, 0x080000, CRC(30cd589a) SHA1(74a14ec41fe4fc9f73e5357b0903f1199ed96337) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "nm1-ep0l.bin", 0x000001, 0x080000, CRC(4398b898) SHA1(0d1517409ba181f796f7f413cac704c60085b505) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "nm1-ep0u.bin", 0x000000, 0x080000, CRC(be90aa79) SHA1(6884a8d72dd34c889527e8e653f5e5b4cf3fb5d6) )
+	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x100001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
+	ROM_LOAD16_BYTE( "nm1-ep1u.bin", 0x100000, 0x080000, CRC(30cd589a) SHA1(74a14ec41fe4fc9f73e5357b0903f1199ed96337) )
 
-	ROM_LOAD16_BYTE( "nm1-ma0l.bin", 0x280001, 0x100000, CRC(20faaa57) SHA1(9dbfc0dd48eec37b2c0715a5691c6e6f923fc7f7) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "nm1-ma0u.bin", 0x280000, 0x100000, CRC(ed7c37f2) SHA1(829751af33754ade941f76982e196b494d56ab0a) )
-	ROM_LOAD16_BYTE( "nm1-ma1l.bin", 0x480001, 0x100000, CRC(2232e3b4) SHA1(e9da3dc34eb2576c8a88e23cb9007129e885496d) )
-	ROM_LOAD16_BYTE( "nm1-ma1u.bin", 0x480000, 0x100000, CRC(6cc9675c) SHA1(fec74da4479f2a088760efc6908e6acfaea3989f) )
-	ROM_LOAD16_BYTE( "nm1-ma2l.bin", 0x680001, 0x100000, CRC(208abb39) SHA1(52d7247a71c6a14467f12f5270921bba1824cc3f) )
-	ROM_LOAD16_BYTE( "nm1-ma2u.bin", 0x680000, 0x100000, CRC(03a3f204) SHA1(9cb0422c8ecc819d0cc8a65c29a228369d78d986) )
-	ROM_LOAD16_BYTE( "nm1-ma3l.bin", 0x880001, 0x100000, CRC(42a539e9) SHA1(1c53a5a031648891ab7a37cf026c979404ce9589) )
-	ROM_LOAD16_BYTE( "nm1-ma3u.bin", 0x880000, 0x100000, CRC(f79e2112) SHA1(8bb8639a9d3a5d3ac5c9bb78e72b3d76582a9c25) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "nm1-ma0l.bin", 0x000001, 0x100000, CRC(20faaa57) SHA1(9dbfc0dd48eec37b2c0715a5691c6e6f923fc7f7) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "nm1-ma0u.bin", 0x000000, 0x100000, CRC(ed7c37f2) SHA1(829751af33754ade941f76982e196b494d56ab0a) )
+	ROM_LOAD16_BYTE( "nm1-ma1l.bin", 0x200001, 0x100000, CRC(2232e3b4) SHA1(e9da3dc34eb2576c8a88e23cb9007129e885496d) )
+	ROM_LOAD16_BYTE( "nm1-ma1u.bin", 0x200000, 0x100000, CRC(6cc9675c) SHA1(fec74da4479f2a088760efc6908e6acfaea3989f) )
+	ROM_LOAD16_BYTE( "nm1-ma2l.bin", 0x400001, 0x100000, CRC(208abb39) SHA1(52d7247a71c6a14467f12f5270921bba1824cc3f) )
+	ROM_LOAD16_BYTE( "nm1-ma2u.bin", 0x400000, 0x100000, CRC(03a3f204) SHA1(9cb0422c8ecc819d0cc8a65c29a228369d78d986) )
+	ROM_LOAD16_BYTE( "nm1-ma3l.bin", 0x600001, 0x100000, CRC(42a539e9) SHA1(1c53a5a031648891ab7a37cf026c979404ce9589) )
+	ROM_LOAD16_BYTE( "nm1-ma3u.bin", 0x600000, 0x100000, CRC(f79e2112) SHA1(8bb8639a9d3a5d3ac5c9bb78e72b3d76582a9c25) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1354,20 +1351,21 @@ ROM_START( numanathj )
 ROM_END
 
 ROM_START( quiztou )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "qt1ep0l.6c", 0x080001, 0x080000, CRC(b680e543) SHA1(f10f38113a46c821d8e9d66f52d7311d9d52e595) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "qt1ep0u.6f", 0x080000, 0x080000, CRC(143c5e4d) SHA1(24c584986c97a5e6fe7e73f0e9af4af28ed20c4a) )
-	ROM_LOAD16_BYTE( "qt1ep1l.7c", 0x180001, 0x080000, CRC(33a72242) SHA1(5d17f033878d28dbebba50931a549ccf84802c05) )
-	ROM_LOAD16_BYTE( "qt1ep1u.7f", 0x180000, 0x080000, CRC(69f876cb) SHA1(d0c7e972a04c45d3ab34ef5be88614d6389189c6) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "qt1ep0l.6c", 0x000001, 0x080000, CRC(b680e543) SHA1(f10f38113a46c821d8e9d66f52d7311d9d52e595) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "qt1ep0u.6f", 0x000000, 0x080000, CRC(143c5e4d) SHA1(24c584986c97a5e6fe7e73f0e9af4af28ed20c4a) )
+	ROM_LOAD16_BYTE( "qt1ep1l.7c", 0x100001, 0x080000, CRC(33a72242) SHA1(5d17f033878d28dbebba50931a549ccf84802c05) )
+	ROM_LOAD16_BYTE( "qt1ep1u.7f", 0x100000, 0x080000, CRC(69f876cb) SHA1(d0c7e972a04c45d3ab34ef5be88614d6389189c6) )
 
-	ROM_LOAD16_BYTE( "qt1ma0l.2c", 0x280001, 0x100000, CRC(5597f2b9) SHA1(747c4be867d4eb37ffab8303740729686a00b825) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "qt1ma0u.2f", 0x280000, 0x100000, CRC(f0a4cb7d) SHA1(364e85af956e7cfc29c957da11574a4b389f7797) )
-	ROM_LOAD16_BYTE( "qt1ma1l.3c", 0x480001, 0x100000, CRC(1b9ce7a6) SHA1(dac1da9dd8076f238211fed5c780b4b8bededf22) )
-	ROM_LOAD16_BYTE( "qt1ma1u.3f", 0x480000, 0x100000, CRC(58910872) SHA1(c0acbd64e90672564c3839fd21870672aa32e439) )
-	ROM_LOAD16_BYTE( "qt1ma2l.4c", 0x680001, 0x100000, CRC(94739917) SHA1(b5be5c9fd7223d3fb601f769cb80f56a5a586de0) )
-	ROM_LOAD16_BYTE( "qt1ma2u.4f", 0x680000, 0x100000, CRC(6ba5b893) SHA1(071caed9cf261f1f8af7079875bd206177baef1a) )
-	ROM_LOAD16_BYTE( "qt1ma3l.5c", 0x880001, 0x100000, CRC(aa9dc6ff) SHA1(c738f8c59bb5245874576c5bcf88c7138fa9a147) )
-	ROM_LOAD16_BYTE( "qt1ma3u.5f", 0x880000, 0x100000, CRC(14a5a163) SHA1(1107f50e491bedeb4ab7ac3f32cfe47727274ba9) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "qt1ma0l.2c", 0x000001, 0x100000, CRC(5597f2b9) SHA1(747c4be867d4eb37ffab8303740729686a00b825) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "qt1ma0u.2f", 0x000000, 0x100000, CRC(f0a4cb7d) SHA1(364e85af956e7cfc29c957da11574a4b389f7797) )
+	ROM_LOAD16_BYTE( "qt1ma1l.3c", 0x200001, 0x100000, CRC(1b9ce7a6) SHA1(dac1da9dd8076f238211fed5c780b4b8bededf22) )
+	ROM_LOAD16_BYTE( "qt1ma1u.3f", 0x200000, 0x100000, CRC(58910872) SHA1(c0acbd64e90672564c3839fd21870672aa32e439) )
+	ROM_LOAD16_BYTE( "qt1ma2l.4c", 0x400001, 0x100000, CRC(94739917) SHA1(b5be5c9fd7223d3fb601f769cb80f56a5a586de0) )
+	ROM_LOAD16_BYTE( "qt1ma2u.4f", 0x400000, 0x100000, CRC(6ba5b893) SHA1(071caed9cf261f1f8af7079875bd206177baef1a) )
+	ROM_LOAD16_BYTE( "qt1ma3l.5c", 0x600001, 0x100000, CRC(aa9dc6ff) SHA1(c738f8c59bb5245874576c5bcf88c7138fa9a147) )
+	ROM_LOAD16_BYTE( "qt1ma3u.5f", 0x600000, 0x100000, CRC(14a5a163) SHA1(1107f50e491bedeb4ab7ac3f32cfe47727274ba9) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
@@ -1378,14 +1376,15 @@ ROM_START( quiztou )
 ROM_END
 
 ROM_START( xday2 )
-	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "xds1-mpr0.4b", 0x080001, 0x080000, CRC(83539aaa) SHA1(42d97bb2daaf5ff48efac70f0ff37869c5ba177d) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "xds1-mpr1.8b", 0x080000, 0x080000, CRC(468b36de) SHA1(52817be9913a6938ce6add2834ba1a727b1d677e) )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "xds1-mpr0.4b", 0x000001, 0x080000, CRC(83539aaa) SHA1(42d97bb2daaf5ff48efac70f0ff37869c5ba177d) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "xds1-mpr1.8b", 0x000000, 0x080000, CRC(468b36de) SHA1(52817be9913a6938ce6add2834ba1a727b1d677e) )
 
-	ROM_LOAD16_BYTE( "xds1-dat0.4b", 0x280001, 0x200000, CRC(42cecc8b) SHA1(7510f16b908dd0f7828887dcfa26c5e4643df66c) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "xds1-dat1.8b", 0x280000, 0x200000, CRC(d250b7e8) SHA1(b99251ae8e25fae062d33e74ff800ab43fb308a2) )
-	ROM_LOAD16_BYTE( "xds1-dat2.4c", 0x680001, 0x200000, CRC(99d72a08) SHA1(4615b43b9a81240ffee8b0f021037f554f4f1f24) )
-	ROM_LOAD16_BYTE( "xds1-dat3.8c", 0x680000, 0x200000, CRC(8980acc4) SHA1(ecd94a3d3a38923e8e322cd8863671af26e30812) )
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "xds1-dat0.4b", 0x000001, 0x200000, CRC(42cecc8b) SHA1(7510f16b908dd0f7828887dcfa26c5e4643df66c) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "xds1-dat1.8b", 0x000000, 0x200000, CRC(d250b7e8) SHA1(b99251ae8e25fae062d33e74ff800ab43fb308a2) )
+	ROM_LOAD16_BYTE( "xds1-dat2.4c", 0x400001, 0x200000, CRC(99d72a08) SHA1(4615b43b9a81240ffee8b0f021037f554f4f1f24) )
+	ROM_LOAD16_BYTE( "xds1-dat3.8c", 0x400000, 0x200000, CRC(8980acc4) SHA1(ecd94a3d3a38923e8e322cd8863671af26e30812) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
