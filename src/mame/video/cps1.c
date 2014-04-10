@@ -1322,6 +1322,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mtwins",      CPS_B_14,     mapper_CK24B },
 	{"chikij",      CPS_B_14,     mapper_CK24B },   // wrong, this set uses CK22B, dumped but equations still not added
 	{"nemo",        CPS_B_15,     mapper_NM24B },
+	{"nemoa",       CPS_B_15,     mapper_NM24B },
 	{"nemoj",       CPS_B_15,     mapper_NM24B },   // wrong, this set uses NM22B, still not dumped
 	{"cawing",      CPS_B_16,     mapper_CA24B },
 	{"cawingr1",    CPS_B_16,     mapper_CA24B },
