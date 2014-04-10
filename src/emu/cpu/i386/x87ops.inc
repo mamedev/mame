@@ -1976,7 +1976,7 @@ void i386_device::x87_fprem(UINT8 modrm)
 		floatx80 a = ST(0);
 		floatx80 b = ST(1);
 
-		m_x87_sw &= ~X87_SW_C0;
+		m_x87_sw &= ~X87_SW_C2;
 
 		// TODO: Implement Cx bits
 		result = floatx80_rem(a, b);
@@ -2002,7 +2002,7 @@ void i386_device::x87_fprem1(UINT8 modrm)
 		floatx80 a = ST(0);
 		floatx80 b = ST(1);
 
-		m_x87_sw &= ~X87_SW_C0;
+		m_x87_sw &= ~X87_SW_C2;
 
 		// TODO: Implement Cx bits
 		result = floatx80_rem(a, b);
