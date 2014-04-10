@@ -447,6 +447,14 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/snes_ppu.h,VIDEOS += SNES_PPU
+#-------------------------------------------------
+ifneq ($(filter SNES_PPU,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/snes_ppu.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/video/stvvdp1.h,VIDEOS += STVVDP
 #@src/emu/video/stvvdp2.h,VIDEOS += STVVDP
 #-------------------------------------------------

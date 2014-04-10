@@ -1461,7 +1461,7 @@ CUSTOM_INPUT_MEMBER( snes_console_state::sscope_offscreen_input )
 	INT16 y = ioport(portnames[port][2])->read();
 
 	/* these are the theoretical boundaries, but we currently are always onscreen... */
-	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu.m_beam.last_visible_line)
+	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu->m_beam.last_visible_line)
 		m_scope[port].offscreen = 1;
 	else
 		m_scope[port].offscreen = 0;
@@ -1480,12 +1480,12 @@ void snes_console_state::gun_latch(INT16 x, INT16 y)
 
 	if (y < 0)
 		y = 0;
-	if (y > (m_ppu.m_beam.last_visible_line - 1))
-		y = m_ppu.m_beam.last_visible_line - 1;
+	if (y > (m_ppu->m_beam.last_visible_line - 1))
+		y = m_ppu->m_beam.last_visible_line - 1;
 
-	m_ppu.m_beam.latch_horz = x;
-	m_ppu.m_beam.latch_vert = y;
-	m_ppu.m_stat78 |= 0x40;
+	m_ppu->m_beam.latch_horz = x;
+	m_ppu->m_beam.latch_vert = y;
+	m_ppu->m_stat78 |= 0x40;
 }
 
 void snes_console_state::input_read_sscope(int port)
@@ -1956,6 +1956,10 @@ static MACHINE_CONFIG_START( snes, snes_console_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+
+	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

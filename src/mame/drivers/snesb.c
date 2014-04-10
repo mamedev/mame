@@ -144,10 +144,7 @@ Iron PCB (same as Final Fight 2?)
 
 
 #include "emu.h"
-#include "cpu/spc700/spc700.h"
-#include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
-#include "audio/snes_snd.h"
 
 
 class snesb_state : public snes_state
@@ -633,6 +630,10 @@ static MACHINE_CONFIG_START( kinstb, snesb_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+
+	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

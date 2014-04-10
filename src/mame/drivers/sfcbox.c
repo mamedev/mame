@@ -116,13 +116,10 @@ How does the Super Famicom Box operates
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/spc700/spc700.h"
-#include "cpu/g65816/g65816.h"
 #include "cpu/z180/z180.h"
 #include "machine/s3520cf.h"
 #include "video/mb90082.h"
 #include "includes/snes.h"
-#include "audio/snes_snd.h"
 #include "rendlay.h"
 
 class sfcbox_state : public snes_state
@@ -476,6 +473,10 @@ static MACHINE_CONFIG_START( sfcbox, sfcbox_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+
+	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// SFCBOX
 	MCFG_SCREEN_ADD("osd", RASTER)
