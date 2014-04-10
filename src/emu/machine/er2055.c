@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ER2055, "ER2055", tag, owner, clock, "er2055", __FILE__),
+	: device_t(mconfig, ER2055, "ER2055 EAROM", tag, owner, clock, "er2055", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map)),

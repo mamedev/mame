@@ -29,7 +29,7 @@ const device_type I8251 = &device_creator<i8251_device>;
 //-------------------------------------------------
 
 i8251_device::i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8251, "I8251", tag, owner, clock, "i8251", __FILE__),
+	: device_t(mconfig, I8251, "8251 USART", tag, owner, clock, "i8251", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_txd_handler(*this),
 	m_dtr_handler(*this),

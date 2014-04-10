@@ -29,7 +29,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, H63484, "H63484", tag, owner, clock, "h63484", __FILE__),
+	: device_t(mconfig, H63484, "HD63484 CRTC (rewrite)", tag, owner, clock, "h63484", __FILE__),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_ar(0),

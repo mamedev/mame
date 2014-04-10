@@ -40,7 +40,7 @@ UINT32 s3c2410_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 const device_type S3C2410 = &device_creator<s3c2410_device>;
 
 s3c2410_device::s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, S3C2410, "Samsung S3C2410", tag, owner, clock, "s3c2410", __FILE__),
+		: device_t(mconfig, S3C2410, "S3C2410 MCU", tag, owner, clock, "s3c2410", __FILE__),
 		m_palette(*this),
 		m_cpu(*this, ":maincpu")
 {

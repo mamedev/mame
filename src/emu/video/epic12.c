@@ -8,7 +8,7 @@
 const device_type EPIC12 = &device_creator<epic12_device>;
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EPIC12, "epic12_device", tag, owner, clock, "epic12", __FILE__),
+	: device_t(mconfig, EPIC12, "EP1C12 BLITTER", tag, owner, clock, "epic12", __FILE__),
 		device_video_interface(mconfig, *this)
 {
 	m_is_unsafe = 0;
