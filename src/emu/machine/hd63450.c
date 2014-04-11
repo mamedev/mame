@@ -308,7 +308,7 @@ void hd63450_device::dma_transfer_abort(int channel)
 	m_reg[channel].csr &= ~0x08;  // channel no longer active
 	m_reg[channel].cer = 0x11;
 	m_reg[channel].ccr &= ~0xc0;
-	m_dma_error((offs_t)3, 1);
+	m_dma_error((offs_t)3, m_reg[channel].ccr & 0x08);
 }
 
 void hd63450_device::dma_transfer_halt(int channel)

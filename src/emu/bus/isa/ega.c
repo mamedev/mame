@@ -449,23 +449,14 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 #define EGA_SCREEN_NAME "ega_screen"
 #define EGA_CRTC_NAME   "crtc_ega_ega"
 
+
+#define EGA_MODE_GRAPHICS 1
+#define EGA_MODE_TEXT     2
+
+
 /*
     Prototypes
 */
-static CRTC_EGA_UPDATE_ROW( ega_update_row );
-
-static CRTC_EGA_INTERFACE( crtc_ega_ega_intf )
-{
-	8,                  /* numbers of pixels per video memory address */
-	NULL,               /* begin_update */
-	ega_update_row,     /* update_row */
-	NULL,               /* end_update */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, de_changed),       /* on_de_chaged */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, hsync_changed),    /* on_hsync_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, vsync_changed),    /* on vsync_changed */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ega_device, vblank_changed)    /* on_vblank_changed */
-};
-
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
@@ -474,8 +465,15 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_ega )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 64 )
-	MCFG_CRTC_EGA_ADD(EGA_CRTC_NAME, 16257000/8, crtc_ega_ega_intf)
+
+	MCFG_DEVICE_ADD(EGA_CRTC_NAME, CRTC_EGA, 16257000/8)
 	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
+	MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(8)
+	MCFG_CRTC_EGA_ROW_UPDATE_CB(isa8_ega_device, ega_update_row)
+	MCFG_CRTC_EGA_RES_OUT_DE_CB(WRITELINE(isa8_ega_device, de_changed))
+	MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(WRITELINE(isa8_ega_device, hsync_changed))
+	MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(WRITELINE(isa8_ega_device, vsync_changed))
+	MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(WRITELINE(isa8_ega_device, vblank_changed))
 MACHINE_CONFIG_END
 
 ROM_START( ega )
@@ -664,7 +662,6 @@ void isa8_ega_device::device_reset()
 
 	install_banks();
 
-	m_update_row = NULL;
 	m_misc_output = 0;
 	m_attribute.index_write = 1;
 
@@ -686,6 +683,7 @@ void isa8_ega_device::device_reset()
 	m_attribute.data[14] = 0x3E;
 	m_attribute.data[15] = 0x3F;
 
+	m_video_mode = 0;
 }
 
 void isa8_ega_device::install_banks()
@@ -746,13 +744,12 @@ void isa8_ega_device::install_banks()
 	}
 }
 
-static CRTC_EGA_UPDATE_ROW( ega_update_row )
+CRTC_EGA_ROW_UPDATE( isa8_ega_device::ega_update_row )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
-	if ( ega->m_update_row )
-	{
-		ega->m_update_row( device, bitmap, cliprect, ma, ra, y, x_count, cursor_x, param );
-	}
+	if (m_video_mode == EGA_MODE_GRAPHICS)
+		pc_ega_graphics(bitmap, cliprect, ma, ra, y, x_count, cursor_x);
+	else if (m_video_mode == EGA_MODE_TEXT)
+		pc_ega_text(bitmap, cliprect, ma, ra, y, x_count, cursor_x);
 }
 
 
@@ -784,48 +781,47 @@ WRITE_LINE_MEMBER( isa8_ega_device::vblank_changed )
 }
 
 
-static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
+CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_graphics )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
 	UINT16  *p = &bitmap.pix16(y);
 
 //  logerror( "pc_ega_graphics: y = %d, x_count = %d, ma = %d, ra = %d\n", y, x_count, ma, ra );
 
-	if ( ega->m_graphics_controller.data[5] & 0x10 )
+	if ( m_graphics_controller.data[5] & 0x10 )
 	{
 		// Odd/Even mode (CGA compatible)
 
 		for ( int i = 0; i < x_count; i++ )
 		{
 			UINT16 offset = ( ( ma + i ) & 0x1fff ) | ( ( y & 1 ) << 12 );
-			UINT8 data = ega->m_plane[0][offset];
+			UINT8 data = m_plane[0][offset];
 
-			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+			*p = m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = m_attribute.data[   data        & 0x03 ]; p++;
 
-			data = ega->m_plane[1][offset];
+			data = m_plane[1][offset];
 
-			*p = ega->m_attribute.data[ ( data >> 6 )        ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
-			*p = ega->m_attribute.data[   data        & 0x03 ]; p++;
+			*p = m_attribute.data[ ( data >> 6 )        ]; p++;
+			*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
+			*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
+			*p = m_attribute.data[   data        & 0x03 ]; p++;
 		}
 	}
 	else
 	{
 		// EGA mode
 
-		UINT8 mask = ega->m_attribute.data[0x12] & 0x0f;
+		UINT8 mask = m_attribute.data[0x12] & 0x0f;
 
 		for ( int i = 0; i < x_count; i++ )
 		{
 			UINT16 offset = ma + i;
-			UINT16 data0 = ega->m_plane[0][offset];
-			UINT16 data1 = ega->m_plane[1][offset] << 1;
-			UINT16 data2 = ega->m_plane[2][offset] << 2;
-			UINT16 data3 = ega->m_plane[3][offset] << 3;
+			UINT16 data0 = m_plane[0][offset];
+			UINT16 data1 = m_plane[1][offset] << 1;
+			UINT16 data2 = m_plane[2][offset] << 2;
+			UINT16 data3 = m_plane[3][offset] << 3;
 
 			for ( int j = 7; j >= 0; j-- )
 			{
@@ -833,7 +829,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 
 				col &= mask;
 
-				p[j] = ega->m_attribute.data[col];
+				p[j] = m_attribute.data[col];
 
 				data0 >>= 1;
 				data1 >>= 1;
@@ -846,9 +842,8 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_graphics )
 }
 
 
-static CRTC_EGA_UPDATE_ROW( pc_ega_text )
+CRTC_EGA_ROW_UPDATE( isa8_ega_device::pc_ega_text )
 {
-	isa8_ega_device *ega = dynamic_cast<isa8_ega_device*>(device->owner());
 	UINT16  *p = &bitmap.pix16(y);
 	int i;
 
@@ -857,28 +852,28 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16  offset = ma + i;
-		UINT8   chr = ega->m_plane[0][ offset ];
-		UINT8   attr = ega->m_plane[1][ offset ];
+		UINT8   chr = m_plane[0][ offset ];
+		UINT8   attr = m_plane[1][ offset ];
 		UINT8   data = 0;
-		UINT16  fg = ega->m_attribute.data[ attr & 0x07 ];
-		UINT16  bg = ega->m_attribute.data[ ( attr >> 4 ) & 0x07 ];
+		UINT16  fg = m_attribute.data[ attr & 0x07 ];
+		UINT16  bg = m_attribute.data[ ( attr >> 4 ) & 0x07 ];
 
 		/* If character set A and B are equal attribute bit 3 is used as intensity */
-		if ( ega->m_charA == ega->m_charB )
+		if ( m_charA == m_charB )
 		{
 			/* intensity selector */
-			data = ega->m_charB[ chr * 32 + ra ];
+			data = m_charB[ chr * 32 + ra ];
 			fg += ( attr & 0x08 ) ? 0x38 : 0x00;
 		}
 		else
 		{
 			/* character set selector */
-			data = ( attr & 0x08 ) ? ega->m_charA[ chr * 32 + ra ] : ega->m_charB[ chr * 32 + ra ];
+			data = ( attr & 0x08 ) ? m_charA[ chr * 32 + ra ] : m_charB[ chr * 32 + ra ];
 		}
 
 		if ( i == cursor_x )
 		{
-			if ( ega->m_frame_cnt & 0x08 )
+			if ( m_frame_cnt & 0x08 )
 			{
 				data = 0xFF;
 			}
@@ -886,7 +881,7 @@ static CRTC_EGA_UPDATE_ROW( pc_ega_text )
 		else
 		{
 			/* Check for blinking */
-			if ( ( ega->m_attribute.data[0x10] & 0x08 ) && ( attr & 0x80 ) && ( ega->m_frame_cnt & 0x10 ) )
+			if ( ( m_attribute.data[0x10] & 0x08 ) && ( attr & 0x80 ) && ( m_frame_cnt & 0x10 ) )
 			{
 				data = 0x00;
 			}
@@ -908,7 +903,7 @@ void isa8_ega_device::change_mode()
 {
 	int clock, pixels;
 
-	m_update_row = NULL;
+	m_video_mode = 0;
 
 	/* Check for graphics mode */
 	if (   ( m_attribute.data[0x10] & 0x01 ) &&
@@ -920,7 +915,7 @@ void isa8_ega_device::change_mode()
 			logerror("change_mode(): Switch to graphics mode\n");
 		}
 
-		m_update_row = pc_ega_graphics;
+		m_video_mode = EGA_MODE_GRAPHICS;
 	}
 
 	/* Check for text mode */
@@ -933,7 +928,7 @@ void isa8_ega_device::change_mode()
 			logerror("chnage_mode(): Switching to text mode\n");
 		}
 
-		m_update_row = pc_ega_text;
+		m_video_mode = EGA_MODE_TEXT;
 
 		/* Set character maps */
 		if ( m_sequencer.data[0x04] & 0x02 )
@@ -959,8 +954,8 @@ void isa8_ega_device::change_mode()
 	m_crtc_ega->set_clock( clock / pixels );
 	m_crtc_ega->set_hpixels_per_column( pixels );
 
-if ( ! m_update_row )
-	logerror("unknown video mode\n");
+	if (!m_video_mode)
+		logerror("unknown video mode\n");
 }
 
 

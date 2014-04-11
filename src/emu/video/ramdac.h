@@ -16,21 +16,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RAMDAC_ADD(_tag,_config,_map,_palette_tag) \
+#define MCFG_RAMDAC_ADD(_tag, _map, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
 	ramdac_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#define RAMDAC_INTERFACE(name) \
-	const ramdac_interface (name) =
+#define MCFG_RAMDAC_SPLIT_READ(_split) \
+	ramdac_device::set_split_read(*device, _split);
 
-// ======================> ramdac_interface
-
-struct ramdac_interface
-{
-	UINT8 m_split_read_reg; // read register index is separated, seen in rltennis
-};
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,8 +32,7 @@ struct ramdac_interface
 // ======================> ramdac_device
 
 class ramdac_device :   public device_t,
-						public device_memory_interface,
-						public ramdac_interface
+						public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -48,6 +40,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations
 	DECLARE_READ8_MEMBER( index_r );
@@ -68,7 +61,6 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
 	inline void reg_increment(UINT8 inc_type);
@@ -81,18 +73,13 @@ private:
 
 	const address_space_config      m_space_config;
 	required_device<palette_device> m_palette;
+	
+	UINT8 m_split_read_reg; // read register index is separated, seen in rltennis
 };
 
 
 // device type definition
 extern const device_type RAMDAC;
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 
 
 #endif

@@ -145,11 +145,6 @@ WRITE8_MEMBER( llc_state::kbd_put )
 		m_term_status = 0xff;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(llc_state, kbd_put)
-};
-
 static const z80_daisy_config llc1_daisy_chain[] =
 {
 	{ "z80ctc" },
@@ -225,7 +220,8 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc1_z80pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_3MHz, llc1_z80pio2_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc1_ctc_intf )
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(llc_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( llc2, llc_state )

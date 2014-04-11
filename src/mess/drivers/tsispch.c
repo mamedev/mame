@@ -169,10 +169,6 @@ WRITE8_MEMBER( tsispch_state::i8251_rxd )
 	i8251_device *uart = machine().device<i8251_device>("i8251a_u15");
 	uart->receive_character(data);
 }
-static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(tsispch_state, i8251_rxd)
-};
 
 /*****************************************************************************
  PIC 8259 stuff
@@ -433,7 +429,8 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	//MCFG_SOUND_ADD("dac", DAC, 0) /* TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up */
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG,tsispch_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(tsispch_state, i8251_rxd))
 MACHINE_CONFIG_END
 
 /******************************************************************************

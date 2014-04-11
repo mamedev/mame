@@ -1466,11 +1466,6 @@ void mazerbla_state::machine_reset()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mazerbla_state::irq_callback),this));
 }
 
-static const mb_vcu_interface vcu_interface =
-{
-	"sub2"
-};
-
 static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 
 	/* basic machine hardware */
@@ -1493,7 +1488,9 @@ static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 	/* synchronization forced on the fly */
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
+	MCFG_DEVICE_ADD("vcu", MB_VCU, SOUND_CLOCK/4)
+	MCFG_MB_VCU_CPU("sub2")
+	MCFG_MB_VCU_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1530,7 +1527,9 @@ static MACHINE_CONFIG_START( greatgun, mazerbla_state )
     */
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
-	MCFG_MB_VCU_ADD("vcu",SOUND_CLOCK/4,vcu_interface,"palette")
+	MCFG_DEVICE_ADD("vcu", MB_VCU, SOUND_CLOCK/4)
+	MCFG_MB_VCU_CPU("sub2")
+	MCFG_MB_VCU_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

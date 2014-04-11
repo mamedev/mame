@@ -435,8 +435,6 @@ static const ay8910_interface kothello_ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-static const hd63484_interface shanghai_hd63484_intf = { 0 };
-
 static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* basic machine hardware */
@@ -457,7 +455,8 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
-	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	// TODO: convert to use H63484
+	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -490,7 +489,8 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	// TODO: convert to use H63484
+	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -526,7 +526,8 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	// TODO: convert to use H63484
+	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

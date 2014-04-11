@@ -156,31 +156,9 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 		device_video_interface(mconfig, *this),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
 		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram)),
+		m_cpu(*this),
 		m_palette(*this)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mb_vcu_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mb_vcu_interface *intf = reinterpret_cast<const mb_vcu_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<mb_vcu_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_cpu_tag = NULL;
-		//m_screen_tag = NULL;
-	}
 }
 
 //-------------------------------------------------
@@ -200,7 +178,6 @@ void mb_vcu_device::device_validity_check(validity_checker &valid) const
 void mb_vcu_device::device_start()
 {
 	// TODO: m_screen_tag
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 	m_palram = auto_alloc_array_clear(machine(), UINT8, 0x100);
 

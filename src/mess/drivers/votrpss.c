@@ -261,11 +261,6 @@ WRITE8_MEMBER( votrpss_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(votrpss_state, kbd_put)
-};
-
 DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
 {
 	m_uart->write_txc(state);
@@ -294,7 +289,8 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(votrpss_state, kbd_put))
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

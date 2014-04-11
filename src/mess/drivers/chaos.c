@@ -130,11 +130,6 @@ WRITE8_MEMBER( chaos_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(chaos_state, kbd_put)
-};
-
 void chaos_state::machine_reset()
 {
 	// copy the roms into ram
@@ -150,7 +145,8 @@ static MACHINE_CONFIG_START( chaos, chaos_state )
 	MCFG_CPU_IO_MAP(chaos_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(chaos_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

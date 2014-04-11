@@ -97,11 +97,6 @@ void cm1800_state::machine_reset()
 {
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(cm1800_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( cm1800, cm1800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
@@ -110,7 +105,8 @@ static MACHINE_CONFIG_START( cm1800, cm1800_state )
 
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(cm1800_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

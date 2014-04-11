@@ -739,11 +739,6 @@ WRITE8_MEMBER( sol20_state::kbd_put )
 	}
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(sol20_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( sol20, sol20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_14_31818MHz/7)
@@ -774,7 +769,8 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_interface )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sol20_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

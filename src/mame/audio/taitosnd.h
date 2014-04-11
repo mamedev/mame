@@ -17,13 +17,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct tc0140syt_interface
-{
-	const char         *master;
-	const char         *slave;
-};
-
-
 // ======================> tc0140syt_device
 
 class tc0140syt_device : public device_t

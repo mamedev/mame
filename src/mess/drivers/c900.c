@@ -84,11 +84,6 @@ WRITE8_MEMBER( c900_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(c900_state, kbd_put)
-};
-
 /* F4 Character Displayer */
 static const gfx_layout c900_charlayout =
 {
@@ -114,7 +109,8 @@ static MACHINE_CONFIG_START( c900, c900_state )
 	MCFG_CPU_DATA_MAP(c900_data)
 	MCFG_CPU_IO_MAP(c900_io)
 
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(c900_state, kbd_put))
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c900)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 MACHINE_CONFIG_END

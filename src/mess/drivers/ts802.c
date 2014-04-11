@@ -223,11 +223,6 @@ WRITE8_MEMBER( ts802_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ts802_state, kbd_put)
-};
-
 #if 0
 // not correct
 static const z80_daisy_config daisy_chain_intf[] =
@@ -261,7 +256,8 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
 
 	/* Devices */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ts802_state, kbd_put))
 	MCFG_Z80DMA_ADD("z80dma", XTAL_16MHz / 4, dma_intf)
 	MCFG_Z80DART_ADD("z80dart1", XTAL_16MHz / 4, dart0_intf )
 	MCFG_Z80DART_ADD("z80dart2", XTAL_16MHz / 4, dart1_intf )

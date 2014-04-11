@@ -43,7 +43,8 @@ ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, RAMDAC, "ramdac", tag, owner, clock, "ramdac", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram)),
-		m_palette(*this)
+		m_palette(*this),
+		m_split_read_reg(0)
 {
 }
 
@@ -85,27 +86,6 @@ inline void ramdac_device::writebyte(offs_t address, UINT8 data)
 {
 	space().write_byte(address, data);
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ramdac_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ramdac_interface *intf = reinterpret_cast<const ramdac_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ramdac_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		// ...
-	}
-}
-
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks

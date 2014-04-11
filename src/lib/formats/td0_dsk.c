@@ -823,191 +823,183 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	dynamic_buffer imagebuf(max_size);
 	UINT8 header[12];
 
-	try
+	io_generic_read(io, header, 0, 12);
+	head_count = header[9];
+
+	if(header[0] == 't')
 	{
-		io_generic_read(io, header, 0, 12);
-		head_count = header[9];
+		td0dsk_t disk_decode;
 
-		if(header[0] == 't')
+		disk_decode.floppy_file = io;
+		disk_decode.init_Decode();
+		disk_decode.floppy_file_offset = 12;
+		disk_decode.Decode(imagebuf, max_size);
+	}
+	else
+		io_generic_read(io, imagebuf, 12, io_generic_size(io));
+
+	if(header[7] & 0x80)
+		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
+
+	track_spt = imagebuf[offset];
+	if(track_spt == 255) // Empty file?
+		return false;
+
+	switch(header[6])
+	{
+		case 2:
+			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
+			{
+				if(head_count == 2)
+					image->set_variant(floppy_image::DSHD);
+				else
+					return false; // single side hd?
+				break;
+			}
+			/* no break; could be qd, won't know until tracks are counted */
+		case 1:
+			if(head_count == 2)
+				image->set_variant(floppy_image::DSDD);
+			else
+				image->set_variant(floppy_image::SSDD);
+			break;
+		case 4:
+			if((imagebuf[offset + 2] & 0x7f) == 2) // ?
+			{
+				if(head_count == 2)
+					image->set_variant(floppy_image::DSHD);
+				else
+					return false; // single side 3.5?
+				break;
+			}
+			/* no break */
+		case 3:
+			if(head_count == 2)
+			{
+				if(form_factor == floppy_image::FF_525)
+					image->set_variant(floppy_image::DSQD);
+				else
+					image->set_variant(floppy_image::DSDD);
+			}
+			else
+			{
+				if(form_factor == floppy_image::FF_525)
+					image->set_variant(floppy_image::SSQD);
+				else
+					return false; // single side 3.5?
+			}
+			break;
+	}
+
+	static const int rates[3] = { 250000, 300000, 500000 };
+	int rate = (header[5] & 0x7f) >= 3 ? 500000 : rates[header[5] & 0x7f];
+	int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
+	int base_cell_count = rate*60/rpm;
+
+	while(track_spt != 255)
+	{
+		desc_pc_sector sects[256];
+		UINT8 sect_data[65536];
+		int sdatapos = 0;
+		int track = imagebuf[offset + 1];
+		int head = imagebuf[offset + 2] & 1;
+		bool fm = (header[5] & 0x80) || (imagebuf[offset + 2] & 0x80); // ?
+		offset += 4;
+		for(int i = 0; i < track_spt; i++)
 		{
-			td0dsk_t disk_decode;
+			UINT8 *hs = &imagebuf[offset];
+			UINT16 size;
+			offset += 6;
 
-			disk_decode.floppy_file = io;
-			disk_decode.init_Decode();
-			disk_decode.floppy_file_offset = 12;
-			disk_decode.Decode(imagebuf, max_size);
+			sects[i].track       = hs[0];
+			sects[i].head        = hs[1];
+			sects[i].sector      = hs[2];
+			sects[i].size        = hs[3];
+			sects[i].deleted     = (hs[4] & 4) == 4;
+			sects[i].bad_crc     = (hs[4] & 2) == 2;
+
+			if(hs[4] & 0x30)
+				size = 0;
+			else
+			{
+				offset += 3;
+				size = 128 << hs[3];
+				int j, k;
+				switch(hs[8])
+				{
+					default:
+						return false;
+					case 0:
+						memcpy(&sect_data[sdatapos], &imagebuf[offset], size);
+						offset += size;
+						break;
+					case 1:
+						offset += 4;
+						k = (hs[9] + (hs[10] << 8)) * 2;
+						k = (k <= size) ? k : size;
+						for(j = 0; j < k; j += 2)
+						{
+							sect_data[sdatapos + j] = hs[11];
+							sect_data[sdatapos + j + 1] = hs[12];
+						}
+						if(k < size)
+							memset(&sect_data[sdatapos + k], '\0', size - k);
+						break;
+					case 2:
+						k = 0;
+						while(k < size)
+						{
+							UINT16 len = imagebuf[offset];
+							UINT16 rep = imagebuf[offset + 1];
+							offset += 2;
+							if(!len)
+							{
+								memcpy(&sect_data[sdatapos + k], &imagebuf[offset], rep);
+								offset += rep;
+								k += rep;
+							}
+							else
+							{
+								len = (1 << len);
+								rep = len * rep;
+								rep = ((rep + k) <= size) ? rep : (size - k);
+								for(j = 0; j < rep; j += len)
+									memcpy(&sect_data[sdatapos + j + k], &imagebuf[offset], len);
+								k += rep;
+								offset += len;
+							}
+						}
+						break;
+				}
+			}
+
+			sects[i].actual_size = size;
+
+			if(size)
+			{
+				sects[i].data = &sect_data[sdatapos];
+				sdatapos += size;
+			}
+			else
+				sects[i].data = NULL;
 		}
-		else
-			io_generic_read(io, imagebuf, 12, io_generic_size(io));
+		track_count = track;
 
-		if(header[7] & 0x80)
-			offset = 10 + imagebuf[2] + (imagebuf[3] << 8);
+		if(fm)
+			build_pc_track_fm(track, head, image, base_cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+		else
+			build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 
 		track_spt = imagebuf[offset];
-		if(track_spt == 255) // Empty file?
-			throw false;
-
-		switch(header[6])
-		{
-			case 2:
-				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
-				{
-					if(head_count == 2)
-						image->set_variant(floppy_image::DSHD);
-					else
-						throw false; // single side hd?
-					break;
-				}
-				/* no break; could be qd, won't know until tracks are counted */
-			case 1:
-				if(head_count == 2)
-					image->set_variant(floppy_image::DSDD);
-				else
-					image->set_variant(floppy_image::SSDD);
-				break;
-			case 4:
-				if((imagebuf[offset + 2] & 0x7f) == 2) // ?
-				{
-					if(head_count == 2)
-						image->set_variant(floppy_image::DSHD);
-					else
-						throw false; // single side 3.5?
-					break;
-				}
-				/* no break */
-			case 3:
-				if(head_count == 2)
-				{
-					if(form_factor == floppy_image::FF_525)
-						image->set_variant(floppy_image::DSQD);
-					else
-						image->set_variant(floppy_image::DSDD);
-				}
-				else
-				{
-					if(form_factor == floppy_image::FF_525)
-						image->set_variant(floppy_image::SSQD);
-					else
-						throw false; // single side 3.5?
-				}
-				break;
-		}
-
-		static const int rates[3] = { 250000, 300000, 500000 };
-		int rate = (header[5] & 0x7f) >= 3 ? 500000 : rates[header[5] & 0x7f];
-		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
-		int base_cell_count = rate*60/rpm;
-
-		while(track_spt != 255)
-		{
-			desc_pc_sector sects[256];
-			UINT8 sect_data[65536];
-			int sdatapos = 0;
-			int track = imagebuf[offset + 1];
-			int head = imagebuf[offset + 2] & 1;
-			bool fm = (header[5] & 0x80) || (imagebuf[offset + 2] & 0x80); // ?
-			offset += 4;
-			for(int i = 0; i < track_spt; i++)
-			{
-				UINT8 *hs = &imagebuf[offset];
-				UINT16 size;
-				offset += 6;
-
-				sects[i].track       = hs[0];
-				sects[i].head        = hs[1];
-				sects[i].sector      = hs[2];
-				sects[i].size        = hs[3];
-				sects[i].deleted     = (hs[4] & 4) == 4;
-				sects[i].bad_crc     = (hs[4] & 2) == 2;
-
-				if(hs[4] & 0x30)
-					size = 0;
-				else
-				{
-					offset += 3;
-					size = 128 << hs[3];
-					int j, k;
-					switch(hs[8])
-					{
-						default:
-							throw false;
-						case 0:
-							memcpy(&sect_data[sdatapos], &imagebuf[offset], size);
-							offset += size;
-							break;
-						case 1:
-							offset += 4;
-							k = (hs[9] + (hs[10] << 8)) * 2;
-							k = (k <= size) ? k : size;
-							for(j = 0; j < k; j += 2)
-							{
-								sect_data[sdatapos + j] = hs[11];
-								sect_data[sdatapos + j + 1] = hs[12];
-							}
-							if(k < size)
-								memset(&sect_data[sdatapos + k], '\0', size - k);
-							break;
-						case 2:
-							k = 0;
-							while(k < size)
-							{
-								UINT16 len = imagebuf[offset];
-								UINT16 rep = imagebuf[offset + 1];
-								offset += 2;
-								if(!len)
-								{
-									memcpy(&sect_data[sdatapos + k], &imagebuf[offset], rep);
-									offset += rep;
-									k += rep;
-								}
-								else
-								{
-									len = (1 << len);
-									rep = len * rep;
-									rep = ((rep + k) <= size) ? rep : (size - k);
-									for(j = 0; j < rep; j += len)
-										memcpy(&sect_data[sdatapos + j + k], &imagebuf[offset], len);
-									k += rep;
-									offset += len;
-								}
-							}
-							break;
-					}
-				}
-
-				sects[i].actual_size = size;
-
-				if(size)
-				{
-					sects[i].data = &sect_data[sdatapos];
-					sdatapos += size;
-				}
-				else
-					sects[i].data = NULL;
-			}
-			track_count = track;
-
-			if(fm)
-				build_pc_track_fm(track, head, image, base_cell_count, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
-			else
-				build_pc_track_mfm(track, head, image, base_cell_count*2, track_spt, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
-
-			track_spt = imagebuf[offset];
-		}
-		if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
-		{
-			if(image->get_variant() == floppy_image::DSDD)
-				image->set_variant(floppy_image::DSQD);
-			else if(image->get_variant() == floppy_image::SSDD)
-				image->set_variant(floppy_image::SSQD);
-		}
-		throw true;
 	}
-	catch(bool ret)
+	if((track_count > 50) && (form_factor == floppy_image::FF_525)) // ?
 	{
-		return ret;
+		if(image->get_variant() == floppy_image::DSDD)
+			image->set_variant(floppy_image::DSQD);
+		else if(image->get_variant() == floppy_image::SSDD)
+			image->set_variant(floppy_image::SSQD);
 	}
-	return false;
+	return true;
 }
 
 

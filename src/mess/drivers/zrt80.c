@@ -282,12 +282,6 @@ WRITE8_MEMBER( zrt80_state::kbd_put )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(zrt80_state, kbd_put)
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout zrt80_charlayout =
 {
@@ -330,7 +324,8 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 8, zrt80_crtc6845_interface)
 	MCFG_INS8250_ADD( "ins8250", zrt80_com_interface, 2457600 )
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zrt80_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

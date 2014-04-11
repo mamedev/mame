@@ -134,6 +134,8 @@ void a310_state::machine_start()
 {
 	archimedes_init();
 
+
+
 	// reset the DAC to centerline
 	//m_dac->write_signed8(0x80);
 }
@@ -160,7 +162,7 @@ INPUT_CHANGED_MEMBER(a310_state::key_stroke)
 
 	if(newval && !oldval)
 		m_kart->send_keycode_down(row_val,col_val);
-    
+
 	if(oldval && !newval)
 		m_kart->send_keycode_up(row_val,col_val);
 }
@@ -277,7 +279,6 @@ static INPUT_PORTS_START( a310 )
     PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CHANGED_MEMBER(DEVICE_SELF, a310_state, key_stroke, 0x24) PORT_IMPULSE(1) // (KP?)
     PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("#") PORT_CHANGED_MEMBER(DEVICE_SELF, a310_state, key_stroke, 0x25) PORT_IMPULSE(1) // (KP?)
 
-
 	PORT_START("via1a") /* VIA #1 PORT A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(2)
@@ -325,10 +326,16 @@ static AAKART_INTERFACE( kart_interface )
 	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_rx_w)
 };
 
+static ARM_INTERFACE( a310_config )
+{
+	ARM_COPRO_TYPE_VL86C020
+};
+
 static MACHINE_CONFIG_START( a310, a310_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
+	MCFG_CPU_CONFIG(a310_config)
 
 	MCFG_AAKART_ADD("kart", 8000000/256, kart_interface) // TODO: frequency
 

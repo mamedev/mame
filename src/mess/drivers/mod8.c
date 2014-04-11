@@ -139,11 +139,6 @@ WRITE8_MEMBER( mod8_state::kbd_put )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static GENERIC_TELEPRINTER_INTERFACE( teleprinter_intf )
-{
-	DEVCB_DRIVER_MEMBER(mod8_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( mod8, mod8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8008, 800000)
@@ -151,7 +146,8 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
 	MCFG_CPU_IO_MAP(mod8_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG, teleprinter_intf)
+	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(WRITE8(mod8_state, kbd_put))
 MACHINE_CONFIG_END
 
 

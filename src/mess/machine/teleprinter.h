@@ -6,7 +6,6 @@
 #define TELEPRINTER_WIDTH 80
 #define TELEPRINTER_HEIGHT 50
 
-#define GENERIC_TELEPRINTER_INTERFACE GENERIC_TERMINAL_INTERFACE
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -14,12 +13,8 @@
 #define TELEPRINTER_TAG "teleprinter"
 #define TELEPRINTER_SCREEN_TAG "tty_screen"
 
-#define MCFG_GENERIC_TELEPRINTER_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, TELEPRINTER, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_GENERIC_TELEPRINTER_REMOVE(_tag)       \
-	MCFG_DEVICE_REMOVE(_tag)
+#define MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(_devcb) \
+	devcb = &generic_terminal_device::set_keyboard_callback(*device, DEVCB2_##_devcb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES

@@ -233,11 +233,6 @@ WRITE8_MEMBER( a6809_state::kbd_put )
 	m_via->write_cb1(0);
 }
 
-static ASCII_KEYBOARD_INTERFACE( kb_intf )
-{
-	DEVCB_DRIVER_MEMBER(a6809_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( a6809, a6809_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
@@ -270,7 +265,8 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_SAA5050_D_CALLBACK(READ8(a6809_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
-	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(a6809_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_c", a6809_state, a6809_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_p", a6809_state, a6809_p, attotime::from_hz(40000))

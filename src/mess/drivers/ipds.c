@@ -135,12 +135,6 @@ WRITE8_MEMBER( ipds_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(ipds_state, kbd_put)
-};
-
-
 static MACHINE_CONFIG_START( ipds, ipds_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
@@ -158,7 +152,8 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
 	MCFG_I8275_ADD  ( "i8275", ipds_i8275_interface)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ipds_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

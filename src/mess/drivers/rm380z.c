@@ -109,11 +109,6 @@ static ADDRESS_MAP_START( rm380z_io , AS_IO, 8, rm380z_state)
 	AM_RANGE(0xc5, 0xff) AM_READWRITE(rm380z_porthi_r, rm380z_porthi_w)
 ADDRESS_MAP_END
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(rm380z_state, keyboard_put)
-};
-
 INPUT_PORTS_START( rm380z )
 //  PORT_START("additional_chars")
 //  PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_ESC)
@@ -170,7 +165,8 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rm380z_floppy_interface)
 
 	/* keyboard */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

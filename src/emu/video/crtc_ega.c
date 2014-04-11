@@ -16,31 +16,14 @@
 const device_type CRTC_EGA = &device_creator<crtc_ega_device>;
 
 
-void crtc_ega_device::device_config_complete()
-{
-	const crtc_ega_interface *intf = reinterpret_cast<const crtc_ega_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<crtc_ega_interface *>(this) = *intf;
-	}
-	else
-	{
-		m_hpixels_per_column = 0;
-		m_begin_update = NULL;
-		m_update_row = NULL;
-		m_end_update = NULL;
-		memset(&m_out_de_func, 0, sizeof(m_out_de_func));
-		memset(&m_out_hsync_func, 0, sizeof(m_out_hsync_func));
-		memset(&m_out_vsync_func, 0, sizeof(m_out_vsync_func));
-		memset(&m_out_vblank_func, 0, sizeof(m_out_vblank_func));
-	}
-}
-
-
 crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CRTC_EGA, "crtc_EGA", tag, owner, clock, "crtc_ega", __FILE__),
-		device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false),
+		m_res_out_de_cb(*this),
+		m_res_out_hsync_cb(*this),
+		m_res_out_vsync_cb(*this),
+		m_res_out_vblank_cb(*this),
+		m_hpixels_per_column(0)
 {
 }
 
@@ -239,60 +222,60 @@ void crtc_ega_device::update_counters()
 
 void crtc_ega_device::set_de(int state)
 {
-	if ( m_de != state )
+	if (m_de != state)
 	{
 		m_de = state;
 
-		if ( !m_res_out_de_func.isnull() )
-			m_res_out_de_func( m_de );
+		if (!m_res_out_de_cb.isnull())
+			m_res_out_de_cb(m_de);
 	}
 }
 
 
 void crtc_ega_device::set_hsync(int state)
 {
-	if ( m_hsync != state )
+	if (m_hsync != state)
 	{
 		m_hsync = state;
 
-		if ( !m_res_out_hsync_func.isnull() )
-			m_res_out_hsync_func( m_hsync );
+		if (!m_res_out_hsync_cb.isnull())
+			m_res_out_hsync_cb(m_hsync);
 	}
 }
 
 
 void crtc_ega_device::set_vsync(int state)
 {
-	if ( m_vsync != state )
+	if (m_vsync != state)
 	{
 		m_vsync = state;
 
-		if ( !m_res_out_vsync_func.isnull() )
-			m_res_out_vsync_func( m_vsync );
+		if (!m_res_out_vsync_cb.isnull())
+			m_res_out_vsync_cb(m_vsync);
 	}
 }
 
 
 void crtc_ega_device::set_vblank(int state)
 {
-	if ( m_vblank != state )
+	if (m_vblank != state)
 	{
 		m_vblank = state;
 
-		if ( !m_res_out_vblank_func.isnull() )
-			m_res_out_vblank_func( m_vblank );
+		if (!m_res_out_vblank_cb.isnull())
+			m_res_out_vblank_cb(m_vblank);
 	}
 }
 
 
 void crtc_ega_device::set_cur(int state)
 {
-	if ( m_cur != state )
+	if (m_cur != state)
 	{
 		m_cur = state;
 
-//      if ( !m_res_out_cur_func.isnull() )
-//          m_res_out_cur_func( m_cur );
+//      if (!m_res_out_cur_cb.isnull())
+//          m_res_out_cur_cb(m_cur);
 	}
 }
 
@@ -538,13 +521,11 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		UINT16 y;
 
-		void *param = NULL;
-
-		assert(m_update_row != NULL);
+		assert(!m_row_update_cb.isnull() != NULL);
 
 		/* call the set up function if any */
-		if (m_begin_update != NULL)
-			param = m_begin_update(this, bitmap, cliprect);
+		if (!m_begin_update_cb.isnull())
+			m_begin_update_cb(bitmap, cliprect);
 
 		if (cliprect.min_y == 0)
 		{
@@ -569,7 +550,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			INT8 cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			m_update_row(this, bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp + 1, cursor_x, param);
+			m_row_update_cb(bitmap, cliprect, m_current_disp_addr, ra, y, m_horiz_disp + 1, cursor_x);
 
 			/* update MA if the last raster address */
 			if (ra == m_max_ras_addr)
@@ -577,8 +558,8 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		}
 
 		/* call the tear down function if any */
-		if (m_end_update != NULL)
-			m_end_update(this, bitmap, cliprect, param);
+		if (!m_end_update_cb.isnull())
+			m_end_update_cb(bitmap, cliprect);
 	}
 	else
 		logerror("Invalid crtc_ega screen parameters - display disabled!!!\n");
@@ -595,10 +576,15 @@ void crtc_ega_device::device_start()
 	assert(m_hpixels_per_column > 0);
 
 	/* resolve callbacks */
-	m_res_out_de_func.resolve(m_out_de_func, *this);
-	m_res_out_hsync_func.resolve(m_out_hsync_func, *this);
-	m_res_out_vsync_func.resolve(m_out_vsync_func, *this);
-	m_res_out_vblank_func.resolve(m_out_vblank_func, *this);
+	m_res_out_de_cb.resolve();
+	m_res_out_hsync_cb.resolve();
+	m_res_out_vsync_cb.resolve();
+	m_res_out_vblank_cb.resolve();
+
+	/* bind delegates */
+	m_begin_update_cb.bind_relative_to(*owner());
+	m_row_update_cb.bind_relative_to(*owner());
+	m_end_update_cb.bind_relative_to(*owner());
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);
@@ -699,19 +685,19 @@ void crtc_ega_device::device_start()
 void crtc_ega_device::device_reset()
 {
 	/* internal registers other than status remain unchanged, all outputs go low */
-	if ( !m_res_out_de_func.isnull() )
-		m_res_out_de_func( FALSE );
+	if (!m_res_out_de_cb.isnull())
+		m_res_out_de_cb(false);
 
-	if ( !m_res_out_hsync_func.isnull() )
-		m_res_out_hsync_func( FALSE );
+	if (!m_res_out_hsync_cb.isnull())
+		m_res_out_hsync_cb(false);
 
-	if ( !m_res_out_vsync_func.isnull() )
-		m_res_out_vsync_func( FALSE );
+	if (!m_res_out_vsync_cb.isnull())
+		m_res_out_vsync_cb(false);
 
-	if ( !m_res_out_vblank_func.isnull() )
-		m_res_out_vblank_func( FALSE );
+	if (!m_res_out_vblank_cb.isnull())
+		m_res_out_vblank_cb(false);
 
-	if ( ! m_line_timer->enabled( ) )
+	if (!m_line_timer->enabled())
 	{
 		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 	}

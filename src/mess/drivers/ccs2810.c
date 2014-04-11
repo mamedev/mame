@@ -174,11 +174,6 @@ WRITE8_MEMBER( ccs_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ccs_state, kbd_put)
-};
-
 #if 0
 static const ins8250_interface com_intf =
 {
@@ -340,7 +335,8 @@ static MACHINE_CONFIG_START( ccs2810, ccs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ccs_state, ccs)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs_state, kbd_put))
 
 	/* Devices */
 	//MCFG_INS8250_ADD( "ins8250", com_intf, XTAL_1_8432MHz )
@@ -354,7 +350,8 @@ static MACHINE_CONFIG_START( ccs2422, ccs_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ccs_state, ccs)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(ccs_state, kbd_put))
 
 	/* Devices */
 	MCFG_MB8877x_ADD("fdc", XTAL_16MHz / 8) // UB1793 or MB8877

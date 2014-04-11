@@ -16,7 +16,7 @@ void namcona1_state::tilemap_get_info(
 	const UINT16 *tilemap_videoram,
 	bool use_4bpp_gfx )
 {
-	UINT16 *source;
+	//UINT16 *source;
 
 	int data = tilemap_videoram[tile_index];
 	int tile = data&0xfff;

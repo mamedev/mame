@@ -104,11 +104,6 @@ WRITE8_MEMBER( seattle_comp_state::kbd_put )
 	m_key_available = 1;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(seattle_comp_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( seattle, seattle_comp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 4000000) // no idea
@@ -116,7 +111,8 @@ static MACHINE_CONFIG_START( seattle, seattle_comp_state )
 	MCFG_CPU_IO_MAP(seattle_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(seattle_comp_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

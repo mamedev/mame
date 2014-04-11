@@ -537,12 +537,6 @@ static MACHINE_CONFIG_DERIVED( ti85d, ti85 )
 MACHINE_CONFIG_END
 
 
-static const t6a04_interface ti82_display =
-{
-	64,                 // number of lines
-	96,                 // pixels for line
-};
-
 static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 6000000)        /* 6 MHz */
@@ -557,7 +551,8 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
-	MCFG_T6A04_ADD("t6a04", ti82_display)
+	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
+	MCFG_T6A04_SIZE(96, 64)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -587,7 +582,8 @@ static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
-	MCFG_T6A04_ADD("t6a04", ti82_display)
+	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
+	MCFG_T6A04_SIZE(96, 64)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ti86, ti85 )
@@ -621,7 +617,8 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_PALETTE_ENTRIES(2)
 	MCFG_PALETTE_INIT_OWNER(ti85_state, ti82 )
 
-	MCFG_T6A04_ADD("t6a04", ti82_display)
+	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
+	MCFG_T6A04_SIZE(96, 64)
 
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER(ti83p)

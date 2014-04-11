@@ -194,11 +194,6 @@ WRITE8_MEMBER( cd2650_state::kbd_put )
 		m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(cd2650_state, kbd_put)
-};
-
 QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 {
 	int i, result = IMAGE_INIT_FAIL;
@@ -296,7 +291,8 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(cd2650_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 

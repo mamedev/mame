@@ -216,12 +216,6 @@ WRITE8_MEMBER( sbc6510_state::a2_w )
 	m_terminal->write(space, 0, data);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_NULL
-};
-
-
 void sbc6510_state::machine_start()
 {
 	char kbdrow[6];
@@ -314,7 +308,7 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", TERMINAL_TAG":palette", sbc6510)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

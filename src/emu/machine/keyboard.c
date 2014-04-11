@@ -8,7 +8,9 @@ or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 Example of usage in a driver.
 
 In MACHINE_CONFIG
-    MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+    	
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xxx_state, kbd_put))
 
 In the code:
 
@@ -16,11 +18,6 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 {
     (code to capture the key as it is pressed)
 }
-
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-    DEVCB_DRIVER_MEMBER(xxx_state, kbd_put)
-};
 
 ***************************************************************************/
 
@@ -41,7 +38,8 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd5(*this, "TERM_LINE5"),
 	m_io_kbd6(*this, "TERM_LINE6"),
 	m_io_kbd7(*this, "TERM_LINE7"),
-	m_io_kbdc(*this, "TERM_LINEC")
+	m_io_kbdc(*this, "TERM_LINEC"),
+	m_keyboard_cb(*this)
 {
 }
 
@@ -55,7 +53,8 @@ generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, 
 	m_io_kbd5(*this, "TERM_LINE5"),
 	m_io_kbd6(*this, "TERM_LINE6"),
 	m_io_kbd7(*this, "TERM_LINE7"),
-	m_io_kbdc(*this, "TERM_LINEC")
+	m_io_kbdc(*this, "TERM_LINEC"),
+	m_keyboard_cb(*this)
 {
 }
 
@@ -209,21 +208,8 @@ machine_config_constructor generic_keyboard_device::device_mconfig_additions() c
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_func.resolve(m_keyboard_cb, *this);
+	m_keyboard_cb.resolve_safe();
 	m_timer = timer_alloc();
-}
-
-void generic_keyboard_device::device_config_complete()
-{
-	const keyboard_interface *intf = reinterpret_cast<const keyboard_interface *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<keyboard_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_keyboard_cb, 0, sizeof(m_keyboard_cb));
-	}
 }
 
 void generic_keyboard_device::device_reset()

@@ -9,72 +9,70 @@
 
 #include "emu.h"
 
-#define CRTC_EGA_INTERFACE(name) \
-	const crtc_ega_interface (name) =
+/* callback definitions */
+typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> crtc_ega_begin_update_delegate;
 
-#define MCFG_CRTC_EGA_ADD(_tag, _clock, _intrf) \
-	MCFG_DEVICE_ADD(_tag, CRTC_EGA, _clock) \
-	MCFG_DEVICE_CONFIG(_intrf)
+typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra,
+										UINT16 y, UINT8 x_count, INT8 cursor_x)> crtc_ega_row_update_delegate;
+
+typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> crtc_ega_end_update_delegate;
+
+
+#define CRTC_EGA_BEGIN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define CRTC_EGA_ROW_UPDATE(_name)   void _name(bitmap_ind16 &bitmap,    \
+												const rectangle &cliprect, UINT16 ma, UINT8 ra,                 \
+												UINT16 y, UINT8 x_count, INT8 cursor_x)
+#define CRTC_EGA_END_UPDATE(_name)   void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+
 
 #define MCFG_CRTC_EGA_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
+#define MCFG_CRTC_EGA_BEGIN_UPDATE_CB(_class, _method) \
+	crtc_ega_device::set_begin_update_callback(*device, crtc_ega_begin_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-class crtc_ega_device;
+#define MCFG_CRTC_EGA_ROW_UPDATE_CB(_class, _method) \
+	crtc_ega_device::set_row_update_callback(*device, crtc_ega_row_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-/* callback definitions */
-typedef void * (*crtc_ega_begin_update_func)(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect);
-#define CRTC_EGA_BEGIN_UPDATE(name) void *name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define MCFG_CRTC_EGA_END_UPDATE_CB(_class, _method) \
+	crtc_ega_device::set_end_update_callback(*device, crtc_ega_end_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
-typedef void (*crtc_ega_update_row_func)(crtc_ega_device *device, bitmap_ind16 &bitmap,
-										const rectangle &cliprect, UINT16 ma, UINT8 ra,
-										UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define CRTC_EGA_UPDATE_ROW(name)       void name(crtc_ega_device *device, bitmap_ind16 &bitmap,    \
-												const rectangle &cliprect, UINT16 ma, UINT8 ra,                 \
-												UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+#define MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(_pix) \
+	crtc_ega_device::set_hpixels_per_column(*device, _pix);
 
-typedef void (*crtc_ega_end_update_func)(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param);
-#define CRTC_EGA_END_UPDATE(name)       void name(crtc_ega_device *device, bitmap_ind16 &bitmap, const rectangle &cliprect, void *param)
+#define MCFG_CRTC_EGA_RES_OUT_DE_CB(_devcb) \
+	devcb = &crtc_ega_device::set_res_out_de_callback(*device, DEVCB2_##_devcb);
 
+#define MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(_devcb) \
+	devcb = &crtc_ega_device::set_res_out_hsync_callback(*device, DEVCB2_##_devcb);
 
-/* interface */
-struct crtc_ega_interface
-{
-	int m_hpixels_per_column;       /* number of pixels per video memory address */
+#define MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(_devcb) \
+	devcb = &crtc_ega_device::set_res_out_vsync_callback(*device, DEVCB2_##_devcb);
 
-	/* if specified, this gets called before any pixel update,
-	   optionally return a pointer that will be passed to the
-	   update and tear down callbacks */
-	crtc_ega_begin_update_func      m_begin_update;
-
-	/* this gets called for every row, the driver must output
-	   x_count * hpixels_per_column pixels.
-	   cursor_x indicates the character position where the cursor is, or -1
-	   if there is no cursor on this row */
-	crtc_ega_update_row_func        m_update_row;
-
-	/* if specified, this gets called after all row updating is complete */
-	crtc_ega_end_update_func            m_end_update;
-
-	/* if specified, this gets called for every change of the disply enable signal */
-	devcb_write_line    m_out_de_func;
-
-	/* if specified, this gets called for every change of the HSYNC signal */
-	devcb_write_line    m_out_hsync_func;
-
-	/* if specified, this gets called for every change of the VSYNC signal */
-	devcb_write_line    m_out_vsync_func;
-
-	devcb_write_line    m_out_vblank_func;
-};
+#define MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(_devcb) \
+	devcb = &crtc_ega_device::set_res_out_vblank_callback(*device, DEVCB2_##_devcb);
 
 
 class crtc_ega_device : public device_t,
-						public device_video_interface,
-						public crtc_ega_interface
+						public device_video_interface
 {
 public:
 	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _Object> static devcb2_base &set_res_out_de_callback(device_t &device, _Object object) 
+						{ return downcast<crtc_ega_device &>(device).m_res_out_de_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_res_out_hsync_callback(device_t &device, _Object object) 
+						{ return downcast<crtc_ega_device &>(device).m_res_out_hsync_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_res_out_vsync_callback(device_t &device, _Object object) 
+						{ return downcast<crtc_ega_device &>(device).m_res_out_vsync_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_res_out_vblank_callback(device_t &device, _Object object) 
+						{ return downcast<crtc_ega_device &>(device).m_res_out_vblank_cb.set_callback(object); }
+
+	static void set_begin_update_callback(device_t &device, crtc_ega_begin_update_delegate callback) { downcast<crtc_ega_device &>(device).m_begin_update_cb = callback; }
+	static void set_row_update_callback(device_t &device, crtc_ega_row_update_delegate callback) { downcast<crtc_ega_device &>(device).m_row_update_cb = callback; }
+	static void set_end_update_callback(device_t &device, crtc_ega_end_update_delegate callback) { downcast<crtc_ega_device &>(device).m_end_update_cb = callback; }
+	static void set_hpixels_per_column(device_t &device, int hpixels_per_column) { downcast<crtc_ega_device &>(device).m_hpixels_per_column = hpixels_per_column; }
+	
 	/* select one of the registers for reading or writing */
 	DECLARE_WRITE8_MEMBER( address_w );
 
@@ -106,19 +104,31 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_write_line   m_res_out_de_func;
-	devcb_resolved_write_line   m_res_out_cur_func;
-	devcb_resolved_write_line   m_res_out_hsync_func;
-	devcb_resolved_write_line   m_res_out_vsync_func;
-	devcb_resolved_write_line   m_res_out_vblank_func;
+	devcb2_write_line   m_res_out_de_cb;
+	devcb2_write_line   m_res_out_hsync_cb;
+	devcb2_write_line   m_res_out_vsync_cb;
+	devcb2_write_line   m_res_out_vblank_cb;
 
+	/* if specified, this gets called before any pixel update,
+	 optionally return a pointer that will be passed to the
+	 update and tear down callbacks */
+	crtc_ega_begin_update_delegate      m_begin_update_cb;
+	
+	/* this gets called for every row, the driver must output
+	 x_count * hpixels_per_column pixels.
+	 cursor_x indicates the character position where the cursor is, or -1
+	 if there is no cursor on this row */
+	crtc_ega_row_update_delegate        m_row_update_cb;
+	
+	/* if specified, this gets called after all row updating is complete */
+	crtc_ega_end_update_delegate        m_end_update_cb;
+	
 	/* ega/vga register file */
 	UINT8   m_horiz_char_total; /* 0x00 */
 	UINT8   m_horiz_disp;           /* 0x01 */
@@ -157,6 +167,7 @@ private:
 	UINT8   m_register_address_latch;
 	bool    m_cursor_state; /* 0 = off, 1 = on */
 	UINT8   m_cursor_blink_count;
+	int     m_hpixels_per_column;       /* number of pixels per video memory address */
 
 	/* output signals */
 	int     m_cur;

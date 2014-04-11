@@ -336,11 +336,6 @@ WRITE8_MEMBER( zorba_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(zorba_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( zorba, zorba_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
@@ -405,7 +400,8 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* Keyboard */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zorba_state, kbd_put))
 MACHINE_CONFIG_END
 
 ROM_START( zorba )

@@ -89,11 +89,6 @@ WRITE8_MEMBER( microdec_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(microdec_state, kbd_put)
-};
-
 static SLOT_INTERFACE_START( microdec_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -105,7 +100,8 @@ static MACHINE_CONFIG_START( microdec, microdec_state )
 	MCFG_CPU_IO_MAP(microdec_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(microdec_state, kbd_put))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats)

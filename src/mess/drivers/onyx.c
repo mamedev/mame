@@ -68,11 +68,6 @@ WRITE8_MEMBER( onyx_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(onyx_state, kbd_put)
-};
-
 #if 0
 WRITE_LINE_MEMBER( onyx_state::p8k_daisy_interrupt )
 {
@@ -420,7 +415,8 @@ static MACHINE_CONFIG_START( c8002, onyx_state )
 	//MCFG_Z80PIO_ADD("z80pio_2", XTAL_4MHz, p8k_16_pio_2_intf )
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(onyx_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

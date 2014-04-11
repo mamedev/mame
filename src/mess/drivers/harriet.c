@@ -180,11 +180,6 @@ WRITE8_MEMBER( harriet_state::kbd_put )
 	m_teletype_status |= 0x80;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(harriet_state, kbd_put)
-};
-
 void harriet_state::machine_start()
 {
 }
@@ -201,7 +196,8 @@ static MACHINE_CONFIG_START( harriet, harriet_state )
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(harriet_state, kbd_put))
 
 	MCFG_PALETTE_ADD("palette", 8)
 

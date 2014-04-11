@@ -446,13 +446,6 @@ WRITE8_MEMBER( abc80_state::kbd_w )
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(abc80_state, kbd_w)
-};
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -567,7 +560,8 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "slow")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("slow", abc830_slow)
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(abc80_state, kbd_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -96,11 +96,6 @@ WRITE8_MEMBER( mx2178_state::kbd_put )
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(mx2178_state, kbd_put)
-};
-
 static MC6845_UPDATE_ROW( update_row )
 {
 	mx2178_state *state = device->machine().driver_data<mx2178_state>();
@@ -196,7 +191,8 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 
 	/// TODO: hook up acia to keyboard and memory map
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(mx2178_state, kbd_put))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 614400)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(mx2178_state, write_acia_clock))

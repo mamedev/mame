@@ -454,11 +454,6 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 static TIMER_DEVICE_CALLBACK ( obj_irq_cb )
 {
 	sliver_state *state = timer.machine().driver_data<sliver_state>();
@@ -485,7 +480,7 @@ static MACHINE_CONFIG_START( sliver, sliver_state )
 	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update_sliver)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map, "palette")
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

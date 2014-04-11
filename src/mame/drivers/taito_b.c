@@ -2881,12 +2881,6 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-/* TODO: Properly hook up the HD63484 */
-static const hd63484_interface realpunc_hd63484_intf =
-{
-	0
-};
-
 static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	/* basic machine hardware */
@@ -2921,7 +2915,8 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 
-	MCFG_HD63484_ADD("hd63484", realpunc_hd63484_intf)
+	// TODO: convert to use H63484 and hook it up properly
+	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)

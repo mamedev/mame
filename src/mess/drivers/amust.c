@@ -202,12 +202,6 @@ WRITE8_MEMBER( amust_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(amust_state, kbd_put)
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout amust_charlayout =
 {
@@ -311,7 +305,8 @@ static MACHINE_CONFIG_START( amust, amust_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8, amust_crtc)
-	MCFG_ASCII_KEYBOARD_ADD("keybd", keyboard_intf)
+	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(amust_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525dd", floppy_image_device::default_floppy_formats)

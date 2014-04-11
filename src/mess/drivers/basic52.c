@@ -112,11 +112,6 @@ WRITE8_MEMBER( basic52_state::kbd_put )
 	m_term_data = data;
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(basic52_state, kbd_put)
-};
-
 static I8255_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,                 /* Port A read */
@@ -135,7 +130,8 @@ static MACHINE_CONFIG_START( basic31, basic52_state )
 
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(basic52_state, kbd_put))
 
 	MCFG_I8255_ADD("ppi8255", ppi8255_intf )
 MACHINE_CONFIG_END

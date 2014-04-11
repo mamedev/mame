@@ -160,12 +160,6 @@ WRITE8_MEMBER( tk80bs_state::kbd_put )
 	m_term_data = data;
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(tk80bs_state, kbd_put)
-};
-
-
 /* F4 Character Displayer */
 static const gfx_layout tk80bs_charlayout =
 {
@@ -202,7 +196,8 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi", ppi_intf)
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tk80bs_state, kbd_put))
 MACHINE_CONFIG_END
 
 

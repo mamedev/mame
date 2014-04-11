@@ -248,6 +248,7 @@ arm_be_cpu_device::arm_be_cpu_device(const machine_config &mconfig, const char *
 }
 
 
+
 void arm_cpu_device::cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
@@ -308,6 +309,20 @@ void arm_cpu_device::SetModeRegister( int mode, int rIndex, UINT32 value )
 
 
 /***************************************************************************/
+
+void arm_cpu_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const arm_interface *intf = reinterpret_cast<const arm_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<arm_interface *>(this) = *intf;
+
+	// or set default if none provided
+	else
+	{
+		coprotype = ARM_COPRO_TYPE_UNKNOWN_CP15;
+	}
+}
 
 void arm_cpu_device::device_reset()
 {
@@ -413,7 +428,11 @@ void arm_cpu_device::execute_run()
 		}
 		else if ((insn & 0x0f000000u) == 0x0e000000u)   /* Coprocessor */
 		{
-			HandleCoPro(insn);
+			if(coprotype == 1)
+				HandleCoProVL86C020(insn);
+			else
+				HandleCoPro(insn);
+
 			R15 += 4;
 		}
 		else if ((insn & 0x0f000000u) == 0x0f000000u)   /* Software interrupt */
@@ -1363,6 +1382,45 @@ UINT32 arm_cpu_device::DecimalToBCD(UINT32 value)
 	return accumulator;
 }
 
+void arm_cpu_device::HandleCoProVL86C020( UINT32 insn )
+{
+	UINT32 rn=(insn>>12)&0xf;
+	UINT32 crn=(insn>>16)&0xf;
+
+	m_icount -= S_CYCLE;
+
+	/* MRC - transfer copro register to main register */
+	if( (insn&0x0f100010)==0x0e100010 )
+	{
+		if(crn == 0) // ID, read only
+		{
+			/*
+			0x41<<24 <- Designer code, Acorn Computer Ltd.
+			0x56<<16 <- Manufacturer code, VLSI Technology Inc.
+			0x03<<8 <- Part type, VLC86C020
+			0x00<<0 <- Revision number, 0
+			*/
+			SetRegister(rn, 0x41560300);
+			debugger_break(machine());
+		}
+		else
+			SetRegister(rn, m_coproRegister[crn]);
+
+	}
+	/* MCR - transfer main register to copro register */
+	else if( (insn&0x0f100010)==0x0e000010 )
+	{
+		if(crn != 0)
+			m_coproRegister[crn]=GetRegister(rn);
+
+		printf("%08x:  VL86C020 copro instruction write %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
+	}
+	else
+	{
+		printf("%08x:  Unimplemented VL86C020 copro instruction %08x %d %d\n", R15 & 0x3ffffff, insn,rn,crn);
+		debugger_break(machine());
+	}
+}
 
 void arm_cpu_device::HandleCoPro( UINT32 insn )
 {

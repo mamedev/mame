@@ -101,12 +101,6 @@ WRITE8_MEMBER( ec65_state::kbd_put )
 	}
 }
 
-
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(ec65_state, kbd_put)
-};
-
 void ec65_state::machine_reset()
 {
 	m_via_1->write_pb0(1);
@@ -221,7 +215,8 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ec65_state, kbd_put))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ec65k, ec65k_state )

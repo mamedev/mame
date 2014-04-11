@@ -154,11 +154,6 @@ WRITE_LINE_MEMBER( poly_state::write_acia_clock )
 	m_acia->write_rxc(state);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(poly_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( poly, poly_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, XTAL_12MHz / 3) // 12.0576MHz
@@ -203,7 +198,8 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	MCFG_MC6854_ADD("adlc", adlc_intf)
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(poly_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

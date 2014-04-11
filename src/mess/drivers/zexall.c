@@ -162,11 +162,6 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-static GENERIC_TERMINAL_INTERFACE( zexall_terminal_intf )
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( zexall, zexall_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz*10)
@@ -175,7 +170,7 @@ static MACHINE_CONFIG_START( zexall, zexall_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, zexall_terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 
 

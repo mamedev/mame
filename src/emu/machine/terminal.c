@@ -141,14 +141,16 @@ static const UINT8 terminal_font[256*16] =
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF")
+		m_io_term_conf(*this, "TERM_CONF"),
+		m_keyboard_cb(*this)
 {
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
 		m_palette(*this, "palette"),
-		m_io_term_conf(*this, "TERM_CONF")
+		m_io_term_conf(*this, "TERM_CONF"),
+		m_keyboard_cb(*this)
 {
 }
 
@@ -304,11 +306,6 @@ WRITE8_MEMBER( generic_terminal_device::kbd_put )
 		send_key(data);
 }
 
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, generic_terminal_device, kbd_put)
-};
-
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
@@ -323,7 +320,8 @@ static MACHINE_CONFIG_FRAGMENT( generic_terminal )
 
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(WRITE8(generic_terminal_device, kbd_put))
 MACHINE_CONFIG_END
 
 machine_config_constructor generic_terminal_device::device_mconfig_additions() const
@@ -333,20 +331,7 @@ machine_config_constructor generic_terminal_device::device_mconfig_additions() c
 
 void generic_terminal_device::device_start()
 {
-	m_keyboard_func.resolve(m_keyboard_cb, *this);
-}
-
-void generic_terminal_device::device_config_complete()
-{
-	const terminal_interface *intf = reinterpret_cast<const terminal_interface *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<terminal_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_keyboard_cb, 0, sizeof(m_keyboard_cb));
-	}
+	m_keyboard_cb.resolve_safe();
 }
 
 void generic_terminal_device::device_reset()

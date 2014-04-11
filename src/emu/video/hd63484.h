@@ -21,13 +21,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct hd63484_interface
-{
-	int        m_skattva_hack;
-};
-
-class hd63484_device : public device_t,
-										public hd63484_interface
+class hd63484_device : public device_t
 {
 public:
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -45,7 +39,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -64,6 +57,7 @@ private:
 	INT16        m_cpx, m_cpy;
 
 	int          m_regno;
+	int          m_skattva_hack;
 
 	void doclr16( int opcode, UINT16 fill, int *dst, INT16 _ax, INT16 _ay );
 	void docpy16( int opcode, int src, int *dst, INT16 _ax, INT16 _ay );
@@ -78,18 +72,8 @@ private:
 	void paint( int sx, int sy, int col );
 
 	void command_w(UINT16 cmd);
-
 };
 
 extern ATTR_DEPRECATED const device_type HD63484;
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_HD63484_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, HD63484, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 
 #endif /* __HD63484_H__ */

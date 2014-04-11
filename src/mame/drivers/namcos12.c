@@ -1077,8 +1077,8 @@ public:
 
 	int m_ttt_cnt;
 	UINT32 m_ttt_val[2];
-	int m_s12_porta;
-	int m_s12_lastpB;
+	UINT8 m_sub_porta;
+	UINT8 m_sub_portb;
 
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(sharedram_r);
@@ -1235,7 +1235,7 @@ void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state 
 {
 	m_sub->set_input_line(1, vblank_state ? ASSERT_LINE : CLEAR_LINE);
 	m_adc->adtrg_w(vblank_state);
-	m_s12_lastpB = (m_s12_lastpB & 0x7f) | (vblank_state << 7);
+	m_sub_portb = (m_sub_portb & 0x7f) | (vblank_state << 7);
 }
 
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
@@ -1473,34 +1473,34 @@ READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 
 READ16_MEMBER(namcos12_state::s12_mcu_pa_r)
 {
-	return m_s12_porta;
+	return m_sub_porta;
 }
 
 WRITE16_MEMBER(namcos12_state::s12_mcu_pa_w)
 {
 	logerror("pa_w %02x\n", data);
-	m_s12_porta = data;
-	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
-	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
+	m_sub_porta = data;
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 READ16_MEMBER(namcos12_state::s12_mcu_portB_r)
 {
-	return m_s12_lastpB;
+	return m_sub_portb;
 }
 
 WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
 {
-	m_s12_lastpB = data;
-	m_rtc->ce_w((m_s12_lastpB & 0x20) && (m_s12_porta & 1));
-	m_settings->ce_w((m_s12_lastpB & 0x20) && !(m_s12_porta & 1));
+	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
+	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
+	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 	AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(h8_device::PORT_8, h8_device::PORT_8) AM_READ(s12_mcu_p8_r) AM_WRITENOP
+	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READWRITE(s12_mcu_pa_r, s12_mcu_pa_w)
+	AM_RANGE(h8_device::PORT_B, h8_device::PORT_B) AM_READWRITE(s12_mcu_portB_r, s12_mcu_portB_w)
 	AM_RANGE(h8_device::ADC_0, h8_device::ADC_0) AM_NOP
 	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_NOP
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_NOP
@@ -1508,26 +1508,21 @@ static ADDRESS_MAP_START( s12h8iomap, AS_IO, 16, namcos12_state )
 ADDRESS_MAP_END
 
 
-/* Golgo 13 lightgun inputs
- *
- * Note: The H8/3002's ADC is 10 bits wide, but
- * it expects the 10-bit value to be left-justified
- * within the 16-bit word.
- */
+// Golgo 13 lightgun inputs
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
 {
-	return ioport("LIGHT0_X")->read() << 2;
+	return ioport("LIGHT0_X")->read();
 }
 
 READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 {
-	return ioport("LIGHT0_Y")->read() << 2;
+	return ioport("LIGHT0_Y")->read();
 }
 
 static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
-	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r )
-	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r )
+	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
+	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r)
 
 	AM_IMPORT_FROM( s12h8iomap )
 ADDRESS_MAP_END
@@ -1537,8 +1532,8 @@ DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
 	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
-	m_s12_porta = 0;
-	m_s12_lastpB = 0x50;
+	m_sub_porta = 0;
+	m_sub_portb = 0x50;
 
 	m_n_tektagdmaoffset = 0;
 	m_n_dmaoffset = 0;

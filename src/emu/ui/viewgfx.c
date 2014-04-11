@@ -621,6 +621,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 			break;
 		xcells--;
 	}
+	info.columns[set] = xcells;
 
 	// worst case, we need a pixel scale of 1
 	pixelscale = MAX(1, pixelscale);
@@ -770,8 +771,8 @@ static void gfxset_handle_keys(running_machine &machine, ui_gfx_state &state, in
 	// clamp within range
 	if (info.columns[set] < 2)
 	{ info.columns[set] = 2; state.bitmap_dirty = true; }
-	if (info.columns[set] > 32)
-	{ info.columns[set] = 32; state.bitmap_dirty = true; }
+	if (info.columns[set] > 128)
+	{ info.columns[set] = 128; state.bitmap_dirty = true; }
 
 	// handle rotation (R)
 	if (ui_input_pressed(machine, IPT_UI_ROTATE))

@@ -101,11 +101,6 @@ WRITE_LINE_MEMBER(imsai_state::write_uart_clock)
 	m_uart->write_rxc(state);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(imsai_state, kbd_put)
-};
-
 WRITE8_MEMBER( imsai_state::control_w )
 {
 }
@@ -122,7 +117,8 @@ static MACHINE_CONFIG_START( imsai, imsai_state )
 	MCFG_CPU_IO_MAP(imsai_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(imsai_state, kbd_put))
 
 	/* Devices */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
