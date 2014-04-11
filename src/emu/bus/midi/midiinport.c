@@ -17,13 +17,9 @@ midiin_port_device::midiin_port_device(const machine_config &mconfig, const char
 {
 }
 
-static midiin_config midiin_port_image_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midiin_port_device, read)
-};
-
 static MACHINE_CONFIG_FRAGMENT(midiin_port_config)
-	MCFG_MIDIIN_ADD("midiinimg", midiin_port_image_config)
+	MCFG_DEVICE_ADD("midiinimg", MIDIIN, 0)
+	MCFG_MIDIIN_INPUT_CB(WRITELINE(midiin_port_device, read))
 MACHINE_CONFIG_END
 
 machine_config_constructor midiin_port_device::device_mconfig_additions() const

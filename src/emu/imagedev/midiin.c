@@ -22,7 +22,8 @@ const device_type MIDIIN = &device_creator<midiin_device>;
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock, "midiin", __FILE__),
 		device_image_interface(mconfig, *this),
-			device_serial_interface(mconfig, *this)
+			device_serial_interface(mconfig, *this),
+			m_input_cb(*this)
 {
 }
 
@@ -32,7 +33,7 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 
 void midiin_device::device_start()
 {
-	m_input_func.resolve(m_input_callback, *this);
+	m_input_cb.resolve_safe();
 	m_timer = timer_alloc(0);
 	m_midi = NULL;
 	m_timer->enable(false);
@@ -55,15 +56,6 @@ void midiin_device::device_reset()
 
 void midiin_device::device_config_complete(void)
 {
-	const midiin_config *intf = reinterpret_cast<const midiin_config *>(static_config());
-	if(intf != NULL)
-	{
-		*static_cast<midiin_config *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_input_callback, 0, sizeof(m_input_callback));
-	}
 	update_names();
 }
 
@@ -152,7 +144,7 @@ void midiin_device::tra_complete()
 void midiin_device::tra_callback()
 {
 	int bit = transmit_register_get_data_bit();
-	m_input_func(bit);
+	m_input_cb(bit);
 }
 
 void midiin_device::xmit_char(UINT8 data)
