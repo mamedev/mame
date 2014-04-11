@@ -64,7 +64,7 @@ INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
 WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 {
 	/* bits 4-6 = bank number */
-	membank("bank1")->set_entry((data & 0x70) >> 4);
+	m_rombank->set_entry((data & 0x70) >> 4);
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(machine(), 0,data & 0x01);
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)                          /* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)                    /* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                                        /* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")                              /* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
 ADDRESS_MAP_END
 
@@ -224,7 +224,7 @@ void rockrage_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
+	m_rombank->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_layer_colorbase));
