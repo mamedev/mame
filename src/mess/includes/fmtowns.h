@@ -272,6 +272,8 @@ class towns_state : public driver_device
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 
+	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
+
 	void towns_update_video_banks(address_space&);
 	void init_serial_rom();
 	void init_rtc();
