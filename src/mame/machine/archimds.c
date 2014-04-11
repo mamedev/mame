@@ -685,9 +685,19 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 			{
 				case 0: return ioc_ctrl_r(space,offset,mem_mask);
 				case 1:
-					if (m_fdc) {
-						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return m_fdc->data_r(space, offset&0xf);
+					if (m_fdc)
+					{
+						//printf("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
+
+						switch(ioc_addr & 0xc)
+						{
+							case 0x00: return m_fdc->status_r();
+							case 0x04: return m_fdc->track_r();
+							case 0x08: return m_fdc->sector_r();
+							case 0x0c: return m_fdc->data_r();
+						}
+
+						return 0;
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -702,14 +712,21 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					if (m_fdc) {
+					if (m_fdc)
+					{
 						switch(ioc_addr & 0xfffc)
 						{
+							case 0x18: return 0xff; // FDC latch B
+							case 0x40: return 0xff; // FDC latch A
 							case 0x50: return 0; //fdc type, new model returns 5 here
+                            case 0x70: return 0x0F;
+                            case 0x74: return 0xFF; // unknown
+//                          case 0x78: /* joystick */
+//                          case 0x7c:
 						}
 					}
 
-					logerror("IOC: Internal Latches Read %08x\n",ioc_addr);
+					//printf("IOC: Internal Latches Read %08x\n",ioc_addr);
 
 					return 0xffff;
 			}
@@ -740,10 +757,30 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 			{
 				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
 				case 1:
-						if (m_fdc) {
-							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							m_fdc->data_w(space, offset&0xf, data&0xff);
-						} else {
+						if (m_fdc)
+						{
+							//printf("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
+							switch(ioc_addr & 0xc)
+							{
+								case 0x00:
+									m_fdc->cmd_w(data);
+									return;
+
+								case 0x04:
+									m_fdc->track_w(data);
+									return;
+
+								case 0x08:
+									m_fdc->sector_w(data);
+									return;
+
+									case 0x0c:
+									m_fdc->data_w(data);
+									return;
+							}
+						}
+						else
+						{
 							logerror("Write to FDC device?\n");
 						}
 						return;
@@ -757,11 +794,12 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					logerror("IOC: Internal Podule Write\n");
 					return;
 				case 5:
-					if (m_fdc) {
+					if (m_fdc)
+					{
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								m_fdc->dden_w(BIT(data, 1));
+								m_fdc->dden_w(!(BIT(data, 1)));
 								return;
 
 							case 0x40: // latch A
@@ -769,19 +807,21 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 
 								if (data & 1) { floppy = m_floppy0->get_device(); }
 								if (data & 2) { floppy = m_floppy1->get_device(); }
-								//if (data & 4) { m_fdc->set_drive(2); }
-								//if (data & 8) { m_fdc->set_drive(3); }
+								if (data & 4) { floppy = NULL; } // floppy 2
+								if (data & 8) { floppy = NULL; } // floppy 3
 
 								m_fdc->set_floppy(floppy);
 
 								if(floppy)
 								{
 									floppy->mon_w(BIT(data, 5));
-									m_fdc->dden_w(BIT(data, 4));
+									floppy->ss_w(BIT(data, 4));
 								}
 								//bit 5 is motor on
 								return;
 						}
+
+						//printf("%08x\n",ioc_addr);
 					}
 					break;
 			}
