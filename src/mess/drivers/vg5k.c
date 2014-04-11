@@ -405,7 +405,7 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_CASSETTE_ADD( "cassette", vg5k_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

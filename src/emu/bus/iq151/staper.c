@@ -34,7 +34,7 @@ static I8255_INTERFACE( iq151_staper_ppi_intf )
 static MACHINE_CONFIG_FRAGMENT( iq151_staper )
 	MCFG_I8255A_ADD("ppi8255", iq151_staper_ppi_intf)
 
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 MACHINE_CONFIG_END
 
 //**************************************************************************
