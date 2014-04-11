@@ -2065,12 +2065,6 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 	m_tmp68301->external_interrupt_2();   // to do: hook up x1-10 interrupts
 }
 
-static const x1_010_interface x1_010_sound_intf =
-{
-	0x0000,     /* address */
-};
-
-
 static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
@@ -2098,7 +2092,6 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_50MHz/3)   // clock?
-	MCFG_SOUND_CONFIG(x1_010_sound_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

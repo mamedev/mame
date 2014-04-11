@@ -86,6 +86,7 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, X1_010, "X1-010", tag, owner, clock, "x1_010", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rate(0),
+		m_adr(0),
 		m_stream(NULL),
 		m_region(NULL),
 		m_sound_enable(0),
@@ -95,26 +96,6 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_HI_WORD_BUF, 0, sizeof(m_HI_WORD_BUF));
 	memset(m_smp_offset, 0, sizeof(SETA_NUM_CHANNELS));
 	memset(m_env_offset, 0, sizeof(SETA_NUM_CHANNELS));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void x1_010_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const x1_010_interface *intf = reinterpret_cast<const x1_010_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<x1_010_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_adr = 0;
-	}
 }
 
 //-------------------------------------------------
