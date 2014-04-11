@@ -685,9 +685,9 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 			{
 				case 0: return ioc_ctrl_r(space,offset,mem_mask);
 				case 1:
-					if (m_wd1772) {
+					if (m_fdc) {
 						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return m_wd1772->data_r(space, offset&0xf);
+						return m_fdc->data_r(space, offset&0xf);
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -702,7 +702,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					if (m_wd1772) {
+					if (m_fdc) {
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x50: return 0; //fdc type, new model returns 5 here
@@ -740,9 +740,9 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 			{
 				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
 				case 1:
-						if (m_wd1772) {
+						if (m_fdc) {
 							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							m_wd1772->data_w(space, offset&0xf, data&0xff);
+							m_fdc->data_w(space, offset&0xf, data&0xff);
 						} else {
 							logerror("Write to FDC device?\n");
 						}
@@ -757,20 +757,28 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					logerror("IOC: Internal Podule Write\n");
 					return;
 				case 5:
-					if (m_wd1772) {
+					if (m_fdc) {
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								m_wd1772->dden_w(BIT(data, 1));
+								m_fdc->dden_w(BIT(data, 1));
 								return;
 
 							case 0x40: // latch A
-								if (data & 1) { m_wd1772->set_drive(0); }
-								if (data & 2) { m_wd1772->set_drive(1); }
-								if (data & 4) { m_wd1772->set_drive(2); }
-								if (data & 8) { m_wd1772->set_drive(3); }
+								floppy_image_device *floppy = NULL;
 
-								m_wd1772->set_side((data & 0x10)>>4);
+								if (data & 1) { floppy = m_floppy0->get_device(); }
+								if (data & 2) { floppy = m_floppy1->get_device(); }
+								//if (data & 4) { m_fdc->set_drive(2); }
+								//if (data & 8) { m_fdc->set_drive(3); }
+
+								m_fdc->set_floppy(floppy);
+
+								if(floppy)
+								{
+									floppy->mon_w(BIT(data, 5));
+									m_fdc->dden_w(BIT(data, 4));
+								}
 								//bit 5 is motor on
 								return;
 						}
@@ -920,6 +928,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 
 		//#ifdef MAME_DEBUG
+		if(0)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
 		//#endif
 

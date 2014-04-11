@@ -15,6 +15,7 @@
  *  \- some subtle memory paging fault
  *  \- missing RAM max size
  *  \- ARM bug?
+ *  - 38776b8
  *
  *
 =======================================================================================
@@ -58,14 +59,14 @@
 
 
 #include "emu.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
 //#include "machine/aakart.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "formats/applix_dsk.h"
 
 
 class a310_state : public archimedes_state
@@ -87,6 +88,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
     DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
 protected:
@@ -296,13 +298,13 @@ static INPUT_PORTS_START( a310 )
 	PORT_BIT (0xf8, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
-static const wd17xx_interface a310_wd17xx_interface =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(a310_state, a310_wd177x_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(a310_state, a310_wd177x_drq_w),
-	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
-};
+FLOPPY_FORMATS_MEMBER( a310_state::floppy_formats )
+	FLOPPY_APPLIX_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( a310_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
 {
@@ -331,13 +333,14 @@ static ARM_INTERFACE( a310_config )
 	ARM_COPRO_TYPE_VL86C020
 };
 
+
 static MACHINE_CONFIG_START( a310, a310_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 	MCFG_CPU_CONFIG(a310_config)
 
-	MCFG_AAKART_ADD("kart", 8000000/256, kart_interface) // TODO: frequency
+	MCFG_AAKART_ADD("kart", 8000000/256, kart_interface)
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x100)
@@ -356,9 +359,9 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("512K, 1M, 4M, 8M, 16M")
 
-	MCFG_WD1772_ADD("wd1772", a310_wd17xx_interface )
-
-	//MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(a310_floppy_interface)
+	MCFG_WD1772x_ADD("fdc", 8000000 / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", a310_floppies, "35dd", a310_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", a310_floppies, "35dd", a310_state::floppy_formats)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac0", DAC, 0)

@@ -10,7 +10,7 @@
 #include "machine/aakart.h"
 #include "sound/dac.h"
 #include "machine/i2cmem.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
@@ -47,7 +47,9 @@ public:
 		m_kart(*this, "kart"),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
-		m_wd1772(*this, "wd1772"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_vram(*this, "vram"),
 		m_screen(*this, "screen"),
@@ -92,7 +94,9 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
-	optional_device<wd1772_device> m_wd1772;
+	optional_device<wd1772_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_vram;
 	required_device<screen_device> m_screen;
