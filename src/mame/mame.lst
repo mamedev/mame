@@ -10868,11 +10868,13 @@ pepp0221a       // (c) 1987 IGT - International Game Technology
 pepp0224        // (c) 1987 IGT - International Game Technology
 pepp0224a       // (c) 1987 IGT - International Game Technology
 pepp0230        // (c) 1987 IGT - International Game Technology
+pepp0242        // (c) 1987 IGT - International Game Technology
 pepp0249        // (c) 1987 IGT - International Game Technology
 pepp0250        // (c) 1987 IGT - International Game Technology
 pepp0265        // (c) 1987 IGT - International Game Technology
 pepp0265a       // (c) 1987 IGT - International Game Technology
 pepp0274        // (c) 1987 IGT - International Game Technology
+pepp0288        // (c) 1987 IGT - International Game Technology
 pepp0290        // (c) 1987 IGT - International Game Technology
 pepp0291        // (c) 1987 IGT - International Game Technology
 pepp0409        // (c) 1987 IGT - International Game Technology
@@ -10885,10 +10887,12 @@ pepp0423        // (c) 1987 IGT - International Game Technology
 pepp0426        // (c) 1987 IGT - International Game Technology
 pepp0428        // (c) 1987 IGT - International Game Technology
 pepp0429        // (c) 1987 IGT - International Game Technology
+pepp0431        // (c) 1987 IGT - International Game Technology
 pepp0434        // (c) 1987 IGT - International Game Technology
 pepp0447        // (c) 1987 IGT - International Game Technology
 pepp0447a       // (c) 1987 IGT - International Game Technology
 pepp0449        // (c) 1987 IGT - International Game Technology
+pepp0449a       // (c) 1987 IGT - International Game Technology
 pepp0452        // (c) 1987 IGT - International Game Technology
 pepp0454        // (c) 1987 IGT - International Game Technology
 pepp0455        // (c) 1987 IGT - International Game Technology
@@ -10971,6 +10975,7 @@ pex0055pp       // (c) 1995 IGT - International Game Technology
 pex0055pq       // (c) 1995 IGT - International Game Technology
 pex0055pr       // (c) 1995 IGT - International Game Technology
 pex0060p        // (c) 1995 IGT - International Game Technology
+pex0150p        // (c) 1995 IGT - International Game Technology
 pex0158p        // (c) 1995 IGT - International Game Technology
 pex0171p        // (c) 1995 IGT - International Game Technology
 pex0188p        // (c) 1995 IGT - International Game Technology
@@ -10979,6 +10984,7 @@ pex0197p        // (c) 1995 IGT - International Game Technology
 pex0203p        // (c) 1995 IGT - International Game Technology
 pex0224p        // (c) 1995 IGT - International Game Technology
 pex0225p        // (c) 1995 IGT - International Game Technology
+pex0242p        // (c) 1995 IGT - International Game Technology
 pex0265p        // (c) 1995 IGT - International Game Technology
 pex0291p        // (c) 1995 IGT - International Game Technology
 pex0417p        // (c) 1995 IGT - International Game Technology
@@ -10995,6 +11001,7 @@ pex0459pa       // (c) 1995 IGT - International Game Technology
 pex0508p        // (c) 1995 IGT - International Game Technology
 pex0514p        // (c) 1995 IGT - International Game Technology
 pex0515p        // (c) 1995 IGT - International Game Technology
+pex0516p        // (c) 1995 IGT - International Game Technology
 pex0536p        // (c) 1995 IGT - International Game Technology
 pex0537p        // (c) 1995 IGT - International Game Technology
 pex0568p        // (c) 1995 IGT - International Game Technology
@@ -11011,9 +11018,11 @@ pex2027p        // (c) 1995 IGT - International Game Technology
 pex2031p        // (c) 1995 IGT - International Game Technology
 pex2035p        // (c) 1995 IGT - International Game Technology
 pex2036p        // (c) 1995 IGT - International Game Technology
+pex2038p        // (c) 1995 IGT - International Game Technology
 pex2040p        // (c) 1995 IGT - International Game Technology
 pex2042p        // (c) 1995 IGT - International Game Technology
 pex2043p        // (c) 1995 IGT - International Game Technology
+pex2044p        // (c) 1995 IGT - International Game Technology
 pex2045p        // (c) 1995 IGT - International Game Technology
 pex2066p        // (c) 1995 IGT - International Game Technology
 pex2067p        // (c) 1995 IGT - International Game Technology
@@ -11031,11 +11040,15 @@ pex2245p        // (c) 1995 IGT - International Game Technology
 pex2245pa       // (c) 1995 IGT - International Game Technology
 pex2250p        // (c) 1995 IGT - International Game Technology
 pex2251p        // (c) 1995 IGT - International Game Technology
+pex2272p        // (c) 1995 IGT - International Game Technology
+pex2275p        // (c) 1995 IGT - International Game Technology
 pex2283p        // (c) 1995 IGT - International Game Technology
 pex2284p        // (c) 1995 IGT - International Game Technology
 pex2302p        // (c) 1995 IGT - International Game Technology
 pex2303p        // (c) 1995 IGT - International Game Technology
+pex2306p        // (c) 1995 IGT - International Game Technology
 pex2307p        // (c) 1995 IGT - International Game Technology
+pex2310p        // (c) 1995 IGT - International Game Technology
 pex2314p        // (c) 1995 IGT - International Game Technology
 pex2374p        // (c) 1995 IGT - International Game Technology
 pex2377p        // (c) 1995 IGT - International Game Technology
@@ -11054,9 +11067,11 @@ pexm005p        // (c) 1997 IGT - International Game Technology
 pexm006p        // (c) 1997 IGT - International Game Technology
 pexm007p        // (c) 1997 IGT - International Game Technology
 pexm008p        // (c) 1997 IGT - International Game Technology
+pexmp013        // (c) 1997 IGT - International Game Technology
 pexmp017        // (c) 1997 IGT - International Game Technology
 pexmp017a       // (c) 1997 IGT - International Game Technology
 pexmp017b       // (c) 1997 IGT - International Game Technology
+pexmp026        // (c) 1997 IGT - International Game Technology
 pexmp030        // (c) 1997 IGT - International Game Technology
 
 elgrande        // (c) 1982 Tuni Electro Service / E.T. Marketing
