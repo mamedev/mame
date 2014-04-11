@@ -1488,17 +1488,6 @@ void ip22_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_RTC.nRAM, 0x200);
 }
 
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_STANDARD,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
 DRIVER_INIT_MEMBER(ip22_state,ip225015)
 {
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
@@ -1643,7 +1632,9 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^rspeaker", 1.0)
 
-	MCFG_KBDC8042_ADD("kbdc", at8042)
+	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
+	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )

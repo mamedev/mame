@@ -197,6 +197,11 @@ const device_type KBDC8042 = &device_creator<kbdc8042_device>;
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, KBDC8042, "Keyboard Controller 8042", tag, owner, clock, "kbdc8042", __FILE__)
 	, m_keyboard_dev(*this, "at_keyboard")
+	, m_system_reset_cb(*this)
+	, m_gate_a20_cb(*this)
+	, m_input_buffer_full_cb(*this)
+	, m_output_buffer_empty_cb(*this)
+	, m_speaker_cb(*this)
 {
 }
 
@@ -209,33 +214,6 @@ machine_config_constructor kbdc8042_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( keyboard );
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kbdc8042_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const kbdc8042_interface *intf = reinterpret_cast<const kbdc8042_interface *>(static_config());
-
-	if (intf != NULL)
-	{
-		*static_cast<kbdc8042_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_system_reset_cb, 0, sizeof(m_system_reset_cb));
-		memset(&m_gate_a20_cb, 0, sizeof(m_gate_a20_cb));
-		memset(&m_input_buffer_full_func, 0, sizeof(m_input_buffer_full_func));
-		memset(&m_output_buffer_empty_cb, 0, sizeof(m_output_buffer_empty_cb));
-		memset(&m_speaker_cb, 0, sizeof(m_speaker_cb));
-	}
-}
-
 /*-------------------------------------------------
     device_start - device-specific startup
 -------------------------------------------------*/
@@ -243,11 +221,11 @@ void kbdc8042_device::device_config_complete()
 void kbdc8042_device::device_start()
 {
 	// resolve callbacks
-	m_system_reset_func.resolve(m_system_reset_cb, *this);
-	m_gate_a20_func.resolve(m_gate_a20_cb, *this);
-	m_input_buffer_full_func.resolve(m_input_buffer_full_cb, *this);
-	m_output_buffer_empty_func.resolve(m_output_buffer_empty_cb, *this);
-	m_speaker_func.resolve(m_speaker_cb, *this);
+	m_system_reset_cb.resolve_safe();
+	m_gate_a20_cb.resolve();
+	m_input_buffer_full_cb.resolve();
+	m_output_buffer_empty_cb.resolve_safe();
+	m_speaker_cb.resolve();
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 }
 
@@ -271,8 +249,8 @@ void kbdc8042_device::at_8042_set_outport(UINT8 data, int initial)
 	m_outport = data;
 	if (change & 0x02)
 	{
-		if (!m_gate_a20_func.isnull())
-			m_gate_a20_func(data & 0x02 ? 1 : 0);
+		if (!m_gate_a20_cb.isnull())
+			m_gate_a20_cb(data & 0x02 ? 1 : 0);
 	}
 }
 
@@ -286,7 +264,7 @@ TIMER_CALLBACK_MEMBER( kbdc8042_device::kbdc8042_clr_int )
 {
 	/* Lets 8952's timers do their job before clear the interrupt line, */
 	/* else Keyboard interrupt never happens. */
-	m_input_buffer_full_func(0);
+	m_input_buffer_full_cb(0);
 }
 
 void kbdc8042_device::at_8042_receive(UINT8 data)
@@ -297,9 +275,9 @@ void kbdc8042_device::at_8042_receive(UINT8 data)
 	m_data = data;
 	m_keyboard.received = 1;
 
-	if (!m_input_buffer_full_func.isnull())
+	if (!m_input_buffer_full_cb.isnull())
 	{
-		m_input_buffer_full_func(1);
+		m_input_buffer_full_cb(1);
 		/* Lets 8952's timers do their job before clear the interrupt line, */
 		/* else Keyboard interrupt never happens. */
 		machine().scheduler().timer_set(attotime::from_usec(2), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_clr_int),this));
@@ -515,8 +493,8 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 	case 1:
 		m_speaker = data;
-		if (!m_speaker_func.isnull())
-					m_speaker_func(0, m_speaker);
+		if (!m_speaker_cb.isnull())
+					m_speaker_cb((offs_t)0, m_speaker);
 
 		break;
 
@@ -617,7 +595,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			 * the bits low set in the command byte.  The only pulse that has
 			 * an effect currently is bit 0, which pulses the CPU's reset line
 			 */
-			m_system_reset_func(PULSE_LINE);
+			m_system_reset_cb(PULSE_LINE);
 			at_8042_set_outport(m_outport | 0x02, 0);
 			break;
 		}

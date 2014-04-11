@@ -164,24 +164,8 @@ WRITE_LINE_MEMBER( pcat_base_state::at_pit8254_out2_changed )
 	m_kbdc->write_out2(state);
 }
 
-/*************************************************************
- *
- * Keyboard
- *
- *************************************************************/
 
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
-ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
+ ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffffffff)
@@ -209,5 +193,9 @@ MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
-	MCFG_KBDC8042_ADD("kbdc", at8042)
+	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
+	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir1_w))
 MACHINE_CONFIG_END
