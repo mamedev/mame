@@ -979,13 +979,6 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static const namco_interface namco_config =
-{
-	8,      /* number of voices */
-	0       /* stereo */
-};
-
-
 static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	/* basic machine hardware */
@@ -1024,7 +1017,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

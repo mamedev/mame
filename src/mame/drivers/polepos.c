@@ -823,17 +823,6 @@ GFXDECODE_END
 
 
 /*********************************************************************
- * Sound interfaces
- *********************************************************************/
-
-static const namco_interface namco_config =
-{
-	8,              /* number of voices */
-	1               /* stereo */
-};
-
-
-/*********************************************************************
  * Machine driver
  *********************************************************************/
 
@@ -911,7 +900,8 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
+	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
@@ -979,7 +969,8 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
+	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

@@ -121,20 +121,6 @@ WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
 
 /*************************************
  *
- *  Audio
- *
- *************************************/
-
-static const namco_interface namco_config =
-{
-	3,      /* number of voices */
-	0       /* stereo */
-};
-
-
-
-/*************************************
- *
  *  Coin counter
  *
  *************************************/
@@ -408,7 +394,7 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DAC_ADD("dac")

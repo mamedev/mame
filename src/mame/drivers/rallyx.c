@@ -797,12 +797,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const namco_interface namco_config =
-{
-	3,              /* number of voices */
-	0               /* stereo */
-};
-
 static const char *const rallyx_sample_names[] =
 {
 	"*rallyx",
@@ -880,7 +874,7 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SAMPLES_ADD("samples", rallyx_samples_interface)

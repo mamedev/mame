@@ -364,14 +364,6 @@ GFXDECODE_END
 
 
 
-static const namco_interface namco_config =
-{
-	8,                  /* number of voices */
-	0                   /* stereo */
-};
-
-
-
 static MACHINE_CONFIG_START( baraduke, baraduke_state )
 
 	/* basic machine hardware */
@@ -401,7 +393,7 @@ static MACHINE_CONFIG_START( baraduke, baraduke_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
