@@ -778,13 +778,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-static const sega_pcm_interface segapcm_interface =
-{
-	BANK_512
-};
-
-
-
 //**************************************************************************
 //  GRAPHICS DECODING
 //**************************************************************************
@@ -882,7 +875,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
 
 	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz)
-	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -921,7 +914,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
 
 	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -943,7 +936,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2151 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz/2)
-	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

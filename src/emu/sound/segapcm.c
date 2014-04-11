@@ -19,6 +19,7 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_ram(NULL),
 		m_rom(NULL),
+		m_bank(0),
 		m_bankshift(0),
 		m_bankmask(0),
 		m_rgnmask(0),
@@ -34,17 +35,16 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 void segapcm_device::device_start()
 {
 	int mask, rom_mask, len;
-	const sega_pcm_interface *intf = (const sega_pcm_interface *)static_config();
 
 	m_rom = *region();
 	m_ram = auto_alloc_array(machine(), UINT8, 0x800);
 
 	memset(m_ram, 0xff, 0x800);
 
-	m_bankshift = (UINT8)(intf->bank);
-	mask = intf->bank >> 16;
-	if(!mask)
-		mask = BANK_MASK7>>16;
+	m_bankshift = (UINT8) m_bank;
+	mask = m_bank >> 16;
+	if (!mask)
+		mask = BANK_MASK7 >> 16;
 
 	len = region()->bytes();
 	m_rgnmask = len - 1;

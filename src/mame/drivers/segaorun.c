@@ -1160,17 +1160,6 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  SOUND DEFINITIONS
-//**************************************************************************
-
-static const sega_pcm_interface segapcm_interface =
-{
-	BANK_512
-};
-
-
-
-//**************************************************************************
 //  GRAPHICS DEFINITIONS
 //**************************************************************************
 
@@ -1223,7 +1212,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
-	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
