@@ -250,8 +250,6 @@ protected:
 
 	int m_mod_number;
 	int m_mmtr_data;
-	int m_alpha_data_line;
-	int m_alpha_clock;
 	int m_ay8913_address;
 	int m_serial_data;
 	int m_signal_50hz;

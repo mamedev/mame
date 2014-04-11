@@ -259,22 +259,9 @@ WRITE8_MEMBER(bfmsys85_state::vfd_w)
 {
 //reset 0x20, clock 0x80, data 0x40
 
-	if (data & 0x20)//inverted?
-	{
-		if (m_alpha_clock != (data & 0x80))
-		{
-			if (m_alpha_clock)//rising edge
-			{
-				m_vfd->shift_data(data & 0x40?1:0);
-			}
-		}
-	m_alpha_clock = (data & 0x80);
-	}
-	else
-	{
-		m_vfd->reset();
-	}
-
+	m_vfd->por(data & 0x20);//inverted?
+	m_vfd->sclk(data & 0x80);
+	m_vfd->data(data&0x40);
 }
 
 //////////////////////////////////////////////////////////////////////////////////

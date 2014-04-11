@@ -136,8 +136,6 @@ public:
 	optional_device<roc10937_t> m_vfd;
 
 
-int m_alpha_data_line;
-int m_alpha_clock;
 int m_triac_ic3;
 int m_triac_ic4;
 int m_triac_ic5;
@@ -595,18 +593,9 @@ READ8_MEMBER(mpu3_state::pia_ic6_portb_r)
 WRITE8_MEMBER(mpu3_state::pia_ic6_porta_w)
 {
 	LOG(("%s: IC6 PIA Port A Set to %2x (Alpha)\n", machine().describe_context(),data));
-	if ( data & 0x08 ) m_vfd->reset();
-
-	m_alpha_data_line = ((data & 0x20) >> 5);
-
-	if (m_alpha_clock != ((data & 0x10) >>4))
-	{
-		if (!m_alpha_clock)//falling edge
-		{
-			m_vfd->shift_data(m_alpha_data_line?1:0);
-		}
-	}
-	m_alpha_clock = (data & 0x10) >>4;
+	m_vfd->por((!data&0x08));
+	m_vfd->data((data & 0x20) >> 5);
+	m_vfd->sclk((data & 0x10) >>4);
 }
 
 WRITE8_MEMBER(mpu3_state::pia_ic6_portb_w)

@@ -95,7 +95,7 @@ static const UINT16 roc10937charset[]=
 			//                     -.
 	0x2001, // 0010 0000 0000 0001 -
 			//                     /.
-	0x2430, // 0010 0010 0011 0000 <.
+	0x2230, // 0010 0010 0011 0000 <.
 	0x4430, // 0100 0100 0011 0000 =.
 	0x8830, // 1000 1000 0011 0000 >.
 	0x1407, // 0001 0100 0000 0111 ?.
@@ -150,6 +150,8 @@ void rocvfd_t::device_start()
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_brightness));
 	save_item(NAME(m_count));
+	save_item(NAME(m_sclk));
+	save_item(NAME(m_data));
 	save_item(NAME(m_duty));
 	save_item(NAME(m_disp));
 
@@ -168,6 +170,8 @@ void rocvfd_t::device_reset()
 	m_count=0;
 	m_duty=31;
 	m_disp = 0;
+	m_sclk = 0;
+	m_data = 0;
 
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_outputs, 0, sizeof(m_outputs));
@@ -183,35 +187,60 @@ UINT32 rocvfd_t::set_display(UINT32 segin)
 ///////////////////////////////////////////////////////////////////////////
 void rocvfd_t::device_post_load()
 {
-	for (int i =0; i<16; i++)
-	{
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	update_display();
 }
 
-//Display on Rockwell chips is naturally backwards, due to the way it is wired. We emulate this by flipping the display at update time
 void rocvfd_t::update_display()
 {
 	for (int i =0; i<16; i++)
 	{
-		m_outputs[i] = set_display(m_chars[15-i]);
+		m_outputs[i] = set_display(m_chars[i]);
 		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
 	}
 }
 
-void rocvfd_t::shift_data(int data)
+WRITE_LINE_MEMBER( rocvfd_t::sclk ) 
+{ 
+	shift_clock(state); 
+}
+
+WRITE_LINE_MEMBER( rocvfd_t::data ) 
+{ 
+	m_data = state;
+}
+
+WRITE_LINE_MEMBER( rocvfd_t::por ) 
 {
-	m_shift_data <<= 1;
-
-	if ( !data ) m_shift_data |= 1;
-
-	if ( ++m_shift_count >= 8 )
+	//If line goes low, reset mode is engaged, until such a time as it goes high again.
+	if (!state)
 	{
-		write_char(m_shift_data);
-		m_shift_count = 0;
-		m_shift_data  = 0;
+		reset();
 	}
-	update_display();
+}
+
+
+void rocvfd_t::shift_clock(int state)
+{
+	if (m_sclk != state)
+	{
+		//Clock data on FALLING edge
+		if (!m_sclk)
+		{
+			m_shift_data <<= 1;
+
+			if ( m_data ) m_shift_data |= 1;
+
+			if ( ++m_shift_count >= 8 )
+			{
+				write_char(m_shift_data);
+				m_shift_count = 0;
+				m_shift_data  = 0;
+			}
+			update_display();
+
+		}
+	}
+	m_sclk = state;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -354,14 +383,4 @@ s16lf01_t::s16lf01_t(const machine_config &mconfig, const char *tag, device_t *o
 	: rocvfd_t(mconfig, S16LF01, "Samsung 16LF01 Series VFD controller and compatible", tag, owner, clock, "s16lf01", __FILE__)
 {
 	m_port_val=0;
-}
-
-//Samsung chips fix the issue with the reversal of the drive.
-void s16lf01_t::update_display()
-{
-	for (int i =0; i<16; i++)
-	{
-		m_outputs[i] = set_display(m_chars[i]);
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
 }

@@ -238,23 +238,10 @@ WRITE16_MEMBER(jpmsys5_state::jpm_upd7759_w)
 		}
 		case 1:
 		{
-			//Reset 0x04, data 0x02, clock 0x01
-			if(data & 0x04)
-			{
-				int alpha_data = (data & 0x02)?0:1;
-				if (m_alpha_clock != (data & 0x01))
-				{
-					if (!m_alpha_clock)//falling edge
-					{
-						m_vfd->shift_data(alpha_data);
-					}
-				}
-				m_alpha_clock = (data & 0x01);
-			}
-			else
-			{
-				m_vfd->reset();
-			}
+			//Reset 0x04, data 0x02, clock 
+			m_vfd->por(data & 0x04);
+			m_vfd->data(data & 0x02);
+			m_vfd->sclk(data & 0x01);
 			break;
 		}
 		case 2:
