@@ -34,7 +34,7 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 		m_rom(NULL),
 		m_rom_size(0),
 		m_delta_table(NULL),
-		m_intf(NULL)
+		m_rgnoverride(NULL)
 {
 	memset(m_regs, 0, sizeof(int)*0x30);
 }
@@ -46,23 +46,17 @@ k053260_device::k053260_device(const machine_config &mconfig, const char *tag, d
 
 void k053260_device::device_start()
 {
-	static const k053260_interface defintrf = { 0 };
 	int rate = clock() / 32;
-	int i;
-
-	/* Initialize our chip structure */
-	m_intf = (static_config() != NULL) ? (const k053260_interface *)static_config() : &defintrf;
 
 	m_mode = 0;
 
-	memory_region *region = (m_intf->rgnoverride != NULL) ? memregion(m_intf->rgnoverride) : this->region();
-
+	memory_region *region = (m_rgnoverride) ? memregion(m_rgnoverride) : this->region();
 	m_rom = *region;
 	m_rom_size = region->bytes();
 
 	device_reset();
 
-	for ( i = 0; i < 0x30; i++ )
+	for (int i = 0; i < 0x30; i++)
 		m_regs[i] = 0;
 
 	m_delta_table = auto_alloc_array( machine(), UINT32, 0x1000 );
@@ -75,7 +69,7 @@ void k053260_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_regs));
 
-	for ( i = 0; i < 4; i++ )
+	for (int i = 0; i < 4; i++)
 	{
 		save_item(NAME(m_channels[i].rate), i);
 		save_item(NAME(m_channels[i].size), i);
@@ -98,9 +92,9 @@ void k053260_device::device_start()
 
 void k053260_device::device_reset()
 {
-	int i;
 
-	for( i = 0; i < 4; i++ ) {
+	for (int i = 0; i < 4; i++) 
+	{
 		m_channels[i].rate = 0;
 		m_channels[i].size = 0;
 		m_channels[i].start = 0;

@@ -260,11 +260,6 @@ static INPUT_PORTS_START( overdriv )
 INPUT_PORTS_END
 
 
-static const k053260_interface k053260_config =
-{
-	"shared"
-};
-
 static const k053247_interface overdriv_k053246_intf =
 {
 	"gfx1", 0,
@@ -375,12 +370,12 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_K053260_ADD("k053260_1", 3579545)
-	MCFG_SOUND_CONFIG(k053260_config)
+	MCFG_K053260_REGION("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MCFG_K053260_ADD("k053260_2", 3579545)
-	MCFG_SOUND_CONFIG(k053260_config)
+	MCFG_K053260_REGION("shared")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
