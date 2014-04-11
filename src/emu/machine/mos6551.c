@@ -240,7 +240,15 @@ void mos6551_device::update_divider()
 		m_tx_internal_clock = true;
 
 		m_divide = 16;
-		scale = (double) 1 / scale;
+
+		if (!m_dtr || m_rx_state != STATE_START)
+		{
+			scale = (double) 1 / scale;
+		}
+		else
+		{
+			scale = 0;
+		}
 	}
 	else
 	{
@@ -355,6 +363,8 @@ void mos6551_device::write_command(UINT8 data)
 		m_tx_output = OUTPUT_MARK;
 		output_txd(1);
 	}
+
+	update_divider();
 }
 
 READ8_MEMBER( mos6551_device::read )
@@ -629,6 +639,11 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					}
 
 					m_rx_state = STATE_START;
+
+					if (m_dtr)
+					{
+						update_divider();
+					}
 				}
 				break;
 			}
