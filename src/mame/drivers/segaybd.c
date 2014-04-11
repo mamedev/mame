@@ -1138,18 +1138,6 @@ static INPUT_PORTS_START( strkfgtr )
 INPUT_PORTS_END
 
 
-
-//**************************************************************************
-//  SOUND DEFINITIONS
-//**************************************************************************
-
-static const sega_pcm_interface segapcm_interface =
-{
-	BANK_12M | BANK_MASKF8
-};
-
-
-
 //**************************************************************************
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
@@ -1206,7 +1194,7 @@ static MACHINE_CONFIG_START( yboard, segaybd_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
-	MCFG_SOUND_CONFIG(segapcm_interface)
+	MCFG_SEGAPCM_BANK(BANK_12M | BANK_MASKF8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

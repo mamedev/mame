@@ -14,7 +14,7 @@ Konami 037122
 const device_type K037122 = &device_creator<k037122_device>;
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K037122, "Konami 0371222", tag, owner, clock, "k037122", __FILE__),
+	: device_t(mconfig, K037122, "Konami 037122", tag, owner, clock, "k037122", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_tile_ram(NULL),
 	m_char_ram(NULL),

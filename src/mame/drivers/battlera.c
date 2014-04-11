@@ -212,11 +212,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const c6280_interface c6280_config =
-{
-	"audiocpu"
-};
-
 static MACHINE_CONFIG_START( battlera, battlera_state )
 
 	/* basic machine hardware */
@@ -255,7 +250,7 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 
 	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("audiocpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END

@@ -76,7 +76,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 	/* bit 4 = relay (???) */
 
 	/* bits 5-6 = bank number */
-	membank("bank1")->set_entry((data & 0x60) >> 5);
+	m_rombank->set_entry((data & 0x60) >> 5);
 
 	/* bit 7 = select sprite bank */
 	m_spritebank = (data & 0x80) << 3;
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE("k051733", k051733_device, read, write)    /* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP                        /* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                             /* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -258,8 +258,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( bladestl )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,     0,   2 ) /* colors 00..31 */
-	GFXDECODE_ENTRY( "gfx1", 0x040000, spritelayout,   32,  16 )    /* colors 32..47 but using lookup table */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0,  2 ) /* colors 00..31 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 32, 16 ) /* colors 32..47 but using lookup table */
 GFXDECODE_END
 
 
@@ -282,9 +282,7 @@ static const ay8910_interface ay8910_config =
 
 void bladestl_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_layer_colorbase));
@@ -363,16 +361,17 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( bladestl )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "797-t01.19c", 0x10000, 0x08000, CRC(89d7185d) SHA1(0d2f346d9515cab0389106c0e227fb0bd84a2c9c) )   /* fixed ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* banked ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "797-t01.19c", 0x00000, 0x10000, CRC(89d7185d) SHA1(0d2f346d9515cab0389106c0e227fb0bd84a2c9c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x000000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
-	ROM_LOAD( "797a06.13h", 0x040000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */
@@ -383,16 +382,17 @@ ROM_START( bladestl )
 ROM_END
 
 ROM_START( bladestll )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "797-l01.19c", 0x10000, 0x08000, CRC(1ab14c40) SHA1(c566e31a666b467d75f5fc9fa427986c3ebc705c) )   /* fixed ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* banked ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "797-l01.19c", 0x00000, 0x10000, CRC(1ab14c40) SHA1(c566e31a666b467d75f5fc9fa427986c3ebc705c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x000000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
-	ROM_LOAD( "797a06.13h", 0x040000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */
@@ -403,16 +403,17 @@ ROM_START( bladestll )
 ROM_END
 
 ROM_START( bladestle )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* code + banked roms */
-	ROM_LOAD( "797-e01.19c", 0x10000, 0x08000, CRC(f8472e95) SHA1(8b6caa905fb1642300dd9da508871b00429872c3) )   /* fixed ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* banked ROM */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* code + banked roms */
+	ROM_LOAD( "797-e01.19c", 0x00000, 0x10000, CRC(f8472e95) SHA1(8b6caa905fb1642300dd9da508871b00429872c3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "797a05.19h", 0x000000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
-	ROM_LOAD( "797a06.13h", 0x040000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )   /* tiles */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )   /* sprites */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) /* sprites lookup table, 63S141N BPROM */

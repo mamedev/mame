@@ -44,7 +44,9 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 		m_stream(NULL),
 		m_namco_clock(0),
 		m_sample_rate(0),
-		m_f_fracbits(0)
+		m_f_fracbits(0),
+		m_voices(0),
+		m_stereo(0)
 {
 }
 
@@ -63,27 +65,6 @@ namco_cus30_device::namco_cus30_device(const machine_config &mconfig, const char
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void namco_audio_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const namco_interface *intf = reinterpret_cast<const namco_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<namco_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_voices = 0;
-		m_stereo = 0;
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

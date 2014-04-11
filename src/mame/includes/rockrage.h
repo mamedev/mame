@@ -13,21 +13,15 @@ class rockrage_state : public driver_device
 public:
 	rockrage_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
-
-	/* memory pointers */
-	required_shared_ptr<UINT8> m_paletteram;
-
-	/* video-related */
-	int        m_layer_colorbase[2];
-	int        m_vreg;
+		m_palette(*this, "palette"),
+		m_rombank(*this, "rombank"),
+		m_paletteram(*this, "paletteram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -37,6 +31,14 @@ public:
 	required_device<vlm5030_device> m_vlm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	/* memory pointers */
+	required_memory_bank m_rombank;
+	required_shared_ptr<UINT8> m_paletteram;
+
+	/* video-related */
+	int        m_layer_colorbase[2];
+	int        m_vreg;
 
 	DECLARE_WRITE8_MEMBER(rockrage_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(rockrage_sh_irqtrigger_w);

@@ -8,11 +8,13 @@
 
 #define MAX_VOLUME 16
 
-struct namco_interface
-{
-	int m_voices;     /* number of voices */
-	int m_stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
-};
+
+#define MCFG_NAMCO_AUDIO_VOICES(_voices) \
+	namco_audio_device::set_voices(*device, _voices);
+
+#define MCFG_NAMCO_AUDIO_STEREO(_stereo) \
+	namco_audio_device::set_stereo(*device, _stereo);
+
 
 /* this structure defines the parameters for a channel */
 struct sound_channel
@@ -29,16 +31,18 @@ struct sound_channel
 };
 
 class namco_audio_device : public device_t,
-									public device_sound_interface,
-									public namco_interface
+							public device_sound_interface
 {
 public:
 	namco_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~namco_audio_device() {}
 
-	protected:
+	// static configuration
+	static void set_voices(device_t &device, int voices) { downcast<namco_audio_device &>(device).m_voices = voices; }
+	static void set_stereo(device_t &device, int stereo) { downcast<namco_audio_device &>(device).m_stereo = stereo; }
+	
+protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// internal state
@@ -60,6 +64,9 @@ public:
 	int m_namco_clock;
 	int m_sample_rate;
 	int m_f_fracbits;
+
+	int m_voices;     /* number of voices */
+	int m_stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
 
 	/* decoded waveform table */
 	INT16 *m_waveform[MAX_VOLUME];

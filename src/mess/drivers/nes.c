@@ -640,12 +640,6 @@ static INPUT_PORTS_START( famicom )
 INPUT_PORTS_END
 
 
-static const nesapu_interface nes_apu_interface =
-{
-	"maincpu"
-};
-
-
 void nes_state::ppu_nmi(int *ppu_regs)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -693,7 +687,6 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_SCREEN_UPDATE_DRIVER(nes_state, screen_update_nes)
 	MCFG_SCREEN_PALETTE("palette")
 
-
 	MCFG_PALETTE_ADD("palette", 4*16*8)
 	MCFG_PALETTE_INIT_OWNER(nes_state, nes)
 
@@ -704,7 +697,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("nessound", NES_APU, NTSC_CLOCK)
-	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_cart, NULL)
@@ -735,7 +728,7 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("nessound", NES_APU, PAL_CLOCK)
-	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -757,7 +750,7 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("nessound", NES_APU, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
-	MCFG_SOUND_CONFIG(nes_apu_interface)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 

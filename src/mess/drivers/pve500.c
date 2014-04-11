@@ -64,7 +64,7 @@ private:
 
 static Z80CTC_INTERFACE( external_ctc_intf )
 {
-	DEVCB_NULL, /* interrupt handler */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
 	DEVCB_NULL, /* ZC/TO0 callback */
 	DEVCB_NULL, /* ZC/TO1 callback */
 	DEVCB_NULL  /* ZC/TO2 callback */
@@ -72,13 +72,21 @@ static Z80CTC_INTERFACE( external_ctc_intf )
 
 static const z80sio_interface external_sio_intf =
 {
-	DEVCB_NULL, /* interrupt handler */
-	DEVCB_NULL, /* DTR changed handler */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), /* interrupt handler */
+  DEVCB_NULL, /* DTR changed handler */
 	DEVCB_NULL, /* RTS changed handler */
 	DEVCB_NULL, /* BREAK changed handler */
 	DEVCB_NULL, /* transmit handler */
 	DEVCB_NULL  /* receive handler */
 };
+
+static const z80_daisy_config maincpu_daisy_chain[] =
+{
+	{ "external_ctc" },
+	{ "external_sio" },
+	{ NULL }
+};
+
 
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("external_sio", z80sio_device, read, write)
@@ -106,8 +114,92 @@ DRIVER_INIT_MEMBER( pve500_state, pve500 )
 }
 
 static INPUT_PORTS_START( pve500 )
-	PORT_START("keyboard")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_NAME("TODO") PORT_CODE(KEYCODE_A)
+	PORT_START("SCAN0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRANS")       PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A/B")         PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("FROM TO")     PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P2")          PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1")          PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTRY")       PORT_CODE(KEYCODE_SPACE)
+
+	PORT_START("SCAN1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ALL STOP")    PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LAST EDIT")   PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AUDIO SPLIT") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A2")          PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ASMBL")       PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V")           PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A1")          PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTRY")       PORT_CODE(KEYCODE_SPACE)
+
+	PORT_START("SCAN2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RVW/JUMP")    PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("AUTO EDIT")   PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREVIEW")     PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-FF")        PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-REW")       PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-STILL")     PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-PLAY")      PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTRY")       PORT_CODE(KEYCODE_SPACE)
+
+	PORT_START("SCAN3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-OUT")       PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-IN")        PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GO TO")       PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-OUT")       PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P-IN")        PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRIM+")       PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRIM-")       PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTRY")       PORT_CODE(KEYCODE_SPACE)
+
+	PORT_START("SCAN4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-FF")        PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-REW")       PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-STILL")     PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-PLAY")      PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EDIT")        PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REC")         PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTRY")       PORT_CODE(KEYCODE_SPACE)
+
+	PORT_START("SCAN5")
+		PORT_DIPNAME( 0x03, 0x02, "R-EDIT REF" )
+		PORT_DIPSETTING(    0x02, "TC" )
+		PORT_DIPSETTING(    0x00, "RTC" )
+		PORT_DIPSETTING(    0x01, "CTL" )
+
+		PORT_DIPNAME( 0x0C, 0x08, "P2-EDIT REF" )
+		PORT_DIPSETTING(    0x08, "TC" )
+		PORT_DIPSETTING(    0x00, "RTC" )
+		PORT_DIPSETTING(    0x04, "CTL" )
+
+		PORT_DIPNAME( 0x30, 0x20, "P1-EDIT REF" )
+		PORT_DIPSETTING(    0x20, "TC" )
+		PORT_DIPSETTING(    0x00, "RTC" )
+		PORT_DIPSETTING(    0x10, "CTL" )
+
+	PORT_START("SCAN6")
+		PORT_DIPNAME( 0x03, 0x02, "SYNCHRO" )
+		PORT_DIPSETTING(    0x02, "ON/CF" )
+		PORT_DIPSETTING(    0x00, "ON" )
+		PORT_DIPSETTING(    0x01, "OFF" )
+
+		PORT_DIPNAME( 0x0C, 0x08, "PREROLL" )
+		PORT_DIPSETTING(    0x08, "7" )
+		PORT_DIPSETTING(    0x00, "5" )
+		PORT_DIPSETTING(    0x04, "3" )
+
+	PORT_START("SCAN7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TOTAL")       PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEARN")       PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRANS-1F")    PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRANS-10F")   PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRANS-100F")  PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-RESET")     PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P2-RESET")    PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P1-RESET")    PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 void pve500_state::machine_start()
@@ -119,7 +211,7 @@ void pve500_state::machine_start()
 	io_KY = 0;
 
 	for (int i=0; i<27; i++)
-		output_set_digit_value(i, 0xff);
+		output_set_digit_value(i, 0x00);
 }
 
 void pve500_state::machine_reset()
@@ -162,6 +254,15 @@ READ8_MEMBER(pve500_state::io_expander_r)
 		case IO_EXPANDER_PORTB:
 			return io_LE;
 		case IO_EXPANDER_PORTC:
+			io_KY = 0x00;
+			if (io_SC & 0x01) io_KY |= ioport("SCAN0")->read();
+			if (io_SC & 0x02) io_KY |= ioport("SCAN1")->read();
+			if (io_SC & 0x04) io_KY |= ioport("SCAN2")->read();
+			if (io_SC & 0x08) io_KY |= ioport("SCAN3")->read();
+			if (io_SC & 0x10) io_KY |= ioport("SCAN4")->read();
+			if (io_SC & 0x20) io_KY |= ioport("SCAN5")->read();
+			if (io_SC & 0x40) io_KY |= ioport("SCAN6")->read();
+			if (io_SC & 0x80) io_KY |= ioport("SCAN7")->read();
 			return io_KY;
 		case IO_EXPANDER_PORTD:
 			return io_LD;
@@ -192,18 +293,11 @@ WRITE8_MEMBER(pve500_state::io_expander_w)
 			io_SEL = data;
 			for (int i=0; i<4; i++){
 				if (io_SEL & (1 << i)){
-					switch (io_SC){
-						case 1:   output_set_digit_value(8*i + 0, io_LD & 0x7F); break;
-						case 2:   output_set_digit_value(8*i + 1, io_LD & 0x7F); break;
-						case 4:   output_set_digit_value(8*i + 2, io_LD & 0x7F); break;
-						case 8:   output_set_digit_value(8*i + 3, io_LD & 0x7F); break;
-						case 16:  output_set_digit_value(8*i + 4, io_LD & 0x7F); break;
-						case 32:  output_set_digit_value(8*i + 5, io_LD & 0x7F); break;
-						case 64:  output_set_digit_value(8*i + 6, io_LD & 0x7F); break;
-						case 128: output_set_digit_value(8*i + 7, io_LD & 0x7F); break;
-						default:
-							/*software should not do it.
-					any idea how to emulate that in case it does? */ break;
+					for (int j=0; j<8; j++){
+						if (io_SC & (1<<j)){
+							output_set_digit_value(8*i + j, BITSWAP8(io_LD & 0x7F, 7, 0, 1, 2, 3, 4, 5, 6));
+							printf("io_expander_w PORTE data=%02X\n", data);
+						}
 					}
 				}
 			}
@@ -217,6 +311,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_ADD("maincpu", TLCS_Z80, XTAL_12MHz / 2) /* TMPZ84C015BF-6 (TOSHIBA TLCS-Z80) */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
+	MCFG_CPU_CONFIG(maincpu_daisy_chain)
 	MCFG_Z80CTC_ADD("external_ctc", XTAL_12MHz / 2, external_ctc_intf)
 	MCFG_Z80SIO_ADD("external_sio", XTAL_12MHz / 2, external_sio_intf)
 

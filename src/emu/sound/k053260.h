@@ -19,16 +19,13 @@
 #define MCFG_K053260_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, K053260, _clock)
 
+#define MCFG_K053260_REGION(_tag) \
+	k053260_device::set_region_tag(*device, _tag);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct k053260_interface
-{
-	const char *rgnoverride;
-};
-
 
 struct k053260_channel
 {
@@ -68,6 +65,8 @@ public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~k053260_device() { }
 
+	static void set_region_tag(device_t &device, const char *tag) { downcast<k053260_device &>(device).m_rgnoverride = tag; }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -84,7 +83,6 @@ private:
 	void InitDeltaTable( int rate, int clock );
 	void check_bounds( int channel );
 
-private:
 	sound_stream *              m_channel;
 	int                         m_mode;
 	int                         m_regs[0x30];
@@ -92,10 +90,9 @@ private:
 	int                         m_rom_size;
 	UINT32                      *m_delta_table;
 	k053260_channel             m_channels[4];
-	const k053260_interface     *m_intf;
+	const char                  *m_rgnoverride;
 };
 
 extern const device_type K053260;
-
 
 #endif /* __K053260_H__ */

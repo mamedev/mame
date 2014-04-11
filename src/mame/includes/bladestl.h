@@ -13,16 +13,27 @@ class bladestl_state : public driver_device
 public:
 	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
+
+		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
-		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_rombank(*this, "rombank"),
+		m_paletteram(*this, "paletteram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k007342_device> m_k007342;
+	required_device<k007420_device> m_k007420;
+	required_device<upd7759_device> m_upd7759;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	/* memory pointers */
+	required_memory_bank m_rombank;
 	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
@@ -33,9 +44,6 @@ public:
 	int        m_last_track[4];
 
 	/* devices */
-	required_device<cpu_device> m_audiocpu;
-	required_device<k007342_device> m_k007342;
-	required_device<k007420_device> m_k007420;
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bladestl_sh_irqtrigger_w);
@@ -47,10 +55,6 @@ public:
 	DECLARE_PALETTE_INIT(bladestl);
 	UINT32 screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
-	required_device<cpu_device> m_maincpu;
-	required_device<upd7759_device> m_upd7759;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void set_pens();
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);

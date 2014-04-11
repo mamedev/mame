@@ -416,6 +416,7 @@ public:
 	void dword_write_le(UINT8 *addr,UINT32 d);
 	void word_write_le(UINT8 *addr,UINT16 d);
 	void debug_generate_irq(int irq,bool active);
+	void debug_grab_texture(int type, char *filename);
 
 	void vblank_callback(screen_device &screen, bool state);
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -445,11 +446,23 @@ public:
 		UINT32 words[256/4];
 	} smbusst;
 	struct apu_state {
-		UINT32 memory0_sgaddress;
-		UINT32 memory0_sgblocks;
-		UINT32 memory0_address;
-		UINT32 memory1_sgaddress;
-		UINT32 memory1_sgblocks;
+		UINT32 memory[0x60000/4];
+		UINT32 gpdsp_sgaddress; // global processor scatter-gather
+		UINT32 gpdsp_sgblocks;
+		UINT32 gpdsp_address;
+		UINT32 epdsp_sgaddress; // encoder processor scatter-gather
+		UINT32 epdsp_sgblocks; 
+		UINT32 unknown_sgaddress;
+		UINT32 unknown_sgblocks;
+		int voice_number;
+		UINT32 voices_heap_blockaddr[1024];
+		UINT64 voices_active[4]; //one bit for each voice: 1 playing 0 not
+		UINT32 voicedata_address;
+		int voices_frequency[256]; // sample rate
+		int voices_position[256]; // position in samples * 1000
+		int voices_position_start[256]; // position in samples * 1000
+		int voices_position_end[256]; // position in samples * 1000
+		int voices_position_increment[256]; // position increment every 1ms * 1000
 		emu_timer *timer;
 		address_space *space;
 	} apust;
@@ -503,7 +516,10 @@ public:
 		combiner.used=0;
 		combiner.lock=osd_lock_alloc();
 		enabled_vertex_attributes=0;
-		memset(words_vertex_attributes,0,sizeof(words_vertex_attributes));
+		indexesleft_count = 0;
+		debug_grab_texttype = -1;
+		debug_grab_textfile = NULL;
+		memset(words_vertex_attributes, 0, sizeof(words_vertex_attributes));
 	}
 	DECLARE_READ32_MEMBER( geforce_r );
 	DECLARE_WRITE32_MEMBER( geforce_w );
@@ -546,6 +562,7 @@ public:
 	void computedilated(void);
 	void putpixtex(int xp,int yp,int up,int vp);
 	int toggle_register_combiners_usage();
+	void debug_grab_texture(int type, const char *filename);
 	void savestate_items();
 
 	struct {
@@ -570,6 +587,9 @@ public:
 		int rectangle_pitch;
 		void *buffer;
 	} texture[4];
+	int primitives_count;
+	int indexesleft_count;
+	UINT32 indexesleft[8];
 	struct {
 		float variable_A[4]; // 0=R 1=G 2=B 3=A
 		float variable_B[4];
@@ -673,6 +693,20 @@ public:
 		int used;
 		osd_lock *lock;
 	} combiner;
+	struct {
+		float modelview[16];
+		float modelview_inverse[16];
+		float projection[16];
+		float translate[4];
+		float scale[4];
+	} matrix;
+	struct {
+		UINT32 instruction[1024];
+		int instructions;
+		int upload_instruction;
+		UINT32 parameter[1024];
+		int upload_parameter;
+	} vertexprogram;
 	int enabled_vertex_attributes;
 	int words_vertex_attributes[16];
 	bitmap_rgb32 fb;
@@ -680,6 +714,8 @@ public:
 	UINT32 dilated1[16][2048];
 	int dilatechose[256];
 	nvidia_object_data *objectdata;
+	int debug_grab_texttype;
+	char *debug_grab_textfile;
 
 	enum NV2A_BEGIN_END {
 		STOP=0,
@@ -1052,6 +1088,20 @@ static void nv2a_combiners_command(running_machine &machine, int ref, int params
 		debug_console_printf(machine,"Register combiners disabled\n");
 }
 
+static void grab_texture_command(running_machine &machine, int ref, int params, const char **param)
+{
+	UINT64 type;
+	chihiro_state *chst = machine.driver_data<chihiro_state>();
+
+	if (params < 2)
+		return;
+	if (!debug_command_parameter_number(machine, param[0], &type))
+		return;
+	if ((param[1][0] == 0) || (strlen(param[1]) > 127))
+		return;
+	chst->nvidia_nv2a->debug_grab_texture((int)type,param[1]);
+}
+
 static void help_command(running_machine &machine, int ref, int params, const char **param)
 {
 	debug_console_printf(machine,"Available Chihiro commands:\n");
@@ -1062,6 +1112,7 @@ static void help_command(running_machine &machine, int ref, int params, const ch
 	debug_console_printf(machine,"  chihiro curthread -- Print information about current thread\n");
 	debug_console_printf(machine,"  chihiro irq,<number> -- Generate interrupt with irq number 0-15\n");
 	debug_console_printf(machine,"  chihiro nv2a_combiners -- Toggle use of register combiners\n");
+	debug_console_printf(machine,"  chihiro grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	debug_console_printf(machine,"  chihiro help -- this list\n");
 }
 
@@ -1083,6 +1134,8 @@ static void chihiro_debug_commands(running_machine &machine, int ref, int params
 		generate_irq_command(machine,ref,params-1,param+1);
 	else if (strcmp("nv2a_combiners",param[0]) == 0)
 		nv2a_combiners_command(machine,ref,params-1,param+1);
+	else if (strcmp("grab_texture", param[0]) == 0)
+		grab_texture_command(machine, ref, params - 1, param + 1);
 	else
 		help_command(machine,ref,params-1,param+1);
 }
@@ -1256,118 +1309,212 @@ UINT32 convert_r5g6b5_r8g8b8(UINT32 r5g6b5)
 
 UINT32 nv2a_renderer::texture_get_texel(int number,int x,int y)
 {
-	UINT32 to,s,c,sa,ca;
-	UINT32 a4r4g4b4,a1r5g5b5,r5g6b5;
-	int bx,by;
-	int color0,color1,color0m2,color1m2;
+	UINT32 to, s, c, sa, ca;
+	UINT32 a4r4g4b4, a1r5g5b5, r5g6b5;
+	int bx, by;
+	int color0, color1, color0m2, color1m2, alpha0, alpha1;
 	UINT32 codes;
 	UINT64 alphas;
-	int cr,cg,cb;
+	int cr, cg, cb;
 
+	// force to [0,size-1]
+	x = (unsigned int)x & (texture[number].sizeu - 1);
+	y = (unsigned int)y & (texture[number].sizev - 1);
 	switch (texture[number].format) {
-		case A8R8G8B8:
-			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
-			return *(((UINT32 *)texture[number].buffer)+to); // get texel color
-		case DXT1:
-			bx=x >> 2;
-			by=y >> 2;
-			x=x & 3;
-			y=y & 3;
-			//to=dilated0[texture[number].dilate][bx]+dilated1[texture[number].dilate][by]; // swizzle 4x4 blocks ?
-			to=bx+by*(texture[number].sizeu >> 2);
-			color0=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+0);
-			color1=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+1);
-			codes=*((UINT32 *)(((UINT64 *)texture[number].buffer)+to)+1);
-			s=(y << 3)+(x << 1);
-			c=(codes >> s) & 3;
-			c=c+(color0 > color1 ? 0 : 4);
-			color0m2=color0 << 1;
-			color1m2=color1 << 1;
-			switch (c) {
-				case 0:
-					return 0xff000000+convert_r5g6b5_r8g8b8(color0);
-					break;
-				case 1:
-					return 0xff000000+convert_r5g6b5_r8g8b8(color1);
-					break;
-				case 2:
-					cb=pal5bit(((color0m2 & 0x003e)+(color1 & 0x001f))/3);
-					cg=pal6bit(((color0m2 & 0x0fc0)+(color1 & 0x07e0))/3 >> 5);
-					cr=pal5bit(((color0m2 & 0x1f000)+color1)/3 >> 11);
-					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
-					break;
-				case 3:
-					cb=pal5bit(((color1m2 & 0x003e)+(color0 & 0x001f))/3);
-					cg=pal6bit(((color1m2 & 0x0fc0)+(color0 & 0x07e0))/3 >> 5);
-					cr=pal5bit(((color1m2 & 0x1f000)+color0)/3 >> 11);
-					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
-					break;
-				case 4:
-					return 0xff000000+convert_r5g6b5_r8g8b8(color0);
-					break;
-				case 5:
-					return 0xff000000+convert_r5g6b5_r8g8b8(color1);
-					break;
-				case 6:
-					cb=pal5bit(((color0 & 0x001f)+(color1 & 0x001f))/2);
-					cg=pal6bit(((color0 & 0x07e0)+(color1 & 0x07e0))/2 >> 5);
-					cr=pal5bit((color0+color1)/2 >> 11);
-					return 0xff000000|(cr<<16)|(cg<<8)|(cb);
-					break;
-				default:
-					return 0xff000000;
-					break;
-			}
-		case DXT3:
-			bx=x >> 2;
-			by=y >> 2;
-			x=x & 3;
-			y=y & 3;
-			//to=(dilated0[texture[number].dilate][bx]+dilated1[texture[number].dilate][by]) << 1; // swizzle 4x4 blocks ?
-			to=(bx+by*(texture[number].sizeu >> 2)) << 1;
-			color0=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+4);
-			color1=*((UINT16 *)(((UINT64 *)texture[number].buffer)+to)+5);
-			codes=*((UINT32 *)(((UINT64 *)texture[number].buffer)+to)+3);
-			alphas=*(((UINT64 *)texture[number].buffer)+to);
-			s=(y << 3)+(x << 1);
-			sa=((y << 2)+x) << 2;
-			c=(codes >> s) & 3;
-			ca=(alphas >> sa) & 15;
-			switch (c) {
-				case 0:
-					return ((ca+(ca << 4)) << 24)+convert_r5g6b5_r8g8b8(color0);
-					break;
-				case 1:
-					return ((ca+(ca << 4)) << 24)+convert_r5g6b5_r8g8b8(color1);
-					break;
-				case 2:
-					cb=pal5bit(((color0 & 0x001f)+(color1 & 0x001f))/2);
-					cg=pal6bit(((color0 & 0x07e0)+(color1 & 0x07e0))/2 >> 5);
-					cr=pal5bit((color0+color1)/2 >> 11);
-					return ((ca+(ca << 4)) << 24)|(cr<<16)|(cg<<8)|(cb);
-					break;
-				default:
-					return (ca+(ca << 4)) << 24;
-					break;
-			}
+	case A8R8G8B8:
+		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+		return *(((UINT32 *)texture[number].buffer) + to); // get texel color
+	case DXT1:
+		bx = x >> 2;
+		by = y >> 2;
+		x = x & 3;
+		y = y & 3;
+		to = bx + by*(texture[number].sizeu >> 2);
+		color0 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 0);
+		color1 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 1);
+		codes = *((UINT32 *)(((UINT64 *)texture[number].buffer) + to) + 1);
+		s = (y << 3) + (x << 1);
+		c = (codes >> s) & 3;
+		c = c + (color0 > color1 ? 0 : 4);
+		color0m2 = color0 << 1;
+		color1m2 = color1 << 1;
+		switch (c) {
+		case 0:
+			return 0xff000000 + convert_r5g6b5_r8g8b8(color0);
 			break;
-		case A4R4G4B4:
-			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
-			a4r4g4b4=*(((UINT16 *)texture[number].buffer)+to); // get texel color
-			return convert_a4r4g4b4_a8r8g8b8(a4r4g4b4);
-		case A1R5G5B5:
-			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
-			a1r5g5b5=*(((UINT16 *)texture[number].buffer)+to); // get texel color
-			return convert_a1r5g5b5_a8r8g8b8(a1r5g5b5);
-		case R5G6B5:
-			to=dilated0[texture[number].dilate][x]+dilated1[texture[number].dilate][y]; // offset of texel in texture memory
-			r5g6b5=*(((UINT16 *)texture[number].buffer)+to); // get texel color
-			return 0xff000000+convert_r5g6b5_r8g8b8(r5g6b5);
-		case R8G8B8_RECT:
-			to=texture[number].rectangle_pitch*y+(x << 2);
-			return *((UINT32 *)(((UINT8 *)texture[number].buffer)+to));
+		case 1:
+			return 0xff000000 + convert_r5g6b5_r8g8b8(color1);
+			break;
+		case 2:
+			cb = pal5bit(((color0m2 & 0x003e) + (color1 & 0x001f)) / 3);
+			cg = pal6bit(((color0m2 & 0x0fc0) + (color1 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit(((color0m2 & 0x1f000) + color1) / 3 >> 11);
+			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
+			break;
+		case 3:
+			cb = pal5bit(((color1m2 & 0x003e) + (color0 & 0x001f)) / 3);
+			cg = pal6bit(((color1m2 & 0x0fc0) + (color0 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit(((color1m2 & 0x1f000) + color0) / 3 >> 11);
+			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
+			break;
+		case 4:
+			return 0xff000000 + convert_r5g6b5_r8g8b8(color0);
+			break;
+		case 5:
+			return 0xff000000 + convert_r5g6b5_r8g8b8(color1);
+			break;
+		case 6:
+			cb = pal5bit(((color0 & 0x001f) + (color1 & 0x001f)) / 2);
+			cg = pal6bit(((color0 & 0x07e0) + (color1 & 0x07e0)) / 2 >> 5);
+			cr = pal5bit(((color0 & 0xf800) + (color1 & 0xf800)) / 2 >> 11);
+			return 0xff000000 | (cr << 16) | (cg << 8) | (cb);
+			break;
 		default:
-			return 0xff00ff00;
+			return 0xff000000;
+			break;
+		}
+	case DXT3:
+		bx = x >> 2;
+		by = y >> 2;
+		x = x & 3;
+		y = y & 3;
+		to = (bx + by*(texture[number].sizeu >> 2)) << 1;
+		color0 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 4);
+		color1 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 5);
+		codes = *((UINT32 *)(((UINT64 *)texture[number].buffer) + to) + 3);
+		alphas = *(((UINT64 *)texture[number].buffer) + to);
+		s = (y << 3) + (x << 1);
+		sa = ((y << 2) + x) << 2;
+		c = (codes >> s) & 3;
+		ca = (alphas >> sa) & 15;
+		switch (c) {
+		case 0:
+			return ((ca + (ca << 4)) << 24) + convert_r5g6b5_r8g8b8(color0);
+			break;
+		case 1:
+			return ((ca + (ca << 4)) << 24) + convert_r5g6b5_r8g8b8(color1);
+			break;
+		case 2:
+			cb = pal5bit((2 * (color0 & 0x001f) + (color1 & 0x001f)) / 3);
+			cg = pal6bit((2 * (color0 & 0x07e0) + (color1 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit((2 * (color0 & 0xf800) + (color1 & 0xf800)) / 3 >> 11);
+			return ((ca + (ca << 4)) << 24) | (cr << 16) | (cg << 8) | (cb);
+			break;
+		default:
+			cb = pal5bit(((color0 & 0x001f) + 2 * (color1 & 0x001f)) / 3);
+			cg = pal6bit(((color0 & 0x07e0) + 2 * (color1 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit(((color0 & 0xf800) + 2 * (color1 & 0xf800)) / 3 >> 11);
+			return ((ca + (ca << 4)) << 24) | (cr << 16) | (cg << 8) | (cb);
+			break;
+		}
+		break;
+	case A4R4G4B4:
+		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+		a4r4g4b4 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
+		return convert_a4r4g4b4_a8r8g8b8(a4r4g4b4);
+	case A1R5G5B5:
+		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+		a1r5g5b5 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
+		return convert_a1r5g5b5_a8r8g8b8(a1r5g5b5);
+	case R5G6B5:
+		to = dilated0[texture[number].dilate][x] + dilated1[texture[number].dilate][y]; // offset of texel in texture memory
+		r5g6b5 = *(((UINT16 *)texture[number].buffer) + to); // get texel color
+		return 0xff000000 + convert_r5g6b5_r8g8b8(r5g6b5);
+	case R8G8B8_RECT:
+		to = texture[number].rectangle_pitch*y + (x << 2);
+		return *((UINT32 *)(((UINT8 *)texture[number].buffer) + to));
+	case A8R8G8B8_RECT:
+		to = texture[number].rectangle_pitch*y + (x << 2);
+		return *((UINT32 *)(((UINT8 *)texture[number].buffer) + to));
+	case DXT5:
+		bx = x >> 2;
+		by = y >> 2;
+		x = x & 3;
+		y = y & 3;
+		to = (bx + by*(texture[number].sizeu >> 2)) << 1;
+		color0 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 4);
+		color1 = *((UINT16 *)(((UINT64 *)texture[number].buffer) + to) + 5);
+		codes = *((UINT32 *)(((UINT64 *)texture[number].buffer) + to) + 3);
+		alpha0 = *((UINT8 *)(((UINT64 *)texture[number].buffer) + to) + 0);
+		alpha1 = *((UINT8 *)(((UINT64 *)texture[number].buffer) + to) + 1);
+		alphas = *(((UINT64 *)texture[number].buffer) + to);
+		s = (y << 3) + (x << 1);
+		sa = ((y << 2) + x) * 3;
+		c = (codes >> s) & 3;
+		ca = (alphas >> sa) & 7;
+		ca = ca + (alpha0 > alpha1 ? 0 : 8);
+		switch (ca) {
+		case 0:
+			ca = alpha0;
+			break;
+		case 1:
+			ca = alpha1;
+			break;
+		case 2:
+			ca = (6 * alpha0 + 1 * alpha1) / 7;
+			break;
+		case 3:
+			ca = (5 * alpha0 + 2 * alpha1) / 7;
+			break;
+		case 4:
+			ca = (4 * alpha0 + 3 * alpha1) / 7;
+			break;
+		case 5:
+			ca = (3 * alpha0 + 4 * alpha1) / 7;
+			break;
+		case 6:
+			ca = (2 * alpha0 + 5 * alpha1) / 7;
+			break;
+		case 7:
+			ca = (1 * alpha0 + 6 * alpha1) / 7;
+			break;
+		case 8:
+			ca = alpha0;
+			break;
+		case 9:
+			ca = alpha1;
+			break;
+		case 10:
+			ca = (4 * alpha0 + 1 * alpha1) / 5;
+			break;
+		case 11:
+			ca = (3 * alpha0 + 2 * alpha1) / 5;
+			break;
+		case 12:
+			ca = (2 * alpha0 + 3 * alpha1) / 5;
+			break;
+		case 13:
+			ca = (1 * alpha0 + 4 * alpha1) / 5;
+			break;
+		case 14:
+			ca = 0;
+			break;
+		case 15:
+			ca = 255;
+			break;
+		}
+		switch (c) {
+		case 0:
+			return (ca << 24) + convert_r5g6b5_r8g8b8(color0);
+			break;
+		case 1:
+			return (ca << 24) + convert_r5g6b5_r8g8b8(color1);
+			break;
+		case 2:
+			cb = pal5bit((2 * (color0 & 0x001f) + (color1 & 0x001f)) / 3);
+			cg = pal6bit((2 * (color0 & 0x07e0) + (color1 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit((2 * (color0 & 0xf800) + (color1 & 0xf800)) / 3 >> 11);
+			return (ca << 24) | (cr << 16) | (cg << 8) | (cb);
+			break;
+		default:
+			cb = pal5bit(((color0 & 0x001f) + 2 * (color1 & 0x001f)) / 3);
+			cg = pal6bit(((color0 & 0x07e0) + 2 * (color1 & 0x07e0)) / 3 >> 5);
+			cr = pal5bit(((color0 & 0xf800) + 2 * (color1 & 0xf800)) / 3 >> 11);
+			return (ca << 24) | (cr << 16) | (cg << 8) | (cb);
+			break;
+		}
+	default:
+		return 0xff00ff00;
 	}
 }
 
@@ -1616,6 +1763,11 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 	maddress=method*4;
 	data=space.read_dword(address);
 	channel[chanel][subchannel].object.method[method]=data;
+	if (maddress == 0x17fc) {
+		indexesleft_count = 0;
+		primitives_count = 0;
+		countlen--;
+	}
 	if (maddress == 0x1810) {
 		// draw vertices
 		int offset,count,type;
@@ -1629,7 +1781,6 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		offset=data & 0xffffff;
 		count=(data >> 24) & 0xff;
 		type=channel[chanel][subchannel].object.method[0x17fc/4];
-		tmp=channel[chanel][subchannel].object.method[0x1720/4];
 		dmahand[0]=channel[chanel][subchannel].object.method[0x019c/4];
 		dmahand[1]=channel[chanel][subchannel].object.method[0x01a0/4];
 		geforce_read_dma_object(dmahand[0],dmaoff[0],smasiz[0]);
@@ -1674,7 +1825,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 					*((UINT32 *)(&xy[m].y))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+4);
 					*((UINT32 *)(&z[m]))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+8);
 					*((UINT32 *)(&w[m]))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+12);
-					c[m]=space.read_dword(vtxbuf_address[3]+(n+m+offset)*vtxbuf_stride[0]+0); // color
+					c[m]=space.read_dword(vtxbuf_address[3]+(n+m+offset)*vtxbuf_stride[3]+0); // color
 					xy[m].p[0]=c[m] & 0xff; // b
 					xy[m].p[1]=(c[m] & 0xff00) >> 8; // g
 					xy[m].p[2]=(c[m] & 0xff0000) >> 16; // r
@@ -1711,7 +1862,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				*((UINT32 *)(&xy[m].y))=space.read_dword(vtxbuf_address[0]+(m+offset)*vtxbuf_stride[0]+4);
 				*((UINT32 *)(&z[m]))=space.read_dword(vtxbuf_address[0]+(m+offset)*vtxbuf_stride[0]+8);
 				*((UINT32 *)(&w[m]))=space.read_dword(vtxbuf_address[0]+(m+offset)*vtxbuf_stride[0]+12);
-				c[m]=space.read_dword(vtxbuf_address[3]+(m+offset)*vtxbuf_stride[0]+0); // color
+				c[m]=space.read_dword(vtxbuf_address[3]+(m+offset)*vtxbuf_stride[3]+0); // color
 				xy[m].p[0]=c[m] & 0xff; // b
 				xy[m].p[1]=(c[m] & 0xff00) >> 8;  // g
 				xy[m].p[2]=(c[m] & 0xff0000) >> 16;  // r
@@ -1731,7 +1882,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				*((UINT32 *)(&xy[2].y))=space.read_dword(vtxbuf_address[0]+(n+offset)*vtxbuf_stride[0]+4);
 				*((UINT32 *)(&z[2]))=space.read_dword(vtxbuf_address[0]+(n+offset)*vtxbuf_stride[0]+8);
 				*((UINT32 *)(&w[2]))=space.read_dword(vtxbuf_address[0]+(n+offset)*vtxbuf_stride[0]+12);
-				c[2]=space.read_dword(vtxbuf_address[3]+(n+offset)*vtxbuf_stride[0]+0); // color
+				c[2]=space.read_dword(vtxbuf_address[3]+(n+offset)*vtxbuf_stride[3]+0); // color
 				xy[2].p[0]=c[2] & 0xff; // b
 				xy[2].p[1]=(c[2] & 0xff00) >> 8; // g
 				xy[2].p[2]=(c[2] & 0xff0000) >> 16; // r
@@ -1759,6 +1910,208 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 			logerror("Unsupported primitive %d for method 0x1810\n",type);
 		}
 		countlen--;
+	}
+	if (maddress == 0x1800) {
+		int vtxbuf_stride[16];
+		UINT32 vtxbuf_address[16];
+		UINT32 dmahand[2], dmaoff[2], smasiz[2];
+		UINT32 type, tmp, n, m, u;
+		render_delegate renderspans;
+
+		// vertices are selected from the vertex buffer using an array of indexes
+		// each dword after 1800 contains two 16 bit index values to select the vartices
+		type = channel[chanel][subchannel].object.method[0x17fc / 4];
+		dmahand[0] = channel[chanel][subchannel].object.method[0x019c / 4];
+		dmahand[1] = channel[chanel][subchannel].object.method[0x01a0 / 4];
+		geforce_read_dma_object(dmahand[0], dmaoff[0], smasiz[0]);
+		geforce_read_dma_object(dmahand[1], dmaoff[1], smasiz[1]);
+		if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
+			renderspans = render_delegate(FUNC(nv2a_renderer::render_register_combiners), this);
+		}
+		else if (texture[0].enabled) {
+			renderspans = render_delegate(FUNC(nv2a_renderer::render_texture_simple), this);
+		}
+		else
+			renderspans = render_delegate(FUNC(nv2a_renderer::render_color), this);
+#ifdef LOG_NV2A
+		printf("vertex %d %d %d\n\r", type, offset, count);
+#endif
+		for (n = 0; n < 16; n++) {
+#ifdef LOG_NV2A
+			printf(" %08X %08X\n\r", channel[chanel][subchannel].object.method[0x1720 / 4 + n], channel[chanel][subchannel].object.method[0x1760 / 4 + n]);
+#endif
+			tmp = channel[chanel][subchannel].object.method[0x1760 / 4 + n]; // VTXBUF_FMT
+			//vtxbuf_kind[n]=tmp & 15;
+			//vtxbuf_size[n]=(tmp >> 4) & 15;
+			vtxbuf_stride[n] = (tmp >> 8) & 255;
+			tmp = channel[chanel][subchannel].object.method[0x1720 / 4 + n]; // VTXBUF_OFFSET
+			if (tmp & 0x80000000)
+				vtxbuf_address[n] = (tmp & 0x0fffffff) + dmaoff[1];
+			else
+				vtxbuf_address[n] = (tmp & 0x0fffffff) + dmaoff[0];
+		}
+		if (type == nv2a_renderer::QUADS) {
+			while (1) {
+				vertex_t xy[4];
+				float z[4], w[4];
+				UINT32 c[4];
+
+				// need 4 per object
+				// get remaining
+				while ((indexesleft_count < 4) && (countlen > 0)) {
+					indexesleft[indexesleft_count] = data & 0xffff;
+					indexesleft[indexesleft_count+ 1] = (data >> 16) & 0xffff;
+					indexesleft_count+=2;
+					countlen--;
+					address = address + 4;
+					data = space.read_dword(address);
+				}
+				if ((indexesleft_count < 4) && (countlen == 0))
+					break;
+				//printf("draw quad\n\r");
+				for (m = 0; m < 4; m++) {
+					*((UINT32 *)(&xy[m].x)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 0);
+					*((UINT32 *)(&xy[m].y)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 4);
+					*((UINT32 *)(&z[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 8);
+					*((UINT32 *)(&w[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 12);
+					c[m] = space.read_dword(vtxbuf_address[3] + indexesleft[m] * vtxbuf_stride[3] + 0); // color
+					xy[m].p[0] = c[m] & 0xff; // b
+					xy[m].p[1] = (c[m] & 0xff00) >> 8; // g
+					xy[m].p[2] = (c[m] & 0xff0000) >> 16; // r
+					xy[m].p[3] = (c[m] & 0xff000000) >> 24; // a
+					for (u = 0; u < 4; u++) {
+						xy[m].p[4 + u * 2] = 0;
+						xy[m].p[5 + u * 2] = 0;
+						if (texture[u].enabled) {
+							*((UINT32 *)(&xy[m].p[4 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 0);
+							*((UINT32 *)(&xy[m].p[5 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 4);
+						}
+					}
+				}
+
+				render_polygon<4>(fb.cliprect(), renderspans, 4 + 4 * 2, xy); // 4 rgba, 4 texture units 2 uv
+				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
+				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);
+				myline(fb,xy[3].x,xy[3].y,xy[0].x,xy[0].y);*/
+#ifdef LOG_NV2A
+				printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r", xy[0].x, xy[0].y, z[0], xy[1].x, xy[1].y, z[1], xy[2].x, xy[2].y, z[2], xy[3].x, xy[3].y, z[3]);
+#endif
+				for (m = 4; m < indexesleft_count; m++)
+					indexesleft[m - 4] = indexesleft[m];
+				indexesleft_count = indexesleft_count - 4;
+			}
+			wait();
+		}
+		else if (type == nv2a_renderer::TRIANGLES) {
+			while (1) {
+				vertex_t xy[4];
+				float z[4], w[4];
+				UINT32 c[4];
+
+				// need 3 dwords per object
+				// get remaining
+				while ((indexesleft_count < 3) && (countlen > 0)) {
+					indexesleft[indexesleft_count] = data & 0xffff;
+					indexesleft[indexesleft_count + 1] = (data >> 16) & 0xffff;
+					indexesleft_count += 2;
+					countlen--;
+					address = address + 4;
+					data = space.read_dword(address);
+				}
+				if ((indexesleft_count < 3) && (countlen == 0))
+					break;
+				//printf("draw triangle\n\r");
+				for (m = 0; m < 3; m++) {
+					*((UINT32 *)(&xy[m].x)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 0);
+					*((UINT32 *)(&xy[m].y)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 4);
+					*((UINT32 *)(&z[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 8);
+					*((UINT32 *)(&w[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 12);
+					c[m] = space.read_dword(vtxbuf_address[3] + indexesleft[m] * vtxbuf_stride[3] + 0); // color
+					xy[m].p[0] = c[m] & 0xff; // b
+					xy[m].p[1] = (c[m] & 0xff00) >> 8; // g
+					xy[m].p[2] = (c[m] & 0xff0000) >> 16; // r
+					xy[m].p[3] = (c[m] & 0xff000000) >> 24; // a
+					for (u = 0; u < 4; u++) {
+						xy[m].p[4 + u * 2] = 0;
+						xy[m].p[5 + u * 2] = 0;
+						if (texture[u].enabled) {
+							*((UINT32 *)(&xy[m].p[4 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 0);
+							*((UINT32 *)(&xy[m].p[5 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 4);
+						}
+					}
+				}
+
+				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[0], xy[1], xy[2]); // 4 rgba, 4 texture units 2 uv
+				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
+				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);*/
+#ifdef LOG_NV2A
+				printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r", xy[0].x, xy[0].y, z[0], xy[1].x, xy[1].y, z[1], xy[2].x, xy[2].y, z[2]);
+#endif
+				for (m = 3; m < indexesleft_count; m++)
+					indexesleft[m - 3] = indexesleft[m];
+				indexesleft_count = indexesleft_count - 3;
+			}
+			wait();
+		}
+		else if (type == nv2a_renderer::TRIANGLE_STRIP) {
+			while (1) {
+				vertex_t xy[4];
+				float z[4], w[4];
+				UINT32 c[4];
+
+				// need 3 dwords per object
+				// get remaining
+				while ((indexesleft_count < 3) && (countlen > 0)) {
+					indexesleft[indexesleft_count] = data & 0xffff;
+					indexesleft[indexesleft_count + 1] = (data >> 16) & 0xffff;
+					indexesleft_count += 2;
+					countlen--;
+					address = address + 4;
+					data = space.read_dword(address);
+				}
+				if ((indexesleft_count < 3) && (countlen == 0))
+					break;
+				//printf("draw triangle\n\r");
+				for (m = 0; m < 3; m++) {
+					*((UINT32 *)(&xy[m].x)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 0);
+					*((UINT32 *)(&xy[m].y)) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 4);
+					*((UINT32 *)(&z[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 8);
+					*((UINT32 *)(&w[m])) = space.read_dword(vtxbuf_address[0] + indexesleft[m] * vtxbuf_stride[0] + 12);
+					c[m] = space.read_dword(vtxbuf_address[3] + indexesleft[m] * vtxbuf_stride[3] + 0); // color
+					xy[m].p[0] = c[m] & 0xff; // b
+					xy[m].p[1] = (c[m] & 0xff00) >> 8; // g
+					xy[m].p[2] = (c[m] & 0xff0000) >> 16; // r
+					xy[m].p[3] = (c[m] & 0xff000000) >> 24; // a
+					for (u = 0; u < 4; u++) {
+						xy[m].p[4 + u * 2] = 0;
+						xy[m].p[5 + u * 2] = 0;
+						if (texture[u].enabled) {
+							*((UINT32 *)(&xy[m].p[4 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 0);
+							*((UINT32 *)(&xy[m].p[5 + u * 2])) = space.read_dword(vtxbuf_address[9 + u] + indexesleft[m] * vtxbuf_stride[9 + u] + 4);
+						}
+					}
+				}
+
+				render_triangle(fb.cliprect(), renderspans, 4 + 4 * 2, xy[primitives_count & 1], xy[~primitives_count & 1], xy[2]); // 012,102,012,102...
+				/*myline(fb,xy[0].x,xy[0].y,xy[1].x,xy[1].y);
+				myline(fb,xy[1].x,xy[1].y,xy[2].x,xy[2].y);
+				myline(fb,xy[2].x,xy[2].y,xy[3].x,xy[3].y);*/
+#ifdef LOG_NV2A
+				printf(" (%f,%f,%f)-(%f,%f,%f)-(%f,%f,%f)\n\r", xy[0].x, xy[0].y, z[0], xy[1].x, xy[1].y, z[1], xy[2].x, xy[2].y, z[2]);
+#endif
+				primitives_count++;
+				for (m = 1; m < indexesleft_count; m++)
+					indexesleft[m - 1] = indexesleft[m];
+				indexesleft_count = indexesleft_count - 1;
+			}
+			wait();
+		}
+		else {
+			logerror("Unsupported primitive %d for method 0x1800\n", type);
+			countlen = 0;
+		}
 	}
 	if (maddress == 0x1818) {
 		int n,m,u,vwords;
@@ -1899,7 +2252,6 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				return;
 			}
 			for (n=2;countlen > 0;n++) {
-				// put vertex n data in element 2 of arrays
 				// put vertex n data in element 2 of arrays
 				// position
 				*((UINT32 *)(&xy[2].x))=space.read_dword(address+vattrpos[0]*4+0);
@@ -2055,7 +2407,34 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 			wait();
 		} else {
 			logerror("Unsupported primitive %d for method 0x1818\n",type);
+			countlen = 0;
 		}
+	}
+	if ((maddress >= 0x1760) && (maddress < 0x17A0)) {
+		int bit=method-0x1760/4;
+
+		data=data & 255;
+		if (data > 15)
+			enabled_vertex_attributes |= (1 << bit);
+		else
+			enabled_vertex_attributes &= ~(1 << bit);
+		switch (data & 15) {
+			case 0:
+				words_vertex_attributes[bit]=(((data >> 4) + 3) & 15) >> 2;
+				break;
+			case nv2a_renderer::FLOAT:
+				words_vertex_attributes[bit]=(data >> 4);
+				break;
+			case nv2a_renderer::UBYTE:
+				words_vertex_attributes[bit]=(((data >> 4) + 3) & 15) >> 2;
+				break;
+			case nv2a_renderer::USHORT:
+				words_vertex_attributes[bit]=(((data >> 4) + 1) & 15) >> 1;
+				break;
+			default:
+				words_vertex_attributes[bit]=0;
+		}
+		countlen--;
 	}
 	if ((maddress == 0x1d6c) || (maddress == 0x1d70) || (maddress == 0x1a4))
 		countlen--;
@@ -2124,6 +2503,19 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 			texture[unit].sizew=1 << basesizew;
 			texture[unit].dilate=dilatechose[(basesizeu << 4)+basesizev];
 			texture[unit].format=format;
+			if (debug_grab_texttype == format) {
+				FILE *f;
+				int written;
+
+				debug_grab_texttype = -1;
+				f = fopen(debug_grab_textfile, "wb");
+				if (f) {
+					written=(int)fwrite(texture[unit].buffer, texture[unit].sizeu*texture[unit].sizev*4, 1, f);
+					fclose(f);
+					logerror("Written %d bytes of texture to specified file\n", written);
+				} else
+					logerror("Unable to save texture to specified file\n");
+			}
 		}
 		if (maddress == 0x1b0c) {
 			// enable texture
@@ -2137,31 +2529,80 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 		}
 		countlen--;
 	}
-	if ((maddress >= 0x1760) && (maddress < 0x17A0)) {
-		int bit=method-0x1760/4;
-
-		data=data & 255;
-		if (data > 15)
-			enabled_vertex_attributes |= (1 << bit);
-		else
-			enabled_vertex_attributes &= ~(1 << bit);
-		switch (data & 15) {
-			case 0:
-				words_vertex_attributes[bit]=(((data >> 4) + 3) & 15) >> 2;
-				break;
-			case nv2a_renderer::FLOAT:
-				words_vertex_attributes[bit]=(data >> 4);
-				break;
-			case nv2a_renderer::UBYTE:
-				words_vertex_attributes[bit]=(((data >> 4) + 3) & 15) >> 2;
-				break;
-			case nv2a_renderer::USHORT:
-				words_vertex_attributes[bit]=(((data >> 4) + 1) & 15) >> 1;
-				break;
-			default:
-				words_vertex_attributes[bit]=0;
-		}
+	// modelview matrix
+	if ((maddress >= 0x0480) && (maddress < 0x04c0)) {
+		maddress = (maddress - 0x0480) / 4;
+		*(UINT32 *)(&matrix.modelview[maddress]) = data;
+		countlen--;
 	}
+	// inverse modelview matrix
+	if ((maddress >= 0x0580) && (maddress < 0x05c0)) {
+		maddress = (maddress - 0x0580) / 4;
+		*(UINT32 *)(&matrix.modelview_inverse[maddress]) = data;
+		countlen--;
+	}
+	// projection matrix
+	if ((maddress >= 0x0680) && (maddress < 0x06c0)) {
+		maddress = (maddress - 0x0680) / 4;
+		*(UINT32 *)(&matrix.projection[maddress]) = data;
+		countlen--;
+	}
+	// viewport translate
+	if ((maddress >= 0x0a20) && (maddress < 0x0a30)) {
+		maddress = (maddress - 0x0a20) / 4;
+		*(UINT32 *)(&matrix.translate[maddress]) = data;
+		countlen--;
+	}
+	// viewport scale
+	if ((maddress >= 0x0af0) && (maddress < 0x0b00)) {
+		maddress = (maddress - 0x0af0) / 4;
+		*(UINT32 *)(&matrix.scale[maddress]) = data;
+		countlen--;
+	}
+	// Vertex program (shader)
+	if (maddress == 0x1e94) {
+		/*if (data == 2)
+			logerror("Enabled vertex program\n");
+		else if (data == 4)
+			logerror("Enabled fixed function pipeline\n");
+		else if (data == 6)
+			logerror("Enabled both fixed function pipeline and vertex program ?\n");
+		else
+			logerror("Unknown value %d to method 0x1e94\n",data);*/
+		countlen--;
+	}
+	if (maddress == 0x1e9c) {
+		//logerror("VP_UPLOAD_FROM_ID %d\n",data);
+		vertexprogram.upload_instruction=data*4;
+		countlen--;
+	}
+	if (maddress == 0x1ea0) {
+		//logerror("VP_START_FROM_ID %d\n",data);
+		vertexprogram.instructions=vertexprogram.upload_instruction/4;
+		countlen--;
+	}
+	if (maddress == 0x1ea4) {
+		//logerror("VP_UPLOAD_CONST_ID %d\n",data);
+		vertexprogram.upload_parameter=data;
+		countlen--;
+	}
+	if ((maddress >= 0x0b00) && (maddress < 0x0b80)) {
+		//logerror("VP_UPLOAD_INST\n");
+		if (vertexprogram.upload_instruction < 1024)
+			vertexprogram.instruction[vertexprogram.upload_instruction]=data;
+		else
+			logerror("Need to increase size of vertexprogram.instruction to %d\n\r", vertexprogram.upload_parameter);
+		vertexprogram.upload_instruction++;
+	}
+	if ((maddress >= 0x0b80) && (maddress < 0x0c00)) {
+		//logerror("VP_UPLOAD_CONST\n");
+		if (vertexprogram.upload_parameter < 1024)
+			vertexprogram.parameter[vertexprogram.upload_parameter] = data;
+		else
+			logerror("Need to increase size of vertexprogram.parameter to %d\n\r", vertexprogram.upload_parameter);
+		vertexprogram.upload_parameter++;
+	}
+	// Register combiners
 	if (maddress == 0x1e60) {
 		combiner.stages=data & 15;
 		countlen--;
@@ -2288,6 +2729,14 @@ int nv2a_renderer::toggle_register_combiners_usage()
 {
 	combiner.used=1-combiner.used;
 	return combiner.used;
+}
+
+void nv2a_renderer::debug_grab_texture(int type, const char *filename)
+{
+	debug_grab_texttype = type;
+	if (debug_grab_textfile == NULL)
+		debug_grab_textfile = (char *)malloc(128);
+	strncpy(debug_grab_textfile, filename, 127);
 }
 
 void nv2a_renderer::savestate_items()
@@ -3008,6 +3457,11 @@ void chihiro_state::debug_generate_irq(int irq,bool active)
 	}
 }
 
+void chihiro_state::debug_grab_texture(int type, char *filename)
+{
+	nvidia_nv2a->debug_grab_texture(type, filename);
+}
+
 void chihiro_state::vblank_callback(screen_device &screen, bool state)
 {
 	nvidia_nv2a->vblank_callback(screen,state);
@@ -3338,26 +3792,116 @@ WRITE32_MEMBER( chihiro_state::usbctrl_w )
 READ32_MEMBER( chihiro_state::audio_apu_r )
 {
 	logerror("Audio_APU: read from %08X mask %08X\n",0xfe800000+offset*4,mem_mask);
-	if (offset == 0x20010/4)
+	if (offset == 0x20010/4) // some kind of internal counter or state value
 		return 0x20+4+8+0x48+0x80;
-	return 0;
+	return apust.memory[offset];
 }
 
 WRITE32_MEMBER( chihiro_state::audio_apu_w )
 {
+	//UINT32 old;
+	UINT32 v;
+
 	logerror("Audio_APU: write at %08X mask %08X value %08X\n",0xfe800000+offset*4,mem_mask,data);
-	if (offset == 0x2040/4)
-		apust.memory0_sgaddress=data;
-	if (offset == 0x20d4/4) {
-		apust.memory0_sgblocks=data;
-		apust.memory0_address=apust.space->read_dword(apust.memory0_sgaddress);
+	//old = apust.memory[offset];
+	apust.memory[offset] = data;
+	if (offset == 0x02040/4) // address of memory area with scatter-gather info (gpdsp scratch dma)
+		apust.gpdsp_sgaddress=data;
+	if (offset == 0x020d4/4) { // block count (gpdsp)
+		apust.gpdsp_sgblocks=data;
+		apust.gpdsp_address=apust.space->read_dword(apust.gpdsp_sgaddress); // memory address of first block
 		apust.timer->enable();
 		apust.timer->adjust(attotime::from_msec(1),0,attotime::from_msec(1));
 	}
-	if (offset == 0x2048/4)
-		apust.memory1_sgaddress=data;
-	if (offset == 0x20dc/4)
-		apust.memory1_sgblocks=data;
+	if (offset == 0x02048 / 4) // (epdsp scratch dma)
+		apust.epdsp_sgaddress=data;
+	if (offset == 0x020dc / 4) // (epdsp)
+		apust.epdsp_sgblocks=data;
+	if (offset == 0x0204c / 4) // address of memory area with information about blocks
+		apust.unknown_sgaddress = data;
+	if (offset == 0x020e0 / 4) // block count - 1
+		apust.unknown_sgblocks = data;
+	if (offset == 0x0202c / 4) { // address of memory area with 0x80 bytes for each voice
+		apust.voicedata_address = data;
+		return;
+	}
+	if (offset == 0x04024 / 4) // offset in memory area indicated by 0x204c (analog output ?)
+		return;
+	if (offset == 0x04034 / 4) // size
+		return;
+	if (offset == 0x04028 / 4) // offset in memory area indicated by 0x204c (digital output ?)
+		return;
+	if (offset == 0x04038 / 4) // size
+		return;
+	if (offset == 0x20804 / 4) { // block number for scatter-gather heap that stores sampled audio to be played
+		if (data >= 1024) {
+			logerror("Audio_APU: sg block number too high, increase size of voices_heap_blockaddr\n");
+			apust.memory[offset] = 1023;
+		}
+		return;
+	}
+	if (offset == 0x20808 / 4) { // block address for scatter-gather heap that stores sampled audio to be played
+		apust.voices_heap_blockaddr[apust.memory[0x20804 / 4]] = data;
+		return;
+	}
+	if (offset == 0x202f8 / 4) { // voice number for parameters ?
+		apust.voice_number = data;
+		return;
+	}
+	if (offset == 0x202fc / 4) // 1 when accessing voice parameters 0 otherwise
+		return;
+	if (offset == 0x20304 / 4) { // format
+		/*
+		  bits 28-31 sample format:
+		   0  8-bit pcm
+		   5  16-bit pcm
+		   10 adpcm ?
+		   14 24-bit pcm
+		   15 32-bit pcm
+		  bits 16-20 number of channels - 1:
+		   0  mono
+		   1  stereo
+		*/
+		return;
+	}
+	if (offset == 0x2037c / 4) { // value related to sample rate
+		INT16 v = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
+		float vv = ((float)v) / 4096.0; // divide by 4096
+		float vvv = powf(2, vv); // two to the vv
+		int f = vvv*48000.0; // sample rate
+		apust.voices_frequency[apust.voice_number] = f;
+		return;
+	}
+	if (offset == 0x203a0 / 4) // start offset of data in scatter-gather heap
+		return;
+	if (offset == 0x203a4 / 4) { // first sample to play
+		apust.voices_position_start[apust.voice_number] = data*1000;
+		return;
+	}
+	if (offset == 0x203dc / 4) { // last sample to play
+		apust.voices_position_end[apust.voice_number] = data*1000;
+		return;
+	}
+	if (offset == 0x2010c / 4) // voice processor 0 idle 1 not idle ?
+		return;
+	if (offset == 0x20124 / 4) { // voice number to activate ?
+		v = apust.voice_number;
+		apust.voices_active[v >> 6] |= ((UINT64)1 << (v & 63));
+		apust.voices_position[v] = apust.voices_position_start[apust.voice_number];
+		apust.voices_position_increment[apust.voice_number] = apust.voices_frequency[apust.voice_number];
+		return;
+	}
+	if (offset == 0x20128 / 4) { // voice number to deactivate ?
+		v = apust.voice_number;
+		apust.voices_active[v >> 6] &= ~(1 << (v & 63));
+		return;
+	}
+	if (offset == 0x20140 / 4) // voice number to ?
+		return;
+	if ((offset >= 0x20200 / 4) && (offset < 0x20280 / 4)) // headroom for each of the 32 mixbins
+		return;
+	if (offset == 0x20280 / 4) // hrtf headroom ?
+		return;
 }
 
 READ32_MEMBER( chihiro_state::audio_ac93_r )
@@ -3405,11 +3949,30 @@ WRITE32_MEMBER( chihiro_state::audio_ac93_w )
 
 TIMER_CALLBACK_MEMBER(chihiro_state::audio_apu_timer)
 {
-	int cmd=apust.space->read_dword(apust.memory0_address+0x800+0x10);
+	int cmd;
+	int bb, b, v;
+	UINT64 bv;
+	UINT32 phys;
+
+	cmd=apust.space->read_dword(apust.gpdsp_address+0x800+0x10);
 	if (cmd == 3)
-		apust.space->write_dword(apust.memory0_address+0x800+0x10,0);
+		apust.space->write_dword(apust.gpdsp_address+0x800+0x10,0);
 	/*else
-	    logerror("Audio_APU: unexpected value at address %d\n",apust.memory0_address+0x800+0x10);*/
+	    logerror("Audio_APU: unexpected value at address %d\n",apust.gpdsp_address+0x800+0x10);*/
+	for (b = 0; b < 4; b++) {
+		bv = 1;
+		for (bb = 0; bb < 64; bb++) {
+			if (apust.voices_active[b] & bv) {
+				v = bb + (b << 6);
+				apust.voices_position[v] += apust.voices_position_increment[v];
+				while (apust.voices_position[v] >= apust.voices_position_end[v])
+					apust.voices_position[v] = apust.voices_position_start[v] + apust.voices_position[v] - apust.voices_position_end[v] - 1000;
+				phys = apust.voicedata_address + 0x80 * v;
+				apust.space->write_dword(phys + 0x58, apust.voices_position[v] / 1000);
+			}
+			bv = bv << 1;
+		}
+	}
 }
 
 /*
@@ -3902,7 +4465,14 @@ void chihiro_state::machine_start()
 	if (chihiro_devs.dimmboard != NULL) {
 		dimm_board_memory=chihiro_devs.dimmboard->memory(dimm_board_memory_size);
 	}
-	apust.space=&m_maincpu->space();
+	memset(apust.memory, 0, sizeof(apust.memory));
+	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
+	memset(apust.voices_active, 0, sizeof(apust.voices_active));
+	memset(apust.voices_position, 0, sizeof(apust.voices_position));
+	memset(apust.voices_position_start, 0, sizeof(apust.voices_position_start));
+	memset(apust.voices_position_end, 0, sizeof(apust.voices_position_end));
+	memset(apust.voices_position_increment, 0, sizeof(apust.voices_position_increment));
+	apust.space = &m_maincpu->space();
 	apust.timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(chihiro_state::audio_apu_timer),this),(void *)"APU Timer");
 	apust.timer->enable(false);
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)

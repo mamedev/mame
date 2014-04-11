@@ -336,7 +336,7 @@ void mc68901_device::gpio_output()
 //-------------------------------------------------
 
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock, "mc68901", __FILE__),
+	: device_t(mconfig, MC68901, "MC68901 MFP", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_timer_clock(0),
 		m_rx_clock(0),

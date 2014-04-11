@@ -3298,20 +3298,6 @@ static GFXDECODE_START( crush4 )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static const namco_interface namco_config =
-{
-	3,          /* number of voices */
-	0           /* stereo */
-};
-
-
 /*************************************
  *
  *  Machine drivers
@@ -3344,7 +3330,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

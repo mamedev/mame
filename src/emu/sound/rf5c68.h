@@ -19,15 +19,16 @@
 #define MCFG_RF5C68_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, RF5C68, _clock)
 
+#define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
+	rf5c68_device::set_end_callback(*device, rf5c68_sample_end_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct rf5c68_interface
-{
-	void (*sample_end_callback)(device_t* device, int channel);
-};
+typedef device_delegate<void (int channel)> rf5c68_sample_end_cb_delegate;
+
+#define RF5C68_SAMPLE_END_CB_MEMBER(_name)   void _name(int channel)
 
 
 struct rf5c68_pcm_channel
@@ -51,7 +52,6 @@ struct rf5c68_pcm_channel
 };
 
 
-
 // ======================> rf5c68_device
 
 class rf5c68_device : public device_t,
@@ -61,6 +61,8 @@ public:
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~rf5c68_device() { }
 
+	static void set_end_callback(device_t &device, rf5c68_sample_end_cb_delegate callback) { downcast<rf5c68_device &>(device).m_sample_end_cb = callback; }
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -82,7 +84,8 @@ private:
 	UINT8                m_wbank;
 	UINT8                m_enable;
 	UINT8                m_data[0x10000];
-	void                (*m_sample_callback)(device_t* device,int channel);
+
+	rf5c68_sample_end_cb_delegate m_sample_end_cb;
 };
 
 extern const device_type RF5C68;

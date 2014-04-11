@@ -1595,20 +1595,6 @@ static GFXDECODE_START( todruaga )
 GFXDECODE_END
 
 
-
-/***************************************************************************
-
-  Sound interface
-
-***************************************************************************/
-
-static const namco_interface namco_config =
-{
-	8,              /* number of voices */
-	0               /* stereo */
-};
-
-
 /***************************************************************************
 
   Custom I/O initialization
@@ -1709,7 +1695,7 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1832,7 +1818,7 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1871,7 +1857,7 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

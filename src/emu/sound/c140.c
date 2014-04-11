@@ -106,11 +106,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 
 void c140_device::device_start()
 {
-	const c140_interface *intf = (const c140_interface *)static_config();
-
 	m_sample_rate=m_baserate=clock();
-
-	m_banking_type = intf->banking_type;
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 

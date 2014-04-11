@@ -521,7 +521,7 @@ UINT32 crtc_ega_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		UINT16 y;
 
-		assert(!m_row_update_cb.isnull() != NULL);
+		assert(!m_row_update_cb.isnull());
 
 		/* call the set up function if any */
 		if (!m_begin_update_cb.isnull())

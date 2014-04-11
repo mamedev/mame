@@ -415,13 +415,6 @@ static GFXDECODE_START( skykid )
 GFXDECODE_END
 
 
-
-static const namco_interface namco_config =
-{
-	8,                  /* number of voices */
-	0                   /* stereo */
-};
-
 INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
 {
 	if(m_main_irq_mask)
@@ -469,7 +462,7 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -23,16 +23,13 @@ enum
 #define MCFG_C140_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, C140, _clock)
 
+#define MCFG_C140_BANK_TYPE(_type) \
+	c140_device::set_bank_type(*device, _type);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct c140_interface
-{
-	int banking_type;
-};
-
 
 struct C140_VOICE
 {
@@ -80,6 +77,9 @@ class c140_device : public device_t,
 public:
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~c140_device() { }
+
+	// static configuration
+	static void set_bank_type(device_t &device, int bank) { downcast<c140_device &>(device).m_banking_type = bank; }
 
 protected:
 	// device-level overrides

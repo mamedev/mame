@@ -38,7 +38,7 @@ WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
 WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
 {
 	/* bits 6 & 7 = bank number */
-	membank("bank1")->set_entry((data & 0xc0) >> 6);
+	m_rombank->set_entry((data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
 	coin_counter_w(machine(), 0, data & 0x10);
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
 	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)                /* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w) /* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* banked ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
 ADDRESS_MAP_END
 
@@ -212,7 +212,7 @@ void battlnts_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	m_rombank->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_layer_colorbase));

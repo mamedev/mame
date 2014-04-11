@@ -1177,22 +1177,6 @@ static INPUT_PORTS_START( shrike )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static const cem3394_interface cem_interface =
-{
-	431.894,
-	1300.0,
-	balsente_noise_gen
-};
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -1233,27 +1217,39 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_CEM3394_ADD("cem1", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_0)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_CEM3394_ADD("cem2", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_1)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_CEM3394_ADD("cem3", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_2)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_CEM3394_ADD("cem4", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_3)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_CEM3394_ADD("cem5", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_4)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_CEM3394_ADD("cem6", 0)
-	MCFG_SOUND_CONFIG(cem_interface)
+	MCFG_CEM3394_EXT_INPUT_CB(balsente_state, noise_gen_5)
+	MCFG_CEM3394_VCO_ZERO(431.894)
+	MCFG_CEM3394_FILTER_ZERO(1300.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 

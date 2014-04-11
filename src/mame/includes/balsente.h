@@ -215,6 +215,13 @@ public:
 	void update_grudge_steering();
 	void expand_roms(UINT8 cd_rom_mask);
 	inline void config_shooter_adc(UINT8 shooter, UINT8 adc_shift);
+	inline void noise_gen_chip(int chip, int count, short *buffer);
+	CEM3394_EXT_INPUT(noise_gen_0);
+	CEM3394_EXT_INPUT(noise_gen_1);
+	CEM3394_EXT_INPUT(noise_gen_2);
+	CEM3394_EXT_INPUT(noise_gen_3);
+	CEM3394_EXT_INPUT(noise_gen_4);
+	CEM3394_EXT_INPUT(noise_gen_5);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_68k;

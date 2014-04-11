@@ -1359,13 +1359,6 @@ static const hd63450_interface dmac_interface =
 	{attotime::from_usec(32),attotime::from_nsec(450),attotime::from_nsec(50),attotime::from_nsec(50)}, // Burst mode timing (guesstimate)
 };
 
-static const okim6258_interface x68k_okim6258_interface =
-{
-	FOSC_DIV_BY_512,
-	TYPE_4BITS,
-	OUTPUT_10BITS,
-};
-
 static INPUT_PORTS_START( x68000 )
 	PORT_START("ctrltype")
 	PORT_CONFNAME(0x0f, 0x00, "Joystick Port 1")
@@ -1870,8 +1863,11 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
 	MCFG_OKIM6258_ADD("okim6258", 4000000)
-	MCFG_SOUND_CONFIG(x68k_okim6258_interface)
+	MCFG_OKIM6258_DIVIDER(FOSC_DIV_BY_512)
+	MCFG_OKIM6258_ADPCM_TYPE(TYPE_4BITS)
+	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

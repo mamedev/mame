@@ -168,6 +168,22 @@ W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
 W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 
+// Define standard and maximum RAM sizes (A, then B model):
+//#define BOARD_RAM 0x10000  // 64 K base RAM  (100-A)
+//#define END_OF_RAM 0xcffff // very last byte (100-A) DO NOT CHANGE.
+
+// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
+// It is no longer possible to key in the RAM size from within the 100-B BIOS.
+#define BOARD_RAM 0x20000  // 128 K base RAM (100-B)
+#define END_OF_RAM 0xdffff // very last byte (100-B) DO NOT CHANGE.
+
+// TROUBLESHOOTING RAM
+// Unexpected low RAM sizes are an indication of option RAM (at worst: 128 K on board) failure.
+// While motherboard errors often render the system unbootable, bad option RAM (> 128 K)
+// can be narrowed down with the Diagnostic Disk and codes from the 'Pocket Service Guide'
+// EK-PC100-PS-002 (APPENDIX B.2.2); pc100ps2.pdf
+
+
 // Workaround DOES NOT APPLY to the 190-B ROM. Only enable when compiling the 'rainbow' driver -
 //#define FORCE_RAINBOW_100_LOGO
 
@@ -203,6 +219,7 @@ public:
 		m_inp7(*this, "GRAPHICS OPTION"),
 		m_inp8(*this, "MEMORY PRESENT"),
 		m_inp9(*this, "MONITOR TYPE"),
+		m_inp10(*this, "J17"),
 
 		m_crtc(*this, "vt100_video"),
 		m_i8088(*this, "maincpu"),
@@ -231,9 +248,6 @@ public:
 
 	DECLARE_READ8_MEMBER(share_z80_r);
 	DECLARE_WRITE8_MEMBER(share_z80_w);
-
-	DECLARE_READ8_MEMBER(floating_bus_r);
-	DECLARE_WRITE8_MEMBER(floating_bus_w);
 
 	DECLARE_READ8_MEMBER(hd_status_68_r);
 
@@ -285,6 +299,7 @@ private:
 	required_ioport m_inp7;
 	required_ioport m_inp8;
 	required_ioport m_inp9;
+	required_ioport m_inp10;
 
 	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
@@ -368,11 +383,7 @@ void rainbow_state::machine_start()
 static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM
-
-	// test at f4e00 - f4e1c
-	AM_RANGE(0x20000, 0xdffff) AM_READWRITE(floating_bus_r,floating_bus_w)
-	AM_RANGE(0x20000, 0xdffff) AM_RAM
+	AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 
 	// Documentation claims there is a 256 x 4 bit NVRAM from 0xed000 to 0xed040 (*)
 	//   shadowed at $ec000 - $ecfff and from $ed040 - $edfff.
@@ -475,33 +486,41 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPSETTING(    0x02, "GREEN" )
 		PORT_DIPSETTING(    0x03, "AMBER" )
 
+	// MEMORY, FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
 		PORT_START("MEMORY PRESENT")
-		PORT_DIPNAME( 0xF000, 0x2000, "MEMORY PRESENT")
-		PORT_DIPSETTING(    0x2000, "128 K (BOARD DEFAULT)" ) // NOTE: 0x2000 hard coded in 'system_parameter_r'
-		PORT_DIPSETTING(    0x3000, "192 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x4000, "256 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x5000, "320 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x6000, "384 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x7000, "448 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x8000, "512 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0x9000, "576 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0xA000, "640 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0xB000, "704 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0xC000, "768 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0xD000, "832 K (MEMORY OPTION)" )
-		PORT_DIPSETTING(    0xE000, "896 K (MEMORY OPTION)" )
+		PORT_DIPNAME( 0xF0000, 0x20000, "MEMORY PRESENT")
+		PORT_DIPSETTING(    0x10000, "64  K (MINIMUM ON 100-A)" ) // see BOARD_RAM
+		PORT_DIPSETTING(    0x20000, "128 K (MINIMUM ON 100-B)" ) 
+		PORT_DIPSETTING(    0x30000, "192 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x40000, "256 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x50000, "320 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x60000, "384 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x70000, "448 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x80000, "512 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0x90000, "576 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xA0000, "640 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xB0000, "704 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xC0000, "768 K (MEMORY OPTION)" )
+		PORT_DIPSETTING(    0xD0000, "832 K (MAX.MEM.ON -A)" ) // see END_OF_RAM
+		PORT_DIPSETTING(    0xE0000, "896 K (MAX.MEM.ON -B)" )
 
-		PORT_START("GRAPHICS OPTION")
-		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	// Floppy is always 'on', BUNDLE + GRAPHICS are not implemented yet:
+		PORT_START("FLOPPY CONTROLLER")
+		PORT_DIPNAME( 0x01, 0x01, "FLOPPY CONTROLLER") PORT_TOGGLE
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) ) 
 
 		PORT_START("BUNDLE OPTION")
 		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
-	PORT_START("W13") // W13 - W18 affect 'system_parameter_r'
+		PORT_START("GRAPHICS OPTION")
+		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+		
+	// W13 - W18 are used for factory tests	and affect the boot process -
+	PORT_START("W13") 
 		PORT_DIPNAME( 0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -522,7 +541,7 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
 
 	// J17 jumper on FDC controller board shifts drive select (experimental) -
-	PORT_START("FLOPPY CONTROLLER")
+	PORT_START("J17")
 		PORT_DIPNAME( 0x02, 0x00, "J17 DRIVE SELECT (A => C and B => D)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -548,6 +567,12 @@ LEGACY_FLOPPY_OPTIONS_END
 
 void rainbow_state::machine_reset()
 {
+	/* configure RAM */
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	if (m_inp8->read() < END_OF_RAM) 
+	{	program.unmap_readwrite(m_inp8->read(), END_OF_RAM);
+	}
+
 	if (COLD_BOOT == 1)
 	{
 		COLD_BOOT = 2;
@@ -601,39 +626,6 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 	else
 			m_crtc->video_update(bitmap, cliprect);
 	return 0;
-}
-
-// It is no longer possible to key in the RAM size on the 100-B.
-// The DEC-100-B boot ROM probes until a 'flaky' area is found (around F400:0E04).
-
-// Unexpected low RAM sizes are an indication of option RAM (at worst: 128 K on board) failure.
-// While motherboard errors often render the system unbootable, bad option RAM (> 128 K)
-// can be narrowed down with the Diagnostic Disk and codes from the 'Pocket Service Guide'
-// EK-PC100-PS-002 (APPENDIX B.2.2); pc100ps2.pdf
-// ================================================================
-// - Simulate floating bus for initial RAM detection -
-// FIXME: code valid ONLY within ROM section F4Exxx.
-//
-// NOTE: MS-DOS 2.x unfortunately probes RAM in a similar way.
-// => SET OPTION RAM to 896 K for unknown applications (and DOS) <=
-// ================================================================
-READ8_MEMBER(rainbow_state::floating_bus_r)
-{
-	int pc = space.device().safe_pc();
-
-	if ( ((pc & 0xFFF00) == 0xF4E00) &&
-			( m_maincpu->state_int(I8086_DS) >= m_inp8->read() )
-		)
-	{
-		return (offset>>16) + 2;
-	}
-	else
-		return space.read_byte(offset);
-}
-
-WRITE8_MEMBER(rainbow_state::floating_bus_w)
-{
-		space.write_byte(offset,data);
 }
 
 // interrupt handling and arbitration.  priorities currently unknown.
@@ -746,11 +738,11 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
     B F G M
    ( 1 means NOT present )
 */
-	// Hard coded value 0x2000 - see DIP switch setup!
-	return 0x0f - m_inp5->read()
-				- 0                 // floppy is hard coded in emulator.
-				- m_inp7->read()
-				- ((m_inp8->read() > 0x2000) ? 8 : 0);
+	return	(((m_inp5->read() == 1)		? 0 : 1)  |
+		 ((m_inp6->read() == 1)		? 0 : 2)  |
+		 ((m_inp7->read() == 1)		? 0 : 4)  |
+		 ((m_inp8->read() > BOARD_RAM)	? 0 : 8)
+		);
 }
 
 READ8_MEMBER(rainbow_state::comm_control_r)
@@ -951,7 +943,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	int force_ready = ( (data & 4) != 0 ) ? 0 : 1;
 
 	int drive;
-	if ( m_inp6->read() && ((data & 3) < 2) )
+	if ( m_inp10->read() && ((data & 3) < 2) )
 		drive = (data & 1) + 2;
 	else
 		drive = data & 3;
@@ -1236,7 +1228,7 @@ MACHINE_CONFIG_END
 // 'Rainbow 100-A' (introduced May 1982) is first-generation hardware with ROM 04.03.11
 // - 64 K base RAM on board (instead of 128 K on 'B' model).  832 K RAM max.
 // - inability to boot from hard disc (mind the inadequate PSU)
-// - cannot control bit 7 of IRQ vector (prevents DOS 2.0x from booting on unmodified hardware)
+// - cannot control bit 7 of IRQ vector (prevents DOS >= 2.05 from booting on unmodified hardware)
 // - limited palette with color graphics option (4 instead of 16 colors)
 // - smaller ROMs (3 x 2764) with fewer routines (no documented way to beep...)
 

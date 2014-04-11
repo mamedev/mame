@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 
 
@@ -358,11 +359,22 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 };
 
 
+static ADDRESS_MAP_START( megaphx_pic_io_map, AS_IO, 8, megaphx_state )
+//	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
+//	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
+//	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
+//	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+ADDRESS_MAP_END
+
 
 static MACHINE_CONFIG_START( megaphx, megaphx_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
+
+	MCFG_CPU_ADD("pic", PIC16C54, 12000000)    /* 3MHz */
+	/* Program and Data Maps are internal to the MCU */
+	MCFG_CPU_IO_MAP(megaphx_pic_io_map)
 
 
 	MCFG_INDER_AUDIO_ADD("inder_sb")
@@ -408,11 +420,12 @@ ROM_START( megaphx )
 	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
 	ROM_LOAD( "sonido_mph0.u35", 0x000000, 0x2000,  CRC(abc1b140) SHA1(8384a162d85cf9ea870d22f44b1ca64001c6a083) )
 
+	ROM_REGION( 0x100000, "pic", 0 )
+	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+
 	ROM_REGION( 0x100000, "pals", 0 ) // jedutil won't convert these? are they bad?
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
 	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
-
-	// there is a PIC responsible for some I/O tasks (what type? what internal rom size?)
 ROM_END
 
 GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, megaphx, ROT0, "Dinamic / Inder", "Mega Phoenix", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

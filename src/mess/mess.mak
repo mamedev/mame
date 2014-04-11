@@ -301,6 +301,7 @@ VIDEOS += SAA5050
 VIDEOS += SED1200
 VIDEOS += SED1330
 VIDEOS += SED1520
+VIDEOS += SNES_PPU
 VIDEOS += STVVDP
 VIDEOS += T6A04
 #VIDEOS += TLC34076
@@ -795,7 +796,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/ppu2c0x.o     \
 	$(MAME_AUDIO)/snes_snd.o    \
 	$(MAME_MACHINE)/snes.o      \
-	$(MAME_VIDEO)/snes.o        \
 	$(MAME_MACHINE)/n64.o       \
 	$(MAME_VIDEO)/n64.o         \
 	$(MAME_VIDEO)/rdpblend.o    \

@@ -1056,12 +1056,6 @@ GFXDECODE_END
 
 
 
-static const namco_interface namco_config =
-{
-	8,          /* number of voices */
-	1           /* stereo */
-};
-
 /*
     namcos1 has two 8bit dac channel. But They are mixed before pre-amp.
     And,they are connected with pre-amp through active LPF.
@@ -1115,7 +1109,8 @@ static MACHINE_CONFIG_START( ns1, namcos1_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048/2)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
+	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

@@ -911,12 +911,6 @@ static GFXDECODE_START( armwrest )
 GFXDECODE_END
 
 
-
-static const nesapu_interface nes_config =
-{
-	"audiocpu"
-};
-
 void punchout_state::machine_reset()
 {
 	m_rp5c01_mode_sel = 0;
@@ -971,7 +965,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_config)
+	MCFG_NES_APU_CPU("audiocpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3580000)

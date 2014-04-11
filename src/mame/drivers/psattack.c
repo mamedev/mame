@@ -167,12 +167,6 @@ static INPUT_PORTS_START(psattack)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const vr0_interface vr0_config =
-{
-	0x04800000
-};
-
-
 static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(psattack_mem)
@@ -196,7 +190,7 @@ static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("vrender", VRENDER0, 0)
-	MCFG_SOUND_CONFIG(vr0_config)
+	MCFG_VR0_REGBASE(0x04800000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

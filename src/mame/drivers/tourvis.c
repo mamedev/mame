@@ -361,11 +361,6 @@ static I8155_INTERFACE(i8155_intf)
 	DEVCB_DRIVER_LINE_MEMBER(tourvision_state,tourvision_timer_out)
 };
 
-static const c6280_interface c6280_config =
-{
-	"maincpu"
-};
-
 WRITE_LINE_MEMBER(tourvision_state::pce_irq_changed)
 {
 	m_maincpu->set_input_line(0, state);
@@ -401,7 +396,7 @@ static MACHINE_CONFIG_START( tourvision, tourvision_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 

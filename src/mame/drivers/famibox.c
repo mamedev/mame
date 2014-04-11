@@ -511,11 +511,6 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-static const nesapu_interface famibox_interface_1 =
-{
-	"maincpu"
-};
-
 PALETTE_INIT_MEMBER(famibox_state, famibox)
 {
 	m_ppu->init_palette(palette, 0);
@@ -574,7 +569,6 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MCFG_CPU_PROGRAM_MAP(famibox_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -595,7 +589,7 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(famibox_interface_1)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac")

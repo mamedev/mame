@@ -1472,11 +1472,6 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-static const c140_interface C140_interface =
-{
-	C140_TYPE_SYSTEM21
-};
-
 MACHINE_START_MEMBER(namcos21_state,namcos21)
 {
 	MACHINE_START_CALL_MEMBER( namcos2 );
@@ -1535,7 +1530,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface)
+	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1591,7 +1586,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface)
+	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1651,7 +1646,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_SOUND_CONFIG(C140_interface)
+	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

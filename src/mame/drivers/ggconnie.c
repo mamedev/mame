@@ -175,11 +175,6 @@ static INPUT_PORTS_START(ggconnie)
 	PORT_DIPSETTING(0x00, DEF_STR(On) )
 INPUT_PORTS_END
 
-static const c6280_interface c6280_config =
-{
-	"maincpu"
-};
-
 static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
@@ -221,7 +216,7 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 

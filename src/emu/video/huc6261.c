@@ -23,20 +23,6 @@
 const device_type HUC6261 = &device_creator<huc6261_device>;
 
 
-void huc6261_device::device_config_complete()
-{
-	const huc6261_interface *intf = reinterpret_cast<const huc6261_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		*static_cast<huc6261_interface *>(this) = *intf;
-	}
-	else
-	{
-	}
-}
-
-
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	:   device_t(mconfig, HUC6261, "HuC6261", tag, owner, clock, "huc6261", __FILE__),
 		device_video_interface(mconfig, *this)
@@ -403,12 +389,12 @@ WRITE16_MEMBER( huc6261_device::write )
 void huc6261_device::device_start()
 {
 	/* Make sure we are supplied all our mandatory tags */
-	assert( huc6270_a_tag != NULL );
-	assert( huc6270_b_tag != NULL );
+	assert( m_huc6270_a_tag != NULL );
+	assert( m_huc6270_b_tag != NULL );
 
 	m_timer = timer_alloc();
-	m_huc6270_a = machine().device<huc6270_device>( huc6270_a_tag );
-	m_huc6270_b = machine().device<huc6270_device>( huc6270_b_tag );
+	m_huc6270_a = machine().device<huc6270_device>(m_huc6270_a_tag);
+	m_huc6270_b = machine().device<huc6270_device>(m_huc6270_b_tag);
 
 	m_bmp = auto_bitmap_rgb32_alloc( machine(), HUC6261_WPF, HUC6261_LPF );
 

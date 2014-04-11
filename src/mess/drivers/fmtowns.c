@@ -2078,16 +2078,13 @@ WRITE_LINE_MEMBER(towns_state::towns_fm_irq)
 }
 
 // PCM interrupt (IRQ 13)
-static void towns_pcm_irq(device_t* device, int channel)
+RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
-	pic8259_device* pic = state->m_pic_slave;
-
-	if(state->m_towns_pcm_channel_mask & (1 << channel))
+	if (m_towns_pcm_channel_mask & (1 << channel))
 	{
-		state->m_towns_pcm_irq_flag = 1;
-		state->m_towns_pcm_channel_flag |= (1 << channel);
-		pic->ir5_w(1);
+		m_towns_pcm_irq_flag = 1;
+		m_towns_pcm_channel_flag |= (1 << channel);
+		m_pic_slave->ir5_w(1);
 		if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
 }
@@ -2670,11 +2667,6 @@ static const upd71071_intf towns_dma_config =
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
-static const rf5c68_interface rf5c68_intf =
-{
-	towns_pcm_irq
-};
-
 static const gfx_layout fnt_chars_16x16 =
 {
 	16,16,
@@ -2733,8 +2725,9 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(towns_state, towns_fm_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
 	MCFG_RF5C68_ADD("pcm", 53693100 / 7)  // actual clock speed unknown
-	MCFG_SOUND_CONFIG(rf5c68_intf)
+	MCFG_RF5C68_SAMPLE_END_CB(towns_state, towns_pcm_irq)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MCFG_SOUND_ADD("cdda",CDDA,0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

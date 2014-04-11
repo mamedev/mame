@@ -30,7 +30,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),
-		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -46,7 +45,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -62,8 +60,8 @@ public:
 	// this has to be UINT8 to be in the right byte order for the tilemap system
 	dynamic_array<UINT8> m_shaperam;
 
-	UINT16 *m_mpBank0;
-	UINT16 *m_mpBank1;
+	UINT16 *m_prgrom;
+	UINT16 *m_maskrom;
 	int m_mEnableInterrupts;
 	int m_gametype;
 	UINT16 m_count;
@@ -75,7 +73,6 @@ public:
 	UINT8 m_mcu_port8;
 	tilemap_t *m_bg_tilemap[4+1];
 	int m_palette_is_dirty;
-
 
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
@@ -100,7 +97,6 @@ public:
 	void write_version_info();
 	int transfer_dword(UINT32 dest, UINT32 source);
 	void namcona1_blit();
-	void init_namcona1(int gametype);
 	void UpdatePalette(int offset);
 	DECLARE_WRITE16_MEMBER(namcona1_videoram_w);
 	DECLARE_WRITE16_MEMBER(namcona1_paletteram_w);
@@ -134,7 +130,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_namcona1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(namcona1_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
 
 private:
 	void tilemap_get_info(tile_data &tileinfo, int tile_index, const UINT16 *tilemap_videoram, bool use_4bpp_gfx);

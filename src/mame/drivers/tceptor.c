@@ -323,15 +323,6 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static const namco_interface namco_config =
-{
-	8,          /* number of voices */
-	1           /* stereo */
-};
-
-
-/*******************************************************************/
-
 void tceptor_state::machine_start()
 {
 	save_item(NAME(m_m6809_irq_enable));
@@ -424,7 +415,8 @@ static MACHINE_CONFIG_START( tceptor, tceptor_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_NAMCO_AUDIO_VOICES(8)
+	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 

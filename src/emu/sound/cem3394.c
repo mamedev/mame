@@ -116,7 +116,6 @@ const device_type CEM3394 = &device_creator<cem3394_device>;
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock, "cem3394", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_external(NULL),
 		m_stream(NULL),
 		m_vco_zero_freq(0.0),
 		m_filter_zero_freq(0.0),
@@ -154,7 +153,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	int i;
 
 	/* external volume is effectively 0 if no external function */
-	if (!m_external || !ENABLE_EXTERNAL)
+	if (m_ext_cb.isnull() || !ENABLE_EXTERNAL)
 		ext_volume = 0;
 
 	/* adjust the volume for the filter */
@@ -175,7 +174,7 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		INT16 last_ext = m_last_ext;
 
 		/* fetch the external data */
-		(*m_external)(this, samples, m_external_buffer);
+		m_ext_cb(samples, m_external_buffer);
 
 		/* compute the modulation depth, and adjust fstep to the maximum frequency */
 		/* we lop off 13 bits of depth so that we can multiply by stepadjust, below, */
@@ -325,17 +324,14 @@ void cem3394_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 void cem3394_device::device_start()
 {
-	const cem3394_interface *intf = (const cem3394_interface *)static_config();
-
 	/* copy global parameters */
 	m_sample_rate = CEM3394_SAMPLE_RATE;
 	m_inv_sample_rate = 1.0 / (double)m_sample_rate;
 
 	/* allocate stream channels, 1 per chip */
 	m_stream = stream_alloc(0, 1, m_sample_rate);
-	m_external = intf->external;
-	m_vco_zero_freq = intf->vco_zero_freq;
-	m_filter_zero_freq = intf->filter_zero_freq;
+
+	m_ext_cb.bind_relative_to(*owner());
 
 	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
 	m_mixer_buffer = auto_alloc_array(machine(), INT16, m_sample_rate);

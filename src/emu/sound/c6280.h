@@ -5,16 +5,13 @@
 
 #include "cpu/h6280/h6280.h"
 
-struct c6280_interface
-{
-	const char *    cpu;
-};
-
 class c6280_device : public device_t,
 						public device_sound_interface
 {
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void set_devicecpu_tag(device_t &device, const char *tag) { downcast<c6280_device &>(device).m_cpudevice.set_tag(tag); }
 
 	// read/write
 	DECLARE_READ8_MEMBER( c6280_r );
@@ -22,7 +19,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
@@ -43,7 +39,7 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	h6280_device *m_cpudevice;
+	required_device<h6280_device> m_cpudevice;
 	UINT8 m_select;
 	UINT8 m_balance;
 	UINT8 m_lfo_frequency;
@@ -55,6 +51,9 @@ private:
 };
 
 extern const device_type C6280;
+
+#define MCFG_C6280_CPU(_tag) \
+	c6280_device::set_devicecpu_tag(*device, "^"_tag);
 
 
 #endif /* __C6280_H__ */

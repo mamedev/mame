@@ -1696,16 +1696,6 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-static const nesapu_interface nes_interface_1 =
-{
-	"maincpu"
-};
-
-static const nesapu_interface nes_interface_2 =
-{
-	"sub"
-};
-
 static MACHINE_CONFIG_START( vsnes, vsnes_state )
 
 	/* basic machine hardware */
@@ -1737,7 +1727,7 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac1")
@@ -1829,11 +1819,11 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("nesapu2", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_2)
+	MCFG_NES_APU_CPU("sub")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac1")
@@ -1879,7 +1869,7 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac1")

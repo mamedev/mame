@@ -24,14 +24,13 @@
 #define MCFG_SEGAPCM_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, SEGAPCM, _clock)
 
+#define MCFG_SEGAPCM_BANK(_bank) \
+	segapcm_device::set_bank(*device, _bank);
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct sega_pcm_interface
-{
-	int  bank;
-};
 
 class segapcm_device : public device_t,
 						public device_sound_interface
@@ -39,7 +38,13 @@ class segapcm_device : public device_t,
 public:
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~segapcm_device() { }
-
+	
+	// static configuration
+	static void set_bank(device_t &device, int bank) { downcast<segapcm_device &>(device).m_bank = bank; }
+	
+	DECLARE_WRITE8_MEMBER( sega_pcm_w );
+	DECLARE_READ8_MEMBER( sega_pcm_r );
+	
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -47,14 +52,11 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-public:
-	DECLARE_WRITE8_MEMBER( sega_pcm_w );
-	DECLARE_READ8_MEMBER( sega_pcm_r );
-
 private:
 	UINT8* m_ram;
 	UINT8 m_low[16];
 	const UINT8* m_rom;
+	int m_bank;
 	int m_bankshift;
 	int m_bankmask;
 	int m_rgnmask;
