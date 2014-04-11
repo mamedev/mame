@@ -932,11 +932,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::namcona1_interrupt)
 	}
 }
 
-static const c140_interface C140_interface_typeA =
-{
-	C140_TYPE_ASIC219
-};
-
 /* cropped at sides */
 static MACHINE_CONFIG_START( namcona1, namcona1_state )
 
@@ -970,7 +965,7 @@ static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 44100)
-	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_C140_BANK_TYPE(C140_TYPE_ASIC219)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
