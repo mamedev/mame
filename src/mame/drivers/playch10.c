@@ -660,11 +660,6 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const nesapu_interface nes_config =
-{
-	"cart"
-};
-
 static MACHINE_CONFIG_START( playch10, playch10_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
@@ -705,7 +700,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_config)
+	MCFG_NES_APU_CPU("cart")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac")

@@ -272,11 +272,6 @@ static INPUT_PORTS_START( cham24 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static const nesapu_interface cham24_interface_1 =
-{
-	"maincpu"
-};
-
 void cham24_state::machine_reset()
 {
 }
@@ -361,7 +356,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(cham24_interface_1)
+	MCFG_NES_APU_CPU("maincpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac")

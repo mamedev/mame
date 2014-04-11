@@ -41,25 +41,20 @@
 #define  SYNCS_MAX1     0x20
 #define  SYNCS_MAX2     0x80
 
-struct nesapu_interface
-{
-	const char *m_cpu_tag;  /* CPU tag */
-};
-
 class nesapu_device : public device_t,
-									public device_sound_interface,
-									public nesapu_interface
+						public device_sound_interface
 {
 public:
 	nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~nesapu_device() {}
+	
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<nesapu_device &>(device).m_cpu_tag = tag; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
@@ -78,6 +73,8 @@ private:
 	uint32  m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
 
+	const char *m_cpu_tag;
+
 	void create_syncs(unsigned long sps);
 	int8 apu_square(square_t *chan);
 	int8 apu_triangle(triangle_t *chan);
@@ -89,6 +86,9 @@ private:
 };
 
 extern const device_type NES_APU;
+
+#define MCFG_NES_APU_CPU(_tag) \
+	nesapu_device::set_cpu_tag(*device, _tag);
 
 
 #endif /* __NES_APU_H__ */

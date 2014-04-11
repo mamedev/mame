@@ -1334,9 +1334,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const nesapu_interface nes_interface_1 = { "n2a03a" };
-static const nesapu_interface nes_interface_2 = { "n2a03b" };
-
 const tms5110_interface tms_interface = {
 	NULL,
 	NULL,
@@ -1469,11 +1466,11 @@ MACHINE_CONFIG_FRAGMENT( dkong3_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_NES_APU_CPU("n2a03a")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("nesapu2", NES_APU, N2A03_DEFAULTCLOCK)
-	MCFG_SOUND_CONFIG(nes_interface_2)
+	MCFG_NES_APU_CPU("n2a03b")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END

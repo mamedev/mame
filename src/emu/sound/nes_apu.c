@@ -108,7 +108,8 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(NULL)
+		m_stream(NULL),
+		m_cpu_tag("")
 {
 	for (int i = 0; i < NOISE_LONG; i++)
 	{
@@ -132,33 +133,12 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nesapu_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const nesapu_interface *intf = reinterpret_cast<const nesapu_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<nesapu_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_cpu_tag = "";
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void nesapu_device::device_start()
 {
 	int rate = clock() / 4;
-	int i;
 
 	/* Initialize global variables */
 	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds);
@@ -180,7 +160,7 @@ void nesapu_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate, this);
 
 	/* register for save */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_APU.squ[i].regs), i);
 		save_item(NAME(m_APU.squ[i].vbl_length), i);
