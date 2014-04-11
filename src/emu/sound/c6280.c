@@ -248,17 +248,8 @@ const device_type C6280 = &device_creator<c6280_device>;
 
 c6280_device::c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C6280, "HuC6280", tag, owner, clock, "c6280", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c6280_device::device_config_complete()
+		device_sound_interface(mconfig, *this),
+		m_cpudevice(*this)
 {
 }
 
@@ -273,8 +264,6 @@ void c6280_device::device_start()
 	/* Create stereo stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, rate, this);
 
-	const c6280_interface *intf = (const c6280_interface *)static_config();
-
 	/* Loudest volume level for table */
 	double level = 65535.0 / 6.0 / 32.0;
 
@@ -284,12 +273,6 @@ void c6280_device::device_start()
 	m_lfo_frequency = 0;
 	m_lfo_control = 0;
 	memset(m_channel, 0, sizeof(channel) * 8);
-
-	m_cpudevice = machine().device<h6280_device>(intf->cpu);
-	if (m_cpudevice == NULL)
-	{
-		fatalerror("c6280_init: no CPU found with tag of '%s'\n", tag());
-	}
 
 	/* Make waveform frequency table */
 	for (int i = 0; i < 4096; i += 1)
@@ -321,14 +304,14 @@ void c6280_device::device_start()
 	save_item(NAME(m_lfo_control));
 	for (int chan = 0; chan < 8; chan++)
 	{
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_frequency);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_control);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_balance);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_waveform);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_index);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_dda);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_noise_control);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_noise_counter);
-		state_save_register_item(machine(), "c6280", NULL, chan, m_channel[chan].m_counter);
+		save_item(NAME(m_channel[chan].m_frequency), chan);
+		save_item(NAME(m_channel[chan].m_control), chan);
+		save_item(NAME(m_channel[chan].m_balance), chan);
+		save_item(NAME(m_channel[chan].m_waveform), chan);
+		save_item(NAME(m_channel[chan].m_index), chan);
+		save_item(NAME(m_channel[chan].m_dda), chan);
+		save_item(NAME(m_channel[chan].m_noise_control), chan);
+		save_item(NAME(m_channel[chan].m_noise_counter), chan);
+		save_item(NAME(m_channel[chan].m_counter), chan);
 	}
 }

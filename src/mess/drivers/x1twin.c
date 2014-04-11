@@ -514,12 +514,6 @@ static const floppy_interface x1_floppy_interface =
 };
 
 
-#if 0
-static const c6280_interface c6280_config =
-{
-	"pce_cpu"
-};
-#endif
 
 static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	/* basic machine hardware */
@@ -599,7 +593,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 
 #if 0
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-//  MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("pce_cpu")
 	MCFG_SOUND_ROUTE(0, "pce_l", 0.5)
 	MCFG_SOUND_ROUTE(1, "pce_r", 0.5)
 #endif

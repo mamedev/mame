@@ -284,11 +284,6 @@ static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
 ADDRESS_MAP_END
 
 
-static const c6280_interface c6280_config =
-{
-	"maincpu"
-};
-
 UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
@@ -337,7 +332,7 @@ static MACHINE_CONFIG_START( pce_common, pce_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
@@ -402,7 +397,7 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 

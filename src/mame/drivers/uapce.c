@@ -300,11 +300,6 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-static const c6280_interface c6280_config =
-{
-	"maincpu"
-};
-
 WRITE_LINE_MEMBER(uapce_state::pce_irq_changed)
 {
 	m_maincpu->set_input_line(0, state);
@@ -339,7 +334,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_C6280_CPU("maincpu")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
