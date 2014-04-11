@@ -410,7 +410,7 @@ UINT32 core_fread(core_file *file, void *buffer, UINT32 length)
 	file->back_char_tail = 0;
 
 	/* handle real files */
-	if (file->data == NULL)
+	if (file->length && file->data == NULL)
 	{
 		/* if we're within the buffer, consume that first */
 		if (file->offset >= file->bufferbase && file->offset < file->bufferbase + file->bufferbytes)
@@ -657,7 +657,7 @@ const void *core_fbuffer(core_file *file)
 	UINT32 read_length;
 
 	/* if we already have data, just return it */
-	if (file->data != NULL)
+	if (file->data != NULL || !file->length)
 		return file->data;
 
 	/* allocate some memory */
