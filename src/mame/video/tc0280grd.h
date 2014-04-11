@@ -47,14 +47,6 @@ extern const device_type TC0280GRD;
 
 #define TC0430GRW TC0280GRD
 
-#define MCFG_TC0280GRD_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, TC0280GRD, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_TC0430GRW_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, TC0430GRW, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 #define MCFG_TC0280GRD_GFX_REGION(_region) \
 	tc0280grd_device::set_gfx_region(*device, _region);
 
