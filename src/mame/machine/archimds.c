@@ -688,7 +688,6 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					if (m_fdc)
 					{
 						//printf("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-
 						switch(ioc_addr & 0xc)
 						{
 							case 0x00: return m_fdc->status_r();
@@ -805,17 +804,17 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 							case 0x40: // latch A
 								floppy_image_device *floppy = NULL;
 
-								if (data & 1) { floppy = m_floppy0->get_device(); }
-								if (data & 2) { floppy = m_floppy1->get_device(); }
-								if (data & 4) { floppy = NULL; } // floppy 2
-								if (data & 8) { floppy = NULL; } // floppy 3
+								if (!(data & 1)) { floppy = m_floppy0->get_device(); }
+								if (!(data & 2)) { floppy = m_floppy1->get_device(); }
+								if (!(data & 4)) { floppy = NULL; } // floppy 2
+								if (!(data & 8)) { floppy = NULL; } // floppy 3
 
 								m_fdc->set_floppy(floppy);
 
 								if(floppy)
 								{
 									floppy->mon_w(BIT(data, 5));
-									floppy->ss_w(BIT(data, 4));
+									floppy->ss_w(!(BIT(data, 4)));
 								}
 								//bit 5 is motor on
 								return;
