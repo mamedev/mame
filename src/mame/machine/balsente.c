@@ -206,32 +206,28 @@ void balsente_state::poly17_init()
 }
 
 
-void balsente_noise_gen(device_t *device, int count, short *buffer)
+inline void balsente_state::noise_gen_chip(int chip, int count, short *buffer)
 {
-	balsente_state *state = device->machine().driver_data<balsente_state>();
-	int chip;
-	UINT32 step, noise_counter;
-
-	/* find the chip we are referring to */
-	for (chip = 0; chip < ARRAY_LENGTH(state->m_cem_device); chip++)
-		if (device == state->m_cem_device[chip])
-			break;
-	assert(chip < ARRAY_LENGTH(state->m_cem_device));
-
 	/* noise generator runs at 100kHz */
-	step = (100000 << 14) / CEM3394_SAMPLE_RATE;
-	noise_counter = state->m_noise_position[chip];
-
+	UINT32 step = (100000 << 14) / CEM3394_SAMPLE_RATE;
+	UINT32 noise_counter = m_noise_position[chip];
+	
 	while (count--)
 	{
-		*buffer++ = state->m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
+		*buffer++ = m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
 		noise_counter += step;
 	}
-
+	
 	/* remember the noise position */
-	state->m_noise_position[chip] = noise_counter;
+	m_noise_position[chip] = noise_counter;
 }
 
+CEM3394_EXT_INPUT(balsente_state::noise_gen_0) { noise_gen_chip(0, count, buffer); }
+CEM3394_EXT_INPUT(balsente_state::noise_gen_1) { noise_gen_chip(1, count, buffer); }
+CEM3394_EXT_INPUT(balsente_state::noise_gen_2) { noise_gen_chip(2, count, buffer); }
+CEM3394_EXT_INPUT(balsente_state::noise_gen_3) { noise_gen_chip(3, count, buffer); }
+CEM3394_EXT_INPUT(balsente_state::noise_gen_4) { noise_gen_chip(4, count, buffer); }
+CEM3394_EXT_INPUT(balsente_state::noise_gen_5) { noise_gen_chip(5, count, buffer); }
 
 
 /*************************************
@@ -930,8 +926,7 @@ WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
 	/* bit D0 enables/disables audio */
 	if (diff_counter_control & 0x01)
 	{
-		int ch;
-		for (ch = 0; ch < 6; ch++)
+		for (int ch = 0; ch < 6; ch++)
 			m_cem_device[ch]->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
 	}
 

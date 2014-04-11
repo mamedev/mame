@@ -5,15 +5,6 @@
 
 #define CEM3394_SAMPLE_RATE     (44100*4)
 
-
-// interface
-struct cem3394_interface
-{
-	double vco_zero_freq;                    /* frequency at 0V for VCO */
-	double filter_zero_freq;                 /* frequency at 0V for filter */
-	void (*external)(device_t*, int, short*);/* external input source */
-};
-
 // inputs
 enum
 {
@@ -27,6 +18,9 @@ enum
 	CEM3394_FINAL_GAIN
 };
 
+typedef device_delegate<void (int count, short *buffer)> cem3394_ext_input_delegate;
+
+#define CEM3394_EXT_INPUT(_name) void _name(int count, short *buffer)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -37,6 +31,14 @@ enum
 #define MCFG_CEM3394_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, CEM3394, _clock)
 
+#define MCFG_CEM3394_EXT_INPUT_CB(_class, _method) \
+	cem3394_device::set_ext_input_callback(*device, cem3394_ext_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_CEM3394_VCO_ZERO(_freq) \
+	cem3394_device::set_vco_zero_freq(*device, _freq);
+
+#define MCFG_CEM3394_FILTER_ZERO(_freq) \
+	cem3394_device::set_filter_zero_freq(*device, _freq);
 
 
 class cem3394_device : public device_t,
@@ -45,6 +47,10 @@ class cem3394_device : public device_t,
 public:
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~cem3394_device() { }
+
+	static void set_ext_input_callback(device_t &device, cem3394_ext_input_delegate callback) { downcast<cem3394_device &>(device).m_ext_cb = callback; }
+	static void set_vco_zero_freq(device_t &device, double freq) { downcast<cem3394_device &>(device).m_vco_zero_freq = freq; }
+	static void set_filter_zero_freq(device_t &device, double freq) { downcast<cem3394_device &>(device).m_filter_zero_freq = freq; }
 
 protected:
 	// device-level overrides
@@ -73,7 +79,7 @@ private:
 	UINT32 compute_db_volume(double voltage);
 
 private:
-	void (*m_external)(device_t*, int, short*);/* callback to generate external samples */
+	cem3394_ext_input_delegate m_ext_cb; /* callback to generate external samples */
 
 	sound_stream *m_stream;           /* our stream */
 	double m_vco_zero_freq;           /* frequency of VCO at 0.0V */
