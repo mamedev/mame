@@ -130,6 +130,7 @@ private:
 	UINT8 m_video_dma_on,m_audio_dma_on;
 	UINT8 m_vidc_pixel_clk;
 	UINT8 m_vidc_stereo_reg[8];
+	bool m_cursor_enabled;
 	emu_timer *m_timer[4], *m_snd_timer, *m_vid_timer;
 	emu_timer *m_vbl_timer;
 };
