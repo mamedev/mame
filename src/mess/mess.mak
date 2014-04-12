@@ -553,6 +553,7 @@ BUSES += MIDI
 BUSES += MEGADRIVE
 BUSES += NES
 BUSES += NUBUS
+BUSES += ORICEXT
 BUSES += PCE
 BUSES += PCI
 BUSES += PC_JOY
@@ -1788,9 +1789,7 @@ $(MESSOBJ)/tangerin.a:          \
 	$(MESS_VIDEO)/microtan.o    \
 	$(MESS_MACHINE)/microtan.o  \
 	$(MESS_DRIVERS)/microtan.o  \
-	$(MESS_DRIVERS)/oric.o      \
-	$(MESS_VIDEO)/oric.o        \
-	$(MESS_MACHINE)/oric.o      \
+	$(MESS_DRIVERS)/oric.o
 
 $(MESSOBJ)/tatung.a:            \
 	$(MESS_DRIVERS)/einstein.o  \

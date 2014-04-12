@@ -1047,3 +1047,14 @@ OBJDIRS += $(BUSOBJ)/macpds
 BUSOBJS += $(BUSOBJ)/macpds/macpds.o
 BUSOBJS += $(BUSOBJ)/macpds/pds_tpdfpd.o
 endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/oricext/oricext.h,BUSES += ORICEXT
+#-------------------------------------------------
+ifneq ($(filter ORICEXT,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/oricext
+BUSOBJS += $(BUSOBJ)/oricext/oricext.o
+BUSOBJS += $(BUSOBJ)/oricext/jasmin.o
+BUSOBJS += $(BUSOBJ)/oricext/microdisc.o
+endif
