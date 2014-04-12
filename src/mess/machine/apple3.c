@@ -39,7 +39,7 @@
             bits 0-5: 6-bit audio DAC output
             bit 6: screen blank
             bit 7: OR of NMI from slots
-
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -150,12 +150,40 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
-		case 0x60: case 0x61: case 0x62: case 0x63:
-		case 0x64: case 0x65: case 0x66: case 0x67:
-		case 0x68: case 0x69: case 0x6A: case 0x6B:
-		case 0x6C: case 0x6D: case 0x6E: case 0x6F:
-			/* unsure what these are */
-			result = 0x00;
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			pdl_handler(offset);
+			break;
+
+		case 0x60:	// joystick switch 0
+		case 0x68:
+			result = (m_joybuttons->read() & 1) ? 0x80 : 0x00;
+			break;
+
+		case 0x61:	// joystick switch 1 (margin switch for Silentype) 
+		case 0x69:
+			result = (m_joybuttons->read() & 4) ? 0x80 : 0x00;
+			break;
+
+		case 0x62:	// joystick switch 2
+		case 0x6a:
+			result = (m_joybuttons->read() & 2) ? 0x80 : 0x00;
+			break;
+
+		case 0x63:	// joystick switch 3 (serial clock for silentype)
+		case 0x6b:
+			result = (m_joybuttons->read() & 8) ? 0x80 : 0x00;
+			break;
+
+		case 0x66:	// paddle A/D conversion done (bit 7 = 1 while counting, 0 when done)
+		case 0x6e:
+			return m_ramp_active ? 0x80 : 0x00;
 			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73:
@@ -246,6 +274,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
 	device_a2bus_card_interface *slotdevice;
+	UINT8 pdlread;
 
 	switch(offset)
 	{
@@ -287,6 +316,16 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
 			break;
 
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+		case 0x5f:
+			pdl_handler(offset);
+			break;
 
 		case 0x70: case 0x71: case 0x72: case 0x73:
 		case 0x74: case 0x75: case 0x76: case 0x77:
@@ -582,6 +621,8 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 	m_lastchar = 0x0d;
 	m_rom_has_been_disabled = false;
 	m_cnxx_slot = -1;
+	m_analog_sel = 0;
+	m_ramp_active = false;
 }
 
 
@@ -715,6 +756,9 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_flags));
 	save_item(NAME(m_char_mem));
+	save_item(NAME(m_analog_sel));
+	save_item(NAME(m_ramp_active));
+	save_item(NAME(m_pdl_charge));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(apple3_state::apple3_postload), this));
 }
@@ -1152,3 +1196,99 @@ WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
 		}
 	}
 }
+
+void apple3_state::pdl_handler(int offset)
+{
+	UINT8 pdlread;
+
+	switch (offset)
+	{
+		case 0x58:
+			m_analog_sel &= ~1;
+			break;
+
+		case 0x59:
+			m_analog_sel |= 1;
+			break;
+
+		case 0x5a:
+			m_analog_sel &= ~4;
+			break;
+
+		case 0x5b:
+			m_analog_sel |= 4;
+			break;
+
+		case 0x5c:
+			m_ramp_active = false;
+			m_pdl_charge = 0;
+			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			break;
+
+		case 0x5d:
+			switch (m_analog_sel)
+			{
+				case 1:
+					pdlread = m_joy1x->read();
+					break;
+
+				case 2:
+					pdlread = m_joy1y->read();
+					break;
+
+				case 4:
+					pdlread = m_joy2x->read();
+					break;
+
+				case 5:
+					pdlread = m_joy2y->read();
+					break;
+
+				default:
+					pdlread = 127;
+					break;
+			}
+
+			// help the ROM self-test
+			if (m_pdl_charge > 82)
+			{
+				m_pdl_charge += (pdlread*4);
+				m_pdl_charge -= 93;
+			}
+			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+			m_ramp_active = true;
+			break; 
+
+		case 0x5e:
+			m_analog_sel &= ~2;
+			break;
+
+		case 0x5f:
+			m_analog_sel |= 2;
+			break;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
+{
+	if (m_ramp_active)
+	{
+		m_pdl_charge--;
+
+		if (m_pdl_charge > 0)
+		{
+			m_pdltimer->adjust(attotime::from_hz(1000000.0));
+		}
+		else
+		{
+			m_pdltimer->adjust(attotime::never);
+			m_ramp_active = false;
+		}
+	}
+	else
+	{
+		m_pdl_charge++;
+		m_pdltimer->adjust(attotime::from_hz(1000000.0));
+	}
+}
+
