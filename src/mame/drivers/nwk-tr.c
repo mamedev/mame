@@ -709,11 +709,6 @@ static const adc12138_interface nwktr_adc_interface = {
 };
 
 
-static const k033906_interface nwktr_k033906_interface =
-{
-	"voodoo"
-};
-
 void nwktr_state::machine_reset()
 {
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -747,7 +742,9 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_M48T58_ADD( "m48t58" )
 	MCFG_ADC12138_ADD( "adc12138", nwktr_adc_interface )
-	MCFG_K033906_ADD("k033906_1", nwktr_k033906_interface)
+
+	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo")
 
 	/* video hardware */
 	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)

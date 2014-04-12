@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE_LEGACY(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, read, write, 0xffffffff)
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)
 	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)   /* Data ROM */
@@ -780,18 +780,6 @@ static const adc1038_interface thunderh_adc1038_intf =
 	adc1038_input_callback
 };
 
-static const k056230_interface gticlub_k056230_intf =
-{
-	"maincpu",
-	0
-};
-
-static const k056230_interface thunderh_k056230_intf =
-{
-	"maincpu",
-	1
-};
-
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
@@ -940,7 +928,8 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_ADC1038_ADD("adc1038", gticlub_adc1038_intf)
 
-	MCFG_K056230_ADD("k056230", gticlub_k056230_intf)
+	MCFG_DEVICE_ADD("k056230", K056230, 0)
+	MCFG_K056230_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -980,7 +969,9 @@ static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 
 	MCFG_DEVICE_REMOVE("k056230")
-	MCFG_K056230_ADD("k056230", thunderh_k056230_intf)
+	MCFG_DEVICE_ADD("k056230", K056230, 0)
+	MCFG_K056230_CPU("maincpu")
+	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
@@ -1000,16 +991,6 @@ static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 	MCFG_K001604_PALETTE("palette")
 MACHINE_CONFIG_END
 
-
-static const k033906_interface hangplt_k033906_intf_0 =
-{
-	"voodoo0"
-};
-
-static const k033906_interface hangplt_k033906_intf_1 =
-{
-	"voodoo1"
-};
 
 MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 {
@@ -1064,13 +1045,18 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
 	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
-	MCFG_K056230_ADD("k056230", gticlub_k056230_intf)
+
+	MCFG_DEVICE_ADD("k056230", K056230, 0)
+	MCFG_K056230_CPU("maincpu")
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
 	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, voodoo_r_intf)
 
-	MCFG_K033906_ADD("k033906_1", hangplt_k033906_intf_0)
-	MCFG_K033906_ADD("k033906_2", hangplt_k033906_intf_1)
+	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo0")
+
+	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo1")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 65536)

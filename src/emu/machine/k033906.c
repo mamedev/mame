@@ -26,29 +26,6 @@ k033906_device::k033906_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k033906_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k033906_interface *intf = reinterpret_cast<const k033906_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<k033906_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_voodoo_tag = NULL;
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -64,12 +41,12 @@ void k033906_device::device_start()
 }
 
 
-WRITE_LINE_MEMBER(k033906_device::k033906_set_reg)
+WRITE_LINE_MEMBER(k033906_device::set_reg)
 {
 	m_reg_set = state & 1;
 }
 
-UINT32 k033906_device::k033906_reg_r(int reg)
+UINT32 k033906_device::reg_r(int reg)
 {
 	switch (reg)
 	{
@@ -84,7 +61,7 @@ UINT32 k033906_device::k033906_reg_r(int reg)
 	return 0;
 }
 
-void k033906_device::k033906_reg_w(int reg, UINT32 data)
+void k033906_device::reg_w(int reg, UINT32 data)
 {
 	switch (reg)
 	{
@@ -131,26 +108,18 @@ void k033906_device::k033906_reg_w(int reg, UINT32 data)
 	}
 }
 
-READ32_MEMBER(k033906_device::k033906_r)
+READ32_MEMBER(k033906_device::read)
 {
-	if(m_reg_set)
-	{
-		return k033906_reg_r(offset);
-	}
+	if (m_reg_set)
+		return reg_r(offset);
 	else
-	{
 		return m_ram[offset];
-	}
 }
 
-WRITE32_MEMBER(k033906_device::k033906_w)
+WRITE32_MEMBER(k033906_device::write)
 {
-	if(m_reg_set)
-	{
-		k033906_reg_w(offset, data);
-	}
+	if (m_reg_set)
+		reg_w(offset, data);
 	else
-	{
 		m_ram[offset] = data;
-	}
 }

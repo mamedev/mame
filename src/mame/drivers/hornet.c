@@ -948,16 +948,6 @@ static const adc12138_interface hornet_adc_interface = {
 	adc12138_input_callback
 };
 
-static const k033906_interface hornet_k033906_intf_0 =
-{
-	"voodoo0"
-};
-
-static const k033906_interface hornet_k033906_intf_1 =
-{
-	"voodoo1"
-};
-
 static const voodoo_config hornet_voodoo_intf =
 {
 	2, //               fbmem;
@@ -990,7 +980,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, hornet_voodoo_intf)
 
-	MCFG_K033906_ADD("k033906_1", hornet_k033906_intf_0)
+	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo0")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1086,7 +1077,8 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, voodoo_l_intf)
 	MCFG_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, voodoo_r_intf)
 
-	MCFG_K033906_ADD("k033906_2", hornet_k033906_intf_1)
+	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
+	MCFG_K033906_VOODOO("voodoo1")
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

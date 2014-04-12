@@ -17,46 +17,38 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_K056230_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, K056230, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_K056230_CPU(_tag) \
+	k056230_device::set_cpu_tag(*device, "^"_tag);
+
+#define MCFG_K056230_HACK(_region) \
+	k056230_device::set_thunderh_hack(*device, _region);
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-
-// ======================> k056230_interface
-
-struct k056230_interface
-{
-	const char         *m_cpu_tag;
-	bool                m_is_thunderh;
-};
-
-
-
 // ======================> k056230_device
 
-class k056230_device :  public device_t,
-						public k056230_interface
+class k056230_device :  public device_t
 {
 public:
 	// construction/destruction
 	k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void set_cpu_tag(device_t &device, const char *tag) { downcast<k056230_device &>(device).m_cpu.set_tag(tag); }
+	static void set_thunderh_hack(device_t &device, int thunderh) { downcast<k056230_device &>(device).m_is_thunderh = thunderh; }
+
 	DECLARE_READ32_MEMBER(lanc_ram_r);
 	DECLARE_WRITE32_MEMBER(lanc_ram_w);
 
-	DECLARE_READ8_MEMBER(k056230_r);
-	DECLARE_WRITE8_MEMBER(k056230_w);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
 	static TIMER_CALLBACK( network_irq_clear_callback );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset() { }
 	virtual void device_post_load() { }
@@ -65,8 +57,9 @@ protected:
 private:
 
 	void network_irq_clear();
+	int m_is_thunderh;
 
-	device_t *m_cpu;
+	required_device<cpu_device> m_cpu;
 	UINT32 m_ram[0x2000];
 };
 

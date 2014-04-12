@@ -158,7 +158,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 					dsp_state[cgboard_id] |= 0x10;
 
 				if (k033906 != NULL)    /* zr107.c has no PCI and some games only have one PCI Bridge */
-					k033906->k033906_set_reg((data & 0x20000000) ? 1 : 0);
+					k033906->set_reg((data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
 					dsp->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -413,13 +413,13 @@ READ32_HANDLER( K033906_0_r )
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return k033906_1->k033906_r(space, offset, mem_mask);
+		return k033906_1->read(space, offset, mem_mask);
 }
 
 WRITE32_HANDLER( K033906_0_w )
 {
 	k033906_device *k033906_1 = space.machine().device<k033906_device>("k033906_1");
-	k033906_1->k033906_w(space, offset, data, mem_mask);
+	k033906_1->write(space, offset, data, mem_mask);
 }
 
 READ32_HANDLER( K033906_1_r )
@@ -428,13 +428,13 @@ READ32_HANDLER( K033906_1_r )
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return k033906_2->k033906_r(space, offset, mem_mask);
+		return k033906_2->read(space, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K033906_1_w)
 {
 	k033906_device *k033906_2 = space.machine().device<k033906_device>("k033906_2");
-	k033906_2->k033906_w(space, offset, data, mem_mask);
+	k033906_2->write(space, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
