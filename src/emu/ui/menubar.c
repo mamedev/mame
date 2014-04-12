@@ -254,7 +254,8 @@ bool ui_menubar::poll_navigation_keys()
 {
 	int code_previous_menu = IPT_INVALID;
 	int code_next_menu = IPT_INVALID;
-	int code_child_menu = IPT_INVALID;
+	int code_child_menu1 = IPT_INVALID;
+	int code_child_menu2 = IPT_INVALID;
 	int code_parent_menu = IPT_INVALID;
 	int code_previous_sub_menu = IPT_INVALID;
 	int code_next_sub_menu = IPT_INVALID;
@@ -271,7 +272,7 @@ bool ui_menubar::poll_navigation_keys()
 			// no pull down menu selected
 			code_previous_menu = IPT_UI_LEFT;
 			code_next_menu = IPT_UI_RIGHT;
-			code_child_menu = IPT_UI_DOWN;
+			code_child_menu1 = IPT_UI_DOWN;
 		}
 		else
 		{
@@ -279,7 +280,10 @@ bool ui_menubar::poll_navigation_keys()
 			code_previous_menu = IPT_UI_UP;
 			code_next_menu = IPT_UI_DOWN;
 			if (m_selected_item->child())
-				code_child_menu = IPT_UI_SELECT;
+			{
+				code_child_menu1 = IPT_UI_SELECT;
+				code_child_menu2 = IPT_UI_RIGHT;
+			}
 			code_previous_sub_menu = IPT_UI_LEFT;
 			code_next_sub_menu = IPT_UI_RIGHT;
 			if (m_selected_item->parent()->is_sub_menu())
@@ -292,7 +296,7 @@ bool ui_menubar::poll_navigation_keys()
 		result = walk_selection_previous();
 	else if (input_pressed_safe(code_next_menu))
 		result = walk_selection_next();
-	else if (input_pressed_safe(code_child_menu))
+	else if (input_pressed_safe(code_child_menu1) || input_pressed_safe(code_child_menu2))
 		result = walk_selection_child();
 	else if (input_pressed_safe(IPT_UI_CANCEL))
 		result = walk_selection_escape();
