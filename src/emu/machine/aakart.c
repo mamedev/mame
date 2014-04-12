@@ -149,7 +149,6 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
                     m_keyb_state = 0;
                 }
 
-
                 break;
             case 0xfd:
                 m_rx = 0xfd;

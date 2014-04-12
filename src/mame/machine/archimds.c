@@ -58,7 +58,7 @@ void archimedes_state::archimedes_request_irq_b(int mask)
 
 	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_IRQ_LINE, 1);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -66,9 +66,11 @@ void archimedes_state::archimedes_request_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] |= mask;
 
+	//printf("STATUS:%02x IRQ:%02x MASK:%02x\n",m_ioc_regs[FIQ_STATUS],mask,m_ioc_regs[FIQ_MASK]);
+
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_FIRQ_LINE, 1);
+		m_maincpu->set_input_line(ARM_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -81,13 +83,13 @@ void archimedes_state::archimedes_clear_irq_a(int mask)
 void archimedes_state::archimedes_clear_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] &= ~mask;
-	archimedes_request_irq_b(0);
+	//archimedes_request_irq_b(0);
 }
 
 void archimedes_state::archimedes_clear_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] &= ~mask;
-	archimedes_request_fiq(0);
+	//archimedes_request_fiq(0);
 }
 
 void archimedes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -138,10 +140,11 @@ void archimedes_state::vidc_video_tick()
 			offset_ptr = m_vidc_vidstart;
 	}
 
-	size = m_vidc_vidend-m_vidc_vidstart+0x10;
-
-	for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
-		m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+	if(m_cursor_enabled == true)
+	{
+		for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
+			m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+	}
 
 	if(m_video_dma_on)
 	{
@@ -276,7 +279,7 @@ void archimedes_state::archimedes_reset()
 	}
 
 	m_ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
-	m_ioc_regs[IRQ_STATUS_B] = 0x02; //set up IL[1] On
+	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
 }
@@ -967,7 +970,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 
 		//#ifdef MAME_DEBUG
-		if(0)
+		if(1)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
 		//#endif
 
@@ -1001,23 +1004,25 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
+				m_cursor_enabled = false;
 				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
-				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
+				printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
 
 			case 1: /* video start */
 				m_vidc_vidstart = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//printf("MEMC: VIDSTART %08x\n",m_vidc_vidstart);
+				printf("MEMC: VIDSTART %08x\n",m_vidc_vidstart);
 				break;
 
 			case 2: /* video end */
 				m_vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
+				printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
 				break;
 
 			case 3: /* cursor init */
+				//m_cursor_enabled = true;
 				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//printf("MEMC: CURSOR %08x\n",((data>>2)&0x7fff)*16);
+				printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
 				break;
 
 			case 4: /* sound start */
