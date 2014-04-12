@@ -835,11 +835,11 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 {
 	// init options
-	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	m_maincpu->sh2drc_add_pcflush(0x3234);
-	m_maincpu->sh2drc_add_pcflush(0x32dc);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x3234);
+	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_pcflush(0x32dc);
 
 	m_mainCpuIsArm = 0;
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));

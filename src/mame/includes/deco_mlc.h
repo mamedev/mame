@@ -1,7 +1,6 @@
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
 #include "sound/ymz280b.h"
-#include "cpu/sh2/sh2.h"
 
 
 class deco_mlc_state : public driver_device
@@ -69,7 +68,7 @@ public:
 	void blitRaster(bitmap_rgb32 &bitmap, int rasterMode);
 	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
 	void descramble_sound(  );
-	required_device<sh2_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ymz280b_device> m_ymz;
 	required_device<gfxdecode_device> m_gfxdecode;
