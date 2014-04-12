@@ -929,11 +929,14 @@ UINT32 nmk16_state::screen_update_redhawki(screen_device &screen, bitmap_ind16 &
 UINT32 nmk16_state::screen_update_firehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1] + 0x100);
-	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_1[0]);
+	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_0[1] - 0x100);
 
 	m_bg_tilemap0->draw(screen, bitmap, cliprect, 0,0);
 
 	nmk16_draw_sprites_flipsupported(bitmap,cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	return 0;}
+	return 0;
+}
+
+

@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "audio/pleiads.h"
 
+#undef VMIN
+#undef VMAX
+
 #define VMIN    0
 #define VMAX    32767
 
