@@ -274,7 +274,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
 	device_a2bus_card_interface *slotdevice;
-	UINT8 pdlread;
 
 	switch(offset)
 	{
