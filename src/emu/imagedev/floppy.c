@@ -16,7 +16,7 @@
 */
 
 // Show step operation
-#define TRACE_STEP 0
+#define TRACE_STEP 1
 
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
@@ -759,7 +759,6 @@ void floppy_image_device::set_write_splice(attotime when)
 	attotime base;
 	int splice_pos = find_position(base, when);
 	image->set_write_splice_position(cyl, ss, splice_pos);
-	logerror("%s: Track %d head %d set splice pos %d\n", tag(), cyl, ss, splice_pos);
 }
 
 UINT32 floppy_image_device::get_form_factor() const

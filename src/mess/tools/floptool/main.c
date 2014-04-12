@@ -39,6 +39,10 @@
 #include "formats/ap_dsk35.h"
 #include "formats/ap2_dsk.h"
 
+#include "formats/oric_dsk.h"
+
+#include "formats/applix_dsk.h"
+
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
 	FLOPPY_DFI_FORMAT,
@@ -60,6 +64,10 @@ static floppy_format_type floppy_formats[] = {
 	FLOPPY_DC42_FORMAT,
 	FLOPPY_A216S_FORMAT,
 	FLOPPY_RWTS18_FORMAT,
+
+	FLOPPY_ORIC_DSK_FORMAT,
+
+	FLOPPY_APPLIX_FORMAT,
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

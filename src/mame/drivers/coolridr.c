@@ -344,8 +344,8 @@ public:
 	UINT32 m_clipvals[2][3];
 	UINT8  m_clipblitterMode[2]; // hack
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<sh2_device> m_maincpu;
+	required_device<sh2_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
@@ -3704,8 +3704,8 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
-	sh2drc_set_options(m_maincpu, SH2DRC_FASTEST_OPTIONS);
-	sh2drc_set_options(m_subcpu, SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
+	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)

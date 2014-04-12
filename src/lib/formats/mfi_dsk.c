@@ -99,7 +99,7 @@ int mfi_format::identify(io_generic *io, UINT32 form_factor)
 	if(memcmp( h.sign, sign, 16 ) == 0 &&
 		h.cyl_count <= 160 &&
 		h.head_count <= 2 &&
-		(!form_factor || h.form_factor == form_factor))
+		(!form_factor || !h.form_factor || h.form_factor == form_factor))
 		return 100;
 	return 0;
 }

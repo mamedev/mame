@@ -818,8 +818,8 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
-	sh2drc_set_options(m_maincpu, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(m_slave, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	m_slave->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;

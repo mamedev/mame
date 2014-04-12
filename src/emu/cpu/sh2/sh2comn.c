@@ -17,138 +17,86 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-INLINE sh2_state *GET_SH2(device_t *dev)
-{
-	if (dev->machine().options().drc()) {
-	return *(sh2_state **)downcast<legacy_cpu_device *>(dev)->token();
-	} else {
-	return (sh2_state *)downcast<legacy_cpu_device *>(dev)->token();
-	}
-}
-
 static const int div_tab[4] = { 3, 5, 7, 0 };
 
-INLINE UINT32 RL(sh2_state *sh2, offs_t A)
+
+void sh2_device::sh2_timer_resync()
 {
-	if (A >= 0xe0000000) /* I/O */
-		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
-
-	if (A >= 0xc0000000) /* Cache Data Array */
-		return sh2->program->read_dword(A);
-
-	/*  0x60000000 Cache Address Data Array */
-
-	if (A >= 0x40000000) /* Cache Associative Purge Area */
-		return 0xa5a5a5a5;
-
-	/* 0x20000000 no Cache */
-	/* 0x00000000 read thru Cache if CE bit is 1 */
-	return sh2->program->read_dword(A & AM);
-}
-
-INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
-{
-	if (A >= 0xe0000000) /* I/O */
-	{
-		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
-		return;
-	}
-
-	if (A >= 0xc0000000) /* Cache Data Array */
-	{
-		sh2->program->write_dword(A,V);
-		return;
-	}
-
-	/*  0x60000000 Cache Address Data Array */
-
-	if (A >= 0x40000000) /* Cache Associative Purge Area */
-		return;
-
-	/* 0x20000000 no Cache */
-	/* 0x00000000 read thru Cache if CE bit is 1 */
-	sh2->program->write_dword(A & AM,V);
-}
-
-static void sh2_timer_resync(sh2_state *sh2)
-{
-	int divider = div_tab[(sh2->m[5] >> 8) & 3];
-	UINT64 cur_time = sh2->device->total_cycles();
-	UINT64 add = (cur_time - sh2->frc_base) >> divider;
+	int divider = div_tab[(m_m[5] >> 8) & 3];
+	UINT64 cur_time = total_cycles();
+	UINT64 add = (cur_time - m_frc_base) >> divider;
 
 	if (add > 0)
 	{
 		if(divider)
-			sh2->frc += add;
+			m_frc += add;
 
-		sh2->frc_base = cur_time;
+		m_frc_base = cur_time;
 	}
 }
 
-static void sh2_timer_activate(sh2_state *sh2)
+void sh2_device::sh2_timer_activate()
 {
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	sh2->timer->adjust(attotime::never);
+	m_timer->adjust(attotime::never);
 
-	frc = sh2->frc;
-	if(!(sh2->m[4] & OCFA)) {
-		UINT16 delta = sh2->ocra - frc;
+	frc = m_frc;
+	if(!(m_m[4] & OCFA)) {
+		UINT16 delta = m_ocra - frc;
 		if(delta < max_delta)
 			max_delta = delta;
 	}
 
-	if(!(sh2->m[4] & OCFB) && (sh2->ocra <= sh2->ocrb || !(sh2->m[4] & 0x010000))) {
-		UINT16 delta = sh2->ocrb - frc;
+	if(!(m_m[4] & OCFB) && (m_ocra <= m_ocrb || !(m_m[4] & 0x010000))) {
+		UINT16 delta = m_ocrb - frc;
 		if(delta < max_delta)
 			max_delta = delta;
 	}
 
-	if(!(sh2->m[4] & OVF) && !(sh2->m[4] & 0x010000)) {
+	if(!(m_m[4] & OVF) && !(m_m[4] & 0x010000)) {
 		int delta = 0x10000 - frc;
 		if(delta < max_delta)
 			max_delta = delta;
 	}
 
 	if(max_delta != 0xfffff) {
-		int divider = div_tab[(sh2->m[5] >> 8) & 3];
+		int divider = div_tab[(m_m[5] >> 8) & 3];
 		if(divider) {
 			max_delta <<= divider;
-			sh2->frc_base = sh2->device->total_cycles();
-			sh2->timer->adjust(sh2->device->cycles_to_attotime(max_delta));
+			m_frc_base = total_cycles();
+			m_timer->adjust(cycles_to_attotime(max_delta));
 		} else {
-			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag(), max_delta);
+			logerror("SH2.%s: Timer event in %d cycles of external clock", tag(), max_delta);
 		}
 	}
 }
 
-
-static TIMER_CALLBACK( sh2_timer_callback )
+TIMER_CALLBACK_MEMBER( sh2_device::sh2_timer_callback )
 {
-	sh2_state *sh2 = (sh2_state *)ptr;
 	UINT16 frc;
 
-	sh2_timer_resync(sh2);
+	sh2_timer_resync();
 
-	frc = sh2->frc;
+	frc = m_frc;
 
-	if(frc == sh2->ocrb)
-		sh2->m[4] |= OCFB;
+	if(frc == m_ocrb)
+		m_m[4] |= OCFB;
 
 	if(frc == 0x0000)
-		sh2->m[4] |= OVF;
+		m_m[4] |= OVF;
 
-	if(frc == sh2->ocra)
+	if(frc == m_ocra)
 	{
-		sh2->m[4] |= OCFA;
+		m_m[4] |= OCFA;
 
-		if(sh2->m[4] & 0x010000)
-			sh2->frc = 0;
+		if(m_m[4] & 0x010000)
+			m_frc = 0;
 	}
 
-	sh2_recalc_irq(sh2);
-	sh2_timer_activate(sh2);
+	sh2_recalc_irq();
+	sh2_timer_activate();
 }
 
 
@@ -176,35 +124,34 @@ static TIMER_CALLBACK( sh2_timer_callback )
 
 
 
-void sh2_notify_dma_data_available(device_t *device)
+void sh2_device::sh2_notify_dma_data_available()
 {
-	sh2_state *sh2 = GET_SH2(device);
 	//printf("call notify\n");
 
 	for (int dma=0;dma<2;dma++)
 	{
-		//printf("sh2->dma_timer_active[dma] %04x\n",sh2->dma_timer_active[dma]);
+		//printf("m_dma_timer_active[dma] %04x\n",m_dma_timer_active[dma]);
 
-		if (sh2->dma_timer_active[dma]==2) // 2 = stalled
+		if (m_dma_timer_active[dma]==2) // 2 = stalled
 		{
 		//  printf("resuming stalled dma\n");
-			sh2->dma_timer_active[dma]=1;
-			sh2->dma_current_active_timer[dma]->adjust(attotime::zero, dma);
+			m_dma_timer_active[dma]=1;
+			m_dma_current_active_timer[dma]->adjust(attotime::zero, dma);
 		}
 	}
 
 }
 
-void sh2_do_dma(sh2_state *sh2, int dma)
+void sh2_device::sh2_do_dma(int dma)
 {
 	UINT32 dmadata;
 
 	UINT32 tempsrc, tempdst;
 
-	if (sh2->active_dma_count[dma] > 0)
+	if (m_active_dma_count[dma] > 0)
 	{
 		// process current DMA
-		switch(sh2->active_dma_size[dma])
+		switch(m_active_dma_size[dma])
 		{
 		case 0:
 			{
@@ -212,197 +159,197 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				// to allow for the callback to check if we can process the DMA at this
 				// time (we need to know where we're reading / writing to/from)
 
-				if(sh2->active_dma_incs[dma] == 2)
-					tempsrc = sh2->active_dma_src[dma] - 1;
+				if(m_active_dma_incs[dma] == 2)
+					tempsrc = m_active_dma_src[dma] - 1;
 				else
-					tempsrc = sh2->active_dma_src[dma];
+					tempsrc = m_active_dma_src[dma];
 
-				if(sh2->active_dma_incd[dma] == 2)
-					tempdst = sh2->active_dma_dst[dma] - 1;
+				if(m_active_dma_incd[dma] == 2)
+					tempdst = m_active_dma_dst[dma] - 1;
 				else
-					tempdst = sh2->active_dma_dst[dma];
+					tempdst = m_active_dma_dst[dma];
 
-				if (sh2->dma_callback_fifo_data_available)
+				if (m_dma_callback_fifo_data_available)
 				{
-					int available = sh2->dma_callback_fifo_data_available(sh2->device, tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
+					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
 						//printf("dma stalled\n");
-						sh2->dma_timer_active[dma]=2;// mark as stalled
+						m_dma_timer_active[dma]=2;// mark as stalled
 						return;
 					}
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
 					//schedule next DMA callback
-				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
+				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
 				#endif
 
 
-				dmadata = sh2->program->read_byte(tempsrc);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_byte(tempdst, dmadata);
+				dmadata = m_program->read_byte(tempsrc);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_byte(tempdst, dmadata);
 
-				if(sh2->active_dma_incs[dma] == 2)
-					sh2->active_dma_src[dma] --;
-				if(sh2->active_dma_incd[dma] == 2)
-					sh2->active_dma_dst[dma] --;
+				if(m_active_dma_incs[dma] == 2)
+					m_active_dma_src[dma] --;
+				if(m_active_dma_incd[dma] == 2)
+					m_active_dma_dst[dma] --;
 
 
-				if(sh2->active_dma_incs[dma] == 1)
-					sh2->active_dma_src[dma] ++;
-				if(sh2->active_dma_incd[dma] == 1)
-					sh2->active_dma_dst[dma] ++;
+				if(m_active_dma_incs[dma] == 1)
+					m_active_dma_src[dma] ++;
+				if(m_active_dma_incd[dma] == 1)
+					m_active_dma_dst[dma] ++;
 
-				sh2->active_dma_count[dma] --;
+				m_active_dma_count[dma] --;
 			}
 			break;
 		case 1:
 			{
-				if(sh2->active_dma_incs[dma] == 2)
-					tempsrc = sh2->active_dma_src[dma] - 2;
+				if(m_active_dma_incs[dma] == 2)
+					tempsrc = m_active_dma_src[dma] - 2;
 				else
-					tempsrc = sh2->active_dma_src[dma];
+					tempsrc = m_active_dma_src[dma];
 
-				if(sh2->active_dma_incd[dma] == 2)
-					tempdst = sh2->active_dma_dst[dma] - 2;
+				if(m_active_dma_incd[dma] == 2)
+					tempdst = m_active_dma_dst[dma] - 2;
 				else
-					tempdst = sh2->active_dma_dst[dma];
+					tempdst = m_active_dma_dst[dma];
 
-				if (sh2->dma_callback_fifo_data_available)
+				if (m_dma_callback_fifo_data_available)
 				{
-					int available = sh2->dma_callback_fifo_data_available(sh2->device, tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
+					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
 						//printf("dma stalled\n");
-						sh2->dma_timer_active[dma]=2;// mark as stalled
+						m_dma_timer_active[dma]=2;// mark as stalled
 						return;
 					}
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
 					//schedule next DMA callback
-				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
+				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
 				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
-				dmadata = sh2->program->read_word(tempsrc);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_word(tempdst, dmadata);
+				dmadata = m_program->read_word(tempsrc);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_word(tempdst, dmadata);
 
-				if(sh2->active_dma_incs[dma] == 2)
-					sh2->active_dma_src[dma] -= 2;
-				if(sh2->active_dma_incd[dma] == 2)
-					sh2->active_dma_dst[dma] -= 2;
+				if(m_active_dma_incs[dma] == 2)
+					m_active_dma_src[dma] -= 2;
+				if(m_active_dma_incd[dma] == 2)
+					m_active_dma_dst[dma] -= 2;
 
-				if(sh2->active_dma_incs[dma] == 1)
-					sh2->active_dma_src[dma] += 2;
-				if(sh2->active_dma_incd[dma] == 1)
-					sh2->active_dma_dst[dma] += 2;
+				if(m_active_dma_incs[dma] == 1)
+					m_active_dma_src[dma] += 2;
+				if(m_active_dma_incd[dma] == 1)
+					m_active_dma_dst[dma] += 2;
 
-				sh2->active_dma_count[dma] --;
+				m_active_dma_count[dma] --;
 			}
 			break;
 		case 2:
 			{
-				if(sh2->active_dma_incs[dma] == 2)
-					tempsrc = sh2->active_dma_src[dma] - 4;
+				if(m_active_dma_incs[dma] == 2)
+					tempsrc = m_active_dma_src[dma] - 4;
 				else
-					tempsrc = sh2->active_dma_src[dma];
+					tempsrc = m_active_dma_src[dma];
 
-				if(sh2->active_dma_incd[dma] == 2)
-					tempdst = sh2->active_dma_dst[dma] - 4;
+				if(m_active_dma_incd[dma] == 2)
+					tempdst = m_active_dma_dst[dma] - 4;
 				else
-					tempdst = sh2->active_dma_dst[dma];
+					tempdst = m_active_dma_dst[dma];
 
-				if (sh2->dma_callback_fifo_data_available)
+				if (m_dma_callback_fifo_data_available)
 				{
-					int available = sh2->dma_callback_fifo_data_available(sh2->device, tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
+					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
 						//printf("dma stalled\n");
-						sh2->dma_timer_active[dma]=2;// mark as stalled
+						m_dma_timer_active[dma]=2;// mark as stalled
 						return;
 					}
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
 					//schedule next DMA callback
-				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
+				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
 				#endif
 
-				dmadata = sh2->program->read_dword(tempsrc);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_dword(tempdst, dmadata);
+				dmadata = m_program->read_dword(tempsrc);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_dword(tempdst, dmadata);
 
-				if(sh2->active_dma_incs[dma] == 2)
-					sh2->active_dma_src[dma] -= 4;
-				if(sh2->active_dma_incd[dma] == 2)
-					sh2->active_dma_dst[dma] -= 4;
+				if(m_active_dma_incs[dma] == 2)
+					m_active_dma_src[dma] -= 4;
+				if(m_active_dma_incd[dma] == 2)
+					m_active_dma_dst[dma] -= 4;
 
-				if(sh2->active_dma_incs[dma] == 1)
-					sh2->active_dma_src[dma] += 4;
-				if(sh2->active_dma_incd[dma] == 1)
-					sh2->active_dma_dst[dma] += 4;
+				if(m_active_dma_incs[dma] == 1)
+					m_active_dma_src[dma] += 4;
+				if(m_active_dma_incd[dma] == 1)
+					m_active_dma_dst[dma] += 4;
 
-				sh2->active_dma_count[dma] --;
+				m_active_dma_count[dma] --;
 			}
 			break;
 		case 3:
 			{
 				// shouldn't this really be 4 calls here instead?
 
-				tempsrc = sh2->active_dma_src[dma];
+				tempsrc = m_active_dma_src[dma];
 
-				if(sh2->active_dma_incd[dma] == 2)
-					tempdst = sh2->active_dma_dst[dma] - 16;
+				if(m_active_dma_incd[dma] == 2)
+					tempdst = m_active_dma_dst[dma] - 16;
 				else
-					tempdst = sh2->active_dma_dst[dma];
+					tempdst = m_active_dma_dst[dma];
 
-				if (sh2->dma_callback_fifo_data_available)
+				if (m_dma_callback_fifo_data_available)
 				{
-					int available = sh2->dma_callback_fifo_data_available(sh2->device, tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
+					int available = m_dma_callback_fifo_data_available(this, tempsrc, tempdst, 0, m_active_dma_size[dma]);
 
 					if (!available)
 					{
 						//printf("dma stalled\n");
-						sh2->dma_timer_active[dma]=2;// mark as stalled
+						m_dma_timer_active[dma]=2;// mark as stalled
 						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode\n");
 					}
 				}
 
 				#ifdef USE_TIMER_FOR_DMA
 					//schedule next DMA callback
-				sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
+				m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
 				#endif
 
-				dmadata = sh2->program->read_dword(tempsrc);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_dword(tempdst, dmadata);
+				dmadata = m_program->read_dword(tempsrc);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_dword(tempdst, dmadata);
 
-				dmadata = sh2->program->read_dword(tempsrc+4);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_dword(tempdst+4, dmadata);
+				dmadata = m_program->read_dword(tempsrc+4);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_dword(tempdst+4, dmadata);
 
-				dmadata = sh2->program->read_dword(tempsrc+8);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_dword(tempdst+8, dmadata);
+				dmadata = m_program->read_dword(tempsrc+8);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_dword(tempdst+8, dmadata);
 
-				dmadata = sh2->program->read_dword(tempsrc+12);
-				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(sh2->device, tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
-				sh2->program->write_dword(tempdst+12, dmadata);
+				dmadata = m_program->read_dword(tempsrc+12);
+				if (m_dma_callback_kludge) dmadata = m_dma_callback_kludge(this, tempsrc, tempdst, dmadata, m_active_dma_size[dma]);
+				m_program->write_dword(tempdst+12, dmadata);
 
-				if(sh2->active_dma_incd[dma] == 2)
-					sh2->active_dma_dst[dma] -= 16;
+				if(m_active_dma_incd[dma] == 2)
+					m_active_dma_dst[dma] -= 16;
 
-				sh2->active_dma_src[dma] += 16;
-				if(sh2->active_dma_incd[dma] == 1)
-					sh2->active_dma_dst[dma] += 16;
+				m_active_dma_src[dma] += 16;
+				if(m_active_dma_incd[dma] == 1)
+					m_active_dma_dst[dma] += 16;
 
-				sh2->active_dma_count[dma]-=4;
+				m_active_dma_count[dma]-=4;
 			}
 			break;
 		}
@@ -410,78 +357,76 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 	else // the dma is complete
 	{
 	//  int dma = param & 1;
-	//  sh2_state *sh2 = (sh2_state *)ptr;
 
 		// fever soccer uses cycle-stealing mode, resume the CPU now DMA has finished
-		if (sh2->active_dma_steal[dma])
+		if (m_active_dma_steal[dma])
 		{
-			sh2->device->resume(SUSPEND_REASON_HALT );
+			resume(SUSPEND_REASON_HALT );
 		}
 
 
-		LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
-		sh2->m[0x63+4*dma] |= 2;
-		sh2->dma_timer_active[dma] = 0;
-		sh2->dma_irq[dma] |= 1;
-		sh2_recalc_irq(sh2);
+		LOG(("SH2.%s: DMA %d complete\n", tag(), dma));
+		m_m[0x63+4*dma] |= 2;
+		m_dma_timer_active[dma] = 0;
+		m_dma_irq[dma] |= 1;
+		sh2_recalc_irq();
 
 	}
 }
 
-static TIMER_CALLBACK( sh2_dma_current_active_callback )
+TIMER_CALLBACK_MEMBER( sh2_device::sh2_dma_current_active_callback )
 {
 	int dma = param & 1;
-	sh2_state *sh2 = (sh2_state *)ptr;
 
-	sh2_do_dma(sh2, dma);
+	sh2_do_dma(dma);
 }
 
 
-static void sh2_dmac_check(sh2_state *sh2, int dma)
+void sh2_device::sh2_dmac_check(int dma)
 {
-	if(sh2->m[0x63+4*dma] & sh2->m[0x6c] & 1)
+	if(m_m[0x63+4*dma] & m_m[0x6c] & 1)
 	{
-		if(!sh2->dma_timer_active[dma] && !(sh2->m[0x63+4*dma] & 2))
+		if(!m_dma_timer_active[dma] && !(m_m[0x63+4*dma] & 2))
 		{
-			sh2->active_dma_incd[dma] = (sh2->m[0x63+4*dma] >> 14) & 3;
-			sh2->active_dma_incs[dma] = (sh2->m[0x63+4*dma] >> 12) & 3;
-			sh2->active_dma_size[dma] = (sh2->m[0x63+4*dma] >> 10) & 3;
-			sh2->active_dma_steal[dma] = (sh2->m[0x63+4*dma] &0x10);
+			m_active_dma_incd[dma] = (m_m[0x63+4*dma] >> 14) & 3;
+			m_active_dma_incs[dma] = (m_m[0x63+4*dma] >> 12) & 3;
+			m_active_dma_size[dma] = (m_m[0x63+4*dma] >> 10) & 3;
+			m_active_dma_steal[dma] = (m_m[0x63+4*dma] &0x10);
 
-			if(sh2->active_dma_incd[dma] == 3 || sh2->active_dma_incs[dma] == 3)
+			if(m_active_dma_incd[dma] == 3 || m_active_dma_incs[dma] == 3)
 			{
-				logerror("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", sh2->active_dma_incd[dma], sh2->active_dma_incs[dma], sh2->active_dma_size[dma], sh2->m[0x63+4*dma]);
+				logerror("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", m_active_dma_incd[dma], m_active_dma_incs[dma], m_active_dma_size[dma], m_m[0x63+4*dma]);
 				return;
 			}
-			sh2->active_dma_src[dma]   = sh2->m[0x60+4*dma];
-			sh2->active_dma_dst[dma]   = sh2->m[0x61+4*dma];
-			sh2->active_dma_count[dma] = sh2->m[0x62+4*dma];
-			if(!sh2->active_dma_count[dma])
-				sh2->active_dma_count[dma] = 0x1000000;
+			m_active_dma_src[dma]   = m_m[0x60+4*dma];
+			m_active_dma_dst[dma]   = m_m[0x61+4*dma];
+			m_active_dma_count[dma] = m_m[0x62+4*dma];
+			if(!m_active_dma_count[dma])
+				m_active_dma_count[dma] = 0x1000000;
 
-			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, sh2->active_dma_src[dma], sh2->active_dma_dst[dma], sh2->active_dma_count[dma], sh2->m[0x63+4*dma], sh2->active_dma_incs[dma], sh2->active_dma_incd[dma], sh2->active_dma_size[dma]));
+			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, m_active_dma_src[dma], m_active_dma_dst[dma], m_active_dma_count[dma], m_m[0x63+4*dma], m_active_dma_incs[dma], m_active_dma_incd[dma], m_active_dma_size[dma]));
 
-			sh2->dma_timer_active[dma] = 1;
+			m_dma_timer_active[dma] = 1;
 
-			sh2->active_dma_src[dma] &= AM;
-			sh2->active_dma_dst[dma] &= AM;
+			m_active_dma_src[dma] &= AM;
+			m_active_dma_dst[dma] &= AM;
 
-			switch(sh2->active_dma_size[dma])
+			switch(m_active_dma_size[dma])
 			{
 			case 0:
 				break;
 			case 1:
-				sh2->active_dma_src[dma] &= ~1;
-				sh2->active_dma_dst[dma] &= ~1;
+				m_active_dma_src[dma] &= ~1;
+				m_active_dma_dst[dma] &= ~1;
 				break;
 			case 2:
-				sh2->active_dma_src[dma] &= ~3;
-				sh2->active_dma_dst[dma] &= ~3;
+				m_active_dma_src[dma] &= ~3;
+				m_active_dma_dst[dma] &= ~3;
 				break;
 			case 3:
-				sh2->active_dma_src[dma] &= ~3;
-				sh2->active_dma_dst[dma] &= ~3;
-				sh2->active_dma_count[dma] &= ~3;
+				m_active_dma_src[dma] &= ~3;
+				m_active_dma_dst[dma] &= ~3;
+				m_active_dma_count[dma] &= ~3;
 				break;
 			}
 
@@ -492,41 +437,40 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 			// start DMA timer
 
 			// fever soccer uses cycle-stealing mode, requiring the CPU to be halted
-			if (sh2->active_dma_steal[dma])
+			if (m_active_dma_steal[dma])
 			{
 				//printf("cycle stealing DMA\n");
-				sh2->device->suspend(SUSPEND_REASON_HALT, 1 );
+				suspend(SUSPEND_REASON_HALT, 1 );
 			}
 
-			sh2->dma_current_active_timer[dma]->adjust(sh2->device->cycles_to_attotime(2), dma);
+			m_dma_current_active_timer[dma]->adjust(cycles_to_attotime(2), dma);
 #endif
 
 		}
 	}
 	else
 	{
-		if(sh2->dma_timer_active[dma])
+		if(m_dma_timer_active[dma])
 		{
 			logerror("SH2: DMA %d cancelled in-flight\n", dma);
-			//sh2->dma_complete_timer[dma]->adjust(attotime::never);
-			sh2->dma_current_active_timer[dma]->adjust(attotime::never);
+			//m_dma_complete_timer[dma]->adjust(attotime::never);
+			m_dma_current_active_timer[dma]->adjust(attotime::never);
 
-			sh2->dma_timer_active[dma] = 0;
+			m_dma_timer_active[dma] = 0;
 		}
 	}
 }
 
-WRITE32_HANDLER( sh2_internal_w )
+WRITE32_MEMBER( sh2_device::sh2_internal_w )
 {
-	sh2_state *sh2 = GET_SH2(&space.device());
 	UINT32 old;
 
-	if (sh2->isdrc)
+	if (m_isdrc)
 		offset &= 0x7f;
 
 
-	old = sh2->m[offset];
-	COMBINE_DATA(sh2->m+offset);
+	old = m_m[offset];
+	COMBINE_DATA(m_m+offset);
 
 	//  if(offset != 0x20)
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
@@ -547,23 +491,23 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
 		{
-			sh2_timer_resync(sh2);
+			sh2_timer_resync();
 		}
-//      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag(), data >> 16, mem_mask>>16);
-		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
-		COMBINE_DATA(&sh2->frc);
+//      printf("SH2.%s: TIER write %04x @ %04x\n", m_device->tag(), data >> 16, mem_mask>>16);
+		m_m[4] = (m_m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & m_m[4] & (ICF|OCFA|OCFB|OVF));
+		COMBINE_DATA(&m_frc);
 		if((mem_mask & 0x00ffffff) != 0)
-			sh2_timer_activate(sh2);
-		sh2_recalc_irq(sh2);
+			sh2_timer_activate();
+		sh2_recalc_irq();
 		break;
 	case 0x05: // OCRx, TCR, TOCR
-//      printf("SH2.%s: TCR write %08x @ %08x\n", sh2->device->tag(), data, mem_mask);
-		sh2_timer_resync(sh2);
-		if(sh2->m[5] & 0x10)
-			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
+//      printf("SH2.%s: TCR write %08x @ %08x\n", m_device->tag(), data, mem_mask);
+		sh2_timer_resync();
+		if(m_m[5] & 0x10)
+			m_ocrb = (m_ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
 		else
-			sh2->ocra = (sh2->ocra & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
-		sh2_timer_activate(sh2);
+			m_ocra = (m_ocra & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		sh2_timer_activate();
 		break;
 
 	case 0x06: // ICR
@@ -573,7 +517,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x18: // IPRB, VCRA
 	case 0x19: // VCRB, VCRC
 	case 0x1a: // VCRD
-		sh2_recalc_irq(sh2);
+		sh2_recalc_irq();
 		break;
 
 		// DMA
@@ -582,10 +526,10 @@ WRITE32_HANDLER( sh2_internal_w )
 
 		// Watchdog
 	case 0x20: // WTCNT, RSTCSR
-		if((sh2->m[0x20] & 0xff000000) == 0x5a000000)
-			sh2->wtcnt = (sh2->m[0x20] >> 16) & 0xff;
+		if((m_m[0x20] & 0xff000000) == 0x5a000000)
+			m_wtcnt = (m_m[0x20] >> 16) & 0xff;
 
-		if((sh2->m[0x20] & 0xff000000) == 0xa5000000)
+		if((m_m[0x20] & 0xff000000) == 0xa5000000)
 		{
 			/*
 			WTCSR
@@ -596,17 +540,17 @@ WRITE32_HANDLER( sh2_internal_w )
 			---- -xxx Clock select
 			*/
 
-			sh2->wtcsr = (sh2->m[0x20] >> 16) & 0xff;
+			m_wtcsr = (m_m[0x20] >> 16) & 0xff;
 		}
 
-		if((sh2->m[0x20] & 0x0000ff00) == 0x00005a00)
+		if((m_m[0x20] & 0x0000ff00) == 0x00005a00)
 		{
 			// -x-- ---- RSTE (1: resets wtcnt when overflows 0: no reset)
 			// --x- ---- RSTS (0: power-on reset 1: Manual reset)
 			// ...
 		}
 
-		if((sh2->m[0x20] & 0x0000ff00) == 0x0000a500)
+		if((m_m[0x20] & 0x0000ff00) == 0x0000a500)
 		{
 			// clear WOVF
 			// ...
@@ -640,59 +584,59 @@ WRITE32_HANDLER( sh2_internal_w )
 		break;
 	case 0x41: // DVDNT
 		{
-			INT32 a = sh2->m[0x41];
-			INT32 b = sh2->m[0x40];
-			LOG(("SH2 '%s' div+mod %d/%d\n", sh2->device->tag(), a, b));
+			INT32 a = m_m[0x41];
+			INT32 b = m_m[0x40];
+			LOG(("SH2 '%s' div+mod %d/%d\n", tag(), a, b));
 			if (b)
 			{
-				sh2->m[0x45] = a / b;
-				sh2->m[0x44] = a % b;
+				m_m[0x45] = a / b;
+				m_m[0x44] = a % b;
 			}
 			else
 			{
-				sh2->m[0x42] |= 0x00010000;
-				sh2->m[0x45] = 0x7fffffff;
-				sh2->m[0x44] = 0x7fffffff;
-				sh2_recalc_irq(sh2);
+				m_m[0x42] |= 0x00010000;
+				m_m[0x45] = 0x7fffffff;
+				m_m[0x44] = 0x7fffffff;
+				sh2_recalc_irq();
 			}
 			break;
 		}
 	case 0x42: // DVCR
-		sh2->m[0x42] = (sh2->m[0x42] & ~0x00001000) | (old & sh2->m[0x42] & 0x00010000);
-		sh2_recalc_irq(sh2);
+		m_m[0x42] = (m_m[0x42] & ~0x00001000) | (old & m_m[0x42] & 0x00010000);
+		sh2_recalc_irq();
 		break;
 	case 0x43: // VCRDIV
-		sh2_recalc_irq(sh2);
+		sh2_recalc_irq();
 		break;
 	case 0x44: // DVDNTH
 		break;
 	case 0x45: // DVDNTL
 		{
-			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
-			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", sh2->device->tag(), a, b));
+			INT64 a = m_m[0x45] | ((UINT64)(m_m[0x44]) << 32);
+			INT64 b = (INT32)m_m[0x40];
+			LOG(("SH2 '%s' div+mod %" I64FMT "d/%" I64FMT "d\n", tag(), a, b));
 			if (b)
 			{
 				INT64 q = a / b;
 				if (q != (INT32)q)
 				{
-					sh2->m[0x42] |= 0x00010000;
-					sh2->m[0x45] = 0x7fffffff;
-					sh2->m[0x44] = 0x7fffffff;
-					sh2_recalc_irq(sh2);
+					m_m[0x42] |= 0x00010000;
+					m_m[0x45] = 0x7fffffff;
+					m_m[0x44] = 0x7fffffff;
+					sh2_recalc_irq();
 				}
 				else
 				{
-					sh2->m[0x45] = q;
-					sh2->m[0x44] = a % b;
+					m_m[0x45] = q;
+					m_m[0x44] = a % b;
 				}
 			}
 			else
 			{
-				sh2->m[0x42] |= 0x00010000;
-				sh2->m[0x45] = 0x7fffffff;
-				sh2->m[0x44] = 0x7fffffff;
-				sh2_recalc_irq(sh2);
+				m_m[0x42] |= 0x00010000;
+				m_m[0x45] = 0x7fffffff;
+				m_m[0x44] = 0x7fffffff;
+				sh2_recalc_irq();
 			}
 			break;
 		}
@@ -702,30 +646,30 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x61: // DAR0
 		break;
 	case 0x62: // DTCR0
-		sh2->m[0x62] &= 0xffffff;
+		m_m[0x62] &= 0xffffff;
 		break;
 	case 0x63: // CHCR0
-		sh2->m[0x63] = (sh2->m[0x63] & ~2) | (old & sh2->m[0x63] & 2);
-		sh2_dmac_check(sh2, 0);
+		m_m[0x63] = (m_m[0x63] & ~2) | (old & m_m[0x63] & 2);
+		sh2_dmac_check(0);
 		break;
 	case 0x64: // SAR1
 	case 0x65: // DAR1
 		break;
 	case 0x66: // DTCR1
-		sh2->m[0x66] &= 0xffffff;
+		m_m[0x66] &= 0xffffff;
 		break;
 	case 0x67: // CHCR1
-		sh2->m[0x67] = (sh2->m[0x67] & ~2) | (old & sh2->m[0x67] & 2);
-		sh2_dmac_check(sh2, 1);
+		m_m[0x67] = (m_m[0x67] & ~2) | (old & m_m[0x67] & 2);
+		sh2_dmac_check(1);
 		break;
 	case 0x68: // VCRDMA0
 	case 0x6a: // VCRDMA1
-		sh2_recalc_irq(sh2);
+		sh2_recalc_irq();
 		break;
 	case 0x6c: // DMAOR
-		sh2->m[0x6c] = (sh2->m[0x6c] & ~6) | (old & sh2->m[0x6c] & 6);
-		sh2_dmac_check(sh2, 0);
-		sh2_dmac_check(sh2, 1);
+		m_m[0x6c] = (m_m[0x6c] & ~6) | (old & m_m[0x6c] & 6);
+		sh2_dmac_check(0);
+		sh2_dmac_check(1);
 		break;
 
 		// Bus controller
@@ -744,11 +688,9 @@ WRITE32_HANDLER( sh2_internal_w )
 	}
 }
 
-READ32_HANDLER( sh2_internal_r )
+READ32_MEMBER( sh2_device::sh2_internal_r )
 {
-	sh2_state *sh2 = GET_SH2(&space.device());
-
-	if (sh2->isdrc)
+	if (m_isdrc)
 	offset &= 0x7f;
 
 //  logerror("sh2_internal_r:  Read %08x (%x) @ %08x\n", 0xfffffe00+offset*4, offset, mem_mask);
@@ -757,72 +699,69 @@ READ32_HANDLER( sh2_internal_r )
 	case 0x00:
 		break;
 	case 0x01:
-		return sh2->m[1] | 0x80000000; // TDRE: Trasmit Data Register Empty. Force it to be '1' for the time being.
+		return m_m[1] | 0x80000000; // TDRE: Trasmit Data Register Empty. Force it to be '1' for the time being.
 
 	case 0x04: // TIER, FTCSR, FRC
 		if ( mem_mask == 0x00ff0000 )
 		{
-			if ( sh2->ftcsr_read_callback != NULL )
+			if ( m_ftcsr_read_callback != NULL )
 			{
-				sh2->ftcsr_read_callback( (sh2->m[4] & 0xffff0000) | sh2->frc );
+				m_ftcsr_read_callback( (m_m[4] & 0xffff0000) | m_frc );
 			}
 		}
-		sh2_timer_resync(sh2);
-		return (sh2->m[4] & 0xffff0000) | sh2->frc;
+		sh2_timer_resync();
+		return (m_m[4] & 0xffff0000) | m_frc;
 	case 0x05: // OCRx, TCR, TOCR
-		if(sh2->m[5] & 0x10)
-			return (sh2->ocrb << 16) | (sh2->m[5] & 0xffff);
+		if(m_m[5] & 0x10)
+			return (m_ocrb << 16) | (m_m[5] & 0xffff);
 		else
-			return (sh2->ocra << 16) | (sh2->m[5] & 0xffff);
+			return (m_ocra << 16) | (m_m[5] & 0xffff);
 	case 0x06: // ICR
-		return sh2->icr << 16;
+		return m_icr << 16;
 
 	case 0x20:
-		return (((sh2->wtcsr | 0x18) & 0xff) << 24)  | ((sh2->wtcnt & 0xff) << 16);
+		return (((m_wtcsr | 0x18) & 0xff) << 24)  | ((m_wtcnt & 0xff) << 16);
 
 	case 0x24: // SBYCR, CCR
-		return sh2->m[0x24] & ~0x3000; /* bit 4-5 of CCR are always zero */
+		return m_m[0x24] & ~0x3000; /* bit 4-5 of CCR are always zero */
 
 	case 0x38: // ICR, IPRA
-		return (sh2->m[0x38] & 0x7fffffff) | (sh2->nmi_line_state == ASSERT_LINE ? 0 : 0x80000000);
+		return (m_m[0x38] & 0x7fffffff) | (m_nmi_line_state == ASSERT_LINE ? 0 : 0x80000000);
 
 	case 0x78: // BCR1
-		return sh2->is_slave ? 0x00008000 : 0;
+		return m_is_slave ? 0x00008000 : 0;
 
 	case 0x41: // dvdntl mirrors
 	case 0x47:
-		return sh2->m[0x45];
+		return m_m[0x45];
 
 	case 0x46: // dvdnth mirror
-		return sh2->m[0x44];
+		return m_m[0x44];
 	}
-	return sh2->m[offset];
+	return m_m[offset];
 }
 
-void sh2_set_ftcsr_read_callback(device_t *device, void (*callback)(UINT32))
+void sh2_device::sh2_set_ftcsr_read_callback(void (*callback)(UINT32))
 {
-	sh2_state *sh2 = GET_SH2(device);
-	sh2->ftcsr_read_callback = callback;
+	m_ftcsr_read_callback = callback;
 }
 
-void sh2_set_frt_input(device_t *device, int state)
+void sh2_device::sh2_set_frt_input(int state)
 {
-	sh2_state *sh2 = GET_SH2(device);
-
 	if(state == PULSE_LINE)
 	{
-		sh2_set_frt_input(device, ASSERT_LINE);
-		sh2_set_frt_input(device, CLEAR_LINE);
+		sh2_set_frt_input(ASSERT_LINE);
+		sh2_set_frt_input(CLEAR_LINE);
 		return;
 	}
 
-	if(sh2->frt_input == state) {
+	if(m_frt_input == state) {
 		return;
 	}
 
-	sh2->frt_input = state;
+	m_frt_input = state;
 
-	if(sh2->m[5] & 0x8000) {
+	if(m_m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
 			return;
 		}
@@ -832,256 +771,125 @@ void sh2_set_frt_input(device_t *device, int state)
 		}
 	}
 
-	sh2_timer_resync(sh2);
-	sh2->icr = sh2->frc;
-	sh2->m[4] |= ICF;
-	//logerror("SH2.%s: ICF activated (%x)\n", sh2->device->tag(), sh2->pc & AM);
-	sh2_recalc_irq(sh2);
+	sh2_timer_resync();
+	m_icr = m_frc;
+	m_m[4] |= ICF;
+	//logerror("SH2.%s: ICF activated (%x)\n", tag(), m_sh2_state->pc & AM);
+	sh2_recalc_irq();
 }
 
-void sh2_set_irq_line(sh2_state *sh2, int irqline, int state)
-{
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (sh2->nmi_line_state == state)
-			return;
-		sh2->nmi_line_state = state;
-
-		if( state == CLEAR_LINE )
-		{
-			LOG(("SH-2 '%s' cleared nmi\n", sh2->device->tag()));
-		}
-		else
-		{
-			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag()));
-
-			sh2_exception(sh2, "Set IRQ line", 16);
-
-			if (sh2->isdrc)
-				sh2->pending_nmi = 1;
-		}
-	}
-	else
-	{
-		if (sh2->irq_line_state[irqline] == state)
-			return;
-		sh2->irq_line_state[irqline] = state;
-
-		if( state == CLEAR_LINE )
-		{
-			LOG(("SH-2 '%s' cleared irq #%d\n", sh2->device->tag(), irqline));
-			sh2->pending_irq &= ~(1 << irqline);
-		}
-		else
-		{
-			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag(), irqline));
-			sh2->pending_irq |= 1 << irqline;
-			if (sh2->isdrc)
-			{
-			sh2->test_irq = 1;
-			} else {
-			if(sh2->delay)
-				sh2->test_irq = 1;
-			else
-				CHECK_PENDING_IRQ("sh2_set_irq_line");
-			}
-		}
-	}
-}
-
-void sh2_recalc_irq(sh2_state *sh2)
+void sh2_device::sh2_recalc_irq()
 {
 	int irq = 0, vector = -1;
 	int  level;
 
 	// Timer irqs
-	if((sh2->m[4]>>8) & sh2->m[4] & (ICF|OCFA|OCFB|OVF))
+	if((m_m[4]>>8) & m_m[4] & (ICF|OCFA|OCFB|OVF))
 	{
-		level = (sh2->m[0x18] >> 24) & 15;
+		level = (m_m[0x18] >> 24) & 15;
 		if(level > irq)
 		{
-			int mask = (sh2->m[4]>>8) & sh2->m[4];
+			int mask = (m_m[4]>>8) & m_m[4];
 			irq = level;
 			if(mask & ICF)
-				vector = (sh2->m[0x19] >> 8) & 0x7f;
+				vector = (m_m[0x19] >> 8) & 0x7f;
 			else if(mask & (OCFA|OCFB))
-				vector = sh2->m[0x19] & 0x7f;
+				vector = m_m[0x19] & 0x7f;
 			else
-				vector = (sh2->m[0x1a] >> 24) & 0x7f;
+				vector = (m_m[0x1a] >> 24) & 0x7f;
 		}
 	}
 
 	// DMA irqs
-	if((sh2->m[0x63] & 6) == 6 && sh2->dma_irq[0]) {
-		level = (sh2->m[0x38] >> 8) & 15;
+	if((m_m[0x63] & 6) == 6 && m_dma_irq[0]) {
+		level = (m_m[0x38] >> 8) & 15;
 		if(level > irq) {
 			irq = level;
-			sh2->dma_irq[0] &= ~1;
-			vector = (sh2->m[0x68]) & 0x7f;
+			m_dma_irq[0] &= ~1;
+			vector = (m_m[0x68]) & 0x7f;
 		}
 	}
-	else if((sh2->m[0x67] & 6) == 6 && sh2->dma_irq[1]) {
-		level = (sh2->m[0x38] >> 8) & 15;
+	else if((m_m[0x67] & 6) == 6 && m_dma_irq[1]) {
+		level = (m_m[0x38] >> 8) & 15;
 		if(level > irq) {
 			irq = level;
-			sh2->dma_irq[1] &= ~1;
-			vector = (sh2->m[0x6a]) & 0x7f;
+			m_dma_irq[1] &= ~1;
+			vector = (m_m[0x6a]) & 0x7f;
 		}
 	}
 
-	sh2->internal_irq_level = irq;
-	sh2->internal_irq_vector = vector;
-	sh2->test_irq = 1;
+	m_sh2_state->internal_irq_level = irq;
+	m_internal_irq_vector = vector;
+	m_test_irq = 1;
 }
 
-void sh2_exception(sh2_state *sh2, const char *message, int irqline)
+void sh2_device::sh2_exception(const char *message, int irqline)
 {
 	int vector;
 
 	if (irqline != 16)
 	{
-		if (irqline <= ((sh2->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
+		if (irqline <= ((m_sh2_state->sr >> 4) & 15)) /* If the cpu forbids this interrupt */
 			return;
 
 		// if this is an sh2 internal irq, use its vector
-		if (sh2->internal_irq_level == irqline)
+		if (m_sh2_state->internal_irq_level == irqline)
 		{
-			vector = sh2->internal_irq_vector;
+			vector = m_internal_irq_vector;
 			/* avoid spurious irqs with this (TODO: needs a better fix) */
-			sh2->internal_irq_level = -1;
-			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
+			m_sh2_state->internal_irq_level = -1;
+			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", tag(), irqline, vector, message));
 		}
 		else
 		{
-			if(sh2->m[0x38] & 0x00010000)
+			if(m_m[0x38] & 0x00010000)
 			{
-				vector = sh2->irq_callback(sh2->device, irqline);
-				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
+				vector = standard_irq_callback(irqline);
+				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", tag(), irqline, vector, message));
 			}
 			else
 			{
-				sh2->irq_callback(sh2->device, irqline);
+				standard_irq_callback(irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", tag(), irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag(), vector, message));
+		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", tag(), vector, message));
 	}
 
-	if (sh2->isdrc)
+	if (m_isdrc)
 	{
-	sh2->evec = RL( sh2, sh2->vbr + vector * 4 );
-	sh2->evec &= AM;
-	sh2->irqsr = sh2->sr;
+		m_sh2_state->evec = RL( m_sh2_state->vbr + vector * 4 );
+		m_sh2_state->evec &= AM;
+		m_sh2_state->irqsr = m_sh2_state->sr;
 
-	/* set I flags in SR */
-	if (irqline > SH2_INT_15)
-		sh2->sr = sh2->sr | I;
-	else
-		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
 
-//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
+//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, m_sh2_state->evec, m_sh2_state->irqsr, m_sh2_state->sr);
 	} else {
-	sh2->r[15] -= 4;
-	WL( sh2, sh2->r[15], sh2->sr );     /* push SR onto stack */
-	sh2->r[15] -= 4;
-	WL( sh2, sh2->r[15], sh2->pc );     /* push PC onto stack */
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
+		m_sh2_state->r[15] -= 4;
+		WL( m_sh2_state->r[15], m_sh2_state->pc );     /* push PC onto stack */
 
-	/* set I flags in SR */
-	if (irqline > SH2_INT_15)
-		sh2->sr = sh2->sr | I;
-	else
-		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
+		/* set I flags in SR */
+		if (irqline > SH2_INT_15)
+			m_sh2_state->sr = m_sh2_state->sr | I;
+		else
+			m_sh2_state->sr = (m_sh2_state->sr & ~I) | (irqline << 4);
 
-	/* fetch PC */
-	sh2->pc = RL( sh2, sh2->vbr + vector * 4 );
+		/* fetch PC */
+		m_sh2_state->pc = RL( m_sh2_state->vbr + vector * 4 );
 	}
 
-	if(sh2->sleep_mode == 1) { sh2->sleep_mode = 2; }
+	if(m_sh2_state->sleep_mode == 1) { m_sh2_state->sleep_mode = 2; }
 }
 
-void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, bool drc)
-{
-	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config();
-	int i;
-
-	sh2->isdrc = drc;
-	sh2->timer = device->machine().scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);
-	sh2->timer->adjust(attotime::never);
-
-	sh2->dma_current_active_timer[0] = device->machine().scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
-	sh2->dma_current_active_timer[0]->adjust(attotime::never);
-
-	sh2->dma_current_active_timer[1] = device->machine().scheduler().timer_alloc(FUNC(sh2_dma_current_active_callback), sh2);
-	sh2->dma_current_active_timer[1]->adjust(attotime::never);
-
-	if(conf)
-	{
-		sh2->is_slave = conf->is_slave;
-		sh2->dma_callback_kludge = conf->dma_callback_kludge;
-		sh2->dma_callback_fifo_data_available = conf->dma_callback_fifo_data_available;
-	}
-	else
-	{
-		sh2->is_slave = 0;
-		sh2->dma_callback_kludge = NULL;
-		sh2->dma_callback_fifo_data_available = NULL;
-
-	}
-	sh2->irq_callback = irqcallback;
-	sh2->device = device;
-	sh2->program = &device->space(AS_PROGRAM);
-	sh2->direct = &sh2->program->direct();
-	sh2->internal = &device->space(AS_PROGRAM);
-
-	device->save_item(NAME(sh2->pc));
-	device->save_item(NAME(sh2->sr));
-	device->save_item(NAME(sh2->pr));
-	device->save_item(NAME(sh2->gbr));
-	device->save_item(NAME(sh2->vbr));
-	device->save_item(NAME(sh2->mach));
-	device->save_item(NAME(sh2->macl));
-	device->save_item(NAME(sh2->r));
-	device->save_item(NAME(sh2->ea));
-	device->save_item(NAME(sh2->delay));
-	device->save_item(NAME(sh2->cpu_off));
-	device->save_item(NAME(sh2->dvsr));
-	device->save_item(NAME(sh2->dvdnth));
-	device->save_item(NAME(sh2->dvdntl));
-	device->save_item(NAME(sh2->dvcr));
-	device->save_item(NAME(sh2->pending_irq));
-	device->save_item(NAME(sh2->test_irq));
-	device->save_item(NAME(sh2->pending_nmi));
-	device->save_item(NAME(sh2->irqline));
-	device->save_item(NAME(sh2->evec));
-	device->save_item(NAME(sh2->irqsr));
-	device->save_item(NAME(sh2->target));
-	for (i = 0; i < 16; ++i)
-	{
-		device->save_item(NAME(sh2->irq_queue[i].irq_vector), i);
-		device->save_item(NAME(sh2->irq_queue[i].irq_priority), i);
-	}
-	device->save_item(NAME(sh2->pcfsel));
-	device->save_item(NAME(sh2->maxpcfsel));
-	device->save_item(NAME(sh2->pcflushes));
-	device->save_item(NAME(sh2->irq_line_state));
-	device->save_pointer(NAME(sh2->m), 0x200/4);
-	device->save_item(NAME(sh2->nmi_line_state));
-	device->save_item(NAME(sh2->frc));
-	device->save_item(NAME(sh2->ocra));
-	device->save_item(NAME(sh2->ocrb));
-	device->save_item(NAME(sh2->icr));
-	device->save_item(NAME(sh2->frc_base));
-	device->save_item(NAME(sh2->frt_input));
-	device->save_item(NAME(sh2->internal_irq_level));
-	device->save_item(NAME(sh2->internal_irq_vector));
-	device->save_item(NAME(sh2->dma_timer_active));
-	device->save_item(NAME(sh2->dma_irq));
-	device->save_item(NAME(sh2->wtcnt));
-	device->save_item(NAME(sh2->wtcsr));
-	device->save_item(NAME(sh2->sleep_mode));
-}

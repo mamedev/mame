@@ -799,7 +799,7 @@ void cps3_state::init_crypt(UINT32 key1, UINT32 key2, int altEncryption)
 	if (!m_user5region) m_user5region = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(m_maincpu, SH2DRC_STRICT_VERIFY);
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios();
 	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);

@@ -685,20 +685,14 @@ $(CPUOBJ)/hcd62121/hcd62121.o:  $(CPUSRC)/hcd62121/hcd62121.c \
 
 ifneq ($(filter SH2,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh2
-CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o $(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2fe.o $(DRCOBJ)
 DASMOBJS += $(CPUOBJ)/sh2/sh2dasm.o
 endif
 
 $(CPUOBJ)/sh2/sh2.o:    $(CPUSRC)/sh2/sh2.c \
 			$(CPUSRC)/sh2/sh2.h \
-			$(CPUSRC)/sh2/sh2comn.h
-
-$(CPUOBJ)/sh2/sh2comn.o:  $(CPUSRC)/sh2/sh2comn.c \
-			$(CPUSRC)/sh2/sh2comn.h \
-			$(CPUSRC)/sh2/sh2.h
-
-$(CPUOBJ)/sh2/sh2drc.o: $(CPUSRC)/sh2/sh2drc.c \
-			$(CPUSRC)/sh2/sh2.h \
+			$(CPUSRC)/sh2/sh2comn.c \
+			$(CPUSRC)/sh2/sh2drc.c \
 			$(CPUSRC)/sh2/sh2comn.h \
 			$(DRCDEPS)
 

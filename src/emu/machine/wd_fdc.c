@@ -38,7 +38,7 @@ const device_type WD1773x = &device_creator<wd1773_t>;
 #define TRACE_COMP 0
 
 // Shows command invocation
-#define TRACE_COMMAND 0
+#define TRACE_COMMAND 1
 
 // Shows sync actions
 #define TRACE_SYNC 0
@@ -223,7 +223,7 @@ void wd_fdc_t::command_end()
 
 void wd_fdc_t::seek_start(int state)
 {
-	if (TRACE_COMMAND) logerror("%s: seek %d\n", tag(), data);
+	if (TRACE_COMMAND) logerror("%s: seek %d (track=%d)\n", tag(), data, track);
 	main_state = state;
 	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
 	if(head_control) {
@@ -264,8 +264,10 @@ void wd_fdc_t::seek_continue()
 				delay_cycles(t_gen, step_times[command & 3]);
 			}
 
-			if(main_state == SEEK && track == data)
+			if(main_state == SEEK && track == data) {
+				logerror("track=%d data=%d\n", track, data);
 				sub_state = SEEK_DONE;
+			}
 
 			if(sub_state == SPINUP_DONE) {
 				counter = 0;
@@ -1184,10 +1186,9 @@ void wd_fdc_t::spinup()
 		counter = 0;
 	}
 
-	status |= S_MON;
+	status |= S_MON|S_SPIN;
 	if(floppy)
 		floppy->mon_w(0);
-
 }
 
 void wd_fdc_t::ready_callback(floppy_image_device *floppy, int state)
@@ -2669,7 +2670,7 @@ wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *own
 {
 	step_times = wd_digital_step_times;
 	delay_register_commit = 32;
-	delay_command_commit = 48;
+	delay_command_commit = 36; // official 48 is too high for oric jasmin boot
 	disable_mfm = false;
 	inverted_bus = false;
 	side_control = false;

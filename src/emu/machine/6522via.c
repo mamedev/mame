@@ -842,6 +842,11 @@ void via6522_device::write_pa(int line, int state)
 		m_in_a &= ~(1 << line);
 }
 
+WRITE8_MEMBER( via6522_device::write_pa )
+{
+	m_in_a = data;
+}
+
 /*-------------------------------------------------
     ca1_w - interface setting VIA port CA1 input
 -------------------------------------------------*/
@@ -900,6 +905,11 @@ void via6522_device::write_pb(int line, int state)
 		m_in_b |= (1 << line);
 	else
 		m_in_b &= ~(1 << line);
+}
+
+WRITE8_MEMBER( via6522_device::write_pb )
+{
+	m_in_b = data;
 }
 
 /*-------------------------------------------------

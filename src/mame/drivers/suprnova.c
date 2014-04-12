@@ -945,12 +945,12 @@ READ32_MEMBER(skns_state::sengekij_speedup_r)// 60006ee  600308e
 void skns_state::init_skns()
 {
 	// init DRC to fastest options
-	sh2drc_set_options(m_maincpu, SH2DRC_FASTEST_OPTIONS);
+	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 }
 
 void skns_state::set_drc_pcflush(UINT32 addr)
 {
-	sh2drc_add_pcflush(m_maincpu, addr);
+	m_maincpu->sh2drc_add_pcflush(addr);
 }
 
 DRIVER_INIT_MEMBER(skns_state,galpani4)   { machine().device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns();  }
