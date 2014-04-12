@@ -2083,25 +2083,6 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 	{
 		switch (entry->type())
 		{
-			// configurable UI mode switch
-			case IPT_UI_TOGGLE_UI:
-				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
-				if(!strcmp(uimode,"auto"))
-				{
-					#if defined(__APPLE__) && defined(__MACH__)
-					mameid_code = lookup_mame_code("ITEM_ID_INSERT");
-					#else
-					mameid_code = lookup_mame_code("ITEM_ID_SCRLOCK");
-					#endif
-				}
-				else
-				{
-					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
-					mameid_code = lookup_mame_code(fullmode);
-				}
-				ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
-				entry->defseq(SEQ_TYPE_STANDARD).set(ui_code);
-				break;
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
 				entry->configure_osd("TOGGLE_FULLSCREEN", "Toggle Fullscreen");
@@ -2182,7 +2163,23 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between apps)
 			case IPT_UI_CONFIGURE:
-				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
+				// configurable UI mode switch
+				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
+				if(!strcmp(uimode,"auto"))
+				{
+					#if defined(__APPLE__) && defined(__MACH__)
+					mameid_code = lookup_mame_code("ITEM_ID_INSERT");
+					#else
+					mameid_code = lookup_mame_code("ITEM_ID_SCRLOCK");
+					#endif
+				}
+				else
+				{
+					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
+					mameid_code = lookup_mame_code(fullmode);
+				}
+				ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT, input_seq::or_code, ui_code);
 				break;
 
 			// leave everything else alone

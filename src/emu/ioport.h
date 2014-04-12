@@ -72,7 +72,8 @@ enum crosshair_axis_t
 // groups for input ports
 enum ioport_group
 {
-	IPG_UI = 0,
+	IPG_UI_GENERAL = 0,
+	IPG_UI_SHORTCUT,
 	IPG_PLAYER1,
 	IPG_PLAYER2,
 	IPG_PLAYER3,
@@ -362,7 +363,7 @@ enum ioport_type
 		IPT_UI_NEXT_GROUP,
 		IPT_UI_ROTATE,
 		IPT_UI_SHOW_PROFILER,
-		IPT_UI_TOGGLE_UI,
+		IPT_UI_EXIT,
 		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
@@ -1391,6 +1392,8 @@ public:
 private:
 	// internal helpers
 	void init_port_types();
+	void adjust_ui_seqs_for_keyboard();
+	static bool is_modifier_item_id(input_item_id item_id);
 	void init_autoselect_devices(int type1, int type2, int type3, const char *option, const char *ananame);
 
 	void frame_update_callback();

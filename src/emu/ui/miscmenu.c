@@ -16,11 +16,11 @@
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
-#include "ui/filemngr.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
 #include <ctype.h>
+#include "ui/selgame.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 
@@ -72,42 +72,6 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    ui_menu_keyboard_mode - menu that
--------------------------------------------------*/
-
-ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_container *container) : ui_menu(machine, container)
-{
-}
-
-void ui_menu_keyboard_mode::populate()
-{
-	bool natural = machine().ui().use_natural_keyboard();
-	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
-}
-
-ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
-{
-}
-
-void ui_menu_keyboard_mode::handle()
-{
-	bool natural = machine().ui().use_natural_keyboard();
-
-	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
-
-	if (menu_event != NULL)
-	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-		{
-			machine().ui().set_use_natural_keyboard(natural ^ true);
-			reset(UI_MENU_RESET_REMEMBER_REF);
-		}
-	}
-}
-
 
 /*-------------------------------------------------
     ui_slot_get_current_option - returns
@@ -433,7 +397,8 @@ void ui_menu_input_groups::populate()
 	int player;
 
 	/* build up the menu */
-	item_append("User Interface", NULL, 0, (void *)(IPG_UI + 1));
+	item_append("User Interface", NULL, 0, (void *)(IPG_UI_GENERAL + 1));
+	item_append("Shortcuts", NULL, 0, (void *)(IPG_UI_SHORTCUT + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
 		char buffer[40];

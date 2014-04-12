@@ -80,6 +80,7 @@
 #include "crsshair.h"
 #include "validity.h"
 #include "unzip.h"
+#include "ui/selgame.h"
 #include "debug/debugcon.h"
 #include "debug/debugvw.h"
 

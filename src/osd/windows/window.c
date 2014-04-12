@@ -464,6 +464,18 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 
 
 //============================================================
+//  winwindow_can_take_snap
+//  (main thread)
+//============================================================
+
+bool winwindow_can_take_snap(void)
+{
+	return draw.window_record != NULL;
+}
+
+
+
+//============================================================
 //  winwindow_take_snap
 //  (main thread)
 //============================================================
@@ -487,6 +499,30 @@ void winwindow_take_snap(void)
 
 
 //============================================================
+//  winwindow_can_toggle_fsfx
+//  (main thread)
+//============================================================
+
+bool winwindow_can_toggle_fsfx(void)
+{
+	return draw.window_toggle_fsfx != NULL;
+}
+
+
+
+//============================================================
+//  winwindow_is_fsfx_enabled
+//  (main thread)
+//============================================================
+
+bool winwindow_is_fsfx_enabled(void)
+{
+	return draw.window_fsfx_enabled != NULL && draw.window_fsfx_enabled(win_window_list);
+}
+
+
+
+//============================================================
 //  winwindow_toggle_fsfx
 //  (main thread)
 //============================================================
@@ -505,6 +541,18 @@ void winwindow_toggle_fsfx(void)
 	{
 		(*draw.window_toggle_fsfx)(window);
 	}
+}
+
+
+
+//============================================================
+//  winwindow_can_take_video
+//  (main thread)
+//============================================================
+
+bool winwindow_can_take_video(void)
+{
+	return draw.window_record != NULL;
 }
 
 
@@ -1272,37 +1320,41 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 		// input events
 		case WM_MOUSEMOVE:
-			ui_input_push_mouse_move_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			if (!wininput_should_hide_mouse())
+				ui_input_push_mouse_move_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_MOUSELEAVE:
-			ui_input_push_mouse_leave_event(window->machine(), window->target);
+			if (!wininput_should_hide_mouse())
+				ui_input_push_mouse_leave_event(window->machine(), window->target);
 			break;
 
 		case WM_LBUTTONDOWN:
-		{
-			DWORD ticks = GetTickCount();
-			ui_input_push_mouse_down_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			if (!wininput_should_hide_mouse())
+			{
+				DWORD ticks = GetTickCount();
+				ui_input_push_mouse_down_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
-			// check for a double-click
-			if (ticks - window->lastclicktime < GetDoubleClickTime() &&
-				GET_X_LPARAM(lparam) >= window->lastclickx - 4 && GET_X_LPARAM(lparam) <= window->lastclickx + 4 &&
-				GET_Y_LPARAM(lparam) >= window->lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky + 4)
-			{
-				window->lastclicktime = 0;
-				ui_input_push_mouse_double_click_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-			}
-			else
-			{
-				window->lastclicktime = ticks;
-				window->lastclickx = GET_X_LPARAM(lparam);
-				window->lastclicky = GET_Y_LPARAM(lparam);
+				// check for a double-click
+				if (ticks - window->lastclicktime < GetDoubleClickTime() &&
+					GET_X_LPARAM(lparam) >= window->lastclickx - 4 && GET_X_LPARAM(lparam) <= window->lastclickx + 4 &&
+					GET_Y_LPARAM(lparam) >= window->lastclicky - 4 && GET_Y_LPARAM(lparam) <= window->lastclicky + 4)
+				{
+					window->lastclicktime = 0;
+					ui_input_push_mouse_double_click_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+				}
+				else
+				{
+					window->lastclicktime = ticks;
+					window->lastclickx = GET_X_LPARAM(lparam);
+					window->lastclicky = GET_Y_LPARAM(lparam);
+				}
 			}
 			break;
-		}
 
 		case WM_LBUTTONUP:
-			ui_input_push_mouse_up_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			if (!wininput_should_hide_mouse())
+				ui_input_push_mouse_up_event(window->machine(), window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 			break;
 
 		case WM_CHAR:

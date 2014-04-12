@@ -15,6 +15,7 @@
 #define __USRINTRF_H__
 
 #include "render.h"
+#include "emenubar.h"
 
 
 /***************************************************************************
@@ -22,7 +23,9 @@
 ***************************************************************************/
 
 /* preferred font height; use ui_get_line_height() to get actual height */
+#define UI_TARGET_FONT_COLUMNS	(25)
 #define UI_TARGET_FONT_ROWS     (25)
+#define UI_TARGET_FONT_WIDTH    (1.0f / (float)UI_TARGET_FONT_COLUMNS)
 #define UI_TARGET_FONT_HEIGHT   (1.0f / (float)UI_TARGET_FONT_ROWS)
 #define UI_MAX_FONT_HEIGHT      (1.0f / 15.0f)
 
@@ -83,6 +86,14 @@ enum
 	DRAW_OPAQUE
 };
 
+enum
+{
+	LOADSAVE_NONE,
+	LOADSAVE_LOAD,
+	LOADSAVE_SAVE
+};
+
+
 #define SLIDER_NOCHANGE     0x12345678
 
 
@@ -119,6 +130,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
+	bool menubar_visible() { return m_menubar && m_menubar->is_visible(); }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }
@@ -159,6 +171,10 @@ public:
 	void decrease_frameskip();
 	void request_quit();
 
+	// UI handlers
+	static UINT32 ui_handler_load_save(running_machine &machine, render_container *container, UINT32 state);
+	UINT32 handler_ingame_method(render_container *container, UINT32 state);
+
 	// print the game info string into a buffer
 	astring &game_info_astring(astring &string);
 
@@ -183,6 +199,7 @@ private:
 	UINT8 *                 m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
+	ui_menubar *			m_menubar;
 
 	// text generators
 	astring &disclaimer_string(astring &buffer);
@@ -193,7 +210,6 @@ private:
 	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
-	static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
 	static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
 
 	// private methods

@@ -173,47 +173,10 @@ void ui_menu_control_device_image::handle()
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}
-
-	case START_SOFTLIST:
-		sld = 0;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software(machine(), container, image->image_interface(), &sld)));
-		state = SELECT_SOFTLIST;
-		break;
-
-	case START_OTHER_PART: {
-		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, swp->interface(), &swp, true, &submenu_result)));
-		state = SELECT_OTHER_PART;
-		break;
-	}
-
-	case SELECT_SOFTLIST:
-		if(!sld) {
-			ui_menu::stack_pop(machine());
-			break;
-		}
-		software_info_name = "";
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, sld, image->image_interface(), software_info_name)));
-		state = SELECT_PARTLIST;
-		break;
-
-	case SELECT_PARTLIST:
-		swi = sld->find(software_info_name);
-		if(swi->has_multiple_parts(image->image_interface())) {
-			submenu_result = -1;
-			swp = 0;
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_parts(machine(), container, swi, image->image_interface(), &swp, false, &submenu_result)));
-			state = SELECT_ONE_PART;
-		} else {
-			swp = swi->first_part();
-			load_software_part();
-			ui_menu::stack_pop(machine());
-		}
-		break;
 
 	case SELECT_ONE_PART:
 		switch(submenu_result) {
@@ -263,11 +226,6 @@ void ui_menu_control_device_image::handle()
 		case ui_menu_file_selector::R_CREATE:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_create(machine(), container, image, current_directory, current_file)));
 			state = CREATE_FILE;
-			break;
-
-		case ui_menu_file_selector::R_SOFTLIST:
-			state = START_SOFTLIST;
-			handle();
 			break;
 
 		case -1: // return to system

@@ -61,8 +61,6 @@ static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(windows_options &options, int index);
 
-static void check_osd_inputs(running_machine &machine);
-
 static void extract_video_config(running_machine &machine);
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, win_window_config *config, int report_error);
@@ -190,7 +188,6 @@ void windows_osd_interface::update(bool skip_redraw)
 	// poll the joystick values here
 	winwindow_process_events(machine(), TRUE, FALSE);
 	wininput_poll(machine());
-	check_osd_inputs(machine());
 }
 
 
@@ -320,31 +317,6 @@ finishit:
 	if (aspect != 0)
 		monitor->aspect = aspect;
 	return monitor;
-}
-
-
-
-//============================================================
-//  check_osd_inputs
-//============================================================
-
-static void check_osd_inputs(running_machine &machine)
-{
-	// check for toggling fullscreen mode
-	if (ui_input_pressed(machine, IPT_OSD_1))
-		winwindow_toggle_full_screen();
-
-	// check for taking fullscreen snap
-	if (ui_input_pressed(machine, IPT_OSD_2))
-		winwindow_take_snap();
-
-	// check for taking fullscreen video
-	if (ui_input_pressed(machine, IPT_OSD_3))
-		winwindow_take_video();
-
-	// check for taking fullscreen video
-	if (ui_input_pressed(machine, IPT_OSD_4))
-		winwindow_toggle_fsfx();
 }
 
 

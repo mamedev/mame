@@ -169,6 +169,15 @@ void osd_interface::customize_input_type_list(simple_list<input_type_entry> &typ
 }
 
 
+//============================================================
+//  customize_menubar
+//============================================================
+
+void osd_interface::customize_menubar(ui_menubar &menu_bar)
+{
+}
+
+
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name

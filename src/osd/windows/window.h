@@ -92,6 +92,7 @@ struct win_draw_callbacks
 	void (*window_save)(win_window_info *window);
 	void (*window_record)(win_window_info *window);
 	void (*window_toggle_fsfx)(win_window_info *window);
+	bool (*window_fsfx_enabled)(win_window_info *window);
 	void (*window_destroy)(win_window_info *window);
 };
 
@@ -125,8 +126,14 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
 void winwindow_toggle_full_screen(void);
+
+// HLSL
+bool winwindow_can_take_snap(void);
 void winwindow_take_snap(void);
+bool winwindow_can_take_video(void);
 void winwindow_take_video(void);
+bool winwindow_can_toggle_fsfx(void);
+bool winwindow_is_fsfx_enabled(void);
 void winwindow_toggle_fsfx(void);
 
 void winwindow_process_events_periodic(running_machine &machine);

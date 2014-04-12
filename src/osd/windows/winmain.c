@@ -965,6 +965,46 @@ bool windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, b
 }
 
 
+//-------------------------------------------------
+//  toggle_full_screen
+//-------------------------------------------------
+
+void windows_osd_interface::toggle_full_screen()
+{
+	winwindow_toggle_full_screen();
+}
+
+
+//-------------------------------------------------
+//  take_snap
+//-------------------------------------------------
+
+void windows_osd_interface::take_snap()
+{
+	winwindow_take_snap();
+}
+
+
+//-------------------------------------------------
+//  take_video
+//-------------------------------------------------
+
+void windows_osd_interface::take_video()
+{
+	winwindow_take_video();
+}
+
+
+//-------------------------------------------------
+//  toggle_fsfx
+//-------------------------------------------------
+
+void windows_osd_interface::toggle_fsfx()
+{
+	winwindow_toggle_fsfx();
+}
+
+
 //============================================================
 //  winmain_dump_stack
 //============================================================

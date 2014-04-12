@@ -68,18 +68,5 @@ private:
 };
 
 
-// ======================> ui_menu_software
-
-class ui_menu_software : public ui_menu {
-public:
-	ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result);
-	virtual ~ui_menu_software();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	const char *                    m_interface;
-	software_list_device **         m_result;
-};
 
 #endif  /* __UI_SWLIST_H__ */
