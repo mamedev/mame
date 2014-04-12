@@ -238,7 +238,7 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054338, "Konami 054338", tag, owner, clock, "k054338", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
-	m_k055555_tag("")
+	m_k055555_tag(NULL)
 	//m_regs[32],
 	//m_shd_rgb[9],
 {
@@ -250,7 +250,7 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 
 void k054338_device::device_start()
 {
-	m_k055555 = machine().device<k055555_device>(m_k055555_tag);
+	m_k055555 = m_k055555_tag ? machine().device<k055555_device>(m_k055555_tag) : NULL;
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_shd_rgb));
