@@ -103,8 +103,8 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
 	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY);
 	}
-	//else
-	//	archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
+	else
+		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
 }
 
 WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
@@ -114,8 +114,8 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
 	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 	}
-	//else
-	//	archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
+	else
+		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
 READ32_MEMBER(a310_state::a310_psy_wram_r)

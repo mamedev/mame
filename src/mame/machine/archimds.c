@@ -801,7 +801,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								m_fdc->dden_w(!(BIT(data, 1)));
+								m_fdc->dden_w(BIT(data, 1));
 								return;
 
 							case 0x40: // latch A
@@ -1006,23 +1006,23 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 			case 0: /* video init */
 				m_cursor_enabled = false;
 				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
-				printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
+				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
 
 			case 1: /* video start */
 				m_vidc_vidstart = 0x2000000 | (((data>>2)&0x7fff)*16);
-				printf("MEMC: VIDSTART %08x\n",m_vidc_vidstart);
+				//printf("MEMC: VIDSTART %08x\n",m_vidc_vidstart);
 				break;
 
 			case 2: /* video end */
 				m_vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
-				printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
+				//printf("MEMC: VIDEND %08x\n",m_vidc_vidend);
 				break;
 
 			case 3: /* cursor init */
 				//m_cursor_enabled = true;
 				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
-				printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
+				//printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
 				break;
 
 			case 4: /* sound start */
