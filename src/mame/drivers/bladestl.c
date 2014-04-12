@@ -53,7 +53,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
 
 READ8_MEMBER(bladestl_state::trackball_r)
 {
-	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
+	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P2_2" };
 	int curr, delta;
 
 	curr = ioport(port[offset])->read();
