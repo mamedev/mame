@@ -196,6 +196,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(copro_tgp_fifoin_pop_ok);
 	DECLARE_READ32_MEMBER(copro_tgp_fifoin_pop);
 	DECLARE_WRITE32_MEMBER(copro_tgp_fifoout_push);
+	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
+	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
 };
 
 /*----------- defined in video/model2.c -----------*/
