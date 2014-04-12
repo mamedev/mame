@@ -46,15 +46,15 @@ class pinkiri8_state : public driver_device
 public:
 	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_janshi_back_vram(*this, "back_vram"),
-		m_janshi_vram1(*this, "vram1"),
-		m_janshi_unk1(*this, "unk1"),
-		m_janshi_widthflags(*this, "widthflags"),
-		m_janshi_unk2(*this, "unk2"),
-		m_janshi_vram2(*this, "vram2"),
-		m_janshi_paletteram(*this, "paletteram"),
-		m_janshi_paletteram2(*this, "paletteram2"),
-		m_janshi_crtc_regs(*this, "crtc_regs"),
+		m_janshi_back_vram(*this, "janshivdp:back_vram"),
+		m_janshi_vram1(*this, "janshivdp:vram1"),
+		m_janshi_unk1(*this, "janshivdp:unk1"),
+		m_janshi_widthflags(*this, "janshivdp:widthflags"),
+		m_janshi_unk2(*this, "janshivdp:unk2"),
+		m_janshi_vram2(*this, "janshivdp:vram2"),
+		m_janshi_paletteram(*this, "janshivdp:paletteram"),
+		m_janshi_paletteram2(*this, "janshivdp:paletteram2"),
+		m_janshi_crtc_regs(*this, "janshivdp:crtc_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
@@ -102,6 +102,7 @@ class janshi_vdp_device : public device_t,
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	DECLARE_ADDRESS_MAP(map, 8);
 protected:
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const;
@@ -112,8 +113,7 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, janshi_vdp_device )
-
+DEVICE_ADDRESS_MAP_START( map, 8, janshi_vdp_device )
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("back_vram") // bg tilemap?
 	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("vram1") // xpos, colour, tile number etc.
 
@@ -134,7 +134,7 @@ const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
-		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
+		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
 {
 }
 
