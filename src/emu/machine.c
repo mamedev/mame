@@ -299,9 +299,6 @@ void running_machine::start()
 
 	// initialize lua
 	m_lua_engine.initialize();
-
-	// disallow save state registrations starting here
-	m_save.allow_registration(false);
 }
 
 
@@ -351,6 +348,12 @@ int running_machine::run(bool firstrun)
 
 		// load the configuration settings and NVRAM
 		bool settingsloaded = config_load_settings(*this);
+
+		// disallow save state registrations starting here.
+		// Don't do it earlier, config load can create network
+		// devices with timers.
+		m_save.allow_registration(false);
+
 		nvram_load();
 		sound().ui_mute(false);
 
