@@ -969,13 +969,18 @@ READ32_MEMBER(model2_state::daytona_unk_r)
 	return 0x00400000;
 }
 
+#if 0
 READ32_MEMBER(model2_state::desert_unk_r)
 {
+	static UINT8 test;
+
+	test ^= 8;
 	// vcop needs bit 3 clear (infinite loop otherwise)
 	// desert needs other bits set (not sure which specifically)
 	// daytona needs the MSW to return ff
-	return 0x00ff00f7;
+	return 0x00f700ff | (test << 16);
 }
+#endif
 
 READ32_MEMBER(model2_state::model2_irq_r)
 {
@@ -1000,6 +1005,14 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 	}
 
 	m_intreq &= data;
+	UINT32 irq_ack = data ^ 0xffffffff;
+
+	if(irq_ack & 1<<0)
+		m_maincpu->set_input_line(I960_IRQ0, CLEAR_LINE);
+
+	if(irq_ack & 1<<10)
+		m_maincpu->set_input_line(I960_IRQ3, CLEAR_LINE);
+
 }
 
 READ32_MEMBER(model2_state::model2_serial_r)
@@ -1415,7 +1428,7 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ(desert_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c")
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ(daytona_unk_r )
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2o_serial_w )
@@ -1584,6 +1597,62 @@ static INPUT_PORTS_START( desert )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("1c0001c")
+	PORT_BIT( 0xfff7ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) // VR 1 (Blue)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) // VR 2 (Green)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) // VR 3 (Red)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // shift
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)  // machine gun
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)  // cannon
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	MODEL2_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("ACCEL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vcop )
+	PORT_START("1c00000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "STEER")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "ACCEL")
+
+	PORT_START("1c00004")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "BRAKE")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("1c00010")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN0")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+
+	PORT_START("1c00014")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("1c0001c")
+	PORT_BIT( 0xfff7ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1630,6 +1699,11 @@ static INPUT_PORTS_START( daytona )
 	PORT_START("1c00014")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("1c0001c")
+	PORT_BIT( 0xfff7ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
 
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1784,14 +1858,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 0) // 384
+	if(scanline == 384) // 384
 	{
 		m_intreq |= (1<<10);
 		if (m_intena & (1<<10))
 			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 	}
 
-	if(scanline == 384/2)
+	if(scanline == 0)
 	{
 		m_intreq |= (1<<0);
 		if (m_intena & (1<<0))
@@ -1962,10 +2036,7 @@ static MACHINE_CONFIG_START( model2o, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(62*8, 48*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -5483,8 +5554,8 @@ GAME( 1993, daytonat,  daytona, model2o, daytona, driver_device, 0,       ROT0, 
 GAME( 1993, daytonata, daytona, model2o, daytona, driver_device, 0,       ROT0, "Sega",   "Daytona USA (Japan, Turbo hack, set 2)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, daytonam,  daytona, model2o, daytona, model2_state,  daytonam,ROT0, "Sega",   "Daytona USA (Japan, To The MAXX)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, desert,          0, model2o, desert,  driver_device, 0,       ROT0, "Sega / Martin Marietta", "Desert Tank", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, vcop,            0, model2o, daytona, driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, vcopa,           0, model2o, daytona, driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, vcop,            0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, vcopa,           0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1995, manxtt, 0, manxttdx,model2, driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
