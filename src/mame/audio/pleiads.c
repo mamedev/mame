@@ -22,7 +22,7 @@
 const device_type PLEIADS = &device_creator<pleiads_sound_device>;
 
 pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PLEIADS, "Pleiads Custom", tag, owner, clock, "pleiads_sound", __FILE__),
+	: device_t(mconfig, PLEIADS, "Pleiads Audio Custom", tag, owner, clock, "pleiads_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
@@ -121,7 +121,7 @@ void pleiads_sound_device::device_start()
 const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
 
 naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
+	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Audio Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
 {
 }
 
@@ -199,7 +199,7 @@ void naughtyb_sound_device::device_start()
 const device_type POPFLAME = &device_creator<popflame_sound_device>;
 
 popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Custom", tag, owner, clock, "popflame_sound", __FILE__)
+	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Audio Custom", tag, owner, clock, "popflame_sound", __FILE__)
 {
 }
 

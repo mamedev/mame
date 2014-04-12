@@ -152,7 +152,7 @@ ADDRESS_MAP_END
 
 
 sega315_5124_device::sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t( mconfig, SEGA315_5124, "Sega 315-5124", tag, owner, clock, "sega315_5124", __FILE__)
+	: device_t( mconfig, SEGA315_5124, "Sega 315-5124 VDP", tag, owner, clock, "sega315_5124", __FILE__)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_cram_size( SEGA315_5124_CRAM_SIZE )
@@ -184,7 +184,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 
 
 sega315_5246_device::sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
+	: sega315_5124_device( mconfig, SEGA315_5246, "Sega 315-5246 VDP", tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0, true, "sega315_5246", __FILE__)
 {
 }
 

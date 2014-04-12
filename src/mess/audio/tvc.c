@@ -17,7 +17,7 @@ const device_type TVC_SOUND = &device_creator<tvc_sound_device>;
 //-------------------------------------------------
 
 tvc_sound_device::tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, TVC_SOUND, "TVC 64 Custom Sound", tag, owner, clock, "tvc_sound", __FILE__),
+	device_t(mconfig, TVC_SOUND, "TVC 64 Audio Custom", tag, owner, clock, "tvc_sound", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_write_sndint(*this)
 {

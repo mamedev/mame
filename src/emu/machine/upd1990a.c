@@ -66,7 +66,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag,
 }
 
 upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: upd1990a_device(mconfig, UPD4990A, "uPD4990A", tag, owner, clock, TYPE_4990A, "upd4990a", __FILE__) { }
+	: upd1990a_device(mconfig, UPD4990A, "uPD4990A RTC", tag, owner, clock, TYPE_4990A, "upd4990a", __FILE__) { }
 
 
 bool upd1990a_device::is_serial_mode()

@@ -47,6 +47,7 @@ public:
 	UINT8 b() const { return m_data >> 0; }
 	rgb15_t as_rgb15() const { return ((r() >> 3) << 10) | ((g() >> 3) << 5) | ((b() >> 3) << 0); }
 	UINT8 brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }
+	UINT32 const *ptr() const { return &m_data; }
 
 	// setters
 	rgb_t &set_a(UINT8 a) { m_data &= ~0xff000000; m_data |= a << 24; return *this; }

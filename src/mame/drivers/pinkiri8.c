@@ -132,7 +132,7 @@ ADDRESS_MAP_END
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock, "janshi_vdp", __FILE__),
+	: device_t(mconfig, JANSHIVDP, "Janshi VDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, address_map_delegate(FUNC(janshi_vdp_device::map), this))
 {

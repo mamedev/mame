@@ -31,7 +31,7 @@ TODO:
 const device_type MJKJIDAI = &device_creator<mjkjidai_adpcm_device>;
 
 mjkjidai_adpcm_device::mjkjidai_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MJKJIDAI, "Custom ADPCM", tag, owner, clock, "mjkjidai_adpcm", __FILE__),
+	: device_t(mconfig, MJKJIDAI, "Mahjong Kyou Jidai ADPCM Custom", tag, owner, clock, "mjkjidai_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_current(0),

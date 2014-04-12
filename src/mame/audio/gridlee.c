@@ -23,7 +23,7 @@ const device_type GRIDLEE = &device_creator<gridlee_sound_device>;
 //-------------------------------------------------
 
 gridlee_sound_device::gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GRIDLEE, "Gridlee Custom", tag, owner, clock, "gridlee_sound", __FILE__),
+	: device_t(mconfig, GRIDLEE, "Gridlee Audio Custom", tag, owner, clock, "gridlee_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_tone_step(0),
 		m_tone_fraction(0),

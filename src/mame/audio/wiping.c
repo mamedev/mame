@@ -15,7 +15,7 @@ static const int defgain = 48;
 const device_type WIPING = &device_creator<wiping_sound_device>;
 
 wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WIPING, "Wiping Custom", tag, owner, clock, "wiping_sound", __FILE__),
+	: device_t(mconfig, WIPING, "Wiping Audio Custom", tag, owner, clock, "wiping_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 	m_last_channel(NULL),
 	m_sound_prom(NULL),

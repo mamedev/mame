@@ -184,7 +184,7 @@ cirrus_vga_device::cirrus_vga_device(const machine_config &mconfig, const char *
 }
 
 ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IBM8514A, "IBM8514A", tag, owner, clock, "ibm8514a", __FILE__)
+	: device_t(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
 {
 }
 

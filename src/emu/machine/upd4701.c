@@ -17,7 +17,7 @@
 const device_type UPD4701 = &device_creator<upd4701_device>;
 
 upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD4701, "NEC uPD4701 Encoder", tag, owner, clock, "upd4701", __FILE__)
+	: device_t(mconfig, UPD4701, "uPD4701 Encoder", tag, owner, clock, "upd4701", __FILE__)
 {
 }
 

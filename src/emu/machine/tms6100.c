@@ -89,7 +89,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, d
 const device_type M58819 = &device_creator<m58819_device>;
 
 m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms6100_device(mconfig, M58819, "M58819", tag, owner, clock, "m58819", __FILE__)
+	: tms6100_device(mconfig, M58819, "M58819 Memory Controller", tag, owner, clock, "m58819", __FILE__)
 {
 }
 

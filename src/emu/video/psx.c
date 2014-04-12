@@ -52,17 +52,17 @@ void psxgpu_device::device_reset( void )
 }
 
 cxd8514q_device::cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxgpu_device(mconfig, CXD8514Q, "CXD8514Q", tag, owner, clock, "cxd8514q", __FILE__)
+	: psxgpu_device(mconfig, CXD8514Q, "CXD8514Q GPU", tag, owner, clock, "cxd8514q", __FILE__)
 {
 }
 
 cxd8538q_device::cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxgpu_device(mconfig, CXD8538Q, "CXD8538Q", tag, owner, clock, "cxd8538q", __FILE__)
+	: psxgpu_device(mconfig, CXD8538Q, "CXD8538Q GPU", tag, owner, clock, "cxd8538q", __FILE__)
 {
 }
 
 cxd8561q_device::cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxgpu_device(mconfig, CXD8561Q, "CXD8561Q", tag, owner, clock, "cxd8561q", __FILE__)
+	: psxgpu_device(mconfig, CXD8561Q, "CXD8561Q GPU", tag, owner, clock, "cxd8561q", __FILE__)
 {
 }
 
@@ -72,12 +72,12 @@ cxd8561bq_device::cxd8561bq_device(const machine_config &mconfig, const char *ta
 }
 
 cxd8561cq_device::cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ", tag, owner, clock, "cxd8561cq", __FILE__)
+	: psxgpu_device(mconfig, CXD8561CQ, "CXD8561CQ GPU", tag, owner, clock, "cxd8561cq", __FILE__)
 {
 }
 
 cxd8654q_device::cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: psxgpu_device(mconfig, CXD8654Q, "CXD8654Q", tag, owner, clock, "cxd8654q", __FILE__)
+	: psxgpu_device(mconfig, CXD8654Q, "CXD8654Q GPU", tag, owner, clock, "cxd8654q", __FILE__)
 {
 }
 

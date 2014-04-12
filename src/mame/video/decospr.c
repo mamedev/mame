@@ -146,7 +146,7 @@ void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock, "decospr", __FILE__),
+	: device_t(mconfig, DECO_SPRITE, "DECO 52 Sprite", tag, owner, clock, "decospr", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_is_bootleg(false),

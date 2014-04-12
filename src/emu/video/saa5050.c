@@ -184,7 +184,7 @@ saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, 
 }
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SAA5050, "SAA5050 video", tag, owner, clock, "saa5050", __FILE__),
+	device_t(mconfig, SAA5050, "SAA5050 Video", tag, owner, clock, "saa5050", __FILE__),
 	m_char_rom(*this, "chargen"),
 	m_read_d(*this),
 	m_frame_count(0),

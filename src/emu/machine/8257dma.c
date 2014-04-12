@@ -59,7 +59,7 @@ const device_type I8257 = &device_creator<i8257_device>;
 //-------------------------------------------------
 
 i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8257, "DMA8257", tag, owner, clock, "i8257", __FILE__),
+	: device_t(mconfig, I8257, "8257 DMA", tag, owner, clock, "i8257", __FILE__),
 		m_out_hrq_cb(*this),
 		m_out_tc_cb(*this),
 		m_out_mark_cb(*this),

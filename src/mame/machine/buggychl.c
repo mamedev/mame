@@ -6,7 +6,7 @@
 const device_type BUGGYCHL_MCU = &device_creator<buggychl_mcu_device>;
 
 buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BUGGYCHL_MCU, "BuggyChl MCU", tag, owner, clock, "buggychl_mcu", __FILE__),
+	: device_t(mconfig, BUGGYCHL_MCU, "Buggy Challenge MCU Simulation", tag, owner, clock, "buggychl_mcu", __FILE__),
 	m_port_a_in(0),
 	m_port_a_out(0),
 	m_ddr_a(0),

@@ -31,7 +31,7 @@
 const device_type MAC_SOUND = &device_creator<mac_sound_device>;
 
 mac_sound_device::mac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, MAC_SOUND, "Mac Custom", tag, owner, clock, "mac_sound", __FILE__),
+					: device_t(mconfig, MAC_SOUND, "Mac Audio Custom", tag, owner, clock, "mac_sound", __FILE__),
 						device_sound_interface(mconfig, *this),
 						m_sample_enable(0),
 						m_mac_snd_buf_ptr(NULL),
