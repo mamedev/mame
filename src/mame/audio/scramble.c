@@ -325,20 +325,6 @@ static const tmsprom_interface prom_intf =
 	DEVCB_DEVICE_MEMBER("tms", tms5110_device, ctl_w)      /* tms ctl func */
 };
 
-static const tms5110_interface ad2083_tms5110_interface =
-{
-	/* legacy interface */
-	NULL,                                           /* function to be called when chip requests another bit */
-	NULL,                                           /* speech ROM load address callback */
-	/* new rom controller interface */
-	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, m0_w),     /* the M0 line */
-	DEVCB_NULL,                                     /* the M1 line */
-	DEVCB_NULL,                                     /* Write to ADD1,2,4,8 - 4 address bits */
-	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, data_r),   /* Read one bit from ADD8/Data - voice data */
-	DEVCB_NULL                                      /* rom clock - Only used to drive the data lines */
-};
-
-
 
 MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 
@@ -359,6 +345,7 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
-	MCFG_SOUND_CONFIG(ad2083_tms5110_interface)
+	MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
+	MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

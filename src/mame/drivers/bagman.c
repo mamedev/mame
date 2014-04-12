@@ -448,19 +448,6 @@ static const tmsprom_interface prom_intf =
 	DEVCB_DEVICE_MEMBER("tms", tms5110_device, ctl_w)      /* tms ctl func */
 };
 
-static const tms5110_interface bagman_tms5110_interface =
-{
-	/* legacy interface */
-	NULL,                                           /* function to be called when chip requests another bit */
-	NULL,                                           /* speech ROM load address callback */
-	/* new rom controller interface */
-	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, m0_w),     /* the M0 line */
-	DEVCB_NULL,                                     /* the M1 line */
-	DEVCB_NULL,                                     /* Write to ADD1,2,4,8 - 4 address bits */
-	DEVCB_DEVICE_LINE_MEMBER("tmsprom", tmsprom_device, data_r),   /* Read one bit from ADD8/Data - voice data */
-	DEVCB_NULL                                      /* rom clock - Only used to drive the data lines */
-};
-
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 {
 	if(m_irq_mask)
@@ -501,7 +488,8 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("tms", TMS5110A, 640000)
-	MCFG_SOUND_CONFIG(bagman_tms5110_interface)
+	MCFG_TMS5110_M0_CB(DEVWRITELINE("tmsprom", tmsprom_device, m0_w))
+	MCFG_TMS5110_DATA_CB(DEVREADLINE("tmsprom", tmsprom_device, data_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -265,17 +265,17 @@ static const int tune4[13*6] = {
 static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 
 #define DECAY(voice)                                            \
-	if( m_vol[voice] > VMIN )                                   \
+	if( m_vol[voice] > TMS36XX_VMIN )                                   \
 	{                                                           \
 		/* decay of first voice */                              \
 		m_vol_counter[voice] -= m_decay[voice];                 \
 		while( m_vol_counter[voice] <= 0 )                      \
 		{                                                       \
 			m_vol_counter[voice] += samplerate;                 \
-			if( m_vol[voice]-- <= VMIN )                        \
+			if( m_vol[voice]-- <= TMS36XX_VMIN )                        \
 			{                                                   \
 				m_frequency[voice] = 0;                         \
-				m_vol[voice] = VMIN;                            \
+				m_vol[voice] = TMS36XX_VMIN;                            \
 				break;                                          \
 			}                                                   \
 		}                                                       \
@@ -287,7 +287,7 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 		m_frequency[m_shift+voice] =                            \
 			tunes[m_tune_num][m_tune_ofs*6+voice] *             \
 			(m_basefreq << m_octave) / FSCALE;                  \
-		m_vol[m_shift+voice] = VMAX;                            \
+		m_vol[m_shift+voice] = TMS36XX_VMAX;                            \
 	}
 
 #define TONE(voice)                                             \
@@ -361,7 +361,7 @@ void tms36xx_device::device_start()
 	{
 		if (m_decay_time[j] > 0)
 		{
-			m_decay[j+0] = m_decay[j+6] = VMAX / m_decay_time[j];
+			m_decay[j+0] = m_decay[j+6] = TMS36XX_VMAX / m_decay_time[j];
 			enable |= 0x41 << j;
 		}
 	}
@@ -410,7 +410,7 @@ void tms36xx_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			if( (m_note_counter -= n) <= 0 )
 			{
-				m_note_counter += VMAX;
+				m_note_counter += TMS36XX_VMAX;
 				if (m_tune_ofs < m_tune_max)
 				{
 					/* shift to the other 'bank' of voices */

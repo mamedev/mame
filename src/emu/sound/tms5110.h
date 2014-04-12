@@ -23,29 +23,34 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-struct tms5110_interface
-{
-	/* legacy interface */
-	int (*M0_callback)(device_t *device);   /* function to be called when chip requests another bit */
-	void (*load_address)(device_t *device, int addr);   /* speech ROM load address callback */
-	/* new rom controller interface */
-	devcb_write_line m0_func;       /* the M0 line */
-	devcb_write_line m1_func;       /* the M1 line */
-	devcb_write8 addr_func;         /* Write to ADD1,2,4,8 - 4 address bits */
-	devcb_read_line data_func;      /* Read one bit from ADD8/Data - voice data */
-	/* on a real chip rom_clk is running all the time
-	 * Here, we only use it to properly emulate the protocol.
-	 * Do not rely on it to be a timed signal.
-	 */
-	devcb_write_line romclk_func;   /* rom clock - Only used to drive the data lines */
-};
+#define MCFG_TMS5110_M0_CB(_devcb) \
+	devcb = &tms5110_device::set_m0_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TMS5110_M1_CB(_devcb) \
+	devcb = &tms5110_device::set_m1_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TMS5110_ADDR_CB(_devcb) \
+	devcb = &tms5110_device::set_addr_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TMS5110_DATA_CB(_devcb) \
+	devcb = &tms5110_device::set_data_callback(*device, DEVCB2_##_devcb);
+
+#define MCFG_TMS5110_ROMCLK_CB(_devcb) \
+	devcb = &tms5110_device::set_romclk_callback(*device, DEVCB2_##_devcb);
+
 
 class tms5110_device : public device_t,
-									public device_sound_interface
+						public device_sound_interface
 {
 public:
 	tms5110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	tms5110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	template<class _Object> static devcb2_base &set_m0_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m0_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_m1_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_m1_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_addr_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_addr_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(object); }
+	template<class _Object> static devcb2_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( ctl_w );
 	DECLARE_READ8_MEMBER( ctl_r );
@@ -65,7 +70,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -75,6 +79,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	void set_variant(int variant);
+
+	UINT8 m_talk_status; 
+	sound_stream *m_stream; 
 
 private:
 	void new_int_write(UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr);
@@ -99,7 +106,8 @@ private:
 	UINT8 m_PDC;
 	UINT8 m_CTL_pins;
 	UINT8 m_speaking_now;
-protected:  UINT8 m_talk_status; private:
+
+	
 	UINT8 m_state;
 
 	/* Rom interface */
@@ -108,16 +116,15 @@ protected:  UINT8 m_talk_status; private:
 	UINT8  m_schedule_dummy_read;
 	UINT8  m_addr_bit;
 
-	/* external callback */
-	int (*m_M0_callback)(device_t *);
-	void (*m_set_load_address)(device_t *, int);
-
 	/* callbacks */
-	devcb_resolved_write_line m_m0_func;      /* the M0 line */
-	devcb_resolved_write_line m_m1_func;      /* the M1 line */
-	devcb_resolved_write8 m_addr_func;        /* Write to ADD1,2,4,8 - 4 address bits */
-	devcb_resolved_read_line m_data_func;     /* Read one bit from ADD8/Data - voice data */
-	devcb_resolved_write_line m_romclk_func;  /* rom clock - Only used to drive the data lines */
+	devcb2_write_line   m_m0_cb;      // the M0 line
+	devcb2_write_line   m_m1_cb;      // the M1 line
+	devcb2_write8       m_addr_cb;    // Write to ADD1,2,4,8 - 4 address bits
+	devcb2_read_line    m_data_cb;    // Read one bit from ADD8/Data - voice data
+	// On a real chip rom_clk is running all the time
+	// Here, we only use it to properly emulate the protocol.
+	// Do not rely on it to be a timed signal.
+	devcb2_write_line   m_romclk_cb;  // rom clock - Only used to drive the data lines
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 m_old_energy;
@@ -157,9 +164,7 @@ protected:  UINT8 m_talk_status; private:
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
 
-protected: sound_stream *m_stream; private:
 	emu_timer *m_romclk_hack_timer;
-	const tms5110_interface *m_intf;
 	const UINT8 *m_table;
 };
 

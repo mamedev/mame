@@ -406,29 +406,20 @@ WRITE8_MEMBER(cvs_state::cvs_tms5110_pdc_w)
 }
 
 
-static int speech_rom_read_bit( device_t *device )
+READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
 {
-	cvs_state *state = device->machine().driver_data<cvs_state>();
-	UINT8 *ROM = state->memregion("speechdata")->base();
 	int bit;
+	UINT8 *ROM = memregion("speechdata")->base();
 
 	/* before reading the bit, clamp the address to the region length */
-	state->m_speech_rom_bit_address = state->m_speech_rom_bit_address & ((state->memregion("speechdata")->bytes() * 8) - 1);
-	bit = (ROM[state->m_speech_rom_bit_address >> 3] >> (state->m_speech_rom_bit_address & 0x07)) & 0x01;
+	m_speech_rom_bit_address &= ((memregion("speechdata")->bytes() * 8) - 1);
+	bit = BIT(ROM[m_speech_rom_bit_address >> 3], m_speech_rom_bit_address & 0x07);
 
 	/* prepare for next bit */
-	state->m_speech_rom_bit_address = state->m_speech_rom_bit_address + 1;
+	m_speech_rom_bit_address++;
 
 	return bit;
 }
-
-
-static const tms5110_interface tms5100_interface =
-{
-	speech_rom_read_bit, /* M0 callback function. Called whenever chip requests a single bit of data */
-	NULL
-};
-
 
 
 /*************************************
@@ -1061,7 +1052,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
-	MCFG_SOUND_CONFIG(tms5100_interface)
+	MCFG_TMS5110_DATA_CB(READLINE(cvs_state, speech_rom_read_bit))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
