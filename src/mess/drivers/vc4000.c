@@ -676,7 +676,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 
 
 /*   YEAR  NAME      PARENT     COMPAT    MACHINE    INPUT        INIT      COMPANY             FULLNAME */
-CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "VC 4000",          GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
+CONS(1978, vc4000,   0,         0,        vc4000,    vc4000, driver_device,      0,        "Interton",         "Intertion Electronic VC 4000", GAME_IMPERFECT_GRAPHICS )          /* Germany, Austria, UK, Australia */
 CONS(1979, spc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Grundig",          "Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )  /* Germany, Austria */
 CONS(1979, cx3000tc, vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Palson",           "CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )     /* Spain */
 CONS(1979, tvc4000,  vc4000,    0,        vc4000,    vc4000, driver_device,      0,        "Koerting",         "TVC-4000",         GAME_IMPERFECT_GRAPHICS )          /* Argentina */

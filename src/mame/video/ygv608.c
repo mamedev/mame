@@ -50,7 +50,7 @@
 const device_type YGV608 = &device_creator<ygv608_device>;
 
 ygv608_device::ygv608_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
-	: device_t(mconfig, YGV608, "YGV608", tag, owner, clock, "ygv608", __FILE__),
+	: device_t(mconfig, YGV608, "YGV608 VDP", tag, owner, clock, "ygv608", __FILE__),
 	m_gfxdecode(*this),
 	m_palette(*this)
 {

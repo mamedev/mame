@@ -22,7 +22,7 @@ Memo:
 const device_type NB1413M3 = &device_creator<nb1413m3_device>;
 
 nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NB1413M3, "Nichibutsu NB1413M3", tag, owner, clock, "nb1413m3", __FILE__),
+	: device_t(mconfig, NB1413M3, "NB1413M3 Mahjong Custom", tag, owner, clock, "nb1413m3", __FILE__),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
 	m_sndrombank2(0),

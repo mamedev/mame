@@ -97,7 +97,7 @@ legacy_mos6526r2_device::legacy_mos6526r2_device(const machine_config &mconfig, 
 	: legacy_mos6526_device(mconfig, LEGACY_MOS6526R2, "LEGACY_MOS6526R2", tag, owner, clock, "legacy_mos6526r2", __FILE__) { }
 
 legacy_mos8520_device::legacy_mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "LEGACY_MOS8520", tag, owner, clock, "legacy_mos8520", __FILE__) { }
+	: legacy_mos6526_device(mconfig, LEGACY_MOS8520, "8520 CIA", tag, owner, clock, "legacy_mos8520", __FILE__) { }
 
 legacy_mos5710_device::legacy_mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: legacy_mos6526_device(mconfig, LEGACY_MOS5710, "LEGACY_MOS5710", tag, owner, clock, "legacy_mos5710", __FILE__) { }

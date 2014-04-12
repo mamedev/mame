@@ -352,7 +352,7 @@ DISCRETE_SOUND_END
 const device_type SNK6502 = &device_creator<snk6502_sound_device>;
 
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SNK6502, "snk6502 Custom", tag, owner, clock, "snk6502_sound", __FILE__),
+	: device_t(mconfig, SNK6502, "SNK6502 Audio Custom", tag, owner, clock, "snk6502_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		//m_tone_channels[CHANNELS],
 		m_tone_clock_expire(0),

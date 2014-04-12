@@ -388,7 +388,7 @@ DISCRETE_SOUND_END
 const device_type GALAXIAN = &device_creator<galaxian_sound_device>;
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GALAXIAN, "Galaxian Custom", tag, owner, clock, "galaxian_sound", __FILE__),
+	: device_t(mconfig, GALAXIAN, "Galaxian Audio Custom", tag, owner, clock, "galaxian_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_lfo_val(0)
 {

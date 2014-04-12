@@ -113,7 +113,7 @@ $8000 - $ffff   ROM
 const device_type RENEGADE_ADPCM = &device_creator<renegade_adpcm_device>;
 
 renegade_adpcm_device::renegade_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RENEGADE_ADPCM, "Renegade Custom ADPCM", tag, owner, clock, "renegade_adpcm", __FILE__),
+	: device_t(mconfig, RENEGADE_ADPCM, "Renegade ADPCM Custom", tag, owner, clock, "renegade_adpcm", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(NULL),
 		m_current(0),

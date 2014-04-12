@@ -20,7 +20,7 @@ const device_type DAI_SOUND = &device_creator<dai_sound_device>;
 //-------------------------------------------------
 
 dai_sound_device::dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DAI_SOUND, "DAI Custom Sound", tag, owner, clock, "dai_sound", __FILE__),
+	: device_t(mconfig, DAI_SOUND, "DAI Audio Custom", tag, owner, clock, "dai_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
