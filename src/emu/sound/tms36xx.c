@@ -5,9 +5,6 @@
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define VMIN    0x0000
-#define VMAX    0x7fff
-
 /* the frequencies are later adjusted by "* clock / FSCALE" */
 #define FSCALE  1024
 
@@ -338,8 +335,7 @@ tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, d
 		m_enable(0),
 		m_tune_num(0),
 		m_tune_ofs(0),
-		m_tune_max(0),
-		m_intf(NULL)
+		m_tune_max(0)
 {
 	memset(m_vol, 0, sizeof(int)*12);
 	memset(m_vol_counter, 0, sizeof(int)*12);
@@ -355,24 +351,20 @@ tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, d
 
 void tms36xx_device::device_start()
 {
-	int j;
-	int enable;
-
-	m_intf = (const tms36xx_interface *)static_config();
+	int enable = 0;
 
 	m_channel = stream_alloc(0, 1, clock() * 64);
 	m_samplerate = clock() * 64;
 	m_basefreq = clock();
-	enable = 0;
-	for (j = 0; j < 6; j++)
+
+	for (int j = 0; j < 6; j++)
 	{
-		if( m_intf->decay[j] > 0 )
+		if (m_decay_time[j] > 0)
 		{
-			m_decay[j+0] = m_decay[j+6] = VMAX / m_intf->decay[j];
+			m_decay[j+0] = m_decay[j+6] = VMAX / m_decay_time[j];
 			enable |= 0x41 << j;
 		}
 	}
-	m_speed = (m_intf->speed > 0) ? VMAX / m_intf->speed : VMAX;
 	tms3617_enable(enable);
 
 	LOG(("TMS36xx samplerate    %d\n", m_samplerate));
