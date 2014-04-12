@@ -65,6 +65,7 @@ ui_menubar::ui_menubar(running_machine &machine)
 	m_mouse_y = -1;
 	m_mouse_button = false;
 	m_last_mouse_move = 0;
+	m_first_time = true;
 }
 
 
@@ -239,7 +240,8 @@ bool ui_menubar::event_loop()
 	if (!done)
 	{
 		bool navigation_input_pressed = poll_navigation_keys();
-		poll_shortcut_keys(navigation_input_pressed);
+		poll_shortcut_keys(navigation_input_pressed || m_first_time);
+		m_first_time = false;
 		done = true;
 	}
 	return done;

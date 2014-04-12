@@ -226,6 +226,7 @@ private:
 	float					m_checkmark_width;
 	osd_ticks_t				m_last_mouse_move;
 	menubar_visibility_t	m_menubar_visibility;
+	bool					m_first_time;
 
 	// selection walking
 	bool walk_selection_previous();
