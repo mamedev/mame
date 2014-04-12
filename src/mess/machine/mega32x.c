@@ -575,8 +575,8 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 						current_fifo_block = fifo_block_b;
 						current_fifo_readblock = fifo_block_a;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						sh2_notify_dma_data_available(m_master_cpu);
-						sh2_notify_dma_data_available(m_slave_cpu);
+						m_master_cpu->sh2_notify_dma_data_available();
+						m_slave_cpu->sh2_notify_dma_data_available();
 
 					}
 					current_fifo_write_pos = 0;
@@ -590,8 +590,8 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 						current_fifo_block = fifo_block_a;
 						current_fifo_readblock = fifo_block_b;
 						// incase we have a stalled DMA in progress, let the SH2 know there is data available
-						sh2_notify_dma_data_available(m_master_cpu);
-						sh2_notify_dma_data_available(m_slave_cpu);
+						m_master_cpu->sh2_notify_dma_data_available();
+						m_slave_cpu->sh2_notify_dma_data_available();
 
 					}
 
@@ -1931,8 +1931,8 @@ void sega_32x_device::device_reset()
 
 
 // checking if these help brutal, they don't.
-	sh2drc_set_options(m_master_cpu, SH2DRC_COMPATIBLE_OPTIONS);
-	sh2drc_set_options(m_slave_cpu, SH2DRC_COMPATIBLE_OPTIONS);
+	m_master_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
+	m_slave_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
 
 
 // install these now, otherwise we'll get the following (incorrect) warnings on startup..

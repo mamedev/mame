@@ -31,8 +31,8 @@ class sega_32x_device : public device_t
 public:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	required_device<cpu_device> m_master_cpu;
-	required_device<cpu_device> m_slave_cpu;
+	required_device<sh2_device> m_master_cpu;
+	required_device<sh2_device> m_slave_cpu;
 	required_device<dac_device> m_lch_pwm;
 	required_device<dac_device> m_rch_pwm;
 

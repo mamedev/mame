@@ -1,5 +1,7 @@
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
+#include "cpu/sh2/sh2.h"
+
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
 
@@ -49,7 +51,7 @@ public:
 	UINT8          m_alphatable[256];
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<sh2_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

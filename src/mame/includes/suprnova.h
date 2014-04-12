@@ -1,3 +1,7 @@
+
+#include "cpu/sh2/sh2.h"
+
+
 struct hit_t
 {
 	UINT16 x1p, y1p, z1p, x1s, y1s, z1s;
@@ -34,7 +38,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<sh2_device> m_maincpu;
 	required_shared_ptr<UINT32> m_spriteram;
 
 	sknsspr_device* m_spritegen;

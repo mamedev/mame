@@ -590,7 +590,7 @@ WRITE32_MEMBER(saturn_state::minit_w)
 	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
-	sh2_set_frt_input(m_slave, PULSE_LINE);
+	m_slave->sh2_set_frt_input(PULSE_LINE);
 }
 
 WRITE32_MEMBER(saturn_state::sinit_w)
@@ -598,7 +598,7 @@ WRITE32_MEMBER(saturn_state::sinit_w)
 	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
 	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
-	sh2_set_frt_input(m_maincpu, PULSE_LINE);
+	m_maincpu->sh2_set_frt_input(PULSE_LINE);
 }
 
 /*
@@ -631,7 +631,7 @@ WRITE32_MEMBER(saturn_state::saturn_minit_w)
 		machine().scheduler().trigger(1000);
 	}
 
-	sh2_set_frt_input(m_slave, PULSE_LINE);
+	m_slave->sh2_set_frt_input(PULSE_LINE);
 }
 
 WRITE32_MEMBER(saturn_state::saturn_sinit_w)
@@ -642,7 +642,7 @@ WRITE32_MEMBER(saturn_state::saturn_sinit_w)
 	else
 		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 
-	sh2_set_frt_input(m_maincpu, PULSE_LINE);
+	m_maincpu->sh2_set_frt_input(PULSE_LINE);
 }
 
 
