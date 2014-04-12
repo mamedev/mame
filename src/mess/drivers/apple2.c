@@ -190,6 +190,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2lang.h"
 #include "bus/a2bus/a2diskii.h"
+#include "bus/a2bus/a2diskiing.h"
 #include "bus/a2bus/a2mockingboard.h"
 #include "bus/a2bus/a2cffa.h"
 #include "bus/a2bus/a2memexp.h"
@@ -968,6 +969,7 @@ SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
+	SLOT_INTERFACE("diskiing", A2BUS_DISKIING)  /* Disk II Controller Card, cycle-accurate version */
 	SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
 	SLOT_INTERFACE("phasor", A2BUS_PHASOR)  /* Applied Engineering Phasor */
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
@@ -1057,7 +1059,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl3", apple2_cards, NULL)
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl4", apple2_cards, "mockingboard")
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl5", apple2_cards, NULL)
-	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskii")
+	MCFG_A2BUS_SLOT_ADD("a2bus", "sl6", apple2_cards, "diskiing")
 	MCFG_A2BUS_SLOT_ADD("a2bus", "sl7", apple2_cards, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
@@ -1170,7 +1172,7 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	// TODO: populate the IIc's other virtual slots with ONBOARD_ADD
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl1", A2BUS_SSC, NULL)
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl2", A2BUS_SSC, NULL)
-	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKII, NULL)
+	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl6", A2BUS_DISKIING, NULL)
 
 	MCFG_A2EAUXSLOT_SLOT_REMOVE("aux")
 	MCFG_A2EAUXSLOT_BUS_REMOVE(AUXSLOT_TAG)

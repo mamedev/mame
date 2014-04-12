@@ -520,6 +520,18 @@ LEGACY_FLOPPY_OPTIONS_END
 
 ****************************************************************************/
 
+static const UINT8 dos_skewing[] = 
+{
+	0x00, 0x07, 0x0E, 0x06, 0x0D, 0x05, 0x0C, 0x04,
+	0x0B, 0x03, 0x0A, 0x02, 0x09, 0x01, 0x08, 0x0F
+};
+
+static const UINT8 prodos_skewing[] =
+{
+	0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
+	0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
+};
+
 
 a2_16sect_format::a2_16sect_format() : floppy_image_format_t()
 {
@@ -537,7 +549,7 @@ const char *a2_16sect_format::description() const
 
 const char *a2_16sect_format::extensions() const
 {
-		return "dsk";
+		return "dsk,do,po";
 }
 
 bool a2_16sect_format::supports_save() const
@@ -582,35 +594,103 @@ const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
 		{ END },
 };
 
-
 bool a2_16sect_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-/*      TODO: rewrite me properly
-        UINT8 sector_data[(256)*16];
-        memset(sector_data, 0, sizeof(sector_data));
+	m_prodos_order = false;
 
-        desc_s sectors[16];
-        int format = 0;
-        int pos_data = 0;
+	int fpos = 0;
+	for(int track=0; track < 35; track++) {
+		UINT32 track_data[51090*2];
+		UINT8 sector_data[256*16];
+		int offset = 0;
 
-        int head_count = 1;
+		io_generic_read(io, sector_data, fpos, 256*16);
 
-        for(int track=0; track < 35; track++) {
-                for(int head=0; head < head_count; head++) {
-                        for(int si=0; si<16; si++) {
-                                UINT8 *data = sector_data + (256)*si;
-                                sectors[si].data = data;
-                                sectors[si].size = 256;
-                                sectors[si].sector_id = si;
-                                sectors[si].sector_info = format;
-                                io_generic_read(io, data, pos_data, 256);
-                                pos_data += 256;
-                        }
-                        generate_track(mac_gcr, track, head, sectors, 16, 3104*16, image);
-                }
-        }
-        return true;*/
-		return false; // I hope that throws an error...
+		if (track == 0 && fpos == 0)
+		{
+			// check ProDOS boot block
+			if (!memcmp("PRODOS", &sector_data[0x103], 6))
+			{
+				m_prodos_order = true;
+			}	// check SOS boot block
+			else if (!memcmp("SOS BOOT", &sector_data[0x3], 8))
+			{
+				m_prodos_order = true;
+			}	// check Apple II Pascal
+			else if (!memcmp("SYSTEM.APPLE", &sector_data[0xd7], 12))
+			{
+				unsigned char pascal_block1[4] = { 0x08, 0xa5, 0x0f, 0x29 };
+
+				// Pascal discs can still be DOS order.
+				// Check for the second half of the boot code at 0x100
+				// (which means ProDOS order)
+				if (!memcmp(pascal_block1, &sector_data[0x100], 4))
+				{
+					m_prodos_order = true;
+				}
+			}
+		}
+
+		fpos += 256*16;
+		for(int i=0; i<51; i++)
+			raw_w(track_data, offset, 10, 0x3fc);
+		for(int i=0; i<16; i++) {
+			int sector;
+
+			if (m_prodos_order)
+			{
+				sector = prodos_skewing[i];
+			}
+			else
+			{
+				sector = dos_skewing[i];
+			}
+
+			const UINT8 *sdata = sector_data + 256 * sector;
+			for(int j=0; j<20; j++)
+				raw_w(track_data, offset, 10, 0x3fc);
+			raw_w(track_data, offset,  8, 0xff);
+			raw_w(track_data, offset, 24, 0xd5aa96);
+			raw_w(track_data, offset, 16, gcr4_encode(0xfe));
+			raw_w(track_data, offset, 16, gcr4_encode(track));
+			raw_w(track_data, offset, 16, gcr4_encode(i));
+			raw_w(track_data, offset, 16, gcr4_encode(0xfe ^ track ^ i));
+			raw_w(track_data, offset, 24, 0xdeaaeb);
+
+			for(int j=0; j<4; j++)
+				raw_w(track_data, offset, 10, 0x3fc);
+
+			raw_w(track_data, offset,  9, 0x01fe);
+			raw_w(track_data, offset, 24, 0xd5aaad);
+
+			UINT8 pval = 0x00;
+			for(int i=0; i<342; i++) {
+				UINT8 nval;
+				if(i >= 0x56)
+					nval = sdata[i - 0x56] >> 2;
+				else {
+					nval =
+						((sdata[i+0x00] & 0x01) << 1) | 
+						((sdata[i+0x00] & 0x02) >> 1) | 
+						((sdata[i+0x56] & 0x01) << 3) | 
+						((sdata[i+0x56] & 0x02) << 1);
+					if(i < 256-0xac)
+						nval |=
+							((sdata[i+0xac] & 0x01) << 5) | 
+							((sdata[i+0xac] & 0x02) << 3);
+				}
+				raw_w(track_data, offset, 8, translate6[nval ^ pval]);
+				pval = nval;
+			}
+			raw_w(track_data, offset, 8, translate6[pval]);
+			raw_w(track_data, offset, 24, 0xdeaaeb);
+		}
+		raw_w(track_data, offset, 4, 0xff);
+		assert(offset == 51090);
+
+		generate_track_from_levels(track, 0, track_data, 51090, 0, image);
+	}			
+	return true;
 }
 
 UINT8 a2_16sect_format::gb(const UINT8 *buf, int ts, int &pos, int &wrap)
@@ -632,18 +712,19 @@ void a2_16sect_format::update_chk(const UINT8 *data, int size, UINT32 &chk)
 {
 }
 
+//#define VERBOSE_SAVE
+
 bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 {
 		int g_tracks, g_heads;
 		int visualgrid[16][35]; // visualizer grid, cleared/initialized below
+
 // lenient addr check: if unset, only accept an addr mark if the checksum was good
 // if set, accept an addr mark if the track and sector values are both sane
 #undef LENIENT_ADDR_CHECK
 // if set, use the old, not as robust logic for choosing which copy of a decoded sector to write
 // to the resulting image if the sector has a bad checksum and/or postamble
 #undef USE_OLD_BEST_SECTOR_PRIORITY
-// select a sector order for resulting file: 0 = logical, 1 = dos3.3, 2 = prodos
-#define SECTOR_ORDER 1
 // nothing found
 #define NOTFOUND 0
 // address mark was found
@@ -667,36 +748,43 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 		int pos_data = 0;
 
-		for(int track=0; track < 70; track+=2) {
+		for(int track=0; track < 35; track++) {
 				UINT8 sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;
-				UINT8 buf[130000]; // originally 13000, multiread dfi disks need larger
+				UINT8 buf[10000]; // normal is 51090 cells, e.g. 6387 bytes, add 50% and round up for denser than normal disks
 				int ts;
-//fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
-				//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
-				generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
-//fprintf(stderr,"done.\n");
+				#ifdef VERBOSE_SAVE
+				fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
+				#endif
+				generate_bitstream_from_track(track, head, 3915, buf, ts, image);
+				#ifdef VERBOSE_SAVE
+				fprintf(stderr,"done.\n");
+				#endif
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
 				int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 				for(;;) {
 						UINT8 v = gb(buf, ts, pos, wrap);
-						if(v == 0xff)
+						if(v == 0xff)   			{
 								hb = 1;
-						else if(hb == 1 && v == 0xd5)
+							}
+							else if(hb == 1 && v == 0xd5){
 								hb = 2;
-						else if(hb == 2 && v == 0xaa)
+								}
+							else if(hb == 2 && v == 0xaa) {
 								hb = 3;
-						else if(hb == 3 && ((v == 0x96) || (v == 0xab))) { // 0x96 = dos 3.3/16sec, 0xab = dos 3.21 and below/13sec
+							}
+							else if(hb == 3 && ((v == 0x96) || (v == 0xab))) { // 0x96 = dos 3.3/16sec, 0xab = dos 3.21 and below/13sec
 								hb = 4;
 								if (v == 0xab) dosver = 1;
 								}
-						else
+							else
 								hb = 0;
 
 						if(hb == 4) {
+								printf("hb = 4\n");
 								UINT8 h[11];
 								for(int i=0; i<11; i++)
 										h[i] = gb(buf, ts, pos, wrap);
@@ -706,15 +794,17 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								UINT8 se = gcr4_decode(h[4],h[5]);
 								UINT8 chk = gcr4_decode(h[6],h[7]);
 								UINT32 post = (h[8]<<16)|(h[9]<<8)|h[10];
+								#ifdef VERBOSE_SAVE
 								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
+								#endif
 								// sanity check
-								if (tr == track/2 && se < nsect) {
-								visualgrid[se][track/2] |= ADDRFOUND;
-								visualgrid[se][track/2] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
+								if (tr == track && se < nsect) {
+								visualgrid[se][track] |= ADDRFOUND;
+								visualgrid[se][track] |= ((chk ^ vl ^ tr ^ se)==0)?ADDRGOOD:0;
 #ifdef LENIENT_ADDR_CHECK
-									if ((visualgrid[se][track/2] & ADDRFOUND) == ADDRFOUND) {
+									if ((visualgrid[se][track] & ADDRFOUND) == ADDRFOUND) {
 #else
-									if ((visualgrid[se][track/2] & ADDRGOOD) == ADDRGOOD) {
+									if ((visualgrid[se][track] & ADDRGOOD) == ADDRGOOD) {
 #endif
 										int opos = pos;
 										int owrap = wrap;
@@ -733,26 +823,21 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 														hb = 0;
 										}
 										if((hb == 4)&&(dosver == 0)) {
-												visualgrid[se][track/2] |= DATAFOUND;
-												int sector_translate[16] = {
-#if SECTOR_ORDER == 0
-												// logical order (0-15)
-												0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-												0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-#elif SECTOR_ORDER == 1
-												// DOS order (*.do)
-												0x00, 0x07, 0x0E, 0x06, 0x0D, 0x05, 0x0C, 0x04,
-												0x0B, 0x03, 0x0A, 0x02, 0x09, 0x01, 0x08, 0x0F
-#elif SECTOR_ORDER == 2
-												// prodos order (*.po)
-												0x00, 0x08, 0x01, 0x09, 0x02, 0x0A, 0x03, 0x0B,
-												0x04, 0x0C, 0x05, 0x0D, 0x06, 0x0E, 0x07, 0x0F
-#endif
-												};
-												UINT8 *dest = sectdata+(256)*sector_translate[se];
+												visualgrid[se][track] |= DATAFOUND;
+												UINT8 *dest;
 												UINT8 data[0x157];
 												UINT32 dpost = 0;
 												UINT8 c = 0;
+
+												if (m_prodos_order)
+												{
+													dest = sectdata+(256)*prodos_skewing[se]; 
+												}
+												else
+												{
+													dest = sectdata+(256)*dos_skewing[se]; 
+												}
+
 												// first read in sector and decode to 6bit form
 												for(int i=0; i<0x156; i++) {
 														data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
@@ -780,16 +865,16 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 												// if it is set we don't want to overwrite a guaranteed good read with a bad one
 												// if past read had a bad checksum or bad postamble...
 #ifndef USE_OLD_BEST_SECTOR_PRIORITY
-												if (((visualgrid[se][track/2]&DATAGOOD)==0)||((visualgrid[se][track/2]&DATAPOST)==0)) {
+												if (((visualgrid[se][track]&DATAGOOD)==0)||((visualgrid[se][track]&DATAPOST)==0)) {
 													// if the current read is good, and postamble is good, write it in, no matter what.
 													// if the current read is good and the current postamble is bad, write it in unless the postamble was good before
 													// if the current read is bad and the current postamble is good and the previous read had neither good, write it in
 													// if the current read isn't good and neither is the postamble but nothing better
 													// has been written before, write it anyway.
 													if ( ((data[0x156] == c) && (dpost&0xFFFF00)==0xDEAA00) ||
-													(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track/2]&DATAPOST)==0)) ||
-													(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0)) ||
-													(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track/2]&DATAGOOD)==0)&&(visualgrid[se][track/2]&DATAPOST)==0))
+													(((data[0x156] == c) && (dpost&0xFFFF00)!=0xDEAA00) && ((visualgrid[se][track]&DATAPOST)==0)) ||
+													(((data[0x156] != c) && (dpost&0xFFFF00)==0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0)) ||
+													(((data[0x156] != c) && (dpost&0xFFFF00)!=0xDEAA00) && (((visualgrid[se][track]&DATAGOOD)==0)&&(visualgrid[se][track]&DATAPOST)==0))
 													) {
 														for(int i=0x56; i<0x156; i++) {
 															UINT8 dv = data[i];
@@ -798,7 +883,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 													}
 												}
 #else
-												if ((visualgrid[se][track/2]&DATAGOOD)==0) {
+												if ((visualgrid[se][track]&DATAGOOD)==0) {
 														for(int i=0x56; i<0x156; i++) {
 															UINT8 dv = data[i];
 															*dest++ = dv;
@@ -806,10 +891,12 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 												}
 #endif
 												// do some checking
+												#ifdef VERBOSE_SAVE
 												if ((data[0x156] != c) || (dpost&0xFFFF00)!=0xDEAA00)
 													fprintf(stderr,"Data Mark:\tChecksum xpctd %d found %d: %s, Postamble %03X: %s\n", data[0x156], c, (data[0x156]==c)?"OK":"BAD", dpost, (dpost&0xFFFF00)==0xDEAA00?"OK":"BAD");
-												if (data[0x156] == c) visualgrid[se][track/2] |= DATAGOOD;
-												if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track/2] |= DATAPOST;
+												#endif
+												if (data[0x156] == c) visualgrid[se][track] |= DATAGOOD;
+												if ((dpost&0xFFFF00)==0xDEAA00) visualgrid[se][track] |= DATAPOST;
 										} else if ((hb == 4)&&(dosver == 1)) {
 											fprintf(stderr,"ERROR: We don't handle dos sectors below 3.3 yet!\n");
 										} else {
@@ -832,6 +919,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				//printf("\n");
 		}
 		// display a little table of which sectors decoded ok
+		#ifdef VERBOSE_SAVE
 		int total_good = 0;
 		for (int j = 0; j < 35; j++) {
 			printf("T%2d: ",j);
@@ -848,6 +936,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 			printf("\n");
 		}
 		printf("Total Good Sectors: %d\n", total_good);
+		#endif
 
 		return true;
 }

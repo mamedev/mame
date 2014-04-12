@@ -51,6 +51,8 @@ private:
 
 		UINT8 gb(const UINT8 *buf, int ts, int &pos, int &wrap);
 		void update_chk(const UINT8 *data, int size, UINT32 &chk);
+
+		bool m_prodos_order;
 };
 
 extern const floppy_format_type FLOPPY_A216S_FORMAT;

@@ -1847,3 +1847,11 @@ ifneq ($(filter CORVUSHD,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/corvushd.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/machine/wozfdc.h,MACHINES += WOZFDC
+#-------------------------------------------------
+ifneq ($(filter WOZFDC,$(MACHINES)),)
+MACHINEOBJS += $(MACHINEOBJ)/wozfdc.o
+endif
+

@@ -515,6 +515,7 @@ MACHINES += SMC92X4
 MACHINES += TI99_HD
 MACHINES += STRATA
 MACHINES += CORVUSHD
+MACHINES += WOZFDC
 
 #-------------------------------------------------
 # specify available bus cores
