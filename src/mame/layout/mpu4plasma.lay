@@ -458,52 +458,52 @@
 		<backdrop name="digit7" element="digit" state="0">
 			<bounds x="356" y="200" width="8" height="10"/>
 		</backdrop>
-		<backdrop name="vfd0" element="vfd0" state="0">
+		<backdrop name="vfd15" element="vfd0" state="0">
 			<bounds x="17" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd1" element="vfd0" state="0">
+		<backdrop name="vfd14" element="vfd0" state="0">
 			<bounds x="24" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd2" element="vfd0" state="0">
+		<backdrop name="vfd13" element="vfd0" state="0">
 			<bounds x="31" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd3" element="vfd0" state="0">
+		<backdrop name="vfd12" element="vfd0" state="0">
 			<bounds x="38" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd4" element="vfd0" state="0">
+		<backdrop name="vfd11" element="vfd0" state="0">
 			<bounds x="45" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd5" element="vfd0" state="0">
+		<backdrop name="vfd10" element="vfd0" state="0">
 			<bounds x="52" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd6" element="vfd0" state="0">
+		<backdrop name="vfd9" element="vfd0" state="0">
 			<bounds x="59" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd7" element="vfd0" state="0">
+		<backdrop name="vfd8" element="vfd0" state="0">
 			<bounds x="66" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd8" element="vfd0" state="0">
+		<backdrop name="vfd7" element="vfd0" state="0">
 			<bounds x="73" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd9" element="vfd0" state="0">
+		<backdrop name="vfd6" element="vfd0" state="0">
 			<bounds x="80" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd10" element="vfd0" state="0">
+		<backdrop name="vfd5" element="vfd0" state="0">
 			<bounds x="87" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd11" element="vfd0" state="0">
+		<backdrop name="vfd4" element="vfd0" state="0">
 			<bounds x="94" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd12" element="vfd0" state="0">
+		<backdrop name="vfd3" element="vfd0" state="0">
 			<bounds x="101" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd13" element="vfd0" state="0">
+		<backdrop name="vfd2" element="vfd0" state="0">
 			<bounds x="108" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd14" element="vfd0" state="0">
+		<backdrop name="vfd1" element="vfd0" state="0">
 			<bounds x="115" y="280" width="7" height="24"/>
 		</backdrop>
-		<backdrop name="vfd15" element="vfd0" state="0">
+		<backdrop name="vfd0" element="vfd0" state="0">
 			<bounds x="122" y="280" width="7" height="24"/>
 		</backdrop>
 

@@ -58,7 +58,7 @@ void archimedes_state::archimedes_request_irq_b(int mask)
 
 	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_IRQ_LINE, 1);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -66,9 +66,11 @@ void archimedes_state::archimedes_request_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] |= mask;
 
+	//printf("STATUS:%02x IRQ:%02x MASK:%02x\n",m_ioc_regs[FIQ_STATUS],mask,m_ioc_regs[FIQ_MASK]);
+
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(m_maincpu, ARM_FIRQ_LINE, 1);
+		m_maincpu->set_input_line(ARM_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -81,13 +83,13 @@ void archimedes_state::archimedes_clear_irq_a(int mask)
 void archimedes_state::archimedes_clear_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] &= ~mask;
-	archimedes_request_irq_b(0);
+	//archimedes_request_irq_b(0);
 }
 
 void archimedes_state::archimedes_clear_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] &= ~mask;
-	archimedes_request_fiq(0);
+	//archimedes_request_fiq(0);
 }
 
 void archimedes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -138,10 +140,11 @@ void archimedes_state::vidc_video_tick()
 			offset_ptr = m_vidc_vidstart;
 	}
 
-	size = m_vidc_vidend-m_vidc_vidstart+0x10;
-
-	for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
-		m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+	if(m_cursor_enabled == true)
+	{
+		for(m_vidc_ccur = 0;m_vidc_ccur < 0x200;m_vidc_ccur++)
+			m_cursor_vram[m_vidc_ccur] = (space.read_byte(m_vidc_cinit+m_vidc_ccur));
+	}
 
 	if(m_video_dma_on)
 	{
@@ -276,7 +279,7 @@ void archimedes_state::archimedes_reset()
 	}
 
 	m_ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
-	m_ioc_regs[IRQ_STATUS_B] = 0x02; //set up IL[1] On
+	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
 }
@@ -685,9 +688,18 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 			{
 				case 0: return ioc_ctrl_r(space,offset,mem_mask);
 				case 1:
-					if (m_wd1772) {
-						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return m_wd1772->data_r(space, offset&0xf);
+					if (m_fdc)
+					{
+						//printf("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
+						switch(ioc_addr & 0xc)
+						{
+							case 0x00: return m_fdc->status_r();
+							case 0x04: return m_fdc->track_r();
+							case 0x08: return m_fdc->sector_r();
+							case 0x0c: return m_fdc->data_r();
+						}
+
+						return 0;
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -702,14 +714,21 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					if (m_wd1772) {
+					if (m_fdc)
+					{
 						switch(ioc_addr & 0xfffc)
 						{
+							case 0x18: return 0xff; // FDC latch B
+							case 0x40: return 0xff; // FDC latch A
 							case 0x50: return 0; //fdc type, new model returns 5 here
+                            case 0x70: return 0x0F;
+                            case 0x74: return 0xFF; // unknown
+//                          case 0x78: /* joystick */
+//                          case 0x7c:
 						}
 					}
 
-					logerror("IOC: Internal Latches Read %08x\n",ioc_addr);
+					//printf("IOC: Internal Latches Read %08x\n",ioc_addr);
 
 					return 0xffff;
 			}
@@ -740,10 +759,30 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 			{
 				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
 				case 1:
-						if (m_wd1772) {
-							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							m_wd1772->data_w(space, offset&0xf, data&0xff);
-						} else {
+						if (m_fdc)
+						{
+							//printf("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
+							switch(ioc_addr & 0xc)
+							{
+								case 0x00:
+									m_fdc->cmd_w(data);
+									return;
+
+								case 0x04:
+									m_fdc->track_w(data);
+									return;
+
+								case 0x08:
+									m_fdc->sector_w(data);
+									return;
+
+									case 0x0c:
+									m_fdc->data_w(data);
+									return;
+							}
+						}
+						else
+						{
 							logerror("Write to FDC device?\n");
 						}
 						return;
@@ -757,23 +796,34 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					logerror("IOC: Internal Podule Write\n");
 					return;
 				case 5:
-					if (m_wd1772) {
+					if (m_fdc)
+					{
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								m_wd1772->dden_w(BIT(data, 1));
+								m_fdc->dden_w(BIT(data, 1));
 								return;
 
 							case 0x40: // latch A
-								if (data & 1) { m_wd1772->set_drive(0); }
-								if (data & 2) { m_wd1772->set_drive(1); }
-								if (data & 4) { m_wd1772->set_drive(2); }
-								if (data & 8) { m_wd1772->set_drive(3); }
+								floppy_image_device *floppy = NULL;
 
-								m_wd1772->set_side((data & 0x10)>>4);
+								if (!(data & 1)) { floppy = m_floppy0->get_device(); }
+								if (!(data & 2)) { floppy = m_floppy1->get_device(); }
+								if (!(data & 4)) { floppy = NULL; } // floppy 2
+								if (!(data & 8)) { floppy = NULL; } // floppy 3
+
+								m_fdc->set_floppy(floppy);
+
+								if(floppy)
+								{
+									floppy->mon_w(BIT(data, 5));
+									floppy->ss_w(!(BIT(data, 4)));
+								}
 								//bit 5 is motor on
 								return;
 						}
+
+						//printf("%08x\n",ioc_addr);
 					}
 					break;
 			}
@@ -920,6 +970,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 
 		//#ifdef MAME_DEBUG
+		if(1)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], m_vidc_regs[reg]);
 		//#endif
 
@@ -953,6 +1004,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
+				m_cursor_enabled = false;
 				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
@@ -968,8 +1020,9 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				break;
 
 			case 3: /* cursor init */
+				//m_cursor_enabled = true;
 				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
-				//printf("MEMC: CURSOR %08x\n",((data>>2)&0x7fff)*16);
+				//printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
 				break;
 
 			case 4: /* sound start */

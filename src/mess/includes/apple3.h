@@ -50,7 +50,13 @@ public:
 		m_speaker(*this, SPEAKER_TAG),
 		m_dac(*this, DAC_TAG),
 		m_kbspecial(*this, "keyb_special"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_joy1x(*this, "joy_1_x"),
+		m_joy1y(*this, "joy_1_y"),
+		m_joy2x(*this, "joy_2_x"),
+		m_joy2y(*this, "joy_2_y"),
+		m_joybuttons(*this, "joy_buttons"),
+		m_pdltimer(*this, "pdltimer")
 	{
 	}
 
@@ -67,6 +73,8 @@ public:
 	required_device<dac_device> m_dac;
 	required_ioport m_kbspecial;
 	required_device<palette_device> m_palette;
+	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
+	required_device<timer_device> m_pdltimer;
 
 	DECLARE_READ8_MEMBER(apple3_memory_r);
 	DECLARE_WRITE8_MEMBER(apple3_memory_w);
@@ -107,6 +115,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	void apple3_postload();
+	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
+	void pdl_handler(int offset);
 
 	// these need to be public for now
 	UINT32 m_flags;
@@ -137,6 +147,10 @@ private:
 	int m_c040_time;
 	UINT16 m_lastchar, m_strobe;
 	UINT8 m_transchar;
+
+	int m_analog_sel;
+	bool m_ramp_active;
+	int m_pdl_charge;
 };
 
 

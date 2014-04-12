@@ -520,7 +520,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_CASSETTE_ADD("cassette", mc10_cassette_interface)
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_CASSETTE_ADD("cassette", alice32_cassette_interface)
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

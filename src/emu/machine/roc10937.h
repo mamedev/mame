@@ -54,10 +54,13 @@ public:
 	virtual void update_display();
 	UINT8   m_port_val;
 	void blank(int data);
-	void shift_data(int data);
+	void shift_clock(int data);
 	void write_char(int data);
 	void setdata(int segdata, int data);
 	UINT32 set_display(UINT32 segin);
+	DECLARE_WRITE_LINE_MEMBER( sclk );
+	DECLARE_WRITE_LINE_MEMBER( data );
+	DECLARE_WRITE_LINE_MEMBER( por );
 
 
 protected:
@@ -68,8 +71,10 @@ protected:
 	int m_pcursor_pos;
 	int m_brightness;
 	int m_count;
+	int m_data;
 	int m_duty;
 	int m_disp;
+	int m_sclk;
 	UINT8 m_cursor;
 	UINT32 m_chars[16];
 	UINT32 m_outputs[16];
@@ -109,8 +114,6 @@ protected:
 class s16lf01_t : public rocvfd_t {
 public:
 	s16lf01_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual void update_display();
 protected:
 
 };

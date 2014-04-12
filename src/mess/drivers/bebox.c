@@ -21,7 +21,6 @@
 #include "bus/pci/pci.h"
 #include "machine/am9517a.h"
 #include "machine/pckeybrd.h"
-#include "machine/8042kbdc.h"
 #include "machine/idectrl.h"
 #include "bus/pci/mpc105.h"
 #include "machine/intelfsh.h"
@@ -155,17 +154,6 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 	m_pic8259_1->ir1_w(state);
 }
 
-static const struct kbdc8042_interface bebox_8042_interface =
-{
-	KBDC8042_STANDARD,
-	DEVCB_CPU_INPUT_LINE("ppc1", INPUT_LINE_RESET),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_keyboard_interrupt),
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("mpc105", MPC105)
 	SLOT_INTERFACE("cirrus", CIRRUS)
@@ -235,7 +223,11 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 
-	MCFG_KBDC8042_ADD("kbdc", bebox_8042_interface)
+	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
+	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("ppc1", INPUT_LINE_RESET))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE(bebox_state, bebox_keyboard_interrupt))
+	
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")

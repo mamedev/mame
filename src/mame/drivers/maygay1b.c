@@ -147,21 +147,9 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
 //  printf("m1_pia_porta_w %02x\n",data);
 
-	if((data & 0x40))
-	{
-		if (m_alpha_clock != (data & 0x20))
-		{
-			if (!m_alpha_clock)
-			{
-				m_vfd->shift_data((data & 0x10)?0:1);
-			}
-		}
-		m_alpha_clock = (data & 0x20);
-	}
-	else
-	{
-		m_vfd->reset();
-	}
+		m_vfd->por(!data & 0x40);
+		m_vfd->data(data & 0x10);
+		m_vfd->sclk(data & 0x20);
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)

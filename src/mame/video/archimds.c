@@ -176,7 +176,7 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		}
 
 
-		if(0)
+		if(m_cursor_enabled == true)
 		{
 			count = 0;
 			for(y=0;y<16;y++)

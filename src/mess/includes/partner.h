@@ -47,7 +47,6 @@ public:
 
 /*----------- defined in machine/partner.c -----------*/
 
-extern const i8257_interface partner_dma;
 extern const wd17xx_interface partner_wd17xx_interface;
 
 #endif /* partner_H_ */

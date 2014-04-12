@@ -133,9 +133,6 @@ extern const i8275_interface partner_i8275_interface;
 extern const i8275_interface mikrosha_i8275_interface;
 extern const i8275_interface apogee_i8275_interface;
 
-extern const i8257_interface radio86_dma;
-
-
 extern void radio86_init_keyboard(running_machine &machine);
 
 

@@ -209,7 +209,11 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))
+	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("i8275", i8275_device, dack_w))
 
 	MCFG_CASSETTE_ADD( "cassette", mikrosha_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")

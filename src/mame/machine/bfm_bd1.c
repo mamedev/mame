@@ -130,6 +130,8 @@ void bfm_bd1_t::device_start()
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_user_data));           // user defined character data (16 bit)
 	save_item(NAME(m_user_def));            // user defined character state
+	save_item(NAME(m_sclk));
+	save_item(NAME(m_data));
 
 	device_reset();
 }
@@ -150,6 +152,8 @@ void bfm_bd1_t::device_reset()
 	m_flash_control = 0;
 	m_user_data = 0;
 	m_user_def = 0;
+	m_sclk = 0;
+	m_data = 0;
 
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_outputs, 0, sizeof(m_outputs));
@@ -163,10 +167,7 @@ UINT16 bfm_bd1_t::set_display(UINT16 segin)
 
 void bfm_bd1_t::device_post_load()
 {
-	for (int i =0; i<16; i++)
-	{
-		output_set_indexed_value("vfd", (m_port_val*16) + i, m_outputs[i]);
-	}
+	update_display();
 }
 
 void bfm_bd1_t::update_display()
@@ -535,16 +536,36 @@ void bfm_bd1_t::setdata(int segdata, int data)
 	}
 }
 
-void bfm_bd1_t::shift_data(int data)
+void bfm_bd1_t::shift_clock(int state)
 {
-	m_shift_data <<= 1;
-
-	if ( !data ) m_shift_data |= 1;
-
-	if ( ++m_shift_count >= 8 )
+	if (m_sclk != state)
 	{
-		write_char(m_shift_data);
-		m_shift_count = 0;
-		m_shift_data  = 0;
+		if (!m_sclk)
+		{
+			m_shift_data <<= 1;
+
+			if ( !m_data ) m_shift_data |= 1;
+
+			if ( ++m_shift_count >= 8 )
+			{
+				write_char(m_shift_data);
+				m_shift_count = 0;
+				m_shift_data  = 0;
+			}
+			update_display();
+
+		}
+	}
+	m_sclk = state;
+}
+
+WRITE_LINE_MEMBER( bfm_bd1_t::sclk ) { shift_clock(state); }
+WRITE_LINE_MEMBER( bfm_bd1_t::data ) { m_data = state; }
+
+WRITE_LINE_MEMBER( bfm_bd1_t::por ) 
+{
+	if (!state)
+	{
+		reset();
 	}
 }

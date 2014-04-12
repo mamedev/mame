@@ -645,8 +645,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 WRITE_LINE_MEMBER(mpu4_state::pia_ic3_ca2_w)
 {
 	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", machine().describe_context(),state));
-
-	m_alpha_data_line = state;
+	m_vfd->data(state);
 }
 
 
@@ -654,10 +653,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic3_cb2_w)
 {
 	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",machine().describe_context(),state));
 // DM Data pin A
-	if ( !state )
-	{
-		m_vfd->reset();
-	}
+	m_vfd->por(state);
 }
 
 
@@ -1346,14 +1342,8 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", machine().describe_context(), state & 0xFF));
 
 	// DM Data pin B
-	if (m_alpha_clock != state)
-	{
-		if (!m_alpha_clock)//falling edge
-		{
-			m_vfd->shift_data(m_alpha_data_line?0:1);
-		}
-	}
-	m_alpha_clock = state;
+	
+	m_vfd->sclk(!state);
 }
 
 // universal sampled sound program card PCB 683077

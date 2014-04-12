@@ -411,25 +411,6 @@ static GFXDECODE_START( pleiads )
 GFXDECODE_END
 
 
-static const tms36xx_interface phoenix_tms36xx_interface =
-{
-	MM6221AA,   /* TMS36xx subtype(s) */
-	{0.50,0,0,1.05,0,0}, /* decay times of voices */
-	0.21       /* tune speed (time between beats) */
-};
-
-static const tms36xx_interface pleiads_tms36xx_interface =
-{
-	TMS3615,    /* TMS36xx subtype(s) */
-	/*
-	 * Decay times of the voices; NOTE: it's unknown if
-	 * the the TMS3615 mixes more than one voice internally.
-	 * A wav taken from Pop Flamer sounds like there
-	 * are at least no 'odd' harmonics (5 1/3' and 2 2/3')
-	 */
-	{0.33,0.33,0,0.33,0,0.33}
-};
-
 static const ay8910_interface survival_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -471,8 +452,10 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_TMS36XX_ADD("tms",  372)
-	MCFG_SOUND_CONFIG(phoenix_tms36xx_interface)
+	MCFG_TMS36XX_ADD("tms", 372)
+	MCFG_TMS36XX_TYPE(MM6221AA)
+	MCFG_TMS36XX_DECAY_TIMES(0.50, 0, 0, 1.05, 0, 0)
+	MCFG_TMS36XX_TUNE_SPEED(0.21)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_SOUND_ADD("cust", PHOENIX, 0)
@@ -498,7 +481,11 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 
 	/* sound hardware */
 	MCFG_TMS36XX_REPLACE("tms", 247)
-	MCFG_SOUND_CONFIG(pleiads_tms36xx_interface)
+	MCFG_TMS36XX_TYPE(TMS3615)
+	MCFG_TMS36XX_DECAY_TIMES(0.33, 0.33, 0, 0.33, 0, 0.33)
+	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
+	// A wav taken from Pop Flamer sounds like there are at least no 'odd' 
+	// harmonics (5 1/3' and 2 2/3')
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_DEVICE_REMOVE("cust")

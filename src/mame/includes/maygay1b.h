@@ -60,7 +60,6 @@ public:
 	int m_old_lamp_strobe;
 	int m_lamp_strobe2;
 	int m_old_lamp_strobe2;
-	int m_alpha_clock;
 	int m_RAMEN;
 	int m_ALARMEN;
 	int m_PSUrelay;

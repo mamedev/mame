@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
 	MCFG_SAM6883_RES_CALLBACK(READ8(dragon_state, sam_read))
 	MCFG_CASSETTE_ADD("cassette", dragon_state::coco_cassette_interface)
-	MCFG_PRINTER_ADD(PRINTER_TAG)
+	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
 
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)

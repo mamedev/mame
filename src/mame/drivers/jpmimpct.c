@@ -957,22 +957,9 @@ WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 WRITE8_MEMBER(jpmimpct_state::display_c_w)
 {
 	//Reset 0x04, data 0x02, clock 0x01
-	if(data & 0x04)
-	{
-		int alpha_data = (data & 0x02)?0:1;
-		if (m_alpha_clock != (data & 0x01))
-		{
-			if (!m_alpha_clock)//falling edge
-			{
-				m_vfd->shift_data(alpha_data);
-			}
-		}
-		m_alpha_clock = (data & 0x01);
-	}
-	else
-	{
-		m_vfd->reset();
-	}
+	m_vfd->por(data & 0x04);
+	m_vfd->data(data & 0x02);
+	m_vfd->sclk(data & 0x01);
 }
 
 static I8255_INTERFACE (ppi8255_intf)

@@ -710,17 +710,6 @@ WRITE8_MEMBER(fanucspmg_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-I8257_INTERFACE( fanucspmg_dma )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(fanucspmg_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(fanucspmg_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 static MC6845_UPDATE_ROW( fanuc_update_row )
 {
 	fanucspmg_state *state = downcast<fanucspmg_state *>(device->owner());
@@ -819,7 +808,9 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_PIT8253_CLK1(XTAL_15MHz/12)
 	MCFG_PIT8253_CLK2(XTAL_15MHz/12)
 
-	MCFG_I8257_ADD(DMAC_TAG, XTAL_15MHz / 5, fanucspmg_dma)
+	MCFG_DEVICE_ADD(DMAC_TAG, I8257, XTAL_15MHz / 5)
+	MCFG_I8257_IN_MEMR_CB(READ8(fanucspmg_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(fanucspmg_state, memory_write_byte))
 
 	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, NULL)
 	MCFG_PIC8259_ADD(PIC1_TAG, INPUTLINE("maincpu", 0), VCC, NULL)

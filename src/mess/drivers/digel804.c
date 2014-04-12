@@ -117,8 +117,6 @@ public:
 	DECLARE_WRITE8_MEMBER( acia_control_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
-	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
-	UINT8 m_vfd_sclk;
 	// current speaker state for port 45
 	UINT8 m_speaker_state;
 	// ram stuff for banking
@@ -164,7 +162,6 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 void digel804_state::machine_reset()
 {
 	m_vfd->reset();
-	m_vfd_sclk = 0;
 }
 
 READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
@@ -288,12 +285,9 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 #ifdef PORT44_W_VERBOSE
 	logerror("Digel804: port 0x44 vfd/state control had %02x written to it!\n", data);
 #endif
-	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
-	if (m_vfd_sclk && ((data&1)==0))
-	{
-		m_vfd->shift_data((data & 0x80) ? 0 : 1);
-	}
-	m_vfd_sclk = data & 1;
+	m_vfd->por(!(data&0x04));
+	m_vfd->data(data&0x80);
+	m_vfd->sclk(data&1);
 }
 
 WRITE8_MEMBER( digel804_state::op45 ) // speaker write

@@ -121,11 +121,14 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, write_dsr))
 	// TODO: remove cts kludge from machine/apple3.c and come up with a good way of coping with pull up resistors.
 
+	/* paddle */
+	MCFG_TIMER_DRIVER_ADD("pdltimer", apple3_state, paddle_timer);
+
 	/* rtc */
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 2000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_0_irq_func))
@@ -313,6 +316,28 @@ static INPUT_PORTS_START( apple3 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_START("joy_1_x")      /* Joystick 1 X Axis */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P1 Joystick X")
+	PORT_MINMAX(0, 0xff) PORT_PLAYER(1)
+
+	PORT_START("joy_1_y")      /* Joystick 1 Y Axis */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P1 Joystick Y")
+	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
+
+	PORT_START("joy_2_x")      /* Joystick 2 X Axis */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P2 Joystick X")
+	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
+
+	PORT_START("joy_2_y")      /* Joystick 2 Y Axis */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P2 Joystick Y")
+	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
+
+	PORT_START("joy_buttons")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("Joystick 1 Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("Joystick 1 Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("Joystick 2 Button 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("Joystick 2 Button 2")
 INPUT_PORTS_END
 
 ROM_START(apple3)

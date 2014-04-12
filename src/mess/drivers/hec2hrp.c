@@ -466,7 +466,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 MACHINE_CONFIG_END
 
@@ -510,7 +510,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 MACHINE_CONFIG_END
 
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
@@ -621,7 +621,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 MACHINE_CONFIG_END
 /*****************************************************************************/
@@ -670,7 +670,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 MACHINE_CONFIG_END
 
@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
-	MCFG_PRINTER_ADD("printer")
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
 
 	MACHINE_CONFIG_END
 

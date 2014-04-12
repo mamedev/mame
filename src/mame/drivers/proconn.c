@@ -332,17 +332,19 @@ static Z80CTC_INTERFACE( ctc_intf )
 WRITE16_MEMBER(proconn_state::serial_transmit)
 {
 //Don't like the look of this, should be a clock somewhere
-//  if (offset == 0)
-//      m_vfd->write_char( data );
-
+ 
 	// should probably be in the pios above
 
-	for (int i=0; i<8;i++)
+	if (offset == 0)
 	{
-		m_vfd->shift_data( (data & (1<<i))?0:1  );
+		for (int i=0; i<8;i++)
+		{
+			m_vfd->data(data & (1<<i));
+			m_vfd->sclk(1);
+			m_vfd->sclk(0);		
+		}
 	}
 }
-
 
 READ16_MEMBER(proconn_state::serial_receive)
 {

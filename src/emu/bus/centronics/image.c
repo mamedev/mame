@@ -8,17 +8,10 @@
 // device type definition
 const device_type CENTRONICS_PRINTER_IMAGE = &device_creator<centronics_printer_image_device>;
 
-/*****************************************************************************
-    PRINTER INTERFACE
-*****************************************************************************/
-const struct printer_interface centronics_printer_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, centronics_printer_image_device, printer_online)
-};
 
 static MACHINE_CONFIG_FRAGMENT( centronics_printer )
-	MCFG_PRINTER_ADD("printer")
-	MCFG_DEVICE_CONFIG(centronics_printer_config)
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_image_device, printer_online))
 MACHINE_CONFIG_END
 
 

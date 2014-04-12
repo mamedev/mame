@@ -19,7 +19,8 @@ const device_type PRINTER = &device_creator<printer_image_device>;
 
 printer_image_device::printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PRINTER, "Printer", tag, owner, clock, "printer_image", __FILE__),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_online_cb(*this)
 {
 }
 
@@ -39,17 +40,6 @@ printer_image_device::~printer_image_device()
 
 void printer_image_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const printer_interface *intf = reinterpret_cast<const printer_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<printer_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_online, 0, sizeof(m_online));
-	}
-
 	// set brief and instance name
 	update_names();
 }
@@ -61,7 +51,7 @@ void printer_image_device::device_config_complete()
 
 void printer_image_device::device_start()
 {
-	m_online_func.resolve(m_online, *this);
+	m_online_cb.resolve();
 }
 
 /***************************************************************************
@@ -107,8 +97,8 @@ bool printer_image_device::call_create(int format_type, option_resolution *forma
 bool printer_image_device::call_load()
 {
 	/* send notify that the printer is now online */
-	if (!m_online_func.isnull())
-		m_online_func(TRUE);
+	if (!m_online_cb.isnull())
+		m_online_cb(TRUE);
 
 	/* we don't need to do anything special */
 	return IMAGE_INIT_PASS;
@@ -121,6 +111,6 @@ bool printer_image_device::call_load()
 void printer_image_device::call_unload()
 {
 	/* send notify that the printer is now offline */
-	if (!m_online_func.isnull())
-		m_online_func(FALSE);
+	if (!m_online_cb.isnull())
+		m_online_cb(FALSE);
 }
