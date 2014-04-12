@@ -109,9 +109,6 @@ void tms6100_device::device_config_complete()
 
 void tms6100_device::device_start()
 {
-	//static const tms5110_interface dummy = { 0 };
-
-	//tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
 	m_rom = *region();
 
 	// save device variables

@@ -31,11 +31,8 @@
 #define TMS3615     15      // Naughty Boy, Pleiads (13 notes, one output)
 #define TMS3617     17      // Monster Bash (13 notes, six outputs)
 
-#undef VMIN
-#undef VMAX
-
-#define VMIN    0x0000
-#define VMAX    0x7fff
+#define TMS36XX_VMIN    0x0000
+#define TMS36XX_VMAX    0x7fff
 
 
 // ======================> tms36xx_device
@@ -68,7 +65,7 @@ public:
 	}
 	static void set_tune_speed(device_t &device, double speed) 
 	{ 
-		downcast<tms36xx_device &>(device).m_speed = (speed > 0) ? VMAX / speed : VMAX; 
+		downcast<tms36xx_device &>(device).m_speed = (speed > 0) ? TMS36XX_VMAX / speed : TMS36XX_VMAX; 
 	}
 	static void set_decays(device_t &device, double decay_0, double decay_1, double decay_2, double decay_3, double decay_4, double decay_5)
 	{
