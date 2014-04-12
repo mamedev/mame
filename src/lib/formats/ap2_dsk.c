@@ -793,8 +793,8 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 								UINT8 tr = gcr4_decode(h[2],h[3]);
 								UINT8 se = gcr4_decode(h[4],h[5]);
 								UINT8 chk = gcr4_decode(h[6],h[7]);
-								UINT32 post = (h[8]<<16)|(h[9]<<8)|h[10];
 								#ifdef VERBOSE_SAVE
+								UINT32 post = (h[8]<<16)|(h[9]<<8)|h[10];
 								printf("Address Mark:\tVolume %d, Track %d, Sector %2d, Checksum %02X: %s, Postamble %03X: %s\n", vl, tr, se, chk, (chk ^ vl ^ tr ^ se)==0?"OK":"BAD", post, (post&0xFFFF00)==0xDEAA00?"OK":"BAD");
 								#endif
 								// sanity check
