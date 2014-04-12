@@ -272,7 +272,8 @@ bool ui_menubar::poll_navigation_keys()
 			// no pull down menu selected
 			code_previous_menu = IPT_UI_LEFT;
 			code_next_menu = IPT_UI_RIGHT;
-			code_child_menu1 = IPT_UI_DOWN;
+			code_child_menu1 = IPT_UI_SELECT;
+			code_child_menu2 = IPT_UI_DOWN;
 		}
 		else
 		{
