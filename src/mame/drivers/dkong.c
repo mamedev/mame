@@ -370,28 +370,6 @@ static Z80DMA_INTERFACE( dk3_dma )
 	DEVCB_NULL
 };
 
-static I8257_INTERFACE( dk_dma )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(dkong_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(dkong_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
-static I8257_INTERFACE( hb_dma )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(dkong_state,p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
-};
-
 /*************************************
  *
  *  VBLANK and IRQ generation
@@ -1657,7 +1635,12 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
-	MCFG_I8257_ADD("dma8257", CLOCK_1H, dk_dma)
+	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
+	MCFG_I8257_OUT_HRQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
+	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, memory_write_byte))
+	MCFG_I8257_IN_IOR_1_CB(READ8(dkong_state, p8257_ctl_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8(dkong_state, p8257_ctl_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1784,7 +1767,8 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
 
 	MCFG_DEVICE_MODIFY("dma8257")
-	MCFG_DEVICE_CONFIG(hb_dma)
+	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, hb_dma_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(dkong_state, hb_dma_write_byte))
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END

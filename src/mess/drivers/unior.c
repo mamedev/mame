@@ -393,17 +393,6 @@ READ8_MEMBER(unior_state::dma_r)
 		return m_p_vram[offset & 0x7ff];
 }
 
-static I8257_INTERFACE( dma_intf )
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", I8085_HALT),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("crtc", i8275_device, dack_w),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(unior_state, dma_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-};
-
 WRITE8_MEMBER( unior_state::cpu_status_callback )
 {
 	m_dma->i8257_hlda_w(BIT(data, 3));
@@ -462,7 +451,12 @@ static MACHINE_CONFIG_START( unior, unior_state )
 
 	MCFG_I8255_ADD( "ppi0", ppi0_intf )
 	MCFG_I8255_ADD( "ppi1", ppi1_intf )
-	MCFG_I8257_ADD("dma", XTAL_20MHz / 9, dma_intf) // unknown clock
+
+	MCFG_DEVICE_ADD("dma", I8257, XTAL_20MHz / 9) // unknown clock
+	MCFG_I8257_OUT_HRQ_CB(INPUTLINE("maincpu", I8085_HALT))
+	MCFG_I8257_OUT_MEMW_CB(DEVWRITE8("crtc", i8275_device, dack_w))
+	MCFG_I8257_IN_IOR_2_CB(READ8(unior_state, dma_r))
+
 	MCFG_I8275_ADD("crtc", crtc_intf)
 MACHINE_CONFIG_END
 

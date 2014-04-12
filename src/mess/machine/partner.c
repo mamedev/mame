@@ -362,22 +362,11 @@ READ8_MEMBER(partner_state::partner_fdc_r)
 {
 	return m_fdc->data_r(space,offset);
 }
+
 WRITE8_MEMBER(partner_state::partner_fdc_w)
 {
 	m_fdc->data_w(space,offset,data);
 }
-
-I8257_INTERFACE( partner_dma )
-{
-	DEVCB_DRIVER_LINE_MEMBER(partner_state,hrq_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(radio86_state, memory_write_byte),
-	{ DEVCB_DRIVER_MEMBER(partner_state, partner_fdc_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_DRIVER_MEMBER(partner_state, partner_fdc_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
-};
-
 
 MACHINE_RESET_MEMBER(partner_state,partner)
 {

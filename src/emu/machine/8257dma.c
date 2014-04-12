@@ -60,6 +60,19 @@ const device_type I8257 = &device_creator<i8257_device>;
 
 i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8257, "DMA8257", tag, owner, clock, "i8257", __FILE__),
+		m_out_hrq_cb(*this),
+		m_out_tc_cb(*this),
+		m_out_mark_cb(*this),
+		m_in_memr_cb(*this),
+		m_out_memw_cb(*this),
+		m_in_ior_0_cb(*this),
+		m_in_ior_1_cb(*this),
+		m_in_ior_2_cb(*this),
+		m_in_ior_3_cb(*this),
+		m_out_iow_0_cb(*this),
+		m_out_iow_1_cb(*this),
+		m_out_iow_2_cb(*this),
+		m_out_iow_3_cb(*this),
 		m_mode(0),
 		m_rr(0),
 		m_msb(0),
@@ -72,42 +85,6 @@ i8257_device::i8257_device(const machine_config &mconfig, const char *tag, devic
 	memset(m_rwmode, 0, sizeof(m_rwmode));
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8257_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8257_interface *intf = reinterpret_cast<const i8257_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<i8257_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_hrq_cb, 0, sizeof(m_out_hrq_cb));
-		memset(&m_out_tc_cb, 0, sizeof(m_out_tc_cb));
-		memset(&m_out_mark_cb, 0, sizeof(m_out_mark_cb));
-		memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
-		memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
-		memset(&m_in_ior_cb[0], 0, sizeof(m_in_ior_cb[0]));
-		memset(&m_in_ior_cb[1], 0, sizeof(m_in_ior_cb[1]));
-		memset(&m_in_ior_cb[2], 0, sizeof(m_in_ior_cb[2]));
-		memset(&m_in_ior_cb[3], 0, sizeof(m_in_ior_cb[3]));
-		memset(&m_out_iow_cb[0], 0, sizeof(m_out_iow_cb[0]));
-		memset(&m_out_iow_cb[1], 0, sizeof(m_out_iow_cb[1]));
-		memset(&m_out_iow_cb[2], 0, sizeof(m_out_iow_cb[2]));
-		memset(&m_out_iow_cb[3], 0, sizeof(m_out_iow_cb[3]));
-	}
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -118,18 +95,20 @@ void i8257_device::device_start()
 	assert(this != NULL);
 
 	/* resolve callbacks */
-	m_out_hrq_func.resolve(m_out_hrq_cb, *this);
-	m_out_tc_func.resolve(m_out_tc_cb, *this);
-	m_out_mark_func.resolve(m_out_mark_cb, *this);
-	m_in_memr_func.resolve(m_in_memr_cb, *this);
-	m_out_memw_func.resolve(m_out_memw_cb, *this);
-
-	for (int i = 0; i < I8257_NUM_CHANNELS; i++)
-	{
-		m_in_ior_func[i].resolve(m_in_ior_cb[i], *this);
-		m_out_iow_func[i].resolve(m_out_iow_cb[i], *this);
-	}
-
+	m_out_hrq_cb.resolve_safe();
+	m_out_tc_cb.resolve_safe();
+	m_out_mark_cb.resolve_safe();
+	m_in_memr_cb.resolve();
+	m_out_memw_cb.resolve();
+	m_in_ior_0_cb.resolve();
+	m_in_ior_1_cb.resolve();
+	m_in_ior_2_cb.resolve();
+	m_in_ior_3_cb.resolve();
+	m_out_iow_0_cb.resolve();
+	m_out_iow_1_cb.resolve();
+	m_out_iow_2_cb.resolve();
+	m_out_iow_3_cb.resolve();
+	
 	/* set initial values */
 	m_timer = timer_alloc(TIMER_OPERATION);
 	m_msbflip_timer = timer_alloc(TIMER_MSBFLIP);
@@ -162,33 +141,53 @@ void i8257_device::device_reset()
 int i8257_device::i8257_do_operation(int channel)
 {
 	int done;
-	UINT8 data;
+	UINT8 data = 0;
 
 	UINT8 mode = m_rwmode[channel];
 	if (m_count[channel] == 0x0000)
 	{
 		m_status |=  (0x01 << channel);
 
-		m_out_tc_func(ASSERT_LINE);
+		m_out_tc_cb(ASSERT_LINE);
 	}
-	switch(mode) {
+
+	switch(mode) 
+	{
 	case 1:
-		if (!m_in_memr_func.isnull())
-		{
-			data = m_in_memr_func(m_address[channel]);
-		}
+		if (!m_in_memr_cb.isnull())
+			data = m_in_memr_cb(m_address[channel]);
 		else
 		{
 			data = 0;
 			logerror("8257: No memory read function defined.\n");
 		}
-		if (!m_out_iow_func[channel].isnull())
+			
+		switch (channel)
 		{
-			m_out_iow_func[channel](m_address[channel], data);
-		}
-		else
-		{
-			logerror("8257: No channel write function for channel %d defined.\n",channel);
+		case 0:
+			if (!m_out_iow_0_cb.isnull()) 
+				m_out_iow_0_cb((offs_t)m_address[channel], data); 
+			else
+				logerror("8257: No channel write function for channel %d defined.\n", channel);
+			break;
+		case 1:
+			if (!m_out_iow_1_cb.isnull()) 
+				m_out_iow_1_cb((offs_t)m_address[channel], data); 
+			else
+				logerror("8257: No channel write function for channel %d defined.\n", channel);
+			break;
+		case 2:
+			if (!m_out_iow_2_cb.isnull()) 
+				m_out_iow_2_cb((offs_t)m_address[channel], data); 
+			else
+				logerror("8257: No channel write function for channel %d defined.\n", channel);
+			break;
+		case 3:
+			if (!m_out_iow_3_cb.isnull()) 
+				m_out_iow_3_cb((offs_t)m_address[channel], data); 
+			else
+				logerror("8257: No channel write function for channel %d defined.\n", channel);
+			break;
 		}
 
 		m_address[channel]++;
@@ -197,37 +196,67 @@ int i8257_device::i8257_do_operation(int channel)
 		break;
 
 	case 2:
-		if (!m_in_ior_func[channel].isnull())
+		switch (channel)
 		{
-			data = m_in_ior_func[channel](m_address[channel]);
-		}
-		else
-		{
-			data = 0;
-			logerror("8257: No channel read function for channel %d defined.\n",channel);
+		case 0:
+			if (!m_in_ior_0_cb.isnull()) 
+				data = m_in_ior_0_cb((offs_t)m_address[channel]); 
+			else
+			{
+				data = 0;
+				logerror("8257: No channel read function for channel %d defined.\n", channel);
+			}
+			break;
+		case 1:
+			if (!m_in_ior_1_cb.isnull()) 
+				data = m_in_ior_1_cb((offs_t)m_address[channel]); 
+			else
+			{
+				data = 0;
+				logerror("8257: No channel read function for channel %d defined.\n", channel);
+			}
+			break;
+		case 2:
+			if (!m_in_ior_2_cb.isnull()) 
+				data = m_in_ior_2_cb((offs_t)m_address[channel]); 
+			else
+			{
+				data = 0;
+				logerror("8257: No channel read function for channel %d defined.\n", channel);
+			}
+			break;
+		case 3:
+			if (!m_in_ior_3_cb.isnull()) 
+				data = m_in_ior_3_cb((offs_t)m_address[channel]); 
+			else
+			{
+				data = 0;
+				logerror("8257: No channel read function for channel %d defined.\n", channel);
+			}
+			break;
 		}
 
-		if (!m_out_memw_func.isnull())
-		{
-			m_out_memw_func(m_address[channel], data);
-		}
+		if (!m_out_memw_cb.isnull())
+			m_out_memw_cb((offs_t)m_address[channel], data);
 		else
-		{
 			logerror("8257: No memory write function defined.\n");
-		}
+
 		m_address[channel]++;
 		m_count[channel]--;
-		done = (m_count[channel] == 0xFFFF);
+		done = (m_count[channel] == 0xffff);
 		break;
+
 	case 0: /* verify */
 		m_address[channel]++;
 		m_count[channel]--;
-		done = (m_count[channel] == 0xFFFF);
+		done = (m_count[channel] == 0xffff);
 		break;
+
 	default:
 		fatalerror("i8257_do_operation: invalid mode!\n");
 		break;
 	}
+
 	if (done)
 	{
 		if ((channel==2) && DMA_MODE_AUTOLOAD(m_mode))
@@ -238,7 +267,7 @@ int i8257_device::i8257_do_operation(int channel)
 			m_registers[5] = m_registers[7];
 		}
 
-		m_out_tc_func(CLEAR_LINE);
+		m_out_tc_cb(CLEAR_LINE);
 	}
 	return done;
 }
@@ -337,7 +366,7 @@ void i8257_device::i8257_update_status()
 	}
 
 	/* set the halt line */
-	m_out_hrq_func(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
+	m_out_hrq_cb(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -146,17 +146,6 @@ WRITE8_MEMBER(radio86_state::memory_write_byte)
 	return prog_space.write_byte(offset, data);
 }
 
-I8257_INTERFACE( radio86_dma )
-{
-	DEVCB_DRIVER_LINE_MEMBER(radio86_state,hrq_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(radio86_state, memory_read_byte),
-	DEVCB_DRIVER_MEMBER(radio86_state, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
-};
-
 void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
