@@ -7381,7 +7381,7 @@ DRIVER_INIT_MEMBER(nmk16_state,spec2k)
 	decryptcode( machine(), 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9,  8, 7,  6,  5,  4, 3,  2,  1,  0 );
 }
 
-ROM_START( spec2k )
+ROM_START( spec2kh )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "yonatech5.u124", 0x00000, 0x40000, CRC(72ab5c05) SHA1(182a811982b89b8cda0677547ef0625c274f5c6b) )
 	ROM_LOAD16_BYTE( "yonatech6.u120", 0x00001, 0x40000, CRC(7e44bd9c) SHA1(da59685be14a09ec037743fcec34fb293f7d588d) )
@@ -7406,13 +7406,14 @@ ROM_START( spec2k )
 	ROM_LOAD( "yonatech3.u106", 0x00000, 0x80000, CRC(6644c404) SHA1(b7ad3f9f08971432d024ef8be3fa3140f0bbae67) )
 ROM_END
 
-ROM_START( spec2kv )
+
+ROM_START( spec2k )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1", 0x00000, 0x40000, NO_DUMP )
-	ROM_LOAD16_BYTE( "prg2", 0x00001, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "u124", 0x00000, 0x40000, CRC(dbd6f65d) SHA1(0fad9836689fcbee60904ccad59a2a5be09f3139) )
+	ROM_LOAD16_BYTE( "u120", 0x00001, 0x40000, CRC(be53e243) SHA1(38144b90a35ba144921824a0c4f133339e07f9a1) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 Code */
-	ROM_LOAD( "z80", 0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "u103", 0x00000, 0x10000, CRC(f4e4fb10) SHA1(d19953d37e31fc753b50f0047d5be16f1f2daf09) )
 
 	ROM_REGION( 0x200000, "sprites",0 ) /* Sprites, 16x16x4 */
 	ROM_LOAD( "uc1", 0x00000, 0x200000, CRC(3139a213) SHA1(5ec4be0e27cbf1c4556ab10d7e1408ea64aa9e17) )
@@ -7422,13 +7423,13 @@ ROM_START( spec2kv )
 	ROM_LOAD( "uc2", 0x200000, 0x200000, CRC(998dc05c) SHA1(cadf8bb0b8944372fbce9934b93684749ebc3ba0) )
 
 	ROM_REGION( 0x20000, "fgtile", ROMREGION_ERASEFF )    /* Layer 1, 8x8x4 */
-	ROM_LOAD( "fgtiles", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "u3", 0x00000, 0x20000, CRC(921503b8) SHA1(dea6e9d47c9db83e79907bc0609a64176aff26bc) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
-	ROM_LOAD( "samples1", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "u101", 0x00000, 0x40000, CRC(d16aaaad) SHA1(96ca173ca433164ed0ae51b41b42343bd3cfb5fe) )
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
-	ROM_LOAD( "samples2", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "u106", 0x00000, 0x80000, CRC(65d61f3a) SHA1(a8f7ad61ae29a5c852820e5cbe886a8cd437634a) )
 ROM_END
 
 /***************************************************************************
@@ -7585,9 +7586,9 @@ GAME( 1999, popspops, 0,        popspops, popspops, nmk16_state,   grdnstrm, ROT
 GAME( 2000, mangchi,  0,        popspops, mangchi, nmk16_state,    bubl2000, ROT0,               "Afega",                             "Mang-Chi", 0 )
 
 // these two are very similar games, but the exact parent/clone relationship is unknown
-GAME( 2000, spec2k,   0,        firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (Euro)", 0 )
-GAME( 2000, spec2kv,  spec2k,   firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_NOT_WORKING ) // incomplete dump, only gfx roms are dumped
-GAME( 2001, firehawk, 0,        firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
+GAME( 2000, spec2k,   0,       firehawk, spec2k, nmk16_state,     spec2k,   ROT270,             "Yona Tech",             "Spectrum 2000 (vertical)", GAME_IMPERFECT_GRAPHICS ) // the ships scroll off the screen if you insert a coin during the attract demo?  verify it doesn't happen on real hw(!)
+GAME( 2000, spec2kh,  spec2k,  firehawk, spec2k, nmk16_state,     spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (horizontal, buggy) (Europe)", 0 ) // this has odd bugs even on real hardware, eg glitchy 3 step destruction sequence of some larger enemies
+GAME( 2001, firehawk, spec2k,  firehawk, firehawk, driver_device, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk (horizontal)", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc, 0,        manybloc, manybloc, driver_device, 0,        ROT270,             "Bee-Oh",                "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

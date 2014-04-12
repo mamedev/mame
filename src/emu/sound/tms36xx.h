@@ -31,6 +31,9 @@
 #define TMS3615     15      // Naughty Boy, Pleiads (13 notes, one output)
 #define TMS3617     17      // Monster Bash (13 notes, six outputs)
 
+#undef VMIN
+#undef VMAX
+
 #define VMIN    0x0000
 #define VMAX    0x7fff
 
