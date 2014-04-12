@@ -233,8 +233,8 @@ private:
 	bool walk_selection_child();
 	bool walk_selection_parent();
 	bool walk_selection_escape();
-	bool walk_selection_previous_peer();
-	bool walk_selection_next_peer();
+	bool walk_selection_previous_sub_menu();
+	bool walk_selection_next_sub_menu();
 
 	// miscellaneous
 	void draw_child_menu(menu_item *menu, float x, float y);

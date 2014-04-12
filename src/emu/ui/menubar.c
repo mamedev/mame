@@ -255,8 +255,8 @@ bool ui_menubar::poll_navigation_keys()
 	int code_next_menu = IPT_INVALID;
 	int code_child_menu = IPT_INVALID;
 	int code_parent_menu = IPT_INVALID;
-	int code_previous_peer = IPT_INVALID;
-	int code_next_peer = IPT_INVALID;
+	int code_previous_sub_menu = IPT_INVALID;
+	int code_next_sub_menu = IPT_INVALID;
 	int code_selected = (m_selected_item && m_selected_item->is_invokable())
 		? IPT_UI_SELECT
 		: IPT_INVALID;
@@ -279,8 +279,8 @@ bool ui_menubar::poll_navigation_keys()
 			code_next_menu = IPT_UI_DOWN;
 			if (m_selected_item->child())
 				code_child_menu = IPT_UI_SELECT;
-			code_previous_peer = IPT_UI_LEFT;
-			code_next_peer = IPT_UI_RIGHT;
+			code_previous_sub_menu = IPT_UI_LEFT;
+			code_next_sub_menu = IPT_UI_RIGHT;
 			if (m_selected_item->parent()->is_sub_menu())
 				code_parent_menu = IPT_UI_LEFT;
 		}
@@ -297,10 +297,10 @@ bool ui_menubar::poll_navigation_keys()
 		result = walk_selection_escape();
 	else if (input_pressed_safe(code_parent_menu))
 		result = walk_selection_parent();
-	else if (input_pressed_safe(code_previous_peer))
-		result = walk_selection_previous_peer();
-	else if (input_pressed_safe(code_next_peer))
-		result = walk_selection_next_peer();
+	else if (input_pressed_safe(code_previous_sub_menu))
+		result = walk_selection_previous_sub_menu();
+	else if (input_pressed_safe(code_next_sub_menu))
+		result = walk_selection_next_sub_menu();
 	else if (input_pressed_safe(IPT_UI_CONFIGURE))
 		toggle_selection();
 	else if (input_pressed_safe(code_selected))
@@ -464,12 +464,14 @@ bool ui_menubar::walk_selection_escape()
 
 
 //-------------------------------------------------
-//  walk_selection_previous_peer
+//  walk_selection_previous_sub_menu
 //-------------------------------------------------
 
-bool ui_menubar::walk_selection_previous_peer()
+bool ui_menubar::walk_selection_previous_sub_menu()
 {
-	bool result = walk_selection_parent() && walk_selection_previous();
+	while(walk_selection_parent())
+		;
+	bool result = walk_selection_previous();
 	if (result)
 		walk_selection_child();
 	return result;
@@ -477,12 +479,14 @@ bool ui_menubar::walk_selection_previous_peer()
 
 
 //-------------------------------------------------
-//  walk_selection_next_peer
+//  walk_selection_next_sub_menu
 //-------------------------------------------------
 
-bool ui_menubar::walk_selection_next_peer()
+bool ui_menubar::walk_selection_next_sub_menu()
 {
-	bool result = walk_selection_parent() && walk_selection_next();
+	while(walk_selection_parent())
+		;
+	bool result = walk_selection_next();
 	if (result)
 		walk_selection_child();
 	return result;
