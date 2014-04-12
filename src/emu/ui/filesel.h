@@ -85,7 +85,7 @@ private:
 	astring &                   m_current_directory;
 	astring &                   m_current_file;
 	bool                        m_has_empty;
-	bool                        m_has_softlist;
+//	bool                        m_has_softlist;
 	bool                        m_has_create;
 	int *                       m_result;
 	file_selector_entry *       m_entrylist;
