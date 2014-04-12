@@ -64,6 +64,7 @@ ui_menubar::ui_menubar(running_machine &machine)
 	m_mouse_x = -1;
 	m_mouse_y = -1;
 	m_mouse_button = false;
+	m_last_mouse_move = 0;
 }
 
 
@@ -726,10 +727,11 @@ ui_menubar::menubar_visibility_t ui_menubar::get_menubar_visibility()
 	menubar_visibility_t result;
 
 	// is the mouse in the menu bar?
-	bool in_menu_bar = m_mouse_y <= machine().ui().get_line_height();
+	bool in_menu_bar = (m_mouse_y >= 0) && (m_mouse_y <= machine().ui().get_line_height());
 
 	// did we recently move the mouse?
-	bool recently_moved = (osd_ticks() - m_last_mouse_move) * 5 / osd_ticks_per_second() < 1;
+	bool recently_moved = (m_last_mouse_move != 0)
+		&& ((osd_ticks() - m_last_mouse_move) * 5 / osd_ticks_per_second() < 1);
 
 	// make the choice
 	if ((m_selected_item != NULL) || (m_active_item != NULL))
