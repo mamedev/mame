@@ -28,18 +28,29 @@ ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, d
 
 void ncr5390_device::device_start()
 {
+	nscsi_device::device_start();
+
 	save_item(NAME(command));
 	save_item(NAME(config));
 	save_item(NAME(status));
 	save_item(NAME(istatus));
-	save_item(NAME(fifo_pos));
+	save_item(NAME(clock_conv));
+	save_item(NAME(sync_offset));
+	save_item(NAME(sync_period));
+	save_item(NAME(bus_id));
+	save_item(NAME(select_timeout));
+	save_item(NAME(seq));
 	save_item(NAME(fifo));
 	save_item(NAME(tcount));
 	save_item(NAME(mode));
+	save_item(NAME(fifo_pos));
 	save_item(NAME(command_pos));
+	save_item(NAME(state));
+	save_item(NAME(xfr_phase));
+	save_item(NAME(command_length));
+	save_item(NAME(dma_dir));
 	save_item(NAME(irq));
 	save_item(NAME(drq));
-	save_item(NAME(clock_conv));
 
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();

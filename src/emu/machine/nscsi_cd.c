@@ -12,6 +12,11 @@ void nscsi_cdrom_device::device_start()
 {
 	nscsi_full_device::device_start();
 	bytes_per_sector = 2048;
+	save_item(NAME(block));
+	save_item(NAME(lba));
+	save_item(NAME(cur_lba));
+	save_item(NAME(blocks));
+	save_item(NAME(bytes_per_sector));
 }
 
 void nscsi_cdrom_device::device_reset()

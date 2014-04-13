@@ -92,6 +92,8 @@ protected:
 	int scsi_id;
 	int scsi_refid;
 	nscsi_bus_device *scsi_bus;
+
+	virtual void device_start();
 };
 
 class nscsi_full_device : public nscsi_device

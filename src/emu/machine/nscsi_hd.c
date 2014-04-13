@@ -16,6 +16,11 @@ nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, devi
 void nscsi_harddisk_device::device_start()
 {
 	nscsi_full_device::device_start();
+	save_item(NAME(block));
+	save_item(NAME(lba));
+	save_item(NAME(cur_lba));
+	save_item(NAME(blocks));
+	save_item(NAME(bytes_per_sector));
 }
 
 void nscsi_harddisk_device::device_reset()

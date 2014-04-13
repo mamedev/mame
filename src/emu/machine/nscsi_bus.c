@@ -14,6 +14,13 @@ void nscsi_bus_device::device_start()
 {
 	data = 0;
 	ctrl = 0;
+	save_item(NAME(data));
+	save_item(NAME(ctrl));
+	for(int i=0; i<devcnt; i++) {
+		save_item(NAME(dev[i].data), i);
+		save_item(NAME(dev[i].ctrl), i);
+		save_item(NAME(dev[i].wait_ctrl), i);
+	}
 }
 
 void nscsi_bus_device::device_reset()
@@ -161,6 +168,11 @@ void nscsi_device::scsi_ctrl_changed()
 {
 }
 
+void nscsi_device::device_start()
+{
+	save_item(NAME(scsi_id));
+}
+
 nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	nscsi_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
@@ -168,7 +180,25 @@ nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type 
 
 void nscsi_full_device::device_start()
 {
+	nscsi_device::device_start();
 	scsi_timer = timer_alloc(SCSI_TIMER);
+	save_item(NAME(scsi_cmdbuf));
+	save_item(NAME(scsi_sense_buffer));
+	save_item(NAME(scsi_cmdsize));
+	save_item(NAME(scsi_identify));
+	save_item(NAME(scsi_state));
+	save_item(NAME(scsi_substate));
+	save_item(NAME(scsi_initiator_id));
+	save_item(NAME(data_buffer_id));
+	save_item(NAME(data_buffer_size));
+	save_item(NAME(data_buffer_pos));
+	save_item(NAME(buf_control_rpos));
+	save_item(NAME(buf_control_wpos));
+	for(int i=0; i<32; i++) {
+		save_item(NAME(buf_control[i].action), i);
+		save_item(NAME(buf_control[i].param1), i);
+		save_item(NAME(buf_control[i].param2), i);
+	}
 }
 
 void nscsi_full_device::device_reset()
