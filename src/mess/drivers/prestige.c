@@ -90,11 +90,21 @@ public:
 	prestige_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_bank1(*this, "bank1"),
+			m_bank2(*this, "bank2"),
+			m_bank3(*this, "bank3"),
+			m_bank4(*this, "bank4"),
+			m_bank5(*this, "bank5")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
 
 	UINT8 m_bank[7];
 	UINT8 m_kb_matrix;
@@ -130,39 +140,36 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 	switch (offset)
 	{
 	case 0:
-		membank("bank1")->set_entry(data & 0x3f);
+		m_bank1->set_entry(data & 0x3f);
 		break;
 
 	case 1:
-		if (m_bank[5] & 0x08)
-			membank("bank2")->set_entry(0x40 + (data & 1));
+		if (m_bank[5] & 0x02)
+			m_bank2->set_entry(0x40 + (data & 0x1f));
 		else
-			membank("bank2")->set_entry(data & 0x3f);
+			m_bank2->set_entry(data & 0x3f);
 		break;
 
 	case 2:
 		if (m_bank[5] & 0x04)
-			membank("bank3")->set_entry(0x40 + (data & 1));
+			m_bank3->set_entry(0x40 + (data & 0x1f));
 		else
-			membank("bank3")->set_entry(data & 0x3f);
+			m_bank3->set_entry(data & 0x3f);
 		break;
 
 	case 3:
-		if (m_bank[5] & 0x02)
-			membank("bank4")->set_entry(0x04 + (data & 0x03));
-		else
-			membank("bank4")->set_entry(data & 0x03);
+		m_bank4->set_entry(data & 0x03);
 		break;
 
 	case 4:
-		membank("bank5")->set_entry(data & 0x03);
+		m_bank5->set_entry(data & 0x03);
 		break;
 
 	case 5:
 		if (ioport("CART_TYPE")->read() == 0x01)
 		{
 			//cartridge memory is writable
-			if (data & 0x08)
+			if (data & 0x02)
 				program.install_readwrite_bank(0x4000, 0x7fff, "bank2");
 			else
 				program.unmap_write(0x4000, 0x7fff);
@@ -171,17 +178,10 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 				program.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 			else
 				program.unmap_write(0x8000, 0xbfff);
-
-			program.install_readwrite_bank(0xc000, 0xdfff, "bank4");
 		}
 		else
 		{
 			//cartridge memory is read-only
-			if (data & 0x02)
-				program.unmap_write(0xc000, 0xdfff);
-			else
-				program.install_readwrite_bank(0xc000, 0xdfff, "bank4");
-
 			program.unmap_write(0x4000, 0xbfff);
 		}
 		break;
@@ -264,15 +264,15 @@ ADDRESS_MAP_END
 /* Input ports */
 INPUT_PORTS_START( prestige )
 	PORT_START("CART_TYPE")
-	PORT_CONFNAME( 0x01, 0x01, "Cartridge Type" )
+	PORT_CONFNAME( 0x01, 0x00, "Cartridge Type" )
 	PORT_CONFSETTING( 0x00, "ROM" )
 	PORT_CONFSETTING( 0x01, "RAM" )
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(2)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(2)
 
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left mouse button")  PORT_CODE(MOUSECODE_BUTTON1)
@@ -418,25 +418,27 @@ IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 
 void prestige_state::machine_start()
 {
+	UINT8 *rom = (UINT8 *)(*memregion("maincpu"));
+	UINT8 *cart = (UINT8 *)(*memregion("cart"));
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(prestige_state::prestige_int_ack),this));
 
-	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);
-	membank("bank2")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);
-	membank("bank2")->configure_entries(64, 2, memregion("cart")->base(), 0x4000);
-	membank("bank3")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);
-	membank("bank3")->configure_entries(64, 2, memregion("cart")->base(), 0x4000);
-	membank("bank4")->configure_entries(0, 4, ram, 0x2000);
-	membank("bank4")->configure_entries(4, 4, memregion("cart")->base(), 0x2000);
-	membank("bank5")->configure_entries(0, 4, ram, 0x2000);
+	m_bank1->configure_entries(0, 64, rom,  0x4000);
+	m_bank1->configure_entries(64,32, cart, 0x4000);
+	m_bank2->configure_entries(0, 64, rom,  0x4000);
+	m_bank2->configure_entries(64,32, cart, 0x4000);
+	m_bank3->configure_entries(0, 64, rom,  0x4000);
+	m_bank3->configure_entries(64,32, cart, 0x4000);
+	m_bank4->configure_entries(0, 4,  ram,  0x2000);
+	m_bank5->configure_entries(0, 4,  ram,  0x2000);
 
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
-	membank("bank3")->set_entry(0);
-	membank("bank4")->set_entry(0);
-	membank("bank5")->set_entry(0);
+	m_bank1->set_entry(0);
+	m_bank2->set_entry(0);
+	m_bank3->set_entry(0);
+	m_bank4->set_entry(0);
+	m_bank5->set_entry(0);
 
 	//pointer to the videoram
 	m_vram = ram;
@@ -477,7 +479,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( prestige, prestige_state )
+static MACHINE_CONFIG_START( prestige_base, prestige_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
@@ -510,13 +512,19 @@ static MACHINE_CONFIG_START( prestige, prestige_state )
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl6000sl, prestige )
+static MACHINE_CONFIG_DERIVED( prestige, prestige_base )
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gl6000sl, prestige_base )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gl7007sl, prestige )
+static MACHINE_CONFIG_DERIVED( gl7007sl, prestige_base )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
@@ -527,32 +535,32 @@ ROM_START( gl6000sl )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "27-5894-01",   0x000000, 0x080000, CRC(7336231c) SHA1(35a1f739994b5c8fb67a7f76d423e50d8154e9ea) )
 
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
 ROM_START( gl7007sl )
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "27-6060-00", 0x000000, 0x100000, CRC(06b2a595) SHA1(654d00e55ee43627ff947d72676c8e48e0518123) )
 
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
 ROM_START( prestige )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-6020-02.u2", 0x00000, 0x100000, CRC(6bb6db14) SHA1(5d51fc3fd799e7f01ee99c453f9005fb07747b1e) )
 
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
 ROM_START( glcolor )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5488-00.u5", 0x00000, 0x080000, CRC(e6cf7702) SHA1(ce40418a7777b331bf8c4c881d51732aeb384582) )
 
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
 ROM_END
 
 /* Driver */
