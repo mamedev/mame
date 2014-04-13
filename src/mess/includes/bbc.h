@@ -48,6 +48,10 @@ public:
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
 		m_i8271(*this, "i8271"),
+		m_joy0(*this, "JOY0"),
+		m_joy1(*this, "JOY1"),
+		m_joy2(*this, "JOY2"),
+		m_joy3(*this, "JOY3"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_user1(*this, "user1"),
 		m_region_user2(*this, "user2"),
@@ -152,8 +156,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-
 	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
+
+	UPD7002_GET_ANALOGUE(BBC_get_analogue_input);
+	UPD7002_EOC(BBC_uPD7002_EOC);
 
 	int exp_rom_load(device_image_interface &image, int index);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbc_exp_rom );
@@ -176,6 +182,7 @@ public: // HACK FOR MC6845
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
 	optional_device<i8271_device> m_i8271;
+	required_ioport m_joy0, m_joy1, m_joy2, m_joy3;
 
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_user1;
@@ -416,9 +423,5 @@ extern const mc6845_interface bbc_mc6845_intf;
 
 extern const i8271_interface bbc_i8271_interface;
 extern const wd17xx_interface bbc_wd17xx_interface;
-
-/* tape support */
-
-extern const upd7002_interface bbc_uPD7002;
 
 #endif /* BBC_H_ */

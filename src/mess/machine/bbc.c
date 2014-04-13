@@ -1153,35 +1153,27 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_via_user_irq_w)
 BBC Joystick Support
 **************************************/
 
-static UPD7002_GET_ANALOGUE(BBC_get_analogue_input)
+UPD7002_GET_ANALOGUE(bbc_state::BBC_get_analogue_input)
 {
-	switch(channel_number)
+	switch (channel_number)
 	{
 		case 0:
-			return ((0xff-device->machine().root_device().ioport("JOY0")->read())<<8);
+			return ((0xff - m_joy0->read()) << 8);
 		case 1:
-			return ((0xff-device->machine().root_device().ioport("JOY1")->read())<<8);
+			return ((0xff - m_joy1->read()) << 8);
 		case 2:
-			return ((0xff-device->machine().root_device().ioport("JOY2")->read())<<8);
+			return ((0xff - m_joy2->read()) << 8);
 		case 3:
-			return ((0xff-device->machine().root_device().ioport("JOY3")->read())<<8);
+			return ((0xff - m_joy3->read()) << 8);
 	}
 
 	return 0;
 }
 
-static UPD7002_EOC(BBC_uPD7002_EOC)
+UPD7002_EOC(bbc_state::BBC_uPD7002_EOC)
 {
-	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
-	via_0->write_cb1(data);
+	m_via6522_0->write_cb1(data);
 }
-
-const upd7002_interface bbc_uPD7002 =
-{
-	BBC_get_analogue_input,
-	BBC_uPD7002_EOC
-};
-
 
 /***************************************
   BBC 2C199 Serial Interface Cassette

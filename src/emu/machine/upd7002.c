@@ -22,32 +22,14 @@ upd7002_device::upd7002_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd7002_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd7002_interface *intf = reinterpret_cast<const upd7002_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd7002_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		get_analogue_func = NULL;
-		eoc_func = NULL;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void upd7002_device::device_start()
 {
+	m_get_analogue_cb.bind_relative_to(*owner());
+	m_eoc_cb.bind_relative_to(*owner());
+
 	// register for state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_data1));
@@ -99,7 +81,7 @@ void upd7002_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			// call the EOC function with EOC from status
 			// eoc_r(0) this has just been set to 0
-			if (eoc_func) (eoc_func)(this,0);
+			if (!m_eoc_cb.isnull()) m_eoc_cb(0);
 			m_conversion_counter=0;
 		}
 		break;
@@ -153,13 +135,13 @@ WRITE8_MEMBER( upd7002_device::write )
 
 		// call the EOC function with EOC from status
 		// eoc_r(0) this has just been set to 1
-		if (eoc_func) eoc_func(this, 1);
+		if (!m_eoc_cb.isnull()) m_eoc_cb(1);
 
 		/* the uPD7002 works by sampling the analogue value at the start of the conversion
 		   so it is read hear and stored until the end of the A to D conversion */
 
 		// this function should return a 16 bit value.
-		m_digitalvalue = get_analogue_func(this, m_status & 0x03);
+		m_digitalvalue = m_get_analogue_cb(m_status & 0x03);
 
 		m_conversion_counter++;
 

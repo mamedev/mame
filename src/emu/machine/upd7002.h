@@ -15,37 +15,32 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef int (*upd7002_get_analogue_func)(device_t *device, int channel_number);
-#define UPD7002_GET_ANALOGUE(name)  int name(device_t *device, int channel_number )
+typedef device_delegate<int (int channel_number)> upd7002_get_analogue_delegate;
+#define UPD7002_GET_ANALOGUE(name)  int name(int channel_number)
 
-typedef void (*upd7002_eoc_func)(device_t *device, int data);
-#define UPD7002_EOC(name)   void name(device_t *device, int data )
+typedef device_delegate<void (int data)> upd7002_eoc_delegate;
+#define UPD7002_EOC(name)   void name(int data)
 
-
-struct upd7002_interface
-{
-	upd7002_get_analogue_func get_analogue_func;
-	upd7002_eoc_func          eoc_func;
-};
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
 
-class upd7002_device : public device_t,
-								public upd7002_interface
+class upd7002_device : public device_t
 {
 public:
 	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd7002_device() {}
 
-	DECLARE_READ8_MEMBER ( eoc_r );
-	DECLARE_READ8_MEMBER ( read );
-	DECLARE_WRITE8_MEMBER ( write );
+	static void set_get_analogue_callback(device_t &device, upd7002_get_analogue_delegate callback) { downcast<upd7002_device &>(device).m_get_analogue_cb = callback; }
+	static void set_eoc_callback(device_t &device, upd7002_eoc_delegate callback) { downcast<upd7002_device &>(device).m_eoc_cb = callback; }
+
+	DECLARE_READ8_MEMBER(eoc_r);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -84,6 +79,9 @@ private:
 	only then at the end of the second conversion will the conversion complete function run */
 	int m_conversion_counter;
 
+	upd7002_get_analogue_delegate m_get_analogue_cb;
+	upd7002_eoc_delegate          m_eoc_cb;
+
 	enum
 	{
 		TIMER_CONVERSION_COMPLETE
@@ -97,9 +95,10 @@ extern const device_type UPD7002;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_UPD7002_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, UPD7002, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
+#define MCFG_UPD7002_GET_ANALOGUE_CB(_class, _method) \
+	upd7002_device::set_get_analogue_callback(*device, upd7002_get_analogue_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
+#define MCFG_UPD7002_EOC_CB(_class, _method) \
+	upd7002_device::set_eoc_callback(*device, upd7002_eoc_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #endif /* UPD7002_H_ */

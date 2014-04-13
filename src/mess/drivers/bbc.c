@@ -764,7 +764,9 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* adc */
-	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
+	MCFG_UPD7002_GET_ANALOGUE_CB(bbc_state, BBC_get_analogue_input)
+	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
@@ -821,7 +823,9 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* adc */
-	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
+	MCFG_UPD7002_GET_ANALOGUE_CB(bbc_state, BBC_get_analogue_input)
+	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_printers, "image")
@@ -965,7 +969,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bbc_state, write_acia_clock))
 
 	/* adc */
-	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+	MCFG_DEVICE_ADD("upd7002", UPD7002, 0)
+	MCFG_UPD7002_GET_ANALOGUE_CB(bbc_state, BBC_get_analogue_input)
+	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
