@@ -15,6 +15,7 @@
 #define MCFG_SEGAM1AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -53,6 +54,7 @@ private:
 	int m_to_68k[8];
 	int m_fifo_rptr;
 	int m_fifo_wptr;
+	devcb2_write_line   m_main_irq_cb;
 };
 
 

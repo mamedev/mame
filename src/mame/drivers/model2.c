@@ -161,6 +161,7 @@ READ32_MEMBER(model2_state::copro_tgp_fifoin_pop)
 {
 	UINT32 r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
 
+
 	if (m_copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
 	{
 		m_copro_fifoin_rpos = 0;
@@ -181,7 +182,7 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", device->safe_pc(), data, *(float*)&data);
+	//printf("COPRO FIFOIN at %08X, %08X, %f\n", device->safe_pc(), data, *(float*)&data);
 
 	state->m_copro_fifoin_data[state->m_copro_fifoin_wpos++] = data;
 	if (state->m_copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
@@ -339,10 +340,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timers[tnum]->reset();
 
 	m_intreq |= (1<<bit);
-	if (m_intena & (1<<bit))
-	{
-		m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
-	}
+	model2_check_irq_state();
 
 	m_timervals[tnum] = 0;
 	m_timerrun[tnum] = 0;
@@ -366,6 +364,7 @@ MACHINE_RESET_MEMBER(model2_state,model2_common)
 	m_geocnt = 0;
 	m_ctrlmode = 0;
 	m_analog_channel = 0;
+	m_soundack = 0;
 
 	m_timervals[0] = 0xfffff;
 	m_timervals[1] = 0xfffff;
@@ -483,7 +482,12 @@ READ32_MEMBER(model2_state::fifoctl_r)
 
 READ32_MEMBER(model2_state::videoctl_r)
 {
-	return (m_screen->frame_number() & 1) << 2;
+	return ((m_screen->frame_number() & 1) << 2) | (m_videocontrol & 3);
+}
+
+WRITE32_MEMBER(model2_state::videoctl_w)
+{
+	COMBINE_DATA(&m_videocontrol);
 }
 
 CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
@@ -994,6 +998,17 @@ READ32_MEMBER(model2_state::model2_irq_r)
 	return m_intreq;
 }
 
+void model2_state::model2_check_irq_state()
+{
+	const int irq_type[16]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
+
+	for(int i=0;i<16;i++)
+	{
+		if (m_intena & (1<<i) && m_intreq & 1<<i)
+			m_maincpu->set_input_line(irq_type[i], ASSERT_LINE);
+	}
+}
+
 WRITE32_MEMBER(model2_state::model2_irq_w)
 {
 	m_maincpu->i960_noburst();
@@ -1001,10 +1016,12 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 	if (offset)
 	{
 		COMBINE_DATA(&m_intena);
+		model2_check_irq_state();
 		return;
 	}
 
 	m_intreq &= data;
+	/* TODO: improve this */
 	UINT32 irq_ack = data ^ 0xffffffff;
 
 	if(irq_ack & 1<<0)
@@ -1015,6 +1032,7 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 
 }
 
+/* TODO: rewrite this part. */
 READ32_MEMBER(model2_state::model2_serial_r)
 {
 	if ((offset == 0) && (mem_mask == 0xffff0000))
@@ -1025,8 +1043,16 @@ READ32_MEMBER(model2_state::model2_serial_r)
 	return 0xffffffff;
 }
 
+
 WRITE32_MEMBER(model2_state::model2o_serial_w)
 {
+	if(mem_mask == 0xffff0000)
+	{
+		if (!space.debugger_access())
+		{
+			//m_soundack++;
+		}
+	}
 	if (mem_mask == 0x0000ffff)
 	{
 		if (!m_m1audio->ready_r(space, 0))
@@ -1081,6 +1107,7 @@ static const UINT8 ZGUNProt[] =
 	0x94,0xD5,0x73,0x09,0xE4,0x3D,0x2D,0x92,0xC9,0xA7,0xA3,0x53,0x42,0x82,0x55,0x67,
 	0xE4,0x66,0xD0,0x4A,0x7D,0x4A,0x13,0xDE,0xD7,0x9F,0x38,0xAA,0x00,0x56,0x85,0x0A
 };
+
 static const UINT8 DCOPKey1326[]=
 {
 	0x43,0x66,0x54,0x11,0x99,0xfe,0xcc,0x8e,0xdd,0x87,0x11,0x89,0x22,0xdf,0x44,0x09
@@ -1376,7 +1403,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
-	AM_RANGE(0x0098000c, 0x0098000f) AM_READ(videoctl_r)
+	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
 
 	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
 
@@ -1489,6 +1516,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
+	AM_RANGE(0x01c0000c, 0x01c0000f) AM_READ_PORT("1c0000c")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
 	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ(hotd_unk_r )
@@ -1579,6 +1607,10 @@ static INPUT_PORTS_START( model2 )
 	PORT_START("1c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN2")
+
+	PORT_START("1c0000c")
+	PORT_BIT( 0xfffffff7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("1c00010")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN0")
@@ -1940,18 +1972,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 384) // 384
-	{
-		m_intreq |= (1<<10);
-		if (m_intena & (1<<10))
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
-	}
-
-	if(scanline == 0)
+	if(scanline == 384)
 	{
 		m_intreq |= (1<<0);
-		if (m_intena & (1<<0))
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
+		model2_check_irq_state();
+	}
+	else if(scanline == 0)
+	{
+		/* From sound to main CPU (TODO: what enables this?) */
+		m_intreq |= (1<<10);
+		model2_check_irq_state();
 	}
 }
 
@@ -1962,22 +1992,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 	if(scanline == 0) // 384
 	{
 		m_intreq |= (1<<10);
-		if (m_intena & (1<<10))
-			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
+		model2_check_irq_state();
 	}
 
 	if(scanline == 256)
 	{
 		m_intreq |= (1<<2);
-		if (m_intena & (1<<2))
-			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
+		model2_check_irq_state();
 	}
 
 	if(scanline == 128)
 	{
 		m_intreq |= (1<<0);
-		if (m_intena & (1<<0))
-			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
+		model2_check_irq_state();
 	}
 }
 
@@ -2167,10 +2194,7 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(62*8, 48*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MCFG_SCREEN_RAW_PARAMS(25000000/2, 496+16, 0, 496, 384+16, 0, 384) // not accurate
 	MCFG_SCREEN_UPDATE_DRIVER(model2_state, screen_update_model2)
 
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -5640,7 +5664,7 @@ GAME( 1994, vcop,            0, model2o, vcop,    driver_device, 0,       ROT0, 
 GAME( 1994, vcopa,           0, model2o, vcop,    driver_device, 0,       ROT0, "Sega",   "Virtua Cop (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
-GAME( 1995, manxtt, 0, manxttdx,model2, driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, manxtt,          0, manxttdx,model2, driver_device, 0, ROT0, "Sega", "Manx TT Superbike - DX (Revision D)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, manxttc,         0, model2a, model2,  driver_device, 0,       ROT0, "Sega",   "Manx TT Superbike - Twin (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallyc,         0, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, srallycb,  srallyc, srallyc, srallyc, model2_state,  srallyc, ROT0, "Sega",   "Sega Rally Championship - TWIN (Revision B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

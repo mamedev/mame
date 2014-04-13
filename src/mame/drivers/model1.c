@@ -1508,8 +1508,6 @@ ROM_START( netmerc )
 	ROM_LOAD( "u2", 0x4000, 0x4000, CRC(c589f428) SHA1(98dc0114a5f89636b4e237ed954e19f1cfd186ab) )
 ROM_END
 
-
-
 static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_CPU_ADD("maincpu", V60, 16000000)
 	MCFG_CPU_PROGRAM_MAP(model1_mem)
