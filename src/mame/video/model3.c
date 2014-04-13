@@ -446,7 +446,7 @@ WRITE64_MEMBER(model3_state::model3_vid_reg_w)
 	{
 		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); m_vid_reg0 = data; break;
 		case 0x08/8:    break;      /* ??? */
-		case 0x10/8:    model3_set_irq_line(machine(), (data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
+		case 0x10/8:    set_irq_line((data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
 		case 0x20/8:    m_layer_enable = (data >> 52);  break;
 
@@ -747,65 +747,64 @@ static void real3d_upload_texture(running_machine &machine, UINT32 header, UINT3
 	}
 }
 
-void real3d_display_list_end(running_machine &machine)
+void model3_state::real3d_display_list_end()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	/* upload textures if there are any in the FIFO */
-	if (state->m_texture_fifo_pos > 0)
+	if (m_texture_fifo_pos > 0)
 	{
 		int i = 0;
-		while(i < state->m_texture_fifo_pos)
+		while (i < m_texture_fifo_pos)
 		{
-			int length = (state->m_texture_fifo[i] / 2) + 2;
-			UINT32 header = state->m_texture_fifo[i+1];
-			real3d_upload_texture(machine, header, &state->m_texture_fifo[i+2]);
+			int length = (m_texture_fifo[i] / 2) + 2;
+			UINT32 header = m_texture_fifo[i+1];
+			real3d_upload_texture(machine(), header, &m_texture_fifo[i+2]);
 			i += length;
 		};
 	}
-	state->m_texture_fifo_pos = 0;
-	state->m_zbuffer.fill(0);
-	state->m_bitmap3d.fill(0x8000);
-	real3d_traverse_display_list(machine);
+	m_texture_fifo_pos = 0;
+	m_zbuffer.fill(0);
+	m_bitmap3d.fill(0x8000);
+	real3d_traverse_display_list(machine());
 	//state->m_real3d_display_list = 1;
 }
 
-void real3d_display_list1_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space.machine().driver_data<model3_state>();
-	int i;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for(i=0; i < length; i+=4) {
+	for (int i = 0; i < length; i += 4) 
+	{
 		UINT32 w;
 		if (byteswap) {
 			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
 			w = space.read_dword(src);
 		}
-		state->m_display_list_ram[d++] = w;
+		m_display_list_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_display_list2_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space.machine().driver_data<model3_state>();
-	int i;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for(i=0; i < length; i+=4) {
+	for (int i = 0; i < length; i += 4) 
+	{
 		UINT32 w;
 		if (byteswap) {
 			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
 			w = space.read_dword(src);
 		}
-		state->m_culling_ram[d++] = w;
+		m_culling_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_vrom_texture_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space.machine().driver_data<model3_state>();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if((dst & 0xff) == 0) {
 		UINT32 address, header;
 
@@ -816,47 +815,47 @@ void real3d_vrom_texture_dma(address_space &space, UINT32 src, UINT32 dst, int l
 			address = space.read_dword((src+0));
 			header = space.read_dword((src+4));
 		}
-		real3d_upload_texture(space.machine(), header, (UINT32*)&state->m_vrom[address]);
+		real3d_upload_texture(space.machine(), header, (UINT32*)&m_vrom[address]);
 	}
 }
 
-void real3d_texture_fifo_dma(address_space &space, UINT32 src, int length, int byteswap)
+void model3_state::real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
 {
-	model3_state *state = space.machine().driver_data<model3_state>();
-	int i;
-	for(i=0; i < length; i+=4) {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int i = 0; i < length; i += 4) 
+	{
 		UINT32 w;
 		if (byteswap) {
 			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
 			w = space.read_dword(src);
 		}
-		state->m_texture_fifo[state->m_texture_fifo_pos] = w;
-		state->m_texture_fifo_pos++;
+		m_texture_fifo[m_texture_fifo_pos] = w;
+		m_texture_fifo_pos++;
 		src += 4;
 	}
 }
 
-void real3d_polygon_ram_dma(address_space &space, UINT32 src, UINT32 dst, int length, int byteswap)
+void model3_state::real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	model3_state *state = space.machine().driver_data<model3_state>();
-	int i;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int d = (dst & 0xffffff) / 4;
-	for(i=0; i < length; i+=4) {
+	for (int i = 0; i < length; i += 4) 
+	{
 		UINT32 w;
 		if (byteswap) {
 			w = BYTE_REVERSE32(space.read_dword(src));
 		} else {
 			w = space.read_dword(src);
 		}
-		state->m_polygon_ram[d++] = w;
+		m_polygon_ram[d++] = w;
 		src += 4;
 	}
 }
 
 WRITE64_MEMBER(model3_state::real3d_cmd_w)
 {
-	real3d_display_list_end(machine());
+	real3d_display_list_end();
 }
 
 

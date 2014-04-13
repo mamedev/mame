@@ -3,24 +3,26 @@
 
 #include "machine/scsihle.h"
 
-struct LSI53C810interface
-{
-	void (*irq_callback)(running_machine &machine, int); /* IRQ callback */
-	void (*dma_callback)(running_machine &machine, UINT32, UINT32, int, int);   /* DMA callback */
-	UINT32 (*fetch)(running_machine &machine, UINT32 dsp);
-};
+typedef device_delegate<void (int state)> lsi53c810_irq_delegate;
+#define LSI53C810_IRQ_CB(name)  void name(int state)
 
-#define MCFG_LSI53C810_ADD( _tag, _config ) \
-	MCFG_DEVICE_ADD( _tag, LSI53C810, 0 ) \
-	MCFG_DEVICE_CONFIG(_config)
+typedef device_delegate<void (UINT32 src, UINT32 dst, int length, int byteswap)> lsi53c810_dma_delegate;
+#define LSI53C810_DMA_CB(name)  void name(UINT32 src, UINT32 dst, int length, int byteswap)
 
-class lsi53c810_device : public device_t,
-						public LSI53C810interface
+typedef device_delegate<UINT32 (UINT32 dsp)> lsi53c810_fetch_delegate;
+#define LSI53C810_FETCH_CB(name)  UINT32 name(UINT32 dsp)
+
+
+class lsi53c810_device : public device_t
 {
 public:
 	// construction/destruction
 	lsi53c810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void set_irq_callback(device_t &device, lsi53c810_irq_delegate callback) { downcast<lsi53c810_device &>(device).m_irq_cb = callback; }
+	static void set_dma_callback(device_t &device, lsi53c810_dma_delegate callback) { downcast<lsi53c810_device &>(device).m_dma_cb = callback; }
+	static void set_fetch_callback(device_t &device, lsi53c810_fetch_delegate callback) { downcast<lsi53c810_device &>(device).m_fetch_cb = callback; }
+	
 	void lsi53c810_read_data(int bytes, UINT8 *pData);
 	void lsi53c810_write_data(int bytes, UINT8 *pData);
 
@@ -29,12 +31,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
 	typedef delegate<void (void)> opcode_handler_delegate;
 	opcode_handler_delegate dma_opcode[256];
+
+	lsi53c810_irq_delegate m_irq_cb;
+	lsi53c810_dma_delegate m_dma_cb;
+	lsi53c810_fetch_delegate m_fetch_cb;
 
 	UINT32 FETCH();
 	void dmaop_invalid();
@@ -99,5 +104,15 @@ private:
 
 // device type definition
 extern const device_type LSI53C810;
+
+
+#define MCFG_LSI53C810_IRQ_CB(_class, _method) \
+	lsi53c810_device::set_irq_callback(*device, lsi53c810_irq_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_LSI53C810_DMA_CB(_class, _method) \
+	lsi53c810_device::set_dma_callback(*device, lsi53c810_dma_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+
+#define MCFG_LSI53C810_FETCH_CB(_class, _method) \
+	lsi53c810_device::set_fetch_callback(*device, lsi53c810_fetch_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #endif

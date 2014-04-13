@@ -662,34 +662,28 @@ ALL VROM ROMs are 16M MASK
 #include "includes/model3.h"
 
 
-static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap);
-
-
-
-static void update_irq_state(running_machine &machine)
+void model3_state::update_irq_state()
 {
-	model3_state *state = machine.driver_data<model3_state>();
-	if ((state->m_irq_enable & state->m_irq_state) || state->m_scsi_irq_state)
+	if ((m_irq_enable & m_irq_state) || m_scsi_irq_state)
 	{
-//      printf("IRQ set: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
-		state->m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
-		state->m_scsi_irq_state = 0;
+//      printf("IRQ set: state %x enable %x scsi %x\n", m_irq_state, m_irq_enable, m_scsi_irq_state);
+		m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
+		m_scsi_irq_state = 0;
 	}
 	else
 	{
-//      printf("IRQ clear: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
-		state->m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
+//      printf("IRQ clear: state %x enable %x scsi %x\n", m_irq_state, m_irq_enable, m_scsi_irq_state);
+		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 	}
 }
 
-void model3_set_irq_line(running_machine &machine, UINT8 bit, int line)
+void model3_state::set_irq_line(UINT8 bit, int line)
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	if (line != CLEAR_LINE)
-		state->m_irq_state |= bit;
+		m_irq_state |= bit;
 	else
-		state->m_irq_state &= ~bit;
-	update_irq_state(machine);
+		m_irq_state &= ~bit;
+	update_irq_state();
 }
 
 
@@ -1056,20 +1050,17 @@ WRITE64_MEMBER(model3_state::scsi_w)
 	}
 }
 
-static UINT32 scsi_fetch(running_machine &machine, UINT32 dsp)
+LSI53C810_FETCH_CB(model3_state::scsi_fetch)
 {
-	model3_state *drvstate = machine.driver_data<model3_state>();
-	address_space &space = drvstate->m_maincpu->space(AS_PROGRAM);
-	UINT32 result;
-	result = space.read_dword(dsp);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT32 result = space.read_dword(dsp);
 	return FLIPENDIAN_INT32(result);
 }
 
-static void scsi_irq_callback(running_machine &machine, int state)
+LSI53C810_IRQ_CB(model3_state::scsi_irq_callback)
 {
-	model3_state *drvstate = machine.driver_data<model3_state>();
-	drvstate->m_scsi_irq_state = state;
-	update_irq_state(machine);
+	m_scsi_irq_state = state;
+	update_irq_state();
 }
 
 /*****************************************************************************/
@@ -1112,21 +1103,21 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
 				if (m_dma_endian & 0x80)
 				{
-					real3d_dma_callback(machine(), m_dma_source, m_dma_dest, length, 0);
+					real3d_dma_callback(m_dma_source, m_dma_dest, length, 0);
 				}
 				else
 				{
-					real3d_dma_callback(machine(), m_dma_source, m_dma_dest, length, 1);
+					real3d_dma_callback(m_dma_source, m_dma_dest, length, 1);
 				}
 				m_dma_irq |= 0x01;
-				scsi_irq_callback(machine(), 1);
+				scsi_irq_callback(1);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
 					m_dma_irq &= ~0x1;
-					scsi_irq_callback(machine(), 0);
+					scsi_irq_callback(0);
 				}
 				return;
 			}
@@ -1157,46 +1148,37 @@ WRITE64_MEMBER(model3_state::real3d_dma_w)
 	logerror("real3d_dma_w: %08X, %08X%08X, %08X%08X", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 }
 
-static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap)
+LSI53C810_DMA_CB(model3_state::real3d_dma_callback)
 {
-	model3_state *drvstate = machine.driver_data<model3_state>();
-	address_space &space = drvstate->m_maincpu->space(AS_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:      /* Display List End Trigger */
-			real3d_display_list_end(machine);
+			real3d_display_list_end();
 			break;
 		case 0x8c:      /* Display List RAM 2 */
-			real3d_display_list2_dma(space, src, dst, length, byteswap);
+			real3d_display_list2_dma(src, dst, length, byteswap);
 			break;
 		case 0x8e:      /* Display List RAM 1 */
-			real3d_display_list1_dma(space, src, dst, length, byteswap);
+			real3d_display_list1_dma(src, dst, length, byteswap);
 			break;
 		case 0x90:      /* VROM Texture Download */
-			real3d_vrom_texture_dma(space, src, dst, length, byteswap);
+			real3d_vrom_texture_dma(src, dst, length, byteswap);
 			break;
 		case 0x94:      /* Texture FIFO */
-			real3d_texture_fifo_dma(space, src, length, byteswap);
+			real3d_texture_fifo_dma(src, length, byteswap);
 			break;
 		case 0x98:      /* Polygon RAM */
-			real3d_polygon_ram_dma(space, src, dst, length, byteswap);
+			real3d_polygon_ram_dma(src, dst, length, byteswap);
 			break;
 		case 0x9c:      /* Unknown */
 			break;
 		default:
-			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, machine.device("maincpu")->safe_pc());
+			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, machine().device("maincpu")->safe_pc());
 			break;
 	}
 }
 
 /*****************************************************************************/
-
-static const struct LSI53C810interface lsi53c810_intf =
-{
-	&scsi_irq_callback,
-	&real3d_dma_callback,
-	&scsi_fetch,
-};
 
 static void configure_fast_ram(running_machine &machine)
 {
@@ -1212,7 +1194,7 @@ TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 {
 	if (m_sound_irq_enable)
 	{
-		model3_set_irq_line(machine(), 0x40, ASSERT_LINE);
+		set_irq_line(0x40, ASSERT_LINE);
 	}
 }
 
@@ -1617,7 +1599,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 	{
 		case 0:
 			// clear the interrupt
-			model3_set_irq_line(machine(), 0x40, CLEAR_LINE);
+			set_irq_line(0x40, CLEAR_LINE);
 
 			if (m_dsbz80 != NULL)
 			{
@@ -5395,9 +5377,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
 	int scanline = param;
 
 	if (scanline == 384)
-		model3_set_irq_line(machine(), 0x02, ASSERT_LINE);
+		set_irq_line(0x02, ASSERT_LINE);
 	else if(scanline == 0)
-		model3_set_irq_line(machine(), 0x0d, ASSERT_LINE);
+		set_irq_line(0x0d, ASSERT_LINE);
 }
 
 static const powerpc_config model3_10 =
@@ -5457,7 +5439,10 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
+	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
+	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
+	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_15, model3_state )
@@ -5497,7 +5482,10 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
+	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
+	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
+	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(scud, model3_15)

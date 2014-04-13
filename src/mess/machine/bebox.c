@@ -116,8 +116,6 @@
  *
  *************************************/
 
-static void bebox_update_interrupts(running_machine &machine);
-
 static void bebox_mbreg32_w(UINT32 *target, UINT64 data, UINT64 mem_mask)
 {
 	int i;
@@ -163,7 +161,7 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
 				(unsigned) space.device().safe_pc( ), m_cpu_imask[0]);
 		}
-		bebox_update_interrupts(space.machine());
+		bebox_update_interrupts();
 	}
 }
 
@@ -180,7 +178,7 @@ WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
 				(unsigned) space.device() .safe_pc( ), m_cpu_imask[1]);
 		}
-		bebox_update_interrupts(space.machine());
+		bebox_update_interrupts();
 	}
 }
 
@@ -253,31 +251,28 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 }
 
 
-static void bebox_update_interrupts(running_machine &machine)
+void bebox_state::bebox_update_interrupts()
 {
-	bebox_state *state = machine.driver_data<bebox_state>();
-	int cpunum;
 	UINT32 interrupt;
 	static const char *const cputags[] = { "ppc1", "ppc2" };
 
-	for (cpunum = 0; cpunum < 2; cpunum++)
+	for (int cpunum = 0; cpunum < 2; cpunum++)
 	{
-		interrupt = state->m_interrupts & state->m_cpu_imask[cpunum];
+		interrupt = m_interrupts & m_cpu_imask[cpunum];
 
 		if (LOG_INTERRUPTS)
 		{
 			logerror("\tbebox_update_interrupts(): CPU #%d [%08X|%08X] IRQ %s\n", cpunum,
-				state->m_interrupts, state->m_cpu_imask[cpunum], interrupt ? "on" : "off");
+				m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
 		}
 
-		machine.device(cputags[cpunum])->execute().set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		machine().device(cputags[cpunum])->execute().set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
-void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val)
+void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 {
-	bebox_state *state = machine.driver_data<bebox_state>();
 	static const char *const interrupt_names[32] =
 	{
 		NULL,
@@ -321,21 +316,21 @@ void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) machine.device("ppc1")->safe_pc(),
-			(unsigned) machine.device("ppc2")->safe_pc(),
+			(unsigned) machine().device("ppc1")->safe_pc(),
+			(unsigned) machine().device("ppc2")->safe_pc(),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
 
-	old_interrupts = state->m_interrupts;
+	old_interrupts = m_interrupts;
 	if (val)
-		state->m_interrupts |= 1 << interrupt_bit;
+		m_interrupts |= 1 << interrupt_bit;
 	else
-		state->m_interrupts &= ~(1 << interrupt_bit);
+		m_interrupts &= ~(1 << interrupt_bit);
 
 	/* if interrupt values have changed, update the lines */
-	if (state->m_interrupts != old_interrupts)
-		bebox_update_interrupts(machine);
+	if (m_interrupts != old_interrupts)
+		bebox_update_interrupts();
 }
 
 
@@ -394,7 +389,7 @@ const ins8250_interface bebox_uart_inteface_3 =
 
 WRITE_LINE_MEMBER( bebox_state::fdc_interrupt )
 {
-	bebox_set_irq_bit(machine(), 13, state);
+	bebox_set_irq_bit(13, state);
 	m_pic8259_1->ir6_w(state);
 }
 
@@ -408,7 +403,7 @@ READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
 	UINT32 result;
 	result = m_pic8259_1->acknowledge();
-	bebox_set_irq_bit(space.machine(), 5, 0);   /* HACK */
+	bebox_set_irq_bit(5, 0);   /* HACK */
 	return ((UINT64) result) << 56;
 }
 
@@ -421,7 +416,7 @@ READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 
 WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
 {
-	bebox_set_irq_bit(machine(), 5, state);
+	bebox_set_irq_bit(5, state);
 }
 
 WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
@@ -443,7 +438,7 @@ READ8_MEMBER(bebox_state::get_slave_ack)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
-	bebox_set_irq_bit(machine(), 7, state);
+	bebox_set_irq_bit(7, state);
 	m_pic8259_1->ir6_w(state);
 }
 

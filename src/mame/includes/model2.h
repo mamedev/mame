@@ -120,6 +120,7 @@ public:
 	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
 	DECLARE_READ32_MEMBER(copro_prg_r);
 	DECLARE_WRITE32_MEMBER(copro_prg_w);
+	DECLARE_READ32_MEMBER(copro_ctl1_r);
 	DECLARE_WRITE32_MEMBER(copro_ctl1_w);
 	DECLARE_WRITE32_MEMBER(copro_function_port_w);
 	DECLARE_READ32_MEMBER(copro_fifo_r);
