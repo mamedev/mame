@@ -15,7 +15,7 @@
 #include "rendutil.h"
 #include "uiinput.h"
 #include "cheat.h"
-#include "ui/emenubar.h"
+#include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include <ctype.h>
 
@@ -1038,8 +1038,9 @@ void ui_menu::do_handle()
 
 UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container, UINT32 state)
 {
-	// if we have no menus stacked up, we have to have something
-	assert(menu_stack != NULL);
+	// if we have no menus stacked up, start with the main menu
+	if (menu_stack == NULL)
+		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
 
 	// update the menu state
 	if (menu_stack != NULL)

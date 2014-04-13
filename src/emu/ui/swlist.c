@@ -357,3 +357,87 @@ void ui_menu_software_list::handle()
 	}
 }
 
+
+/***************************************************************************
+    SOFTWARE MENU - list of available software lists - i.e. cartridges,
+    floppies
+***************************************************************************/
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+ui_menu_software::ui_menu_software(running_machine &machine, render_container *container, const char *interface, software_list_device **result)
+	: ui_menu(machine, container)
+{
+	m_interface = interface;
+	m_result = result;
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+ui_menu_software::~ui_menu_software()
+{
+}
+
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_software::populate()
+{
+	bool have_compatible = false;
+
+	// Add original software lists for this system
+	software_list_device_iterator iter(machine().config().root_device());
+	for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
+		if (swlistdev->list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM)
+			if (swlistdev->first_software_info() != NULL && m_interface != NULL)
+			{
+				bool found = false;
+				for (const software_info *swinfo = swlistdev->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
+					if (swinfo->first_part()->matches_interface(m_interface))
+						found = true;
+				if (found)
+					item_append(swlistdev->description(), NULL, 0, (void *)swlistdev);
+			}
+
+	// add compatible software lists for this system
+	for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
+		if (swlistdev->list_type() == SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+			if (swlistdev->first_software_info() != NULL && m_interface != NULL)
+			{
+				bool found = false;
+				for (const software_info *swinfo = swlistdev->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
+					if (swinfo->first_part()->matches_interface(m_interface))
+						found = true;
+				if (found)
+				{
+					if (!have_compatible)
+						item_append("[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
+					item_append(swlistdev->description(), NULL, 0, (void *)swlistdev);
+				}
+				have_compatible = true;
+			}
+}
+
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void ui_menu_software::handle()
+{
+	// process the menu
+	const ui_menu_event *event = process(0);
+
+	if (event != NULL && event->iptkey == IPT_UI_SELECT) {
+		//      ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_software_list(machine(), container, (software_list_config *)event->itemref, image)));
+		*m_result = (software_list_device *)event->itemref;
+		ui_menu::stack_pop(machine());
+	}
+}

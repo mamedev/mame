@@ -26,7 +26,6 @@
 // forward references
 class input_type_entry;
 class device_t;
-class ui_menubar;
 typedef void *osd_font;
 
 
@@ -57,7 +56,6 @@ public:
 
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
-	virtual void customize_menubar(ui_menubar &menubar);
 
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);
