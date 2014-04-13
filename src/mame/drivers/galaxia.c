@@ -272,20 +272,6 @@ static GFXDECODE_START( astrowar )
 GFXDECODE_END
 
 
-static const s2636_interface galaxia_s2636_config[3] =
-{
-	{ 0x100, 3, -26 },
-	{ 0x100, 3, -26 },
-	{ 0x100, 3, -26 }
-};
-
-static const s2636_interface astrowar_s2636_config =
-{
-	0x100,
-	3, 0
-};
-
-
 static MACHINE_CONFIG_START( galaxia, galaxia_state )
 
 	/* basic machine hardware */
@@ -311,11 +297,19 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,galaxia)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
 
-	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
+	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(3, -26)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_S2636_ADD("s2636_1", galaxia_s2636_config[1])
+
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(3, -26)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_S2636_ADD("s2636_2", galaxia_s2636_config[2])
+
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(3, -26)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* sound hardware */
@@ -348,7 +342,9 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_PALETTE_INIT_OWNER(galaxia_state,astrowar)
 	MCFG_VIDEO_START_OVERRIDE(galaxia_state,astrowar)
 
-	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)
+	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(3, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* sound hardware */

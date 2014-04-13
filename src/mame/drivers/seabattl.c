@@ -472,13 +472,6 @@ static GFXDECODE_START( seabattl )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 24, 1 )
 GFXDECODE_END
 
-static const s2636_interface s2636_config =
-{
-	0x100,
-	3, -21,
-	//"s2636snd"
-};
-
 static MACHINE_CONFIG_START( seabattl, seabattl_state )
 
 	/* basic machine hardware */
@@ -487,7 +480,9 @@ static MACHINE_CONFIG_START( seabattl, seabattl_state )
 	MCFG_CPU_IO_MAP(seabattl_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seabattl_state, seabattl_interrupt)
 
-	MCFG_S2636_ADD("s2636", s2636_config)
+	MCFG_DEVICE_ADD("s2636", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(3, -21)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_DEVICE_ADD("sc_thousand", DM9368, 0)

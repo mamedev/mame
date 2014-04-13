@@ -634,25 +634,6 @@ INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
 	m_cb1_toggle ^= 1;
 }
 
-
-static const s2636_interface s2636_1_config =
-{
-	0x100,
-	0, -19
-};
-
-static const s2636_interface s2636_2_config =
-{
-	0x100,
-	0, -19
-};
-
-static const s2636_interface s2636_3_config =
-{
-	0x100,
-	0, -19
-};
-
 void laserbat_state::machine_start()
 {
 	m_pia = machine().device<pia6821_device>("pia");
@@ -726,10 +707,17 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_S2636_ADD("s2636_1", s2636_1_config)
-	MCFG_S2636_ADD("s2636_2", s2636_2_config)
-	MCFG_S2636_ADD("s2636_3", s2636_3_config)
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
 
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
+
+	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -775,10 +763,17 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", laserbat)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_S2636_ADD("s2636_1", s2636_1_config)
-	MCFG_S2636_ADD("s2636_2", s2636_2_config)
-	MCFG_S2636_ADD("s2636_3", s2636_3_config)
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
 
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
+
+	MCFG_DEVICE_ADD("s2636_3", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(0, -19)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

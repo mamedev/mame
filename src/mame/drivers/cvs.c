@@ -936,25 +936,6 @@ GFXDECODE_END
  *
  *************************************/
 
-static const s2636_interface s2636_0_config =
-{
-	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
-};
-
-static const s2636_interface s2636_1_config =
-{
-	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
-};
-
-static const s2636_interface s2636_2_config =
-{
-	0x100,
-	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
-};
-
-
 MACHINE_START_MEMBER(cvs_state,cvs)
 {
 	/* allocate memory */
@@ -1032,9 +1013,17 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cvs_state, screen_update_cvs)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_S2636_ADD("s2636_0", s2636_0_config)
-	MCFG_S2636_ADD("s2636_1", s2636_1_config)
-	MCFG_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
+
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
+
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_WORKRAM_SIZE(0x100)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

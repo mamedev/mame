@@ -94,32 +94,13 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 		m_channel(NULL),
 		m_size(0),
 		m_pos(0),
-		m_level(0)
+		m_level(0),
+		m_work_ram_size(0),
+		m_y_offset(0),
+		m_x_offset(0)
 {
 	for (int i = 0; i < 1; i++)
-	m_reg[i] = 0;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void s2636_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const s2636_interface *intf = reinterpret_cast<const s2636_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<s2636_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_work_ram_size = 0;
-		m_y_offset = 0;
-		m_x_offset = 0;
-	}
+		m_reg[i] = 0;
 }
 
 //-------------------------------------------------
@@ -135,20 +116,15 @@ void s2636_device::device_start()
 	m_bitmap.resize(width, height);
 	m_collision_bitmap.resize(width, height);
 
-	save_item(NAME(m_x_offset));
-	save_item(NAME(m_y_offset));
 	save_item(NAME(m_work_ram));
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_collision_bitmap));
-
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
 	save_item(NAME(m_size));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_level));
-
-	for (int i = 0; i < 1; i++)
-	save_item(NAME(m_reg[i]), i);
+	save_item(NAME(m_reg));
 }
 
 /*************************************
@@ -171,24 +147,16 @@ static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
 
 static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or_mode, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int sy;
-
 	/* for each row */
-	for (sy = 0; sy < SPRITE_HEIGHT; sy++)
+	for (int sy = 0; sy < SPRITE_HEIGHT; sy++)
 	{
-		int sx;
-
 		/* for each pixel on the row */
-		for (sx = 0; sx < SPRITE_WIDTH; sx++)
+		for (int sx = 0; sx < SPRITE_WIDTH; sx++)
 		{
-			int ey;
-
 			/* each pixel can be expanded */
-			for (ey = 0; ey <= expand; ey++)
+			for (int ey = 0; ey <= expand; ey++)
 			{
-				int ex;
-
-				for (ex = 0; ex <= expand; ex++)
+				for (int ex = 0; ex <= expand; ex++)
 				{
 					/* compute effective destination pixel */
 					int ty = y + sy * (expand + 1) + ey;
@@ -211,7 +179,6 @@ static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or
 		}
 	}
 }
-
 
 
 /*************************************
