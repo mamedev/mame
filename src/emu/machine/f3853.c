@@ -73,6 +73,8 @@ void f3853_device::device_start()
 		}
 	}
 
+	m_interrupt_req_cb.bind_relative_to(*owner());
+
 	m_timer = machine().scheduler().timer_alloc(FUNC(f3853_timer_callback), (void *)this );
 
 	save_item(NAME(m_high) );
