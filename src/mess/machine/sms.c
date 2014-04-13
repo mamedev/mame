@@ -912,8 +912,8 @@ WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
 {
 	int led_number = data >> 4;
 	int led_column = led_number / 4;
-	int led_line = 3 - (led_number % 4);
-	int game_number = (4 * led_column) + led_line;
+	int led_line = led_number % 4;
+	int game_number = (4 * led_column) + (3 - led_line);
 
 	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
 	logerror("sms_store_control: LED #%d activated for game #%d\n", led_number, game_number);
