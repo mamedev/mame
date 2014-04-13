@@ -351,6 +351,7 @@ public:
 	UINT32 mmu_tt0, mmu_tt1;
 	UINT32 mmu_itt0, mmu_itt1, mmu_dtt0, mmu_dtt1;
 	UINT32 mmu_acr0, mmu_acr1, mmu_acr2, mmu_acr3;
+	UINT32 mmu_last_page_entry, mmu_last_page_entry_addr;
 
 	UINT16 mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
 	UINT16 mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */

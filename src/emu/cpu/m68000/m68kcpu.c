@@ -1018,6 +1018,8 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(mmu_acr1));
 	save_item(NAME(mmu_acr2));
 	save_item(NAME(mmu_acr3));
+	save_item(NAME(mmu_last_page_entry));
+	save_item(NAME(mmu_last_page_entry_addr));
 
 	for (int i=0; i<MMU_ATC_ENTRIES;i++) {
 		save_item(NAME(mmu_atc_tag[i]), i);

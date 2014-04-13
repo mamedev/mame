@@ -625,8 +625,34 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 		// is UDT marked valid?
 		if (root_entry & 2)
 		{
+			// we're accessing through this root entry, so set the U bit
+			if ((!(root_entry & 0x8)) && (!ptest))
+			{
+				root_entry |= 0x8;
+				m68k->program->write_dword(root_ptr, root_entry);
+			}
+
+			// PTEST: any write protect bits set in the search tree will set W in SR
+			if ((ptest) && (root_entry & 4))
+			{
+				m68k->mmu_tmp_sr |= 4;
+			}
+
 			pointer_ptr = (root_entry & ~0x1ff) + (ptr_idx<<2);
 			pointer_entry = m68k->program->read_dword(pointer_ptr);
+
+			// PTEST: any write protect bits set in the search tree will set W in SR
+			if ((ptest) && (pointer_entry & 4))
+			{
+				m68k->mmu_tmp_sr |= 4;
+			}
+
+			// update U bit on this pointer entry too
+			if ((!(pointer_entry & 0x8)) && (!ptest))
+			{
+				pointer_entry |= 0x8;
+				m68k->program->write_dword(pointer_ptr, pointer_entry);
+			}
 
 			//          logerror("pointer entry = %08x\n", pointer_entry);
 
@@ -682,7 +708,6 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 			page_idx = (addr_in >> 13) & 0x1f;
 			page = addr_in & 0x1fff;
 			pointer_entry &= ~0x7f;
-
 			//          logerror("8k pages: index %x page %x\n", page_idx, page);
 		}
 		else    // 4k pages
@@ -690,12 +715,12 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 			page_idx = (addr_in >> 12) & 0x3f;
 			page = addr_in & 0xfff;
 			pointer_entry &= ~0xff;
-
 			//          logerror("4k pages: index %x page %x\n", page_idx, page);
 		}
 
 		page_ptr = pointer_entry + (page_idx<<2);
 		page_entry = m68k->program->read_dword(page_ptr);
+		m68k->mmu_last_page_entry_addr = page_ptr;
 
 		//      logerror("page_entry = %08x\n", page_entry);
 
@@ -703,7 +728,9 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 		while ((page_entry & 3) == 2)
 		{
 			page_entry = m68k->program->read_dword(page_entry & ~0x3);
+			m68k->mmu_last_page_entry_addr = (page_entry & ~0x3);
 		}
+		m68k->mmu_last_page_entry = page_entry;
 
 		// is the page write protected or supervisor protected?
 		if ((((page_entry & 4) && !m68k->mmu_tmp_rw) || ((page_entry & 0x80) && !(fc&4))) && !ptest)
@@ -745,8 +772,30 @@ INLINE UINT32 get_dt3_table_entry(m68000_base_device *m68k, UINT32 tptr, UINT8 f
 					addr_out = (page_entry & ~0xfff) | page;
 				}
 
+				if (!(ptest))
+				{
+					page_entry |= 0x8;	// always set the U bit
 
-				break;
+					// if we're writing, the M bit comes into play
+					if (!m68k->mmu_tmp_rw)
+					{
+						page_entry |= 0x10;	// set Modified
+					}
+
+					// if these updates resulted in a change, write the entry back where we found it
+					if (page_entry != m68k->mmu_last_page_entry)
+					{
+						m68k->mmu_last_page_entry = page_entry;
+						m68k->program->write_dword(m68k->mmu_last_page_entry_addr, m68k->mmu_last_page_entry);
+					}
+				}
+				else
+				{
+					// page entry: UR G U1 U0 S CM CM M U W PDT
+					// SR:         B  G U1 U0 S CM CM M 0 W T R
+					m68k->mmu_tmp_sr |= ((addr_out & ~0xfff) || (page_entry & 0x7f4));
+				}
+				break; 
 
 			case 2: // shouldn't happen
 				fatalerror("68040: got indirect final page pointer, shouldn't be possible\n");
