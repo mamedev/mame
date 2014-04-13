@@ -105,6 +105,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	LSI53C810_FETCH_CB(scsi_fetch);
+	LSI53C810_IRQ_CB(scsi_irq_callback);
+	LSI53C810_DMA_CB(scsi_dma_callback);
+
+	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
+	void bebox_update_interrupts();	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -118,8 +125,6 @@ extern const ins8250_interface bebox_uart_inteface_0;
 extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;
 extern const ins8250_interface bebox_uart_inteface_3;
-
-void bebox_set_irq_bit(running_machine &machine, unsigned int interrupt_bit, int val);
 
 UINT32 scsi53c810_pci_read(device_t *busdevice, device_t *device, int function, int offset, UINT32 mem_mask);
 void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, int offset, UINT32 data, UINT32 mem_mask);

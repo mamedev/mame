@@ -9,7 +9,7 @@
 
 UINT32 lsi53c810_device::FETCH()
 {
-	UINT32 r = fetch(machine(), dsp);
+	UINT32 r = m_fetch_cb(dsp);
 	dsp += 4;
 	return r;
 }
@@ -26,9 +26,8 @@ void lsi53c810_device::dmaop_move_memory()
 	int count;
 
 	count = dcmd & 0xffffff;
-	if(dma_callback != NULL) {
-		dma_callback(machine(), src, dst, count, 1);
-	}
+	if (!m_dma_cb.isnull())
+		m_dma_cb(src, dst, count, 1);
 }
 
 void lsi53c810_device::dmaop_interrupt()
@@ -41,9 +40,9 @@ void lsi53c810_device::dmaop_interrupt()
 	istat |= 0x1;   /* DMA interrupt pending */
 	dstat |= 0x4;   /* SIR (SCRIPTS Interrupt Instruction Received) */
 
-	if(irq_callback != NULL) {
-		irq_callback(machine(), 1);
-	}
+	if (!m_irq_cb.isnull())
+		m_irq_cb(1);
+
 	dma_icount = 0;
 	halted = 1;
 }
@@ -59,7 +58,7 @@ void lsi53c810_device::dmaop_block_move()
 
 	// normal indirect
 	if (dcmd & 0x20000000)
-		address = fetch(machine(), address);
+		address = m_fetch_cb(address);
 
 	// table indirect
 	if (dcmd & 0x10000000)
@@ -74,8 +73,8 @@ void lsi53c810_device::dmaop_block_move()
 		dsps += dsa;
 
 		logerror("Loading from table at %x\n", dsps);
-		count = fetch(machine(),dsps);
-		address = fetch(machine(),dsps+4);
+		count = m_fetch_cb(dsps);
+		address = m_fetch_cb(dsps + 4);
 	}
 
 	logerror("block move: address %x count %x phase %x\n", address, count, (dcmd>>24)&7);
@@ -428,10 +427,8 @@ UINT8 lsi53c810_device::lsi53c810_reg_r( int offset )
 			return (dsa >> 24) & 0xff;
 		case 0x14:      /* ISTAT */
 			// clear the interrupt on service
-			if(irq_callback != NULL)
-			{
-				irq_callback(machine(), 0);
-			}
+			if (!m_irq_cb.isnull())
+				m_irq_cb(0);
 
 			return istat;
 		case 0x2c:      /* DSP [7-0] */
@@ -572,9 +569,8 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 
 				istat |= 0x3;   /* DMA interrupt pending */
 				dstat |= 0x8;   /* SSI (Single Step Interrupt) */
-				if(irq_callback != NULL) {
-					irq_callback(machine(), 1);
-				}
+				if (!m_irq_cb.isnull())
+					m_irq_cb(1);
 			}
 			else if(dcntl & 0x04 && !halted)    /* manual start DMA */
 			{
@@ -610,9 +606,10 @@ void lsi53c810_device::lsi53c810_reg_w(int offset, UINT8 data)
 
 void lsi53c810_device::add_opcode(UINT8 op, UINT8 mask, opcode_handler_delegate handler)
 {
-	int i;
-	for(i=0; i < 256; i++) {
-		if((i & mask) == op) {
+	for (int i = 0; i < 256; i++) 
+	{
+		if ((i & mask) == op) 
+		{
 			dma_opcode[i] = handler;
 		}
 	}
@@ -623,23 +620,15 @@ lsi53c810_device::lsi53c810_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void lsi53c810_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const LSI53C810interface *intf = reinterpret_cast<const LSI53C810interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<LSI53C810interface *>(this) = *intf;
-	}
-}
-
 void lsi53c810_device::device_start()
 {
-	int i;
-
-	for(i = 0; i < 256; i++)
+	m_irq_cb.bind_relative_to(*owner());
+	m_dma_cb.bind_relative_to(*owner());
+	m_fetch_cb.bind_relative_to(*owner());
+	
+	for (int i = 0; i < 256; i++)
 	{
-		dma_opcode[i] = opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_invalid ), this);
+		dma_opcode[i] = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
 	}
 
 	add_opcode(0x00, 0xc0, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_block_move ), this));
@@ -662,10 +651,10 @@ void lsi53c810_device::device_start()
 	memset(devices, 0, sizeof(devices));
 
 	// try to open the devices
-	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
+	for (device_t *device = owner()->first_subdevice(); device != NULL; device = device->next())
 	{
 		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if( scsidev != NULL )
+		if (scsidev != NULL)
 		{
 			devices[scsidev->GetDeviceID()] = scsidev;
 		}
@@ -704,7 +693,7 @@ void lsi53c810_device::lsi53c810_write_data(int bytes, UINT8 *pData)
 
 UINT32 lsi53c810_device::lsi53c810_dasm_fetch(UINT32 pc)
 {
-	return fetch(machine(), pc);
+	return m_fetch_cb(pc);
 }
 
 unsigned lsi53c810_device::lsi53c810_dasm(char *buf, UINT32 pc)

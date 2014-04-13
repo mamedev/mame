@@ -100,33 +100,22 @@ ADDRESS_MAP_END
 								((x << 8) & 0xff0000) | \
 								((x << 24) & 0xff000000))
 
-static UINT32 scsi53c810_fetch(running_machine &machine, UINT32 dsp)
+LSI53C810_FETCH_CB(bebox_state::scsi_fetch)
 {
-	UINT32 result;
-	bebox_state *state = machine.driver_data<bebox_state>();
-	result = state->m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
+	UINT32 result = m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 
 
-static void scsi53c810_irq_callback(running_machine &machine, int value)
+LSI53C810_IRQ_CB(bebox_state::scsi_irq_callback)
 {
-	bebox_set_irq_bit(machine, 21, value);
+	bebox_set_irq_bit(21, state);
 }
 
 
-static void scsi53c810_dma_callback(running_machine &machine, UINT32 src, UINT32 dst, int length, int byteswap)
+LSI53C810_DMA_CB(bebox_state::scsi_dma_callback)
 {
 }
-
-
-static const struct LSI53C810interface lsi53c810_intf =
-{
-	&scsi53c810_irq_callback,
-	&scsi53c810_dma_callback,
-	&scsi53c810_fetch,
-};
-
 
 FLOPPY_FORMATS_MEMBER( bebox_state::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -150,7 +139,7 @@ MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 {
-	bebox_set_irq_bit(machine(), 16, state);
+	bebox_set_irq_bit(16, state);
 	m_pic8259_1->ir1_w(state);
 }
 
@@ -202,7 +191,10 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_0)
 	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
-	MCFG_LSI53C810_ADD( "scsi:lsi53c810", lsi53c810_intf)
+	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_LSI53C810_IRQ_CB(bebox_state, scsi_irq_callback)
+	MCFG_LSI53C810_DMA_CB(bebox_state, scsi_dma_callback)
+	MCFG_LSI53C810_FETCH_CB(bebox_state, scsi_fetch)
 
 	MCFG_IDE_CONTROLLER_ADD( "ide", ata_devices, "hdd", NULL, false ) /* FIXME */
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))
