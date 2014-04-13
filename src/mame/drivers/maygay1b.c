@@ -147,9 +147,9 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_porta_w)
 {
 //  printf("m1_pia_porta_w %02x\n",data);
 
-		m_vfd->por(!data & 0x40);
-		m_vfd->data(data & 0x10);
-		m_vfd->sclk(data & 0x20);
+	m_vfd->por(!(data & 0x40));
+	m_vfd->data(data & 0x10);
+	m_vfd->sclk(data & 0x20);
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
