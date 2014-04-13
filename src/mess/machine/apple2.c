@@ -345,11 +345,33 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 	if(!space.debugger_access())
 	{
 		device_a2bus_card_interface *slotdevice;
+		int slot;
 
 		offset &= 0x7F;
+		slot = offset / 0x10;
+
+		if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS))
+		{
+			if (slot == 1)
+			{
+				offset &= 0xf;
+				if (offset >= 8 && offset <= 0xb)
+				{
+					return m_acia1->read(space, offset-8); 
+				}
+			}
+			else if (slot == 2)
+			{
+				offset &= 0xf;
+				if (offset >= 8 && offset <= 0xb)
+				{
+					return m_acia2->read(space, offset-8); 
+				}
+			}
+		}
 
 		/* now identify the device */
-		slotdevice = m_a2bus->get_a2bus_card(offset / 0x10);
+		slotdevice = m_a2bus->get_a2bus_card(slot);
 
 		/* and if we can, read from the slot */
 		if (slotdevice != NULL)
@@ -365,11 +387,35 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 WRITE8_MEMBER(apple2_state::apple2_c080_w)
 {
 	device_a2bus_card_interface *slotdevice;
+	int slot;
 
 	offset &= 0x7F;
+	slot = offset / 0x10;
+
+	if ((m_machinetype == APPLE_IIC) || (m_machinetype == APPLE_IICPLUS))
+	{
+		if (slot == 1)
+		{
+			offset &= 0xf;
+			if (offset >= 8 && offset <= 0xb)
+			{
+				m_acia1->write(space, offset-8, data);
+				return;
+			}
+		}
+		else if (slot == 2)
+		{
+			offset &= 0xf;
+			if (offset >= 8 && offset <= 0xb)
+			{
+				m_acia2->write(space, offset-8, data);
+				return;
+			}
+		}
+	}
 
 	/* now identify the device */
-	slotdevice = m_a2bus->get_a2bus_card(offset / 0x10);
+	slotdevice = m_a2bus->get_a2bus_card(slot);
 
 	/* and if we can, write to the slot */
 	if (slotdevice != NULL)
