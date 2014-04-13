@@ -84,7 +84,8 @@ segam1audio_device::segam1audio_device(const machine_config &mconfig, const char
 	m_audiocpu(*this, M68000_TAG),
 	m_multipcm_1(*this, MULTIPCM_1_TAG),
 	m_multipcm_2(*this, MULTIPCM_2_TAG),
-	m_ym(*this, YM3438_TAG)
+	m_ym(*this, YM3438_TAG),
+	m_main_irq_cb(*this)
 {
 }
 
@@ -94,6 +95,7 @@ segam1audio_device::segam1audio_device(const machine_config &mconfig, const char
 
 void segam1audio_device::device_start()
 {
+	m_main_irq_cb.resolve_safe();
 }
 
 //-------------------------------------------------

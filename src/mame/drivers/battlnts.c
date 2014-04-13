@@ -330,7 +330,7 @@ ROM_START( rackemup )
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "765_l04.13a", 0x00000, 0x40000, CRC(acfbeee2) SHA1(c2bf750892ba33d4610fa4497170f49c101ed4c1) ) /* tiles */
+	ROM_LOAD( "765_l04.13a", 0x00000, 0x40000, CRC(d8fb9c64) SHA1(37dac643aa492ef1ecc29c5030bc7fe5226027a2) ) /* tiles */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "765_l05.13e", 0x00000, 0x40000, CRC(1bb6855f) SHA1(251081564dfede8fa9a422081d58465fe5ca4ed1) ) /* sprites */
@@ -367,49 +367,6 @@ ROM_START( thehustlj )
 ROM_END
 
 
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-/*
-    This recursive function doesn't use additional memory
-    (it could be easily converted into an iterative one).
-    It's called shuffle because it mimics the shuffling of a deck of cards.
-*/
-static void shuffle( UINT8 *buf, int len )
-{
-	int i;
-	UINT8 t;
-
-	if (len == 2)
-		return;
-
-	if (len % 4)
-		fatalerror("shuffle() - not modulo 4\n");   /* must not happen */
-
-	len /= 2;
-
-	for (i = 0; i < len / 2; i++)
-	{
-		t = buf[len / 2 + i];
-		buf[len / 2 + i] = buf[len + i];
-		buf[len + i] = t;
-	}
-
-	shuffle(buf, len);
-	shuffle(buf + len, len);
-}
-
-
-DRIVER_INIT_MEMBER(battlnts_state,rackemup)
-{
-	/* rearrange char ROM */
-	shuffle(memregion("gfx1")->base(), memregion("gfx1")->bytes());
-}
-
-
 
 /*************************************
  *
@@ -417,9 +374,9 @@ DRIVER_INIT_MEMBER(battlnts_state,rackemup)
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, driver_device, 0,        ROT90, "Konami", "Battlantis (program code G)",         GAME_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, driver_device, 0,        ROT90, "Konami", "Battlantis (program code F)",         GAME_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, driver_device, 0,        ROT90, "Konami", "Battlantis (Japan, program code E)",  GAME_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, rackemup, ROT90, "Konami", "Rack 'em Up (program code L)",        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, driver_device, 0,        ROT90, "Konami", "The Hustler (Japan, program code M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, driver_device, 0,        ROT90, "Konami", "The Hustler (Japan, program code J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, driver_device, 0, ROT90, "Konami", "Battlantis (program code G)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, driver_device, 0, ROT90, "Konami", "Battlantis (program code F)",         GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, driver_device, 0, ROT90, "Konami", "Battlantis (Japan, program code E)",  GAME_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, driver_device, 0, ROT90, "Konami", "Rack 'em Up (program code L)",        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, driver_device, 0, ROT90, "Konami", "The Hustler (Japan, program code M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, driver_device, 0, ROT90, "Konami", "The Hustler (Japan, program code J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

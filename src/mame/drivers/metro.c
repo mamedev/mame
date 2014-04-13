@@ -1784,7 +1784,7 @@ WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 		*m_irq_enable = data ^ 0xffff;
 }
 
-	/* FIXME: algorithm not yet understood. */
+/* FIXME: algorithm not yet understood. */
 WRITE16_MEMBER(metro_state::vram_0_clr_w)
 {
 	static int i;

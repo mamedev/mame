@@ -101,6 +101,9 @@ public:
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
+	UINT32 m_videocontrol;
+	UINT32 m_soundack;
+	void model2_check_irq_state();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
@@ -112,6 +115,7 @@ public:
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
+	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
 	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
 	DECLARE_READ32_MEMBER(copro_prg_r);
