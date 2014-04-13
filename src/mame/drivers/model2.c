@@ -7,6 +7,24 @@
     Hardware and protection reverse-engineering and general assistance by ElSemi.
     MAME driver by R. Belmont, Olivier Galibert, and ElSemi.
 
+	TODO (updated as for April 2014):
+	- all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also stalls at some point;
+	- daytona: runs at half speed in gameplay;
+	- desert: several 3d bugs, presumably down to FIFO;
+	- dynamcop: stalls at stage select screen;
+	- fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
+	- manxtt: missing 3d;
+	- motoraid: stalls after course select;
+	- pltkidsa: after few secs of gameplay, background 3d disappears and everything reports a collision against the player;
+	- skytargt: MAME hardlocks after disclaimer screen;
+	- srallyc: opponent cars flickers like wild;
+	- vcop: lightgun input is offsetted;
+	- vcop: sound dies at enter initial screen (i.e. after played the game once);
+	- vcop: priority bug at stage select screen;
+	- vcop2: no 3d;
+	- vf2: stalls after disclaimer screen;
+	- zeroguna: stalls after some seconds of gameplay;
+
     OK (controls may be wrong/missing/incomplete)
     --
     daytona/daytonat/daytonam
@@ -337,12 +355,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
+	if(m_timerrun[tnum] == 0)
+		return;
+
 	m_timers[tnum]->reset();
 
 	m_intreq |= (1<<bit);
+	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
 	model2_check_irq_state();
 
-	m_timervals[tnum] = 0;
+	m_timervals[tnum] = -1;
 	m_timerrun[tnum] = 0;
 }
 
@@ -1005,12 +1027,26 @@ READ32_MEMBER(model2_state::model2_irq_r)
 
 void model2_state::model2_check_irq_state()
 {
-	const int irq_type[16]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
+	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
 
-	for(int i=0;i<16;i++)
+	for(int i=0;i<12;i++)
 	{
-		if (m_intena & (1<<i) && m_intreq & 1<<i)
+		if (m_intena & (1<<i) && m_intreq & (1<<i))
+		{
 			m_maincpu->set_input_line(irq_type[i], ASSERT_LINE);
+			return;
+		}
+	}
+}
+
+void model2_state::model2_check_irqack_state(UINT32 data)
+{
+	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
+
+	for(int i=0;i<12;i++)
+	{
+		if(data & 1<<i)
+			m_maincpu->set_input_line(irq_type[i], CLEAR_LINE);
 	}
 }
 
@@ -1026,15 +1062,8 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 	}
 
 	m_intreq &= data;
-	/* TODO: improve this */
-	UINT32 irq_ack = data ^ 0xffffffff;
 
-	if(irq_ack & 1<<0)
-		m_maincpu->set_input_line(I960_IRQ0, CLEAR_LINE);
-
-	if(irq_ack & 1<<10)
-		m_maincpu->set_input_line(I960_IRQ3, CLEAR_LINE);
-
+	model2_check_irqack_state(data ^ 0xffffffff);
 }
 
 /* TODO: rewrite this part. */
@@ -1994,23 +2023,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 0) // 384
-	{
-		m_intreq |= (1<<10);
-		model2_check_irq_state();
-	}
-
-	if(scanline == 256)
-	{
-		m_intreq |= (1<<2);
-		model2_check_irq_state();
-	}
-
-	if(scanline == 128)
+	if(scanline == 384)
 	{
 		m_intreq |= (1<<0);
 		model2_check_irq_state();
 	}
+	else if(scanline == 0) // 384
+	{
+		m_intreq |= (1<<10);
+		model2_check_irq_state();
+	}
+	else if(scanline == 256)
+	{
+		/* TODO: irq source? Source allocation in dynamcopc? */
+		m_intreq |= (1<<2);
+		model2_check_irq_state();
+	}
+
+
 }
 
 /* Model 2 sound board emulation */
@@ -2175,7 +2205,6 @@ static MACHINE_CONFIG_START( model2a, model2_state )
 	MCFG_MB86233_FIFO_READ_OK_CB(READLINE(model2_state,copro_tgp_fifoin_pop_ok))
 	MCFG_MB86233_FIFO_WRITE_CB(WRITE32(model2_state,copro_tgp_fifoout_push))
 	MCFG_MB86233_TABLE_REGION("user5")
-
 
 	MCFG_MACHINE_START_OVERRIDE(model2_state,model2)
 	MCFG_MACHINE_RESET_OVERRIDE(model2_state,model2)
