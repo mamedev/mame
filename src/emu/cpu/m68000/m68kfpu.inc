@@ -716,6 +716,15 @@ static floatx80 READ_EA_FPE(m68000_base_device *m68k, int ea)
 		{
 			switch (reg)
 			{
+				case 1:     // (xxx)
+					{
+						UINT32 d1 = OPER_I_16(m68k);
+						UINT32 d2 = OPER_I_16(m68k);
+						UINT32 ea = (d1 << 16) | d2;
+						fpr = load_extended_float80(m68k, ea);
+					}
+					break;
+
 				case 2: // (d16, PC)
 					{
 						UINT32 ea = EA_PCDI_32(m68k);
