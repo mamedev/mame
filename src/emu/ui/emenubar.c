@@ -22,6 +22,7 @@
 #include "ui/barcode.h"
 #include "softlist.h"
 #include "cheat.h"
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -184,6 +185,10 @@ void ui_emu_menubar::build_file_menu()
 		menu_item &paste_menu = file_menu.append("Paste", &ui_manager::paste, machine().ui(), IPT_UI_PASTE);
 		paste_menu.set_enabled(machine().ui().can_paste());
 	}
+
+	// debug
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		file_menu.append("Break into debugger", &ui_emu_menubar::debugger_break, *this, IPT_UI_TOGGLE_DEBUG);
 
 	// pause
 	menu_item &pause_menu = file_menu.append("Pause", &running_machine::toggle_pause, machine(), IPT_UI_PAUSE);
@@ -646,3 +651,14 @@ void ui_emu_menubar::set_throttle_rate(float throttle_rate)
 	if (throttle_rate != 0.0)
 		machine().video().set_throttle_rate(throttle_rate);
 }
+
+
+//-------------------------------------------------
+//  debugger_break
+//-------------------------------------------------
+
+void ui_emu_menubar::debugger_break()
+{
+	::debugger_break(machine());
+}
+

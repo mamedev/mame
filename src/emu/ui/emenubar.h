@@ -54,6 +54,7 @@ private:
 	bool has_images();
 	void set_throttle_rate(float throttle_rate);
 	void start_menu(ui_menu *menu);
+	void debugger_break();
 
 	// template methods
 	template<class _Menu>
