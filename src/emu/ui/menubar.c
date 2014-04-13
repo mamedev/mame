@@ -1012,9 +1012,9 @@ void ui_menubar::menu_item::sensible_seq_name(astring &text, const input_seq &se
 {
 	// special case; we don't want 'None'
 	if (seq[0] == input_seq::end_code)
-		m_shortcut_text.cpy("");
+		text.cpy("");
 	else
-		m_menubar.machine().input().seq_name(m_shortcut_text, seq);
+		m_menubar.machine().input().seq_name(text, seq);
 }
 
 
