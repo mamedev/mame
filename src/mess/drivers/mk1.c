@@ -58,6 +58,7 @@ public:
 	UINT8 m_led[4];
 	virtual void machine_start();
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
+	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -109,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mk1_io, AS_IO, 8, mk1_state )
 	AM_RANGE( 0x0, 0x1 ) AM_READWRITE( mk1_f8_r, mk1_f8_w )
-	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE("f3853", f3853_device, f3853_r, f3853_w )
+	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE("f3853", f3853_device, read, write )
 ADDRESS_MAP_END
 
 
@@ -151,12 +152,10 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
-	UINT8 i;
-
-	for ( i = 0; i < 4; i++ )
+	for (int i = 0; i < 4; i++)
 	{
-		output_set_digit_value( i, m_led[i] >> 1 );
-		output_set_led_value( i, m_led[i] & 0x01 );
+		output_set_digit_value(i, m_led[i] >> 1);
+		output_set_led_value(i, m_led[i] & 0x01);
 		m_led[i] = 0;
 	}
 }
@@ -167,33 +166,25 @@ void mk1_state::machine_start()
 }
 
 
-static void mk1_interrupt( device_t *device, UINT16 addr, int level )
+F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
 {
-	mk1_state *drvstate = device->machine().driver_data<mk1_state>();
-	drvstate->m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr );
-
-	drvstate->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr);
+	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
 }
-
-
-static const f3853_interface mk1_config =
-{
-	mk1_interrupt
-};
-
 
 static MACHINE_CONFIG_START( mk1, mk1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
-	MCFG_CPU_PROGRAM_MAP( mk1_mem)
-	MCFG_CPU_IO_MAP( mk1_io)
+	MCFG_CPU_PROGRAM_MAP(mk1_mem)
+	MCFG_CPU_IO_MAP(mk1_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_F3853_ADD( "f3853", MAIN_CLOCK, mk1_config )
+	MCFG_DEVICE_ADD("f3853", F3853, MAIN_CLOCK)
+	MCFG_F3853_EXT_INPUT_CB(mk1_state, mk1_interrupt)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_mk1 )
+	MCFG_DEFAULT_LAYOUT(layout_mk1)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END

@@ -52,30 +52,6 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void f3853_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const f3853_interface *intf = reinterpret_cast<const f3853_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<f3853_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_interrupt_request, 0, sizeof(m_interrupt_request));
-	}
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -91,7 +67,7 @@ void f3853_device::device_start()
 		INT32 o3 = (reg & 0x08) ? TRUE : FALSE;
 		m_value_to_cycle[reg] = i;
 		reg <<= 1;
-		if(!((o7 != o5) != (o4 != o3)))
+		if (!((o7 != o5) != (o4 != o3)))
 		{
 			reg |= 1;
 		}
@@ -127,29 +103,21 @@ void f3853_device::device_reset()
 }
 
 
-void f3853_device::f3853_set_interrupt_request_line()
+void f3853_device::set_interrupt_request_line()
 {
-	if(!m_interrupt_request)
-	{
+	if (m_interrupt_req_cb.isnull())
 		return;
-	}
 
-	if(m_external_enable && !m_priority_line)
-	{
-		m_interrupt_request(this, INTERRUPT_VECTOR(TRUE), TRUE);
-	}
-	else if( m_timer_enable && !m_priority_line && m_request_flipflop)
-	{
-		m_interrupt_request(this, INTERRUPT_VECTOR(FALSE), TRUE);
-	}
+	if (m_external_enable && !m_priority_line)
+		m_interrupt_req_cb(INTERRUPT_VECTOR(TRUE), TRUE);
+	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
+		m_interrupt_req_cb(INTERRUPT_VECTOR(FALSE), TRUE);
 	else
-	{
-		m_interrupt_request(this, 0, FALSE);
-	}
+		m_interrupt_req_cb(0, FALSE);
 }
 
 
-void f3853_device::f3853_timer_start(UINT8 value)
+void f3853_device::timer_start(UINT8 value)
 {
 	attotime period = (value != 0xff) ? attotime::from_hz(clock()) * (m_value_to_cycle[value]*31) : attotime::never;
 
@@ -159,37 +127,37 @@ void f3853_device::f3853_timer_start(UINT8 value)
 
 TIMER_CALLBACK( f3853_device::f3853_timer_callback )
 {
-	reinterpret_cast<f3853_device*>(ptr)->f3853_timer();
+	reinterpret_cast<f3853_device*>(ptr)->timer();
 }
 
-void f3853_device::f3853_timer()
+void f3853_device::timer()
 {
 	if(m_timer_enable)
 	{
 		m_request_flipflop = TRUE;
-		f3853_set_interrupt_request_line();
+		set_interrupt_request_line();
 	}
-	f3853_timer_start(0xfe);
+	timer_start(0xfe);
 }
 
-void f3853_device::f3853_set_external_interrupt_in_line(int level)
+void f3853_device::set_external_interrupt_in_line(int level)
 {
 	if(m_external_interrupt_line && !level && m_external_enable)
 	{
 		m_request_flipflop = TRUE;
 	}
 	m_external_interrupt_line = level;
-	f3853_set_interrupt_request_line();
+	set_interrupt_request_line();
 }
 
-void f3853_device::f3853_set_priority_in_line(int level)
+void f3853_device::set_priority_in_line(int level)
 {
 	m_priority_line = level;
-	f3853_set_interrupt_request_line();
+	set_interrupt_request_line();
 }
 
 
-READ8_MEMBER(f3853_device::f3853_r)
+READ8_MEMBER(f3853_device::read)
 {
 	UINT8 data = 0;
 
@@ -212,7 +180,7 @@ READ8_MEMBER(f3853_device::f3853_r)
 }
 
 
-WRITE8_MEMBER(f3853_device::f3853_w)
+WRITE8_MEMBER(f3853_device::write)
 {
 	switch(offset)
 	{
@@ -227,13 +195,13 @@ WRITE8_MEMBER(f3853_device::f3853_w)
 	case 2: //interrupt control
 		m_external_enable = ((data & 3) == 1);
 		m_timer_enable = ((data & 3) == 3);
-		f3853_set_interrupt_request_line();
+		set_interrupt_request_line();
 		break;
 
 	case 3: //timer
 		m_request_flipflop = FALSE;
-		f3853_set_interrupt_request_line();
-		f3853_timer_start(data);
+		set_interrupt_request_line();
+		timer_start(data);
 		break;
 	}
 }

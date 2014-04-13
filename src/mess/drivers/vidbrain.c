@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( vidbrain_io, AS_IO, 8, vidbrain_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
-//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, f3853_r, f3853_w)
+//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -397,22 +397,14 @@ DISCRETE_SOUND_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  f3853_interface smi_intf
+//  f3853 interrupt request callback
 //-------------------------------------------------
 
-static void f3853_int_req_w(device_t *device, UINT16 addr, int level)
+F3853_INTERRUPT_REQ_CB(vidbrain_state::f3853_int_req_w)
 {
-	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
-
-	state->m_vector = addr;
-	state->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
+	m_vector = addr;
+	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level);
 }
-
-static const f3853_interface smi_intf =
-{
-	f3853_int_req_w
-};
-
 
 //-------------------------------------------------
 //  UV201_INTERFACE( uv_intf )
@@ -567,7 +559,8 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_F3853_ADD(F3853_TAG, XTAL_4MHz/2, smi_intf)
+	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL_4MHz/2)
+	MCFG_F3853_EXT_INPUT_CB(vidbrain_state, f3853_int_req_w)
 
 	// cartridge
 	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, vidbrain_expansion_cards, NULL)

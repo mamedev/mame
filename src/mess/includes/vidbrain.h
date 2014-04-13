@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
 
+	F3853_INTERRUPT_REQ_CB(f3853_int_req_w);
 
 	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
 
