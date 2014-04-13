@@ -625,8 +625,8 @@ public:
 
 	ATTR_HOT void solve();
 
-	netlist_list_t<netlist_core_terminal_t *> m_registered; // save post-start m_list ...
-	plinked_list<netlist_core_terminal_t> m_list;
+	netlist_list_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
+	plinked_list<netlist_core_terminal_t> m_list_active;
 
 	ATTR_COLD void rebuild_list();     /* rebuild m_list after a load */
 

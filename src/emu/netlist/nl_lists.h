@@ -42,7 +42,7 @@ public:
 
 	ATTR_COLD netlist_list_t &operator=(const netlist_list_t &rhs)
 	{
-		this->reset();
+		this->clear();
 		for (int i=0; i<rhs.count(); i++)
 		{
 			this->add(rhs[i]);
@@ -129,7 +129,7 @@ public:
 	ATTR_HOT inline const _ListClass *next(const _ListClass *lc) const { return ((lc < last()) ? lc + 1 : NULL ); }
 	ATTR_HOT inline const _ListClass *last() const { return &m_list[m_count -1]; }
 	ATTR_HOT inline int count() const { return m_count; }
-	ATTR_HOT inline bool empty() const { return (m_count == 0); }
+	ATTR_HOT inline bool is_empty() const { return (m_count == 0); }
 	ATTR_HOT inline void clear() { m_count = 0; }
 	ATTR_HOT inline int capacity() const { return m_num_elements; }
 
