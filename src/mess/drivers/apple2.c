@@ -831,8 +831,8 @@ INPUT_PORTS_START( apple2ep )
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
@@ -1016,7 +1016,7 @@ static MACHINE_CONFIG_START( apple2_common, apple2_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(apple2_state, apple2 )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state, apple2e )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1141,7 +1141,7 @@ static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2c)
 	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
 
 	/* internal ram */
@@ -1158,7 +1158,7 @@ static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
-	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2)
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2c)
 	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
 
 	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
@@ -1180,6 +1180,10 @@ static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("128K")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( apple2cp, apple2c )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2cp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c_iwm, apple2c )
@@ -1644,7 +1648,7 @@ COMP( 1988, las128ex, apple2c,  0,        laser128,    apple2e, driver_device,  
 COMP( 1985, apple2c0, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (UniDisk 3.5)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c3, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (Original Memory Expansion)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2c4, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c (rev 4)", GAME_NOT_WORKING )
-COMP( 1988, apple2cp, apple2c,  0,        apple2c_iwm, apple2e, driver_device,  0,        "Apple Computer",    "Apple //c Plus", GAME_SUPPORTS_SAVE )
+COMP( 1988, apple2cp, apple2c,  0,        apple2cp,    apple2e, driver_device,  0,        "Apple Computer",    "Apple //c Plus", GAME_SUPPORTS_SAVE )
 COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", GAME_SUPPORTS_SAVE )
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)

@@ -2125,22 +2125,11 @@ void apple2_state::apple2_init_common()
 	apple2_refresh_delegates();
 }
 
-MACHINE_START_MEMBER(apple2_state,apple2)
+void apple2_state::apple2eplus_init_common(void *apple2cp_ce00_ram)
 {
 	apple2_memmap_config mem_cfg;
-	void *apple2cp_ce00_ram = NULL;
 
 	m_flags_mask = 0;
-
-	/* there appears to be some hidden RAM that is swapped in on the Apple
-	 * IIc plus; I have not found any official documentation but the BIOS
-	 * clearly uses this area as writeable memory */
-	if (!strcmp(machine().system().name, "apple2cp")) {
-		apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
-		memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
-	}
-
-	m_machinetype = APPLE_IIEPLUS;
 
 	apple2_init_common();
 
@@ -2152,20 +2141,33 @@ MACHINE_START_MEMBER(apple2_state,apple2)
 	apple2_setup_memory(&mem_cfg);
 }
 
-MACHINE_START_MEMBER(apple2_state,apple2e)
+MACHINE_START_MEMBER(apple2_state,apple2c)
 {
-	apple2_memmap_config mem_cfg;
-	void *apple2cp_ce00_ram = NULL;
+	m_machinetype = APPLE_IIC;
 
-	m_flags_mask = 0;
+	apple2eplus_init_common((void *)NULL);
+}
+
+MACHINE_START_MEMBER(apple2_state,apple2cp)
+{
+	void *apple2cp_ce00_ram;
 
 	/* there appears to be some hidden RAM that is swapped in on the Apple
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
-	if (!strcmp(machine().system().name, "apple2cp")) {
-		apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
-		memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
-	}
+	apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
+	memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
+
+	m_machinetype = APPLE_IICPLUS;
+
+	apple2eplus_init_common(apple2cp_ce00_ram);
+}
+
+MACHINE_START_MEMBER(apple2_state,apple2e)
+{
+	apple2_memmap_config mem_cfg;
+
+	m_flags_mask = 0;
 
 	m_machinetype = APPLE_IIE;
 
@@ -2175,7 +2177,7 @@ MACHINE_START_MEMBER(apple2_state,apple2e)
 	memset(&mem_cfg, 0, sizeof(mem_cfg));
 	mem_cfg.first_bank = 1;
 	mem_cfg.memmap = apple2_memmap_entries;
-	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
+	mem_cfg.auxmem = (UINT8*)NULL;
 	apple2_setup_memory(&mem_cfg);
 }
 
