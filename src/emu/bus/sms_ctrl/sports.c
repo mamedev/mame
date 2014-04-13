@@ -118,6 +118,8 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	m_sports_out(*this, "SPORTS_OUT"),
 	m_sports_x(*this, "SPORTS_X"),
 	m_sports_y(*this, "SPORTS_Y"),
+	m_read_state(0),
+	m_last_data(0),
 	m_interval(SPORTS_PAD_INTERVAL)
 {
 }
@@ -129,8 +131,6 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 
 void sms_sports_pad_device::device_start()
 {
-	m_read_state = 0;
-	m_last_data = 0;
 	m_last_time = machine().time();
 
 	save_item(NAME(m_read_state));

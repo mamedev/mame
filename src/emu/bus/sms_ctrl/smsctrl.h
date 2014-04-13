@@ -120,6 +120,7 @@ extern const device_type SMS_CONTROL_PORT;
 #include "sports.h"
 #include "sportsjp.h"
 #include "rfu.h"
+#include "multitap.h"
 
 SLOT_INTERFACE_EXTERN( sms_control_port_devices );
 

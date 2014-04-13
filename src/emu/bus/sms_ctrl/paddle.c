@@ -77,6 +77,7 @@ sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),
 	m_paddle_x(*this, "PADDLE_X"),
+	m_read_state(0),
 	m_interval(PADDLE_INTERVAL)
 {
 }
@@ -89,7 +90,6 @@ sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *
 void sms_paddle_device::device_start()
 {
 	m_start_time = machine().time();
-	m_read_state = 0;
 
 	save_item(NAME(m_start_time));
 	save_item(NAME(m_read_state));

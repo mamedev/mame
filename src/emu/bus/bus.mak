@@ -874,6 +874,7 @@ BUSOBJS += $(BUSOBJ)/sms_ctrl/paddle.o
 BUSOBJS += $(BUSOBJ)/sms_ctrl/rfu.o
 BUSOBJS += $(BUSOBJ)/sms_ctrl/sports.o
 BUSOBJS += $(BUSOBJ)/sms_ctrl/sportsjp.o
+BUSOBJS += $(BUSOBJ)/sms_ctrl/multitap.o
 endif
 
 #-------------------------------------------------

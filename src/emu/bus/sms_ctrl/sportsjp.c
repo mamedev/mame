@@ -92,6 +92,7 @@ sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig
 	m_sports_jp_in(*this, "SPORTS_JP_IN"),
 	m_sports_jp_x(*this, "SPORTS_JP_X"),
 	m_sports_jp_y(*this, "SPORTS_JP_Y"),
+	m_read_state(0),
 	m_interval(SPORTS_PAD_JP_INTERVAL)
 {
 }
@@ -104,7 +105,6 @@ sms_sports_pad_jp_device::sms_sports_pad_jp_device(const machine_config &mconfig
 void sms_sports_pad_jp_device::device_start()
 {
 	m_start_time = machine().time();
-	m_read_state = 0;
 
 	save_item(NAME(m_start_time));
 	save_item(NAME(m_read_state));

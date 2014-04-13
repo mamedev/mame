@@ -55,6 +55,7 @@ sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, cons
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
 	m_subctrl_port(*this, "ctrl"),
+	m_read_state(0),
 	m_interval(RAPID_FIRE_INTERVAL)
 {
 }
@@ -67,7 +68,6 @@ sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, cons
 void sms_rapid_fire_device::device_start()
 {
 	m_start_time = machine().time();
-	m_read_state = 0;
 
 	save_item(NAME(m_start_time));
 	save_item(NAME(m_read_state));
