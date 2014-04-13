@@ -248,6 +248,10 @@ public:
 		m_dsp2(*this, "dsp2"),
 		m_k056800(*this, "k056800"),
 		m_adc1038(*this, "adc1038"),
+		m_analog0(*this, "AN0"),
+		m_analog1(*this, "AN1"),
+		m_analog2(*this, "AN2"),
+		m_analog3(*this, "AN3"),
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette")  { }
 
@@ -261,6 +265,7 @@ public:
 	optional_device<cpu_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
+	required_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 
@@ -292,6 +297,8 @@ public:
 	DECLARE_VIDEO_START(gticlub);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
+
+	ADC1038_INPUT_CB(adc1038_input_callback);
 
 	UINT32 screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -750,15 +757,15 @@ INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 }
 
 
-static int adc1038_input_callback( device_t *device, int input )
+ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
 {
 	int value = 0;
 	switch (input)
 	{
-	case 0: value = device->machine().root_device().ioport("AN0")->read(); break;
-	case 1: value = device->machine().root_device().ioport("AN1")->read(); break;
-	case 2: value = device->machine().root_device().ioport("AN2")->read(); break;
-	case 3: value = device->machine().root_device().ioport("AN3")->read(); break;
+	case 0: value = m_analog0->read(); break;
+	case 1: value = m_analog1->read(); break;
+	case 2: value = m_analog2->read(); break;
+	case 3: value = m_analog3->read(); break;
 	case 4: value = 0x000; break;
 	case 5: value = 0x000; break;
 	case 6: value = 0x000; break;
@@ -767,19 +774,6 @@ static int adc1038_input_callback( device_t *device, int input )
 
 	return value;
 }
-
-static const adc1038_interface gticlub_adc1038_intf =
-{
-	1,
-	adc1038_input_callback
-};
-
-static const adc1038_interface thunderh_adc1038_intf =
-{
-	0,
-	adc1038_input_callback
-};
-
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
@@ -926,7 +920,9 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_ADC1038_ADD("adc1038", gticlub_adc1038_intf)
+	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
+	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	MCFG_ADC1038_GTIHACK(1)
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")
@@ -966,7 +962,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 
 	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
+	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
 
 	MCFG_DEVICE_REMOVE("k056230")
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
@@ -977,7 +974,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 
 	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
+	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
 
 	MCFG_DEVICE_REMOVE("k001604_1")
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
@@ -1044,7 +1042,8 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
-	MCFG_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
+	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
+	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
 
 	MCFG_DEVICE_ADD("k056230", K056230, 0)
 	MCFG_K056230_CPU("maincpu")

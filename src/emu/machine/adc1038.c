@@ -14,28 +14,9 @@
 const device_type ADC1038 = &device_creator<adc1038_device>;
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADC1038, "ADC1038", tag, owner, clock, "adc1038", __FILE__)
+	: device_t(mconfig, ADC1038, "ADC1038", tag, owner, clock, "adc1038", __FILE__),
+		m_gticlub_hack(0)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void adc1038_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const adc1038_interface *intf = reinterpret_cast<const adc1038_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<adc1038_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		input_callback_r = NULL;
-	}
 }
 
 //-------------------------------------------------
@@ -44,7 +25,7 @@ void adc1038_device::device_config_complete()
 
 void adc1038_device::device_start()
 {
-	m_input_callback_r_func = input_callback_r;
+	m_input_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_clk));
@@ -98,7 +79,7 @@ WRITE_LINE_MEMBER( adc1038_device::clk_write )
 			m_cycle = 0;
 
 			/* notice that m_adr is always < 7! */
-			m_adc_data = m_input_callback_r_func(this, m_adr);
+			m_adc_data = m_input_cb(m_adr);
 		}
 	}
 
@@ -131,7 +112,7 @@ READ_LINE_MEMBER( adc1038_device::sars_read )
 	m_cycle = 0;
 
 	/* notice that m_adr is always < 7! */
-	m_adc_data = m_input_callback_r_func(this, m_adr);
+	m_adc_data = m_input_cb(m_adr);
 
 	m_sars ^= 1;
 	return m_sars;
