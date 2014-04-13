@@ -361,6 +361,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timers[tnum]->reset();
 
 	m_intreq |= (1<<bit);
+	if(m_intena & 1<<bit)
+		m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	//printf("%08x %08x (%08x)\n",m_intreq,m_intena,1<<bit);
 	model2_check_irq_state();
 
@@ -1027,6 +1029,9 @@ READ32_MEMBER(model2_state::model2_irq_r)
 
 void model2_state::model2_check_irq_state()
 {
+	return;
+
+	/* TODO: vf2 and fvipers hangs with an irq halt on POST, disabled for now */
 	const int irq_type[12]= {I960_IRQ0,I960_IRQ1,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ2,I960_IRQ3,I960_IRQ3};
 
 	for(int i=0;i<12;i++)
@@ -1420,6 +1425,12 @@ WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
+READ32_MEMBER(model2_state::tgpid_r)
+{
+	popmessage("Read from TGP ID, contact MAMEdev");
+	return 0;
+}
+
 /* common map for all Model 2 versions */
 static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
@@ -1438,6 +1449,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ(fifoctl_r)
 	AM_RANGE(0x0098000c, 0x0098000f) AM_READWRITE(videoctl_r,videoctl_w)
+	AM_RANGE(0x00980030, 0x0098005f) AM_READ(tgpid_r)
 
 	AM_RANGE(0x00e80000, 0x00e80007) AM_READWRITE(model2_irq_r, model2_irq_w)
 
@@ -2009,12 +2021,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 	if(scanline == 384)
 	{
 		m_intreq |= (1<<0);
+		if(m_intena & 1<<0)
+			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		model2_check_irq_state();
 	}
 	else if(scanline == 0)
 	{
 		/* From sound to main CPU (TODO: what enables this?) */
 		m_intreq |= (1<<10);
+		if(m_intena & 1<<10)
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 		model2_check_irq_state();
 	}
 }
@@ -2026,17 +2042,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
 	if(scanline == 384)
 	{
 		m_intreq |= (1<<0);
+		if(m_intena & 1<<0)
+			m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		model2_check_irq_state();
 	}
 	else if(scanline == 0) // 384
 	{
 		m_intreq |= (1<<10);
+		if(m_intena & 1<<10)
+			m_maincpu->set_input_line(I960_IRQ3, ASSERT_LINE);
 		model2_check_irq_state();
 	}
 	else if(scanline == 256)
 	{
-		/* TODO: irq source? Source allocation in dynamcopc? */
+		/* TODO: irq source? Scroll allocation in dynamcopc? */
 		m_intreq |= (1<<2);
+		if(m_intena & 1<<2)
+			m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 		model2_check_irq_state();
 	}
 
