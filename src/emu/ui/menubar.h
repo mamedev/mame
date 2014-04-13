@@ -241,6 +241,7 @@ private:
 	void draw_child_menu(menu_item *menu, float x, float y);
 	bool is_child_menu_visible(menu_item *menu) const;
 	void draw_menu_item_text(menu_item *mi, float x0, float y0, float x1, float y1, bool decorations, const float *column_widths = NULL);
+	bool is_highlighted_selection(menu_item *mi);
 	bool event_loop();
 	bool poll_navigation_keys();
 	bool poll_shortcut_keys(bool swallow);

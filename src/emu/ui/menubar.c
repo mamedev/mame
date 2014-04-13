@@ -634,7 +634,7 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 		fgcolor = UI_UNAVAILABLE_COLOR;
 		bgcolor = UI_TEXT_BG_COLOR;
 	}
-	else if (mi == m_selected_item)
+	else if (is_highlighted_selection(mi))
 	{
 		// selected
 		fgcolor = UI_SELECTED_COLOR;
@@ -700,6 +700,34 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 		if (column_widths != NULL)
 			x0 += column_widths[iter.index()];
 	}
+}
+
+
+//-------------------------------------------------
+//  is_highlighted_selection
+//-------------------------------------------------
+
+bool ui_menubar::is_highlighted_selection(menu_item *mi)
+{
+	bool result = false;
+
+	if (mi == m_selected_item)
+	{
+		// this item _is_ the selection
+		result = true;
+	}
+	else if (m_selected_item != NULL)
+	{
+		// walk up the menu hierarchy; we want to also highlight ancestor sub menus
+		menu_item *selected_item_ancestor = m_selected_item;
+		do
+		{
+			selected_item_ancestor = selected_item_ancestor->parent();
+			result = (mi == selected_item_ancestor) && selected_item_ancestor->is_sub_menu();
+		}
+		while(!result && selected_item_ancestor->is_sub_menu());
+	}
+	return result;
 }
 
 
