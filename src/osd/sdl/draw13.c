@@ -354,7 +354,7 @@ INLINE void set_coloralphamode(SDL_Texture  *texture_id, const render_color *col
 	else
 	{
 		SDL_SetTextureColorMod(texture_id, 0xFF, 0xFF, 0xFF);
-		SDL_SetTextureAlphaMod(texture_id, 0xFF);
+		SDL_SetTextureAlphaMod(texture_id, 0x00);
 	}
 }
 
