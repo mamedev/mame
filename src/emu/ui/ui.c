@@ -1558,9 +1558,22 @@ void ui_manager::request_quit()
 
 UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
-	astring quit_message("Are you sure you want to quit?\n\n");
-	quit_message.cat("Press ''UI Select'' (default: Enter) to quit,\n");
-	quit_message.cat("Press ''UI Cancel'' (default: Esc) to return to emulation.");
+	// get the text for 'UI Select'
+	astring ui_select_text;
+	machine.input().seq_name(ui_select_text, machine.ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+
+	// get the text for 'UI Cancel'
+	astring ui_cancel_text;
+	machine.input().seq_name(ui_cancel_text, machine.ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+
+	// assemble the quit message
+	astring quit_message;
+	quit_message.printf(
+		"Are you sure you want to quit?\n\n"
+		"Press ''%s'' to quit,\n"
+		"Press ''%s'' to return to emulation.",
+		ui_select_text.cstr(),
+		ui_cancel_text.cstr());
 
 	machine.ui().draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine.pause();
