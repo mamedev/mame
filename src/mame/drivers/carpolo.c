@@ -221,16 +221,6 @@ static GFXDECODE_START( carpolo )
 	GFXDECODE_ENTRY( "gfx3", 0, alphalayout,  12*2+2*16, 4 )
 GFXDECODE_END
 
-static const ttl74148_config carpolo_ttl74148_intf =
-{
-	carpolo_74148_3s_cb
-};
-
-static const ttl74153_config carpolo_ttl74153_intf =
-{
-	NULL
-};
-
 /*************************************
  *
  *  Machine driver
@@ -280,8 +270,10 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_DEVICE_ADD("7474_1a_1", TTL7474, 0)
 	MCFG_DEVICE_ADD("7474_1a_2", TTL7474, 0)
 
-	MCFG_74148_ADD("74148_3s", carpolo_ttl74148_intf)
-	MCFG_74153_ADD("74153_1k", carpolo_ttl74153_intf)
+	MCFG_DEVICE_ADD("74148_3s", TTL74148, 0)
+	MCFG_74148_OUTPUT_CB(carpolo_state, ttl74148_3s_cb)
+
+	MCFG_DEVICE_ADD("74153_1k", TTL74153, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

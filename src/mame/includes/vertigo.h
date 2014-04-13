@@ -130,6 +130,8 @@ public:
 	TIMER_CALLBACK_MEMBER(sound_command_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
+	TTL74148_OUTPUT_CB(update_irq);
+
 	void vertigo_vproc_init();
 	void vertigo_vproc_reset();
 	void am2901x4 (am2901 *bsp, microcode *mc);
@@ -137,7 +139,3 @@ public:
 	void vertigo_vproc(int cycles, int irq4);
 	void update_irq_encoder(int line, int state);
 };
-
-/*----------- defined in machine/vertigo.c -----------*/
-
-void vertigo_update_irq(device_t *device);

@@ -107,6 +107,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
 
+	TTL74148_OUTPUT_CB(ttl74148_3s_cb);
+
 	void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy);
 	void normalize_coordinates(int *x1, int *y1, int *x2, int *y2);
 	int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only);
@@ -123,8 +125,3 @@ public:
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
 };
-
-
-/*----------- defined in machine/carpolo.c -----------*/
-
-void carpolo_74148_3s_cb(device_t *device);

@@ -45,37 +45,17 @@
 const device_type TTL74148 = &device_creator<ttl74148_device>;
 
 ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74148, "74148 TTL", tag, owner, clock, "74148", __FILE__),
-	m_enable_input(0),
-	m_output(0),
-	m_output_valid(0),
-	m_enable_output(0),
-	m_last_output(0),
-	m_last_output_valid(0),
-	m_last_enable_output(0)
+				: device_t(mconfig, TTL74148, "74148 TTL", tag, owner, clock, "74148", __FILE__),
+					m_enable_input(0),
+					m_output(0),
+					m_output_valid(0),
+					m_enable_output(0),
+					m_last_output(0),
+					m_last_output_valid(0),
+					m_last_enable_output(0)
 {
 	for (int i = 0; i < 8; i++)
-	m_input_lines[i] = 0;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ttl74148_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ttl74148_config *intf = reinterpret_cast<const ttl74148_config *>(static_config());
-	if (intf != NULL)
-	*static_cast<ttl74148_config *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-
+		m_input_lines[i] = 0;
 }
 
 //-------------------------------------------------
@@ -84,6 +64,8 @@ void ttl74148_device::device_config_complete()
 
 void ttl74148_device::device_start()
 {
+	m_output_cb.bind_relative_to(*owner());
+
 	save_item(NAME(m_input_lines));
 	save_item(NAME(m_enable_input));
 	save_item(NAME(m_output));
@@ -171,16 +153,15 @@ void ttl74148_device::update()
 
 
 	/* call callback if any of the outputs changed */
-	if (  m_output_cb &&
-		((m_output        != m_last_output) ||
-			(m_output_valid  != m_last_output_valid) ||
-			(m_enable_output != m_last_enable_output)))
+	if (!m_output_cb.isnull() &&
+		((m_output != m_last_output) ||
+			(m_output_valid != m_last_output_valid) || (m_enable_output != m_last_enable_output)))
 	{
 		m_last_output = m_output;
 		m_last_output_valid = m_output_valid;
 		m_last_enable_output = m_enable_output;
 
-		m_output_cb(this);
+		m_output_cb();
 	}
 }
 

@@ -55,10 +55,9 @@
 #define CAR_BORDER_EXTRA_BITS       0x50
 
 
-void carpolo_74148_3s_cb(device_t *device)
+TTL74148_OUTPUT_CB(carpolo_state::ttl74148_3s_cb)
 {
-	carpolo_state *state = device->machine().driver_data<carpolo_state>();
-	state->m_maincpu->set_input_line(M6502_IRQ_LINE, state->m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

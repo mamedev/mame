@@ -40,9 +40,9 @@
 const device_type TTL74153 = &device_creator<ttl74153_device>;
 
 ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TTL74153, "74153 TTL", tag, owner, clock, "74153", __FILE__),
-	m_a(0),
-	m_b(0)
+				: device_t(mconfig, TTL74153, "74153 TTL", tag, owner, clock, "74153", __FILE__),
+					m_a(0),
+					m_b(0)
 {
 	m_input_lines[0][0] = 0;
 	m_input_lines[0][1] = 0;
@@ -54,32 +54,13 @@ ttl74153_device::ttl74153_device(const machine_config &mconfig, const char *tag,
 	m_input_lines[1][3] = 0;
 
 	for (int i = 0; i < 2; i++)
-	m_enable[i] = 0;
+		m_enable[i] = 0;
 
 	for (int i = 0; i < 2; i++)
-	m_output[i] = 0;
+		m_output[i] = 0;
 
 	for (int i = 0; i < 2; i++)
-	m_last_output[i] = 0;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ttl74153_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ttl74153_config *intf = reinterpret_cast<const ttl74153_config *>(static_config());
-	if (intf != NULL)
-	*static_cast<ttl74153_config *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
+		m_last_output[i] = 0;
 }
 
 //-------------------------------------------------
@@ -88,6 +69,8 @@ void ttl74153_device::device_config_complete()
 
 void ttl74153_device::device_start()
 {
+	m_output_cb.bind_relative_to(*owner());
+
 	save_item(NAME(m_enable));
 	save_item(NAME(m_last_output));
 	save_item(NAME(m_input_lines[0][0]));
@@ -146,14 +129,13 @@ void ttl74153_device::update()
 
 
 	/* call callback if either of the outputs changed */
-	if (  m_output_cb &&
-		((m_output[0] != m_last_output[0]) ||
-			(m_output[1] != m_last_output[1])))
+	if (!m_output_cb.isnull() &&
+		((m_output[0] != m_last_output[0]) || (m_output[1] != m_last_output[1])))
 	{
 		m_last_output[0] = m_output[0];
 		m_last_output[1] = m_output[1];
 
-		m_output_cb(this);
+		m_output_cb();
 	}
 }
 

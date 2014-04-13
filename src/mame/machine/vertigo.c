@@ -30,16 +30,15 @@
  *
  *************************************/
 
-void vertigo_update_irq(device_t *device)
+TTL74148_OUTPUT_CB(vertigo_state::update_irq)
 {
-	vertigo_state *state = device->machine().driver_data<vertigo_state>();
-	if (state->m_irq_state < 7)
-		state->m_maincpu->set_input_line(state->m_irq_state ^ 7, CLEAR_LINE);
+	if (m_irq_state < 7)
+		m_maincpu->set_input_line(m_irq_state ^ 7, CLEAR_LINE);
 
-	state->m_irq_state = state->m_ttl74148->output_r();
+	m_irq_state = m_ttl74148->output_r();
 
-	if (state->m_irq_state < 7)
-		state->m_maincpu->set_input_line(state->m_irq_state ^ 7, ASSERT_LINE);
+	if (m_irq_state < 7)
+		m_maincpu->set_input_line(m_irq_state ^ 7, ASSERT_LINE);
 }
 
 
