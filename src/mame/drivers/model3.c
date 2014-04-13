@@ -1223,59 +1223,58 @@ MACHINE_START_MEMBER(model3_state,model3_21)
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 }
 
-static void model3_init(running_machine &machine, int step)
+void model3_state::model3_init(int step)
 {
-	model3_state *state = machine.driver_data<model3_state>();
-	state->m_step = step;
+	m_step = step;
 
-	state->m_sound_irq_enable = 0;
-	state->m_sound_timer->adjust(attotime::never);
+	m_sound_irq_enable = 0;
+	m_sound_timer->adjust(attotime::never);
 
-	state->membank("bank1")->set_base(state->memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
+	membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	state->membank("bank4")->set_base(state->memregion("samples")->base() + 0x200000);
-	state->membank("bank5")->set_base(state->memregion("samples")->base() + 0x600000);
+	membank("bank4")->set_base(memregion("samples")->base() + 0x200000);
+	membank("bank5")->set_base(memregion("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(state->m_soundram, state->memregion("audiocpu")->base()+0x80000, 16);
-	machine.device("audiocpu")->reset();
+	memcpy(m_soundram, memregion("audiocpu")->base()+0x80000, 16);
+	machine().device("audiocpu")->reset();
 
-	model3_machine_init(machine, step); // step 1.5
-	model3_tap_reset(machine);
+	m_m3_step = step; // step = BCD hardware rev.  0x10 for 1.0, 0x15 for 1.5, 0x20 for 2.0, etc.
+	tap_reset();
 
-	if(step < 0x20) {
-		if( core_stricmp(machine.system().name, "vs215") == 0 ||
-			core_stricmp(machine.system().name, "vs29815") == 0 ||
-			core_stricmp(machine.system().name, "bass") == 0 )
+	if (step < 0x20) {
+		if( core_stricmp(machine().system().name, "vs215") == 0 ||
+			core_stricmp(machine().system().name, "vs29815") == 0 ||
+			core_stricmp(machine().system().name, "bass") == 0 )
 		{
-			mpc106_init(machine);
+			mpc106_init(machine());
 		}
 		else
 		{
-			mpc105_init(machine);
+			mpc105_init(machine());
 		}
-		state->m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
+		m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
 	else {
-		mpc106_init(machine);
+		mpc106_init(machine());
 		// some step 2+ games need the older PCI ID (obvious symptom:
 		// vbl is enabled briefly then disabled so the game hangs)
-		if (core_stricmp(machine.system().name, "magtruck") == 0 ||
-			core_stricmp(machine.system().name, "von254g") == 0)
+		if (core_stricmp(machine().system().name, "magtruck") == 0 ||
+			core_stricmp(machine().system().name, "von254g") == 0)
 		{
-			state->m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
+			m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 		}
 		else
 		{
-			state->m_real3d_device_id = 0x178611db; /* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
+			m_real3d_device_id = 0x178611db; /* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
 		}
 	}
 }
 
-MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(machine(), 0x10); }
-MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(machine(), 0x15); }
-MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(machine(), 0x20); }
-MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(machine(), 0x21); }
+MACHINE_RESET_MEMBER(model3_state,model3_10){ model3_init(0x10); }
+MACHINE_RESET_MEMBER(model3_state,model3_15){ model3_init(0x15); }
+MACHINE_RESET_MEMBER(model3_state,model3_20){ model3_init(0x20); }
+MACHINE_RESET_MEMBER(model3_state,model3_21){ model3_init(0x21); }
 
 
 READ64_MEMBER(model3_state::model3_ctrl_r)
@@ -1466,7 +1465,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 		case 0x10/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				UINT64 res = model3_tap_read(machine());
+				UINT64 res = tap_read();
 
 				return res<<61;
 			}
@@ -1545,8 +1544,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 			if (ACCESSING_BITS_24_31)
 			{
 				data >>= 24;
-				model3_tap_write(machine(),
-					(data >> 6) & 1,// TCK
+				tap_write((data >> 6) & 1,// TCK
 					(data >> 2) & 1,// TMS
 					(data >> 5) & 1,// TDI
 					(data >> 7) & 1 // TRST
