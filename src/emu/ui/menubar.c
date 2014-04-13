@@ -723,9 +723,9 @@ bool ui_menubar::is_highlighted_selection(menu_item *mi)
 		do
 		{
 			selected_item_ancestor = selected_item_ancestor->parent();
-			result = (mi == selected_item_ancestor) && selected_item_ancestor->is_sub_menu();
+			result = mi == selected_item_ancestor;
 		}
-		while(!result && selected_item_ancestor->is_sub_menu());
+		while(!result && selected_item_ancestor != &root_menu());
 	}
 	return result;
 }
