@@ -677,6 +677,7 @@ static void m68k_presave(m68000_base_device *m68k)
 static void m68k_postload(m68000_base_device *m68k)
 {
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
+	fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
 	m68k->stopped = (m68k->save_stopped ? STOP_LEVEL_STOP : 0) | (m68k->save_halted  ? STOP_LEVEL_HALT : 0);
 	m68ki_jump(m68k, REG_PC(m68k));
 }
@@ -991,6 +992,38 @@ void m68000_base_device::init_cpu_common(void)
 	save_item(NAME(save_halted));
 	save_item(NAME(pref_addr));
 	save_item(NAME(pref_data));
+	save_item(NAME(reset_cycles));
+	save_item(NAME(nmi_pending));
+	save_item(NAME(has_pmmu));
+	save_item(NAME(has_hmmu));
+	save_item(NAME(pmmu_enabled));
+	save_item(NAME(hmmu_enabled));
+
+	save_item(NAME(mmu_crp_aptr));
+	save_item(NAME(mmu_crp_limit));
+	save_item(NAME(mmu_srp_aptr));
+	save_item(NAME(mmu_srp_limit));
+	save_item(NAME(mmu_urp_aptr));
+	save_item(NAME(mmu_tc));
+	save_item(NAME(mmu_sr));
+	save_item(NAME(mmu_sr_040));
+	save_item(NAME(mmu_atc_rr));
+	save_item(NAME(mmu_tt0));
+	save_item(NAME(mmu_tt1));
+	save_item(NAME(mmu_itt0));
+	save_item(NAME(mmu_itt1));
+	save_item(NAME(mmu_dtt0));
+	save_item(NAME(mmu_dtt1));
+	save_item(NAME(mmu_acr0));
+	save_item(NAME(mmu_acr1));
+	save_item(NAME(mmu_acr2));
+	save_item(NAME(mmu_acr3));
+
+	for (int i=0; i<MMU_ATC_ENTRIES;i++) {
+		save_item(NAME(mmu_atc_tag[i]), i);
+		save_item(NAME(mmu_atc_data[i]), i);
+	}
+
 	machine().save().register_presave(save_prepost_delegate(FUNC(m68k_presave), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(m68k_postload), this));
 

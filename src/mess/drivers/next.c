@@ -824,11 +824,26 @@ void next_state::machine_start()
 	save_item(NAME(irq_level));
 	save_item(NAME(phy));
 	save_item(NAME(scsictrl));
+	save_item(NAME(scsistat));
 	save_item(NAME(timer_tbase));
 	save_item(NAME(timer_vbase));
 	save_item(NAME(timer_data));
+	save_item(NAME(timer_next_data));
 	save_item(NAME(timer_ctrl));
 	save_item(NAME(eventc_latch));
+	save_item(NAME(esp));
+
+	for(int i=0; i<0x20; i++) {
+		save_item(NAME(dma_slots[i].start), i);
+		save_item(NAME(dma_slots[i].limit), i);
+		save_item(NAME(dma_slots[i].chain_start), i);
+		save_item(NAME(dma_slots[i].chain_limit), i);
+		save_item(NAME(dma_slots[i].current), i);
+		save_item(NAME(dma_slots[i].state), i);
+		save_item(NAME(dma_slots[i].supdate), i);
+		save_item(NAME(dma_slots[i].restart), i);
+		save_item(NAME(dma_slots[i].drq), i);
+	}
 
 	timer_tm = timer_alloc(0);
 }
@@ -841,6 +856,7 @@ void next_state::machine_reset()
 	irq_level = 0;
 	esp = 0;
 	scsictrl = 0;
+	scsistat = 0;
 	phy[0] = phy[1] = 0;
 	eventc_latch = 0;
 	timer_vbase = 0;
