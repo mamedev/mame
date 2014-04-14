@@ -31,7 +31,6 @@
 #include "sound/speaker.h"
 #include "machine/nsc810.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/null_modem.h"
 #include "machine/nvram.h"
 #include "machine/bankdev.h"
 
@@ -371,10 +370,6 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-SLOT_INTERFACE_START( hunter2_rs232_devices )
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, 4000000)
@@ -415,7 +410,7 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
 	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
 
-	MCFG_RS232_PORT_ADD("serial",hunter2_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,NULL)
 	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
 	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
 

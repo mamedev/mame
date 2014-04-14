@@ -69,7 +69,6 @@
  ******************************************************************************/
 
 
-#include "bus/rs232/null_modem.h"
 #include "includes/avigo.h"
 #include "avigo.lh"
 
@@ -865,10 +864,6 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-static SLOT_INTERFACE_START( avigo_com )
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_START( avigo, avigo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -878,7 +873,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 
 	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
 
-	MCFG_RS232_PORT_ADD( "serport", avigo_com, NULL )
+	MCFG_RS232_PORT_ADD( "serport", default_rs232_devices, NULL )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
