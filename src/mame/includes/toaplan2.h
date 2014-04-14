@@ -32,8 +32,8 @@ public:
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_vdp0(*this, "gp9001vdp0"),
-		m_vdp1(*this, "gp9001vdp1"),
+		m_vdp0(*this, "gp9001"),
+		m_vdp1(*this, "gp9001_1"),
 		m_nmk112(*this, "nmk112"),
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
@@ -61,12 +61,11 @@ public:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd4992_device> m_rtc;
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	UINT16 m_mcu_data;
-	UINT16 m_video_status;
 	INT8 m_old_p1_paddle_h; /* For Ghox */
 	INT8 m_old_p2_paddle_h;
 	UINT8 m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
