@@ -14,7 +14,6 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/ie15/ie15.h"
-#include "imagedev/bitbngr.h"
 #include "machine/ie15_kbd.h"
 #include "sound/beep.h"
 #include "ie15.lh"
