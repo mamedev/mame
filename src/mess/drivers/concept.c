@@ -190,13 +190,6 @@ INPUT_PORTS_END
 /* init with simple, fixed, B/W palette */
 /* Is the palette black on white or white on black??? */
 
-static const mm58274c_interface concept_mm58274c_interface =
-{
-	0,  /*  mode 24*/
-	1   /*  first day of week */
-};
-
-
 SLOT_INTERFACE_START( concept_exp_devices )
 	SLOT_INTERFACE("fdc", CONCEPT_FDC)
 	SLOT_INTERFACE("hdc", CONCEPT_HDC)
@@ -227,7 +220,9 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	/* no sound? */
 
 	/* rtc */
-	MCFG_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
+	MCFG_DEVICE_ADD("mm58274c", MM58274C, 0)
+	MCFG_MM58274C_MODE24(0) // 12 hour
+	MCFG_MM58274C_DAY1(1)   // monday
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1022750)

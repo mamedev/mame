@@ -747,12 +747,6 @@ I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 	}
 }
 
-static mm58274c_interface wicat_rtc_intf =
-{
-	0,  // 12 hour
-	1   // first day
-};
-
 AM9517A_INTERFACE( wicat_videodma_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(wicat_state,dma_hrq_w), // m_out_hreq_cb;
@@ -776,7 +770,9 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 
-	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
+	MCFG_DEVICE_ADD("rtc", MM58274C, 0)  // actually an MM58174AN, but should be compatible
+	MCFG_MM58274C_MODE24(0) // 12 hour
+	MCFG_MM58274C_DAY1(1)   // monday
 
 	// internal terminal
 	MCFG_DEVICE_ADD("uart0", MC2661, XTAL_5_0688MHz)  // connected to terminal board

@@ -435,12 +435,6 @@ const smc92x4_interface ti99_smc92x4_interface =
 	FALSE,      /* do not use the full track layout */
 };
 
-static const mm58274c_interface floppy_mm58274c_interface =
-{
-	1,  /*  mode 24*/
-	0   /*  first day of week */
-};
-
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_SMC92X4_ADD(FDC_TAG, ti99_smc92x4_interface )
 	MCFG_SMC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
@@ -449,7 +443,10 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_SMC92X4_AUXBUS_IN_CALLBACK(READ8(myarc_hfdc_device, auxbus_in))
 	MCFG_SMC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
 	MCFG_SMC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
-	MCFG_MM58274C_ADD(CLOCK_TAG, floppy_mm58274c_interface)
+
+	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(1) // 24 hour
+	MCFG_MM58274C_DAY1(0)   // sunday
 MACHINE_CONFIG_END
 
 ROM_START( ti99_hfdc )

@@ -594,12 +594,6 @@ void snug_bwg_device::device_config_complete()
 	if (subdevice("3")!=NULL) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
 }
 
-static const mm58274c_interface bwg_mm58274c_interface =
-{
-	1,  /*  mode 24*/
-	0   /*  first day of week */
-};
-
 INPUT_PORTS_START( bwg_fdc )
 	PORT_START( "BWGDIP1" )
 	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" )
@@ -634,7 +628,10 @@ MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_WD1773x_ADD(FDC_TAG, XTAL_8MHz)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(snug_bwg_device, fdc_drq_w))
-	MCFG_MM58274C_ADD(CLOCK_TAG, bwg_mm58274c_interface)
+
+	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(1) // 24 hour
+	MCFG_MM58274C_DAY1(0)   // sunday
 
 	MCFG_FLOPPY_DRIVE_ADD("0", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("1", bwg_floppies, "525dd", snug_bwg_device::floppy_formats)
@@ -1115,12 +1112,6 @@ const wd17xx_interface bwgleg_wd17xx_interface =
 	{ PFLOPPY_0, PFLOPPY_1, PFLOPPY_2, PFLOPPY_3 }
 };
 
-static const mm58274c_interface floppyleg_mm58274c_interface =
-{
-	1,  /*  mode 24*/
-	0   /*  first day of week */
-};
-
 INPUT_PORTS_START( bwg_fdc_legacy )
 	PORT_START( "BWGDIP1" )
 	PORT_DIPNAME( 0x01, 0x00, "BwG step rate" )
@@ -1142,7 +1133,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_FRAGMENT( bwg_fdc_legacy )
 	MCFG_WD1773_ADD(FDCLEG_TAG, bwgleg_wd17xx_interface )
-	MCFG_MM58274C_ADD(CLOCK_TAG, floppyleg_mm58274c_interface)
+
+	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
+	MCFG_MM58274C_MODE24(1) // 24 hour
+	MCFG_MM58274C_DAY1(0)   // sunday
 MACHINE_CONFIG_END
 
 ROM_START( bwg_fdc_legacy )

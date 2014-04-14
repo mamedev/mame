@@ -344,17 +344,6 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-//-------------------------------------------------
-//  mm58274c_interface rtc_intf
-//-------------------------------------------------
-
-// this is all guess
-static const mm58274c_interface rtc_intf =
-{
-	0,  /*  mode 24*/
-	1   /*  first day of week */
-};
-
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
@@ -411,8 +400,12 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MM58274C_ADD("rtc", rtc_intf)
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
+	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
+	// this is all guess
+	MCFG_MM58274C_MODE24(0) // 12 hour
+	MCFG_MM58274C_DAY1(1)   // monday
+
+//MCFG_TIMER_DRIVER_ADD_PERIODIC("hunter_a", hunter2_state, a_timer, attotime::from_hz(61))
 
 	MCFG_NSC810_ADD("iotimer",XTAL_4MHz,XTAL_4MHz)
 	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,port00_r))
