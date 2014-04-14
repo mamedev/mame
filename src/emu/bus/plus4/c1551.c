@@ -241,20 +241,6 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 	m_ga->oe_w(BIT(data, 4));
 }
 
-static const tpi6525_interface tpi0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_w),
-	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
-	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi0_pc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
@@ -325,20 +311,6 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 	m_dav = BIT(data, 6);
 }
 
-static const tpi6525_interface tpi1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tcbm_data_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pb_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, tpi1_pc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  ADDRESS_MAP( c1551_mem )
 //-------------------------------------------------
@@ -380,9 +352,20 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
 
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf)
-	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
-
+	MCFG_DEVICE_ADD(M6523_0_TAG, TPI6525, 0)
+	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(DEVREAD8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_TPI6525_OUT_PB_CB(DEVWRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi0_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi0_pc_w))
+	MCFG_DEVICE_ADD(M6523_1_TAG, TPI6525, 0)
+	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(c1551_device, tpi1_pb_r))
+	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi1_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi1_pc_w))
+	
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
 	MCFG_64H156_BYTE_CALLBACK(DEVWRITELINE(C64H156_TAG, c64h156_device, atni_w))
 	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)

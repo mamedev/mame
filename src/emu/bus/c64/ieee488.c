@@ -138,27 +138,19 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
 	m_roml_sel = BIT(data, 4);
 }
 
-static const tpi6525_interface tpi_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_ieee488_device, tpi_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_ieee488_device, tpi_pa_w),
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_ieee488_device, tpi_pc_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_ieee488_device, tpi_pc_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
-	MCFG_TPI6525_ADD(MOS6525_TAG, tpi_intf)
-
+	MCFG_DEVICE_ADD(MOS6525_TAG, TPI6525, 0)
+	MCFG_TPI6525_IN_PA_CB(READ8(c64_ieee488_device, tpi_pa_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(c64_ieee488_device, tpi_pa_w))
+	MCFG_TPI6525_IN_PB_CB(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_TPI6525_OUT_PB_CB(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(c64_ieee488_device, tpi_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(c64_ieee488_device, tpi_pc_w))
+	
 	MCFG_CBM_IEEE488_ADD(NULL)
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
