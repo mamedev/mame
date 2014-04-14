@@ -25,8 +25,8 @@
 #include "cpu/m68000/m68000.h"
 
 #define MAC_SCREEN_NAME "screen"
-#define MAC_539X_1_TAG "scsi:539x_1"
-#define MAC_539X_2_TAG "scsi:539x_2"
+#define MAC_539X_1_TAG "539x_1"
+#define MAC_539X_2_TAG "539x_2"
 #define MACKBD_TAG "mackbd"
 
 // uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
@@ -200,7 +200,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG),
-		m_ncr5380(*this, "scsi:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this,"rtc"),
 		m_mouse0(*this, "MOUSE0"),

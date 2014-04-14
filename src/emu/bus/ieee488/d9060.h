@@ -19,7 +19,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
-#include "machine/scsicb.h"
+#include "bus/scsi/scsi.h"
 
 
 
@@ -49,7 +49,6 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( req_w );
 	DECLARE_READ8_MEMBER( dio_r );
 	DECLARE_WRITE8_MEMBER( dio_w );
 	DECLARE_READ8_MEMBER( riot1_pa_r );
@@ -79,7 +78,8 @@ private:
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<via6522_device> m_via;
-	required_device<scsicb_device> m_sasibus;
+	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
 	required_ioport m_address;
 
 	// IEEE-488 bus

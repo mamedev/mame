@@ -6,7 +6,7 @@
 #ifndef _WD33C93_H_
 #define _WD33C93_H_
 
-#include "machine/scsihle.h"
+#include "legscsi.h"
 
 /* wd register names */
 
@@ -48,7 +48,7 @@ enum
 #define MCFG_WD33C93_IRQ_CB(_devcb) \
 	devcb = &wd33c93_device::set_irq_callback(*device, DEVCB2_##_devcb);
 
-class wd33c93_device : public device_t
+class wd33c93_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -59,8 +59,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void get_dma_data( int bytes, UINT8 *pData );
-	void write_data(int bytes, UINT8 *pData);
+	void dma_read_data( int bytes, UINT8 *pData );
+	void dma_write_data(int bytes, UINT8 *pData);
 	void clear_dma();
 	int get_dma_count();
 
@@ -73,7 +73,6 @@ private:
 	UINT8 getunit( void );
 	void set_xfer_count( int count );
 	int get_xfer_count( void );
-	void read_data(int bytes, UINT8 *pData);
 	void complete_immediate( int status );
 	void complete_cmd( UINT8 status );
 	void unimplemented_cmd();
@@ -86,8 +85,6 @@ private:
 	void negate_ack();
 	void xferinfo_cmd();
 	void dispatch_command();
-
-	scsihle_device *devices[8]; // SCSI IDs 0-7
 
 	UINT8       sasr;
 	UINT8       regs[WD_AUXILIARY_STATUS+1];

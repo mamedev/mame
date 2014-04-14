@@ -16,9 +16,8 @@
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
 #include "machine/ram.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 #include "machine/v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -84,7 +83,10 @@ public:
 		m_clock_sio(*this, CLOCK_SIO_TAG),
 		m_timer_ack(*this, TIMER_ACK_TAG),
 		m_timer_rst(*this, TIMER_RST_TAG),
-		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_sasibus(*this, SASIBUS_TAG),
+		m_sasi_data_out(*this, "scsi_data_out"),
+		m_sasi_data_in(*this, "scsi_data_in"),
+		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram"),
 		m_attr_ram(*this, "attr_ram"),
@@ -124,7 +126,7 @@ public:
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_vs_w );
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
-	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
+	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
@@ -182,7 +184,10 @@ public: // HACK for MC6845
 	required_device<clock_device> m_clock_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
-	required_device<scsicb_device> m_sasibus;
+	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_device<input_buffer_device> m_sasi_data_in;
+	required_device<input_buffer_device> m_sasi_ctrl_in;
 	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 	optional_shared_ptr<UINT8> m_attr_ram;
@@ -211,7 +216,8 @@ public: // HACK for MC6845
 	UINT8 m_attr;               // attribute latch
 
 	// sasi state
-	UINT8 data_out;
+	UINT8 m_sasi_data;
+	int m_sasi_data_enable;
 
 	UINT8 m_rtc_ppi_pa;
 	UINT8 m_rtc_ppi_pc;

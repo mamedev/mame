@@ -494,6 +494,7 @@ MACHINES += PCCARD
 #-------------------------------------------------
 BUSES += CENTRONICS
 BUSES += ISA
+BUSES += SCSI
 
 #-------------------------------------------------
 # this is the list of driver libraries that

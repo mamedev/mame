@@ -3,7 +3,7 @@
 #ifndef __D9060HD__
 #define __D9060HD__
 
-#include "machine/scsihd.h"
+#include "scsihd.h"
 
 class d9060hd_device : public scsihd_device
 {

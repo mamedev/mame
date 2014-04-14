@@ -17,7 +17,7 @@
 
 #include "emu.h"
 #include "abcbus.h"
-#include "machine/scsicb.h"
+#include "bus/scsi/scsi.h"
 
 
 
@@ -36,7 +36,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-							public device_abcbus_card_interface
+	public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
@@ -47,9 +47,10 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( sasi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( sasi_io_w );
-	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
 
 protected:
 	// device-level overrides
@@ -69,13 +70,20 @@ protected:
 private:
 	inline void update_trrq_int();
 
-	required_device<scsicb_device> m_sasibus;
+	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_device<input_buffer_device> m_sasi_data_in;
 	required_ioport m_1e;
 	required_ioport m_5e;
 
 	int m_cs;
 	UINT8 m_data;
 	UINT8 m_dma;
+
+	int m_sasi_bsy;
+	int m_sasi_req;
+	int m_sasi_cd;
+	int m_sasi_io;
 };
 
 

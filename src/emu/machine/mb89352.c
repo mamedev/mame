@@ -113,15 +113,17 @@ const device_type MB89352A = &device_creator<mb89352_device>;
  * Device
  */
 
-mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
-		m_irq_cb(*this),
-		m_drq_cb(*this)
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	legacy_scsi_host_adapter(mconfig, MB89352A, "MB89352A", tag, owner, clock, "mb89352", __FILE__),
+	m_irq_cb(*this),
+	m_drq_cb(*this)
 {
 }
 
 void mb89352_device::device_start()
 {
+	legacy_scsi_host_adapter::device_start();
+
 	m_phase = SCSI_PHASE_BUS_FREE;
 	m_target = 0;
 	m_command_index = 0;
@@ -136,20 +138,8 @@ void mb89352_device::device_start()
 	m_irq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
 
-	memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
-
 	// allocate read timer
 	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
-
-	// try to open the devices
-	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
-	{
-		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if( scsidev != NULL )
-		{
-			m_SCSIdevices[scsidev->GetDeviceID()] = scsidev;
-		}
-	}
 }
 
 void mb89352_device::device_reset()
@@ -304,7 +294,7 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 			m_transfer_index++;
 			m_transfer_count--;
 			if(m_transfer_index % 512 == 0)
-				m_SCSIdevices[m_target]->ReadData(m_buffer,512);
+				read_data(m_buffer, 512);
 			if(m_transfer_count == 0)
 			{
 				// End of transfer
@@ -437,6 +427,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			{
 				//m_ints |= INTS_SELECTION;
 			}
+			select(m_target);
 			set_phase(SCSI_PHASE_COMMAND); // straight to command phase, may need a delay between selection and command phases
 			m_line_status |= MB89352_LINE_SEL;
 			m_line_status |= MB89352_LINE_BSY;
@@ -462,7 +453,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			if(m_phase == SCSI_PHASE_DATAIN)  // if we are reading data...
 			{
 				m_spc_status &= ~SSTS_DREG_EMPTY;  // DREG is no longer empty
-				m_SCSIdevices[m_target]->ReadData(m_buffer,512);
+				read_data(m_buffer, 512);
 			}
 			if(m_phase == SCSI_PHASE_MESSAGE_IN)
 			{
@@ -504,10 +495,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 					int x;
 					int phase;
 					// execute SCSI command
-					m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-					m_SCSIdevices[m_target]->ExecCommand();
-					m_SCSIdevices[m_target]->GetLength(&m_result_length);
-					m_SCSIdevices[m_target]->GetPhase(&phase);
+					send_command(m_command, m_command_index);
+					phase = get_phase();
 					if(m_command[0] == 1) // Rezero Unit - not implemented in SCSI code
 						set_phase(SCSI_PHASE_STATUS);
 					else
@@ -521,12 +510,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			}
 			if(m_phase == SCSI_PHASE_STATUS)
 			{
-				void *image;
-				m_SCSIdevices[m_target]->GetDevice(&image);
-				if (image != NULL)
-					m_temp = 0x00;
-				else
-					m_temp = 0x02;
+				m_temp = get_status();
 				set_phase(SCSI_PHASE_MESSAGE_IN);
 				return;
 			}
@@ -570,10 +554,8 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 				int x;
 				int phase;
 				// execute SCSI command
-				m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-				m_SCSIdevices[m_target]->ExecCommand();
-				m_SCSIdevices[m_target]->GetLength(&m_result_length);
-				m_SCSIdevices[m_target]->GetPhase(&phase);
+				send_command(m_command, m_command_index);
+				phase = get_phase();
 				if(m_command[0] == 1) // Rezero Unit - not implemented in SCSI code
 					set_phase(SCSI_PHASE_STATUS);
 				else
@@ -592,7 +574,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			m_transfer_index++;
 			m_transfer_count--;
 			if(m_transfer_index % 512 == 0)
-				m_SCSIdevices[m_target]->WriteData(m_buffer,512);
+				write_data(m_buffer, 512);
 			if(m_transfer_count == 0)
 			{
 				// End of transfer

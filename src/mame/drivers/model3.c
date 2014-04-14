@@ -5436,11 +5436,13 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+
+	MCFG_DEVICE_ADD("lsi53c810", LSI53C810, 0)
 	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
 	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
 	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
+	MCFG_LEGACY_SCSI_PORT("scsi")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model3_15, model3_state )
@@ -5479,11 +5481,13 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+
+	MCFG_DEVICE_ADD("lsi53c810", LSI53C810, 0)
 	MCFG_LSI53C810_IRQ_CB(model3_state, scsi_irq_callback)
 	MCFG_LSI53C810_DMA_CB(model3_state, real3d_dma_callback)
 	MCFG_LSI53C810_FETCH_CB(model3_state, scsi_fetch)
+	MCFG_LEGACY_SCSI_PORT("scsi")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(scud, model3_15)

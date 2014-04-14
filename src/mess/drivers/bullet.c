@@ -60,6 +60,7 @@ Notes:
 
 #include "includes/bullet.h"
 #include "bus/rs232/rs232.h"
+#include "bus/scsi/scsihd.h"
 
 
 
@@ -530,9 +531,9 @@ WRITE8_MEMBER( bulletf_state::mbank_w )
 
 READ8_MEMBER( bulletf_state::scsi_r )
 {
-	UINT8 data = m_scsibus->scsi_data_r();
+	UINT8 data = m_scsi_data_in->read();
 
-	m_scsibus->scsi_ack_w(1);
+	m_scsibus->write_ack(1);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -547,9 +548,9 @@ READ8_MEMBER( bulletf_state::scsi_r )
 
 WRITE8_MEMBER( bulletf_state::scsi_w )
 {
-	m_scsibus->scsi_data_w(data);
+	m_scsi_data_out->write(data);
 
-	m_scsibus->scsi_ack_w(1);
+	m_scsibus->write_ack(1);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -970,38 +971,6 @@ static Z80PIO_INTERFACE( pio_intf )
 };
 
 
-//-------------------------------------------------
-//  Z80PIO_INTERFACE( bulletf_pio_intf )
-//-------------------------------------------------
-
-READ8_MEMBER( bulletf_state::pio_pa_r )
-{
-	/*
-
-	    bit     signal
-
-	    0
-	    1
-	    2
-	    3       BUSY
-	    4       MSG
-	    5       C/D
-	    6       REQ
-	    7       I/O
-
-	*/
-
-	UINT8 data = 0;
-
-	data |= m_scsibus->scsi_bsy_r() << 3;
-	data |= m_scsibus->scsi_msg_r() << 4;
-	data |= m_scsibus->scsi_cd_r() << 5;
-	data |= m_scsibus->scsi_req_r() << 6;
-	data |= m_scsibus->scsi_io_r() << 7;
-
-	return data;
-}
-
 WRITE8_MEMBER( bulletf_state::pio_pa_w )
 {
 	/*
@@ -1011,17 +980,17 @@ WRITE8_MEMBER( bulletf_state::pio_pa_w )
 	    0       ATN
 	    1       RST
 	    2       SEL
-	    3
-	    4
-	    5
-	    6
-	    7
+	    3       BUSY
+	    4       MSG
+	    5       C/D
+	    6       REQ
+	    7       I/O
 
 	*/
 
-	m_scsibus->scsi_atn_w(BIT(data, 0));
-	m_scsibus->scsi_rst_w(BIT(data, 1));
-	m_scsibus->scsi_sel_w(BIT(data, 2));
+	m_scsibus->write_atn(BIT(data, 0));
+	m_scsibus->write_rst(BIT(data, 1));
+	m_scsibus->write_sel(BIT(data, 2));
 }
 
 WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
@@ -1032,7 +1001,7 @@ WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 static Z80PIO_INTERFACE( bulletf_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
-	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_r),
+	DEVCB_DEVICE_MEMBER("scsi_ctrl_in", input_buffer_device, read),
 	DEVCB_DRIVER_MEMBER(bulletf_state, pio_pa_w),
 	DEVCB_DEVICE_MEMBER("cent_data_out", output_latch_device, write),
 	DEVCB_NULL,
@@ -1070,13 +1039,15 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
 	if (!state)
 	{
-		m_scsibus->scsi_ack_w(0);
+		m_scsibus->write_ack(0);
 
 		m_wack = 1;
 	}
 
 	m_wrdy = !state;
 	update_dma_rdy();
+
+	m_scsi_ctrl_in->write_bit6(state);
 }
 
 
@@ -1304,10 +1275,19 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bulletf_state, req_w))
+	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
+	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(bulletf_state, req_w))
+	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
+	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SCSIBUS_TAG)
+	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
+	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")

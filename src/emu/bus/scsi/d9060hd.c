@@ -3,7 +3,6 @@
  *
  */
 
-#include "emu.h"
 #include "d9060hd.h"
 
 // device type definition

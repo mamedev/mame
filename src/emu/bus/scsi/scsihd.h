@@ -9,7 +9,7 @@
 #ifndef _SCSIHD_H_
 #define _SCSIHD_H_
 
-#include "machine/scsihle.h"
+#include "scsihle.h"
 #include "machine/t10sbc.h"
 
 class scsihd_device : public scsihle_device,

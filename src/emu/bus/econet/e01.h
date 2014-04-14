@@ -14,15 +14,16 @@
 #ifndef __E01__
 #define __E01__
 
-#include "emu.h"
 #include "econet.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/scsi/scsi.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
-#include "bus/centronics/ctronics.h"
+#include "machine/buffer.h"
+#include "machine/latch.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
-#include "machine/scsicb.h"
 #include "machine/wd_fdc.h"
 
 class e01_device : public device_t,
@@ -86,7 +87,10 @@ protected:
 	required_device<mc6854_device> m_adlc;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram;
-	required_device<scsicb_device> m_scsibus;
+	required_device<SCSI_PORT_DEVICE> m_scsibus;
+	required_device<output_latch_device> m_scsi_data_out;
+	required_device<input_buffer_device> m_scsi_data_in;
+	required_device<input_buffer_device> m_scsi_ctrl_in;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_memory_region m_rom;

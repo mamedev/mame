@@ -31,7 +31,6 @@
 
 #include "a2scsi.h"
 #include "includes/apple2.h"
-#include "machine/scsibus.h"
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
 
@@ -61,7 +60,6 @@ static SLOT_INTERFACE_START( scsi_devices )
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( scsi )
-	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_NSCSI_BUS_ADD(SCSI_BUS_TAG)
 	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, 0, false)
 	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, 0, false)

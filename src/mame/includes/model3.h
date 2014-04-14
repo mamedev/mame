@@ -1,5 +1,5 @@
 #include "video/polylgcy.h"
-#include "machine/scsibus.h"
+#include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
@@ -21,7 +21,7 @@ public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_lsi53c810(*this, "scsi:lsi53c810"),
+		m_lsi53c810(*this, "lsi53c810"),
 		m_audiocpu(*this, "audiocpu"),
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),

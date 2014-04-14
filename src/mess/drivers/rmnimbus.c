@@ -14,9 +14,7 @@
 #include "machine/ram.h"
 #include "formats/pc_dsk.h"
 #include "includes/rmnimbus.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsihd.h"
 #include "bus/scsi/s1410.h"
 #include "bus/scsi/acb4070.h"
 #include "machine/6522via.h"
@@ -297,17 +295,26 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_WD2793_ADD(FDC_TAG, nimbus_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(nimbus_floppy_interface)
 
-	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk2", ACB4070, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk3", S1410, SCSI_ID_3)
-	MCFG_SCSICB_ADD(SCSIBUS_TAG ":host")
-	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_bsy_w))
-	MCFG_SCSICB_CD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_cd_w))
-	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_io_w))
-	MCFG_SCSICB_MSG_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_msg_w))
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, rmnimbus_state, nimbus_scsi_req_w))
+	MCFG_DEVICE_ADD(SCSIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+	MCFG_SCSI_MSG_HANDLER(WRITELINE(rmnimbus_state, write_scsi_msg))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(rmnimbus_state, write_scsi_bsy))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(rmnimbus_state, write_scsi_io))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(rmnimbus_state, write_scsi_cd))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(rmnimbus_state, write_scsi_req))
+
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE3, "harddisk", ACB4070, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":" SCSI_PORT_DEVICE4, "harddisk", S1410, SCSI_ID_3)
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SCSIBUS_TAG)
+	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+
+	MCFG_DEVICE_ADD("scsi_ctrl_out", OUTPUT_LATCH, 0)
+	MCFG_OUTPUT_LATCH_BIT0_HANDLER(DEVWRITELINE(SCSIBUS_TAG, SCSI_PORT_DEVICE, write_rst))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE(SCSIBUS_TAG, SCSI_PORT_DEVICE, write_sel))
+	MCFG_OUTPUT_LATCH_BIT2_HANDLER(WRITELINE(rmnimbus_state, write_scsi_iena))
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1536K")

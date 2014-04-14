@@ -355,53 +355,25 @@ static Z80PIO_INTERFACE( gppio_intf )
 	DEVCB_NULL      /* portB ready active callback */
 };
 
-READ8_MEMBER( xerox820ii_state::rdpio_pb_r )
-{
-	/*
-
-	    bit     description
-
-	    0       NBSY
-	    1       NMSG
-	    2       NC/D
-	    3       NREQ
-	    4       NI/O
-	    5
-	    6       LS74 Q
-	    7
-
-	*/
-
-	UINT8 data = 0;
-
-	data |= !m_sasibus->scsi_bsy_r();
-	data |= !m_sasibus->scsi_msg_r() << 1;
-	data |= !m_sasibus->scsi_cd_r() << 2;
-	data |= !m_sasibus->scsi_req_r() << 3;
-	data |= !m_sasibus->scsi_io_r() << 4;
-
-	return data;
-}
-
 WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 {
 	/*
 
 	    bit     description
 
-	    0
-	    1
-	    2
-	    3
-	    4
+		0       NBSY
+	    1       NMSG
+	    2       NC/D
+	    3       NREQ
+	    4       NI/O
 	    5       NSEL
-	    6
+	    6       LS74 Q
 	    7       NRST
-
 	*/
 
-	m_sasibus->scsi_sel_w(!BIT(data, 5));
-	m_sasibus->scsi_rst_w(!BIT(data, 7));
+	m_sasibus->write_sel(!BIT(data, 5));
+	m_sasibus->write_rst(!BIT(data, 7));
+	// TODO: LS74 Q
 }
 
 WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
@@ -412,10 +384,10 @@ WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
 static Z80PIO_INTERFACE( rdpio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_r),   /* port A read callback */
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_w),   /* port A write callback */
+	DEVCB_DEVICE_MEMBER("sasi_data_in", input_buffer_device, read),   /* port A read callback */
+	DEVCB_DEVICE_MEMBER("sasi_data_out", output_latch_device, write),   /* port A write callback */
 	DEVCB_DRIVER_LINE_MEMBER(xerox820ii_state, rdpio_pardy_w),      /* portA ready active callback */
-	DEVCB_DRIVER_MEMBER(xerox820ii_state, rdpio_pb_r),      /* port B read callback */
+	DEVCB_DEVICE_MEMBER("sasi_ctrl_in", input_buffer_device, read),      /* port B read callback */
 	DEVCB_DRIVER_MEMBER(xerox820ii_state, rdpio_pb_w),      /* port B write callback */
 	DEVCB_NULL      /* portB ready active callback */
 };
@@ -779,9 +751,19 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(xerox820_state, kbd_w))
 
 	// SASI bus
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SA1403D, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
+	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
+	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit1)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit2)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit3)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_IO_HANDLER(DEVWRITELINE("sasi_ctrl_in", input_buffer_device, write_bit4)) MCFG_DEVCB_XOR(1)
+
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SA1403D, SCSI_ID_0)
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
+	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
+	MCFG_DEVICE_ADD("sasi_ctrl_in", INPUT_BUFFER, 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

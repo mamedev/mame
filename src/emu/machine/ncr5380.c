@@ -75,8 +75,8 @@ const device_type NCR5380 = &device_creator<ncr5380_device>;
 //  ncr5380_device - constructor/destructor
 //-------------------------------------------------
 
-ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__),
+ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	legacy_scsi_host_adapter(mconfig, NCR5380, "5380 SCSI", tag, owner, clock, "ncr5380", __FILE__),
 	m_irq_cb(*this)
 {
 }
@@ -87,9 +87,10 @@ ncr5380_device::ncr5380_device(const machine_config &mconfig, const char *tag, d
 
 void ncr5380_device::device_start()
 {
+	legacy_scsi_host_adapter::device_start();
+
 	memset(m_5380_Registers, 0, sizeof(m_5380_Registers));
 	memset(m_5380_Data, 0, sizeof(m_5380_Data));
-	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	m_next_req_flag = 0;
 	m_irq_cb.resolve_safe();
@@ -102,16 +103,6 @@ void ncr5380_device::device_start()
 	save_item(NAME(m_d_ptr));
 	save_item(NAME(m_d_limit));
 	save_item(NAME(m_next_req_flag));
-
-	// try to open the devices
-	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
-	{
-		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if( scsidev != NULL )
-		{
-			m_scsi_devices[scsidev->GetDeviceID()] = scsidev;
-		}
-	}
 }
 
 //-------------------------------------------------
@@ -184,7 +175,7 @@ UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
 						// don't issue a "false" read
 						if (m_d_limit > 0)
 						{
-							ncr5380_read_data((m_d_limit < 512) ? m_d_limit : 512, m_5380_Data);
+							read_data(m_5380_Data, (m_d_limit < 512) ? m_d_limit : 512);
 						}
 						else
 						{
@@ -282,7 +273,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 				// if we've hit a sector, flush
 				if (m_d_ptr == 511)
 				{
-					ncr5380_write_data(512, &m_5380_Data[0]);
+					write_data(&m_5380_Data[0], 512);
 
 					m_d_limit -= 512;
 					m_d_ptr = 0;
@@ -318,9 +309,8 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 						if (VERBOSE)
 							logerror("%s NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x\n", machine().describe_context(), m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9]);
 
-						m_scsi_devices[m_last_id]->SetCommand(&m_5380_Command[0], 16);
-						m_scsi_devices[m_last_id]->ExecCommand();
-						m_scsi_devices[m_last_id]->GetLength(&m_d_limit);
+						send_command(&m_5380_Command[0], 16);
+						m_d_limit = get_length();
 
 						if (VERBOSE)
 							logerror("NCR5380: Command returned %d bytes\n",  m_d_limit);
@@ -337,7 +327,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 							}
 
 							// read back the amount available, or 512 bytes, whichever is smaller
-							ncr5380_read_data((m_d_limit < 512) ? m_d_limit : 512, m_5380_Data);
+							read_data(m_5380_Data, (m_d_limit < 512) ? m_d_limit : 512);
 
 							// raise REQ to indicate data is available
 							m_5380_Registers[R5380_BUSSTATUS] |= 0x20;
@@ -352,7 +342,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 				// if the device exists, make the bus busy.
 				// otherwise don't.
 
-				if (m_scsi_devices[m_last_id])
+				if (select(m_last_id))
 				{
 					if (VERBOSE)
 						logerror("NCR5380: Giving the bus for ID %d\n", m_last_id);
@@ -427,33 +417,5 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 	if (reg == R5380_STARTDMA)
 	{
 		m_5380_Registers[R5380_BUSANDSTAT] = 0x48;
-	}
-}
-
-
-void ncr5380_device::ncr5380_read_data(int bytes, UINT8 *pData)
-{
-	if (m_scsi_devices[m_last_id])
-	{
-		if (VERBOSE)
-			logerror("NCR5380: issuing read for %d bytes\n", bytes);
-		m_scsi_devices[m_last_id]->ReadData(pData, bytes);
-	}
-	else
-	{
-		logerror("ncr5380: read unknown device SCSI ID %d\n", m_last_id);
-	}
-}
-
-
-void ncr5380_device::ncr5380_write_data(int bytes, UINT8 *pData)
-{
-	if (m_scsi_devices[m_last_id])
-	{
-		m_scsi_devices[m_last_id]->WriteData(pData, bytes);
-	}
-	else
-	{
-		logerror("ncr5380: write to unknown device SCSI ID %d\n", m_last_id);
 	}
 }

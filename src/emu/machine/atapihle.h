@@ -17,7 +17,7 @@
 #define __ATAPIHLE_H__
 
 #include "atahle.h"
-#include "scsihle.h"
+#include "t10spc.h"
 
 class atapi_hle_device : public ata_hle_device,
 	public virtual t10spc

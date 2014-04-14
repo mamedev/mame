@@ -6,7 +6,7 @@
 #ifndef _NCR539x_H_
 #define _NCR539x_H_
 
-#include "machine/scsihle.h"
+#include "legscsi.h"
 
 //// 539x registers
 //enum
@@ -21,8 +21,7 @@
 #define MCFG_NCR539X_OUT_DRQ_CB(_devcb) \
 	devcb = &ncr539x_device::set_out_drq_callback(*device, DEVCB2_##_devcb);
 	
-
-class ncr539x_device : public device_t
+class ncr539x_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -49,8 +48,6 @@ private:
 	void check_fifo_executable();
 	void exec_fifo();
 	void update_fifo_internal_state(int bytes);
-
-	scsihle_device *m_scsi_devices[8];
 
 	UINT32 m_xfer_count;
 	UINT32 m_dma_size;

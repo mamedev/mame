@@ -6,13 +6,13 @@
 #ifndef _AM53CF96_H_
 #define _AM53CF96_H_
 
-#include "machine/scsihle.h"
+#pragma once
 
-#define MCFG_AM53CF96_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, AM53CF96, 0 )
+#include "legscsi.h"
 
 #define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
 	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB2_##_devcb);
+
 // 53CF96 register set
 enum
 {
@@ -35,7 +35,7 @@ enum
 	REG_DATAALIGN       // data alignment (write only)
 };
 
-class am53cf96_device : public device_t
+class am53cf96_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -57,8 +57,6 @@ protected:
 
 private:
 	static const device_timer_id TIMER_TRANSFER = 0;
-
-	scsihle_device *devices[8];
 
 	UINT8 scsi_regs[32];
 	UINT8 fifo[16];

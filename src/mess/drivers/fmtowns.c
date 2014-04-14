@@ -173,8 +173,8 @@ Notes:
 */
 
 #include "includes/fmtowns.h"
-#include "machine/scsibus.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
@@ -2253,7 +2253,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	// Keyboard (8042 MCU)
 	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
 	// SCSI controller
-	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi:fm",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
+	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("fmscsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff00ff)
 	// CMOS
 	AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff00ff)
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2305,7 +2305,7 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	// Keyboard (8042 MCU)
 	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff)
 	// SCSI controller
-	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi:fm",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff)
+	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("fmscsi",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff)
 	// CMOS
 	AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff)
 	// Something (MS-DOS wants this 0x41ff to be 1)
@@ -2614,7 +2614,7 @@ void towns_state::machine_reset()
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device<cdda_device>("cdda");
-	m_scsi = machine().device<fmscsi_device>("scsi:fm");
+	m_scsi = machine().device<fmscsi_device>("fmscsi");
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;
@@ -2759,15 +2759,17 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 
 	MCFG_CDROM_ADD("cdrom",towns_cdrom)
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk0", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:harddisk2", SCSIHD, SCSI_ID_2)
-	MCFG_SCSIDEV_ADD("scsi:harddisk3", SCSIHD, SCSI_ID_3)
-	MCFG_SCSIDEV_ADD("scsi:harddisk4", SCSIHD, SCSI_ID_4)
-	MCFG_FMSCSI_ADD("scsi:fm")
-	MCFG_FMSCSI_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, towns_state, towns_scsi_irq))
-	MCFG_FMSCSI_DRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, towns_state, towns_scsi_drq))
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "harddisk", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
+
+	MCFG_FMSCSI_ADD("fmscsi")
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_FMSCSI_IRQ_HANDLER(WRITELINE(towns_state, towns_scsi_irq))
+	MCFG_FMSCSI_DRQ_HANDLER(WRITELINE(towns_state, towns_scsi_drq))
 
 	MCFG_UPD71071_ADD("dma_1",towns_dma_config)
 	MCFG_UPD71071_ADD("dma_2",towns_dma_config)

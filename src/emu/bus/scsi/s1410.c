@@ -86,7 +86,6 @@ Notes:
 */
 
 
-#include "emu.h"
 #include "s1410.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"

@@ -9,7 +9,7 @@
 #include "cpu/i86/i186.h"
 #include "machine/z80sio.h"
 #include "machine/wd17xx.h"
-#include "machine/scsicb.h"
+#include "bus/scsi/scsi.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "machine/er59256.h"
@@ -133,8 +133,6 @@ struct keyboard_t
 struct nimbus_drives_t
 {
 	UINT8   reg400;
-	UINT8   reg410_in;
-	UINT8   reg410_out;
 	UINT8   reg418;
 
 	UINT8   drq_ff;
@@ -283,33 +281,6 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 #define HDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
 #define FDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 
-/* Masks for port 0x410 read*/
-
-#define FDC_READY_MASK  0x01
-#define FDC_INDEX_MASK  0x02
-#define FDC_MOTOR_MASKI 0x04
-#define HDC_MSG_MASK    0x08
-#define HDC_BSY_MASK    0x10
-#define HDC_IO_MASK     0x20
-#define HDC_CD_MASK     0x40
-#define HDC_REQ_MASK    0x80
-
-#define FDC_BITS_410    (FDC_READY_MASK | FDC_INDEX_MASK | FDC_MOTOR_MASKI)
-#define HDC_BITS_410    (HDC_MSG_MASK | HDC_BSY_MASK | HDC_IO_MASK | HDC_CD_MASK | HDC_REQ_MASK)
-#define INV_BITS_410    (HDC_BSY_MASK | HDC_IO_MASK | HDC_CD_MASK | HDC_REQ_MASK)
-
-#define HDC_INT_TRIGGER (HDC_IO_MASK | HDC_CD_MASK | HDC_REQ_MASK)
-
-/* Masks for port 0x410 write*/
-
-#define HDC_RESET_MASK  0x01
-#define HDC_SEL_MASK    0x02
-#define HDC_IRQ_MASK    0x04
-#define HDC_IRQ_ENABLED()   ((m_nimbus_drives.reg410_out & HDC_IRQ_MASK) ? 1 : 0)
-
-
-#define SCSI_ID_NONE    0x80
-
 
 /* 8031/8051 Peripheral controler */
 
@@ -388,29 +359,35 @@ enum
 class rmnimbus_state : public driver_device
 {
 public:
-	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, MSM5205_TAG),
 		m_ay8910(*this, AY8910_TAG),
-		m_scsibus(*this, SCSIBUS_TAG ":host"),
+		m_scsibus(*this, SCSIBUS_TAG),
 		m_ram(*this, RAM_TAG),
 		m_eeprom(*this, ER59256_TAG),
 		m_via(*this, VIA_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_scsi_data_out(*this, "scsi_data_out"),
+		m_scsi_data_in(*this, "scsi_data_in"),
+		m_scsi_ctrl_out(*this, "scsi_ctrl_out")
 	{
 	}
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<ay8910_device> m_ay8910;
-	required_device<scsicb_device> m_scsibus;
+	required_device<SCSI_PORT_DEVICE> m_scsibus;
 	required_device<ram_device> m_ram;
 	required_device<er59256_device> m_eeprom;
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
 	required_device<palette_device> m_palette;
+	required_device<output_latch_device> m_scsi_data_out;
+	required_device<input_buffer_device> m_scsi_data_in;
+	required_device<output_latch_device> m_scsi_ctrl_out;
 
 	UINT32 m_debug_machine;
 //  i186_state m_i186;
@@ -476,14 +453,14 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_bsy_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_cd_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_io_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_msg_w);
-	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_msg);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_req);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
+	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
 
-	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
 	UINT8 get_pixel(UINT16 x, UINT16 y);
 	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
@@ -535,4 +512,11 @@ public:
 	void iou_reset();
 	void rmni_sound_reset();
 	void mouse_js_reset();
+
+	int m_scsi_iena;
+	int m_scsi_msg;
+	int m_scsi_bsy;
+	int m_scsi_io;
+	int m_scsi_cd;
+	int m_scsi_req;
 };

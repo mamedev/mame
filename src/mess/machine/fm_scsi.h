@@ -8,7 +8,7 @@
 #ifndef FM_SCSI_H_
 #define FM_SCSI_H_
 
-#include "machine/scsihle.h"
+#include "machine/legscsi.h"
 
 // SCSI input lines (from target)
 #define FMSCSI_LINE_REQ   0x80
@@ -37,7 +37,8 @@
 	devcb = &fmscsi_device::set_irq_handler(*device, DEVCB2_##_devcb);
 #define MCFG_FMSCSI_DRQ_HANDLER(_devcb) \
 	devcb = &fmscsi_device::set_drq_handler(*device, DEVCB2_##_devcb);
-class fmscsi_device : public device_t
+
+class fmscsi_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -78,7 +79,6 @@ private:
 	devcb2_write_line m_irq_handler;
 	devcb2_write_line m_drq_handler;
 
-	scsihle_device* m_SCSIdevices[8];
 	UINT8 m_command[32];
 	//UINT8 m_result[32];
 	UINT8 m_command_index;

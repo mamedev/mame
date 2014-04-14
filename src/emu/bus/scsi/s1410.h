@@ -14,8 +14,7 @@
 #ifndef __S1410__
 #define __S1410__
 
-#include "emu.h"
-#include "machine/scsihd.h"
+#include "scsihd.h"
 
 class s1410_device  : public scsihd_device
 {

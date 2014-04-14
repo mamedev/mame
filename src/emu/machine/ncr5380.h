@@ -6,7 +6,7 @@
 #ifndef _NCR5380_H_
 #define _NCR5380_H_
 
-#include "machine/scsihle.h"
+#include "legscsi.h"
 
 // 5380 registers
 enum
@@ -35,7 +35,7 @@ enum
 #define MCFG_NCR5380_IRQ_CB(_devcb) \
 	devcb = &ncr5380_device::set_irq_callback(*device, DEVCB2_##_devcb);
 
-class ncr5380_device : public device_t
+class ncr5380_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
@@ -47,9 +47,6 @@ public:
 	UINT8 ncr5380_read_reg(UINT32 offset);
 	void ncr5380_write_reg(UINT32 offset, UINT8 data);
 
-	void ncr5380_read_data(int bytes, UINT8 *pData);
-	void ncr5380_write_data(int bytes, UINT8 *pData);
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -57,8 +54,6 @@ protected:
 	virtual void device_stop();
 
 private:
-	scsihle_device *m_scsi_devices[8];
-
 	UINT8 m_5380_Registers[8];
 	UINT8 m_last_id;
 	UINT8 m_5380_Command[32];

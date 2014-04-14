@@ -11,9 +11,8 @@
 #include "machine/com8116.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
@@ -140,14 +139,15 @@ public:
 class xerox820ii_state : public xerox820_state
 {
 public:
-	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xerox820_state(mconfig, type, tag),
-			m_speaker(*this, "speaker"),
-			m_sasibus(*this, SASIBUS_TAG ":host")
-	{ }
+	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag) :
+		xerox820_state(mconfig, type, tag),
+		m_speaker(*this, "speaker"),
+		m_sasibus(*this, SASIBUS_TAG)
+	{
+	}
 
 	required_device<speaker_sound_device> m_speaker;
-	required_device<scsicb_device> m_sasibus;
+	required_device<SCSI_PORT_DEVICE> m_sasibus;
 
 	virtual void machine_reset();
 
@@ -157,7 +157,6 @@ public:
 	DECLARE_WRITE8_MEMBER( lowlite_w );
 	DECLARE_WRITE8_MEMBER( sync_w );
 
-	DECLARE_READ8_MEMBER( rdpio_pb_r );
 	DECLARE_WRITE8_MEMBER( rdpio_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
 

@@ -9,7 +9,7 @@
 #ifndef _SCSICD_H_
 #define _SCSICD_H_
 
-#include "machine/scsihle.h"
+#include "scsihle.h"
 #include "machine/t10mmc.h"
 
 class scsicd_device : public scsihle_device,

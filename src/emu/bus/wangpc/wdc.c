@@ -10,7 +10,7 @@
 **********************************************************************/
 
 #include "wdc.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsihd.h"
 
 
 

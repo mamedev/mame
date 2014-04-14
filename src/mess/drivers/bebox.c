@@ -24,12 +24,12 @@
 #include "machine/idectrl.h"
 #include "bus/pci/mpc105.h"
 #include "machine/intelfsh.h"
-#include "machine/scsibus.h"
+#include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
 
 /* Devices */
-#include "machine/scsicd.h"
-#include "machine/scsihd.h"
+#include "bus/scsi/scsicd.h"
+#include "bus/scsi/scsihd.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 #include "machine/8042kbdc.h"
@@ -188,13 +188,15 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_FUJITSU_29F016A_ADD("flash")
 
-	MCFG_SCSIBUS_ADD("scsi")
-	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_0)
-	MCFG_SCSIDEV_ADD("scsi:cdrom", SCSICD, SCSI_ID_3)
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_3)
+
 	MCFG_DEVICE_ADD("scsi:lsi53c810", LSI53C810, 0)
 	MCFG_LSI53C810_IRQ_CB(bebox_state, scsi_irq_callback)
 	MCFG_LSI53C810_DMA_CB(bebox_state, scsi_dma_callback)
 	MCFG_LSI53C810_FETCH_CB(bebox_state, scsi_fetch)
+	MCFG_LEGACY_SCSI_PORT("scsi")
 
 	MCFG_IDE_CONTROLLER_ADD( "ide", ata_devices, "hdd", NULL, false ) /* FIXME */
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(bebox_state, bebox_ide_interrupt))

@@ -37,7 +37,7 @@ const device_type FMSCSI = &device_creator<fmscsi_device>;
  */
 
 fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
+	: legacy_scsi_host_adapter(mconfig, FMSCSI, "FM-SCSI", tag, owner, clock, "fmscsi", __FILE__),
 	m_irq_handler(*this),
 	m_drq_handler(*this)
 {
@@ -55,18 +55,6 @@ void fmscsi_device::device_start()
 
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
-
-	memset(m_SCSIdevices,0,sizeof(m_SCSIdevices));
-
-	// try to open the devices
-	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
-	{
-		scsihle_device *scsidev = dynamic_cast<scsihle_device *>(device);
-		if( scsidev != NULL )
-		{
-			m_SCSIdevices[scsidev->GetDeviceID()] = scsidev;
-		}
-	}
 
 	// allocate read timer
 	m_transfer_timer = timer_alloc(TIMER_TRANSFER);
@@ -133,7 +121,7 @@ UINT8 fmscsi_device::fmscsi_data_r(void)
 		//logerror("FMSCSI: DATAIN phase read data %02x\n",m_data);
 		m_result_index++;
 		if(m_result_index % 512 == 0)
-			m_SCSIdevices[m_target]->ReadData(m_buffer,512);  // read next sector
+			read_data(m_buffer,512);  // read next sector
 
 		if(m_result_index >= m_result_length)
 		{
@@ -198,7 +186,7 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 		m_buffer[m_result_index % 512] = m_data;
 		m_result_index++;
 		if(m_result_index % 512 == 0)
-			m_SCSIdevices[m_target]->WriteData(m_buffer,512);  // write buffer to disc
+			write_data(m_buffer,512);  // write buffer to disc
 		if(m_result_index >= m_result_length)
 		{
 			// end of data transfer
@@ -219,10 +207,9 @@ void fmscsi_device::fmscsi_data_w(UINT8 data)
 		if(m_command_index >= get_scsi_cmd_len(m_command[0]))
 		{
 			// command complete
-			m_SCSIdevices[m_target]->SetCommand(m_command,m_command_index);
-			m_SCSIdevices[m_target]->ExecCommand();
-			m_SCSIdevices[m_target]->GetLength(&m_result_length);
-			m_SCSIdevices[m_target]->GetPhase(&phase);
+			send_command(m_command,m_command_index);
+			m_result_length = get_length();
+			phase = get_phase();
 			if(m_command[0] == 1)  // rezero unit command - not implemented in SCSI code
 				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
 			else
@@ -275,7 +262,7 @@ void fmscsi_device::set_phase(int phase)
 		set_input_line(FMSCSI_LINE_REQ,1);
 		// start transfer timer
 		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
-		m_SCSIdevices[m_target]->ReadData(m_buffer,512);
+		read_data(m_buffer,512);
 		m_result_index = 0;
 		logerror("FMSCSI: Starting transfer (%i)\n",m_result_length);
 		break;
@@ -356,9 +343,7 @@ void fmscsi_device::set_output_line(UINT8 line, UINT8 state)
 	{
 		if(state != 0 && !(m_output_lines & FMSCSI_LINE_SEL)) // low to high transition
 		{
-			void *image;
-			m_SCSIdevices[m_target]->GetDevice(&image);
-			if (image != NULL)  // if device is mounted
+			if (select(m_target))
 			{
 				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_COMMAND);
 				m_data = 0x08;

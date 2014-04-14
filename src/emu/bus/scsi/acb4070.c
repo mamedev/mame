@@ -3,7 +3,6 @@
  *
  */
 
-#include "emu.h"
 #include "acb4070.h"
 
 // device type definition

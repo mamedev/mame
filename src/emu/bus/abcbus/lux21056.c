@@ -75,6 +75,7 @@
 */
 
 #include "lux21056.h"
+#include "bus/scsi/s1410.h"
 
 
 
@@ -207,35 +208,49 @@ static Z80DMA_INTERFACE( dma_intf )
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21056_device, io_write_byte),
 };
 
-WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_bsy_w )
+WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_bsy )
 {
-	if (state)
+	m_sasi_bsy = state;
+
+	if (m_sasi_bsy)
 	{
-		m_sasibus->scsi_sel_w(0);
+		m_sasibus->write_sel(!m_sasi_bsy);
 	}
 }
 
-WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_io_w )
+WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_io )
 {
-	if (!state)
+	m_sasi_io = state;
+
+	if (!m_sasi_io)
 	{
-		m_sasibus->scsi_data_w(m_sasi_data);
+		m_sasi_data_out->write(m_sasi_data);
 	}
 	else
 	{
-		m_sasibus->scsi_data_w(0);
+		m_sasi_data_out->write(0);
 	}
 }
 
-WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_req_w )
+WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_req )
 {
-	if (state)
+	m_sasi_req = state;
+
+	if (m_sasi_req)
 	{
-		m_req = 0;
-		m_sasibus->scsi_ack_w(!m_req);
+		m_sasibus->write_ack(!m_sasi_req);
 	}
 }
 
+WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_cd )
+{
+	m_sasi_cd = state;
+}
+
+WRITE_LINE_MEMBER( luxor_55_21056_device::write_sasi_msg )
+{
+	m_sasi_msg = state;
+}
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( luxor_55_21056 )
@@ -249,12 +264,17 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
-	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_55_21056_device, sasi_bsy_w))
-	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_55_21056_device, sasi_io_w))
-	MCFG_SCSICB_REQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_55_21056_device, sasi_req_w))
+	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(luxor_55_21056_device, write_sasi_req))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(luxor_55_21056_device, write_sasi_io))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(luxor_55_21056_device, write_sasi_cd))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE(luxor_55_21056_device, write_sasi_msg))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(luxor_55_21056_device, write_sasi_bsy))
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("sasi_data_out", SASIBUS_TAG)
+	MCFG_DEVICE_ADD("sasi_data_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
 
 
@@ -329,11 +349,17 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),
-		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_sasibus(*this, SASIBUS_TAG),
+		m_sasi_data_out(*this, "sasi_data_out"),
+		m_sasi_data_in(*this, "sasi_data_in"),
 		m_s1(*this, "S1"),
 		m_cs(false),
 		m_rdy(0),
-		m_req(0),
+		m_sasi_req(0),
+		m_sasi_io(0),
+		m_sasi_cd(0),
+		m_sasi_msg(0),
+		m_sasi_bsy(0),
 		m_stat(0),
 		m_sasi_data(0)
 {
@@ -349,10 +375,14 @@ void luxor_55_21056_device::device_start()
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_rdy));
-	save_item(NAME(m_req));
 	save_item(NAME(m_inp));
 	save_item(NAME(m_out));
 	save_item(NAME(m_stat));
+	save_item(NAME(m_sasi_req));
+	save_item(NAME(m_sasi_io));
+	save_item(NAME(m_sasi_cd));
+	save_item(NAME(m_sasi_msg));
+	save_item(NAME(m_sasi_bsy));
 	save_item(NAME(m_sasi_data));
 }
 
@@ -492,11 +522,11 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	data |= m_rdy ^ STAT_DIR;
 
-	data |= (m_req || m_sasibus->scsi_req_r()) << 1;
-	data |= m_sasibus->scsi_io_r() << 2;
-	data |= !m_sasibus->scsi_cd_r() << 3;
-	data |= !m_sasibus->scsi_msg_r() << 4;
-	data |= !m_sasibus->scsi_bsy_r() << 5;
+	data |= !m_sasi_req << 1;
+	data |= !m_sasi_io << 2;
+	data |= !m_sasi_cd << 3;
+	data |= !m_sasi_msg << 4;
+	data |= !m_sasi_bsy << 5;
 
 	return data ^ 0xff;
 }
@@ -546,10 +576,9 @@ WRITE8_MEMBER( luxor_55_21056_device::inp_w )
 
 READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
 {
-	UINT8 data = m_sasibus->scsi_data_r();
+	UINT8 data = m_sasi_data_in->read();
 
-	m_req = !m_sasibus->scsi_req_r();
-	m_sasibus->scsi_ack_w(!m_req);
+	m_sasibus->write_ack(!m_sasi_req);
 
 	return data;
 }
@@ -563,13 +592,12 @@ WRITE8_MEMBER( luxor_55_21056_device::sasi_data_w )
 {
 	m_sasi_data = data;
 
-	if (!m_sasibus->scsi_io_r())
+	if (!m_sasi_io)
 	{
-		m_sasibus->scsi_data_w(m_sasi_data);
+		m_sasi_data_out->write(m_sasi_data);
 	}
 
-	m_req = !m_sasibus->scsi_req_r();
-	m_sasibus->scsi_ack_w(!m_req);
+	m_sasibus->write_ack(!m_sasi_req);
 }
 
 
@@ -613,7 +641,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_sel_r )
 
 WRITE8_MEMBER( luxor_55_21056_device::sasi_sel_w )
 {
-	m_sasibus->scsi_sel_w(!m_sasibus->scsi_bsy_r());
+	m_sasibus->write_sel(!m_sasi_bsy);
 }
 
 
@@ -635,8 +663,8 @@ READ8_MEMBER( luxor_55_21056_device::sasi_rst_r )
 
 WRITE8_MEMBER( luxor_55_21056_device::sasi_rst_w )
 {
-	m_sasibus->scsi_rst_w(1);
-	m_sasibus->scsi_rst_w(0);
+	m_sasibus->write_rst(1);
+	m_sasibus->write_rst(0);
 }
 
 

@@ -12,7 +12,7 @@
 const device_type SCSIHD = &device_creator<scsihd_device>;
 
 scsihd_device::scsihd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, SCSIHD, "SCSIHD", tag, owner, clock, "scsihd", __FILE__)
+	: scsihle_device(mconfig, SCSIHD, "SCSI HD", tag, owner, clock, "scsihd", __FILE__)
 {
 }
 

@@ -388,62 +388,38 @@ WRITE8_MEMBER( v1050_state::dvint_clr_w )
 
 WRITE8_MEMBER( v1050_state::sasi_data_w )
 {
-	data_out = data;
+	m_sasi_data = data;
 
-	if( !m_sasibus->scsi_io_r() )
+	if (m_sasi_data_enable)
 	{
-		m_sasibus->scsi_data_w( data );
+		m_sasi_data_out->write(m_sasi_data);
 	}
 }
 
-WRITE_LINE_MEMBER( v1050_state::sasi_io_w )
+WRITE_LINE_MEMBER( v1050_state::write_sasi_io )
 {
-	if( !state )
+	m_sasi_ctrl_in->write_bit4(state);
+
+	m_sasi_data_enable = state;
+
+	if (m_sasi_data_enable)
 	{
-		m_sasibus->scsi_data_w( data_out );
+		m_sasi_data_out->write(m_sasi_data);
 	}
 	else
 	{
-		m_sasibus->scsi_data_w( 0 );
+		m_sasi_data_out->write(0);
 	}
-}
-
-READ8_MEMBER( v1050_state::sasi_status_r )
-{
-	/*
-
-	    bit     description
-
-	    0       REQ-
-	    1       BUSY
-	    2       MESSAGE
-	    3       C/D-
-	    4       I-/O
-	    5
-	    6
-	    7
-
-	*/
-
-	UINT8 data = 0;
-
-	data |= !m_sasibus->scsi_req_r();
-	data |= m_sasibus->scsi_bsy_r() << 1;
-	data |= m_sasibus->scsi_msg_r() << 2;
-	data |= m_sasibus->scsi_cd_r() << 3;
-	data |= !m_sasibus->scsi_io_r() << 4;
-
-	return data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_ack_tick)
 {
-	m_sasibus->scsi_ack_w(0);
+	m_sasibus->write_ack(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 {
-	m_sasibus->scsi_rst_w(0);
+	m_sasibus->write_rst(0);
 }
 
 WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
@@ -463,12 +439,12 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 
 	*/
 
-	m_sasibus->scsi_sel_w(BIT(data, 0));
+	m_sasibus->write_sel(BIT(data, 0));
 
 	if (BIT(data, 1))
 	{
 		// send acknowledge pulse
-		m_sasibus->scsi_ack_w(1);
+		m_sasibus->write_ack(1);
 
 		m_timer_ack->adjust(attotime::from_nsec(100));
 	}
@@ -476,7 +452,7 @@ WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
 	if (BIT(data, 7))
 	{
 		// send reset pulse
-		m_sasibus->scsi_rst_w(1);
+		m_sasibus->write_rst(1);
 
 		m_timer_rst->adjust(attotime::from_nsec(100));
 	}
@@ -510,8 +486,8 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(v1050_i8214_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(bank_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(sasi_data_w) AM_DEVREAD(SASIBUS_TAG ":host", scsicb_device, scsi_data_r)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(sasi_status_r, sasi_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(sasi_data_w) AM_DEVREAD("scsi_data_in", input_buffer_device, read)
+	AM_RANGE(0xe1, 0xe1) AM_DEVREAD("scsi_ctrl_in", input_buffer_device, read) AM_WRITE(sasi_ctrl_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
@@ -1157,10 +1133,18 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
 
 	// SASI bus
-	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
-	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
-	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, v1050_state, sasi_io_w))
+	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
+	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+	MCFG_SCSI_REQ_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
+	MCFG_SCSI_BSY_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+	MCFG_SCSI_MSG_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
+	MCFG_SCSI_CD_HANDLER(DEVWRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(v1050_state, write_sasi_io)) MCFG_DEVCB_XOR(1) // bit4
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
+
+	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SASIBUS_TAG)
+	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
 
 	MCFG_TIMER_DRIVER_ADD(TIMER_ACK_TAG, v1050_state, sasi_ack_tick)
 	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)
