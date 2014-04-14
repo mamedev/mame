@@ -2063,7 +2063,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/hunter2.o   \
 	$(EMU_MACHINE)/nsc810.o     \
 	$(MESS_DRIVERS)/ibm6580.o   \
-	$(MESS_DRIVERS)/ie15.o      \
+	$(MESS_DRIVERS)/ie15.o $(MESS_MACHINE)/ie15_kbd.o \
 	$(MESS_DRIVERS)/if800.o     \
 	$(MESS_DRIVERS)/imsai.o     \
 	$(MESS_DRIVERS)/indiana.o   \
@@ -2232,6 +2232,7 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 							$(MESS_LAYOUT)/vsc.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
+$(MESS_DRIVERS)/ie15.o:     $(MESS_LAYOUT)/ie15.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh
 $(MESS_DRIVERS)/kim1.o:     $(MESS_LAYOUT)/kim1.lh
