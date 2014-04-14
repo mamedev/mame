@@ -36,7 +36,9 @@ PIT.
 Having the PIT on ports 14-17 seems to make sense. It sets counters 1 and 2
 to mode 3, binary, initial count = 0x80. Counter 0 not used?
 
+
 Floppy Parameters:
+------------------
 Double Density
 Two Side
 80 track
@@ -48,7 +50,23 @@ Two Side
 Skew 1,3,5,2,4
 
 
+Stuff that doesn't make sense:
+------------------------------
+1. To access the screen, it waits for IRQ presumably from sync pulse. It sets INT
+mode 0 which means a page-zero jump, but doesn't write anything to the zero-page ram.
+That's why I added a RETI at 0008 and set the vector to there. A bit later it writes
+a jump at 0000. Then it sets the interrupting device to the fdc (not sure how yet),
+then proceeds to overwrite all of page-zero with the disk contents. This of course
+kills the jump it just wrote, and my RETI. So it runs into the weeds at high speed.
+What should happen is after loading the boot sector succesfully it will jump to 0000,
+otherwise it will write BOOT NG to the screen and you're in the monitor. The bios
+contains no RETI instructions.
+2. At F824 it copies itself to the same address which is presumably shadow ram. But
+it never switches to it. The ram is physically in the machine.
+
+
 Monitor Commands:
+-----------------
 B = Boot from floppy
 (YES! Most useless monitor ever)
 
@@ -57,7 +75,7 @@ ToDo:
 - Everything
 - Need software
 - If booting straight to CP/M, the load message should be in the middle of the screen.
-- Beeper is a low pulse on bit 0 of port 0b
+
 
 ****************************************************************************/
 
@@ -69,15 +87,22 @@ ToDo:
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
+#include "sound/beep.h"
 
 
 class amust_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BEEP_OFF
+	};
+
 	amust_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_beep(*this, "beeper")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -109,11 +134,25 @@ private:
 	UINT8 m_port08;
 	UINT8 m_port0a;
 	UINT8 m_term_data;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 };
+
+void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_BEEP_OFF:
+		m_beep->set_state(0);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in amust_state::device_timer");
+	}
+}
 
 //WRITE8_MEMBER( amust_state::port00_w )
 //{
@@ -196,6 +235,7 @@ READ8_MEMBER( amust_state::port06_r )
 	return m_port06;
 }
 
+// BIT 5 low while writing to screen
 WRITE8_MEMBER( amust_state::port06_w )
 {
 	m_port06 = data;
@@ -216,14 +256,25 @@ READ8_MEMBER( amust_state::port08_r )
 	return m_port08;
 }
 
+// lower 8 bits of video address
 WRITE8_MEMBER( amust_state::port08_w )
 {
 	m_port08 = data;
 }
 
-// bit 4: H = go to monitor; L = boot from disk
+/*
+d0 - something to do with type of disk
+d1 -
+d2 -
+d3 -
+d4 - H = go to monitor; L = boot from disk
+d5 - status of disk-related; loops till NZ
+d6 -
+d7 -
+*/
 READ8_MEMBER( amust_state::port09_r )
 {
+	printf("%s\n",machine().describe_context());
 	return 0xff;
 }
 
@@ -232,9 +283,22 @@ READ8_MEMBER( amust_state::port0a_r )
 	return m_port0a;
 }
 
+/* Bits 7,6,5,3 something to do
+with selecting which device causes interrupt?
+50, 58 = video sync
+70 disk
+D0 ?
+Bit 4 low = beeper.
+Lower 3 bits = upper part of video address */
 WRITE8_MEMBER( amust_state::port0a_w )
 {
 	m_port0a = data;
+
+	if (!BIT(data, 4))
+	{
+		m_beep->set_state(1);
+		timer_set(attotime::from_msec(150), TIMER_BEEP_OFF);
+	}
 }
 
 static I8255_INTERFACE( ppi2_intf )
@@ -327,8 +391,10 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 	m_p_videoram = memregion("videoram")->base();
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
+	m_beep->set_frequency(800);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.write_byte(8, 0xc9);
+	space.write_byte(8, 0xed);
+	space.write_byte(9, 0x4d);
 	m_port04 = 0;
 	m_port06 = 0;
 	m_port08 = 0;
@@ -362,6 +428,11 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amust)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8, amust_crtc)
@@ -408,4 +479,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", GAME_IS_SKELETON)
+COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", GAME_NOT_WORKING )
