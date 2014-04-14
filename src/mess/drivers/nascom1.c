@@ -258,16 +258,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const ay31015_config nascom1_ay31015_config =
-{
-	( XTAL_16MHz / 16 ) / 256,
-	( XTAL_16MHz / 16 ) / 256,
-	DEVCB_DRIVER_MEMBER(nascom1_state, nascom1_hd6402_si),
-	DEVCB_DRIVER_MEMBER(nascom1_state, nascom1_hd6402_so),
-	DEVCB_NULL
-};
-
-
 static Z80PIO_INTERFACE( nascom1_z80pio_intf )
 {
 	DEVCB_NULL,
@@ -299,7 +289,12 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nascom1)
 	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
 
-	MCFG_AY31015_ADD( "hd6402", nascom1_ay31015_config )
+	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+	MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+	MCFG_AY51013_READ_SI_CB(READ8(nascom1_state, nascom1_hd6402_si))
+	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom1_state, nascom1_hd6402_so))
+	
 
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_16MHz/8, nascom1_z80pio_intf )
 

@@ -96,12 +96,20 @@ const device_type AY31015 = &device_creator<ay31015_device>;
 const device_type AY51013 = &device_creator<ay51013_device>;
 
 ay31015_device::ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-				: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+				m_rx_clock(0),
+				m_tx_clock(0),
+				m_read_si_cb(*this),
+				m_write_so_cb(*this),
+				m_status_changed_cb(*this)
 {
 }
 
 ay31015_device::ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__)
+				: device_t(mconfig, AY31015, "AY-3-1015", tag, owner, clock, "ay31015", __FILE__),
+				m_read_si_cb(*this),
+				m_write_so_cb(*this),
+				m_status_changed_cb(*this)
 {
 }
 
@@ -111,41 +119,14 @@ ay51013_device::ay51013_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ay31015_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ay31015_config *intf = reinterpret_cast<const ay31015_config *>(static_config());
-	if (intf != NULL)
-		*static_cast<ay31015_config *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&read_si_cb, 0, sizeof(read_si_cb));
-		memset(&write_so_cb, 0, sizeof(write_so_cb));
-		memset(&status_changed_cb, 0, sizeof(status_changed_cb));
-		transmitter_clock = 0;
-		receiver_clock = 0;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ay31015_device::device_start()
 {
-	m_read_si.resolve(read_si_cb, *this);
-	m_write_so.resolve(write_so_cb, *this);
-	m_status_changed.resolve(status_changed_cb, *this);
-
-	m_tx_clock = transmitter_clock;
-	m_rx_clock = receiver_clock;
+	m_read_si_cb.resolve();
+	m_write_so_cb.resolve();
+	m_status_changed_cb.resolve();
 
 	m_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::rx_process),this));
 	m_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::tx_process),this));
@@ -191,8 +172,8 @@ void ay31015_device::device_reset()
 
 inline UINT8 ay31015_device::get_si()
 {
-	if (!m_read_si.isnull())
-		m_pins[AY31015_SI] = m_read_si(0) ? 1 : 0;
+	if (!m_read_si_cb.isnull())
+		m_pins[AY31015_SI] = m_read_si_cb(0) ? 1 : 0;
 
 	return m_pins[AY31015_SI];
 }
@@ -202,8 +183,8 @@ inline void ay31015_device::set_so( int data )
 {
 	m_pins[AY31015_SO] = data ? 1 : 0;
 
-	if (!m_write_so.isnull())
-		m_write_so(0, m_pins[AY31015_SO]);
+	if (!m_write_so_cb.isnull())
+		m_write_so_cb((offs_t)0, m_pins[AY31015_SO]);
 }
 
 
@@ -238,9 +219,9 @@ void ay31015_device::update_status_pins()
 	}
 	status_pins_changed += update_status_pin(STATUS_EOC, AY31015_EOC);
 
-	if (status_pins_changed && !m_status_changed.isnull())
+	if (status_pins_changed && !m_status_changed_cb.isnull())
 	{
-		m_status_changed(0, status_pins_changed);
+		m_status_changed_cb((offs_t)0, status_pins_changed);
 	}
 }
 

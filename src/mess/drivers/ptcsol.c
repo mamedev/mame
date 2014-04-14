@@ -547,15 +547,6 @@ static INPUT_PORTS_START( sol20 )
 	PORT_CONFSETTING(    0x02, "6575")
 INPUT_PORTS_END
 
-static const ay31015_config sol20_ay31015_config =
-{
-	4800.0,
-	4800.0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 static const cassette_interface sol20_cassette_interface =
 {
@@ -767,8 +758,12 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 	// devices
 	MCFG_CASSETTE_ADD( "cassette", sol20_cassette_interface )
 	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_interface )
-	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
-	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
+	MCFG_DEVICE_ADD( "uart", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
+	MCFG_DEVICE_ADD( "uart_s", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(sol20_state, kbd_put))
 MACHINE_CONFIG_END

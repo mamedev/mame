@@ -400,15 +400,6 @@ static const UINT32 lx388palette[] =
 	rgb_t(0xff, 0xc4, 0x18)      /* ALPHANUMERIC BRIGHT ORANGE */
 };
 
-static const ay31015_config z80ne_ay31015_config =
-{
-	4800.0,
-	4800.0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const cassette_interface z80ne_cassettea_config =
 {
 	cassette_default_formats,
@@ -464,7 +455,9 @@ static MACHINE_CONFIG_START( z80ne, z80ne_state )
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80ne)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80ne)
 
-	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
+	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
 
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
@@ -508,7 +501,9 @@ static MACHINE_CONFIG_START( z80netb, z80ne_state )
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netb)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netb)
 
-	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
+	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
 
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )
@@ -536,7 +531,9 @@ static MACHINE_CONFIG_START( z80netf, z80ne_state )
 	MCFG_MACHINE_START_OVERRIDE(z80ne_state,z80netf)
 	MCFG_MACHINE_RESET_OVERRIDE(z80ne_state,z80netf)
 
-	MCFG_AY31015_ADD( "ay_3_1015", z80ne_ay31015_config )
+	MCFG_DEVICE_ADD( "ay_3_1015", AY31015, 0 )
+	MCFG_AY31015_TX_CLOCK(4800.0)
+	MCFG_AY31015_RX_CLOCK(4800.0)
 
 	MCFG_CASSETTE_ADD( "cassette", z80ne_cassettea_config )
 	MCFG_CASSETTE_ADD( "cassette2", z80ne_cassetteb_config )

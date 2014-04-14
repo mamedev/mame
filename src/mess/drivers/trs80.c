@@ -554,15 +554,6 @@ static const cassette_interface trs80l2_cassette_interface =
 	NULL
 };
 
-static const ay31015_config trs80_ay31015_config =
-{
-	0.0,
-	0.0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const floppy_interface trs80_floppy_interface =
 {
 	DEVCB_NULL,
@@ -629,7 +620,7 @@ static MACHINE_CONFIG_DERIVED( model1, trs80 )      // model I, level II
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_AY31015_ADD( "tr1602", trs80_ay31015_config )
+	MCFG_DEVICE_ADD( "tr1602", AY31015, 0 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( model3, model1 )
