@@ -1,17 +1,17 @@
 /***************************************************************************
-Generic ASCII Keyboard
+Generic ASCII Serial Keyboard
 
 Use MCFG_SERIAL_KEYBOARD_ADD to attach this as a serial device to a terminal
 or computer.
 
-Use MCFG_ASCII_KEYBOARD_ADD to attach as a generic ascii input device in
-cases where either the driver isn't developed enough yet; or for testing;
-or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 
 Example of usage in a driver.
 
 In MACHINE_CONFIG
-    MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, 0)
+or
+	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, initial_baud_rate)
+
 
 In the code:
 
@@ -24,6 +24,15 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
     DEVCB_DRIVER_MEMBER(xxx_state, kbd_put)
 };
+
+If a baud_rate is specified, it will be the initial baud rate, with
+8 bits, no parity, 1 stop bit. However you can override this with the
+config switches. (Note that the config switch will specify 9600 initially,
+even though it isn't).
+
+If a baud_rate is not specified, the rate will be solely determined
+by the config switches. (Default 9600 baud)
+
 
 ***************************************************************************/
 
@@ -96,16 +105,20 @@ static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800
 
 void serial_keyboard_device::device_start()
 {
-	int baud = clock();
-	if(!baud) baud = 9600;
+	m_baud = clock();
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
 	m_timer = timer_alloc();
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_tra_rate(baud);
+
+	if (m_baud)
+	{
+		set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+		set_tra_rate(m_baud);
+	}
 }
 
 INPUT_CHANGED_MEMBER(serial_keyboard_device::update_frame)
 {
+	m_baud = 0;
 	reset();
 }
 
@@ -118,24 +131,27 @@ void serial_keyboard_device::device_reset()
 	else
 		m_out_tx_func(m_rbit);
 
-	UINT8 val = m_io_term_frame->read();
-	set_tra_rate(rates[val & 0x0f]);
-
-	switch(val & 0x30)
+	if (m_baud == 0)
 	{
-	case 0x10:
-		set_data_frame(1, 7, PARITY_EVEN, STOP_BITS_1);
-		break;
-	case 0x00:
-	default:
-		set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-		break;
-	case 0x20:
-		set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-		break;
-	case 0x30:
-		set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
-		break;
+		UINT8 val = m_io_term_frame->read();
+		set_tra_rate(rates[val & 0x0f]);
+
+		switch(val & 0x30)
+		{
+		case 0x10:
+			set_data_frame(1, 7, PARITY_EVEN, STOP_BITS_1);
+			break;
+		case 0x00:
+		default:
+			set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+			break;
+		case 0x20:
+			set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
+			break;
+		case 0x30:
+			set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
+			break;
+		}
 	}
 }
 
