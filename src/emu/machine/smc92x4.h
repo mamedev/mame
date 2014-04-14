@@ -66,16 +66,14 @@ extern const device_type SMC92X4;
 #define MCFG_SMC92X4_DMA_OUT_CALLBACK(_write) \
 	devcb = &smc92x4_device::set_dma_wr_callback(*device, DEVCB2_##_write);
 
-struct smc92x4_interface
-{
-	// Disk format support. This flag allows to choose between the full
-	// FM/MFM format and an abbreviated track layout. The difference results
-	// from legal variations of the layout. This is not part of
-	// the smc92x4 specification, but it allows to keep the image format
-	// simple without too much case checking. Should be removed as soon as
-	// the respective disk formats support the full format.
-	int full_track_layout;
-};
+// Disk format support. This flag allows to choose between the full
+// FM/MFM format and an abbreviated track layout. The difference results
+// from legal variations of the layout. This is not part of
+// the smc92x4 specification, but it allows to keep the image format
+// simple without too much case checking. Should be removed as soon as
+// the respective disk formats support the full format.
+#define MCFG_SMC92X4_FULL_TRACK_LAYOUT(_lay) \
+	smc92x4_device::set_full_track_layout(*device, _lay);
 
 
 class smc92x4_device : public device_t
@@ -89,6 +87,8 @@ public:
 	template<class _Object> static devcb2_base &set_auxbus_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_auxbus.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dma_rd_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_in_dma.set_callback(object); }
 	template<class _Object> static devcb2_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<smc92x4_device &>(device).m_out_dma.set_callback(object); }
+
+	static void set_full_track_layout(device_t &device, bool lay) { downcast<smc92x4_device &>(device).m_full_track_layout = lay; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -225,9 +225,5 @@ private:
 	legacy_floppy_image_device    *m_drive;
 	mfm_harddisk_device           *m_harddisk;
 };
-
-#define MCFG_SMC92X4_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, SMC92X4, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif

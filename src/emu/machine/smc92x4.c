@@ -194,7 +194,8 @@ smc92x4_device::smc92x4_device(const machine_config &mconfig, const char *tag, d
 	m_out_auxbus(*this),
 	m_in_auxbus(*this),
 	m_in_dma(*this),
-	m_out_dma(*this)
+	m_out_dma(*this),
+	m_full_track_layout(FALSE)
 {
 }
 
@@ -1951,16 +1952,12 @@ WRITE8_MEMBER( smc92x4_device::write )
 
 void smc92x4_device::device_start()
 {
-	const smc92x4_interface *intf = reinterpret_cast<const smc92x4_interface *>(static_config());
-
 	m_out_intrq.resolve_safe();
 	m_out_dip.resolve_safe();
 	m_out_auxbus.resolve_safe();
 	m_in_auxbus.resolve_safe(0);
 	m_out_dma.resolve_safe();
 	m_in_dma.resolve_safe(0);
-
-	m_full_track_layout = intf->full_track_layout;
 
 	// allocate timers
 	// m_timer_data = timer_alloc(DATA_TIMER);
