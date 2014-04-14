@@ -98,6 +98,9 @@ void adc083x_device::device_start()
 {
 	clear_sars();
 
+	/* resolve callbacks */
+	m_input_callback.bind_relative_to(*owner());
+
 	/* register for state saving */
 	save_item( NAME(m_cs) );
 	save_item( NAME(m_clk) );
@@ -178,8 +181,8 @@ UINT8 adc083x_device::conversion()
 	int negative_channel = ADC083X_AGND;
 	double positive = 0;
 	double negative = 0;
-	double gnd = m_input_callback( this, ADC083X_AGND );
-	double vref = m_input_callback( this, ADC083X_VREF );
+	double gnd = m_input_callback(ADC083X_AGND);
+	double vref = m_input_callback(ADC083X_VREF);
 
 	if( type() == ADC0831 )
 	{
@@ -225,12 +228,12 @@ UINT8 adc083x_device::conversion()
 
 	if( positive_channel != ADC083X_AGND )
 	{
-		positive = m_input_callback( this, positive_channel ) - gnd;
+		positive = m_input_callback(positive_channel) - gnd;
 	}
 
 	if( negative_channel != ADC083X_AGND )
 	{
-		negative = m_input_callback( this, negative_channel ) - gnd;
+		negative = m_input_callback(negative_channel) - gnd;
 	}
 
 	result = (int) ( ( ( positive - negative ) * 255 ) / vref );

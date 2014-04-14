@@ -15,10 +15,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef double (*adc083x_input_callback)(device_t *device, UINT8 input);
+typedef device_delegate<double (UINT8 input)> adc083x_input_delegate;
+#define ADC083X_INPUT_CB(name)  double name(UINT8 input)
 
-#define MCFG_ADC083X_INPUT_CALLBACK(input_callback) \
-	adc083x_device::set_input_callback(*device, input_callback);
+#define MCFG_ADC083X_INPUT_CB(_class, _method) \
+	adc083x_device::set_input_callback(*device, adc083x_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 /***************************************************************************
     CONSTANTS
@@ -46,7 +47,7 @@ public:
 	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// static configuration helpers
-	static void set_input_callback(device_t &device, adc083x_input_callback input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
+	static void set_input_callback(device_t &device, adc083x_input_delegate input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
 
 	DECLARE_WRITE_LINE_MEMBER( cs_write );
 	DECLARE_WRITE_LINE_MEMBER( clk_write );
@@ -81,7 +82,7 @@ private:
 	INT32 m_bit;
 	INT32 m_output;
 
-	adc083x_input_callback m_input_callback;
+	adc083x_input_delegate m_input_callback;
 };
 
 class adc0831_device : public adc083x_device

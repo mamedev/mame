@@ -80,6 +80,8 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(read_line_adc083x_sars);
 	virtual DECLARE_WRITE_LINE_MEMBER(write_line_d5);
 
+	ADC083X_INPUT_CB(punchmania_inputs_callback);
+
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 

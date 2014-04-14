@@ -191,6 +191,16 @@ public:
 		m_k056800(*this, "k056800"),
 		m_k056832(*this, "k056832"),
 		m_workram(*this, "workram"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_in3(*this, "IN3"),
+		m_in4(*this, "IN4"),
+		m_out4(*this, "OUT4"),
+		m_eepromout(*this, "EEPROMOUT"),
+		m_analog1(*this, "ANALOG1"),
+		m_analog2(*this, "ANALOG2"),
+		m_analog3(*this, "ANALOG3"),
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -200,6 +210,7 @@ public:
 	required_device<k056800_device> m_k056800;
 	optional_device<k056832_device> m_k056832;
 	optional_shared_ptr<UINT32> m_workram;
+	required_ioport m_in0, m_in1, m_in2, m_in3, m_in4, m_out4, m_eepromout, m_analog1, m_analog2, m_analog3;
 	required_device<palette_device> m_palette;
 
 	UINT32 *m_sharc_dataram;
@@ -229,6 +240,7 @@ public:
 	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	WRITE_LINE_MEMBER(k054539_irq_gen);
+	ADC083X_INPUT_CB(adc0838_callback);
 
 protected:
 	virtual void machine_start();
@@ -316,18 +328,24 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 READ8_MEMBER(zr107_state::sysreg_r)
 {
 	UINT32 r = 0;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4" };
 
 	switch (offset)
 	{
 		case 0: /* I/O port 0 */
-		case 1: /* I/O port 1 */
-		case 2: /* I/O port 2 */
-		case 3: /* System Port 0 */
-		case 4: /* System Port 1 */
-			r = ioport(portnames[offset])->read();
+			r = m_in0->read();
 			break;
-
+		case 1: /* I/O port 1 */
+			r = m_in1->read();
+			break;
+		case 2: /* I/O port 2 */
+			r = m_in2->read();
+			break;
+		case 3: /* System Port 0 */
+			r = m_in3->read();
+			break;
+		case 4: /* System Port 1 */
+			r = m_in4->read();
+			break;
 		case 5: /* Parallel data port */
 			break;
 	}
@@ -361,7 +379,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			    0x02 = EEPCLK
 			    0x01 = EEPDI
 			*/
-			ioport("EEPROMOUT")->write(data & 0x07, 0xff);
+			m_eepromout->write(data & 0x07, 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
@@ -382,7 +400,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			if (data & 0x40)    /* CG Board 0 IRQ Ack */
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			ioport("OUT4")->write(data, 0xff);
+			m_out4->write(data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -675,16 +693,16 @@ INPUT_PORTS_END
 
 /* ADC0838 Interface */
 
-static double adc0838_callback( device_t *device, UINT8 input )
+ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 {
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * device->machine().root_device().ioport("ANALOG1")->read()) / 255.0;
+		return (double)(5 * m_analog1->read()) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * device->machine().root_device().ioport("ANALOG2")->read()) / 255.0;
+		return (double)(5 * m_analog2->read()) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * device->machine().root_device().ioport("ANALOG3")->read()) / 255.0;
+		return (double)(5 * m_analog3->read()) / 255.0;
 	case ADC083X_CH3:
 		return 0;
 	case ADC083X_COM:
@@ -791,7 +809,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CALLBACK(adc0838_callback)
+	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
 MACHINE_CONFIG_END
 
 
@@ -855,7 +873,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MCFG_DEVICE_ADD("adc0838", ADC0838, 0)
-	MCFG_ADC083X_INPUT_CALLBACK(adc0838_callback)
+	MCFG_ADC083X_INPUT_CB(zr107_state, adc0838_callback)
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
